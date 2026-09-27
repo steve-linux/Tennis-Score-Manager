@@ -349,7 +349,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
+    /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
+    val customVoiceCount = MutableStateFlow(0)
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -370,6 +372,8 @@ class MatchController(
     init {
         announcer.lang = options.value.lang
         announcer.enabled = options.value.audio
+        announcer.useGeneratedFiles = options.value.voiceFiles
+        announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
         scope.launch(io) { voice.writeReadme() }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
@@ -400,6 +404,8 @@ class MatchController(
         storage.options = v
         announcer.lang = v.lang
         announcer.enabled = v.audio
+        announcer.useGeneratedFiles = v.voiceFiles
+        if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
         if (old.lang != v.lang) refreshVoiceCount()
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
@@ -738,7 +744,10 @@ class MatchController(
 
     fun resumeSaved(rec: MatchRecord) {
         val cur = options.value
-        val o = rec.options.copy(mode = cur.mode, lang = cur.lang, audio = cur.audio)
+        val o = rec.options.copy(
+            mode = cur.mode, lang = cur.lang, audio = cur.audio,
+            ttsEngine = cur.ttsEngine, ttsVoice = cur.ttsVoice, voiceFiles = cur.voiceFiles,
+        )
         setup.value = rec.setup
         options.value = o
         storage.options = o
@@ -866,7 +875,14 @@ class MatchController(
 
     fun refreshVoiceCount() {
         val l = options.value.lang
-        scope.launch { voiceCount.value = withContext(io) { voice.refresh(l); voice.count(l) } }
+        scope.launch {
+            val (gen, rec) = withContext(io) {
+                voice.refresh(l)
+                voice.generatedCount(l) to voice.customCount(l)
+            }
+            voiceCount.value = gen
+            customVoiceCount.value = rec
+        }
     }
 
     fun generateVoice() {
@@ -903,12 +919,16 @@ class MatchController(
         announcer.announce(
             force = true,
             segs = listOf(
+                Seg.Clip("first_set"), Seg.Pause(700),
+                Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
                 Seg.Clip("score_1_0"), Seg.Pause(500),
                 Seg.Clip("deuce"), Seg.Pause(500),
-                Seg.Clip("advantage"), Seg.Say(n.side(Side.P1)), Seg.Pause(500),
+                Seg.Clip("advantage"), Seg.Say(n.side(Side.P2)), Seg.Pause(500),
                 Seg.Clip("game"), Seg.Say(n.side(Side.P1)), Seg.Pause(300),
                 Seg.Say(n.side(Side.P1)), Seg.Clip("leads"), Seg.Clip("games_1_0"), Seg.Pause(500),
-                Seg.Clip("change_ends"),
+                Seg.Clip("change_ends"), Seg.Pause(700),
+                Seg.Clip("game"), Seg.Say(n.side(Side.P2)), Seg.Pause(300),
+                Seg.Clip("games_all_6"), Seg.Clip("tiebreak"),
             ),
         )
     }
@@ -1621,6 +1641,11 @@ data class MatchOptions(
     val p1Left: Boolean = true,
     val firstServerP1: Int = 0,
     val firstServerP2: Int = 0,
+    /** Motore di sintesi vocale (pacchetto) e voce scelti; null = automatico. */
+    val ttsEngine: String? = null,
+    val ttsVoice: String? = null,
+    /** true = legge i file generati invece della sintesi continua. */
+    val voiceFiles: Boolean = false,
 )
 
 @Serializable
@@ -2686,6 +2711,16 @@ interface Strings {
     val generating: (Int, Int) -> String
     val importVoiceZip: String
     val deleteCustomVoice: String
+    val ttsEngine: String
+    val engineDefault: String
+    val ttsVoice: String
+    val voiceAuto: String
+    val voiceName: (String) -> String
+    val online: String
+    val offline: String
+    val voiceFilesMode: String
+    val voiceFilesModeHint: String
+    val customRecordings: (Int, Int) -> String
     val testVoice: String
     val ttsMissing: String
     val installVoice: String
@@ -2862,12 +2897,22 @@ object ItStrings : Strings {
     override val english = "English"
     override val audioSection = "Audio e voce"
     override val voiceCalls = "Chiamate vocali dell'arbitro"
-    override val voiceFiles: (Int, Int) -> String = { n, tot -> "File vocali offline: $n/$tot" }
-    override val voiceFilesHint = "Le chiamate fisse usano file audio sul telefono (funzionano senza internet); i nomi sono letti dalla sintesi vocale."
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "File generati: $n/$tot" }
+    override val voiceFilesHint = "Tutto funziona senza internet con le voci installate sul telefono. Le registrazioni personalizzate (ZIP) hanno sempre la precedenza sulla sintesi vocale."
     override val generateVoice = "Genera file"
     override val generating: (Int, Int) -> String = { n, tot -> "Generazione $n/$tot…" }
     override val importVoiceZip = "Importa ZIP"
     override val deleteCustomVoice = "Rimuovi registrazioni"
+    override val ttsEngine = "Motore sintesi vocale"
+    override val engineDefault = "Predefinito del telefono"
+    override val ttsVoice = "Voce"
+    override val voiceAuto = "Automatica (migliore offline)"
+    override val voiceName: (String) -> String = { "Voce $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Usa file audio pre-generati"
+    override val voiceFilesModeHint = "Di norma ogni chiamata è letta in un'unica frase (più naturale). Attivalo per usare i file generati, ad esempio per portarti offline una voce online."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Registrazioni personalizzate: $n/$tot" }
     override val testVoice = "Prova voce"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
     override val installVoice = "Installa voce"
@@ -3034,12 +3079,22 @@ object EnStrings : Strings {
     override val english = "English"
     override val audioSection = "Audio and voice"
     override val voiceCalls = "Umpire voice calls"
-    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Offline voice files: $n/$tot" }
-    override val voiceFilesHint = "Fixed calls use audio files stored on the phone (no internet needed); names are read by text-to-speech."
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Generated files: $n/$tot" }
+    override val voiceFilesHint = "Everything works offline with the voices installed on the phone. Custom recordings (ZIP) always take precedence over text-to-speech."
     override val generateVoice = "Generate files"
     override val generating: (Int, Int) -> String = { n, tot -> "Generating $n/$tot…" }
     override val importVoiceZip = "Import ZIP"
     override val deleteCustomVoice = "Remove recordings"
+    override val ttsEngine = "Speech engine"
+    override val engineDefault = "Phone default"
+    override val ttsVoice = "Voice"
+    override val voiceAuto = "Automatic (best offline)"
+    override val voiceName: (String) -> String = { "Voice $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Use pre-generated audio files"
+    override val voiceFilesModeHint = "By default each call is read as one sentence (more natural). Turn this on to play the generated files, e.g. to take an online voice offline."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Custom recordings: $n/$tot" }
     override val testVoice = "Test voice"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
     override val installVoice = "Install voice"
@@ -4044,16 +4099,36 @@ private fun BandPicker(c: MatchController, side: Side, playerName: String, curre
 private fun VoiceSection(c: MatchController, o: MatchOptions) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val count by c.voiceCount.collectAsState()
+    val generated by c.voiceCount.collectAsState()
+    val custom by c.customVoiceCount.collectAsState()
     val progress by c.voiceProgress.collectAsState()
     val tts by c.announcer.status.collectAsState()
+    val engines by c.announcer.engines.collectAsState()
+    val voices by c.announcer.voices.collectAsState()
+    val currentVoice by c.announcer.currentVoice.collectAsState()
+    val currentEngine by c.announcer.currentEngineFlow.collectAsState()
     val zipLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { c.importVoiceZip(it) } }
     val total = Phrases.keys.size
 
     SectionCard(s.audioSection, Icons.AutoMirrored.Filled.VolumeUp) {
         SwitchRow(Icons.Filled.RecordVoiceOver, s.voiceCalls, null, o.audio) { v -> c.updateOptions { it.copy(audio = v) } }
-        Text(s.voiceFiles(count, total), color = if (count == total) TsmColors.Ok else TsmColors.Orange, fontWeight = FontWeight.Bold)
-        Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+
+        // Motore: Samsung, Google, ... (i nomi delle voci cambiano col motore, quindi si riparte da "automatica")
+        val engineLabel = engines.firstOrNull { it.pkg == (o.ttsEngine ?: currentEngine) }?.label
+        Picker(
+            label = s.ttsEngine,
+            value = if (o.ttsEngine == null) "${s.engineDefault}${engineLabel?.let { " ($it)" } ?: ""}" else engineLabel ?: o.ttsEngine,
+            options = listOf<Pair<String?, String>>(null to s.engineDefault) + engines.map { it.pkg to it.label },
+        ) { pkg -> c.updateOptions { it.copy(ttsEngine = pkg, ttsVoice = null) } }
+
+        Picker(
+            label = s.ttsVoice,
+            value = if (o.ttsVoice == null) "${s.voiceAuto}${currentVoice?.let { " · ${voiceLabel(it, s)}" } ?: ""}"
+            else voiceLabel(o.ttsVoice, s),
+            options = listOf<Pair<String?, String>>(null to s.voiceAuto) +
+                voices.map { it.name to "${voiceLabel(it.name, s)} · ${if (it.online) s.online else s.offline}" },
+        ) { name -> c.updateOptions { it.copy(ttsVoice = name) } }
+
         if (tts == TtsStatus.MISSING_LANGUAGE || tts == TtsStatus.ERROR) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(s.ttsMissing, color = TsmColors.Orange, modifier = Modifier.weight(1f), fontSize = 13.sp)
@@ -4062,21 +4137,57 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
                 }) { Text(s.installVoice) }
             }
         }
-        progress?.let { (i, n) ->
-            Text(s.generating(i, n), color = TsmColors.TextMain)
-            LinearProgressIndicator(progress = { if (n == 0) 0f else i / n.toFloat() }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
-        }
+        SmallAction(s.testVoice, Icons.Filled.PlayCircle, Modifier.fillMaxWidth()) { c.testVoice() }
+        Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+
+        // Registrazioni personalizzate (voce vera): sempre prioritarie
+        Text(s.customRecordings(custom, total), color = if (custom > 0) TsmColors.Ok else TsmColors.TextDim, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.weight(1f), enabled = progress == null) { c.generateVoice() }
             SmallAction(s.importVoiceZip, Icons.Filled.FolderZip, Modifier.weight(1f)) {
                 zipLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
             }
+            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = custom > 0) { c.deleteCustomVoice() }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SmallAction(s.testVoice, Icons.Filled.PlayCircle, Modifier.weight(1f)) { c.testVoice() }
-            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f)) { c.deleteCustomVoice() }
+
+        // File pre-generati (facoltativi)
+        SwitchRow(Icons.Filled.FolderZip, s.voiceFilesMode, s.voiceFilesModeHint, o.voiceFiles) { v -> c.updateOptions { it.copy(voiceFiles = v) } }
+        if (o.voiceFiles) {
+            Text(s.voiceFiles(generated, total), color = if (generated == total) TsmColors.Ok else TsmColors.Orange, fontWeight = FontWeight.Bold)
+            progress?.let { (i, n) ->
+                Text(s.generating(i, n), color = TsmColors.TextMain)
+                LinearProgressIndicator(progress = { if (n == 0) 0f else i / n.toFloat() }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
+            }
+            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.fillMaxWidth(), enabled = progress == null) { c.generateVoice() }
         }
         Text(c.voice.baseDir.absolutePath, color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+}
+
+/** "it-it-x-itb-local" -> "Voce ITB"; gli altri nomi restano come sono. */
+private fun voiceLabel(name: String, s: Strings): String =
+    if ("-x-" in name) s.voiceName(name.substringAfter("-x-").substringBefore('-').uppercase()) else name
+
+/** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
+@Composable
+private fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth()) {
+        Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
+        Spacer(Modifier.height(4.dp))
+        Box {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+                Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+            }
+            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                for ((key, text) in options) {
+                    DropdownMenuItem(text = { Text(text) }, onClick = {
+                        open = false
+                        onSelect(key)
+                    })
+                }
+            }
+        }
     }
 }
 
@@ -4859,6 +4970,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import android.util.Log
 import com.tennis.scoremanager.model.Lang
 import kotlinx.coroutines.CancellationException
@@ -4881,8 +4993,16 @@ import kotlin.coroutines.resume
 
 enum class TtsStatus { INIT, READY, MISSING_LANGUAGE, ERROR }
 
+/** Motore di sintesi vocale installato sul telefono (Samsung, Google, ...). */
+data class EngineOption(val pkg: String, val label: String)
+
+/** Voce disponibile per la lingua corrente. */
+data class VoiceOption(val name: String, val online: Boolean, val quality: Int)
+
 /**
- * Legge le chiamate: file audio locali quando esistono, altrimenti TTS; i nomi sempre col TTS.
+ * Legge le chiamate. Di norma ogni chiamata è detta dalla sintesi vocale in un'unica frase (suona naturale e
+ * funziona offline con le voci installate); le registrazioni personalizzate, se ci sono, hanno la precedenza.
+ * Con [useGeneratedFiles] si usano invece i file generati una volta dal TTS (utile con una voce online).
  * L'audio esce dal canale "media", quindi va anche su una cassa Bluetooth collegata al telefono.
  */
 class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.OnInitListener {
@@ -4894,6 +5014,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
         .build()
 
+    private var enginePkg: String? = null
+    private var preferredVoice: String? = null
     private var tts: TextToSpeech? = TextToSpeech(app, this)
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
     private var job: Job? = null
@@ -4901,12 +5023,22 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     private val _status = MutableStateFlow(TtsStatus.INIT)
     val status: StateFlow<TtsStatus> = _status
+    private val _engines = MutableStateFlow<List<EngineOption>>(emptyList())
+    val engines: StateFlow<List<EngineOption>> = _engines
+    private val _voices = MutableStateFlow<List<VoiceOption>>(emptyList())
+    val voices: StateFlow<List<VoiceOption>> = _voices
+    private val _currentVoice = MutableStateFlow<String?>(null)
+    val currentVoice: StateFlow<String?> = _currentVoice
+    private val _currentEngine = MutableStateFlow<String?>(null)
+    val currentEngineFlow: StateFlow<String?> = _currentEngine
 
     var enabled: Boolean = true
         set(value) {
             field = value
             if (!value) stop()
         }
+
+    var useGeneratedFiles: Boolean = false
 
     var lang: Lang = Lang.IT
         set(value) {
@@ -4916,6 +5048,24 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             }
         }
 
+    /** Pacchetto del motore effettivamente in uso (serve alle correzioni di pronuncia). */
+    private val currentEngine: String?
+        get() = enginePkg ?: runCatching { tts?.defaultEngine }.getOrNull()
+
+    /** Sceglie motore (null = predefinito del telefono) e voce (null = la migliore offline). */
+    fun configure(engine: String?, voiceName: String?) {
+        preferredVoice = voiceName
+        if (engine != enginePkg) {
+            enginePkg = engine
+            stop()
+            runCatching { tts?.shutdown() }
+            _status.value = TtsStatus.INIT
+            tts = TextToSpeech(app, this, engine)
+        } else {
+            applyLanguage(lang)
+        }
+    }
+
     override fun onInit(status: Int) {
         val t = tts
         if (status != TextToSpeech.SUCCESS || t == null) {
@@ -4923,7 +5073,6 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             return
         }
         t.setAudioAttributes(attrs)
-        t.setSpeechRate(0.95f)
         t.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
             override fun onDone(utteranceId: String?) {
@@ -4943,27 +5092,34 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                 utteranceId?.let { pending.remove(it)?.complete(false) }
             }
         })
+        _engines.value = runCatching { t.engines.map { EngineOption(it.name, it.label) } }.getOrDefault(emptyList())
+        _currentEngine.value = currentEngine
         applyLanguage(lang)
     }
 
     private fun locale(l: Lang): Locale = if (l == Lang.IT) Locale.ITALY else Locale.UK
 
-    /** Imposta la lingua preferendo una voce installata sul telefono (niente rete). */
+    /** Imposta la lingua e la voce: quella scelta se esiste, altrimenti la migliore installata sul telefono. */
     private fun applyLanguage(l: Lang) {
         val t = tts ?: return
         if (_status.value == TtsStatus.ERROR) return
         val loc = locale(l)
         val res = runCatching { t.setLanguage(loc) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
         if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+            _voices.value = emptyList()
             _status.value = TtsStatus.MISSING_LANGUAGE
             return
         }
-        runCatching {
-            t.voices
-                ?.filter { it.locale.language == loc.language && !it.isNetworkConnectionRequired && "notInstalled" !in it.features }
-                ?.maxWithOrNull(compareBy({ it.locale.country == loc.country }, { it.quality }))
-                ?.let { t.voice = it }
-        }
+        val all: List<Voice> = runCatching { t.voices?.toList() }.getOrNull().orEmpty()
+            .filter { it.locale.language == loc.language && "notInstalled" !in it.features }
+        _voices.value = all
+            .map { VoiceOption(it.name, it.isNetworkConnectionRequired, it.quality) }
+            .sortedWith(compareBy({ it.online }, { it.name }))
+        val chosen = all.firstOrNull { it.name == preferredVoice }
+            ?: all.filter { !it.isNetworkConnectionRequired }
+                .maxWithOrNull(compareBy({ it.locale.country == loc.country }, { it.quality }))
+        chosen?.let { runCatching { t.voice = it } }
+        _currentVoice.value = runCatching { t.voice?.name }.getOrNull()
         _status.value = TtsStatus.READY
     }
 
@@ -4976,6 +5132,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             override val tag: String? get() = null
         }
     }
+
+    private fun fileFor(key: String, l: Lang): File? =
+        voice.customFor(key, l) ?: if (useGeneratedFiles) voice.generatedFor(key, l) else null
 
     /** Unisce i pezzi consecutivi senza file in un'unica frase TTS: suona molto più naturale. */
     private fun plan(segs: List<Seg>, l: Lang): List<Part> {
@@ -4991,13 +5150,12 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             when (s) {
                 is Seg.Pause -> { flush(); parts += Part.Silence(s.ms) }
                 is Seg.Clip -> {
-                    val f = voice.fileFor(s.key, l)
+                    val f = fileFor(s.key, l)
                     if (f != null) {
                         flush()
                         parts += Part.Audio(f, s.tag)
                     } else {
-                        if (s.tag != null) flush()
-                        if (s.tag != null) tag = s.tag
+                        if (s.tag != null) { flush(); tag = s.tag }
                         text.append(Phrases.text(s.key, l)).append(' ')
                     }
                 }
@@ -5040,7 +5198,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     when (p) {
                         is Part.Silence -> delay(p.ms)
                         is Part.Audio -> playFile(p.file)
-                        is Part.Speech -> speak(p.text)
+                        is Part.Speech -> speak(Pronunciation.fix(p.text, l, currentEngine))
                     }
                 }
             } finally {
@@ -5099,7 +5257,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     }
 
     /**
-     * Genera i file vocali di [l] con il TTS del telefono (una volta sola, poi funzionano offline).
+     * Genera i file vocali di [l] con la voce scelta (anche una voce online: dopo funzionano senza rete).
      * Ritorna quanti file sono stati creati.
      */
     suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): Int {
@@ -5112,15 +5270,17 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             applyLanguage(lang)
             return 0
         }
+        voice.deleteGenerated(l)
         val dir = voice.ttsDir(l)
         val keys = Phrases.keys
+        val engine = currentEngine
         var ok = 0
         for ((i, key) in keys.withIndex()) {
             val f = File(dir, "$key.wav")
             val id = "gen_${key}_${UUID.randomUUID()}"
             val done = CompletableDeferred<Boolean>()
             pending[id] = done
-            val r = t.synthesizeToFile(Phrases.text(key, l), Bundle(), f, id)
+            val r = t.synthesizeToFile(Pronunciation.fix(Phrases.text(key, l), l, engine), Bundle(), f, id)
             val good = r == TextToSpeech.SUCCESS && withTimeoutOrNull(20_000) { done.await() } == true
             pending.remove(id)
             if (good && f.length() > 64) ok++ else f.delete()
@@ -5400,6 +5560,35 @@ class CallBuilder(private val lang: Lang) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/Pronunciation.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/voice/Pronunciation.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.voice
+
+import com.tennis.scoremanager.model.Lang
+
+/**
+ * Correzioni di pronuncia per la sintesi vocale, verificate trascrivendo l'audio dei motori reali:
+ * - Samsung legge "primo set" come "primo settembre": "sèt" (con l'accento) non viene espanso da nessun motore;
+ * - "tie-break" diventa "die breaka" (Samsung) o "time break" (Google): "taibrèk" è letto giusto da entrambi;
+ * - Samsung pronuncia male "gioco" isolato (sembra "Giacomo"); dentro una frase va bene, da solo si usa "giuoco".
+ * Il testo mostrato a schermo e nel file LEGGIMI resta quello normale.
+ */
+object Pronunciation {
+    const val SAMSUNG = "com.samsung.SMT"
+
+    private val wordSet = Regex("\\bset\\b", RegexOption.IGNORE_CASE)
+    private val tieBreak = Regex("(?<!super )tie-break", RegexOption.IGNORE_CASE)
+
+    fun fix(text: String, lang: Lang, engine: String?): String {
+        if (lang != Lang.IT) return text
+        var t = tieBreak.replace(text, "taibrèk")
+        t = wordSet.replace(t, "sèt")
+        if (engine == SAMSUNG && t.trim().trimEnd('.', '!', ',').equals("gioco", ignoreCase = true)) t = "giuoco"
+        return t
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/VoicePack.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/voice/VoicePack.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.voice
@@ -5421,7 +5610,8 @@ import java.util.zip.ZipInputStream
 class VoicePack(private val context: Context) {
 
     private val exts = listOf("wav", "mp3", "ogg", "m4a", "aac", "flac")
-    private val cache = mutableMapOf<Lang, Map<String, File>>()
+    private val custom = mutableMapOf<Lang, Map<String, File>>()
+    private val generated = mutableMapOf<Lang, Map<String, File>>()
 
     val baseDir: File
         get() = File(context.getExternalFilesDir(null) ?: context.filesDir, "voice")
@@ -5429,24 +5619,28 @@ class VoicePack(private val context: Context) {
     fun dir(lang: Lang): File = File(baseDir, lang.name.lowercase()).apply { mkdirs() }
     fun ttsDir(lang: Lang): File = File(dir(lang), "tts").apply { mkdirs() }
 
+    /** Registrazione personalizzata (voce vera) della frase, se c'è: ha sempre la precedenza. */
     @Synchronized
-    fun fileFor(key: String, lang: Lang): File? = cache.getOrPut(lang) { scan(lang) }[key]
+    fun customFor(key: String, lang: Lang): File? = custom.getOrPut(lang) { scan(dir(lang)) }[key]
+
+    /** File generato dal TTS del telefono (usato solo con l'opzione "File audio offline"). */
+    @Synchronized
+    fun generatedFor(key: String, lang: Lang): File? = generated.getOrPut(lang) { scan(ttsDir(lang)) }[key]
 
     @Synchronized
     fun refresh(lang: Lang) {
-        cache[lang] = scan(lang)
+        custom[lang] = scan(dir(lang))
+        generated[lang] = scan(ttsDir(lang))
     }
 
-    fun count(lang: Lang): Int = Phrases.keys.count { fileFor(it, lang) != null }
-    fun customCount(lang: Lang): Int = Phrases.keys.count { k -> exts.any { File(dir(lang), "$k.$it").isFile } }
+    fun generatedCount(lang: Lang): Int = Phrases.keys.count { generatedFor(it, lang) != null }
+    fun customCount(lang: Lang): Int = Phrases.keys.count { customFor(it, lang) != null }
 
-    private fun scan(lang: Lang): Map<String, File> {
+    private fun scan(folder: File): Map<String, File> {
         val out = HashMap<String, File>()
-        for (folder in listOf(ttsDir(lang), dir(lang))) { // le registrazioni personalizzate sovrascrivono il TTS
-            folder.listFiles()?.forEach { f ->
-                if (f.isFile && f.extension.lowercase() in exts && f.length() > 64 && f.nameWithoutExtension in Phrases.keys) {
-                    out[f.nameWithoutExtension] = f
-                }
+        folder.listFiles()?.forEach { f ->
+            if (f.isFile && f.extension.lowercase() in exts && f.length() > 64 && f.nameWithoutExtension in Phrases.keys) {
+                out[f.nameWithoutExtension] = f
             }
         }
         return out
@@ -6140,6 +6334,40 @@ class CallBuilderTest {
         assertEquals("tre giochi a due", Phrases.text("games_3_2", Lang.IT))
         assertEquals("one game to love", Phrases.text("games_1_0", Lang.EN))
         assertEquals("trenta quindici", Phrases.text("score_2_1", Lang.IT))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/PronunciationTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/PronunciationTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.voice
+
+import com.tennis.scoremanager.model.Lang
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class PronunciationTest {
+
+    @Test
+    fun italianFixes() {
+        assertEquals("primo sèt", Pronunciation.fix("primo set", Lang.IT, null))
+        assertEquals("gioco, sèt, partita Rossi", Pronunciation.fix("gioco, set, partita Rossi", Lang.IT, null))
+        assertEquals("gioco Rossi sei giochi pari taibrèk", Pronunciation.fix("gioco Rossi sei giochi pari tie-break", Lang.IT, null))
+        assertEquals("un sèt pari super tie-break", Pronunciation.fix("un set pari super tie-break", Lang.IT, null))
+        // "Settimo" e i nomi che contengono "set" non vanno toccati
+        assertEquals("Setti conduce", Pronunciation.fix("Setti conduce", Lang.IT, null))
+    }
+
+    @Test
+    fun samsungIsolatedGioco() {
+        assertEquals("giuoco", Pronunciation.fix("gioco", Lang.IT, Pronunciation.SAMSUNG))
+        assertEquals("gioco", Pronunciation.fix("gioco", Lang.IT, "com.google.android.tts"))
+        assertEquals("gioco Rossi", Pronunciation.fix("gioco Rossi", Lang.IT, Pronunciation.SAMSUNG))
+    }
+
+    @Test
+    fun englishUntouched() {
+        assertEquals("first set Rossi to serve", Pronunciation.fix("first set Rossi to serve", Lang.EN, Pronunciation.SAMSUNG))
     }
 }
 TSM_EOF
@@ -7815,6 +8043,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 46 file del progetto in $DEST"
+echo ">> Fatto: 48 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."

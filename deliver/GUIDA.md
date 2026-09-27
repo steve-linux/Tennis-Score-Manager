@@ -35,7 +35,7 @@ bash ~/Scaricati/installa_tsm.sh
 5. Se Android Studio propone l'**AGP Upgrade Assistant**, puoi ignorarlo: queste versioni sono state compilate e testate così.
 6. JDK di Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (quello incluso, è il predefinito).
 7. **Build › Make Project**: deve finire con *BUILD SUCCESSFUL*.
-8. Facoltativo: i test delle regole (34 test) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
+8. Facoltativo: i test delle regole (37 test) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
 
 ## 3. Installare l'app sul telefono
 
@@ -46,10 +46,15 @@ bash ~/Scaricati/installa_tsm.sh
 
 ## 4. La voce (funziona senza internet)
 
-- Le chiamate fisse (*quindici zero, parità, vantaggio, gioco, cambio campo, tie-break…*: 84 frasi per lingua) sono **file audio sul telefono**; i nomi dei giocatori sono letti dalla sintesi vocale.
-- Prima volta: sul telefono **Impostazioni › Sistema › Lingue › Output sintesi vocale** → *Servizi di sintesi vocale di Google* → installa la voce **Italiano** (e Inglese) per l'uso offline.
-- Nell'app, pagina 2 › **Audio e voce › Genera file**: crea i file vocali una volta sola (barra di avanzamento, ~1 minuto). Il contatore deve arrivare a **84/84**.
-- **Registrazioni personalizzate** (es. la tua voce o un vero arbitro): nella cartella `Android/data/com.tennis.scoremanager/files/voice/` c'è `LEGGIMI.txt` con l'elenco delle chiavi e delle frasi. Registra i file con quei nomi (`score_1_0.mp3` = "quindici zero"…), mettili in uno ZIP con le cartelle `it/` ed `en/` e usa **Importa ZIP**. Le tue registrazioni hanno la precedenza su quelle generate; **Rimuovi registrazioni** torna a quelle generate.
+- Ogni chiamata è letta **in un'unica frase** dalla sintesi vocale del telefono, con una voce installata: niente internet e prosodia naturale. I nomi dei giocatori entrano nella frase.
+- Pagina 2 › **Audio e voce**:
+  - **Motore sintesi vocale**: *Predefinito del telefono* (sui Samsung è Samsung TTS) oppure un motore a scelta, ad esempio *Servizi di sintesi vocale di Google*. Nei test Google italiano suona più naturale.
+  - **Voce**: *Automatica* (la migliore offline) oppure una voce precisa (con Google: Voce ITB, ITC, ITD, KDA; quelle *online* richiedono internet).
+  - **Prova voce**: legge una sequenza di chiamate di esempio con i nomi inseriti.
+- Se manca la voce italiana: **Impostazioni › Gestione generale › Lingua › Sintesi vocale** (o *Output sintesi vocale*) → scarica la voce italiana del motore scelto.
+- **Pronuncia**: alcuni motori sbagliano parole del tennis ("primo set" letto "primo settembre", "tie-break" letto "time break"). L'app le corregge da sola (`voice/Pronunciation.kt`); le correzioni sono state verificate trascrivendo l'audio reale di Samsung e Google.
+- **Registrazioni personalizzate** (la voce più naturale in assoluto: la tua o quella di un arbitro): nella cartella `Android/data/com.tennis.scoremanager/files/voice/` c'è `LEGGIMI.txt` con l'elenco delle 84 chiavi e delle frasi. Registra i file con quei nomi (`score_1_0.mp3` = "quindici zero"…), mettili in uno ZIP con le cartelle `it/` ed `en/` e usa **Importa ZIP**. Le registrazioni hanno sempre la precedenza sulla sintesi; i nomi restano letti dalla sintesi.
+- **Usa file audio pre-generati** (facoltativo): con **Genera file** l'app crea una volta gli 84 file con la voce scelta (anche una voce *online*, se in quel momento c'è internet) e poi li usa al posto della sintesi continua. Suona più "a pezzi", ma è utile per portarsi offline una voce online.
 - **Cassa esterna**: basta accoppiarla al telefono in Bluetooth; la voce esce sul canale multimediale (regola il volume media).
 
 ## 5. Firmware dei braccialetti (Arduino IDE su Fedora)
@@ -132,6 +137,6 @@ bash ~/Scaricati/installa_tsm.sh
 ## 10. Problemi comuni
 
 - **Braccialetto non trovato**: Bluetooth e posizione attivi? Il braccialetto sta lampeggiando PAIRING? (Se è già collegato a un altro telefono non si vede.) Spegnilo e riaccendilo.
-- **La voce non parla**: volume multimediale, *Audio On*, voce italiana installata nella sintesi vocale, contatore file 84/84.
+- **La voce non parla o legge male**: volume multimediale, *Audio On*, voce italiana installata; prova un altro motore o un'altra voce in *Audio e voce*.
 - **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro lo schermo resta acceso.
 - **Sync Gradle fallita per il JDK**: imposta Gradle JDK = jbr-21 (punto 2.6).
