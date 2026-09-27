@@ -6,6 +6,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.speech.tts.Voice
 import android.util.Log
 import com.tennis.scoremanager.model.Lang
 import kotlinx.coroutines.CancellationException
@@ -28,8 +29,16 @@ import kotlin.coroutines.resume
 
 enum class TtsStatus { INIT, READY, MISSING_LANGUAGE, ERROR }
 
+/** Motore di sintesi vocale installato sul telefono (Samsung, Google, ...). */
+data class EngineOption(val pkg: String, val label: String)
+
+/** Voce disponibile per la lingua corrente. */
+data class VoiceOption(val name: String, val online: Boolean, val quality: Int)
+
 /**
- * Legge le chiamate: file audio locali quando esistono, altrimenti TTS; i nomi sempre col TTS.
+ * Legge le chiamate. Di norma ogni chiamata è detta dalla sintesi vocale in un'unica frase (suona naturale e
+ * funziona offline con le voci installate); le registrazioni personalizzate, se ci sono, hanno la precedenza.
+ * Con [useGeneratedFiles] si usano invece i file generati una volta dal TTS (utile con una voce online).
  * L'audio esce dal canale "media", quindi va anche su una cassa Bluetooth collegata al telefono.
  */
 class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.OnInitListener {
@@ -41,6 +50,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
         .build()
 
+    private var enginePkg: String? = null
+    private var preferredVoice: String? = null
     private var tts: TextToSpeech? = TextToSpeech(app, this)
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
     private var job: Job? = null
@@ -48,12 +59,22 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     private val _status = MutableStateFlow(TtsStatus.INIT)
     val status: StateFlow<TtsStatus> = _status
+    private val _engines = MutableStateFlow<List<EngineOption>>(emptyList())
+    val engines: StateFlow<List<EngineOption>> = _engines
+    private val _voices = MutableStateFlow<List<VoiceOption>>(emptyList())
+    val voices: StateFlow<List<VoiceOption>> = _voices
+    private val _currentVoice = MutableStateFlow<String?>(null)
+    val currentVoice: StateFlow<String?> = _currentVoice
+    private val _currentEngine = MutableStateFlow<String?>(null)
+    val currentEngineFlow: StateFlow<String?> = _currentEngine
 
     var enabled: Boolean = true
         set(value) {
             field = value
             if (!value) stop()
         }
+
+    var useGeneratedFiles: Boolean = false
 
     var lang: Lang = Lang.IT
         set(value) {
@@ -63,6 +84,24 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             }
         }
 
+    /** Pacchetto del motore effettivamente in uso (serve alle correzioni di pronuncia). */
+    private val currentEngine: String?
+        get() = enginePkg ?: runCatching { tts?.defaultEngine }.getOrNull()
+
+    /** Sceglie motore (null = predefinito del telefono) e voce (null = la migliore offline). */
+    fun configure(engine: String?, voiceName: String?) {
+        preferredVoice = voiceName
+        if (engine != enginePkg) {
+            enginePkg = engine
+            stop()
+            runCatching { tts?.shutdown() }
+            _status.value = TtsStatus.INIT
+            tts = TextToSpeech(app, this, engine)
+        } else {
+            applyLanguage(lang)
+        }
+    }
+
     override fun onInit(status: Int) {
         val t = tts
         if (status != TextToSpeech.SUCCESS || t == null) {
@@ -70,7 +109,6 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             return
         }
         t.setAudioAttributes(attrs)
-        t.setSpeechRate(0.95f)
         t.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
             override fun onDone(utteranceId: String?) {
@@ -90,27 +128,34 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                 utteranceId?.let { pending.remove(it)?.complete(false) }
             }
         })
+        _engines.value = runCatching { t.engines.map { EngineOption(it.name, it.label) } }.getOrDefault(emptyList())
+        _currentEngine.value = currentEngine
         applyLanguage(lang)
     }
 
     private fun locale(l: Lang): Locale = if (l == Lang.IT) Locale.ITALY else Locale.UK
 
-    /** Imposta la lingua preferendo una voce installata sul telefono (niente rete). */
+    /** Imposta la lingua e la voce: quella scelta se esiste, altrimenti la migliore installata sul telefono. */
     private fun applyLanguage(l: Lang) {
         val t = tts ?: return
         if (_status.value == TtsStatus.ERROR) return
         val loc = locale(l)
         val res = runCatching { t.setLanguage(loc) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
         if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
+            _voices.value = emptyList()
             _status.value = TtsStatus.MISSING_LANGUAGE
             return
         }
-        runCatching {
-            t.voices
-                ?.filter { it.locale.language == loc.language && !it.isNetworkConnectionRequired && "notInstalled" !in it.features }
-                ?.maxWithOrNull(compareBy({ it.locale.country == loc.country }, { it.quality }))
-                ?.let { t.voice = it }
-        }
+        val all: List<Voice> = runCatching { t.voices?.toList() }.getOrNull().orEmpty()
+            .filter { it.locale.language == loc.language && "notInstalled" !in it.features }
+        _voices.value = all
+            .map { VoiceOption(it.name, it.isNetworkConnectionRequired, it.quality) }
+            .sortedWith(compareBy({ it.online }, { it.name }))
+        val chosen = all.firstOrNull { it.name == preferredVoice }
+            ?: all.filter { !it.isNetworkConnectionRequired }
+                .maxWithOrNull(compareBy({ it.locale.country == loc.country }, { it.quality }))
+        chosen?.let { runCatching { t.voice = it } }
+        _currentVoice.value = runCatching { t.voice?.name }.getOrNull()
         _status.value = TtsStatus.READY
     }
 
@@ -123,6 +168,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             override val tag: String? get() = null
         }
     }
+
+    private fun fileFor(key: String, l: Lang): File? =
+        voice.customFor(key, l) ?: if (useGeneratedFiles) voice.generatedFor(key, l) else null
 
     /** Unisce i pezzi consecutivi senza file in un'unica frase TTS: suona molto più naturale. */
     private fun plan(segs: List<Seg>, l: Lang): List<Part> {
@@ -138,13 +186,12 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             when (s) {
                 is Seg.Pause -> { flush(); parts += Part.Silence(s.ms) }
                 is Seg.Clip -> {
-                    val f = voice.fileFor(s.key, l)
+                    val f = fileFor(s.key, l)
                     if (f != null) {
                         flush()
                         parts += Part.Audio(f, s.tag)
                     } else {
-                        if (s.tag != null) flush()
-                        if (s.tag != null) tag = s.tag
+                        if (s.tag != null) { flush(); tag = s.tag }
                         text.append(Phrases.text(s.key, l)).append(' ')
                     }
                 }
@@ -187,7 +234,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     when (p) {
                         is Part.Silence -> delay(p.ms)
                         is Part.Audio -> playFile(p.file)
-                        is Part.Speech -> speak(p.text)
+                        is Part.Speech -> speak(Pronunciation.fix(p.text, l, currentEngine))
                     }
                 }
             } finally {
@@ -246,7 +293,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     }
 
     /**
-     * Genera i file vocali di [l] con il TTS del telefono (una volta sola, poi funzionano offline).
+     * Genera i file vocali di [l] con la voce scelta (anche una voce online: dopo funzionano senza rete).
      * Ritorna quanti file sono stati creati.
      */
     suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): Int {
@@ -259,15 +306,17 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             applyLanguage(lang)
             return 0
         }
+        voice.deleteGenerated(l)
         val dir = voice.ttsDir(l)
         val keys = Phrases.keys
+        val engine = currentEngine
         var ok = 0
         for ((i, key) in keys.withIndex()) {
             val f = File(dir, "$key.wav")
             val id = "gen_${key}_${UUID.randomUUID()}"
             val done = CompletableDeferred<Boolean>()
             pending[id] = done
-            val r = t.synthesizeToFile(Phrases.text(key, l), Bundle(), f, id)
+            val r = t.synthesizeToFile(Pronunciation.fix(Phrases.text(key, l), l, engine), Bundle(), f, id)
             val good = r == TextToSpeech.SUCCESS && withTimeoutOrNull(20_000) { done.await() } == true
             pending.remove(id)
             if (good && f.length() > 64) ok++ else f.delete()

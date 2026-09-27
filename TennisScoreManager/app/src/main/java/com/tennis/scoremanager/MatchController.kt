@@ -92,7 +92,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
+    /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
+    val customVoiceCount = MutableStateFlow(0)
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -113,6 +115,8 @@ class MatchController(
     init {
         announcer.lang = options.value.lang
         announcer.enabled = options.value.audio
+        announcer.useGeneratedFiles = options.value.voiceFiles
+        announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
         scope.launch(io) { voice.writeReadme() }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
@@ -143,6 +147,8 @@ class MatchController(
         storage.options = v
         announcer.lang = v.lang
         announcer.enabled = v.audio
+        announcer.useGeneratedFiles = v.voiceFiles
+        if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
         if (old.lang != v.lang) refreshVoiceCount()
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
@@ -481,7 +487,10 @@ class MatchController(
 
     fun resumeSaved(rec: MatchRecord) {
         val cur = options.value
-        val o = rec.options.copy(mode = cur.mode, lang = cur.lang, audio = cur.audio)
+        val o = rec.options.copy(
+            mode = cur.mode, lang = cur.lang, audio = cur.audio,
+            ttsEngine = cur.ttsEngine, ttsVoice = cur.ttsVoice, voiceFiles = cur.voiceFiles,
+        )
         setup.value = rec.setup
         options.value = o
         storage.options = o
@@ -609,7 +618,14 @@ class MatchController(
 
     fun refreshVoiceCount() {
         val l = options.value.lang
-        scope.launch { voiceCount.value = withContext(io) { voice.refresh(l); voice.count(l) } }
+        scope.launch {
+            val (gen, rec) = withContext(io) {
+                voice.refresh(l)
+                voice.generatedCount(l) to voice.customCount(l)
+            }
+            voiceCount.value = gen
+            customVoiceCount.value = rec
+        }
     }
 
     fun generateVoice() {
@@ -646,12 +662,16 @@ class MatchController(
         announcer.announce(
             force = true,
             segs = listOf(
+                Seg.Clip("first_set"), Seg.Pause(700),
+                Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
                 Seg.Clip("score_1_0"), Seg.Pause(500),
                 Seg.Clip("deuce"), Seg.Pause(500),
-                Seg.Clip("advantage"), Seg.Say(n.side(Side.P1)), Seg.Pause(500),
+                Seg.Clip("advantage"), Seg.Say(n.side(Side.P2)), Seg.Pause(500),
                 Seg.Clip("game"), Seg.Say(n.side(Side.P1)), Seg.Pause(300),
                 Seg.Say(n.side(Side.P1)), Seg.Clip("leads"), Seg.Clip("games_1_0"), Seg.Pause(500),
-                Seg.Clip("change_ends"),
+                Seg.Clip("change_ends"), Seg.Pause(700),
+                Seg.Clip("game"), Seg.Say(n.side(Side.P2)), Seg.Pause(300),
+                Seg.Clip("games_all_6"), Seg.Clip("tiebreak"),
             ),
         )
     }

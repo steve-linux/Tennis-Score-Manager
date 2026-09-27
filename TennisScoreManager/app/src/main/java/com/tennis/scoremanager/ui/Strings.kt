@@ -58,6 +58,16 @@ interface Strings {
     val generating: (Int, Int) -> String
     val importVoiceZip: String
     val deleteCustomVoice: String
+    val ttsEngine: String
+    val engineDefault: String
+    val ttsVoice: String
+    val voiceAuto: String
+    val voiceName: (String) -> String
+    val online: String
+    val offline: String
+    val voiceFilesMode: String
+    val voiceFilesModeHint: String
+    val customRecordings: (Int, Int) -> String
     val testVoice: String
     val ttsMissing: String
     val installVoice: String
@@ -234,12 +244,22 @@ object ItStrings : Strings {
     override val english = "English"
     override val audioSection = "Audio e voce"
     override val voiceCalls = "Chiamate vocali dell'arbitro"
-    override val voiceFiles: (Int, Int) -> String = { n, tot -> "File vocali offline: $n/$tot" }
-    override val voiceFilesHint = "Le chiamate fisse usano file audio sul telefono (funzionano senza internet); i nomi sono letti dalla sintesi vocale."
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "File generati: $n/$tot" }
+    override val voiceFilesHint = "Tutto funziona senza internet con le voci installate sul telefono. Le registrazioni personalizzate (ZIP) hanno sempre la precedenza sulla sintesi vocale."
     override val generateVoice = "Genera file"
     override val generating: (Int, Int) -> String = { n, tot -> "Generazione $n/$tot…" }
     override val importVoiceZip = "Importa ZIP"
     override val deleteCustomVoice = "Rimuovi registrazioni"
+    override val ttsEngine = "Motore sintesi vocale"
+    override val engineDefault = "Predefinito del telefono"
+    override val ttsVoice = "Voce"
+    override val voiceAuto = "Automatica (migliore offline)"
+    override val voiceName: (String) -> String = { "Voce $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Usa file audio pre-generati"
+    override val voiceFilesModeHint = "Di norma ogni chiamata è letta in un'unica frase (più naturale). Attivalo per usare i file generati, ad esempio per portarti offline una voce online."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Registrazioni personalizzate: $n/$tot" }
     override val testVoice = "Prova voce"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
     override val installVoice = "Installa voce"
@@ -406,12 +426,22 @@ object EnStrings : Strings {
     override val english = "English"
     override val audioSection = "Audio and voice"
     override val voiceCalls = "Umpire voice calls"
-    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Offline voice files: $n/$tot" }
-    override val voiceFilesHint = "Fixed calls use audio files stored on the phone (no internet needed); names are read by text-to-speech."
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Generated files: $n/$tot" }
+    override val voiceFilesHint = "Everything works offline with the voices installed on the phone. Custom recordings (ZIP) always take precedence over text-to-speech."
     override val generateVoice = "Generate files"
     override val generating: (Int, Int) -> String = { n, tot -> "Generating $n/$tot…" }
     override val importVoiceZip = "Import ZIP"
     override val deleteCustomVoice = "Remove recordings"
+    override val ttsEngine = "Speech engine"
+    override val engineDefault = "Phone default"
+    override val ttsVoice = "Voice"
+    override val voiceAuto = "Automatic (best offline)"
+    override val voiceName: (String) -> String = { "Voice $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Use pre-generated audio files"
+    override val voiceFilesModeHint = "By default each call is read as one sentence (more natural). Turn this on to play the generated files, e.g. to take an online voice offline."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Custom recordings: $n/$tot" }
     override val testVoice = "Test voice"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
     override val installVoice = "Install voice"

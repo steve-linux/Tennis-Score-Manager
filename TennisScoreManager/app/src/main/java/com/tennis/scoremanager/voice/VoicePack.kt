@@ -17,7 +17,8 @@ import java.util.zip.ZipInputStream
 class VoicePack(private val context: Context) {
 
     private val exts = listOf("wav", "mp3", "ogg", "m4a", "aac", "flac")
-    private val cache = mutableMapOf<Lang, Map<String, File>>()
+    private val custom = mutableMapOf<Lang, Map<String, File>>()
+    private val generated = mutableMapOf<Lang, Map<String, File>>()
 
     val baseDir: File
         get() = File(context.getExternalFilesDir(null) ?: context.filesDir, "voice")
@@ -25,24 +26,28 @@ class VoicePack(private val context: Context) {
     fun dir(lang: Lang): File = File(baseDir, lang.name.lowercase()).apply { mkdirs() }
     fun ttsDir(lang: Lang): File = File(dir(lang), "tts").apply { mkdirs() }
 
+    /** Registrazione personalizzata (voce vera) della frase, se c'è: ha sempre la precedenza. */
     @Synchronized
-    fun fileFor(key: String, lang: Lang): File? = cache.getOrPut(lang) { scan(lang) }[key]
+    fun customFor(key: String, lang: Lang): File? = custom.getOrPut(lang) { scan(dir(lang)) }[key]
+
+    /** File generato dal TTS del telefono (usato solo con l'opzione "File audio offline"). */
+    @Synchronized
+    fun generatedFor(key: String, lang: Lang): File? = generated.getOrPut(lang) { scan(ttsDir(lang)) }[key]
 
     @Synchronized
     fun refresh(lang: Lang) {
-        cache[lang] = scan(lang)
+        custom[lang] = scan(dir(lang))
+        generated[lang] = scan(ttsDir(lang))
     }
 
-    fun count(lang: Lang): Int = Phrases.keys.count { fileFor(it, lang) != null }
-    fun customCount(lang: Lang): Int = Phrases.keys.count { k -> exts.any { File(dir(lang), "$k.$it").isFile } }
+    fun generatedCount(lang: Lang): Int = Phrases.keys.count { generatedFor(it, lang) != null }
+    fun customCount(lang: Lang): Int = Phrases.keys.count { customFor(it, lang) != null }
 
-    private fun scan(lang: Lang): Map<String, File> {
+    private fun scan(folder: File): Map<String, File> {
         val out = HashMap<String, File>()
-        for (folder in listOf(ttsDir(lang), dir(lang))) { // le registrazioni personalizzate sovrascrivono il TTS
-            folder.listFiles()?.forEach { f ->
-                if (f.isFile && f.extension.lowercase() in exts && f.length() > 64 && f.nameWithoutExtension in Phrases.keys) {
-                    out[f.nameWithoutExtension] = f
-                }
+        folder.listFiles()?.forEach { f ->
+            if (f.isFile && f.extension.lowercase() in exts && f.length() > 64 && f.nameWithoutExtension in Phrases.keys) {
+                out[f.nameWithoutExtension] = f
             }
         }
         return out

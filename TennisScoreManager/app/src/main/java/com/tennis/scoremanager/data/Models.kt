@@ -37,6 +37,11 @@ data class MatchOptions(
     val p1Left: Boolean = true,
     val firstServerP1: Int = 0,
     val firstServerP2: Int = 0,
+    /** Motore di sintesi vocale (pacchetto) e voce scelti; null = automatico. */
+    val ttsEngine: String? = null,
+    val ttsVoice: String? = null,
+    /** true = legge i file generati invece della sintesi continua. */
+    val voiceFiles: Boolean = false,
 )
 
 @Serializable
