@@ -74,7 +74,7 @@ static volatile bool rxReady = false;
 static uint8_t  seqNo = 0;
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
-static uint32_t advSince = 0;
+static volatile uint32_t advSince = 0;  // aggiornato anche dal task BLE alla disconnessione
 static bool     advFast = true;
 static bool     advertising = false;
 static uint32_t lastActivity = 0;
@@ -229,6 +229,9 @@ class ServerCallbacks : public NimBLEServerCallbacks {
     s->updateConnParams(info.getConnHandle(), 24, 40, 4, 400);
   }
   void onDisconnect(NimBLEServer* s, NimBLEConnInfo& info, int reason) override {
+    // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
+    // (spegnerebbe il braccialetto in piena partita).
+    advSince = millis();
     connected = false;
     justDisconnect = true;
   }
@@ -288,11 +291,10 @@ static void setupBle() {
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
-  svc->start();
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
-  bas->start();
+  server->start();  // registra i servizi GATT (in NimBLE 2.x si avvia il server, non i singoli servizi)
   updateBattery(false);
 
   // Pacchetto di advertising: flag + UUID del servizio (l'app filtra la ricerca su questo);
@@ -414,17 +416,17 @@ void loop() {
   }
 
   // --- advertising e lampeggio "PAIRING"
-  if (!connected) {
+  if (!connected && !justDisconnect) {
     if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
     const uint32_t limit = everConnected ? RECONNECT_TIMEOUT_MS : PAIRING_TIMEOUT_MS;
-    if (now - advSince > limit) powerOff(TXT_NO_PHONE);
+    if ((int32_t)(millis() - advSince) > (int32_t)limit) powerOff(TXT_NO_PHONE);
     if ((int32_t)(now - nextBlink) >= 0 && (!displayOn || blinkShown)) {
       drawMessage(TXT_PAIRING, deviceName, C_BALL);
       showFor(BLINK_ON_MS);
       blinkShown = true;
       nextBlink = now + BLINK_PERIOD_MS;
     }
-  } else {
+  } else if (connected) {
     blinkShown = false;
     if (now - lastActivity > IDLE_TIMEOUT_MS) powerOff(TXT_IDLE);
   }

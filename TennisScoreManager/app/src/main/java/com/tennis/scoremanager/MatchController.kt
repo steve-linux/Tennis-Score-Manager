@@ -106,6 +106,7 @@ class MatchController(
     private var cdKind: CountdownKind? = null
     private var cdEnd = 0L
     private var lastPointAt = 0L
+    private var lastBandUndoAt = 0L
     private var lastAutosave = 0L
     private var messageJob: Job? = null
 
@@ -151,13 +152,19 @@ class MatchController(
     fun go(to: Screen) {
         if (to == Screen.START) refreshSaved()
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
+        // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
+        // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
+        if (to == Screen.START && options.value.mode == PlayMode.BANDS) MatchService.start(app)
         screen.value = to
     }
 
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
-            Screen.START -> Screen.OPTIONS
+            Screen.START -> {
+                MatchService.stop(app)
+                Screen.OPTIONS
+            }
             else -> screen.value
         }
     }
@@ -206,14 +213,20 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
+        val now = SystemClock.elapsedRealtime()
         when (e.type) {
             BandProtocol.EVT_POINT -> when (screen.value) {
                 Screen.START -> startMatch()
-                Screen.MATCH -> if (!endDialog.value) awardPoint(e.side, fromBand = true)
+                // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
+                Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(e.side, fromBand = true)
                 else -> Unit
             }
             // KEY2 annulla l'ultimo punto, anche dal popup di fine partita. Non può mai confermare la fine.
-            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH) undo()
+            // Due KEY2 ravvicinati (anche da braccialetti diversi) annullano un solo punto.
+            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
+                lastBandUndoAt = now
+                undo()
+            }
         }
     }
 
@@ -293,7 +306,7 @@ class MatchController(
 
     private fun onPlay() {
         val lm = live.value ?: return
-        if (lm.record.startedAt != null) return
+        if (lm.record.startedAt != null || lm.record.suspended) return
         runningSince = SystemClock.elapsedRealtime()
         setRecord(lm.record.copy(startedAt = System.currentTimeMillis()))
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
@@ -446,7 +459,9 @@ class MatchController(
     /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
     fun newMatch() {
         live.value?.let { lm ->
-            live.value = LiveMatch(lm.record.copy(suspended = true, clockMs = currentClock()), lm.state)
+            val total = currentClock()
+            runningSince = null
+            live.value = LiveMatch(lm.record.copy(suspended = true, clockMs = total), lm.state)
             persist()
         }
         announcer.stop()

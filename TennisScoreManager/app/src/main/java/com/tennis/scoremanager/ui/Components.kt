@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -82,7 +83,7 @@ fun ScreenScaffold(
     bottomBar: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball),
@@ -202,7 +203,10 @@ fun BigButton(
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(
+            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center, lineHeight = 17.sp,
+        )
     }
 }
 

@@ -174,6 +174,7 @@ class BleManager(context: Context) {
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
+        private var setupWatchdog: Job? = null
         private val opLock = Mutex()
         @Volatile private var pendingOp: CompletableDeferred<Int>? = null
         private val wake = Channel<Unit>(Channel.CONFLATED)
@@ -238,9 +239,17 @@ class BleManager(context: Context) {
                 scope.launch {
                     if (g !== gatt) return@launch
                     if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+                        lastSeq = -1  // il braccialetto può essere stato riacceso: la sequenza riparte
+                        setupWatchdog?.cancel()
+                        setupWatchdog = scope.launch {
+                            // Se la configurazione non finisce (callback persa) si ricomincia da capo.
+                            delay(15_000)
+                            if (gatt === g && state != LinkState.READY) runCatching { g.disconnect() }
+                        }
                         delay(400)
                         runCatching { g.discoverServices() }
                     } else {
+                        setupWatchdog?.cancel()
                         pendingOp?.complete(-1)
                         runCatching { g.close() }
                         gatt = null
@@ -318,13 +327,18 @@ class BleManager(context: Context) {
                 return
             }
             op { g.requestMtu(185) }
-            svc.getCharacteristic(BandProtocol.EVENT)?.let { enableNotify(g, it) }
+            // Senza notifiche i tasti del braccialetto andrebbero persi: meglio riconnettersi.
+            val evt = svc.getCharacteristic(BandProtocol.EVENT)
+            if (evt == null || !enableNotify(g, evt)) {
+                runCatching { g.disconnect() }
+                return
+            }
             g.getService(BandProtocol.BATTERY_SERVICE)?.getCharacteristic(BandProtocol.BATTERY_LEVEL)?.let {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
             if (g !== gatt) return
-            lastSeq = -1
+            setupWatchdog?.cancel()
             changeState(LinkState.READY)
             _ready.tryEmit(side)
             wake.trySend(Unit)

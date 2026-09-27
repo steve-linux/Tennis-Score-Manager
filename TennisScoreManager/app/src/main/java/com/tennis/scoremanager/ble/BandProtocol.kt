@@ -39,5 +39,5 @@ object BandProtocol {
         "G|$myGames|$theirGames|$mySets|$theirSets|${clean(header)}"
 
     fun message(line1: String, line2: String, seconds: Int) =
-        "M|${clean(line1)}|${clean(line2)}|$seconds"
+        "M|${clean(line1)}|${clean(line2, 28)}|$seconds"
 }

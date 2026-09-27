@@ -8,6 +8,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import com.tennis.scoremanager.model.Lang
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -171,6 +172,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             }
         }
         stop()
+        // In Logcat (filtro "Announcer") si legge ogni chiamata: comodo per controllare le frasi.
+        Log.d("Announcer", CallBuilder(lang).render(segs))
         if ((!enabled && !force) || segs.isEmpty()) {
             tags.forEach(onTag)
             return
@@ -232,6 +235,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     mp.start()
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.w("Announcer", "File audio non leggibile: ${file.name}", e)
         } finally {

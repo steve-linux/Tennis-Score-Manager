@@ -562,10 +562,13 @@ fun CourtDiagram(p1Left: Boolean, server: Side, names: Names, s: Strings) {
                                 maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, fontSize = 13.sp,
                             )
                         }
-                        if (side == server) {
-                            Spacer(Modifier.height(4.dp))
-                            Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball, modifier = Modifier.size(22.dp))
-                        }
+                        // Lo spazio della pallina c'è sempre, così i due nomi restano allineati.
+                        Spacer(Modifier.height(4.dp))
+                        Icon(
+                            Icons.Filled.SportsTennis, null,
+                            tint = if (side == server) TsmColors.Ball else Color.Transparent,
+                            modifier = Modifier.size(22.dp),
+                        )
                     }
                 }
             }
