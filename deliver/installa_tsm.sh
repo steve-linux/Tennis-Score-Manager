@@ -32,6 +32,7 @@ mkdir -p "$DEST/app/src/main/res/drawable"
 mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
 mkdir -p "$DEST/app/src/main/res/values"
 mkdir -p "$DEST/app/src/main/res/xml"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/gradle"
@@ -186,7 +187,9 @@ package com.tennis.scoremanager
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
+import android.graphics.Color
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
@@ -208,7 +211,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Tema sempre scuro: icone chiare nelle barre di sistema.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
         setContent {
             val options by controller.options.collectAsState()
             TsmTheme {
@@ -356,6 +363,7 @@ class MatchController(
     private var cdKind: CountdownKind? = null
     private var cdEnd = 0L
     private var lastPointAt = 0L
+    private var lastBandUndoAt = 0L
     private var lastAutosave = 0L
     private var messageJob: Job? = null
 
@@ -401,13 +409,19 @@ class MatchController(
     fun go(to: Screen) {
         if (to == Screen.START) refreshSaved()
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
+        // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
+        // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
+        if (to == Screen.START && options.value.mode == PlayMode.BANDS) MatchService.start(app)
         screen.value = to
     }
 
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
-            Screen.START -> Screen.OPTIONS
+            Screen.START -> {
+                MatchService.stop(app)
+                Screen.OPTIONS
+            }
             else -> screen.value
         }
     }
@@ -456,14 +470,20 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
+        val now = SystemClock.elapsedRealtime()
         when (e.type) {
             BandProtocol.EVT_POINT -> when (screen.value) {
                 Screen.START -> startMatch()
-                Screen.MATCH -> if (!endDialog.value) awardPoint(e.side, fromBand = true)
+                // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
+                Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(e.side, fromBand = true)
                 else -> Unit
             }
             // KEY2 annulla l'ultimo punto, anche dal popup di fine partita. Non può mai confermare la fine.
-            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH) undo()
+            // Due KEY2 ravvicinati (anche da braccialetti diversi) annullano un solo punto.
+            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
+                lastBandUndoAt = now
+                undo()
+            }
         }
     }
 
@@ -543,7 +563,7 @@ class MatchController(
 
     private fun onPlay() {
         val lm = live.value ?: return
-        if (lm.record.startedAt != null) return
+        if (lm.record.startedAt != null || lm.record.suspended) return
         runningSince = SystemClock.elapsedRealtime()
         setRecord(lm.record.copy(startedAt = System.currentTimeMillis()))
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
@@ -696,7 +716,9 @@ class MatchController(
     /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
     fun newMatch() {
         live.value?.let { lm ->
-            live.value = LiveMatch(lm.record.copy(suspended = true, clockMs = currentClock()), lm.state)
+            val total = currentClock()
+            runningSince = null
+            live.value = LiveMatch(lm.record.copy(suspended = true, clockMs = total), lm.state)
             persist()
         }
         announcer.stop()
@@ -731,6 +753,7 @@ class MatchController(
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
         if (!state.isFinished) showMessage(strings.msgSuspended)
+        if (rec.location == null) fetchLocation()
         if (o.mode == PlayMode.BANDS) {
             ble.reconnectAll()
             MatchService.start(app)
@@ -1054,7 +1077,7 @@ object BandProtocol {
         "G|$myGames|$theirGames|$mySets|$theirSets|${clean(header)}"
 
     fun message(line1: String, line2: String, seconds: Int) =
-        "M|${clean(line1)}|${clean(line2)}|$seconds"
+        "M|${clean(line1)}|${clean(line2, 28)}|$seconds"
 }
 TSM_EOF
 
@@ -1236,6 +1259,7 @@ class BleManager(context: Context) {
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
+        private var setupWatchdog: Job? = null
         private val opLock = Mutex()
         @Volatile private var pendingOp: CompletableDeferred<Int>? = null
         private val wake = Channel<Unit>(Channel.CONFLATED)
@@ -1300,9 +1324,17 @@ class BleManager(context: Context) {
                 scope.launch {
                     if (g !== gatt) return@launch
                     if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+                        lastSeq = -1  // il braccialetto può essere stato riacceso: la sequenza riparte
+                        setupWatchdog?.cancel()
+                        setupWatchdog = scope.launch {
+                            // Se la configurazione non finisce (callback persa) si ricomincia da capo.
+                            delay(15_000)
+                            if (gatt === g && state != LinkState.READY) runCatching { g.disconnect() }
+                        }
                         delay(400)
                         runCatching { g.discoverServices() }
                     } else {
+                        setupWatchdog?.cancel()
                         pendingOp?.complete(-1)
                         runCatching { g.close() }
                         gatt = null
@@ -1380,13 +1412,18 @@ class BleManager(context: Context) {
                 return
             }
             op { g.requestMtu(185) }
-            svc.getCharacteristic(BandProtocol.EVENT)?.let { enableNotify(g, it) }
+            // Senza notifiche i tasti del braccialetto andrebbero persi: meglio riconnettersi.
+            val evt = svc.getCharacteristic(BandProtocol.EVENT)
+            if (evt == null || !enableNotify(g, evt)) {
+                runCatching { g.disconnect() }
+                return
+            }
             g.getService(BandProtocol.BATTERY_SERVICE)?.getCharacteristic(BandProtocol.BATTERY_LEVEL)?.let {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
             if (g !== gatt) return
-            lastSeq = -1
+            setupWatchdog?.cancel()
             changeState(LinkState.READY)
             _ready.tryEmit(side)
             wake.trySend(Unit)
@@ -1472,7 +1509,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
-import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 
 /** Posizione del campo per il riepilogo (senza Google Play Services). */
@@ -1501,7 +1537,7 @@ object LocationHelper {
             suspendCancellableCoroutine { cont ->
                 val signal = android.os.CancellationSignal()
                 cont.invokeOnCancellation { signal.cancel() }
-                LocationManagerCompat.getCurrentLocation(lm, provider, signal, Executors.newSingleThreadExecutor()) { loc ->
+                LocationManagerCompat.getCurrentLocation(lm, provider, signal, ContextCompat.getMainExecutor(ctx)) { loc ->
                     if (cont.isActive) cont.resume(loc)
                 }
             }
@@ -2253,12 +2289,14 @@ TSM_EOF
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/MatchService.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.service
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
@@ -2309,6 +2347,10 @@ class MatchService : Service() {
         private const val CHANNEL = "match"
 
         fun start(ctx: Context) {
+            // Il tipo "connectedDevice" richiede il permesso Bluetooth: senza, Android chiuderebbe l'app.
+            if (Build.VERSION.SDK_INT >= 31 &&
+                ContextCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+            ) return
             runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, MatchService::class.java)) }
                 .onFailure { Log.w("MatchService", "start", it) }
         }
@@ -2341,6 +2383,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -2406,7 +2449,7 @@ fun ScreenScaffold(
     bottomBar: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(TsmColors.Ball),
@@ -2526,7 +2569,10 @@ fun BigButton(
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(text, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(
+            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center, lineHeight = 17.sp,
+        )
     }
 }
 
@@ -3555,7 +3601,7 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val gap = 12.dp
         val label = 30.dp
-        val sizeDp = min((maxWidth - gap) / 2, maxHeight - label - 6.dp)
+        val sizeDp = min((maxWidth - gap) / 2, maxHeight - label - 6.dp).coerceAtLeast(0.dp)
         Row(Modifier.align(Alignment.Center), horizontalArrangement = Arrangement.spacedBy(gap)) {
             val left = state.leftSide()
             for (side in listOf(left, left.other)) {
@@ -3627,6 +3673,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
@@ -3776,6 +3823,7 @@ fun OptionsScreen(c: MatchController) {
     var bandsRequired by remember { mutableStateOf(false) }
     var missingBands by remember { mutableStateOf<String?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
+    BackHandler { c.back() }
 
     fun onNext() {
         if (o.mode == PlayMode.BANDS) {
@@ -4181,10 +4229,13 @@ fun CourtDiagram(p1Left: Boolean, server: Side, names: Names, s: Strings) {
                                 maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, fontSize = 13.sp,
                             )
                         }
-                        if (side == server) {
-                            Spacer(Modifier.height(4.dp))
-                            Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball, modifier = Modifier.size(22.dp))
-                        }
+                        // Lo spazio della pallina c'è sempre, così i due nomi restano allineati.
+                        Spacer(Modifier.height(4.dp))
+                        Icon(
+                            Icons.Filled.SportsTennis, null,
+                            tint = if (side == server) TsmColors.Ball else Color.Transparent,
+                            modifier = Modifier.size(22.dp),
+                        )
                     }
                 }
             }
@@ -4810,6 +4861,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import com.tennis.scoremanager.model.Lang
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -4973,6 +5025,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
             }
         }
         stop()
+        // In Logcat (filtro "Announcer") si legge ogni chiamata: comodo per controllare le frasi.
+        Log.d("Announcer", CallBuilder(lang).render(segs))
         if ((!enabled && !force) || segs.isEmpty()) {
             tags.forEach(onTag)
             return
@@ -5034,6 +5088,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     mp.start()
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.w("Announcer", "File audio non leggibile: ${file.name}", e)
         } finally {
@@ -5555,6 +5611,63 @@ cat > "$DEST/app/src/main/res/xml/file_paths.xml" << 'TSM_EOF'
 <paths>
     <cache-path name="share" path="share/" />
 </paths>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DataTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DataTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.model.SetScore
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.EnStrings
+import com.tennis.scoremanager.ui.ItStrings
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class DataTest {
+
+    @Test
+    fun singlesNamesAndDefaults() {
+        val n = Names(SetupData(p1a = "  Rossi ", p2a = ""), ItStrings)
+        assertEquals("Rossi", n.side(Side.P1))
+        assertEquals("Giocatore 2", n.side(Side.P2))
+        assertEquals(listOf("Rossi"), n.players(Side.P1))
+        assertEquals("Player 2", Names(SetupData(), EnStrings).side(Side.P2))
+    }
+
+    @Test
+    fun doublesNamesStayOnTheirSide() {
+        val su = SetupData(doubles = true, p1a = "Rossi", p1b = "Verdi", p2a = "Bianchi", p2b = "")
+        val n = Names(su, ItStrings)
+        assertEquals("Rossi e Verdi", n.side(Side.P1))
+        assertEquals("Rossi / Verdi", n.short(Side.P1))
+        assertEquals("Bianchi", n.side(Side.P2))
+        assertEquals(listOf("Bianchi", "Giocatore 2B"), n.players(Side.P2))
+        assertEquals("Verdi", n.player(Side.P1, 1))
+        assertEquals("Giocatore 1", Names(SetupData(doubles = true), ItStrings).side(Side.P1))
+        assertEquals("Rossi and Verdi", Names(su, EnStrings).side(Side.P1))
+    }
+
+    @Test
+    fun setNotation() {
+        assertEquals("6-4", Reports.setText(SetScore(6, 4), Side.P1))
+        assertEquals("4-6", Reports.setText(SetScore(6, 4), Side.P2))
+        assertEquals("7-6(5)", Reports.setText(SetScore(7, 6, 7, 5), Side.P1))
+        assertEquals("6-7(5)", Reports.setText(SetScore(7, 6, 7, 5), Side.P2))
+        assertEquals("[10-8]", Reports.setText(SetScore(1, 0, 10, 8, matchTiebreak = true), Side.P1))
+        assertEquals("[8-10]", Reports.setText(SetScore(1, 0, 10, 8, matchTiebreak = true), Side.P2))
+        assertEquals("1:02:03", Reports.duration(3_723_000))
+    }
+
+    @Test
+    fun bandTextIsPlainAscii() {
+        assertEquals("NICCOLO FORTE", BandProtocol.clean("Niccolò Forté"))
+        assertEquals("A/B", BandProtocol.clean("a|b"))
+        assertEquals("P|15|AD|1|TIE-BREAK", BandProtocol.point("15", "AD", 1, "Tie-break"))
+        assertEquals("M|GAME SET MATCH|6-4 7-5|15", BandProtocol.message("Game set match", "6-4 7-5", 15))
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt
@@ -7329,7 +7442,7 @@ static volatile bool rxReady = false;
 static uint8_t  seqNo = 0;
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
-static uint32_t advSince = 0;
+static volatile uint32_t advSince = 0;  // aggiornato anche dal task BLE alla disconnessione
 static bool     advFast = true;
 static bool     advertising = false;
 static uint32_t lastActivity = 0;
@@ -7484,6 +7597,9 @@ class ServerCallbacks : public NimBLEServerCallbacks {
     s->updateConnParams(info.getConnHandle(), 24, 40, 4, 400);
   }
   void onDisconnect(NimBLEServer* s, NimBLEConnInfo& info, int reason) override {
+    // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
+    // (spegnerebbe il braccialetto in piena partita).
+    advSince = millis();
     connected = false;
     justDisconnect = true;
   }
@@ -7543,11 +7659,10 @@ static void setupBle() {
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
-  svc->start();
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
-  bas->start();
+  server->start();  // registra i servizi GATT (in NimBLE 2.x si avvia il server, non i singoli servizi)
   updateBattery(false);
 
   // Pacchetto di advertising: flag + UUID del servizio (l'app filtra la ricerca su questo);
@@ -7669,17 +7784,17 @@ void loop() {
   }
 
   // --- advertising e lampeggio "PAIRING"
-  if (!connected) {
+  if (!connected && !justDisconnect) {
     if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
     const uint32_t limit = everConnected ? RECONNECT_TIMEOUT_MS : PAIRING_TIMEOUT_MS;
-    if (now - advSince > limit) powerOff(TXT_NO_PHONE);
+    if ((int32_t)(millis() - advSince) > (int32_t)limit) powerOff(TXT_NO_PHONE);
     if ((int32_t)(now - nextBlink) >= 0 && (!displayOn || blinkShown)) {
       drawMessage(TXT_PAIRING, deviceName, C_BALL);
       showFor(BLINK_ON_MS);
       blinkShown = true;
       nextBlink = now + BLINK_PERIOD_MS;
     }
-  } else {
+  } else if (connected) {
     blinkShown = false;
     if (now - lastActivity > IDLE_TIMEOUT_MS) powerOff(TXT_IDLE);
   }
@@ -7700,6 +7815,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 45 file del progetto in $DEST"
+echo ">> Fatto: 46 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
