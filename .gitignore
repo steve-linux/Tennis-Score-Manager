@@ -1,0 +1,9 @@
+.DS_Store
+TennisScoreManager/.gradle/
+TennisScoreManager/.kotlin/
+TennisScoreManager/.idea/
+TennisScoreManager/local.properties
+TennisScoreManager/build/
+TennisScoreManager/app/build/
+firmware/**/build/
+deliver/out/
