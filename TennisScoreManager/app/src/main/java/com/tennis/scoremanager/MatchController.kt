@@ -56,6 +56,12 @@ data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
 data class LiveMatch(val record: MatchRecord, val state: MatchState)
 
+/** Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati). */
+data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean) {
+    /** "~6 h" oppure "~40 min". */
+    fun leftText(): String? = hoursLeft?.let { h -> if (h >= 1.0) "~${Math.round(h)} h" else "~${Math.round(h * 60)} min" }
+}
+
 /**
  * Cuore dell'app: tiene la partita, i tempi, la voce e i braccialetti.
  * Vive quanto il processo (non quanto l'Activity), così i braccialetti funzionano anche a schermo spento.
@@ -95,6 +101,9 @@ class MatchController(
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
     val customVoiceCount = MutableStateFlow(0)
+    val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
+    private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
+    private val batteryWarned = mutableMapOf<Side, Int>()
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -123,6 +132,7 @@ class MatchController(
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
+        scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
         scope.launch {
             while (true) {
@@ -190,6 +200,54 @@ class MatchController(
     }
 
     private fun bandLabel(side: Side) = if (side == Side.P1) "1" else "2"
+
+    /**
+     * Stato batteria ogni minuto: stima dell'autonomia sul consumo reale, avvisi al 20 % e al 10 %,
+     * registro CSV (files/battery_log.csv) per verificare quanto dura il braccialetto.
+     */
+    private fun onBandStatus(side: Side, st: com.tennis.scoremanager.ble.BandStatus) {
+        val now = SystemClock.elapsedRealtime()
+        val soc = com.tennis.scoremanager.ble.BatteryModel.soc(st.millivolts)
+        val samples = batterySamples.getOrPut(side) { mutableListOf() }
+        if (st.charging) samples.clear() else samples += now to soc
+        // teniamo al massimo le ultime 3 ore di campioni
+        while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
+        val hours = if (st.charging) null else com.tennis.scoremanager.ble.BatteryModel.hoursLeft(samples)
+        bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
+        scope.launch(io) {
+            runCatching {
+                java.io.File(app.filesDir, "battery_log.csv").appendText(
+                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$soc,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS}\n",
+                )
+            }
+        }
+        live.value?.let { lm ->
+            if (lm.record.startedAt != null && side !in lm.record.batteryStart && !st.charging) {
+                setRecord(lm.record.copy(batteryStart = lm.record.batteryStart + (side to soc)))
+            }
+        }
+        if (!st.charging && screen.value == Screen.MATCH) {
+            val level = when {
+                soc <= 10 -> 10
+                soc <= 20 -> 20
+                else -> null
+            }
+            if (level != null && (batteryWarned[side] ?: 101) > level) {
+                batteryWarned[side] = level
+                showMessage(strings.msgBandBatteryLow(bandLabel(side), soc))
+                ble.send(side, BandProtocol.message(strings.bandBatteryLow, "$soc%", 4))
+            }
+        }
+    }
+
+    /** Batteria bassa già all'inizio: meglio saperlo prima di giocare. */
+    private fun warnLowBandsAtStart() {
+        if (options.value.mode != PlayMode.BANDS) return
+        for ((side, b) in bandBattery.value) {
+            if (!b.charging && b.percent < 30) showMessage(strings.msgBandBatteryLow(bandLabel(side), b.percent))
+        }
+    }
 
     private suspend fun watchBands() {
         var prev: Map<Side, LinkState> = emptyMap()
@@ -305,6 +363,8 @@ class MatchController(
         screen.value = Screen.MATCH
         persist()
         if (o.mode == PlayMode.BANDS) MatchService.start(app)
+        batteryWarned.clear()
+        warnLowBandsAtStart()
         fetchLocation()
         // "Primo set" · "[nome] al servizio" · "gioco": il tempo partita parte su "gioco".
         announcer.announce(calls().start(state, names())) { tag -> if (tag == CallBuilder.TAG_PLAY) onPlay() }
@@ -314,7 +374,10 @@ class MatchController(
         val lm = live.value ?: return
         if (lm.record.startedAt != null || lm.record.suspended) return
         runningSince = SystemClock.elapsedRealtime()
-        setRecord(lm.record.copy(startedAt = System.currentTimeMillis()))
+        val startBattery = if (options.value.mode == PlayMode.BANDS) {
+            bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
+        } else emptyMap()
+        setRecord(lm.record.copy(startedAt = System.currentTimeMillis(), batteryStart = startBattery))
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }
@@ -448,7 +511,13 @@ class MatchController(
     fun confirmEnd() {
         val lm = live.value ?: return
         if (!lm.state.isFinished) return
-        val rec = lm.record.copy(finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis())
+        val endBattery = if (lm.record.options.mode == PlayMode.BANDS) {
+            bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
+        } else emptyMap()
+        val rec = lm.record.copy(
+            finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
+            batteryEnd = endBattery,
+        )
         runningSince = null
         scope.launch(io) {
             storage.deleteMatch(rec.id)

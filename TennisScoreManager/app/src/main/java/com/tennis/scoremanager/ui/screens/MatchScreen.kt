@@ -108,7 +108,7 @@ fun MatchScreen(c: MatchController) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         TimersRow(clock, cd, s)
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands)
+        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -248,7 +248,7 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
 }
 
 @Composable
-private fun BandStatusRow(bands: Map<Side, BandInfo>) {
+private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         for (side in Side.entries) {
             val b = bands[side]
@@ -257,10 +257,18 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>) {
                 LinkState.POWERED_OFF -> Icons.Filled.PowerSettingsNew to false
                 else -> Icons.Filled.BluetoothDisabled to false
             }
+            val bat = battery[side]
+            val low = bat != null && !bat.charging && bat.percent <= 20
             Pill(
-                (if (side == Side.P1) "G1" else "G2") + (b?.battery?.let { " · $it%" } ?: ""),
-                if (ok) TsmColors.player(side) else TsmColors.SurfaceHigh,
-                if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                (if (side == Side.P1) "G1" else "G2") +
+                    ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
+                    (bat?.leftText()?.let { " · $it" } ?: ""),
+                when {
+                    low -> TsmColors.Danger
+                    ok -> TsmColors.player(side)
+                    else -> TsmColors.SurfaceHigh
+                },
+                if (low) TsmColors.TextMain else if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
                 icon,
             )
         }

@@ -155,6 +155,10 @@ interface Strings {
     val msgBandConnected: (String) -> String
     val msgBandLost: (String) -> String
     val msgBandOff: (String) -> String
+    val msgBandBatteryLow: (String, Int) -> String
+    val bandBatteryLow: String
+    val autonomy: (String) -> String
+    val bandsBattery: String
 
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
@@ -339,6 +343,10 @@ object ItStrings : Strings {
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
     override val msgBandLost: (String) -> String = { "BRACCIALETTO $it DISCONNESSO" }
     override val msgBandOff: (String) -> String = { "BRACCIALETTO $it SPENTO" }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "BRACCIALETTO $n: BATTERIA $p%" }
+    override val bandBatteryLow = "BATTERIA BASSA"
+    override val autonomy: (String) -> String = { "autonomia ~$it" }
+    override val bandsBattery = "Batteria braccialetti"
 
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
@@ -521,6 +529,10 @@ object EnStrings : Strings {
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
     override val msgBandLost: (String) -> String = { "WRISTBAND $it DISCONNECTED" }
     override val msgBandOff: (String) -> String = { "WRISTBAND $it OFF" }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "WRISTBAND $n: BATTERY $p%" }
+    override val bandBatteryLow = "LOW BATTERY"
+    override val autonomy: (String) -> String = { "about $it left" }
+    override val bandsBattery = "Wristband battery"
 
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"

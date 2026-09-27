@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
@@ -158,6 +159,9 @@ fun SummaryScreen(c: MatchController) {
                 InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
                 InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
                 InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
+                if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
+                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec))
+                }
             }
         }
         Column(

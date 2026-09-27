@@ -30,6 +30,9 @@ static const uint32_t KEY2_HOLD_MS         = 2000;                 // pressione 
 static const uint32_t BLINK_PERIOD_MS      = 2000;                 // lampeggio "PAIRING": ogni 2 s...
 static const uint32_t BLINK_ON_MS          = 350;                  // ...acceso solo 350 ms
 static const uint32_t PAIRED_MSG_MS        = 3000;                 // "PAIRING OK" per 3 s
+static const uint32_t POINT_SHOW_MS        = 3000;                 // punteggio del game acceso 3 s
+static const uint32_t GAMES_SHOW_MS        = 5000;                 // riepilogo game/set acceso 5 s
+static const uint32_t STATUS_PERIOD_MS     = 60000;                // stato batteria al telefono ogni minuto
 
 // Testi mostrati dal braccialetto (solo ASCII)
 #define TXT_PAIRING    "PAIRING..."
@@ -45,6 +48,7 @@ static const uint32_t PAIRED_MSG_MS        = 3000;                 // "PAIRING O
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
+#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56" per misurare i consumi
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 
 // Colori (RGB565)
@@ -59,6 +63,7 @@ static const uint16_t C_RED    = 0xF800;
 static NimBLEServer*         server   = nullptr;
 static NimBLECharacteristic* evtChr   = nullptr;
 static NimBLECharacteristic* battChr  = nullptr;
+static NimBLECharacteristic* statusChr = nullptr;
 static char deviceName[16];
 
 static volatile bool connected      = false;
@@ -79,6 +84,8 @@ static bool     advFast = true;
 static bool     advertising = false;
 static uint32_t lastActivity = 0;
 static uint32_t lastBattery = 0;
+static uint32_t displayOnSince = 0;   // per contare quanto resta acceso il display (diagnostica consumi)
+static uint32_t displayOnTotalMs = 0;
 static uint32_t nextBlink = 0;
 static bool     blinkShown = false;
 
@@ -88,6 +95,7 @@ static void displayWake() {
     M5.Display.wakeup();
     M5.Display.setBrightness(BRIGHTNESS);
     displayOn = true;
+    displayOnSince = millis();
   }
 }
 
@@ -97,6 +105,7 @@ static void displaySleep() {
     M5.Display.setBrightness(0);
     M5.Display.sleep();
     displayOn = false;
+    displayOnTotalMs += millis() - displayOnSince;
   }
 }
 
@@ -204,10 +213,10 @@ static void handleMessage(char* msg) {
   if (n < 1 || !f[0][0]) return;
   switch (f[0][0]) {
     case 'P':
-      if (n >= 5) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(4000); }
+      if (n >= 5) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(POINT_SHOW_MS); }
       break;
     case 'G':
-      if (n >= 6) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor(6000); }
+      if (n >= 6) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor(GAMES_SHOW_MS); }
       break;
     case 'M':
       if (n >= 4) {
@@ -224,9 +233,10 @@ class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* s, NimBLEConnInfo& info) override {
     connected = true;
     justConnected = true;
-    // Intervallo 30-50 ms con latenza 4: la radio si sveglia ogni ~250 ms quando non c'è traffico,
-    // ma un tasto premuto parte al primo evento utile (<= 50 ms).
-    s->updateConnParams(info.getConnHandle(), 24, 40, 4, 400);
+    // Intervallo 80-120 ms con latenza 3: senza traffico la radio si sveglia 2-3 volte al secondo
+    // (con 30 ms e latenza 0 erano 33 volte), un tasto parte comunque entro ~120 ms.
+    // Timeout 6 s: tiene la connessione anche con il polso che copre l'antenna.
+    s->updateConnParams(info.getConnHandle(), 64, 96, 3, 600);
   }
   void onDisconnect(NimBLEServer* s, NimBLEConnInfo& info, int reason) override {
     // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
@@ -270,10 +280,21 @@ static void sendEvent(uint8_t type) {
 
 static void updateBattery(bool notify) {
   int level = M5.Power.getBatteryLevel();
-  if (level < 0) return;
-  uint8_t v = (uint8_t)constrain(level, 0, 100);
-  battChr->setValue(&v, 1);
-  if (notify && connected) battChr->notify();
+  if (level >= 0) {
+    uint8_t v = (uint8_t)constrain(level, 0, 100);
+    battChr->setValue(&v, 1);
+    if (notify && connected) battChr->notify();
+  }
+  // Stato per l'app: tensione in mV (più precisa della percentuale), in carica, secondi di accensione,
+  // secondi di display acceso. Con questi dati l'app calcola consumo e autonomia reali.
+  char buf[64];
+  uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
+  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu",
+           (int)M5.Power.getBatteryVoltage(),
+           M5.Power.isCharging() == m5::Power_Class::is_charging ? 1 : 0,
+           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000));
+  statusChr->setValue((const uint8_t*)buf, strlen(buf));
+  if (notify && connected) statusChr->notify();
 }
 
 static void setupBle() {
@@ -291,6 +312,7 @@ static void setupBle() {
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
+  statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -431,8 +453,8 @@ void loop() {
     if (now - lastActivity > IDLE_TIMEOUT_MS) powerOff(TXT_IDLE);
   }
 
-  // --- batteria ogni minuto
-  if (now - lastBattery > 60000UL) {
+  // --- batteria e stato ogni minuto
+  if (now - lastBattery > STATUS_PERIOD_MS) {
     lastBattery = now;
     updateBattery(true);
   }

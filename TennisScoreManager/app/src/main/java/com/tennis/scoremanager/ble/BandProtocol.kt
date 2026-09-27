@@ -17,6 +17,8 @@ object BandProtocol {
     val SERVICE: UUID = UUID.fromString("7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val EVENT: UUID = UUID.fromString("7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val DISPLAY: UUID = UUID.fromString("7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Stato batteria ogni minuto (notify): vedi [BatteryModel.parse]. Assente nei firmware vecchi. */
+    val STATUS: UUID = UUID.fromString("7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")

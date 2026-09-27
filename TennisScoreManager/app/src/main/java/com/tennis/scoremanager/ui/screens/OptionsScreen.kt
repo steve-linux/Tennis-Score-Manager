@@ -314,12 +314,20 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     }
     if (searched && !scanning && found.isEmpty()) Text(s.bandNotFound, color = TsmColors.Orange)
     for (side in Side.entries) {
-        BandPicker(c, side, names.short(side), bands[side], found, bands)
+        BandPicker(c, side, names.short(side), bands[side], found, bands, c.bandBattery.collectAsState().value[side])
     }
 }
 
 @Composable
-private fun BandPicker(c: MatchController, side: Side, playerName: String, current: BandInfo?, found: List<FoundBand>, all: Map<Side, BandInfo>) {
+private fun BandPicker(
+    c: MatchController,
+    side: Side,
+    playerName: String,
+    current: BandInfo?,
+    found: List<FoundBand>,
+    all: Map<Side, BandInfo>,
+    battery: com.tennis.scoremanager.BandBattery?,
+) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
@@ -345,7 +353,12 @@ private fun BandPicker(c: MatchController, side: Side, playerName: String, curre
                             LinkState.POWERED_OFF -> s.bandOff
                             LinkState.IDLE -> s.bandIdle
                         }
-                        Text(st + (current.battery?.let { " · ${s.battery} $it%" } ?: ""), color = TsmColors.TextDim, fontSize = 12.sp)
+                        val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        Text(
+                            st + (current.battery?.let { " · ${s.battery} $it%$volts" } ?: "") +
+                                (battery?.leftText()?.let { " · ${s.autonomy(it)}" } ?: ""),
+                            color = TsmColors.TextDim, fontSize = 12.sp,
+                        )
                     }
                 }
                 Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)

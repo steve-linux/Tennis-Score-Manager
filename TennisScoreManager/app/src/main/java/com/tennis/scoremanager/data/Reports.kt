@@ -52,6 +52,15 @@ object Reports {
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
+    /** "G1 92% → 71% · G2 88% → 70%" */
+    fun batteryLine(rec: MatchRecord): String =
+        Side.entries.mapNotNull { side ->
+            val a = rec.batteryStart[side]
+            val b = rec.batteryEnd[side]
+            if (a == null && b == null) null
+            else "${if (side == Side.P1) "G1" else "G2"} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
+        }.joinToString(" · ")
+
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · No-Ad" else "") +
@@ -99,6 +108,7 @@ object Reports {
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec)}")
         sb.appendLine()
         sb.append("#tennis · ${s.generatedWith}")
         return sb.toString()

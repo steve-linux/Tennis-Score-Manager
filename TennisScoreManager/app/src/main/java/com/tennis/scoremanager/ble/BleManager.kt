@@ -50,7 +50,10 @@ data class BandInfo(
     val address: String,
     val name: String,
     val state: LinkState = LinkState.IDLE,
+    /** Percentuale: dalla tensione se il firmware la manda, altrimenti quella del braccialetto. */
     val battery: Int? = null,
+    val millivolts: Int? = null,
+    val charging: Boolean = false,
 )
 
 data class BandEvent(val side: Side, val type: Int)
@@ -77,6 +80,9 @@ class BleManager(context: Context) {
     private val _ready = MutableSharedFlow<Side>(extraBufferCapacity = 4)
     /** Emesso quando un braccialetto è connesso e pronto a ricevere. */
     val ready: SharedFlow<Side> = _ready
+    private val _status = MutableSharedFlow<Pair<Side, BandStatus>>(extraBufferCapacity = 8)
+    /** Stato batteria ricevuto dai braccialetti (per stima autonomia e registro consumi). */
+    val status: SharedFlow<Pair<Side, BandStatus>> = _status
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
 
@@ -164,13 +170,16 @@ class BleManager(context: Context) {
     }
 
     private fun publish() {
-        _bands.value = links.mapValues { (_, l) -> BandInfo(l.address, l.name, l.state, l.battery) }
+        _bands.value = links.mapValues { (_, l) ->
+            BandInfo(l.address, l.name, l.state, l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery, l.status?.millivolts, l.status?.charging == true)
+        }
     }
 
     private inner class BandLink(val side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
         var battery: Int? = null
+        var status: BandStatus? = null
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -316,6 +325,11 @@ class BleManager(context: Context) {
                         battery = (copy[0].toInt() and 0xFF).coerceIn(0, 100)
                         publish()
                     }
+                    BandProtocol.STATUS -> BatteryModel.parse(String(copy, Charsets.US_ASCII))?.let {
+                        status = it
+                        publish()
+                        _status.tryEmit(side to it)
+                    }
                 }
             }
         }
@@ -337,6 +351,13 @@ class BleManager(context: Context) {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
+            svc.getCharacteristic(BandProtocol.STATUS)?.let {
+                enableNotify(g, it)
+                op { g.readCharacteristic(it) }
+            }
+            // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
+            // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
+            runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
             if (g !== gatt) return
             setupWatchdog?.cancel()
             changeState(LinkState.READY)

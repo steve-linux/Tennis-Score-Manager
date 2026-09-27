@@ -65,6 +65,9 @@ data class MatchRecord(
     val finished: Boolean = false,
     val location: MatchLocation? = null,
     val updatedAt: Long = 0L,
+    /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
+    val batteryStart: Map<Side, Int> = emptyMap(),
+    val batteryEnd: Map<Side, Int> = emptyMap(),
 )
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
