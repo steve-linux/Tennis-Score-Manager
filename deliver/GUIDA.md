@@ -82,6 +82,7 @@ bash installa_tsm.sh
 6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → `/dev/ttyACM0`.
    *(Senza il pacchetto M5Stack va bene anche "ESP32S3 Dev Module": USB CDC On Boot = Enabled, Flash Size = 8MB, Partition = 8M with spiffs.)*
 7. **Upload (→)**. Se la porta non compare o il caricamento fallisce: tieni premuto a lungo il **tasto laterale** (modalità download) e riprova.
+   **Dopo il caricamento**, se il display resta nero (il braccialetto è rimasto in modalità programmazione), premi **una volta** il tasto laterale: riparte con il programma nuovo.
 8. All'avvio il braccialetto mostra il suo nome, es. **TSM-3FA2**. Ripeti per il secondo braccialetto. Consiglio: un'etichetta "G1"/"G2" sul cinturino.
 
 ## 6. Usare i braccialetti
