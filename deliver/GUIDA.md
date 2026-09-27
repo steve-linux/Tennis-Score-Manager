@@ -6,7 +6,7 @@ App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis second
 
 | File | A cosa serve |
 |---|---|
-| `installa_tsm.sh` | Crea **tutto** il progetto Android (45 file) e lo sketch del braccialetto. È fatto solo di blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
+| `installa_tsm.sh` | Crea **tutto** il progetto Android (46 file) e lo sketch del braccialetto. È fatto solo di blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
 | `TennisScoreManager-debug.apk` | L'app già compilata, per provarla subito sul telefono. |
 | `TSM_Band.ino` | Il firmware del braccialetto (è anche dentro lo script). |
 | `GUIDA.md` | Questa guida. |
