@@ -481,6 +481,7 @@ class MatchController(
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
         if (!state.isFinished) showMessage(strings.msgSuspended)
+        if (rec.location == null) fetchLocation()
         if (o.mode == PlayMode.BANDS) {
             ble.reconnectAll()
             MatchService.start(app)

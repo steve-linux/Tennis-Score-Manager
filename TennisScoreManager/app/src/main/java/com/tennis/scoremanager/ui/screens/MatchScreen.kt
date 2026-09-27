@@ -359,7 +359,7 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val gap = 12.dp
         val label = 30.dp
-        val sizeDp = min((maxWidth - gap) / 2, maxHeight - label - 6.dp)
+        val sizeDp = min((maxWidth - gap) / 2, maxHeight - label - 6.dp).coerceAtLeast(0.dp)
         Row(Modifier.align(Alignment.Center), horizontalArrangement = Arrangement.spacedBy(gap)) {
             val left = state.leftSide()
             for (side in listOf(left, left.other)) {

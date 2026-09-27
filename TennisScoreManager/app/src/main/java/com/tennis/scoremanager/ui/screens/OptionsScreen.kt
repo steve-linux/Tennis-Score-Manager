@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
@@ -155,6 +156,7 @@ fun OptionsScreen(c: MatchController) {
     var bandsRequired by remember { mutableStateOf(false) }
     var missingBands by remember { mutableStateOf<String?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
+    BackHandler { c.back() }
 
     fun onNext() {
         if (o.mode == PlayMode.BANDS) {

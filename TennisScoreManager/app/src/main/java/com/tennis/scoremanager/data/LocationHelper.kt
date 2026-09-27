@@ -15,7 +15,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
-import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 
 /** Posizione del campo per il riepilogo (senza Google Play Services). */
@@ -44,7 +43,7 @@ object LocationHelper {
             suspendCancellableCoroutine { cont ->
                 val signal = android.os.CancellationSignal()
                 cont.invokeOnCancellation { signal.cancel() }
-                LocationManagerCompat.getCurrentLocation(lm, provider, signal, Executors.newSingleThreadExecutor()) { loc ->
+                LocationManagerCompat.getCurrentLocation(lm, provider, signal, ContextCompat.getMainExecutor(ctx)) { loc ->
                     if (cont.isActive) cont.resume(loc)
                 }
             }

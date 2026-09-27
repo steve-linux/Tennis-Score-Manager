@@ -1,11 +1,13 @@
 package com.tennis.scoremanager.service
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
@@ -56,6 +58,10 @@ class MatchService : Service() {
         private const val CHANNEL = "match"
 
         fun start(ctx: Context) {
+            // Il tipo "connectedDevice" richiede il permesso Bluetooth: senza, Android chiuderebbe l'app.
+            if (Build.VERSION.SDK_INT >= 31 &&
+                ContextCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+            ) return
             runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, MatchService::class.java)) }
                 .onFailure { Log.w("MatchService", "start", it) }
         }
