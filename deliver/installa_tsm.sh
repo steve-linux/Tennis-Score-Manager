@@ -32,6 +32,7 @@ mkdir -p "$DEST/app/src/main/res/drawable"
 mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
 mkdir -p "$DEST/app/src/main/res/values"
 mkdir -p "$DEST/app/src/main/res/xml"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
@@ -313,6 +314,12 @@ data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
 data class LiveMatch(val record: MatchRecord, val state: MatchState)
 
+/** Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati). */
+data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean) {
+    /** "~6 h" oppure "~40 min". */
+    fun leftText(): String? = hoursLeft?.let { h -> if (h >= 1.0) "~${Math.round(h)} h" else "~${Math.round(h * 60)} min" }
+}
+
 /**
  * Cuore dell'app: tiene la partita, i tempi, la voce e i braccialetti.
  * Vive quanto il processo (non quanto l'Activity), così i braccialetti funzionano anche a schermo spento.
@@ -352,6 +359,9 @@ class MatchController(
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
     val customVoiceCount = MutableStateFlow(0)
+    val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
+    private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
+    private val batteryWarned = mutableMapOf<Side, Int>()
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -380,6 +390,7 @@ class MatchController(
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
+        scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
         scope.launch {
             while (true) {
@@ -447,6 +458,54 @@ class MatchController(
     }
 
     private fun bandLabel(side: Side) = if (side == Side.P1) "1" else "2"
+
+    /**
+     * Stato batteria ogni minuto: stima dell'autonomia sul consumo reale, avvisi al 20 % e al 10 %,
+     * registro CSV (files/battery_log.csv) per verificare quanto dura il braccialetto.
+     */
+    private fun onBandStatus(side: Side, st: com.tennis.scoremanager.ble.BandStatus) {
+        val now = SystemClock.elapsedRealtime()
+        val soc = com.tennis.scoremanager.ble.BatteryModel.soc(st.millivolts)
+        val samples = batterySamples.getOrPut(side) { mutableListOf() }
+        if (st.charging) samples.clear() else samples += now to soc
+        // teniamo al massimo le ultime 3 ore di campioni
+        while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
+        val hours = if (st.charging) null else com.tennis.scoremanager.ble.BatteryModel.hoursLeft(samples)
+        bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
+        scope.launch(io) {
+            runCatching {
+                java.io.File(app.filesDir, "battery_log.csv").appendText(
+                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$soc,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS}\n",
+                )
+            }
+        }
+        live.value?.let { lm ->
+            if (lm.record.startedAt != null && side !in lm.record.batteryStart && !st.charging) {
+                setRecord(lm.record.copy(batteryStart = lm.record.batteryStart + (side to soc)))
+            }
+        }
+        if (!st.charging && screen.value == Screen.MATCH) {
+            val level = when {
+                soc <= 10 -> 10
+                soc <= 20 -> 20
+                else -> null
+            }
+            if (level != null && (batteryWarned[side] ?: 101) > level) {
+                batteryWarned[side] = level
+                showMessage(strings.msgBandBatteryLow(bandLabel(side), soc))
+                ble.send(side, BandProtocol.message(strings.bandBatteryLow, "$soc%", 4))
+            }
+        }
+    }
+
+    /** Batteria bassa già all'inizio: meglio saperlo prima di giocare. */
+    private fun warnLowBandsAtStart() {
+        if (options.value.mode != PlayMode.BANDS) return
+        for ((side, b) in bandBattery.value) {
+            if (!b.charging && b.percent < 30) showMessage(strings.msgBandBatteryLow(bandLabel(side), b.percent))
+        }
+    }
 
     private suspend fun watchBands() {
         var prev: Map<Side, LinkState> = emptyMap()
@@ -562,6 +621,8 @@ class MatchController(
         screen.value = Screen.MATCH
         persist()
         if (o.mode == PlayMode.BANDS) MatchService.start(app)
+        batteryWarned.clear()
+        warnLowBandsAtStart()
         fetchLocation()
         // "Primo set" · "[nome] al servizio" · "gioco": il tempo partita parte su "gioco".
         announcer.announce(calls().start(state, names())) { tag -> if (tag == CallBuilder.TAG_PLAY) onPlay() }
@@ -571,7 +632,10 @@ class MatchController(
         val lm = live.value ?: return
         if (lm.record.startedAt != null || lm.record.suspended) return
         runningSince = SystemClock.elapsedRealtime()
-        setRecord(lm.record.copy(startedAt = System.currentTimeMillis()))
+        val startBattery = if (options.value.mode == PlayMode.BANDS) {
+            bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
+        } else emptyMap()
+        setRecord(lm.record.copy(startedAt = System.currentTimeMillis(), batteryStart = startBattery))
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }
@@ -705,7 +769,13 @@ class MatchController(
     fun confirmEnd() {
         val lm = live.value ?: return
         if (!lm.state.isFinished) return
-        val rec = lm.record.copy(finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis())
+        val endBattery = if (lm.record.options.mode == PlayMode.BANDS) {
+            bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
+        } else emptyMap()
+        val rec = lm.record.copy(
+            finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
+            batteryEnd = endBattery,
+        )
         runningSince = null
         scope.launch(io) {
             storage.deleteMatch(rec.id)
@@ -1075,6 +1145,8 @@ object BandProtocol {
     val SERVICE: UUID = UUID.fromString("7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val EVENT: UUID = UUID.fromString("7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val DISPLAY: UUID = UUID.fromString("7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Stato batteria ogni minuto (notify): vedi [BatteryModel.parse]. Assente nei firmware vecchi. */
+    val STATUS: UUID = UUID.fromString("7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -1098,6 +1170,75 @@ object BandProtocol {
 
     fun message(line1: String, line2: String, seconds: Int) =
         "M|${clean(line1)}|${clean(line2, 28)}|$seconds"
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ble/BatteryModel.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ble/BatteryModel.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ble
+
+/** Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56". */
+data class BandStatus(val millivolts: Int, val charging: Boolean, val uptimeS: Long, val displayS: Long)
+
+/**
+ * Batteria LiPo del braccialetto (250 mAh): la carica si ricava dalla tensione con la curva di scarica
+ * tipica (a basso carico), molto più fedele della retta 3,30-4,15 V usata da M5Unified.
+ * L'autonomia si stima dal consumo reale misurato durante l'uso.
+ */
+object BatteryModel {
+
+    private val curve = listOf(
+        4200 to 100, 4150 to 95, 4110 to 90, 4080 to 85, 4020 to 80, 3980 to 75, 3950 to 70,
+        3910 to 65, 3870 to 60, 3850 to 55, 3840 to 50, 3820 to 45, 3800 to 40, 3790 to 35,
+        3770 to 30, 3750 to 25, 3730 to 20, 3710 to 15, 3690 to 10, 3610 to 5, 3270 to 0,
+    )
+
+    fun parse(text: String): BandStatus? {
+        val map = text.split(';').mapNotNull { part ->
+            val kv = part.split('=', limit = 2)
+            if (kv.size == 2) kv[0].trim() to kv[1].trim() else null
+        }.toMap()
+        val mv = map["mv"]?.toIntOrNull() ?: return null
+        return BandStatus(
+            millivolts = mv,
+            charging = map["chg"] == "1",
+            uptimeS = map["up"]?.toLongOrNull() ?: 0,
+            displayS = map["dsp"]?.toLongOrNull() ?: 0,
+        )
+    }
+
+    /** Percentuale di carica (0-100) dalla tensione in mV. */
+    fun soc(mv: Int): Int {
+        if (mv >= curve.first().first) return 100
+        if (mv <= curve.last().first) return 0
+        for (i in 0 until curve.lastIndex) {
+            val (vHi, pHi) = curve[i]
+            val (vLo, pLo) = curve[i + 1]
+            if (mv in vLo..vHi) return pLo + (mv - vLo) * (pHi - pLo) / (vHi - vLo)
+        }
+        return 0
+    }
+
+    /**
+     * Ore di autonomia rimaste, dalla retta dei minimi quadrati sui campioni (tempo in ms, carica %).
+     * Servono almeno 20 minuti di dati e un calo misurabile, altrimenti null.
+     */
+    fun hoursLeft(samples: List<Pair<Long, Int>>): Double? {
+        if (samples.size < 3) return null
+        val t0 = samples.first().first
+        val span = samples.last().first - t0
+        if (span < 20 * 60_000L) return null
+        val xs = samples.map { (it.first - t0) / 3_600_000.0 }
+        val ys = samples.map { it.second.toDouble() }
+        val mx = xs.average()
+        val my = ys.average()
+        val den = xs.sumOf { (it - mx) * (it - mx) }
+        if (den <= 0.0) return null
+        val slope = xs.indices.sumOf { (xs[it] - mx) * (ys[it] - my) } / den // % all'ora (negativo)
+        if (slope >= -0.5) return null // calo troppo piccolo per stimare
+        val now = my + slope * (xs.last() - mx)
+        return (now / -slope).coerceAtLeast(0.0)
+    }
 }
 TSM_EOF
 
@@ -1155,7 +1296,10 @@ data class BandInfo(
     val address: String,
     val name: String,
     val state: LinkState = LinkState.IDLE,
+    /** Percentuale: dalla tensione se il firmware la manda, altrimenti quella del braccialetto. */
     val battery: Int? = null,
+    val millivolts: Int? = null,
+    val charging: Boolean = false,
 )
 
 data class BandEvent(val side: Side, val type: Int)
@@ -1182,6 +1326,9 @@ class BleManager(context: Context) {
     private val _ready = MutableSharedFlow<Side>(extraBufferCapacity = 4)
     /** Emesso quando un braccialetto è connesso e pronto a ricevere. */
     val ready: SharedFlow<Side> = _ready
+    private val _status = MutableSharedFlow<Pair<Side, BandStatus>>(extraBufferCapacity = 8)
+    /** Stato batteria ricevuto dai braccialetti (per stima autonomia e registro consumi). */
+    val status: SharedFlow<Pair<Side, BandStatus>> = _status
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
 
@@ -1269,13 +1416,16 @@ class BleManager(context: Context) {
     }
 
     private fun publish() {
-        _bands.value = links.mapValues { (_, l) -> BandInfo(l.address, l.name, l.state, l.battery) }
+        _bands.value = links.mapValues { (_, l) ->
+            BandInfo(l.address, l.name, l.state, l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery, l.status?.millivolts, l.status?.charging == true)
+        }
     }
 
     private inner class BandLink(val side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
         var battery: Int? = null
+        var status: BandStatus? = null
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -1421,6 +1571,11 @@ class BleManager(context: Context) {
                         battery = (copy[0].toInt() and 0xFF).coerceIn(0, 100)
                         publish()
                     }
+                    BandProtocol.STATUS -> BatteryModel.parse(String(copy, Charsets.US_ASCII))?.let {
+                        status = it
+                        publish()
+                        _status.tryEmit(side to it)
+                    }
                 }
             }
         }
@@ -1442,6 +1597,13 @@ class BleManager(context: Context) {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
+            svc.getCharacteristic(BandProtocol.STATUS)?.let {
+                enableNotify(g, it)
+                op { g.readCharacteristic(it) }
+            }
+            // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
+            // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
+            runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
             if (g !== gatt) return
             setupWatchdog?.cancel()
             changeState(LinkState.READY)
@@ -1669,6 +1831,9 @@ data class MatchRecord(
     val finished: Boolean = false,
     val location: MatchLocation? = null,
     val updatedAt: Long = 0L,
+    /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
+    val batteryStart: Map<Side, Int> = emptyMap(),
+    val batteryEnd: Map<Side, Int> = emptyMap(),
 )
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
@@ -1761,6 +1926,15 @@ object Reports {
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
+    /** "G1 92% → 71% · G2 88% → 70%" */
+    fun batteryLine(rec: MatchRecord): String =
+        Side.entries.mapNotNull { side ->
+            val a = rec.batteryStart[side]
+            val b = rec.batteryEnd[side]
+            if (a == null && b == null) null
+            else "${if (side == Side.P1) "G1" else "G2"} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
+        }.joinToString(" · ")
+
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · No-Ad" else "") +
@@ -1808,6 +1982,7 @@ object Reports {
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec)}")
         sb.appendLine()
         sb.append("#tennis · ${s.generatedWith}")
         return sb.toString()
@@ -2808,6 +2983,10 @@ interface Strings {
     val msgBandConnected: (String) -> String
     val msgBandLost: (String) -> String
     val msgBandOff: (String) -> String
+    val msgBandBatteryLow: (String, Int) -> String
+    val bandBatteryLow: String
+    val autonomy: (String) -> String
+    val bandsBattery: String
 
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
@@ -2992,6 +3171,10 @@ object ItStrings : Strings {
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
     override val msgBandLost: (String) -> String = { "BRACCIALETTO $it DISCONNESSO" }
     override val msgBandOff: (String) -> String = { "BRACCIALETTO $it SPENTO" }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "BRACCIALETTO $n: BATTERIA $p%" }
+    override val bandBatteryLow = "BATTERIA BASSA"
+    override val autonomy: (String) -> String = { "autonomia ~$it" }
+    override val bandsBattery = "Batteria braccialetti"
 
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
@@ -3174,6 +3357,10 @@ object EnStrings : Strings {
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
     override val msgBandLost: (String) -> String = { "WRISTBAND $it DISCONNECTED" }
     override val msgBandOff: (String) -> String = { "WRISTBAND $it OFF" }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "WRISTBAND $n: BATTERY $p%" }
+    override val bandBatteryLow = "LOW BATTERY"
+    override val autonomy: (String) -> String = { "about $it left" }
+    override val bandsBattery = "Wristband battery"
 
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"
@@ -3405,7 +3592,7 @@ fun MatchScreen(c: MatchController) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         TimersRow(clock, cd, s)
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands)
+        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -3545,7 +3732,7 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
 }
 
 @Composable
-private fun BandStatusRow(bands: Map<Side, BandInfo>) {
+private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         for (side in Side.entries) {
             val b = bands[side]
@@ -3554,10 +3741,18 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>) {
                 LinkState.POWERED_OFF -> Icons.Filled.PowerSettingsNew to false
                 else -> Icons.Filled.BluetoothDisabled to false
             }
+            val bat = battery[side]
+            val low = bat != null && !bat.charging && bat.percent <= 20
             Pill(
-                (if (side == Side.P1) "G1" else "G2") + (b?.battery?.let { " · $it%" } ?: ""),
-                if (ok) TsmColors.player(side) else TsmColors.SurfaceHigh,
-                if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                (if (side == Side.P1) "G1" else "G2") +
+                    ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
+                    (bat?.leftText()?.let { " · $it" } ?: ""),
+                when {
+                    low -> TsmColors.Danger
+                    ok -> TsmColors.player(side)
+                    else -> TsmColors.SurfaceHigh
+                },
+                if (low) TsmColors.TextMain else if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
                 icon,
             )
         }
@@ -4036,12 +4231,20 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     }
     if (searched && !scanning && found.isEmpty()) Text(s.bandNotFound, color = TsmColors.Orange)
     for (side in Side.entries) {
-        BandPicker(c, side, names.short(side), bands[side], found, bands)
+        BandPicker(c, side, names.short(side), bands[side], found, bands, c.bandBattery.collectAsState().value[side])
     }
 }
 
 @Composable
-private fun BandPicker(c: MatchController, side: Side, playerName: String, current: BandInfo?, found: List<FoundBand>, all: Map<Side, BandInfo>) {
+private fun BandPicker(
+    c: MatchController,
+    side: Side,
+    playerName: String,
+    current: BandInfo?,
+    found: List<FoundBand>,
+    all: Map<Side, BandInfo>,
+    battery: com.tennis.scoremanager.BandBattery?,
+) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
@@ -4067,7 +4270,12 @@ private fun BandPicker(c: MatchController, side: Side, playerName: String, curre
                             LinkState.POWERED_OFF -> s.bandOff
                             LinkState.IDLE -> s.bandIdle
                         }
-                        Text(st + (current.battery?.let { " · ${s.battery} $it%" } ?: ""), color = TsmColors.TextDim, fontSize = 12.sp)
+                        val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        Text(
+                            st + (current.battery?.let { " · ${s.battery} $it%$volts" } ?: "") +
+                                (battery?.leftText()?.let { " · ${s.autonomy(it)}" } ?: ""),
+                            color = TsmColors.TextDim, fontSize = 12.sp,
+                        )
                     }
                 }
                 Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
@@ -4732,6 +4940,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
@@ -4865,6 +5074,9 @@ fun SummaryScreen(c: MatchController) {
                 InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
                 InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
                 InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
+                if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
+                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec))
+                }
             }
         }
         Column(
@@ -5805,6 +6017,53 @@ cat > "$DEST/app/src/main/res/xml/file_paths.xml" << 'TSM_EOF'
 <paths>
     <cache-path name="share" path="share/" />
 </paths>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BatteryModelTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BatteryModelTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ble
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class BatteryModelTest {
+
+    @Test
+    fun parseStatus() {
+        val s = BatteryModel.parse("mv=3987;chg=0;up=1234;dsp=56")!!
+        assertEquals(3987, s.millivolts)
+        assertEquals(false, s.charging)
+        assertEquals(1234L, s.uptimeS)
+        assertEquals(56L, s.displayS)
+        assertNull(BatteryModel.parse("garbage"))
+    }
+
+    @Test
+    fun socFromVoltage() {
+        assertEquals(100, BatteryModel.soc(4250))
+        assertEquals(0, BatteryModel.soc(3200))
+        assertEquals(50, BatteryModel.soc(3840))
+        assertEquals(20, BatteryModel.soc(3730))
+        val mid = BatteryModel.soc(4000)
+        assertTrue(mid in 76..79)
+    }
+
+    @Test
+    fun hoursLeftFromSteadyDrain() {
+        // 10 % all'ora partendo da 80 %: dopo 1 ora siamo a 70 %, restano ~7 ore
+        val samples = (0..60).map { m -> m * 60_000L to (80 - m / 6) }
+        val h = BatteryModel.hoursLeft(samples)
+        assertNotNull(h)
+        assertEquals(7.0, h!!, 0.4)
+        // troppo pochi dati
+        assertNull(BatteryModel.hoursLeft(samples.take(10)))
+        // nessun calo
+        assertNull(BatteryModel.hoursLeft((0..30).map { it * 60_000L to 80 }))
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DataTest.kt
@@ -7626,6 +7885,9 @@ static const uint32_t KEY2_HOLD_MS         = 2000;                 // pressione 
 static const uint32_t BLINK_PERIOD_MS      = 2000;                 // lampeggio "PAIRING": ogni 2 s...
 static const uint32_t BLINK_ON_MS          = 350;                  // ...acceso solo 350 ms
 static const uint32_t PAIRED_MSG_MS        = 3000;                 // "PAIRING OK" per 3 s
+static const uint32_t POINT_SHOW_MS        = 3000;                 // punteggio del game acceso 3 s
+static const uint32_t GAMES_SHOW_MS        = 5000;                 // riepilogo game/set acceso 5 s
+static const uint32_t STATUS_PERIOD_MS     = 60000;                // stato batteria al telefono ogni minuto
 
 // Testi mostrati dal braccialetto (solo ASCII)
 #define TXT_PAIRING    "PAIRING..."
@@ -7641,6 +7903,7 @@ static const uint32_t PAIRED_MSG_MS        = 3000;                 // "PAIRING O
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
+#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56" per misurare i consumi
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 
 // Colori (RGB565)
@@ -7655,6 +7918,7 @@ static const uint16_t C_RED    = 0xF800;
 static NimBLEServer*         server   = nullptr;
 static NimBLECharacteristic* evtChr   = nullptr;
 static NimBLECharacteristic* battChr  = nullptr;
+static NimBLECharacteristic* statusChr = nullptr;
 static char deviceName[16];
 
 static volatile bool connected      = false;
@@ -7675,6 +7939,8 @@ static bool     advFast = true;
 static bool     advertising = false;
 static uint32_t lastActivity = 0;
 static uint32_t lastBattery = 0;
+static uint32_t displayOnSince = 0;   // per contare quanto resta acceso il display (diagnostica consumi)
+static uint32_t displayOnTotalMs = 0;
 static uint32_t nextBlink = 0;
 static bool     blinkShown = false;
 
@@ -7684,6 +7950,7 @@ static void displayWake() {
     M5.Display.wakeup();
     M5.Display.setBrightness(BRIGHTNESS);
     displayOn = true;
+    displayOnSince = millis();
   }
 }
 
@@ -7693,6 +7960,7 @@ static void displaySleep() {
     M5.Display.setBrightness(0);
     M5.Display.sleep();
     displayOn = false;
+    displayOnTotalMs += millis() - displayOnSince;
   }
 }
 
@@ -7800,10 +8068,10 @@ static void handleMessage(char* msg) {
   if (n < 1 || !f[0][0]) return;
   switch (f[0][0]) {
     case 'P':
-      if (n >= 5) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(4000); }
+      if (n >= 5) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(POINT_SHOW_MS); }
       break;
     case 'G':
-      if (n >= 6) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor(6000); }
+      if (n >= 6) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor(GAMES_SHOW_MS); }
       break;
     case 'M':
       if (n >= 4) {
@@ -7820,9 +8088,10 @@ class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* s, NimBLEConnInfo& info) override {
     connected = true;
     justConnected = true;
-    // Intervallo 30-50 ms con latenza 4: la radio si sveglia ogni ~250 ms quando non c'è traffico,
-    // ma un tasto premuto parte al primo evento utile (<= 50 ms).
-    s->updateConnParams(info.getConnHandle(), 24, 40, 4, 400);
+    // Intervallo 80-120 ms con latenza 3: senza traffico la radio si sveglia 2-3 volte al secondo
+    // (con 30 ms e latenza 0 erano 33 volte), un tasto parte comunque entro ~120 ms.
+    // Timeout 6 s: tiene la connessione anche con il polso che copre l'antenna.
+    s->updateConnParams(info.getConnHandle(), 64, 96, 3, 600);
   }
   void onDisconnect(NimBLEServer* s, NimBLEConnInfo& info, int reason) override {
     // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
@@ -7866,10 +8135,21 @@ static void sendEvent(uint8_t type) {
 
 static void updateBattery(bool notify) {
   int level = M5.Power.getBatteryLevel();
-  if (level < 0) return;
-  uint8_t v = (uint8_t)constrain(level, 0, 100);
-  battChr->setValue(&v, 1);
-  if (notify && connected) battChr->notify();
+  if (level >= 0) {
+    uint8_t v = (uint8_t)constrain(level, 0, 100);
+    battChr->setValue(&v, 1);
+    if (notify && connected) battChr->notify();
+  }
+  // Stato per l'app: tensione in mV (più precisa della percentuale), in carica, secondi di accensione,
+  // secondi di display acceso. Con questi dati l'app calcola consumo e autonomia reali.
+  char buf[64];
+  uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
+  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu",
+           (int)M5.Power.getBatteryVoltage(),
+           M5.Power.isCharging() == m5::Power_Class::is_charging ? 1 : 0,
+           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000));
+  statusChr->setValue((const uint8_t*)buf, strlen(buf));
+  if (notify && connected) statusChr->notify();
 }
 
 static void setupBle() {
@@ -7887,6 +8167,7 @@ static void setupBle() {
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
+  statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -8027,8 +8308,8 @@ void loop() {
     if (now - lastActivity > IDLE_TIMEOUT_MS) powerOff(TXT_IDLE);
   }
 
-  // --- batteria ogni minuto
-  if (now - lastBattery > 60000UL) {
+  // --- batteria e stato ogni minuto
+  if (now - lastBattery > STATUS_PERIOD_MS) {
     lastBattery = now;
     updateBattery(true);
   }
@@ -8043,6 +8324,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 48 file del progetto in $DEST"
+echo ">> Fatto: 50 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
