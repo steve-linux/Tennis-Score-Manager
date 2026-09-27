@@ -2,23 +2,33 @@
 
 App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia e due braccialetti **M5StickS3** collegati in Bluetooth LE.
 
-## 0. Cosa c'è nel pacchetto
+## 0. Cosa c'è nel repository
 
-| File | A cosa serve |
+| Percorso | A cosa serve |
 |---|---|
-| `installa_tsm.sh` | Crea **tutto** il progetto Android (48 file) e lo sketch del braccialetto. È fatto solo di blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
-| `TennisScoreManager-debug.apk` | L'app già compilata, per provarla subito sul telefono. |
-| `TSM_Band.ino` | Il firmware del braccialetto (è anche dentro lo script). |
-| `GUIDA.md` | Questa guida. |
+| `TennisScoreManager/` | Il progetto Android Studio. |
+| `firmware/TSM_Band/TSM_Band.ino` | Il firmware del braccialetto. |
+| `deliver/installa_tsm.sh` | In alternativa al clone: crea **tutto** il progetto Android e lo sketch con soli blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
+| `deliver/GUIDA.md` | Questa guida. |
 
 Versioni usate e verificate: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
-## 1. Installare il progetto su Fedora
+## 1. Scaricare il progetto su Fedora
+
+**Con git (consigliato)**:
 
 ```bash
-bash ~/Scaricati/installa_tsm.sh
+git clone https://github.com/steve-linux/Tennis-Score-Manager.git ~/AndroidStudioProjects/Tennis-Score-Manager
+```
+
+Il progetto da aprire in Android Studio è la sottocartella `TennisScoreManager`; lo sketch è in `firmware/TSM_Band/`. Per gli aggiornamenti basta `git pull`.
+
+**Oppure con lo script** (tutto come blocchi `cat`):
+
+```bash
+bash installa_tsm.sh
 ```
 
 - Il progetto va in `/home/stefano/AndroidStudioProjects/TennisScoreManager`.
@@ -29,7 +39,7 @@ bash ~/Scaricati/installa_tsm.sh
 ## 2. Aprire e compilare in Android Studio
 
 1. Avvia Android Studio: `/opt/android-studio/bin/studio.sh`.
-2. **File › Open** → scegli `/home/stefano/AndroidStudioProjects/TennisScoreManager` → **Trust Project**.
+2. **File › Open** → scegli la cartella `TennisScoreManager` (quella del clone o quella creata dallo script) → **Trust Project**.
 3. Aspetta la sincronizzazione Gradle (la prima volta scarica Gradle, il plugin Android e le librerie: serve internet solo adesso).
 4. Se compare *"Failed to find target android-36"* clicca il link **Install missing platform** (oppure **Tools › SDK Manager › SDK Platforms › Android 16 (API 36)**).
 5. Se Android Studio propone l'**AGP Upgrade Assistant**, puoi ignorarlo: queste versioni sono state compilate e testate così.
@@ -42,7 +52,7 @@ bash ~/Scaricati/installa_tsm.sh
 1. Sul telefono: **Impostazioni › Info telefono** → tocca 7 volte *Numero build* → **Opzioni sviluppatore › Debug USB** attivo.
 2. Colleghi il cavo, accetti l'impronta RSA, scegli il telefono in alto e premi **▶ Run**.
    - Se Fedora non vede il telefono: `sudo dnf install android-tools` (regole udev) e ricollega; in alternativa **Device Manager › Pair devices using Wi-Fi** (debug wireless, Android 11+).
-3. In alternativa copia `TennisScoreManager-debug.apk` sul telefono e installalo (va consentita l'installazione da origini sconosciute).
+3. In alternativa **Build › Build App Bundle(s) / APK(s) › Build APK(s)**, copia l'APK sul telefono e installalo (va consentita l'installazione da origini sconosciute).
 
 ## 4. La voce (funziona senza internet)
 
@@ -68,7 +78,7 @@ bash ~/Scaricati/installa_tsm.sh
    `https://static-cdn.m5stack.com/resource/arduino/package_m5stack_index.json`
 3. **Boards Manager** → cerca **M5Stack** → installa la versione **≥ 3.2.5**.
 4. **Library Manager** → installa **M5Unified** (accetta "Install all" per M5GFX) e **NimBLE-Arduino** di *h2zero* (≥ 2.1).
-5. **File › Open** → `~/Arduino/TSM_Band/TSM_Band.ino`.
+5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` del clone (oppure `~/Arduino/TSM_Band/TSM_Band.ino` se hai usato lo script).
 6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → `/dev/ttyACM0`.
    *(Senza il pacchetto M5Stack va bene anche "ESP32S3 Dev Module": USB CDC On Boot = Enabled, Flash Size = 8MB, Partition = 8M with spiffs.)*
 7. **Upload (→)**. Se la porta non compare o il caricamento fallisce: tieni premuto a lungo il **tasto laterale** (modalità download) e riprova.
