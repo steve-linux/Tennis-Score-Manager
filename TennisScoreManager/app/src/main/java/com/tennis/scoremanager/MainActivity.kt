@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         controller.envTick.value++
+        controller.ble.refreshLocation()
         if (controller.options.value.mode == PlayMode.BANDS) controller.ble.reconnectAll()
     }
 

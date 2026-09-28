@@ -1,6 +1,7 @@
 package com.tennis.scoremanager.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 
 /** Testi dell'app nelle due lingue. Le etichette dei cronometri restano in inglese come sul tabellone ATP. */
@@ -37,16 +38,47 @@ interface Strings {
     val enable: String
     val allow: String
     val ok: String
-    val searchBands: String
-    val searching: String
     val bandFor: (String) -> String
     val noBand: String
-    val bandNotFound: String
     val bandConnected: String
     val bandConnecting: String
     val bandIdle: String
     val bandOff: String
     val battery: String
+    val autoSearch: String
+    val autoSearchOff: String
+    val identify: String
+    val swapBands: String
+    val bandsOffAtEnd: String
+    val bandsOffAtEndHint: String
+    val bandNotReady: String
+
+    // Impostazioni del braccialetto
+    val bandSettings: String
+    val settingsShort: String
+    val bandSettingsNeedLink: String
+    val bandFirmwareOld: String
+    val bandFirmware: (String) -> String
+    val bandName: String
+    val brightness: String
+    val scoreTime: String
+    val scoreTimeHint: String
+    val beeperVolume: String
+    val mute: String
+    val off: String
+    val flipDisplay: String
+    val flipDisplayHint: String
+    val autoOff: String
+    val pairTimeout: String
+    val lostTimeout: String
+    val idleTimeout: String
+    val estimateFull: (String) -> String
+    val estimateNow: (String, Int) -> String
+    val estimateBreakdown: (String, String, String, String) -> String
+    val estimateMeasured: String
+    val estimateTheory: String
+    val copyToOther: String
+    val powerOff: String
     val languageSection: String
     val italian: String
     val english: String
@@ -139,6 +171,10 @@ interface Strings {
     val whoServesFirst: (String) -> String
     val confirm: String
     val backDisabled: String
+    val exit: String
+    val exitConfirmTitle: String
+    val exitConfirmText: String
+    val exitConfirmBands: String
 
     // Messaggi del riquadro arancione
     val msgChangeEnds: String
@@ -154,7 +190,7 @@ interface Strings {
     val msgResumed: String
     val msgBandConnected: (String) -> String
     val msgBandLost: (String) -> String
-    val msgBandOff: (String) -> String
+    val msgBandOff: (String, Int?) -> String
     val msgBandBatteryLow: (String, Int) -> String
     val bandBatteryLow: String
     val autonomy: (String) -> String
@@ -168,6 +204,9 @@ interface Strings {
     val bandSet: String
     val bandSuspended: String
     val bandGameSetMatch: String
+    val bandMatchOver: String
+    val bandAppClosed: String
+    val bandOffFromApp: String
 
     // Riepilogo
     val summaryTitle: String
@@ -186,7 +225,6 @@ interface Strings {
     val result: String
     val saveHistory: String
     val share: String
-    val exit: String
     val saveDialogTitle: String
     val fileName: String
     val folder: String
@@ -233,16 +271,48 @@ object ItStrings : Strings {
     override val enable = "Attiva"
     override val allow = "Consenti"
     override val ok = "OK"
-    override val searchBands = "Cerca braccialetti"
-    override val searching = "Ricerca in corso…"
     override val bandFor: (String) -> String = { "Braccialetto di $it" }
     override val noBand = "Nessuno"
-    override val bandNotFound = "Nessun braccialetto trovato: accendilo (tasto laterale) e riprova."
     override val bandConnected = "Connesso"
     override val bandConnecting = "Connessione…"
     override val bandIdle = "Non connesso"
     override val bandOff = "Spento"
     override val battery = "Batteria"
+    override val autoSearch = "Ricerca automatica: accendi i braccialetti (tasto laterale), si associano da soli."
+    override val autoSearchOff = "La ricerca parte quando i requisiti qui sopra sono a posto."
+    override val identify = "Identifica"
+    override val swapBands = "Scambia G1 ↔ G2"
+    override val bandsOffAtEnd = "Spegni i braccialetti a fine partita e all'uscita"
+    override val bandsOffAtEndHint = "Si riaccendono con un clic sul tasto laterale."
+    override val bandNotReady = "Braccialetto non collegato"
+
+    override val bandSettings = "Impostazioni braccialetto"
+    override val settingsShort = "Impostazioni"
+    override val bandSettingsNeedLink = "Collega il braccialetto per vedere e cambiare le impostazioni."
+    override val bandFirmwareOld = "Il firmware di questo braccialetto non ha le impostazioni: carica TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Nome"
+    override val brightness = "Luminosità display"
+    override val scoreTime = "Punteggio visibile dopo ogni punto"
+    override val scoreTimeHint = "Il riepilogo di fine game resta 2 secondi in più."
+    override val beeperVolume = "Volume cicalino"
+    override val mute = "Muto"
+    override val off = "No"
+    override val flipDisplay = "Display capovolto"
+    override val flipDisplayHint = "Per portare il braccialetto sull'altro polso."
+    override val autoOff = "Spegnimento automatico"
+    override val pairTimeout = "All'accensione, se nessun telefono si collega"
+    override val lostTimeout = "Se perde il collegamento col telefono"
+    override val idleTimeout = "Se resta collegato ma inattivo"
+    override val estimateFull: (String) -> String = { "Autonomia stimata $it da carica piena" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h con la carica attuale ($p%)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Consumo medio $tot mA: scheda e Bluetooth $base · display $dsp · cicalino $snd"
+    }
+    override val estimateMeasured = "Base misurata su questo braccialetto durante l'uso."
+    override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
+    override val copyToOther = "Copia sull'altro braccialetto"
+    override val powerOff = "Spegni"
     override val languageSection = "Lingua"
     override val italian = "Italiano"
     override val english = "English"
@@ -327,7 +397,11 @@ object ItStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
-    override val backDisabled = "Durante la partita usa «Nuova partita» per uscire."
+    override val backDisabled = "Durante la partita usa «Nuova partita» o «Esci»."
+    override val exit = "Esci"
+    override val exitConfirmTitle = "Uscire dall'app?"
+    override val exitConfirmText = "La partita resta salvata tra le partite sospese e potrai riprenderla."
+    override val exitConfirmBands = "I braccialetti vengono spenti."
 
     override val msgChangeEnds = "CAMBIO CAMPO"
     override val msgTiebreak = "TIE-BREAK"
@@ -342,7 +416,14 @@ object ItStrings : Strings {
     override val msgResumed = "PARTITA RIPRESA"
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
     override val msgBandLost: (String) -> String = { "BRACCIALETTO $it DISCONNESSO" }
-    override val msgBandOff: (String) -> String = { "BRACCIALETTO $it SPENTO" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "BRACCIALETTO $n SPENTO" + when (why) {
+            BandProtocol.OFF_IDLE -> " (INATTIVO)"
+            BandProtocol.OFF_BATTERY -> " (BATTERIA SCARICA)"
+            BandProtocol.OFF_TIMEOUT -> " (NESSUN TELEFONO)"
+            else -> ""
+        }
+    }
     override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "BRACCIALETTO $n: BATTERIA $p%" }
     override val bandBatteryLow = "BATTERIA BASSA"
     override val autonomy: (String) -> String = { "autonomia ~$it" }
@@ -355,6 +436,9 @@ object ItStrings : Strings {
     override val bandSet = "SET"
     override val bandSuspended = "SOSPESA"
     override val bandGameSetMatch = "GAME SET MATCH"
+    override val bandMatchOver = "FINE PARTITA"
+    override val bandAppClosed = "APP CHIUSA"
+    override val bandOffFromApp = "SPEGNIMENTO"
 
     override val summaryTitle = "Partita conclusa"
     override val winner = "Vincitore"
@@ -372,7 +456,6 @@ object ItStrings : Strings {
     override val result = "Risultato"
     override val saveHistory = "Salva nello storico"
     override val share = "Condividi"
-    override val exit = "Esci"
     override val saveDialogTitle = "Salva nello storico"
     override val fileName = "Nome"
     override val folder = "Cartella"
@@ -419,16 +502,48 @@ object EnStrings : Strings {
     override val enable = "Turn on"
     override val allow = "Allow"
     override val ok = "OK"
-    override val searchBands = "Search wristbands"
-    override val searching = "Searching…"
     override val bandFor: (String) -> String = { "$it's wristband" }
     override val noBand = "None"
-    override val bandNotFound = "No wristband found: switch it on (side button) and retry."
     override val bandConnected = "Connected"
     override val bandConnecting = "Connecting…"
     override val bandIdle = "Not connected"
     override val bandOff = "Off"
     override val battery = "Battery"
+    override val autoSearch = "Searching automatically: switch the wristbands on (side button), they pair by themselves."
+    override val autoSearchOff = "The search starts once the requirements above are met."
+    override val identify = "Identify"
+    override val swapBands = "Swap P1 ↔ P2"
+    override val bandsOffAtEnd = "Switch the wristbands off at match end and on exit"
+    override val bandsOffAtEndHint = "One click on the side button switches them back on."
+    override val bandNotReady = "Wristband not connected"
+
+    override val bandSettings = "Wristband settings"
+    override val settingsShort = "Settings"
+    override val bandSettingsNeedLink = "Connect the wristband to see and change its settings."
+    override val bandFirmwareOld = "This wristband's firmware has no settings: upload TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Name"
+    override val brightness = "Display brightness"
+    override val scoreTime = "Score shown after each point"
+    override val scoreTimeHint = "The end-of-game summary stays 2 seconds longer."
+    override val beeperVolume = "Beeper volume"
+    override val mute = "Mute"
+    override val off = "Off"
+    override val flipDisplay = "Flip display"
+    override val flipDisplayHint = "To wear the wristband on the other wrist."
+    override val autoOff = "Automatic power-off"
+    override val pairTimeout = "At power-on, if no phone connects"
+    override val lostTimeout = "If the phone link is lost"
+    override val idleTimeout = "If connected but idle"
+    override val estimateFull: (String) -> String = { "Estimated battery life $it from full" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h at the current charge ($p%)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Average draw $tot mA: board and Bluetooth $base · display $dsp · beeper $snd"
+    }
+    override val estimateMeasured = "Base draw measured on this wristband while in use."
+    override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
+    override val copyToOther = "Copy to the other wristband"
+    override val powerOff = "Power off"
     override val languageSection = "Language"
     override val italian = "Italiano"
     override val english = "English"
@@ -513,7 +628,11 @@ object EnStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
-    override val backDisabled = "During the match use «New match» to leave."
+    override val backDisabled = "During the match use «New match» or «Exit»."
+    override val exit = "Exit"
+    override val exitConfirmTitle = "Exit the app?"
+    override val exitConfirmText = "The match stays saved among suspended matches and can be resumed."
+    override val exitConfirmBands = "The wristbands are switched off."
 
     override val msgChangeEnds = "CHANGE ENDS"
     override val msgTiebreak = "TIE-BREAK"
@@ -528,7 +647,14 @@ object EnStrings : Strings {
     override val msgResumed = "MATCH RESUMED"
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
     override val msgBandLost: (String) -> String = { "WRISTBAND $it DISCONNECTED" }
-    override val msgBandOff: (String) -> String = { "WRISTBAND $it OFF" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "WRISTBAND $n OFF" + when (why) {
+            BandProtocol.OFF_IDLE -> " (IDLE)"
+            BandProtocol.OFF_BATTERY -> " (BATTERY EMPTY)"
+            BandProtocol.OFF_TIMEOUT -> " (NO PHONE)"
+            else -> ""
+        }
+    }
     override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "WRISTBAND $n: BATTERY $p%" }
     override val bandBatteryLow = "LOW BATTERY"
     override val autonomy: (String) -> String = { "about $it left" }
@@ -541,6 +667,9 @@ object EnStrings : Strings {
     override val bandSet = "SET"
     override val bandSuspended = "SUSPENDED"
     override val bandGameSetMatch = "GAME SET MATCH"
+    override val bandMatchOver = "MATCH OVER"
+    override val bandAppClosed = "APP CLOSED"
+    override val bandOffFromApp = "POWER OFF"
 
     override val summaryTitle = "Match concluded"
     override val winner = "Winner"
@@ -558,7 +687,6 @@ object EnStrings : Strings {
     override val result = "Result"
     override val saveHistory = "Save to history"
     override val share = "Share"
-    override val exit = "Exit"
     override val saveDialogTitle = "Save to history"
     override val fileName = "Name"
     override val folder = "Folder"

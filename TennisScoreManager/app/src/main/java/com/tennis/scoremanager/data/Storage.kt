@@ -42,6 +42,14 @@ class Storage(context: Context) {
             .apply()
     }
 
+    /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
+    fun bandBaseMa(address: String): Double? =
+        prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
+
+    fun setBandBaseMa(address: String, ma: Double) {
+        prefs.edit().putFloat("base_ma_$address", ma.toFloat()).apply()
+    }
+
     var historyTree: String?
         get() = prefs.getString("history_tree", null)
         set(v) = prefs.edit().putString("history_tree", v).apply()

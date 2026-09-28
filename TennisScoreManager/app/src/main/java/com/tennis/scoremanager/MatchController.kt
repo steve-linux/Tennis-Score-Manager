@@ -8,10 +8,15 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.ble.BandSettings
+import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
+import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchLocation
@@ -30,6 +35,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.stringsFor
 import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.CallBuilder
@@ -39,12 +45,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.io.OutputStream
 
@@ -103,7 +113,17 @@ class MatchController(
     val customVoiceCount = MutableStateFlow(0)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
+    /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
+    private val statusStart = mutableMapOf<Side, BandStatus>()
+    private val lastStatus = mutableMapOf<Side, BandStatus>()
     private val batteryWarned = mutableMapOf<Side, Int>()
+    /** Consumo di base misurato per braccialetto (indirizzo -> mA): rende più precisa la stima nelle impostazioni. */
+    val bandBaseMa = MutableStateFlow<Map<String, Double>>(emptyMap())
+    /** Ricerca automatica attiva (pagina dei braccialetti aperta): i braccialetti trovati riempiono i posti liberi. */
+    private var autoAssign = false
+    /** Braccialetti tolti a mano: la ricerca automatica non li rimette. */
+    private val autoBlocked = mutableSetOf<String>()
+    private var closing = false
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -132,6 +152,7 @@ class MatchController(
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
+        scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
         scope.launch {
@@ -193,10 +214,82 @@ class MatchController(
     }
 
     fun assignBand(side: Side, address: String?, name: String?) {
+        if (address == null) ble.bands.value[side]?.address?.let { autoBlocked += it } else autoBlocked -= address
+        setBand(side, address, name)
+    }
+
+    private fun setBand(side: Side, address: String?, name: String?) {
         // Un braccialetto appartiene a un solo giocatore: se era sull'altro lato lo si toglie.
         if (address != null && storage.bandAddress(side == Side.P2) == address) storage.setBand(side == Side.P2, null, null)
         storage.setBand(side == Side.P1, address, name)
         ble.assign(side, address, name)
+    }
+
+    /**
+     * Ricerca automatica e continua mentre la pagina dei braccialetti è aperta (e l'app in primo piano).
+     * I braccialetti trovati vanno da soli nei posti liberi: prima Giocatore 1, poi Giocatore 2.
+     */
+    fun setBandScan(on: Boolean) {
+        autoAssign = on && options.value.mode == PlayMode.BANDS
+        ble.setAutoScan(autoAssign)
+    }
+
+    private fun autoFill(found: List<FoundBand>) {
+        if (!autoAssign || options.value.mode != PlayMode.BANDS) return
+        for (f in found.sortedByDescending { it.rssi }) {
+            val bands = ble.bands.value
+            if (bands.values.any { it.address == f.address } || f.address in autoBlocked) continue
+            val free = Side.entries.firstOrNull { bands[it] == null } ?: return
+            setBand(free, f.address, f.name)
+        }
+    }
+
+    /** Scambia i braccialetti tra i due giocatori (restano collegati) e lo mostra su ciascuno. */
+    fun swapBands() {
+        val p1 = storage.bandAddress(true) to storage.bandName(true)
+        val p2 = storage.bandAddress(false) to storage.bandName(false)
+        storage.setBand(true, p2.first, p2.second)
+        storage.setBand(false, p1.first, p1.second)
+        ble.swapSides()
+        Side.entries.forEach { ble.send(it, BandProtocol.message(strings.bandPaired, names().short(it), 3)) }
+    }
+
+    /** Il braccialetto lampeggia nel colore del giocatore e suona: così si vede quale braccialetto è di chi. */
+    fun identifyBand(side: Side) {
+        val s = strings
+        val line1 = s.playerDefault(if (side == Side.P1) 1 else 2)
+        scope.launch {
+            if (!ble.command(side, BandProtocol.identify(line1, names().short(side), 6, TsmColors.player(side).toArgb()))) {
+                _toasts.tryEmit(s.bandNotReady)
+            }
+        }
+    }
+
+    /** Scrive le impostazioni nel braccialetto; il braccialetto risponde con quelle applicate. */
+    fun writeBandSettings(side: Side, settings: BandSettings) {
+        val s = strings
+        scope.launch { if (!ble.writeSettings(side, settings)) _toasts.tryEmit(s.bandNotReady) }
+    }
+
+    /** Stesse impostazioni sull'altro braccialetto (il nome resta il suo). */
+    fun copyBandSettings(from: Side) {
+        val src = ble.bands.value[from]?.settings ?: return
+        val dst = ble.bands.value[from.other]?.settings ?: return
+        writeBandSettings(from.other, src.copy(name = dst.name))
+    }
+
+    fun powerOffBand(side: Side) {
+        val s = strings
+        scope.launch { if (!ble.command(side, BandProtocol.powerOff(s.bandOffFromApp, ""))) _toasts.tryEmit(s.bandNotReady) }
+    }
+
+    /** Spegne i braccialetti collegati; [line2] è il testo sotto a "SPEGNIMENTO" per ciascun lato. */
+    private suspend fun powerOffBands(line1: String, line2: (Side) -> String) {
+        withTimeoutOrNull(3_000) {
+            coroutineScope {
+                Side.entries.map { side -> async { ble.command(side, BandProtocol.powerOff(line1, line2(side))) } }.awaitAll()
+            }
+        }
     }
 
     private fun bandLabel(side: Side) = if (side == Side.P1) "1" else "2"
@@ -205,15 +298,23 @@ class MatchController(
      * Stato batteria ogni minuto: stima dell'autonomia sul consumo reale, avvisi al 20 % e al 10 %,
      * registro CSV (files/battery_log.csv) per verificare quanto dura il braccialetto.
      */
-    private fun onBandStatus(side: Side, st: com.tennis.scoremanager.ble.BandStatus) {
+    private fun onBandStatus(side: Side, st: BandStatus) {
         val now = SystemClock.elapsedRealtime()
-        val soc = com.tennis.scoremanager.ble.BatteryModel.soc(st.millivolts)
+        val soc = BatteryModel.soc(st.millivolts)
         val samples = batterySamples.getOrPut(side) { mutableListOf() }
-        if (st.charging) samples.clear() else samples += now to soc
+        // Braccialetto riacceso (i contatori ripartono) o in carica: si ricomincia a misurare.
+        val rebooted = lastStatus[side]?.let { st.uptimeS < it.uptimeS } == true
+        lastStatus[side] = st
+        if (st.charging || rebooted) samples.clear()
+        if (!st.charging) {
+            if (samples.isEmpty()) statusStart[side] = st
+            samples += now to soc
+        }
         // teniamo al massimo le ultime 3 ore di campioni
         while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
-        val hours = if (st.charging) null else com.tennis.scoremanager.ble.BatteryModel.hoursLeft(samples)
+        val hours = if (st.charging) null else BatteryModel.hoursLeft(samples)
         bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        calibrate(side, st, samples)
         android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
         scope.launch(io) {
             runCatching {
@@ -241,6 +342,23 @@ class MatchController(
         }
     }
 
+    /**
+     * Consumo di base misurato: calo della carica meno il display acceso nel frattempo (lo conta il braccialetto).
+     * Si salva per indirizzo, così la stima nelle impostazioni migliora a ogni uso.
+     */
+    private fun calibrate(side: Side, st: BandStatus, samples: List<Pair<Long, Int>>) {
+        val band = ble.bands.value[side] ?: return
+        val settings = band.settings ?: return
+        val start = statusStart[side] ?: return
+        val drain = BatteryModel.drainPerHour(samples) ?: return
+        val upS = st.uptimeS - start.uptimeS
+        if (upS <= 0) return
+        val duty = ((st.displayS - start.displayS).toDouble() / upS).coerceIn(0.0, 1.0)
+        val base = BatteryModel.baseFromMeasure(drain, duty, settings)
+        storage.setBandBaseMa(band.address, base)
+        bandBaseMa.value = bandBaseMa.value + (band.address to base)
+    }
+
     /** Batteria bassa già all'inizio: meglio saperlo prima di giocare. */
     private fun warnLowBandsAtStart() {
         if (options.value.mode != PlayMode.BANDS) return
@@ -256,10 +374,17 @@ class MatchController(
                 for ((side, info) in bands) {
                     val before = prev[side]
                     if (before == LinkState.READY && info.state == LinkState.IDLE) showMessage(strings.msgBandLost(bandLabel(side)))
-                    if (before != LinkState.POWERED_OFF && info.state == LinkState.POWERED_OFF) showMessage(strings.msgBandOff(bandLabel(side)))
                 }
             }
             prev = bands.mapValues { it.value.state }
+            for ((side, info) in bands) {
+                // Nome cambiato dalle impostazioni: lo si ricorda per la prossima volta.
+                val n = info.settings?.name
+                if (!n.isNullOrEmpty() && storage.bandAddress(side == Side.P1) == info.address && storage.bandName(side == Side.P1) != n) {
+                    storage.setBand(side == Side.P1, info.address, n)
+                }
+                if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
+            }
         }
     }
 
@@ -279,6 +404,9 @@ class MatchController(
     private fun onBandEvent(e: BandEvent) {
         val now = SystemClock.elapsedRealtime()
         when (e.type) {
+            BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
+                showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))
+            }
             BandProtocol.EVT_POINT -> when (screen.value) {
                 Screen.START -> startMatch()
                 // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
@@ -529,6 +657,11 @@ class MatchController(
         stopCountdown()
         screen.value = Screen.SUMMARY
         MatchService.stop(app)
+        // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
+        if (rec.options.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) {
+            val s = strings
+            scope.launch { powerOffBands(s.bandMatchOver) { side -> Reports.scoreLine(lm.state, side) } }
+        }
     }
 
     /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
@@ -830,12 +963,37 @@ class MatchController(
         return Intent.createChooser(send, s.share)
     }
 
-    fun exitApp(activity: Activity) {
-        persist()
-        announcer.stop()
-        ble.disconnectAll()
-        MatchService.stop(app)
-        activity.finishAndRemoveTask()
+    /** "Esci": l'app si chiude davvero e alla prossima apertura riparte dalla prima schermata. */
+    fun exitApp(activity: Activity) = shutdown { activity.finishAndRemoveTask() }
+
+    /** L'app è stata tolta dalle app recenti mentre il servizio della partita era attivo: stessa cosa di "Esci". */
+    fun onTaskRemoved(stopService: () -> Unit) = shutdown(stopService)
+
+    /**
+     * Chiusura: la partita in corso resta tra le sospese (salvata prima di tutto), i braccialetti si spengono
+     * (se l'opzione è attiva), poi si chiude il processo. Senza questo Android lo tiene in vita e l'app
+     * riaprirebbe esattamente dov'era.
+     */
+    private fun shutdown(finish: () -> Unit) {
+        if (closing) return
+        closing = true
+        val s = strings
+        scope.launch {
+            announcer.stop()
+            live.value?.let { lm ->
+                val snapshot = lm.record.copy(
+                    suspended = !lm.state.isFinished, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
+                )
+                runningSince = null
+                withContext(io) { storage.saveMatch(snapshot) }
+            }
+            if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
+            ble.disconnectAll()
+            MatchService.stop(app)
+            finish()
+            delay(400)
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
     }
 
     /** Chiamato quando l'Activity va in secondo piano. */

@@ -42,6 +42,9 @@ import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Language
@@ -90,6 +93,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.BandInfo
@@ -103,9 +107,11 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.Picker
 import com.tennis.scoremanager.ui.RequirementRow
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
@@ -128,12 +134,13 @@ fun OptionsScreen(c: MatchController) {
     val su by c.setup.collectAsState()
     val env by c.envTick.collectAsState()
     val btOn by c.ble.adapterOn.collectAsState()
+    // Bluetooth e posizione si seguono in tempo reale (anche se li si spegne dalla tendina senza lasciare l'app).
+    val locOn by c.ble.locationOn.collectAsState()
     var permTick by remember { mutableIntStateOf(0) }
     val names = remember(su, s) { Names(su, s) }
 
     val blePerms = remember(env, permTick) { c.ble.hasPermissions() }
     val locPerm = remember(env, permTick) { LocationHelper.hasPermission(context) }
-    val locOn = remember(env, permTick) { LocationHelper.isEnabled(context) }
 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permTick++
@@ -289,32 +296,36 @@ fun OptionsScreen(c: MatchController) {
 @Composable
 private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     val s = LocalStrings.current
+    val o by c.options.collectAsState()
     val found by c.ble.found.collectAsState()
     val scanning by c.ble.scanning.collectAsState()
     val bands by c.ble.bands.collectAsState()
-    var searched by remember { mutableStateOf(false) }
+    val batteries by c.bandBattery.collectAsState()
+
+    // Ricerca automatica e continua finché questa pagina è aperta e l'app è in primo piano.
+    LifecycleResumeEffect(enabled) {
+        c.setBandScan(enabled)
+        onPauseOrDispose { c.setBandScan(false) }
+    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        BigButton(
-            if (scanning) s.searching else s.searchBands,
-            Icons.AutoMirrored.Filled.BluetoothSearching,
-            onClick = {
-                searched = true
-                if (scanning) c.ble.stopScan() else c.ble.startScan()
-            },
-            enabled = enabled,
-            modifier = Modifier.weight(1f),
-            color = TsmColors.SurfaceHigh,
-            onColor = TsmColors.TextMain,
-        )
         if (scanning) {
-            Spacer(Modifier.width(12.dp))
-            CircularProgressIndicator(Modifier.size(28.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+            CircularProgressIndicator(Modifier.size(22.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+            Spacer(Modifier.width(10.dp))
+        } else {
+            Icon(Icons.AutoMirrored.Filled.BluetoothSearching, null, tint = TsmColors.TextDim)
+            Spacer(Modifier.width(10.dp))
         }
+        Text(if (scanning) s.autoSearch else s.autoSearchOff, color = if (scanning) TsmColors.TextMain else TsmColors.Orange, fontSize = 13.sp)
     }
-    if (searched && !scanning && found.isEmpty()) Text(s.bandNotFound, color = TsmColors.Orange)
     for (side in Side.entries) {
-        BandPicker(c, side, names.short(side), bands[side], found, bands, c.bandBattery.collectAsState().value[side])
+        BandPicker(c, side, names.short(side), bands[side], found, bands, batteries[side])
+    }
+    if (bands.size == 2) {
+        GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapBands() }, Modifier.fillMaxWidth())
+    }
+    SwitchRow(Icons.Filled.PowerSettingsNew, s.bandsOffAtEnd, s.bandsOffAtEndHint, o.bandsOffAtEnd) { v ->
+        c.updateOptions { it.copy(bandsOffAtEnd = v) }
     }
 }
 
@@ -330,6 +341,7 @@ private fun BandPicker(
 ) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
+    var settingsOpen by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
     Column(Modifier.fillMaxWidth()) {
         Text(s.bandFor(playerName), color = accent, fontWeight = FontWeight.Bold)
@@ -381,6 +393,22 @@ private fun BandPicker(
                         },
                     )
                 }
+            }
+        }
+        if (current != null) {
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val ready = current.state == LinkState.READY
+                SmallAction(s.identify, Icons.Filled.FlashOn, Modifier.weight(1f), enabled = ready) { c.identifyBand(side) }
+                SmallAction(
+                    s.settingsShort, if (settingsOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, Modifier.weight(1f),
+                ) { settingsOpen = !settingsOpen }
+            }
+            if (settingsOpen) {
+                Spacer(Modifier.height(8.dp))
+                Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, accent.copy(alpha = 0.5f), RoundedCornerShape(14.dp)).padding(12.dp),
+                ) { BandSettingsPanel(c, side) }
             }
         }
     }
@@ -457,30 +485,6 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
 /** "it-it-x-itb-local" -> "Voce ITB"; gli altri nomi restano come sono. */
 private fun voiceLabel(name: String, s: Strings): String =
     if ("-x-" in name) s.voiceName(name.substringAfter("-x-").substringBefore('-').uppercase()) else name
-
-/** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
-@Composable
-private fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
-    var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth()) {
-        Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
-        Spacer(Modifier.height(4.dp))
-        Box {
-            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
-                Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
-            }
-            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-                for ((key, text) in options) {
-                    DropdownMenuItem(text = { Text(text) }, onClick = {
-                        open = false
-                        onSelect(key)
-                    })
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun SmallAction(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {

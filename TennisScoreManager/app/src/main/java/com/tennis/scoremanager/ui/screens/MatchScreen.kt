@@ -1,5 +1,6 @@
 package com.tennis.scoremanager.ui.screens
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -9,6 +10,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,6 +29,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
@@ -37,10 +42,14 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -76,6 +85,7 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -83,10 +93,12 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
+    val activity = context as? Activity
     val liveMatch by c.live.collectAsState()
     val lm = liveMatch ?: return
     val clock by c.clockMs.collectAsState()
@@ -100,6 +112,8 @@ fun MatchScreen(c: MatchController) {
     val state = lm.state
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
+    var confirmExit by remember { mutableStateOf(false) }
+    var bandSheet by remember { mutableStateOf<Side?>(null) }
 
     BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
 
@@ -108,7 +122,7 @@ fun MatchScreen(c: MatchController) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         TimersRow(clock, cd, s)
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value)
+        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -135,12 +149,51 @@ fun MatchScreen(c: MatchController) {
             ) { c.toggleSuspend() }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
             ControlButton(
                 if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                if (o.audio) s.audioOn else s.audioOff,
-                Modifier.weight(1f),
+                null,
+                Modifier.width(64.dp),
+                contentDescription = if (o.audio) s.audioOn else s.audioOff,
             ) { c.toggleAudio() }
-            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1f)) { confirmNew = true }
+            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+            ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+        }
+    }
+
+    if (confirmExit) {
+        AlertDialog(
+            onDismissRequest = { confirmExit = false },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
+            title = { Text(s.exitConfirmTitle) },
+            text = {
+                Text(s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    confirmExit = false
+                    activity?.let { c.exitApp(it) }
+                }) { Text(s.exit) }
+            },
+            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text(s.cancel) } },
+        )
+    }
+
+    bandSheet?.let { first ->
+        var side by remember(first) { mutableStateOf(first) }
+        ModalBottomSheet(onDismissRequest = { bandSheet = null }, containerColor = TsmColors.Surface) {
+            Column(
+                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(s.bandSettings, color = TsmColors.TextMain, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Segmented(
+                    Side.entries.map { SegOption(names.short(it), Icons.Filled.Watch, TsmColors.player(it), TsmColors.onPlayer(it)) },
+                    selected = side.ordinal,
+                    onSelect = { side = Side.entries[it] },
+                )
+                BandSettingsPanel(c, side)
+            }
         }
     }
 
@@ -247,9 +300,10 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
     }
 }
 
+/** Stato dei braccialetti; toccandone uno si aprono le sue impostazioni. */
 @Composable
-private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>, onOpen: (Side) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         for (side in Side.entries) {
             val b = bands[side]
             val (icon, ok) = when (b?.state) {
@@ -270,8 +324,14 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
                 },
                 if (low) TsmColors.TextMain else if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
                 icon,
+                onClick = { onOpen(side) },
             )
         }
+        Spacer(Modifier.weight(1f))
+        Icon(
+            Icons.Filled.Tune, null, tint = TsmColors.TextDim,
+            modifier = Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).clickable { onOpen(Side.P1) },
+        )
     }
 }
 
@@ -413,7 +473,14 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
 }
 
 @Composable
-private fun ControlButton(icon: ImageVector, text: String, modifier: Modifier, highlight: Boolean = false, onClick: () -> Unit) {
+private fun ControlButton(
+    icon: ImageVector,
+    text: String?,
+    modifier: Modifier,
+    highlight: Boolean = false,
+    contentDescription: String? = null,
+    onClick: () -> Unit,
+) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
@@ -421,9 +488,11 @@ private fun ControlButton(icon: ImageVector, text: String, modifier: Modifier, h
         modifier = modifier.height(52.dp),
     ) {
         Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Icon(icon, null, tint = if (highlight) TsmColors.OnOrange else TsmColors.TextMain)
-            Spacer(Modifier.width(8.dp))
-            Text(text, color = if (highlight) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(icon, contentDescription, tint = if (highlight) TsmColors.OnOrange else TsmColors.TextMain)
+            if (text != null) {
+                Spacer(Modifier.width(8.dp))
+                Text(text, color = if (highlight) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
         }
     }
 }

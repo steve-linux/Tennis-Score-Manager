@@ -25,6 +25,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -244,9 +251,11 @@ fun RequirementRow(icon: ImageVector, label: String, ok: Boolean, action: String
 }
 
 @Composable
-fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null) {
+fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null, onClick: (() -> Unit)? = null) {
     Row(
-        Modifier.clip(RoundedCornerShape(50)).background(color).padding(horizontal = 10.dp, vertical = 4.dp),
+        Modifier.clip(RoundedCornerShape(50)).background(color)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -254,5 +263,29 @@ fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null) 
             Spacer(Modifier.width(4.dp))
         }
         Text(text, color = onColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    }
+}
+
+/** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
+@Composable
+fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth()) {
+        Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
+        Spacer(Modifier.height(4.dp))
+        Box {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+                Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+            }
+            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                for ((key, text) in options) {
+                    DropdownMenuItem(text = { Text(text) }, onClick = {
+                        open = false
+                        onSelect(key)
+                    })
+                }
+            }
+        }
     }
 }

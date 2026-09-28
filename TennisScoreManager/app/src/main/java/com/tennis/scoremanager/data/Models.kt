@@ -42,6 +42,8 @@ data class MatchOptions(
     val ttsVoice: String? = null,
     /** true = legge i file generati invece della sintesi continua. */
     val voiceFiles: Boolean = false,
+    /** Spegne i braccialetti quando si conferma la fine della partita (e quando si esce dall'app). */
+    val bandsOffAtEnd: Boolean = true,
 )
 
 @Serializable

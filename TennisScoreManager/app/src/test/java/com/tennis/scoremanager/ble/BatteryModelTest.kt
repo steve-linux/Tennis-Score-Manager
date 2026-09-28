@@ -40,4 +40,38 @@ class BatteryModelTest {
         // nessun calo
         assertNull(BatteryModel.hoursLeft((0..30).map { it * 60_000L to 80 }))
     }
+
+    @Test
+    fun estimateFollowsSettings() {
+        val default = BatteryModel.estimate(BandSettings())
+        assertTrue(!default.measured)
+        // 250 mAh con ~36 mA: circa 7 ore da carica piena, più della partita più lunga
+        assertEquals(7.0, default.hoursFull, 0.5)
+        assertEquals(default.hoursFull / 2, default.hoursAt(50), 0.01)
+        // display più luminoso e più a lungo, cicalino al massimo: consuma di più
+        val bright = BatteryModel.estimate(BandSettings(brightness = 100, pointSeconds = 8, volume = 100))
+        assertTrue(bright.totalMa > default.totalMa + 3)
+        // punteggio spento e muto: consuma di meno
+        val saver = BatteryModel.estimate(BandSettings(brightness = 5, pointSeconds = 0, volume = 0))
+        assertTrue(saver.totalMa < default.totalMa)
+        assertEquals(0.0, saver.soundMa, 0.0)
+        // con una base misurata si usa quella
+        val measured = BatteryModel.estimate(BandSettings(), 50.0)
+        assertTrue(measured.measured)
+        assertEquals(50.0, measured.baseMa, 0.0)
+    }
+
+    @Test
+    fun baseFromMeasuredDrain() {
+        // 16 % all'ora di 250 mAh = 40 mA in tutto; display acceso il 10 % del tempo a luminosità 20 (8 mA)
+        val s = BandSettings(brightness = 20, volume = 0)
+        assertEquals(40.0 - 0.8, BatteryModel.baseFromMeasure(16.0, 0.10, s), 0.01)
+    }
+
+    @Test
+    fun hoursText() {
+        assertEquals("~40 min", BatteryModel.formatHours(40 / 60.0))
+        assertEquals("~7 h", BatteryModel.formatHours(7.0))
+        assertEquals("~6 h 30 min", BatteryModel.formatHours(6.5))
+    }
 }

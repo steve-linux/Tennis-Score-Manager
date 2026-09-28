@@ -17,6 +17,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MainActivity
 import com.tennis.scoremanager.R
+import com.tennis.scoremanager.TsmApp
 
 /**
  * Servizio in primo piano durante la partita con i braccialetti: tiene attivo il processo
@@ -25,6 +26,11 @@ import com.tennis.scoremanager.R
 class MatchService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    /** App tolta dalle recenti durante la partita: si chiude come con "Esci" (partita salvata tra le sospese). */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        (application as TsmApp).controller.onTaskRemoved { stopSelf() }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val nm = getSystemService(NotificationManager::class.java)

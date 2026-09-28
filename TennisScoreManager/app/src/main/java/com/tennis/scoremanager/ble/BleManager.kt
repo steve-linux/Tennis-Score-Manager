@@ -20,9 +20,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.model.Side
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +47,7 @@ import java.util.UUID
 
 enum class LinkState { IDLE, CONNECTING, READY, POWERED_OFF }
 
-data class FoundBand(val address: String, val name: String, val rssi: Int)
+data class FoundBand(val address: String, val name: String, val rssi: Int, val lastSeen: Long = 0L)
 
 data class BandInfo(
     val address: String,
@@ -54,9 +57,12 @@ data class BandInfo(
     val battery: Int? = null,
     val millivolts: Int? = null,
     val charging: Boolean = false,
+    /** Impostazioni lette dal braccialetto; null = firmware senza impostazioni (prima della 2.0) o non ancora lette. */
+    val settings: BandSettings? = null,
 )
 
-data class BandEvent(val side: Side, val type: Int)
+/** [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. */
+data class BandEvent(val side: Side, val type: Int, val reason: Int? = null)
 
 /**
  * Gestisce i due braccialetti. Ogni lato (Giocatore 1 / Giocatore 2) ha al massimo un braccialetto:
@@ -85,9 +91,14 @@ class BleManager(context: Context) {
     val status: SharedFlow<Pair<Side, BandStatus>> = _status
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
+    private val _locationOn = MutableStateFlow(LocationHelper.isEnabled(app))
+    /** Posizione del telefono attiva: senza, Android non restituisce i braccialetti trovati. Si aggiorna da sola. */
+    val locationOn: StateFlow<Boolean> = _locationOn
 
     private val links = mutableMapOf<Side, BandLink>()
-    private var scanStopJob: Job? = null
+    private var scanJob: Job? = null
+    /** Ricerca automatica voluta (pagina dei braccialetti aperta): riparte da sola se Bluetooth o posizione tornano. */
+    private var autoScan = false
 
     init {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -95,13 +106,32 @@ class BleManager(context: Context) {
             override fun onReceive(c: Context?, i: Intent?) {
                 val st = i?.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
                 _adapterOn.value = st == BluetoothAdapter.STATE_ON
-                if (st == BluetoothAdapter.STATE_ON) links.values.forEach { it.connect() }
+                if (st == BluetoothAdapter.STATE_ON) {
+                    links.values.forEach { it.connect() }
+                    if (autoScan) startScan()
+                }
                 if (st == BluetoothAdapter.STATE_OFF) {
-                    _scanning.value = false
+                    stopScan()
                     links.values.forEach { it.onAdapterOff() }
                 }
             }
         }, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        // La posizione si può spegnere dalla tendina senza che l'app vada in pausa: la si segue in tempo reale.
+        val locFilter = IntentFilter().apply {
+            addAction(LocationManager.MODE_CHANGED_ACTION)
+            addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
+        }
+        ContextCompat.registerReceiver(app, object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, i: Intent?) = refreshLocation()
+        }, locFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    }
+
+    /** Ricontrolla la posizione (anche a ogni ritorno nell'app). Quando torna attiva la ricerca riparte. */
+    fun refreshLocation() {
+        val on = LocationHelper.isEnabled(app)
+        val was = _locationOn.value
+        _locationOn.value = on
+        if (on && !was && autoScan) startScan()
     }
 
     val isSupported: Boolean get() = adapter != null && app.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
@@ -111,31 +141,59 @@ class BleManager(context: Context) {
         ContextCompat.checkSelfPermission(app, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun startScan(): Boolean {
+    /**
+     * Ricerca automatica e continua dei braccialetti finché [on] (la pagina dei braccialetti è aperta).
+     * I braccialetti che non si sentono più da 10 s spariscono dall'elenco (spenti, o già collegati: da
+     * collegati non trasmettono più).
+     */
+    fun setAutoScan(on: Boolean) {
+        autoScan = on
+        if (on) startScan() else stopScan()
+    }
+
+    private fun startScan(): Boolean {
         val scanner = adapter?.bluetoothLeScanner ?: return false
         if (!hasPermissions() || !isEnabled) return false
         stopScan()
-        _found.value = emptyList()
         val filters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
         val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
         return runCatching {
             scanner.startScan(filters, settings, scanCallback)
             _scanning.value = true
-            scanStopJob = scope.launch { delay(15_000); stopScan() }
+            scanJob = scope.launch {
+                var sinceRestart = 0L
+                while (true) {
+                    delay(2_000)
+                    val now = SystemClock.elapsedRealtime()
+                    _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
+                    // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
+                    sinceRestart += 2_000
+                    if (sinceRestart >= 10 * 60_000L) {
+                        sinceRestart = 0
+                        runCatching {
+                            scanner.stopScan(scanCallback)
+                            scanner.startScan(filters, settings, scanCallback)
+                        }
+                    }
+                }
+            }
         }.isSuccess
     }
 
-    fun stopScan() {
-        scanStopJob?.cancel()
+    private fun stopScan() {
+        scanJob?.cancel()
+        scanJob = null
         if (_scanning.value) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
         _scanning.value = false
+        _found.value = emptyList()
     }
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val addr = result.device.address
             val name = result.scanRecord?.deviceName ?: runCatching { result.device.name }.getOrNull() ?: "TSM-Band"
-            _found.update { list -> (list.filterNot { it.address == addr } + FoundBand(addr, name, result.rssi)).sortedBy { it.name } }
+            val band = FoundBand(addr, name, result.rssi, SystemClock.elapsedRealtime())
+            _found.update { list -> (list.filterNot { it.address == addr } + band).sortedBy { it.name } }
         }
     }
 
@@ -153,17 +211,33 @@ class BleManager(context: Context) {
         publish()
     }
 
+    /** Scambia i due braccialetti tra Giocatore 1 e Giocatore 2 senza scollegarli. */
+    fun swapSides() {
+        val a = links.remove(Side.P1)
+        val b = links.remove(Side.P2)
+        a?.let { it.side = Side.P2; links[Side.P2] = it }
+        b?.let { it.side = Side.P1; links[Side.P1] = it }
+        publish()
+    }
+
     /** Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi). */
     fun reconnectAll() = links.values.forEach { it.connect() }
 
+    /** Punteggi e messaggi: se ne arrivano altri prima dell'invio vale l'ultimo. */
     fun send(side: Side, payload: String) {
         links[side]?.send(payload)
     }
 
+    /** Comando che non deve andare perso (Identifica, spegnimento): scritto subito, true se è arrivato. */
+    suspend fun command(side: Side, payload: String): Boolean = links[side]?.command(payload) ?: false
+
+    /** Scrive le impostazioni nel braccialetto; true se le ha ricevute (poi risponde con quelle applicate). */
+    suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = links[side]?.writeConfig(settings.encode()) ?: false
+
     fun isReady(side: Side): Boolean = links[side]?.state == LinkState.READY
 
     fun disconnectAll() {
-        stopScan()
+        setAutoScan(false)
         links.values.forEach { it.close() }
         links.clear()
         publish()
@@ -171,15 +245,24 @@ class BleManager(context: Context) {
 
     private fun publish() {
         _bands.value = links.mapValues { (_, l) ->
-            BandInfo(l.address, l.name, l.state, l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery, l.status?.millivolts, l.status?.charging == true)
+            BandInfo(
+                address = l.address,
+                name = l.settings?.name?.takeIf { it.isNotEmpty() } ?: l.name,
+                state = l.state,
+                battery = l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery,
+                millivolts = l.status?.millivolts,
+                charging = l.status?.charging == true,
+                settings = l.settings,
+            )
         }
     }
 
-    private inner class BandLink(val side: Side, val address: String, val name: String) {
+    private inner class BandLink(var side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
         var battery: Int? = null
         var status: BandStatus? = null
+        var settings: BandSettings? = null
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -319,7 +402,12 @@ class BleManager(context: Context) {
                         if (seq == lastSeq) return@launch // stessa pressione ricevuta due volte
                         lastSeq = seq
                         if (type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
-                        _events.tryEmit(BandEvent(side, type))
+                        val reason = if (type == BandProtocol.EVT_POWER_OFF && copy.size >= 3) copy[2].toInt() and 0xFF else null
+                        _events.tryEmit(BandEvent(side, type, reason))
+                    }
+                    BandProtocol.CONFIG -> BandSettings.parse(String(copy, Charsets.US_ASCII))?.let {
+                        settings = it
+                        publish()
                     }
                     BandProtocol.BATTERY_LEVEL -> if (copy.isNotEmpty()) {
                         battery = (copy[0].toInt() and 0xFF).coerceIn(0, 100)
@@ -352,6 +440,10 @@ class BleManager(context: Context) {
                 op { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.STATUS)?.let {
+                enableNotify(g, it)
+                op { g.readCharacteristic(it) }
+            }
+            svc.getCharacteristic(BandProtocol.CONFIG)?.let {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
@@ -391,9 +483,13 @@ class BleManager(context: Context) {
             }
         }
 
-        private suspend fun write(msg: String): Boolean {
+        suspend fun command(msg: String): Boolean = state == LinkState.READY && write(msg)
+
+        suspend fun writeConfig(text: String): Boolean = state == LinkState.READY && write(text, BandProtocol.CONFIG)
+
+        private suspend fun write(msg: String, uuid: UUID = BandProtocol.DISPLAY): Boolean {
             val g = gatt ?: return false
-            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(BandProtocol.DISPLAY) ?: return false
+            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return false
             val bytes = msg.toByteArray(Charsets.US_ASCII).copyOf(minOf(msg.length, 180))
             return op {
                 if (Build.VERSION.SDK_INT >= 33) {
