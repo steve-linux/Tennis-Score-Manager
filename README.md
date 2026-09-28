@@ -35,4 +35,5 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Frasi e chiamate vocali | `app/.../voice/Calls.kt`, correzioni di pronuncia in `voice/Pronunciation.kt` |
 | Tempi (25/90/120/30 s), messaggi, flusso partita | `app/.../MatchController.kt` |
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
+| Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |
 | Testi IT/EN, grafica | `app/.../ui/Strings.kt`, `ui/screens/`, `ui/Theme.kt` |

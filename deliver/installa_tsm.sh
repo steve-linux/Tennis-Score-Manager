@@ -58,8 +58,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "2.0.0"
+        versionCode = 3
+        versionName = "2.1.0"
     }
 
     buildTypes {
@@ -244,6 +244,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         controller.envTick.value++
+        controller.ble.refreshLocation()
         if (controller.options.value.mode == PlayMode.BANDS) controller.ble.reconnectAll()
     }
 
@@ -266,10 +267,15 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.ble.BandSettings
+import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
+import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchLocation
@@ -288,6 +294,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.stringsFor
 import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.CallBuilder
@@ -297,12 +304,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.io.OutputStream
 
@@ -361,7 +372,17 @@ class MatchController(
     val customVoiceCount = MutableStateFlow(0)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
+    /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
+    private val statusStart = mutableMapOf<Side, BandStatus>()
+    private val lastStatus = mutableMapOf<Side, BandStatus>()
     private val batteryWarned = mutableMapOf<Side, Int>()
+    /** Consumo di base misurato per braccialetto (indirizzo -> mA): rende più precisa la stima nelle impostazioni. */
+    val bandBaseMa = MutableStateFlow<Map<String, Double>>(emptyMap())
+    /** Ricerca automatica attiva (pagina dei braccialetti aperta): i braccialetti trovati riempiono i posti liberi. */
+    private var autoAssign = false
+    /** Braccialetti tolti a mano: la ricerca automatica non li rimette. */
+    private val autoBlocked = mutableSetOf<String>()
+    private var closing = false
     /** Aumenta a ogni onResume dell'Activity: le schermate ricontrollano Bluetooth/posizione. */
     val envTick = MutableStateFlow(0)
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -390,6 +411,7 @@ class MatchController(
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
+        scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
         scope.launch {
@@ -451,10 +473,82 @@ class MatchController(
     }
 
     fun assignBand(side: Side, address: String?, name: String?) {
+        if (address == null) ble.bands.value[side]?.address?.let { autoBlocked += it } else autoBlocked -= address
+        setBand(side, address, name)
+    }
+
+    private fun setBand(side: Side, address: String?, name: String?) {
         // Un braccialetto appartiene a un solo giocatore: se era sull'altro lato lo si toglie.
         if (address != null && storage.bandAddress(side == Side.P2) == address) storage.setBand(side == Side.P2, null, null)
         storage.setBand(side == Side.P1, address, name)
         ble.assign(side, address, name)
+    }
+
+    /**
+     * Ricerca automatica e continua mentre la pagina dei braccialetti è aperta (e l'app in primo piano).
+     * I braccialetti trovati vanno da soli nei posti liberi: prima Giocatore 1, poi Giocatore 2.
+     */
+    fun setBandScan(on: Boolean) {
+        autoAssign = on && options.value.mode == PlayMode.BANDS
+        ble.setAutoScan(autoAssign)
+    }
+
+    private fun autoFill(found: List<FoundBand>) {
+        if (!autoAssign || options.value.mode != PlayMode.BANDS) return
+        for (f in found.sortedByDescending { it.rssi }) {
+            val bands = ble.bands.value
+            if (bands.values.any { it.address == f.address } || f.address in autoBlocked) continue
+            val free = Side.entries.firstOrNull { bands[it] == null } ?: return
+            setBand(free, f.address, f.name)
+        }
+    }
+
+    /** Scambia i braccialetti tra i due giocatori (restano collegati) e lo mostra su ciascuno. */
+    fun swapBands() {
+        val p1 = storage.bandAddress(true) to storage.bandName(true)
+        val p2 = storage.bandAddress(false) to storage.bandName(false)
+        storage.setBand(true, p2.first, p2.second)
+        storage.setBand(false, p1.first, p1.second)
+        ble.swapSides()
+        Side.entries.forEach { ble.send(it, BandProtocol.message(strings.bandPaired, names().short(it), 3)) }
+    }
+
+    /** Il braccialetto lampeggia nel colore del giocatore e suona: così si vede quale braccialetto è di chi. */
+    fun identifyBand(side: Side) {
+        val s = strings
+        val line1 = s.playerDefault(if (side == Side.P1) 1 else 2)
+        scope.launch {
+            if (!ble.command(side, BandProtocol.identify(line1, names().short(side), 6, TsmColors.player(side).toArgb()))) {
+                _toasts.tryEmit(s.bandNotReady)
+            }
+        }
+    }
+
+    /** Scrive le impostazioni nel braccialetto; il braccialetto risponde con quelle applicate. */
+    fun writeBandSettings(side: Side, settings: BandSettings) {
+        val s = strings
+        scope.launch { if (!ble.writeSettings(side, settings)) _toasts.tryEmit(s.bandNotReady) }
+    }
+
+    /** Stesse impostazioni sull'altro braccialetto (il nome resta il suo). */
+    fun copyBandSettings(from: Side) {
+        val src = ble.bands.value[from]?.settings ?: return
+        val dst = ble.bands.value[from.other]?.settings ?: return
+        writeBandSettings(from.other, src.copy(name = dst.name))
+    }
+
+    fun powerOffBand(side: Side) {
+        val s = strings
+        scope.launch { if (!ble.command(side, BandProtocol.powerOff(s.bandOffFromApp, ""))) _toasts.tryEmit(s.bandNotReady) }
+    }
+
+    /** Spegne i braccialetti collegati; [line2] è il testo sotto a "SPEGNIMENTO" per ciascun lato. */
+    private suspend fun powerOffBands(line1: String, line2: (Side) -> String) {
+        withTimeoutOrNull(3_000) {
+            coroutineScope {
+                Side.entries.map { side -> async { ble.command(side, BandProtocol.powerOff(line1, line2(side))) } }.awaitAll()
+            }
+        }
     }
 
     private fun bandLabel(side: Side) = if (side == Side.P1) "1" else "2"
@@ -463,15 +557,23 @@ class MatchController(
      * Stato batteria ogni minuto: stima dell'autonomia sul consumo reale, avvisi al 20 % e al 10 %,
      * registro CSV (files/battery_log.csv) per verificare quanto dura il braccialetto.
      */
-    private fun onBandStatus(side: Side, st: com.tennis.scoremanager.ble.BandStatus) {
+    private fun onBandStatus(side: Side, st: BandStatus) {
         val now = SystemClock.elapsedRealtime()
-        val soc = com.tennis.scoremanager.ble.BatteryModel.soc(st.millivolts)
+        val soc = BatteryModel.soc(st.millivolts)
         val samples = batterySamples.getOrPut(side) { mutableListOf() }
-        if (st.charging) samples.clear() else samples += now to soc
+        // Braccialetto riacceso (i contatori ripartono) o in carica: si ricomincia a misurare.
+        val rebooted = lastStatus[side]?.let { st.uptimeS < it.uptimeS } == true
+        lastStatus[side] = st
+        if (st.charging || rebooted) samples.clear()
+        if (!st.charging) {
+            if (samples.isEmpty()) statusStart[side] = st
+            samples += now to soc
+        }
         // teniamo al massimo le ultime 3 ore di campioni
         while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
-        val hours = if (st.charging) null else com.tennis.scoremanager.ble.BatteryModel.hoursLeft(samples)
+        val hours = if (st.charging) null else BatteryModel.hoursLeft(samples)
         bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        calibrate(side, st, samples)
         android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
         scope.launch(io) {
             runCatching {
@@ -499,6 +601,23 @@ class MatchController(
         }
     }
 
+    /**
+     * Consumo di base misurato: calo della carica meno il display acceso nel frattempo (lo conta il braccialetto).
+     * Si salva per indirizzo, così la stima nelle impostazioni migliora a ogni uso.
+     */
+    private fun calibrate(side: Side, st: BandStatus, samples: List<Pair<Long, Int>>) {
+        val band = ble.bands.value[side] ?: return
+        val settings = band.settings ?: return
+        val start = statusStart[side] ?: return
+        val drain = BatteryModel.drainPerHour(samples) ?: return
+        val upS = st.uptimeS - start.uptimeS
+        if (upS <= 0) return
+        val duty = ((st.displayS - start.displayS).toDouble() / upS).coerceIn(0.0, 1.0)
+        val base = BatteryModel.baseFromMeasure(drain, duty, settings)
+        storage.setBandBaseMa(band.address, base)
+        bandBaseMa.value = bandBaseMa.value + (band.address to base)
+    }
+
     /** Batteria bassa già all'inizio: meglio saperlo prima di giocare. */
     private fun warnLowBandsAtStart() {
         if (options.value.mode != PlayMode.BANDS) return
@@ -514,10 +633,17 @@ class MatchController(
                 for ((side, info) in bands) {
                     val before = prev[side]
                     if (before == LinkState.READY && info.state == LinkState.IDLE) showMessage(strings.msgBandLost(bandLabel(side)))
-                    if (before != LinkState.POWERED_OFF && info.state == LinkState.POWERED_OFF) showMessage(strings.msgBandOff(bandLabel(side)))
                 }
             }
             prev = bands.mapValues { it.value.state }
+            for ((side, info) in bands) {
+                // Nome cambiato dalle impostazioni: lo si ricorda per la prossima volta.
+                val n = info.settings?.name
+                if (!n.isNullOrEmpty() && storage.bandAddress(side == Side.P1) == info.address && storage.bandName(side == Side.P1) != n) {
+                    storage.setBand(side == Side.P1, info.address, n)
+                }
+                if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
+            }
         }
     }
 
@@ -537,6 +663,9 @@ class MatchController(
     private fun onBandEvent(e: BandEvent) {
         val now = SystemClock.elapsedRealtime()
         when (e.type) {
+            BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
+                showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))
+            }
             BandProtocol.EVT_POINT -> when (screen.value) {
                 Screen.START -> startMatch()
                 // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
@@ -787,6 +916,11 @@ class MatchController(
         stopCountdown()
         screen.value = Screen.SUMMARY
         MatchService.stop(app)
+        // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
+        if (rec.options.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) {
+            val s = strings
+            scope.launch { powerOffBands(s.bandMatchOver) { side -> Reports.scoreLine(lm.state, side) } }
+        }
     }
 
     /** Torna alla prima schermata. Una partita non finita resta salvata tra le sospese. */
@@ -1088,12 +1222,37 @@ class MatchController(
         return Intent.createChooser(send, s.share)
     }
 
-    fun exitApp(activity: Activity) {
-        persist()
-        announcer.stop()
-        ble.disconnectAll()
-        MatchService.stop(app)
-        activity.finishAndRemoveTask()
+    /** "Esci": l'app si chiude davvero e alla prossima apertura riparte dalla prima schermata. */
+    fun exitApp(activity: Activity) = shutdown { activity.finishAndRemoveTask() }
+
+    /** L'app è stata tolta dalle app recenti mentre il servizio della partita era attivo: stessa cosa di "Esci". */
+    fun onTaskRemoved(stopService: () -> Unit) = shutdown(stopService)
+
+    /**
+     * Chiusura: la partita in corso resta tra le sospese (salvata prima di tutto), i braccialetti si spengono
+     * (se l'opzione è attiva), poi si chiude il processo. Senza questo Android lo tiene in vita e l'app
+     * riaprirebbe esattamente dov'era.
+     */
+    private fun shutdown(finish: () -> Unit) {
+        if (closing) return
+        closing = true
+        val s = strings
+        scope.launch {
+            announcer.stop()
+            live.value?.let { lm ->
+                val snapshot = lm.record.copy(
+                    suspended = !lm.state.isFinished, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
+                )
+                runningSince = null
+                withContext(io) { storage.saveMatch(snapshot) }
+            }
+            if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
+            ble.disconnectAll()
+            MatchService.stop(app)
+            finish()
+            delay(400)
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
     }
 
     /** Chiamato quando l'Activity va in secondo piano. */
@@ -1134,12 +1293,15 @@ import java.util.UUID
 /**
  * Protocollo BLE condiviso con il firmware del braccialetto (TSM_Band.ino): tenere allineati gli UUID.
  *
- * Braccialetto -> telefono (notify su EVENT): 2 byte [tipo, sequenza].
+ * Braccialetto -> telefono (notify su EVENT): [tipo, sequenza] più, dal firmware 2.0, il motivo dello spegnimento.
  * Telefono -> braccialetto (write su DISPLAY): testo ASCII con campi separati da '|':
  *   P|<mio>|<avversario>|<servizio 0/1/2>|<intestazione>        punteggio del game (grande)
  *   G|<miei game>|<game avv>|<miei set>|<set avv>|<intestazione> riepilogo a fine game
  *   M|<riga 1>|<riga 2>|<secondi>                                messaggio
+ *   I|<riga 1>|<riga 2>|<secondi>|<RRGGBB>                       "Identifica": lampeggia e suona (firmware 2.0)
+ *   O|<riga 1>|<riga 2>                                          si spegne (firmware 2.0)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
+ * I firmware vecchi ignorano i tipi che non conoscono.
  */
 object BandProtocol {
     val SERVICE: UUID = UUID.fromString("7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10")
@@ -1147,14 +1309,23 @@ object BandProtocol {
     val DISPLAY: UUID = UUID.fromString("7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     /** Stato batteria ogni minuto (notify): vedi [BatteryModel.parse]. Assente nei firmware vecchi. */
     val STATUS: UUID = UUID.fromString("7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Impostazioni del braccialetto (lettura, scrittura, notify): vedi [BandSettings]. Dal firmware 2.0. */
+    val CONFIG: UUID = UUID.fromString("7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
     const val EVT_POINT = 1      // KEY1 pressione corta: punto a chi indossa il braccialetto
     const val EVT_UNDO = 2       // KEY2 pressione corta: annulla l'ultimo punto
-    const val EVT_POWER_OFF = 3  // KEY2 pressione lunga: il braccialetto si spegne
+    const val EVT_POWER_OFF = 3  // il braccialetto si spegne (terzo byte: OFF_*)
     const val EVT_BATTERY = 4    // KEY1 pressione lunga: mostra la batteria (solo informativo)
+
+    // Motivo dello spegnimento (terzo byte di EVT_POWER_OFF)
+    const val OFF_KEY = 0        // KEY2 tenuto premuto
+    const val OFF_IDLE = 1       // collegato ma inattivo troppo a lungo
+    const val OFF_BATTERY = 2    // batteria scarica
+    const val OFF_APP = 3        // l'ha chiesto l'app
+    const val OFF_TIMEOUT = 4    // nessun telefono
 
     /** Il font del braccialetto è ASCII: niente accenti, niente '|', maiuscolo. */
     fun clean(s: String, max: Int = 18): String {
@@ -1170,6 +1341,91 @@ object BandProtocol {
 
     fun message(line1: String, line2: String, seconds: Int) =
         "M|${clean(line1)}|${clean(line2, 28)}|$seconds"
+
+    /** Lampeggio a tutto schermo nel colore del giocatore (0xRRGGBB), con un bip a ogni lampo. */
+    fun identify(line1: String, line2: String, seconds: Int, rgb: Int) =
+        "I|${clean(line1)}|${clean(line2, 28)}|$seconds|${"%06X".format(rgb and 0xFFFFFF)}"
+
+    fun powerOff(line1: String, line2: String) = "O|${clean(line1)}|${clean(line2, 28)}"
+}
+
+/**
+ * Impostazioni salvate nel braccialetto. Testo sulla caratteristica CONFIG:
+ * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30".
+ * In scrittura bastano le chiavi da cambiare; il braccialetto risponde con tutte.
+ */
+data class BandSettings(
+    val name: String = "",
+    /** Luminosità del display, 5-100 %. */
+    val brightness: Int = 20,
+    /** Secondi di punteggio acceso dopo ogni punto (0 = non mostrarlo; il riepilogo di fine game dura 2 s in più). */
+    val pointSeconds: Int = 3,
+    /** Volume del cicalino, 0-100 % (0 = muto). */
+    val volume: Int = 50,
+    /** Display capovolto, per portare il braccialetto sull'altro polso. */
+    val flip: Boolean = false,
+    /** Spegnimento se all'accensione nessun telefono si collega (s). */
+    val pairTimeoutS: Int = 30,
+    /** Spegnimento se il telefono si scollega (s). */
+    val lostTimeoutS: Int = 180,
+    /** Spegnimento se collegato ma inattivo (min). */
+    val idleTimeoutMin: Int = 30,
+    val firmware: String = "",
+) {
+    fun clamped() = copy(
+        name = cleanName(name),
+        brightness = brightness.coerceIn(5, 100),
+        pointSeconds = pointSeconds.coerceIn(0, 10),
+        volume = volume.coerceIn(0, 100),
+        pairTimeoutS = pairTimeoutS.coerceIn(15, 600),
+        lostTimeoutS = lostTimeoutS.coerceIn(30, 1800),
+        idleTimeoutMin = idleTimeoutMin.coerceIn(5, 120),
+    )
+
+    /** Testo da scrivere sulla caratteristica CONFIG (il nome solo se c'è). */
+    fun encode(): String {
+        val c = clamped()
+        return buildList {
+            if (c.name.isNotEmpty()) add("name=${c.name}")
+            add("bri=${c.brightness}")
+            add("pt=${c.pointSeconds}")
+            add("vol=${c.volume}")
+            add("flip=${if (c.flip) 1 else 0}")
+            add("pair=${c.pairTimeoutS}")
+            add("lost=${c.lostTimeoutS}")
+            add("idle=${c.idleTimeoutMin}")
+        }.joinToString(";")
+    }
+
+    companion object {
+        const val NAME_MAX = 12
+
+        /** Nome valido per il braccialetto: ASCII stampabile, senza i separatori del protocollo, max 12. */
+        fun cleanName(s: String): String {
+            val plain = Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+            return plain.filter { it.code in 32..126 && it !in "|;=" }.trim().take(NAME_MAX).trim()
+        }
+
+        fun parse(text: String): BandSettings? {
+            val map = text.split(';').mapNotNull { part ->
+                val kv = part.split('=', limit = 2)
+                if (kv.size == 2) kv[0].trim() to kv[1].trim() else null
+            }.toMap()
+            if ("bri" !in map) return null
+            val d = BandSettings()
+            return BandSettings(
+                name = map["name"] ?: "",
+                brightness = map["bri"]?.toIntOrNull() ?: d.brightness,
+                pointSeconds = map["pt"]?.toIntOrNull() ?: d.pointSeconds,
+                volume = map["vol"]?.toIntOrNull() ?: d.volume,
+                flip = map["flip"] == "1",
+                pairTimeoutS = map["pair"]?.toIntOrNull() ?: d.pairTimeoutS,
+                lostTimeoutS = map["lost"]?.toIntOrNull() ?: d.lostTimeoutS,
+                idleTimeoutMin = map["idle"]?.toIntOrNull() ?: d.idleTimeoutMin,
+                firmware = map["fw"] ?: "",
+            )
+        }
+    }
 }
 TSM_EOF
 
@@ -1180,12 +1436,37 @@ package com.tennis.scoremanager.ble
 /** Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56". */
 data class BandStatus(val millivolts: Int, val charging: Boolean, val uptimeS: Long, val displayS: Long)
 
+/** Consumo medio stimato (mA) diviso per voce; [measured] = la base viene da una misura sul campo. */
+data class PowerEstimate(val baseMa: Double, val displayMa: Double, val soundMa: Double, val measured: Boolean) {
+    val totalMa: Double get() = baseMa + displayMa + soundMa
+    /** Ore di autonomia da carica piena. */
+    val hoursFull: Double get() = BatteryModel.CAPACITY_MAH / totalMa
+    /** Ore di autonomia con la carica indicata. */
+    fun hoursAt(percent: Int): Double = hoursFull * percent.coerceIn(0, 100) / 100.0
+}
+
 /**
  * Batteria LiPo del braccialetto (250 mAh): la carica si ricava dalla tensione con la curva di scarica
  * tipica (a basso carico), molto più fedele della retta 3,30-4,15 V usata da M5Unified.
  * L'autonomia si stima dal consumo reale misurato durante l'uso.
  */
 object BatteryModel {
+
+    const val CAPACITY_MAH = 250.0
+
+    /**
+     * ESP32-S3 a 80 MHz con il Bluetooth collegato e il display spento. Il core Arduino è compilato senza
+     * gestione del risparmio energetico (niente light sleep col Bluetooth acceso), quindi questa è la voce
+     * che pesa di più. Valore stimato: appena c'è una misura sul campo si usa quella ([baseFromMeasure]).
+     */
+    const val BASE_MA = 35.0
+
+    // Uso tipico in partita per ogni braccialetto: ~60 punti e ~10 game all'ora, ~1 minuto di messaggi,
+    // ~40 bip (i tasti premuti da chi lo indossa più gli avvisi).
+    const val POINTS_PER_HOUR = 60
+    const val GAMES_PER_HOUR = 10
+    const val MESSAGE_S_PER_HOUR = 60
+    const val BEEPS_PER_HOUR = 40
 
     private val curve = listOf(
         4200 to 100, 4150 to 95, 4110 to 90, 4080 to 85, 4020 to 80, 3980 to 75, 3950 to 70,
@@ -1220,10 +1501,10 @@ object BatteryModel {
     }
 
     /**
-     * Ore di autonomia rimaste, dalla retta dei minimi quadrati sui campioni (tempo in ms, carica %).
+     * Calo della carica in % all'ora (positivo), dalla retta dei minimi quadrati sui campioni (tempo in ms, carica %).
      * Servono almeno 20 minuti di dati e un calo misurabile, altrimenti null.
      */
-    fun hoursLeft(samples: List<Pair<Long, Int>>): Double? {
+    fun drainPerHour(samples: List<Pair<Long, Int>>): Double? {
         if (samples.size < 3) return null
         val t0 = samples.first().first
         val span = samples.last().first - t0
@@ -1236,8 +1517,56 @@ object BatteryModel {
         if (den <= 0.0) return null
         val slope = xs.indices.sumOf { (xs[it] - mx) * (ys[it] - my) } / den // % all'ora (negativo)
         if (slope >= -0.5) return null // calo troppo piccolo per stimare
-        val now = my + slope * (xs.last() - mx)
-        return (now / -slope).coerceAtLeast(0.0)
+        return -slope
+    }
+
+    /** Ore di autonomia rimaste secondo il calo misurato (null finché non si può stimare). */
+    fun hoursLeft(samples: List<Pair<Long, Int>>): Double? {
+        val drain = drainPerHour(samples) ?: return null
+        val xs = samples.map { (it.first - samples.first().first) / 3_600_000.0 }
+        val my = samples.map { it.second.toDouble() }.average()
+        val now = my - drain * (xs.last() - xs.average())
+        return (now / drain).coerceAtLeast(0.0)
+    }
+
+    /** Display: controller più retroilluminazione, in mA mentre è acceso. */
+    fun displayOnMa(brightness: Int): Double = 3.0 + 0.25 * brightness.coerceIn(0, 100)
+
+    /** Frazione di tempo col display acceso in partita (punteggio dopo ogni punto, riepilogo a fine game, messaggi). */
+    fun displayDuty(pointSeconds: Int): Double {
+        val shown = if (pointSeconds <= 0) 0 else POINTS_PER_HOUR * pointSeconds + GAMES_PER_HOUR * (pointSeconds + 2)
+        return (shown + MESSAGE_S_PER_HOUR) / 3600.0
+    }
+
+    /** Cicalino: codec e amplificatore restano accesi ~1,6 s per bip. */
+    fun soundMa(volume: Int): Double =
+        if (volume <= 0) 0.0 else BEEPS_PER_HOUR * 1.6 / 3600.0 * (15.0 + 0.6 * volume.coerceIn(0, 100))
+
+    /** Consumo medio con le impostazioni scelte; [measuredBaseMa] sostituisce la base stimata se c'è. */
+    fun estimate(s: BandSettings, measuredBaseMa: Double? = null): PowerEstimate = PowerEstimate(
+        baseMa = measuredBaseMa ?: BASE_MA,
+        displayMa = displayOnMa(s.brightness) * displayDuty(s.pointSeconds),
+        soundMa = soundMa(s.volume),
+        measured = measuredBaseMa != null,
+    )
+
+    /**
+     * Consumo di base ricavato da una misura: calo % all'ora × capacità, meno il display
+     * (acceso per [displayDuty] del tempo, misurato dal braccialetto) e il cicalino.
+     */
+    fun baseFromMeasure(drainPctPerHour: Double, displayDuty: Double, s: BandSettings): Double {
+        val total = drainPctPerHour * CAPACITY_MAH / 100.0
+        return (total - displayOnMa(s.brightness) * displayDuty - soundMa(s.volume)).coerceIn(10.0, 150.0)
+    }
+
+    /** "~7 h 10 min" oppure "~40 min". */
+    fun formatHours(h: Double): String {
+        val min = Math.round(h * 60).toInt()
+        return when {
+            min < 60 -> "~$min min"
+            min % 60 == 0 || min >= 600 -> "~${Math.round(h)} h"
+            else -> "~${min / 60} h ${min % 60} min"
+        }
     }
 }
 TSM_EOF
@@ -1266,9 +1595,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.model.Side
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -1290,7 +1622,7 @@ import java.util.UUID
 
 enum class LinkState { IDLE, CONNECTING, READY, POWERED_OFF }
 
-data class FoundBand(val address: String, val name: String, val rssi: Int)
+data class FoundBand(val address: String, val name: String, val rssi: Int, val lastSeen: Long = 0L)
 
 data class BandInfo(
     val address: String,
@@ -1300,9 +1632,12 @@ data class BandInfo(
     val battery: Int? = null,
     val millivolts: Int? = null,
     val charging: Boolean = false,
+    /** Impostazioni lette dal braccialetto; null = firmware senza impostazioni (prima della 2.0) o non ancora lette. */
+    val settings: BandSettings? = null,
 )
 
-data class BandEvent(val side: Side, val type: Int)
+/** [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. */
+data class BandEvent(val side: Side, val type: Int, val reason: Int? = null)
 
 /**
  * Gestisce i due braccialetti. Ogni lato (Giocatore 1 / Giocatore 2) ha al massimo un braccialetto:
@@ -1331,9 +1666,14 @@ class BleManager(context: Context) {
     val status: SharedFlow<Pair<Side, BandStatus>> = _status
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
+    private val _locationOn = MutableStateFlow(LocationHelper.isEnabled(app))
+    /** Posizione del telefono attiva: senza, Android non restituisce i braccialetti trovati. Si aggiorna da sola. */
+    val locationOn: StateFlow<Boolean> = _locationOn
 
     private val links = mutableMapOf<Side, BandLink>()
-    private var scanStopJob: Job? = null
+    private var scanJob: Job? = null
+    /** Ricerca automatica voluta (pagina dei braccialetti aperta): riparte da sola se Bluetooth o posizione tornano. */
+    private var autoScan = false
 
     init {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -1341,13 +1681,32 @@ class BleManager(context: Context) {
             override fun onReceive(c: Context?, i: Intent?) {
                 val st = i?.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
                 _adapterOn.value = st == BluetoothAdapter.STATE_ON
-                if (st == BluetoothAdapter.STATE_ON) links.values.forEach { it.connect() }
+                if (st == BluetoothAdapter.STATE_ON) {
+                    links.values.forEach { it.connect() }
+                    if (autoScan) startScan()
+                }
                 if (st == BluetoothAdapter.STATE_OFF) {
-                    _scanning.value = false
+                    stopScan()
                     links.values.forEach { it.onAdapterOff() }
                 }
             }
         }, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        // La posizione si può spegnere dalla tendina senza che l'app vada in pausa: la si segue in tempo reale.
+        val locFilter = IntentFilter().apply {
+            addAction(LocationManager.MODE_CHANGED_ACTION)
+            addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
+        }
+        ContextCompat.registerReceiver(app, object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, i: Intent?) = refreshLocation()
+        }, locFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    }
+
+    /** Ricontrolla la posizione (anche a ogni ritorno nell'app). Quando torna attiva la ricerca riparte. */
+    fun refreshLocation() {
+        val on = LocationHelper.isEnabled(app)
+        val was = _locationOn.value
+        _locationOn.value = on
+        if (on && !was && autoScan) startScan()
     }
 
     val isSupported: Boolean get() = adapter != null && app.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
@@ -1357,31 +1716,59 @@ class BleManager(context: Context) {
         ContextCompat.checkSelfPermission(app, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun startScan(): Boolean {
+    /**
+     * Ricerca automatica e continua dei braccialetti finché [on] (la pagina dei braccialetti è aperta).
+     * I braccialetti che non si sentono più da 10 s spariscono dall'elenco (spenti, o già collegati: da
+     * collegati non trasmettono più).
+     */
+    fun setAutoScan(on: Boolean) {
+        autoScan = on
+        if (on) startScan() else stopScan()
+    }
+
+    private fun startScan(): Boolean {
         val scanner = adapter?.bluetoothLeScanner ?: return false
         if (!hasPermissions() || !isEnabled) return false
         stopScan()
-        _found.value = emptyList()
         val filters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
         val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
         return runCatching {
             scanner.startScan(filters, settings, scanCallback)
             _scanning.value = true
-            scanStopJob = scope.launch { delay(15_000); stopScan() }
+            scanJob = scope.launch {
+                var sinceRestart = 0L
+                while (true) {
+                    delay(2_000)
+                    val now = SystemClock.elapsedRealtime()
+                    _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
+                    // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
+                    sinceRestart += 2_000
+                    if (sinceRestart >= 10 * 60_000L) {
+                        sinceRestart = 0
+                        runCatching {
+                            scanner.stopScan(scanCallback)
+                            scanner.startScan(filters, settings, scanCallback)
+                        }
+                    }
+                }
+            }
         }.isSuccess
     }
 
-    fun stopScan() {
-        scanStopJob?.cancel()
+    private fun stopScan() {
+        scanJob?.cancel()
+        scanJob = null
         if (_scanning.value) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
         _scanning.value = false
+        _found.value = emptyList()
     }
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val addr = result.device.address
             val name = result.scanRecord?.deviceName ?: runCatching { result.device.name }.getOrNull() ?: "TSM-Band"
-            _found.update { list -> (list.filterNot { it.address == addr } + FoundBand(addr, name, result.rssi)).sortedBy { it.name } }
+            val band = FoundBand(addr, name, result.rssi, SystemClock.elapsedRealtime())
+            _found.update { list -> (list.filterNot { it.address == addr } + band).sortedBy { it.name } }
         }
     }
 
@@ -1399,17 +1786,33 @@ class BleManager(context: Context) {
         publish()
     }
 
+    /** Scambia i due braccialetti tra Giocatore 1 e Giocatore 2 senza scollegarli. */
+    fun swapSides() {
+        val a = links.remove(Side.P1)
+        val b = links.remove(Side.P2)
+        a?.let { it.side = Side.P2; links[Side.P2] = it }
+        b?.let { it.side = Side.P1; links[Side.P1] = it }
+        publish()
+    }
+
     /** Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi). */
     fun reconnectAll() = links.values.forEach { it.connect() }
 
+    /** Punteggi e messaggi: se ne arrivano altri prima dell'invio vale l'ultimo. */
     fun send(side: Side, payload: String) {
         links[side]?.send(payload)
     }
 
+    /** Comando che non deve andare perso (Identifica, spegnimento): scritto subito, true se è arrivato. */
+    suspend fun command(side: Side, payload: String): Boolean = links[side]?.command(payload) ?: false
+
+    /** Scrive le impostazioni nel braccialetto; true se le ha ricevute (poi risponde con quelle applicate). */
+    suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = links[side]?.writeConfig(settings.encode()) ?: false
+
     fun isReady(side: Side): Boolean = links[side]?.state == LinkState.READY
 
     fun disconnectAll() {
-        stopScan()
+        setAutoScan(false)
         links.values.forEach { it.close() }
         links.clear()
         publish()
@@ -1417,15 +1820,24 @@ class BleManager(context: Context) {
 
     private fun publish() {
         _bands.value = links.mapValues { (_, l) ->
-            BandInfo(l.address, l.name, l.state, l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery, l.status?.millivolts, l.status?.charging == true)
+            BandInfo(
+                address = l.address,
+                name = l.settings?.name?.takeIf { it.isNotEmpty() } ?: l.name,
+                state = l.state,
+                battery = l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery,
+                millivolts = l.status?.millivolts,
+                charging = l.status?.charging == true,
+                settings = l.settings,
+            )
         }
     }
 
-    private inner class BandLink(val side: Side, val address: String, val name: String) {
+    private inner class BandLink(var side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
         var battery: Int? = null
         var status: BandStatus? = null
+        var settings: BandSettings? = null
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -1565,7 +1977,12 @@ class BleManager(context: Context) {
                         if (seq == lastSeq) return@launch // stessa pressione ricevuta due volte
                         lastSeq = seq
                         if (type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
-                        _events.tryEmit(BandEvent(side, type))
+                        val reason = if (type == BandProtocol.EVT_POWER_OFF && copy.size >= 3) copy[2].toInt() and 0xFF else null
+                        _events.tryEmit(BandEvent(side, type, reason))
+                    }
+                    BandProtocol.CONFIG -> BandSettings.parse(String(copy, Charsets.US_ASCII))?.let {
+                        settings = it
+                        publish()
                     }
                     BandProtocol.BATTERY_LEVEL -> if (copy.isNotEmpty()) {
                         battery = (copy[0].toInt() and 0xFF).coerceIn(0, 100)
@@ -1598,6 +2015,10 @@ class BleManager(context: Context) {
                 op { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.STATUS)?.let {
+                enableNotify(g, it)
+                op { g.readCharacteristic(it) }
+            }
+            svc.getCharacteristic(BandProtocol.CONFIG)?.let {
                 enableNotify(g, it)
                 op { g.readCharacteristic(it) }
             }
@@ -1637,9 +2058,13 @@ class BleManager(context: Context) {
             }
         }
 
-        private suspend fun write(msg: String): Boolean {
+        suspend fun command(msg: String): Boolean = state == LinkState.READY && write(msg)
+
+        suspend fun writeConfig(text: String): Boolean = state == LinkState.READY && write(text, BandProtocol.CONFIG)
+
+        private suspend fun write(msg: String, uuid: UUID = BandProtocol.DISPLAY): Boolean {
             val g = gatt ?: return false
-            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(BandProtocol.DISPLAY) ?: return false
+            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return false
             val bytes = msg.toByteArray(Charsets.US_ASCII).copyOf(minOf(msg.length, 180))
             return op {
                 if (Build.VERSION.SDK_INT >= 33) {
@@ -1808,6 +2233,8 @@ data class MatchOptions(
     val ttsVoice: String? = null,
     /** true = legge i file generati invece della sintesi continua. */
     val voiceFiles: Boolean = false,
+    /** Spegne i braccialetti quando si conferma la fine della partita (e quando si esce dall'app). */
+    val bandsOffAtEnd: Boolean = true,
 )
 
 @Serializable
@@ -2116,6 +2543,14 @@ class Storage(context: Context) {
             .putString(if (p1) "band_p1" else "band_p2", address)
             .putString(if (p1) "band_p1_name" else "band_p2_name", name)
             .apply()
+    }
+
+    /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
+    fun bandBaseMa(address: String): Double? =
+        prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
+
+    fun setBandBaseMa(address: String, ma: Double) {
+        prefs.edit().putFloat("base_ma_$address", ma.toFloat()).apply()
     }
 
     var historyTree: String?
@@ -2506,6 +2941,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MainActivity
 import com.tennis.scoremanager.R
+import com.tennis.scoremanager.TsmApp
 
 /**
  * Servizio in primo piano durante la partita con i braccialetti: tiene attivo il processo
@@ -2514,6 +2950,11 @@ import com.tennis.scoremanager.R
 class MatchService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    /** App tolta dalle recenti durante la partita: si chiude come con "Esci" (partita salvata tra le sospese). */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        (application as TsmApp).controller.onTaskRemoved { stopSelf() }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val nm = getSystemService(NotificationManager::class.java)
@@ -2562,6 +3003,246 @@ class MatchService : Service() {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/BandSettingsPanel.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/BandSettingsPanel.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.BatteryStd
+import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.ble.BandSettings
+import com.tennis.scoremanager.ble.BatteryModel
+import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.model.Side
+import java.util.Locale
+
+/**
+ * Impostazioni di un braccialetto: si scrivono nel braccialetto (che le salva) e la stima dell'autonomia
+ * si aggiorna mentre si muovono i cursori, prima ancora di rilasciarli.
+ */
+@Composable
+fun BandSettingsPanel(c: MatchController, side: Side) {
+    val s = LocalStrings.current
+    val bands by c.ble.bands.collectAsState()
+    val batteries by c.bandBattery.collectAsState()
+    val baseMa by c.bandBaseMa.collectAsState()
+    val band = bands[side] ?: return
+    if (band.state != LinkState.READY) {
+        Text(s.bandSettingsNeedLink, color = TsmColors.TextDim, fontSize = 13.sp)
+        return
+    }
+    val settings = band.settings ?: run {
+        Text(s.bandFirmwareOld, color = TsmColors.Orange, fontSize = 13.sp)
+        return
+    }
+    // Bozza locale: i cursori la cambiano subito, il braccialetto riceve il valore al rilascio.
+    var draft by remember(band.address, settings) { mutableStateOf(settings) }
+    fun commit(v: BandSettings) {
+        draft = v
+        if (v != settings) c.writeBandSettings(side, v)
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        NameField(settings.name) { commit(draft.copy(name = it)) }
+
+        SliderRow(Icons.Filled.BrightnessMedium, s.brightness, "${draft.brightness}%", draft.brightness, 5..100, 5,
+            onChange = { draft = draft.copy(brightness = it) }, onDone = { commit(draft) })
+
+        Label(Icons.Filled.Timer, s.scoreTime)
+        val times = listOf(0, 2, 3, 5, 8)
+        Segmented(
+            times.map { SegOption(if (it == 0) s.off else "$it s") },
+            selected = times.indexOf(draft.pointSeconds).takeIf { it >= 0 } ?: times.indexOfFirst { it >= draft.pointSeconds }.coerceAtLeast(0),
+            onSelect = { commit(draft.copy(pointSeconds = times[it])) },
+        )
+        Text(s.scoreTimeHint, color = TsmColors.TextDim, fontSize = 12.sp)
+
+        SliderRow(Icons.AutoMirrored.Filled.VolumeUp, s.beeperVolume, if (draft.volume == 0) s.mute else "${draft.volume}%",
+            draft.volume, 0..100, 10, onChange = { draft = draft.copy(volume = it) }, onDone = { commit(draft) })
+
+        SwitchRow(Icons.Filled.ScreenRotation, s.flipDisplay, s.flipDisplayHint, draft.flip) { commit(draft.copy(flip = it)) }
+
+        Label(Icons.Filled.PowerSettingsNew, s.autoOff)
+        Picker(s.pairTimeout, duration(draft.pairTimeoutS), listOf(15, 30, 60, 120, 180, 300).map { it to duration(it) }) {
+            commit(draft.copy(pairTimeoutS = it))
+        }
+        Picker(s.lostTimeout, duration(draft.lostTimeoutS), listOf(60, 120, 180, 300, 600).map { it to duration(it) }) {
+            commit(draft.copy(lostTimeoutS = it))
+        }
+        Picker(s.idleTimeout, duration(draft.idleTimeoutMin * 60), listOf(10, 15, 30, 45, 60).map { it to duration(it * 60) }) {
+            commit(draft.copy(idleTimeoutMin = it))
+        }
+
+        Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PanelButton(s.identify, Icons.Filled.FlashOn, Modifier.weight(1f)) { c.identifyBand(side) }
+            PanelButton(s.powerOff, Icons.Filled.PowerSettingsNew, Modifier.weight(1f), danger = true) { c.powerOffBand(side) }
+        }
+        val other = bands[side.other]
+        PanelButton(s.copyToOther, Icons.Filled.ContentCopy, Modifier.fillMaxWidth(),
+            enabled = other?.state == LinkState.READY && other.settings != null) { c.copyBandSettings(side) }
+        if (settings.firmware.isNotEmpty()) Text(s.bandFirmware(settings.firmware), color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+}
+
+/** "30 s", "1 min", "1 min 30 s". */
+private fun duration(seconds: Int): String = when {
+    seconds < 60 -> "$seconds s"
+    seconds % 60 == 0 -> "${seconds / 60} min"
+    else -> "${seconds / 60} min ${seconds % 60} s"
+}
+
+private fun ma(v: Double): String = String.format(Locale.getDefault(), if (v >= 10) "%.0f" else "%.1f", v)
+
+@Composable
+private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: Int?) {
+    val s = LocalStrings.current
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Ball.copy(alpha = 0.10f)).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.BatteryStd, null, tint = TsmColors.Ball, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(s.estimateFull(BatteryModel.formatHours(est.hoursFull)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        }
+        if (percent != null) Text(s.estimateNow(BatteryModel.formatHours(est.hoursAt(percent)), percent), color = TsmColors.Ball, fontWeight = FontWeight.SemiBold)
+        Text(s.estimateBreakdown(ma(est.totalMa), ma(est.baseMa), ma(est.displayMa), ma(est.soundMa)), color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(if (est.measured) s.estimateMeasured else s.estimateTheory, color = TsmColors.TextDim, fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun NameField(current: String, onSave: (String) -> Unit) {
+    val s = LocalStrings.current
+    val focus = LocalFocusManager.current
+    var text by remember(current) { mutableStateOf(current) }
+    val clean = BandSettings.cleanName(text)
+    fun save() {
+        focus.clearFocus()
+        if (clean.isNotEmpty() && clean != current) onSave(clean)
+    }
+    OutlinedTextField(
+        value = text,
+        onValueChange = { text = it.take(BandSettings.NAME_MAX) },
+        label = { Text(s.bandName) },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { save() }),
+        trailingIcon = {
+            if (clean.isNotEmpty() && clean != current) {
+                IconButton(onClick = { save() }) { Icon(Icons.Filled.Check, s.save, tint = TsmColors.Ball) }
+            }
+        },
+    )
+}
+
+@Composable
+private fun Label(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, tint = TsmColors.TextDim, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(text, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun SliderRow(
+    icon: ImageVector,
+    title: String,
+    valueText: String,
+    value: Int,
+    range: IntRange,
+    step: Int,
+    onChange: (Int) -> Unit,
+    onDone: () -> Unit,
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = TsmColors.TextDim, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            Text(valueText, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+        }
+        Slider(
+            value = value.toFloat(),
+            // a scatti di [step] senza i puntini delle tacche
+            onValueChange = { onChange((Math.round(it / step) * step).coerceIn(range)) },
+            onValueChangeFinished = onDone,
+            valueRange = range.first.toFloat()..range.last.toFloat(),
+            colors = SliderDefaults.colors(thumbColor = TsmColors.Ball, activeTrackColor = TsmColors.Ball),
+            modifier = Modifier.height(36.dp),
+        )
+    }
+}
+
+@Composable
+private fun PanelButton(text: String, icon: ImageVector, modifier: Modifier, enabled: Boolean = true, danger: Boolean = false, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.height(46.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (danger) TsmColors.Danger.copy(alpha = 0.18f) else TsmColors.SurfaceHigh,
+            contentColor = if (danger) TsmColors.Danger else TsmColors.TextMain,
+        ),
+    ) {
+        Icon(icon, null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(text, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Components.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Components.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ui
@@ -2591,6 +3272,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -2810,9 +3498,11 @@ fun RequirementRow(icon: ImageVector, label: String, ok: Boolean, action: String
 }
 
 @Composable
-fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null) {
+fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null, onClick: (() -> Unit)? = null) {
     Row(
-        Modifier.clip(RoundedCornerShape(50)).background(color).padding(horizontal = 10.dp, vertical = 4.dp),
+        Modifier.clip(RoundedCornerShape(50)).background(color)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -2822,6 +3512,30 @@ fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null) 
         Text(text, color = onColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
     }
 }
+
+/** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
+@Composable
+fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth()) {
+        Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
+        Spacer(Modifier.height(4.dp))
+        Box {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+                Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+            }
+            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                for ((key, text) in options) {
+                    DropdownMenuItem(text = { Text(text) }, onClick = {
+                        open = false
+                        onSelect(key)
+                    })
+                }
+            }
+        }
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Strings.kt
@@ -2829,6 +3543,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Strings.kt" << 'TSM_EO
 package com.tennis.scoremanager.ui
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 
 /** Testi dell'app nelle due lingue. Le etichette dei cronometri restano in inglese come sul tabellone ATP. */
@@ -2865,16 +3580,47 @@ interface Strings {
     val enable: String
     val allow: String
     val ok: String
-    val searchBands: String
-    val searching: String
     val bandFor: (String) -> String
     val noBand: String
-    val bandNotFound: String
     val bandConnected: String
     val bandConnecting: String
     val bandIdle: String
     val bandOff: String
     val battery: String
+    val autoSearch: String
+    val autoSearchOff: String
+    val identify: String
+    val swapBands: String
+    val bandsOffAtEnd: String
+    val bandsOffAtEndHint: String
+    val bandNotReady: String
+
+    // Impostazioni del braccialetto
+    val bandSettings: String
+    val settingsShort: String
+    val bandSettingsNeedLink: String
+    val bandFirmwareOld: String
+    val bandFirmware: (String) -> String
+    val bandName: String
+    val brightness: String
+    val scoreTime: String
+    val scoreTimeHint: String
+    val beeperVolume: String
+    val mute: String
+    val off: String
+    val flipDisplay: String
+    val flipDisplayHint: String
+    val autoOff: String
+    val pairTimeout: String
+    val lostTimeout: String
+    val idleTimeout: String
+    val estimateFull: (String) -> String
+    val estimateNow: (String, Int) -> String
+    val estimateBreakdown: (String, String, String, String) -> String
+    val estimateMeasured: String
+    val estimateTheory: String
+    val copyToOther: String
+    val powerOff: String
     val languageSection: String
     val italian: String
     val english: String
@@ -2967,6 +3713,10 @@ interface Strings {
     val whoServesFirst: (String) -> String
     val confirm: String
     val backDisabled: String
+    val exit: String
+    val exitConfirmTitle: String
+    val exitConfirmText: String
+    val exitConfirmBands: String
 
     // Messaggi del riquadro arancione
     val msgChangeEnds: String
@@ -2982,7 +3732,7 @@ interface Strings {
     val msgResumed: String
     val msgBandConnected: (String) -> String
     val msgBandLost: (String) -> String
-    val msgBandOff: (String) -> String
+    val msgBandOff: (String, Int?) -> String
     val msgBandBatteryLow: (String, Int) -> String
     val bandBatteryLow: String
     val autonomy: (String) -> String
@@ -2996,6 +3746,9 @@ interface Strings {
     val bandSet: String
     val bandSuspended: String
     val bandGameSetMatch: String
+    val bandMatchOver: String
+    val bandAppClosed: String
+    val bandOffFromApp: String
 
     // Riepilogo
     val summaryTitle: String
@@ -3014,7 +3767,6 @@ interface Strings {
     val result: String
     val saveHistory: String
     val share: String
-    val exit: String
     val saveDialogTitle: String
     val fileName: String
     val folder: String
@@ -3061,16 +3813,48 @@ object ItStrings : Strings {
     override val enable = "Attiva"
     override val allow = "Consenti"
     override val ok = "OK"
-    override val searchBands = "Cerca braccialetti"
-    override val searching = "Ricerca in corso…"
     override val bandFor: (String) -> String = { "Braccialetto di $it" }
     override val noBand = "Nessuno"
-    override val bandNotFound = "Nessun braccialetto trovato: accendilo (tasto laterale) e riprova."
     override val bandConnected = "Connesso"
     override val bandConnecting = "Connessione…"
     override val bandIdle = "Non connesso"
     override val bandOff = "Spento"
     override val battery = "Batteria"
+    override val autoSearch = "Ricerca automatica: accendi i braccialetti (tasto laterale), si associano da soli."
+    override val autoSearchOff = "La ricerca parte quando i requisiti qui sopra sono a posto."
+    override val identify = "Identifica"
+    override val swapBands = "Scambia G1 ↔ G2"
+    override val bandsOffAtEnd = "Spegni i braccialetti a fine partita e all'uscita"
+    override val bandsOffAtEndHint = "Si riaccendono con un clic sul tasto laterale."
+    override val bandNotReady = "Braccialetto non collegato"
+
+    override val bandSettings = "Impostazioni braccialetto"
+    override val settingsShort = "Impostazioni"
+    override val bandSettingsNeedLink = "Collega il braccialetto per vedere e cambiare le impostazioni."
+    override val bandFirmwareOld = "Il firmware di questo braccialetto non ha le impostazioni: carica TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Nome"
+    override val brightness = "Luminosità display"
+    override val scoreTime = "Punteggio visibile dopo ogni punto"
+    override val scoreTimeHint = "Il riepilogo di fine game resta 2 secondi in più."
+    override val beeperVolume = "Volume cicalino"
+    override val mute = "Muto"
+    override val off = "No"
+    override val flipDisplay = "Display capovolto"
+    override val flipDisplayHint = "Per portare il braccialetto sull'altro polso."
+    override val autoOff = "Spegnimento automatico"
+    override val pairTimeout = "All'accensione, se nessun telefono si collega"
+    override val lostTimeout = "Se perde il collegamento col telefono"
+    override val idleTimeout = "Se resta collegato ma inattivo"
+    override val estimateFull: (String) -> String = { "Autonomia stimata $it da carica piena" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h con la carica attuale ($p%)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Consumo medio $tot mA: scheda e Bluetooth $base · display $dsp · cicalino $snd"
+    }
+    override val estimateMeasured = "Base misurata su questo braccialetto durante l'uso."
+    override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
+    override val copyToOther = "Copia sull'altro braccialetto"
+    override val powerOff = "Spegni"
     override val languageSection = "Lingua"
     override val italian = "Italiano"
     override val english = "English"
@@ -3155,7 +3939,11 @@ object ItStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
     override val whoServesFirst: (String) -> String = { "Chi serve per primo in $it?" }
     override val confirm = "Conferma"
-    override val backDisabled = "Durante la partita usa «Nuova partita» per uscire."
+    override val backDisabled = "Durante la partita usa «Nuova partita» o «Esci»."
+    override val exit = "Esci"
+    override val exitConfirmTitle = "Uscire dall'app?"
+    override val exitConfirmText = "La partita resta salvata tra le partite sospese e potrai riprenderla."
+    override val exitConfirmBands = "I braccialetti vengono spenti."
 
     override val msgChangeEnds = "CAMBIO CAMPO"
     override val msgTiebreak = "TIE-BREAK"
@@ -3170,7 +3958,14 @@ object ItStrings : Strings {
     override val msgResumed = "PARTITA RIPRESA"
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
     override val msgBandLost: (String) -> String = { "BRACCIALETTO $it DISCONNESSO" }
-    override val msgBandOff: (String) -> String = { "BRACCIALETTO $it SPENTO" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "BRACCIALETTO $n SPENTO" + when (why) {
+            BandProtocol.OFF_IDLE -> " (INATTIVO)"
+            BandProtocol.OFF_BATTERY -> " (BATTERIA SCARICA)"
+            BandProtocol.OFF_TIMEOUT -> " (NESSUN TELEFONO)"
+            else -> ""
+        }
+    }
     override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "BRACCIALETTO $n: BATTERIA $p%" }
     override val bandBatteryLow = "BATTERIA BASSA"
     override val autonomy: (String) -> String = { "autonomia ~$it" }
@@ -3183,6 +3978,9 @@ object ItStrings : Strings {
     override val bandSet = "SET"
     override val bandSuspended = "SOSPESA"
     override val bandGameSetMatch = "GAME SET MATCH"
+    override val bandMatchOver = "FINE PARTITA"
+    override val bandAppClosed = "APP CHIUSA"
+    override val bandOffFromApp = "SPEGNIMENTO"
 
     override val summaryTitle = "Partita conclusa"
     override val winner = "Vincitore"
@@ -3200,7 +3998,6 @@ object ItStrings : Strings {
     override val result = "Risultato"
     override val saveHistory = "Salva nello storico"
     override val share = "Condividi"
-    override val exit = "Esci"
     override val saveDialogTitle = "Salva nello storico"
     override val fileName = "Nome"
     override val folder = "Cartella"
@@ -3247,16 +4044,48 @@ object EnStrings : Strings {
     override val enable = "Turn on"
     override val allow = "Allow"
     override val ok = "OK"
-    override val searchBands = "Search wristbands"
-    override val searching = "Searching…"
     override val bandFor: (String) -> String = { "$it's wristband" }
     override val noBand = "None"
-    override val bandNotFound = "No wristband found: switch it on (side button) and retry."
     override val bandConnected = "Connected"
     override val bandConnecting = "Connecting…"
     override val bandIdle = "Not connected"
     override val bandOff = "Off"
     override val battery = "Battery"
+    override val autoSearch = "Searching automatically: switch the wristbands on (side button), they pair by themselves."
+    override val autoSearchOff = "The search starts once the requirements above are met."
+    override val identify = "Identify"
+    override val swapBands = "Swap P1 ↔ P2"
+    override val bandsOffAtEnd = "Switch the wristbands off at match end and on exit"
+    override val bandsOffAtEndHint = "One click on the side button switches them back on."
+    override val bandNotReady = "Wristband not connected"
+
+    override val bandSettings = "Wristband settings"
+    override val settingsShort = "Settings"
+    override val bandSettingsNeedLink = "Connect the wristband to see and change its settings."
+    override val bandFirmwareOld = "This wristband's firmware has no settings: upload TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Name"
+    override val brightness = "Display brightness"
+    override val scoreTime = "Score shown after each point"
+    override val scoreTimeHint = "The end-of-game summary stays 2 seconds longer."
+    override val beeperVolume = "Beeper volume"
+    override val mute = "Mute"
+    override val off = "Off"
+    override val flipDisplay = "Flip display"
+    override val flipDisplayHint = "To wear the wristband on the other wrist."
+    override val autoOff = "Automatic power-off"
+    override val pairTimeout = "At power-on, if no phone connects"
+    override val lostTimeout = "If the phone link is lost"
+    override val idleTimeout = "If connected but idle"
+    override val estimateFull: (String) -> String = { "Estimated battery life $it from full" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h at the current charge ($p%)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Average draw $tot mA: board and Bluetooth $base · display $dsp · beeper $snd"
+    }
+    override val estimateMeasured = "Base draw measured on this wristband while in use."
+    override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
+    override val copyToOther = "Copy to the other wristband"
+    override val powerOff = "Power off"
     override val languageSection = "Language"
     override val italian = "Italiano"
     override val english = "English"
@@ -3341,7 +4170,11 @@ object EnStrings : Strings {
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
     override val whoServesFirst: (String) -> String = { "Who serves first for $it?" }
     override val confirm = "Confirm"
-    override val backDisabled = "During the match use «New match» to leave."
+    override val backDisabled = "During the match use «New match» or «Exit»."
+    override val exit = "Exit"
+    override val exitConfirmTitle = "Exit the app?"
+    override val exitConfirmText = "The match stays saved among suspended matches and can be resumed."
+    override val exitConfirmBands = "The wristbands are switched off."
 
     override val msgChangeEnds = "CHANGE ENDS"
     override val msgTiebreak = "TIE-BREAK"
@@ -3356,7 +4189,14 @@ object EnStrings : Strings {
     override val msgResumed = "MATCH RESUMED"
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
     override val msgBandLost: (String) -> String = { "WRISTBAND $it DISCONNECTED" }
-    override val msgBandOff: (String) -> String = { "WRISTBAND $it OFF" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "WRISTBAND $n OFF" + when (why) {
+            BandProtocol.OFF_IDLE -> " (IDLE)"
+            BandProtocol.OFF_BATTERY -> " (BATTERY EMPTY)"
+            BandProtocol.OFF_TIMEOUT -> " (NO PHONE)"
+            else -> ""
+        }
+    }
     override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "WRISTBAND $n: BATTERY $p%" }
     override val bandBatteryLow = "LOW BATTERY"
     override val autonomy: (String) -> String = { "about $it left" }
@@ -3369,6 +4209,9 @@ object EnStrings : Strings {
     override val bandSet = "SET"
     override val bandSuspended = "SUSPENDED"
     override val bandGameSetMatch = "GAME SET MATCH"
+    override val bandMatchOver = "MATCH OVER"
+    override val bandAppClosed = "APP CLOSED"
+    override val bandOffFromApp = "POWER OFF"
 
     override val summaryTitle = "Match concluded"
     override val winner = "Winner"
@@ -3386,7 +4229,6 @@ object EnStrings : Strings {
     override val result = "Result"
     override val saveHistory = "Save to history"
     override val share = "Share"
-    override val exit = "Exit"
     override val saveDialogTitle = "Save to history"
     override val fileName = "Name"
     override val folder = "Folder"
@@ -3484,6 +4326,7 @@ TSM_EOF
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchScreen.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ui.screens
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -3493,6 +4336,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -3509,6 +4355,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
@@ -3521,10 +4368,14 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -3560,6 +4411,7 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -3567,10 +4419,12 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchScreen(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
+    val activity = context as? Activity
     val liveMatch by c.live.collectAsState()
     val lm = liveMatch ?: return
     val clock by c.clockMs.collectAsState()
@@ -3584,6 +4438,8 @@ fun MatchScreen(c: MatchController) {
     val state = lm.state
     val suspended = lm.record.suspended
     var confirmNew by remember { mutableStateOf(false) }
+    var confirmExit by remember { mutableStateOf(false) }
+    var bandSheet by remember { mutableStateOf<Side?>(null) }
 
     BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
 
@@ -3592,7 +4448,7 @@ fun MatchScreen(c: MatchController) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         TimersRow(clock, cd, s)
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value)
+        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -3619,12 +4475,51 @@ fun MatchScreen(c: MatchController) {
             ) { c.toggleSuspend() }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
             ControlButton(
                 if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                if (o.audio) s.audioOn else s.audioOff,
-                Modifier.weight(1f),
+                null,
+                Modifier.width(64.dp),
+                contentDescription = if (o.audio) s.audioOn else s.audioOff,
             ) { c.toggleAudio() }
-            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1f)) { confirmNew = true }
+            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+            ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+        }
+    }
+
+    if (confirmExit) {
+        AlertDialog(
+            onDismissRequest = { confirmExit = false },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
+            title = { Text(s.exitConfirmTitle) },
+            text = {
+                Text(s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    confirmExit = false
+                    activity?.let { c.exitApp(it) }
+                }) { Text(s.exit) }
+            },
+            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text(s.cancel) } },
+        )
+    }
+
+    bandSheet?.let { first ->
+        var side by remember(first) { mutableStateOf(first) }
+        ModalBottomSheet(onDismissRequest = { bandSheet = null }, containerColor = TsmColors.Surface) {
+            Column(
+                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(s.bandSettings, color = TsmColors.TextMain, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Segmented(
+                    Side.entries.map { SegOption(names.short(it), Icons.Filled.Watch, TsmColors.player(it), TsmColors.onPlayer(it)) },
+                    selected = side.ordinal,
+                    onSelect = { side = Side.entries[it] },
+                )
+                BandSettingsPanel(c, side)
+            }
         }
     }
 
@@ -3731,9 +4626,10 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
     }
 }
 
+/** Stato dei braccialetti; toccandone uno si aprono le sue impostazioni. */
 @Composable
-private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>, onOpen: (Side) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         for (side in Side.entries) {
             val b = bands[side]
             val (icon, ok) = when (b?.state) {
@@ -3754,8 +4650,14 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
                 },
                 if (low) TsmColors.TextMain else if (ok) TsmColors.onPlayer(side) else TsmColors.TextDim,
                 icon,
+                onClick = { onOpen(side) },
             )
         }
+        Spacer(Modifier.weight(1f))
+        Icon(
+            Icons.Filled.Tune, null, tint = TsmColors.TextDim,
+            modifier = Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).clickable { onOpen(Side.P1) },
+        )
     }
 }
 
@@ -3897,7 +4799,14 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
 }
 
 @Composable
-private fun ControlButton(icon: ImageVector, text: String, modifier: Modifier, highlight: Boolean = false, onClick: () -> Unit) {
+private fun ControlButton(
+    icon: ImageVector,
+    text: String?,
+    modifier: Modifier,
+    highlight: Boolean = false,
+    contentDescription: String? = null,
+    onClick: () -> Unit,
+) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
@@ -3905,9 +4814,11 @@ private fun ControlButton(icon: ImageVector, text: String, modifier: Modifier, h
         modifier = modifier.height(52.dp),
     ) {
         Row(Modifier.fillMaxSize().padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Icon(icon, null, tint = if (highlight) TsmColors.OnOrange else TsmColors.TextMain)
-            Spacer(Modifier.width(8.dp))
-            Text(text, color = if (highlight) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(icon, contentDescription, tint = if (highlight) TsmColors.OnOrange else TsmColors.TextMain)
+            if (text != null) {
+                Spacer(Modifier.width(8.dp))
+                Text(text, color = if (highlight) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
         }
     }
 }
@@ -3959,6 +4870,9 @@ import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Language
@@ -4007,6 +4921,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.BandInfo
@@ -4020,9 +4935,11 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.Picker
 import com.tennis.scoremanager.ui.RequirementRow
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
@@ -4045,12 +4962,13 @@ fun OptionsScreen(c: MatchController) {
     val su by c.setup.collectAsState()
     val env by c.envTick.collectAsState()
     val btOn by c.ble.adapterOn.collectAsState()
+    // Bluetooth e posizione si seguono in tempo reale (anche se li si spegne dalla tendina senza lasciare l'app).
+    val locOn by c.ble.locationOn.collectAsState()
     var permTick by remember { mutableIntStateOf(0) }
     val names = remember(su, s) { Names(su, s) }
 
     val blePerms = remember(env, permTick) { c.ble.hasPermissions() }
     val locPerm = remember(env, permTick) { LocationHelper.hasPermission(context) }
-    val locOn = remember(env, permTick) { LocationHelper.isEnabled(context) }
 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permTick++
@@ -4206,32 +5124,36 @@ fun OptionsScreen(c: MatchController) {
 @Composable
 private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     val s = LocalStrings.current
+    val o by c.options.collectAsState()
     val found by c.ble.found.collectAsState()
     val scanning by c.ble.scanning.collectAsState()
     val bands by c.ble.bands.collectAsState()
-    var searched by remember { mutableStateOf(false) }
+    val batteries by c.bandBattery.collectAsState()
+
+    // Ricerca automatica e continua finché questa pagina è aperta e l'app è in primo piano.
+    LifecycleResumeEffect(enabled) {
+        c.setBandScan(enabled)
+        onPauseOrDispose { c.setBandScan(false) }
+    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        BigButton(
-            if (scanning) s.searching else s.searchBands,
-            Icons.AutoMirrored.Filled.BluetoothSearching,
-            onClick = {
-                searched = true
-                if (scanning) c.ble.stopScan() else c.ble.startScan()
-            },
-            enabled = enabled,
-            modifier = Modifier.weight(1f),
-            color = TsmColors.SurfaceHigh,
-            onColor = TsmColors.TextMain,
-        )
         if (scanning) {
-            Spacer(Modifier.width(12.dp))
-            CircularProgressIndicator(Modifier.size(28.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+            CircularProgressIndicator(Modifier.size(22.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+            Spacer(Modifier.width(10.dp))
+        } else {
+            Icon(Icons.AutoMirrored.Filled.BluetoothSearching, null, tint = TsmColors.TextDim)
+            Spacer(Modifier.width(10.dp))
         }
+        Text(if (scanning) s.autoSearch else s.autoSearchOff, color = if (scanning) TsmColors.TextMain else TsmColors.Orange, fontSize = 13.sp)
     }
-    if (searched && !scanning && found.isEmpty()) Text(s.bandNotFound, color = TsmColors.Orange)
     for (side in Side.entries) {
-        BandPicker(c, side, names.short(side), bands[side], found, bands, c.bandBattery.collectAsState().value[side])
+        BandPicker(c, side, names.short(side), bands[side], found, bands, batteries[side])
+    }
+    if (bands.size == 2) {
+        GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapBands() }, Modifier.fillMaxWidth())
+    }
+    SwitchRow(Icons.Filled.PowerSettingsNew, s.bandsOffAtEnd, s.bandsOffAtEndHint, o.bandsOffAtEnd) { v ->
+        c.updateOptions { it.copy(bandsOffAtEnd = v) }
     }
 }
 
@@ -4247,6 +5169,7 @@ private fun BandPicker(
 ) {
     val s = LocalStrings.current
     var open by remember { mutableStateOf(false) }
+    var settingsOpen by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
     Column(Modifier.fillMaxWidth()) {
         Text(s.bandFor(playerName), color = accent, fontWeight = FontWeight.Bold)
@@ -4298,6 +5221,22 @@ private fun BandPicker(
                         },
                     )
                 }
+            }
+        }
+        if (current != null) {
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val ready = current.state == LinkState.READY
+                SmallAction(s.identify, Icons.Filled.FlashOn, Modifier.weight(1f), enabled = ready) { c.identifyBand(side) }
+                SmallAction(
+                    s.settingsShort, if (settingsOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, Modifier.weight(1f),
+                ) { settingsOpen = !settingsOpen }
+            }
+            if (settingsOpen) {
+                Spacer(Modifier.height(8.dp))
+                Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, accent.copy(alpha = 0.5f), RoundedCornerShape(14.dp)).padding(12.dp),
+                ) { BandSettingsPanel(c, side) }
             }
         }
     }
@@ -4374,30 +5313,6 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
 /** "it-it-x-itb-local" -> "Voce ITB"; gli altri nomi restano come sono. */
 private fun voiceLabel(name: String, s: Strings): String =
     if ("-x-" in name) s.voiceName(name.substringAfter("-x-").substringBefore('-').uppercase()) else name
-
-/** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
-@Composable
-private fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
-    var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth()) {
-        Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
-        Spacer(Modifier.height(4.dp))
-        Box {
-            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
-                Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
-            }
-            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-                for ((key, text) in options) {
-                    DropdownMenuItem(text = { Text(text) }, onClick = {
-                        open = false
-                        onSelect(key)
-                    })
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun SmallAction(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier, enabled: Boolean = true, onClick: () -> Unit) {
@@ -6019,6 +6934,60 @@ cat > "$DEST/app/src/main/res/xml/file_paths.xml" << 'TSM_EOF'
 </paths>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ble
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class BandSettingsTest {
+
+    @Test
+    fun parseFirmwareConfig() {
+        val s = BandSettings.parse("fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=1;pair=30;lost=180;idle=30")!!
+        assertEquals("TSM-1A2B", s.name)
+        assertEquals(20, s.brightness)
+        assertEquals(3, s.pointSeconds)
+        assertEquals(50, s.volume)
+        assertTrue(s.flip)
+        assertEquals(30, s.pairTimeoutS)
+        assertEquals(180, s.lostTimeoutS)
+        assertEquals(30, s.idleTimeoutMin)
+        assertEquals("2.0", s.firmware)
+        // un testo qualsiasi (o lo stato batteria) non sono impostazioni
+        assertNull(BandSettings.parse("mv=3987;chg=0;up=1234;dsp=56"))
+    }
+
+    @Test
+    fun encodeRoundTripAndClamp() {
+        val s = BandSettings(name = "Mario", brightness = 70, pointSeconds = 5, volume = 0, flip = true, pairTimeoutS = 60, lostTimeoutS = 300, idleTimeoutMin = 45)
+        assertEquals("name=Mario;bri=70;pt=5;vol=0;flip=1;pair=60;lost=300;idle=45", s.encode())
+        assertEquals(s, BandSettings.parse(s.encode()))
+        // valori fuori scala: il telefono li riporta negli stessi limiti del firmware
+        val wild = BandSettings(brightness = 0, pointSeconds = 99, volume = 150, pairTimeoutS = 1, lostTimeoutS = 99_999, idleTimeoutMin = 0)
+        assertEquals("bri=5;pt=10;vol=100;flip=0;pair=15;lost=1800;idle=5", wild.encode())
+    }
+
+    @Test
+    fun nameIsSafeForTheProtocol() {
+        assertEquals("Nicolo G1", BandSettings.cleanName("Nicolò G1"))
+        assertEquals("ab", BandSettings.cleanName("a|;=b"))
+        assertEquals("ABCDEFGHIJKL", BandSettings.cleanName("ABCDEFGHIJKLMNOP"))
+        assertFalse(BandSettings(name = "x;pt=0").encode().contains("x;pt=0"))
+    }
+
+    @Test
+    fun identifyAndPowerOffMessages() {
+        assertEquals("I|GIOCATORE 1|ROSSI|6|FFD600", BandProtocol.identify("Giocatore 1", "Rossi", 6, 0xFFFFD600.toInt()))
+        assertEquals("O|FINE PARTITA|6-4 6-3", BandProtocol.powerOff("Fine partita", "6-4 6-3"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BatteryModelTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BatteryModelTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ble
@@ -6062,6 +7031,40 @@ class BatteryModelTest {
         assertNull(BatteryModel.hoursLeft(samples.take(10)))
         // nessun calo
         assertNull(BatteryModel.hoursLeft((0..30).map { it * 60_000L to 80 }))
+    }
+
+    @Test
+    fun estimateFollowsSettings() {
+        val default = BatteryModel.estimate(BandSettings())
+        assertTrue(!default.measured)
+        // 250 mAh con ~36 mA: circa 7 ore da carica piena, più della partita più lunga
+        assertEquals(7.0, default.hoursFull, 0.5)
+        assertEquals(default.hoursFull / 2, default.hoursAt(50), 0.01)
+        // display più luminoso e più a lungo, cicalino al massimo: consuma di più
+        val bright = BatteryModel.estimate(BandSettings(brightness = 100, pointSeconds = 8, volume = 100))
+        assertTrue(bright.totalMa > default.totalMa + 3)
+        // punteggio spento e muto: consuma di meno
+        val saver = BatteryModel.estimate(BandSettings(brightness = 5, pointSeconds = 0, volume = 0))
+        assertTrue(saver.totalMa < default.totalMa)
+        assertEquals(0.0, saver.soundMa, 0.0)
+        // con una base misurata si usa quella
+        val measured = BatteryModel.estimate(BandSettings(), 50.0)
+        assertTrue(measured.measured)
+        assertEquals(50.0, measured.baseMa, 0.0)
+    }
+
+    @Test
+    fun baseFromMeasuredDrain() {
+        // 16 % all'ora di 250 mAh = 40 mA in tutto; display acceso il 10 % del tempo a luminosità 20 (8 mA)
+        val s = BandSettings(brightness = 20, volume = 0)
+        assertEquals(40.0 - 0.8, BatteryModel.baseFromMeasure(16.0, 0.10, s), 0.01)
+    }
+
+    @Test
+    fun hoursText() {
+        assertEquals("~40 min", BatteryModel.formatHours(40 / 60.0))
+        assertEquals("~7 h", BatteryModel.formatHours(7.0))
+        assertEquals("~6 h 30 min", BatteryModel.formatHours(6.5))
     }
 }
 TSM_EOF
@@ -7857,9 +8860,14 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   Tennis Score Manager - firmware braccialetto M5StickS3
   --------------------------------------------------------
   KEY1 corto  : punto a chi indossa il braccialetto
-  KEY1 lungo  : mostra la batteria
+  KEY1 lungo  : mostra la batteria (tiene anche acceso il braccialetto se è inattivo)
   KEY2 corto  : annulla l'ultimo punto
   KEY2 lungo  : spegne il braccialetto (riaccensione: tasto laterale, un clic)
+  Se non è collegato, un tasto qualsiasi rimanda lo spegnimento automatico.
+
+  Impostazioni (dall'app, menu "Impostazioni braccialetto"), salvate nel braccialetto:
+  nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
+  spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
 
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
@@ -7872,39 +8880,47 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 
 #include <M5Unified.h>
 #include <NimBLEDevice.h>
+#include <Preferences.h>
 
-// ------------------------------------------------------------------ impostazioni
-#define DISPLAY_ROTATION 1          // 1 o 3 = orizzontale (girare di 180° se il braccialetto è montato al contrario)
-static const uint8_t  BRIGHTNESS           = 48;                 // luminosità bassa (0-255)
-static const uint32_t PAIRING_TIMEOUT_MS   = 3UL * 60UL * 1000UL;  // nessun telefono all'accensione: si spegne dopo 3 min
-static const uint32_t RECONNECT_TIMEOUT_MS = 5UL * 60UL * 1000UL;  // telefono perso: si spegne dopo 5 min
-static const uint32_t IDLE_TIMEOUT_MS      = 45UL * 60UL * 1000UL; // connesso ma inattivo: si spegne dopo 45 min
+#define FW_VERSION "2.0"
+
+// ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
 static const uint32_t KEY1_HOLD_MS         = 1000;                 // pressione lunga KEY1 (batteria)
 static const uint32_t KEY2_HOLD_MS         = 2000;                 // pressione lunga KEY2 (spegnimento)
 static const uint32_t BLINK_PERIOD_MS      = 2000;                 // lampeggio "PAIRING": ogni 2 s...
 static const uint32_t BLINK_ON_MS          = 350;                  // ...acceso solo 350 ms
+static const uint32_t COUNTDOWN_MS         = 10000;                // ultimi 10 s prima dello spegnimento: lampeggio ogni secondo
+static const uint32_t IDLE_WARN_MS         = 30000;                // avviso 30 s prima dello spegnimento per inattività
 static const uint32_t PAIRED_MSG_MS        = 3000;                 // "PAIRING OK" per 3 s
-static const uint32_t POINT_SHOW_MS        = 3000;                 // punteggio del game acceso 3 s
-static const uint32_t GAMES_SHOW_MS        = 5000;                 // riepilogo game/set acceso 5 s
 static const uint32_t STATUS_PERIOD_MS     = 60000;                // stato batteria al telefono ogni minuto
+static const uint32_t BATT_CHECK_MS        = 15000;                // controllo batteria scarica
+static const int      BATT_EMPTY_MV        = 3300;                 // sotto questa tensione la LiPo è vuota
+static const uint32_t IDENTIFY_FLASH_MS    = 300;                  // lampeggio di "Identifica"
 
 // Testi mostrati dal braccialetto (solo ASCII)
 #define TXT_PAIRING    "PAIRING..."
 #define TXT_PAIRED     "PAIRING OK"
+#define TXT_RECONNECT  "RICONNESSIONE"
 #define TXT_NO_PHONE   "NESSUN TELEFONO"
 #define TXT_POWER_OFF  "SPEGNIMENTO"
 #define TXT_BATTERY    "BATTERIA"
 #define TXT_CHARGING   "IN CARICA"
 #define TXT_NO_LINK    "NON CONNESSO"
 #define TXT_IDLE       "INATTIVO"
+#define TXT_HOLD_KEY1  "TIENI PREMUTO KEY1"
+#define TXT_EMPTY      "BATTERIA SCARICA"
+#define TXT_SAVED      "IMPOSTAZIONI OK"
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56" per misurare i consumi
+#define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.0;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30"
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
+// Terzo byte di EVT_POWER_OFF: perché si spegne
+enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
 
 // Colori (RGB565)
 static const uint16_t C_BG     = TFT_BLACK;
@@ -7914,22 +8930,39 @@ static const uint16_t C_BALL   = 0xC7E6;   // verde pallina
 static const uint16_t C_ORANGE = 0xFD20;
 static const uint16_t C_RED    = 0xF800;
 
+// ------------------------------------------------------------------ impostazioni (salvate in memoria)
+struct Settings {
+  char     name[13];   // nome del braccialetto, max 12 caratteri ASCII
+  uint8_t  bri;        // luminosità display 5-100 %
+  uint8_t  pointS;     // secondi di punteggio acceso dopo ogni punto (0 = non mostrarlo)
+  uint8_t  vol;        // volume cicalino 0-100 % (0 = muto)
+  bool     flip;       // display capovolto (braccialetto sull'altro polso)
+  uint16_t pairS;      // spegnimento se all'accensione nessun telefono si collega (s)
+  uint16_t lostS;      // spegnimento se il telefono si scollega (s)
+  uint16_t idleMin;    // spegnimento se collegato ma inattivo (min)
+};
+static Settings cfg;
+static Preferences prefs;
+static char defaultName[13];
+
 // ------------------------------------------------------------------ stato
 static NimBLEServer*         server   = nullptr;
 static NimBLECharacteristic* evtChr   = nullptr;
 static NimBLECharacteristic* battChr  = nullptr;
 static NimBLECharacteristic* statusChr = nullptr;
-static char deviceName[16];
+static NimBLECharacteristic* configChr = nullptr;
 
 static volatile bool connected      = false;
 static volatile bool justConnected  = false;
 static volatile bool justDisconnect = false;
 static bool everConnected = false;
 
-// Messaggio ricevuto dal telefono: lo scrive il task BLE, lo disegna il loop.
+// Messaggi ricevuti dal telefono: li scrive il task BLE, li usa il loop.
 static portMUX_TYPE rxMux = portMUX_INITIALIZER_UNLOCKED;
 static char rxBuf[192];
 static volatile bool rxReady = false;
+static char cfgBuf[192];
+static volatile bool cfgReady = false;
 
 static uint8_t  seqNo = 0;
 static bool     displayOn = false;
@@ -7938,17 +8971,64 @@ static volatile uint32_t advSince = 0;  // aggiornato anche dal task BLE alla di
 static bool     advFast = true;
 static bool     advertising = false;
 static uint32_t lastActivity = 0;
+static bool     idleWarned = false;
 static uint32_t lastBattery = 0;
+static uint32_t lastBattCheck = 0;
+static uint8_t  battEmptyCount = 0;
 static uint32_t displayOnSince = 0;   // per contare quanto resta acceso il display (diagnostica consumi)
 static uint32_t displayOnTotalMs = 0;
 static uint32_t nextBlink = 0;
 static bool     blinkShown = false;
+static bool     countdownBeeped = false;
+
+// "Identifica": lampeggio a tutto schermo col colore del giocatore
+static uint32_t identifyUntil = 0;
+static uint32_t identifyNext = 0;
+static bool     identifyPhase = false;
+static uint16_t identifyColor = C_BALL;
+static char     identifyL1[24];
+static char     identifyL2[32];
+
+// Cicalino: acceso solo mentre suona
+static bool     spkOn = false;
+static uint32_t spkOffAt = 0;
+
+// ------------------------------------------------------------------ cicalino
+static void beep(float freq, uint32_t ms) {
+  if (cfg.vol == 0) return;
+  if (!spkOn) {
+    if (!M5.Speaker.begin()) return;
+    spkOn = true;
+  }
+  // volume percepito ~ quadratico: 50 % = 64/255 (il valore predefinito di M5Unified)
+  uint32_t v = (uint32_t)cfg.vol * cfg.vol * 255UL / 10000UL;
+  M5.Speaker.setVolume((uint8_t)constrain(v, 8UL, 255UL));
+  M5.Speaker.tone(freq, ms, 0, false);  // canale 0 senza interrompere: due bip di fila suonano uno dopo l'altro
+  spkOffAt = millis() + ms + 1500;      // l'amplificatore resta acceso 1,5 s: più toni di fila non lo riaccendono
+}
+
+static void speakerOff() {
+  M5.Speaker.end();  // spegne l'amplificatore
+  // M5Unified lascia acceso il codec ES8311: si spengono DAC, uscita e parte analogica
+  // (M5.Speaker.begin() riscrive questi stessi registri al prossimo bip).
+  static const uint8_t ES8311 = 0x18;
+  M5.In_I2C.writeRegister8(ES8311, 0x32, 0x00, 400000);  // volume DAC a zero
+  M5.In_I2C.writeRegister8(ES8311, 0x12, 0x02, 400000);  // DAC spento
+  M5.In_I2C.writeRegister8(ES8311, 0x13, 0x00, 400000);  // uscita spenta
+  M5.In_I2C.writeRegister8(ES8311, 0x0D, 0xFC, 400000);  // parte analogica spenta
+  M5.In_I2C.writeRegister8(ES8311, 0x00, 0x00, 400000);  // macchina a stati spenta
+  spkOn = false;
+}
+
+static void speakerIdle(uint32_t now) {
+  if (spkOn && (int32_t)(now - spkOffAt) >= 0 && !M5.Speaker.isPlaying()) speakerOff();
+}
 
 // ------------------------------------------------------------------ display
 static void displayWake() {
   if (!displayOn) {
     M5.Display.wakeup();
-    M5.Display.setBrightness(BRIGHTNESS);
+    M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
     displayOn = true;
     displayOnSince = millis();
   }
@@ -7969,8 +9049,8 @@ static void showFor(uint32_t ms) {
 }
 
 // Scrive un testo centrato scegliendo il font più grande che ci sta in larghezza.
-static void drawFit(const char* txt, int y, const lgfx::IFont* const* fonts, int nFonts, uint16_t color, int maxW = 232) {
-  M5.Display.setTextColor(color, C_BG);
+static void drawFit(const char* txt, int y, const lgfx::IFont* const* fonts, int nFonts, uint16_t color, int maxW = 232, uint16_t bg = C_BG) {
+  M5.Display.setTextColor(color, bg);
   M5.Display.setTextDatum(middle_center);
   for (int i = 0; i < nFonts; i++) {
     M5.Display.setFont(fonts[i]);
@@ -7983,14 +9063,14 @@ static void drawFit(const char* txt, int y, const lgfx::IFont* const* fonts, int
 static const lgfx::IFont* const BIG_FONTS[]   = { &fonts::FreeSansBold24pt7b, &fonts::FreeSansBold18pt7b, &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b };
 static const lgfx::IFont* const SMALL_FONTS[] = { &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b, &fonts::Font2 };
 
-static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT) {
+static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT, uint16_t bg = C_BG, uint16_t color2 = C_DIM) {
   displayWake();
-  M5.Display.fillScreen(C_BG);
+  M5.Display.fillScreen(bg);
   if (l2 && l2[0]) {
-    drawFit(l1, 45, BIG_FONTS, 4, color);
-    drawFit(l2, 100, SMALL_FONTS, 3, C_DIM);
+    drawFit(l1, 45, BIG_FONTS, 4, color, 232, bg);
+    drawFit(l2, 100, SMALL_FONTS, 3, color2, 232, bg);
   } else {
-    drawFit(l1, M5.Display.height() / 2, BIG_FONTS, 4, color);
+    drawFit(l1, M5.Display.height() / 2, BIG_FONTS, 4, color, 232, bg);
   }
 }
 
@@ -8048,8 +9128,106 @@ static void drawBattery() {
   showFor(3000);
 }
 
+// ------------------------------------------------------------------ impostazioni
+static void clampSettings() {
+  cfg.bri     = constrain(cfg.bri, 5, 100);
+  cfg.pointS  = constrain(cfg.pointS, 0, 10);
+  cfg.vol     = constrain(cfg.vol, 0, 100);
+  cfg.pairS   = constrain(cfg.pairS, 15, 600);
+  cfg.lostS   = constrain(cfg.lostS, 30, 1800);
+  cfg.idleMin = constrain(cfg.idleMin, 5, 120);
+  if (!cfg.name[0]) strlcpy(cfg.name, defaultName, sizeof(cfg.name));
+}
+
+static void loadSettings() {
+  prefs.begin("tsm", false);
+  String n = prefs.getString("name", "");
+  strlcpy(cfg.name, n.c_str(), sizeof(cfg.name));
+  cfg.bri     = prefs.getUChar("bri", 20);
+  cfg.pointS  = prefs.getUChar("pt", 3);
+  cfg.vol     = prefs.getUChar("vol", 50);
+  cfg.flip    = prefs.getBool("flip", false);
+  cfg.pairS   = prefs.getUShort("pair", 30);
+  cfg.lostS   = prefs.getUShort("lost", 180);
+  cfg.idleMin = prefs.getUShort("idle", 30);
+  clampSettings();
+}
+
+static void saveSettings() {
+  // Il nome predefinito non si salva: così resta legato al chip anche dopo un ripristino.
+  prefs.putString("name", strcmp(cfg.name, defaultName) == 0 ? "" : cfg.name);
+  prefs.putUChar("bri", cfg.bri);
+  prefs.putUChar("pt", cfg.pointS);
+  prefs.putUChar("vol", cfg.vol);
+  prefs.putBool("flip", cfg.flip);
+  prefs.putUShort("pair", cfg.pairS);
+  prefs.putUShort("lost", cfg.lostS);
+  prefs.putUShort("idle", cfg.idleMin);
+}
+
+static void publishConfig(bool notify) {
+  char buf[128];
+  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u",
+           FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin);
+  configChr->setValue((const uint8_t*)buf, strlen(buf));
+  if (notify && connected) configChr->notify();
+}
+
+static void applyName() {
+  NimBLEDevice::setDeviceName(cfg.name);
+  NimBLEAdvertisementData scanData;
+  scanData.setName(cfg.name);
+  NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
+  bool wasOn = adv->isAdvertising();
+  if (wasOn) adv->stop();
+  adv->setScanResponseData(scanData);
+  if (wasOn) adv->start();
+}
+
+// "chiave=valore;chiave=valore": si applicano solo le chiavi presenti, le altre restano come sono.
+static void handleConfig(char* text) {
+  char oldName[13];
+  strlcpy(oldName, cfg.name, sizeof(oldName));
+  const uint8_t oldVol = cfg.vol;
+  for (char* part = strtok(text, ";"); part; part = strtok(nullptr, ";")) {
+    char* eq = strchr(part, '=');
+    if (!eq) continue;
+    *eq = 0;
+    const char* k = part;
+    const char* v = eq + 1;
+    if (!strcmp(k, "name")) {
+      char clean[13];
+      int j = 0;
+      for (const char* p = v; *p && j < 12; p++) {
+        if (*p >= 32 && *p <= 126 && *p != '|' && *p != ';' && *p != '=') clean[j++] = *p;
+      }
+      clean[j] = 0;
+      strlcpy(cfg.name, clean, sizeof(cfg.name));
+    }
+    else if (!strcmp(k, "bri"))  cfg.bri     = atoi(v);
+    else if (!strcmp(k, "pt"))   cfg.pointS  = atoi(v);
+    else if (!strcmp(k, "vol"))  cfg.vol     = atoi(v);
+    else if (!strcmp(k, "flip")) cfg.flip    = atoi(v) != 0;
+    else if (!strcmp(k, "pair")) cfg.pairS   = atoi(v);
+    else if (!strcmp(k, "lost")) cfg.lostS   = atoi(v);
+    else if (!strcmp(k, "idle")) cfg.idleMin = atoi(v);
+  }
+  clampSettings();
+  saveSettings();
+  if (strcmp(oldName, cfg.name) != 0) applyName();
+  M5.Display.setRotation(cfg.flip ? 3 : 1);
+  if (displayOn) M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
+  publishConfig(true);
+  // Anteprima: nome con la nuova luminosità e il nuovo verso, e un bip col nuovo volume.
+  identifyUntil = 0;
+  drawMessage(cfg.name, TXT_SAVED, C_BALL);
+  showFor(2000);
+  if (cfg.vol > 0 && cfg.vol != oldVol) beep(2700, 80);
+}
+
 // ------------------------------------------------------------------ messaggi dal telefono
 // P|mio|avversario|servizio|intestazione   G|mieiG|loroG|mieiS|loroS|intestazione   M|riga1|riga2|secondi
+// I|riga1|riga2|secondi|RRGGBB (identifica)   O|riga1|riga2 (spegni)
 static int splitFields(char* s, char** out, int maxOut) {
   int n = 0;
   out[n++] = s;
@@ -8062,16 +9240,25 @@ static int splitFields(char* s, char** out, int maxOut) {
   return n;
 }
 
+static uint16_t rgb565(const char* hex) {
+  uint32_t rgb = strtoul(hex, nullptr, 16);
+  return (uint16_t)(((rgb >> 8) & 0xF800) | ((rgb >> 5) & 0x07E0) | ((rgb >> 3) & 0x001F));
+}
+
+static void powerOff(const char* l1, const char* why, uint8_t reason);
+
 static void handleMessage(char* msg) {
   char* f[8] = { 0 };
   int n = splitFields(msg, f, 8);
   if (n < 1 || !f[0][0]) return;
-  switch (f[0][0]) {
+  const char type = f[0][0];
+  if (type != 'I') identifyUntil = 0;  // un nuovo messaggio interrompe "Identifica"
+  switch (type) {
     case 'P':
-      if (n >= 5) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(POINT_SHOW_MS); }
+      if (n >= 5 && cfg.pointS > 0) { drawPoint(f[1], f[2], atoi(f[3]), f[4]); showFor(cfg.pointS * 1000UL); }
       break;
     case 'G':
-      if (n >= 6) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor(GAMES_SHOW_MS); }
+      if (n >= 6 && cfg.pointS > 0) { drawGames(atoi(f[1]), atoi(f[2]), atoi(f[3]), atoi(f[4]), f[5]); showFor((cfg.pointS + 2) * 1000UL); }
       break;
     case 'M':
       if (n >= 4) {
@@ -8080,7 +9267,41 @@ static void handleMessage(char* msg) {
         showFor((uint32_t)constrain(s, 1, 30) * 1000UL);
       }
       break;
+    case 'I':
+      if (n >= 4) {
+        strlcpy(identifyL1, f[1], sizeof(identifyL1));
+        strlcpy(identifyL2, f[2], sizeof(identifyL2));
+        identifyColor = (n >= 5 && f[4][0]) ? rgb565(f[4]) : C_BALL;
+        identifyUntil = millis() + (uint32_t)constrain(atoi(f[3]), 1, 30) * 1000UL;
+        identifyNext = millis();
+        identifyPhase = false;
+      }
+      break;
+    case 'O':
+      powerOff(n >= 2 && f[1][0] ? f[1] : TXT_POWER_OFF, n >= 3 ? f[2] : "", OFF_APP);
+      break;
   }
+}
+
+// Lampeggio: colore pieno con testo nero, poi nero con testo colorato; un bip a ogni lampo.
+static void identifyStep(uint32_t now) {
+  if (!identifyUntil) return;
+  if ((int32_t)(now - identifyUntil) >= 0) {
+    identifyUntil = 0;
+    drawMessage(identifyL1, identifyL2, identifyColor);
+    showFor(1500);
+    return;
+  }
+  if ((int32_t)(now - identifyNext) < 0) return;
+  identifyNext = now + IDENTIFY_FLASH_MS;
+  identifyPhase = !identifyPhase;
+  if (identifyPhase) {
+    drawMessage(identifyL1, identifyL2, C_BG, identifyColor, C_BG);
+    beep(2400, 60);
+  } else {
+    drawMessage(identifyL1, identifyL2, identifyColor);
+  }
+  showFor(IDENTIFY_FLASH_MS * 3);
 }
 
 // ------------------------------------------------------------------ BLE
@@ -8102,17 +9323,23 @@ class ServerCallbacks : public NimBLEServerCallbacks {
   }
 };
 
+static void copyValue(NimBLECharacteristic* c, char* buf, size_t size, volatile bool& flag) {
+  NimBLEAttValue v = c->getValue();
+  size_t len = v.length();
+  if (len >= size) len = size - 1;
+  portENTER_CRITICAL(&rxMux);
+  memcpy(buf, v.data(), len);
+  buf[len] = 0;
+  flag = true;
+  portEXIT_CRITICAL(&rxMux);
+}
+
 class DisplayCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override {
-    NimBLEAttValue v = c->getValue();
-    size_t len = v.length();
-    if (len >= sizeof(rxBuf)) len = sizeof(rxBuf) - 1;
-    portENTER_CRITICAL(&rxMux);
-    memcpy(rxBuf, v.data(), len);
-    rxBuf[len] = 0;
-    rxReady = true;
-    portEXIT_CRITICAL(&rxMux);
-  }
+  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override { copyValue(c, rxBuf, sizeof(rxBuf), rxReady); }
+};
+
+class ConfigCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override { copyValue(c, cfgBuf, sizeof(cfgBuf), cfgReady); }
 };
 
 static void startAdvertising(bool fast) {
@@ -8126,10 +9353,10 @@ static void startAdvertising(bool fast) {
   advFast = fast;
 }
 
-static void sendEvent(uint8_t type) {
+static void sendEvent(uint8_t type, uint8_t extra = 0) {
   if (!connected || !evtChr) return;
-  uint8_t data[2] = { type, ++seqNo };
-  evtChr->setValue(data, 2);
+  uint8_t data[3] = { type, ++seqNo, extra };
+  evtChr->setValue(data, 3);
   evtChr->notify();
 }
 
@@ -8154,8 +9381,9 @@ static void updateBattery(bool notify) {
 
 static void setupBle() {
   uint64_t mac = ESP.getEfuseMac();
-  snprintf(deviceName, sizeof(deviceName), "TSM-%04X", (unsigned)((mac >> 32) & 0xFFFF));
-  NimBLEDevice::init(deviceName);
+  snprintf(defaultName, sizeof(defaultName), "TSM-%04X", (unsigned)((mac >> 32) & 0xFFFF));
+  loadSettings();
+  NimBLEDevice::init(cfg.name);
   NimBLEDevice::setPower(9);  // dBm: portata sufficiente per un campo da tennis col polso in mezzo
   NimBLEDevice::setMTU(185);
 
@@ -8168,11 +9396,14 @@ static void setupBle() {
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
   statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+  configChr = svc->createCharacteristic(CONFIG_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
+  configChr->setCallbacks(new ConfigCallbacks());
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   server->start();  // registra i servizi GATT (in NimBLE 2.x si avvia il server, non i singoli servizi)
   updateBattery(false);
+  publishConfig(false);
 
   // Pacchetto di advertising: flag + UUID del servizio (l'app filtra la ricerca su questo);
   // il nome va nella risposta allo scan per stare nei 31 byte.
@@ -8180,24 +9411,32 @@ static void setupBle() {
   advData.setFlags(BLE_HS_ADV_F_DISC_GEN | BLE_HS_ADV_F_BREDR_UNSUP);
   advData.addServiceUUID(NimBLEUUID(SERVICE_UUID));
   NimBLEAdvertisementData scanData;
-  scanData.setName(deviceName);
+  scanData.setName(cfg.name);
   NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
   adv->setAdvertisementData(advData);
   adv->setScanResponseData(scanData);
 }
 
 // ------------------------------------------------------------------ spegnimento
-static void powerOff(const char* why) {
-  drawMessage(TXT_POWER_OFF, why, C_ORANGE);
-  delay(1500);
+static void powerOff(const char* l1, const char* why, uint8_t reason) {
+  // L'app deve sapere che il braccialetto si è spento (e perché), non che l'ha perso.
+  if (connected) {
+    sendEvent(EVT_POWER_OFF, reason);
+    delay(300);  // lascia partire la notifica
+  }
+  drawMessage(l1, why, C_ORANGE);
+  beep(1200, 120);
+  delay(250);
+  beep(700, 250);
+  delay(1250);
   if (connected) {
     for (uint16_t h : server->getPeerDevices()) server->disconnect(h);
     delay(200);
   }
+  if (spkOn) speakerOff();
   M5.Display.setBrightness(0);
   M5.Display.sleep();
-  M5.Power.powerOff();
-  // Con l'USB collegato alcuni moduli restano alimentati: in quel caso si resta a schermo spento.
+  M5.Power.powerOff();  // col cavo USB collegato il PM1 può non togliere corrente: allora deep sleep
   while (true) delay(1000);
 }
 
@@ -8205,24 +9444,26 @@ static void powerOff(const char* why) {
 void setup() {
   setCpuFrequencyMhz(80);  // il minimo che tiene in piedi il Bluetooth: consumo molto più basso di 240 MHz
 
-  auto cfg = M5.config();
-  cfg.clear_display = true;
-  cfg.output_power  = false;   // niente 5V sul connettore Grove
-  cfg.internal_imu  = false;
-  cfg.internal_rtc  = false;
-  cfg.internal_spk  = false;
-  cfg.internal_mic  = false;
-  cfg.led_brightness = 0;
-  M5.begin(cfg);
-  M5.Display.setRotation(DISPLAY_ROTATION);
-  M5.Display.setBrightness(BRIGHTNESS);
+  auto cfgM5 = M5.config();
+  cfgM5.clear_display = true;
+  cfgM5.output_power  = false;   // niente 5V sul connettore Grove
+  cfgM5.internal_imu  = false;
+  cfgM5.internal_rtc  = false;
+  cfgM5.internal_spk  = true;    // configurato ma spento: si accende solo per i bip
+  cfgM5.internal_mic  = false;
+  cfgM5.led_brightness = 0;
+  M5.begin(cfgM5);
+
+  setupBle();  // carica anche le impostazioni
+
+  M5.Display.setRotation(cfg.flip ? 3 : 1);
+  M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
   displayOn = true;
+  displayOnSince = millis();
   M5.BtnA.setHoldThresh(KEY1_HOLD_MS);
   M5.BtnB.setHoldThresh(KEY2_HOLD_MS);
 
-  setupBle();
-
-  drawMessage("TSM BAND", deviceName, C_BALL);
+  drawMessage("TSM BAND", cfg.name, C_BALL);
   delay(1200);
   displaySleep();
 
@@ -8230,6 +9471,15 @@ void setup() {
   startAdvertising(true);
   lastActivity = millis();
   nextBlink = millis();
+}
+
+// Un tasto premuto senza telefono: rimanda lo spegnimento e torna all'advertising veloce.
+static void keyWhileDisconnected(uint32_t now) {
+  advSince = now;
+  if (!advFast) startAdvertising(true);
+  drawMessage(TXT_NO_LINK, cfg.name, C_RED);
+  showFor(1500);
+  beep(400, 150);
 }
 
 void loop() {
@@ -8242,13 +9492,18 @@ void loop() {
     everConnected = true;
     advertising = false;
     lastActivity = now;
-    drawMessage(TXT_PAIRED, deviceName, C_BALL);
+    idleWarned = false;
+    drawMessage(TXT_PAIRED, cfg.name, C_BALL);
     showFor(PAIRED_MSG_MS);
+    beep(2000, 70);
+    beep(2800, 90);
     updateBattery(true);
+    publishConfig(true);
   }
   if (justDisconnect) {
     justDisconnect = false;
     advSince = now;
+    identifyUntil = 0;
     startAdvertising(true);
   }
   if (rxReady) {
@@ -8260,58 +9515,106 @@ void loop() {
     // Il messaggio "PAIRING OK" resta i suoi 3 secondi; poi vale quello che manda il telefono.
     handleMessage(local);
     lastActivity = now;
+    idleWarned = false;
+  }
+  if (cfgReady) {
+    char local[sizeof(cfgBuf)];
+    portENTER_CRITICAL(&rxMux);
+    memcpy(local, cfgBuf, sizeof(cfgBuf));
+    cfgReady = false;
+    portEXIT_CRITICAL(&rxMux);
+    handleConfig(local);
+    lastActivity = now;
+    idleWarned = false;
   }
 
   // --- tasti
   if (M5.BtnA.wasClicked()) {
     lastActivity = now;
+    idleWarned = false;
     if (connected) {
       sendEvent(EVT_POINT);
+      beep(2700, 40);
     } else {
-      drawMessage(TXT_NO_LINK, deviceName, C_RED);
-      showFor(1500);
+      keyWhileDisconnected(now);
     }
   }
   if (M5.BtnA.wasHold()) {
     lastActivity = now;
+    idleWarned = false;
+    if (!connected) advSince = now;
     drawBattery();
     sendEvent(EVT_BATTERY);
   }
   if (M5.BtnB.wasClicked()) {
     lastActivity = now;
+    idleWarned = false;
     if (connected) {
       sendEvent(EVT_UNDO);
+      beep(1800, 40);
     } else {
-      drawMessage(TXT_NO_LINK, deviceName, C_RED);
-      showFor(1500);
+      keyWhileDisconnected(now);
     }
   }
-  if (M5.BtnB.wasHold()) {
-    sendEvent(EVT_POWER_OFF);
-    delay(300);  // lascia partire la notifica prima di spegnere
-    powerOff("");
-  }
+  if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, "", OFF_KEY);
 
-  // --- advertising e lampeggio "PAIRING"
+  // --- advertising, lampeggio e spegnimento automatico senza telefono
   if (!connected && !justDisconnect) {
     if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
-    const uint32_t limit = everConnected ? RECONNECT_TIMEOUT_MS : PAIRING_TIMEOUT_MS;
-    if ((int32_t)(millis() - advSince) > (int32_t)limit) powerOff(TXT_NO_PHONE);
+    // all'accensione vale il tempo di pairing, dopo una disconnessione quello di telefono perso
+    const uint32_t limit = (uint32_t)(everConnected ? cfg.lostS : cfg.pairS) * 1000UL;
+    const int32_t left = (int32_t)limit - (int32_t)(millis() - advSince);
+    if (left <= 0) powerOff(TXT_POWER_OFF, TXT_NO_PHONE, OFF_TIMEOUT);
+    const bool countdown = left <= (int32_t)COUNTDOWN_MS;
+    if (!countdown) countdownBeeped = false;
     if ((int32_t)(now - nextBlink) >= 0 && (!displayOn || blinkShown)) {
-      drawMessage(TXT_PAIRING, deviceName, C_BALL);
+      if (countdown) {
+        char l2[24];
+        snprintf(l2, sizeof(l2), "%lds - PREMI UN TASTO", (long)((left + 999) / 1000));
+        drawMessage(TXT_POWER_OFF, l2, C_ORANGE);
+        if (!countdownBeeped) {  // un solo bip all'inizio del conto alla rovescia
+          countdownBeeped = true;
+          beep(1000, 80);
+        }
+      } else {
+        drawMessage(everConnected ? TXT_RECONNECT : TXT_PAIRING, cfg.name, everConnected ? C_ORANGE : C_BALL);
+      }
       showFor(BLINK_ON_MS);
       blinkShown = true;
-      nextBlink = now + BLINK_PERIOD_MS;
+      nextBlink = now + (countdown ? 1000 : BLINK_PERIOD_MS);
     }
   } else if (connected) {
     blinkShown = false;
-    if (now - lastActivity > IDLE_TIMEOUT_MS) powerOff(TXT_IDLE);
+    // --- spegnimento per inattività, con avviso 30 s prima
+    const uint32_t idleMs = (uint32_t)cfg.idleMin * 60000UL;
+    if (now - lastActivity > idleMs) powerOff(TXT_POWER_OFF, TXT_IDLE, OFF_IDLE);
+    if (!idleWarned && now - lastActivity > idleMs - IDLE_WARN_MS) {
+      idleWarned = true;
+      drawMessage(TXT_IDLE, TXT_HOLD_KEY1, C_ORANGE);
+      showFor(5000);
+      beep(1000, 150);
+    }
   }
+
+  // --- "Identifica"
+  identifyStep(now);
 
   // --- batteria e stato ogni minuto
   if (now - lastBattery > STATUS_PERIOD_MS) {
     lastBattery = now;
     updateBattery(true);
+  }
+
+  // --- batteria scarica: meglio spegnersi che restare acceso a metà (due letture di fila, in carica no)
+  if (now - lastBattCheck > BATT_CHECK_MS) {
+    lastBattCheck = now;
+    const int mv = M5.Power.getBatteryVoltage();
+    const bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
+    if (!charging && mv > 2500 && mv < BATT_EMPTY_MV) {
+      if (++battEmptyCount >= 2) powerOff(TXT_POWER_OFF, TXT_EMPTY, OFF_BATTERY);
+    } else {
+      battEmptyCount = 0;
+    }
   }
 
   // --- spegnimento display a tempo
@@ -8320,10 +9623,12 @@ void loop() {
     blinkShown = !connected;
   }
 
+  speakerIdle(now);
+
   delay(20);  // 50 Hz per i tasti; nel resto del tempo la CPU resta ferma in idle
 }
 TSM_EOF
 
-echo ">> Fatto: 50 file del progetto in $DEST"
+echo ">> Fatto: 52 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
