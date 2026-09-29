@@ -7,6 +7,11 @@
   KEY2 lungo  : spegne il braccialetto (riaccensione: tasto laterale, un clic)
   Se non è collegato, un tasto qualsiasi rimanda lo spegnimento automatico.
 
+  Ricarica (cavo USB): il braccialetto non si spegne da solo finché è alimentato e mostra la
+  schermata di carica (percentuale, tensioni, da quanto è in carica, fine stimata) per 30 s,
+  poi un'occhiata ogni 10 s; un tasto qualsiasi la riaccende. A carica completa resta spento.
+  Da collegato al telefono la partita ha la precedenza: solo un breve messaggio "IN CARICA".
+
   Impostazioni (dall'app, menu "Impostazioni braccialetto"), salvate nel braccialetto:
   nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
   spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
@@ -24,7 +29,7 @@
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.0"
+#define FW_VERSION "2.1"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -39,6 +44,15 @@ static const uint32_t STATUS_PERIOD_MS     = 60000;                // stato batt
 static const uint32_t BATT_CHECK_MS        = 15000;                // controllo batteria scarica
 static const int      BATT_EMPTY_MV        = 3300;                 // sotto questa tensione la LiPo è vuota
 static const uint32_t IDENTIFY_FLASH_MS    = 300;                  // lampeggio di "Identifica"
+static const uint32_t POWER_POLL_MS        = 1000;                 // controllo cavo USB e stato di carica
+static const int      USB_MIN_MV           = 4000;                 // sopra questa tensione il cavo USB è collegato
+static const int      CHG_OFFSET_MV        = 100;                  // in carica la tensione misurata è più alta di quella a riposo
+static const uint32_t CHARGE_SHOW_MS       = 30000;                // schermata di carica accesa dopo l'inserimento o un tasto
+static const uint32_t CHARGE_GLANCE_EVERY  = 10000;                // poi un'occhiata ogni 10 s...
+static const uint32_t CHARGE_GLANCE_MS     = 1500;                 // ...di 1,5 s
+static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT spento da 20 s = carica completa
+static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
+static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 
 // Testi mostrati dal braccialetto (solo ASCII)
 #define TXT_PAIRING    "PAIRING..."
@@ -53,12 +67,16 @@ static const uint32_t IDENTIFY_FLASH_MS    = 300;                  // lampeggio 
 #define TXT_HOLD_KEY1  "TIENI PREMUTO KEY1"
 #define TXT_EMPTY      "BATTERIA SCARICA"
 #define TXT_SAVED      "IMPOSTAZIONI OK"
+#define TXT_FULL       "CARICA COMPLETA"
+#define TXT_USB_POWER  "ALIMENTATO DA USB"
+#define TXT_USB_OUT    "USB SCOLLEGATO"
+#define TXT_KEEPS_CHG  "LA CARICA CONTINUA"
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
-#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56" per misurare i consumi
+#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.0;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30"
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
@@ -122,6 +140,28 @@ static uint32_t displayOnTotalMs = 0;
 static uint32_t nextBlink = 0;
 static bool     blinkShown = false;
 static bool     countdownBeeped = false;
+
+// Ricarica: stato letto ogni secondo dal PM1 (tensione USB) e dal caricabatterie (CHG_STAT)
+enum ChargeState : uint8_t { CHG_NONE, CHG_ACTIVE, CHG_FULL, CHG_IDLE };  // IDLE = USB ma non carica (né completa)
+static bool     usbOn = false;
+static uint8_t  usbFlips = 0;          // letture di fila diverse dallo stato attuale (anti-rimbalzo)
+static uint8_t  chgState = CHG_NONE;
+static uint32_t usbSince = 0;          // inizio della carica
+static uint32_t fullAt = 0;            // quando è diventata completa
+static uint32_t notChgSince = 0;
+static uint32_t cvSince = 0;
+static int      chgPct = 0;            // percentuale mostrata in carica: non scende mai, 100 solo a carica completa
+static int      lastMv = 0;
+static int      restMv = 0;            // ultima tensione senza cavo: base della percentuale all'inserimento
+static int      lastVbus = 0;
+static uint32_t lastPowerPoll = 0;
+static uint32_t chargeShowUntil = 0;   // schermata di carica accesa fino a...
+static uint32_t chargeNextGlance = 0;
+static uint32_t lastChargeDraw = 0;
+static int      pctHist[11];           // percentuale minuto per minuto (ultimi 10 minuti) per stimare la fine
+static uint8_t  pctHistN = 0;
+static uint32_t lastPctSample = 0;
+static bool     chargeScreen = false;  // sullo schermo c'è la schermata di carica (si può aggiornare)
 
 // "Identifica": lampeggio a tutto schermo col colore del giocatore
 static uint32_t identifyUntil = 0;
@@ -207,6 +247,7 @@ static const lgfx::IFont* const SMALL_FONTS[] = { &fonts::FreeSansBold12pt7b, &f
 
 static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT, uint16_t bg = C_BG, uint16_t color2 = C_DIM) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(bg);
   if (l2 && l2[0]) {
     drawFit(l1, 45, BIG_FONTS, 4, color, 232, bg);
@@ -219,6 +260,7 @@ static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT,
 // Punteggio del game: a sinistra chi indossa il braccialetto, a destra l'avversario.
 static void drawPoint(const char* mine, const char* theirs, int serve, const char* header) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(C_BG);
   const int w = M5.Display.width();
   const int h = M5.Display.height();
@@ -240,6 +282,7 @@ static void drawPoint(const char* mine, const char* theirs, int serve, const cha
 // Riepilogo a fine game: game del set e set vinti.
 static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(C_BG);
   const int w = M5.Display.width();
   if (header && header[0]) drawFit(header, 14, SMALL_FONTS, 3, C_ORANGE);
@@ -260,13 +303,121 @@ static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   M5.Display.drawString(buf, w - 8, 108);
 }
 
+// ------------------------------------------------------------------ batteria e ricarica
+// Curva di scarica tipica della LiPo (mV -> %), la stessa dell'app (BatteryModel.kt): più fedele della
+// retta 3,30-4,15 V di M5Unified, così braccialetto e telefono mostrano la stessa percentuale.
+static const int16_t SOC_CURVE[][2] = {
+  {4200, 100}, {4150, 95}, {4110, 90}, {4080, 85}, {4020, 80}, {3980, 75}, {3950, 70},
+  {3910, 65}, {3870, 60}, {3850, 55}, {3840, 50}, {3820, 45}, {3800, 40}, {3790, 35},
+  {3770, 30}, {3750, 25}, {3730, 20}, {3710, 15}, {3690, 10}, {3610, 5}, {3270, 0},
+};
+
+static int socFromMv(int mv) {
+  const int n = sizeof(SOC_CURVE) / sizeof(SOC_CURVE[0]);
+  if (mv >= SOC_CURVE[0][0]) return 100;
+  if (mv <= SOC_CURVE[n - 1][0]) return 0;
+  for (int i = 0; i < n - 1; i++) {
+    const int vHi = SOC_CURVE[i][0], pHi = SOC_CURVE[i][1];
+    const int vLo = SOC_CURVE[i + 1][0], pLo = SOC_CURVE[i + 1][1];
+    if (mv >= vLo && mv <= vHi) return pLo + (mv - vLo) * (pHi - pLo) / (vHi - vLo);
+  }
+  return 0;
+}
+
+// Percentuale da mostrare: col cavo USB quella della carica, altrimenti dalla tensione (-1 = lettura fallita).
+static int batteryPct() {
+  if (usbOn) return chgPct;
+  const int mv = M5.Power.getBatteryVoltage();
+  return mv > 2500 ? socFromMv(mv) : -1;
+}
+
+// "42 MIN" oppure "1H 25"
+static void fmtDuration(char* buf, size_t n, uint32_t ms) {
+  const unsigned long min = ms / 60000UL;
+  if (min < 60) snprintf(buf, n, "%lu MIN", min);
+  else snprintf(buf, n, "%luH %02lu", min / 60, min % 60);
+}
+
+// Minuti alla fine della carica dal ritmo degli ultimi 10 minuti (-1 = non ancora stimabile).
+// Il PM1 non misura la corrente di carica, quindi è una stima: arrotondata a 5 minuti.
+static int chargeMinutesLeft() {
+  if (chgState != CHG_ACTIVE || pctHistN < 11) return -1;
+  const int gained = chgPct - pctHist[0];  // pctHist[0] = 10 minuti fa
+  if (gained <= 0) return -1;
+  const int left = (100 - chgPct) * 10 / gained;
+  return constrain(((left + 4) / 5) * 5, 5, 300);
+}
+
+// Pila con livello di riempimento e, in carica, un fulmine.
+static void drawBatteryIcon(int x, int y, int w, int h, int pct, uint16_t fill, bool bolt) {
+  M5.Display.drawRoundRect(x, y, w, h, 7, C_TEXT);
+  M5.Display.drawRoundRect(x + 1, y + 1, w - 2, h - 2, 6, C_TEXT);
+  M5.Display.fillRoundRect(x + w, y + h / 2 - 9, 6, 18, 2, C_TEXT);  // polo positivo
+  const int fw = (w - 10) * constrain(pct, 0, 100) / 100;
+  if (fw > 0) M5.Display.fillRoundRect(x + 5, y + 5, fw, h - 10, 3, fill);
+  if (bolt) {
+    const int cx = x + w / 2, cy = y + h / 2;
+    M5.Display.fillTriangle(cx + 5, cy - 17, cx - 9, cy + 3, cx + 2, cy + 3, C_TEXT);
+    M5.Display.fillTriangle(cx - 5, cy + 17, cx + 9, cy - 3, cx - 2, cy - 3, C_TEXT);
+  }
+}
+
+// Schermata di carica: nome e tensione USB, pila, percentuale, stato, tensione della batteria e tempi.
+static void drawCharge() {
+  displayWake();
+  chargeScreen = true;
+  lastChargeDraw = millis();
+  M5.Display.fillScreen(C_BG);
+  const int w = M5.Display.width();
+  const bool full = chgState == CHG_FULL;
+  const bool active = chgState == CHG_ACTIVE;
+  char buf[48];
+  char t[16];
+
+  snprintf(buf, sizeof(buf), "%s   USB %d.%02dV", cfg.name, lastVbus / 1000, (lastVbus % 1000) / 10);
+  drawFit(buf, 10, SMALL_FONTS + 2, 1, C_DIM);
+
+  const uint16_t fill = full ? C_BALL : (active ? (chgPct < 20 ? C_ORANGE : C_BALL) : C_DIM);
+  drawBatteryIcon(12, 29, 92, 52, chgPct, fill, active);
+  snprintf(buf, sizeof(buf), "%d%%", chgPct);
+  M5.Display.setFont(&fonts::FreeSansBold24pt7b);
+  M5.Display.setTextSize(1);
+  M5.Display.setTextDatum(middle_center);
+  M5.Display.setTextColor(full ? C_BALL : C_TEXT, C_BG);
+  M5.Display.drawString(buf, (118 + w) / 2, 57);
+
+  drawFit(full ? TXT_FULL : (active ? TXT_CHARGING : TXT_USB_POWER), 99, SMALL_FONTS, 3, full ? C_BALL : (active ? C_TEXT : C_DIM));
+
+  if (full) {
+    fmtDuration(t, sizeof(t), fullAt - usbSince);
+    snprintf(buf, sizeof(buf), "%d.%02dV   CARICATA IN %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+  } else {
+    fmtDuration(t, sizeof(t), millis() - usbSince);
+    const int left = chargeMinutesLeft();
+    if (left > 0) snprintf(buf, sizeof(buf), "%d.%02dV  DA %s  FINE ~%d MIN", lastMv / 1000, (lastMv % 1000) / 10, t, left);
+    else snprintf(buf, sizeof(buf), "%d.%02dV   DA %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+  }
+  drawFit(buf, 124, SMALL_FONTS + 2, 1, C_DIM);
+}
+
+// Schermata di carica accesa per [ms] (aggiornata ogni volta che cambia qualcosa).
+static void chargeScreenFor(uint32_t ms) {
+  chargeShowUntil = millis() + ms;
+  drawCharge();
+  showFor(ms);
+}
+
 static void drawBattery() {
-  int level = M5.Power.getBatteryLevel();
-  bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
+  if (usbOn && !connected) {
+    chargeScreenFor(CHARGE_SHOW_MS);
+    return;
+  }
+  const int level = batteryPct();
   char buf[24];
   if (level < 0) snprintf(buf, sizeof(buf), "--%%");
   else snprintf(buf, sizeof(buf), "%d%%", level);
-  drawMessage(buf, charging ? TXT_CHARGING : TXT_BATTERY, level >= 0 && level < 20 ? C_RED : C_BALL);
+  const char* l2 = usbOn ? (chgState == CHG_FULL ? TXT_FULL : TXT_CHARGING) : TXT_BATTERY;
+  drawMessage(buf, l2, !usbOn && level >= 0 && level < 20 ? C_RED : C_BALL);
   showFor(3000);
 }
 
@@ -503,20 +654,22 @@ static void sendEvent(uint8_t type, uint8_t extra = 0) {
 }
 
 static void updateBattery(bool notify) {
-  int level = M5.Power.getBatteryLevel();
+  const int level = batteryPct();
   if (level >= 0) {
     uint8_t v = (uint8_t)constrain(level, 0, 100);
     battChr->setValue(&v, 1);
     if (notify && connected) battChr->notify();
   }
-  // Stato per l'app: tensione in mV (più precisa della percentuale), in carica, secondi di accensione,
-  // secondi di display acceso. Con questi dati l'app calcola consumo e autonomia reali.
-  char buf[64];
+  // Stato per l'app: tensione in mV (più precisa della percentuale), alimentato da USB (chg=1 anche a carica
+  // completa: non c'è consumo da misurare), secondi di accensione e di display acceso (consumo e autonomia
+  // reali); dal firmware 2.1 anche tensione USB, carica completa e la percentuale mostrata dal braccialetto.
+  char buf[96];
   uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
-  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu",
-           (int)M5.Power.getBatteryVoltage(),
-           M5.Power.isCharging() == m5::Power_Class::is_charging ? 1 : 0,
-           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000));
+  const bool chg = usbOn || M5.Power.isCharging() == m5::Power_Class::is_charging;
+  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu;usb=%d;full=%d;pct=%d",
+           (int)M5.Power.getBatteryVoltage(), chg ? 1 : 0,
+           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000),
+           usbOn ? lastVbus : 0, chgState == CHG_FULL ? 1 : 0, level);
   statusChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) statusChr->notify();
 }
@@ -582,6 +735,129 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
   while (true) delay(1000);
 }
 
+// ------------------------------------------------------------------ ricarica
+static void onUsbIn(uint32_t now) {
+  usbOn = true;
+  usbSince = now;
+  fullAt = 0;
+  notChgSince = 0;
+  cvSince = 0;
+  chgState = M5.Power.isCharging() == m5::Power_Class::is_charging ? CHG_ACTIVE : CHG_IDLE;
+  chgPct = restMv > 2500 ? socFromMv(restMv) : 0;
+  pctHistN = 0;
+  lastPctSample = now - 60000UL;
+  if (connected) {
+    // In partita (powerbank al polso) il punteggio ha la precedenza: solo un messaggio breve.
+    char l2[16];
+    snprintf(l2, sizeof(l2), "%d%%", chgPct);
+    drawMessage(TXT_CHARGING, l2, C_BALL);
+    showFor(2500);
+  } else {
+    identifyUntil = 0;
+    chargeNextGlance = now + CHARGE_SHOW_MS;
+    chargeScreenFor(CHARGE_SHOW_MS);
+  }
+  beep(2400, 60);
+  updateBattery(true);
+}
+
+static void onUsbOut(uint32_t now) {
+  usbOn = false;
+  chgState = CHG_NONE;
+  chargeShowUntil = 0;
+  // Da qui ripartono i tempi di spegnimento automatico, come appena acceso.
+  advSince = now;
+  lastActivity = now;
+  idleWarned = false;
+  if (!connected && !advFast) startAdvertising(true);
+  char l2[24];
+  snprintf(l2, sizeof(l2), "%s %d%%", TXT_BATTERY, chgPct);
+  identifyUntil = 0;
+  drawMessage(TXT_USB_OUT, l2, C_ORANGE);
+  showFor(3000);
+  nextBlink = now + 3000;
+  updateBattery(true);
+}
+
+// Ogni secondo: cavo USB (con anti-rimbalzo), stato della carica, percentuale e storico per la stima.
+static void pollPower(uint32_t now) {
+  if (now - lastPowerPoll < POWER_POLL_MS) return;
+  lastPowerPoll = now;
+  const int vbus = M5.Power.getVBUSVoltage();
+  const bool chg = M5.Power.isCharging() == m5::Power_Class::is_charging;  // CHG_STAT basso = in carica
+  const int mv = M5.Power.getBatteryVoltage();
+  if (vbus > 0) lastVbus = vbus;
+  if (mv > 2500) {
+    lastMv = mv;
+    if (!usbOn) restMv = mv;
+  }
+  const bool usb = vbus > USB_MIN_MV || chg;
+  if (usb != usbOn) {
+    if (++usbFlips >= 2) {
+      usbFlips = 0;
+      if (usb) onUsbIn(now);
+      else onUsbOut(now);
+    }
+    return;
+  }
+  usbFlips = 0;
+  if (!usbOn || chgState == CHG_FULL) return;
+
+  if (chg) {
+    notChgSince = 0;
+    chgState = CHG_ACTIVE;
+    // Riserva se il caricabatterie non chiude mai la carica: 45 minuti a tensione piena.
+    if (lastMv >= CV_FULL_MV) {
+      if (!cvSince) cvSince = now;
+    } else {
+      cvSince = 0;
+    }
+  } else {
+    cvSince = 0;
+    if (!notChgSince) notChgSince = now;
+    // CHG_STAT spento per 20 s: carica finita (con la batteria alta) oppure solo alimentazione
+    if (now - notChgSince >= FULL_DEBOUNCE_MS) chgState = lastMv >= USB_MIN_MV ? CHG_FULL : CHG_IDLE;
+  }
+  if (chgState == CHG_ACTIVE && cvSince && now - cvSince >= CV_FULL_MS) chgState = CHG_FULL;
+
+  if (chgState == CHG_FULL) {
+    fullAt = now;
+    chgPct = 100;
+    if (!connected) chargeScreenFor(CHARGE_SHOW_MS);  // niente bip: può succedere di notte
+    updateBattery(true);
+    return;
+  }
+  if (lastMv > 2500) {
+    const int p = socFromMv(lastMv - (chgState == CHG_ACTIVE ? CHG_OFFSET_MV : 0));
+    chgPct = max(chgPct, min(p, 99));
+  }
+  if (chgState == CHG_ACTIVE && now - lastPctSample >= 60000UL) {
+    lastPctSample = now;
+    if (pctHistN == 11) {
+      memmove(pctHist, pctHist + 1, 10 * sizeof(int));
+      pctHistN = 10;
+    }
+    pctHist[pctHistN++] = chgPct;
+  }
+}
+
+// Col cavo e senza telefono: schermata di carica aggiornata mentre è accesa, poi un'occhiata ogni 10 s.
+static void chargeDisplay(uint32_t now) {
+  static int shownSig = -1;
+  if (displayOn && chargeScreen && (int32_t)(now - chargeShowUntil) < 0) {
+    // si ridisegna solo se cambia qualcosa (niente sfarfallio), comunque ogni 10 s per le tensioni
+    const int sig = chgPct * 100000 + chgState * 10000 + (int)((now - usbSince) / 60000UL) * 10 + (chargeMinutesLeft() > 0 ? 1 : 0);
+    if (sig != shownSig || now - lastChargeDraw >= 10000) {
+      shownSig = sig;
+      drawCharge();
+    }
+  } else if (!displayOn && chgState != CHG_FULL && (int32_t)(now - chargeNextGlance) >= 0) {
+    drawCharge();
+    showFor(CHARGE_GLANCE_MS);
+    chargeNextGlance = now + CHARGE_GLANCE_EVERY;
+  }
+}
+
 // ------------------------------------------------------------------ setup / loop
 void setup() {
   setCpuFrequencyMhz(80);  // il minimo che tiene in piedi il Bluetooth: consumo molto più basso di 240 MHz
@@ -627,6 +903,7 @@ static void keyWhileDisconnected(uint32_t now) {
 void loop() {
   M5.update();
   const uint32_t now = millis();
+  pollPower(now);
 
   // --- eventi BLE
   if (justConnected) {
@@ -677,6 +954,8 @@ void loop() {
     if (connected) {
       sendEvent(EVT_POINT);
       beep(2700, 40);
+    } else if (usbOn) {
+      chargeScreenFor(CHARGE_SHOW_MS);
     } else {
       keyWhileDisconnected(now);
     }
@@ -694,14 +973,21 @@ void loop() {
     if (connected) {
       sendEvent(EVT_UNDO);
       beep(1800, 40);
+    } else if (usbOn) {
+      chargeScreenFor(CHARGE_SHOW_MS);
     } else {
       keyWhileDisconnected(now);
     }
   }
-  if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, "", OFF_KEY);
+  if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
 
+  // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
+  if (!connected && !justDisconnect && usbOn) {
+    if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
+    chargeDisplay(now);
+  }
   // --- advertising, lampeggio e spegnimento automatico senza telefono
-  if (!connected && !justDisconnect) {
+  else if (!connected && !justDisconnect) {
     if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
     // all'accensione vale il tempo di pairing, dopo una disconnessione quello di telefono perso
     const uint32_t limit = (uint32_t)(everConnected ? cfg.lostS : cfg.pairS) * 1000UL;
@@ -728,9 +1014,10 @@ void loop() {
   } else if (connected) {
     blinkShown = false;
     // --- spegnimento per inattività, con avviso 30 s prima
+    // (col cavo USB no: il tempo riparte quando lo si stacca)
     const uint32_t idleMs = (uint32_t)cfg.idleMin * 60000UL;
-    if (now - lastActivity > idleMs) powerOff(TXT_POWER_OFF, TXT_IDLE, OFF_IDLE);
-    if (!idleWarned && now - lastActivity > idleMs - IDLE_WARN_MS) {
+    if (!usbOn && now - lastActivity > idleMs) powerOff(TXT_POWER_OFF, TXT_IDLE, OFF_IDLE);
+    if (!usbOn && !idleWarned && now - lastActivity > idleMs - IDLE_WARN_MS) {
       idleWarned = true;
       drawMessage(TXT_IDLE, TXT_HOLD_KEY1, C_ORANGE);
       showFor(5000);
@@ -752,7 +1039,7 @@ void loop() {
     lastBattCheck = now;
     const int mv = M5.Power.getBatteryVoltage();
     const bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
-    if (!charging && mv > 2500 && mv < BATT_EMPTY_MV) {
+    if (!charging && !usbOn && mv > 2500 && mv < BATT_EMPTY_MV) {
       if (++battEmptyCount >= 2) powerOff(TXT_POWER_OFF, TXT_EMPTY, OFF_BATTERY);
     } else {
       battEmptyCount = 0;
@@ -763,6 +1050,7 @@ void loop() {
   if (displayOn && (int32_t)(now - displayOffAt) >= 0) {
     displaySleep();
     blinkShown = !connected;
+    chargeScreen = false;
   }
 
   speakerIdle(now);
