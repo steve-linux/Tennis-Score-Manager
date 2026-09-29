@@ -1,7 +1,21 @@
 package com.tennis.scoremanager.ble
 
-/** Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56". */
-data class BandStatus(val millivolts: Int, val charging: Boolean, val uptimeS: Long, val displayS: Long)
+/**
+ * Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56", dal firmware 2.1 anche
+ * ";usb=5010;full=0;pct=71". [charging] = alimentato dal cavo USB (dal 2.1 anche a carica completa).
+ */
+data class BandStatus(
+    val millivolts: Int,
+    val charging: Boolean,
+    val uptimeS: Long,
+    val displayS: Long,
+    /** Tensione USB in mV (0 = senza cavo); null = firmware prima della 2.1. */
+    val usbMv: Int? = null,
+    /** Carica completa, col cavo ancora collegato. */
+    val full: Boolean = false,
+    /** Percentuale mostrata dal braccialetto: in carica è quella della carica (la tensione lì è falsata). */
+    val percent: Int? = null,
+)
 
 /** Consumo medio stimato (mA) diviso per voce; [measured] = la base viene da una misura sul campo. */
 data class PowerEstimate(val baseMa: Double, val displayMa: Double, val soundMa: Double, val measured: Boolean) {
@@ -52,7 +66,17 @@ object BatteryModel {
             charging = map["chg"] == "1",
             uptimeS = map["up"]?.toLongOrNull() ?: 0,
             displayS = map["dsp"]?.toLongOrNull() ?: 0,
+            usbMv = map["usb"]?.toIntOrNull(),
+            full = map["full"] == "1",
+            percent = map["pct"]?.toIntOrNull()?.takeIf { it in 0..100 },
         )
+    }
+
+    /** Percentuale da mostrare: in carica quella del braccialetto (firmware 2.1), altrimenti dalla tensione. */
+    fun shownPercent(st: BandStatus): Int = when {
+        st.full -> 100
+        st.charging && st.percent != null -> st.percent
+        else -> soc(st.millivolts)
     }
 
     /** Percentuale di carica (0-100) dalla tensione in mV. */

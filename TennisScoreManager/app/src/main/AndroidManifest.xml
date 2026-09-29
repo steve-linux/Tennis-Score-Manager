@@ -16,6 +16,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Tabellone TV: server web locale, ricerca del telefono dell'arbitro, rete Wi-Fi anche senza internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- Android 11+: senza questa dichiarazione la sintesi vocale non trova i motori TTS -->
     <queries>
@@ -32,6 +37,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.TSM"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="36">
 
         <activity
@@ -46,6 +52,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Telefono usato come tabellone: pagina del telefono dell'arbitro a schermo intero, in orizzontale -->
+        <activity
+            android:name=".tv.DisplayActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
+            android:launchMode="singleTask" />
 
         <service
             android:name=".service.MatchService"

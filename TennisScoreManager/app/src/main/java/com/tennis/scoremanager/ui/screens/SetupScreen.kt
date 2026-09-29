@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -25,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +37,8 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.DisplayActivity
+import android.content.Intent
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -49,6 +53,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
+    val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
         subtitle = s.setupSubtitle,
@@ -72,6 +77,13 @@ fun SetupScreen(c: MatchController) {
         }
         PlayerCard(c, su, Side.P1)
         PlayerCard(c, su, Side.P2)
+        // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
+        SectionCard(s.displayMode, Icons.Filled.Tv) {
+            Text(s.displayModeHint, color = TsmColors.TextDim)
+            GhostButton(s.displayMode, Icons.Filled.Tv, {
+                context.startActivity(Intent(context, DisplayActivity::class.java))
+            }, Modifier.fillMaxWidth())
+        }
     }
 }
 

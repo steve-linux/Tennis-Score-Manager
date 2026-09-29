@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -71,6 +72,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -120,6 +122,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
 import kotlinx.coroutines.launch
@@ -221,6 +224,9 @@ fun OptionsScreen(c: MatchController) {
 
         // Audio e voce
         VoiceSection(c, o)
+
+        // Tabellone su TV
+        TvSection(c)
 
         // Formato
         SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
@@ -366,8 +372,13 @@ private fun BandPicker(
                             LinkState.IDLE -> s.bandIdle
                         }
                         val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        val batteryText = when {
+                            current.chargeFull -> " · ${s.bandChargeFull}"
+                            current.charging && current.battery != null -> " · ${s.bandCharging(current.battery)}$volts"
+                            else -> current.battery?.let { " · ${s.battery} $it%$volts" } ?: ""
+                        }
                         Text(
-                            st + (current.battery?.let { " · ${s.battery} $it%$volts" } ?: "") +
+                            st + batteryText +
                                 (battery?.leftText()?.let { " · ${s.autonomy(it)}" } ?: ""),
                             color = TsmColors.TextDim, fontSize = 12.sp,
                         )
@@ -456,7 +467,15 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
                 }) { Text(s.installVoice) }
             }
         }
-        SmallAction(s.testVoice, Icons.Filled.PlayCircle, Modifier.fillMaxWidth()) { c.testVoice() }
+        // Lo stesso tasto avvia e ferma la prova; uscendo dalla pagina si ferma da sola.
+        val playing by c.announcer.playing.collectAsState()
+        val testing = playing == MatchController.VOICE_TEST
+        DisposableEffect(Unit) { onDispose { c.stopVoiceTest() } }
+        SmallAction(
+            if (testing) s.stopVoiceTest else s.testVoice,
+            if (testing) Icons.Filled.StopCircle else Icons.Filled.PlayCircle,
+            Modifier.fillMaxWidth(),
+        ) { if (testing) c.stopVoiceTest() else c.testVoice() }
         Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
 
         // Registrazioni personalizzate (voce vera): sempre prioritarie

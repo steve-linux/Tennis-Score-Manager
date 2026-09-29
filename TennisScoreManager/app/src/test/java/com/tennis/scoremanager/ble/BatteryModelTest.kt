@@ -19,6 +19,27 @@ class BatteryModelTest {
     }
 
     @Test
+    fun parseChargeStatus() {
+        // firmware 2.1: col cavo "chg" resta 1 anche a carica completa
+        val c = BatteryModel.parse("mv=4150;chg=1;up=60;dsp=30;usb=5012;full=0;pct=62")!!
+        assertEquals(true, c.charging)
+        assertEquals(5012, c.usbMv)
+        assertEquals(false, c.full)
+        assertEquals(62, c.percent)
+        // in carica vale la percentuale del braccialetto, non la tensione (falsata dalla carica)
+        assertEquals(62, BatteryModel.shownPercent(c))
+        val f = BatteryModel.parse("mv=4190;chg=1;up=60;dsp=30;usb=5012;full=1;pct=100")!!
+        assertEquals(100, BatteryModel.shownPercent(f))
+        // firmware 2.0: niente campi nuovi, percentuale dalla tensione
+        val old = BatteryModel.parse("mv=3840;chg=0;up=1;dsp=0")!!
+        assertNull(old.usbMv)
+        assertNull(old.percent)
+        assertEquals(50, BatteryModel.shownPercent(old))
+        // senza cavo la percentuale del braccialetto non serve: stessa curva dall'app
+        assertEquals(50, BatteryModel.shownPercent(BatteryModel.parse("mv=3840;chg=0;up=1;dsp=0;usb=0;full=0;pct=49")!!))
+    }
+
+    @Test
     fun socFromVoltage() {
         assertEquals(100, BatteryModel.soc(4250))
         assertEquals(0, BatteryModel.soc(3200))

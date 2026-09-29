@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Tabellone TSM</title>
+<!--
+  Tabellone di Tennis Score Manager, servito dal telefono dell'arbitro (TvServer.kt).
+  Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
+  da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
+  Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
+  Anteprima senza telefono: scoreboard.html?demo=1
+-->
+<style>
+  :root {
+    --p1: #FFD600;
+    --p2: #FF3030;
+    --ghost: #15181C;
+    --line: #2A2D31;
+    --dim: #9A9A9A;
+    --cyan: #22C3EE;
+    --green: #22D65A;
+    --orange: #FF9800;
+    --ball: #C6F432;
+    /* 1vh e 1vw: li ricalcola anche lo script, perché alcune WebView danno 1vh = 0 */
+    --vh: 1vh;
+    --vw: 1vw;
+  }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  body { cursor: none; -webkit-user-select: none; user-select: none; }
+  body.pointer { cursor: default; }
+  #board {
+    position: fixed; inset: 0; display: grid; grid-template-rows: 77% 23%;
+    font-family: "DejaVu Sans Mono", "Roboto Mono", "Droid Sans Mono", "Liberation Mono", Menlo, monospace;
+    font-weight: 700; color: #DDD; transition: opacity .4s;
+  }
+  body.lost #board { opacity: .35; }
+  svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  #main { display: grid; grid-template-columns: 1fr 15.6% 1fr; padding: calc(4 * var(--vh)) calc(2.1 * var(--vw)) calc(1.2 * var(--vh)); min-height: 0; }
+  .side { display: grid; grid-template-rows: 17% 83%; min-width: 0; min-height: 0; padding: 0 calc(1.4 * var(--vw)); }
+  .name {
+    display: flex; align-items: center; gap: .7em; min-width: 0; white-space: nowrap; overflow: hidden;
+    font-size: min(calc(6.2 * var(--vh)), calc(3.6 * var(--vw))); letter-spacing: .04em; text-transform: uppercase;
+  }
+  .name .nm { overflow: hidden; text-overflow: clip; }
+  .ball { flex: none; width: .62em; height: .62em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 .35em var(--ball); visibility: hidden; }
+  .serving .ball { visibility: visible; }
+  .big { padding: calc(2.8 * var(--vh)) 0 calc(3.2 * var(--vh)); min-height: 0; }
+
+  #mid {
+    border-left: 2px solid var(--line); border-right: 2px solid var(--line); min-width: 0; min-height: 0;
+    display: grid; grid-template-rows: 15% 23% 9% 23% 10% 16%; justify-items: center; align-items: center;
+  }
+  #vs { font-size: min(calc(5.6 * var(--vh)), calc(3.2 * var(--vw))); font-style: italic; color: #5E6166; letter-spacing: .06em; white-space: nowrap; }
+  #vs.tb { font-style: normal; color: var(--cyan); font-size: min(calc(3.4 * var(--vh)), calc(1.9 * var(--vw))); text-align: center; white-space: normal; line-height: 1.1; }
+  .gm { height: 86%; width: 60%; }
+  .lbl { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); letter-spacing: .05em; color: var(--dim); }
+  .lbl.cy { color: var(--cyan); }
+  #setrow { display: grid; grid-template-columns: 1fr 1fr; gap: 28%; width: 62%; height: 88%; }
+
+  #foot {
+    border-top: 2px solid var(--line); margin: 0 calc(2.1 * var(--vw)); min-height: 0;
+    display: grid; grid-template-columns: minmax(0, auto) 1fr minmax(0, auto); column-gap: calc(2 * var(--vw));
+    padding: calc(2.4 * var(--vh)) calc(1.2 * var(--vw)) calc(3 * var(--vh));
+  }
+  #fl, #fr { display: grid; grid-template-rows: 1fr 1.5fr; min-height: 0; min-width: 0; }
+  #fr { justify-items: start; }
+  #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
+  #clock { height: 78%; width: auto; align-self: end; }
+  #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: .calc(6 * var(--vh)); }
+  #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
+  #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
+  #timer { font-size: min(calc(5.4 * var(--vh)), calc(3.1 * var(--vw))); color: var(--p2); white-space: nowrap; align-self: end; letter-spacing: .05em; }
+  #timer.pause { color: var(--orange); }
+  .hide { visibility: hidden; }
+  @keyframes blink { to { visibility: hidden; } }
+
+  #banner {
+    position: fixed; left: 0; right: 0; top: 0; padding: calc(1.4 * var(--vh)) calc(2 * var(--vw)); text-align: center; display: none;
+    font: 700 min(calc(4 * var(--vh)), calc(2.4 * var(--vw))) monospace; color: #000; background: var(--orange); letter-spacing: .04em;
+  }
+  body.lost #banner { display: block; }
+  #fs {
+    position: fixed; left: calc(2 * var(--vw)); bottom: calc(2 * var(--vh)); display: none; padding: calc(1.2 * var(--vh)) calc(1.6 * var(--vw)); border: 2px solid #444; border-radius: calc(1 * var(--vh));
+    font: 700 min(calc(3 * var(--vh)), calc(1.8 * var(--vw))) monospace; color: #DDD; background: #111; cursor: pointer;
+  }
+  body.pointer #fs.can { display: block; }
+</style>
+</head>
+<body>
+<div id="board">
+  <div id="main">
+    <section class="side" id="side0">
+      <div class="name"><span class="nm" id="n0"></span><span class="ball"></span></div>
+      <div class="big"><svg id="pt0"></svg></div>
+    </section>
+    <section id="mid">
+      <div id="vs">VS</div>
+      <svg class="gm" id="g0"></svg>
+      <div class="lbl" id="lgames">GAMES</div>
+      <svg class="gm" id="g1"></svg>
+      <div class="lbl cy" id="lset">SET</div>
+      <div id="setrow"><svg id="s0"></svg><svg id="s1"></svg></div>
+    </section>
+    <section class="side" id="side1">
+      <div class="name"><span class="nm" id="n1"></span><span class="ball"></span></div>
+      <div class="big"><svg id="pt1"></svg></div>
+    </section>
+  </div>
+  <div id="foot">
+    <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
+    <div id="fc"><div id="title"></div></div>
+    <div id="fr"><div id="msg"></div><div id="timer"></div></div>
+  </div>
+</div>
+<div id="banner"></div>
+<button id="fs" type="button"></button>
+
+<script>
+"use strict";
+// ------------------------------------------------------------------ cifre a 7 segmenti
+// Una cifra è 100 x 172: barre orizzontali tra le verticali, come un tabellone a LED.
+const DW = 100, DH = 172, T = 14, GAP = 1.8, DSP = 16, COLON = 34;
+const V = (DH - 3 * T) / 2;
+const RECT = {
+  a: [T + GAP, 0, DW - 2 * T - 2 * GAP, T],
+  b: [DW - T, T + GAP, T, V - 2 * GAP],
+  c: [DW - T, 2 * T + V + GAP, T, V - 2 * GAP],
+  d: [T + GAP, DH - T, DW - 2 * T - 2 * GAP, T],
+  e: [0, 2 * T + V + GAP, T, V - 2 * GAP],
+  f: [0, T + GAP, T, V - 2 * GAP],
+  g: [T + GAP, T + V, DW - 2 * T - 2 * GAP, T],
+};
+const GLYPH = {
+  "0": "abcdef", "1": "bc", "2": "abdeg", "3": "abcdg", "4": "bcfg", "5": "acdfg", "6": "acdefg",
+  "7": "abc", "8": "abcdefg", "9": "abcdfg", "A": "abcefg", "D": "bcdeg", "-": "g", " ": "",
+};
+const NS = "http://www.w3.org/2000/svg";
+let ghost = true;
+
+/** Prepara un display: "88" = due cifre, "88:88:88" = orologio. */
+function buildSeg(svg, pattern) {
+  let x = 0;
+  const cells = [];
+  for (const ch of pattern) {
+    if (ch === ":") {
+      const dots = [];
+      for (const y of [DH * 0.32, DH * 0.68]) {
+        const r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x + COLON / 2 - T / 2); r.setAttribute("y", y - T / 2);
+        r.setAttribute("width", T); r.setAttribute("height", T); r.setAttribute("rx", 2);
+        svg.appendChild(r); dots.push(r);
+      }
+      cells.push({ colon: dots });
+      x += COLON + DSP;
+    } else {
+      const segs = {};
+      for (const k in RECT) {
+        const [rx, ry, w, h] = RECT[k];
+        const r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x + rx); r.setAttribute("y", ry);
+        r.setAttribute("width", w); r.setAttribute("height", h); r.setAttribute("rx", 2.5);
+        svg.appendChild(r); segs[k] = r;
+      }
+      cells.push({ segs });
+      x += DW + DSP;
+    }
+  }
+  svg.setAttribute("viewBox", `0 0 ${x - DSP} ${DH}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg._cells = cells;
+  svg._text = null;
+}
+
+/** Scrive un testo (allineato a destra, spazi = cifra spenta) nel colore dato. */
+function setSeg(svg, text, color) {
+  const key = text + "|" + color + "|" + ghost;
+  if (svg._text === key) return;
+  svg._text = key;
+  const digits = svg._cells.filter(c => c.segs).length;
+  const chars = String(text).toUpperCase().padStart(digits, " ").slice(-digits).split("");
+  let i = 0;
+  for (const cell of svg._cells) {
+    if (cell.colon) { cell.colon.forEach(r => r.setAttribute("fill", color)); continue; }
+    const on = GLYPH[chars[i++]] ?? "";
+    for (const k in cell.segs) cell.segs[k].setAttribute("fill", on.includes(k) ? color : (ghost ? "var(--ghost)" : "transparent"));
+  }
+}
+
+// ------------------------------------------------------------------ stato
+const $ = id => document.getElementById(id);
+const pts = [$("pt0"), $("pt1")], gms = [$("g0"), $("g1")], sts = [$("s0"), $("s1")];
+pts.forEach(s => buildSeg(s, "88"));
+gms.forEach(s => buildSeg(s, "8"));
+sts.forEach(s => buildSeg(s, "8"));
+buildSeg($("clock"), "88:88:88");
+
+const IT = (navigator.language || "it").startsWith("it");
+let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
+const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
+const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
+
+function fitText(el, maxPx) {
+  el.style.fontSize = "";
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  const box = el.parentElement;
+  while (el.scrollWidth > box.clientWidth - (maxPx || 0) && size > 8) {
+    size *= 0.92;
+    el.style.fontSize = size + "px";
+  }
+}
+
+function hms(ms) {
+  const t = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(t / 3600) % 100, m = Math.floor(t / 60) % 60, s = t % 60;
+  return [h, m, s].map(v => String(v).padStart(2, "0")).join("");
+}
+
+function setText(el, text) { if (el.textContent !== text) el.textContent = text; }
+
+function render() {
+  if (!S) return;
+  ghost = S.show.ghost !== false;
+  document.documentElement.lang = S.lang;
+  const L = S.labels;
+  document.documentElement.style.setProperty("--p1", color(0));
+  document.documentElement.style.setProperty("--p2", color(1));
+  for (let i = 0; i < 2; i++) {
+    const n = $("n" + i);
+    n.style.color = color(i);
+    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
+    $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
+    setSeg(pts[i], S.points[i], color(i));
+    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
+    setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
+  }
+  const vs = $("vs");
+  const tb = S.phase === "play" || S.phase === "suspended" ? (S.tiebreak === "match" ? L.matchTiebreak : S.tiebreak === "set" ? L.tiebreak : "") : "";
+  setText(vs, tb || L.vs);
+  vs.classList.toggle("tb", !!tb);
+  setText($("lgames"), L.games);
+  setText($("lset"), L.set);
+
+  // set conclusi: [6-4] [7-6(5)] [10-8]
+  const done = S.show.sets ? S.done.map(d => {
+    const tbPts = !d.mtb && d.tb1 != null && d.tb2 != null ? `(${Math.min(d.tb1, d.tb2)})` : "";
+    return d.mtb ? `[${d.tb1}-${d.tb2}]` : `[${d.g1}-${d.g2}${tbPts}]`;
+  }).join(" ") : "";
+  setText($("done"), done);
+  $("clock").classList.toggle("hide", !S.show.clock);
+  setText($("title"), S.title || "");
+
+  // messaggio: fasi speciali prima di tutto
+  const msg = $("msg");
+  let text = "", blink = false, col = "var(--orange)";
+  if (S.phase === "idle") text = L.waiting;
+  else if (S.phase === "ready") text = L.ready;
+  else if (S.phase === "suspended") { text = L.suspended; blink = true; }
+  else if (S.phase === "finished" && S.winner != null) { text = `${L.winner} ${S.players[S.winner].name}`.toUpperCase(); col = color(S.winner); }
+  else if (S.message) text = S.message.toUpperCase();
+  setText(msg, text);
+  msg.style.color = col;
+  msg.classList.toggle("blink", blink);
+  tick();
+}
+
+function tick() {
+  const now = performance.now();
+  if (S) {
+    const clock = S.clockMs + (S.clockRunning ? now - recvAt : 0);
+    setSeg($("clock"), hms(clock), "var(--green)");
+    const timer = $("timer");
+    const cd = S.countdown;
+    if (cd) {
+      const left = Math.max(0, Math.ceil((cd.leftMs - (now - recvAt)) / 1000));
+      setText(timer, `${cd.label}: ${String(left).padStart(2, "0")} ${S.labels.sec}`);
+      timer.classList.toggle("pause", !cd.shot);
+      timer.classList.remove("hide");
+    } else {
+      timer.classList.add("hide");
+    }
+  }
+  // collegamento: il telefono manda qualcosa almeno ogni 5 secondi
+  const silent = now - lastMsg;
+  document.body.classList.toggle("lost", silent > 12000);
+  if (silent > 12000) {
+    setText($("banner"), S ? S.labels.lost : (IT ? "CONNESSIONE PERSA - RICONNESSIONE..." : "CONNECTION LOST - RECONNECTING..."));
+    if (!lostSince) lostSince = now;
+    if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
+  } else {
+    lostSince = 0;
+    lostCalled = false;
+  }
+}
+
+function onState(json) {
+  S = json;
+  recvAt = lastMsg = performance.now();
+  render();
+}
+
+// ------------------------------------------------------------------ collegamento
+function connect() {
+  if (!window.EventSource) { poll(); return; }
+  const es = new EventSource("events");
+  es.onmessage = e => { try { onState(JSON.parse(e.data)); } catch (err) {} };
+}
+function poll() {
+  fetch("state", { cache: "no-store" }).then(r => r.json()).then(onState).catch(() => {}).finally(() => setTimeout(poll, 1000));
+}
+
+// ------------------------------------------------------------------ schermo intero e schermo acceso
+const fs = $("fs");
+fs.textContent = "⛶ " + (IT ? "SCHERMO INTERO" : "FULL SCREEN");
+if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
+let pointerTimer = 0;
+function showPointer() {
+  document.body.classList.add("pointer");
+  clearTimeout(pointerTimer);
+  pointerTimer = setTimeout(() => document.body.classList.remove("pointer"), 4000);
+}
+["mousemove", "touchstart", "click"].forEach(ev => document.addEventListener(ev, showPointer, { passive: true }));
+fs.addEventListener("click", async () => {
+  try {
+    await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(() => {});
+  } catch (e) {}
+  keepAwake();
+});
+document.addEventListener("fullscreenchange", () => fs.classList.toggle("can", !document.fullscreenElement));
+async function keepAwake() {
+  // funziona solo in https o su localhost; nell'app TSM lo schermo resta acceso comunque
+  try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
+function viewportUnits() {
+  if (innerHeight > 0 && innerWidth > 0) {
+    document.documentElement.style.setProperty("--vh", innerHeight / 100 + "px");
+    document.documentElement.style.setProperty("--vw", innerWidth / 100 + "px");
+  }
+}
+viewportUnits();
+window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); });
+keepAwake();
+setInterval(tick, 200);
+
+// ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
+if (/[?&]demo=1/.test(location.search)) {
+  const labels = {
+    vs: "VS", games: "GAMES", set: "SET", sec: "SEC", waiting: "IN ATTESA DELLA PARTITA", ready: "IN ATTESA DEL VIA",
+    suspended: "PARTITA SOSPESA", winner: "VINCE", tiebreak: "TIE-BREAK", matchTiebreak: "MATCH TIE-BREAK",
+    lost: "CONNESSIONE PERSA - RICONNESSIONE...", fullscreen: "SCHERMO INTERO",
+  };
+  const base = {
+    tsm: 1, seq: 1, lang: "it", phase: "play", title: "Circolo Tennis · Campo 3",
+    players: [{ name: "Stefano", color: "#FFD600" }, { name: "Mario", color: "#FF3030" }],
+    server: 0, points: ["15", "0"], games: [0, 0], sets: [1, 0], done: [{ g1: 6, g2: 0 }], tiebreak: "",
+    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: "SERVIZIO", leftMs: 25000, shot: true },
+    message: null, labels,
+    show: { clock: true, timers: true, sets: true, messages: true, serve: true, ghost: true },
+  };
+  const m = location.search.match(/[?&]state=([a-z]+)/);
+  const variants = {
+    play: {},
+    ad: { points: ["AD", "40"], games: [5, 4], message: "Set point", server: 1 },
+    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: "CAMBIO CAMPO", leftMs: 30000, shot: false } },
+    end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
+    doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
+  };
+  onState(Object.assign({}, base, variants[(m && m[1]) || "play"] || {}));
+  setInterval(() => { lastMsg = performance.now(); }, 1000);
+} else {
+  connect();
+}
+</script>
+</body>
+</html>

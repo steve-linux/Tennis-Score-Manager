@@ -2,6 +2,7 @@ package com.tennis.scoremanager.data
 
 import android.content.Context
 import android.util.Log
+import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -29,6 +30,18 @@ class Storage(context: Context) {
             runCatching { json.decodeFromString(MatchOptions.serializer(), it) }.getOrNull()
         } ?: MatchOptions()
         set(v) = prefs.edit().putString("options", json.encodeToString(MatchOptions.serializer(), v)).apply()
+
+    /** Tabellone TV: impostazioni del telefono, non della partita. */
+    var tv: TvSettings
+        get() = prefs.getString("tv", null)?.let {
+            runCatching { json.decodeFromString(TvSettings.serializer(), it) }.getOrNull()
+        } ?: TvSettings()
+        set(v) = prefs.edit().putString("tv", json.encodeToString(TvSettings.serializer(), v)).apply()
+
+    /** Ultimo indirizzo a cui si è collegato questo telefono usato come tabellone ("192.168.43.1:8080"). */
+    var lastScoreboardHost: String?
+        get() = prefs.getString("display_host", null)
+        set(v) = prefs.edit().putString("display_host", v).apply()
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }

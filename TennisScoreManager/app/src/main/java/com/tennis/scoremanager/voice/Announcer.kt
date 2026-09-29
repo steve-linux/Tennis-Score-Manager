@@ -12,6 +12,7 @@ import com.tennis.scoremanager.model.Lang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -67,6 +68,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     val currentVoice: StateFlow<String?> = _currentVoice
     private val _currentEngine = MutableStateFlow<String?>(null)
     val currentEngineFlow: StateFlow<String?> = _currentEngine
+    private val _playing = MutableStateFlow<String?>(null)
+    /** Chiamata in corso: il [name] passato ad [announce] ("" se senza nome); null = nessuna. */
+    val playing: StateFlow<String?> = _playing
 
     var enabled: Boolean = true
         set(value) {
@@ -209,8 +213,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
      * Legge una chiamata interrompendo quella in corso. [onTag] viene chiamato quando parte un pezzo
      * con tag (es. "gioco" che avvia il tempo partita); se l'audio è spento o la chiamata viene
      * interrotta, i tag vengono comunque notificati subito. [force] legge anche ad audio spento (prova voce).
+     * [name] distingue la chiamata in [playing] (es. la prova voce, che il suo tasto può fermare).
      */
-    fun announce(segs: List<Seg>, force: Boolean = false, onTag: (String) -> Unit = {}) {
+    fun announce(segs: List<Seg>, force: Boolean = false, name: String = "", onTag: (String) -> Unit = {}) {
         val tags = segs.mapNotNull {
             when (it) {
                 is Seg.Clip -> it.tag
@@ -227,7 +232,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         }
         val l = lang
         val fired = mutableSetOf<String>()
-        job = scope.launch {
+        // LAZY: [job] è assegnato prima che parta, così anche una chiamata che finisce subito azzera [playing].
+        val j = scope.launch(start = CoroutineStart.LAZY) {
             try {
                 for (p in plan(segs, l)) {
                     p.tag?.let { fired += it; onTag(it) }
@@ -239,13 +245,21 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                 }
             } finally {
                 tags.filter { it !in fired }.forEach(onTag)
+                if (job === coroutineContext[Job]) {
+                    job = null
+                    _playing.value = null
+                }
             }
         }
+        job = j
+        _playing.value = name
+        j.start()
     }
 
     fun stop() {
         job?.cancel()
         job = null
+        _playing.value = null
         runCatching { tts?.stop() }
         pending.values.forEach { it.complete(false) }
         pending.clear()

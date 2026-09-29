@@ -57,6 +57,8 @@ data class BandInfo(
     val battery: Int? = null,
     val millivolts: Int? = null,
     val charging: Boolean = false,
+    /** Carica completa col cavo ancora collegato (firmware 2.1). */
+    val chargeFull: Boolean = false,
     /** Impostazioni lette dal braccialetto; null = firmware senza impostazioni (prima della 2.0) o non ancora lette. */
     val settings: BandSettings? = null,
 )
@@ -249,9 +251,10 @@ class BleManager(context: Context) {
                 address = l.address,
                 name = l.settings?.name?.takeIf { it.isNotEmpty() } ?: l.name,
                 state = l.state,
-                battery = l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery,
+                battery = l.status?.let { BatteryModel.shownPercent(it) } ?: l.battery,
                 millivolts = l.status?.millivolts,
                 charging = l.status?.charging == true,
+                chargeFull = l.status?.full == true,
                 settings = l.settings,
             )
         }

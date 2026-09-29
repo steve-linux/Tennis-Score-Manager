@@ -92,6 +92,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TvChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +122,7 @@ fun MatchScreen(c: MatchController) {
         Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        TimersRow(clock, cd, s)
+        TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         MessageBox(msg)
         Scoreboard(state, names, s)
@@ -278,12 +279,14 @@ private fun formatClock(ms: Long): String {
 private fun formatCountdown(sec: Int): String = if (sec >= 60) String.format(java.util.Locale.ROOT, "%d:%02d", sec / 60, sec % 60) else sec.toString()
 
 @Composable
-private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
+private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Composable () -> Unit = {}) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         Column {
             Text(s.matchTime, color = TsmColors.TextDim, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Text(formatClock(clock), color = TsmColors.TextMain, fontSize = 30.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
         }
+        Spacer(Modifier.weight(1f))
+        Box(Modifier.padding(top = 10.dp)) { middle() }
         Spacer(Modifier.weight(1f))
         Column(horizontalAlignment = Alignment.End) {
             val label = when (cd?.kind) {
@@ -316,6 +319,7 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             Pill(
                 (if (side == Side.P1) "G1" else "G2") +
                     ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
+                    (if (bat?.charging == true || b?.charging == true) " ⚡" else "") +
                     (bat?.leftText()?.let { " · $it" } ?: ""),
                 when {
                     low -> TsmColors.Danger

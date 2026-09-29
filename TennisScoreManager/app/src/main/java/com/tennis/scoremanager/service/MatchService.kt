@@ -20,8 +20,8 @@ import com.tennis.scoremanager.R
 import com.tennis.scoremanager.TsmApp
 
 /**
- * Servizio in primo piano durante la partita con i braccialetti: tiene attivo il processo
- * (Bluetooth, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
+ * Servizio in primo piano durante la partita con i braccialetti o col tabellone TV: tiene attivo il processo
+ * (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
  */
 class MatchService : Service() {
 
@@ -41,10 +41,18 @@ class MatchService : Service() {
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
+        val c = (application as TsmApp).controller
+        val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
+        val tv = c.tv.value.enabled
+        val what = when {
+            bands && tv -> "braccialetti e tabellone TV attivi"
+            tv -> "tabellone TV attivo"
+            else -> "braccialetti attivi"
+        }
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText("Partita in corso · braccialetti attivi")
+            .setContentText("Partita in corso · $what")
             .setOngoing(true)
             .setContentIntent(open)
             .build()
@@ -64,9 +72,11 @@ class MatchService : Service() {
         private const val CHANNEL = "match"
 
         fun start(ctx: Context) {
-            // Il tipo "connectedDevice" richiede il permesso Bluetooth: senza, Android chiuderebbe l'app.
+            // Il tipo "connectedDevice" richiede il permesso Bluetooth o quello di rete (CHANGE_NETWORK_STATE,
+            // concesso da solo): senza nessuno dei due Android chiuderebbe l'app.
+            fun granted(p: String) = ContextCompat.checkSelfPermission(ctx, p) == PackageManager.PERMISSION_GRANTED
             if (Build.VERSION.SDK_INT >= 31 &&
-                ContextCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+                !granted(Manifest.permission.BLUETOOTH_CONNECT) && !granted(Manifest.permission.CHANGE_NETWORK_STATE)
             ) return
             runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, MatchService::class.java)) }
                 .onFailure { Log.w("MatchService", "start", it) }

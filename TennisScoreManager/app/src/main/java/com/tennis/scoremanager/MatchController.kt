@@ -34,6 +34,11 @@ import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.tv.TvInput
+import com.tennis.scoremanager.tv.TvServer
+import com.tennis.scoremanager.tv.TvSettings
+import com.tennis.scoremanager.tv.TvSnapshot
+import com.tennis.scoremanager.tv.TvSnapshots
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.stringsFor
@@ -52,9 +57,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.OutputStream
 
@@ -66,8 +75,11 @@ data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
 data class LiveMatch(val record: MatchRecord, val state: MatchState)
 
-/** Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati). */
-data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean) {
+/**
+ * Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati).
+ * [charging] = col cavo USB; [full] = carica completa (firmware 2.1).
+ */
+data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean, val full: Boolean = false) {
     /** "~6 h" oppure "~40 min". */
     fun leftText(): String? = hoursLeft?.let { h -> if (h >= 1.0) "~${Math.round(h)} h" else "~${Math.round(h * 60)} min" }
 }
@@ -91,6 +103,8 @@ class MatchController(
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         private const val MESSAGE_MS = 5_000L
+        /** Nome della prova voce in [Announcer.playing]. */
+        const val VOICE_TEST = "test"
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -129,6 +143,14 @@ class MatchController(
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
     val toasts: SharedFlow<String> = _toasts
 
+    /** Tabellone TV: impostazioni, server web e messaggi per il pubblico (solo quelli di gioco). */
+    val tv = MutableStateFlow(storage.tv)
+    val tvServer = TvServer(app)
+    private val tvMessage = MutableStateFlow<String?>(null)
+    private var tvMessageJob: Job? = null
+    private var tvSeq = 0L
+    private val tvJson = Json { encodeDefaults = true }
+
     val strings: Strings get() = stringsFor(options.value.lang)
     fun names(s: SetupData = setup.value): Names = Names(s, strings)
     private fun calls() = CallBuilder(options.value.lang)
@@ -161,6 +183,78 @@ class MatchController(
                 delay(200)
             }
         }
+        scope.launch {
+            tv.map { it.enabled }.distinctUntilChanged().collect { on ->
+                if (on) tvServer.start() else tvServer.stop()
+                publishTv()
+                // Il servizio in primo piano tiene vivo il server anche a schermo spento.
+                if (on && (screen.value == Screen.START || screen.value == Screen.MATCH)) MatchService.start(app)
+                if (!on && options.value.mode != PlayMode.BANDS) MatchService.stop(app)
+            }
+        }
+        scope.launch {
+            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé)...
+            merge(
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients,
+                countdown.map { it?.kind }.distinctUntilChanged(),
+            ).collect { publishTv() }
+        }
+        scope.launch {
+            // ...e comunque ogni 5 secondi: rimette in passo gli orologi e dice al tabellone che il telefono c'è.
+            while (true) {
+                delay(5_000)
+                publishTv()
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- tabellone TV
+
+    fun updateTv(transform: (TvSettings) -> TvSettings) {
+        val v = transform(tv.value)
+        tv.value = v
+        storage.tv = v
+    }
+
+    /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
+    private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
+
+    private fun publishTv() {
+        if (!tvServer.running.value) return
+        val sc = screen.value
+        val lm = live.value
+        val match = lm ?: summary.value?.takeIf { sc == Screen.SUMMARY }
+        val o = options.value
+        val snap = TvSnapshots.build(
+            TvInput(
+                screen = sc,
+                setup = setup.value,
+                lang = o.lang,
+                firstServer = o.firstServer,
+                match = match,
+                clockMs = if (lm != null) currentClock() else match?.record?.clockMs ?: 0L,
+                clockRunning = lm != null && runningSince != null,
+                countdown = cdKind,
+                countdownLeftMs = cdEnd - SystemClock.elapsedRealtime(),
+                message = tvMessage.value,
+                tv = tv.value,
+                strings = strings,
+                seq = ++tvSeq,
+            ),
+        )
+        tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
+    }
+
+    /** Messaggio di gioco per il tabellone (set point, cambio campo...): 5 secondi come sul telefono. */
+    private fun showTvMessage(text: String?) {
+        tvMessage.value = text
+        tvMessageJob?.cancel()
+        if (text != null) {
+            tvMessageJob = scope.launch {
+                delay(MESSAGE_MS)
+                tvMessage.value = null
+            }
+        }
     }
 
     // ---------------------------------------------------------------- configurazione
@@ -191,7 +285,7 @@ class MatchController(
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
-        if (to == Screen.START && options.value.mode == PlayMode.BANDS) MatchService.start(app)
+        if (to == Screen.START && needsService()) MatchService.start(app)
         screen.value = to
     }
 
@@ -313,13 +407,14 @@ class MatchController(
         // teniamo al massimo le ultime 3 ore di campioni
         while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
         val hours = if (st.charging) null else BatteryModel.hoursLeft(samples)
-        bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        val shown = if (st.charging) BatteryModel.shownPercent(st) else soc
+        bandBattery.value = bandBattery.value + (side to BandBattery(shown, hours, st.charging, st.full))
         calibrate(side, st, samples)
-        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
+        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc shown=$shown chg=${st.charging} full=${st.full} usb=${st.usbMv} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
         scope.launch(io) {
             runCatching {
                 java.io.File(app.filesDir, "battery_log.csv").appendText(
-                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$soc,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS}\n",
+                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$shown,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS},${st.usbMv ?: ""},${if (st.full) 1 else 0}\n",
                 )
             }
         }
@@ -490,7 +585,7 @@ class MatchController(
         lastPointAt = 0
         screen.value = Screen.MATCH
         persist()
-        if (o.mode == PlayMode.BANDS) MatchService.start(app)
+        if (needsService()) MatchService.start(app)
         batteryWarned.clear()
         warnLowBandsAtStart()
         fetchLocation()
@@ -560,6 +655,7 @@ class MatchController(
             else -> pressureMessage(state)
         }
         if (msg != null) showMessage(msg)
+        showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
     }
 
@@ -597,6 +693,7 @@ class MatchController(
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
         showMessage(strings.msgPointUndone)
+        showTvMessage(null)
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
@@ -620,7 +717,7 @@ class MatchController(
             announcer.announce(calls().resume())
             showMessage(s.msgResumed)
             pushScore(lm.state, null)
-            if (options.value.mode == PlayMode.BANDS) MatchService.start(app)
+            if (needsService()) MatchService.start(app)
         } else {
             val total = currentClock()
             runningSince = null
@@ -708,10 +805,8 @@ class MatchController(
         screen.value = Screen.MATCH
         if (!state.isFinished) showMessage(strings.msgSuspended)
         if (rec.location == null) fetchLocation()
-        if (o.mode == PlayMode.BANDS) {
-            ble.reconnectAll()
-            MatchService.start(app)
-        }
+        if (o.mode == PlayMode.BANDS) ble.reconnectAll()
+        if (needsService()) MatchService.start(app)
         pushScore(state, null)
     }
 
@@ -859,10 +954,12 @@ class MatchController(
         }
     }
 
+    /** Prova voce; lo stesso tasto la ferma ([stopVoiceTest]). */
     fun testVoice() {
         val n = names()
         announcer.announce(
             force = true,
+            name = VOICE_TEST,
             segs = listOf(
                 Seg.Clip("first_set"), Seg.Pause(700),
                 Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
@@ -876,6 +973,11 @@ class MatchController(
                 Seg.Clip("games_all_6"), Seg.Clip("tiebreak"),
             ),
         )
+    }
+
+    /** Ferma la prova voce (e solo quella: una chiamata di partita non si tocca). */
+    fun stopVoiceTest() {
+        if (announcer.playing.value == VOICE_TEST) announcer.stop()
     }
 
     // ---------------------------------------------------------------- riepilogo

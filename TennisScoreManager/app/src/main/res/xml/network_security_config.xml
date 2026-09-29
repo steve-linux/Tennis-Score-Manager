@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Il tabellone arriva in http dal telefono dell'arbitro sulla rete locale (hotspot): niente https lì. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

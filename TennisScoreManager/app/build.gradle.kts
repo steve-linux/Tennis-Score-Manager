@@ -15,8 +15,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.1.0"
+        versionCode = 4
+        versionName = "2.2.0"
     }
 
     buildTypes {
@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.zxing.core)  // QR del tabellone TV
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
