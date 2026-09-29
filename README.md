@@ -1,6 +1,6 @@
 # Tennis Score Manager
 
-App Android per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano e inglese, anche senza internet) e due braccialetti **M5StickS3** collegati in Bluetooth LE.
+App Android per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano e inglese, anche senza internet), due braccialetti **M5StickS3** collegati in Bluetooth LE e un tabellone a LED su TV o monitor (secondo telefono col cavo HDMI, Chromecast o browser, sull'hotspot di un telefono).
 
 | Cartella | Contenuto |
 |---|---|
@@ -37,3 +37,5 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Protocollo Bluetooth (condiviso col firmware) | `app/.../ble/BandProtocol.kt` e in cima a `TSM_Band.ino` |
 | Impostazioni dei braccialetti, stima autonomia | `app/.../ble/BandProtocol.kt` (`BandSettings`), `ble/BatteryModel.kt`, `ui/BandSettingsPanel.kt` |
 | Testi IT/EN, grafica | `app/.../ui/Strings.kt`, `ui/screens/`, `ui/Theme.kt` |
+| Tabellone TV (pagina, server, telefono-tabellone) | `app/src/main/assets/scoreboard.html`, `app/.../tv/`, `ui/TvSection.kt` — anteprima: `scoreboard.html?demo=1` |
+| Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |

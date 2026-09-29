@@ -20,11 +20,13 @@ mkdir -p "$DEST"
 echo ">> Creo le cartelle"
 mkdir -p "$DEST/app"
 mkdir -p "$DEST/app/src/main"
+mkdir -p "$DEST/app/src/main/assets"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/service"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/voice"
@@ -35,6 +37,7 @@ mkdir -p "$DEST/app/src/main/res/xml"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/gradle"
 mkdir -p "$DEST/gradle/wrapper"
@@ -58,8 +61,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.1.0"
+        versionCode = 4
+        versionName = "2.2.0"
     }
 
     buildTypes {
@@ -101,6 +104,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.zxing.core)  // QR del tabellone TV
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
@@ -132,6 +136,11 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Tabellone TV: server web locale, ricerca del telefono dell'arbitro, rete Wi-Fi anche senza internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- Android 11+: senza questa dichiarazione la sintesi vocale non trova i motori TTS -->
     <queries>
@@ -148,6 +157,7 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.TSM"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="36">
 
         <activity
@@ -162,6 +172,14 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Telefono usato come tabellone: pagina del telefono dell'arbitro a schermo intero, in orizzontale -->
+        <activity
+            android:name=".tv.DisplayActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
+            android:launchMode="singleTask" />
 
         <service
             android:name=".service.MatchService"
@@ -179,6 +197,392 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         </provider>
     </application>
 </manifest>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/scoreboard.html
+cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Tabellone TSM</title>
+<!--
+  Tabellone di Tennis Score Manager, servito dal telefono dell'arbitro (TvServer.kt).
+  Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
+  da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
+  Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
+  Anteprima senza telefono: scoreboard.html?demo=1
+-->
+<style>
+  :root {
+    --p1: #FFD600;
+    --p2: #FF3030;
+    --ghost: #15181C;
+    --line: #2A2D31;
+    --dim: #9A9A9A;
+    --cyan: #22C3EE;
+    --green: #22D65A;
+    --orange: #FF9800;
+    --ball: #C6F432;
+    /* 1vh e 1vw: li ricalcola anche lo script, perché alcune WebView danno 1vh = 0 */
+    --vh: 1vh;
+    --vw: 1vw;
+  }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  body { cursor: none; -webkit-user-select: none; user-select: none; }
+  body.pointer { cursor: default; }
+  #board {
+    position: fixed; inset: 0; display: grid; grid-template-rows: 77% 23%;
+    font-family: "DejaVu Sans Mono", "Roboto Mono", "Droid Sans Mono", "Liberation Mono", Menlo, monospace;
+    font-weight: 700; color: #DDD; transition: opacity .4s;
+  }
+  body.lost #board { opacity: .35; }
+  svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  #main { display: grid; grid-template-columns: 1fr 15.6% 1fr; padding: calc(4 * var(--vh)) calc(2.1 * var(--vw)) calc(1.2 * var(--vh)); min-height: 0; }
+  .side { display: grid; grid-template-rows: 17% 83%; min-width: 0; min-height: 0; padding: 0 calc(1.4 * var(--vw)); }
+  .name {
+    display: flex; align-items: center; gap: .7em; min-width: 0; white-space: nowrap; overflow: hidden;
+    font-size: min(calc(6.2 * var(--vh)), calc(3.6 * var(--vw))); letter-spacing: .04em; text-transform: uppercase;
+  }
+  .name .nm { overflow: hidden; text-overflow: clip; }
+  .ball { flex: none; width: .62em; height: .62em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 .35em var(--ball); visibility: hidden; }
+  .serving .ball { visibility: visible; }
+  .big { padding: calc(2.8 * var(--vh)) 0 calc(3.2 * var(--vh)); min-height: 0; }
+
+  #mid {
+    border-left: 2px solid var(--line); border-right: 2px solid var(--line); min-width: 0; min-height: 0;
+    display: grid; grid-template-rows: 15% 23% 9% 23% 10% 16%; justify-items: center; align-items: center;
+  }
+  #vs { font-size: min(calc(5.6 * var(--vh)), calc(3.2 * var(--vw))); font-style: italic; color: #5E6166; letter-spacing: .06em; white-space: nowrap; }
+  #vs.tb { font-style: normal; color: var(--cyan); font-size: min(calc(3.4 * var(--vh)), calc(1.9 * var(--vw))); text-align: center; white-space: normal; line-height: 1.1; }
+  .gm { height: 86%; width: 60%; }
+  .lbl { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); letter-spacing: .05em; color: var(--dim); }
+  .lbl.cy { color: var(--cyan); }
+  #setrow { display: grid; grid-template-columns: 1fr 1fr; gap: 28%; width: 62%; height: 88%; }
+
+  #foot {
+    border-top: 2px solid var(--line); margin: 0 calc(2.1 * var(--vw)); min-height: 0;
+    display: grid; grid-template-columns: minmax(0, auto) 1fr minmax(0, auto); column-gap: calc(2 * var(--vw));
+    padding: calc(2.4 * var(--vh)) calc(1.2 * var(--vw)) calc(3 * var(--vh));
+  }
+  #fl, #fr { display: grid; grid-template-rows: 1fr 1.5fr; min-height: 0; min-width: 0; }
+  #fr { justify-items: start; }
+  #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
+  #clock { height: 78%; width: auto; align-self: end; }
+  #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: .calc(6 * var(--vh)); }
+  #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
+  #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
+  #timer { font-size: min(calc(5.4 * var(--vh)), calc(3.1 * var(--vw))); color: var(--p2); white-space: nowrap; align-self: end; letter-spacing: .05em; }
+  #timer.pause { color: var(--orange); }
+  .hide { visibility: hidden; }
+  @keyframes blink { to { visibility: hidden; } }
+
+  #banner {
+    position: fixed; left: 0; right: 0; top: 0; padding: calc(1.4 * var(--vh)) calc(2 * var(--vw)); text-align: center; display: none;
+    font: 700 min(calc(4 * var(--vh)), calc(2.4 * var(--vw))) monospace; color: #000; background: var(--orange); letter-spacing: .04em;
+  }
+  body.lost #banner { display: block; }
+  #fs {
+    position: fixed; left: calc(2 * var(--vw)); bottom: calc(2 * var(--vh)); display: none; padding: calc(1.2 * var(--vh)) calc(1.6 * var(--vw)); border: 2px solid #444; border-radius: calc(1 * var(--vh));
+    font: 700 min(calc(3 * var(--vh)), calc(1.8 * var(--vw))) monospace; color: #DDD; background: #111; cursor: pointer;
+  }
+  body.pointer #fs.can { display: block; }
+</style>
+</head>
+<body>
+<div id="board">
+  <div id="main">
+    <section class="side" id="side0">
+      <div class="name"><span class="nm" id="n0"></span><span class="ball"></span></div>
+      <div class="big"><svg id="pt0"></svg></div>
+    </section>
+    <section id="mid">
+      <div id="vs">VS</div>
+      <svg class="gm" id="g0"></svg>
+      <div class="lbl" id="lgames">GAMES</div>
+      <svg class="gm" id="g1"></svg>
+      <div class="lbl cy" id="lset">SET</div>
+      <div id="setrow"><svg id="s0"></svg><svg id="s1"></svg></div>
+    </section>
+    <section class="side" id="side1">
+      <div class="name"><span class="nm" id="n1"></span><span class="ball"></span></div>
+      <div class="big"><svg id="pt1"></svg></div>
+    </section>
+  </div>
+  <div id="foot">
+    <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
+    <div id="fc"><div id="title"></div></div>
+    <div id="fr"><div id="msg"></div><div id="timer"></div></div>
+  </div>
+</div>
+<div id="banner"></div>
+<button id="fs" type="button"></button>
+
+<script>
+"use strict";
+// ------------------------------------------------------------------ cifre a 7 segmenti
+// Una cifra è 100 x 172: barre orizzontali tra le verticali, come un tabellone a LED.
+const DW = 100, DH = 172, T = 14, GAP = 1.8, DSP = 16, COLON = 34;
+const V = (DH - 3 * T) / 2;
+const RECT = {
+  a: [T + GAP, 0, DW - 2 * T - 2 * GAP, T],
+  b: [DW - T, T + GAP, T, V - 2 * GAP],
+  c: [DW - T, 2 * T + V + GAP, T, V - 2 * GAP],
+  d: [T + GAP, DH - T, DW - 2 * T - 2 * GAP, T],
+  e: [0, 2 * T + V + GAP, T, V - 2 * GAP],
+  f: [0, T + GAP, T, V - 2 * GAP],
+  g: [T + GAP, T + V, DW - 2 * T - 2 * GAP, T],
+};
+const GLYPH = {
+  "0": "abcdef", "1": "bc", "2": "abdeg", "3": "abcdg", "4": "bcfg", "5": "acdfg", "6": "acdefg",
+  "7": "abc", "8": "abcdefg", "9": "abcdfg", "A": "abcefg", "D": "bcdeg", "-": "g", " ": "",
+};
+const NS = "http://www.w3.org/2000/svg";
+let ghost = true;
+
+/** Prepara un display: "88" = due cifre, "88:88:88" = orologio. */
+function buildSeg(svg, pattern) {
+  let x = 0;
+  const cells = [];
+  for (const ch of pattern) {
+    if (ch === ":") {
+      const dots = [];
+      for (const y of [DH * 0.32, DH * 0.68]) {
+        const r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x + COLON / 2 - T / 2); r.setAttribute("y", y - T / 2);
+        r.setAttribute("width", T); r.setAttribute("height", T); r.setAttribute("rx", 2);
+        svg.appendChild(r); dots.push(r);
+      }
+      cells.push({ colon: dots });
+      x += COLON + DSP;
+    } else {
+      const segs = {};
+      for (const k in RECT) {
+        const [rx, ry, w, h] = RECT[k];
+        const r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x + rx); r.setAttribute("y", ry);
+        r.setAttribute("width", w); r.setAttribute("height", h); r.setAttribute("rx", 2.5);
+        svg.appendChild(r); segs[k] = r;
+      }
+      cells.push({ segs });
+      x += DW + DSP;
+    }
+  }
+  svg.setAttribute("viewBox", `0 0 ${x - DSP} ${DH}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg._cells = cells;
+  svg._text = null;
+}
+
+/** Scrive un testo (allineato a destra, spazi = cifra spenta) nel colore dato. */
+function setSeg(svg, text, color) {
+  const key = text + "|" + color + "|" + ghost;
+  if (svg._text === key) return;
+  svg._text = key;
+  const digits = svg._cells.filter(c => c.segs).length;
+  const chars = String(text).toUpperCase().padStart(digits, " ").slice(-digits).split("");
+  let i = 0;
+  for (const cell of svg._cells) {
+    if (cell.colon) { cell.colon.forEach(r => r.setAttribute("fill", color)); continue; }
+    const on = GLYPH[chars[i++]] ?? "";
+    for (const k in cell.segs) cell.segs[k].setAttribute("fill", on.includes(k) ? color : (ghost ? "var(--ghost)" : "transparent"));
+  }
+}
+
+// ------------------------------------------------------------------ stato
+const $ = id => document.getElementById(id);
+const pts = [$("pt0"), $("pt1")], gms = [$("g0"), $("g1")], sts = [$("s0"), $("s1")];
+pts.forEach(s => buildSeg(s, "88"));
+gms.forEach(s => buildSeg(s, "8"));
+sts.forEach(s => buildSeg(s, "8"));
+buildSeg($("clock"), "88:88:88");
+
+const IT = (navigator.language || "it").startsWith("it");
+let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
+const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
+const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
+
+function fitText(el, maxPx) {
+  el.style.fontSize = "";
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  const box = el.parentElement;
+  while (el.scrollWidth > box.clientWidth - (maxPx || 0) && size > 8) {
+    size *= 0.92;
+    el.style.fontSize = size + "px";
+  }
+}
+
+function hms(ms) {
+  const t = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(t / 3600) % 100, m = Math.floor(t / 60) % 60, s = t % 60;
+  return [h, m, s].map(v => String(v).padStart(2, "0")).join("");
+}
+
+function setText(el, text) { if (el.textContent !== text) el.textContent = text; }
+
+function render() {
+  if (!S) return;
+  ghost = S.show.ghost !== false;
+  document.documentElement.lang = S.lang;
+  const L = S.labels;
+  document.documentElement.style.setProperty("--p1", color(0));
+  document.documentElement.style.setProperty("--p2", color(1));
+  for (let i = 0; i < 2; i++) {
+    const n = $("n" + i);
+    n.style.color = color(i);
+    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
+    $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
+    setSeg(pts[i], S.points[i], color(i));
+    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
+    setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
+  }
+  const vs = $("vs");
+  const tb = S.phase === "play" || S.phase === "suspended" ? (S.tiebreak === "match" ? L.matchTiebreak : S.tiebreak === "set" ? L.tiebreak : "") : "";
+  setText(vs, tb || L.vs);
+  vs.classList.toggle("tb", !!tb);
+  setText($("lgames"), L.games);
+  setText($("lset"), L.set);
+
+  // set conclusi: [6-4] [7-6(5)] [10-8]
+  const done = S.show.sets ? S.done.map(d => {
+    const tbPts = !d.mtb && d.tb1 != null && d.tb2 != null ? `(${Math.min(d.tb1, d.tb2)})` : "";
+    return d.mtb ? `[${d.tb1}-${d.tb2}]` : `[${d.g1}-${d.g2}${tbPts}]`;
+  }).join(" ") : "";
+  setText($("done"), done);
+  $("clock").classList.toggle("hide", !S.show.clock);
+  setText($("title"), S.title || "");
+
+  // messaggio: fasi speciali prima di tutto
+  const msg = $("msg");
+  let text = "", blink = false, col = "var(--orange)";
+  if (S.phase === "idle") text = L.waiting;
+  else if (S.phase === "ready") text = L.ready;
+  else if (S.phase === "suspended") { text = L.suspended; blink = true; }
+  else if (S.phase === "finished" && S.winner != null) { text = `${L.winner} ${S.players[S.winner].name}`.toUpperCase(); col = color(S.winner); }
+  else if (S.message) text = S.message.toUpperCase();
+  setText(msg, text);
+  msg.style.color = col;
+  msg.classList.toggle("blink", blink);
+  tick();
+}
+
+function tick() {
+  const now = performance.now();
+  if (S) {
+    const clock = S.clockMs + (S.clockRunning ? now - recvAt : 0);
+    setSeg($("clock"), hms(clock), "var(--green)");
+    const timer = $("timer");
+    const cd = S.countdown;
+    if (cd) {
+      const left = Math.max(0, Math.ceil((cd.leftMs - (now - recvAt)) / 1000));
+      setText(timer, `${cd.label}: ${String(left).padStart(2, "0")} ${S.labels.sec}`);
+      timer.classList.toggle("pause", !cd.shot);
+      timer.classList.remove("hide");
+    } else {
+      timer.classList.add("hide");
+    }
+  }
+  // collegamento: il telefono manda qualcosa almeno ogni 5 secondi
+  const silent = now - lastMsg;
+  document.body.classList.toggle("lost", silent > 12000);
+  if (silent > 12000) {
+    setText($("banner"), S ? S.labels.lost : (IT ? "CONNESSIONE PERSA - RICONNESSIONE..." : "CONNECTION LOST - RECONNECTING..."));
+    if (!lostSince) lostSince = now;
+    if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
+  } else {
+    lostSince = 0;
+    lostCalled = false;
+  }
+}
+
+function onState(json) {
+  S = json;
+  recvAt = lastMsg = performance.now();
+  render();
+}
+
+// ------------------------------------------------------------------ collegamento
+function connect() {
+  if (!window.EventSource) { poll(); return; }
+  const es = new EventSource("events");
+  es.onmessage = e => { try { onState(JSON.parse(e.data)); } catch (err) {} };
+}
+function poll() {
+  fetch("state", { cache: "no-store" }).then(r => r.json()).then(onState).catch(() => {}).finally(() => setTimeout(poll, 1000));
+}
+
+// ------------------------------------------------------------------ schermo intero e schermo acceso
+const fs = $("fs");
+fs.textContent = "⛶ " + (IT ? "SCHERMO INTERO" : "FULL SCREEN");
+if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
+let pointerTimer = 0;
+function showPointer() {
+  document.body.classList.add("pointer");
+  clearTimeout(pointerTimer);
+  pointerTimer = setTimeout(() => document.body.classList.remove("pointer"), 4000);
+}
+["mousemove", "touchstart", "click"].forEach(ev => document.addEventListener(ev, showPointer, { passive: true }));
+fs.addEventListener("click", async () => {
+  try {
+    await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(() => {});
+  } catch (e) {}
+  keepAwake();
+});
+document.addEventListener("fullscreenchange", () => fs.classList.toggle("can", !document.fullscreenElement));
+async function keepAwake() {
+  // funziona solo in https o su localhost; nell'app TSM lo schermo resta acceso comunque
+  try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
+function viewportUnits() {
+  if (innerHeight > 0 && innerWidth > 0) {
+    document.documentElement.style.setProperty("--vh", innerHeight / 100 + "px");
+    document.documentElement.style.setProperty("--vw", innerWidth / 100 + "px");
+  }
+}
+viewportUnits();
+window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); });
+keepAwake();
+setInterval(tick, 200);
+
+// ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
+if (/[?&]demo=1/.test(location.search)) {
+  const labels = {
+    vs: "VS", games: "GAMES", set: "SET", sec: "SEC", waiting: "IN ATTESA DELLA PARTITA", ready: "IN ATTESA DEL VIA",
+    suspended: "PARTITA SOSPESA", winner: "VINCE", tiebreak: "TIE-BREAK", matchTiebreak: "MATCH TIE-BREAK",
+    lost: "CONNESSIONE PERSA - RICONNESSIONE...", fullscreen: "SCHERMO INTERO",
+  };
+  const base = {
+    tsm: 1, seq: 1, lang: "it", phase: "play", title: "Circolo Tennis · Campo 3",
+    players: [{ name: "Stefano", color: "#FFD600" }, { name: "Mario", color: "#FF3030" }],
+    server: 0, points: ["15", "0"], games: [0, 0], sets: [1, 0], done: [{ g1: 6, g2: 0 }], tiebreak: "",
+    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: "SERVIZIO", leftMs: 25000, shot: true },
+    message: null, labels,
+    show: { clock: true, timers: true, sets: true, messages: true, serve: true, ghost: true },
+  };
+  const m = location.search.match(/[?&]state=([a-z]+)/);
+  const variants = {
+    play: {},
+    ad: { points: ["AD", "40"], games: [5, 4], message: "Set point", server: 1 },
+    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: "CAMBIO CAMPO", leftMs: 30000, shot: false } },
+    end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
+    doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
+  };
+  onState(Object.assign({}, base, variants[(m && m[1]) || "play"] || {}));
+  setInterval(() => { lastMsg = performance.now(); }, 1000);
+} else {
+  connect();
+}
+</script>
+</body>
+</html>
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/MainActivity.kt
@@ -293,6 +697,11 @@ import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.tv.TvInput
+import com.tennis.scoremanager.tv.TvServer
+import com.tennis.scoremanager.tv.TvSettings
+import com.tennis.scoremanager.tv.TvSnapshot
+import com.tennis.scoremanager.tv.TvSnapshots
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.stringsFor
@@ -311,9 +720,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.OutputStream
 
@@ -325,8 +738,11 @@ data class CountdownUi(val kind: CountdownKind, val seconds: Int)
 
 data class LiveMatch(val record: MatchRecord, val state: MatchState)
 
-/** Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati). */
-data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean) {
+/**
+ * Carica del braccialetto e autonomia stimata dal consumo misurato (null finché non ci sono dati).
+ * [charging] = col cavo USB; [full] = carica completa (firmware 2.1).
+ */
+data class BandBattery(val percent: Int, val hoursLeft: Double?, val charging: Boolean, val full: Boolean = false) {
     /** "~6 h" oppure "~40 min". */
     fun leftText(): String? = hoursLeft?.let { h -> if (h >= 1.0) "~${Math.round(h)} h" else "~${Math.round(h * 60)} min" }
 }
@@ -350,6 +766,8 @@ class MatchController(
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         private const val MESSAGE_MS = 5_000L
+        /** Nome della prova voce in [Announcer.playing]. */
+        const val VOICE_TEST = "test"
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -388,6 +806,14 @@ class MatchController(
     private val _toasts = MutableSharedFlow<String>(extraBufferCapacity = 4)
     val toasts: SharedFlow<String> = _toasts
 
+    /** Tabellone TV: impostazioni, server web e messaggi per il pubblico (solo quelli di gioco). */
+    val tv = MutableStateFlow(storage.tv)
+    val tvServer = TvServer(app)
+    private val tvMessage = MutableStateFlow<String?>(null)
+    private var tvMessageJob: Job? = null
+    private var tvSeq = 0L
+    private val tvJson = Json { encodeDefaults = true }
+
     val strings: Strings get() = stringsFor(options.value.lang)
     fun names(s: SetupData = setup.value): Names = Names(s, strings)
     private fun calls() = CallBuilder(options.value.lang)
@@ -420,6 +846,78 @@ class MatchController(
                 delay(200)
             }
         }
+        scope.launch {
+            tv.map { it.enabled }.distinctUntilChanged().collect { on ->
+                if (on) tvServer.start() else tvServer.stop()
+                publishTv()
+                // Il servizio in primo piano tiene vivo il server anche a schermo spento.
+                if (on && (screen.value == Screen.START || screen.value == Screen.MATCH)) MatchService.start(app)
+                if (!on && options.value.mode != PlayMode.BANDS) MatchService.stop(app)
+            }
+        }
+        scope.launch {
+            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé)...
+            merge(
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients,
+                countdown.map { it?.kind }.distinctUntilChanged(),
+            ).collect { publishTv() }
+        }
+        scope.launch {
+            // ...e comunque ogni 5 secondi: rimette in passo gli orologi e dice al tabellone che il telefono c'è.
+            while (true) {
+                delay(5_000)
+                publishTv()
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- tabellone TV
+
+    fun updateTv(transform: (TvSettings) -> TvSettings) {
+        val v = transform(tv.value)
+        tv.value = v
+        storage.tv = v
+    }
+
+    /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
+    private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
+
+    private fun publishTv() {
+        if (!tvServer.running.value) return
+        val sc = screen.value
+        val lm = live.value
+        val match = lm ?: summary.value?.takeIf { sc == Screen.SUMMARY }
+        val o = options.value
+        val snap = TvSnapshots.build(
+            TvInput(
+                screen = sc,
+                setup = setup.value,
+                lang = o.lang,
+                firstServer = o.firstServer,
+                match = match,
+                clockMs = if (lm != null) currentClock() else match?.record?.clockMs ?: 0L,
+                clockRunning = lm != null && runningSince != null,
+                countdown = cdKind,
+                countdownLeftMs = cdEnd - SystemClock.elapsedRealtime(),
+                message = tvMessage.value,
+                tv = tv.value,
+                strings = strings,
+                seq = ++tvSeq,
+            ),
+        )
+        tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
+    }
+
+    /** Messaggio di gioco per il tabellone (set point, cambio campo...): 5 secondi come sul telefono. */
+    private fun showTvMessage(text: String?) {
+        tvMessage.value = text
+        tvMessageJob?.cancel()
+        if (text != null) {
+            tvMessageJob = scope.launch {
+                delay(MESSAGE_MS)
+                tvMessage.value = null
+            }
+        }
     }
 
     // ---------------------------------------------------------------- configurazione
@@ -450,7 +948,7 @@ class MatchController(
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
-        if (to == Screen.START && options.value.mode == PlayMode.BANDS) MatchService.start(app)
+        if (to == Screen.START && needsService()) MatchService.start(app)
         screen.value = to
     }
 
@@ -572,13 +1070,14 @@ class MatchController(
         // teniamo al massimo le ultime 3 ore di campioni
         while (samples.isNotEmpty() && now - samples.first().first > 3 * 3_600_000L) samples.removeAt(0)
         val hours = if (st.charging) null else BatteryModel.hoursLeft(samples)
-        bandBattery.value = bandBattery.value + (side to BandBattery(soc, hours, st.charging))
+        val shown = if (st.charging) BatteryModel.shownPercent(st) else soc
+        bandBattery.value = bandBattery.value + (side to BandBattery(shown, hours, st.charging, st.full))
         calibrate(side, st, samples)
-        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc chg=${st.charging} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
+        android.util.Log.i("BandStatus", "${bandLabel(side)} mv=${st.millivolts} soc=$soc shown=$shown chg=${st.charging} full=${st.full} usb=${st.usbMv} up=${st.uptimeS}s dsp=${st.displayS}s left=${hours?.let { "%.1fh".format(it) } ?: "-"}")
         scope.launch(io) {
             runCatching {
                 java.io.File(app.filesDir, "battery_log.csv").appendText(
-                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$soc,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS}\n",
+                    "${System.currentTimeMillis()},${bandLabel(side)},${st.millivolts},$shown,${if (st.charging) 1 else 0},${st.uptimeS},${st.displayS},${st.usbMv ?: ""},${if (st.full) 1 else 0}\n",
                 )
             }
         }
@@ -749,7 +1248,7 @@ class MatchController(
         lastPointAt = 0
         screen.value = Screen.MATCH
         persist()
-        if (o.mode == PlayMode.BANDS) MatchService.start(app)
+        if (needsService()) MatchService.start(app)
         batteryWarned.clear()
         warnLowBandsAtStart()
         fetchLocation()
@@ -819,6 +1318,7 @@ class MatchController(
             else -> pressureMessage(state)
         }
         if (msg != null) showMessage(msg)
+        showTvMessage(msg)
         if (t.setWinner != null && state.rules.doubles) serveOrderPrompt.value = true
     }
 
@@ -856,6 +1356,7 @@ class MatchController(
         announcer.announce(calls().correction(state, names()))
         pushScore(state, null)
         showMessage(strings.msgPointUndone)
+        showTvMessage(null)
     }
 
     fun setServeOrder(firstP1: Int, firstP2: Int) {
@@ -879,7 +1380,7 @@ class MatchController(
             announcer.announce(calls().resume())
             showMessage(s.msgResumed)
             pushScore(lm.state, null)
-            if (options.value.mode == PlayMode.BANDS) MatchService.start(app)
+            if (needsService()) MatchService.start(app)
         } else {
             val total = currentClock()
             runningSince = null
@@ -967,10 +1468,8 @@ class MatchController(
         screen.value = Screen.MATCH
         if (!state.isFinished) showMessage(strings.msgSuspended)
         if (rec.location == null) fetchLocation()
-        if (o.mode == PlayMode.BANDS) {
-            ble.reconnectAll()
-            MatchService.start(app)
-        }
+        if (o.mode == PlayMode.BANDS) ble.reconnectAll()
+        if (needsService()) MatchService.start(app)
         pushScore(state, null)
     }
 
@@ -1118,10 +1617,12 @@ class MatchController(
         }
     }
 
+    /** Prova voce; lo stesso tasto la ferma ([stopVoiceTest]). */
     fun testVoice() {
         val n = names()
         announcer.announce(
             force = true,
+            name = VOICE_TEST,
             segs = listOf(
                 Seg.Clip("first_set"), Seg.Pause(700),
                 Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
@@ -1135,6 +1636,11 @@ class MatchController(
                 Seg.Clip("games_all_6"), Seg.Clip("tiebreak"),
             ),
         )
+    }
+
+    /** Ferma la prova voce (e solo quella: una chiamata di partita non si tocca). */
+    fun stopVoiceTest() {
+        if (announcer.playing.value == VOICE_TEST) announcer.stop()
     }
 
     // ---------------------------------------------------------------- riepilogo
@@ -1433,8 +1939,22 @@ TSM_EOF
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ble/BatteryModel.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ble
 
-/** Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56". */
-data class BandStatus(val millivolts: Int, val charging: Boolean, val uptimeS: Long, val displayS: Long)
+/**
+ * Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56", dal firmware 2.1 anche
+ * ";usb=5010;full=0;pct=71". [charging] = alimentato dal cavo USB (dal 2.1 anche a carica completa).
+ */
+data class BandStatus(
+    val millivolts: Int,
+    val charging: Boolean,
+    val uptimeS: Long,
+    val displayS: Long,
+    /** Tensione USB in mV (0 = senza cavo); null = firmware prima della 2.1. */
+    val usbMv: Int? = null,
+    /** Carica completa, col cavo ancora collegato. */
+    val full: Boolean = false,
+    /** Percentuale mostrata dal braccialetto: in carica è quella della carica (la tensione lì è falsata). */
+    val percent: Int? = null,
+)
 
 /** Consumo medio stimato (mA) diviso per voce; [measured] = la base viene da una misura sul campo. */
 data class PowerEstimate(val baseMa: Double, val displayMa: Double, val soundMa: Double, val measured: Boolean) {
@@ -1485,7 +2005,17 @@ object BatteryModel {
             charging = map["chg"] == "1",
             uptimeS = map["up"]?.toLongOrNull() ?: 0,
             displayS = map["dsp"]?.toLongOrNull() ?: 0,
+            usbMv = map["usb"]?.toIntOrNull(),
+            full = map["full"] == "1",
+            percent = map["pct"]?.toIntOrNull()?.takeIf { it in 0..100 },
         )
+    }
+
+    /** Percentuale da mostrare: in carica quella del braccialetto (firmware 2.1), altrimenti dalla tensione. */
+    fun shownPercent(st: BandStatus): Int = when {
+        st.full -> 100
+        st.charging && st.percent != null -> st.percent
+        else -> soc(st.millivolts)
     }
 
     /** Percentuale di carica (0-100) dalla tensione in mV. */
@@ -1632,6 +2162,8 @@ data class BandInfo(
     val battery: Int? = null,
     val millivolts: Int? = null,
     val charging: Boolean = false,
+    /** Carica completa col cavo ancora collegato (firmware 2.1). */
+    val chargeFull: Boolean = false,
     /** Impostazioni lette dal braccialetto; null = firmware senza impostazioni (prima della 2.0) o non ancora lette. */
     val settings: BandSettings? = null,
 )
@@ -1824,9 +2356,10 @@ class BleManager(context: Context) {
                 address = l.address,
                 name = l.settings?.name?.takeIf { it.isNotEmpty() } ?: l.name,
                 state = l.state,
-                battery = l.status?.let { BatteryModel.soc(it.millivolts) } ?: l.battery,
+                battery = l.status?.let { BatteryModel.shownPercent(it) } ?: l.battery,
                 millivolts = l.status?.millivolts,
                 charging = l.status?.charging == true,
+                chargeFull = l.status?.full == true,
                 settings = l.settings,
             )
         }
@@ -2505,6 +3038,7 @@ package com.tennis.scoremanager.data
 
 import android.content.Context
 import android.util.Log
+import com.tennis.scoremanager.tv.TvSettings
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -2532,6 +3066,18 @@ class Storage(context: Context) {
             runCatching { json.decodeFromString(MatchOptions.serializer(), it) }.getOrNull()
         } ?: MatchOptions()
         set(v) = prefs.edit().putString("options", json.encodeToString(MatchOptions.serializer(), v)).apply()
+
+    /** Tabellone TV: impostazioni del telefono, non della partita. */
+    var tv: TvSettings
+        get() = prefs.getString("tv", null)?.let {
+            runCatching { json.decodeFromString(TvSettings.serializer(), it) }.getOrNull()
+        } ?: TvSettings()
+        set(v) = prefs.edit().putString("tv", json.encodeToString(TvSettings.serializer(), v)).apply()
+
+    /** Ultimo indirizzo a cui si è collegato questo telefono usato come tabellone ("192.168.43.1:8080"). */
+    var lastScoreboardHost: String?
+        get() = prefs.getString("display_host", null)
+        set(v) = prefs.edit().putString("display_host", v).apply()
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
@@ -2944,8 +3490,8 @@ import com.tennis.scoremanager.R
 import com.tennis.scoremanager.TsmApp
 
 /**
- * Servizio in primo piano durante la partita con i braccialetti: tiene attivo il processo
- * (Bluetooth, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
+ * Servizio in primo piano durante la partita con i braccialetti o col tabellone TV: tiene attivo il processo
+ * (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
  */
 class MatchService : Service() {
 
@@ -2965,10 +3511,18 @@ class MatchService : Service() {
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
+        val c = (application as TsmApp).controller
+        val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
+        val tv = c.tv.value.enabled
+        val what = when {
+            bands && tv -> "braccialetti e tabellone TV attivi"
+            tv -> "tabellone TV attivo"
+            else -> "braccialetti attivi"
+        }
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText("Partita in corso · braccialetti attivi")
+            .setContentText("Partita in corso · $what")
             .setOngoing(true)
             .setContentIntent(open)
             .build()
@@ -2988,9 +3542,11 @@ class MatchService : Service() {
         private const val CHANNEL = "match"
 
         fun start(ctx: Context) {
-            // Il tipo "connectedDevice" richiede il permesso Bluetooth: senza, Android chiuderebbe l'app.
+            // Il tipo "connectedDevice" richiede il permesso Bluetooth o quello di rete (CHANGE_NETWORK_STATE,
+            // concesso da solo): senza nessuno dei due Android chiuderebbe l'app.
+            fun granted(p: String) = ContextCompat.checkSelfPermission(ctx, p) == PackageManager.PERMISSION_GRANTED
             if (Build.VERSION.SDK_INT >= 31 &&
-                ContextCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+                !granted(Manifest.permission.BLUETOOTH_CONNECT) && !granted(Manifest.permission.CHANGE_NETWORK_STATE)
             ) return
             runCatching { ContextCompat.startForegroundService(ctx, Intent(ctx, MatchService::class.java)) }
                 .onFailure { Log.w("MatchService", "start", it) }
@@ -2999,6 +3555,1088 @@ class MatchService : Service() {
         fun stop(ctx: Context) {
             ctx.stopService(Intent(ctx, MatchService::class.java))
         }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/tv/DisplayActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/tv/DisplayActivity.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.tv
+
+import android.annotation.SuppressLint
+import android.app.Presentation
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.graphics.Color
+import android.hardware.display.DisplayManager
+import android.net.ConnectivityManager
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
+import android.view.Display
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Cast
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+
+/**
+ * "Usa come tabellone": questo telefono trova da solo il telefono dell'arbitro sulla rete dell'hotspot
+ * e mostra il tabellone a schermo intero, in orizzontale, con lo schermo sempre acceso.
+ * Con un monitor collegato (cavo USB-C/HDMI) il tabellone va sul monitor con il suo formato 16:9
+ * (Presentation) e il telefono resta libero; senza, lo schermo del telefono si può trasmettere
+ * a un Chromecast ("Trasmetti schermo").
+ */
+class DisplayActivity : ComponentActivity() {
+
+    private val controller get() = (application as TsmApp).controller
+    private val s: Strings get() = stringsFor(controller.options.value.lang)
+    private lateinit var finder: ScoreboardFinder
+    private lateinit var displays: DisplayManager
+
+    private val found = MutableStateFlow<FoundScoreboard?>(null)
+    private val searching = MutableStateFlow(false)
+    private val notFound = MutableStateFlow(false)
+    private val external = MutableStateFlow<Display?>(null)
+    private val showHere = MutableStateFlow(false)
+    private var presentation: ScoreboardPresentation? = null
+    private var searchJob: Job? = null
+    private var lastBack = 0L
+    /** Solo per le prove (adb): accetta anche il server di questo stesso telefono. */
+    private var allowSelf = false
+
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(id: Int) = refreshExternal()
+        override fun onDisplayRemoved(id: Int) = refreshExternal()
+        override fun onDisplayChanged(id: Int) {}
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        finder = ScoreboardFinder(this)
+        displays = getSystemService(DisplayManager::class.java)
+        allowSelf = intent.getBooleanExtra("allowSelf", false)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.decorView.setBackgroundColor(Color.BLACK)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Due volte indietro per uscire: un tocco per sbaglio non spegne il tabellone.
+                val now = SystemClock.elapsedRealtime()
+                if (found.value == null || now - lastBack < 2_500) finish()
+                else Toast.makeText(this@DisplayActivity, s.displayBackAgain, Toast.LENGTH_SHORT).show()
+                lastBack = now
+            }
+        })
+        displays.registerDisplayListener(displayListener, Handler(Looper.getMainLooper()))
+        refreshExternal()
+        setContent { TsmTheme { DisplayContent() } }
+        search()
+    }
+
+    override fun onDestroy() {
+        displays.unregisterDisplayListener(displayListener)
+        presentation?.dismiss()
+        presentation = null
+        getSystemService(ConnectivityManager::class.java)?.bindProcessToNetwork(null)
+        super.onDestroy()
+    }
+
+    // ---------------------------------------------------------------- ricerca e collegamento
+
+    private fun search(manual: String? = null) {
+        searchJob?.cancel()
+        notFound.value = false
+        searching.value = true
+        searchJob = lifecycleScope.launch {
+            val result = if (manual != null) {
+                ScoreboardFinder.parseAddress(manual)?.let { (h, p) -> kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { finder.verify(h, p) } }
+            } else {
+                finder.find(controller.storage.lastScoreboardHost)?.takeIf { allowSelf || it.host !in TvServer.localAddresses() }
+            }
+            searching.value = false
+            if (result != null) connect(result) else notFound.value = found.value == null
+        }
+    }
+
+    private fun connect(f: FoundScoreboard) {
+        // Collegato all'hotspot dell'altro telefono: il traffico della pagina deve passare dal Wi-Fi anche se
+        // Android, non vedendo internet lì, preferirebbe i dati mobili.
+        getSystemService(ConnectivityManager::class.java)?.bindProcessToNetwork(f.network)
+        controller.storage.lastScoreboardHost = f.label
+        found.value = f
+        updatePresentation()
+    }
+
+    /** Dalla pagina: niente aggiornamenti da 20 secondi. Si cerca di nuovo (l'indirizzo può essere cambiato). */
+    private fun onLost() {
+        if (searchJob?.isActive == true) return
+        searchJob = lifecycleScope.launch {
+            val again = finder.find(null, timeoutMs = 30_000)?.takeIf { allowSelf || it.host !in TvServer.localAddresses() }
+            if (again != null && again.label != found.value?.label) connect(again)
+        }
+    }
+
+    // ---------------------------------------------------------------- monitor esterno
+
+    private fun refreshExternal() {
+        external.value = displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION).firstOrNull()
+        updatePresentation()
+    }
+
+    private fun updatePresentation() {
+        val d = external.value
+        val f = found.value
+        val current = presentation
+        if (d == null || f == null) {
+            current?.dismiss()
+            presentation = null
+        } else if (current == null || current.display.displayId != d.displayId || current.url != f.url) {
+            current?.dismiss()
+            presentation = ScoreboardPresentation(this, d, f.url) { runOnUiThread { onLost() } }.also {
+                runCatching { it.show() }.onFailure { presentation = null }
+            }
+        }
+        // Tabellone sul monitor: il telefono si abbassa al minimo (resta acceso, se no si spegne anche l'uscita video).
+        window.attributes = window.attributes.apply {
+            screenBrightness = if (presentation != null && !showHere.value) 0.05f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        }
+    }
+
+    // ---------------------------------------------------------------- interfaccia
+
+    @Composable
+    private fun DisplayContent() {
+        val f by found.collectAsState()
+        val ext by external.collectAsState()
+        val here by showHere.collectAsState()
+        val busy by searching.collectAsState()
+        val missing by notFound.collectAsState()
+        when {
+            f == null -> SearchScreen(busy, missing)
+            ext != null && presentation != null && !here -> OnMonitorScreen(f!!)
+            else -> AndroidView(
+                factory = { ctx -> scoreboardWebView(ctx) { runOnUiThread { onLost() } } },
+                update = { web -> if (web.tag != f!!.url) { web.tag = f!!.url; web.loadUrl(f!!.url) } },
+                modifier = Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black),
+            )
+        }
+    }
+
+    @Composable
+    private fun SearchScreen(busy: Boolean, missing: Boolean) {
+        val str = s
+        var address by remember { mutableStateOf(controller.storage.lastScoreboardHost ?: "") }
+        Row(
+            Modifier.fillMaxSize().background(TsmColors.Background).padding(horizontal = 32.dp, vertical = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+        ) {
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Tv, null, tint = TsmColors.Ball, modifier = Modifier.size(36.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text(str.displayMode, color = TsmColors.TextMain, fontSize = 26.sp, fontWeight = FontWeight.Black)
+                }
+                if (busy) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(Modifier.size(24.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+                        Spacer(Modifier.width(12.dp))
+                        Text(str.displaySearching, color = TsmColors.TextMain, fontSize = 18.sp)
+                    }
+                } else if (missing) {
+                    Text(str.displayNotFound, color = TsmColors.Orange, fontSize = 16.sp)
+                }
+                Text(str.displaySteps, color = TsmColors.TextDim, fontSize = 15.sp, lineHeight = 22.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Cast, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(str.tvChromecastHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                }
+            }
+            Column(Modifier.widthIn(max = 320.dp).fillMaxWidth(0.4f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = address,
+                    onValueChange = { address = it.take(40) },
+                    label = { Text(str.displayManual) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                BigButton(str.displayConnect, Icons.Filled.Link, { search(address) }, Modifier.fillMaxWidth(), enabled = address.isNotBlank() && !busy)
+                GhostButton(str.displayRetry, Icons.Filled.Refresh, { search() }, Modifier.fillMaxWidth(), enabled = !busy)
+                GhostButton(str.exit, Icons.AutoMirrored.Filled.ExitToApp, { finish() }, Modifier.fillMaxWidth())
+            }
+        }
+    }
+
+    @Composable
+    private fun OnMonitorScreen(f: FoundScoreboard) {
+        val str = s
+        Column(
+            Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black).padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(Icons.Filled.Tv, null, tint = TsmColors.Ball, modifier = Modifier.size(48.dp))
+            Spacer(Modifier.height(8.dp))
+            Text(str.displayOnMonitor, color = TsmColors.TextMain, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(f.label, color = TsmColors.TextDim, fontSize = 14.sp)
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                GhostButton(str.displayShowHere, Icons.Filled.Tv, { showHere.value = true; updatePresentation() })
+                GhostButton(str.exit, Icons.AutoMirrored.Filled.ExitToApp, { finish() })
+            }
+        }
+    }
+}
+
+/** Il tabellone su un monitor collegato col cavo: occupa tutto il monitor, il telefono resta libero. */
+class ScoreboardPresentation(
+    context: Context,
+    display: Display,
+    val url: String,
+    private val onLost: () -> Unit,
+) : Presentation(context, display) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val page = url  // dentro apply "url" sarebbe quello della WebView
+        setContentView(scoreboardWebView(context, onLost).apply { tag = page; loadUrl(page) })
+    }
+}
+
+/** WebView del tabellone: JavaScript acceso, fondo nero, ricarica da sola se la pagina non arriva. */
+@SuppressLint("SetJavaScriptEnabled")
+fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(context).apply {
+    // Altezza esplicita: con WRAP_CONTENT (il default di AndroidView) la WebView calcola 1vh = 0 e i testi spariscono.
+    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    // Versione di prova (Android Studio): la pagina si ispeziona da chrome://inspect sul computer.
+    if (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) WebView.setWebContentsDebuggingEnabled(true)
+    setBackgroundColor(Color.BLACK)
+    settings.javaScriptEnabled = true
+    settings.domStorageEnabled = true
+    overScrollMode = View.OVER_SCROLL_NEVER
+    isVerticalScrollBarEnabled = false
+    isHorizontalScrollBarEnabled = false
+    keepScreenOn = true
+    addJavascriptInterface(object {
+        @JavascriptInterface
+        fun lost() = onLost()
+    }, "TSMDisplay")
+    webChromeClient = object : WebChromeClient() {
+        override fun onConsoleMessage(m: ConsoleMessage): Boolean {
+            Log.d("Tabellone", "${m.message()} (riga ${m.lineNumber()})")
+            return true
+        }
+    }
+    webViewClient = object : WebViewClient() {
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            if (request.isForMainFrame) view.postDelayed({ (view.tag as? String)?.let { url -> view.loadUrl(url) } }, 3_000)
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/tv/ScoreboardFinder.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/tv/ScoreboardFinder.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.tv
+
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdServiceInfo
+import android.os.Build
+import android.util.Log
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import java.net.Inet4Address
+import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import javax.net.SocketFactory
+
+/** Telefono dell'arbitro trovato: [network] è la rete da usare per raggiungerlo (null = quella normale). */
+data class FoundScoreboard(val host: String, val port: Int, val network: Network?) {
+    val url: String get() = "http://$host:$port/?display=app"
+    val label: String get() = "$host:$port"
+}
+
+/**
+ * Cerca il telefono dell'arbitro sulla rete locale, senza chiedere nulla all'utente:
+ *   1. l'ultimo indirizzo che ha funzionato;
+ *   2. l'annuncio "_tsm._tcp" sulla rete (NSD/mDNS);
+ *   3. una scansione della rete dell'hotspot (al massimo 1024 indirizzi, porta 8080 e seguenti).
+ * Ogni candidato si conferma chiedendo /state: deve rispondere il JSON del tabellone ("tsm":1).
+ */
+class ScoreboardFinder(context: Context) {
+
+    private val app = context.applicationContext
+    private val cm = app.getSystemService(ConnectivityManager::class.java)
+
+    suspend fun find(lastKnown: String?, timeoutMs: Long = 20_000): FoundScoreboard? = withContext(Dispatchers.IO) {
+        lastKnown?.let { parseAddress(it) }?.let { (h, p) -> verify(h, p)?.let { return@withContext it } }
+        val result = CompletableDeferred<FoundScoreboard?>()
+        val job = launch {
+            launch { nsd()?.let { result.complete(it) } }
+            for (port in listOf(TvServer.PORT, TvServer.PORT + 1, TvServer.PORT + 2)) {
+                if (result.isCompleted) break
+                scan(port)?.let { result.complete(it) }
+            }
+            // scansione finita senza risultato: qualche secondo ancora per l'annuncio NSD
+            delay(3_000)
+            result.complete(null)
+        }
+        val found = withTimeoutOrNull(timeoutMs) { result.await() }
+        job.cancel()
+        found
+    }
+
+
+    /** Conferma che a [host]:[port] c'è un tabellone TSM (con la rete giusta per raggiungerlo). */
+    fun verify(host: String, port: Int): FoundScoreboard? {
+        val network = networkFor(host)
+        val factory = network?.socketFactory ?: SocketFactory.getDefault()
+        return runCatching {
+            factory.createSocket().use { s ->
+                s.connect(InetSocketAddress(host, port), 700)
+                s.soTimeout = 1_500
+                s.getOutputStream().write("GET /state HTTP/1.0\r\nHost: $host\r\n\r\n".toByteArray())
+                val body = readAll(s.getInputStream(), 16_384)
+                if ("\"tsm\":1" in body) FoundScoreboard(host, port, network) else null
+            }
+        }.getOrNull()
+    }
+
+    // ---------------------------------------------------------------- NSD
+
+    private suspend fun nsd(): FoundScoreboard? {
+        val nsd = app.getSystemService(NsdManager::class.java) ?: return null
+        val services = kotlinx.coroutines.channels.Channel<NsdServiceInfo>(8)
+        val listener = object : NsdManager.DiscoveryListener {
+            override fun onServiceFound(info: NsdServiceInfo) { services.trySend(info) }
+            override fun onDiscoveryStarted(type: String) {}
+            override fun onDiscoveryStopped(type: String) {}
+            override fun onServiceLost(info: NsdServiceInfo) {}
+            override fun onStartDiscoveryFailed(type: String, error: Int) { services.close() }
+            override fun onStopDiscoveryFailed(type: String, error: Int) {}
+        }
+        runCatching { nsd.discoverServices(TvServer.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, listener) }.onFailure { return null }
+        try {
+            for (info in services) {
+                val resolved = resolve(nsd, info) ?: continue
+                @Suppress("DEPRECATION")
+                val host = (resolved.host as? Inet4Address)?.hostAddress ?: continue
+                verify(host, resolved.port)?.let { return it }
+            }
+        } finally {
+            runCatching { nsd.stopServiceDiscovery(listener) }
+        }
+        return null
+    }
+
+    @Suppress("DEPRECATION")
+    private suspend fun resolve(nsd: NsdManager, info: NsdServiceInfo): NsdServiceInfo? {
+        val done = CompletableDeferred<NsdServiceInfo?>()
+        runCatching {
+            nsd.resolveService(info, object : NsdManager.ResolveListener {
+                override fun onResolveFailed(i: NsdServiceInfo, error: Int) { done.complete(null) }
+                override fun onServiceResolved(i: NsdServiceInfo) { done.complete(i) }
+            })
+        }.onFailure { return null }
+        return withTimeoutOrNull(5_000) { done.await() }
+    }
+
+    // ---------------------------------------------------------------- scansione
+
+    /** Reti IPv4 locali: indirizzo di questo telefono e lunghezza del prefisso (es. 192.168.43.12/24). */
+    private data class Lan(val self: Int, val prefix: Int, val iface: String)
+
+    private fun lans(): List<Lan> = runCatching {
+        NetworkInterface.getNetworkInterfaces().toList()
+            .filter { it.isUp && !it.isLoopback && !it.name.startsWith("rmnet") && !it.name.startsWith("dummy") && !it.name.startsWith("tun") }
+            .flatMap { nif ->
+                nif.interfaceAddresses.mapNotNull { a ->
+                    val ip = a.address as? Inet4Address ?: return@mapNotNull null
+                    if (!ip.isSiteLocalAddress || a.networkPrefixLength !in 20..30) return@mapNotNull null
+                    Lan(toInt(ip), a.networkPrefixLength.toInt(), nif.name)
+                }
+            }
+    }.getOrDefault(emptyList())
+
+    private suspend fun scan(port: Int): FoundScoreboard? = coroutineScope {
+        val gate = Semaphore(48)
+        for (lan in lans()) {
+            val mask = -1 shl (32 - lan.prefix)
+            val base = lan.self and mask
+            val size = (1 shl (32 - lan.prefix)).coerceAtMost(1024)
+            // prima il probabile router/hotspot (.1), poi il resto
+            val hosts = (listOf(base + 1) + (1 until size - 1).map { base + it }).distinct().filter { it != lan.self }
+            val found = CompletableDeferred<FoundScoreboard?>()
+            val jobs = hosts.map { ipInt ->
+                async {
+                    gate.withPermit {
+                        ensureActive()
+                        if (!found.isCompleted) verify(fromInt(ipInt), port)?.let { found.complete(it) }
+                    }
+                }
+            }
+            launch { jobs.awaitAll(); found.complete(null) }
+            val hit = found.await()
+            jobs.forEach { it.cancel() }
+            if (hit != null) {
+                Log.i("ScoreboardFinder", "Trovato ${hit.label} su ${lan.iface}")
+                return@coroutineScope hit
+            }
+        }
+        null
+    }
+
+    /**
+     * La rete (Network) da cui si raggiunge [host]: serve quando questo telefono è collegato all'hotspot
+     * dell'altro e Android, vedendola senza internet, manderebbe il traffico sui dati mobili.
+     * Se il telefono è lui stesso l'hotspot la rete non è una "Network" di Android: null va bene.
+     */
+    fun networkFor(host: String): Network? {
+        val target = runCatching { toInt(java.net.InetAddress.getByName(host) as Inet4Address) }.getOrNull() ?: return null
+        @Suppress("DEPRECATION")
+        val all = cm?.allNetworks.orEmpty()
+        return all.firstOrNull { n ->
+            cm?.getLinkProperties(n)?.linkAddresses.orEmpty().any { la ->
+                val ip = la.address as? Inet4Address ?: return@any false
+                val p = la.prefixLength
+                val mask = if (p == 0) 0 else -1 shl (32 - p)
+                (toInt(ip) and mask) == (target and mask)
+            }
+        }
+    }
+
+    private fun readAll(input: java.io.InputStream, max: Int): String {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(2048)
+        while (out.size() < max) {
+            val n = input.read(buf)
+            if (n < 0) break
+            out.write(buf, 0, n)
+        }
+        return out.toString("UTF-8")
+    }
+
+    private fun toInt(ip: Inet4Address): Int = ip.address.fold(0) { acc, b -> (acc shl 8) or (b.toInt() and 0xFF) }
+
+    private fun fromInt(v: Int): String = "${v ushr 24 and 0xFF}.${v ushr 16 and 0xFF}.${v ushr 8 and 0xFF}.${v and 0xFF}"
+
+    companion object {
+        /** "192.168.43.1", "192.168.43.1:8081" o "http://192.168.43.1:8080/" -> host e porta. */
+        fun parseAddress(text: String): Pair<String, Int>? {
+            val t = text.trim().removePrefix("http://").removePrefix("https://").substringBefore('/')
+            if (t.isEmpty()) return null
+            val host = t.substringBefore(':')
+            val port = t.substringAfter(':', "").toIntOrNull() ?: TvServer.PORT
+            return if (host.isNotEmpty() && port in 1..65535) host to port else null
+        }
+
+        /** Per i log: modello e Android, utile se la ricerca fallisce su un telefono particolare. */
+        val device: String get() = "${Build.MANUFACTURER} ${Build.MODEL} (Android ${Build.VERSION.RELEASE})"
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/tv/TvModels.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/tv/TvModels.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.tv
+
+import com.tennis.scoremanager.CountdownKind
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import com.tennis.scoremanager.ui.Strings
+import kotlinx.serialization.Serializable
+
+/** Tabellone su TV: impostazioni del telefono dell'arbitro (non della singola partita). */
+@Serializable
+data class TvSettings(
+    val enabled: Boolean = false,
+    /** Riga facoltativa in basso (torneo, circolo...); vuota = circolo e campo della pagina 1. */
+    val title: String = "",
+    /** Colori dei due giocatori sul tabellone (#RRGGBB). */
+    val color1: String = TvColors.YELLOW,
+    val color2: String = TvColors.RED,
+    val showClock: Boolean = true,
+    /** Cronometro dei 25" di servizio e delle pause. */
+    val showTimers: Boolean = true,
+    /** Punteggi dei set conclusi, es. [6-4] [3-6]. */
+    val showSets: Boolean = true,
+    /** Palla break, set point, match point, cambio campo... */
+    val showMessages: Boolean = true,
+    /** Pallina accanto a chi serve. */
+    val showServe: Boolean = true,
+    /** Segmenti spenti visibili, come un tabellone a LED vero. */
+    val ghostSegments: Boolean = true,
+)
+
+object TvColors {
+    const val YELLOW = "#FFD600"
+    const val RED = "#FF3030"
+    /** Tavolozza proposta nelle impostazioni (colori ben visibili su fondo nero). */
+    val palette = listOf(YELLOW, RED, "#2F80FF", "#22D65A", "#22D3EE", "#FF9800", "#F5F5F5", "#FF3DCC")
+}
+
+/**
+ * Quello che il tabellone deve mostrare in un istante. Viaggia in JSON verso la pagina (scoreboard.html):
+ * i tempi arrivano come valore più "sta correndo", così la pagina li fa scorrere da sola tra un invio e l'altro.
+ * Indici delle liste: 0 = Giocatore 1, 1 = Giocatore 2.
+ */
+@Serializable
+data class TvSnapshot(
+    /** Firma per riconoscere il server TSM durante la ricerca. */
+    val tsm: Int = 1,
+    val seq: Long,
+    val lang: String,
+    /** idle (nessuna partita), ready (in attesa del via), play, suspended, finished. */
+    val phase: String,
+    val title: String,
+    val players: List<TvPlayer>,
+    val server: Int? = null,
+    /** Punti del game: "0" "15" "30" "40" "AD" o i punti del tie-break; "" = spento. */
+    val points: List<String>,
+    val games: List<Int>,
+    val sets: List<Int>,
+    val done: List<TvSet>,
+    /** "", "set" o "match". */
+    val tiebreak: String,
+    val winner: Int? = null,
+    val clockMs: Long,
+    val clockRunning: Boolean,
+    val countdown: TvCountdown? = null,
+    val message: String? = null,
+    val show: TvShow,
+    val labels: TvLabels,
+)
+
+@Serializable
+data class TvPlayer(val name: String, val color: String)
+
+@Serializable
+data class TvSet(val g1: Int, val g2: Int, val tb1: Int? = null, val tb2: Int? = null, val mtb: Boolean = false)
+
+/** [shot] = i 25" tra un punto e l'altro (in rosso come sul tabellone di riferimento). */
+@Serializable
+data class TvCountdown(val label: String, val leftMs: Long, val shot: Boolean)
+
+@Serializable
+data class TvShow(val clock: Boolean, val timers: Boolean, val sets: Boolean, val messages: Boolean, val serve: Boolean, val ghost: Boolean)
+
+@Serializable
+data class TvLabels(
+    val vs: String,
+    val games: String,
+    val set: String,
+    val sec: String,
+    val waiting: String,
+    val ready: String,
+    val suspended: String,
+    val winner: String,
+    val tiebreak: String,
+    val matchTiebreak: String,
+    val lost: String,
+    val fullscreen: String,
+)
+
+/** Stato dell'app da cui si ricava il tabellone. */
+data class TvInput(
+    val screen: Screen,
+    val setup: SetupData,
+    val lang: Lang,
+    val firstServer: Side,
+    /** Partita in corso, oppure quella appena finita mentre si guarda il riepilogo. */
+    val match: LiveMatch?,
+    val clockMs: Long,
+    val clockRunning: Boolean,
+    val countdown: CountdownKind?,
+    val countdownLeftMs: Long,
+    val message: String?,
+    val tv: TvSettings,
+    val strings: Strings,
+    val seq: Long,
+)
+
+object TvSnapshots {
+
+    fun build(i: TvInput): TvSnapshot {
+        val s = i.strings
+        val m = i.match
+        val st = m?.state
+        val names = Names(m?.record?.setup ?: i.setup, s)
+        val phase = when {
+            m == null || st == null -> if (i.screen == Screen.START) "ready" else "idle"
+            st.isFinished -> "finished"
+            m.record.suspended -> "suspended"
+            m.record.startedAt == null -> "ready"
+            else -> "play"
+        }
+        val sides = listOf(Side.P1, Side.P2)
+        val points = when {
+            st == null -> if (phase == "ready") listOf("0", "0") else listOf("", "")
+            st.isFinished -> listOf("", "")
+            else -> sides.map { st.pointLabel(it) }
+        }
+        // A partita finita i game del set in corso sono azzerati: si mostrano quelli dell'ultimo set.
+        val games = when {
+            st == null -> listOf(0, 0)
+            st.isFinished -> st.sets.lastOrNull()?.let { set -> sides.map { set.shown(it) } } ?: listOf(0, 0)
+            else -> sides.map { st.games(it) }
+        }
+        val server = when {
+            phase == "finished" || phase == "idle" -> null
+            st != null -> st.server.ordinal
+            else -> i.firstServer.ordinal
+        }
+        val countdown = i.countdown?.takeIf { phase == "play" && i.tv.showTimers }?.let { k ->
+            TvCountdown(
+                label = when (k) {
+                    CountdownKind.SHOT_CLOCK -> s.tvServe
+                    CountdownKind.CHANGEOVER -> s.tvChangeover
+                    CountdownKind.SET_BREAK -> s.tvSetBreak
+                    CountdownKind.TIEBREAK_BREAK -> s.tvTiebreakBreak
+                },
+                leftMs = i.countdownLeftMs.coerceAtLeast(0),
+                shot = k == CountdownKind.SHOT_CLOCK,
+            )
+        }
+        return TvSnapshot(
+            seq = i.seq,
+            lang = if (i.lang == Lang.IT) "it" else "en",
+            phase = phase,
+            title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
+            players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),
+            server = server,
+            points = points,
+            games = games,
+            sets = sides.map { st?.setsWon(it) ?: 0 },
+            done = st?.sets.orEmpty().map { TvSet(it.g1, it.g2, it.tb1, it.tb2, it.matchTiebreak) },
+            tiebreak = when (st?.tiebreak) {
+                TiebreakKind.SET -> "set"
+                TiebreakKind.MATCH -> "match"
+                else -> ""
+            },
+            winner = st?.winner?.ordinal,
+            clockMs = if (phase == "idle") 0 else i.clockMs,
+            clockRunning = phase == "play" && i.clockRunning,
+            countdown = countdown,
+            message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
+            show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
+            labels = TvLabels(
+                vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
+                waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
+                tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
+            ),
+        )
+    }
+
+    /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */
+    fun defaultTitle(su: SetupData, s: Strings): String {
+        val court = su.court.trim().let { if (it.isNotEmpty() && it.all(Char::isDigit)) "${s.court} $it" else it }
+        return listOf(su.club.trim(), court).filter { it.isNotEmpty() }.joinToString(" · ")
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/tv/TvServer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/tv/TvServer.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.tv
+
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdServiceInfo
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.Inet4Address
+import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import java.net.ServerSocket
+import java.net.Socket
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+
+/**
+ * Piccolo server web sul telefono dell'arbitro, attivo solo con il tabellone TV acceso.
+ *   /        la pagina del tabellone (assets/scoreboard.html)
+ *   /events  aggiornamenti in diretta (Server-Sent Events): un JSON a ogni punto e ogni 5 secondi
+ *   /state   l'ultimo JSON (serve anche alla ricerca automatica del telefono-tabellone)
+ * Solo lettura: dal tabellone non si può cambiare niente. Si annuncia sulla rete come "_tsm._tcp"
+ * e tiene agganciata la rete Wi-Fi anche se non ha internet (hotspot dell'altro telefono).
+ */
+class TvServer(context: Context) {
+
+    companion object {
+        const val PORT = 8080
+        const val SERVICE_TYPE = "_tsm._tcp"
+        private const val MAX_STREAMS = 12
+        private const val STOP = "\u0000stop"
+        private const val TAG = "TvServer"
+
+        /**
+         * Indirizzi IPv4 locali del telefono, prima Wi-Fi e hotspot. Esclusi i dati mobili e le VPN:
+         * da lì il tabellone non si raggiunge.
+         */
+        fun localAddresses(): List<String> = runCatching {
+            NetworkInterface.getNetworkInterfaces().toList()
+                .filter { it.isUp && !it.isLoopback && !skipInterface(it.name) }
+                .sortedBy { interfaceRank(it.name) }
+                .flatMap { nif ->
+                    nif.inetAddresses.toList().filterIsInstance<Inet4Address>()
+                        .filter { it.isSiteLocalAddress }
+                        .mapNotNull { it.hostAddress }
+                }
+                .distinct()
+        }.getOrDefault(emptyList())
+
+        private fun skipInterface(name: String): Boolean =
+            listOf("rmnet", "r_rmnet", "ccmni", "v4-", "dummy", "tun", "ppp", "ipsec", "clat").any { name.startsWith(it) }
+
+        /** wlan0 = collegato a una rete; swlan/ap/wlan1 = hotspot di questo telefono; poi USB ed Ethernet. */
+        private fun interfaceRank(name: String): Int = when {
+            name == "wlan0" -> 0
+            name.startsWith("swlan") || name.startsWith("ap") || name.startsWith("softap") || name.startsWith("wlan") -> 1
+            name.startsWith("rndis") || name.startsWith("usb") || name.startsWith("eth") -> 2
+            else -> 3
+        }
+    }
+
+    private val app = context.applicationContext
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val pool = Executors.newCachedThreadPool()
+
+    private val _running = MutableStateFlow(false)
+    val running: StateFlow<Boolean> = _running
+    private val _port = MutableStateFlow<Int?>(null)
+    val port: StateFlow<Int?> = _port
+    private val _clients = MutableStateFlow(0)
+    /** Tabelloni collegati in questo momento. */
+    val clients: StateFlow<Int> = _clients
+    private val _addresses = MutableStateFlow<List<String>>(emptyList())
+    val addresses: StateFlow<List<String>> = _addresses
+
+    @Volatile private var latest: String = "{}"
+    @Volatile private var server: ServerSocket? = null
+    private val streams = CopyOnWriteArrayList<LinkedBlockingQueue<String>>()
+    private var addressJob: Job? = null
+    private var nsdListener: NsdManager.RegistrationListener? = null
+    private var wifiCallback: ConnectivityManager.NetworkCallback? = null
+    private val page: ByteArray by lazy { app.assets.open("scoreboard.html").use { it.readBytes() } }
+
+    /** Indirizzo da mostrare e da mettere nel QR, es. http://192.168.43.1:8080/ (null = nessuna rete locale). */
+    fun url(address: String? = _addresses.value.firstOrNull()): String? {
+        val p = _port.value ?: return null
+        return address?.let { "http://$it:$p/" }
+    }
+
+    @Synchronized
+    fun start() {
+        if (server != null) return
+        val socket = (PORT until PORT + 10).firstNotNullOfOrNull { p ->
+            runCatching { ServerSocket().apply { reuseAddress = true; bind(InetSocketAddress(p)) } }.getOrNull()
+        } ?: run {
+            Log.w(TAG, "Nessuna porta libera tra $PORT e ${PORT + 9}")
+            return
+        }
+        server = socket
+        _port.value = socket.localPort
+        _running.value = true
+        pool.execute { acceptLoop(socket) }
+        registerNsd(socket.localPort)
+        keepWifi()
+        addressJob = scope.launch {
+            while (isActive) {
+                _addresses.value = localAddresses()
+                delay(3_000)
+            }
+        }
+        Log.i(TAG, "Tabellone su porta ${socket.localPort}")
+    }
+
+    @Synchronized
+    fun stop() {
+        val socket = server ?: return
+        server = null
+        runCatching { socket.close() }
+        streams.forEach { it.offer(STOP) }
+        streams.clear()
+        _clients.value = 0
+        _running.value = false
+        _port.value = null
+        addressJob?.cancel()
+        addressJob = null
+        unregisterNsd()
+        releaseWifi()
+    }
+
+    /** Nuovo stato del tabellone: va subito a tutti i tabelloni collegati. */
+    fun publish(json: String) {
+        latest = json
+        for (q in streams) {
+            if (q.size > 16) q.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
+            q.offer(json)
+        }
+    }
+
+    // ---------------------------------------------------------------- HTTP
+
+    private fun acceptLoop(socket: ServerSocket) {
+        while (!socket.isClosed) {
+            val client = try {
+                socket.accept()
+            } catch (e: IOException) {
+                break
+            }
+            pool.execute { runCatching { handle(client) }.onFailure { Log.d(TAG, "richiesta interrotta: $it") } }
+        }
+    }
+
+    private fun handle(sock: Socket) {
+        sock.use { s ->
+            s.soTimeout = 10_000
+            s.tcpNoDelay = true
+            val input = s.getInputStream()
+            val requestLine = readLine(input) ?: return
+            while (true) {
+                val header = readLine(input) ?: return
+                if (header.isEmpty()) break
+            }
+            val parts = requestLine.split(' ')
+            if (parts.size < 2) return
+            val method = parts[0]
+            val path = parts[1].substringBefore('?')
+            val out = BufferedOutputStream(s.getOutputStream())
+            val head = method == "HEAD"
+            if (method != "GET" && !head) {
+                respond(out, "405 Method Not Allowed", "text/plain", "GET only".toByteArray(), head)
+                return
+            }
+            when (path) {
+                "/", "/index.html" -> respond(out, "200 OK", "text/html; charset=utf-8", page, head)
+                "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head)
+                "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
+                "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
+                else -> respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+            }
+        }
+    }
+
+    /** Riga della richiesta HTTP (max 4 KB), senza \r\n; null = connessione chiusa. */
+    private fun readLine(input: InputStream): String? {
+        val sb = StringBuilder()
+        while (sb.length < 4096) {
+            val c = input.read()
+            if (c < 0) return if (sb.isEmpty()) null else sb.toString()
+            if (c == '\n'.code) return sb.toString().trimEnd('\r')
+            sb.append(c.toChar())
+        }
+        return sb.toString()
+    }
+
+    private fun respond(out: OutputStream, status: String, type: String, body: ByteArray, head: Boolean) {
+        val headers = "HTTP/1.1 $status\r\n" +
+            "Content-Type: $type\r\n" +
+            "Content-Length: ${body.size}\r\n" +
+            "Cache-Control: no-store\r\n" +
+            "Access-Control-Allow-Origin: *\r\n" +
+            "Connection: close\r\n\r\n"
+        out.write(headers.toByteArray(Charsets.ISO_8859_1))
+        if (!head) out.write(body)
+        out.flush()
+    }
+
+    /** Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace. */
+    private fun stream(s: Socket, out: OutputStream) {
+        if (streams.size >= MAX_STREAMS) {
+            respond(out, "503 Service Unavailable", "text/plain", "Troppi tabelloni".toByteArray(), false)
+            return
+        }
+        val q = LinkedBlockingQueue<String>()
+        streams += q
+        _clients.value = streams.size
+        try {
+            s.soTimeout = 0
+            out.write(
+                ("HTTP/1.1 200 OK\r\n" +
+                    "Content-Type: text/event-stream; charset=utf-8\r\n" +
+                    "Cache-Control: no-store\r\n" +
+                    "Access-Control-Allow-Origin: *\r\n" +
+                    "Connection: keep-alive\r\n\r\n" +
+                    "retry: 2000\n\n").toByteArray(Charsets.UTF_8),
+            )
+            out.write("data: $latest\n\n".toByteArray(Charsets.UTF_8))
+            out.flush()
+            while (server != null) {
+                val msg = q.poll(15, TimeUnit.SECONDS)
+                if (msg == STOP) break
+                out.write((if (msg == null) ": ping\n\n" else "data: $msg\n\n").toByteArray(Charsets.UTF_8))
+                out.flush()
+            }
+        } catch (e: IOException) {
+            // tabellone chiuso o fuori portata: se ne va da solo
+        } finally {
+            streams -= q
+            _clients.value = streams.size
+        }
+    }
+
+    // ---------------------------------------------------------------- rete
+
+    private fun registerNsd(port: Int) {
+        val nsd = app.getSystemService(NsdManager::class.java) ?: return
+        val info = NsdServiceInfo().apply {
+            serviceName = "TSM Tabellone"
+            serviceType = SERVICE_TYPE
+            setPort(port)
+        }
+        val listener = object : NsdManager.RegistrationListener {
+            override fun onServiceRegistered(info: NsdServiceInfo) {
+                Log.i(TAG, "Annunciato come ${info.serviceName}")
+            }
+
+            override fun onRegistrationFailed(info: NsdServiceInfo, error: Int) {
+                Log.w(TAG, "Annuncio fallito: $error")
+            }
+            override fun onServiceUnregistered(info: NsdServiceInfo) {}
+            override fun onUnregistrationFailed(info: NsdServiceInfo, error: Int) {}
+        }
+        runCatching { nsd.registerService(info, NsdManager.PROTOCOL_DNS_SD, listener) }
+            .onSuccess { nsdListener = listener }
+            .onFailure { Log.w(TAG, "NSD", it) }
+    }
+
+    private fun unregisterNsd() {
+        val l = nsdListener ?: return
+        nsdListener = null
+        runCatching { app.getSystemService(NsdManager::class.java)?.unregisterService(l) }
+    }
+
+    /**
+     * Collegato all'hotspot di un altro telefono (senza internet) Android potrebbe lasciare la rete Wi-Fi:
+     * una richiesta "Wi-Fi anche senza internet" la tiene agganciata finché il tabellone è acceso.
+     */
+    private fun keepWifi() {
+        val cm = app.getSystemService(ConnectivityManager::class.java) ?: return
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        val cb = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                _addresses.value = localAddresses()
+            }
+
+            override fun onLost(network: Network) {
+                _addresses.value = localAddresses()
+            }
+        }
+        runCatching { cm.requestNetwork(request, cb) }
+            .onSuccess { wifiCallback = cb }
+            .onFailure { Log.w(TAG, "requestNetwork", it) }
+    }
+
+    private fun releaseWifi() {
+        val cb = wifiCallback ?: return
+        wifiCallback = null
+        runCatching { app.getSystemService(ConnectivityManager::class.java)?.unregisterNetworkCallback(cb) }
     }
 }
 TSM_EOF
@@ -3587,6 +5225,8 @@ interface Strings {
     val bandIdle: String
     val bandOff: String
     val battery: String
+    val bandCharging: (Int) -> String
+    val bandChargeFull: String
     val autoSearch: String
     val autoSearchOff: String
     val identify: String
@@ -3643,6 +5283,7 @@ interface Strings {
     val voiceFilesModeHint: String
     val customRecordings: (Int, Int) -> String
     val testVoice: String
+    val stopVoiceTest: String
     val ttsMissing: String
     val installVoice: String
     val formatSection: String
@@ -3782,6 +5423,58 @@ interface Strings {
     val playerDefault: (Int) -> String
     val teamJoiner: String
     val generatedWith: String
+
+    // Tabellone TV: testi della pagina (maiuscolo, come un tabellone a LED)
+    val tvVs: String get() = "VS"
+    val tvGames: String get() = "GAMES"
+    val tvSet: String get() = "SET"
+    val tvSec: String get() = "SEC"
+    val tvServe: String
+    val tvChangeover: String
+    val tvSetBreak: String
+    val tvTiebreakBreak: String
+    val tvWaiting: String
+    val tvReady: String
+    val tvSuspended: String
+    val tvWinner: String
+    val tvTiebreak: String get() = "TIE-BREAK"
+    val tvMatchTiebreak: String get() = "MATCH TIE-BREAK"
+    val tvLost: String
+    val tvFullscreen: String
+
+    // Tabellone TV: impostazioni sul telefono dell'arbitro
+    val tvSection: String
+    val tvEnable: String
+    val tvEnableHint: String
+    val tvAddress: String
+    val tvNoNetwork: String
+    val tvScreens: (Int) -> String
+    val tvQrHint: String
+    val tvLook: String
+    val tvTitle: String
+    val tvTitleHint: (String) -> String
+    val tvColorOf: (String) -> String
+    val tvShowClock: String
+    val tvShowTimers: String
+    val tvShowSets: String
+    val tvShowMessages: String
+    val tvShowServe: String
+    val tvGhost: String
+    val tvPreview: String
+    val tvChromecastHint: String
+
+    // Telefono usato come tabellone
+    val displayMode: String
+    val displayModeHint: String
+    val displaySearching: String
+    val displaySteps: String
+    val displayManual: String
+    val displayConnect: String
+    val displayNotFound: String
+    val displayOnMonitor: String
+    val displayShowHere: String
+    val displayBackAgain: String
+    val displayRetry: String
 }
 
 object ItStrings : Strings {
@@ -3820,6 +5513,8 @@ object ItStrings : Strings {
     override val bandIdle = "Non connesso"
     override val bandOff = "Spento"
     override val battery = "Batteria"
+    override val bandCharging: (Int) -> String = { "In carica $it%" }
+    override val bandChargeFull = "Carica completa"
     override val autoSearch = "Ricerca automatica: accendi i braccialetti (tasto laterale), si associano da soli."
     override val autoSearchOff = "La ricerca parte quando i requisiti qui sopra sono a posto."
     override val identify = "Identifica"
@@ -3877,6 +5572,7 @@ object ItStrings : Strings {
     override val voiceFilesModeHint = "Di norma ogni chiamata è letta in un'unica frase (più naturale). Attivalo per usare i file generati, ad esempio per portarti offline una voce online."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Registrazioni personalizzate: $n/$tot" }
     override val testVoice = "Prova voce"
+    override val stopVoiceTest = "Ferma la prova"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
     override val installVoice = "Installa voce"
     override val formatSection = "Formato partita"
@@ -4013,6 +5709,49 @@ object ItStrings : Strings {
     override val playerDefault: (Int) -> String = { "Giocatore $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Creato con Tennis Score Manager"
+
+    override val tvServe = "SERVIZIO"
+    override val tvChangeover = "CAMBIO CAMPO"
+    override val tvSetBreak = "PAUSA SET"
+    override val tvTiebreakBreak = "PAUSA"
+    override val tvWaiting = "IN ATTESA DELLA PARTITA"
+    override val tvReady = "IN ATTESA DEL VIA"
+    override val tvSuspended = "PARTITA SOSPESA"
+    override val tvWinner = "VINCE"
+    override val tvLost = "CONNESSIONE PERSA - RICONNESSIONE..."
+    override val tvFullscreen = "SCHERMO INTERO"
+
+    override val tvSection = "Tabellone su TV"
+    override val tvEnable = "Tabellone su TV o monitor"
+    override val tvEnableHint = "Un altro telefono (o un computer, o un Chromecast) mostra il punteggio in diretta su un monitor. I telefoni devono stare sulla stessa rete: l'hotspot di uno dei due."
+    override val tvAddress = "Indirizzo del tabellone"
+    override val tvNoNetwork = "Nessuna rete: accendi l'hotspot su uno dei due telefoni e collega l'altro."
+    override val tvScreens: (Int) -> String = { if (it == 0) "Nessun tabellone collegato" else if (it == 1) "1 tabellone collegato" else "$it tabelloni collegati" }
+    override val tvQrHint = "Sull'altro telefono: apri Tennis Score Manager e tocca «Usa come tabellone» (si collega da solo), oppure inquadra il codice con la fotocamera e aprilo nel browser."
+    override val tvLook = "Aspetto del tabellone"
+    override val tvTitle = "Scritta in basso"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vuota: nessuna scritta" else "Vuota: «$it» (circolo e campo della pagina 1)" }
+    override val tvColorOf: (String) -> String = { "Colore di $it" }
+    override val tvShowClock = "Tempo partita"
+    override val tvShowTimers = "Cronometro servizio e pause"
+    override val tvShowSets = "Set conclusi"
+    override val tvShowMessages = "Messaggi (palla break, set point...)"
+    override val tvShowServe = "Pallina di chi serve"
+    override val tvGhost = "Segmenti spenti visibili"
+    override val tvPreview = "Anteprima su questo telefono"
+    override val tvChromecastHint = "Con un Chromecast: sul telefono-tabellone usa «Trasmetti schermo» (Smart View sui Samsung). Il Chromecast vuole una rete con internet: accendi i dati mobili sul telefono che fa l'hotspot."
+
+    override val displayMode = "Usa come tabellone"
+    override val displayModeHint = "Questo telefono mostra il punteggio sul monitor (cavo HDMI o Chromecast)"
+    override val displaySearching = "Cerco il telefono dell'arbitro…"
+    override val displaySteps = "1. Accendi l'hotspot su uno dei due telefoni e collega l'altro.\n2. Sul telefono dell'arbitro: pagina 2 → «Tabellone su TV» acceso.\n3. Collega questo telefono al monitor (cavo USB-C/HDMI) o trasmetti lo schermo a un Chromecast."
+    override val displayManual = "Indirizzo (es. 192.168.43.1:8080)"
+    override val displayConnect = "Collega"
+    override val displayNotFound = "Non trovato. Controlla che i due telefoni siano sulla stessa rete e che il tabellone sia acceso nell'app dell'arbitro."
+    override val displayOnMonitor = "Il tabellone è sul monitor esterno"
+    override val displayShowHere = "Mostra anche qui"
+    override val displayBackAgain = "Premi di nuovo indietro per uscire"
+    override val displayRetry = "Cerca di nuovo"
 }
 
 object EnStrings : Strings {
@@ -4051,6 +5790,8 @@ object EnStrings : Strings {
     override val bandIdle = "Not connected"
     override val bandOff = "Off"
     override val battery = "Battery"
+    override val bandCharging: (Int) -> String = { "Charging $it%" }
+    override val bandChargeFull = "Fully charged"
     override val autoSearch = "Searching automatically: switch the wristbands on (side button), they pair by themselves."
     override val autoSearchOff = "The search starts once the requirements above are met."
     override val identify = "Identify"
@@ -4108,6 +5849,7 @@ object EnStrings : Strings {
     override val voiceFilesModeHint = "By default each call is read as one sentence (more natural). Turn this on to play the generated files, e.g. to take an online voice offline."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Custom recordings: $n/$tot" }
     override val testVoice = "Test voice"
+    override val stopVoiceTest = "Stop the test"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
     override val installVoice = "Install voice"
     override val formatSection = "Match format"
@@ -4244,6 +5986,49 @@ object EnStrings : Strings {
     override val playerDefault: (Int) -> String = { "Player $it" }
     override val teamJoiner = " and "
     override val generatedWith = "Made with Tennis Score Manager"
+
+    override val tvServe = "SERVE"
+    override val tvChangeover = "CHANGEOVER"
+    override val tvSetBreak = "SET BREAK"
+    override val tvTiebreakBreak = "BREAK"
+    override val tvWaiting = "WAITING FOR THE MATCH"
+    override val tvReady = "READY TO PLAY"
+    override val tvSuspended = "MATCH SUSPENDED"
+    override val tvWinner = "WINNER"
+    override val tvLost = "CONNECTION LOST - RECONNECTING..."
+    override val tvFullscreen = "FULL SCREEN"
+
+    override val tvSection = "TV scoreboard"
+    override val tvEnable = "Scoreboard on a TV or monitor"
+    override val tvEnableHint = "Another phone (or a computer, or a Chromecast) shows the live score on a monitor. The phones must be on the same network: one phone's hotspot."
+    override val tvAddress = "Scoreboard address"
+    override val tvNoNetwork = "No network: turn on the hotspot on one phone and connect the other."
+    override val tvScreens: (Int) -> String = { if (it == 0) "No scoreboard connected" else if (it == 1) "1 scoreboard connected" else "$it scoreboards connected" }
+    override val tvQrHint = "On the other phone: open Tennis Score Manager and tap «Use as scoreboard» (it connects by itself), or scan the code with the camera and open it in the browser."
+    override val tvLook = "Scoreboard look"
+    override val tvTitle = "Bottom line"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Empty: no text" else "Empty: «$it» (club and court from page 1)" }
+    override val tvColorOf: (String) -> String = { "Colour of $it" }
+    override val tvShowClock = "Match time"
+    override val tvShowTimers = "Serve clock and breaks"
+    override val tvShowSets = "Finished sets"
+    override val tvShowMessages = "Messages (break point, set point...)"
+    override val tvShowServe = "Ball next to the server"
+    override val tvGhost = "Unlit segments visible"
+    override val tvPreview = "Preview on this phone"
+    override val tvChromecastHint = "With a Chromecast: on the scoreboard phone use «Cast screen» (Smart View on Samsung). The Chromecast needs a network with internet: turn on mobile data on the hotspot phone."
+
+    override val displayMode = "Use as scoreboard"
+    override val displayModeHint = "This phone shows the score on the monitor (HDMI cable or Chromecast)"
+    override val displaySearching = "Looking for the umpire's phone…"
+    override val displaySteps = "1. Turn on the hotspot on one phone and connect the other.\n2. On the umpire's phone: page 2 → «TV scoreboard» on.\n3. Connect this phone to the monitor (USB-C/HDMI cable) or cast the screen to a Chromecast."
+    override val displayManual = "Address (e.g. 192.168.43.1:8080)"
+    override val displayConnect = "Connect"
+    override val displayNotFound = "Not found. Check that both phones are on the same network and the scoreboard is on in the umpire's app."
+    override val displayOnMonitor = "The scoreboard is on the external monitor"
+    override val displayShowHere = "Show here too"
+    override val displayBackAgain = "Press back again to exit"
+    override val displayRetry = "Search again"
 }
 
 fun stringsFor(lang: Lang): Strings = if (lang == Lang.IT) ItStrings else EnStrings
@@ -4319,6 +6104,207 @@ private val typography = Typography(
 @Composable
 fun TsmTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = scheme, typography = typography, content = content)
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/TvSection.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/TvSection.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cast
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Grid4x4
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Title
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.WatchLater
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.TvColors
+import com.tennis.scoremanager.tv.TvSnapshots
+
+/** Pagina 2: tabellone su TV (acceso/spento, indirizzo e QR, aspetto). */
+@Composable
+fun TvSection(c: MatchController) {
+    val s = LocalStrings.current
+    val tv by c.tv.collectAsState()
+    val su by c.setup.collectAsState()
+    var lookOpen by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    SectionCard(s.tvSection, Icons.Filled.Tv) {
+        SwitchRow(Icons.Filled.Tv, s.tvEnable, s.tvEnableHint, tv.enabled) { v -> c.updateTv { it.copy(enabled = v) } }
+        if (!tv.enabled) return@SectionCard
+        TvStatus(c)
+        Row(verticalAlignment = Alignment.Top) {
+            Icon(Icons.Filled.Cast, null, tint = TsmColors.TextDim, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(s.tvChromecastHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
+        val port by c.tvServer.port.collectAsState()
+        GhostButton(s.tvPreview, Icons.Filled.OpenInBrowser, {
+            port?.let { p -> runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("http://127.0.0.1:$p/"))) } }
+        }, Modifier.fillMaxWidth(), enabled = port != null)
+
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { lookOpen = !lookOpen }.padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Palette, null, tint = TsmColors.TextDim)
+            Spacer(Modifier.width(12.dp))
+            Text(s.tvLook, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            Icon(if (lookOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, null, tint = TsmColors.TextDim)
+        }
+        if (lookOpen) {
+            val names = c.names(su)
+            ColorRow(s.tvColorOf(names.short(Side.P1)), tv.color1) { hex -> c.updateTv { it.copy(color1 = hex) } }
+            ColorRow(s.tvColorOf(names.short(Side.P2)), tv.color2) { hex -> c.updateTv { it.copy(color2 = hex) } }
+            SwitchRow(Icons.Filled.WatchLater, s.tvShowClock, null, tv.showClock) { v -> c.updateTv { it.copy(showClock = v) } }
+            SwitchRow(Icons.Filled.Timer, s.tvShowTimers, null, tv.showTimers) { v -> c.updateTv { it.copy(showTimers = v) } }
+            SwitchRow(Icons.Filled.FormatListNumbered, s.tvShowSets, null, tv.showSets) { v -> c.updateTv { it.copy(showSets = v) } }
+            SwitchRow(Icons.Filled.Message, s.tvShowMessages, null, tv.showMessages) { v -> c.updateTv { it.copy(showMessages = v) } }
+            SwitchRow(Icons.Filled.SportsTennis, s.tvShowServe, null, tv.showServe) { v -> c.updateTv { it.copy(showServe = v) } }
+            SwitchRow(Icons.Filled.Grid4x4, s.tvGhost, null, tv.ghostSegments) { v -> c.updateTv { it.copy(ghostSegments = v) } }
+            OutlinedTextField(
+                value = tv.title,
+                onValueChange = { v -> c.updateTv { it.copy(title = v.take(60)) } },
+                label = { Text(s.tvTitle) },
+                leadingIcon = { Icon(Icons.Filled.Title, null) },
+                supportingText = { Text(s.tvTitleHint(TvSnapshots.defaultTitle(su, s))) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/** Indirizzo, QR da inquadrare e tabelloni collegati (anche dalla schermata della partita). */
+@Composable
+fun TvStatus(c: MatchController) {
+    val s = LocalStrings.current
+    val addresses by c.tvServer.addresses.collectAsState()
+    val port by c.tvServer.port.collectAsState()
+    val clients by c.tvServer.clients.collectAsState()
+    val url = port?.let { p -> addresses.firstOrNull()?.let { "http://$it:$p/" } }
+    if (url == null) {
+        Text(s.tvNoNetwork, color = TsmColors.Orange, fontSize = 14.sp)
+    } else {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            QrCode(url, 120.dp)
+            Spacer(Modifier.width(14.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(s.tvAddress, color = TsmColors.TextDim, fontSize = 12.sp)
+                Text(url.removePrefix("http://").removeSuffix("/"), color = TsmColors.Ball, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                // altre reti (es. hotspot e Wi-Fi insieme)
+                for (a in addresses.drop(1)) Text("$a:$port", color = TsmColors.TextDim, fontSize = 13.sp, fontFamily = FontFamily.Monospace)
+                Text(s.tvScreens(clients), color = if (clients > 0) TsmColors.Ok else TsmColors.TextDim, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+    Text(s.tvQrHint, color = TsmColors.TextDim, fontSize = 13.sp)
+}
+
+/** Chip "TV" nella schermata della partita: tabelloni collegati; toccandolo si rivede il QR. */
+@Composable
+fun TvChip(c: MatchController) {
+    val s = LocalStrings.current
+    val tv by c.tv.collectAsState()
+    if (!tv.enabled) return
+    val clients by c.tvServer.clients.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    Pill("TV · $clients", if (clients > 0) TsmColors.Ok else TsmColors.SurfaceHigh, if (clients > 0) Color.White else TsmColors.TextDim, Icons.Filled.Tv) { open = true }
+    if (open) {
+        AlertDialog(
+            onDismissRequest = { open = false },
+            icon = { Icon(Icons.Filled.Tv, null, tint = TsmColors.Ball) },
+            title = { Text(s.tvSection) },
+            text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { TvStatus(c) } },
+            confirmButton = { TextButton(onClick = { open = false }) { Text(s.ok) } },
+        )
+    }
+}
+
+@Composable
+private fun ColorRow(label: String, selected: String, onPick: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(label, color = TsmColors.TextMain, fontSize = 14.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (hex in TvColors.palette) {
+                val on = hex.equals(selected, ignoreCase = true)
+                Box(
+                    Modifier.size(28.dp).clip(CircleShape).background(Color(android.graphics.Color.parseColor(hex)))
+                        .border(if (on) 3.dp else 1.dp, if (on) Color.White else TsmColors.Outline, CircleShape)
+                        .clickable { onPick(hex) },
+                )
+            }
+        }
+    }
+}
+
+/** Codice QR (bianco e nero, con margine) generato sul telefono: niente internet. */
+@Composable
+fun QrCode(text: String, size: Dp) {
+    val bitmap = remember(text) {
+        val m = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, mapOf(EncodeHintType.MARGIN to 2))
+        val px = IntArray(m.width * m.height) { i -> if (m[i % m.width, i / m.width]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt() }
+        Bitmap.createBitmap(px, m.width, m.height, Bitmap.Config.ARGB_8888).asImageBitmap()
+    }
+    Image(
+        bitmap, null,
+        filterQuality = FilterQuality.None,
+        modifier = Modifier.size(size).clip(RoundedCornerShape(8.dp)).background(Color.White),
+    )
 }
 TSM_EOF
 
@@ -4418,6 +6404,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TvChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -4447,7 +6434,7 @@ fun MatchScreen(c: MatchController) {
         Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        TimersRow(clock, cd, s)
+        TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         MessageBox(msg)
         Scoreboard(state, names, s)
@@ -4604,12 +6591,14 @@ private fun formatClock(ms: Long): String {
 private fun formatCountdown(sec: Int): String = if (sec >= 60) String.format(java.util.Locale.ROOT, "%d:%02d", sec / 60, sec % 60) else sec.toString()
 
 @Composable
-private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings) {
+private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Composable () -> Unit = {}) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         Column {
             Text(s.matchTime, color = TsmColors.TextDim, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Text(formatClock(clock), color = TsmColors.TextMain, fontSize = 30.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
         }
+        Spacer(Modifier.weight(1f))
+        Box(Modifier.padding(top = 10.dp)) { middle() }
         Spacer(Modifier.weight(1f))
         Column(horizontalAlignment = Alignment.End) {
             val label = when (cd?.kind) {
@@ -4642,6 +6631,7 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             Pill(
                 (if (side == Side.P1) "G1" else "G2") +
                     ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
+                    (if (bat?.charging == true || b?.charging == true) " ⚡" else "") +
                     (bat?.leftText()?.let { " · $it" } ?: ""),
                 when {
                     low -> TsmColors.Danger
@@ -4880,6 +6870,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -4899,6 +6890,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -4948,6 +6940,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
 import kotlinx.coroutines.launch
@@ -5049,6 +7042,9 @@ fun OptionsScreen(c: MatchController) {
 
         // Audio e voce
         VoiceSection(c, o)
+
+        // Tabellone su TV
+        TvSection(c)
 
         // Formato
         SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
@@ -5194,8 +7190,13 @@ private fun BandPicker(
                             LinkState.IDLE -> s.bandIdle
                         }
                         val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        val batteryText = when {
+                            current.chargeFull -> " · ${s.bandChargeFull}"
+                            current.charging && current.battery != null -> " · ${s.bandCharging(current.battery)}$volts"
+                            else -> current.battery?.let { " · ${s.battery} $it%$volts" } ?: ""
+                        }
                         Text(
-                            st + (current.battery?.let { " · ${s.battery} $it%$volts" } ?: "") +
+                            st + batteryText +
                                 (battery?.leftText()?.let { " · ${s.autonomy(it)}" } ?: ""),
                             color = TsmColors.TextDim, fontSize = 12.sp,
                         )
@@ -5284,7 +7285,15 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
                 }) { Text(s.installVoice) }
             }
         }
-        SmallAction(s.testVoice, Icons.Filled.PlayCircle, Modifier.fillMaxWidth()) { c.testVoice() }
+        // Lo stesso tasto avvia e ferma la prova; uscendo dalla pagina si ferma da sola.
+        val playing by c.announcer.playing.collectAsState()
+        val testing = playing == MatchController.VOICE_TEST
+        DisposableEffect(Unit) { onDispose { c.stopVoiceTest() } }
+        SmallAction(
+            if (testing) s.stopVoiceTest else s.testVoice,
+            if (testing) Icons.Filled.StopCircle else Icons.Filled.PlayCircle,
+            Modifier.fillMaxWidth(),
+        ) { if (testing) c.stopVoiceTest() else c.testVoice() }
         Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
 
         // Registrazioni personalizzate (voce vera): sempre prioritarie
@@ -5504,6 +7513,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -5513,6 +7523,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -5523,6 +7534,8 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.DisplayActivity
+import android.content.Intent
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -5537,6 +7550,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
+    val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
         subtitle = s.setupSubtitle,
@@ -5560,6 +7574,13 @@ fun SetupScreen(c: MatchController) {
         }
         PlayerCard(c, su, Side.P1)
         PlayerCard(c, su, Side.P2)
+        // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
+        SectionCard(s.displayMode, Icons.Filled.Tv) {
+            Text(s.displayModeHint, color = TsmColors.TextDim)
+            GhostButton(s.displayMode, Icons.Filled.Tv, {
+                context.startActivity(Intent(context, DisplayActivity::class.java))
+            }, Modifier.fillMaxWidth())
+        }
     }
 }
 
@@ -6103,6 +8124,7 @@ import com.tennis.scoremanager.model.Lang
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -6158,6 +8180,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     val currentVoice: StateFlow<String?> = _currentVoice
     private val _currentEngine = MutableStateFlow<String?>(null)
     val currentEngineFlow: StateFlow<String?> = _currentEngine
+    private val _playing = MutableStateFlow<String?>(null)
+    /** Chiamata in corso: il [name] passato ad [announce] ("" se senza nome); null = nessuna. */
+    val playing: StateFlow<String?> = _playing
 
     var enabled: Boolean = true
         set(value) {
@@ -6300,8 +8325,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
      * Legge una chiamata interrompendo quella in corso. [onTag] viene chiamato quando parte un pezzo
      * con tag (es. "gioco" che avvia il tempo partita); se l'audio è spento o la chiamata viene
      * interrotta, i tag vengono comunque notificati subito. [force] legge anche ad audio spento (prova voce).
+     * [name] distingue la chiamata in [playing] (es. la prova voce, che il suo tasto può fermare).
      */
-    fun announce(segs: List<Seg>, force: Boolean = false, onTag: (String) -> Unit = {}) {
+    fun announce(segs: List<Seg>, force: Boolean = false, name: String = "", onTag: (String) -> Unit = {}) {
         val tags = segs.mapNotNull {
             when (it) {
                 is Seg.Clip -> it.tag
@@ -6318,7 +8344,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         }
         val l = lang
         val fired = mutableSetOf<String>()
-        job = scope.launch {
+        // LAZY: [job] è assegnato prima che parta, così anche una chiamata che finisce subito azzera [playing].
+        val j = scope.launch(start = CoroutineStart.LAZY) {
             try {
                 for (p in plan(segs, l)) {
                     p.tag?.let { fired += it; onTag(it) }
@@ -6330,13 +8357,21 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                 }
             } finally {
                 tags.filter { it !in fired }.forEach(onTag)
+                if (job === coroutineContext[Job]) {
+                    job = null
+                    _playing.value = null
+                }
             }
         }
+        job = j
+        _playing.value = name
+        j.start()
     }
 
     fun stop() {
         job?.cancel()
         job = null
+        _playing.value = null
         runCatching { tts?.stop() }
         pending.values.forEach { it.complete(false) }
         pending.clear()
@@ -6934,6 +8969,15 @@ cat > "$DEST/app/src/main/res/xml/file_paths.xml" << 'TSM_EOF'
 </paths>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/res/xml/network_security_config.xml
+cat > "$DEST/app/src/main/res/xml/network_security_config.xml" << 'TSM_EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Il tabellone arriva in http dal telefono dell'arbitro sulla rete locale (hotspot): niente https lì. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ble
@@ -7008,6 +9052,27 @@ class BatteryModelTest {
         assertEquals(1234L, s.uptimeS)
         assertEquals(56L, s.displayS)
         assertNull(BatteryModel.parse("garbage"))
+    }
+
+    @Test
+    fun parseChargeStatus() {
+        // firmware 2.1: col cavo "chg" resta 1 anche a carica completa
+        val c = BatteryModel.parse("mv=4150;chg=1;up=60;dsp=30;usb=5012;full=0;pct=62")!!
+        assertEquals(true, c.charging)
+        assertEquals(5012, c.usbMv)
+        assertEquals(false, c.full)
+        assertEquals(62, c.percent)
+        // in carica vale la percentuale del braccialetto, non la tensione (falsata dalla carica)
+        assertEquals(62, BatteryModel.shownPercent(c))
+        val f = BatteryModel.parse("mv=4190;chg=1;up=60;dsp=30;usb=5012;full=1;pct=100")!!
+        assertEquals(100, BatteryModel.shownPercent(f))
+        // firmware 2.0: niente campi nuovi, percentuale dalla tensione
+        val old = BatteryModel.parse("mv=3840;chg=0;up=1;dsp=0")!!
+        assertNull(old.usbMv)
+        assertNull(old.percent)
+        assertEquals(50, BatteryModel.shownPercent(old))
+        // senza cavo la percentuale del braccialetto non serve: stessa curva dall'app
+        assertEquals(50, BatteryModel.shownPercent(BatteryModel.parse("mv=3840;chg=0;up=1;dsp=0;usb=0;full=0;pct=49")!!))
     }
 
     @Test
@@ -7412,6 +9477,150 @@ class ScoreEngineTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/tv/TvSnapshotTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/tv/TvSnapshotTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.tv
+
+import com.tennis.scoremanager.CountdownKind
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.MatchOptions
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ItStrings
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class TvSnapshotTest {
+
+    private val setup = SetupData(club = "TC Roma", court = "3", p1a = "Stefano", p2a = "Mario")
+    private val rules = RulesConfig()
+
+    private fun match(points: List<Side>, started: Boolean = true, suspended: Boolean = false): LiveMatch {
+        val events = points.map { MatchEvent.Point(it) }
+        val rec = MatchRecord(
+            id = "m1", setup = setup, options = MatchOptions(), rules = rules, events = events,
+            startedAt = if (started) 1L else null, suspended = suspended,
+        )
+        return LiveMatch(rec, ScoreEngine.replay(rules, events))
+    }
+
+    private fun input(
+        screen: Screen = Screen.MATCH,
+        match: LiveMatch? = null,
+        countdown: CountdownKind? = null,
+        message: String? = null,
+        tv: TvSettings = TvSettings(enabled = true),
+    ) = TvInput(
+        screen = screen, setup = setup, lang = Lang.IT, firstServer = Side.P2, match = match,
+        clockMs = 65_000, clockRunning = true, countdown = countdown, countdownLeftMs = 20_000,
+        message = message, tv = tv, strings = ItStrings, seq = 7,
+    )
+
+    @Test
+    fun idleBeforeAnyMatch() {
+        val s = TvSnapshots.build(input(screen = Screen.SETUP))
+        assertEquals("idle", s.phase)
+        assertEquals(listOf("", ""), s.points)
+        assertNull(s.server)
+        assertEquals(0L, s.clockMs)
+        assertEquals("TC Roma · Campo 3", s.title)
+        assertEquals(listOf("Stefano", "Mario"), s.players.map { it.name })
+    }
+
+    @Test
+    fun readyOnStartScreenShowsFirstServer() {
+        val s = TvSnapshots.build(input(screen = Screen.START))
+        assertEquals("ready", s.phase)
+        assertEquals(listOf("0", "0"), s.points)
+        assertEquals(1, s.server)
+    }
+
+    @Test
+    fun pointsGamesAndAdvantage() {
+        // 1-0 in game, poi 40-40 e vantaggio Mario
+        val pts = List(4) { Side.P1 } + listOf(Side.P1, Side.P1, Side.P1, Side.P2, Side.P2, Side.P2, Side.P2)
+        val s = TvSnapshots.build(input(match = match(pts), countdown = CountdownKind.SHOT_CLOCK, message = "Palla break"))
+        assertEquals("play", s.phase)
+        assertEquals(listOf(1, 0), s.games)
+        assertEquals(listOf("40", "AD"), s.points)
+        assertEquals("SERVIZIO", s.countdown!!.label)
+        assertTrue(s.countdown!!.shot)
+        assertEquals(20_000L, s.countdown!!.leftMs)
+        assertEquals("Palla break", s.message)
+        assertTrue(s.clockRunning)
+    }
+
+    @Test
+    fun finishedShowsLastSetAndWinner() {
+        // 6-0 6-0 per Stefano
+        val s = TvSnapshots.build(input(screen = Screen.SUMMARY, match = match(List(48) { Side.P1 }), countdown = CountdownKind.SHOT_CLOCK, message = "x"))
+        assertEquals("finished", s.phase)
+        assertEquals(0, s.winner)
+        assertEquals(listOf(6, 0), s.games)
+        assertEquals(listOf(2, 0), s.sets)
+        assertEquals(2, s.done.size)
+        assertEquals(listOf("", ""), s.points)
+        assertNull(s.server)
+        assertNull(s.countdown)
+        assertNull(s.message)
+        assertFalse(s.clockRunning)
+    }
+
+    @Test
+    fun suspendedHidesTimersAndMessages() {
+        val s = TvSnapshots.build(input(match = match(listOf(Side.P1), suspended = true), countdown = CountdownKind.SHOT_CLOCK, message = "x"))
+        assertEquals("suspended", s.phase)
+        assertEquals(listOf("15", "0"), s.points)
+        assertNull(s.countdown)
+        assertNull(s.message)
+    }
+
+    @Test
+    fun settingsHideTimersAndMessages() {
+        val tv = TvSettings(enabled = true, showTimers = false, showMessages = false, title = " Torneo sociale ", color1 = "#2F80FF")
+        val s = TvSnapshots.build(input(match = match(emptyList()), countdown = CountdownKind.CHANGEOVER, message = "x", tv = tv))
+        assertNull(s.countdown)
+        assertNull(s.message)
+        assertEquals("Torneo sociale", s.title)
+        assertEquals("#2F80FF", s.players[0].color)
+        assertFalse(s.show.timers)
+    }
+
+    @Test
+    fun jsonIsOneLineWithSignature() {
+        val s = TvSnapshots.build(input(match = match(listOf(Side.P2))))
+        val json = Json { encodeDefaults = true }.encodeToString(TvSnapshot.serializer(), s)
+        assertFalse('\n' in json)  // una riga sola: così viaggia in un unico evento SSE
+        assertTrue("\"tsm\":1" in json)  // la ricerca del tabellone riconosce il server da questo
+    }
+
+    @Test
+    fun defaultTitle() {
+        assertEquals("", TvSnapshots.defaultTitle(SetupData(), ItStrings))
+        assertEquals("Campo Centrale", TvSnapshots.defaultTitle(SetupData(court = "Campo Centrale"), ItStrings))
+        assertEquals("TC Roma", TvSnapshots.defaultTitle(SetupData(club = "TC Roma"), ItStrings))
+    }
+
+    @Test
+    fun manualAddresses() {
+        assertEquals("192.168.43.1" to 8080, ScoreboardFinder.parseAddress("192.168.43.1"))
+        assertEquals("192.168.43.1" to 8081, ScoreboardFinder.parseAddress(" http://192.168.43.1:8081/ "))
+        assertNull(ScoreboardFinder.parseAddress(""))
+        assertNull(ScoreboardFinder.parseAddress("10.0.0.2:99999"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/CallBuilderTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/CallBuilderTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.voice
@@ -7665,6 +9874,7 @@ lifecycle = "2.9.4"
 coroutines = "1.10.2"
 serialization = "1.9.0"
 junit = "4.13.2"
+zxing = "3.5.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -7680,6 +9890,7 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -8865,6 +11076,11 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   KEY2 lungo  : spegne il braccialetto (riaccensione: tasto laterale, un clic)
   Se non è collegato, un tasto qualsiasi rimanda lo spegnimento automatico.
 
+  Ricarica (cavo USB): il braccialetto non si spegne da solo finché è alimentato e mostra la
+  schermata di carica (percentuale, tensioni, da quanto è in carica, fine stimata) per 30 s,
+  poi un'occhiata ogni 10 s; un tasto qualsiasi la riaccende. A carica completa resta spento.
+  Da collegato al telefono la partita ha la precedenza: solo un breve messaggio "IN CARICA".
+
   Impostazioni (dall'app, menu "Impostazioni braccialetto"), salvate nel braccialetto:
   nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
   spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
@@ -8882,7 +11098,7 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.0"
+#define FW_VERSION "2.1"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -8897,6 +11113,15 @@ static const uint32_t STATUS_PERIOD_MS     = 60000;                // stato batt
 static const uint32_t BATT_CHECK_MS        = 15000;                // controllo batteria scarica
 static const int      BATT_EMPTY_MV        = 3300;                 // sotto questa tensione la LiPo è vuota
 static const uint32_t IDENTIFY_FLASH_MS    = 300;                  // lampeggio di "Identifica"
+static const uint32_t POWER_POLL_MS        = 1000;                 // controllo cavo USB e stato di carica
+static const int      USB_MIN_MV           = 4000;                 // sopra questa tensione il cavo USB è collegato
+static const int      CHG_OFFSET_MV        = 100;                  // in carica la tensione misurata è più alta di quella a riposo
+static const uint32_t CHARGE_SHOW_MS       = 30000;                // schermata di carica accesa dopo l'inserimento o un tasto
+static const uint32_t CHARGE_GLANCE_EVERY  = 10000;                // poi un'occhiata ogni 10 s...
+static const uint32_t CHARGE_GLANCE_MS     = 1500;                 // ...di 1,5 s
+static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT spento da 20 s = carica completa
+static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
+static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 
 // Testi mostrati dal braccialetto (solo ASCII)
 #define TXT_PAIRING    "PAIRING..."
@@ -8911,12 +11136,16 @@ static const uint32_t IDENTIFY_FLASH_MS    = 300;                  // lampeggio 
 #define TXT_HOLD_KEY1  "TIENI PREMUTO KEY1"
 #define TXT_EMPTY      "BATTERIA SCARICA"
 #define TXT_SAVED      "IMPOSTAZIONI OK"
+#define TXT_FULL       "CARICA COMPLETA"
+#define TXT_USB_POWER  "ALIMENTATO DA USB"
+#define TXT_USB_OUT    "USB SCOLLEGATO"
+#define TXT_KEEPS_CHG  "LA CARICA CONTINUA"
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
-#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56" per misurare i consumi
+#define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.0;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30"
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
@@ -8980,6 +11209,28 @@ static uint32_t displayOnTotalMs = 0;
 static uint32_t nextBlink = 0;
 static bool     blinkShown = false;
 static bool     countdownBeeped = false;
+
+// Ricarica: stato letto ogni secondo dal PM1 (tensione USB) e dal caricabatterie (CHG_STAT)
+enum ChargeState : uint8_t { CHG_NONE, CHG_ACTIVE, CHG_FULL, CHG_IDLE };  // IDLE = USB ma non carica (né completa)
+static bool     usbOn = false;
+static uint8_t  usbFlips = 0;          // letture di fila diverse dallo stato attuale (anti-rimbalzo)
+static uint8_t  chgState = CHG_NONE;
+static uint32_t usbSince = 0;          // inizio della carica
+static uint32_t fullAt = 0;            // quando è diventata completa
+static uint32_t notChgSince = 0;
+static uint32_t cvSince = 0;
+static int      chgPct = 0;            // percentuale mostrata in carica: non scende mai, 100 solo a carica completa
+static int      lastMv = 0;
+static int      restMv = 0;            // ultima tensione senza cavo: base della percentuale all'inserimento
+static int      lastVbus = 0;
+static uint32_t lastPowerPoll = 0;
+static uint32_t chargeShowUntil = 0;   // schermata di carica accesa fino a...
+static uint32_t chargeNextGlance = 0;
+static uint32_t lastChargeDraw = 0;
+static int      pctHist[11];           // percentuale minuto per minuto (ultimi 10 minuti) per stimare la fine
+static uint8_t  pctHistN = 0;
+static uint32_t lastPctSample = 0;
+static bool     chargeScreen = false;  // sullo schermo c'è la schermata di carica (si può aggiornare)
 
 // "Identifica": lampeggio a tutto schermo col colore del giocatore
 static uint32_t identifyUntil = 0;
@@ -9065,6 +11316,7 @@ static const lgfx::IFont* const SMALL_FONTS[] = { &fonts::FreeSansBold12pt7b, &f
 
 static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT, uint16_t bg = C_BG, uint16_t color2 = C_DIM) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(bg);
   if (l2 && l2[0]) {
     drawFit(l1, 45, BIG_FONTS, 4, color, 232, bg);
@@ -9077,6 +11329,7 @@ static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT,
 // Punteggio del game: a sinistra chi indossa il braccialetto, a destra l'avversario.
 static void drawPoint(const char* mine, const char* theirs, int serve, const char* header) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(C_BG);
   const int w = M5.Display.width();
   const int h = M5.Display.height();
@@ -9098,6 +11351,7 @@ static void drawPoint(const char* mine, const char* theirs, int serve, const cha
 // Riepilogo a fine game: game del set e set vinti.
 static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   displayWake();
+  chargeScreen = false;
   M5.Display.fillScreen(C_BG);
   const int w = M5.Display.width();
   if (header && header[0]) drawFit(header, 14, SMALL_FONTS, 3, C_ORANGE);
@@ -9118,13 +11372,121 @@ static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   M5.Display.drawString(buf, w - 8, 108);
 }
 
+// ------------------------------------------------------------------ batteria e ricarica
+// Curva di scarica tipica della LiPo (mV -> %), la stessa dell'app (BatteryModel.kt): più fedele della
+// retta 3,30-4,15 V di M5Unified, così braccialetto e telefono mostrano la stessa percentuale.
+static const int16_t SOC_CURVE[][2] = {
+  {4200, 100}, {4150, 95}, {4110, 90}, {4080, 85}, {4020, 80}, {3980, 75}, {3950, 70},
+  {3910, 65}, {3870, 60}, {3850, 55}, {3840, 50}, {3820, 45}, {3800, 40}, {3790, 35},
+  {3770, 30}, {3750, 25}, {3730, 20}, {3710, 15}, {3690, 10}, {3610, 5}, {3270, 0},
+};
+
+static int socFromMv(int mv) {
+  const int n = sizeof(SOC_CURVE) / sizeof(SOC_CURVE[0]);
+  if (mv >= SOC_CURVE[0][0]) return 100;
+  if (mv <= SOC_CURVE[n - 1][0]) return 0;
+  for (int i = 0; i < n - 1; i++) {
+    const int vHi = SOC_CURVE[i][0], pHi = SOC_CURVE[i][1];
+    const int vLo = SOC_CURVE[i + 1][0], pLo = SOC_CURVE[i + 1][1];
+    if (mv >= vLo && mv <= vHi) return pLo + (mv - vLo) * (pHi - pLo) / (vHi - vLo);
+  }
+  return 0;
+}
+
+// Percentuale da mostrare: col cavo USB quella della carica, altrimenti dalla tensione (-1 = lettura fallita).
+static int batteryPct() {
+  if (usbOn) return chgPct;
+  const int mv = M5.Power.getBatteryVoltage();
+  return mv > 2500 ? socFromMv(mv) : -1;
+}
+
+// "42 MIN" oppure "1H 25"
+static void fmtDuration(char* buf, size_t n, uint32_t ms) {
+  const unsigned long min = ms / 60000UL;
+  if (min < 60) snprintf(buf, n, "%lu MIN", min);
+  else snprintf(buf, n, "%luH %02lu", min / 60, min % 60);
+}
+
+// Minuti alla fine della carica dal ritmo degli ultimi 10 minuti (-1 = non ancora stimabile).
+// Il PM1 non misura la corrente di carica, quindi è una stima: arrotondata a 5 minuti.
+static int chargeMinutesLeft() {
+  if (chgState != CHG_ACTIVE || pctHistN < 11) return -1;
+  const int gained = chgPct - pctHist[0];  // pctHist[0] = 10 minuti fa
+  if (gained <= 0) return -1;
+  const int left = (100 - chgPct) * 10 / gained;
+  return constrain(((left + 4) / 5) * 5, 5, 300);
+}
+
+// Pila con livello di riempimento e, in carica, un fulmine.
+static void drawBatteryIcon(int x, int y, int w, int h, int pct, uint16_t fill, bool bolt) {
+  M5.Display.drawRoundRect(x, y, w, h, 7, C_TEXT);
+  M5.Display.drawRoundRect(x + 1, y + 1, w - 2, h - 2, 6, C_TEXT);
+  M5.Display.fillRoundRect(x + w, y + h / 2 - 9, 6, 18, 2, C_TEXT);  // polo positivo
+  const int fw = (w - 10) * constrain(pct, 0, 100) / 100;
+  if (fw > 0) M5.Display.fillRoundRect(x + 5, y + 5, fw, h - 10, 3, fill);
+  if (bolt) {
+    const int cx = x + w / 2, cy = y + h / 2;
+    M5.Display.fillTriangle(cx + 5, cy - 17, cx - 9, cy + 3, cx + 2, cy + 3, C_TEXT);
+    M5.Display.fillTriangle(cx - 5, cy + 17, cx + 9, cy - 3, cx - 2, cy - 3, C_TEXT);
+  }
+}
+
+// Schermata di carica: nome e tensione USB, pila, percentuale, stato, tensione della batteria e tempi.
+static void drawCharge() {
+  displayWake();
+  chargeScreen = true;
+  lastChargeDraw = millis();
+  M5.Display.fillScreen(C_BG);
+  const int w = M5.Display.width();
+  const bool full = chgState == CHG_FULL;
+  const bool active = chgState == CHG_ACTIVE;
+  char buf[48];
+  char t[16];
+
+  snprintf(buf, sizeof(buf), "%s   USB %d.%02dV", cfg.name, lastVbus / 1000, (lastVbus % 1000) / 10);
+  drawFit(buf, 10, SMALL_FONTS + 2, 1, C_DIM);
+
+  const uint16_t fill = full ? C_BALL : (active ? (chgPct < 20 ? C_ORANGE : C_BALL) : C_DIM);
+  drawBatteryIcon(12, 29, 92, 52, chgPct, fill, active);
+  snprintf(buf, sizeof(buf), "%d%%", chgPct);
+  M5.Display.setFont(&fonts::FreeSansBold24pt7b);
+  M5.Display.setTextSize(1);
+  M5.Display.setTextDatum(middle_center);
+  M5.Display.setTextColor(full ? C_BALL : C_TEXT, C_BG);
+  M5.Display.drawString(buf, (118 + w) / 2, 57);
+
+  drawFit(full ? TXT_FULL : (active ? TXT_CHARGING : TXT_USB_POWER), 99, SMALL_FONTS, 3, full ? C_BALL : (active ? C_TEXT : C_DIM));
+
+  if (full) {
+    fmtDuration(t, sizeof(t), fullAt - usbSince);
+    snprintf(buf, sizeof(buf), "%d.%02dV   CARICATA IN %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+  } else {
+    fmtDuration(t, sizeof(t), millis() - usbSince);
+    const int left = chargeMinutesLeft();
+    if (left > 0) snprintf(buf, sizeof(buf), "%d.%02dV  DA %s  FINE ~%d MIN", lastMv / 1000, (lastMv % 1000) / 10, t, left);
+    else snprintf(buf, sizeof(buf), "%d.%02dV   DA %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+  }
+  drawFit(buf, 124, SMALL_FONTS + 2, 1, C_DIM);
+}
+
+// Schermata di carica accesa per [ms] (aggiornata ogni volta che cambia qualcosa).
+static void chargeScreenFor(uint32_t ms) {
+  chargeShowUntil = millis() + ms;
+  drawCharge();
+  showFor(ms);
+}
+
 static void drawBattery() {
-  int level = M5.Power.getBatteryLevel();
-  bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
+  if (usbOn && !connected) {
+    chargeScreenFor(CHARGE_SHOW_MS);
+    return;
+  }
+  const int level = batteryPct();
   char buf[24];
   if (level < 0) snprintf(buf, sizeof(buf), "--%%");
   else snprintf(buf, sizeof(buf), "%d%%", level);
-  drawMessage(buf, charging ? TXT_CHARGING : TXT_BATTERY, level >= 0 && level < 20 ? C_RED : C_BALL);
+  const char* l2 = usbOn ? (chgState == CHG_FULL ? TXT_FULL : TXT_CHARGING) : TXT_BATTERY;
+  drawMessage(buf, l2, !usbOn && level >= 0 && level < 20 ? C_RED : C_BALL);
   showFor(3000);
 }
 
@@ -9361,20 +11723,22 @@ static void sendEvent(uint8_t type, uint8_t extra = 0) {
 }
 
 static void updateBattery(bool notify) {
-  int level = M5.Power.getBatteryLevel();
+  const int level = batteryPct();
   if (level >= 0) {
     uint8_t v = (uint8_t)constrain(level, 0, 100);
     battChr->setValue(&v, 1);
     if (notify && connected) battChr->notify();
   }
-  // Stato per l'app: tensione in mV (più precisa della percentuale), in carica, secondi di accensione,
-  // secondi di display acceso. Con questi dati l'app calcola consumo e autonomia reali.
-  char buf[64];
+  // Stato per l'app: tensione in mV (più precisa della percentuale), alimentato da USB (chg=1 anche a carica
+  // completa: non c'è consumo da misurare), secondi di accensione e di display acceso (consumo e autonomia
+  // reali); dal firmware 2.1 anche tensione USB, carica completa e la percentuale mostrata dal braccialetto.
+  char buf[96];
   uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
-  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu",
-           (int)M5.Power.getBatteryVoltage(),
-           M5.Power.isCharging() == m5::Power_Class::is_charging ? 1 : 0,
-           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000));
+  const bool chg = usbOn || M5.Power.isCharging() == m5::Power_Class::is_charging;
+  snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu;usb=%d;full=%d;pct=%d",
+           (int)M5.Power.getBatteryVoltage(), chg ? 1 : 0,
+           (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000),
+           usbOn ? lastVbus : 0, chgState == CHG_FULL ? 1 : 0, level);
   statusChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) statusChr->notify();
 }
@@ -9440,6 +11804,129 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
   while (true) delay(1000);
 }
 
+// ------------------------------------------------------------------ ricarica
+static void onUsbIn(uint32_t now) {
+  usbOn = true;
+  usbSince = now;
+  fullAt = 0;
+  notChgSince = 0;
+  cvSince = 0;
+  chgState = M5.Power.isCharging() == m5::Power_Class::is_charging ? CHG_ACTIVE : CHG_IDLE;
+  chgPct = restMv > 2500 ? socFromMv(restMv) : 0;
+  pctHistN = 0;
+  lastPctSample = now - 60000UL;
+  if (connected) {
+    // In partita (powerbank al polso) il punteggio ha la precedenza: solo un messaggio breve.
+    char l2[16];
+    snprintf(l2, sizeof(l2), "%d%%", chgPct);
+    drawMessage(TXT_CHARGING, l2, C_BALL);
+    showFor(2500);
+  } else {
+    identifyUntil = 0;
+    chargeNextGlance = now + CHARGE_SHOW_MS;
+    chargeScreenFor(CHARGE_SHOW_MS);
+  }
+  beep(2400, 60);
+  updateBattery(true);
+}
+
+static void onUsbOut(uint32_t now) {
+  usbOn = false;
+  chgState = CHG_NONE;
+  chargeShowUntil = 0;
+  // Da qui ripartono i tempi di spegnimento automatico, come appena acceso.
+  advSince = now;
+  lastActivity = now;
+  idleWarned = false;
+  if (!connected && !advFast) startAdvertising(true);
+  char l2[24];
+  snprintf(l2, sizeof(l2), "%s %d%%", TXT_BATTERY, chgPct);
+  identifyUntil = 0;
+  drawMessage(TXT_USB_OUT, l2, C_ORANGE);
+  showFor(3000);
+  nextBlink = now + 3000;
+  updateBattery(true);
+}
+
+// Ogni secondo: cavo USB (con anti-rimbalzo), stato della carica, percentuale e storico per la stima.
+static void pollPower(uint32_t now) {
+  if (now - lastPowerPoll < POWER_POLL_MS) return;
+  lastPowerPoll = now;
+  const int vbus = M5.Power.getVBUSVoltage();
+  const bool chg = M5.Power.isCharging() == m5::Power_Class::is_charging;  // CHG_STAT basso = in carica
+  const int mv = M5.Power.getBatteryVoltage();
+  if (vbus > 0) lastVbus = vbus;
+  if (mv > 2500) {
+    lastMv = mv;
+    if (!usbOn) restMv = mv;
+  }
+  const bool usb = vbus > USB_MIN_MV || chg;
+  if (usb != usbOn) {
+    if (++usbFlips >= 2) {
+      usbFlips = 0;
+      if (usb) onUsbIn(now);
+      else onUsbOut(now);
+    }
+    return;
+  }
+  usbFlips = 0;
+  if (!usbOn || chgState == CHG_FULL) return;
+
+  if (chg) {
+    notChgSince = 0;
+    chgState = CHG_ACTIVE;
+    // Riserva se il caricabatterie non chiude mai la carica: 45 minuti a tensione piena.
+    if (lastMv >= CV_FULL_MV) {
+      if (!cvSince) cvSince = now;
+    } else {
+      cvSince = 0;
+    }
+  } else {
+    cvSince = 0;
+    if (!notChgSince) notChgSince = now;
+    // CHG_STAT spento per 20 s: carica finita (con la batteria alta) oppure solo alimentazione
+    if (now - notChgSince >= FULL_DEBOUNCE_MS) chgState = lastMv >= USB_MIN_MV ? CHG_FULL : CHG_IDLE;
+  }
+  if (chgState == CHG_ACTIVE && cvSince && now - cvSince >= CV_FULL_MS) chgState = CHG_FULL;
+
+  if (chgState == CHG_FULL) {
+    fullAt = now;
+    chgPct = 100;
+    if (!connected) chargeScreenFor(CHARGE_SHOW_MS);  // niente bip: può succedere di notte
+    updateBattery(true);
+    return;
+  }
+  if (lastMv > 2500) {
+    const int p = socFromMv(lastMv - (chgState == CHG_ACTIVE ? CHG_OFFSET_MV : 0));
+    chgPct = max(chgPct, min(p, 99));
+  }
+  if (chgState == CHG_ACTIVE && now - lastPctSample >= 60000UL) {
+    lastPctSample = now;
+    if (pctHistN == 11) {
+      memmove(pctHist, pctHist + 1, 10 * sizeof(int));
+      pctHistN = 10;
+    }
+    pctHist[pctHistN++] = chgPct;
+  }
+}
+
+// Col cavo e senza telefono: schermata di carica aggiornata mentre è accesa, poi un'occhiata ogni 10 s.
+static void chargeDisplay(uint32_t now) {
+  static int shownSig = -1;
+  if (displayOn && chargeScreen && (int32_t)(now - chargeShowUntil) < 0) {
+    // si ridisegna solo se cambia qualcosa (niente sfarfallio), comunque ogni 10 s per le tensioni
+    const int sig = chgPct * 100000 + chgState * 10000 + (int)((now - usbSince) / 60000UL) * 10 + (chargeMinutesLeft() > 0 ? 1 : 0);
+    if (sig != shownSig || now - lastChargeDraw >= 10000) {
+      shownSig = sig;
+      drawCharge();
+    }
+  } else if (!displayOn && chgState != CHG_FULL && (int32_t)(now - chargeNextGlance) >= 0) {
+    drawCharge();
+    showFor(CHARGE_GLANCE_MS);
+    chargeNextGlance = now + CHARGE_GLANCE_EVERY;
+  }
+}
+
 // ------------------------------------------------------------------ setup / loop
 void setup() {
   setCpuFrequencyMhz(80);  // il minimo che tiene in piedi il Bluetooth: consumo molto più basso di 240 MHz
@@ -9485,6 +11972,7 @@ static void keyWhileDisconnected(uint32_t now) {
 void loop() {
   M5.update();
   const uint32_t now = millis();
+  pollPower(now);
 
   // --- eventi BLE
   if (justConnected) {
@@ -9535,6 +12023,8 @@ void loop() {
     if (connected) {
       sendEvent(EVT_POINT);
       beep(2700, 40);
+    } else if (usbOn) {
+      chargeScreenFor(CHARGE_SHOW_MS);
     } else {
       keyWhileDisconnected(now);
     }
@@ -9552,14 +12042,21 @@ void loop() {
     if (connected) {
       sendEvent(EVT_UNDO);
       beep(1800, 40);
+    } else if (usbOn) {
+      chargeScreenFor(CHARGE_SHOW_MS);
     } else {
       keyWhileDisconnected(now);
     }
   }
-  if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, "", OFF_KEY);
+  if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
 
+  // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
+  if (!connected && !justDisconnect && usbOn) {
+    if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
+    chargeDisplay(now);
+  }
   // --- advertising, lampeggio e spegnimento automatico senza telefono
-  if (!connected && !justDisconnect) {
+  else if (!connected && !justDisconnect) {
     if (advFast && now - advSince > FAST_ADV_MS) startAdvertising(false);
     // all'accensione vale il tempo di pairing, dopo una disconnessione quello di telefono perso
     const uint32_t limit = (uint32_t)(everConnected ? cfg.lostS : cfg.pairS) * 1000UL;
@@ -9586,9 +12083,10 @@ void loop() {
   } else if (connected) {
     blinkShown = false;
     // --- spegnimento per inattività, con avviso 30 s prima
+    // (col cavo USB no: il tempo riparte quando lo si stacca)
     const uint32_t idleMs = (uint32_t)cfg.idleMin * 60000UL;
-    if (now - lastActivity > idleMs) powerOff(TXT_POWER_OFF, TXT_IDLE, OFF_IDLE);
-    if (!idleWarned && now - lastActivity > idleMs - IDLE_WARN_MS) {
+    if (!usbOn && now - lastActivity > idleMs) powerOff(TXT_POWER_OFF, TXT_IDLE, OFF_IDLE);
+    if (!usbOn && !idleWarned && now - lastActivity > idleMs - IDLE_WARN_MS) {
       idleWarned = true;
       drawMessage(TXT_IDLE, TXT_HOLD_KEY1, C_ORANGE);
       showFor(5000);
@@ -9610,7 +12108,7 @@ void loop() {
     lastBattCheck = now;
     const int mv = M5.Power.getBatteryVoltage();
     const bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
-    if (!charging && mv > 2500 && mv < BATT_EMPTY_MV) {
+    if (!charging && !usbOn && mv > 2500 && mv < BATT_EMPTY_MV) {
       if (++battEmptyCount >= 2) powerOff(TXT_POWER_OFF, TXT_EMPTY, OFF_BATTERY);
     } else {
       battEmptyCount = 0;
@@ -9621,6 +12119,7 @@ void loop() {
   if (displayOn && (int32_t)(now - displayOffAt) >= 0) {
     displaySleep();
     blinkShown = !connected;
+    chargeScreen = false;
   }
 
   speakerIdle(now);
@@ -9629,6 +12128,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 52 file del progetto in $DEST"
+echo ">> Fatto: 60 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
