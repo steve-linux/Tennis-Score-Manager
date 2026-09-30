@@ -38,6 +38,7 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/gradle"
 mkdir -p "$DEST/gradle/wrapper"
@@ -61,8 +62,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "2.2.0"
+        versionCode = 5
+        versionName = "2.3.0"
     }
 
     buildTypes {
@@ -402,7 +403,15 @@ gms.forEach(s => buildSeg(s, "8"));
 sts.forEach(s => buildSeg(s, "8"));
 buildSeg($("clock"), "88:88:88");
 
-const IT = (navigator.language || "it").startsWith("it");
+// Testi prima che arrivi il primo stato (poi valgono quelli dell'app, nella lingua scelta dall'arbitro).
+const FALLBACK = {
+  it: ["CONNESSIONE PERSA - RICONNESSIONE...", "SCHERMO INTERO"],
+  en: ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"],
+  fr: ["CONNEXION PERDUE - RECONNEXION...", "PLEIN ÉCRAN"],
+  de: ["VERBINDUNG VERLOREN - NEUER VERSUCH...", "VOLLBILD"],
+  es: ["CONEXIÓN PERDIDA - RECONECTANDO...", "PANTALLA COMPLETA"],
+  pt: ["CONEXÃO PERDIDA - RECONECTANDO...", "TELA CHEIA"],
+}[(navigator.language || "it").slice(0, 2).toLowerCase()] || ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"];
 let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
@@ -430,6 +439,7 @@ function render() {
   ghost = S.show.ghost !== false;
   document.documentElement.lang = S.lang;
   const L = S.labels;
+  setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
   for (let i = 0; i < 2; i++) {
@@ -491,7 +501,7 @@ function tick() {
   const silent = now - lastMsg;
   document.body.classList.toggle("lost", silent > 12000);
   if (silent > 12000) {
-    setText($("banner"), S ? S.labels.lost : (IT ? "CONNESSIONE PERSA - RICONNESSIONE..." : "CONNECTION LOST - RECONNECTING..."));
+    setText($("banner"), S ? S.labels.lost : FALLBACK[0]);
     if (!lostSince) lostSince = now;
     if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
   } else {
@@ -518,7 +528,7 @@ function poll() {
 
 // ------------------------------------------------------------------ schermo intero e schermo acceso
 const fs = $("fs");
-fs.textContent = "⛶ " + (IT ? "SCHERMO INTERO" : "FULL SCREEN");
+fs.textContent = "⛶ " + FALLBACK[1];
 if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
 let pointerTimer = 0;
 function showPointer() {
@@ -674,6 +684,7 @@ import android.provider.DocumentsContract
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
+import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BandStatus
@@ -937,7 +948,10 @@ class MatchController(
         announcer.enabled = v.audio
         announcer.useGeneratedFiles = v.voiceFiles
         if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
-        if (old.lang != v.lang) refreshVoiceCount()
+        if (old.lang != v.lang) {
+            refreshVoiceCount()
+            syncBandLanguage(ble.bands.value)
+        }
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
         }
@@ -1143,6 +1157,28 @@ class MatchController(
                 }
                 if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
             }
+            syncBandLanguage(bands)
+        }
+    }
+
+    /** Lingua già chiesta a ciascun braccialetto, per non riscriverla a ogni aggiornamento prima che risponda. */
+    private val bandLangSent = mutableMapOf<Side, String>()
+
+    /**
+     * I braccialetti dal firmware 2.2 parlano la lingua dell'app: la si manda quando si collegano e quando
+     * la si cambia. Quelli più vecchi non dichiarano la lingua e restano in italiano.
+     */
+    private fun syncBandLanguage(bands: Map<Side, BandInfo>) {
+        val want = options.value.lang.code
+        for ((side, info) in bands) {
+            val have = info.settings?.lang
+            if (info.state != LinkState.READY || have.isNullOrEmpty()) {
+                bandLangSent.remove(side)
+                continue
+            }
+            if (have == want || bandLangSent[side] == want) continue
+            bandLangSent[side] = want
+            scope.launch { if (!ble.writeLanguage(side, want)) bandLangSent.remove(side) }
         }
     }
 
@@ -1623,9 +1659,8 @@ class MatchController(
         announcer.announce(
             force = true,
             name = VOICE_TEST,
-            segs = listOf(
-                Seg.Clip("first_set"), Seg.Pause(700),
-                Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
+            segs = listOf(Seg.Clip("first_set"), Seg.Pause(700)) + calls().toServe(n.side(Side.P1)) + listOf(
+                Seg.Pause(700),
                 Seg.Clip("score_1_0"), Seg.Pause(500),
                 Seg.Clip("deuce"), Seg.Pause(500),
                 Seg.Clip("advantage"), Seg.Say(n.side(Side.P2)), Seg.Pause(500),
@@ -1857,8 +1892,9 @@ object BandProtocol {
 
 /**
  * Impostazioni salvate nel braccialetto. Testo sulla caratteristica CONFIG:
- * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30".
+ * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it".
  * In scrittura bastano le chiavi da cambiare; il braccialetto risponde con tutte.
+ * La lingua non passa da [encode]: la manda l'app da sola ([languageConfig]) e il braccialetto la salva senza anteprima.
  */
 data class BandSettings(
     val name: String = "",
@@ -1877,6 +1913,8 @@ data class BandSettings(
     /** Spegnimento se collegato ma inattivo (min). */
     val idleTimeoutMin: Int = 30,
     val firmware: String = "",
+    /** Lingua dei testi del braccialetto ("it", "en", ...); vuota = firmware senza lingue (prima della 2.2). */
+    val lang: String = "",
 ) {
     fun clamped() = copy(
         name = cleanName(name),
@@ -1906,6 +1944,9 @@ data class BandSettings(
     companion object {
         const val NAME_MAX = 12
 
+        /** Solo la lingua: il braccialetto la salva in silenzio (niente "IMPOSTAZIONI OK"). */
+        fun languageConfig(code: String) = "lang=$code"
+
         /** Nome valido per il braccialetto: ASCII stampabile, senza i separatori del protocollo, max 12. */
         fun cleanName(s: String): String {
             val plain = Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
@@ -1929,6 +1970,7 @@ data class BandSettings(
                 lostTimeoutS = map["lost"]?.toIntOrNull() ?: d.lostTimeoutS,
                 idleTimeoutMin = map["idle"]?.toIntOrNull() ?: d.idleTimeoutMin,
                 firmware = map["fw"] ?: "",
+                lang = map["lang"] ?: "",
             )
         }
     }
@@ -2340,6 +2382,8 @@ class BleManager(context: Context) {
 
     /** Scrive le impostazioni nel braccialetto; true se le ha ricevute (poi risponde con quelle applicate). */
     suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = links[side]?.writeConfig(settings.encode()) ?: false
+
+    suspend fun writeLanguage(side: Side, code: String): Boolean = links[side]?.writeConfig(BandSettings.languageConfig(code)) ?: false
 
     fun isReady(side: Side): Boolean = links[side]?.state == LinkState.READY
 
@@ -2849,6 +2893,7 @@ import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.stringsFor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -2856,7 +2901,7 @@ import java.util.Locale
 /** Resoconto finale della partita: testo, JSON e immagine da condividere. */
 object Reports {
 
-    fun locale(lang: Lang): Locale = if (lang == Lang.IT) Locale.ITALY else Locale.UK
+    fun locale(lang: Lang): Locale = lang.locale
 
     fun duration(ms: Long): String {
         val s = ms / 1000
@@ -2868,7 +2913,7 @@ object Reports {
 
     fun date(ts: Long?, lang: Lang): String =
         ts?.let {
-            SimpleDateFormat(if (lang == Lang.IT) "EEEE d MMMM yyyy" else "EEEE, d MMMM yyyy", locale(lang)).format(Date(it))
+            SimpleDateFormat(stringsFor(lang).datePattern, locale(lang)).format(Date(it))
         } ?: ""
 
     /** "6-4" · "7-6(5)" · "[10-8]" dal punto di vista di [from]. */
@@ -2887,12 +2932,12 @@ object Reports {
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
     /** "G1 92% → 71% · G2 88% → 70%" */
-    fun batteryLine(rec: MatchRecord): String =
+    fun batteryLine(rec: MatchRecord, s: Strings): String =
         Side.entries.mapNotNull { side ->
             val a = rec.batteryStart[side]
             val b = rec.batteryEnd[side]
             if (a == null && b == null) null
-            else "${if (side == Side.P1) "G1" else "G2"} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
+            else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
     fun formatLabel(rec: MatchRecord, s: Strings): String =
@@ -2942,7 +2987,7 @@ object Reports {
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
-        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
         sb.appendLine()
         sb.append("#tennis · ${s.generatedWith}")
         return sb.toString()
@@ -3147,6 +3192,7 @@ package com.tennis.scoremanager.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Locale
 
 /** Giocatore 1 (giallo) e Giocatore 2 (rosso). Nel doppio indica la squadra. */
 @Serializable
@@ -3156,8 +3202,23 @@ enum class Side {
     val other: Side get() = if (this == P1) P2 else P1
 }
 
+/**
+ * Lingue di app, chiamate e braccialetti. [code] va al tabellone TV e al braccialetto; [locale] sceglie la voce
+ * della sintesi vocale (preferita, se c'è, quella del paese) e il formato delle date. [label] si scrive nella lingua stessa.
+ */
 @Serializable
-enum class Lang { IT, EN }
+enum class Lang(val code: String, val locale: Locale, val label: String, val flag: String) {
+    IT("it", Locale.ITALY, "Italiano", "🇮🇹"),
+    EN("en", Locale.UK, "English", "🇬🇧"),
+    FR("fr", Locale.FRANCE, "Français", "🇫🇷"),
+    DE("de", Locale.GERMANY, "Deutsch", "🇩🇪"),
+    ES("es", Locale.forLanguageTag("es-ES"), "Español", "🇪🇸"),
+    PT("pt", Locale.forLanguageTag("pt-BR"), "Português", "🇧🇷");
+
+    companion object {
+        fun fromCode(code: String?): Lang? = entries.firstOrNull { it.code == code?.lowercase() }
+    }
+}
 
 @Serializable
 enum class MatchFormat {
@@ -3504,25 +3565,21 @@ class MatchService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val nm = getSystemService(NotificationManager::class.java)
+        val c = (application as TsmApp).controller
+        val s = c.strings
         if (Build.VERSION.SDK_INT >= 26) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Partita in corso", NotificationManager.IMPORTANCE_LOW))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
         }
         val open = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
-        val c = (application as TsmApp).controller
         val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
         val tv = c.tv.value.enabled
-        val what = when {
-            bands && tv -> "braccialetti e tabellone TV attivi"
-            tv -> "tabellone TV attivo"
-            else -> "braccialetti attivi"
-        }
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText("Partita in corso · $what")
+            .setContentText(s.notifText(bands, tv))
             .setOngoing(true)
             .setContentIntent(open)
             .build()
@@ -4283,7 +4340,7 @@ object TvSnapshots {
         }
         return TvSnapshot(
             seq = i.seq,
-            lang = if (i.lang == Lang.IT) "it" else "en",
+            lang = i.lang.code,
             phase = phase,
             title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
             players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),
@@ -5023,34 +5080,41 @@ fun SectionCard(title: String, icon: ImageVector, accent: Color = TsmColors.Ball
 
 data class SegOption(val label: String, val icon: ImageVector? = null, val color: Color = TsmColors.Ball, val onColor: Color = TsmColors.OnBall)
 
-/** Selettore a segmenti (uno solo attivo). */
+/** Selettore a segmenti (uno solo attivo). Con [columns] minore del numero di opzioni va a capo in più righe. */
 @Composable
-fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
-    Row(
+fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size) {
+    Column(
         modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
     ) {
-        options.forEachIndexed { i, o ->
-            val sel = i == selected
-            Row(
-                Modifier.weight(1f)
-                    .background(if (sel) o.color else Color.Transparent)
-                    .clickable(role = Role.RadioButton) { onSelect(i) }
-                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (o.icon != null) {
-                    Icon(o.icon, null, tint = if (sel) o.onColor else TsmColors.TextDim, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
+        options.chunked(columns.coerceAtLeast(1)).forEachIndexed { r, row ->
+            Row(Modifier.fillMaxWidth()) {
+                row.forEachIndexed { c, o ->
+                    val i = r * columns + c
+                    val sel = i == selected
+                    Row(
+                        Modifier.weight(1f)
+                            .background(if (sel) o.color else Color.Transparent)
+                            .clickable(role = Role.RadioButton) { onSelect(i) }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (o.icon != null) {
+                            Icon(o.icon, null, tint = if (sel) o.onColor else TsmColors.TextDim, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                        }
+                        Text(
+                            o.label,
+                            color = if (sel) o.onColor else TsmColors.TextMain,
+                            fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp,
+                        )
+                    }
                 }
-                Text(
-                    o.label,
-                    color = if (sel) o.onColor else TsmColors.TextMain,
-                    fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                )
+                // Ultima riga incompleta: celle vuote per tenere la stessa larghezza.
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
@@ -5184,9 +5248,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 
-/** Testi dell'app nelle due lingue. Le etichette dei cronometri restano in inglese come sul tabellone ATP. */
+/**
+ * Testi dell'app, uno per lingua (vedi [stringsFor]). Le etichette dei cronometri restano in inglese come sul
+ * tabellone ATP. I testi per i braccialetti vanno in maiuscolo e senza accenti (il font è ASCII).
+ */
 interface Strings {
     val appName: String get() = "Tennis Score Manager"
+
+    /** Sigla del giocatore/squadra 1 o 2 ("G1", "P1"...), usata dove non c'è posto per il nome. */
+    val playerTag: (Int) -> String
+
+    /** Data lunga per riepilogo e partite salvate (SimpleDateFormat). */
+    val datePattern: String
 
     // Pagina 1
     val setupTitle: String
@@ -5262,8 +5335,7 @@ interface Strings {
     val copyToOther: String
     val powerOff: String
     val languageSection: String
-    val italian: String
-    val english: String
+    val languageHint: String
     val audioSection: String
     val voiceCalls: String
     val voiceFiles: (Int, Int) -> String
@@ -5379,6 +5451,10 @@ interface Strings {
     val autonomy: (String) -> String
     val bandsBattery: String
 
+    // Notifica mentre la partita è in corso
+    val notifChannel: String
+    val notifText: (bands: Boolean, tv: Boolean) -> String
+
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
     val bandPlay: String
@@ -5478,6 +5554,9 @@ interface Strings {
 }
 
 object ItStrings : Strings {
+    override val playerTag: (Int) -> String = { "G$it" }
+    override val datePattern = "EEEE d MMMM yyyy"
+
     override val setupTitle = "Nuova partita"
     override val setupSubtitle = "Configurazione facoltativa: puoi lasciare tutto vuoto e andare avanti."
     override val clubSection = "Circolo e campo"
@@ -5551,8 +5630,7 @@ object ItStrings : Strings {
     override val copyToOther = "Copia sull'altro braccialetto"
     override val powerOff = "Spegni"
     override val languageSection = "Lingua"
-    override val italian = "Italiano"
-    override val english = "English"
+    override val languageHint = "Vale per le schermate, la voce dell'arbitro, il tabellone TV e i braccialetti."
     override val audioSection = "Audio e voce"
     override val voiceCalls = "Chiamate vocali dell'arbitro"
     override val voiceFiles: (Int, Int) -> String = { n, tot -> "File generati: $n/$tot" }
@@ -5667,6 +5745,15 @@ object ItStrings : Strings {
     override val autonomy: (String) -> String = { "autonomia ~$it" }
     override val bandsBattery = "Batteria braccialetti"
 
+    override val notifChannel = "Partita in corso"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Partita in corso · " + when {
+            bands && tv -> "braccialetti e tabellone TV attivi"
+            tv -> "tabellone TV attivo"
+            else -> "braccialetti attivi"
+        }
+    }
+
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
     override val bandChangeEnds = "CAMBIO CAMPO"
@@ -5755,6 +5842,9 @@ object ItStrings : Strings {
 }
 
 object EnStrings : Strings {
+    override val playerTag: (Int) -> String = { "P$it" }
+    override val datePattern = "EEEE, d MMMM yyyy"
+
     override val setupTitle = "New match"
     override val setupSubtitle = "Optional setup: you can leave everything empty and go on."
     override val clubSection = "Club and court"
@@ -5828,8 +5918,7 @@ object EnStrings : Strings {
     override val copyToOther = "Copy to the other wristband"
     override val powerOff = "Power off"
     override val languageSection = "Language"
-    override val italian = "Italiano"
-    override val english = "English"
+    override val languageHint = "Applies to the screens, the umpire's voice, the TV scoreboard and the wristbands."
     override val audioSection = "Audio and voice"
     override val voiceCalls = "Umpire voice calls"
     override val voiceFiles: (Int, Int) -> String = { n, tot -> "Generated files: $n/$tot" }
@@ -5944,6 +6033,15 @@ object EnStrings : Strings {
     override val autonomy: (String) -> String = { "about $it left" }
     override val bandsBattery = "Wristband battery"
 
+    override val notifChannel = "Match in progress"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Match in progress · " + when {
+            bands && tv -> "wristbands and TV scoreboard on"
+            tv -> "TV scoreboard on"
+            else -> "wristbands on"
+        }
+    }
+
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"
     override val bandChangeEnds = "CHANGE ENDS"
@@ -6031,9 +6129,1216 @@ object EnStrings : Strings {
     override val displayRetry = "Search again"
 }
 
-fun stringsFor(lang: Lang): Strings = if (lang == Lang.IT) ItStrings else EnStrings
+fun stringsFor(lang: Lang): Strings = when (lang) {
+    Lang.IT -> ItStrings
+    Lang.EN -> EnStrings
+    Lang.FR -> FrStrings
+    Lang.DE -> DeStrings
+    Lang.ES -> EsStrings
+    Lang.PT -> PtStrings
+}
 
 val LocalStrings = staticCompositionLocalOf<Strings> { ItStrings }
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/StringsDe.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/StringsDe.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.ble.BandProtocol
+
+/** Deutsch (DTB-Begriffe: Stuhlschiedsrichter, Satzball, Seitenwechsel). */
+object DeStrings : Strings {
+    override val playerTag: (Int) -> String = { "S$it" }
+    override val datePattern = "EEEE, d. MMMM yyyy"
+
+    override val setupTitle = "Neues Match"
+    override val setupSubtitle = "Einrichtung optional: Du kannst alles leer lassen und weitermachen."
+    override val clubSection = "Verein und Platz"
+    override val clubName = "Name des Tennisvereins"
+    override val courtNumber = "Platznummer"
+    override val singles = "Einzel"
+    override val doubles = "Doppel"
+    override val doublesHint = "Im Doppel zwei Namen pro Team eingeben: Die Zählung folgt den ITF-Regeln für das Doppel."
+    override val player1 = "Spieler 1"
+    override val player2 = "Spieler 2"
+    override val playerName = "Name"
+    override val clearFields = "Felder leeren"
+    override val next = "Weiter"
+    override val back = "Zurück"
+
+    override val optionsTitle = "Modus und Regeln"
+    override val modeSection = "Spielmodus"
+    override val modeReferee = "Schiedsrichter"
+    override val modeBands = "Armbänder"
+    override val modeRefereeHint = "Die Punkte werden am Telefon vergeben, wie vom Stuhlschiedsrichter."
+    override val modeBandsHint = "Jeder Spieler vergibt den Punkt mit KEY1 an seinem eigenen M5StickS3."
+    override val requirements = "Voraussetzungen"
+    override val bluetooth = "Bluetooth"
+    override val location = "Standortberechtigung"
+    override val locationServices = "Standort aktiviert"
+    override val enable = "Einschalten"
+    override val allow = "Erlauben"
+    override val ok = "OK"
+    override val bandFor: (String) -> String = { "Armband von $it" }
+    override val noBand = "Keins"
+    override val bandConnected = "Verbunden"
+    override val bandConnecting = "Verbinde…"
+    override val bandIdle = "Nicht verbunden"
+    override val bandOff = "Aus"
+    override val battery = "Akku"
+    override val bandCharging: (Int) -> String = { "Lädt $it %" }
+    override val bandChargeFull = "Voll geladen"
+    override val autoSearch = "Automatische Suche: Schalte die Armbänder ein (Seitentaste), sie koppeln sich von selbst."
+    override val autoSearchOff = "Die Suche startet, sobald die Voraussetzungen oben erfüllt sind."
+    override val identify = "Erkennen"
+    override val swapBands = "S1 ↔ S2 tauschen"
+    override val bandsOffAtEnd = "Armbänder am Matchende und beim Beenden ausschalten"
+    override val bandsOffAtEndHint = "Ein Klick auf die Seitentaste schaltet sie wieder ein."
+    override val bandNotReady = "Armband nicht verbunden"
+
+    override val bandSettings = "Armband-Einstellungen"
+    override val settingsShort = "Einstellungen"
+    override val bandSettingsNeedLink = "Verbinde das Armband, um seine Einstellungen zu sehen und zu ändern."
+    override val bandFirmwareOld = "Die Firmware dieses Armbands hat keine Einstellungen: Lade TSM_Band.ino 2.0 hoch."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Name"
+    override val brightness = "Displayhelligkeit"
+    override val scoreTime = "Spielstand nach jedem Punkt sichtbar"
+    override val scoreTimeHint = "Die Zusammenfassung am Spielende bleibt 2 Sekunden länger."
+    override val beeperVolume = "Lautstärke des Piepsers"
+    override val mute = "Stumm"
+    override val off = "Aus"
+    override val flipDisplay = "Display gedreht"
+    override val flipDisplayHint = "Um das Armband am anderen Handgelenk zu tragen."
+    override val autoOff = "Automatisches Ausschalten"
+    override val pairTimeout = "Beim Einschalten, wenn sich kein Telefon verbindet"
+    override val lostTimeout = "Wenn die Verbindung zum Telefon verloren geht"
+    override val idleTimeout = "Wenn es verbunden, aber inaktiv bleibt"
+    override val estimateFull: (String) -> String = { "Geschätzte Laufzeit $it bei voller Ladung" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h mit der aktuellen Ladung ($p %)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Mittlerer Verbrauch $tot mA: Platine und Bluetooth $base · Display $dsp · Piepser $snd"
+    }
+    override val estimateMeasured = "Grundverbrauch an diesem Armband während der Nutzung gemessen."
+    override val estimateTheory = "Theoretische Schätzung: Nach 20 Minuten Nutzung wird sie mit dem gemessenen Verbrauch korrigiert."
+    override val copyToOther = "Auf das andere Armband kopieren"
+    override val powerOff = "Ausschalten"
+    override val languageSection = "Sprache"
+    override val languageHint = "Gilt für die Bildschirme, die Stimme des Schiedsrichters, die TV-Anzeigetafel und die Armbänder."
+    override val audioSection = "Audio und Stimme"
+    override val voiceCalls = "Ansagen des Schiedsrichters"
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Erzeugte Dateien: $n/$tot" }
+    override val voiceFilesHint = "Alles funktioniert ohne Internet mit den auf dem Telefon installierten Stimmen. Eigene Aufnahmen (ZIP) haben immer Vorrang vor der Sprachausgabe."
+    override val generateVoice = "Dateien erzeugen"
+    override val generating: (Int, Int) -> String = { n, tot -> "Erzeuge $n/$tot…" }
+    override val importVoiceZip = "ZIP importieren"
+    override val deleteCustomVoice = "Aufnahmen entfernen"
+    override val ttsEngine = "Sprachausgabe-Engine"
+    override val engineDefault = "Standard des Telefons"
+    override val ttsVoice = "Stimme"
+    override val voiceAuto = "Automatisch (beste offline)"
+    override val voiceName: (String) -> String = { "Stimme $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Vorab erzeugte Audiodateien verwenden"
+    override val voiceFilesModeHint = "Normalerweise wird jede Ansage in einem Satz gesprochen (natürlicher). Schalte es ein, um die erzeugten Dateien abzuspielen, z. B. um eine Online-Stimme offline mitzunehmen."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Eigene Aufnahmen: $n/$tot" }
+    override val testVoice = "Stimme testen"
+    override val stopVoiceTest = "Test beenden"
+    override val ttsMissing = "Die deutsche Stimme der Sprachausgabe ist auf dem Telefon nicht installiert."
+    override val installVoice = "Stimme installieren"
+    override val formatSection = "Matchformat"
+    override val formatBestOfThree = "2 Gewinnsätze · Tie-Break bis 7"
+    override val formatBestOfThreeHint = "Auf zwei Gewinnsätze, Tie-Break bei 6 beide in jedem Satz."
+    override val formatMatchTiebreak = "2 Sätze + Match-Tie-Break bis 10"
+    override val formatMatchTiebreakHint = "Bei 1:1 Sätzen entscheidet ein Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
+    override val noAd = "No-Ad (entscheidender Punkt)"
+    override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
+    override val coinToss = "Wahl (Münzwurf)"
+    override val tossCoin = "Münze werfen"
+    override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }
+    override val tossHint = "Wer die Wahl gewinnt, entscheidet: Aufschlag, Rückschlag oder Seite. Hier einstellen."
+    override val serving = "Aufschlag"
+    override val courtSides = "Platzseiten"
+    override val umpireView = "Sicht vom Schiedsrichterstuhl"
+    override val swapSides = "Seiten tauschen"
+    override val firstServerOf: (String) -> String = { "Schlägt zuerst auf ($it)" }
+    override val left = "Links"
+    override val right = "Rechts"
+    override val net = "NETZ"
+    override val umpireChair = "Stuhlschiedsrichter"
+
+    override val locationDialogTitle = "Standort einschalten"
+    override val locationDialogText = "Ohne Standort kann der Ort nicht in der Match-Zusammenfassung stehen."
+    override val continueWithout = "Ohne weiter"
+    override val bandsRequiredTitle = "Bluetooth und Standort erforderlich"
+    override val bandsRequiredText = "Für die Armbänder Bluetooth einschalten, die Standortberechtigung erteilen und den Standort eingeschaltet lassen."
+    override val bandsMissingTitle = "Armbänder nicht zugeordnet"
+    override val bandsMissingText: (String) -> String = { "Es fehlt das Armband für: $it. Trotzdem fortfahren?" }
+    override val continueAnyway = "Fortfahren"
+    override val cancel = "Abbrechen"
+
+    override val startMatch = "MATCHBEGINN"
+    override val startHint = "Drücke die Taste, um zu beginnen"
+    override val startHintBands = "Drücke die Taste oder KEY1 an einem Armband"
+    override val startButton = "Match starten"
+    override val resumeSaved = "Unterbrochenes Match fortsetzen"
+    override val noSavedMatches = "Kein unterbrochenes Match gespeichert."
+    override val savedMatchesTitle = "Unterbrochene Matches"
+    override val delete = "Löschen"
+    override val vs = "gegen"
+
+    override val matchTime = "Match Time"
+    override val setsHeader = "SÄTZE"
+    override val gamesHeader = "SPIELE"
+    override val undoPoint = "Punkt zurück"
+    override val suspend = "Unterbrechen"
+    override val resume = "Fortsetzen"
+    override val audioOn = "Audio On"
+    override val audioOff = "Audio Off"
+    override val newMatch = "Neues Match"
+    override val suspendedOverlay = "MATCH UNTERBROCHEN"
+    override val newMatchConfirmTitle = "Neues Match?"
+    override val newMatchConfirmText = "Das laufende Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
+    override val endDialogTitle = "Spiel, Satz und Sieg"
+    override val endDialogText: (String, String) -> String = { name, score -> "Sieg für $name\n$score" }
+    override val matchConcluded = "Match beendet"
+    override val undoLastPoint = "Letzten Punkt zurücknehmen"
+    override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
+    override val whoServesFirst: (String) -> String = { "Wer schlägt bei $it zuerst auf?" }
+    override val confirm = "Bestätigen"
+    override val backDisabled = "Während des Matches «Neues Match» oder «Beenden» verwenden."
+    override val exit = "Beenden"
+    override val exitConfirmTitle = "App beenden?"
+    override val exitConfirmText = "Das Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
+    override val exitConfirmBands = "Die Armbänder werden ausgeschaltet."
+
+    override val msgChangeEnds = "SEITENWECHSEL"
+    override val msgTiebreak = "TIE-BREAK"
+    override val msgMatchTiebreak = "MATCH-TIE-BREAK"
+    override val msgSetWon: (String) -> String = { "SATZ $it" }
+    override val msgSetPoint = "SATZBALL"
+    override val msgMatchPoint = "MATCHBALL"
+    override val msgBreakPoint = "BREAKBALL"
+    override val msgDecidingPoint = "ENTSCHEIDENDER PUNKT"
+    override val msgPointUndone = "PUNKT ZURÜCKGENOMMEN"
+    override val msgSuspended = "MATCH UNTERBROCHEN"
+    override val msgResumed = "MATCH FORTGESETZT"
+    override val msgBandConnected: (String) -> String = { "ARMBAND $it VERBUNDEN" }
+    override val msgBandLost: (String) -> String = { "ARMBAND $it GETRENNT" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "ARMBAND $n AUS" + when (why) {
+            BandProtocol.OFF_IDLE -> " (INAKTIV)"
+            BandProtocol.OFF_BATTERY -> " (AKKU LEER)"
+            BandProtocol.OFF_TIMEOUT -> " (KEIN TELEFON)"
+            else -> ""
+        }
+    }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "ARMBAND $n: AKKU $p %" }
+    override val bandBatteryLow = "AKKU SCHWACH"
+    override val autonomy: (String) -> String = { "noch ~$it" }
+    override val bandsBattery = "Akku der Armbänder"
+
+    override val notifChannel = "Laufendes Match"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Match läuft · " + when {
+            bands && tv -> "Armbänder und TV-Anzeigetafel aktiv"
+            tv -> "TV-Anzeigetafel aktiv"
+            else -> "Armbänder aktiv"
+        }
+    }
+
+    override val bandPaired = "GEKOPPELT MIT"
+    override val bandPlay = "SPIELEN"
+    override val bandChangeEnds = "SEITENWECHSEL"
+    override val bandTiebreak = "TIE-BREAK"
+    override val bandSet = "SATZ"
+    override val bandSuspended = "UNTERBROCHEN"
+    override val bandGameSetMatch = "SPIEL SATZ SIEG"
+    override val bandMatchOver = "MATCH BEENDET"
+    override val bandAppClosed = "APP BEENDET"
+    override val bandOffFromApp = "AUSSCHALTEN"
+
+    override val summaryTitle = "Match beendet"
+    override val winner = "Sieger"
+    override val duration = "Dauer"
+    override val startTime = "Beginn"
+    override val endTime = "Ende"
+    override val date = "Datum"
+    override val club = "Verein"
+    override val court = "Platz"
+    override val place = "Ort"
+    override val placeUnavailable = "Standort nicht verfügbar"
+    override val format = "Format"
+    override val pointsWon = "Gewonnene Punkte"
+    override val gamesWon = "Gewonnene Spiele"
+    override val result = "Ergebnis"
+    override val saveHistory = "Im Verlauf speichern"
+    override val share = "Teilen"
+    override val saveDialogTitle = "Im Verlauf speichern"
+    override val fileName = "Name"
+    override val folder = "Ordner"
+    override val chooseFolder = "Ordner wählen"
+    override val defaultFolder = "App-Ordner (Standard)"
+    override val formatReport = "Bericht (.txt)"
+    override val formatData = "Matchdaten (.json)"
+    override val formatImage = "Bild (.png)"
+    override val save = "Speichern"
+    override val savedTo: (String) -> String = { "Gespeichert in $it" }
+    override val saveError = "Speichern fehlgeschlagen"
+    override val shareSubject = "Ergebnis des Tennismatches"
+    override val playerDefault: (Int) -> String = { "Spieler $it" }
+    override val teamJoiner = " und "
+    override val generatedWith = "Erstellt mit Tennis Score Manager"
+
+    override val tvGames = "SPIELE"
+    override val tvSet = "SATZ"
+    override val tvServe = "AUFSCHLAG"
+    override val tvChangeover = "SEITENWECHSEL"
+    override val tvSetBreak = "SATZPAUSE"
+    override val tvTiebreakBreak = "PAUSE"
+    override val tvWaiting = "WARTEN AUF DAS MATCH"
+    override val tvReady = "BEREIT ZUM SPIELEN"
+    override val tvSuspended = "MATCH UNTERBROCHEN"
+    override val tvWinner = "SIEGER"
+    override val tvMatchTiebreak = "MATCH-TIE-BREAK"
+    override val tvLost = "VERBINDUNG VERLOREN - NEUER VERSUCH..."
+    override val tvFullscreen = "VOLLBILD"
+
+    override val tvSection = "TV-Anzeigetafel"
+    override val tvEnable = "Anzeigetafel auf TV oder Monitor"
+    override val tvEnableHint = "Ein anderes Telefon (oder ein Computer oder ein Chromecast) zeigt den Spielstand live auf einem Monitor. Die Telefone müssen im selben Netz sein: im Hotspot eines der beiden."
+    override val tvAddress = "Adresse der Anzeigetafel"
+    override val tvNoNetwork = "Kein Netz: Schalte auf einem der beiden Telefone den Hotspot ein und verbinde das andere."
+    override val tvScreens: (Int) -> String = { if (it == 0) "Keine Anzeigetafel verbunden" else if (it == 1) "1 Anzeigetafel verbunden" else "$it Anzeigetafeln verbunden" }
+    override val tvQrHint = "Auf dem anderen Telefon: Tennis Score Manager öffnen und «Als Anzeigetafel verwenden» tippen (verbindet sich von selbst), oder den Code mit der Kamera scannen und im Browser öffnen."
+    override val tvLook = "Aussehen der Anzeigetafel"
+    override val tvTitle = "Text unten"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Leer: kein Text" else "Leer: «$it» (Verein und Platz von Seite 1)" }
+    override val tvColorOf: (String) -> String = { "Farbe von $it" }
+    override val tvShowClock = "Matchdauer"
+    override val tvShowTimers = "Aufschlaguhr und Pausen"
+    override val tvShowSets = "Beendete Sätze"
+    override val tvShowMessages = "Meldungen (Breakball, Satzball...)"
+    override val tvShowServe = "Ball beim Aufschläger"
+    override val tvGhost = "Ausgeschaltete Segmente sichtbar"
+    override val tvPreview = "Vorschau auf diesem Telefon"
+    override val tvChromecastHint = "Mit einem Chromecast: Auf dem Anzeigetafel-Telefon «Bildschirm übertragen» verwenden (Smart View bei Samsung). Der Chromecast braucht ein Netz mit Internet: Schalte die mobilen Daten auf dem Hotspot-Telefon ein."
+
+    override val displayMode = "Als Anzeigetafel verwenden"
+    override val displayModeHint = "Dieses Telefon zeigt den Spielstand auf dem Monitor (HDMI-Kabel oder Chromecast)"
+    override val displaySearching = "Suche das Telefon des Schiedsrichters…"
+    override val displaySteps = "1. Schalte auf einem der beiden Telefone den Hotspot ein und verbinde das andere.\n2. Auf dem Telefon des Schiedsrichters: Seite 2 → «TV-Anzeigetafel» ein.\n3. Verbinde dieses Telefon mit dem Monitor (USB-C/HDMI-Kabel) oder übertrage den Bildschirm auf einen Chromecast."
+    override val displayManual = "Adresse (z. B. 192.168.43.1:8080)"
+    override val displayConnect = "Verbinden"
+    override val displayNotFound = "Nicht gefunden. Prüfe, ob beide Telefone im selben Netz sind und die Anzeigetafel in der App des Schiedsrichters eingeschaltet ist."
+    override val displayOnMonitor = "Die Anzeigetafel ist auf dem externen Monitor"
+    override val displayShowHere = "Auch hier zeigen"
+    override val displayBackAgain = "Zum Beenden noch einmal Zurück drücken"
+    override val displayRetry = "Erneut suchen"
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/StringsEs.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/StringsEs.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.ble.BandProtocol
+
+/** Español (España, terminología RFET). */
+object EsStrings : Strings {
+    override val playerTag: (Int) -> String = { "J$it" }
+    override val datePattern = "EEEE, d 'de' MMMM 'de' yyyy"
+
+    override val setupTitle = "Nuevo partido"
+    override val setupSubtitle = "Configuración opcional: puedes dejarlo todo vacío y continuar."
+    override val clubSection = "Club y pista"
+    override val clubName = "Nombre del club de tenis"
+    override val courtNumber = "Número de pista"
+    override val singles = "Individual"
+    override val doubles = "Dobles"
+    override val doublesHint = "En dobles escribe dos nombres por pareja: el tanteo sigue las reglas ITF de dobles."
+    override val player1 = "Jugador 1"
+    override val player2 = "Jugador 2"
+    override val playerName = "Nombre"
+    override val clearFields = "Vaciar campos"
+    override val next = "Siguiente"
+    override val back = "Atrás"
+
+    override val optionsTitle = "Modo y reglas"
+    override val modeSection = "Modo de juego"
+    override val modeReferee = "Juez"
+    override val modeBands = "Pulseras"
+    override val modeRefereeHint = "Los puntos se asignan desde el teléfono, como hace el juez de silla."
+    override val modeBandsHint = "Cada jugador se anota el punto con KEY1 de su propio M5StickS3."
+    override val requirements = "Requisitos"
+    override val bluetooth = "Bluetooth"
+    override val location = "Permiso de ubicación"
+    override val locationServices = "Ubicación activada"
+    override val enable = "Activar"
+    override val allow = "Permitir"
+    override val ok = "OK"
+    override val bandFor: (String) -> String = { "Pulsera de $it" }
+    override val noBand = "Ninguna"
+    override val bandConnected = "Conectada"
+    override val bandConnecting = "Conectando…"
+    override val bandIdle = "No conectada"
+    override val bandOff = "Apagada"
+    override val battery = "Batería"
+    override val bandCharging: (Int) -> String = { "Cargando $it %" }
+    override val bandChargeFull = "Carga completa"
+    override val autoSearch = "Búsqueda automática: enciende las pulseras (botón lateral) y se vinculan solas."
+    override val autoSearchOff = "La búsqueda empieza cuando se cumplen los requisitos de arriba."
+    override val identify = "Identificar"
+    override val swapBands = "Intercambiar J1 ↔ J2"
+    override val bandsOffAtEnd = "Apagar las pulseras al final del partido y al salir"
+    override val bandsOffAtEndHint = "Se vuelven a encender con un clic en el botón lateral."
+    override val bandNotReady = "Pulsera no conectada"
+
+    override val bandSettings = "Ajustes de la pulsera"
+    override val settingsShort = "Ajustes"
+    override val bandSettingsNeedLink = "Conecta la pulsera para ver y cambiar sus ajustes."
+    override val bandFirmwareOld = "El firmware de esta pulsera no tiene ajustes: carga TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Nombre"
+    override val brightness = "Brillo de la pantalla"
+    override val scoreTime = "Marcador visible tras cada punto"
+    override val scoreTimeHint = "El resumen de final de juego dura 2 segundos más."
+    override val beeperVolume = "Volumen del pitido"
+    override val mute = "Silencio"
+    override val off = "No"
+    override val flipDisplay = "Pantalla girada"
+    override val flipDisplayHint = "Para llevar la pulsera en la otra muñeca."
+    override val autoOff = "Apagado automático"
+    override val pairTimeout = "Al encenderla, si no se conecta ningún teléfono"
+    override val lostTimeout = "Si pierde la conexión con el teléfono"
+    override val idleTimeout = "Si sigue conectada pero sin uso"
+    override val estimateFull: (String) -> String = { "Autonomía estimada $it con la carga completa" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h con la carga actual ($p %)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Consumo medio $tot mA: placa y Bluetooth $base · pantalla $dsp · pitido $snd"
+    }
+    override val estimateMeasured = "Consumo base medido en esta pulsera durante el uso."
+    override val estimateTheory = "Estimación teórica: tras 20 minutos de uso se corrige con el consumo medido."
+    override val copyToOther = "Copiar a la otra pulsera"
+    override val powerOff = "Apagar"
+    override val languageSection = "Idioma"
+    override val languageHint = "Se aplica a las pantallas, la voz del juez, el marcador de TV y las pulseras."
+    override val audioSection = "Audio y voz"
+    override val voiceCalls = "Cantos del juez por voz"
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Archivos generados: $n/$tot" }
+    override val voiceFilesHint = "Todo funciona sin internet con las voces instaladas en el teléfono. Las grabaciones personalizadas (ZIP) siempre tienen prioridad sobre la síntesis de voz."
+    override val generateVoice = "Generar archivos"
+    override val generating: (Int, Int) -> String = { n, tot -> "Generando $n/$tot…" }
+    override val importVoiceZip = "Importar ZIP"
+    override val deleteCustomVoice = "Quitar grabaciones"
+    override val ttsEngine = "Motor de síntesis de voz"
+    override val engineDefault = "Predeterminado del teléfono"
+    override val ttsVoice = "Voz"
+    override val voiceAuto = "Automática (la mejor sin conexión)"
+    override val voiceName: (String) -> String = { "Voz $it" }
+    override val online = "en línea"
+    override val offline = "sin conexión"
+    override val voiceFilesMode = "Usar archivos de audio pregenerados"
+    override val voiceFilesModeHint = "Normalmente cada canto se lee en una sola frase (más natural). Actívalo para usar los archivos generados, por ejemplo para llevarte sin conexión una voz en línea."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Grabaciones personalizadas: $n/$tot" }
+    override val testVoice = "Probar voz"
+    override val stopVoiceTest = "Detener la prueba"
+    override val ttsMissing = "La voz en español de la síntesis de voz no está instalada en el teléfono."
+    override val installVoice = "Instalar voz"
+    override val formatSection = "Formato del partido"
+    override val formatBestOfThree = "3 sets · tie-break a 7"
+    override val formatBestOfThreeHint = "Al mejor de tres sets, tie-break con 6-6 en cada set."
+    override val formatMatchTiebreak = "2 sets + súper tie-break a 10"
+    override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
+    override val noAd = "Sin ventaja (punto decisivo)"
+    override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
+    override val coinToss = "Sorteo"
+    override val tossCoin = "Lanzar la moneda"
+    override val tossWinner: (String) -> String = { "Gana el sorteo: $it" }
+    override val tossHint = "Quien gana elige: saque, resto o lado. Indica aquí la elección."
+    override val serving = "Al servicio"
+    override val courtSides = "Lados de la pista"
+    override val umpireView = "Vista desde la silla del juez"
+    override val swapSides = "Cambiar lados"
+    override val firstServerOf: (String) -> String = { "Saca primero ($it)" }
+    override val left = "Izquierda"
+    override val right = "Derecha"
+    override val net = "RED"
+    override val umpireChair = "Juez de silla"
+
+    override val locationDialogTitle = "Activa la ubicación"
+    override val locationDialogText = "Si no activas la ubicación, el lugar no aparecerá en el resumen del partido."
+    override val continueWithout = "Continuar sin ella"
+    override val bandsRequiredTitle = "Bluetooth y ubicación obligatorios"
+    override val bandsRequiredText = "Para usar las pulseras activa el Bluetooth, concede el permiso de ubicación y mantén la ubicación activada."
+    override val bandsMissingTitle = "Pulseras no vinculadas"
+    override val bandsMissingText: (String) -> String = { "Falta la pulsera de: $it. ¿Continuar de todos modos?" }
+    override val continueAnyway = "Continuar"
+    override val cancel = "Cancelar"
+
+    override val startMatch = "INICIO DEL PARTIDO"
+    override val startHint = "Pulsa el botón para empezar"
+    override val startHintBands = "Pulsa el botón o KEY1 en una pulsera"
+    override val startButton = "Empezar partido"
+    override val resumeSaved = "Reanudar partido suspendido"
+    override val noSavedMatches = "No hay partidos suspendidos guardados."
+    override val savedMatchesTitle = "Partidos suspendidos"
+    override val delete = "Eliminar"
+    override val vs = "contra"
+
+    override val matchTime = "Match Time"
+    override val setsHeader = "SETS"
+    override val gamesHeader = "JUEGOS"
+    override val undoPoint = "Anular punto"
+    override val suspend = "Suspender"
+    override val resume = "Reanudar"
+    override val audioOn = "Audio On"
+    override val audioOff = "Audio Off"
+    override val newMatch = "Nuevo partido"
+    override val suspendedOverlay = "PARTIDO SUSPENDIDO"
+    override val newMatchConfirmTitle = "¿Nuevo partido?"
+    override val newMatchConfirmText = "El partido en curso queda guardado entre los partidos suspendidos y podrás reanudarlo."
+    override val endDialogTitle = "Juego, set y partido"
+    override val endDialogText: (String, String) -> String = { name, score -> "Gana $name\n$score" }
+    override val matchConcluded = "Partido terminado"
+    override val undoLastPoint = "Anular el último punto"
+    override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
+    override val whoServesFirst: (String) -> String = { "¿Quién saca primero en $it?" }
+    override val confirm = "Confirmar"
+    override val backDisabled = "Durante el partido usa «Nuevo partido» o «Salir»."
+    override val exit = "Salir"
+    override val exitConfirmTitle = "¿Salir de la app?"
+    override val exitConfirmText = "El partido queda guardado entre los partidos suspendidos y podrás reanudarlo."
+    override val exitConfirmBands = "Las pulseras se apagarán."
+
+    override val msgChangeEnds = "CAMBIO DE LADO"
+    override val msgTiebreak = "TIE-BREAK"
+    override val msgMatchTiebreak = "SÚPER TIE-BREAK"
+    override val msgSetWon: (String) -> String = { "SET $it" }
+    override val msgSetPoint = "BOLA DE SET"
+    override val msgMatchPoint = "BOLA DE PARTIDO"
+    override val msgBreakPoint = "BOLA DE BREAK"
+    override val msgDecidingPoint = "PUNTO DECISIVO"
+    override val msgPointUndone = "PUNTO ANULADO"
+    override val msgSuspended = "PARTIDO SUSPENDIDO"
+    override val msgResumed = "PARTIDO REANUDADO"
+    override val msgBandConnected: (String) -> String = { "PULSERA $it CONECTADA" }
+    override val msgBandLost: (String) -> String = { "PULSERA $it DESCONECTADA" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "PULSERA $n APAGADA" + when (why) {
+            BandProtocol.OFF_IDLE -> " (SIN USO)"
+            BandProtocol.OFF_BATTERY -> " (BATERÍA AGOTADA)"
+            BandProtocol.OFF_TIMEOUT -> " (SIN TELÉFONO)"
+            else -> ""
+        }
+    }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "PULSERA $n: BATERÍA $p %" }
+    override val bandBatteryLow = "BATERÍA BAJA"
+    override val autonomy: (String) -> String = { "autonomía ~$it" }
+    override val bandsBattery = "Batería de las pulseras"
+
+    override val notifChannel = "Partido en curso"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Partido en curso · " + when {
+            bands && tv -> "pulseras y marcador de TV activos"
+            tv -> "marcador de TV activo"
+            else -> "pulseras activas"
+        }
+    }
+
+    override val bandPaired = "VINCULADA A"
+    override val bandPlay = "JUEGUEN"
+    override val bandChangeEnds = "CAMBIO DE LADO"
+    override val bandTiebreak = "TIE-BREAK"
+    override val bandSet = "SET"
+    override val bandSuspended = "SUSPENDIDO"
+    override val bandGameSetMatch = "JUEGO SET PARTIDO"
+    override val bandMatchOver = "FIN DEL PARTIDO"
+    override val bandAppClosed = "APP CERRADA"
+    override val bandOffFromApp = "APAGANDO"
+
+    override val summaryTitle = "Partido terminado"
+    override val winner = "Ganador"
+    override val duration = "Duración"
+    override val startTime = "Inicio"
+    override val endTime = "Fin"
+    override val date = "Fecha"
+    override val club = "Club"
+    override val court = "Pista"
+    override val place = "Lugar"
+    override val placeUnavailable = "Ubicación no disponible"
+    override val format = "Formato"
+    override val pointsWon = "Puntos ganados"
+    override val gamesWon = "Juegos ganados"
+    override val result = "Resultado"
+    override val saveHistory = "Guardar en el historial"
+    override val share = "Compartir"
+    override val saveDialogTitle = "Guardar en el historial"
+    override val fileName = "Nombre"
+    override val folder = "Carpeta"
+    override val chooseFolder = "Elegir carpeta"
+    override val defaultFolder = "Carpeta de la app (predeterminada)"
+    override val formatReport = "Resumen (.txt)"
+    override val formatData = "Datos del partido (.json)"
+    override val formatImage = "Imagen (.png)"
+    override val save = "Guardar"
+    override val savedTo: (String) -> String = { "Guardado en $it" }
+    override val saveError = "No se pudo guardar"
+    override val shareSubject = "Resultado del partido de tenis"
+    override val playerDefault: (Int) -> String = { "Jugador $it" }
+    override val teamJoiner = " y "
+    override val generatedWith = "Creado con Tennis Score Manager"
+
+    override val tvGames = "JUEGOS"
+    override val tvServe = "SAQUE"
+    override val tvChangeover = "CAMBIO DE LADO"
+    override val tvSetBreak = "DESCANSO"
+    override val tvTiebreakBreak = "PAUSA"
+    override val tvWaiting = "ESPERANDO EL PARTIDO"
+    override val tvReady = "LISTOS PARA JUGAR"
+    override val tvSuspended = "PARTIDO SUSPENDIDO"
+    override val tvWinner = "GANADOR"
+    override val tvMatchTiebreak = "SÚPER TIE-BREAK"
+    override val tvLost = "CONEXIÓN PERDIDA - RECONECTANDO..."
+    override val tvFullscreen = "PANTALLA COMPLETA"
+
+    override val tvSection = "Marcador en TV"
+    override val tvEnable = "Marcador en TV o monitor"
+    override val tvEnableHint = "Otro teléfono (o un ordenador, o un Chromecast) muestra el marcador en directo en un monitor. Los teléfonos deben estar en la misma red: el punto de acceso de uno de los dos."
+    override val tvAddress = "Dirección del marcador"
+    override val tvNoNetwork = "Sin red: activa el punto de acceso en uno de los dos teléfonos y conecta el otro."
+    override val tvScreens: (Int) -> String = { if (it == 0) "Ningún marcador conectado" else if (it == 1) "1 marcador conectado" else "$it marcadores conectados" }
+    override val tvQrHint = "En el otro teléfono: abre Tennis Score Manager y toca «Usar como marcador» (se conecta solo), o escanea el código con la cámara y ábrelo en el navegador."
+    override val tvLook = "Aspecto del marcador"
+    override val tvTitle = "Texto inferior"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vacío: sin texto" else "Vacío: «$it» (club y pista de la página 1)" }
+    override val tvColorOf: (String) -> String = { "Color de $it" }
+    override val tvShowClock = "Tiempo de partido"
+    override val tvShowTimers = "Reloj de saque y descansos"
+    override val tvShowSets = "Sets terminados"
+    override val tvShowMessages = "Mensajes (bola de break, bola de set...)"
+    override val tvShowServe = "Pelota junto a quien saca"
+    override val tvGhost = "Segmentos apagados visibles"
+    override val tvPreview = "Vista previa en este teléfono"
+    override val tvChromecastHint = "Con un Chromecast: en el teléfono-marcador usa «Enviar pantalla» (Smart View en Samsung). El Chromecast necesita una red con internet: activa los datos móviles en el teléfono que hace de punto de acceso."
+
+    override val displayMode = "Usar como marcador"
+    override val displayModeHint = "Este teléfono muestra el marcador en el monitor (cable HDMI o Chromecast)"
+    override val displaySearching = "Buscando el teléfono del juez…"
+    override val displaySteps = "1. Activa el punto de acceso en uno de los dos teléfonos y conecta el otro.\n2. En el teléfono del juez: página 2 → «Marcador en TV» activado.\n3. Conecta este teléfono al monitor (cable USB-C/HDMI) o envía la pantalla a un Chromecast."
+    override val displayManual = "Dirección (p. ej. 192.168.43.1:8080)"
+    override val displayConnect = "Conectar"
+    override val displayNotFound = "No encontrado. Comprueba que los dos teléfonos están en la misma red y que el marcador está activado en la app del juez."
+    override val displayOnMonitor = "El marcador está en el monitor externo"
+    override val displayShowHere = "Mostrar también aquí"
+    override val displayBackAgain = "Pulsa atrás otra vez para salir"
+    override val displayRetry = "Buscar de nuevo"
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/StringsFr.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/StringsFr.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.ble.BandProtocol
+
+/** "de Sinner", "d'Alcaraz". */
+private fun de(name: String) = if (name.firstOrNull()?.lowercaseChar()?.let { it in "aeiouyhàâäéèêëîïôöûüœ" } == true) "d'$name" else "de $name"
+
+/** Français (France, terminologie FFT). */
+object FrStrings : Strings {
+    override val playerTag: (Int) -> String = { "J$it" }
+    override val datePattern = "EEEE d MMMM yyyy"
+
+    override val setupTitle = "Nouveau match"
+    override val setupSubtitle = "Configuration facultative : vous pouvez tout laisser vide et continuer."
+    override val clubSection = "Club et court"
+    override val clubName = "Nom du club de tennis"
+    override val courtNumber = "Numéro du court"
+    override val singles = "Simple"
+    override val doubles = "Double"
+    override val doublesHint = "En double, saisissez deux noms par équipe : le décompte suit les règles ITF du double."
+    override val player1 = "Joueur 1"
+    override val player2 = "Joueur 2"
+    override val playerName = "Nom"
+    override val clearFields = "Effacer les champs"
+    override val next = "Suivant"
+    override val back = "Retour"
+
+    override val optionsTitle = "Mode et règles"
+    override val modeSection = "Mode de jeu"
+    override val modeReferee = "Arbitre"
+    override val modeBands = "Bracelets"
+    override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
+    override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
+    override val requirements = "Prérequis"
+    override val bluetooth = "Bluetooth"
+    override val location = "Autorisation de localisation"
+    override val locationServices = "Localisation activée"
+    override val enable = "Activer"
+    override val allow = "Autoriser"
+    override val ok = "OK"
+    override val bandFor: (String) -> String = { "Bracelet ${de(it)}" }
+    override val noBand = "Aucun"
+    override val bandConnected = "Connecté"
+    override val bandConnecting = "Connexion…"
+    override val bandIdle = "Non connecté"
+    override val bandOff = "Éteint"
+    override val battery = "Batterie"
+    override val bandCharging: (Int) -> String = { "En charge $it %" }
+    override val bandChargeFull = "Charge terminée"
+    override val autoSearch = "Recherche automatique : allumez les bracelets (bouton latéral), ils s'associent tout seuls."
+    override val autoSearchOff = "La recherche démarre dès que les prérequis ci-dessus sont remplis."
+    override val identify = "Identifier"
+    override val swapBands = "Échanger J1 ↔ J2"
+    override val bandsOffAtEnd = "Éteindre les bracelets en fin de match et en quittant"
+    override val bandsOffAtEndHint = "Un clic sur le bouton latéral les rallume."
+    override val bandNotReady = "Bracelet non connecté"
+
+    override val bandSettings = "Réglages du bracelet"
+    override val settingsShort = "Réglages"
+    override val bandSettingsNeedLink = "Connectez le bracelet pour voir et modifier ses réglages."
+    override val bandFirmwareOld = "Le firmware de ce bracelet n'a pas de réglages : chargez TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Nom"
+    override val brightness = "Luminosité de l'écran"
+    override val scoreTime = "Score affiché après chaque point"
+    override val scoreTimeHint = "Le résumé de fin de jeu reste affiché 2 secondes de plus."
+    override val beeperVolume = "Volume du bip"
+    override val mute = "Muet"
+    override val off = "Non"
+    override val flipDisplay = "Écran retourné"
+    override val flipDisplayHint = "Pour porter le bracelet à l'autre poignet."
+    override val autoOff = "Extinction automatique"
+    override val pairTimeout = "À l'allumage, si aucun téléphone ne se connecte"
+    override val lostTimeout = "S'il perd la connexion avec le téléphone"
+    override val idleTimeout = "S'il reste connecté mais inactif"
+    override val estimateFull: (String) -> String = { "Autonomie estimée $it avec une charge complète" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h avec la charge actuelle ($p %)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Consommation moyenne $tot mA : carte et Bluetooth $base · écran $dsp · bip $snd"
+    }
+    override val estimateMeasured = "Consommation de base mesurée sur ce bracelet pendant l'utilisation."
+    override val estimateTheory = "Estimation théorique : après 20 minutes d'utilisation, elle se corrige avec la consommation mesurée."
+    override val copyToOther = "Copier sur l'autre bracelet"
+    override val powerOff = "Éteindre"
+    override val languageSection = "Langue"
+    override val languageHint = "S'applique aux écrans, à la voix de l'arbitre, au tableau d'affichage TV et aux bracelets."
+    override val audioSection = "Audio et voix"
+    override val voiceCalls = "Annonces vocales de l'arbitre"
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Fichiers générés : $n/$tot" }
+    override val voiceFilesHint = "Tout fonctionne sans internet avec les voix installées sur le téléphone. Les enregistrements personnalisés (ZIP) ont toujours la priorité sur la synthèse vocale."
+    override val generateVoice = "Générer les fichiers"
+    override val generating: (Int, Int) -> String = { n, tot -> "Génération $n/$tot…" }
+    override val importVoiceZip = "Importer un ZIP"
+    override val deleteCustomVoice = "Supprimer les enregistrements"
+    override val ttsEngine = "Moteur de synthèse vocale"
+    override val engineDefault = "Par défaut du téléphone"
+    override val ttsVoice = "Voix"
+    override val voiceAuto = "Automatique (meilleure hors ligne)"
+    override val voiceName: (String) -> String = { "Voix $it" }
+    override val online = "en ligne"
+    override val offline = "hors ligne"
+    override val voiceFilesMode = "Utiliser des fichiers audio pré-générés"
+    override val voiceFilesModeHint = "Par défaut, chaque annonce est lue d'une seule phrase (plus naturel). Activez cette option pour lire les fichiers générés, par exemple pour emporter hors ligne une voix en ligne."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Enregistrements personnalisés : $n/$tot" }
+    override val testVoice = "Tester la voix"
+    override val stopVoiceTest = "Arrêter le test"
+    override val ttsMissing = "La voix française de la synthèse vocale n'est pas installée sur ce téléphone."
+    override val installVoice = "Installer la voix"
+    override val formatSection = "Format du match"
+    override val formatBestOfThree = "3 manches · jeu décisif à 7"
+    override val formatBestOfThreeHint = "Au meilleur des trois manches, jeu décisif à 6-6 dans chaque manche."
+    override val formatMatchTiebreak = "2 manches + super jeu décisif à 10"
+    override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
+    override val noAd = "No-Ad (point décisif)"
+    override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
+    override val coinToss = "Tirage au sort (toss)"
+    override val tossCoin = "Lancer la pièce"
+    override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
+    override val tossHint = "Le gagnant choisit : service, relance ou côté. Indiquez ici le choix."
+    override val serving = "Au service"
+    override val courtSides = "Côtés du court"
+    override val umpireView = "Vue depuis la chaise d'arbitre"
+    override val swapSides = "Inverser les côtés"
+    override val firstServerOf: (String) -> String = { "Sert en premier ($it)" }
+    override val left = "Gauche"
+    override val right = "Droite"
+    override val net = "FILET"
+    override val umpireChair = "Arbitre de chaise"
+
+    override val locationDialogTitle = "Activer la localisation"
+    override val locationDialogText = "Sans la localisation, le lieu ne pourra pas figurer dans le résumé du match."
+    override val continueWithout = "Continuer sans"
+    override val bandsRequiredTitle = "Bluetooth et localisation obligatoires"
+    override val bandsRequiredText = "Pour utiliser les bracelets, activez le Bluetooth, autorisez la localisation et laissez-la activée."
+    override val bandsMissingTitle = "Bracelets non associés"
+    override val bandsMissingText: (String) -> String = { "Il manque le bracelet de : $it. Continuer quand même ?" }
+    override val continueAnyway = "Continuer"
+    override val cancel = "Annuler"
+
+    override val startMatch = "DÉBUT DU MATCH"
+    override val startHint = "Appuyez sur le bouton pour commencer"
+    override val startHintBands = "Appuyez sur le bouton ou sur KEY1 d'un bracelet"
+    override val startButton = "Commencer le match"
+    override val resumeSaved = "Reprendre un match suspendu"
+    override val noSavedMatches = "Aucun match suspendu enregistré."
+    override val savedMatchesTitle = "Matchs suspendus"
+    override val delete = "Supprimer"
+    override val vs = "contre"
+
+    override val matchTime = "Match Time"
+    override val setsHeader = "SETS"
+    override val gamesHeader = "JEUX"
+    override val undoPoint = "Annuler le point"
+    override val suspend = "Suspendre"
+    override val resume = "Reprendre"
+    override val audioOn = "Audio On"
+    override val audioOff = "Audio Off"
+    override val newMatch = "Nouveau match"
+    override val suspendedOverlay = "MATCH SUSPENDU"
+    override val newMatchConfirmTitle = "Nouveau match ?"
+    override val newMatchConfirmText = "Le match en cours reste enregistré parmi les matchs suspendus et pourra être repris."
+    override val endDialogTitle = "Jeu, set et match"
+    override val endDialogText: (String, String) -> String = { name, score -> "Victoire de $name\n$score" }
+    override val matchConcluded = "Match terminé"
+    override val undoLastPoint = "Annuler le dernier point"
+    override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
+    override val whoServesFirst: (String) -> String = { "Qui sert en premier chez $it ?" }
+    override val confirm = "Confirmer"
+    override val backDisabled = "Pendant le match, utilisez « Nouveau match » ou « Quitter »."
+    override val exit = "Quitter"
+    override val exitConfirmTitle = "Quitter l'application ?"
+    override val exitConfirmText = "Le match reste enregistré parmi les matchs suspendus et pourra être repris."
+    override val exitConfirmBands = "Les bracelets seront éteints."
+
+    override val msgChangeEnds = "CHANGEMENT DE CÔTÉ"
+    override val msgTiebreak = "JEU DÉCISIF"
+    override val msgMatchTiebreak = "SUPER JEU DÉCISIF"
+    override val msgSetWon: (String) -> String = { "MANCHE $it" }
+    override val msgSetPoint = "BALLE DE SET"
+    override val msgMatchPoint = "BALLE DE MATCH"
+    override val msgBreakPoint = "BALLE DE BREAK"
+    override val msgDecidingPoint = "POINT DÉCISIF"
+    override val msgPointUndone = "POINT ANNULÉ"
+    override val msgSuspended = "MATCH SUSPENDU"
+    override val msgResumed = "REPRISE DU MATCH"
+    override val msgBandConnected: (String) -> String = { "BRACELET $it CONNECTÉ" }
+    override val msgBandLost: (String) -> String = { "BRACELET $it DÉCONNECTÉ" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "BRACELET $n ÉTEINT" + when (why) {
+            BandProtocol.OFF_IDLE -> " (INACTIF)"
+            BandProtocol.OFF_BATTERY -> " (BATTERIE VIDE)"
+            BandProtocol.OFF_TIMEOUT -> " (AUCUN TÉLÉPHONE)"
+            else -> ""
+        }
+    }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "BRACELET $n : BATTERIE $p %" }
+    override val bandBatteryLow = "BATTERIE FAIBLE"
+    override val autonomy: (String) -> String = { "autonomie ~$it" }
+    override val bandsBattery = "Batterie des bracelets"
+
+    override val notifChannel = "Match en cours"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Match en cours · " + when {
+            bands && tv -> "bracelets et tableau TV actifs"
+            tv -> "tableau TV actif"
+            else -> "bracelets actifs"
+        }
+    }
+
+    override val bandPaired = "ASSOCIE A"
+    override val bandPlay = "JOUEZ"
+    override val bandChangeEnds = "CHANGEMENT DE COTE"
+    override val bandTiebreak = "JEU DECISIF"
+    override val bandSet = "MANCHE"
+    override val bandSuspended = "SUSPENDU"
+    override val bandGameSetMatch = "JEU SET ET MATCH"
+    override val bandMatchOver = "FIN DU MATCH"
+    override val bandAppClosed = "APPLI FERMEE"
+    override val bandOffFromApp = "EXTINCTION"
+
+    override val summaryTitle = "Match terminé"
+    override val winner = "Vainqueur"
+    override val duration = "Durée"
+    override val startTime = "Début"
+    override val endTime = "Fin"
+    override val date = "Date"
+    override val club = "Club"
+    override val court = "Court"
+    override val place = "Lieu"
+    override val placeUnavailable = "Position non disponible"
+    override val format = "Format"
+    override val pointsWon = "Points gagnés"
+    override val gamesWon = "Jeux gagnés"
+    override val result = "Résultat"
+    override val saveHistory = "Enregistrer dans l'historique"
+    override val share = "Partager"
+    override val saveDialogTitle = "Enregistrer dans l'historique"
+    override val fileName = "Nom"
+    override val folder = "Dossier"
+    override val chooseFolder = "Choisir un dossier"
+    override val defaultFolder = "Dossier de l'application (par défaut)"
+    override val formatReport = "Compte rendu (.txt)"
+    override val formatData = "Données du match (.json)"
+    override val formatImage = "Image (.png)"
+    override val save = "Enregistrer"
+    override val savedTo: (String) -> String = { "Enregistré dans $it" }
+    override val saveError = "Échec de l'enregistrement"
+    override val shareSubject = "Résultat du match de tennis"
+    override val playerDefault: (Int) -> String = { "Joueur $it" }
+    override val teamJoiner = " et "
+    override val generatedWith = "Créé avec Tennis Score Manager"
+
+    override val tvGames = "JEUX"
+    override val tvServe = "SERVICE"
+    override val tvChangeover = "CHANGEMENT DE CÔTÉ"
+    override val tvSetBreak = "PAUSE SET"
+    override val tvTiebreakBreak = "PAUSE"
+    override val tvWaiting = "EN ATTENTE DU MATCH"
+    override val tvReady = "PRÊTS À JOUER"
+    override val tvSuspended = "MATCH SUSPENDU"
+    override val tvWinner = "VAINQUEUR"
+    override val tvTiebreak = "JEU DÉCISIF"
+    override val tvMatchTiebreak = "SUPER JEU DÉCISIF"
+    override val tvLost = "CONNEXION PERDUE - RECONNEXION..."
+    override val tvFullscreen = "PLEIN ÉCRAN"
+
+    override val tvSection = "Tableau d'affichage TV"
+    override val tvEnable = "Tableau d'affichage sur TV ou écran"
+    override val tvEnableHint = "Un autre téléphone (ou un ordinateur, ou un Chromecast) affiche le score en direct sur un écran. Les téléphones doivent être sur le même réseau : le point d'accès de l'un des deux."
+    override val tvAddress = "Adresse du tableau d'affichage"
+    override val tvNoNetwork = "Aucun réseau : activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre."
+    override val tvScreens: (Int) -> String = { if (it == 0) "Aucun tableau connecté" else if (it == 1) "1 tableau connecté" else "$it tableaux connectés" }
+    override val tvQrHint = "Sur l'autre téléphone : ouvrez Tennis Score Manager et touchez « Utiliser comme tableau » (il se connecte tout seul), ou scannez le code avec l'appareil photo et ouvrez-le dans le navigateur."
+    override val tvLook = "Apparence du tableau"
+    override val tvTitle = "Texte en bas"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vide : aucun texte" else "Vide : « $it » (club et court de la page 1)" }
+    override val tvColorOf: (String) -> String = { "Couleur ${de(it)}" }
+    override val tvShowClock = "Durée du match"
+    override val tvShowTimers = "Chrono du service et des pauses"
+    override val tvShowSets = "Manches terminées"
+    override val tvShowMessages = "Messages (balle de break, balle de set...)"
+    override val tvShowServe = "Balle à côté du serveur"
+    override val tvGhost = "Segments éteints visibles"
+    override val tvPreview = "Aperçu sur ce téléphone"
+    override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez « Caster l'écran » (Smart View sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
+
+    override val displayMode = "Utiliser comme tableau"
+    override val displayModeHint = "Ce téléphone affiche le score sur l'écran (câble HDMI ou Chromecast)"
+    override val displaySearching = "Recherche du téléphone de l'arbitre…"
+    override val displaySteps = "1. Activez le point d'accès sur l'un des deux téléphones et connectez-y l'autre.\n2. Sur le téléphone de l'arbitre : page 2 → « Tableau d'affichage TV » activé.\n3. Branchez ce téléphone à l'écran (câble USB-C/HDMI) ou castez l'écran sur un Chromecast."
+    override val displayManual = "Adresse (ex. 192.168.43.1:8080)"
+    override val displayConnect = "Connecter"
+    override val displayNotFound = "Introuvable. Vérifiez que les deux téléphones sont sur le même réseau et que le tableau est activé dans l'application de l'arbitre."
+    override val displayOnMonitor = "Le tableau est sur l'écran externe"
+    override val displayShowHere = "Afficher aussi ici"
+    override val displayBackAgain = "Appuyez encore sur retour pour quitter"
+    override val displayRetry = "Chercher à nouveau"
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/StringsPt.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/StringsPt.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.ble.BandProtocol
+
+/**
+ * Português: grafia do Brasil onde as variantes divergem (tela, salvar, quadra), termos das regras
+ * da FPT e da CBT (árbitro de cadeira, sorteio, tie-break decisivo).
+ */
+object PtStrings : Strings {
+    override val playerTag: (Int) -> String = { "J$it" }
+    override val datePattern = "EEEE, d 'de' MMMM 'de' yyyy"
+
+    override val setupTitle = "Nova partida"
+    override val setupSubtitle = "Configuração opcional: você pode deixar tudo em branco e continuar."
+    override val clubSection = "Clube e quadra"
+    override val clubName = "Nome do clube de tênis"
+    override val courtNumber = "Número da quadra"
+    override val singles = "Simples"
+    override val doubles = "Duplas"
+    override val doublesHint = "Nas duplas, escreva dois nomes por equipe: a contagem segue as regras ITF de duplas."
+    override val player1 = "Jogador 1"
+    override val player2 = "Jogador 2"
+    override val playerName = "Nome"
+    override val clearFields = "Limpar campos"
+    override val next = "Avançar"
+    override val back = "Voltar"
+
+    override val optionsTitle = "Modo e regras"
+    override val modeSection = "Modo de jogo"
+    override val modeReferee = "Árbitro"
+    override val modeBands = "Pulseiras"
+    override val modeRefereeHint = "Os pontos são marcados no telefone, como faz o árbitro de cadeira."
+    override val modeBandsHint = "Cada jogador marca o ponto com o KEY1 do seu próprio M5StickS3."
+    override val requirements = "Requisitos"
+    override val bluetooth = "Bluetooth"
+    override val location = "Permissão de localização"
+    override val locationServices = "Localização ativada"
+    override val enable = "Ativar"
+    override val allow = "Permitir"
+    override val ok = "OK"
+    override val bandFor: (String) -> String = { "Pulseira de $it" }
+    override val noBand = "Nenhuma"
+    override val bandConnected = "Conectada"
+    override val bandConnecting = "Conectando…"
+    override val bandIdle = "Não conectada"
+    override val bandOff = "Desligada"
+    override val battery = "Bateria"
+    override val bandCharging: (Int) -> String = { "Carregando $it%" }
+    override val bandChargeFull = "Carga completa"
+    override val autoSearch = "Busca automática: ligue as pulseiras (botão lateral), elas se pareiam sozinhas."
+    override val autoSearchOff = "A busca começa quando os requisitos acima estiverem ok."
+    override val identify = "Identificar"
+    override val swapBands = "Trocar J1 ↔ J2"
+    override val bandsOffAtEnd = "Desligar as pulseiras no fim da partida e ao sair"
+    override val bandsOffAtEndHint = "Um clique no botão lateral volta a ligá-las."
+    override val bandNotReady = "Pulseira não conectada"
+
+    override val bandSettings = "Ajustes da pulseira"
+    override val settingsShort = "Ajustes"
+    override val bandSettingsNeedLink = "Conecte a pulseira para ver e mudar os ajustes."
+    override val bandFirmwareOld = "O firmware desta pulseira não tem ajustes: carregue o TSM_Band.ino 2.0."
+    override val bandFirmware: (String) -> String = { "Firmware $it" }
+    override val bandName = "Nome"
+    override val brightness = "Brilho da tela"
+    override val scoreTime = "Placar visível após cada ponto"
+    override val scoreTimeHint = "O resumo do fim do jogo fica 2 segundos a mais."
+    override val beeperVolume = "Volume do bipe"
+    override val mute = "Mudo"
+    override val off = "Não"
+    override val flipDisplay = "Tela invertida"
+    override val flipDisplayHint = "Para usar a pulseira no outro pulso."
+    override val autoOff = "Desligamento automático"
+    override val pairTimeout = "Ao ligar, se nenhum telefone se conectar"
+    override val lostTimeout = "Se perder a conexão com o telefone"
+    override val idleTimeout = "Se ficar conectada mas sem uso"
+    override val estimateFull: (String) -> String = { "Autonomia estimada $it com a carga completa" }
+    override val estimateNow: (String, Int) -> String = { h, p -> "$h com a carga atual ($p%)" }
+    override val estimateBreakdown: (String, String, String, String) -> String = { tot, base, dsp, snd ->
+        "Consumo médio $tot mA: placa e Bluetooth $base · tela $dsp · bipe $snd"
+    }
+    override val estimateMeasured = "Consumo base medido nesta pulseira durante o uso."
+    override val estimateTheory = "Estimativa teórica: após 20 minutos de uso ela é corrigida com o consumo medido."
+    override val copyToOther = "Copiar para a outra pulseira"
+    override val powerOff = "Desligar"
+    override val languageSection = "Idioma"
+    override val languageHint = "Vale para as telas, a voz do árbitro, o placar na TV e as pulseiras."
+    override val audioSection = "Áudio e voz"
+    override val voiceCalls = "Anúncios do árbitro por voz"
+    override val voiceFiles: (Int, Int) -> String = { n, tot -> "Arquivos gerados: $n/$tot" }
+    override val voiceFilesHint = "Tudo funciona sem internet com as vozes instaladas no telefone. As gravações personalizadas (ZIP) sempre têm prioridade sobre a síntese de voz."
+    override val generateVoice = "Gerar arquivos"
+    override val generating: (Int, Int) -> String = { n, tot -> "Gerando $n/$tot…" }
+    override val importVoiceZip = "Importar ZIP"
+    override val deleteCustomVoice = "Remover gravações"
+    override val ttsEngine = "Mecanismo de síntese de voz"
+    override val engineDefault = "Padrão do telefone"
+    override val ttsVoice = "Voz"
+    override val voiceAuto = "Automática (melhor offline)"
+    override val voiceName: (String) -> String = { "Voz $it" }
+    override val online = "online"
+    override val offline = "offline"
+    override val voiceFilesMode = "Usar arquivos de áudio pré-gerados"
+    override val voiceFilesModeHint = "Normalmente cada anúncio é lido numa única frase (mais natural). Ative para usar os arquivos gerados, por exemplo para levar offline uma voz online."
+    override val customRecordings: (Int, Int) -> String = { n, tot -> "Gravações personalizadas: $n/$tot" }
+    override val testVoice = "Testar voz"
+    override val stopVoiceTest = "Parar o teste"
+    override val ttsMissing = "A voz em português da síntese de voz não está instalada no telefone."
+    override val installVoice = "Instalar voz"
+    override val formatSection = "Formato da partida"
+    override val formatBestOfThree = "3 sets · tie-break a 7"
+    override val formatBestOfThreeHint = "Melhor de três sets, tie-break no 6-6 em cada set."
+    override val formatMatchTiebreak = "2 sets + tie-break decisivo a 10"
+    override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
+    override val noAd = "Sem vantagem (ponto decisivo)"
+    override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val coinToss = "Sorteio"
+    override val tossCoin = "Jogar a moeda"
+    override val tossWinner: (String) -> String = { "Venceu o sorteio: $it" }
+    override val tossHint = "Quem vence escolhe: serviço, recepção ou lado. Marque a escolha aqui."
+    override val serving = "No serviço"
+    override val courtSides = "Lados da quadra"
+    override val umpireView = "Vista da cadeira do árbitro"
+    override val swapSides = "Inverter lados"
+    override val firstServerOf: (String) -> String = { "Serve primeiro ($it)" }
+    override val left = "Esquerda"
+    override val right = "Direita"
+    override val net = "REDE"
+    override val umpireChair = "Árbitro de cadeira"
+
+    override val locationDialogTitle = "Ative a localização"
+    override val locationDialogText = "Sem a localização, o local não aparece no resumo da partida."
+    override val continueWithout = "Continuar sem"
+    override val bandsRequiredTitle = "Bluetooth e localização obrigatórios"
+    override val bandsRequiredText = "Para usar as pulseiras, ative o Bluetooth, conceda a permissão de localização e mantenha a localização ativada."
+    override val bandsMissingTitle = "Pulseiras não associadas"
+    override val bandsMissingText: (String) -> String = { "Falta a pulseira de: $it. Continuar mesmo assim?" }
+    override val continueAnyway = "Continuar"
+    override val cancel = "Cancelar"
+
+    override val startMatch = "INÍCIO DA PARTIDA"
+    override val startHint = "Toque no botão para começar"
+    override val startHintBands = "Toque no botão ou aperte KEY1 numa pulseira"
+    override val startButton = "Começar partida"
+    override val resumeSaved = "Retomar partida suspensa"
+    override val noSavedMatches = "Nenhuma partida suspensa salva."
+    override val savedMatchesTitle = "Partidas suspensas"
+    override val delete = "Excluir"
+    override val vs = "x"
+
+    override val matchTime = "Match Time"
+    override val setsHeader = "SETS"
+    override val gamesHeader = "JOGOS"
+    override val undoPoint = "Anular ponto"
+    override val suspend = "Suspender"
+    override val resume = "Retomar"
+    override val audioOn = "Audio On"
+    override val audioOff = "Audio Off"
+    override val newMatch = "Nova partida"
+    override val suspendedOverlay = "PARTIDA SUSPENSA"
+    override val newMatchConfirmTitle = "Nova partida?"
+    override val newMatchConfirmText = "A partida em andamento fica salva entre as partidas suspensas e você poderá retomá-la."
+    override val endDialogTitle = "Jogo, set e partida"
+    override val endDialogText: (String, String) -> String = { name, score -> "Vitória de $name\n$score" }
+    override val matchConcluded = "Partida encerrada"
+    override val undoLastPoint = "Anular o último ponto"
+    override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
+    override val whoServesFirst: (String) -> String = { "Quem serve primeiro em $it?" }
+    override val confirm = "Confirmar"
+    override val backDisabled = "Durante a partida use «Nova partida» ou «Sair»."
+    override val exit = "Sair"
+    override val exitConfirmTitle = "Sair do app?"
+    override val exitConfirmText = "A partida fica salva entre as partidas suspensas e você poderá retomá-la."
+    override val exitConfirmBands = "As pulseiras serão desligadas."
+
+    override val msgChangeEnds = "TROCA DE LADO"
+    override val msgTiebreak = "TIE-BREAK"
+    override val msgMatchTiebreak = "TIE-BREAK DECISIVO"
+    override val msgSetWon: (String) -> String = { "SET $it" }
+    override val msgSetPoint = "SET POINT"
+    override val msgMatchPoint = "MATCH POINT"
+    override val msgBreakPoint = "BREAK POINT"
+    override val msgDecidingPoint = "PONTO DECISIVO"
+    override val msgPointUndone = "PONTO ANULADO"
+    override val msgSuspended = "PARTIDA SUSPENSA"
+    override val msgResumed = "PARTIDA RETOMADA"
+    override val msgBandConnected: (String) -> String = { "PULSEIRA $it CONECTADA" }
+    override val msgBandLost: (String) -> String = { "PULSEIRA $it DESCONECTADA" }
+    override val msgBandOff: (String, Int?) -> String = { n, why ->
+        "PULSEIRA $n DESLIGADA" + when (why) {
+            BandProtocol.OFF_IDLE -> " (SEM USO)"
+            BandProtocol.OFF_BATTERY -> " (BATERIA VAZIA)"
+            BandProtocol.OFF_TIMEOUT -> " (SEM TELEFONE)"
+            else -> ""
+        }
+    }
+    override val msgBandBatteryLow: (String, Int) -> String = { n, p -> "PULSEIRA $n: BATERIA $p%" }
+    override val bandBatteryLow = "BATERIA FRACA"
+    override val autonomy: (String) -> String = { "autonomia ~$it" }
+    override val bandsBattery = "Bateria das pulseiras"
+
+    override val notifChannel = "Partida em andamento"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Partida em andamento · " + when {
+            bands && tv -> "pulseiras e placar na TV ativos"
+            tv -> "placar na TV ativo"
+            else -> "pulseiras ativas"
+        }
+    }
+
+    override val bandPaired = "PAREADA COM"
+    override val bandPlay = "JOGUEM"
+    override val bandChangeEnds = "TROCA DE LADO"
+    override val bandTiebreak = "TIE-BREAK"
+    override val bandSet = "SET"
+    override val bandSuspended = "SUSPENSA"
+    override val bandGameSetMatch = "JOGO SET PARTIDA"
+    override val bandMatchOver = "FIM DA PARTIDA"
+    override val bandAppClosed = "APP FECHADO"
+    override val bandOffFromApp = "DESLIGANDO"
+
+    override val summaryTitle = "Partida encerrada"
+    override val winner = "Vencedor"
+    override val duration = "Duração"
+    override val startTime = "Início"
+    override val endTime = "Fim"
+    override val date = "Data"
+    override val club = "Clube"
+    override val court = "Quadra"
+    override val place = "Local"
+    override val placeUnavailable = "Localização indisponível"
+    override val format = "Formato"
+    override val pointsWon = "Pontos ganhos"
+    override val gamesWon = "Jogos ganhos"
+    override val result = "Resultado"
+    override val saveHistory = "Salvar no histórico"
+    override val share = "Compartilhar"
+    override val saveDialogTitle = "Salvar no histórico"
+    override val fileName = "Nome"
+    override val folder = "Pasta"
+    override val chooseFolder = "Escolher pasta"
+    override val defaultFolder = "Pasta do app (padrão)"
+    override val formatReport = "Relatório (.txt)"
+    override val formatData = "Dados da partida (.json)"
+    override val formatImage = "Imagem (.png)"
+    override val save = "Salvar"
+    override val savedTo: (String) -> String = { "Salvo em $it" }
+    override val saveError = "Não foi possível salvar"
+    override val shareSubject = "Resultado da partida de tênis"
+    override val playerDefault: (Int) -> String = { "Jogador $it" }
+    override val teamJoiner = " e "
+    override val generatedWith = "Criado com Tennis Score Manager"
+
+    override val tvGames = "JOGOS"
+    override val tvServe = "SERVIÇO"
+    override val tvChangeover = "TROCA DE LADO"
+    override val tvSetBreak = "INTERVALO"
+    override val tvTiebreakBreak = "PAUSA"
+    override val tvWaiting = "AGUARDANDO A PARTIDA"
+    override val tvReady = "PRONTOS PARA JOGAR"
+    override val tvSuspended = "PARTIDA SUSPENSA"
+    override val tvWinner = "VENCEDOR"
+    override val tvMatchTiebreak = "TIE-BREAK DECISIVO"
+    override val tvLost = "CONEXÃO PERDIDA - RECONECTANDO..."
+    override val tvFullscreen = "TELA CHEIA"
+
+    override val tvSection = "Placar na TV"
+    override val tvEnable = "Placar na TV ou monitor"
+    override val tvEnableHint = "Outro telefone (ou um computador, ou um Chromecast) mostra o placar ao vivo num monitor. Os telefones precisam estar na mesma rede: o hotspot de um dos dois."
+    override val tvAddress = "Endereço do placar"
+    override val tvNoNetwork = "Sem rede: ative o hotspot num dos dois telefones e conecte o outro."
+    override val tvScreens: (Int) -> String = { if (it == 0) "Nenhum placar conectado" else if (it == 1) "1 placar conectado" else "$it placares conectados" }
+    override val tvQrHint = "No outro telefone: abra o Tennis Score Manager e toque em «Usar como placar» (conecta sozinho), ou leia o código com a câmera e abra no navegador."
+    override val tvLook = "Aparência do placar"
+    override val tvTitle = "Texto embaixo"
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vazio: sem texto" else "Vazio: «$it» (clube e quadra da página 1)" }
+    override val tvColorOf: (String) -> String = { "Cor de $it" }
+    override val tvShowClock = "Tempo de partida"
+    override val tvShowTimers = "Relógio de serviço e pausas"
+    override val tvShowSets = "Sets terminados"
+    override val tvShowMessages = "Mensagens (break point, set point...)"
+    override val tvShowServe = "Bola ao lado de quem serve"
+    override val tvGhost = "Segmentos apagados visíveis"
+    override val tvPreview = "Prévia neste telefone"
+    override val tvChromecastHint = "Com um Chromecast: no telefone-placar use «Transmitir tela» (Smart View nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
+
+    override val displayMode = "Usar como placar"
+    override val displayModeHint = "Este telefone mostra o placar no monitor (cabo HDMI ou Chromecast)"
+    override val displaySearching = "Procurando o telefone do árbitro…"
+    override val displaySteps = "1. Ative o hotspot num dos dois telefones e conecte o outro.\n2. No telefone do árbitro: página 2 → «Placar na TV» ativado.\n3. Ligue este telefone ao monitor (cabo USB-C/HDMI) ou transmita a tela para um Chromecast."
+    override val displayManual = "Endereço (ex. 192.168.43.1:8080)"
+    override val displayConnect = "Conectar"
+    override val displayNotFound = "Não encontrado. Verifique se os dois telefones estão na mesma rede e se o placar está ativado no app do árbitro."
+    override val displayOnMonitor = "O placar está no monitor externo"
+    override val displayShowHere = "Mostrar aqui também"
+    override val displayBackAgain = "Toque em voltar de novo para sair"
+    override val displayRetry = "Procurar de novo"
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Theme.kt
@@ -6618,6 +7923,7 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Compos
 /** Stato dei braccialetti; toccandone uno si aprono le sue impostazioni. */
 @Composable
 private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>, onOpen: (Side) -> Unit) {
+    val s = LocalStrings.current
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         for (side in Side.entries) {
             val b = bands[side]
@@ -6629,7 +7935,7 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             val bat = battery[side]
             val low = bat != null && !bat.charging && bat.percent <= 20
             Pill(
-                (if (side == Side.P1) "G1" else "G2") +
+                s.playerTag(side.ordinal + 1) +
                     ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
                     (if (bat?.charging == true || b?.charging == true) " ⚡" else "") +
                     (bat?.leftText()?.let { " · $it" } ?: ""),
@@ -7033,11 +8339,14 @@ fun OptionsScreen(c: MatchController) {
 
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
+            // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             Segmented(
-                listOf(SegOption("🇮🇹  ${s.italian}"), SegOption("🇬🇧  ${s.english}")),
-                selected = if (o.lang == Lang.IT) 0 else 1,
-                onSelect = { i -> c.updateOptions { it.copy(lang = if (i == 0) Lang.IT else Lang.EN) } },
+                Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
+                selected = o.lang.ordinal,
+                onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
+                columns = 2,
             )
+            Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
         }
 
         // Audio e voce
@@ -7214,7 +8523,7 @@ private fun BandPicker(
                 for ((address, label) in options) {
                     val usedBy = all.entries.firstOrNull { it.value.address == address && it.key != side }?.key
                     DropdownMenuItem(
-                        text = { Text(label + (usedBy?.let { " → ${if (it == Side.P1) "G1" else "G2"}" } ?: "")) },
+                        text = { Text(label + (usedBy?.let { " → ${s.playerTag(it.ordinal + 1)}" } ?: "")) },
                         leadingIcon = { Icon(Icons.Filled.Watch, null) },
                         onClick = {
                             open = false
@@ -7742,7 +9051,7 @@ fun StartScreen(c: MatchController) {
                 for (side in Side.entries) {
                     val ready = bands[side]?.state == LinkState.READY
                     Pill(
-                        if (side == Side.P1) "G1" else "G2",
+                        s.playerTag(side.ordinal + 1),
                         if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
                         if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
                         Icons.Filled.Watch,
@@ -8011,7 +9320,7 @@ fun SummaryScreen(c: MatchController) {
                 InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
                 InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
                 if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
-                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec))
+                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
                 }
             }
         }
@@ -8135,7 +9444,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
-import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.resume
@@ -8249,13 +9557,11 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         applyLanguage(lang)
     }
 
-    private fun locale(l: Lang): Locale = if (l == Lang.IT) Locale.ITALY else Locale.UK
-
     /** Imposta la lingua e la voce: quella scelta se esiste, altrimenti la migliore installata sul telefono. */
     private fun applyLanguage(l: Lang) {
         val t = tts ?: return
         if (_status.value == TtsStatus.ERROR) return
-        val loc = locale(l)
+        val loc = l.locale
         val res = runCatching { t.setLanguage(loc) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
         if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
             _voices.value = emptyList()
@@ -8461,6 +9767,286 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/CallWords.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/voice/CallWords.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.voice
+
+import com.tennis.scoremanager.model.Lang
+
+/**
+ * Parole e ordine delle chiamate dell'arbitro in una lingua, presi dai testi ufficiali per i giudici di sedia:
+ * ITF (inglese), FFT «L'arbitrage en 255 questions» e ITF in francese, RFET «Deberes y procedimientos» (spagnolo),
+ * DTB (tedesco), FPT (portoghese). Tutto in lettere: i motori vocali leggono male cifre e trattini ("6-4").
+ */
+internal abstract class CallWords {
+    /** Frasi fisse: una per ciascuna chiave di [Phrases.FIXED_KEYS]. */
+    abstract val fixed: Map<String, String>
+
+    /** Numeri da 0 a [Phrases.MAX_NUMBER] (tie-break e punteggi dei set a fine partita). */
+    abstract val numbers: List<String>
+
+    /** Punti del game: 0, 15, 30, 40. */
+    abstract val points: List<String>
+
+    fun number(n: Int): String = numbers.getOrElse(n) { n.toString() }
+
+    /** Punteggio del game dal lato di chi serve (mai 0-0 né 40-40): "quindici zero", "trenta pari". */
+    open fun score(s: Int, r: Int): String =
+        if (s == r) "${points[s]} ${fixed.getValue("all")}" else "${points[s]} ${points[r]}"
+
+    /** Game del set dal lato di chi conduce: "tre giochi a due". */
+    abstract fun games(a: Int, b: Int): String
+
+    /** Game pari: "due giochi pari". */
+    abstract fun gamesAll(n: Int): String
+
+    /** "Rossi al servizio" (nome prima) oppure "Au service Dupont" (nome dopo). */
+    open val nameBeforeToServe: Boolean = true
+
+    /**
+     * 10-6 … 10-9 detti di seguito suonano come un numero solo: "dix huit" = diciotto, "diez ocho" = "dieciocho",
+     * "dez oito" = "dezoito" (verificato trascrivendo le voci Google). Lì si dice "a" anche dove di solito no.
+     */
+    protected fun soundsLikeOneNumber(a: Int, b: Int): Boolean = a == 10 && b in 6..9
+
+    /** Nel tie-break, tra i due numeri si dice "a" ("tre a uno Rossi")? */
+    open fun tiebreakTo(a: Int, b: Int): Boolean = soundsLikeOneNumber(a, b)
+
+    /** Nei set letti a fine partita, tra i due numeri si dice "a"? */
+    open fun setScoreTo(a: Int, b: Int): Boolean = soundsLikeOneNumber(a, b)
+
+    companion object {
+        fun of(lang: Lang): CallWords = when (lang) {
+            Lang.IT -> ItWords
+            Lang.EN -> EnWords
+            Lang.FR -> FrWords
+            Lang.DE -> DeWords
+            Lang.ES -> EsWords
+            Lang.PT -> PtWords
+        }
+    }
+}
+
+internal object ItWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "primo set",
+        "to_serve" to "al servizio",
+        "play" to "gioco",
+        "deuce" to "parità",
+        "advantage" to "vantaggio",
+        "deciding_point" to "punto decisivo",
+        "game" to "gioco",
+        "leads" to "conduce",
+        "sets_1_0" to "un set a zero",
+        "sets_all_1" to "un set pari",
+        "tiebreak" to "tie-break",
+        "match_tiebreak" to "super tie-break",
+        "to" to "a",
+        "all" to "pari",
+        "game_set_match" to "gioco, set, partita",
+        "change_ends" to "cambio campo",
+        "correction" to "correzione",
+    )
+    override val numbers = listOf(
+        "zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci",
+        "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette", "diciotto",
+        "diciannove", "venti", "ventuno", "ventidue", "ventitré", "ventiquattro", "venticinque",
+        "ventisei", "ventisette", "ventotto", "ventinove", "trenta",
+    )
+    override val points = listOf("zero", "quindici", "trenta", "quaranta")
+    private fun g(n: Int) = if (n == 1) "un gioco" else "${number(n)} giochi"
+    override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
+    override fun gamesAll(n: Int) = "${g(n)} pari"
+    override fun tiebreakTo(a: Int, b: Int) = true
+    override fun setScoreTo(a: Int, b: Int) = false
+}
+
+internal object EnWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "first set",
+        "to_serve" to "to serve",
+        "play" to "play",
+        "deuce" to "deuce",
+        "advantage" to "advantage",
+        "deciding_point" to "deciding point",
+        "game" to "game",
+        "leads" to "leads",
+        "sets_1_0" to "one set to love",
+        "sets_all_1" to "one set all",
+        "tiebreak" to "tie-break",
+        "match_tiebreak" to "match tie-break",
+        "to" to "to",
+        "all" to "all",
+        "game_set_match" to "game, set and match",
+        "change_ends" to "change ends",
+        "correction" to "correction",
+    )
+    override val numbers = listOf(
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+        "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
+        "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five",
+        "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty",
+    )
+    override val points = listOf("love", "fifteen", "thirty", "forty")
+    private fun g(n: Int) = if (n == 1) "one game" else "${number(n)} games"
+    override fun games(a: Int, b: Int) = "${g(a)} to ${if (b == 0) "love" else number(b)}"
+    override fun gamesAll(n: Int) = "${g(n)} all"
+    override fun tiebreakTo(a: Int, b: Int) = false
+    override fun setScoreTo(a: Int, b: Int) = false
+}
+
+/** Francese FFT: il set è la "manche" (tranne in "jeu, set et match"), 15-15 è "quinze A", il nome va dopo "au service". */
+internal object FrWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "première manche",
+        "to_serve" to "au service",
+        "play" to "jouez",
+        "deuce" to "égalité",
+        "advantage" to "avantage",
+        "deciding_point" to "point décisif",
+        "game" to "jeu",
+        "leads" to "mène",
+        "sets_1_0" to "une manche à zéro",
+        "sets_all_1" to "une manche partout",
+        "tiebreak" to "jeu décisif",
+        "match_tiebreak" to "super jeu décisif",
+        "to" to "à",
+        "all" to "partout",
+        "game_set_match" to "jeu, set et match",
+        "change_ends" to "changement de côté",
+        "correction" to "correction",
+    )
+    override val numbers = listOf(
+        "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
+        "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit",
+        "dix-neuf", "vingt", "vingt et un", "vingt-deux", "vingt-trois", "vingt-quatre", "vingt-cinq",
+        "vingt-six", "vingt-sept", "vingt-huit", "vingt-neuf", "trente",
+    )
+    override val points = listOf("zéro", "quinze", "trente", "quarante")
+    override fun score(s: Int, r: Int) = if (s == r) "${points[s]} A" else "${points[s]}-${points[r]}"
+    private fun g(n: Int) = if (n == 1) "un jeu" else "${number(n)} jeux"
+    override fun games(a: Int, b: Int) = "${g(a)} à ${number(b)}"
+    override fun gamesAll(n: Int) = "${g(n)} partout"
+    override val nameBeforeToServe = false
+}
+
+/**
+ * Spagnolo RFET: "iguales" per i pari e per 40-40, "gana" per chi conduce, "al servicio" prima del nome,
+ * "jueguen" per iniziare. "uno" in fondo alla frase ("dos juegos a uno"), "un" davanti al nome ("un juego").
+ */
+internal object EsWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "primer set",
+        "to_serve" to "al servicio",
+        "play" to "jueguen",
+        "deuce" to "iguales",
+        "advantage" to "ventaja",
+        "deciding_point" to "punto decisivo",
+        "game" to "juego",
+        "leads" to "gana",
+        "sets_1_0" to "un set a cero",
+        "sets_all_1" to "un set iguales",
+        "tiebreak" to "tie-break",
+        "match_tiebreak" to "súper tie-break",
+        "to" to "a",
+        "all" to "iguales",
+        "game_set_match" to "juego, set y partido",
+        "change_ends" to "cambio de lado",
+        "correction" to "corrección",
+    )
+    override val numbers = listOf(
+        "cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
+        "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho",
+        "diecinueve", "veinte", "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco",
+        "veintiséis", "veintisiete", "veintiocho", "veintinueve", "treinta",
+    )
+    override val points = listOf("cero", "quince", "treinta", "cuarenta")
+    private fun g(n: Int) = if (n == 1) "un juego" else "${number(n)} juegos"
+    override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
+    override fun gamesAll(n: Int) = "${g(n)} iguales"
+    override val nameBeforeToServe = false
+}
+
+/**
+ * Tedesco DTB (modulo «Korrekte Ansagen» del BTV, documentazione Swiss Tennis): "Aufschlag" prima del nome,
+ * "beide" per i pari, i punteggi con "zu" ("drei zu zwei", come si legge "3:2"), ma i punti del game senza.
+ * "eins" da solo, "ein" davanti al nome ("ein Spiel beide").
+ */
+internal object DeWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "erster Satz",
+        "to_serve" to "Aufschlag",
+        "play" to "spielen",
+        "deuce" to "Einstand",
+        "advantage" to "Vorteil",
+        "deciding_point" to "entscheidender Punkt",
+        "game" to "Spiel",
+        "leads" to "führt",
+        "sets_1_0" to "eins zu null in Sätzen",
+        "sets_all_1" to "ein Satz beide",
+        "tiebreak" to "Tie-Break",
+        "match_tiebreak" to "Match-Tie-Break",
+        "to" to "zu",
+        "all" to "beide",
+        "game_set_match" to "Spiel, Satz und Sieg",
+        "change_ends" to "Seitenwechsel",
+        "correction" to "Korrektur",
+    )
+    override val numbers = listOf(
+        "null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn",
+        "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn", "siebzehn", "achtzehn",
+        "neunzehn", "zwanzig", "einundzwanzig", "zweiundzwanzig", "dreiundzwanzig", "vierundzwanzig", "fünfundzwanzig",
+        "sechsundzwanzig", "siebenundzwanzig", "achtundzwanzig", "neunundzwanzig", "dreißig",
+    )
+    override val points = listOf("null", "fünfzehn", "dreißig", "vierzig")
+    override fun games(a: Int, b: Int) = "${number(a)} zu ${number(b)}"
+    override fun gamesAll(n: Int) = if (n == 1) "ein Spiel beide" else "${number(n)} beide"
+    override val nameBeforeToServe = false
+    override fun tiebreakTo(a: Int, b: Int) = true
+    override fun setScoreTo(a: Int, b: Int) = true
+}
+
+/**
+ * Portoghese: struttura del copione ufficiale FPT («Deveres e Procedimentos para Árbitros», l'unico pubblicato),
+ * con parole che vanno bene in Portogallo e in Brasile ("jogo" e non "game", "partida" e non "encontro"),
+ * "iguais" per i pari e grafia brasiliana dei numeri (la voce preferita è pt-BR).
+ */
+internal object PtWords : CallWords() {
+    override val fixed = mapOf(
+        "first_set" to "primeiro set",
+        "to_serve" to "ao serviço",
+        "play" to "joguem",
+        "deuce" to "iguais",
+        "advantage" to "vantagem",
+        "deciding_point" to "ponto decisivo",
+        "game" to "jogo",
+        "leads" to "vence por",
+        "sets_1_0" to "um set a zero",
+        // "um set a um" suona "um sete a um" (7-1): al singolare "set" si pronuncia come "sete".
+        "sets_all_1" to "sets iguais",
+        "tiebreak" to "tie-break",
+        "match_tiebreak" to "tie-break decisivo",
+        "to" to "a",
+        "all" to "iguais",
+        "game_set_match" to "jogo, set e partida",
+        "change_ends" to "troca de lado",
+        "correction" to "correção",
+    )
+    override val numbers = listOf(
+        "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez",
+        "onze", "doze", "treze", "catorze", "quinze", "dezesseis", "dezessete", "dezoito",
+        "dezenove", "vinte", "vinte e um", "vinte e dois", "vinte e três", "vinte e quatro", "vinte e cinco",
+        "vinte e seis", "vinte e sete", "vinte e oito", "vinte e nove", "trinta",
+    )
+    override val points = listOf("zero", "quinze", "trinta", "quarenta")
+    override fun score(s: Int, r: Int) = if (s == r) "${points[s]} iguais" else "${points[s]}-${points[r]}"
+    private fun g(n: Int) = if (n == 1) "um jogo" else "${number(n)} jogos"
+    override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
+    override fun gamesAll(n: Int) = if (n == 1) "um jogo igual" else "${g(n)} iguais"
+    override fun tiebreakTo(a: Int, b: Int) = true
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/Calls.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/voice/Calls.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.voice
@@ -8490,57 +10076,21 @@ interface CallNames {
 /**
  * Catalogo delle frasi fisse. Ogni chiave corrisponde a un file `<chiave>.wav|.mp3|.ogg|.m4a`
  * nella cartella voce della lingua; il testo serve per generare il file o come riserva TTS.
+ * Le chiavi sono le stesse in tutte le lingue; parole e ordine stanno in [CallWords].
  */
 object Phrases {
     const val MAX_NUMBER = 30
 
-    private val numIt = listOf(
-        "zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci",
-        "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette", "diciotto",
-        "diciannove", "venti", "ventuno", "ventidue", "ventitré", "ventiquattro", "venticinque",
-        "ventisei", "ventisette", "ventotto", "ventinove", "trenta",
+    val FIXED_KEYS = listOf(
+        "first_set", "to_serve", "play", "deuce", "advantage", "deciding_point", "game", "leads",
+        "sets_1_0", "sets_all_1", "tiebreak", "match_tiebreak", "to", "all", "game_set_match",
+        "change_ends", "correction",
     )
-    private val numEn = listOf(
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-        "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
-        "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five",
-        "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty",
-    )
-    private val pointIt = listOf("zero", "quindici", "trenta", "quaranta")
-    private val pointEn = listOf("love", "fifteen", "thirty", "forty")
-
-    private val fixed: Map<String, Pair<String, String>> = linkedMapOf(
-        "first_set" to ("primo set" to "first set"),
-        "to_serve" to ("al servizio" to "to serve"),
-        "play" to ("gioco" to "play"),
-        "deuce" to ("parità" to "deuce"),
-        "advantage" to ("vantaggio" to "advantage"),
-        "deciding_point" to ("punto decisivo" to "deciding point"),
-        "game" to ("gioco" to "game"),
-        "leads" to ("conduce" to "leads"),
-        "sets_1_0" to ("un set a zero" to "one set to love"),
-        "sets_all_1" to ("un set pari" to "one set all"),
-        "tiebreak" to ("tie-break" to "tie-break"),
-        "match_tiebreak" to ("super tie-break" to "match tie-break"),
-        "to" to ("a" to "to"),
-        "all" to ("pari" to "all"),
-        "game_set_match" to ("gioco, set, partita" to "game, set and match"),
-        "change_ends" to ("cambio campo" to "change ends"),
-        "correction" to ("correzione" to "correction"),
-    )
-
-    private fun numberWord(n: Int, lang: Lang): String =
-        (if (lang == Lang.IT) numIt else numEn).getOrElse(n) { n.toString() }
-
-    private fun gamesWord(n: Int, lang: Lang): String = when (lang) {
-        Lang.IT -> if (n == 1) "un gioco" else "${numberWord(n, lang)} giochi"
-        Lang.EN -> if (n == 1) "one game" else "${numberWord(n, lang)} games"
-    }
 
     /** Tutte le chiavi del catalogo, nell'ordine in cui vengono generate. */
     val keys: List<String> by lazy {
         buildList {
-            addAll(fixed.keys)
+            addAll(FIXED_KEYS)
             for (s in 0..3) for (r in 0..3) {
                 if ((s == 0 && r == 0) || (s == 3 && r == 3)) continue
                 add("score_${s}_$r")
@@ -8556,26 +10106,14 @@ object Phrases {
     }
 
     fun text(key: String, lang: Lang): String {
-        fixed[key]?.let { return if (lang == Lang.IT) it.first else it.second }
+        val w = CallWords.of(lang)
+        w.fixed[key]?.let { return it }
         val parts = key.split('_')
         return when {
-            key.startsWith("score_") -> {
-                val s = parts[1].toInt()
-                val r = parts[2].toInt()
-                val words = if (lang == Lang.IT) pointIt else pointEn
-                if (s == r) "${words[s]} ${if (lang == Lang.IT) "pari" else "all"}" else "${words[s]} ${words[r]}"
-            }
-            key.startsWith("games_all_") -> {
-                val n = parts[2].toInt()
-                "${gamesWord(n, lang)} ${if (lang == Lang.IT) "pari" else "all"}"
-            }
-            key.startsWith("games_") -> {
-                val a = parts[1].toInt()
-                val b = parts[2].toInt()
-                if (lang == Lang.IT) "${gamesWord(a, lang)} a ${numberWord(b, lang)}"
-                else "${gamesWord(a, lang)} to ${if (b == 0) "love" else numberWord(b, lang)}"
-            }
-            key.startsWith("num_") -> numberWord(parts[1].toInt(), lang)
+            key.startsWith("score_") -> w.score(parts[1].toInt(), parts[2].toInt())
+            key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
+            key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
+            key.startsWith("num_") -> w.number(parts[1].toInt())
             else -> key
         }
     }
@@ -8583,6 +10121,8 @@ object Phrases {
 
 /** Costruisce le chiamate dell'arbitro secondo le regole concordate. */
 class CallBuilder(private val lang: Lang) {
+
+    private val words = CallWords.of(lang)
 
     companion object {
         /** Tag del segmento "gioco"/"play" iniziale: fa partire il tempo partita. */
@@ -8601,11 +10141,14 @@ class CallBuilder(private val lang: Lang) {
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
         Seg.Clip("first_set"),
         Seg.Pause(START_GAP),
-        Seg.Say(serverName(s, names)),
-        Seg.Clip("to_serve"),
+    ) + toServe(serverName(s, names)) + listOf(
         Seg.Pause(START_GAP),
         Seg.Clip("play", tag = TAG_PLAY),
     )
+
+    /** "Rossi al servizio", "Au service Dupont", "Aufschlag Müller". */
+    fun toServe(name: String): List<Seg> =
+        if (words.nameBeforeToServe) listOf(Seg.Say(name), Seg.Clip("to_serve")) else listOf(Seg.Clip("to_serve"), Seg.Say(name))
 
     /** Ripresa dopo una sospensione. */
     fun resume(): List<Seg> = listOf(Seg.Clip("play"))
@@ -8676,11 +10219,12 @@ class CallBuilder(private val lang: Lang) {
         val b = minOf(s.pt1, s.pt2)
         if (a == b) return listOf(num(a), Seg.Clip("all"))
         val leader = if (s.pt1 > s.pt2) Side.P1 else Side.P2
-        return when (lang) {
-            Lang.IT -> listOf(num(a), Seg.Clip("to"), num(b), Seg.Say(names.side(leader)))
-            Lang.EN -> listOf(num(a), num(b), Seg.Say(names.side(leader)))
-        }
+        return pair(a, b, words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
     }
+
+    /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
+    private fun pair(a: Int, b: Int, to: Boolean): List<Seg> =
+        if (to) listOf(num(a), Seg.Clip("to"), num(b)) else listOf(num(a), num(b))
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
@@ -8704,9 +10248,10 @@ class CallBuilder(private val lang: Lang) {
     fun matchEnd(s: MatchState, winner: Side, names: CallNames): List<Seg> {
         val out = mutableListOf<Seg>(Seg.Clip("game_set_match"), Seg.Say(names.side(winner)))
         for (set in s.sets) {
+            val a = set.shown(winner)
+            val b = set.shown(winner.other)
             out += Seg.Pause(SHORT)
-            out += num(set.shown(winner))
-            out += num(set.shown(winner.other))
+            out += pair(a, b, words.setScoreTo(a, b))
         }
         return out
     }
@@ -8732,7 +10277,10 @@ import com.tennis.scoremanager.model.Lang
  * Correzioni di pronuncia per la sintesi vocale, verificate trascrivendo l'audio dei motori reali:
  * - Samsung legge "primo set" come "primo settembre": "sèt" (con l'accento) non viene espanso da nessun motore;
  * - "tie-break" diventa "die breaka" (Samsung) o "time break" (Google): "taibrèk" è letto giusto da entrambi;
- * - Samsung pronuncia male "gioco" isolato (sembra "Giacomo"); dentro una frase va bene, da solo si usa "giuoco".
+ * - Samsung pronuncia male "gioco" isolato (sembra "Giacomo"); dentro una frase va bene, da solo si usa "giuoco";
+ * - tedesco (Google): "Tie-Break" diventa "Teilbreg" o "Tea Break", "Taibreak" è letto giusto; senza una virgola
+ *   prima, "sechs beide Taibreak" si impasta in "sechs bei Detailbreak";
+ * - francese (Google): "à" da sola (il file vocale della chiave "to") è letta "a accento grave".
  * Il testo mostrato a schermo e nel file LEGGIMI resta quello normale.
  */
 object Pronunciation {
@@ -8740,13 +10288,19 @@ object Pronunciation {
 
     private val wordSet = Regex("\\bset\\b", RegexOption.IGNORE_CASE)
     private val tieBreak = Regex("(?<!super )tie-break", RegexOption.IGNORE_CASE)
+    private val tieBreakDe = Regex("tie-break", RegexOption.IGNORE_CASE)
+    private val beforeTieBreakDe = Regex("(?<=[^\\s,-]) +(?=tie-break)", RegexOption.IGNORE_CASE)
 
-    fun fix(text: String, lang: Lang, engine: String?): String {
-        if (lang != Lang.IT) return text
-        var t = tieBreak.replace(text, "taibrèk")
-        t = wordSet.replace(t, "sèt")
-        if (engine == SAMSUNG && t.trim().trimEnd('.', '!', ',').equals("gioco", ignoreCase = true)) t = "giuoco"
-        return t
+    fun fix(text: String, lang: Lang, engine: String?): String = when (lang) {
+        Lang.IT -> {
+            var t = tieBreak.replace(text, "taibrèk")
+            t = wordSet.replace(t, "sèt")
+            if (engine == SAMSUNG && t.trim().trimEnd('.', '!', ',').equals("gioco", ignoreCase = true)) t = "giuoco"
+            t
+        }
+        Lang.DE -> tieBreakDe.replace(beforeTieBreakDe.replace(text, ", "), "Taibreak")
+        Lang.FR -> if (text.trim() == "à") "a" else text
+        else -> text
     }
 }
 TSM_EOF
@@ -8808,7 +10362,7 @@ class VoicePack(private val context: Context) {
         return out
     }
 
-    /** Importa uno ZIP di registrazioni: `it/score_1_0.mp3`, `en/deuce.wav` o file alla radice (lingua corrente). */
+    /** Importa uno ZIP di registrazioni: `it/score_1_0.mp3`, `fr/deuce.wav` o file alla radice (lingua corrente). */
     fun importZip(uri: Uri, fallback: Lang): Int {
         var n = 0
         context.contentResolver.openInputStream(uri)?.use { input ->
@@ -8821,12 +10375,8 @@ class VoicePack(private val context: Context) {
                     val key = file.nameWithoutExtension
                     val ext = file.extension.lowercase()
                     if (key !in Phrases.keys || ext !in exts) continue
-                    val parts = path.lowercase().split('/')
-                    val lang = when {
-                        "en" in parts.dropLast(1) -> Lang.EN
-                        "it" in parts.dropLast(1) -> Lang.IT
-                        else -> fallback
-                    }
+                    val folders = path.lowercase().split('/').dropLast(1)
+                    val lang = Lang.entries.firstOrNull { it.code in folders } ?: fallback
                     exts.forEach { File(dir(lang), "$key.$it").delete() }
                     File(dir(lang), "$key.$ext").outputStream().use { zip.copyTo(it) }
                     n++
@@ -8851,13 +10401,14 @@ class VoicePack(private val context: Context) {
     fun writeReadme() {
         val sb = StringBuilder()
         sb.appendLine("TENNIS SCORE MANAGER - FILE VOCALI")
-        sb.appendLine("Metti le registrazioni in voice/it/ oppure voice/en/ con il nome della chiave.")
+        sb.appendLine("Metti le registrazioni in voice/<lingua>/ (${Lang.entries.joinToString(", ") { it.code }}) con il nome della chiave.")
         sb.appendLine("Formati: ${exts.joinToString()}. I nomi dei giocatori sono sempre letti dal TTS.")
         sb.appendLine("La cartella tts/ contiene i file generati dall'app: le tue registrazioni hanno la precedenza.")
+        // Una colonna per lingua, separate da tabulazioni: si apre bene anche come foglio di calcolo.
         sb.appendLine()
-        sb.appendLine(String.format("%-18s %-32s %s", "CHIAVE", "ITALIANO", "ENGLISH"))
+        sb.appendLine((listOf("CHIAVE") + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
         for (k in Phrases.keys) {
-            sb.appendLine(String.format("%-18s %-32s %s", k, Phrases.text(k, Lang.IT), Phrases.text(k, Lang.EN)))
+            sb.appendLine((listOf(k) + Lang.entries.map { Phrases.text(k, it) }).joinToString("\t"))
         }
         runCatching { File(baseDir.apply { mkdirs() }, "LEGGIMI.txt").writeText(sb.toString()) }
     }
@@ -9621,6 +11172,109 @@ class TvSnapshotTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ui/StringsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ui/StringsTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.ble.BandSettings
+import com.tennis.scoremanager.model.Lang
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.lang.reflect.Modifier
+import java.text.SimpleDateFormat
+import java.util.Date
+
+class StringsTest {
+
+    /** Prova gli argomenti finché i tipi combaciano (le lambda controllano i tipi solo quando vengono chiamate). */
+    private fun call(f: (List<Any?>) -> Any?, tries: List<List<Any?>>): String =
+        tries.firstNotNullOfOrNull { args -> runCatching { f(args) as String }.getOrNull() } ?: error("nessun argomento valido")
+
+    /** Ogni testo di ogni lingua, funzioni comprese (chiamate con argomenti di prova). */
+    @Suppress("UNCHECKED_CAST")
+    private fun texts(s: Strings): Map<String, String> =
+        Strings::class.java.methods
+            .filter { it.name.startsWith("get") && it.parameterCount == 0 && !Modifier.isStatic(it.modifiers) }
+            .associate { m ->
+                val name = m.name.removePrefix("get")
+                val text = when (val v = m.invoke(s)) {
+                    is String -> v
+                    is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi")))
+                    is Function2<*, *, *> -> call(
+                        { (v as Function2<Any?, Any?, Any?>)(it[0], it[1]) },
+                        listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(true, false)),
+                    )
+                    is Function4<*, *, *, *, *> -> call(
+                        { (v as Function4<Any?, Any?, Any?, Any?, Any?>)(it[0], it[1], it[2], it[3]) },
+                        listOf(listOf("1", "2", "3", "4")),
+                    )
+                    else -> error("$name: ${v?.javaClass}")
+                }
+                name to text
+            }
+
+    @Test
+    fun everyLanguageHasEveryText() {
+        val it = texts(ItStrings)
+        assertTrue(it.size > 250)
+        for (lang in Lang.entries) {
+            val t = texts(stringsFor(lang))
+            assertEquals(it.keys, t.keys)
+            for ((k, v) in t) assertTrue("$lang $k", v.isNotBlank() || k == "TeamJoiner")
+        }
+    }
+
+    @Test
+    fun newLanguagesAreActuallyTranslated() {
+        val en = texts(EnStrings)
+        for (lang in listOf(Lang.FR, Lang.DE, Lang.ES, Lang.PT)) {
+            val t = texts(stringsFor(lang))
+            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } }.keys
+            // Restano uguali solo nomi propri e sigle: Bluetooth, OK, Firmware, Audio On/Off, online...
+            assertTrue("$lang copia l'inglese in: $same", same.size < 30)
+            val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
+            assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
+        }
+    }
+
+    @Test
+    fun bandTextsFitTheWristband() {
+        for (lang in Lang.entries) {
+            val s = stringsFor(lang)
+            val band = listOf(
+                s.bandPaired, s.bandPlay, s.bandChangeEnds, s.bandTiebreak, s.bandSet, s.bandSuspended,
+                s.bandGameSetMatch, s.bandMatchOver, s.bandAppClosed, s.bandOffFromApp, s.bandBatteryLow,
+            )
+            for (b in band) {
+                // Il braccialetto tronca la riga 1 a 18 caratteri: meglio che non serva.
+                assertEquals("$lang «$b»", BandProtocol.clean(b, 99), BandProtocol.clean(b))
+                assertTrue("$lang «$b»", BandProtocol.clean(b).isNotBlank())
+            }
+        }
+    }
+
+    @Test
+    fun datePatternsAreValid() {
+        for (lang in Lang.entries) {
+            val d = SimpleDateFormat(stringsFor(lang).datePattern, lang.locale).format(Date(0))
+            assertTrue("$lang $d", d.contains("1970"))
+        }
+    }
+
+    @Test
+    fun bandSettingsCarryTheLanguage() {
+        val s = BandSettings.parse("fw=2.2;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=fr")!!
+        assertEquals("fr", s.lang)
+        assertEquals("", BandSettings.parse("fw=2.1;name=TSM-1A2B;bri=20")!!.lang)
+        assertEquals("lang=de", BandSettings.languageConfig("de"))
+        // Le impostazioni scritte dal pannello non toccano la lingua (quella la manda l'app da sola).
+        assertTrue("lang" !in s.encode())
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/CallBuilderTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/CallBuilderTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.voice
@@ -9809,6 +11463,224 @@ class CallBuilderTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/LanguagesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/LanguagesTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.voice
+
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Le stesse partite chiamate in ogni lingua, con le formule dei testi ufficiali (vedi CallWords). */
+class LanguagesTest {
+
+    private val names = object : CallNames {
+        override fun side(side: Side) = if (side == Side.P1) "Rossi" else "Bianchi"
+        override fun player(side: Side, index: Int) = listOf(listOf("Rossi", "Verdi"), listOf("Bianchi", "Neri"))[side.ordinal][index]
+    }
+
+    /** Gioca la partita con [lang] e registra la chiamata dopo ogni punto. */
+    private inner class Match(val lang: Lang, rules: RulesConfig = RulesConfig(firstServer = Side.P1)) {
+        val calls = CallBuilder(lang)
+        var state: MatchState = ScoreEngine.initial(rules)
+
+        fun start() = calls.render(calls.start(state, names))
+
+        fun point(w: Side): String {
+            val step = ScoreEngine.pointWonBy(state, w)
+            state = step.state
+            return calls.render(calls.afterPoint(state, step.transition!!, names))
+        }
+
+        fun games(a: Int, b: Int) {
+            var ga = 0
+            var gb = 0
+            while (ga < a || gb < b) {
+                val w = if (ga < a && (ga <= gb || gb >= b)) { ga++; Side.P1 } else { gb++; Side.P2 }
+                repeat(4) { state = ScoreEngine.pointWonBy(state, w).state }
+            }
+        }
+    }
+
+    private data class Expected(
+        val start: String,
+        val points: List<String>,
+        val firstGame: String,
+        val gamesAll: String,
+        val tiebreak: List<String>,
+        val matchEnd: String,
+        val noAd: String,
+        val superTiebreakEnd: String,
+    )
+
+    /** Punti: 15-0, 15-15, 15-30, 15-40, 30-40, deuce, vantaggio Bianchi. Tie-break: 6-6 annunciato, 1-0, 1-1, 1-2. */
+    private fun check(lang: Lang, e: Expected) {
+        assertEquals(e.start, Match(lang).start())
+
+        val m = Match(lang)
+        val order = listOf(Side.P1, Side.P2, Side.P2, Side.P2, Side.P1, Side.P1, Side.P2)
+        assertEquals(e.points, order.map { m.point(it) })
+
+        val g = Match(lang)
+        repeat(3) { g.point(Side.P1) }
+        assertEquals(e.firstGame, g.point(Side.P1))
+        repeat(3) { g.point(Side.P2) }
+        assertEquals(e.gamesAll, g.point(Side.P2))
+
+        val t = Match(lang)
+        t.games(5, 5)
+        repeat(4) { t.point(Side.P1) }
+        repeat(3) { t.point(Side.P2) }
+        assertEquals(e.tiebreak, listOf(t.point(Side.P2), t.point(Side.P1), t.point(Side.P2), t.point(Side.P2)))
+
+        val end = Match(lang)
+        end.games(6, 4)
+        end.games(3, 6)
+        end.games(6, 5)
+        repeat(3) { end.point(Side.P1) }
+        assertEquals(e.matchEnd, end.point(Side.P1))
+
+        val na = Match(lang, RulesConfig(noAd = true))
+        repeat(3) { na.point(Side.P1) }
+        repeat(2) { na.point(Side.P2) }
+        assertEquals(e.noAd, na.point(Side.P2))
+
+        // Match tie-break vinto 10-8: "dix huit", "diez ocho", "dez oito" suonerebbero 18.
+        val st = Match(lang, RulesConfig(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK))
+        st.games(6, 0)
+        st.games(0, 6)
+        repeat(8) { st.point(Side.P1); st.point(Side.P2) }
+        st.point(Side.P1)
+        assertEquals(e.superTiebreakEnd, st.point(Side.P1))
+    }
+
+    @Test
+    fun italian() = check(
+        Lang.IT,
+        Expected(
+            start = "primo set Rossi al servizio gioco",
+            points = listOf("quindici zero", "quindici pari", "quindici trenta", "quindici quaranta", "trenta quaranta", "parità", "vantaggio Bianchi"),
+            firstGame = "gioco Rossi Rossi conduce un gioco a zero cambio campo",
+            gamesAll = "gioco Bianchi un gioco pari",
+            tiebreak = listOf("gioco Bianchi sei giochi pari tie-break", "uno a zero Rossi", "uno pari", "due a uno Bianchi"),
+            matchEnd = "gioco, set, partita Rossi sei quattro tre sei sette cinque",
+            noAd = "parità punto decisivo",
+            superTiebreakEnd = "gioco, set, partita Rossi sei zero zero sei dieci otto",
+        ),
+    )
+
+    @Test
+    fun english() = check(
+        Lang.EN,
+        Expected(
+            start = "first set Rossi to serve play",
+            points = listOf("fifteen love", "fifteen all", "fifteen thirty", "fifteen forty", "thirty forty", "deuce", "advantage Bianchi"),
+            firstGame = "game Rossi Rossi leads one game to love change ends",
+            gamesAll = "game Bianchi one game all",
+            tiebreak = listOf("game Bianchi six games all tie-break", "one zero Rossi", "one all", "two one Bianchi"),
+            matchEnd = "game, set and match Rossi six four three six seven five",
+            noAd = "deuce deciding point",
+            superTiebreakEnd = "game, set and match Rossi six zero zero six ten eight",
+        ),
+    )
+
+    @Test
+    fun french() = check(
+        Lang.FR,
+        Expected(
+            start = "première manche au service Rossi jouez",
+            points = listOf("quinze-zéro", "quinze A", "quinze-trente", "quinze-quarante", "trente-quarante", "égalité", "avantage Bianchi"),
+            firstGame = "jeu Rossi Rossi mène un jeu à zéro changement de côté",
+            gamesAll = "jeu Bianchi un jeu partout",
+            tiebreak = listOf("jeu Bianchi six jeux partout jeu décisif", "un zéro Rossi", "un partout", "deux un Bianchi"),
+            matchEnd = "jeu, set et match Rossi six quatre trois six sept cinq",
+            noAd = "égalité point décisif",
+            superTiebreakEnd = "jeu, set et match Rossi six zéro zéro six dix à huit",
+        ),
+    )
+
+    @Test
+    fun german() = check(
+        Lang.DE,
+        Expected(
+            start = "erster Satz Aufschlag Rossi spielen",
+            points = listOf("fünfzehn null", "fünfzehn beide", "fünfzehn dreißig", "fünfzehn vierzig", "dreißig vierzig", "Einstand", "Vorteil Bianchi"),
+            firstGame = "Spiel Rossi Rossi führt eins zu null Seitenwechsel",
+            gamesAll = "Spiel Bianchi ein Spiel beide",
+            tiebreak = listOf("Spiel Bianchi sechs beide Tie-Break", "eins zu null Rossi", "eins beide", "zwei zu eins Bianchi"),
+            matchEnd = "Spiel, Satz und Sieg Rossi sechs zu vier drei zu sechs sieben zu fünf",
+            noAd = "Einstand entscheidender Punkt",
+            superTiebreakEnd = "Spiel, Satz und Sieg Rossi sechs zu null null zu sechs zehn zu acht",
+        ),
+    )
+
+    @Test
+    fun spanish() = check(
+        Lang.ES,
+        Expected(
+            start = "primer set al servicio Rossi jueguen",
+            points = listOf("quince cero", "quince iguales", "quince treinta", "quince cuarenta", "treinta cuarenta", "iguales", "ventaja Bianchi"),
+            firstGame = "juego Rossi Rossi gana un juego a cero cambio de lado",
+            gamesAll = "juego Bianchi un juego iguales",
+            tiebreak = listOf("juego Bianchi seis juegos iguales tie-break", "uno cero Rossi", "uno iguales", "dos uno Bianchi"),
+            matchEnd = "juego, set y partido Rossi seis cuatro tres seis siete cinco",
+            noAd = "iguales punto decisivo",
+            superTiebreakEnd = "juego, set y partido Rossi seis cero cero seis diez a ocho",
+        ),
+    )
+
+    @Test
+    fun portuguese() = check(
+        Lang.PT,
+        Expected(
+            start = "primeiro set Rossi ao serviço joguem",
+            points = listOf("quinze-zero", "quinze iguais", "quinze-trinta", "quinze-quarenta", "trinta-quarenta", "iguais", "vantagem Bianchi"),
+            firstGame = "jogo Rossi Rossi vence por um jogo a zero troca de lado",
+            gamesAll = "jogo Bianchi um jogo igual",
+            tiebreak = listOf("jogo Bianchi seis jogos iguais tie-break", "um a zero Rossi", "um iguais", "dois a um Bianchi"),
+            matchEnd = "jogo, set e partida Rossi seis quatro três seis sete cinco",
+            noAd = "iguais ponto decisivo",
+            superTiebreakEnd = "jogo, set e partida Rossi seis zero zero seis dez a oito",
+        ),
+    )
+
+    @Test
+    fun everyLanguageHasTheWholeCatalog() {
+        for (lang in Lang.entries) {
+            assertEquals(lang.name, Phrases.FIXED_KEYS.toSet(), CallWords.of(lang).fixed.keys)
+            assertEquals(lang.name, Phrases.MAX_NUMBER + 1, CallWords.of(lang).numbers.size)
+            assertEquals(lang.name, 4, CallWords.of(lang).points.size)
+            for (k in Phrases.keys) {
+                val t = Phrases.text(k, lang)
+                assertTrue("$lang $k", t.isNotBlank() && "_" !in t)
+                // Mai cifre: i motori vocali le leggono come orari, date o sottrazioni.
+                assertFalse("$lang $k: $t", t.any { it.isDigit() })
+            }
+        }
+    }
+
+    @Test
+    fun fixedKeysAreUnique() {
+        assertEquals(Phrases.FIXED_KEYS.size, Phrases.FIXED_KEYS.toSet().size)
+        assertEquals(Phrases.keys.size, Phrases.keys.toSet().size)
+    }
+
+    @Test
+    fun langCodes() {
+        for (lang in Lang.entries) assertEquals(lang, Lang.fromCode(lang.code))
+        assertEquals(Lang.FR, Lang.fromCode("FR"))
+        assertEquals(null, Lang.fromCode("xx"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/PronunciationTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/PronunciationTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.voice
@@ -9839,6 +11711,25 @@ class PronunciationTest {
     @Test
     fun englishUntouched() {
         assertEquals("first set Rossi to serve", Pronunciation.fix("first set Rossi to serve", Lang.EN, Pronunciation.SAMSUNG))
+    }
+
+    @Test
+    fun germanTieBreak() {
+        assertEquals("Taibreak", Pronunciation.fix("Tie-Break", Lang.DE, null))
+        assertEquals("Match-Taibreak", Pronunciation.fix("Match-Tie-Break", Lang.DE, null))
+        assertEquals("sechs beide, Taibreak", Pronunciation.fix("sechs beide Tie-Break", Lang.DE, null))
+    }
+
+    @Test
+    fun frenchIsolatedA() {
+        assertEquals("a", Pronunciation.fix("à", Lang.FR, null))
+        assertEquals("dix à huit Rossi", Pronunciation.fix("dix à huit Rossi", Lang.FR, null))
+    }
+
+    @Test
+    fun otherLanguagesUntouched() {
+        assertEquals("juego Rossi seis juegos iguales tie-break", Pronunciation.fix("juego Rossi seis juegos iguales tie-break", Lang.ES, null))
+        assertEquals("primeiro set", Pronunciation.fix("primeiro set", Lang.PT, null))
     }
 }
 TSM_EOF
@@ -11084,6 +12975,8 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   Impostazioni (dall'app, menu "Impostazioni braccialetto"), salvate nel braccialetto:
   nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
   spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
+  Lingua dei testi (dalla 2.2): la manda l'app da sola, uguale alla sua; resta salvata anche
+  per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento).
 
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
@@ -11098,7 +12991,7 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.1"
+#define FW_VERSION "2.2"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -11123,30 +13016,37 @@ static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT s
 static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 
-// Testi mostrati dal braccialetto (solo ASCII)
-#define TXT_PAIRING    "PAIRING..."
-#define TXT_PAIRED     "PAIRING OK"
-#define TXT_RECONNECT  "RICONNESSIONE"
-#define TXT_NO_PHONE   "NESSUN TELEFONO"
-#define TXT_POWER_OFF  "SPEGNIMENTO"
-#define TXT_BATTERY    "BATTERIA"
-#define TXT_CHARGING   "IN CARICA"
-#define TXT_NO_LINK    "NON CONNESSO"
-#define TXT_IDLE       "INATTIVO"
-#define TXT_HOLD_KEY1  "TIENI PREMUTO KEY1"
-#define TXT_EMPTY      "BATTERIA SCARICA"
-#define TXT_SAVED      "IMPOSTAZIONI OK"
-#define TXT_FULL       "CARICA COMPLETA"
-#define TXT_USB_POWER  "ALIMENTATO DA USB"
-#define TXT_USB_OUT    "USB SCOLLEGATO"
-#define TXT_KEEPS_CHG  "LA CARICA CONTINUA"
+// Testi mostrati dal braccialetto (solo ASCII, maiuscolo), una riga per lingua: vedi TXT[] più sotto.
+enum : uint8_t { L_IT, L_EN, L_FR, L_DE, L_ES, L_PT, N_LANG };
+static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "pt" };
+enum : uint8_t {
+  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_IDLE,
+  T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, N_TXT
+};
+#define TXT_PAIRING    txt(T_PAIRING)
+#define TXT_PAIRED     txt(T_PAIRED)
+#define TXT_RECONNECT  txt(T_RECONNECT)
+#define TXT_NO_PHONE   txt(T_NO_PHONE)
+#define TXT_POWER_OFF  txt(T_POWER_OFF)
+#define TXT_BATTERY    txt(T_BATTERY)
+#define TXT_CHARGING   txt(T_CHARGING)
+#define TXT_NO_LINK    txt(T_NO_LINK)
+#define TXT_IDLE       txt(T_IDLE)
+#define TXT_HOLD_KEY1  txt(T_HOLD_KEY1)
+#define TXT_EMPTY      txt(T_EMPTY)
+#define TXT_SAVED      txt(T_SAVED)
+#define TXT_FULL       txt(T_FULL)
+#define TXT_USB_POWER  txt(T_USB_POWER)
+#define TXT_USB_OUT    txt(T_USB_OUT)
+#define TXT_KEEPS_CHG  txt(T_KEEPS_CHG)
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
-#define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.0;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30"
+#define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
 enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
@@ -11169,10 +13069,41 @@ struct Settings {
   uint16_t pairS;      // spegnimento se all'accensione nessun telefono si collega (s)
   uint16_t lostS;      // spegnimento se il telefono si scollega (s)
   uint16_t idleMin;    // spegnimento se collegato ma inattivo (min)
+  uint8_t  lang;       // lingua dei testi (L_IT...), la imposta l'app
 };
 static Settings cfg;
 static Preferences prefs;
 static char defaultName[13];
+
+// Stesso ordine dell'enum T_*. T_CHARGED_IN, T_SINCE e T_LEFT sono formati di snprintf (%s durata, %d minuti).
+static const char* const TXT[N_LANG][N_TXT] = {
+  { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
+    "NON CONNESSO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
+    "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN" },
+  { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
+    "NOT CONNECTED", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
+    "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT" },
+  { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
+    "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
+    "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
+    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN" },
+  { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
+    "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
+    "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN" },
+  { "EMPAREJANDO...", "EMPAREJADO", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
+    "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
+    "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN" },
+  { "PAREANDO...", "PAREADO", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
+    "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
+    "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN" },
+};
+
+static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
 
 // ------------------------------------------------------------------ stato
 static NimBLEServer*         server   = nullptr;
@@ -11313,6 +13244,7 @@ static void drawFit(const char* txt, int y, const lgfx::IFont* const* fonts, int
 
 static const lgfx::IFont* const BIG_FONTS[]   = { &fonts::FreeSansBold24pt7b, &fonts::FreeSansBold18pt7b, &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b };
 static const lgfx::IFont* const SMALL_FONTS[] = { &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b, &fonts::Font2 };
+static const lgfx::IFont* const TINY_FONTS[]  = { &fonts::Font2, &fonts::Font0 };  // righe di dettaglio: Font0 se non ci stanno
 
 static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT, uint16_t bg = C_BG, uint16_t color2 = C_DIM) {
   displayWake();
@@ -11359,8 +13291,8 @@ static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   M5.Display.setTextDatum(middle_left);
   M5.Display.setFont(&fonts::FreeSansBold12pt7b);
   M5.Display.setTextColor(C_DIM, C_BG);
-  M5.Display.drawString("GAME", 8, 55);
-  M5.Display.drawString("SET", 8, 108);
+  M5.Display.drawString(txt(T_GAMES), 8, 55);
+  M5.Display.drawString(txt(T_SETS), 8, 108);
   M5.Display.setTextDatum(middle_right);
   M5.Display.setFont(&fonts::FreeSansBold24pt7b);
   M5.Display.setTextColor(C_TEXT, C_BG);
@@ -11457,16 +13389,20 @@ static void drawCharge() {
 
   drawFit(full ? TXT_FULL : (active ? TXT_CHARGING : TXT_USB_POWER), 99, SMALL_FONTS, 3, full ? C_BALL : (active ? C_TEXT : C_DIM));
 
+  char since[32];
+  char left[24] = "";
   if (full) {
     fmtDuration(t, sizeof(t), fullAt - usbSince);
-    snprintf(buf, sizeof(buf), "%d.%02dV   CARICATA IN %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+    snprintf(since, sizeof(since), txt(T_CHARGED_IN), t);
   } else {
     fmtDuration(t, sizeof(t), millis() - usbSince);
-    const int left = chargeMinutesLeft();
-    if (left > 0) snprintf(buf, sizeof(buf), "%d.%02dV  DA %s  FINE ~%d MIN", lastMv / 1000, (lastMv % 1000) / 10, t, left);
-    else snprintf(buf, sizeof(buf), "%d.%02dV   DA %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+    snprintf(since, sizeof(since), txt(T_SINCE), t);
+    const int min = chargeMinutesLeft();
+    if (min > 0) snprintf(left, sizeof(left), txt(T_LEFT), min);
   }
-  drawFit(buf, 124, SMALL_FONTS + 2, 1, C_DIM);
+  if (left[0]) snprintf(buf, sizeof(buf), "%d.%02dV  %s  %s", lastMv / 1000, (lastMv % 1000) / 10, since, left);
+  else snprintf(buf, sizeof(buf), "%d.%02dV   %s", lastMv / 1000, (lastMv % 1000) / 10, since);
+  drawFit(buf, 124, TINY_FONTS, 2, C_DIM);
 }
 
 // Schermata di carica accesa per [ms] (aggiornata ogni volta che cambia qualcosa).
@@ -11498,6 +13434,7 @@ static void clampSettings() {
   cfg.pairS   = constrain(cfg.pairS, 15, 600);
   cfg.lostS   = constrain(cfg.lostS, 30, 1800);
   cfg.idleMin = constrain(cfg.idleMin, 5, 120);
+  if (cfg.lang >= N_LANG) cfg.lang = L_IT;
   if (!cfg.name[0]) strlcpy(cfg.name, defaultName, sizeof(cfg.name));
 }
 
@@ -11512,6 +13449,7 @@ static void loadSettings() {
   cfg.pairS   = prefs.getUShort("pair", 30);
   cfg.lostS   = prefs.getUShort("lost", 180);
   cfg.idleMin = prefs.getUShort("idle", 30);
+  cfg.lang    = prefs.getUChar("lang", L_IT);
   clampSettings();
 }
 
@@ -11525,12 +13463,14 @@ static void saveSettings() {
   prefs.putUShort("pair", cfg.pairS);
   prefs.putUShort("lost", cfg.lostS);
   prefs.putUShort("idle", cfg.idleMin);
+  prefs.putUChar("lang", cfg.lang);
 }
 
 static void publishConfig(bool notify) {
   char buf[128];
-  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u",
-           FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin);
+  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s",
+           FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin,
+           LANG_CODES[cfg.lang]);
   configChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) configChr->notify();
 }
@@ -11547,16 +13487,24 @@ static void applyName() {
 }
 
 // "chiave=valore;chiave=valore": si applicano solo le chiavi presenti, le altre restano come sono.
+// Solo "lang=xx" (l'app la manda da sola a ogni collegamento) si salva in silenzio, senza anteprima.
 static void handleConfig(char* text) {
   char oldName[13];
   strlcpy(oldName, cfg.name, sizeof(oldName));
   const uint8_t oldVol = cfg.vol;
+  const uint8_t oldLang = cfg.lang;
+  bool onlyLang = true;
   for (char* part = strtok(text, ";"); part; part = strtok(nullptr, ";")) {
     char* eq = strchr(part, '=');
     if (!eq) continue;
     *eq = 0;
     const char* k = part;
     const char* v = eq + 1;
+    if (!strcmp(k, "lang")) {
+      for (uint8_t i = 0; i < N_LANG; i++) if (!strcasecmp(v, LANG_CODES[i])) cfg.lang = i;
+      continue;
+    }
+    onlyLang = false;
     if (!strcmp(k, "name")) {
       char clean[13];
       int j = 0;
@@ -11575,6 +13523,11 @@ static void handleConfig(char* text) {
     else if (!strcmp(k, "idle")) cfg.idleMin = atoi(v);
   }
   clampSettings();
+  if (onlyLang) {
+    if (cfg.lang != oldLang) prefs.putUChar("lang", cfg.lang);
+    publishConfig(true);
+    return;
+  }
   saveSettings();
   if (strcmp(oldName, cfg.name) != 0) applyName();
   M5.Display.setRotation(cfg.flip ? 3 : 1);
@@ -12128,6 +14081,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 60 file del progetto in $DEST"
+echo ">> Fatto: 67 file del progetto in $DEST"
 echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
