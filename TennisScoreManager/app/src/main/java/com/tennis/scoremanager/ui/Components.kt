@@ -138,34 +138,41 @@ fun SectionCard(title: String, icon: ImageVector, accent: Color = TsmColors.Ball
 
 data class SegOption(val label: String, val icon: ImageVector? = null, val color: Color = TsmColors.Ball, val onColor: Color = TsmColors.OnBall)
 
-/** Selettore a segmenti (uno solo attivo). */
+/** Selettore a segmenti (uno solo attivo). Con [columns] minore del numero di opzioni va a capo in più righe. */
 @Composable
-fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
-    Row(
+fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size) {
+    Column(
         modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
     ) {
-        options.forEachIndexed { i, o ->
-            val sel = i == selected
-            Row(
-                Modifier.weight(1f)
-                    .background(if (sel) o.color else Color.Transparent)
-                    .clickable(role = Role.RadioButton) { onSelect(i) }
-                    .padding(vertical = 12.dp, horizontal = 8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (o.icon != null) {
-                    Icon(o.icon, null, tint = if (sel) o.onColor else TsmColors.TextDim, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
+        options.chunked(columns.coerceAtLeast(1)).forEachIndexed { r, row ->
+            Row(Modifier.fillMaxWidth()) {
+                row.forEachIndexed { c, o ->
+                    val i = r * columns + c
+                    val sel = i == selected
+                    Row(
+                        Modifier.weight(1f)
+                            .background(if (sel) o.color else Color.Transparent)
+                            .clickable(role = Role.RadioButton) { onSelect(i) }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (o.icon != null) {
+                            Icon(o.icon, null, tint = if (sel) o.onColor else TsmColors.TextDim, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                        }
+                        Text(
+                            o.label,
+                            color = if (sel) o.onColor else TsmColors.TextMain,
+                            fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 14.sp,
+                        )
+                    }
                 }
-                Text(
-                    o.label,
-                    color = if (sel) o.onColor else TsmColors.TextMain,
-                    fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 14.sp,
-                )
+                // Ultima riga incompleta: celle vuote per tenere la stessa larghezza.
+                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }

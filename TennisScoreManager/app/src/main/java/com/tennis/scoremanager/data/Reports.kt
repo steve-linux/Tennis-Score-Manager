@@ -15,6 +15,7 @@ import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.stringsFor
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -22,7 +23,7 @@ import java.util.Locale
 /** Resoconto finale della partita: testo, JSON e immagine da condividere. */
 object Reports {
 
-    fun locale(lang: Lang): Locale = if (lang == Lang.IT) Locale.ITALY else Locale.UK
+    fun locale(lang: Lang): Locale = lang.locale
 
     fun duration(ms: Long): String {
         val s = ms / 1000
@@ -34,7 +35,7 @@ object Reports {
 
     fun date(ts: Long?, lang: Lang): String =
         ts?.let {
-            SimpleDateFormat(if (lang == Lang.IT) "EEEE d MMMM yyyy" else "EEEE, d MMMM yyyy", locale(lang)).format(Date(it))
+            SimpleDateFormat(stringsFor(lang).datePattern, locale(lang)).format(Date(it))
         } ?: ""
 
     /** "6-4" · "7-6(5)" · "[10-8]" dal punto di vista di [from]. */
@@ -53,12 +54,12 @@ object Reports {
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
     /** "G1 92% → 71% · G2 88% → 70%" */
-    fun batteryLine(rec: MatchRecord): String =
+    fun batteryLine(rec: MatchRecord, s: Strings): String =
         Side.entries.mapNotNull { side ->
             val a = rec.batteryStart[side]
             val b = rec.batteryEnd[side]
             if (a == null && b == null) null
-            else "${if (side == Side.P1) "G1" else "G2"} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
+            else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
     fun formatLabel(rec: MatchRecord, s: Strings): String =
@@ -108,7 +109,7 @@ object Reports {
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
-        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
         sb.appendLine()
         sb.append("#tennis · ${s.generatedWith}")
         return sb.toString()

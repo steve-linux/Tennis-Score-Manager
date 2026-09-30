@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
-import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.resume
@@ -137,13 +136,11 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         applyLanguage(lang)
     }
 
-    private fun locale(l: Lang): Locale = if (l == Lang.IT) Locale.ITALY else Locale.UK
-
     /** Imposta la lingua e la voce: quella scelta se esiste, altrimenti la migliore installata sul telefono. */
     private fun applyLanguage(l: Lang) {
         val t = tts ?: return
         if (_status.value == TtsStatus.ERROR) return
-        val loc = locale(l)
+        val loc = l.locale
         val res = runCatching { t.setLanguage(loc) }.getOrDefault(TextToSpeech.LANG_NOT_SUPPORTED)
         if (res == TextToSpeech.LANG_MISSING_DATA || res == TextToSpeech.LANG_NOT_SUPPORTED) {
             _voices.value = emptyList()

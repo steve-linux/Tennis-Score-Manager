@@ -306,6 +306,7 @@ private fun TimersRow(clock: Long, cd: CountdownUi?, s: Strings, middle: @Compos
 /** Stato dei braccialetti; toccandone uno si aprono le sue impostazioni. */
 @Composable
 private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.tennis.scoremanager.BandBattery>, onOpen: (Side) -> Unit) {
+    val s = LocalStrings.current
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         for (side in Side.entries) {
             val b = bands[side]
@@ -317,7 +318,7 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             val bat = battery[side]
             val low = bat != null && !bat.charging && bat.percent <= 20
             Pill(
-                (if (side == Side.P1) "G1" else "G2") +
+                s.playerTag(side.ordinal + 1) +
                     ((bat?.percent ?: b?.battery)?.let { " · $it%" } ?: "") +
                     (if (bat?.charging == true || b?.charging == true) " ⚡" else "") +
                     (bat?.leftText()?.let { " · $it" } ?: ""),

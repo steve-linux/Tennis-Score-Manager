@@ -236,6 +236,8 @@ class BleManager(context: Context) {
     /** Scrive le impostazioni nel braccialetto; true se le ha ricevute (poi risponde con quelle applicate). */
     suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = links[side]?.writeConfig(settings.encode()) ?: false
 
+    suspend fun writeLanguage(side: Side, code: String): Boolean = links[side]?.writeConfig(BandSettings.languageConfig(code)) ?: false
+
     fun isReady(side: Side): Boolean = links[side]?.state == LinkState.READY
 
     fun disconnectAll() {

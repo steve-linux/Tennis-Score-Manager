@@ -64,8 +64,9 @@ object BandProtocol {
 
 /**
  * Impostazioni salvate nel braccialetto. Testo sulla caratteristica CONFIG:
- * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30".
+ * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it".
  * In scrittura bastano le chiavi da cambiare; il braccialetto risponde con tutte.
+ * La lingua non passa da [encode]: la manda l'app da sola ([languageConfig]) e il braccialetto la salva senza anteprima.
  */
 data class BandSettings(
     val name: String = "",
@@ -84,6 +85,8 @@ data class BandSettings(
     /** Spegnimento se collegato ma inattivo (min). */
     val idleTimeoutMin: Int = 30,
     val firmware: String = "",
+    /** Lingua dei testi del braccialetto ("it", "en", ...); vuota = firmware senza lingue (prima della 2.2). */
+    val lang: String = "",
 ) {
     fun clamped() = copy(
         name = cleanName(name),
@@ -113,6 +116,9 @@ data class BandSettings(
     companion object {
         const val NAME_MAX = 12
 
+        /** Solo la lingua: il braccialetto la salva in silenzio (niente "IMPOSTAZIONI OK"). */
+        fun languageConfig(code: String) = "lang=$code"
+
         /** Nome valido per il braccialetto: ASCII stampabile, senza i separatori del protocollo, max 12. */
         fun cleanName(s: String): String {
             val plain = Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
@@ -136,6 +142,7 @@ data class BandSettings(
                 lostTimeoutS = map["lost"]?.toIntOrNull() ?: d.lostTimeoutS,
                 idleTimeoutMin = map["idle"]?.toIntOrNull() ?: d.idleTimeoutMin,
                 firmware = map["fw"] ?: "",
+                lang = map["lang"] ?: "",
             )
         }
     }

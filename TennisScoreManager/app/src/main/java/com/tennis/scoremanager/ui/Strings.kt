@@ -4,9 +4,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 
-/** Testi dell'app nelle due lingue. Le etichette dei cronometri restano in inglese come sul tabellone ATP. */
+/**
+ * Testi dell'app, uno per lingua (vedi [stringsFor]). Le etichette dei cronometri restano in inglese come sul
+ * tabellone ATP. I testi per i braccialetti vanno in maiuscolo e senza accenti (il font è ASCII).
+ */
 interface Strings {
     val appName: String get() = "Tennis Score Manager"
+
+    /** Sigla del giocatore/squadra 1 o 2 ("G1", "P1"...), usata dove non c'è posto per il nome. */
+    val playerTag: (Int) -> String
+
+    /** Data lunga per riepilogo e partite salvate (SimpleDateFormat). */
+    val datePattern: String
 
     // Pagina 1
     val setupTitle: String
@@ -82,8 +91,7 @@ interface Strings {
     val copyToOther: String
     val powerOff: String
     val languageSection: String
-    val italian: String
-    val english: String
+    val languageHint: String
     val audioSection: String
     val voiceCalls: String
     val voiceFiles: (Int, Int) -> String
@@ -199,6 +207,10 @@ interface Strings {
     val autonomy: (String) -> String
     val bandsBattery: String
 
+    // Notifica mentre la partita è in corso
+    val notifChannel: String
+    val notifText: (bands: Boolean, tv: Boolean) -> String
+
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
     val bandPlay: String
@@ -298,6 +310,9 @@ interface Strings {
 }
 
 object ItStrings : Strings {
+    override val playerTag: (Int) -> String = { "G$it" }
+    override val datePattern = "EEEE d MMMM yyyy"
+
     override val setupTitle = "Nuova partita"
     override val setupSubtitle = "Configurazione facoltativa: puoi lasciare tutto vuoto e andare avanti."
     override val clubSection = "Circolo e campo"
@@ -371,8 +386,7 @@ object ItStrings : Strings {
     override val copyToOther = "Copia sull'altro braccialetto"
     override val powerOff = "Spegni"
     override val languageSection = "Lingua"
-    override val italian = "Italiano"
-    override val english = "English"
+    override val languageHint = "Vale per le schermate, la voce dell'arbitro, il tabellone TV e i braccialetti."
     override val audioSection = "Audio e voce"
     override val voiceCalls = "Chiamate vocali dell'arbitro"
     override val voiceFiles: (Int, Int) -> String = { n, tot -> "File generati: $n/$tot" }
@@ -487,6 +501,15 @@ object ItStrings : Strings {
     override val autonomy: (String) -> String = { "autonomia ~$it" }
     override val bandsBattery = "Batteria braccialetti"
 
+    override val notifChannel = "Partita in corso"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Partita in corso · " + when {
+            bands && tv -> "braccialetti e tabellone TV attivi"
+            tv -> "tabellone TV attivo"
+            else -> "braccialetti attivi"
+        }
+    }
+
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
     override val bandChangeEnds = "CAMBIO CAMPO"
@@ -575,6 +598,9 @@ object ItStrings : Strings {
 }
 
 object EnStrings : Strings {
+    override val playerTag: (Int) -> String = { "P$it" }
+    override val datePattern = "EEEE, d MMMM yyyy"
+
     override val setupTitle = "New match"
     override val setupSubtitle = "Optional setup: you can leave everything empty and go on."
     override val clubSection = "Club and court"
@@ -648,8 +674,7 @@ object EnStrings : Strings {
     override val copyToOther = "Copy to the other wristband"
     override val powerOff = "Power off"
     override val languageSection = "Language"
-    override val italian = "Italiano"
-    override val english = "English"
+    override val languageHint = "Applies to the screens, the umpire's voice, the TV scoreboard and the wristbands."
     override val audioSection = "Audio and voice"
     override val voiceCalls = "Umpire voice calls"
     override val voiceFiles: (Int, Int) -> String = { n, tot -> "Generated files: $n/$tot" }
@@ -764,6 +789,15 @@ object EnStrings : Strings {
     override val autonomy: (String) -> String = { "about $it left" }
     override val bandsBattery = "Wristband battery"
 
+    override val notifChannel = "Match in progress"
+    override val notifText: (Boolean, Boolean) -> String = { bands, tv ->
+        "Match in progress · " + when {
+            bands && tv -> "wristbands and TV scoreboard on"
+            tv -> "TV scoreboard on"
+            else -> "wristbands on"
+        }
+    }
+
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"
     override val bandChangeEnds = "CHANGE ENDS"
@@ -851,6 +885,13 @@ object EnStrings : Strings {
     override val displayRetry = "Search again"
 }
 
-fun stringsFor(lang: Lang): Strings = if (lang == Lang.IT) ItStrings else EnStrings
+fun stringsFor(lang: Lang): Strings = when (lang) {
+    Lang.IT -> ItStrings
+    Lang.EN -> EnStrings
+    Lang.FR -> FrStrings
+    Lang.DE -> DeStrings
+    Lang.ES -> EsStrings
+    Lang.PT -> PtStrings
+}
 
 val LocalStrings = staticCompositionLocalOf<Strings> { ItStrings }

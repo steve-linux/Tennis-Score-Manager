@@ -215,11 +215,14 @@ fun OptionsScreen(c: MatchController) {
 
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
+            // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             Segmented(
-                listOf(SegOption("🇮🇹  ${s.italian}"), SegOption("🇬🇧  ${s.english}")),
-                selected = if (o.lang == Lang.IT) 0 else 1,
-                onSelect = { i -> c.updateOptions { it.copy(lang = if (i == 0) Lang.IT else Lang.EN) } },
+                Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
+                selected = o.lang.ordinal,
+                onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
+                columns = 2,
             )
+            Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
         }
 
         // Audio e voce
@@ -396,7 +399,7 @@ private fun BandPicker(
                 for ((address, label) in options) {
                     val usedBy = all.entries.firstOrNull { it.value.address == address && it.key != side }?.key
                     DropdownMenuItem(
-                        text = { Text(label + (usedBy?.let { " → ${if (it == Side.P1) "G1" else "G2"}" } ?: "")) },
+                        text = { Text(label + (usedBy?.let { " → ${s.playerTag(it.ordinal + 1)}" } ?: "")) },
                         leadingIcon = { Icon(Icons.Filled.Watch, null) },
                         onClick = {
                             open = false

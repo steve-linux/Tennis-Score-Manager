@@ -160,7 +160,7 @@ fun SummaryScreen(c: MatchController) {
                 InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
                 InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
                 if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
-                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec))
+                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
                 }
             }
         }

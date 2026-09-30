@@ -102,7 +102,7 @@ fun StartScreen(c: MatchController) {
                 for (side in Side.entries) {
                     val ready = bands[side]?.state == LinkState.READY
                     Pill(
-                        if (side == Side.P1) "G1" else "G2",
+                        s.playerTag(side.ordinal + 1),
                         if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
                         if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
                         Icons.Filled.Watch,

@@ -53,7 +53,7 @@ class VoicePack(private val context: Context) {
         return out
     }
 
-    /** Importa uno ZIP di registrazioni: `it/score_1_0.mp3`, `en/deuce.wav` o file alla radice (lingua corrente). */
+    /** Importa uno ZIP di registrazioni: `it/score_1_0.mp3`, `fr/deuce.wav` o file alla radice (lingua corrente). */
     fun importZip(uri: Uri, fallback: Lang): Int {
         var n = 0
         context.contentResolver.openInputStream(uri)?.use { input ->
@@ -66,12 +66,8 @@ class VoicePack(private val context: Context) {
                     val key = file.nameWithoutExtension
                     val ext = file.extension.lowercase()
                     if (key !in Phrases.keys || ext !in exts) continue
-                    val parts = path.lowercase().split('/')
-                    val lang = when {
-                        "en" in parts.dropLast(1) -> Lang.EN
-                        "it" in parts.dropLast(1) -> Lang.IT
-                        else -> fallback
-                    }
+                    val folders = path.lowercase().split('/').dropLast(1)
+                    val lang = Lang.entries.firstOrNull { it.code in folders } ?: fallback
                     exts.forEach { File(dir(lang), "$key.$it").delete() }
                     File(dir(lang), "$key.$ext").outputStream().use { zip.copyTo(it) }
                     n++
@@ -96,13 +92,14 @@ class VoicePack(private val context: Context) {
     fun writeReadme() {
         val sb = StringBuilder()
         sb.appendLine("TENNIS SCORE MANAGER - FILE VOCALI")
-        sb.appendLine("Metti le registrazioni in voice/it/ oppure voice/en/ con il nome della chiave.")
+        sb.appendLine("Metti le registrazioni in voice/<lingua>/ (${Lang.entries.joinToString(", ") { it.code }}) con il nome della chiave.")
         sb.appendLine("Formati: ${exts.joinToString()}. I nomi dei giocatori sono sempre letti dal TTS.")
         sb.appendLine("La cartella tts/ contiene i file generati dall'app: le tue registrazioni hanno la precedenza.")
+        // Una colonna per lingua, separate da tabulazioni: si apre bene anche come foglio di calcolo.
         sb.appendLine()
-        sb.appendLine(String.format("%-18s %-32s %s", "CHIAVE", "ITALIANO", "ENGLISH"))
+        sb.appendLine((listOf("CHIAVE") + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
         for (k in Phrases.keys) {
-            sb.appendLine(String.format("%-18s %-32s %s", k, Phrases.text(k, Lang.IT), Phrases.text(k, Lang.EN)))
+            sb.appendLine((listOf(k) + Lang.entries.map { Phrases.text(k, it) }).joinToString("\t"))
         }
         runCatching { File(baseDir.apply { mkdirs() }, "LEGGIMI.txt").writeText(sb.toString()) }
     }

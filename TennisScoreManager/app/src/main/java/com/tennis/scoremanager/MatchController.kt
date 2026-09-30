@@ -11,6 +11,7 @@ import android.provider.DocumentsContract
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
+import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BandStatus
@@ -274,7 +275,10 @@ class MatchController(
         announcer.enabled = v.audio
         announcer.useGeneratedFiles = v.voiceFiles
         if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
-        if (old.lang != v.lang) refreshVoiceCount()
+        if (old.lang != v.lang) {
+            refreshVoiceCount()
+            syncBandLanguage(ble.bands.value)
+        }
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
         }
@@ -480,6 +484,28 @@ class MatchController(
                 }
                 if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
             }
+            syncBandLanguage(bands)
+        }
+    }
+
+    /** Lingua già chiesta a ciascun braccialetto, per non riscriverla a ogni aggiornamento prima che risponda. */
+    private val bandLangSent = mutableMapOf<Side, String>()
+
+    /**
+     * I braccialetti dal firmware 2.2 parlano la lingua dell'app: la si manda quando si collegano e quando
+     * la si cambia. Quelli più vecchi non dichiarano la lingua e restano in italiano.
+     */
+    private fun syncBandLanguage(bands: Map<Side, BandInfo>) {
+        val want = options.value.lang.code
+        for ((side, info) in bands) {
+            val have = info.settings?.lang
+            if (info.state != LinkState.READY || have.isNullOrEmpty()) {
+                bandLangSent.remove(side)
+                continue
+            }
+            if (have == want || bandLangSent[side] == want) continue
+            bandLangSent[side] = want
+            scope.launch { if (!ble.writeLanguage(side, want)) bandLangSent.remove(side) }
         }
     }
 
@@ -960,9 +986,8 @@ class MatchController(
         announcer.announce(
             force = true,
             name = VOICE_TEST,
-            segs = listOf(
-                Seg.Clip("first_set"), Seg.Pause(700),
-                Seg.Say(n.side(Side.P1)), Seg.Clip("to_serve"), Seg.Pause(700),
+            segs = listOf(Seg.Clip("first_set"), Seg.Pause(700)) + calls().toServe(n.side(Side.P1)) + listOf(
+                Seg.Pause(700),
                 Seg.Clip("score_1_0"), Seg.Pause(500),
                 Seg.Clip("deuce"), Seg.Pause(500),
                 Seg.Clip("advantage"), Seg.Say(n.side(Side.P2)), Seg.Pause(500),

@@ -164,7 +164,7 @@ object TvSnapshots {
         }
         return TvSnapshot(
             seq = i.seq,
-            lang = if (i.lang == Lang.IT) "it" else "en",
+            lang = i.lang.code,
             phase = phase,
             title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
             players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),

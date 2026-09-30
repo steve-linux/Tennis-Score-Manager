@@ -25,57 +25,21 @@ interface CallNames {
 /**
  * Catalogo delle frasi fisse. Ogni chiave corrisponde a un file `<chiave>.wav|.mp3|.ogg|.m4a`
  * nella cartella voce della lingua; il testo serve per generare il file o come riserva TTS.
+ * Le chiavi sono le stesse in tutte le lingue; parole e ordine stanno in [CallWords].
  */
 object Phrases {
     const val MAX_NUMBER = 30
 
-    private val numIt = listOf(
-        "zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci",
-        "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette", "diciotto",
-        "diciannove", "venti", "ventuno", "ventidue", "ventitré", "ventiquattro", "venticinque",
-        "ventisei", "ventisette", "ventotto", "ventinove", "trenta",
+    val FIXED_KEYS = listOf(
+        "first_set", "to_serve", "play", "deuce", "advantage", "deciding_point", "game", "leads",
+        "sets_1_0", "sets_all_1", "tiebreak", "match_tiebreak", "to", "all", "game_set_match",
+        "change_ends", "correction",
     )
-    private val numEn = listOf(
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-        "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
-        "nineteen", "twenty", "twenty-one", "twenty-two", "twenty-three", "twenty-four", "twenty-five",
-        "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty",
-    )
-    private val pointIt = listOf("zero", "quindici", "trenta", "quaranta")
-    private val pointEn = listOf("love", "fifteen", "thirty", "forty")
-
-    private val fixed: Map<String, Pair<String, String>> = linkedMapOf(
-        "first_set" to ("primo set" to "first set"),
-        "to_serve" to ("al servizio" to "to serve"),
-        "play" to ("gioco" to "play"),
-        "deuce" to ("parità" to "deuce"),
-        "advantage" to ("vantaggio" to "advantage"),
-        "deciding_point" to ("punto decisivo" to "deciding point"),
-        "game" to ("gioco" to "game"),
-        "leads" to ("conduce" to "leads"),
-        "sets_1_0" to ("un set a zero" to "one set to love"),
-        "sets_all_1" to ("un set pari" to "one set all"),
-        "tiebreak" to ("tie-break" to "tie-break"),
-        "match_tiebreak" to ("super tie-break" to "match tie-break"),
-        "to" to ("a" to "to"),
-        "all" to ("pari" to "all"),
-        "game_set_match" to ("gioco, set, partita" to "game, set and match"),
-        "change_ends" to ("cambio campo" to "change ends"),
-        "correction" to ("correzione" to "correction"),
-    )
-
-    private fun numberWord(n: Int, lang: Lang): String =
-        (if (lang == Lang.IT) numIt else numEn).getOrElse(n) { n.toString() }
-
-    private fun gamesWord(n: Int, lang: Lang): String = when (lang) {
-        Lang.IT -> if (n == 1) "un gioco" else "${numberWord(n, lang)} giochi"
-        Lang.EN -> if (n == 1) "one game" else "${numberWord(n, lang)} games"
-    }
 
     /** Tutte le chiavi del catalogo, nell'ordine in cui vengono generate. */
     val keys: List<String> by lazy {
         buildList {
-            addAll(fixed.keys)
+            addAll(FIXED_KEYS)
             for (s in 0..3) for (r in 0..3) {
                 if ((s == 0 && r == 0) || (s == 3 && r == 3)) continue
                 add("score_${s}_$r")
@@ -91,26 +55,14 @@ object Phrases {
     }
 
     fun text(key: String, lang: Lang): String {
-        fixed[key]?.let { return if (lang == Lang.IT) it.first else it.second }
+        val w = CallWords.of(lang)
+        w.fixed[key]?.let { return it }
         val parts = key.split('_')
         return when {
-            key.startsWith("score_") -> {
-                val s = parts[1].toInt()
-                val r = parts[2].toInt()
-                val words = if (lang == Lang.IT) pointIt else pointEn
-                if (s == r) "${words[s]} ${if (lang == Lang.IT) "pari" else "all"}" else "${words[s]} ${words[r]}"
-            }
-            key.startsWith("games_all_") -> {
-                val n = parts[2].toInt()
-                "${gamesWord(n, lang)} ${if (lang == Lang.IT) "pari" else "all"}"
-            }
-            key.startsWith("games_") -> {
-                val a = parts[1].toInt()
-                val b = parts[2].toInt()
-                if (lang == Lang.IT) "${gamesWord(a, lang)} a ${numberWord(b, lang)}"
-                else "${gamesWord(a, lang)} to ${if (b == 0) "love" else numberWord(b, lang)}"
-            }
-            key.startsWith("num_") -> numberWord(parts[1].toInt(), lang)
+            key.startsWith("score_") -> w.score(parts[1].toInt(), parts[2].toInt())
+            key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
+            key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
+            key.startsWith("num_") -> w.number(parts[1].toInt())
             else -> key
         }
     }
@@ -118,6 +70,8 @@ object Phrases {
 
 /** Costruisce le chiamate dell'arbitro secondo le regole concordate. */
 class CallBuilder(private val lang: Lang) {
+
+    private val words = CallWords.of(lang)
 
     companion object {
         /** Tag del segmento "gioco"/"play" iniziale: fa partire il tempo partita. */
@@ -136,11 +90,14 @@ class CallBuilder(private val lang: Lang) {
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
         Seg.Clip("first_set"),
         Seg.Pause(START_GAP),
-        Seg.Say(serverName(s, names)),
-        Seg.Clip("to_serve"),
+    ) + toServe(serverName(s, names)) + listOf(
         Seg.Pause(START_GAP),
         Seg.Clip("play", tag = TAG_PLAY),
     )
+
+    /** "Rossi al servizio", "Au service Dupont", "Aufschlag Müller". */
+    fun toServe(name: String): List<Seg> =
+        if (words.nameBeforeToServe) listOf(Seg.Say(name), Seg.Clip("to_serve")) else listOf(Seg.Clip("to_serve"), Seg.Say(name))
 
     /** Ripresa dopo una sospensione. */
     fun resume(): List<Seg> = listOf(Seg.Clip("play"))
@@ -211,11 +168,12 @@ class CallBuilder(private val lang: Lang) {
         val b = minOf(s.pt1, s.pt2)
         if (a == b) return listOf(num(a), Seg.Clip("all"))
         val leader = if (s.pt1 > s.pt2) Side.P1 else Side.P2
-        return when (lang) {
-            Lang.IT -> listOf(num(a), Seg.Clip("to"), num(b), Seg.Say(names.side(leader)))
-            Lang.EN -> listOf(num(a), num(b), Seg.Say(names.side(leader)))
-        }
+        return pair(a, b, words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
     }
+
+    /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
+    private fun pair(a: Int, b: Int, to: Boolean): List<Seg> =
+        if (to) listOf(num(a), Seg.Clip("to"), num(b)) else listOf(num(a), num(b))
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
@@ -239,9 +197,10 @@ class CallBuilder(private val lang: Lang) {
     fun matchEnd(s: MatchState, winner: Side, names: CallNames): List<Seg> {
         val out = mutableListOf<Seg>(Seg.Clip("game_set_match"), Seg.Say(names.side(winner)))
         for (set in s.sets) {
+            val a = set.shown(winner)
+            val b = set.shown(winner.other)
             out += Seg.Pause(SHORT)
-            out += num(set.shown(winner))
-            out += num(set.shown(winner.other))
+            out += pair(a, b, words.setScoreTo(a, b))
         }
         return out
     }

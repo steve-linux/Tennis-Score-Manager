@@ -199,7 +199,15 @@ gms.forEach(s => buildSeg(s, "8"));
 sts.forEach(s => buildSeg(s, "8"));
 buildSeg($("clock"), "88:88:88");
 
-const IT = (navigator.language || "it").startsWith("it");
+// Testi prima che arrivi il primo stato (poi valgono quelli dell'app, nella lingua scelta dall'arbitro).
+const FALLBACK = {
+  it: ["CONNESSIONE PERSA - RICONNESSIONE...", "SCHERMO INTERO"],
+  en: ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"],
+  fr: ["CONNEXION PERDUE - RECONNEXION...", "PLEIN ÉCRAN"],
+  de: ["VERBINDUNG VERLOREN - NEUER VERSUCH...", "VOLLBILD"],
+  es: ["CONEXIÓN PERDIDA - RECONECTANDO...", "PANTALLA COMPLETA"],
+  pt: ["CONEXÃO PERDIDA - RECONECTANDO...", "TELA CHEIA"],
+}[(navigator.language || "it").slice(0, 2).toLowerCase()] || ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"];
 let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
@@ -227,6 +235,7 @@ function render() {
   ghost = S.show.ghost !== false;
   document.documentElement.lang = S.lang;
   const L = S.labels;
+  setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
   for (let i = 0; i < 2; i++) {
@@ -288,7 +297,7 @@ function tick() {
   const silent = now - lastMsg;
   document.body.classList.toggle("lost", silent > 12000);
   if (silent > 12000) {
-    setText($("banner"), S ? S.labels.lost : (IT ? "CONNESSIONE PERSA - RICONNESSIONE..." : "CONNECTION LOST - RECONNECTING..."));
+    setText($("banner"), S ? S.labels.lost : FALLBACK[0]);
     if (!lostSince) lostSince = now;
     if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
   } else {
@@ -315,7 +324,7 @@ function poll() {
 
 // ------------------------------------------------------------------ schermo intero e schermo acceso
 const fs = $("fs");
-fs.textContent = "⛶ " + (IT ? "SCHERMO INTERO" : "FULL SCREEN");
+fs.textContent = "⛶ " + FALLBACK[1];
 if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
 let pointerTimer = 0;
 function showPointer() {

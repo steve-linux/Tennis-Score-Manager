@@ -2,6 +2,7 @@ package com.tennis.scoremanager.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Locale
 
 /** Giocatore 1 (giallo) e Giocatore 2 (rosso). Nel doppio indica la squadra. */
 @Serializable
@@ -11,8 +12,23 @@ enum class Side {
     val other: Side get() = if (this == P1) P2 else P1
 }
 
+/**
+ * Lingue di app, chiamate e braccialetti. [code] va al tabellone TV e al braccialetto; [locale] sceglie la voce
+ * della sintesi vocale (preferita, se c'è, quella del paese) e il formato delle date. [label] si scrive nella lingua stessa.
+ */
 @Serializable
-enum class Lang { IT, EN }
+enum class Lang(val code: String, val locale: Locale, val label: String, val flag: String) {
+    IT("it", Locale.ITALY, "Italiano", "🇮🇹"),
+    EN("en", Locale.UK, "English", "🇬🇧"),
+    FR("fr", Locale.FRANCE, "Français", "🇫🇷"),
+    DE("de", Locale.GERMANY, "Deutsch", "🇩🇪"),
+    ES("es", Locale.forLanguageTag("es-ES"), "Español", "🇪🇸"),
+    PT("pt", Locale.forLanguageTag("pt-BR"), "Português", "🇧🇷");
+
+    companion object {
+        fun fromCode(code: String?): Lang? = entries.firstOrNull { it.code == code?.lowercase() }
+    }
+}
 
 @Serializable
 enum class MatchFormat {

@@ -34,25 +34,21 @@ class MatchService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val nm = getSystemService(NotificationManager::class.java)
+        val c = (application as TsmApp).controller
+        val s = c.strings
         if (Build.VERSION.SDK_INT >= 26) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Partita in corso", NotificationManager.IMPORTANCE_LOW))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, s.notifChannel, NotificationManager.IMPORTANCE_LOW))
         }
         val open = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
-        val c = (application as TsmApp).controller
         val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
         val tv = c.tv.value.enabled
-        val what = when {
-            bands && tv -> "braccialetti e tabellone TV attivi"
-            tv -> "tabellone TV attivo"
-            else -> "braccialetti attivi"
-        }
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText("Partita in corso · $what")
+            .setContentText(s.notifText(bands, tv))
             .setOngoing(true)
             .setContentIntent(open)
             .build()

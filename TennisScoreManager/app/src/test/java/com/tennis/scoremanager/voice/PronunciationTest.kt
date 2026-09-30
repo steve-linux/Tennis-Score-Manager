@@ -27,4 +27,23 @@ class PronunciationTest {
     fun englishUntouched() {
         assertEquals("first set Rossi to serve", Pronunciation.fix("first set Rossi to serve", Lang.EN, Pronunciation.SAMSUNG))
     }
+
+    @Test
+    fun germanTieBreak() {
+        assertEquals("Taibreak", Pronunciation.fix("Tie-Break", Lang.DE, null))
+        assertEquals("Match-Taibreak", Pronunciation.fix("Match-Tie-Break", Lang.DE, null))
+        assertEquals("sechs beide, Taibreak", Pronunciation.fix("sechs beide Tie-Break", Lang.DE, null))
+    }
+
+    @Test
+    fun frenchIsolatedA() {
+        assertEquals("a", Pronunciation.fix("à", Lang.FR, null))
+        assertEquals("dix à huit Rossi", Pronunciation.fix("dix à huit Rossi", Lang.FR, null))
+    }
+
+    @Test
+    fun otherLanguagesUntouched() {
+        assertEquals("juego Rossi seis juegos iguales tie-break", Pronunciation.fix("juego Rossi seis juegos iguales tie-break", Lang.ES, null))
+        assertEquals("primeiro set", Pronunciation.fix("primeiro set", Lang.PT, null))
+    }
 }
