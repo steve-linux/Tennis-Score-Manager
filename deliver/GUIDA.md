@@ -1,5 +1,7 @@
 # Tennis Score Manager — guida passo passo
 
+**Italiano** · [English](GUIDE.en.md) · [Français](GUIDE.fr.md) · [Deutsch](GUIDE.de.md) · [Español](GUIDE.es.md) · [Português](GUIDE.pt.md)
+
 App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia **in sei lingue** (italiano, inglese, francese, tedesco, spagnolo, portoghese: capitolo 4.1), due braccialetti **M5StickS3** collegati in Bluetooth LE e un **tabellone a LED su TV o monitor** (capitolo 8).
 
 ## 0. Cosa c'è nel repository
@@ -9,49 +11,87 @@ App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis second
 | `TennisScoreManager/` | Il progetto Android Studio. |
 | `firmware/TSM_Band/TSM_Band.ino` | Il firmware del braccialetto. |
 | `deliver/installa_tsm.sh` | In alternativa al clone: crea **tutto** il progetto Android e lo sketch con soli blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
-| `deliver/GUIDA.md` | Questa guida. |
+| `deliver/GUIDA.md` | Questa guida (in italiano); le traduzioni sono `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`, `.pt`. |
 
-Versioni usate e verificate: app **2.3** · firmware **2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versioni usate e verificate: app **2.3** · firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
-## 1. Scaricare il progetto su Fedora
+## 1. Preparare il computer e scaricare il progetto
 
-**Con git (consigliato)**:
+Va bene **Windows 10/11**, **Ubuntu** (22.04 o più recente) o **Fedora**; su altre distribuzioni Linux i passi sono quelli di Ubuntu o di Fedora con il loro gestore di pacchetti. Nei comandi `~` è la tua cartella personale: su Linux `/home/<utente>`, su Windows `C:\Users\<utente>`.
+
+### 1.1 Programmi da installare
+
+| | Windows 10/11 (PowerShell) | Ubuntu | Fedora |
+|---|---|---|---|
+| **Git** (scaricare e aggiornare il progetto) | `winget install --id Git.Git -e` | `sudo apt install git` | `sudo dnf install git` |
+| **Android Studio** (l'app) | `winget install --id Google.AndroidStudio -e` | `sudo snap install android-studio --classic` | archivio `.tar.gz` da developer.android.com/studio, estratto ad esempio in `~/android-studio` |
+| **Arduino IDE 2** (i braccialetti) | `winget install --id ArduinoSA.IDE.stable -e` | Flatpak `cc.arduino.IDE2` (vedi sotto) | `flatpak install flathub cc.arduino.IDE2` |
+| **Telefono collegato col cavo** | driver USB del produttore, se serve (vedi sotto) | `sudo apt install android-sdk-platform-tools-common` | `sudo dnf install android-tools` |
+| **Porta seriale del braccialetto** | niente da fare | `sudo usermod -aG dialout $USER` | `sudo usermod -aG dialout $USER` |
+
+- **Windows**: `winget` c'è già in Windows 10/11 aggiornati e si usa da *PowerShell* o *Terminale*. Si possono anche scaricare gli installer normali da git-scm.com, developer.android.com/studio e arduino.cc/en/software.
+- **Ubuntu, Arduino IDE**: se Flatpak non c'è ancora: `sudo apt install flatpak`, poi `flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo` e `flatpak install flathub cc.arduino.IDE2`; esci e rientra nella sessione perché compaia nel menu. L'AppImage di arduino.cc funziona anche, ma sulle Ubuntu recenti vuole pacchetti e opzioni in più: Flatpak è più semplice.
+- **Linux, Android Studio dall'archivio**: si avvia con `bin/studio.sh` dentro la cartella estratta (es. `~/android-studio/bin/studio.sh`). Su Ubuntu anche lo snap va bene; su Fedora c'è pure il Flatpak `com.google.AndroidStudio`, ma l'archivio ufficiale dà meno problemi con il telefono collegato.
+- **Linux, gruppo `dialout`** (porta seriale) e pacchetti per il telefono (regole udev): dopo averli installati **esci e rientra nella sessione** (o riavvia), altrimenti porta e telefono restano inaccessibili.
+- **Windows, driver del telefono**: molti telefoni funzionano subito. Se Android Studio non vede il telefono installa il driver del produttore: *Samsung Android USB Driver* (dal sito Samsung Developer) per i Samsung, *Google USB Driver* (Android Studio › **Tools › SDK Manager › SDK Tools**) per i Pixel. Il braccialetto non ha bisogno di driver: compare come porta `COM3`, `COM4`…
+- Al primo avvio Android Studio fa partire una procedura guidata: scegli **Standard** e lascia che scarichi l'SDK Android (serve internet, qualche GB).
+
+### 1.2 Scaricare il progetto
+
+Il repository su GitHub è **privato**: serve un account GitHub a cui il proprietario ha dato l'accesso.
+
+**A. Con git (consigliato: poi si aggiorna con `git pull`)**
+
+Linux (Ubuntu, Fedora), nel Terminale:
 
 ```bash
-git clone https://github.com/steve-linux/Tennis-Score-Manager.git ~/AndroidStudioProjects/Tennis-Score-Manager
+mkdir -p ~/AndroidStudioProjects
+cd ~/AndroidStudioProjects
+git clone https://github.com/steve-linux/Tennis-Score-Manager.git
 ```
 
-Il progetto da aprire in Android Studio è la sottocartella `TennisScoreManager`; lo sketch è in `firmware/TSM_Band/`. Per gli aggiornamenti basta `git pull`.
+Windows, in PowerShell:
 
-**Oppure con lo script** (tutto come blocchi `cat`):
+```powershell
+mkdir -Force $HOME\AndroidStudioProjects
+cd $HOME\AndroidStudioProjects
+git clone https://github.com/steve-linux/Tennis-Score-Manager.git
+```
+
+- **Accesso**: su Windows git apre da solo la finestra di accesso a GitHub. Su Linux GitHub non accetta la password in `git clone`: il modo più semplice è GitHub CLI (`sudo apt install gh` oppure `sudo dnf install gh`), poi `gh auth login` e, nella cartella `~/AndroidStudioProjects`, `gh repo clone steve-linux/Tennis-Score-Manager`.
+- Il repository finisce in `~/AndroidStudioProjects/Tennis-Score-Manager`. Il progetto da aprire in Android Studio è la sua sottocartella **`TennisScoreManager`**; lo sketch del braccialetto è in `firmware/TSM_Band/`.
+- Aggiornare: `git pull` dentro `Tennis-Score-Manager`.
+
+**B. Senza git**: sulla pagina GitHub del progetto (con l'accesso fatto) **Code › Download ZIP**, poi estrai lo ZIP, ad esempio in `~/AndroidStudioProjects`. Per una versione nuova si riscarica lo ZIP.
+
+**C. Con lo script** `deliver/installa_tsm.sh`, che contiene tutto il progetto in un unico file di testo (blocchi `cat << 'TSM_EOF'`). Si lancia su Linux o, su Windows, in *Git Bash* (arriva con Git):
 
 ```bash
 bash installa_tsm.sh
 ```
 
-- Il progetto va in `/home/stefano/AndroidStudioProjects/TennisScoreManager`.
-- Se quella cartella esiste già viene **spostata** in `TennisScoreManager.backup-AAAAMMGG-hhmmss` (i vecchi layout XML e le vecchie classi farebbero fallire la build nuova).
-- Lo sketch va in `~/Arduino/TSM_Band/TSM_Band.ino`.
+- Il progetto va in `~/AndroidStudioProjects/TennisScoreManager`, lo sketch in `~/Arduino/TSM_Band/TSM_Band.ino`.
+- Se la cartella del progetto esiste già viene **spostata** in `TennisScoreManager.backup-AAAAMMGG-hhmmss` (i vecchi layout XML e le vecchie classi farebbero fallire la build nuova).
 - Per usare altre cartelle: `bash installa_tsm.sh /percorso/progetto /percorso/sketch`.
 
 ## 2. Aprire e compilare in Android Studio
 
-1. Avvia Android Studio: `/opt/android-studio/bin/studio.sh`.
-2. **File › Open** → scegli la cartella `TennisScoreManager` (quella del clone o quella creata dallo script) → **Trust Project**.
+1. Avvia Android Studio: su Windows dal menu Start, su Ubuntu (snap) dal menu delle applicazioni, dall'archivio con `bin/studio.sh` (1.1).
+2. **File › Open** (o **Open** nella finestra di benvenuto) → scegli la cartella `TennisScoreManager` (dentro il clone o lo ZIP, oppure quella creata dallo script) → **Trust Project**.
 3. Aspetta la sincronizzazione Gradle (la prima volta scarica Gradle, il plugin Android e le librerie: serve internet solo adesso).
 4. Se compare *"Failed to find target android-36"* clicca il link **Install missing platform** (oppure **Tools › SDK Manager › SDK Platforms › Android 16 (API 36)**).
 5. Se Android Studio propone l'**AGP Upgrade Assistant**, puoi ignorarlo: queste versioni sono state compilate e testate così.
 6. JDK di Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (quello incluso, è il predefinito).
 7. **Build › Make Project**: deve finire con *BUILD SUCCESSFUL*.
-8. Facoltativo: i test (57: regole, voce, batteria e ricarica, impostazioni dei braccialetti, tabellone TV) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
+8. Facoltativo: i test (74: regole, voce, lingue, batteria e ricarica, impostazioni dei braccialetti, tabellone TV) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
 
 ## 3. Installare l'app sul telefono
 
 1. Sul telefono: **Impostazioni › Info telefono** → tocca 7 volte *Numero build* → **Opzioni sviluppatore › Debug USB** attivo.
 2. Colleghi il cavo, accetti l'impronta RSA, scegli il telefono in alto e premi **▶ Run**.
-   - Se Fedora non vede il telefono: `sudo dnf install android-tools` (regole udev) e ricollega; in alternativa **Device Manager › Pair devices using Wi-Fi** (debug wireless, Android 11+).
+   - Se il computer non vede il telefono: su Windows il driver USB del produttore, su Linux il pacchetto con le regole udev (1.1); poi ricollega il cavo. In alternativa, senza cavo né driver: **Device Manager › Pair devices using Wi-Fi** (debug wireless, Android 11+, computer e telefono sulla stessa rete).
 3. In alternativa **Build › Build App Bundle(s) / APK(s) › Build APK(s)**, copia l'APK sul telefono e installalo (va consentita l'installazione da origini sconosciute).
 
 ## 4. La voce (funziona senza internet)
@@ -92,25 +132,21 @@ Particolarità:
 - **Pronuncia** (`voice/Pronunciation.kt`): tutte le frasi di tutte le lingue sono state fatte leggere alle voci Google e trascritte con whisper. Correzioni aggiunte: in tedesco "Tie-Break" si fa leggere "Taibreak", con una virgola davanti (altrimenti "Teilbreg" o "bei Detailbreak"); in francese la "à" isolata dei file pre-generati si fa leggere "a" (altrimenti "a accent grave"). **Samsung TTS nelle nuove lingue non è ancora stato provato.**
 - **Braccialetti** (firmware 2.2): l'app manda da sola la lingua a ogni collegamento e quando la cambi; il braccialetto la salva e la usa anche da scollegato (ricerca del telefono, ricarica, spegnimento), senza accenti perché il font è ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o precedente i messaggi mandati dall'app sono tradotti, quelli interni del braccialetto restano in italiano.
 
-## 5. Firmware dei braccialetti (Arduino IDE su Fedora)
+## 5. Firmware dei braccialetti (Arduino IDE)
 
-1. Installa Arduino IDE 2 (Flatpak `cc.arduino.IDE2` o AppImage) e dai i permessi alla porta seriale:
-   ```bash
-   sudo usermod -aG dialout $USER
-   ```
-   poi esci e rientra nella sessione.
+1. Installa Arduino IDE 2 (1.1). Su Linux serve anche il permesso sulla porta seriale (gruppo `dialout`, 1.1), dopo essere usciti e rientrati nella sessione.
 2. **File › Preferences › Additional boards manager URLs**:
    `https://static-cdn.m5stack.com/resource/arduino/package_m5stack_index.json`
 3. **Boards Manager** → cerca **M5Stack** → installa la versione **≥ 3.2.5**.
 4. **Library Manager** → installa **M5Unified** (accetta "Install all" per M5GFX) e **NimBLE-Arduino** di *h2zero* (≥ 2.1).
-5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` del clone (oppure `~/Arduino/TSM_Band/TSM_Band.ino` se hai usato lo script).
-6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → `/dev/ttyACM0`.
+5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` del clone o dello ZIP (oppure `~/Arduino/TSM_Band/TSM_Band.ino` se hai usato lo script).
+6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → la porta del braccialetto: su Linux `/dev/ttyACM0`, su Windows `COM3`, `COM4`… (quella che compare quando colleghi il cavo).
    *(Senza il pacchetto M5Stack va bene anche "ESP32S3 Dev Module": USB CDC On Boot = Enabled, Flash Size = 8MB, Partition = 8M with spiffs.)*
-7. **Upload (→)**. Se la porta non compare o il caricamento fallisce: tieni premuto a lungo il **tasto laterale** (modalità download) e riprova.
+7. **Upload (→)**. Se la porta non compare o il caricamento fallisce: prova un altro cavo USB-C (alcuni servono solo a ricaricare), poi tieni premuto a lungo il **tasto laterale** (modalità download) e riprova; in modalità download su Windows il numero della porta COM può cambiare.
    **Dopo il caricamento**, se il display resta nero (il braccialetto è rimasto in modalità programmazione), premi **una volta** il tasto laterale: riparte con il programma nuovo.
 8. All'avvio il braccialetto mostra il suo nome, es. **TSM-3FA2** (si può cambiare dall'app, vedi 6.1). Ripeti per il secondo braccialetto.
 
-> **Firmware 2.2**: i testi del braccialetto nella lingua dell'app (4.1). **Firmware 2.1**: la schermata di ricarica (6.2); le impostazioni, *Identifica* e lo spegnimento dall'app richiedono almeno il 2.0. Carica `TSM_Band.ino` su **entrambi** i braccialetti; con un firmware vecchio l'app lo dice nel pannello delle impostazioni e il resto continua a funzionare.
+> **Firmware 2.2.1**: anche il conto alla rovescia prima dello spegnimento nella lingua dell'app (6). **Firmware 2.2**: i testi del braccialetto nella lingua dell'app (4.1). **Firmware 2.1**: la schermata di ricarica (6.2); le impostazioni, *Identifica* e lo spegnimento dall'app richiedono almeno il 2.0. Carica `TSM_Band.ino` su **entrambi** i braccialetti; con un firmware vecchio l'app lo dice nel pannello delle impostazioni e il resto continua a funzionare.
 
 ## 6. Usare i braccialetti
 
@@ -259,10 +295,10 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 - **Doppio**: rotazione del servizio A1-B1-A2-B2 per tutto il set, anche nel tie-break; all'inizio di ogni set l'app chiede l'ordine (si può cambiare, come da regolamento).
 - **Chiamate**: punteggio letto da chi serve ("quindici zero", "zero quaranta", "quindici pari", "parità", "vantaggio Rossi"); a fine game "gioco Rossi, Rossi conduce tre giochi a due" / "due giochi pari" + "cambio campo" quando si cambia; sul 6-6 "gioco Rossi, sei giochi pari, tie-break"; nel tie-break si legge da chi conduce ("tre a uno Rossi", "sei pari"); fine set "gioco Rossi, Rossi conduce un set a zero" / "un set pari"; fine partita "gioco, set, partita Rossi, sei quattro, tre sei, sette cinque"; "correzione" + punteggio quando si annulla un punto.
 
-**Punti che ho sistemato rispetto alla richiesta originale, secondo ITF:**
+**Scelte fatte rispetto alla richiesta originale, per seguire l'ITF:**
 1. **Sul 6-6 non si cambia campo** (sono 12 game, numero pari): l'app fa la pausa di 30 s e dice "tie-break", ma non dice "cambio campo" e non scambia i tasti. Il primo cambio è dopo 6 punti del tie-break.
 2. Il cambio a fine set dipende dal numero di game del set (vedi sopra), non avviene sempre.
-3. A fine set vinto senza tie-break uso la stessa formula del tie-break ("gioco Rossi, Rossi conduce un set a zero"). Molti arbitri dicono "gioco e set Rossi, sei quattro": si può cambiare facilmente in `Calls.kt`.
+3. A fine set vinto senza tie-break l'app usa la stessa formula del tie-break ("gioco Rossi, Rossi conduce un set a zero"). Molti arbitri dicono "gioco e set Rossi, sei quattro": si può cambiare facilmente in `Calls.kt`.
 4. All'1-1 nel formato con super tie-break la voce aggiunge "super tie-break".
 
 ## 10. Dove mettere le mani
@@ -288,7 +324,9 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 ## 11. Problemi comuni
 
 - **Braccialetto non trovato**: Bluetooth e posizione attivi (righe verdi)? Il braccialetto sta lampeggiando PAIRING? (Se è già collegato a un altro telefono non si vede.) Se nel frattempo si è spento da solo (30 s), riaccendilo con un clic sul tasto laterale.
-- **Nel pannello impostazioni c'è "firmware senza impostazioni"**: quel braccialetto ha ancora lo sketch vecchio, ricaricalo (capitolo 5).
+- **Nel pannello impostazioni c'è "Il firmware di questo braccialetto non ha le impostazioni"**: quel braccialetto ha ancora lo sketch vecchio, ricaricalo (capitolo 5).
+- **Android Studio non vede il telefono**: Debug USB attivo e impronta RSA accettata sul telefono (3)? Su Windows serve a volte il driver del produttore, su Linux le regole udev e una nuova sessione (1.1). Oppure il debug wireless (3).
+- **Arduino IDE non mostra la porta del braccialetto**: cavo USB-C dati e non solo di ricarica; su Linux gruppo `dialout` e nuova sessione (1.1); poi la modalità download (5, punto 7).
 - **La voce non parla o legge male**: volume multimediale, *Audio On*, voce della lingua scelta installata (4); prova un altro motore o un'altra voce in *Audio e voce*.
 - **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro lo schermo resta acceso.
 - **Sync Gradle fallita per il JDK**: imposta Gradle JDK = jbr-21 (punto 2.6).

@@ -1,0 +1,6 @@
+# Clone su Windows (core.autocrlf=true): gradlew deve restare LF.
+# I .bat sono già CRLF nel repository e installa_tsm.sh contiene gradlew.bat con i suoi CRLF: lasciarli così.
+gradlew                   text eol=lf
+*.bat                     -text
+deliver/installa_tsm.sh   -text
+*.jar                     binary

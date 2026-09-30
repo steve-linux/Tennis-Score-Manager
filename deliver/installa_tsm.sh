@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
 # ============================================================================
 #  Tennis Score Manager - installazione completa del progetto (app + firmware)
-#  Uso:  bash installa_tsm.sh [cartella_progetto] [cartella_sketch]
-#  Predefinite: /home/stefano/AndroidStudioProjects/TennisScoreManager
-#               ~/Arduino/TSM_Band
+#  Tennis Score Manager - complete project installer (app + firmware)
+#  Uso / usage:  bash installa_tsm.sh [cartella_progetto] [cartella_sketch]
+#  Predefinite / defaults: ~/AndroidStudioProjects/TennisScoreManager
+#                          ~/Arduino/TSM_Band
 #  Se la cartella del progetto esiste già viene spostata in un backup datato.
+#  An existing project folder is moved to a dated backup first.
+#  Linux, macOS, or Windows in Git Bash.
 # ============================================================================
 set -euo pipefail
-DEST="${1:-/home/stefano/AndroidStudioProjects/TennisScoreManager}"
+DEST="${1:-$HOME/AndroidStudioProjects/TennisScoreManager}"
 FWDIR="${2:-$HOME/Arduino/TSM_Band}"
 
 if [ -d "$DEST" ] && [ -n "$(ls -A "$DEST" 2>/dev/null)" ]; then
   BACKUP="${DEST}.backup-$(date +%Y%m%d-%H%M%S)"
-  echo ">> Cartella esistente spostata in: $BACKUP"
+  echo ">> Cartella esistente spostata in / existing folder moved to: $BACKUP"
   mv "$DEST" "$BACKUP"
 fi
 mkdir -p "$DEST"
 
-echo ">> Creo le cartelle"
+echo ">> Creo le cartelle / creating folders"
 mkdir -p "$DEST/app"
 mkdir -p "$DEST/app/src/main"
 mkdir -p "$DEST/app/src/main/assets"
@@ -12976,7 +12979,8 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
   spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
   Lingua dei testi (dalla 2.2): la manda l'app da sola, uguale alla sua; resta salvata anche
-  per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento).
+  per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento; dalla 2.2.1 anche
+  il conto alla rovescia prima dello spegnimento).
 
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
@@ -12991,7 +12995,7 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.2"
+#define FW_VERSION "2.2.1"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -13022,7 +13026,7 @@ static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "p
 enum : uint8_t {
   T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
-  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, N_TXT
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, N_TXT
 };
 #define TXT_PAIRING    txt(T_PAIRING)
 #define TXT_PAIRED     txt(T_PAIRED)
@@ -13075,32 +13079,33 @@ static Settings cfg;
 static Preferences prefs;
 static char defaultName[13];
 
-// Stesso ordine dell'enum T_*. T_CHARGED_IN, T_SINCE e T_LEFT sono formati di snprintf (%s durata, %d minuti).
+// Stesso ordine dell'enum T_*. T_CHARGED_IN, T_SINCE, T_LEFT e T_PRESS_KEY sono formati di snprintf
+// (%s durata, %d minuti, %ld secondi al conto alla rovescia).
 static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
     "NON CONNESSO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
-    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN" },
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
     "NOT CONNECTED", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
-    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT" },
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN" },
+    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
-    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN" },
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
   { "EMPAREJANDO...", "EMPAREJADO", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
-    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN" },
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
   { "PAREANDO...", "PAREADO", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
-    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN" },
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
 };
 
 static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
@@ -14019,8 +14024,8 @@ void loop() {
     if (!countdown) countdownBeeped = false;
     if ((int32_t)(now - nextBlink) >= 0 && (!displayOn || blinkShown)) {
       if (countdown) {
-        char l2[24];
-        snprintf(l2, sizeof(l2), "%lds - PREMI UN TASTO", (long)((left + 999) / 1000));
+        char l2[40];
+        snprintf(l2, sizeof(l2), txt(T_PRESS_KEY), (long)((left + 999) / 1000));
         drawMessage(TXT_POWER_OFF, l2, C_ORANGE);
         if (!countdownBeeped) {  // un solo bip all'inizio del conto alla rovescia
           countdownBeeped = true;
@@ -14081,6 +14086,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto: 67 file del progetto in $DEST"
-echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"
-echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."
+echo ">> Fatto / done: 67 file del progetto / project files in $DEST"
+echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
+echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

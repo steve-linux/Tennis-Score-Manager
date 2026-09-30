@@ -20,18 +20,21 @@ lines = [
     "#!/usr/bin/env bash",
     "# ============================================================================",
     "#  Tennis Score Manager - installazione completa del progetto (app + firmware)",
-    "#  Uso:  bash installa_tsm.sh [cartella_progetto] [cartella_sketch]",
-    "#  Predefinite: /home/stefano/AndroidStudioProjects/TennisScoreManager",
-    "#               ~/Arduino/TSM_Band",
+    "#  Tennis Score Manager - complete project installer (app + firmware)",
+    "#  Uso / usage:  bash installa_tsm.sh [cartella_progetto] [cartella_sketch]",
+    "#  Predefinite / defaults: ~/AndroidStudioProjects/TennisScoreManager",
+    "#                          ~/Arduino/TSM_Band",
     "#  Se la cartella del progetto esiste già viene spostata in un backup datato.",
+    "#  An existing project folder is moved to a dated backup first.",
+    "#  Linux, macOS, or Windows in Git Bash.",
     "# ============================================================================",
     "set -euo pipefail",
-    'DEST="${1:-/home/stefano/AndroidStudioProjects/TennisScoreManager}"',
+    'DEST="${1:-$HOME/AndroidStudioProjects/TennisScoreManager}"',
     'FWDIR="${2:-$HOME/Arduino/TSM_Band}"',
     "",
     'if [ -d "$DEST" ] && [ -n "$(ls -A "$DEST" 2>/dev/null)" ]; then',
     '  BACKUP="${DEST}.backup-$(date +%Y%m%d-%H%M%S)"',
-    '  echo ">> Cartella esistente spostata in: $BACKUP"',
+    '  echo ">> Cartella esistente spostata in / existing folder moved to: $BACKUP"',
     '  mv "$DEST" "$BACKUP"',
     "fi",
     'mkdir -p "$DEST"',
@@ -39,7 +42,7 @@ lines = [
 ]
 
 dirs = sorted({str(pathlib.Path(f).relative_to("TennisScoreManager").parent) for f in files} - {"."})
-lines.append('echo ">> Creo le cartelle"')
+lines.append('echo ">> Creo le cartelle / creating folders"')
 for d in dirs:
     lines.append(f'mkdir -p "$DEST/{d}"')
 lines.append("")
@@ -76,9 +79,9 @@ lines.append(f"cat > \"$FWDIR/TSM_Band.ino\" << '{DELIM}'")
 lines.append(fw.rstrip("\n"))
 lines.append(DELIM)
 lines.append("")
-lines.append(f'echo ">> Fatto: {count} file del progetto in $DEST"')
-lines.append('echo ">> Sketch del braccialetto in $FWDIR/TSM_Band.ino"')
-lines.append('echo ">> Ora apri la cartella del progetto con Android Studio (File > Open)."')
+lines.append(f'echo ">> Fatto / done: {count} file del progetto / project files in $DEST"')
+lines.append('echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"')
+lines.append('echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."')
 
 OUT.write_text("\n".join(lines) + "\n")
 OUT.chmod(0o755)
