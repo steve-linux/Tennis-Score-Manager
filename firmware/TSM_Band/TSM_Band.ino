@@ -15,6 +15,8 @@
   Impostazioni (dall'app, menu "Impostazioni braccialetto"), salvate nel braccialetto:
   nome, luminosità, durata del punteggio, volume, display capovolto e i tre tempi di
   spegnimento automatico (nessun telefono all'accensione, telefono perso, inattività).
+  Lingua dei testi (dalla 2.2): la manda l'app da sola, uguale alla sua; resta salvata anche
+  per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento).
 
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
@@ -29,7 +31,7 @@
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.1"
+#define FW_VERSION "2.2"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -54,30 +56,37 @@ static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT s
 static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 
-// Testi mostrati dal braccialetto (solo ASCII)
-#define TXT_PAIRING    "PAIRING..."
-#define TXT_PAIRED     "PAIRING OK"
-#define TXT_RECONNECT  "RICONNESSIONE"
-#define TXT_NO_PHONE   "NESSUN TELEFONO"
-#define TXT_POWER_OFF  "SPEGNIMENTO"
-#define TXT_BATTERY    "BATTERIA"
-#define TXT_CHARGING   "IN CARICA"
-#define TXT_NO_LINK    "NON CONNESSO"
-#define TXT_IDLE       "INATTIVO"
-#define TXT_HOLD_KEY1  "TIENI PREMUTO KEY1"
-#define TXT_EMPTY      "BATTERIA SCARICA"
-#define TXT_SAVED      "IMPOSTAZIONI OK"
-#define TXT_FULL       "CARICA COMPLETA"
-#define TXT_USB_POWER  "ALIMENTATO DA USB"
-#define TXT_USB_OUT    "USB SCOLLEGATO"
-#define TXT_KEEPS_CHG  "LA CARICA CONTINUA"
+// Testi mostrati dal braccialetto (solo ASCII, maiuscolo), una riga per lingua: vedi TXT[] più sotto.
+enum : uint8_t { L_IT, L_EN, L_FR, L_DE, L_ES, L_PT, N_LANG };
+static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "pt" };
+enum : uint8_t {
+  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_IDLE,
+  T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, N_TXT
+};
+#define TXT_PAIRING    txt(T_PAIRING)
+#define TXT_PAIRED     txt(T_PAIRED)
+#define TXT_RECONNECT  txt(T_RECONNECT)
+#define TXT_NO_PHONE   txt(T_NO_PHONE)
+#define TXT_POWER_OFF  txt(T_POWER_OFF)
+#define TXT_BATTERY    txt(T_BATTERY)
+#define TXT_CHARGING   txt(T_CHARGING)
+#define TXT_NO_LINK    txt(T_NO_LINK)
+#define TXT_IDLE       txt(T_IDLE)
+#define TXT_HOLD_KEY1  txt(T_HOLD_KEY1)
+#define TXT_EMPTY      txt(T_EMPTY)
+#define TXT_SAVED      txt(T_SAVED)
+#define TXT_FULL       txt(T_FULL)
+#define TXT_USB_POWER  txt(T_USB_POWER)
+#define TXT_USB_OUT    txt(T_USB_OUT)
+#define TXT_KEEPS_CHG  txt(T_KEEPS_CHG)
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
-#define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.0;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30"
+#define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
 enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
@@ -100,10 +109,41 @@ struct Settings {
   uint16_t pairS;      // spegnimento se all'accensione nessun telefono si collega (s)
   uint16_t lostS;      // spegnimento se il telefono si scollega (s)
   uint16_t idleMin;    // spegnimento se collegato ma inattivo (min)
+  uint8_t  lang;       // lingua dei testi (L_IT...), la imposta l'app
 };
 static Settings cfg;
 static Preferences prefs;
 static char defaultName[13];
+
+// Stesso ordine dell'enum T_*. T_CHARGED_IN, T_SINCE e T_LEFT sono formati di snprintf (%s durata, %d minuti).
+static const char* const TXT[N_LANG][N_TXT] = {
+  { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
+    "NON CONNESSO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
+    "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN" },
+  { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
+    "NOT CONNECTED", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
+    "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT" },
+  { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
+    "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
+    "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
+    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN" },
+  { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
+    "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
+    "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN" },
+  { "EMPAREJANDO...", "EMPAREJADO", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
+    "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
+    "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN" },
+  { "PAREANDO...", "PAREADO", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
+    "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
+    "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN" },
+};
+
+static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
 
 // ------------------------------------------------------------------ stato
 static NimBLEServer*         server   = nullptr;
@@ -244,6 +284,7 @@ static void drawFit(const char* txt, int y, const lgfx::IFont* const* fonts, int
 
 static const lgfx::IFont* const BIG_FONTS[]   = { &fonts::FreeSansBold24pt7b, &fonts::FreeSansBold18pt7b, &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b };
 static const lgfx::IFont* const SMALL_FONTS[] = { &fonts::FreeSansBold12pt7b, &fonts::FreeSansBold9pt7b, &fonts::Font2 };
+static const lgfx::IFont* const TINY_FONTS[]  = { &fonts::Font2, &fonts::Font0 };  // righe di dettaglio: Font0 se non ci stanno
 
 static void drawMessage(const char* l1, const char* l2, uint16_t color = C_TEXT, uint16_t bg = C_BG, uint16_t color2 = C_DIM) {
   displayWake();
@@ -290,8 +331,8 @@ static void drawGames(int myG, int thG, int myS, int thS, const char* header) {
   M5.Display.setTextDatum(middle_left);
   M5.Display.setFont(&fonts::FreeSansBold12pt7b);
   M5.Display.setTextColor(C_DIM, C_BG);
-  M5.Display.drawString("GAME", 8, 55);
-  M5.Display.drawString("SET", 8, 108);
+  M5.Display.drawString(txt(T_GAMES), 8, 55);
+  M5.Display.drawString(txt(T_SETS), 8, 108);
   M5.Display.setTextDatum(middle_right);
   M5.Display.setFont(&fonts::FreeSansBold24pt7b);
   M5.Display.setTextColor(C_TEXT, C_BG);
@@ -388,16 +429,20 @@ static void drawCharge() {
 
   drawFit(full ? TXT_FULL : (active ? TXT_CHARGING : TXT_USB_POWER), 99, SMALL_FONTS, 3, full ? C_BALL : (active ? C_TEXT : C_DIM));
 
+  char since[32];
+  char left[24] = "";
   if (full) {
     fmtDuration(t, sizeof(t), fullAt - usbSince);
-    snprintf(buf, sizeof(buf), "%d.%02dV   CARICATA IN %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+    snprintf(since, sizeof(since), txt(T_CHARGED_IN), t);
   } else {
     fmtDuration(t, sizeof(t), millis() - usbSince);
-    const int left = chargeMinutesLeft();
-    if (left > 0) snprintf(buf, sizeof(buf), "%d.%02dV  DA %s  FINE ~%d MIN", lastMv / 1000, (lastMv % 1000) / 10, t, left);
-    else snprintf(buf, sizeof(buf), "%d.%02dV   DA %s", lastMv / 1000, (lastMv % 1000) / 10, t);
+    snprintf(since, sizeof(since), txt(T_SINCE), t);
+    const int min = chargeMinutesLeft();
+    if (min > 0) snprintf(left, sizeof(left), txt(T_LEFT), min);
   }
-  drawFit(buf, 124, SMALL_FONTS + 2, 1, C_DIM);
+  if (left[0]) snprintf(buf, sizeof(buf), "%d.%02dV  %s  %s", lastMv / 1000, (lastMv % 1000) / 10, since, left);
+  else snprintf(buf, sizeof(buf), "%d.%02dV   %s", lastMv / 1000, (lastMv % 1000) / 10, since);
+  drawFit(buf, 124, TINY_FONTS, 2, C_DIM);
 }
 
 // Schermata di carica accesa per [ms] (aggiornata ogni volta che cambia qualcosa).
@@ -429,6 +474,7 @@ static void clampSettings() {
   cfg.pairS   = constrain(cfg.pairS, 15, 600);
   cfg.lostS   = constrain(cfg.lostS, 30, 1800);
   cfg.idleMin = constrain(cfg.idleMin, 5, 120);
+  if (cfg.lang >= N_LANG) cfg.lang = L_IT;
   if (!cfg.name[0]) strlcpy(cfg.name, defaultName, sizeof(cfg.name));
 }
 
@@ -443,6 +489,7 @@ static void loadSettings() {
   cfg.pairS   = prefs.getUShort("pair", 30);
   cfg.lostS   = prefs.getUShort("lost", 180);
   cfg.idleMin = prefs.getUShort("idle", 30);
+  cfg.lang    = prefs.getUChar("lang", L_IT);
   clampSettings();
 }
 
@@ -456,12 +503,14 @@ static void saveSettings() {
   prefs.putUShort("pair", cfg.pairS);
   prefs.putUShort("lost", cfg.lostS);
   prefs.putUShort("idle", cfg.idleMin);
+  prefs.putUChar("lang", cfg.lang);
 }
 
 static void publishConfig(bool notify) {
   char buf[128];
-  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u",
-           FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin);
+  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s",
+           FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin,
+           LANG_CODES[cfg.lang]);
   configChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) configChr->notify();
 }
@@ -478,16 +527,24 @@ static void applyName() {
 }
 
 // "chiave=valore;chiave=valore": si applicano solo le chiavi presenti, le altre restano come sono.
+// Solo "lang=xx" (l'app la manda da sola a ogni collegamento) si salva in silenzio, senza anteprima.
 static void handleConfig(char* text) {
   char oldName[13];
   strlcpy(oldName, cfg.name, sizeof(oldName));
   const uint8_t oldVol = cfg.vol;
+  const uint8_t oldLang = cfg.lang;
+  bool onlyLang = true;
   for (char* part = strtok(text, ";"); part; part = strtok(nullptr, ";")) {
     char* eq = strchr(part, '=');
     if (!eq) continue;
     *eq = 0;
     const char* k = part;
     const char* v = eq + 1;
+    if (!strcmp(k, "lang")) {
+      for (uint8_t i = 0; i < N_LANG; i++) if (!strcasecmp(v, LANG_CODES[i])) cfg.lang = i;
+      continue;
+    }
+    onlyLang = false;
     if (!strcmp(k, "name")) {
       char clean[13];
       int j = 0;
@@ -506,6 +563,11 @@ static void handleConfig(char* text) {
     else if (!strcmp(k, "idle")) cfg.idleMin = atoi(v);
   }
   clampSettings();
+  if (onlyLang) {
+    if (cfg.lang != oldLang) prefs.putUChar("lang", cfg.lang);
+    publishConfig(true);
+    return;
+  }
   saveSettings();
   if (strcmp(oldName, cfg.name) != 0) applyName();
   M5.Display.setRotation(cfg.flip ? 3 : 1);
