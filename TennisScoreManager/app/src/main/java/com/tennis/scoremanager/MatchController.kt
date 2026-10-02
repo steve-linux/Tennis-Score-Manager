@@ -169,7 +169,7 @@ class MatchController(
         announcer.enabled = options.value.audio
         announcer.useGeneratedFiles = options.value.voiceFiles
         announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
-        scope.launch(io) { voice.writeReadme() }
+        scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
         refreshSaved()
@@ -277,6 +277,8 @@ class MatchController(
         if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
         if (old.lang != v.lang) {
             refreshVoiceCount()
+            val s = strings
+            scope.launch(io) { voice.writeReadme(s) }
             syncBandLanguage(ble.bands.value)
         }
         if (old.mode != v.mode) {
@@ -1010,7 +1012,7 @@ class MatchController(
     fun summaryNames(): Names = names(summary.value?.record?.setup ?: setup.value)
 
     fun defaultFileName(): String {
-        val sm = summary.value ?: return "partita"
+        val sm = summary.value ?: return "TSM"
         return Reports.fileBaseName(sm.record, summaryNames())
     }
 

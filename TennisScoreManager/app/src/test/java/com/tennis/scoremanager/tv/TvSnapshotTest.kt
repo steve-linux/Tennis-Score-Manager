@@ -12,7 +12,12 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
+import com.tennis.scoremanager.ui.stringsFor
+import java.io.File
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -136,5 +141,29 @@ class TvSnapshotTest {
         assertEquals("192.168.43.1" to 8081, ScoreboardFinder.parseAddress(" http://192.168.43.1:8081/ "))
         assertNull(ScoreboardFinder.parseAddress(""))
         assertNull(ScoreboardFinder.parseAddress("10.0.0.2:99999"))
+    }
+
+    /** Il blocco id="texts" di scoreboard.html deve avere gli stessi testi dell'app, lingua per lingua. */
+    @Test
+    fun pageTextsMatchTheApp() {
+        val expected = Lang.entries.associate { lang ->
+            val s = stringsFor(lang)
+            val demo = mapOf(
+                "serve" to s.tvServe,
+                "changeover" to s.tvChangeover,
+                "setPoint" to s.msgSetPoint,
+                "title" to TvSnapshots.defaultTitle(SetupData(club = "Tennis Club", court = "3"), s),
+            )
+            lang.code to JsonObject(
+                mapOf(
+                    "labels" to Json.encodeToJsonElement(TvSnapshots.labels(s)),
+                    "demo" to JsonObject(demo.mapValues { JsonPrimitive(it.value) }),
+                ),
+            )
+        }
+        val html = File("src/main/assets/scoreboard.html").readText()
+        val block = html.substringAfter("<script type=\"application/json\" id=\"texts\">").substringBefore("</script>")
+        val paste = expected.entries.joinToString(",\n", "{\n", "\n}") { (k, v) -> "\"$k\": $v" }
+        assertEquals("Copia questo blocco in scoreboard.html:\n$paste\n", JsonObject(expected), Json.parseToJsonElement(block))
     }
 }

@@ -102,6 +102,13 @@ object FrStrings : Strings {
     override val voiceFilesMode = "Utiliser des fichiers audio pré-générés"
     override val voiceFilesModeHint = "Par défaut, chaque annonce est lue d'une seule phrase (plus naturel). Activez cette option pour lire les fichiers générés, par exemple pour emporter hors ligne une voix en ligne."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Enregistrements personnalisés : $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - FICHIERS VOCAUX\n" +
+            "Placez les enregistrements dans voice/<langue>/ ($langs), nommés d'après la clé.\n" +
+            "Formats : $formats. Les noms des joueurs sont toujours lus par la synthèse vocale.\n" +
+            "Le dossier tts/ contient les fichiers générés par l'application : vos enregistrements ont la priorité."
+    }
+    override val voiceReadmeKey = "CLÉ"
     override val testVoice = "Tester la voix"
     override val stopVoiceTest = "Arrêter le test"
     override val ttsMissing = "La voix française de la synthèse vocale n'est pas installée sur ce téléphone."
@@ -251,6 +258,7 @@ object FrStrings : Strings {
     override val generatedWith = "Créé avec Tennis Score Manager"
 
     override val tvGames = "JEUX"
+    override val tvSet = "MANCHES"
     override val tvServe = "SERVICE"
     override val tvChangeover = "CHANGEMENT DE CÔTÉ"
     override val tvSetBreak = "PAUSE SET"
@@ -263,6 +271,7 @@ object FrStrings : Strings {
     override val tvMatchTiebreak = "SUPER JEU DÉCISIF"
     override val tvLost = "CONNEXION PERDUE - RECONNEXION..."
     override val tvFullscreen = "PLEIN ÉCRAN"
+    override val tvPageTitle = "Tableau d'affichage TSM"
 
     override val tvSection = "Tableau d'affichage TV"
     override val tvEnable = "Tableau d'affichage sur TV ou écran"
@@ -282,7 +291,7 @@ object FrStrings : Strings {
     override val tvShowServe = "Balle à côté du serveur"
     override val tvGhost = "Segments éteints visibles"
     override val tvPreview = "Aperçu sur ce téléphone"
-    override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez « Caster l'écran » (Smart View sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
+    override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez le bouton « Caster » des réglages rapides (« Diffusion de l'écran » jusqu'à Android 14, « Smart View » sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
 
     override val displayMode = "Utiliser comme tableau"
     override val displayModeHint = "Ce téléphone affiche le score sur l'écran (câble HDMI ou Chromecast)"

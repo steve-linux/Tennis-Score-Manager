@@ -223,7 +223,7 @@ class TvServer(context: Context) {
     /** Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace. */
     private fun stream(s: Socket, out: OutputStream) {
         if (streams.size >= MAX_STREAMS) {
-            respond(out, "503 Service Unavailable", "text/plain", "Troppi tabelloni".toByteArray(), false)
+            respond(out, "503 Service Unavailable", "text/plain", "Too many scoreboards (max $MAX_STREAMS)".toByteArray(), false)
             return
         }
         val q = LinkedBlockingQueue<String>()
@@ -260,7 +260,7 @@ class TvServer(context: Context) {
     private fun registerNsd(port: Int) {
         val nsd = app.getSystemService(NsdManager::class.java) ?: return
         val info = NsdServiceInfo().apply {
-            serviceName = "TSM Tabellone"
+            serviceName = "Tennis Score Manager"  // chi cerca guarda il tipo, non il nome
             serviceType = SERVICE_TYPE
             setPort(port)
         }

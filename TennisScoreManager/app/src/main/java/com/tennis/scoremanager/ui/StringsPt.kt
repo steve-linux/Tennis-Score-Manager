@@ -102,6 +102,13 @@ object PtStrings : Strings {
     override val voiceFilesMode = "Usar arquivos de áudio pré-gerados"
     override val voiceFilesModeHint = "Normalmente cada anúncio é lido numa única frase (mais natural). Ative para usar os arquivos gerados, por exemplo para levar offline uma voz online."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Gravações personalizadas: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - ARQUIVOS DE VOZ\n" +
+            "Coloque as gravações em voice/<idioma>/ ($langs) com o nome da chave.\n" +
+            "Formatos: $formats. Os nomes dos jogadores são sempre lidos pela síntese de voz.\n" +
+            "A pasta tts/ contém os arquivos gerados pelo app: suas gravações têm prioridade."
+    }
+    override val voiceReadmeKey = "CHAVE"
     override val testVoice = "Testar voz"
     override val stopVoiceTest = "Parar o teste"
     override val ttsMissing = "A voz em português da síntese de voz não está instalada no telefone."
@@ -113,6 +120,7 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
     override val tossWinner: (String) -> String = { "Venceu o sorteio: $it" }
@@ -251,6 +259,8 @@ object PtStrings : Strings {
     override val generatedWith = "Criado com Tennis Score Manager"
 
     override val tvGames = "JOGOS"
+    override val tvSet = "SETS"
+    override val tvSec = "SEG"
     override val tvServe = "SERVIÇO"
     override val tvChangeover = "TROCA DE LADO"
     override val tvSetBreak = "INTERVALO"
@@ -262,6 +272,7 @@ object PtStrings : Strings {
     override val tvMatchTiebreak = "TIE-BREAK DECISIVO"
     override val tvLost = "CONEXÃO PERDIDA - RECONECTANDO..."
     override val tvFullscreen = "TELA CHEIA"
+    override val tvPageTitle = "Placar TSM"
 
     override val tvSection = "Placar na TV"
     override val tvEnable = "Placar na TV ou monitor"
@@ -281,7 +292,7 @@ object PtStrings : Strings {
     override val tvShowServe = "Bola ao lado de quem serve"
     override val tvGhost = "Segmentos apagados visíveis"
     override val tvPreview = "Prévia neste telefone"
-    override val tvChromecastHint = "Com um Chromecast: no telefone-placar use «Transmitir tela» (Smart View nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
+    override val tvChromecastHint = "Com um Chromecast: no telefone-placar use o botão de transmissão das configurações rápidas («Transmitir», «Transmissão» ou «Transmissão de tela», conforme a versão do Android; «Smart View» nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
 
     override val displayMode = "Usar como placar"
     override val displayModeHint = "Este telefone mostra o placar no monitor (cabo HDMI ou Chromecast)"

@@ -64,7 +64,7 @@ object Reports {
 
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · No-Ad" else "") +
+            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
 
     fun place(rec: MatchRecord, s: Strings): String {

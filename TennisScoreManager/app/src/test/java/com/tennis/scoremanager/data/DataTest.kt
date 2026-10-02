@@ -1,10 +1,13 @@
 package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.EnStrings
 import com.tennis.scoremanager.ui.ItStrings
+import com.tennis.scoremanager.ui.stringsFor
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -49,5 +52,13 @@ class DataTest {
         assertEquals("A/B", BandProtocol.clean("a|b"))
         assertEquals("P|15|AD|1|TIE-BREAK", BandProtocol.point("15", "AD", 1, "Tie-break"))
         assertEquals("M|GAME SET MATCH|6-4 7-5|15", BandProtocol.message("Game set match", "6-4 7-5", 15))
+    }
+
+    @Test
+    fun formatLineUsesTheLanguageForNoAd() {
+        val rec = MatchRecord(id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(noAd = true))
+        assertEquals("3 set · tie-break a 7 · No-Ad · Singolare", Reports.formatLabel(rec, ItStrings))
+        assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
+        assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
     }
 }

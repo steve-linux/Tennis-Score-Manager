@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Tabellone TSM</title>
+<title>Tennis Score Manager</title>
 <!--
   Tabellone di Tennis Score Manager, servito dal telefono dell'arbitro (TvServer.kt).
   Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
   da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
   Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
-  Anteprima senza telefono: scoreboard.html?demo=1
+  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, idle, doubles)
 -->
 <style>
   :root {
@@ -120,6 +120,18 @@
 <div id="banner"></div>
 <button id="fs" type="button"></button>
 
+<!-- Testi di ogni lingua per prima del primo stato (titolo, "connessione persa", "schermo intero") e per l'anteprima.
+     Copia di quelli dell'app: TvSnapshotTest controlla che siano uguali e, se no, stampa il blocco giusto. -->
+<script type="application/json" id="texts">
+{
+"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
+"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
+"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
+"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
+"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
+"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
+}
+</script>
 <script>
 "use strict";
 // ------------------------------------------------------------------ cifre a 7 segmenti
@@ -199,15 +211,10 @@ gms.forEach(s => buildSeg(s, "8"));
 sts.forEach(s => buildSeg(s, "8"));
 buildSeg($("clock"), "88:88:88");
 
-// Testi prima che arrivi il primo stato (poi valgono quelli dell'app, nella lingua scelta dall'arbitro).
-const FALLBACK = {
-  it: ["CONNESSIONE PERSA - RICONNESSIONE...", "SCHERMO INTERO"],
-  en: ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"],
-  fr: ["CONNEXION PERDUE - RECONNEXION...", "PLEIN ÉCRAN"],
-  de: ["VERBINDUNG VERLOREN - NEUER VERSUCH...", "VOLLBILD"],
-  es: ["CONEXIÓN PERDIDA - RECONECTANDO...", "PANTALLA COMPLETA"],
-  pt: ["CONEXÃO PERDIDA - RECONECTANDO...", "TELA CHEIA"],
-}[(navigator.language || "it").slice(0, 2).toLowerCase()] || ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"];
+// Testi prima che arrivi il primo stato, nella lingua del browser (poi valgono quelli dell'app, nella lingua dell'arbitro).
+const TEXTS = JSON.parse($("texts").textContent);
+const FALLBACK = (TEXTS[(navigator.language || "it").slice(0, 2).toLowerCase()] || TEXTS.en).labels;
+document.title = FALLBACK.page;
 let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
@@ -235,6 +242,7 @@ function render() {
   ghost = S.show.ghost !== false;
   document.documentElement.lang = S.lang;
   const L = S.labels;
+  if (L.page && document.title !== L.page) document.title = L.page;
   setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
@@ -297,7 +305,7 @@ function tick() {
   const silent = now - lastMsg;
   document.body.classList.toggle("lost", silent > 12000);
   if (silent > 12000) {
-    setText($("banner"), S ? S.labels.lost : FALLBACK[0]);
+    setText($("banner"), S ? S.labels.lost : FALLBACK.lost);
     if (!lostSince) lostSince = now;
     if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
   } else {
@@ -324,7 +332,7 @@ function poll() {
 
 // ------------------------------------------------------------------ schermo intero e schermo acceso
 const fs = $("fs");
-fs.textContent = "⛶ " + FALLBACK[1];
+fs.textContent = "⛶ " + FALLBACK.fullscreen;
 if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
 let pointerTimer = 0;
 function showPointer() {
@@ -359,24 +367,22 @@ setInterval(tick, 200);
 
 // ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
 if (/[?&]demo=1/.test(location.search)) {
-  const labels = {
-    vs: "VS", games: "GAMES", set: "SET", sec: "SEC", waiting: "IN ATTESA DELLA PARTITA", ready: "IN ATTESA DEL VIA",
-    suspended: "PARTITA SOSPESA", winner: "VINCE", tiebreak: "TIE-BREAK", matchTiebreak: "MATCH TIE-BREAK",
-    lost: "CONNESSIONE PERSA - RICONNESSIONE...", fullscreen: "SCHERMO INTERO",
-  };
+  const lm = location.search.match(/[?&]lang=([a-z]{2})/);
+  const lang = lm && TEXTS[lm[1]] ? lm[1] : "it";
+  const { labels, demo } = TEXTS[lang];
   const base = {
-    tsm: 1, seq: 1, lang: "it", phase: "play", title: "Circolo Tennis · Campo 3",
+    tsm: 1, seq: 1, lang, phase: "play", title: demo.title,
     players: [{ name: "Stefano", color: "#FFD600" }, { name: "Mario", color: "#FF3030" }],
     server: 0, points: ["15", "0"], games: [0, 0], sets: [1, 0], done: [{ g1: 6, g2: 0 }], tiebreak: "",
-    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: "SERVIZIO", leftMs: 25000, shot: true },
+    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: demo.serve, leftMs: 25000, shot: true },
     message: null, labels,
     show: { clock: true, timers: true, sets: true, messages: true, serve: true, ghost: true },
   };
   const m = location.search.match(/[?&]state=([a-z]+)/);
   const variants = {
     play: {},
-    ad: { points: ["AD", "40"], games: [5, 4], message: "Set point", server: 1 },
-    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: "CAMBIO CAMPO", leftMs: 30000, shot: false } },
+    ad: { points: ["AD", "40"], games: [5, 4], message: demo.setPoint, server: 1 },
+    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: demo.changeover, leftMs: 30000, shot: false } },
     end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },

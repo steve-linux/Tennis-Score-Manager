@@ -99,6 +99,8 @@ data class TvLabels(
     val matchTiebreak: String,
     val lost: String,
     val fullscreen: String,
+    /** Titolo della pagina (document.title). */
+    val page: String,
 )
 
 /** Stato dell'app da cui si ricava il tabellone. */
@@ -184,13 +186,17 @@ object TvSnapshots {
             countdown = countdown,
             message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
-            labels = TvLabels(
-                vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
-                waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
-                tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
-            ),
+            labels = labels(s),
         )
     }
+
+    /** Testi fissi della pagina; `scoreboard.html` ne ha una copia per lingua (id="texts") da usare prima del primo stato. */
+    fun labels(s: Strings) = TvLabels(
+        vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
+        waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
+        tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
+        page = s.tvPageTitle,
+    )
 
     /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */
     fun defaultTitle(su: SetupData, s: Strings): String {

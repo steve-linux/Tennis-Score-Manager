@@ -3,6 +3,7 @@ package com.tennis.scoremanager.voice
 import android.content.Context
 import android.net.Uri
 import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -13,6 +14,7 @@ import java.util.zip.ZipInputStream
  *   Android/data/com.tennis.scoremanager/files/voice/it/tts/    file generati dal TTS del telefono
  *
  * Il nome di ogni file è la chiave della frase (vedi LEGGIMI.txt), es. `score_1_0.mp3` = "quindici zero".
+ * LEGGIMI.txt ha sempre questo nome (lo citano le guide); le spiegazioni in testa sono nella lingua dell'app.
  */
 class VoicePack(private val context: Context) {
 
@@ -88,16 +90,14 @@ class VoicePack(private val context: Context) {
         refresh(lang)
     }
 
-    /** Elenco delle frasi da registrare, scritto nella cartella voce. */
-    fun writeReadme() {
+    /** Elenco delle frasi da registrare, scritto nella cartella voce (di nuovo a ogni cambio di lingua). */
+    @Synchronized
+    fun writeReadme(s: Strings) {
         val sb = StringBuilder()
-        sb.appendLine("TENNIS SCORE MANAGER - FILE VOCALI")
-        sb.appendLine("Metti le registrazioni in voice/<lingua>/ (${Lang.entries.joinToString(", ") { it.code }}) con il nome della chiave.")
-        sb.appendLine("Formati: ${exts.joinToString()}. I nomi dei giocatori sono sempre letti dal TTS.")
-        sb.appendLine("La cartella tts/ contiene i file generati dall'app: le tue registrazioni hanno la precedenza.")
+        sb.appendLine(s.voiceReadme(Lang.entries.joinToString(", ") { it.code }, exts.joinToString()))
         // Una colonna per lingua, separate da tabulazioni: si apre bene anche come foglio di calcolo.
         sb.appendLine()
-        sb.appendLine((listOf("CHIAVE") + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
+        sb.appendLine((listOf(s.voiceReadmeKey) + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
         for (k in Phrases.keys) {
             sb.appendLine((listOf(k) + Lang.entries.map { Phrases.text(k, it) }).joinToString("\t"))
         }
