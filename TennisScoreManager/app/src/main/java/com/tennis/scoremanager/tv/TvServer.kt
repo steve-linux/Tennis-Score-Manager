@@ -7,6 +7,10 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.ParcelFileDescriptor
+import android.os.SystemClock
+import android.system.Os
+import android.system.OsConstants
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +26,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
@@ -36,17 +42,39 @@ import java.util.concurrent.TimeUnit
  *   /        la pagina del tabellone (assets/scoreboard.html)
  *   /events  aggiornamenti in diretta (Server-Sent Events): un JSON a ogni punto e ogni 5 secondi
  *   /state   l'ultimo JSON (serve anche alla ricerca automatica del telefono-tabellone)
- * Solo lettura: dal tabellone non si può cambiare niente. Si annuncia sulla rete come "_tsm._tcp"
- * e tiene agganciata la rete Wi-Fi anche se non ha internet (hotspot dell'altro telefono).
+ * Solo lettura: dal tabellone non si può cambiare niente, e risponde solo alla rete locale (non ai dati mobili).
+ * Si annuncia sulla rete come "_tsm._tcp" e tiene agganciata la rete Wi-Fi anche se non ha internet
+ * (hotspot dell'altro telefono).
  */
 class TvServer(context: Context) {
 
     companion object {
         const val PORT = 8080
         const val SERVICE_TYPE = "_tsm._tcp"
+        /** Intestazione di /state con l'identità del telefono (vedi [ScoreboardFinder]). */
+        const val ID_HEADER = "X-TSM-Id"
         private const val MAX_STREAMS = 12
+        /** Scrittura ferma da tanto = tabellone sparito senza chiudere: si chiude il collegamento. */
+        private const val WRITE_TIMEOUT_MS = 20_000L
+        /** Linux: chiude la connessione se i dati inviati restano senza conferma per troppo tempo. */
+        private const val TCP_USER_TIMEOUT = 18
         private const val STOP = "\u0000stop"
         private const val TAG = "TvServer"
+
+        /**
+         * Chi può collegarsi: solo la rete locale (Wi-Fi, hotspot, USB). Il server ascolta su tutte le interfacce
+         * (il telefono può essere lui l'hotspot), quindi si scartano i dati mobili, IPv6 pubblico compreso.
+         * Niente 100.64/10: lo usano gli operatori mobili (CGNAT), non gli hotspot Android né iPhone.
+         */
+        fun isLocalPeer(a: InetAddress): Boolean {
+            val b = a.address
+            // IPv4 scritto in IPv6 (::ffff:192.168.43.5)
+            if (a is Inet6Address && b.size == 16 && (0 until 10).all { b[it] == 0.toByte() } && b[10] == (-1).toByte() && b[11] == (-1).toByte()) {
+                return isLocalPeer(InetAddress.getByAddress(b.copyOfRange(12, 16)))
+            }
+            return a.isLoopbackAddress || a.isLinkLocalAddress || a.isSiteLocalAddress ||
+                (a is Inet6Address && (b[0].toInt() and 0xFE) == 0xFC)  // IPv6 locale (ULA, fc00::/7)
+        }
 
         /**
          * Indirizzi IPv4 locali del telefono, prima Wi-Fi e hotspot. Esclusi i dati mobili e le VPN:
@@ -90,13 +118,32 @@ class TvServer(context: Context) {
     private val _addresses = MutableStateFlow<List<String>>(emptyList())
     val addresses: StateFlow<List<String>> = _addresses
 
+    /** Un tabellone collegato a /events. */
+    private class Stream(val socket: Socket) {
+        val queue = LinkedBlockingQueue<String>()
+        /** Da quando è ferma la scrittura in corso (0 = non sta scrivendo). */
+        @Volatile var writingSince = 0L
+
+        fun close() {
+            queue.offer(STOP)
+            runCatching { socket.close() }  // sblocca anche una scrittura ferma
+        }
+    }
+
     @Volatile private var latest: String = "{}"
     @Volatile private var server: ServerSocket? = null
-    private val streams = CopyOnWriteArrayList<LinkedBlockingQueue<String>>()
+    /** Modifiche ed elenco dei collegati sotto synchronized(streams), così il numero mostrato resta giusto. */
+    private val streams = CopyOnWriteArrayList<Stream>()
     private var addressJob: Job? = null
+    private var watchdogJob: Job? = null
     private var nsdListener: NsdManager.RegistrationListener? = null
     private var wifiCallback: ConnectivityManager.NetworkCallback? = null
     private val page: ByteArray by lazy { app.assets.open("scoreboard.html").use { it.readBytes() } }
+    /** Identità di questo telefono: dopo un'interruzione il telefono-tabellone lo ritrova anche se l'indirizzo è cambiato. */
+    private val serverId: String by lazy {
+        val prefs = app.getSharedPreferences("tv_server", Context.MODE_PRIVATE)
+        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit().putString("id", it).apply() }
+    }
 
     /** Indirizzo da mostrare e da mettere nel QR, es. http://192.168.43.1:8080/ (null = nessuna rete locale). */
     fun url(address: String? = _addresses.value.firstOrNull()): String? {
@@ -125,6 +172,16 @@ class TvServer(context: Context) {
                 delay(3_000)
             }
         }
+        watchdogJob = scope.launch {
+            while (isActive) {
+                delay(5_000)
+                val now = SystemClock.elapsedRealtime()
+                streams.filter { it.writingSince != 0L && now - it.writingSince > WRITE_TIMEOUT_MS }.forEach {
+                    Log.d(TAG, "tabellone fermo da ${WRITE_TIMEOUT_MS / 1000}\": chiuso")
+                    it.close()
+                }
+            }
+        }
         Log.i(TAG, "Tabellone su porta ${socket.localPort}")
     }
 
@@ -133,13 +190,17 @@ class TvServer(context: Context) {
         val socket = server ?: return
         server = null
         runCatching { socket.close() }
-        streams.forEach { it.offer(STOP) }
-        streams.clear()
-        _clients.value = 0
+        synchronized(streams) {
+            streams.forEach { it.close() }
+            streams.clear()
+            _clients.value = 0
+        }
         _running.value = false
         _port.value = null
         addressJob?.cancel()
         addressJob = null
+        watchdogJob?.cancel()
+        watchdogJob = null
         unregisterNsd()
         releaseWifi()
     }
@@ -147,9 +208,9 @@ class TvServer(context: Context) {
     /** Nuovo stato del tabellone: va subito a tutti i tabelloni collegati. */
     fun publish(json: String) {
         latest = json
-        for (q in streams) {
-            if (q.size > 16) q.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
-            q.offer(json)
+        for (st in streams) {
+            if (st.queue.size > 16) st.queue.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
+            st.queue.offer(json)
         }
     }
 
@@ -160,7 +221,16 @@ class TvServer(context: Context) {
             val client = try {
                 socket.accept()
             } catch (e: IOException) {
-                break
+                if (socket.isClosed) break
+                // errore passeggero (es. troppi file aperti): si riprova, se no il tabellone sparirebbe per sempre
+                Log.w(TAG, "accept: $e")
+                runCatching { Thread.sleep(500) }
+                continue
+            }
+            if (!isLocalPeer(client.inetAddress)) {
+                Log.d(TAG, "rifiutato ${client.inetAddress}")
+                runCatching { client.close() }
+                continue
             }
             pool.execute { runCatching { handle(client) }.onFailure { Log.d(TAG, "richiesta interrotta: $it") } }
         }
@@ -188,7 +258,7 @@ class TvServer(context: Context) {
             }
             when (path) {
                 "/", "/index.html" -> respond(out, "200 OK", "text/html; charset=utf-8", page, head)
-                "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head)
+                "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
                 else -> respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
@@ -208,50 +278,70 @@ class TvServer(context: Context) {
         return sb.toString()
     }
 
-    private fun respond(out: OutputStream, status: String, type: String, body: ByteArray, head: Boolean) {
+    private fun respond(out: OutputStream, status: String, type: String, body: ByteArray, head: Boolean, extra: String = "") {
         val headers = "HTTP/1.1 $status\r\n" +
             "Content-Type: $type\r\n" +
             "Content-Length: ${body.size}\r\n" +
             "Cache-Control: no-store\r\n" +
             "Access-Control-Allow-Origin: *\r\n" +
+            extra +
             "Connection: close\r\n\r\n"
         out.write(headers.toByteArray(Charsets.ISO_8859_1))
         if (!head) out.write(body)
         out.flush()
     }
 
-    /** Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace. */
+    /**
+     * Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace.
+     * Un tabellone sparito senza chiudere (Wi-Fi caduto) non tiene il posto per sempre: buffer piccolo e
+     * TCP_USER_TIMEOUT fanno fallire presto la scrittura, il controllo chiude chi resta fermo, e a posti esauriti
+     * si libera il collegamento più vecchio invece di rifiutare il nuovo.
+     */
     private fun stream(s: Socket, out: OutputStream) {
-        if (streams.size >= MAX_STREAMS) {
-            respond(out, "503 Service Unavailable", "text/plain", "Too many scoreboards (max $MAX_STREAMS)".toByteArray(), false)
-            return
+        val st = Stream(s)
+        synchronized(streams) {
+            while (streams.size >= MAX_STREAMS) streams.removeAt(0).close()
+            streams += st
+            _clients.value = streams.size
         }
-        val q = LinkedBlockingQueue<String>()
-        streams += q
-        _clients.value = streams.size
         try {
             s.soTimeout = 0
-            out.write(
-                ("HTTP/1.1 200 OK\r\n" +
+            s.sendBufferSize = 16 * 1024
+            runCatching {
+                ParcelFileDescriptor.fromSocket(s).use { Os.setsockoptInt(it.fileDescriptor, OsConstants.IPPROTO_TCP, TCP_USER_TIMEOUT, 30_000) }
+            }
+            send(
+                st, out,
+                "HTTP/1.1 200 OK\r\n" +
                     "Content-Type: text/event-stream; charset=utf-8\r\n" +
                     "Cache-Control: no-store\r\n" +
                     "Access-Control-Allow-Origin: *\r\n" +
                     "Connection: keep-alive\r\n\r\n" +
-                    "retry: 2000\n\n").toByteArray(Charsets.UTF_8),
+                    "retry: 2000\n\n" +
+                    "data: $latest\n\n",
             )
-            out.write("data: $latest\n\n".toByteArray(Charsets.UTF_8))
-            out.flush()
             while (server != null) {
-                val msg = q.poll(15, TimeUnit.SECONDS)
+                val msg = st.queue.poll(15, TimeUnit.SECONDS)
                 if (msg == STOP) break
-                out.write((if (msg == null) ": ping\n\n" else "data: $msg\n\n").toByteArray(Charsets.UTF_8))
-                out.flush()
+                send(st, out, if (msg == null) ": ping\n\n" else "data: $msg\n\n")
             }
         } catch (e: IOException) {
             // tabellone chiuso o fuori portata: se ne va da solo
         } finally {
-            streams -= q
-            _clients.value = streams.size
+            synchronized(streams) {
+                streams -= st
+                _clients.value = streams.size
+            }
+        }
+    }
+
+    private fun send(st: Stream, out: OutputStream, text: String) {
+        st.writingSince = SystemClock.elapsedRealtime()
+        try {
+            out.write(text.toByteArray(Charsets.UTF_8))
+            out.flush()
+        } finally {
+            st.writingSince = 0L
         }
     }
 

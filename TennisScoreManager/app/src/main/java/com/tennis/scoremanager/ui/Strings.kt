@@ -215,6 +215,8 @@ interface Strings {
     // Notifica mentre la partita è in corso
     val notifChannel: String
     val notifText: (bands: Boolean, tv: Boolean) -> String
+    /** Nessuna partita in corso (riepilogo, nuova partita) ma tabellone TV acceso. */
+    val notifTvOnly: String
 
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
@@ -523,6 +525,7 @@ object ItStrings : Strings {
             else -> "braccialetti attivi"
         }
     }
+    override val notifTvOnly = "Tabellone TV attivo"
 
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
@@ -819,6 +822,7 @@ object EnStrings : Strings {
             else -> "wristbands on"
         }
     }
+    override val notifTvOnly = "TV scoreboard on"
 
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"

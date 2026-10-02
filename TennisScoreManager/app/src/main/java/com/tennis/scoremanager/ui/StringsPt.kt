@@ -214,6 +214,7 @@ object PtStrings : Strings {
             else -> "pulseiras ativas"
         }
     }
+    override val notifTvOnly = "Placar na TV ativo"
 
     override val bandPaired = "PAREADA COM"
     override val bandPlay = "JOGUEM"

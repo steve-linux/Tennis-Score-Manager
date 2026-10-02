@@ -141,10 +141,11 @@ object TvSnapshots {
             st.isFinished -> listOf("", "")
             else -> sides.map { st.pointLabel(it) }
         }
-        // A partita finita i game del set in corso sono azzerati: si mostrano quelli dell'ultimo set.
+        // A partita finita i game del set in corso sono azzerati: si mostrano quelli dell'ultimo set. Il match tie-break
+        // vale come set vinto 1-0, come sui tabelloni a LED (una cifra per i game); i punti, es. [10-8], stanno tra i set conclusi.
         val games = when {
             st == null -> listOf(0, 0)
-            st.isFinished -> st.sets.lastOrNull()?.let { set -> sides.map { set.shown(it) } } ?: listOf(0, 0)
+            st.isFinished -> st.sets.lastOrNull()?.let { set -> sides.map { set.games(it) } } ?: listOf(0, 0)
             else -> sides.map { st.games(it) }
         }
         val server = when {

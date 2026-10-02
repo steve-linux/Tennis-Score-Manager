@@ -11,7 +11,7 @@
   Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
   da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
   Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
-  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, idle, doubles)
+  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, mtb, long, idle, doubles)
 -->
 <style>
   :root {
@@ -63,7 +63,8 @@
 
   #foot {
     border-top: 2px solid var(--line); margin: 0 calc(2.1 * var(--vw)); min-height: 0;
-    display: grid; grid-template-columns: minmax(0, auto) 1fr minmax(0, auto); column-gap: calc(2 * var(--vw));
+    /* la scritta al centro tiene sempre un po' di posto: un messaggio lungo si rimpicciolisce (fitText) invece di schiacciarla */
+    display: grid; grid-template-columns: minmax(0, auto) minmax(calc(14 * var(--vw)), 1fr) minmax(0, auto); column-gap: calc(2 * var(--vw));
     padding: calc(2.4 * var(--vh)) calc(1.2 * var(--vw)) calc(3 * var(--vh));
   }
   #fl, #fr { display: grid; grid-template-rows: 1fr 1.5fr; min-height: 0; min-width: 0; }
@@ -71,7 +72,7 @@
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
   #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
-  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: .calc(6 * var(--vh)); }
+  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
   #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
   #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
   #timer { font-size: min(calc(5.4 * var(--vh)), calc(3.1 * var(--vw))); color: var(--p2); white-space: nowrap; align-self: end; letter-spacing: .05em; }
@@ -215,7 +216,7 @@ buildSeg($("clock"), "88:88:88");
 const TEXTS = JSON.parse($("texts").textContent);
 const FALLBACK = (TEXTS[(navigator.language || "it").slice(0, 2).toLowerCase()] || TEXTS.en).labels;
 document.title = FALLBACK.page;
-let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
+let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalledAt = 0;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
 
@@ -279,7 +280,7 @@ function render() {
   else if (S.phase === "suspended") { text = L.suspended; blink = true; }
   else if (S.phase === "finished" && S.winner != null) { text = `${L.winner} ${S.players[S.winner].name}`.toUpperCase(); col = color(S.winner); }
   else if (S.message) text = S.message.toUpperCase();
-  setText(msg, text);
+  if (msg.textContent !== text) { msg.textContent = text; fitText(msg); }
   msg.style.color = col;
   msg.classList.toggle("blink", blink);
   tick();
@@ -307,10 +308,16 @@ function tick() {
   if (silent > 12000) {
     setText($("banner"), S ? S.labels.lost : FALLBACK.lost);
     if (!lostSince) lostSince = now;
-    if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
+    // nell'app: dopo 20" si chiede al telefono di ricollegarsi, poi di nuovo ogni 30" finché non torna
+    if (inApp && window.TSMDisplay && now - lostSince > 20000 && (!lostCalledAt || now - lostCalledAt > 30000)) {
+      lostCalledAt = now;
+      try { TSMDisplay.lost(); } catch (e) {}
+    }
+    // il collegamento può essere morto senza che il browser se ne accorga (Wi-Fi caduto): se ne apre uno nuovo
+    if (now - reopenAt > 15000) reopen();
   } else {
     lostSince = 0;
-    lostCalled = false;
+    lostCalledAt = 0;
   }
 }
 
@@ -321,10 +328,24 @@ function onState(json) {
 }
 
 // ------------------------------------------------------------------ collegamento
+let es = null, retryMs = 2000, retryTimer = 0, reopenAt = 0;
 function connect() {
+  clearTimeout(retryTimer);
   if (!window.EventSource) { poll(); return; }
-  const es = new EventSource("events");
-  es.onmessage = e => { try { onState(JSON.parse(e.data)); } catch (err) {} };
+  if (es) es.close();
+  const src = es = new EventSource("events");
+  src.onmessage = e => { retryMs = 2000; try { onState(JSON.parse(e.data)); } catch (err) {} };
+  src.onerror = () => {
+    // Risposta non valida (es. server pieno): l'EventSource si chiude per sempre, si riprova da qui sempre più piano.
+    // Gli altri errori (rete) li riprova da solo.
+    if (src !== es || src.readyState !== EventSource.CLOSED) return;
+    retryTimer = setTimeout(connect, retryMs);
+    retryMs = Math.min(retryMs * 2, 30000);
+  };
+}
+function reopen() {
+  reopenAt = performance.now();
+  if (window.EventSource && !isDemo) connect();
 }
 function poll() {
   fetch("state", { cache: "no-store" }).then(r => r.json()).then(onState).catch(() => {}).finally(() => setTimeout(poll, 1000));
@@ -361,12 +382,13 @@ function viewportUnits() {
   }
 }
 viewportUnits();
-window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); });
+window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); fitText($("msg")); });
 keepAwake();
 setInterval(tick, 200);
 
 // ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
-if (/[?&]demo=1/.test(location.search)) {
+const isDemo = /[?&]demo=1/.test(location.search);
+if (isDemo) {
   const lm = location.search.match(/[?&]lang=([a-z]{2})/);
   const lang = lm && TEXTS[lm[1]] ? lm[1] : "it";
   const { labels, demo } = TEXTS[lang];
@@ -383,7 +405,11 @@ if (/[?&]demo=1/.test(location.search)) {
     play: {},
     ad: { points: ["AD", "40"], games: [5, 4], message: demo.setPoint, server: 1 },
     tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: demo.changeover, leftMs: 30000, shot: false } },
-    end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    end: { phase: "finished", server: null, points: ["", ""], games: [7, 6], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    // vinta al match tie-break: vale come set vinto 1-0, i punti stanno tra i set conclusi
+    mtb: { phase: "finished", server: null, points: ["", ""], games: [1, 0], sets: [2, 1], done: [{ g1: 6, g2: 3 }, { g1: 4, g2: 6 }, { g1: 1, g2: 0, tb1: 10, tb2: 8, mtb: true }], winner: 0, clockRunning: false, countdown: null },
+    // messaggio lungo (doppio, fine set + match tie-break + cambio campo): si rimpicciolisce senza schiacciare la scritta
+    long: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["0", "0"], games: [0, 0], sets: [1, 1], done: [{ g1: 6, g2: 4 }, { g1: 6, g2: 7, tb1: 5, tb2: 7 }], tiebreak: "match", message: `Rossi / Bianchi · ${labels.matchTiebreak} · ${demo.changeover}`, countdown: { label: demo.changeover, leftMs: 90000, shot: false } },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
   };

@@ -210,6 +210,7 @@ object DeStrings : Strings {
             else -> "Armbänder aktiv"
         }
     }
+    override val notifTvOnly = "TV-Anzeigetafel aktiv"
 
     override val bandPaired = "GEKOPPELT MIT"
     override val bandPlay = "SPIELEN"

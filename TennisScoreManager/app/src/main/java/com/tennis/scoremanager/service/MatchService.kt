@@ -17,11 +17,12 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MainActivity
 import com.tennis.scoremanager.R
+import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.TsmApp
 
 /**
- * Servizio in primo piano durante la partita con i braccialetti o col tabellone TV: tiene attivo il processo
- * (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
+ * Servizio in primo piano durante la partita con i braccialetti, e sempre col tabellone TV acceso: tiene attivo il
+ * processo (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
  */
 class MatchService : Service() {
 
@@ -45,10 +46,12 @@ class MatchService : Service() {
         )
         val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
         val tv = c.tv.value.enabled
+        // Fuori dalla partita (riepilogo, nuova partita, impostazioni) il servizio resta solo per il tabellone TV.
+        val inMatch = c.screen.value == Screen.START || c.screen.value == Screen.MATCH
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText(s.notifText(bands, tv))
+            .setContentText(if (tv && !inMatch) s.notifTvOnly else s.notifText(bands, tv))
             .setOngoing(true)
             .setContentIntent(open)
             .build()

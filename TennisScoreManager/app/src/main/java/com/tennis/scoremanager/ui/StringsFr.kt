@@ -213,6 +213,7 @@ object FrStrings : Strings {
             else -> "bracelets actifs"
         }
     }
+    override val notifTvOnly = "Tableau TV actif"
 
     override val bandPaired = "ASSOCIE A"
     override val bandPlay = "JOUEZ"
