@@ -141,14 +141,14 @@ object Reports {
 
         c.drawText("TENNIS SCORE MANAGER", w / 2f, 110f, paint(40f, Color.rgb(198, 244, 50), true, Paint.Align.CENTER).apply { letterSpacing = 0.2f })
         val header = listOfNotNull(rec.setup.club.ifBlank { null }, rec.setup.court.ifBlank { null }?.let { "${s.court} $it" }).joinToString(" · ")
-        if (header.isNotEmpty()) c.drawText(ellipsize(header, 56), w / 2f, 175f, paint(46f, white, true, Paint.Align.CENTER))
+        if (header.isNotEmpty()) paint(46f, white, true, Paint.Align.CENTER).let { c.drawText(fit(header, it, w - 120f), w / 2f, 175f, it) }
         c.drawText(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }, w / 2f, 235f, paint(36f, grey, false, Paint.Align.CENTER))
 
         // Riquadro del vincitore
         val box = RectF(60f, 290f, w - 60f, 470f)
         c.drawRoundRect(box, 36f, 36f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(60, 255, 255, 255) })
         c.drawText("🏆  ${s.winner.uppercase()}", w / 2f, 355f, paint(38f, grey, true, Paint.Align.CENTER))
-        c.drawText(ellipsize(names.side(winner), 28), w / 2f, 440f, paint(66f, if (winner == Side.P1) yellow else red, true, Paint.Align.CENTER))
+        paint(66f, if (winner == Side.P1) yellow else red, true, Paint.Align.CENTER).let { c.drawText(fit(names.side(winner), it, box.width() - 60f), w / 2f, 440f, it) }
 
         // Tabella punteggio
         val top = 540f
@@ -162,11 +162,13 @@ object Reports {
             c.drawRoundRect(rect, 28f, 28f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(40, 255, 255, 255) })
             c.drawRoundRect(RectF(60f, y, 84f, y + rowH), 12f, 12f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = if (side == Side.P1) yellow else red })
             val players = names.players(side)
+            // I nomi non devono finire sotto la colonna del primo set.
+            val nameW = firstCol - 120f - 20f
             if (players.size == 1) {
-                c.drawText(ellipsize(players[0], 18), 120f, y + rowH / 2 + 22f, paint(58f, white, side == winner))
+                paint(58f, white, side == winner).let { c.drawText(fit(players[0], it, nameW), 120f, y + rowH / 2 + 22f, it) }
             } else {
-                c.drawText(ellipsize(players[0], 18), 120f, y + rowH / 2 - 14f, paint(50f, white, side == winner))
-                c.drawText(ellipsize(players[1], 18), 120f, y + rowH / 2 + 50f, paint(50f, white, side == winner))
+                paint(50f, white, side == winner).let { c.drawText(fit(players[0], it, nameW), 120f, y + rowH / 2 - 14f, it) }
+                paint(50f, white, side == winner).let { c.drawText(fit(players[1], it, nameW), 120f, y + rowH / 2 + 50f, it) }
             }
             for ((j, set) in state.sets.withIndex()) {
                 val x = firstCol + j * colW + colW / 2
@@ -180,11 +182,9 @@ object Reports {
 
         // Dati della partita
         var y = top + 2 * (rowH + 30f) + 70f
-        val label = paint(34f, grey)
-        val value = paint(40f, white, true)
         fun row(l: String, v: String) {
-            c.drawText(l, 80f, y, label)
-            c.drawText(ellipsize(v, 40), 380f, y, value)
+            paint(34f, grey).let { c.drawText(fit(l, it, 380f - 80f - 16f), 80f, y, it) }
+            paint(40f, white, true).let { c.drawText(fit(v, it, w - 60f - 380f), 380f, y, it) }
             y += 66f
         }
         row(s.duration, duration(rec.clockMs))
@@ -195,5 +195,17 @@ object Reports {
         return bmp
     }
 
-    private fun ellipsize(t: String, max: Int) = if (t.length <= max) t else t.take(max - 1) + "…"
+    /**
+     * Testo che sta in [maxWidth] pixel (non in un numero di lettere: "WWW" e "iii" sono larghe diverse):
+     * prima si rimpicciolisce il carattere di [p] fino al 75%, poi si tronca con "…".
+     */
+    private fun fit(t: String, p: Paint, maxWidth: Float): String {
+        val minSize = p.textSize * 0.75f
+        while (p.measureText(t) > maxWidth && p.textSize > minSize) p.textSize -= 2f
+        if (p.measureText(t) <= maxWidth) return t
+        var end = t.length
+        while (end > 1 && p.measureText(t, 0, end) + p.measureText("…") > maxWidth) end--
+        if (end > 1 && Character.isHighSurrogate(t[end - 1])) end--
+        return t.substring(0, end).trimEnd() + "…"
+    }
 }

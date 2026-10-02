@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        controller.onActivityCreated(restored = savedInstanceState != null)
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         controller.envTick.value++
+        controller.onForeground()
         controller.ble.refreshLocation()
         if (controller.options.value.mode == PlayMode.BANDS) controller.ble.reconnectAll()
     }

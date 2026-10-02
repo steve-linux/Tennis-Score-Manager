@@ -65,10 +65,12 @@ import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
@@ -84,6 +86,7 @@ fun StartScreen(c: MatchController) {
     val bands by c.ble.bands.collectAsState()
     val names = remember(su, s) { Names(su, s) }
     var showSaved by remember { mutableStateOf(false) }
+    var toDelete by remember { mutableStateOf<MatchRecord?>(null) }
     BackHandler { c.back() }
 
     val pulse = rememberInfiniteTransition(label = "pulse")
@@ -171,10 +174,10 @@ fun StartScreen(c: MatchController) {
                 } else {
                     LazyColumn(Modifier.heightIn(max = 420.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(saved, key = { it.id }) { rec ->
-                            SavedRow(rec, onOpen = {
+                            SavedRow(rec, o.lang, onOpen = {
                                 showSaved = false
                                 c.resumeSaved(rec)
-                            }, onDelete = { c.deleteSaved(rec) })
+                            }, onDelete = { toDelete = rec })
                         }
                     }
                 }
@@ -182,10 +185,27 @@ fun StartScreen(c: MatchController) {
             confirmButton = { TextButton(onClick = { showSaved = false }) { Text(s.cancel) } },
         )
     }
+
+    // Il cestino sta nella stessa riga che riprende la partita: un tocco storto non deve cancellarla.
+    toDelete?.let { rec ->
+        val n = Names(rec.setup, s)
+        ConfirmDialog(
+            icon = Icons.Filled.Delete,
+            title = s.deleteSavedTitle,
+            text = s.deleteSavedText("${n.short(Side.P1)} ${s.vs} ${n.short(Side.P2)}"),
+            confirm = s.delete,
+            danger = true,
+            onConfirm = {
+                toDelete = null
+                c.deleteSaved(rec)
+            },
+            onDismiss = { toDelete = null },
+        )
+    }
 }
 
 @Composable
-private fun SavedRow(rec: MatchRecord, onOpen: () -> Unit, onDelete: () -> Unit) {
+private fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
     val s = LocalStrings.current
     val names = remember(rec.id) { Names(rec.setup, s) }
     val state = remember(rec.id, rec.events.size) { ScoreEngine.replay(rec.rules, rec.events) }
@@ -198,7 +218,7 @@ private fun SavedRow(rec: MatchRecord, onOpen: () -> Unit, onDelete: () -> Unit)
             val score = (Reports.scoreLine(state, Side.P1) + "  " + "${state.g1}-${state.g2}").trim()
             Text(score, color = TsmColors.Ball)
             Text(
-                "${Reports.date(rec.startedAt ?: rec.updatedAt, rec.options.lang)} · ${Reports.time(rec.updatedAt, rec.options.lang)}",
+                "${Reports.date(rec.startedAt ?: rec.updatedAt, lang)} · ${Reports.time(rec.updatedAt, lang)}",
                 color = TsmColors.TextDim, fontSize = 12.sp,
             )
         }

@@ -57,6 +57,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ui.screens.MatchScreen
@@ -68,6 +74,14 @@ import com.tennis.scoremanager.ui.screens.SummaryScreen
 @Composable
 fun AppRoot(c: MatchController) {
     val screen by c.screen.collectAsState()
+    // Subito dopo un cambio di schermata i tocchi si ignorano: il secondo tocco di un doppio tocco finirebbe
+    // sul pulsante che sta nello stesso punto della schermata nuova ("Inizia partita" due volte = "Sospendi").
+    var guard by remember { mutableStateOf(false) }
+    LaunchedEffect(screen) {
+        guard = true
+        delay(TAP_GUARD_MS)
+        guard = false
+    }
     Surface(color = TsmColors.Background, modifier = Modifier.fillMaxSize()) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
@@ -78,7 +92,62 @@ fun AppRoot(c: MatchController) {
                 Screen.SUMMARY -> SummaryScreen(c)
             }
         }
+        if (guard) {
+            Box(
+                Modifier.fillMaxSize().pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                    }
+                },
+            )
+        }
     }
+}
+
+/** Quanto restano sordi ai tocchi una schermata o un popup appena aperti. */
+const val TAP_GUARD_MS = 450L
+
+/**
+ * Diventa true [TAP_GUARD_MS] dopo l'apertura: i pulsanti di un popup appena comparso ignorano il secondo
+ * tocco di un doppio tocco fatto sotto (es. il punto della partita e poi "Annulla ultimo punto").
+ */
+@Composable
+fun rememberArmed(): Boolean {
+    var armed by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(TAP_GUARD_MS)
+        armed = true
+    }
+    return armed
+}
+
+/** Conferma di un'azione che non si può annullare (cancellare, spegnere, chiudere). */
+@Composable
+fun ConfirmDialog(
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirm: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    danger: Boolean = false,
+) {
+    val s = LocalStrings.current
+    val armed = rememberArmed()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(icon, null, tint = if (danger) TsmColors.Danger else TsmColors.Orange) },
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            Button(
+                onClick = { if (armed) onConfirm() },
+                colors = if (danger) ButtonDefaults.buttonColors(containerColor = TsmColors.Danger, contentColor = TsmColors.TextMain)
+                else ButtonDefaults.buttonColors(),
+            ) { Text(confirm) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(s.cancel) } },
+    )
 }
 
 /** Schermata standard: intestazione, contenuto scorrevole, barra pulsanti in basso. */

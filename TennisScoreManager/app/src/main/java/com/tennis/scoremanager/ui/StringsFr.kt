@@ -82,6 +82,8 @@ object FrStrings : Strings {
     override val estimateTheory = "Estimation théorique : après 20 minutes d'utilisation, elle se corrige avec la consommation mesurée."
     override val copyToOther = "Copier sur l'autre bracelet"
     override val powerOff = "Éteindre"
+    override val bandPowerOffTitle = "Éteindre le bracelet ?"
+    override val bandPowerOffText: (String) -> String = { "$it s'éteint tout de suite. Pour le rallumer : un clic sur le bouton latéral." }
     override val languageSection = "Langue"
     override val languageHint = "S'applique aux écrans, à la voix de l'arbitre, au tableau d'affichage TV et aux bracelets."
     override val audioSection = "Audio et voix"
@@ -140,7 +142,9 @@ object FrStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth et localisation obligatoires"
     override val bandsRequiredText = "Pour utiliser les bracelets, activez le Bluetooth, autorisez la localisation et laissez-la activée."
     override val bandsMissingTitle = "Bracelets non associés"
-    override val bandsMissingText: (String) -> String = { "Il manque le bracelet de : $it. Continuer quand même ?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Il manque les bracelets de : " else "Il manque le bracelet de : ") + it.joinToString(", ") + ". Continuer quand même ?"
+    }
     override val continueAnyway = "Continuer"
     override val cancel = "Annuler"
 
@@ -152,6 +156,8 @@ object FrStrings : Strings {
     override val noSavedMatches = "Aucun match suspendu enregistré."
     override val savedMatchesTitle = "Matchs suspendus"
     override val delete = "Supprimer"
+    override val deleteSavedTitle = "Supprimer le match suspendu ?"
+    override val deleteSavedText: (String) -> String = { "Le match $it ne pourra plus être repris." }
     override val vs = "contre"
 
     override val matchTime = "Match Time"
@@ -167,7 +173,7 @@ object FrStrings : Strings {
     override val newMatchConfirmTitle = "Nouveau match ?"
     override val newMatchConfirmText = "Le match en cours reste enregistré parmi les matchs suspendus et pourra être repris."
     override val endDialogTitle = "Jeu, set et match"
-    override val endDialogText: (String, String) -> String = { name, score -> "Victoire de $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
     override val undoLastPoint = "Annuler le dernier point"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
@@ -240,6 +246,8 @@ object FrStrings : Strings {
     override val gamesWon = "Jeux gagnés"
     override val result = "Résultat"
     override val saveHistory = "Enregistrer dans l'historique"
+    override val summaryLeaveTitle = "Résumé non enregistré"
+    override val summaryLeaveText = "Vous n'avez ni enregistré ni partagé le résumé du match : vous ne pourrez plus le revoir."
     override val share = "Partager"
     override val saveDialogTitle = "Enregistrer dans l'historique"
     override val fileName = "Nom"

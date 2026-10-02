@@ -3,6 +3,7 @@ package com.tennis.scoremanager.ui.screens
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
@@ -73,6 +74,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -95,6 +97,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
@@ -157,6 +160,17 @@ fun OptionsScreen(c: MatchController) {
     }
 
     fun requestLocation() = permLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+
+    // Col tabellone TV il servizio in primo piano parte anche senza braccialetti: su Android 13+ senza questo
+    // permesso la sua notifica non compare e non si torna all'app toccandola.
+    val tvOn = c.tv.collectAsState().value.enabled
+    LaunchedEffect(tvOn) {
+        if (tvOn && Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        }
+    }
     fun openLocationSettings() = runCatching { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
     fun enableBluetooth() {
         if (!blePerms) requestBandPermissions() else runCatching { btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
@@ -164,7 +178,7 @@ fun OptionsScreen(c: MatchController) {
 
     var locationDialog by remember { mutableStateOf(false) }
     var bandsRequired by remember { mutableStateOf(false) }
-    var missingBands by remember { mutableStateOf<String?>(null) }
+    var missingBands by remember { mutableStateOf<List<String>?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
@@ -177,7 +191,7 @@ fun OptionsScreen(c: MatchController) {
             val bands = c.ble.bands.value
             val missing = Side.entries.filter { bands[it] == null }.map { names.short(it) }
             if (missing.isNotEmpty()) {
-                missingBands = missing.joinToString(", ")
+                missingBands = missing
                 return
             }
         } else if (!(locPerm && locOn)) {
@@ -349,6 +363,7 @@ private fun BandPicker(
     battery: com.tennis.scoremanager.BandBattery?,
 ) {
     val s = LocalStrings.current
+    val locale = c.options.collectAsState().value.lang.locale
     var open by remember { mutableStateOf(false) }
     var settingsOpen by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
@@ -374,7 +389,7 @@ private fun BandPicker(
                             LinkState.POWERED_OFF -> s.bandOff
                             LinkState.IDLE -> s.bandIdle
                         }
-                        val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        val volts = current.millivolts?.let { String.format(locale, " (%.2f V)", it / 1000.0) } ?: ""
                         val batteryText = when {
                             current.chargeFull -> " · ${s.bandChargeFull}"
                             current.charging && current.battery != null -> " · ${s.bandCharging(current.battery)}$volts"

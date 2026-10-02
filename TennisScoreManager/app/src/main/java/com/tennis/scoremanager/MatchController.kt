@@ -103,6 +103,10 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
+        /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
+        private const val UNDO_GAP_MS = 1_000L
+        /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
+        private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
@@ -122,6 +126,8 @@ class MatchController(
     val endDialog = MutableStateFlow(false)
     val serveOrderPrompt = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
+    /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
+    val summaryKept = MutableStateFlow(false)
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
@@ -161,6 +167,11 @@ class MatchController(
     private var cdEnd = 0L
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
+    private var lastUndoAt = 0L
+    private var locationJob: Job? = null
+    private var locationFor: String? = null
+    /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
+    private var restoreChecked = false
     private var lastAutosave = 0L
     private var messageJob: Job? = null
     /**
@@ -637,9 +648,12 @@ class MatchController(
 
     fun awardPoint(side: Side, fromBand: Boolean = false) {
         val lm = live.value ?: return
-        if (lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastPointAt < if (fromBand) BAND_GAP_MS else TAP_GAP_MS) return
+        // Il secondo tocco di un doppio tocco su "Annulla" può cadere su un tasto punto (o il popup di fine
+        // partita sparisce sotto il dito): non è un punto.
+        if (!fromBand && now - lastUndoAt < TAP_GAP_MS) return
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
@@ -696,8 +710,10 @@ class MatchController(
         return when {
             next.any { it.matchWinner != null } -> s.msgMatchPoint
             next.any { it.setWinner != null } -> s.msgSetPoint
-            ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
+            // Nel No-Ad sul 40-40 chi riceve vince il game col prossimo punto, quindi è sempre anche palla break:
+            // il punto decisivo va controllato prima.
             state.rules.noAd && state.isDeuce -> s.msgDecidingPoint
+            ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
             else -> null
         }
     }
@@ -705,10 +721,14 @@ class MatchController(
     /** Annulla l'ultimo punto: si rigiocano gli eventi, quindi funziona anche dopo fine game, set o partita. */
     fun undo() {
         val lm = live.value ?: return
+        if (closing) return
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastUndoAt < UNDO_GAP_MS) return
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
         events.removeAt(events.lastIndex)
+        lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
         val rec = lm.record.copy(events = events, endedAt = if (wasFinished) null else lm.record.endedAt)
@@ -778,6 +798,9 @@ class MatchController(
             storage.deleteMatch(rec.id)
             storage.saveLastFinished(rec)
         }
+        // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
+        storage.summaryOpen = rec.id
+        summaryKept.value = false
         summary.value = LiveMatch(rec, lm.state)
         live.value = null
         endDialog.value = false
@@ -802,6 +825,7 @@ class MatchController(
         announcer.stop()
         live.value = null
         summary.value = null
+        storage.summaryOpen = null
         runningSince = null
         clockMs.value = 0
         stopCountdown()
@@ -821,6 +845,7 @@ class MatchController(
             ttsEngine = cur.ttsEngine, ttsVoice = cur.ttsVoice, voiceFiles = cur.voiceFiles,
         )
         setup.value = rec.setup
+        storage.setup = rec.setup
         options.value = o
         storage.options = o
         val state = ScoreEngine.replay(rec.rules, rec.events)
@@ -914,6 +939,8 @@ class MatchController(
 
     /** Salvataggio automatico su file a ogni punto (e ogni 15" col tempo che scorre). */
     fun persist() {
+        // In chiusura il file giusto l'ha già scritto shutdown(): un salvataggio dopo lo sovrascriverebbe.
+        if (closing) return
         val lm = live.value ?: return
         lastAutosave = SystemClock.elapsedRealtime()
         val snapshot = lm.record.copy(clockMs = currentClock(), updatedAt = System.currentTimeMillis())
@@ -921,8 +948,11 @@ class MatchController(
     }
 
     private fun fetchLocation() {
-        val id = live.value?.record?.id ?: return
-        scope.launch {
+        val id = (live.value ?: summary.value)?.record?.id ?: return
+        if (locationJob?.isActive == true && locationFor == id) return
+        locationJob?.cancel()
+        locationFor = id
+        locationJob = scope.launch {
             val loc = LocationHelper.current(app) ?: return@launch
             updateLocation(id, MatchLocation(loc.latitude, loc.longitude))
             val address = LocationHelper.address(app, loc, Reports.locale(options.value.lang))
@@ -1063,14 +1093,26 @@ class MatchController(
                         }
                         folderLabel()
                     } else {
+                        // Come fa il selettore di sistema: "Finale (1).txt" invece di sovrascrivere "Finale.txt".
                         val dir = storage.defaultHistoryDir
-                        for ((file, _, write) in outputs) File(dir, file).outputStream().use(write)
+                        val suffix = generateSequence(0) { it + 1 }.map { if (it == 0) "" else " ($it)" }
+                            .first { sfx -> outputs.none { (file, _, _) -> File(dir, withSuffix(file, sfx)).exists() } }
+                        for ((file, _, write) in outputs) File(dir, withSuffix(file, suffix)).outputStream().use(write)
                         dir.absolutePath
                     }
                 }.getOrNull()
             }
+            if (where != null) summaryKept.value = true
             _toasts.tryEmit(if (where != null) s.savedTo(where) else s.saveError)
         }
+    }
+
+    private fun withSuffix(file: String, suffix: String) =
+        if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
+
+    /** Il riepilogo è stato condiviso: c'è una copia fuori dall'app. */
+    fun markSummaryKept() {
+        summaryKept.value = true
     }
 
     /** Immagine + testo del risultato da condividere sui social. */
@@ -1109,6 +1151,7 @@ class MatchController(
         if (closing) return
         closing = true
         val s = strings
+        storage.summaryOpen = null
         scope.launch {
             announcer.stop()
             live.value?.let { lm ->
@@ -1116,6 +1159,8 @@ class MatchController(
                     suspended = !lm.state.isFinished, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
                 )
                 runningSince = null
+                // Anche in memoria: nei secondi in cui si spengono i braccialetti nulla deve ripartire dal vecchio stato.
+                live.value = lm.copy(record = snapshot)
                 withContext(io) { storage.saveMatch(snapshot) }
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
@@ -1129,4 +1174,36 @@ class MatchController(
 
     /** Chiamato quando l'Activity va in secondo piano. */
     fun onBackground() = persist()
+
+    /**
+     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
+     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Un'apertura normale riparte invece dalla prima schermata.
+     */
+    fun onActivityCreated(restored: Boolean) {
+        if (restoreChecked) return
+        restoreChecked = true
+        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        val id = storage.summaryOpen ?: return
+        val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
+        summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
+        summaryKept.value = false
+        screen.value = Screen.SUMMARY
+    }
+
+    /**
+     * L'app torna in primo piano. Se la partita è partita da un braccialetto a schermo bloccato la posizione
+     * non è arrivata (Android la nega in background): la si chiede ora.
+     */
+    fun onForeground() {
+        val lm = live.value
+        val sm = summary.value
+        when {
+            lm != null -> if (lm.record.location == null) fetchLocation()
+            sm != null -> {
+                val ended = sm.record.endedAt ?: return
+                if (sm.record.location == null && System.currentTimeMillis() - ended < LATE_LOCATION_MS) fetchLocation()
+            }
+        }
+    }
 }

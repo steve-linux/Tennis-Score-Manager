@@ -25,10 +25,14 @@ class StringsTest {
                 val name = m.name.removePrefix("get")
                 val text = when (val v = m.invoke(s)) {
                     is String -> v
-                    is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi")))
+                    is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi"), listOf(listOf("Rossi"))))
                     is Function2<*, *, *> -> call(
                         { (v as Function2<Any?, Any?, Any?>)(it[0], it[1]) },
                         listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(true, false)),
+                    )
+                    is Function3<*, *, *, *> -> call(
+                        { (v as Function3<Any?, Any?, Any?, Any?>)(it[0], it[1], it[2]) },
+                        listOf(listOf("Rossi", "6-4", false)),
                     )
                     is Function4<*, *, *, *, *> -> call(
                         { (v as Function4<Any?, Any?, Any?, Any?, Any?>)(it[0], it[1], it[2], it[3]) },
@@ -47,6 +51,22 @@ class StringsTest {
             val t = texts(stringsFor(lang))
             assertEquals(it.keys, t.keys)
             for ((k, v) in t) assertTrue("$lang $k", v.isNotBlank() || k == "TeamJoiner")
+        }
+    }
+
+    @Test
+    fun doublesAndTwoBandsUsePlural() {
+        assertEquals("Vince Rossi\n6-4 6-3", ItStrings.endDialogText("Rossi", "6-4 6-3", false))
+        assertEquals("Vincono Rossi e Bianchi\n6-4 6-3", ItStrings.endDialogText("Rossi e Bianchi", "6-4 6-3", true))
+        assertEquals("Rossi and Bianchi win\n6-4", EnStrings.endDialogText("Rossi and Bianchi", "6-4", true))
+        assertEquals("Ganan Rossi y Bianchi\n6-4", stringsFor(Lang.ES).endDialogText("Rossi y Bianchi", "6-4", true))
+        for (lang in Lang.entries) {
+            val s = stringsFor(lang)
+            val one = s.bandsMissingText(listOf("Rossi"))
+            val two = s.bandsMissingText(listOf("Rossi", "Bianchi"))
+            assertTrue("$lang: $two", "Rossi, Bianchi" in two)
+            // Al plurale cambia anche il resto della frase, non solo l'elenco dei nomi.
+            assertTrue("$lang: $one / $two", two.replace(", Bianchi", "") != one)
         }
     }
 

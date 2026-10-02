@@ -76,6 +76,8 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
     }
     // Bozza locale: i cursori la cambiano subito, il braccialetto riceve il valore al rilascio.
     var draft by remember(band.address, settings) { mutableStateOf(settings) }
+    var confirmOff by remember(band.address) { mutableStateOf(false) }
+    val locale = c.options.collectAsState().value.lang.locale
     fun commit(v: BandSettings) {
         draft = v
         if (v != settings) c.writeBandSettings(side, v)
@@ -112,16 +114,31 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
             commit(draft.copy(idleTimeoutMin = it))
         }
 
-        Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery)
+        Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery, locale)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PanelButton(s.identify, Icons.Filled.FlashOn, Modifier.weight(1f)) { c.identifyBand(side) }
-            PanelButton(s.powerOff, Icons.Filled.PowerSettingsNew, Modifier.weight(1f), danger = true) { c.powerOffBand(side) }
+            // Anche a partita in corso: spegnere per sbaglio il braccialetto di un giocatore va confermato.
+            PanelButton(s.powerOff, Icons.Filled.PowerSettingsNew, Modifier.weight(1f), danger = true) { confirmOff = true }
         }
         val other = bands[side.other]
         PanelButton(s.copyToOther, Icons.Filled.ContentCopy, Modifier.fillMaxWidth(),
             enabled = other?.state == LinkState.READY && other.settings != null) { c.copyBandSettings(side) }
         if (settings.firmware.isNotEmpty()) Text(s.bandFirmware(settings.firmware), color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+    if (confirmOff) {
+        ConfirmDialog(
+            icon = Icons.Filled.PowerSettingsNew,
+            title = s.bandPowerOffTitle,
+            text = s.bandPowerOffText(settings.name.ifBlank { band.name }),
+            confirm = s.powerOff,
+            danger = true,
+            onConfirm = {
+                confirmOff = false
+                c.powerOffBand(side)
+            },
+            onDismiss = { confirmOff = false },
+        )
     }
 }
 
@@ -132,10 +149,11 @@ private fun duration(seconds: Int): String = when {
     else -> "${seconds / 60} min ${seconds % 60} s"
 }
 
-private fun ma(v: Double): String = String.format(Locale.getDefault(), if (v >= 10) "%.0f" else "%.1f", v)
+/** Milliampere con la virgola o il punto della lingua dell'app (non del telefono). */
+private fun ma(v: Double, locale: Locale): String = String.format(locale, if (v >= 10) "%.0f" else "%.1f", v)
 
 @Composable
-private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: Int?) {
+private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: Int?, locale: Locale) {
     val s = LocalStrings.current
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Ball.copy(alpha = 0.10f)).padding(12.dp),
@@ -147,7 +165,7 @@ private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: In
             Text(s.estimateFull(BatteryModel.formatHours(est.hoursFull)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
         }
         if (percent != null) Text(s.estimateNow(BatteryModel.formatHours(est.hoursAt(percent)), percent), color = TsmColors.Ball, fontWeight = FontWeight.SemiBold)
-        Text(s.estimateBreakdown(ma(est.totalMa), ma(est.baseMa), ma(est.displayMa), ma(est.soundMa)), color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(s.estimateBreakdown(ma(est.totalMa, locale), ma(est.baseMa, locale), ma(est.displayMa, locale), ma(est.soundMa, locale)), color = TsmColors.TextDim, fontSize = 12.sp)
         Text(if (est.measured) s.estimateMeasured else s.estimateTheory, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }

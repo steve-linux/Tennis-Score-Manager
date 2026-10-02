@@ -67,6 +67,11 @@ class Storage(context: Context) {
         get() = prefs.getString("history_tree", null)
         set(v) = prefs.edit().putString("history_tree", v).apply()
 
+    /** Id della partita il cui riepilogo è a schermo (null dopo "Nuova partita" o "Esci"). */
+    var summaryOpen: String?
+        get() = prefs.getString("summary_open", null)
+        set(v) = prefs.edit().putString("summary_open", v).apply()
+
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized
     fun saveMatch(rec: MatchRecord) {

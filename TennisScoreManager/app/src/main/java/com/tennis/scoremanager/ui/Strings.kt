@@ -90,6 +90,9 @@ interface Strings {
     val estimateTheory: String
     val copyToOther: String
     val powerOff: String
+    /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
+    val bandPowerOffTitle: String
+    val bandPowerOffText: (String) -> String
     val languageSection: String
     val languageHint: String
     val audioSection: String
@@ -146,7 +149,8 @@ interface Strings {
     val bandsRequiredTitle: String
     val bandsRequiredText: String
     val bandsMissingTitle: String
-    val bandsMissingText: (String) -> String
+    /** Giocatori senza braccialetto (uno o due: singolare o plurale). */
+    val bandsMissingText: (List<String>) -> String
     val continueAnyway: String
     val cancel: String
 
@@ -159,6 +163,9 @@ interface Strings {
     val noSavedMatches: String
     val savedMatchesTitle: String
     val delete: String
+    /** Conferma prima di eliminare una partita sospesa ("Rossi vs Bianchi"). */
+    val deleteSavedTitle: String
+    val deleteSavedText: (String) -> String
     val vs: String
 
     // Partita
@@ -180,7 +187,8 @@ interface Strings {
     val newMatchConfirmTitle: String
     val newMatchConfirmText: String
     val endDialogTitle: String
-    val endDialogText: (String, String) -> String
+    /** Vincitore, punteggio, doppio (il verbo va al plurale: "Vincono Rossi e Bianchi"). */
+    val endDialogText: (String, String, Boolean) -> String
     val matchConcluded: String
     val undoLastPoint: String
     val serveOrderTitle: (Int) -> String
@@ -244,6 +252,9 @@ interface Strings {
     val gamesWon: String
     val result: String
     val saveHistory: String
+    /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
+    val summaryLeaveTitle: String
+    val summaryLeaveText: String
     val share: String
     val saveDialogTitle: String
     val fileName: String
@@ -392,6 +403,8 @@ object ItStrings : Strings {
     override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
     override val copyToOther = "Copia sull'altro braccialetto"
     override val powerOff = "Spegni"
+    override val bandPowerOffTitle = "Spegnere il braccialetto?"
+    override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
     override val languageSection = "Lingua"
     override val languageHint = "Vale per le schermate, la voce dell'arbitro, il tabellone TV e i braccialetti."
     override val audioSection = "Audio e voce"
@@ -450,7 +463,9 @@ object ItStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth e posizione obbligatori"
     override val bandsRequiredText = "Per usare i braccialetti devi attivare il Bluetooth, concedere il permesso di posizione e tenere attiva la posizione."
     override val bandsMissingTitle = "Braccialetti non associati"
-    override val bandsMissingText: (String) -> String = { "Manca il braccialetto per: $it. Continuare lo stesso?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Mancano i braccialetti per: " else "Manca il braccialetto per: ") + it.joinToString(", ") + ". Continuare lo stesso?"
+    }
     override val continueAnyway = "Continua"
     override val cancel = "Annulla"
 
@@ -462,6 +477,8 @@ object ItStrings : Strings {
     override val noSavedMatches = "Nessuna partita sospesa salvata."
     override val savedMatchesTitle = "Partite sospese"
     override val delete = "Elimina"
+    override val deleteSavedTitle = "Eliminare la partita sospesa?"
+    override val deleteSavedText: (String) -> String = { "La partita $it non si potrà più riprendere." }
     override val vs = "vs"
 
     override val matchTime = "Match Time"
@@ -477,7 +494,7 @@ object ItStrings : Strings {
     override val newMatchConfirmTitle = "Nuova partita?"
     override val newMatchConfirmText = "La partita in corso resta salvata tra le partite sospese e potrai riprenderla."
     override val endDialogTitle = "Gioco, set, partita"
-    override val endDialogText: (String, String) -> String = { name, score -> "Vince $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Vincono" else "Vince"} $name\n$score" }
     override val matchConcluded = "Partita conclusa"
     override val undoLastPoint = "Annulla ultimo punto"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
@@ -550,6 +567,8 @@ object ItStrings : Strings {
     override val gamesWon = "Game vinti"
     override val result = "Risultato"
     override val saveHistory = "Salva nello storico"
+    override val summaryLeaveTitle = "Riepilogo non salvato"
+    override val summaryLeaveText = "Non hai salvato né condiviso il riepilogo della partita: dopo non potrai più rivederlo."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva nello storico"
     override val fileName = "Nome"
@@ -688,6 +707,8 @@ object EnStrings : Strings {
     override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
     override val copyToOther = "Copy to the other wristband"
     override val powerOff = "Power off"
+    override val bandPowerOffTitle = "Power off the wristband?"
+    override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
     override val languageSection = "Language"
     override val languageHint = "Applies to the screens, the umpire's voice, the TV scoreboard and the wristbands."
     override val audioSection = "Audio and voice"
@@ -746,7 +767,9 @@ object EnStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth and location required"
     override val bandsRequiredText = "To use the wristbands turn on Bluetooth, allow location and keep location on."
     override val bandsMissingTitle = "Wristbands not assigned"
-    override val bandsMissingText: (String) -> String = { "No wristband for: $it. Continue anyway?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "No wristbands for: " else "No wristband for: ") + it.joinToString(", ") + ". Continue anyway?"
+    }
     override val continueAnyway = "Continue"
     override val cancel = "Cancel"
 
@@ -758,6 +781,8 @@ object EnStrings : Strings {
     override val noSavedMatches = "No suspended match saved."
     override val savedMatchesTitle = "Suspended matches"
     override val delete = "Delete"
+    override val deleteSavedTitle = "Delete the suspended match?"
+    override val deleteSavedText: (String) -> String = { "The match $it can no longer be resumed." }
     override val vs = "vs"
 
     override val matchTime = "Match Time"
@@ -773,7 +798,7 @@ object EnStrings : Strings {
     override val newMatchConfirmTitle = "New match?"
     override val newMatchConfirmText = "The current match stays saved among suspended matches and can be resumed."
     override val endDialogTitle = "Game, set and match"
-    override val endDialogText: (String, String) -> String = { name, score -> "$name wins\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "$name ${if (team) "win" else "wins"}\n$score" }
     override val matchConcluded = "Match concluded"
     override val undoLastPoint = "Undo last point"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
@@ -846,6 +871,8 @@ object EnStrings : Strings {
     override val gamesWon = "Games won"
     override val result = "Result"
     override val saveHistory = "Save to history"
+    override val summaryLeaveTitle = "Summary not saved"
+    override val summaryLeaveText = "You have neither saved nor shared the match summary: you won't be able to see it again."
     override val share = "Share"
     override val saveDialogTitle = "Save to history"
     override val fileName = "Name"

@@ -79,6 +79,8 @@ object EsStrings : Strings {
     override val estimateTheory = "Estimación teórica: tras 20 minutos de uso se corrige con el consumo medido."
     override val copyToOther = "Copiar a la otra pulsera"
     override val powerOff = "Apagar"
+    override val bandPowerOffTitle = "¿Apagar la pulsera?"
+    override val bandPowerOffText: (String) -> String = { "$it se apaga ahora mismo. Para volver a encenderla: un clic en el botón lateral." }
     override val languageSection = "Idioma"
     override val languageHint = "Se aplica a las pantallas, la voz del juez, el marcador de TV y las pulseras."
     override val audioSection = "Audio y voz"
@@ -138,7 +140,9 @@ object EsStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth y ubicación obligatorios"
     override val bandsRequiredText = "Para usar las pulseras activa el Bluetooth, concede el permiso de ubicación y mantén la ubicación activada."
     override val bandsMissingTitle = "Pulseras no vinculadas"
-    override val bandsMissingText: (String) -> String = { "Falta la pulsera de: $it. ¿Continuar de todos modos?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltan las pulseras de: " else "Falta la pulsera de: ") + it.joinToString(", ") + ". ¿Continuar de todos modos?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
@@ -150,6 +154,8 @@ object EsStrings : Strings {
     override val noSavedMatches = "No hay partidos suspendidos guardados."
     override val savedMatchesTitle = "Partidos suspendidos"
     override val delete = "Eliminar"
+    override val deleteSavedTitle = "¿Eliminar el partido suspendido?"
+    override val deleteSavedText: (String) -> String = { "El partido $it ya no se podrá reanudar." }
     override val vs = "contra"
 
     override val matchTime = "Match Time"
@@ -165,7 +171,7 @@ object EsStrings : Strings {
     override val newMatchConfirmTitle = "¿Nuevo partido?"
     override val newMatchConfirmText = "El partido en curso queda guardado entre los partidos suspendidos y podrás reanudarlo."
     override val endDialogTitle = "Juego, set y partido"
-    override val endDialogText: (String, String) -> String = { name, score -> "Gana $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Ganan" else "Gana"} $name\n$score" }
     override val matchConcluded = "Partido terminado"
     override val undoLastPoint = "Anular el último punto"
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
@@ -238,6 +244,8 @@ object EsStrings : Strings {
     override val gamesWon = "Juegos ganados"
     override val result = "Resultado"
     override val saveHistory = "Guardar en el historial"
+    override val summaryLeaveTitle = "Resumen no guardado"
+    override val summaryLeaveText = "No has guardado ni compartido el resumen del partido: después ya no podrás volver a verlo."
     override val share = "Compartir"
     override val saveDialogTitle = "Guardar en el historial"
     override val fileName = "Nombre"

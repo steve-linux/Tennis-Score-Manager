@@ -66,6 +66,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.TsmColors
@@ -84,6 +85,12 @@ fun SummaryScreen(c: MatchController) {
     val w = state.winner ?: Side.P1
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
+    val kept by c.summaryKept.collectAsState()
+    /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
+    var leaving by remember { mutableStateOf<Boolean?>(null) }
+    fun leave(exit: Boolean) {
+        if (exit) activity?.let { c.exitApp(it) } else c.newMatch()
+    }
     BackHandler { }
 
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
@@ -91,7 +98,7 @@ fun SummaryScreen(c: MatchController) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(s.summaryTitle, fontSize = 26.sp, fontWeight = FontWeight.Black, color = TsmColors.TextMain)
+            Text(s.summaryTitle, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, color = TsmColors.TextMain)
 
             // Vincitore
             Column(
@@ -100,7 +107,7 @@ fun SummaryScreen(c: MatchController) {
             ) {
                 Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-                Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.scoreLine(state, w), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
@@ -171,17 +178,31 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) }.onSuccess { c.markSummaryKept() } }
                 }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
-                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                // Senza salvataggio né condivisione il riepilogo si perde: un tocco solo non basta.
+                GhostButton(s.newMatch, Icons.Filled.Replay, { if (kept) leave(false) else leaving = false }, Modifier.weight(1f))
+                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { if (kept) leave(true) else leaving = true }, Modifier.weight(1f))
             }
         }
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
+    leaving?.let { exit ->
+        ConfirmDialog(
+            icon = if (exit) Icons.AutoMirrored.Filled.ExitToApp else Icons.Filled.Replay,
+            title = s.summaryLeaveTitle,
+            text = s.summaryLeaveText,
+            confirm = if (exit) s.exit else s.newMatch,
+            onConfirm = {
+                leaving = null
+                leave(exit)
+            },
+            onDismiss = { leaving = null },
+        )
+    }
 }
 
 @Composable

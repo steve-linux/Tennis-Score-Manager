@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -85,7 +86,9 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -93,6 +96,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvChip
+import com.tennis.scoremanager.ui.rememberArmed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,7 +139,7 @@ fun MatchScreen(c: MatchController) {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
-                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, fontWeight = FontWeight.Black)
+                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -163,20 +167,16 @@ fun MatchScreen(c: MatchController) {
     }
 
     if (confirmExit) {
-        AlertDialog(
-            onDismissRequest = { confirmExit = false },
-            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
-            title = { Text(s.exitConfirmTitle) },
-            text = {
-                Text(s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "")
+        ConfirmDialog(
+            icon = Icons.AutoMirrored.Filled.ExitToApp,
+            title = s.exitConfirmTitle,
+            text = s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "",
+            confirm = s.exit,
+            onConfirm = {
+                confirmExit = false
+                activity?.let { c.exitApp(it) }
             },
-            confirmButton = {
-                Button(onClick = {
-                    confirmExit = false
-                    activity?.let { c.exitApp(it) }
-                }) { Text(s.exit) }
-            },
-            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text(s.cancel) } },
+            onDismiss = { confirmExit = false },
         )
     }
 
@@ -200,6 +200,7 @@ fun MatchScreen(c: MatchController) {
 
     if (end && state.isFinished) {
         val w = state.winner ?: Side.P1
+        val armed = rememberArmed()
         AlertDialog(
             onDismissRequest = {},
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -207,13 +208,13 @@ fun MatchScreen(c: MatchController) {
             title = { Text(s.endDialogTitle, fontWeight = FontWeight.Black) },
             text = {
                 Text(
-                    s.endDialogText(names.side(w), Reports.scoreLine(state, w)),
+                    s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
                 Button(
-                    onClick = { c.confirmEnd() },
+                    onClick = { if (armed) c.confirmEnd() },
                     colors = ButtonDefaults.buttonColors(containerColor = TsmColors.Ball, contentColor = TsmColors.OnBall),
                 ) {
                     Icon(Icons.Filled.Check, null)
@@ -222,7 +223,7 @@ fun MatchScreen(c: MatchController) {
                 }
             },
             dismissButton = {
-                OutlinedButton(onClick = { c.undo() }) {
+                OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
                     Text(s.undoLastPoint, color = TsmColors.TextMain)
@@ -232,18 +233,16 @@ fun MatchScreen(c: MatchController) {
     }
 
     if (confirmNew) {
-        AlertDialog(
-            onDismissRequest = { confirmNew = false },
-            icon = { Icon(Icons.Filled.AddCircle, null, tint = TsmColors.Orange) },
-            title = { Text(s.newMatchConfirmTitle) },
-            text = { Text(s.newMatchConfirmText) },
-            confirmButton = {
-                Button(onClick = {
-                    confirmNew = false
-                    c.newMatch()
-                }) { Text(s.newMatch) }
+        ConfirmDialog(
+            icon = Icons.Filled.AddCircle,
+            title = s.newMatchConfirmTitle,
+            text = s.newMatchConfirmText,
+            confirm = s.newMatch,
+            onConfirm = {
+                confirmNew = false
+                c.newMatch()
             },
-            dismissButton = { TextButton(onClick = { confirmNew = false }) { Text(s.cancel) } },
+            onDismiss = { confirmNew = false },
         )
     }
 
@@ -340,18 +339,25 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
     }
 }
 
-/** Riquadro arancione: spento, si accende 5 secondi con il messaggio. */
+/**
+ * Riquadro arancione: spento, si accende 5 secondi con il messaggio.
+ * Altezza minima, non fissa: con il carattere di sistema ingrandito la seconda riga non va persa.
+ */
 @Composable
 private fun MessageBox(msg: String?) {
     val bg by animateColorAsState(if (msg != null) TsmColors.Orange else TsmColors.Surface, label = "msg")
     Box(
-        Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(14.dp)).background(bg)
-            .border(1.dp, if (msg != null) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(14.dp)),
+        Modifier.fillMaxWidth().heightIn(min = 50.dp).clip(RoundedCornerShape(14.dp)).background(bg)
+            .border(1.dp, if (msg != null) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(14.dp))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(msg, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "msgText") { m ->
             if (m != null) {
-                Text(m, color = TsmColors.OnOrange, fontWeight = FontWeight.Black, fontSize = 18.sp, maxLines = 2, textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis)
+                Text(
+                    m, color = TsmColors.OnOrange, fontWeight = FontWeight.Black, fontSize = 18.sp, lineHeight = 21.sp,
+                    maxLines = 2, textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -459,8 +465,13 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
                                 fontSize = (sizeDp.value * 0.42f).coerceIn(40f, 110f).sp, fontWeight = FontWeight.Black,
                             )
                             Text(
-                                if (state.inTiebreak) "TIE-BREAK" else " ", color = TsmColors.onPlayer(side).copy(alpha = 0.8f),
-                                fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                                when (state.tiebreak) {
+                                    TiebreakKind.SET -> s.msgTiebreak
+                                    TiebreakKind.MATCH -> s.msgMatchTiebreak
+                                    TiebreakKind.NONE -> " "
+                                },
+                                color = TsmColors.onPlayer(side).copy(alpha = 0.8f),
+                                fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }

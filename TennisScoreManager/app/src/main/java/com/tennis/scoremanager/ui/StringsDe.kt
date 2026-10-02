@@ -79,6 +79,8 @@ object DeStrings : Strings {
     override val estimateTheory = "Theoretische Schätzung: Nach 20 Minuten Nutzung wird sie mit dem gemessenen Verbrauch korrigiert."
     override val copyToOther = "Auf das andere Armband kopieren"
     override val powerOff = "Ausschalten"
+    override val bandPowerOffTitle = "Armband ausschalten?"
+    override val bandPowerOffText: (String) -> String = { "$it schaltet sich sofort aus. Zum Einschalten: ein Klick auf die Seitentaste." }
     override val languageSection = "Sprache"
     override val languageHint = "Gilt für die Bildschirme, die Stimme des Schiedsrichters, die TV-Anzeigetafel und die Armbänder."
     override val audioSection = "Audio und Stimme"
@@ -137,7 +139,9 @@ object DeStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth und Standort erforderlich"
     override val bandsRequiredText = "Für die Armbänder Bluetooth einschalten, die Standortberechtigung erteilen und den Standort eingeschaltet lassen."
     override val bandsMissingTitle = "Armbänder nicht zugeordnet"
-    override val bandsMissingText: (String) -> String = { "Es fehlt das Armband für: $it. Trotzdem fortfahren?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Es fehlen die Armbänder für: " else "Es fehlt das Armband für: ") + it.joinToString(", ") + ". Trotzdem fortfahren?"
+    }
     override val continueAnyway = "Fortfahren"
     override val cancel = "Abbrechen"
 
@@ -149,6 +153,8 @@ object DeStrings : Strings {
     override val noSavedMatches = "Kein unterbrochenes Match gespeichert."
     override val savedMatchesTitle = "Unterbrochene Matches"
     override val delete = "Löschen"
+    override val deleteSavedTitle = "Unterbrochenes Match löschen?"
+    override val deleteSavedText: (String) -> String = { "Das Match $it kann danach nicht mehr fortgesetzt werden." }
     override val vs = "gegen"
 
     override val matchTime = "Match Time"
@@ -164,7 +170,7 @@ object DeStrings : Strings {
     override val newMatchConfirmTitle = "Neues Match?"
     override val newMatchConfirmText = "Das laufende Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
     override val endDialogTitle = "Spiel, Satz und Sieg"
-    override val endDialogText: (String, String) -> String = { name, score -> "Sieg für $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Sieg für $name\n$score" }
     override val matchConcluded = "Match beendet"
     override val undoLastPoint = "Letzten Punkt zurücknehmen"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
@@ -237,6 +243,8 @@ object DeStrings : Strings {
     override val gamesWon = "Gewonnene Spiele"
     override val result = "Ergebnis"
     override val saveHistory = "Im Verlauf speichern"
+    override val summaryLeaveTitle = "Zusammenfassung nicht gespeichert"
+    override val summaryLeaveText = "Die Zusammenfassung des Matches wurde weder gespeichert noch geteilt: Danach ist sie nicht mehr abrufbar."
     override val share = "Teilen"
     override val saveDialogTitle = "Im Verlauf speichern"
     override val fileName = "Name"

@@ -82,6 +82,8 @@ object PtStrings : Strings {
     override val estimateTheory = "Estimativa teórica: após 20 minutos de uso ela é corrigida com o consumo medido."
     override val copyToOther = "Copiar para a outra pulseira"
     override val powerOff = "Desligar"
+    override val bandPowerOffTitle = "Desligar a pulseira?"
+    override val bandPowerOffText: (String) -> String = { "$it desliga agora. Para ligá-la de novo: um clique no botão lateral." }
     override val languageSection = "Idioma"
     override val languageHint = "Vale para as telas, a voz do árbitro, o placar na TV e as pulseiras."
     override val audioSection = "Áudio e voz"
@@ -141,7 +143,9 @@ object PtStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth e localização obrigatórios"
     override val bandsRequiredText = "Para usar as pulseiras, ative o Bluetooth, conceda a permissão de localização e mantenha a localização ativada."
     override val bandsMissingTitle = "Pulseiras não associadas"
-    override val bandsMissingText: (String) -> String = { "Falta a pulseira de: $it. Continuar mesmo assim?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltam as pulseiras de: " else "Falta a pulseira de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
@@ -153,6 +157,8 @@ object PtStrings : Strings {
     override val noSavedMatches = "Nenhuma partida suspensa salva."
     override val savedMatchesTitle = "Partidas suspensas"
     override val delete = "Excluir"
+    override val deleteSavedTitle = "Excluir a partida suspensa?"
+    override val deleteSavedText: (String) -> String = { "A partida $it não poderá mais ser retomada." }
     override val vs = "x"
 
     override val matchTime = "Match Time"
@@ -168,7 +174,7 @@ object PtStrings : Strings {
     override val newMatchConfirmTitle = "Nova partida?"
     override val newMatchConfirmText = "A partida em andamento fica salva entre as partidas suspensas e você poderá retomá-la."
     override val endDialogTitle = "Jogo, set e partida"
-    override val endDialogText: (String, String) -> String = { name, score -> "Vitória de $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Vitória de $name\n$score" }
     override val matchConcluded = "Partida encerrada"
     override val undoLastPoint = "Anular o último ponto"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
@@ -241,6 +247,8 @@ object PtStrings : Strings {
     override val gamesWon = "Jogos ganhos"
     override val result = "Resultado"
     override val saveHistory = "Salvar no histórico"
+    override val summaryLeaveTitle = "Resumo não salvo"
+    override val summaryLeaveText = "Você não salvou nem compartilhou o resumo da partida: depois não poderá mais vê-lo."
     override val share = "Compartilhar"
     override val saveDialogTitle = "Salvar no histórico"
     override val fileName = "Nome"
