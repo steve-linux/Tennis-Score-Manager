@@ -32,7 +32,7 @@
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.2.1"
+#define FW_VERSION "2.2.2"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -130,16 +130,16 @@ static const char* const TXT[N_LANG][N_TXT] = {
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
+    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
     "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
-  { "EMPAREJANDO...", "EMPAREJADO", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
+  { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
     "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
-  { "PAREANDO...", "PAREADO", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
+  { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
     "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
@@ -169,6 +169,7 @@ static volatile bool cfgReady = false;
 static uint8_t  seqNo = 0;
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
+static uint32_t pairedOffAt = 0;       // displayOffAt del messaggio "PAIRING OK": finché è lo stesso, è ancora a schermo
 static volatile uint32_t advSince = 0;  // aggiornato anche dal task BLE alla disconnessione
 static bool     advFast = true;
 static bool     advertising = false;
@@ -566,7 +567,14 @@ static void handleConfig(char* text) {
   }
   clampSettings();
   if (onlyLang) {
-    if (cfg.lang != oldLang) prefs.putUChar("lang", cfg.lang);
+    if (cfg.lang != oldLang) {
+      prefs.putUChar("lang", cfg.lang);
+      // La lingua arriva ~1 s dopo il collegamento: se "PAIRING OK" è ancora a schermo, lo si riscrive nella
+      // lingua giusta (conta per un braccialetto nuovo, che parte in italiano) senza allungarne la durata.
+      if (displayOn && displayOffAt == pairedOffAt && (int32_t)(pairedOffAt - millis()) > 0) {
+        drawMessage(TXT_PAIRED, cfg.name, C_BALL);
+      }
+    }
     publishConfig(true);
     return;
   }
@@ -978,6 +986,7 @@ void loop() {
     idleWarned = false;
     drawMessage(TXT_PAIRED, cfg.name, C_BALL);
     showFor(PAIRED_MSG_MS);
+    pairedOffAt = displayOffAt;
     beep(2000, 70);
     beep(2800, 90);
     updateBattery(true);
