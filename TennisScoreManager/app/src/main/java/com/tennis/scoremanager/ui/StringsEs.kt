@@ -87,8 +87,12 @@ object EsStrings : Strings {
     override val voiceFilesHint = "Todo funciona sin internet con las voces instaladas en el teléfono. Las grabaciones personalizadas (ZIP) siempre tienen prioridad sobre la síntesis de voz."
     override val generateVoice = "Generar archivos"
     override val generating: (Int, Int) -> String = { n, tot -> "Generando $n/$tot…" }
+    override val voiceGenerationFailed = "Generación no completada: los archivos de voz anteriores no cambian."
     override val importVoiceZip = "Importar ZIP"
+    override val voiceImportFailed = "ZIP ilegible o incompleto: no se ha cambiado ninguna grabación."
     override val deleteCustomVoice = "Quitar grabaciones"
+    override val deleteCustomConfirmTitle = "¿Quitar las grabaciones?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Las grabaciones personalizadas en español ($n) se borran del teléfono. Para recuperarlas, importa de nuevo el ZIP." }
     override val ttsEngine = "Motor de síntesis de voz"
     override val engineDefault = "Predeterminado del teléfono"
     override val ttsVoice = "Voz"
@@ -110,6 +114,8 @@ object EsStrings : Strings {
     override val stopVoiceTest = "Detener la prueba"
     override val ttsMissing = "La voz en español de la síntesis de voz no está instalada en el teléfono."
     override val installVoice = "Instalar voz"
+    override val ttsEngineError = "Síntesis de voz no disponible: revisa el motor en los Ajustes de Android."
+    override val openTtsSettings = "Abrir ajustes"
     override val formatSection = "Formato del partido"
     override val formatBestOfThree = "3 sets · tie-break a 7"
     override val formatBestOfThreeHint = "Al mejor de tres sets, tie-break con 6-6 en cada set."

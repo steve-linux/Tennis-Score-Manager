@@ -35,6 +35,9 @@ data class EngineOption(val pkg: String, val label: String)
 /** Voce disponibile per la lingua corrente. */
 data class VoiceOption(val name: String, val online: Boolean, val quality: Int)
 
+/** Esito di "Genera file": file creati su [total]; [installed] = hanno preso il posto di quelli di prima. */
+data class GenResult(val created: Int, val total: Int, val installed: Boolean)
+
 /**
  * Legge le chiamate. Di norma ogni chiamata è detta dalla sintesi vocale in un'unica frase (suona naturale e
  * funziona offline con le voci installate); le registrazioni personalizzate, se ci sono, hanno la precedenza.
@@ -56,6 +59,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
     private var job: Job? = null
     private var player: MediaPlayer? = null
+    /** Aumentano a ogni [stop] e a ogni cambio di motore, voce o lingua: la generazione dei file li controlla. */
+    private var stops = 0
+    private var configs = 0
 
     private val _status = MutableStateFlow(TtsStatus.INIT)
     val status: StateFlow<TtsStatus> = _status
@@ -83,6 +89,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         set(value) {
             if (field != value) {
                 field = value
+                configs++
                 applyLanguage(value)
             }
         }
@@ -93,6 +100,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     /** Sceglie motore (null = predefinito del telefono) e voce (null = la migliore offline). */
     fun configure(engine: String?, voiceName: String?) {
+        configs++
         preferredVoice = voiceName
         if (engine != enginePkg) {
             enginePkg = engine
@@ -164,7 +172,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         val tag: String?
 
         data class Speech(val text: String, override val tag: String?) : Part
-        data class Audio(val file: File, override val tag: String?) : Part
+        /** File della frase [key]: se non si riesce a riprodurre, la frase la dice il TTS. */
+        data class Audio(val file: File, val key: String, override val tag: String?) : Part
         data class Silence(val ms: Long) : Part {
             override val tag: String? get() = null
         }
@@ -190,7 +199,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     val f = fileFor(s.key, l)
                     if (f != null) {
                         flush()
-                        parts += Part.Audio(f, s.tag)
+                        parts += Part.Audio(f, s.key, s.tag)
                     } else {
                         if (s.tag != null) { flush(); tag = s.tag }
                         text.append(Phrases.text(s.key, l)).append(' ')
@@ -236,7 +245,11 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     p.tag?.let { fired += it; onTag(it) }
                     when (p) {
                         is Part.Silence -> delay(p.ms)
-                        is Part.Audio -> playFile(p.file)
+                        is Part.Audio -> if (!playFile(p.file)) {
+                            // File rovinato: non si usa più e la frase la dice la sintesi vocale (non si salta).
+                            voice.markBroken(p.file)
+                            speak(Pronunciation.fix(Phrases.text(p.key, l), l, currentEngine))
+                        }
                         is Part.Speech -> speak(Pronunciation.fix(p.text, l, currentEngine))
                     }
                 }
@@ -254,6 +267,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     }
 
     fun stop() {
+        stops++
         job?.cancel()
         job = null
         _playing.value = null
@@ -279,24 +293,29 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         pending.remove(id)
     }
 
-    private suspend fun playFile(file: File) {
+    /** Riproduce il file; false se il telefono non riesce a leggerlo. */
+    private suspend fun playFile(file: File): Boolean {
         val mp = MediaPlayer()
         player = mp
         try {
             mp.setAudioAttributes(attrs)
             mp.setDataSource(file.absolutePath)
             mp.prepare()
-            withTimeoutOrNull(mp.duration.toLong().coerceAtLeast(500L) + 1_500L) {
-                suspendCancellableCoroutine<Unit> { cont ->
-                    mp.setOnCompletionListener { if (cont.isActive) cont.resume(Unit) }
-                    mp.setOnErrorListener { _, _, _ -> if (cont.isActive) cont.resume(Unit); true }
+            // Allo scadere del tempo (null) il file è comunque stato suonato: conta come riuscito.
+            val ok = withTimeoutOrNull(mp.duration.toLong().coerceAtLeast(500L) + 1_500L) {
+                suspendCancellableCoroutine<Boolean> { cont ->
+                    mp.setOnCompletionListener { if (cont.isActive) cont.resume(true) }
+                    mp.setOnErrorListener { _, _, _ -> if (cont.isActive) cont.resume(false); true }
                     mp.start()
                 }
-            }
+            } ?: true
+            if (!ok) Log.w("Announcer", "Errore durante la riproduzione: ${file.name}")
+            return ok
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Log.w("Announcer", "File audio non leggibile: ${file.name}", e)
+            return false
         } finally {
             if (player === mp) player = null
             runCatching { mp.release() }
@@ -305,37 +324,60 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     /**
      * Genera i file vocali di [l] con la voce scelta (anche una voce online: dopo funzionano senza rete).
-     * Ritorna quanti file sono stati creati.
+     * I file nuovi si creano in una cartella a parte e prendono il posto di quelli di prima solo se la generazione
+     * arriva in fondo e non ne crea meno di prima; se a metà cambiano motore, voce o lingua si lascia perdere.
      */
-    suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): Int {
-        val t = tts ?: return 0
+    suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): GenResult {
+        val keys = Phrases.keys
+        val none = GenResult(0, keys.size, false)
         withTimeoutOrNull(5_000) { while (_status.value == TtsStatus.INIT) delay(100) }
-        if (_status.value == TtsStatus.ERROR) return 0
+        val t = tts ?: return none
+        if (_status.value == TtsStatus.ERROR) return none
         stop()
         applyLanguage(l)
         if (_status.value != TtsStatus.READY) {
             applyLanguage(lang)
-            return 0
+            return none
         }
-        voice.deleteGenerated(l)
-        val dir = voice.ttsDir(l)
-        val keys = Phrases.keys
+        val config = configs
+        val before = voice.generatedCount(l)
+        val dir = voice.newGeneratedDir(l)
         val engine = currentEngine
         var ok = 0
-        for ((i, key) in keys.withIndex()) {
-            val f = File(dir, "$key.wav")
-            val id = "gen_${key}_${UUID.randomUUID()}"
+        var installed = false
+        try {
+            for ((i, key) in keys.withIndex()) {
+                if (tts !== t || configs != config) break
+                if (synthesize(t, Pronunciation.fix(Phrases.text(key, l), l, engine), File(dir, "$key.wav"))) ok++
+                onProgress(i + 1, keys.size)
+            }
+            val complete = tts === t && configs == config
+            installed = complete && ok > 0 && ok >= before && voice.installGenerated(l, dir)
+        } finally {
+            if (!installed) dir.deleteRecursively()
+            if (tts === t) applyLanguage(lang)
+        }
+        return GenResult(ok, keys.size, installed)
+    }
+
+    /**
+     * Un file della generazione. Se intanto [stop] interrompe la sintesi (una chiamata, la prova voce, l'audio spento)
+     * si riprova, al massimo tre volte: [TextToSpeech.stop] ferma anche i file in scrittura.
+     */
+    private suspend fun synthesize(t: TextToSpeech, text: String, f: File): Boolean {
+        repeat(3) {
+            val stopsBefore = stops
+            val id = "gen_${UUID.randomUUID()}"
             val done = CompletableDeferred<Boolean>()
             pending[id] = done
-            val r = t.synthesizeToFile(Pronunciation.fix(Phrases.text(key, l), l, engine), Bundle(), f, id)
+            val r = runCatching { t.synthesizeToFile(text, Bundle(), f, id) }.getOrDefault(TextToSpeech.ERROR)
             val good = r == TextToSpeech.SUCCESS && withTimeoutOrNull(20_000) { done.await() } == true
             pending.remove(id)
-            if (good && f.length() > 64) ok++ else f.delete()
-            onProgress(i + 1, keys.size)
+            if (good && f.length() > VoicePack.MIN_BYTES) return true
+            f.delete()
+            if (stops == stopsBefore) return false
         }
-        applyLanguage(lang)
-        voice.refresh(l)
-        return ok
+        return false
     }
 
     fun shutdown() {

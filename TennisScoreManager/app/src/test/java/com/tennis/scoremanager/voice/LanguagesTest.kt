@@ -120,7 +120,7 @@ class LanguagesTest {
             tiebreak = listOf("game Bianchi six games all tie-break", "one zero Rossi", "one all", "two one Bianchi"),
             matchEnd = "game, set and match Rossi six four three six seven five",
             noAd = "deuce deciding point",
-            superTiebreakEnd = "game, set and match Rossi six zero zero six ten eight",
+            superTiebreakEnd = "game, set and match Rossi six love love six ten eight",
         ),
     )
 

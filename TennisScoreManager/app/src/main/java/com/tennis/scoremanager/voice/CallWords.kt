@@ -19,6 +19,9 @@ internal abstract class CallWords {
 
     fun number(n: Int): String = numbers.getOrElse(n) { n.toString() }
 
+    /** Lo zero nei set letti a fine partita ([Phrases.SET_ZERO]): di norma è il numero. */
+    open val setZero: String get() = number(0)
+
     /** Punteggio del game dal lato di chi serve (mai 0-0 né 40-40): "quindici zero", "trenta pari". */
     open fun score(s: Int, r: Int): String =
         if (s == r) "${points[s]} ${fixed.getValue("all")}" else "${points[s]} ${points[r]}"
@@ -117,6 +120,8 @@ internal object EnWords : CallWords() {
         "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty",
     )
     override val points = listOf("love", "fifteen", "thirty", "forty")
+    // ITF: i set si leggono "six love, six four"; nel tie-break invece "one zero".
+    override val setZero = "love"
     private fun g(n: Int) = if (n == 1) "one game" else "${number(n)} games"
     override fun games(a: Int, b: Int) = "${g(a)} to ${if (b == 0) "love" else number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} all"

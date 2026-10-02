@@ -51,8 +51,18 @@ object Phrases {
             }
             for (n in 1..6) add("games_all_$n")
             for (n in 0..MAX_NUMBER) add("num_$n")
+            add(SET_ZERO)
         }
     }
+
+    /** Lo zero nei set letti a fine partita: "zero" quasi ovunque, ma in inglese "love" ("six love"). */
+    const val SET_ZERO = "set_zero"
+
+    /** Chiavi che in alcune lingue dicono la stessa cosa di un'altra: lì basta il file dell'altra. */
+    private val sameAs = mapOf(SET_ZERO to "num_0")
+
+    /** Chiave con lo stesso testo di [key] in [lang] (il suo file va bene anche per [key]), se c'è. */
+    fun alias(key: String, lang: Lang): String? = sameAs[key]?.takeIf { text(it, lang) == text(key, lang) }
 
     fun text(key: String, lang: Lang): String {
         val w = CallWords.of(lang)
@@ -63,6 +73,7 @@ object Phrases {
             key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
             key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
             key.startsWith("num_") -> w.number(parts[1].toInt())
+            key == SET_ZERO -> w.setZero
             else -> key
         }
     }
@@ -168,12 +179,14 @@ class CallBuilder(private val lang: Lang) {
         val b = minOf(s.pt1, s.pt2)
         if (a == b) return listOf(num(a), Seg.Clip("all"))
         val leader = if (s.pt1 > s.pt2) Side.P1 else Side.P2
-        return pair(a, b, words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
+        return pair(num(a), num(b), words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
     }
 
     /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
-    private fun pair(a: Int, b: Int, to: Boolean): List<Seg> =
-        if (to) listOf(num(a), Seg.Clip("to"), num(b)) else listOf(num(a), num(b))
+    private fun pair(a: Seg, b: Seg, to: Boolean): List<Seg> = if (to) listOf(a, Seg.Clip("to"), b) else listOf(a, b)
+
+    /** Game di un set a fine partita: lo zero è [Phrases.SET_ZERO] ("six love"), nel match tie-break resta "zero". */
+    private fun setNum(n: Int, matchTiebreak: Boolean): Seg = if (n == 0 && !matchTiebreak) Seg.Clip(Phrases.SET_ZERO) else num(n)
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
@@ -200,7 +213,7 @@ class CallBuilder(private val lang: Lang) {
             val a = set.shown(winner)
             val b = set.shown(winner.other)
             out += Seg.Pause(SHORT)
-            out += pair(a, b, words.setScoreTo(a, b))
+            out += pair(setNum(a, set.matchTiebreak), setNum(b, set.matchTiebreak), words.setScoreTo(a, b))
         }
         return out
     }
