@@ -223,6 +223,7 @@ object EsStrings : Strings {
             else -> "pulseras activas"
         }
     }
+    override val notifTvOnly = "Marcador de TV activo"
 
     override val bandPaired = "VINCULADA A"
     override val bandPlay = "JUEGUEN"

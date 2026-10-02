@@ -156,6 +156,8 @@ class MatchController(
     private val tvMessage = MutableStateFlow<String?>(null)
     private var tvMessageJob: Job? = null
     private var tvSeq = 0L
+    /** Fine del cronometro in corso (null = nessuno): a ogni nuovo cronometro il tabellone riceve subito il tempo giusto. */
+    private val tvCountdownEnd = MutableStateFlow<Long?>(null)
     private val tvJson = Json { encodeDefaults = true }
 
     val strings: Strings get() = stringsFor(options.value.lang)
@@ -201,19 +203,22 @@ class MatchController(
             }
         }
         scope.launch {
+            var first = true
             tv.map { it.enabled }.distinctUntilChanged().collect { on ->
                 if (on) tvServer.start() else tvServer.stop()
                 publishTv()
-                // Il servizio in primo piano tiene vivo il server anche a schermo spento.
-                if (on && (screen.value == Screen.START || screen.value == Screen.MATCH)) MatchService.start(app)
-                if (!on && options.value.mode != PlayMode.BANDS) MatchService.stop(app)
+                // Il servizio in primo piano tiene vivo il server anche a schermo spento, in ogni schermata (anche il
+                // riepilogo). Non all'avvio dell'app (first): lì parte con la partita, quando l'app è di sicuro visibile.
+                val bandsMatch = options.value.mode == PlayMode.BANDS && (screen.value == Screen.START || screen.value == Screen.MATCH)
+                if (on && !first || !on && bandsMatch) MatchService.start(app)  // anche per aggiornare il testo della notifica
+                else if (!on) MatchService.stop(app)
+                first = false
             }
         }
         scope.launch {
-            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé)...
+            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients,
-                countdown.map { it?.kind }.distinctUntilChanged(),
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -315,7 +320,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.START -> {
-                MatchService.stop(app)
+                if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
                 Screen.OPTIONS
             }
             else -> screen.value
@@ -806,7 +811,8 @@ class MatchController(
         endDialog.value = false
         stopCountdown()
         screen.value = Screen.SUMMARY
-        MatchService.stop(app)
+        // Col tabellone acceso il servizio resta (il risultato è ancora sul tabellone): si riavvia solo per il testo della notifica.
+        if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
         if (rec.options.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) {
             val s = strings
@@ -832,7 +838,7 @@ class MatchController(
         endDialog.value = false
         serveOrderPrompt.value = false
         message.value = null
-        MatchService.stop(app)
+        if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
         screen.value = Screen.SETUP
@@ -895,11 +901,13 @@ class MatchController(
         cdKind = kind
         cdEnd = SystemClock.elapsedRealtime() + seconds * 1000L
         countdown.value = CountdownUi(kind, seconds)
+        tvCountdownEnd.value = cdEnd
     }
 
     private fun stopCountdown() {
         cdKind = null
         countdown.value = null
+        tvCountdownEnd.value = null
     }
 
     private fun tick() {

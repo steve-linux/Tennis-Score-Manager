@@ -8,12 +8,14 @@ import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
 import com.tennis.scoremanager.ui.stringsFor
 import java.io.File
+import java.net.InetAddress
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -29,7 +31,7 @@ class TvSnapshotTest {
     private val setup = SetupData(club = "TC Roma", court = "3", p1a = "Stefano", p2a = "Mario")
     private val rules = RulesConfig()
 
-    private fun match(points: List<Side>, started: Boolean = true, suspended: Boolean = false): LiveMatch {
+    private fun match(points: List<Side>, started: Boolean = true, suspended: Boolean = false, rules: RulesConfig = this.rules): LiveMatch {
         val events = points.map { MatchEvent.Point(it) }
         val rec = MatchRecord(
             id = "m1", setup = setup, options = MatchOptions(), rules = rules, events = events,
@@ -101,6 +103,19 @@ class TvSnapshotTest {
     }
 
     @Test
+    fun finishedInMatchTiebreakShowsItAsOneSet() {
+        // 6-0 0-6 [10-8] per Stefano: una cifra per i game, quindi 1-0 (non 10-8, che diventerebbe 0-8)
+        val pts = List(24) { Side.P1 } + List(24) { Side.P2 } + List(8) { listOf(Side.P1, Side.P2) }.flatten() + listOf(Side.P1, Side.P1)
+        val s = TvSnapshots.build(input(screen = Screen.SUMMARY, match = match(pts, rules = RulesConfig(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK))))
+        assertEquals("finished", s.phase)
+        assertEquals(0, s.winner)
+        assertEquals(listOf(1, 0), s.games)
+        assertEquals(listOf(2, 1), s.sets)
+        assertEquals(TvSet(1, 0, 10, 8, mtb = true), s.done.last())
+        assertEquals(listOf("", ""), s.points)
+    }
+
+    @Test
     fun suspendedHidesTimersAndMessages() {
         val s = TvSnapshots.build(input(match = match(listOf(Side.P1), suspended = true), countdown = CountdownKind.SHOT_CLOCK, message = "x"))
         assertEquals("suspended", s.phase)
@@ -141,6 +156,33 @@ class TvSnapshotTest {
         assertEquals("192.168.43.1" to 8081, ScoreboardFinder.parseAddress(" http://192.168.43.1:8081/ "))
         assertNull(ScoreboardFinder.parseAddress(""))
         assertNull(ScoreboardFinder.parseAddress("10.0.0.2:99999"))
+    }
+
+    @Test
+    fun onlyLocalNetworkMayConnect() {
+        val ok = listOf("192.168.43.5", "10.0.0.2", "172.20.10.2", "127.0.0.1", "169.254.1.1", "::1", "fe80::1", "fd12:3456::1", "::ffff:192.168.1.2")
+        val no = listOf("8.8.8.8", "100.64.1.1", "2001:db8::1", "2a01:4f8::1", "::ffff:8.8.8.8")
+        ok.forEach { assertTrue(it, TvServer.isLocalPeer(InetAddress.getByName(it))) }
+        no.forEach { assertFalse(it, TvServer.isLocalPeer(InetAddress.getByName(it))) }
+    }
+
+    @Test
+    fun identityFromStateResponse() {
+        val response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nX-TSM-Id: ab12cd34\r\nConnection: close\r\n\r\n" +
+            "{\"tsm\":1,\"title\":\"TC Roma · Campo 3\"}"
+        assertEquals("ab12cd34" to "TC Roma · Campo 3", ScoreboardFinder.identity(response))
+        // server di una versione precedente: niente identità
+        assertEquals(null to "", ScoreboardFinder.identity("HTTP/1.1 200 OK\r\n\r\n{\"tsm\":1}"))
+    }
+
+    @Test
+    fun recoveryStaysOnTheSameCourt() {
+        val prev = FoundScoreboard("192.168.43.1", 8080, null, "ab12cd34", "TC Roma · Campo 3")
+        assertTrue(FoundScoreboard("192.168.43.7", 8080, null, "ab12cd34", "").sameAs(prev))  // stesso telefono, indirizzo nuovo
+        assertTrue(FoundScoreboard("192.168.43.1", 8080, null, null).sameAs(prev))  // stesso indirizzo
+        assertTrue(FoundScoreboard("192.168.43.9", 8081, null, "ffff0000", "TC Roma · Campo 3").sameAs(prev))  // stesso campo
+        assertFalse(FoundScoreboard("192.168.43.9", 8080, null, "ffff0000", "TC Roma · Campo 4").sameAs(prev))
+        assertFalse(FoundScoreboard("192.168.43.9", 8080, null, null, "").sameAs(prev.copy(title = "")))
     }
 
     /** Il blocco id="texts" di scoreboard.html deve avere gli stessi testi dell'app, lingua per lingua. */
