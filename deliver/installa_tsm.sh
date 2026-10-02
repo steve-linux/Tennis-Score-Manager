@@ -65,8 +65,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "2.3.0"
+        versionCode = 6
+        versionName = "2.3.1"
     }
 
     buildTypes {
@@ -212,13 +212,13 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Tabellone TSM</title>
+<title>Tennis Score Manager</title>
 <!--
   Tabellone di Tennis Score Manager, servito dal telefono dell'arbitro (TvServer.kt).
   Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
   da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
   Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
-  Anteprima senza telefono: scoreboard.html?demo=1
+  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, idle, doubles)
 -->
 <style>
   :root {
@@ -327,6 +327,18 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 <div id="banner"></div>
 <button id="fs" type="button"></button>
 
+<!-- Testi di ogni lingua per prima del primo stato (titolo, "connessione persa", "schermo intero") e per l'anteprima.
+     Copia di quelli dell'app: TvSnapshotTest controlla che siano uguali e, se no, stampa il blocco giusto. -->
+<script type="application/json" id="texts">
+{
+"it": {"labels":{"vs":"VS","games":"GAMES","set":"SET","sec":"SEC","waiting":"IN ATTESA DELLA PARTITA","ready":"IN ATTESA DEL VIA","suspended":"PARTITA SOSPESA","winner":"VINCE","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNESSIONE PERSA - RICONNESSIONE...","fullscreen":"SCHERMO INTERO","page":"Tabellone TSM"},"demo":{"serve":"SERVIZIO","changeover":"CAMBIO CAMPO","setPoint":"SET POINT","title":"Tennis Club · Campo 3"}},
+"en": {"labels":{"vs":"VS","games":"GAMES","set":"SETS","sec":"SEC","waiting":"WAITING FOR THE MATCH","ready":"READY TO PLAY","suspended":"MATCH SUSPENDED","winner":"WINNER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH TIE-BREAK","lost":"CONNECTION LOST - RECONNECTING...","fullscreen":"FULL SCREEN","page":"TSM Scoreboard"},"demo":{"serve":"SERVE","changeover":"CHANGEOVER","setPoint":"SET POINT","title":"Tennis Club · Court 3"}},
+"fr": {"labels":{"vs":"VS","games":"JEUX","set":"MANCHES","sec":"SEC","waiting":"EN ATTENTE DU MATCH","ready":"PRÊTS À JOUER","suspended":"MATCH SUSPENDU","winner":"VAINQUEUR","tiebreak":"JEU DÉCISIF","matchTiebreak":"SUPER JEU DÉCISIF","lost":"CONNEXION PERDUE - RECONNEXION...","fullscreen":"PLEIN ÉCRAN","page":"Tableau d'affichage TSM"},"demo":{"serve":"SERVICE","changeover":"CHANGEMENT DE CÔTÉ","setPoint":"BALLE DE SET","title":"Tennis Club · Court 3"}},
+"de": {"labels":{"vs":"VS","games":"SPIELE","set":"SÄTZE","sec":"SEK","waiting":"WARTEN AUF DAS MATCH","ready":"BEREIT ZUM SPIELEN","suspended":"MATCH UNTERBROCHEN","winner":"SIEGER","tiebreak":"TIE-BREAK","matchTiebreak":"MATCH-TIE-BREAK","lost":"VERBINDUNG VERLOREN - NEUER VERSUCH...","fullscreen":"VOLLBILD","page":"TSM-Anzeigetafel"},"demo":{"serve":"AUFSCHLAG","changeover":"SEITENWECHSEL","setPoint":"SATZBALL","title":"Tennis Club · Platz 3"}},
+"es": {"labels":{"vs":"VS","games":"JUEGOS","set":"SETS","sec":"SEG","waiting":"ESPERANDO EL PARTIDO","ready":"LISTOS PARA JUGAR","suspended":"PARTIDO SUSPENDIDO","winner":"GANADOR","tiebreak":"TIE-BREAK","matchTiebreak":"SÚPER TIE-BREAK","lost":"CONEXIÓN PERDIDA - RECONECTANDO...","fullscreen":"PANTALLA COMPLETA","page":"Marcador TSM"},"demo":{"serve":"SAQUE","changeover":"CAMBIO DE LADO","setPoint":"BOLA DE SET","title":"Tennis Club · Pista 3"}},
+"pt": {"labels":{"vs":"VS","games":"JOGOS","set":"SETS","sec":"SEG","waiting":"AGUARDANDO A PARTIDA","ready":"PRONTOS PARA JOGAR","suspended":"PARTIDA SUSPENSA","winner":"VENCEDOR","tiebreak":"TIE-BREAK","matchTiebreak":"TIE-BREAK DECISIVO","lost":"CONEXÃO PERDIDA - RECONECTANDO...","fullscreen":"TELA CHEIA","page":"Placar TSM"},"demo":{"serve":"SERVIÇO","changeover":"TROCA DE LADO","setPoint":"SET POINT","title":"Tennis Club · Quadra 3"}}
+}
+</script>
 <script>
 "use strict";
 // ------------------------------------------------------------------ cifre a 7 segmenti
@@ -406,15 +418,10 @@ gms.forEach(s => buildSeg(s, "8"));
 sts.forEach(s => buildSeg(s, "8"));
 buildSeg($("clock"), "88:88:88");
 
-// Testi prima che arrivi il primo stato (poi valgono quelli dell'app, nella lingua scelta dall'arbitro).
-const FALLBACK = {
-  it: ["CONNESSIONE PERSA - RICONNESSIONE...", "SCHERMO INTERO"],
-  en: ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"],
-  fr: ["CONNEXION PERDUE - RECONNEXION...", "PLEIN ÉCRAN"],
-  de: ["VERBINDUNG VERLOREN - NEUER VERSUCH...", "VOLLBILD"],
-  es: ["CONEXIÓN PERDIDA - RECONECTANDO...", "PANTALLA COMPLETA"],
-  pt: ["CONEXÃO PERDIDA - RECONECTANDO...", "TELA CHEIA"],
-}[(navigator.language || "it").slice(0, 2).toLowerCase()] || ["CONNECTION LOST - RECONNECTING...", "FULL SCREEN"];
+// Testi prima che arrivi il primo stato, nella lingua del browser (poi valgono quelli dell'app, nella lingua dell'arbitro).
+const TEXTS = JSON.parse($("texts").textContent);
+const FALLBACK = (TEXTS[(navigator.language || "it").slice(0, 2).toLowerCase()] || TEXTS.en).labels;
+document.title = FALLBACK.page;
 let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
@@ -442,6 +449,7 @@ function render() {
   ghost = S.show.ghost !== false;
   document.documentElement.lang = S.lang;
   const L = S.labels;
+  if (L.page && document.title !== L.page) document.title = L.page;
   setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
@@ -504,7 +512,7 @@ function tick() {
   const silent = now - lastMsg;
   document.body.classList.toggle("lost", silent > 12000);
   if (silent > 12000) {
-    setText($("banner"), S ? S.labels.lost : FALLBACK[0]);
+    setText($("banner"), S ? S.labels.lost : FALLBACK.lost);
     if (!lostSince) lostSince = now;
     if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
   } else {
@@ -531,7 +539,7 @@ function poll() {
 
 // ------------------------------------------------------------------ schermo intero e schermo acceso
 const fs = $("fs");
-fs.textContent = "⛶ " + FALLBACK[1];
+fs.textContent = "⛶ " + FALLBACK.fullscreen;
 if (!inApp && document.documentElement.requestFullscreen) fs.classList.add("can");
 let pointerTimer = 0;
 function showPointer() {
@@ -566,24 +574,22 @@ setInterval(tick, 200);
 
 // ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
 if (/[?&]demo=1/.test(location.search)) {
-  const labels = {
-    vs: "VS", games: "GAMES", set: "SET", sec: "SEC", waiting: "IN ATTESA DELLA PARTITA", ready: "IN ATTESA DEL VIA",
-    suspended: "PARTITA SOSPESA", winner: "VINCE", tiebreak: "TIE-BREAK", matchTiebreak: "MATCH TIE-BREAK",
-    lost: "CONNESSIONE PERSA - RICONNESSIONE...", fullscreen: "SCHERMO INTERO",
-  };
+  const lm = location.search.match(/[?&]lang=([a-z]{2})/);
+  const lang = lm && TEXTS[lm[1]] ? lm[1] : "it";
+  const { labels, demo } = TEXTS[lang];
   const base = {
-    tsm: 1, seq: 1, lang: "it", phase: "play", title: "Circolo Tennis · Campo 3",
+    tsm: 1, seq: 1, lang, phase: "play", title: demo.title,
     players: [{ name: "Stefano", color: "#FFD600" }, { name: "Mario", color: "#FF3030" }],
     server: 0, points: ["15", "0"], games: [0, 0], sets: [1, 0], done: [{ g1: 6, g2: 0 }], tiebreak: "",
-    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: "SERVIZIO", leftMs: 25000, shot: true },
+    winner: null, clockMs: 113000, clockRunning: true, countdown: { label: demo.serve, leftMs: 25000, shot: true },
     message: null, labels,
     show: { clock: true, timers: true, sets: true, messages: true, serve: true, ghost: true },
   };
   const m = location.search.match(/[?&]state=([a-z]+)/);
   const variants = {
     play: {},
-    ad: { points: ["AD", "40"], games: [5, 4], message: "Set point", server: 1 },
-    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: "CAMBIO CAMPO", leftMs: 30000, shot: false } },
+    ad: { points: ["AD", "40"], games: [5, 4], message: demo.setPoint, server: 1 },
+    tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: demo.changeover, leftMs: 30000, shot: false } },
     end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
@@ -845,7 +851,7 @@ class MatchController(
         announcer.enabled = options.value.audio
         announcer.useGeneratedFiles = options.value.voiceFiles
         announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
-        scope.launch(io) { voice.writeReadme() }
+        scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
         refreshSaved()
@@ -953,6 +959,8 @@ class MatchController(
         if (old.ttsEngine != v.ttsEngine || old.ttsVoice != v.ttsVoice) announcer.configure(v.ttsEngine, v.ttsVoice)
         if (old.lang != v.lang) {
             refreshVoiceCount()
+            val s = strings
+            scope.launch(io) { voice.writeReadme(s) }
             syncBandLanguage(ble.bands.value)
         }
         if (old.mode != v.mode) {
@@ -1686,7 +1694,7 @@ class MatchController(
     fun summaryNames(): Names = names(summary.value?.record?.setup ?: setup.value)
 
     fun defaultFileName(): String {
-        val sm = summary.value ?: return "partita"
+        val sm = summary.value ?: return "TSM"
         return Reports.fileBaseName(sm.record, summaryNames())
     }
 
@@ -2945,7 +2953,7 @@ object Reports {
 
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · No-Ad" else "") +
+            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
 
     fun place(rec: MatchRecord, s: Strings): String {
@@ -4278,6 +4286,8 @@ data class TvLabels(
     val matchTiebreak: String,
     val lost: String,
     val fullscreen: String,
+    /** Titolo della pagina (document.title). */
+    val page: String,
 )
 
 /** Stato dell'app da cui si ricava il tabellone. */
@@ -4363,13 +4373,17 @@ object TvSnapshots {
             countdown = countdown,
             message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
-            labels = TvLabels(
-                vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
-                waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
-                tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
-            ),
+            labels = labels(s),
         )
     }
+
+    /** Testi fissi della pagina; `scoreboard.html` ne ha una copia per lingua (id="texts") da usare prima del primo stato. */
+    fun labels(s: Strings) = TvLabels(
+        vs = s.tvVs, games = s.tvGames, set = s.tvSet, sec = s.tvSec,
+        waiting = s.tvWaiting, ready = s.tvReady, suspended = s.tvSuspended, winner = s.tvWinner,
+        tiebreak = s.tvTiebreak, matchTiebreak = s.tvMatchTiebreak, lost = s.tvLost, fullscreen = s.tvFullscreen,
+        page = s.tvPageTitle,
+    )
 
     /** "Circolo Tennis · Campo 3" dai dati della pagina 1 (un numero da solo diventa "Campo 3"). */
     fun defaultTitle(su: SetupData, s: Strings): String {
@@ -4606,7 +4620,7 @@ class TvServer(context: Context) {
     /** Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace. */
     private fun stream(s: Socket, out: OutputStream) {
         if (streams.size >= MAX_STREAMS) {
-            respond(out, "503 Service Unavailable", "text/plain", "Troppi tabelloni".toByteArray(), false)
+            respond(out, "503 Service Unavailable", "text/plain", "Too many scoreboards (max $MAX_STREAMS)".toByteArray(), false)
             return
         }
         val q = LinkedBlockingQueue<String>()
@@ -4643,7 +4657,7 @@ class TvServer(context: Context) {
     private fun registerNsd(port: Int) {
         val nsd = app.getSystemService(NsdManager::class.java) ?: return
         val info = NsdServiceInfo().apply {
-            serviceName = "TSM Tabellone"
+            serviceName = "Tennis Score Manager"  // chi cerca guarda il tipo, non il nome
             serviceType = SERVICE_TYPE
             setPort(port)
         }
@@ -5357,6 +5371,9 @@ interface Strings {
     val voiceFilesMode: String
     val voiceFilesModeHint: String
     val customRecordings: (Int, Int) -> String
+    /** Intestazione di LEGGIMI.txt nella cartella voce (lingue, formati) e titolo della colonna delle chiavi. */
+    val voiceReadme: (String, String) -> String
+    val voiceReadmeKey: String
     val testVoice: String
     val stopVoiceTest: String
     val ttsMissing: String
@@ -5368,6 +5385,8 @@ interface Strings {
     val formatMatchTiebreakHint: String
     val noAd: String
     val noAdHint: String
+    /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
+    val noAdShort: String get() = "No-Ad"
     val coinToss: String
     val tossCoin: String
     val tossWinner: (String) -> String
@@ -5520,6 +5539,8 @@ interface Strings {
     val tvMatchTiebreak: String get() = "MATCH TIE-BREAK"
     val tvLost: String
     val tvFullscreen: String
+    /** Titolo della pagina (scheda del browser, trasmissione dello schermo). */
+    val tvPageTitle: String
 
     // Tabellone TV: impostazioni sul telefono dell'arbitro
     val tvSection: String
@@ -5652,6 +5673,13 @@ object ItStrings : Strings {
     override val voiceFilesMode = "Usa file audio pre-generati"
     override val voiceFilesModeHint = "Di norma ogni chiamata è letta in un'unica frase (più naturale). Attivalo per usare i file generati, ad esempio per portarti offline una voce online."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Registrazioni personalizzate: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - FILE VOCALI\n" +
+            "Metti le registrazioni in voice/<lingua>/ ($langs) con il nome della chiave.\n" +
+            "Formati: $formats. I nomi dei giocatori sono sempre letti dal TTS.\n" +
+            "La cartella tts/ contiene i file generati dall'app: le tue registrazioni hanno la precedenza."
+    }
+    override val voiceReadmeKey = "CHIAVE"
     override val testVoice = "Prova voce"
     override val stopVoiceTest = "Ferma la prova"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
@@ -5810,6 +5838,7 @@ object ItStrings : Strings {
     override val tvWinner = "VINCE"
     override val tvLost = "CONNESSIONE PERSA - RICONNESSIONE..."
     override val tvFullscreen = "SCHERMO INTERO"
+    override val tvPageTitle = "Tabellone TSM"
 
     override val tvSection = "Tabellone su TV"
     override val tvEnable = "Tabellone su TV o monitor"
@@ -5829,7 +5858,7 @@ object ItStrings : Strings {
     override val tvShowServe = "Pallina di chi serve"
     override val tvGhost = "Segmenti spenti visibili"
     override val tvPreview = "Anteprima su questo telefono"
-    override val tvChromecastHint = "Con un Chromecast: sul telefono-tabellone usa «Trasmetti schermo» (Smart View sui Samsung). Il Chromecast vuole una rete con internet: accendi i dati mobili sul telefono che fa l'hotspot."
+    override val tvChromecastHint = "Con un Chromecast: sul telefono-tabellone usa il pulsante «Trasmetti» delle impostazioni rapide («Trasmissione schermo» fino ad Android 14, «Smart View» sui Samsung). Il Chromecast vuole una rete con internet: accendi i dati mobili sul telefono che fa l'hotspot."
 
     override val displayMode = "Usa come tabellone"
     override val displayModeHint = "Questo telefono mostra il punteggio sul monitor (cavo HDMI o Chromecast)"
@@ -5940,6 +5969,13 @@ object EnStrings : Strings {
     override val voiceFilesMode = "Use pre-generated audio files"
     override val voiceFilesModeHint = "By default each call is read as one sentence (more natural). Turn this on to play the generated files, e.g. to take an online voice offline."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Custom recordings: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - VOICE FILES\n" +
+            "Put your recordings in voice/<language>/ ($langs), named after the key.\n" +
+            "Formats: $formats. Player names are always read by text-to-speech.\n" +
+            "The tts/ folder holds the files generated by the app: your recordings take precedence."
+    }
+    override val voiceReadmeKey = "KEY"
     override val testVoice = "Test voice"
     override val stopVoiceTest = "Stop the test"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
@@ -6088,6 +6124,7 @@ object EnStrings : Strings {
     override val teamJoiner = " and "
     override val generatedWith = "Made with Tennis Score Manager"
 
+    override val tvSet = "SETS"
     override val tvServe = "SERVE"
     override val tvChangeover = "CHANGEOVER"
     override val tvSetBreak = "SET BREAK"
@@ -6098,6 +6135,7 @@ object EnStrings : Strings {
     override val tvWinner = "WINNER"
     override val tvLost = "CONNECTION LOST - RECONNECTING..."
     override val tvFullscreen = "FULL SCREEN"
+    override val tvPageTitle = "TSM Scoreboard"
 
     override val tvSection = "TV scoreboard"
     override val tvEnable = "Scoreboard on a TV or monitor"
@@ -6117,7 +6155,7 @@ object EnStrings : Strings {
     override val tvShowServe = "Ball next to the server"
     override val tvGhost = "Unlit segments visible"
     override val tvPreview = "Preview on this phone"
-    override val tvChromecastHint = "With a Chromecast: on the scoreboard phone use «Cast screen» (Smart View on Samsung). The Chromecast needs a network with internet: turn on mobile data on the hotspot phone."
+    override val tvChromecastHint = "With a Chromecast: on the scoreboard phone use the «Cast» tile in Quick Settings («Screen Cast» up to Android 14, «Smart View» on Samsung). The Chromecast needs a network with internet: turn on mobile data on the hotspot phone."
 
     override val displayMode = "Use as scoreboard"
     override val displayModeHint = "This phone shows the score on the monitor (HDMI cable or Chromecast)"
@@ -6247,6 +6285,13 @@ object DeStrings : Strings {
     override val voiceFilesMode = "Vorab erzeugte Audiodateien verwenden"
     override val voiceFilesModeHint = "Normalerweise wird jede Ansage in einem Satz gesprochen (natürlicher). Schalte es ein, um die erzeugten Dateien abzuspielen, z. B. um eine Online-Stimme offline mitzunehmen."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Eigene Aufnahmen: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - SPRACHDATEIEN\n" +
+            "Lege die Aufnahmen in voice/<sprache>/ ($langs) ab, benannt nach dem Schlüssel.\n" +
+            "Formate: $formats. Die Spielernamen liest immer die Sprachausgabe.\n" +
+            "Der Ordner tts/ enthält die von der App erzeugten Dateien: Deine Aufnahmen haben Vorrang."
+    }
+    override val voiceReadmeKey = "SCHLÜSSEL"
     override val testVoice = "Stimme testen"
     override val stopVoiceTest = "Test beenden"
     override val ttsMissing = "Die deutsche Stimme der Sprachausgabe ist auf dem Telefon nicht installiert."
@@ -6396,7 +6441,8 @@ object DeStrings : Strings {
     override val generatedWith = "Erstellt mit Tennis Score Manager"
 
     override val tvGames = "SPIELE"
-    override val tvSet = "SATZ"
+    override val tvSet = "SÄTZE"
+    override val tvSec = "SEK"
     override val tvServe = "AUFSCHLAG"
     override val tvChangeover = "SEITENWECHSEL"
     override val tvSetBreak = "SATZPAUSE"
@@ -6408,6 +6454,7 @@ object DeStrings : Strings {
     override val tvMatchTiebreak = "MATCH-TIE-BREAK"
     override val tvLost = "VERBINDUNG VERLOREN - NEUER VERSUCH..."
     override val tvFullscreen = "VOLLBILD"
+    override val tvPageTitle = "TSM-Anzeigetafel"
 
     override val tvSection = "TV-Anzeigetafel"
     override val tvEnable = "Anzeigetafel auf TV oder Monitor"
@@ -6427,7 +6474,7 @@ object DeStrings : Strings {
     override val tvShowServe = "Ball beim Aufschläger"
     override val tvGhost = "Ausgeschaltete Segmente sichtbar"
     override val tvPreview = "Vorschau auf diesem Telefon"
-    override val tvChromecastHint = "Mit einem Chromecast: Auf dem Anzeigetafel-Telefon «Bildschirm übertragen» verwenden (Smart View bei Samsung). Der Chromecast braucht ein Netz mit Internet: Schalte die mobilen Daten auf dem Hotspot-Telefon ein."
+    override val tvChromecastHint = "Mit einem Chromecast: Auf dem Anzeigetafel-Telefon die Kachel «Streamen» in den Schnelleinstellungen verwenden («Bildschirm übertragen» bis Android 14, «Smart View» bei Samsung). Der Chromecast braucht ein Netz mit Internet: Schalte die mobilen Daten auf dem Hotspot-Telefon ein."
 
     override val displayMode = "Als Anzeigetafel verwenden"
     override val displayModeHint = "Dieses Telefon zeigt den Spielstand auf dem Monitor (HDMI-Kabel oder Chromecast)"
@@ -6546,6 +6593,13 @@ object EsStrings : Strings {
     override val voiceFilesMode = "Usar archivos de audio pregenerados"
     override val voiceFilesModeHint = "Normalmente cada canto se lee en una sola frase (más natural). Actívalo para usar los archivos generados, por ejemplo para llevarte sin conexión una voz en línea."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Grabaciones personalizadas: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - ARCHIVOS DE VOZ\n" +
+            "Pon las grabaciones en voice/<idioma>/ ($langs) con el nombre de la clave.\n" +
+            "Formatos: $formats. Los nombres de los jugadores los lee siempre la síntesis de voz.\n" +
+            "La carpeta tts/ contiene los archivos generados por la app: tus grabaciones tienen prioridad."
+    }
+    override val voiceReadmeKey = "CLAVE"
     override val testVoice = "Probar voz"
     override val stopVoiceTest = "Detener la prueba"
     override val ttsMissing = "La voz en español de la síntesis de voz no está instalada en el teléfono."
@@ -6557,6 +6611,7 @@ object EsStrings : Strings {
     override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
     override val noAd = "Sin ventaja (punto decisivo)"
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
+    override val noAdShort = "Sin ventaja"
     override val coinToss = "Sorteo"
     override val tossCoin = "Lanzar la moneda"
     override val tossWinner: (String) -> String = { "Gana el sorteo: $it" }
@@ -6695,6 +6750,8 @@ object EsStrings : Strings {
     override val generatedWith = "Creado con Tennis Score Manager"
 
     override val tvGames = "JUEGOS"
+    override val tvSet = "SETS"
+    override val tvSec = "SEG"
     override val tvServe = "SAQUE"
     override val tvChangeover = "CAMBIO DE LADO"
     override val tvSetBreak = "DESCANSO"
@@ -6706,6 +6763,7 @@ object EsStrings : Strings {
     override val tvMatchTiebreak = "SÚPER TIE-BREAK"
     override val tvLost = "CONEXIÓN PERDIDA - RECONECTANDO..."
     override val tvFullscreen = "PANTALLA COMPLETA"
+    override val tvPageTitle = "Marcador TSM"
 
     override val tvSection = "Marcador en TV"
     override val tvEnable = "Marcador en TV o monitor"
@@ -6725,7 +6783,7 @@ object EsStrings : Strings {
     override val tvShowServe = "Pelota junto a quien saca"
     override val tvGhost = "Segmentos apagados visibles"
     override val tvPreview = "Vista previa en este teléfono"
-    override val tvChromecastHint = "Con un Chromecast: en el teléfono-marcador usa «Enviar pantalla» (Smart View en Samsung). El Chromecast necesita una red con internet: activa los datos móviles en el teléfono que hace de punto de acceso."
+    override val tvChromecastHint = "Con un Chromecast: en el teléfono-marcador usa el botón «Enviar» de los ajustes rápidos («Enviar pantalla» hasta Android 14, «Smart View» en Samsung). El Chromecast necesita una red con internet: activa los datos móviles en el teléfono que hace de punto de acceso."
 
     override val displayMode = "Usar como marcador"
     override val displayModeHint = "Este teléfono muestra el marcador en el monitor (cable HDMI o Chromecast)"
@@ -6847,6 +6905,13 @@ object FrStrings : Strings {
     override val voiceFilesMode = "Utiliser des fichiers audio pré-générés"
     override val voiceFilesModeHint = "Par défaut, chaque annonce est lue d'une seule phrase (plus naturel). Activez cette option pour lire les fichiers générés, par exemple pour emporter hors ligne une voix en ligne."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Enregistrements personnalisés : $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - FICHIERS VOCAUX\n" +
+            "Placez les enregistrements dans voice/<langue>/ ($langs), nommés d'après la clé.\n" +
+            "Formats : $formats. Les noms des joueurs sont toujours lus par la synthèse vocale.\n" +
+            "Le dossier tts/ contient les fichiers générés par l'application : vos enregistrements ont la priorité."
+    }
+    override val voiceReadmeKey = "CLÉ"
     override val testVoice = "Tester la voix"
     override val stopVoiceTest = "Arrêter le test"
     override val ttsMissing = "La voix française de la synthèse vocale n'est pas installée sur ce téléphone."
@@ -6996,6 +7061,7 @@ object FrStrings : Strings {
     override val generatedWith = "Créé avec Tennis Score Manager"
 
     override val tvGames = "JEUX"
+    override val tvSet = "MANCHES"
     override val tvServe = "SERVICE"
     override val tvChangeover = "CHANGEMENT DE CÔTÉ"
     override val tvSetBreak = "PAUSE SET"
@@ -7008,6 +7074,7 @@ object FrStrings : Strings {
     override val tvMatchTiebreak = "SUPER JEU DÉCISIF"
     override val tvLost = "CONNEXION PERDUE - RECONNEXION..."
     override val tvFullscreen = "PLEIN ÉCRAN"
+    override val tvPageTitle = "Tableau d'affichage TSM"
 
     override val tvSection = "Tableau d'affichage TV"
     override val tvEnable = "Tableau d'affichage sur TV ou écran"
@@ -7027,7 +7094,7 @@ object FrStrings : Strings {
     override val tvShowServe = "Balle à côté du serveur"
     override val tvGhost = "Segments éteints visibles"
     override val tvPreview = "Aperçu sur ce téléphone"
-    override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez « Caster l'écran » (Smart View sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
+    override val tvChromecastHint = "Avec un Chromecast : sur le téléphone-tableau, utilisez le bouton « Caster » des réglages rapides (« Diffusion de l'écran » jusqu'à Android 14, « Smart View » sur Samsung). Le Chromecast a besoin d'un réseau avec internet : activez les données mobiles sur le téléphone qui partage la connexion."
 
     override val displayMode = "Utiliser comme tableau"
     override val displayModeHint = "Ce téléphone affiche le score sur l'écran (câble HDMI ou Chromecast)"
@@ -7149,6 +7216,13 @@ object PtStrings : Strings {
     override val voiceFilesMode = "Usar arquivos de áudio pré-gerados"
     override val voiceFilesModeHint = "Normalmente cada anúncio é lido numa única frase (mais natural). Ative para usar os arquivos gerados, por exemplo para levar offline uma voz online."
     override val customRecordings: (Int, Int) -> String = { n, tot -> "Gravações personalizadas: $n/$tot" }
+    override val voiceReadme: (String, String) -> String = { langs, formats ->
+        "TENNIS SCORE MANAGER - ARQUIVOS DE VOZ\n" +
+            "Coloque as gravações em voice/<idioma>/ ($langs) com o nome da chave.\n" +
+            "Formatos: $formats. Os nomes dos jogadores são sempre lidos pela síntese de voz.\n" +
+            "A pasta tts/ contém os arquivos gerados pelo app: suas gravações têm prioridade."
+    }
+    override val voiceReadmeKey = "CHAVE"
     override val testVoice = "Testar voz"
     override val stopVoiceTest = "Parar o teste"
     override val ttsMissing = "A voz em português da síntese de voz não está instalada no telefone."
@@ -7160,6 +7234,7 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
     override val tossWinner: (String) -> String = { "Venceu o sorteio: $it" }
@@ -7298,6 +7373,8 @@ object PtStrings : Strings {
     override val generatedWith = "Criado com Tennis Score Manager"
 
     override val tvGames = "JOGOS"
+    override val tvSet = "SETS"
+    override val tvSec = "SEG"
     override val tvServe = "SERVIÇO"
     override val tvChangeover = "TROCA DE LADO"
     override val tvSetBreak = "INTERVALO"
@@ -7309,6 +7386,7 @@ object PtStrings : Strings {
     override val tvMatchTiebreak = "TIE-BREAK DECISIVO"
     override val tvLost = "CONEXÃO PERDIDA - RECONECTANDO..."
     override val tvFullscreen = "TELA CHEIA"
+    override val tvPageTitle = "Placar TSM"
 
     override val tvSection = "Placar na TV"
     override val tvEnable = "Placar na TV ou monitor"
@@ -7328,7 +7406,7 @@ object PtStrings : Strings {
     override val tvShowServe = "Bola ao lado de quem serve"
     override val tvGhost = "Segmentos apagados visíveis"
     override val tvPreview = "Prévia neste telefone"
-    override val tvChromecastHint = "Com um Chromecast: no telefone-placar use «Transmitir tela» (Smart View nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
+    override val tvChromecastHint = "Com um Chromecast: no telefone-placar use o botão de transmissão das configurações rápidas («Transmitir», «Transmissão» ou «Transmissão de tela», conforme a versão do Android; «Smart View» nos Samsung). O Chromecast precisa de uma rede com internet: ative os dados móveis no telefone que faz o hotspot."
 
     override val displayMode = "Usar como placar"
     override val displayModeHint = "Este telefone mostra o placar no monitor (cabo HDMI ou Chromecast)"
@@ -10315,6 +10393,7 @@ package com.tennis.scoremanager.voice
 import android.content.Context
 import android.net.Uri
 import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -10325,6 +10404,7 @@ import java.util.zip.ZipInputStream
  *   Android/data/com.tennis.scoremanager/files/voice/it/tts/    file generati dal TTS del telefono
  *
  * Il nome di ogni file è la chiave della frase (vedi LEGGIMI.txt), es. `score_1_0.mp3` = "quindici zero".
+ * LEGGIMI.txt ha sempre questo nome (lo citano le guide); le spiegazioni in testa sono nella lingua dell'app.
  */
 class VoicePack(private val context: Context) {
 
@@ -10400,16 +10480,14 @@ class VoicePack(private val context: Context) {
         refresh(lang)
     }
 
-    /** Elenco delle frasi da registrare, scritto nella cartella voce. */
-    fun writeReadme() {
+    /** Elenco delle frasi da registrare, scritto nella cartella voce (di nuovo a ogni cambio di lingua). */
+    @Synchronized
+    fun writeReadme(s: Strings) {
         val sb = StringBuilder()
-        sb.appendLine("TENNIS SCORE MANAGER - FILE VOCALI")
-        sb.appendLine("Metti le registrazioni in voice/<lingua>/ (${Lang.entries.joinToString(", ") { it.code }}) con il nome della chiave.")
-        sb.appendLine("Formati: ${exts.joinToString()}. I nomi dei giocatori sono sempre letti dal TTS.")
-        sb.appendLine("La cartella tts/ contiene i file generati dall'app: le tue registrazioni hanno la precedenza.")
+        sb.appendLine(s.voiceReadme(Lang.entries.joinToString(", ") { it.code }, exts.joinToString()))
         // Una colonna per lingua, separate da tabulazioni: si apre bene anche come foglio di calcolo.
         sb.appendLine()
-        sb.appendLine((listOf("CHIAVE") + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
+        sb.appendLine((listOf(s.voiceReadmeKey) + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
         for (k in Phrases.keys) {
             sb.appendLine((listOf(k) + Lang.entries.map { Phrases.text(k, it) }).joinToString("\t"))
         }
@@ -10693,10 +10771,13 @@ cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DataTest.kt" << 'TSM
 package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.EnStrings
 import com.tennis.scoremanager.ui.ItStrings
+import com.tennis.scoremanager.ui.stringsFor
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -10741,6 +10822,14 @@ class DataTest {
         assertEquals("A/B", BandProtocol.clean("a|b"))
         assertEquals("P|15|AD|1|TIE-BREAK", BandProtocol.point("15", "AD", 1, "Tie-break"))
         assertEquals("M|GAME SET MATCH|6-4 7-5|15", BandProtocol.message("Game set match", "6-4 7-5", 15))
+    }
+
+    @Test
+    fun formatLineUsesTheLanguageForNoAd() {
+        val rec = MatchRecord(id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(noAd = true))
+        assertEquals("3 set · tie-break a 7 · No-Ad · Singolare", Reports.formatLabel(rec, ItStrings))
+        assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
+        assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
     }
 }
 TSM_EOF
@@ -11047,7 +11136,12 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
+import com.tennis.scoremanager.ui.stringsFor
+import java.io.File
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -11171,6 +11265,30 @@ class TvSnapshotTest {
         assertEquals("192.168.43.1" to 8081, ScoreboardFinder.parseAddress(" http://192.168.43.1:8081/ "))
         assertNull(ScoreboardFinder.parseAddress(""))
         assertNull(ScoreboardFinder.parseAddress("10.0.0.2:99999"))
+    }
+
+    /** Il blocco id="texts" di scoreboard.html deve avere gli stessi testi dell'app, lingua per lingua. */
+    @Test
+    fun pageTextsMatchTheApp() {
+        val expected = Lang.entries.associate { lang ->
+            val s = stringsFor(lang)
+            val demo = mapOf(
+                "serve" to s.tvServe,
+                "changeover" to s.tvChangeover,
+                "setPoint" to s.msgSetPoint,
+                "title" to TvSnapshots.defaultTitle(SetupData(club = "Tennis Club", court = "3"), s),
+            )
+            lang.code to JsonObject(
+                mapOf(
+                    "labels" to Json.encodeToJsonElement(TvSnapshots.labels(s)),
+                    "demo" to JsonObject(demo.mapValues { JsonPrimitive(it.value) }),
+                ),
+            )
+        }
+        val html = File("src/main/assets/scoreboard.html").readText()
+        val block = html.substringAfter("<script type=\"application/json\" id=\"texts\">").substringBefore("</script>")
+        val paste = expected.entries.joinToString(",\n", "{\n", "\n}") { (k, v) -> "\"$k\": $v" }
+        assertEquals("Copia questo blocco in scoreboard.html:\n$paste\n", JsonObject(expected), Json.parseToJsonElement(block))
     }
 }
 TSM_EOF
@@ -12995,7 +13113,7 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <NimBLEDevice.h>
 #include <Preferences.h>
 
-#define FW_VERSION "2.2.1"
+#define FW_VERSION "2.2.2"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -13093,16 +13211,16 @@ static const char* const TXT[N_LANG][N_TXT] = {
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "SETS", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
+    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
     "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
-  { "EMPAREJANDO...", "EMPAREJADO", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
+  { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
     "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
-  { "PAREANDO...", "PAREADO", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
+  { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
     "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
@@ -13132,6 +13250,7 @@ static volatile bool cfgReady = false;
 static uint8_t  seqNo = 0;
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
+static uint32_t pairedOffAt = 0;       // displayOffAt del messaggio "PAIRING OK": finché è lo stesso, è ancora a schermo
 static volatile uint32_t advSince = 0;  // aggiornato anche dal task BLE alla disconnessione
 static bool     advFast = true;
 static bool     advertising = false;
@@ -13529,7 +13648,14 @@ static void handleConfig(char* text) {
   }
   clampSettings();
   if (onlyLang) {
-    if (cfg.lang != oldLang) prefs.putUChar("lang", cfg.lang);
+    if (cfg.lang != oldLang) {
+      prefs.putUChar("lang", cfg.lang);
+      // La lingua arriva ~1 s dopo il collegamento: se "PAIRING OK" è ancora a schermo, lo si riscrive nella
+      // lingua giusta (conta per un braccialetto nuovo, che parte in italiano) senza allungarne la durata.
+      if (displayOn && displayOffAt == pairedOffAt && (int32_t)(pairedOffAt - millis()) > 0) {
+        drawMessage(TXT_PAIRED, cfg.name, C_BALL);
+      }
+    }
     publishConfig(true);
     return;
   }
@@ -13941,6 +14067,7 @@ void loop() {
     idleWarned = false;
     drawMessage(TXT_PAIRED, cfg.name, C_BALL);
     showFor(PAIRED_MSG_MS);
+    pairedOffAt = displayOffAt;
     beep(2000, 70);
     beep(2800, 90);
     updateBattery(true);

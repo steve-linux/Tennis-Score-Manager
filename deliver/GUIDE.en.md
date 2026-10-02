@@ -13,7 +13,7 @@ Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according
 | `deliver/installa_tsm.sh` | An alternative to cloning: it creates the **whole** Android project and the sketch using only `cat << 'TSM_EOF'` blocks (the Gradle wrapper jar is in base64). |
 | `deliver/GUIDE.en.md` | This guide (in English); the Italian original is `deliver/GUIDA.md`, the other translations are `deliver/GUIDE.fr.md`, `.de`, `.es`, `.pt`. |
 
-Versions used and verified: app **2.3** · firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x.
+Versions used and verified: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. If Android Studio offers the **AGP Upgrade Assistant**, you can ignore it: these versions were built and tested as they are.
 6. Gradle JDK: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (the bundled one, which is the default).
 7. **Build › Make Project**: it must end with *BUILD SUCCESSFUL*.
-8. Optional: the tests (74: rules, voice, languages, battery and charging, wristband settings, TV scoreboard) are run by right-clicking `app/src/test` › **Run Tests**.
+8. Optional: the tests (76: rules, voice, languages, battery and charging, wristband settings, TV scoreboard) are run by right-clicking `app/src/test` › **Run Tests**.
 
 ## 3. Installing the app on the phone
 
@@ -103,7 +103,7 @@ bash installa_tsm.sh
   - **Test voice**: reads a sequence of sample calls with the names you entered. While it is reading, the button becomes **Stop the test**: tap it again to stop (it also stops by itself when you leave the page). Text-to-speech can't be paused mid-sentence, so the button stops it; pressing it again starts over from the beginning.
 - If the voice for the chosen language is missing: **Settings › General management › Language › Text-to-speech** (or *Text-to-speech output*) → download the voice for that language for the chosen engine (the app also shows an **Install voice** button).
 - **Pronunciation**: some engines get tennis words wrong (in Italian, "primo set" read as "primo settembre", i.e. "first of September", and "tie-break" read as "time break"). The app corrects them by itself (`voice/Pronunciation.kt`); the corrections were checked by transcribing the real audio from Samsung and Google.
-- **Custom recordings** (the most natural voice of all: yours or an umpire's): the folder `Android/data/com.tennis.scoremanager/files/voice/` contains `LEGGIMI.txt` (the "read me" file) listing the 84 keys and their phrases. Record the files with those names (`score_1_0.mp3` = "fifteen love"…), put them in a ZIP with one folder per language (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) and use **Import ZIP**. `LEGGIMI.txt` has one tab-separated column per language, so it also opens neatly as a spreadsheet. Recordings always take precedence over text-to-speech; the names are still read by text-to-speech.
+- **Custom recordings** (the most natural voice of all: yours or an umpire's): the folder `Android/data/com.tennis.scoremanager/files/voice/` contains `LEGGIMI.txt` (the "read me" file; the explanations at the top are in the app's language and are rewritten when you change it) listing the 84 keys and their phrases. Record the files with those names (`score_1_0.mp3` = "fifteen love"…), put them in a ZIP with one folder per language (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) and use **Import ZIP**. `LEGGIMI.txt` has one tab-separated column per language, so it also opens neatly as a spreadsheet. Recordings always take precedence over text-to-speech; the names are still read by text-to-speech.
 - **Use pre-generated audio files** (optional): with **Generate files** the app creates the 84 files once with the chosen voice (even an *online* voice, if there is internet at that moment) and then plays them instead of running text-to-speech live. It sounds more "stitched together", but it is useful for taking an online voice offline.
 - **External speaker**: just pair it with the phone over Bluetooth; the voice comes out on the media channel (adjust the media volume).
 
@@ -130,7 +130,7 @@ Particulars:
 - **10-6 … 10-9** in the match tie-break: in French, Spanish and Portuguese the call is "dix **à** huit", "diez **a** ocho", "dez **a** oito", because "dix huit" / "diez ocho" / "dez oito" sound like *eighteen*.
 - **Portuguese**: a single option, with a Brazilian interface and preferred voice (if the Brazilian voice is missing, the European Portuguese one is used) and the calls from the FPT script, using words that are valid in both countries ("jogo" rather than "game", "partida"). "Um set a um" became "sets iguais": in the singular, *set* is pronounced like *sete* (seven) and it sounded like 7-1.
 - **Pronunciation** (`voice/Pronunciation.kt`): every phrase in every language was read by the Google voices and transcribed with whisper. Corrections added: in German "Tie-Break" is made to be read as "Taibreak", with a comma in front of it (otherwise you get "Teilbreg" or "bei Detailbreak"); in French the lone "à" of the pre-generated files is made to be read as "a" (otherwise the voice says "a accent grave"). **Samsung TTS has not been tried in the new languages yet.**
-- **Wristbands** (firmware 2.2): the app sends the language by itself on every connection and whenever you change it; the wristband stores it and uses it even when it isn't connected (looking for the phone, charging, powering off), without accents because the font is ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). With firmware 2.1 or earlier, the messages sent by the app are translated, but the wristband's own messages stay in Italian.
+- **Wristbands** (firmware 2.2): the app sends the language by itself on every connection and whenever you change it; the wristband stores it and uses it even when it isn't connected (looking for the phone, charging, powering off), without accents because the font is ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). With firmware 2.1 or earlier, the messages sent by the app are translated, but the wristband's own messages stay in Italian. A freshly programmed wristband starts in Italian; from firmware 2.2.2 its connection message is redrawn in the app's language as soon as the app sends it, about a second after connecting.
 
 ## 5. Wristband firmware (Arduino IDE)
 
@@ -146,7 +146,7 @@ Particulars:
    **After the upload**, if the display stays black (the wristband has stayed in programming mode), press the side button **once**: it restarts with the new program.
 8. At start-up the wristband shows its name, e.g. **TSM-3FA2** (it can be changed from the app, see 6.1). Repeat for the second wristband.
 
-> **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
+> **Firmware 2.2.2**: the connection message switches to the app's language as soon as it arrives (4.1); Spanish *VINCULANDO…/VINCULADA* and Portuguese *PAREADA* as in the app, French *MANCHES* on the games screen. **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
 
 ## 6. Using the wristbands
 
@@ -247,7 +247,7 @@ The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboa
 | How it gets to the monitor | What you need | Pros | Cons |
 |---|---|---|---|
 | **Second phone with video output** + USB-C/HDMI cable, TSM app in *Use as scoreboard* | a phone with video output over USB-C (DisplayPort Alt Mode) | no internet; the scoreboard fills the whole monitor in 16:9 and the phone stays free | many phones do **not** output video: as a rule Galaxy S/Note/Tab S do (with DeX: choose *Screen mirroring* or turn off DeX's automatic start), almost all Galaxy A models don't. Look for "DisplayPort" / "video output" in the spec sheet |
-| **Chromecast** (or Google TV Streamer) on the monitor + any phone with TSM in *Use as scoreboard* and **Screen Cast** (Smart View on Samsung) | a Chromecast set up once with Google Home on the hotspot's network | any phone will do, no long cable | the Chromecast needs **internet** (mobile data on the hotspot); about 1 s of delay; casting shows the phone's screen (in landscape) |
+| **Chromecast** (or Google TV Streamer) on the monitor + any phone with TSM in *Use as scoreboard* and **Cast** (*Screen Cast* up to Android 14, Smart View on Samsung) | a Chromecast set up once with Google Home on the hotspot's network | any phone will do, no long cable | the Chromecast needs **internet** (mobile data on the hotspot); about 1 s of delay; casting shows the phone's screen (in landscape) |
 | **Browser** on any device connected to the monitor (laptop, tablet, TV box, Fire TV Stick…) | scan the QR code or type in the address | no app to install | the screen switches off by itself unless you set it not to; you have to tap **FULL SCREEN** every time you open it |
 
 **Why not over Bluetooth**: the umpire's phone is already handling the two wristbands over Bluetooth, where button timing matters; Wi-Fi is separate, faster and has a longer range. **Why not straight from the umpire's phone to the Chromecast** (with no second phone): it can be done, but it needs a "receiver" app registered with Google (Google Cast Developer Console, a one-off $5) and published on an https site; it is a possible next step.
@@ -276,13 +276,13 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 2. The phone **finds the umpire's phone by itself** (network announcement and hotspot scan, a few seconds) and remembers the last address. If it can't find it: check the hotspot and *TV scoreboard*, then tap **Search again**, or type in the address shown on the umpire's phone and tap **Connect**.
 3. The scoreboard goes full screen, in landscape, with the screen always on.
    - **With the HDMI cable**: the scoreboard goes to the monitor in the monitor's format; the phone shows *The scoreboard is on the external monitor* with brightness at minimum (**Show here too** to see it on the phone as well). Unplug the cable and it comes back to the phone.
-   - **With the Chromecast**: open the Quick Settings panel › **Screen Cast** / **Smart View** › choose the Chromecast.
+   - **With the Chromecast**: open the Quick Settings panel › **Cast** (or **Screen Cast**) / **Smart View** › choose the Chromecast.
 4. If the umpire's phone disappears (out of range, app closed), *CONNECTION LOST - RECONNECTING...* appears and after 20 seconds it searches again by itself, even if the address has changed.
 5. To exit: press **back twice**.
 
 **From a browser** (laptop, TV box): scan the QR code or type in the address, then tap **FULL SCREEN** (it appears when you move the mouse or touch the screen). Set the screen timeout to *Never*: on an http page the browser can't keep the screen on by itself.
 
-**Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&state=ad`, `tb`, `end`, `idle`, `doubles`) shows the scoreboard with test data (the demo texts are in Italian).
+**Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&lang=en`, `fr`, `de`, `es`, `pt` and `&state=ad`, `tb`, `end`, `idle`, `doubles`) shows the scoreboard with test data.
 
 ## 9. Rules applied (ITF) and agreed choices
 

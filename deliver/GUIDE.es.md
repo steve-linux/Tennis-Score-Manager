@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para llevar el tanteo del tenis según la
 | `deliver/installa_tsm.sh` | Alternativa a clonar el repositorio: crea **todo** el proyecto Android y el sketch solo con bloques `cat << 'TSM_EOF'` (el jar del Gradle wrapper va en base64). |
 | `deliver/GUIDE.es.md` | Esta guía (en español); el original en italiano es `deliver/GUIDA.md` y las demás traducciones son `deliver/GUIDE.en.md`, `.fr`, `.de`, `.pt`. |
 
-Versiones usadas y verificadas: app **2.3** · firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versiones usadas y verificadas: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Si Android Studio te propone el **AGP Upgrade Assistant**, puedes ignorarlo: estas versiones se han compilado y probado tal cual.
 6. JDK de Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (el incluido, que es el predeterminado).
 7. **Build › Make Project**: debe terminar con *BUILD SUCCESSFUL*.
-8. Opcional: las pruebas (74: reglas, voz, idiomas, batería y carga, ajustes de las pulseras, marcador de TV) se lanzan con clic derecho en `app/src/test` › **Run Tests**.
+8. Opcional: las pruebas (76: reglas, voz, idiomas, batería y carga, ajustes de las pulseras, marcador de TV) se lanzan con clic derecho en `app/src/test` › **Run Tests**.
 
 ## 3. Instalar la app en el teléfono
 
@@ -103,7 +103,7 @@ bash installa_tsm.sh
   - **Probar voz**: lee una secuencia de cantos de ejemplo con los nombres introducidos. Mientras lee, el botón pasa a ser **Detener la prueba**: tócalo otra vez para interrumpirla (también se detiene sola al salir de la página). La síntesis de voz no se puede pausar a mitad de frase, así que el botón la detiene; si lo vuelves a pulsar, empieza desde el principio.
 - Si falta la voz del idioma elegido: **Ajustes › Administración general › Idioma › Texto a voz** (o *Salida de texto a voz*) → descarga la voz de ese idioma para el motor elegido (la app muestra también el botón **Instalar voz**).
 - **Pronunciación**: algunos motores leen mal palabras del tenis (en italiano, "primo set" salía como "primo settembre" y "tie-break" como "time break"). La app las corrige sola (`voice/Pronunciation.kt`); las correcciones se han verificado transcribiendo el audio real de Samsung y de Google.
-- **Grabaciones personalizadas** (la voz más natural de todas: la tuya o la de un juez): en la carpeta `Android/data/com.tennis.scoremanager/files/voice/` está `LEGGIMI.txt` (el archivo «léeme») con la lista de las 84 claves y de sus frases. Graba los archivos con esos nombres (`score_1_0.mp3` = «quince cero»…), ponlos en un ZIP con una carpeta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) y usa **Importar ZIP**. `LEGGIMI.txt` tiene una columna por idioma separada por tabuladores, así que también se abre bien como hoja de cálculo. Las grabaciones siempre tienen prioridad sobre la síntesis; los nombres los sigue leyendo la síntesis.
+- **Grabaciones personalizadas** (la voz más natural de todas: la tuya o la de un juez): en la carpeta `Android/data/com.tennis.scoremanager/files/voice/` está `LEGGIMI.txt` (el archivo «léeme»; las explicaciones del principio están en el idioma de la app y se reescriben al cambiarlo) con la lista de las 84 claves y de sus frases. Graba los archivos con esos nombres (`score_1_0.mp3` = «quince cero»…), ponlos en un ZIP con una carpeta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) y usa **Importar ZIP**. `LEGGIMI.txt` tiene una columna por idioma separada por tabuladores, así que también se abre bien como hoja de cálculo. Las grabaciones siempre tienen prioridad sobre la síntesis; los nombres los sigue leyendo la síntesis.
 - **Usar archivos de audio pregenerados** (opcional): con **Generar archivos** la app crea una sola vez los 84 archivos con la voz elegida (incluso una voz *en línea*, si en ese momento hay internet) y después los usa en lugar de la síntesis continua. Suena más «a trozos», pero sirve para llevarse sin conexión una voz en línea.
 - **Altavoz externo**: basta con emparejarlo por Bluetooth con el teléfono; la voz sale por el canal multimedia (ajusta el volumen multimedia).
 
@@ -130,7 +130,7 @@ Particularidades:
 - **10-6 … 10-9** en el súper tie-break: en francés, español y portugués se dice "dix **à** huit", "diez **a** ocho", "dez **a** oito", porque "dix huit" / "diez ocho" / "dez oito" se oyen como *dieciocho*.
 - **Portugués**: una sola opción, con la interfaz y la voz preferida de Brasil (si falta la voz brasileña se usa la portuguesa) y los cantos del guion de la FPT, con palabras válidas en los dos países ("jogo" y no "game", "partida"). "Um set a um" pasó a ser "sets iguais": en singular, *set* se pronuncia como *sete* y parecía 7-1.
 - **Pronunciación** (`voice/Pronunciation.kt`): todas las frases de todos los idiomas se han hecho leer a las voces de Google y se han transcrito con whisper. Correcciones añadidas: en alemán, "Tie-Break" se hace leer "Taibreak", con una coma delante (si no, sale "Teilbreg" o "bei Detailbreak"); en francés, la "à" suelta de los archivos pregenerados se hace leer "a" (si no, sale "a accent grave"). **Samsung TTS todavía no se ha probado en los nuevos idiomas.**
-- **Pulseras** (firmware 2.2): la app envía por sí sola el idioma en cada conexión y cuando lo cambias; la pulsera lo guarda y lo usa también cuando no está conectada (búsqueda del teléfono, carga, apagado), sin tildes porque la fuente es ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o anterior, los mensajes que envía la app salen traducidos, pero los propios de la pulsera siguen en italiano.
+- **Pulseras** (firmware 2.2): la app envía por sí sola el idioma en cada conexión y cuando lo cambias; la pulsera lo guarda y lo usa también cuando no está conectada (búsqueda del teléfono, carga, apagado), sin tildes porque la fuente es ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o anterior, los mensajes que envía la app salen traducidos, pero los propios de la pulsera siguen en italiano. Una pulsera recién programada arranca en italiano; desde el firmware 2.2.2 su mensaje de conexión se vuelve a escribir en el idioma de la app en cuanto esta se lo envía, más o menos un segundo después de conectarse.
 
 ## 5. Firmware de las pulseras (Arduino IDE)
 
@@ -146,7 +146,7 @@ Particularidades:
    **Después de la carga**, si la pantalla se queda negra (la pulsera se ha quedado en modo de programación), pulsa **una vez** el botón lateral: arranca con el programa nuevo.
 8. Al arrancar, la pulsera muestra su nombre, p. ej. **TSM-3FA2** (se puede cambiar desde la app, ver 6.1). Repite el proceso con la segunda pulsera.
 
-> **Firmware 2.2.1**: también la cuenta atrás antes del apagado en el idioma de la app (6). **Firmware 2.2**: los textos de la pulsera en el idioma de la app (4.1). **Firmware 2.1**: la pantalla de carga (6.2); los ajustes, *Identificar* y el apagado desde la app requieren como mínimo la 2.0. Carga `TSM_Band.ino` en **las dos** pulseras; con un firmware antiguo la app lo indica en el panel de ajustes y todo lo demás sigue funcionando.
+> **Firmware 2.2.2**: el mensaje de conexión pasa al idioma de la app en cuanto llega (4.1); en español *VINCULANDO…/VINCULADA* y en portugués *PAREADA*, como en la app; en francés *MANCHES* en la pantalla de juegos. **Firmware 2.2.1**: también la cuenta atrás antes del apagado en el idioma de la app (6). **Firmware 2.2**: los textos de la pulsera en el idioma de la app (4.1). **Firmware 2.1**: la pantalla de carga (6.2); los ajustes, *Identificar* y el apagado desde la app requieren como mínimo la 2.0. Carga `TSM_Band.ino` en **las dos** pulseras; con un firmware antiguo la app lo indica en el panel de ajustes y todo lo demás sigue funcionando.
 
 ## 6. Usar las pulseras
 
@@ -158,15 +158,15 @@ Particularidades:
 | **KEY2** largo (2 s) | apaga la pulsera (con el cable conectado muestra *SIGUE CARGANDO*: se carga también apagada) |
 | Botón lateral | un clic enciende; doble clic apaga (función del hardware) |
 
-- Al encenderla parpadea **EMPAREJANDO...** (encendida 0,35 s cada 2 s, para ahorrar). La app se conecta sola a las pulseras que ya conoce en cuanto se abre; las nuevas las encuentra en la página 2.
-- Conectada: **EMPAREJADO** durante 3 segundos con dos pitidos, luego **VINCULADA A** + el nombre del jugador.
+- Al encenderla parpadea **VINCULANDO...** (encendida 0,35 s cada 2 s, para ahorrar). La app se conecta sola a las pulseras que ya conoce en cuanto se abre; las nuevas las encuentra en la página 2.
+- Conectada: **VINCULADA** durante 3 segundos con dos pitidos, luego **VINCULADA A** + el nombre del jugador.
 - En cada punto la pantalla se enciende con el tanteo del juego en grande (a la izquierda el tuyo, a la derecha el del rival; la pelota verde indica quién saca) y luego se apaga. Al final de cada juego muestra juegos y sets.
 
 **Apagado automático** (los tiempos se cambian desde la app, 6.1):
 
 | Situación | Qué hace la pulsera | Predeterminado |
 |---|---|---|
-| Encendida, pero ningún teléfono se conecta | parpadea EMPAREJANDO y luego se apaga | **30 s** |
+| Encendida, pero ningún teléfono se conecta | parpadea VINCULANDO y luego se apaga | **30 s** |
 | Teléfono perdido (apagado, fuera de alcance, Bluetooth desactivado, app cerrada de golpe) | parpadea RECONECTANDO y se vuelve a conectar sola en cuanto puede; si no, se apaga | 3 min |
 | Conectada pero inactiva (ningún punto, ningún mensaje) | 30 s antes avisa con **INACTIVO · MANTEN PULSADO KEY1** y un pitido, luego se apaga | 30 min |
 | Partido terminado (confirmado en el teléfono) o **Salir** en la app | muestra FIN DEL PARTIDO / APP CERRADA y se apaga enseguida | activado (se puede desactivar, 7.2) |
@@ -240,14 +240,14 @@ Conecta el cable USB-C: la pulsera emite un pitido y muestra la **pantalla de ca
 
 ## 8. Marcador en un televisor o monitor
 
-El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEC** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
+El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
 
 ### 8.1 Las opciones posibles
 
 | Cómo llega al monitor | Qué hace falta | Ventajas | Inconvenientes |
 |---|---|---|---|
 | **Segundo teléfono con salida de vídeo** + cable USB-C/HDMI, app TSM en *Usar como marcador* | un teléfono que saque vídeo por el USB-C (DisplayPort Alt Mode) | sin internet; el marcador ocupa todo el monitor en 16:9 y el teléfono queda libre | muchos teléfonos **no** sacan vídeo: en general sí los Galaxy S/Note/Tab S (con DeX: elige *Duplicar pantalla* o desactiva el inicio automático de DeX), y no casi todos los Galaxy A. Busca «DisplayPort» / «salida de vídeo» en la ficha técnica |
-| **Chromecast** (o Google TV Streamer) en el monitor + cualquier teléfono con TSM en *Usar como marcador* y **Enviar pantalla** (Smart View en los Samsung) | un Chromecast configurado una vez con Google Home en la red del punto de acceso | sirve cualquier teléfono, sin cables largos | el Chromecast necesita **internet** (datos móviles en el punto de acceso); retraso de aproximadamente 1 s; se envía la pantalla del teléfono (en horizontal) |
+| **Chromecast** (o Google TV Streamer) en el monitor + cualquier teléfono con TSM en *Usar como marcador* y **Enviar** (*Enviar pantalla* hasta Android 14, Smart View en los Samsung) | un Chromecast configurado una vez con Google Home en la red del punto de acceso | sirve cualquier teléfono, sin cables largos | el Chromecast necesita **internet** (datos móviles en el punto de acceso); retraso de aproximadamente 1 s; se envía la pantalla del teléfono (en horizontal) |
 | **Navegador** en cualquier aparato conectado al monitor (portátil, tableta, TV box, Fire TV Stick…) | escanear el QR o escribir la dirección | no hay que instalar ninguna app | la pantalla se apaga sola si no la configuras; hay que tocar **PANTALLA COMPLETA** cada vez que se abre |
 
 **Por qué no por Bluetooth**: el teléfono del juez ya mantiene las dos pulseras por Bluetooth, donde cuentan los tiempos de los botones; el Wi-Fi va aparte, es más rápido y llega más lejos. **Por qué no directamente del teléfono del juez al Chromecast** (sin segundo teléfono): se puede hacer, pero hace falta una app «receptora» registrada en Google (Google Cast Developer Console, 5 $ de pago único) y publicada en un sitio https; es un posible paso futuro.
@@ -276,13 +276,13 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 2. El teléfono **busca solo** el teléfono del juez (anuncio en la red y escaneo del punto de acceso, unos segundos) y recuerda la última dirección. Si no lo encuentra: revisa el punto de acceso y *Marcador en TV*, luego **Buscar de nuevo**, o escribe la dirección que muestra el juez y pulsa **Conectar**.
 3. El marcador pasa a pantalla completa, en horizontal, con la pantalla siempre encendida.
    - **Con el cable HDMI**: el marcador va al monitor en su formato; el teléfono muestra *El marcador está en el monitor externo* con el brillo al mínimo (**Mostrar también aquí** para verlo también en el teléfono). Al desconectar el cable vuelve al teléfono.
-   - **Con el Chromecast**: abre los ajustes rápidos › **Enviar pantalla** / **Smart View** › elige el Chromecast.
+   - **Con el Chromecast**: abre los ajustes rápidos › **Enviar** (o **Enviar pantalla**) / **Smart View** › elige el Chromecast.
 4. Si el teléfono del juez desaparece (fuera de alcance, app cerrada) aparece *CONEXIÓN PERDIDA - RECONECTANDO...* y a los 20 segundos lo vuelve a buscar solo, aunque haya cambiado de dirección.
 5. Para salir: **atrás dos veces**.
 
 **Desde un navegador** (portátil, TV box): escanea el QR o escribe la dirección y toca **PANTALLA COMPLETA** (aparece al mover el ratón o al tocar la pantalla). Configura el apagado de la pantalla en *nunca*: en una página http el navegador no puede mantenerla encendida por sí solo.
 
-**Vista previa sin teléfonos**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` en un navegador (también `&state=ad`, `tb`, `end`, `idle`, `doubles`) muestra el marcador con datos de prueba.
+**Vista previa sin teléfonos**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` en un navegador (también `&lang=en`, `fr`, `de`, `es`, `pt` y `&state=ad`, `tb`, `end`, `idle`, `doubles`) muestra el marcador con datos de prueba.
 
 ## 9. Reglas aplicadas (ITF) y decisiones acordadas
 
@@ -323,7 +323,7 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 
 ## 11. Problemas frecuentes
 
-- **No se encuentra la pulsera**: ¿Bluetooth y ubicación activados (filas en verde)? ¿La pulsera está parpadeando EMPAREJANDO? (Si ya está conectada a otro teléfono, no se ve.) Si mientras tanto se ha apagado sola (30 s), vuelve a encenderla con un clic en el botón lateral.
+- **No se encuentra la pulsera**: ¿Bluetooth y ubicación activados (filas en verde)? ¿La pulsera está parpadeando VINCULANDO? (Si ya está conectada a otro teléfono, no se ve.) Si mientras tanto se ha apagado sola (30 s), vuelve a encenderla con un clic en el botón lateral.
 - **En el panel de ajustes aparece «El firmware de esta pulsera no tiene ajustes»**: esa pulsera todavía tiene el sketch antiguo; vuelve a cargarlo (capítulo 5).
 - **Android Studio no ve el teléfono**: ¿depuración por USB activada y huella RSA aceptada en el teléfono (3)? En Windows a veces hace falta el driver del fabricante; en Linux, las reglas udev y una nueva sesión (1.1). O bien la depuración inalámbrica (3).
 - **Arduino IDE no muestra el puerto de la pulsera**: cable USB-C de datos y no solo de carga; en Linux, grupo `dialout` y nueva sesión (1.1); después, el modo de descarga (5, punto 7).

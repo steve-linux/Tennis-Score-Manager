@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis second
 | `deliver/installa_tsm.sh` | In alternativa al clone: crea **tutto** il progetto Android e lo sketch con soli blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
 | `deliver/GUIDA.md` | Questa guida (in italiano); le traduzioni sono `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`, `.pt`. |
 
-Versioni usate e verificate: app **2.3** · firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versioni usate e verificate: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Se Android Studio propone l'**AGP Upgrade Assistant**, puoi ignorarlo: queste versioni sono state compilate e testate così.
 6. JDK di Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (quello incluso, è il predefinito).
 7. **Build › Make Project**: deve finire con *BUILD SUCCESSFUL*.
-8. Facoltativo: i test (74: regole, voce, lingue, batteria e ricarica, impostazioni dei braccialetti, tabellone TV) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
+8. Facoltativo: i test (76: regole, voce, lingue, batteria e ricarica, impostazioni dei braccialetti, tabellone TV) si lanciano con tasto destro su `app/src/test` › **Run Tests**.
 
 ## 3. Installare l'app sul telefono
 
@@ -103,7 +103,7 @@ bash installa_tsm.sh
   - **Prova voce**: legge una sequenza di chiamate di esempio con i nomi inseriti. Mentre legge il tasto diventa **Ferma la prova**: toccalo di nuovo per interromperla (si ferma da sola anche uscendo dalla pagina). La sintesi vocale non si può mettere in pausa a metà frase, quindi il tasto la ferma; ripremendolo riparte dall'inizio.
 - Se manca la voce della lingua scelta: **Impostazioni › Gestione generale › Lingua › Sintesi vocale** (o *Output sintesi vocale*) → scarica la voce di quella lingua per il motore scelto (l'app mostra anche il tasto **Installa voce**).
 - **Pronuncia**: alcuni motori sbagliano parole del tennis ("primo set" letto "primo settembre", "tie-break" letto "time break"). L'app le corregge da sola (`voice/Pronunciation.kt`); le correzioni sono state verificate trascrivendo l'audio reale di Samsung e Google.
-- **Registrazioni personalizzate** (la voce più naturale in assoluto: la tua o quella di un arbitro): nella cartella `Android/data/com.tennis.scoremanager/files/voice/` c'è `LEGGIMI.txt` con l'elenco delle 84 chiavi e delle frasi. Registra i file con quei nomi (`score_1_0.mp3` = "quindici zero"…), mettili in uno ZIP con una cartella per lingua (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e usa **Importa ZIP**. `LEGGIMI.txt` ha una colonna per lingua separata da tabulazioni, quindi si apre bene anche come foglio di calcolo. Le registrazioni hanno sempre la precedenza sulla sintesi; i nomi restano letti dalla sintesi.
+- **Registrazioni personalizzate** (la voce più naturale in assoluto: la tua o quella di un arbitro): nella cartella `Android/data/com.tennis.scoremanager/files/voice/` c'è `LEGGIMI.txt` con l'elenco delle 84 chiavi e delle frasi (le spiegazioni in testa sono nella lingua dell'app e si riscrivono quando la cambi). Registra i file con quei nomi (`score_1_0.mp3` = "quindici zero"…), mettili in uno ZIP con una cartella per lingua (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e usa **Importa ZIP**. `LEGGIMI.txt` ha una colonna per lingua separata da tabulazioni, quindi si apre bene anche come foglio di calcolo. Le registrazioni hanno sempre la precedenza sulla sintesi; i nomi restano letti dalla sintesi.
 - **Usa file audio pre-generati** (facoltativo): con **Genera file** l'app crea una volta gli 84 file con la voce scelta (anche una voce *online*, se in quel momento c'è internet) e poi li usa al posto della sintesi continua. Suona più "a pezzi", ma è utile per portarsi offline una voce online.
 - **Cassa esterna**: basta accoppiarla al telefono in Bluetooth; la voce esce sul canale multimediale (regola il volume media).
 
@@ -130,7 +130,7 @@ Particolarità:
 - **10-6 … 10-9** nel super tie-break: in francese, spagnolo e portoghese si dice "dix **à** huit", "diez **a** ocho", "dez **a** oito", perché "dix huit" / "diez ocho" / "dez oito" si sentono come *diciotto*.
 - **Portoghese**: una sola opzione, con interfaccia e voce preferita del Brasile (se manca la voce brasiliana si usa quella portoghese) e le chiamate del copione FPT, con parole valide nei due paesi ("jogo" e non "game", "partida"). "Um set a um" è diventato "sets iguais": al singolare *set* si pronuncia come *sete* e sembrava 7-1.
 - **Pronuncia** (`voice/Pronunciation.kt`): tutte le frasi di tutte le lingue sono state fatte leggere alle voci Google e trascritte con whisper. Correzioni aggiunte: in tedesco "Tie-Break" si fa leggere "Taibreak", con una virgola davanti (altrimenti "Teilbreg" o "bei Detailbreak"); in francese la "à" isolata dei file pre-generati si fa leggere "a" (altrimenti "a accent grave"). **Samsung TTS nelle nuove lingue non è ancora stato provato.**
-- **Braccialetti** (firmware 2.2): l'app manda da sola la lingua a ogni collegamento e quando la cambi; il braccialetto la salva e la usa anche da scollegato (ricerca del telefono, ricarica, spegnimento), senza accenti perché il font è ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o precedente i messaggi mandati dall'app sono tradotti, quelli interni del braccialetto restano in italiano.
+- **Braccialetti** (firmware 2.2): l'app manda da sola la lingua a ogni collegamento e quando la cambi; il braccialetto la salva e la usa anche da scollegato (ricerca del telefono, ricarica, spegnimento), senza accenti perché il font è ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o precedente i messaggi mandati dall'app sono tradotti, quelli interni del braccialetto restano in italiano. Un braccialetto appena programmato parte in italiano; dal firmware 2.2.2 il suo messaggio di collegamento viene riscritto nella lingua dell'app appena questa gliela manda, circa un secondo dopo il collegamento.
 
 ## 5. Firmware dei braccialetti (Arduino IDE)
 
@@ -146,7 +146,7 @@ Particolarità:
    **Dopo il caricamento**, se il display resta nero (il braccialetto è rimasto in modalità programmazione), premi **una volta** il tasto laterale: riparte con il programma nuovo.
 8. All'avvio il braccialetto mostra il suo nome, es. **TSM-3FA2** (si può cambiare dall'app, vedi 6.1). Ripeti per il secondo braccialetto.
 
-> **Firmware 2.2.1**: anche il conto alla rovescia prima dello spegnimento nella lingua dell'app (6). **Firmware 2.2**: i testi del braccialetto nella lingua dell'app (4.1). **Firmware 2.1**: la schermata di ricarica (6.2); le impostazioni, *Identifica* e lo spegnimento dall'app richiedono almeno il 2.0. Carica `TSM_Band.ino` su **entrambi** i braccialetti; con un firmware vecchio l'app lo dice nel pannello delle impostazioni e il resto continua a funzionare.
+> **Firmware 2.2.2**: il messaggio di collegamento passa alla lingua dell'app appena arriva (4.1); *VINCULANDO…/VINCULADA* in spagnolo e *PAREADA* in portoghese come nell'app, *MANCHES* in francese nella schermata dei game. **Firmware 2.2.1**: anche il conto alla rovescia prima dello spegnimento nella lingua dell'app (6). **Firmware 2.2**: i testi del braccialetto nella lingua dell'app (4.1). **Firmware 2.1**: la schermata di ricarica (6.2); le impostazioni, *Identifica* e lo spegnimento dall'app richiedono almeno il 2.0. Carica `TSM_Band.ino` su **entrambi** i braccialetti; con un firmware vecchio l'app lo dice nel pannello delle impostazioni e il resto continua a funzionare.
 
 ## 6. Usare i braccialetti
 
@@ -247,7 +247,7 @@ Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone
 | Come arriva al monitor | Cosa serve | Pro | Contro |
 |---|---|---|---|
 | **Secondo telefono con uscita video** + cavo USB-C/HDMI, app TSM in *Usa come tabellone* | un telefono che esce in video dalla USB-C (DisplayPort Alt Mode) | niente internet; il tabellone occupa tutto il monitor in 16:9 e il telefono resta libero | molti telefoni **non** escono in video: in genere sì i Galaxy S/Note/Tab S (con DeX: scegli *Duplica schermo* o disattiva l'avvio automatico di DeX), no quasi tutti i Galaxy A. Controlla "DisplayPort" / "uscita video" nella scheda tecnica |
-| **Chromecast** (o Google TV Streamer) sul monitor + un telefono qualsiasi con TSM in *Usa come tabellone* e **Trasmetti schermo** (Smart View sui Samsung) | Chromecast configurato una volta con Google Home sulla rete dell'hotspot | qualsiasi telefono va bene, nessun cavo lungo | il Chromecast vuole **internet** (dati mobili sull'hotspot); ritardo di circa 1 s; la trasmissione mostra lo schermo del telefono (in orizzontale) |
+| **Chromecast** (o Google TV Streamer) sul monitor + un telefono qualsiasi con TSM in *Usa come tabellone* e **Trasmetti** (*Trasmissione schermo* fino ad Android 14, Smart View sui Samsung) | Chromecast configurato una volta con Google Home sulla rete dell'hotspot | qualsiasi telefono va bene, nessun cavo lungo | il Chromecast vuole **internet** (dati mobili sull'hotspot); ritardo di circa 1 s; la trasmissione mostra lo schermo del telefono (in orizzontale) |
 | **Browser** su qualsiasi apparecchio collegato al monitor (portatile, tablet, TV box, Fire TV Stick…) | inquadrare il QR o scrivere l'indirizzo | nessuna app da installare | lo schermo si spegne da solo se non lo imposti; si tocca **SCHERMO INTERO** a ogni apertura |
 
 **Perché non via Bluetooth**: il telefono dell'arbitro regge già i due braccialetti in Bluetooth, dove contano i tempi dei tasti; il Wi-Fi è separato, più veloce e arriva più lontano. **Perché non dal solo telefono dell'arbitro al Chromecast** (senza secondo telefono): si può fare, ma serve una app "ricevitore" registrata presso Google (Google Cast Developer Console, 5 $ una tantum) e pubblicata su un sito https; è un passo successivo possibile.
@@ -276,13 +276,13 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 2. Il telefono **cerca da solo** il telefono dell'arbitro (annuncio sulla rete e scansione dell'hotspot, pochi secondi) e si ricorda l'ultimo indirizzo. Se non lo trova: controlla hotspot e *Tabellone su TV*, poi **Cerca di nuovo**, oppure scrivi l'indirizzo mostrato dall'arbitro e **Collega**.
 3. Il tabellone va a schermo intero, in orizzontale, con lo schermo sempre acceso.
    - **Con il cavo HDMI**: il tabellone va sul monitor nel suo formato; il telefono mostra *Il tabellone è sul monitor esterno* con la luminosità al minimo (**Mostra anche qui** per vederlo anche sul telefono). Staccando il cavo torna sul telefono.
-   - **Con il Chromecast**: apri la tendina › **Trasmetti schermo** / **Smart View** › scegli il Chromecast.
+   - **Con il Chromecast**: apri la tendina › **Trasmetti** (o **Trasmissione schermo**) / **Smart View** › scegli il Chromecast.
 4. Se il telefono dell'arbitro sparisce (fuori portata, app chiusa) compare *CONNESSIONE PERSA - RICONNESSIONE...* e dopo 20 secondi lo ricerca da solo, anche se ha cambiato indirizzo.
 5. Per uscire: **indietro due volte**.
 
 **Da un browser** (portatile, TV box): inquadra il QR o scrivi l'indirizzo, poi tocca **SCHERMO INTERO** (compare muovendo il mouse o toccando lo schermo). Imposta lo spegnimento dello schermo su *mai*: in una pagina http il browser non può tenerlo acceso da solo.
 
-**Anteprima senza telefoni**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in un browser (anche `&state=ad`, `tb`, `end`, `idle`, `doubles`) mostra il tabellone con dati di prova.
+**Anteprima senza telefoni**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in un browser (anche `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`) mostra il tabellone con dati di prova.
 
 ## 9. Regole applicate (ITF) e scelte concordate
 

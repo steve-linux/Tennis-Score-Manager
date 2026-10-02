@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.3** · firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versões usadas e verificadas: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Se o Android Studio sugerir o **AGP Upgrade Assistant**, pode ignorá-lo: estas versões foram compiladas e testadas assim.
 6. JDK do Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (o incluído, que é o padrão).
 7. **Build › Make Project**: deve terminar com *BUILD SUCCESSFUL*.
-8. Opcional: os testes (74: regras, voz, idiomas, bateria e recarga, ajustes das pulseiras, placar na TV) são executados com o botão direito em `app/src/test` › **Run Tests**.
+8. Opcional: os testes (76: regras, voz, idiomas, bateria e recarga, ajustes das pulseiras, placar na TV) são executados com o botão direito em `app/src/test` › **Run Tests**.
 
 ## 3. Instalar o app no telefone
 
@@ -103,7 +103,7 @@ bash installa_tsm.sh
   - **Testar voz**: lê uma sequência de anúncios de exemplo com os nomes digitados. Enquanto lê, o botão vira **Parar o teste**: toque de novo para interrompê-lo (ele também para sozinho quando você sai da página). A síntese de voz não pode ser pausada no meio de uma frase, por isso o botão a interrompe; tocando de novo, ela recomeça do início.
 - Se faltar a voz do idioma escolhido: **Configurações › Gerenciamento geral › Idioma › Conversão de texto em voz** (ou *Saída de conversão de texto em voz*) → baixe a voz desse idioma para o mecanismo escolhido (o app também mostra o botão **Instalar voz**).
 - **Pronúncia**: alguns mecanismos erram palavras do tênis (em italiano, "primo set" lido como "primo settembre", "tie-break" lido como "time break"). O app as corrige sozinho (`voice/Pronunciation.kt`); as correções foram verificadas transcrevendo o áudio real do Samsung e do Google.
-- **Gravações personalizadas** (a voz mais natural de todas: a sua ou a de um árbitro): na pasta `Android/data/com.tennis.scoremanager/files/voice/` há o `LEGGIMI.txt` ("leia-me", em italiano) com a lista das 84 chaves e das frases. Grave os arquivos com esses nomes (`score_1_0.mp3` = "quinze-zero"…), coloque-os num ZIP com uma pasta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e use **Importar ZIP**. O `LEGGIMI.txt` tem uma coluna por idioma, separadas por tabulações, então também abre bem como planilha. As gravações sempre têm prioridade sobre a síntese; os nomes continuam sendo lidos pela síntese.
+- **Gravações personalizadas** (a voz mais natural de todas: a sua ou a de um árbitro): na pasta `Android/data/com.tennis.scoremanager/files/voice/` há o `LEGGIMI.txt` ("leia-me"; as explicações do início ficam no idioma do app e são reescritas quando você o muda) com a lista das 84 chaves e das frases. Grave os arquivos com esses nomes (`score_1_0.mp3` = "quinze-zero"…), coloque-os num ZIP com uma pasta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e use **Importar ZIP**. O `LEGGIMI.txt` tem uma coluna por idioma, separadas por tabulações, então também abre bem como planilha. As gravações sempre têm prioridade sobre a síntese; os nomes continuam sendo lidos pela síntese.
 - **Usar arquivos de áudio pré-gerados** (opcional): com **Gerar arquivos** o app cria uma vez os 84 arquivos com a voz escolhida (até mesmo uma voz *online*, se naquele momento houver internet) e depois os usa no lugar da síntese contínua. Soa mais "picotado", mas é útil para levar offline uma voz online.
 - **Caixa de som externa** (coluna): basta pareá-la com o telefone por Bluetooth; a voz sai pelo canal de mídia (ajuste o volume de mídia).
 
@@ -130,7 +130,7 @@ Particularidades:
 - **10-6 … 10-9** no tie-break decisivo: em francês, espanhol e português diz-se "dix **à** huit", "diez **a** ocho", "dez **a** oito", porque "dix huit" / "diez ocho" / "dez oito" soam como *dezoito*.
 - **Português**: uma única opção, com interface e voz preferida do Brasil (se faltar a voz brasileira, usa-se a de Portugal) e os anúncios do roteiro da FPT, com palavras válidas nos dois países ("jogo" e não "game", "partida"). "Um set a um" virou "sets iguais": no singular, *set* é pronunciado como *sete* e parecia 7-1.
 - **Pronúncia** (`voice/Pronunciation.kt`): todas as frases de todos os idiomas foram lidas pelas vozes do Google e transcritas com o whisper. Correções acrescentadas: em alemão "Tie-Break" é lido como "Taibreak", com uma vírgula antes (senão sai "Teilbreg" ou "bei Detailbreak"); em francês o "à" isolado dos arquivos pré-gerados é lido como "a" (senão sai "a accent grave"). **O Samsung TTS nos novos idiomas ainda não foi testado.**
-- **Pulseiras** (firmware 2.2): o app envia sozinho o idioma a cada conexão e quando você o muda; a pulseira o salva e o usa também quando está desconectada (busca do telefone, recarga, desligamento), sem acentos porque a fonte é ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Com um firmware 2.1 ou anterior, as mensagens enviadas pelo app saem traduzidas, mas as mensagens internas da pulseira continuam em italiano.
+- **Pulseiras** (firmware 2.2): o app envia sozinho o idioma a cada conexão e quando você o muda; a pulseira o salva e o usa também quando está desconectada (busca do telefone, recarga, desligamento), sem acentos porque a fonte é ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Com um firmware 2.1 ou anterior, as mensagens enviadas pelo app saem traduzidas, mas as mensagens internas da pulseira continuam em italiano. Uma pulseira recém-programada começa em italiano; a partir do firmware 2.2.2, a mensagem de conexão é reescrita no idioma do app assim que ele o envia, cerca de um segundo depois de conectar.
 
 ## 5. Firmware das pulseiras (Arduino IDE)
 
@@ -146,7 +146,7 @@ Particularidades:
    **Depois do envio**, se a tela continuar preta (a pulseira ficou no modo de programação), pressione **uma vez** o botão lateral: ela reinicia com o programa novo.
 8. Ao iniciar, a pulseira mostra o seu nome, ex. **TSM-3FA2** (pode ser mudado pelo app, veja 6.1). Repita para a segunda pulseira.
 
-> **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
+> **Firmware 2.2.2**: a mensagem de conexão passa para o idioma do app assim que ele chega (4.1); em espanhol *VINCULANDO…/VINCULADA* e em português *PAREADA*, como no app; em francês *MANCHES* na tela dos jogos. **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
 
 ## 6. Usar as pulseiras
 
@@ -159,7 +159,7 @@ Particularidades:
 | Botão lateral | um clique liga; clique duplo desliga (função do hardware) |
 
 - Ao ligar, pisca **PAREANDO...** (acesa 0,35 s a cada 2 s, para economizar). O app se conecta sozinho às pulseiras que já conhece assim que é aberto; as novas ele encontra na página 2.
-- Conectada: **PAREADO** por 3 segundos com dois bipes, depois **PAREADA COM** + o nome do jogador.
+- Conectada: **PAREADA** por 3 segundos com dois bipes, depois **PAREADA COM** + o nome do jogador.
 - A cada ponto a tela acende com o placar do jogo em tamanho grande (à esquerda o seu, à direita o do adversário; a bolinha verde indica quem serve) e depois apaga. No fim do jogo mostra jogos e sets.
 
 **Desligamento automático** (os tempos são mudados no app, 6.1):
@@ -240,14 +240,14 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
 
 ## 8. Placar na TV ou no monitor
 
-O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEC** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.
+O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.
 
 ### 8.1 Os caminhos possíveis
 
 | Como chega ao monitor | O que é preciso | Prós | Contras |
 |---|---|---|---|
 | **Segundo telefone com saída de vídeo** + cabo USB-C/HDMI, app TSM em *Usar como placar* | um telefone com saída de vídeo pela USB-C (DisplayPort Alt Mode) | sem internet; o placar ocupa todo o monitor em 16:9 e o telefone fica livre | muitos telefones **não** têm saída de vídeo: em geral têm os Galaxy S/Note/Tab S (com DeX: escolha *Espelhamento de tela* ou desative o início automático do DeX), e quase nenhum Galaxy A. Procure "DisplayPort" / "saída de vídeo" na ficha técnica |
-| **Chromecast** (ou Google TV Streamer) no monitor + um telefone qualquer com o TSM em *Usar como placar* e **Transmitir tela** (Smart View nos Samsung) | Chromecast configurado uma vez com o Google Home na rede do hotspot | qualquer telefone serve, nenhum cabo longo | o Chromecast precisa de **internet** (dados móveis no hotspot); atraso de cerca de 1 s; a transmissão mostra a tela do telefone (na horizontal) |
+| **Chromecast** (ou Google TV Streamer) no monitor + um telefone qualquer com o TSM em *Usar como placar* e o botão de transmissão (**Transmitir**, **Transmissão** ou **Transmissão de tela**, conforme a versão do Android; Smart View nos Samsung) | Chromecast configurado uma vez com o Google Home na rede do hotspot | qualquer telefone serve, nenhum cabo longo | o Chromecast precisa de **internet** (dados móveis no hotspot); atraso de cerca de 1 s; a transmissão mostra a tela do telefone (na horizontal) |
 | **Navegador** em qualquer aparelho ligado ao monitor (computador portátil, tablet, TV box, Fire TV Stick…) | ler o QR ou digitar o endereço | nenhum app para instalar | a tela se apaga sozinha se você não configurar; é preciso tocar em **TELA CHEIA** toda vez que abrir |
 
 **Por que não por Bluetooth**: o telefone do árbitro já cuida das duas pulseiras por Bluetooth, onde os tempos dos botões importam; o Wi-Fi é separado, mais rápido e chega mais longe. **Por que não só do telefone do árbitro para o Chromecast** (sem segundo telefone): é possível, mas é preciso um app "receptor" registrado no Google (Google Cast Developer Console, US$ 5, pagamento único) e publicado num site https; é um próximo passo possível.
@@ -276,13 +276,13 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 2. O telefone **procura sozinho** o telefone do árbitro (anúncio na rede e varredura do hotspot, poucos segundos) e lembra o último endereço. Se não o encontrar: verifique o hotspot e o *Placar na TV*, depois **Procurar de novo**, ou digite o endereço mostrado pelo árbitro e toque em **Conectar**.
 3. O placar fica em tela cheia, na horizontal, com a tela sempre acesa.
    - **Com o cabo HDMI**: o placar vai para o monitor, no formato dele; o telefone mostra *O placar está no monitor externo* com o brilho no mínimo (**Mostrar aqui também** para vê-lo também no telefone). Tirando o cabo, ele volta para o telefone.
-   - **Com o Chromecast**: abra o painel de configurações rápidas › **Transmitir tela** / **Smart View** › escolha o Chromecast.
+   - **Com o Chromecast**: abra o painel de configurações rápidas › **Transmitir** (ou **Transmissão**, **Transmissão de tela**) / **Smart View** › escolha o Chromecast.
 4. Se o telefone do árbitro sumir (fora de alcance, app fechado), aparece *CONEXÃO PERDIDA - RECONECTANDO...* e depois de 20 segundos ele o procura de novo sozinho, mesmo que o endereço tenha mudado.
 5. Para sair: **voltar duas vezes**.
 
 **Num navegador** (computador portátil, TV box): leia o QR ou digite o endereço, depois toque em **TELA CHEIA** (aparece ao mover o mouse ou tocar na tela). Configure o tempo limite da tela para *nunca*: numa página http o navegador não consegue mantê-la acesa sozinho.
 
-**Prévia sem telefones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` num navegador (também `&state=ad`, `tb`, `end`, `idle`, `doubles`) mostra o placar com dados de teste.
+**Prévia sem telefones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` num navegador (também `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`) mostra o placar com dados de teste.
 
 ## 9. Regras aplicadas (ITF) e escolhas combinadas
 

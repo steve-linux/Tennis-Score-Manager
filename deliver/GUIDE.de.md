@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.3** · Firmware **2.2.1** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x.
+Verwendete und geprüfte Versionen: App **2.3.1** · Firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Schlägt Android Studio den **AGP Upgrade Assistant** vor, kannst du ihn ignorieren: Diese Versionen wurden genau so gebaut und getestet.
 6. JDK für Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (das mitgelieferte, ist voreingestellt).
 7. **Build › Make Project**: muss mit *BUILD SUCCESSFUL* enden.
-8. Optional: Die Tests (74: Regeln, Stimme, Sprachen, Akku und Laden, Armband-Einstellungen, TV-Anzeigetafel) startest du per Rechtsklick auf `app/src/test` › **Run Tests**.
+8. Optional: Die Tests (76: Regeln, Stimme, Sprachen, Akku und Laden, Armband-Einstellungen, TV-Anzeigetafel) startest du per Rechtsklick auf `app/src/test` › **Run Tests**.
 
 ## 3. App auf dem Telefon installieren
 
@@ -103,7 +103,7 @@ bash installa_tsm.sh
   - **Stimme testen**: spricht eine Folge von Beispielansagen mit den eingegebenen Namen. Während des Sprechens wird die Taste zu **Test beenden**: Tippe erneut darauf, um abzubrechen (der Test stoppt auch von selbst, wenn du die Seite verlässt). Die Sprachausgabe lässt sich nicht mitten im Satz anhalten, deshalb beendet die Taste sie; drückst du erneut, beginnt sie wieder von vorn.
 - Fehlt die Stimme der gewählten Sprache: **Einstellungen › Allgemeine Verwaltung › Sprache › Text-zu-Sprache** (oder *Text-zu-Sprache-Ausgabe*) → die Stimme dieser Sprache für die gewählte Engine herunterladen (die App zeigt auch die Taste **Stimme installieren**).
 - **Aussprache**: Manche Engines sprechen Tenniswörter falsch aus (auf Italienisch z. B. „primo set“ als „primo settembre“, „tie-break“ als „time break“). Die App korrigiert sie selbst (`voice/Pronunciation.kt`); die Korrekturen wurden geprüft, indem das echte Audio von Samsung und Google transkribiert wurde.
-- **Eigene Aufnahmen** (die natürlichste Stimme überhaupt: deine oder die eines Schiedsrichters): Im Ordner `Android/data/com.tennis.scoremanager/files/voice/` liegt `LEGGIMI.txt` (die „Lies mich“-Datei) mit der Liste der 84 Schlüssel und Sätze. Nimm die Dateien unter diesen Namen auf (`score_1_0.mp3` = „fünfzehn null“ …), pack sie in ein ZIP mit einem Ordner pro Sprache (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) und verwende **ZIP importieren**. `LEGGIMI.txt` hat eine Spalte pro Sprache, durch Tabulatoren getrennt, und lässt sich daher auch gut als Tabelle öffnen. Aufnahmen haben immer Vorrang vor der Sprachausgabe; die Namen spricht weiterhin die Sprachausgabe.
+- **Eigene Aufnahmen** (die natürlichste Stimme überhaupt: deine oder die eines Schiedsrichters): Im Ordner `Android/data/com.tennis.scoremanager/files/voice/` liegt `LEGGIMI.txt` (die „Lies mich“-Datei; die Erklärungen oben stehen in der Sprache der App und werden bei einem Sprachwechsel neu geschrieben) mit der Liste der 84 Schlüssel und Sätze. Nimm die Dateien unter diesen Namen auf (`score_1_0.mp3` = „fünfzehn null“ …), pack sie in ein ZIP mit einem Ordner pro Sprache (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) und verwende **ZIP importieren**. `LEGGIMI.txt` hat eine Spalte pro Sprache, durch Tabulatoren getrennt, und lässt sich daher auch gut als Tabelle öffnen. Aufnahmen haben immer Vorrang vor der Sprachausgabe; die Namen spricht weiterhin die Sprachausgabe.
 - **Vorab erzeugte Audiodateien verwenden** (optional): Mit **Dateien erzeugen** legt die App einmalig die 84 Dateien mit der gewählten Stimme an (auch mit einer *Online*-Stimme, wenn gerade Internet da ist) und verwendet sie dann statt der laufenden Sprachausgabe. Das klingt eher „zusammengestückelt“, ist aber praktisch, um eine Online-Stimme offline mitzunehmen.
 - **Externer Lautsprecher**: einfach per Bluetooth mit dem Telefon koppeln; die Stimme kommt über den Medienkanal (Medienlautstärke einstellen).
 
@@ -130,7 +130,7 @@ Besonderheiten:
 - **10:6 … 10:9** im Match-Tie-Break: Auf Französisch, Spanisch und Portugiesisch sagt man „dix **à** huit“, „diez **a** ocho“, „dez **a** oito“, weil „dix huit“ / „diez ocho“ / „dez oito“ wie *achtzehn* klingen.
 - **Portugiesisch**: nur eine Option, mit Oberfläche und bevorzugter Stimme aus Brasilien (fehlt die brasilianische Stimme, wird die portugiesische verwendet) und den Ansagen aus dem FPT-Text, mit Wörtern, die in beiden Ländern gelten („jogo“ und nicht „game“, „partida“). Aus „Um set a um“ wurde „sets iguais“: Im Singular klingt *set* wie *sete* (sieben), und es hörte sich nach 7:1 an.
 - **Aussprache** (`voice/Pronunciation.kt`): Alle Sätze aller Sprachen wurden von den Google-Stimmen vorgelesen und mit whisper transkribiert. Hinzugekommene Korrekturen: Im Deutschen wird „Tie-Break“ als „Taibreak“ gesprochen, mit einem Komma davor (sonst „Teilbreg“ oder „bei Detailbreak“); im Französischen wird das einzelne „à“ der vorab erzeugten Dateien als „a“ gesprochen (sonst „a accent grave“). **Samsung TTS ist in den neuen Sprachen noch nicht getestet.**
-- **Armbänder** (Firmware 2.2): Die App schickt die Sprache von selbst bei jeder Verbindung und bei jeder Änderung; das Armband speichert sie und verwendet sie auch ohne Verbindung (Telefonsuche, Laden, Ausschalten), ohne Umlaute und Akzente, weil die Schrift nur ASCII kennt (*EN CHARGE*, *LAEDT*, *CARGANDO* …). Mit Firmware 2.1 oder älter sind die Meldungen, die die App schickt, übersetzt; die internen Texte des Armbands bleiben italienisch.
+- **Armbänder** (Firmware 2.2): Die App schickt die Sprache von selbst bei jeder Verbindung und bei jeder Änderung; das Armband speichert sie und verwendet sie auch ohne Verbindung (Telefonsuche, Laden, Ausschalten), ohne Umlaute und Akzente, weil die Schrift nur ASCII kennt (*EN CHARGE*, *LAEDT*, *CARGANDO* …). Mit Firmware 2.1 oder älter sind die Meldungen, die die App schickt, übersetzt; die internen Texte des Armbands bleiben italienisch. Ein frisch programmiertes Armband startet auf Italienisch; ab Firmware 2.2.2 wird seine Verbindungsmeldung in der Sprache der App neu gezeichnet, sobald die App sie schickt, etwa eine Sekunde nach dem Verbinden.
 
 ## 5. Firmware der Armbänder (Arduino IDE)
 
@@ -146,7 +146,7 @@ Besonderheiten:
    **Nach dem Hochladen**: Bleibt das Display schwarz (das Armband ist im Programmiermodus geblieben), drücke **einmal** die Seitentaste: Es startet mit dem neuen Programm.
 8. Beim Start zeigt das Armband seinen Namen, z. B. **TSM-3FA2** (in der App änderbar, siehe 6.1). Wiederhole das Ganze für das zweite Armband.
 
-> **Firmware 2.2.1**: auch der Countdown vor dem Ausschalten in der Sprache der App (6). **Firmware 2.2**: die Texte des Armbands in der Sprache der App (4.1). **Firmware 2.1**: der Ladebildschirm (6.2); die Einstellungen, *Erkennen* und das Ausschalten aus der App brauchen mindestens 2.0. Lade `TSM_Band.ino` auf **beide** Armbänder; bei alter Firmware sagt die App das im Einstellungsbereich, und alles andere funktioniert weiter.
+> **Firmware 2.2.2**: Die Verbindungsmeldung wechselt in die Sprache der App, sobald diese ankommt (4.1); Spanisch *VINCULANDO…/VINCULADA* und Portugiesisch *PAREADA* wie in der App, Französisch *MANCHES* auf dem Spielstand-Bildschirm. **Firmware 2.2.1**: auch der Countdown vor dem Ausschalten in der Sprache der App (6). **Firmware 2.2**: die Texte des Armbands in der Sprache der App (4.1). **Firmware 2.1**: der Ladebildschirm (6.2); die Einstellungen, *Erkennen* und das Ausschalten aus der App brauchen mindestens 2.0. Lade `TSM_Band.ino` auf **beide** Armbänder; bei alter Firmware sagt die App das im Einstellungsbereich, und alles andere funktioniert weiter.
 
 ## 6. Die Armbänder benutzen
 
@@ -240,14 +240,14 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
 
 ## 8. Anzeigetafel auf TV oder Monitor
 
-Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEC** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
+Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
 
 ### 8.1 Die möglichen Wege
 
 | Wie es auf den Monitor kommt | Was du brauchst | Vorteile | Nachteile |
 |---|---|---|---|
 | **Zweites Telefon mit Videoausgang** + USB-C/HDMI-Kabel, TSM-App in *Als Anzeigetafel verwenden* | ein Telefon, das über USB-C Video ausgibt (DisplayPort Alt Mode) | kein Internet; die Anzeigetafel füllt den ganzen Monitor in 16:9, und das Telefon bleibt frei | viele Telefone geben **kein** Video aus: meist ja bei Galaxy S/Note/Tab S (mit DeX: *Bildschirmspiegelung* wählen oder den automatischen Start von DeX ausschalten), nein bei fast allen Galaxy A. Im Datenblatt nach „DisplayPort“ / „Videoausgang“ suchen |
-| **Chromecast** (oder Google TV Streamer) am Monitor + ein beliebiges Telefon mit TSM in *Als Anzeigetafel verwenden* und **Bildschirm übertragen** (Smart View bei Samsung) | Chromecast einmalig mit Google Home im Netz des Hotspots eingerichtet | jedes Telefon geht, kein langes Kabel | der Chromecast braucht **Internet** (mobile Daten am Hotspot); etwa 1 s Verzögerung; die Übertragung zeigt den Bildschirm des Telefons (im Querformat) |
+| **Chromecast** (oder Google TV Streamer) am Monitor + ein beliebiges Telefon mit TSM in *Als Anzeigetafel verwenden* und **Streamen** (*Bildschirm übertragen* bis Android 14, Smart View bei Samsung) | Chromecast einmalig mit Google Home im Netz des Hotspots eingerichtet | jedes Telefon geht, kein langes Kabel | der Chromecast braucht **Internet** (mobile Daten am Hotspot); etwa 1 s Verzögerung; die Übertragung zeigt den Bildschirm des Telefons (im Querformat) |
 | **Browser** auf einem beliebigen Gerät am Monitor (Laptop, Tablet, TV-Box, Fire TV Stick …) | QR-Code scannen oder Adresse eintippen | keine App zu installieren | der Bildschirm schaltet sich von selbst aus, wenn du das nicht einstellst; bei jedem Öffnen **VOLLBILD** antippen |
 
 **Warum nicht über Bluetooth**: Das Telefon des Schiedsrichters bedient schon die beiden Armbänder per Bluetooth, wo es auf das Timing der Tasten ankommt; das WLAN ist davon getrennt, schneller und reicht weiter. **Warum nicht allein vom Telefon des Schiedsrichters zum Chromecast** (ohne zweites Telefon): Das ginge, braucht aber eine bei Google registrierte „Receiver“-App (Google Cast Developer Console, einmalig 5 $), die auf einer https-Website veröffentlicht ist; ein möglicher nächster Schritt.
@@ -276,13 +276,13 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 2. Das Telefon **sucht selbst** nach dem Telefon des Schiedsrichters (Ankündigung im Netz und Scan des Hotspots, wenige Sekunden) und merkt sich die letzte Adresse. Findet es ihn nicht: Hotspot und *TV-Anzeigetafel* prüfen, dann **Erneut suchen**, oder die vom Schiedsrichter angezeigte Adresse eintippen und **Verbinden**.
 3. Die Anzeigetafel läuft im Vollbild, im Querformat, mit dauerhaft eingeschaltetem Bildschirm.
    - **Mit HDMI-Kabel**: Die Anzeigetafel erscheint im Format des Monitors auf dem Monitor; das Telefon zeigt *Die Anzeigetafel ist auf dem externen Monitor* bei minimaler Helligkeit (**Auch hier zeigen**, um sie auch auf dem Telefon zu sehen). Nach dem Abziehen des Kabels kehrt sie auf das Telefon zurück.
-   - **Mit Chromecast**: Schnelleinstellungen öffnen › **Bildschirm übertragen** / **Smart View** › den Chromecast wählen.
+   - **Mit Chromecast**: Schnelleinstellungen öffnen › **Streamen** (oder **Bildschirm übertragen**) / **Smart View** › den Chromecast wählen.
 4. Verschwindet das Telefon des Schiedsrichters (außer Reichweite, App geschlossen), erscheint *VERBINDUNG VERLOREN - NEUER VERSUCH...*, und nach 20 Sekunden sucht es von selbst erneut danach, auch wenn sich die Adresse geändert hat.
 5. Zum Beenden: **zweimal Zurück**.
 
 **Aus einem Browser** (Laptop, TV-Box): QR-Code scannen oder Adresse eintippen, dann **VOLLBILD** antippen (erscheint, wenn du die Maus bewegst oder den Bildschirm berührst). Stell das automatische Ausschalten des Bildschirms auf *nie*: Auf einer http-Seite kann der Browser den Bildschirm nicht selbst eingeschaltet halten.
 
-**Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&state=ad`, `tb`, `end`, `idle`, `doubles`) zeigt die Anzeigetafel mit Testdaten.
+**Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `de`, `es`, `pt` und `&state=ad`, `tb`, `end`, `idle`, `doubles`) zeigt die Anzeigetafel mit Testdaten.
 
 ## 9. Angewandte Regeln (ITF) und abgestimmte Entscheidungen
 
