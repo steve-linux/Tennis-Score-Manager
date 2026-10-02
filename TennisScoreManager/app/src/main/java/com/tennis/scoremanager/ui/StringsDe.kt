@@ -89,8 +89,12 @@ object DeStrings : Strings {
     override val voiceFilesHint = "Alles funktioniert ohne Internet mit den auf dem Telefon installierten Stimmen. Eigene Aufnahmen (ZIP) haben immer Vorrang vor der Sprachausgabe."
     override val generateVoice = "Dateien erzeugen"
     override val generating: (Int, Int) -> String = { n, tot -> "Erzeuge $n/$tot…" }
+    override val voiceGenerationFailed = "Erzeugung nicht abgeschlossen: Die bisherigen Sprachdateien bleiben unverändert."
     override val importVoiceZip = "ZIP importieren"
+    override val voiceImportFailed = "ZIP nicht lesbar oder unvollständig: Keine Aufnahme wurde geändert."
     override val deleteCustomVoice = "Aufnahmen entfernen"
+    override val deleteCustomConfirmTitle = "Aufnahmen entfernen?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Die eigenen deutschen Aufnahmen ($n) werden vom Telefon gelöscht. Um sie zurückzubekommen, importiere das ZIP erneut." }
     override val ttsEngine = "Sprachausgabe-Engine"
     override val engineDefault = "Standard des Telefons"
     override val ttsVoice = "Stimme"
@@ -112,6 +116,8 @@ object DeStrings : Strings {
     override val stopVoiceTest = "Test beenden"
     override val ttsMissing = "Die deutsche Stimme der Sprachausgabe ist auf dem Telefon nicht installiert."
     override val installVoice = "Stimme installieren"
+    override val ttsEngineError = "Sprachausgabe nicht verfügbar: Prüfe die Engine in den Android-Einstellungen."
+    override val openTtsSettings = "Einstellungen öffnen"
     override val formatSection = "Matchformat"
     override val formatBestOfThree = "2 Gewinnsätze · Tie-Break bis 7"
     override val formatBestOfThreeHint = "Auf zwei Gewinnsätze, Tie-Break bei 6 beide in jedem Satz."

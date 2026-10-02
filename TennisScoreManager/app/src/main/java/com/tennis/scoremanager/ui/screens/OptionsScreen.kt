@@ -230,11 +230,14 @@ fun OptionsScreen(c: MatchController) {
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
+            // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
+            val generating = c.voiceProgress.collectAsState().value != null
             Segmented(
                 Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
                 selected = o.lang.ordinal,
                 onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
                 columns = 2,
+                enabled = !generating,
             )
             Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
         }
@@ -457,9 +460,12 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
     val currentEngine by c.announcer.currentEngineFlow.collectAsState()
     val zipLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { c.importVoiceZip(it) } }
     val total = Phrases.keys.size
+    // Durante "Genera file" motore, voce, lingua, prova e audio non si toccano: i file uscirebbero misti o interrotti.
+    val generating = progress != null
+    var confirmDelete by remember { mutableStateOf(false) }
 
     SectionCard(s.audioSection, Icons.AutoMirrored.Filled.VolumeUp) {
-        SwitchRow(Icons.Filled.RecordVoiceOver, s.voiceCalls, null, o.audio) { v -> c.updateOptions { it.copy(audio = v) } }
+        SwitchRow(Icons.Filled.RecordVoiceOver, s.voiceCalls, null, o.audio, enabled = !generating) { v -> c.updateOptions { it.copy(audio = v) } }
 
         // Motore: Samsung, Google, ... (i nomi delle voci cambiano col motore, quindi si riparte da "automatica")
         val engineLabel = engines.firstOrNull { it.pkg == (o.ttsEngine ?: currentEngine) }?.label
@@ -467,6 +473,7 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             label = s.ttsEngine,
             value = if (o.ttsEngine == null) "${s.engineDefault}${engineLabel?.let { " ($it)" } ?: ""}" else engineLabel ?: o.ttsEngine,
             options = listOf<Pair<String?, String>>(null to s.engineDefault) + engines.map { it.pkg to it.label },
+            enabled = !generating,
         ) { pkg -> c.updateOptions { it.copy(ttsEngine = pkg, ttsVoice = null) } }
 
         Picker(
@@ -475,14 +482,26 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             else voiceLabel(o.ttsVoice, s),
             options = listOf<Pair<String?, String>>(null to s.voiceAuto) +
                 voices.map { it.name to "${voiceLabel(it.name, s)} · ${if (it.online) s.online else s.offline}" },
+            enabled = !generating,
         ) { name -> c.updateOptions { it.copy(ttsVoice = name) } }
 
-        if (tts == TtsStatus.MISSING_LANGUAGE || tts == TtsStatus.ERROR) {
+        if (tts == TtsStatus.MISSING_LANGUAGE) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(s.ttsMissing, color = TsmColors.Orange, modifier = Modifier.weight(1f), fontSize = 13.sp)
                 TextButton(onClick = {
                     runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
                 }) { Text(s.installVoice) }
+            }
+        }
+        // Il motore non parte: installare una voce non serve, si apre la pagina "Sintesi vocale" di Android
+        // (o le Impostazioni, se il telefono non ce l'ha).
+        if (tts == TtsStatus.ERROR) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(s.ttsEngineError, color = TsmColors.Orange, modifier = Modifier.weight(1f), fontSize = 13.sp)
+                TextButton(onClick = {
+                    runCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
+                        .onFailure { runCatching { context.startActivity(Intent(Settings.ACTION_SETTINGS)) } }
+                }) { Text(s.openTtsSettings) }
             }
         }
         // Lo stesso tasto avvia e ferma la prova; uscendo dalla pagina si ferma da sola.
@@ -493,6 +512,7 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             if (testing) s.stopVoiceTest else s.testVoice,
             if (testing) Icons.Filled.StopCircle else Icons.Filled.PlayCircle,
             Modifier.fillMaxWidth(),
+            enabled = !generating,
         ) { if (testing) c.stopVoiceTest() else c.testVoice() }
         Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
 
@@ -502,20 +522,39 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             SmallAction(s.importVoiceZip, Icons.Filled.FolderZip, Modifier.weight(1f)) {
                 zipLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
             }
-            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = custom > 0) { c.deleteCustomVoice() }
+            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = custom > 0) { confirmDelete = true }
         }
 
         // File pre-generati (facoltativi)
-        SwitchRow(Icons.Filled.FolderZip, s.voiceFilesMode, s.voiceFilesModeHint, o.voiceFiles) { v -> c.updateOptions { it.copy(voiceFiles = v) } }
+        SwitchRow(Icons.Filled.FolderZip, s.voiceFilesMode, s.voiceFilesModeHint, o.voiceFiles, enabled = !generating) { v ->
+            c.updateOptions { it.copy(voiceFiles = v) }
+        }
         if (o.voiceFiles) {
             Text(s.voiceFiles(generated, total), color = if (generated == total) TsmColors.Ok else TsmColors.Orange, fontWeight = FontWeight.Bold)
             progress?.let { (i, n) ->
                 Text(s.generating(i, n), color = TsmColors.TextMain)
                 LinearProgressIndicator(progress = { if (n == 0) 0f else i / n.toFloat() }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
             }
-            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.fillMaxWidth(), enabled = progress == null) { c.generateVoice() }
+            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.fillMaxWidth(), enabled = !generating) { c.generateVoice() }
         }
         Text(c.voice.baseDir.absolutePath, color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+
+    // Le registrazioni rimosse non si recuperano: si chiede conferma come per "Nuova partita" ed "Esci".
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            icon = { Icon(Icons.Filled.DeleteOutline, null, tint = TsmColors.Orange) },
+            title = { Text(s.deleteCustomConfirmTitle) },
+            text = { Text(s.deleteCustomConfirmText(custom)) },
+            confirmButton = {
+                Button(onClick = {
+                    confirmDelete = false
+                    c.deleteCustomVoice()
+                }) { Text(s.deleteCustomVoice) }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(s.cancel) } },
+        )
     }
 }
 

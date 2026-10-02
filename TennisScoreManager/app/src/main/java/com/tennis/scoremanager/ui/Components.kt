@@ -48,6 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -219,9 +220,13 @@ data class SegOption(val label: String, val icon: ImageVector? = null, val color
 
 /** Selettore a segmenti (uno solo attivo). Con [columns] minore del numero di opzioni va a capo in più righe. */
 @Composable
-fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size) {
+fun Segmented(
+    options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size,
+    enabled: Boolean = true,
+) {
     Column(
-        modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
+        modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(14.dp))
+            .border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
     ) {
         options.chunked(columns.coerceAtLeast(1)).forEachIndexed { r, row ->
             Row(Modifier.fillMaxWidth()) {
@@ -231,7 +236,7 @@ fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, 
                     Row(
                         Modifier.weight(1f)
                             .background(if (sel) o.color else Color.Transparent)
-                            .clickable(role = Role.RadioButton) { onSelect(i) }
+                            .clickable(enabled = enabled, role = Role.RadioButton) { onSelect(i) }
                             .padding(vertical = 12.dp, horizontal = 8.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
@@ -258,9 +263,10 @@ fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, 
 }
 
 @Composable
-fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
+fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { onChange(!checked) }.padding(vertical = 4.dp),
+        Modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(12.dp))
+            .clickable(enabled = enabled) { onChange(!checked) }.padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, null, tint = TsmColors.TextDim)
@@ -272,6 +278,7 @@ fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean,
         Switch(
             checked = checked,
             onCheckedChange = onChange,
+            enabled = enabled,
             colors = SwitchDefaults.colors(checkedTrackColor = TsmColors.Ball, checkedThumbColor = TsmColors.OnBall),
         )
     }
@@ -354,13 +361,13 @@ fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null, 
 
 /** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
 @Composable
-fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
+fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, enabled: Boolean = true, onSelect: (T) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f)) {
         Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
         Spacer(Modifier.height(4.dp))
         Box {
-            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), enabled = enabled, shape = RoundedCornerShape(12.dp)) {
                 Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
             }

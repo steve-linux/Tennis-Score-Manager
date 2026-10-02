@@ -92,8 +92,12 @@ object FrStrings : Strings {
     override val voiceFilesHint = "Tout fonctionne sans internet avec les voix installées sur le téléphone. Les enregistrements personnalisés (ZIP) ont toujours la priorité sur la synthèse vocale."
     override val generateVoice = "Générer les fichiers"
     override val generating: (Int, Int) -> String = { n, tot -> "Génération $n/$tot…" }
+    override val voiceGenerationFailed = "Génération non terminée : les fichiers vocaux précédents restent inchangés."
     override val importVoiceZip = "Importer un ZIP"
+    override val voiceImportFailed = "ZIP illisible ou incomplet : aucun enregistrement n'a été modifié."
     override val deleteCustomVoice = "Supprimer les enregistrements"
+    override val deleteCustomConfirmTitle = "Supprimer les enregistrements ?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Les enregistrements personnalisés en français ($n) sont effacés du téléphone. Pour les récupérer, importez de nouveau le ZIP." }
     override val ttsEngine = "Moteur de synthèse vocale"
     override val engineDefault = "Par défaut du téléphone"
     override val ttsVoice = "Voix"
@@ -115,6 +119,8 @@ object FrStrings : Strings {
     override val stopVoiceTest = "Arrêter le test"
     override val ttsMissing = "La voix française de la synthèse vocale n'est pas installée sur ce téléphone."
     override val installVoice = "Installer la voix"
+    override val ttsEngineError = "Synthèse vocale indisponible : vérifiez le moteur dans les Paramètres d'Android."
+    override val openTtsSettings = "Ouvrir les paramètres"
     override val formatSection = "Format du match"
     override val formatBestOfThree = "3 manches · jeu décisif à 7"
     override val formatBestOfThreeHint = "Au meilleur des trois manches, jeu décisif à 6-6 dans chaque manche."

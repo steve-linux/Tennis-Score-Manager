@@ -990,19 +990,25 @@ class MatchController(
         val l = options.value.lang
         scope.launch {
             voiceProgress.value = 0 to com.tennis.scoremanager.voice.Phrases.keys.size
-            val ok = announcer.generateVoicePack(l) { i, n -> voiceProgress.value = i to n }
-            voiceProgress.value = null
+            val r = try {
+                announcer.generateVoicePack(l) { i, n -> voiceProgress.value = i to n }
+            } finally {
+                voiceProgress.value = null
+            }
             refreshVoiceCount()
-            _toasts.tryEmit(strings.voiceFiles(ok, com.tennis.scoremanager.voice.Phrases.keys.size))
+            _toasts.tryEmit(if (r.installed) strings.voiceFiles(r.created, r.total) else strings.voiceGenerationFailed)
         }
     }
 
     fun importVoiceZip(uri: Uri) {
         val l = options.value.lang
         scope.launch {
-            val n = withContext(io) { runCatching { voice.importZip(uri, l) }.getOrDefault(0) }
+            // ZIP rovinato o troncato: le registrazioni restano com'erano e si avvisa (non "0 file").
+            val n = withContext(io) {
+                runCatching { voice.importZip(uri, l) }.onFailure { android.util.Log.w("Voice", "Import ZIP", it) }.getOrNull()
+            }
             refreshVoiceCount()
-            _toasts.tryEmit(strings.voiceFiles(n, com.tennis.scoremanager.voice.Phrases.keys.size))
+            _toasts.tryEmit(if (n == null) strings.voiceImportFailed else strings.voiceFiles(n, com.tennis.scoremanager.voice.Phrases.keys.size))
         }
     }
 

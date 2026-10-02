@@ -101,8 +101,13 @@ interface Strings {
     val voiceFilesHint: String
     val generateVoice: String
     val generating: (Int, Int) -> String
+    /** "Genera file" non arrivato in fondo: restano i file di prima. */
+    val voiceGenerationFailed: String
     val importVoiceZip: String
+    val voiceImportFailed: String
     val deleteCustomVoice: String
+    val deleteCustomConfirmTitle: String
+    val deleteCustomConfirmText: (Int) -> String
     val ttsEngine: String
     val engineDefault: String
     val ttsVoice: String
@@ -120,6 +125,9 @@ interface Strings {
     val stopVoiceTest: String
     val ttsMissing: String
     val installVoice: String
+    /** Il motore di sintesi vocale non parte: installare una voce non serve. */
+    val ttsEngineError: String
+    val openTtsSettings: String
     val formatSection: String
     val formatBestOfThree: String
     val formatBestOfThreeHint: String
@@ -413,8 +421,12 @@ object ItStrings : Strings {
     override val voiceFilesHint = "Tutto funziona senza internet con le voci installate sul telefono. Le registrazioni personalizzate (ZIP) hanno sempre la precedenza sulla sintesi vocale."
     override val generateVoice = "Genera file"
     override val generating: (Int, Int) -> String = { n, tot -> "Generazione $n/$tot…" }
+    override val voiceGenerationFailed = "Generazione non completata: i file vocali di prima restano com'erano."
     override val importVoiceZip = "Importa ZIP"
+    override val voiceImportFailed = "ZIP non leggibile o incompleto: nessuna registrazione è cambiata."
     override val deleteCustomVoice = "Rimuovi registrazioni"
+    override val deleteCustomConfirmTitle = "Rimuovere le registrazioni?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Le registrazioni personalizzate in italiano ($n) vengono cancellate dal telefono. Per riaverle bisogna importare di nuovo lo ZIP." }
     override val ttsEngine = "Motore sintesi vocale"
     override val engineDefault = "Predefinito del telefono"
     override val ttsVoice = "Voce"
@@ -436,6 +448,8 @@ object ItStrings : Strings {
     override val stopVoiceTest = "Ferma la prova"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
     override val installVoice = "Installa voce"
+    override val ttsEngineError = "Sintesi vocale non disponibile: controlla il motore in Impostazioni di Android."
+    override val openTtsSettings = "Apri impostazioni"
     override val formatSection = "Formato partita"
     override val formatBestOfThree = "3 set · tie-break a 7"
     override val formatBestOfThreeHint = "Al meglio dei tre set, tie-break sul 6-6 in ogni set."
@@ -717,8 +731,12 @@ object EnStrings : Strings {
     override val voiceFilesHint = "Everything works offline with the voices installed on the phone. Custom recordings (ZIP) always take precedence over text-to-speech."
     override val generateVoice = "Generate files"
     override val generating: (Int, Int) -> String = { n, tot -> "Generating $n/$tot…" }
+    override val voiceGenerationFailed = "Generation not completed: the previous voice files are unchanged."
     override val importVoiceZip = "Import ZIP"
+    override val voiceImportFailed = "ZIP unreadable or incomplete: no recordings were changed."
     override val deleteCustomVoice = "Remove recordings"
+    override val deleteCustomConfirmTitle = "Remove the recordings?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "The custom English recordings ($n) are deleted from the phone. To get them back, import the ZIP again." }
     override val ttsEngine = "Speech engine"
     override val engineDefault = "Phone default"
     override val ttsVoice = "Voice"
@@ -740,6 +758,8 @@ object EnStrings : Strings {
     override val stopVoiceTest = "Stop the test"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
     override val installVoice = "Install voice"
+    override val ttsEngineError = "Text-to-speech is not available: check the engine in Android Settings."
+    override val openTtsSettings = "Open settings"
     override val formatSection = "Match format"
     override val formatBestOfThree = "3 sets · tie-break to 7"
     override val formatBestOfThreeHint = "Best of three sets, tie-break at 6-6 in every set."
