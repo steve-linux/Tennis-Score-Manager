@@ -6,15 +6,24 @@ import java.util.UUID
 /**
  * Protocollo BLE condiviso con il firmware del braccialetto (TSM_Band.ino): tenere allineati gli UUID.
  *
- * Braccialetto -> telefono (notify su EVENT): [tipo, sequenza] più, dal firmware 2.0, il motivo dello spegnimento.
+ * Braccialetto -> telefono (notify su EVENT): [tipo, sequenza] più, dal firmware 2.0, il motivo dello spegnimento;
+ * dal firmware 2.3 anche [id di accensione (4 byte, little endian), età dell'evento in decimi di secondo]: vedi [parseEvent].
  * Telefono -> braccialetto (write su DISPLAY): testo ASCII con campi separati da '|':
  *   P|<mio>|<avversario>|<servizio 0/1/2>|<intestazione>        punteggio del game (grande)
  *   G|<miei game>|<game avv>|<miei set>|<set avv>|<intestazione> riepilogo a fine game
  *   M|<riga 1>|<riga 2>|<secondi>                                messaggio
  *   I|<riga 1>|<riga 2>|<secondi>|<RRGGBB>                       "Identifica": lampeggia e suona (firmware 2.0)
  *   O|<riga 1>|<riga 2>                                          si spegne (firmware 2.0)
+ *   H|1                                                          confermo gli eventi (app 2.4): prima delle notifiche
+ *   K|<sequenza>                                                 conferma di un evento (solo ai firmware 2.3)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
  * I firmware vecchi ignorano i tipi che non conoscono.
+ *
+ * Conferma dei tasti (firmware 2.3 + app 2.4): il braccialetto tiene in coda KEY1/KEY2 finché l'app non li conferma
+ * e suona il bip di conferma solo allora; dopo una riconnessione rimanda quelli non confermati (fino a 6,5 s dalla
+ * pressione) e a 8 s li dà per persi ("NON INVIATO"). L'app conferma anche i doppioni ma li applica una volta sola
+ * ([EventDedupe]). Senza "H|1" (app vecchia) il firmware 2.3 suona all'invio come prima; senza id di accensione
+ * (firmware vecchio) l'app non manda conferme.
  */
 object BandProtocol {
     val SERVICE: UUID = UUID.fromString("7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10")
@@ -60,6 +69,51 @@ object BandProtocol {
         "I|${clean(line1)}|${clean(line2, 28)}|$seconds|${"%06X".format(rgb and 0xFFFFFF)}"
 
     fun powerOff(line1: String, line2: String) = "O|${clean(line1)}|${clean(line2, 28)}"
+
+    /** L'app conferma gli eventi su questa connessione. Va scritto prima di attivare le notifiche di EVENT. */
+    const val HELLO = "H|1"
+
+    /** Conferma dell'evento [seq]: il braccialetto suona il bip di conferma. */
+    fun ack(seq: Int) = "K|$seq"
+
+    /** Evento da EVENT; null se troppo corto. Gli eventi dei firmware prima della 2.3 hanno [boot] null. */
+    fun parseEvent(b: ByteArray): RawBandEvent? {
+        if (b.size < 2) return null
+        fun u(i: Int) = b[i].toInt() and 0xFF
+        val boot = if (b.size >= 7) u(3).toLong() or (u(4).toLong() shl 8) or (u(5).toLong() shl 16) or (u(6).toLong() shl 24) else null
+        return RawBandEvent(
+            type = u(0),
+            seq = u(1),
+            extra = if (b.size >= 3) u(2) else null,
+            boot = boot,
+            ageMs = if (b.size >= 8) u(7) * 100 else 0,
+        )
+    }
+}
+
+/**
+ * Evento così come arriva dal braccialetto. [boot]: id casuale di quell'accensione (firmware 2.3), null prima;
+ * [ageMs]: da quanto è stato premuto il tasto (più di zero se rimandato dopo una riconnessione).
+ */
+data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: Long?, val ageMs: Int)
+
+/**
+ * Eventi già ricevuti, per braccialetto e accensione. Un evento rimandato dopo una riconnessione (la conferma
+ * era andata persa) si conferma di nuovo ma non si applica una seconda volta. Il braccialetto rimanda solo
+ * eventi di meno di 8 s: la finestra di 30 s basta e la sequenza (8 bit) non fa in tempo a ripetersi.
+ */
+class EventDedupe(private val windowMs: Long = 30_000) {
+    private val seen = mutableMapOf<String, MutableMap<Int, Long>>()
+
+    /** true la prima volta che arriva quell'evento ([now] in ms, orologio monotono). */
+    fun firstTime(address: String, boot: Long, seq: Int, now: Long): Boolean {
+        seen.values.forEach { m -> m.values.removeAll { now - it > windowMs } }
+        seen.values.removeAll { it.isEmpty() }
+        val m = seen.getOrPut("$address/$boot") { mutableMapOf() }
+        if (seq in m) return false
+        m[seq] = now
+        return true
+    }
 }
 
 /**

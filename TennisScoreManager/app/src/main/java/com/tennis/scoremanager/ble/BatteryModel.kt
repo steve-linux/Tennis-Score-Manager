@@ -55,17 +55,24 @@ object BatteryModel {
         3770 to 30, 3750 to 25, 3730 to 20, 3710 to 15, 3690 to 10, 3610 to 5, 3270 to 0,
     )
 
+    /** Tensioni plausibili per la LiPo: fuori da qui la lettura del braccialetto è fallita (i firmware 2.2 mandano "mv=0"). */
+    val PLAUSIBLE_MV = 2500..5000
+
+    /**
+     * null se il testo non è uno stato valido. Uno stato con una tensione impossibile si scarta tutto: con "mv=0"
+     * la batteria risultava allo 0 % (falso allarme che zittiva quelli veri) e la stima dei consumi si sballava.
+     */
     fun parse(text: String): BandStatus? {
         val map = text.split(';').mapNotNull { part ->
             val kv = part.split('=', limit = 2)
             if (kv.size == 2) kv[0].trim() to kv[1].trim() else null
         }.toMap()
-        val mv = map["mv"]?.toIntOrNull() ?: return null
+        val mv = map["mv"]?.toIntOrNull()?.takeIf { it in PLAUSIBLE_MV } ?: return null
         return BandStatus(
             millivolts = mv,
             charging = map["chg"] == "1",
-            uptimeS = map["up"]?.toLongOrNull() ?: 0,
-            displayS = map["dsp"]?.toLongOrNull() ?: 0,
+            uptimeS = map["up"]?.toLongOrNull()?.takeIf { it >= 0 } ?: 0,
+            displayS = map["dsp"]?.toLongOrNull()?.takeIf { it >= 0 } ?: 0,
             usbMv = map["usb"]?.toIntOrNull(),
             full = map["full"] == "1",
             percent = map["pct"]?.toIntOrNull()?.takeIf { it in 0..100 },
