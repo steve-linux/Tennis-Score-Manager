@@ -19,6 +19,17 @@ class BatteryModelTest {
     }
 
     @Test
+    fun failedVoltageReadIsDiscarded() {
+        // firmware 2.2 con la lettura del PM1 fallita: "mv=0" (e "chg=1"), non una batteria a zero
+        assertNull(BatteryModel.parse("mv=0;chg=1;up=600;dsp=20;usb=0;full=0;pct=-1"))
+        assertNull(BatteryModel.parse("mv=2400;chg=0;up=600;dsp=20"))
+        assertNull(BatteryModel.parse("mv=65535;chg=0;up=600;dsp=20"))
+        // ai limiti della LiPo vale ancora
+        assertEquals(3300, BatteryModel.parse("mv=3300;chg=0;up=600;dsp=20")!!.millivolts)
+        assertNull(BatteryModel.parse("mv=3300;chg=0;up=600;dsp=20;usb=0;full=0;pct=-1")!!.percent)
+    }
+
+    @Test
     fun parseChargeStatus() {
         // firmware 2.1: col cavo "chg" resta 1 anche a carica completa
         val c = BatteryModel.parse("mv=4150;chg=1;up=60;dsp=30;usb=5012;full=0;pct=62")!!

@@ -24,6 +24,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
 import android.os.SystemClock
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.model.Side
@@ -101,6 +102,13 @@ class BleManager(context: Context) {
     private var scanJob: Job? = null
     /** Ricerca automatica voluta (pagina dei braccialetti aperta): riparte da sola se Bluetooth o posizione tornano. */
     private var autoScan = false
+    /** La ricerca è davvero avviata nel sistema (startScan riuscito e non fallito dopo). */
+    private var scanRunning = false
+    private var scanStartJob: Job? = null
+    private var scanStopJob: Job? = null
+    private val scanThrottle = ScanThrottle()
+    /** Eventi già ricevuti (per braccialetto e accensione): vale anche tra una connessione e l'altra. */
+    private val dedupe = EventDedupe()
 
     init {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -110,10 +118,10 @@ class BleManager(context: Context) {
                 _adapterOn.value = st == BluetoothAdapter.STATE_ON
                 if (st == BluetoothAdapter.STATE_ON) {
                     links.values.forEach { it.connect() }
-                    if (autoScan) startScan()
+                    if (autoScan) ensureScan()
                 }
                 if (st == BluetoothAdapter.STATE_OFF) {
-                    stopScan()
+                    stopScanNow()
                     links.values.forEach { it.onAdapterOff() }
                 }
             }
@@ -133,15 +141,27 @@ class BleManager(context: Context) {
         val on = LocationHelper.isEnabled(app)
         val was = _locationOn.value
         _locationOn.value = on
-        if (on && !was && autoScan) startScan()
+        // Fino ad Android 11 senza posizione la ricerca non restituisce niente: quando torna la si riavvia.
+        if (on && !was && autoScan) restartScan()
     }
 
     val isSupported: Boolean get() = adapter != null && app.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
     val isEnabled: Boolean get() = adapter?.isEnabled == true
 
-    fun hasPermissions(): Boolean = requiredPermissions().all {
-        ContextCompat.checkSelfPermission(app, it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun granted(p: String) = ContextCompat.checkSelfPermission(app, p) == PackageManager.PERMISSION_GRANTED
+
+    /** Per collegarsi a un braccialetto già associato: da Android 12 basta BLUETOOTH_CONNECT (la posizione no). */
+    fun canConnect(): Boolean = Build.VERSION.SDK_INT < 31 || granted(Manifest.permission.BLUETOOTH_CONNECT)
+
+    /**
+     * Per la ricerca: da Android 12 BLUETOOTH_SCAN, dichiarato "neverForLocation" nel manifest, quindi la posizione
+     * non serve (va bene anche quella approssimativa); prima di Android 12 serve la posizione precisa.
+     */
+    fun canScan(): Boolean =
+        if (Build.VERSION.SDK_INT >= 31) granted(Manifest.permission.BLUETOOTH_SCAN) else granted(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    /** Tutto quello che serve ai braccialetti (ricerca e collegamento). La richiesta ([requiredPermissions]) chiede anche la posizione. */
+    fun hasPermissions(): Boolean = canScan() && canConnect()
 
     /**
      * Ricerca automatica e continua dei braccialetti finché [on] (la pagina dei braccialetti è aperta).
@@ -150,45 +170,89 @@ class BleManager(context: Context) {
      */
     fun setAutoScan(on: Boolean) {
         autoScan = on
-        if (on) startScan() else stopScan()
+        if (on) {
+            scanStopJob?.cancel()
+            ensureScan()
+        } else {
+            // Si ferma con un attimo di ritardo: una pausa breve (dialogo dei permessi, Bluetooth da attivare)
+            // non deve costare un nuovo avvio. Android ne permette 5 in 30 s, poi la ricerca non parte e basta.
+            scanStopJob?.cancel()
+            scanStopJob = scope.launch {
+                delay(SCAN_STOP_GRACE_MS)
+                stopScanNow()
+            }
+        }
     }
 
-    private fun startScan(): Boolean {
-        val scanner = adapter?.bluetoothLeScanner ?: return false
-        if (!hasPermissions() || !isEnabled) return false
-        stopScan()
-        val filters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-        return runCatching {
-            scanner.startScan(filters, settings, scanCallback)
-            _scanning.value = true
-            scanJob = scope.launch {
-                var sinceRestart = 0L
-                while (true) {
-                    delay(2_000)
-                    val now = SystemClock.elapsedRealtime()
-                    _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
-                    // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
-                    sinceRestart += 2_000
-                    if (sinceRestart >= 10 * 60_000L) {
-                        sinceRestart = 0
-                        runCatching {
-                            scanner.stopScan(scanCallback)
-                            scanner.startScan(filters, settings, scanCallback)
-                        }
-                    }
+    /** Avvia la ricerca se è voluta e non è già avviata (o in partenza), rispettando il limite di avvii di Android. */
+    private fun ensureScan(retryInMs: Long = 0) {
+        if (!autoScan || scanRunning || scanStartJob?.isActive == true) return
+        if (!canScan() || !isEnabled || adapter?.bluetoothLeScanner == null) {
+            _scanning.value = false
+            return
+        }
+        _scanning.value = true  // in partenza: per chi guarda è già "ricerca in corso"
+        scanStartJob = scope.launch {
+            delay(maxOf(retryInMs, scanThrottle.delayBeforeStart(SystemClock.elapsedRealtime())))
+            startScanNow()
+        }
+    }
+
+    private fun restartScan() {
+        if (scanRunning) {
+            scanJob?.cancel()
+            runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+            scanRunning = false
+        }
+        ensureScan()
+    }
+
+    private fun startScanNow() {
+        val scanner = adapter?.bluetoothLeScanner
+        if (!autoScan || scanner == null || !canScan() || !isEnabled) {
+            _scanning.value = false
+            return
+        }
+        val ok = runCatching { scanner.startScan(scanFilters, scanSettings, scanCallback) }.isSuccess
+        scanThrottle.recordStart(SystemClock.elapsedRealtime())
+        if (!ok) {
+            _scanning.value = false
+            ensureScan(retryInMs = SCAN_RETRY_MS)
+            return
+        }
+        scanRunning = true
+        _scanning.value = true
+        scanJob?.cancel()
+        scanJob = scope.launch {
+            var sinceRestart = 0L
+            while (true) {
+                delay(2_000)
+                val now = SystemClock.elapsedRealtime()
+                _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
+                // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
+                sinceRestart += 2_000
+                if (sinceRestart >= 10 * 60_000L) {
+                    sinceRestart = 0
+                    restartScan()
+                    break
                 }
             }
-        }.isSuccess
+        }
     }
 
-    private fun stopScan() {
+    private fun stopScanNow() {
+        scanStopJob?.cancel()
+        scanStartJob?.cancel()
         scanJob?.cancel()
         scanJob = null
-        if (_scanning.value) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+        if (scanRunning) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+        scanRunning = false
         _scanning.value = false
         _found.value = emptyList()
     }
+
+    private val scanFilters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
+    private val scanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -196,6 +260,20 @@ class BleManager(context: Context) {
             val name = result.scanRecord?.deviceName ?: runCatching { result.device.name }.getOrNull() ?: "TSM-Band"
             val band = FoundBand(addr, name, result.rssi, SystemClock.elapsedRealtime())
             _found.update { list -> (list.filterNot { it.address == addr } + band).sortedBy { it.name } }
+            // Un braccialetto associato che trasmette è acceso e libero: lo si collega subito.
+            scope.launch { links.values.firstOrNull { it.address == addr }?.onSeen() }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            scope.launch {
+                Log.w(TAG, "ricerca fallita: $errorCode")
+                if (errorCode == SCAN_FAILED_ALREADY_STARTED) return@launch  // è già avviata: i risultati arrivano
+                scanJob?.cancel()
+                scanRunning = false
+                _scanning.value = false
+                // Troppi avvii (Android 13+ lo dice, prima tace) o errore del sistema: si riprova più tardi.
+                ensureScan(retryInMs = if (errorCode == SCAN_FAILED_TOO_FREQUENTLY) 30_000 else SCAN_RETRY_MS)
+            }
         }
     }
 
@@ -222,8 +300,11 @@ class BleManager(context: Context) {
         publish()
     }
 
-    /** Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi). */
-    fun reconnectAll() = links.values.forEach { it.connect() }
+    /**
+     * Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi, o tornando nell'app):
+     * un braccialetto che non rispondeva si riprova subito; uno spento resta in attesa in background.
+     */
+    fun reconnectAll() = links.values.forEach { it.retryNow() }
 
     /** Punteggi e messaggi: se ne arrivano altri prima dell'invio vale l'ultimo. */
     fun send(side: Side, payload: String) {
@@ -262,6 +343,8 @@ class BleManager(context: Context) {
         }
     }
 
+    private enum class OpKind { MTU, DESCRIPTOR, WRITE, READ }
+
     private inner class BandLink(var side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
@@ -274,16 +357,33 @@ class BleManager(context: Context) {
         private var setupWatchdog: Job? = null
         private val opLock = Mutex()
         @Volatile private var pendingOp: CompletableDeferred<Int>? = null
+        @Volatile private var pendingKind: OpKind? = null
         private val wake = Channel<Unit>(Channel.CONFLATED)
         private var latest: String? = null
         private var lastSeq = -1
+        /** Tentativo in corso in background (connectGatt con autoConnect): aspetta il braccialetto senza scadenza. */
+        private var background = false
+        /** Tentativi di fila finiti senza arrivare a READY. */
+        private var failures = 0
+        @Volatile private var mtu = DEFAULT_MTU
+        /** Fino a quando non si scrive sul display: "PAIRING OK" resta a schermo i suoi 3 secondi. */
+        private var quietUntil = 0L
+        private val acks = Channel<Int>(Channel.UNLIMITED)
         private val sender: Job = scope.launch {
             for (tick in wake) {
+                if (state != LinkState.READY) continue
+                val wait = quietUntil - SystemClock.elapsedRealtime()
+                if (wait > 0) delay(wait)
                 if (state != LinkState.READY) continue
                 val msg = latest ?: continue
                 latest = null
                 if (!write(msg) && latest == null) latest = msg
             }
+        }
+        /** Conferme dei tasti: partono subito, anche durante la configurazione (il braccialetto rimanda gli eventi appena ascoltiamo). */
+        private val acker: Job = scope.launch {
+            // Persa? Il braccialetto rimanda l'evento alla prossima connessione e lo si conferma di nuovo.
+            for (seq in acks) if (gatt != null) write(BandProtocol.ack(seq))
         }
 
         private fun changeState(s: LinkState) {
@@ -291,13 +391,43 @@ class BleManager(context: Context) {
             publish()
         }
 
-        fun connect() {
-            if (closed || gatt != null || !hasPermissions() || !isEnabled) return
+        /**
+         * Tentativo diretto (veloce, ma Android lo chiude dopo ~30 s) finché il braccialetto risponde; dopo uno
+         * spegnimento o [DIRECT_TRIES] tentativi a vuoto si aspetta in background: Android collega da solo il
+         * braccialetto quando torna a trasmettere, senza riprovare ogni pochi secondi per sempre.
+         */
+        fun connect(direct: Boolean = false) {
+            if (closed || !canConnect() || !isEnabled) return
+            if (gatt != null) {
+                // Un tentativo diretto prende il posto solo di un'attesa in background.
+                if (!direct || !background || state == LinkState.READY) return
+                runCatching { gatt?.close() }
+                gatt = null
+            }
             val dev = runCatching { adapter?.getRemoteDevice(address) }.getOrNull() ?: return
             retryJob?.cancel()
-            if (state != LinkState.POWERED_OFF) changeState(LinkState.CONNECTING)
-            gatt = runCatching { dev.connectGatt(app, false, callback, BluetoothDevice.TRANSPORT_LE) }.getOrNull()
-            if (gatt == null) scheduleReconnect()
+            val bg = !direct && (state == LinkState.POWERED_OFF || failures >= DIRECT_TRIES)
+            background = bg
+            if (state != LinkState.POWERED_OFF) changeState(if (bg) LinkState.IDLE else LinkState.CONNECTING)
+            gatt = runCatching { dev.connectGatt(app, bg, callback, BluetoothDevice.TRANSPORT_LE) }.getOrNull()
+            if (gatt == null) scheduleReconnect(wasBackground = bg, afterLoss = false)
+        }
+
+        /** Dall'app (ritorno in primo piano, permessi): chi non rispondeva si riprova subito, chi è spento no. */
+        fun retryNow() {
+            if (state == LinkState.POWERED_OFF) {
+                connect()
+            } else {
+                failures = 0
+                connect(direct = true)
+            }
+        }
+
+        /** La ricerca lo vede trasmettere: è acceso e libero, il tentativo diretto è più rapido dell'attesa in background. */
+        fun onSeen() {
+            if (!background || state == LinkState.READY) return
+            failures = 0
+            connect(direct = true)
         }
 
         fun onAdapterOff() {
@@ -316,19 +446,30 @@ class BleManager(context: Context) {
             closed = true
             retryJob?.cancel()
             sender.cancel()
+            acker.cancel()
             pendingOp?.complete(-1)
             runCatching { gatt?.disconnect() }
             runCatching { gatt?.close() }
             gatt = null
         }
 
-        private fun scheduleReconnect() {
+        private fun scheduleReconnect(wasBackground: Boolean, afterLoss: Boolean) {
             if (closed) return
             retryJob?.cancel()
             retryJob = scope.launch {
-                delay(if (state == LinkState.POWERED_OFF) 5_000 else 2_500)
+                delay(
+                    when {
+                        wasBackground -> 30_000   // l'attesa in background è finita male da sola: niente raffiche
+                        afterLoss -> 500          // collegamento appena perso: il braccialetto trasmette già di nuovo
+                        else -> 2_500
+                    },
+                )
                 connect()
             }
+        }
+
+        private fun completeOp(kind: OpKind, status: Int) {
+            if (pendingKind == kind) pendingOp?.complete(status)
         }
 
         private val callback = object : BluetoothGattCallback() {
@@ -336,13 +477,19 @@ class BleManager(context: Context) {
                 scope.launch {
                     if (g !== gatt) return@launch
                     if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
-                        lastSeq = -1  // il braccialetto può essere stato riacceso: la sequenza riparte
+                        lastSeq = -1  // firmware vecchi: il braccialetto può essere stato riacceso, la sequenza riparte
+                        background = false
+                        mtu = DEFAULT_MTU
+                        quietUntil = SystemClock.elapsedRealtime() + PAIRED_MSG_MS
                         setupWatchdog?.cancel()
                         setupWatchdog = scope.launch {
                             // Se la configurazione non finisce (callback persa) si ricomincia da capo.
                             delay(15_000)
                             if (gatt === g && state != LinkState.READY) runCatching { g.disconnect() }
                         }
+                        // Pausa prima della scoperta dei servizi (le librerie BLE di riferimento ne fanno una simile):
+                        // su alcuni telefoni la scoperta fallisce se parte mentre il braccialetto chiede i suoi
+                        // parametri di connessione. Dal firmware 2.3 un tasto premuto intanto resta in coda.
                         delay(400)
                         runCatching { g.discoverServices() }
                     } else {
@@ -350,8 +497,10 @@ class BleManager(context: Context) {
                         pendingOp?.complete(-1)
                         runCatching { g.close() }
                         gatt = null
+                        val wasReady = state == LinkState.READY
+                        if (wasReady) failures = 0 else failures++
                         if (state != LinkState.POWERED_OFF) changeState(LinkState.IDLE)
-                        scheduleReconnect()
+                        scheduleReconnect(wasBackground = background, afterLoss = wasReady)
                     }
                 }
             }
@@ -361,55 +510,54 @@ class BleManager(context: Context) {
             }
 
             override fun onMtuChanged(g: BluetoothGatt, mtu: Int, status: Int) {
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) this@BandLink.mtu = mtu
+                completeOp(OpKind.MTU, status)
             }
 
             override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
-                pendingOp?.complete(status)
+                completeOp(OpKind.DESCRIPTOR, status)
             }
 
             override fun onCharacteristicWrite(g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int) {
-                pendingOp?.complete(status)
+                completeOp(OpKind.WRITE, status)
             }
 
             override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray, status: Int) {
-                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, value)
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, value, fromRead = true)
+                completeOp(OpKind.READ, status)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
             override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int) {
                 if (Build.VERSION.SDK_INT >= 33) return
                 @Suppress("DEPRECATION")
-                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, c.value ?: byteArrayOf())
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, c.value ?: byteArrayOf(), fromRead = true)
+                completeOp(OpKind.READ, status)
             }
 
             override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray) {
-                handle(c.uuid, value)
+                handle(c.uuid, value, fromRead = false)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
             override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic) {
                 if (Build.VERSION.SDK_INT >= 33) return
                 @Suppress("DEPRECATION")
-                handle(c.uuid, c.value ?: byteArrayOf())
+                handle(c.uuid, c.value ?: byteArrayOf(), fromRead = false)
             }
         }
 
-        private fun handle(uuid: UUID, value: ByteArray) {
+        private fun handle(uuid: UUID, value: ByteArray, fromRead: Boolean) {
             val copy = value.copyOf()
             scope.launch {
+                // Con l'MTU minimo (23) le notifiche si fermano a 20 byte: impostazioni e stato arriverebbero
+                // tronchi. Una notifica piena si rilegge: la lettura prende il valore intero, a pezzi.
+                if (!fromRead && (uuid == BandProtocol.CONFIG || uuid == BandProtocol.STATUS) && copy.size >= mtu - 3) {
+                    readFull(uuid)
+                    return@launch
+                }
                 when (uuid) {
-                    BandProtocol.EVENT -> if (copy.size >= 2) {
-                        val type = copy[0].toInt() and 0xFF
-                        val seq = copy[1].toInt() and 0xFF
-                        if (seq == lastSeq) return@launch // stessa pressione ricevuta due volte
-                        lastSeq = seq
-                        if (type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
-                        val reason = if (type == BandProtocol.EVT_POWER_OFF && copy.size >= 3) copy[2].toInt() and 0xFF else null
-                        _events.tryEmit(BandEvent(side, type, reason))
-                    }
+                    BandProtocol.EVENT -> onEvent(copy)
                     BandProtocol.CONFIG -> BandSettings.parse(String(copy, Charsets.US_ASCII))?.let {
                         settings = it
                         publish()
@@ -427,48 +575,82 @@ class BleManager(context: Context) {
             }
         }
 
+        private fun onEvent(bytes: ByteArray) {
+            val ev = BandProtocol.parseEvent(bytes) ?: return
+            if (ev.boot != null) {
+                // Firmware 2.3: si conferma sempre (anche un doppione: la conferma di prima può essere andata
+                // persa), ma si applica una volta sola.
+                acks.trySend(ev.seq)
+                if (!dedupe.firstTime(address, ev.boot, ev.seq, SystemClock.elapsedRealtime())) {
+                    Log.i(TAG, "${side.name}: evento ${ev.seq} già ricevuto, solo confermato")
+                    return
+                }
+                if (ev.ageMs > 0) Log.i(TAG, "${side.name}: evento ${ev.seq} rimandato dopo ${ev.ageMs} ms")
+            } else {
+                if (ev.seq == lastSeq) return // stessa pressione ricevuta due volte
+                lastSeq = ev.seq
+            }
+            if (ev.type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
+            val reason = if (ev.type == BandProtocol.EVT_POWER_OFF) ev.extra else null
+            _events.tryEmit(BandEvent(side, ev.type, reason))
+        }
+
+        private suspend fun readFull(uuid: UUID) {
+            val g = gatt ?: return
+            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return
+            op(OpKind.READ) { g.readCharacteristic(c) }
+        }
+
         private suspend fun setup(g: BluetoothGatt) {
             val svc = g.getService(BandProtocol.SERVICE)
-            if (svc == null) {
+            val evt = svc?.getCharacteristic(BandProtocol.EVENT)
+            if (svc == null || evt == null) {
                 runCatching { g.disconnect() }
                 return
             }
-            op { g.requestMtu(185) }
+            // Prima di tutto i tasti: finché le notifiche di EVENT non sono attive il braccialetto non può
+            // mandarli (i firmware prima della 2.3 li perdono). "H|1" va prima: con le notifiche il firmware 2.3
+            // rimanda subito i tasti in coda e deve già sapere che li confermiamo. I firmware vecchi lo ignorano.
+            write(BandProtocol.HELLO)
             // Senza notifiche i tasti del braccialetto andrebbero persi: meglio riconnettersi.
-            val evt = svc.getCharacteristic(BandProtocol.EVENT)
-            if (evt == null || !enableNotify(g, evt)) {
+            if (!enableNotify(g, evt)) {
                 runCatching { g.disconnect() }
                 return
             }
+            // Senza risposta resta l'MTU minimo: le notifiche lunghe si rileggono (vedi handle()).
+            op(OpKind.MTU) { g.requestMtu(185) }
             g.getService(BandProtocol.BATTERY_SERVICE)?.getCharacteristic(BandProtocol.BATTERY_LEVEL)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.STATUS)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.CONFIG)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
             // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
             runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
             if (g !== gatt) return
             setupWatchdog?.cancel()
+            failures = 0
             changeState(LinkState.READY)
             _ready.tryEmit(side)
-            wake.trySend(Unit)
+            wake.trySend(Unit)  // un messaggio rimasto in sospeso parte quando finisce "PAIRING OK" (quietUntil)
         }
 
         /** Android esegue un'operazione GATT alla volta: le serializziamo e aspettiamo la callback. */
-        private suspend fun op(start: () -> Boolean): Boolean = opLock.withLock {
+        private suspend fun op(kind: OpKind, start: () -> Boolean): Boolean = opLock.withLock {
             val d = CompletableDeferred<Int>()
+            pendingKind = kind
             pendingOp = d
             val started = runCatching(start).getOrDefault(false)
             val result = if (started) withTimeoutOrNull(5_000) { d.await() } else null
             pendingOp = null
+            pendingKind = null
             result == BluetoothGatt.GATT_SUCCESS
         }
 
@@ -476,7 +658,7 @@ class BleManager(context: Context) {
             runCatching { g.setCharacteristicNotification(c, true) }
             val d = c.getDescriptor(BandProtocol.CCCD) ?: return false
             val value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            return op {
+            return op(OpKind.DESCRIPTOR) {
                 if (Build.VERSION.SDK_INT >= 33) {
                     g.writeDescriptor(d, value) == BluetoothStatusCodes.SUCCESS
                 } else {
@@ -496,7 +678,7 @@ class BleManager(context: Context) {
             val g = gatt ?: return false
             val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return false
             val bytes = msg.toByteArray(Charsets.US_ASCII).copyOf(minOf(msg.length, 180))
-            return op {
+            return op(OpKind.WRITE) {
                 if (Build.VERSION.SDK_INT >= 33) {
                     g.writeCharacteristic(c, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT) == BluetoothStatusCodes.SUCCESS
                 } else {
@@ -512,6 +694,17 @@ class BleManager(context: Context) {
     }
 
     companion object {
+        private const val TAG = "BleManager"
+        /** Tentativi diretti a vuoto prima di aspettare il braccialetto in background (~1,5 minuti). */
+        private const val DIRECT_TRIES = 3
+        private const val DEFAULT_MTU = 23
+        /** Il firmware mostra "PAIRING OK" per 3 s dal collegamento: prima nessun messaggio sul display. */
+        private const val PAIRED_MSG_MS = 3_200L
+        private const val SCAN_STOP_GRACE_MS = 1_500L
+        private const val SCAN_RETRY_MS = 5_000L
+        private const val SCAN_FAILED_ALREADY_STARTED = 1  // ScanCallback.SCAN_FAILED_ALREADY_STARTED
+        private const val SCAN_FAILED_TOO_FREQUENTLY = 6   // ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY (API 33)
+
         fun requiredPermissions(): Array<String> =
             if (Build.VERSION.SDK_INT >= 31) {
                 arrayOf(
@@ -523,5 +716,24 @@ class BleManager(context: Context) {
             } else {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+    }
+}
+
+/**
+ * Android blocca la sesta ricerca avviata in 30 s (fino ad Android 12 in silenzio: nessun errore, nessun
+ * risultato). Si tiene il conto degli avvii e si aspetta, con un margine: al massimo [maxStarts] ogni [windowMs].
+ */
+internal class ScanThrottle(private val maxStarts: Int = 4, private val windowMs: Long = 30_000) {
+    private val starts = ArrayDeque<Long>()
+
+    /** Millisecondi da aspettare prima del prossimo avvio (0 = subito). */
+    fun delayBeforeStart(now: Long): Long {
+        while (starts.isNotEmpty() && now - starts.first() >= windowMs) starts.removeFirst()
+        return if (starts.size < maxStarts) 0 else starts.first() + windowMs - now + 500
+    }
+
+    fun recordStart(now: Long) {
+        starts.addLast(now)
+        while (starts.size > maxStarts) starts.removeFirst()
     }
 }

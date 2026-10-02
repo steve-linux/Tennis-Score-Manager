@@ -7,9 +7,12 @@
     <!-- Bluetooth LE per i braccialetti (Android 12+ usa SCAN/CONNECT, prima BLUETOOTH/ADMIN) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- La ricerca serve solo a trovare i braccialetti, non a localizzare: da Android 12 niente posizione -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!-- Posizione: richiesta per i braccialetti e per il luogo nel riepilogo -->
+    <!-- Posizione: per il luogo nel riepilogo e, fino ad Android 11, per la ricerca dei braccialetti -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Servizio in primo piano durante la partita con i braccialetti -->

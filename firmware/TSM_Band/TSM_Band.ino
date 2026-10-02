@@ -6,6 +6,9 @@
   KEY2 corto  : annulla l'ultimo punto
   KEY2 lungo  : spegne il braccialetto (riaccensione: tasto laterale, un clic)
   Se non è collegato, un tasto qualsiasi rimanda lo spegnimento automatico.
+  Conferma dei tasti (dalla 2.3, con l'app 2.4): il bip di KEY1/KEY2 suona quando il telefono ha
+  ricevuto il tasto, non alla pressione. Un tasto non confermato entro 8 s (collegamento perso) non vale:
+  "NON INVIATO" e due bip bassi, va ripremuto. Con le app vecchie il bip suona all'invio, come prima.
 
   Ricarica (cavo USB): il braccialetto non si spegne da solo finché è alimentato e mostra la
   schermata di carica (percentuale, tensioni, da quanto è in carica, fine stimata) per 30 s,
@@ -31,6 +34,7 @@
 #include <M5Unified.h>
 #include <NimBLEDevice.h>
 #include <Preferences.h>
+#include <driver/rtc_io.h>
 
 #define FW_VERSION "2.2.2"
 
@@ -56,12 +60,19 @@ static const uint32_t CHARGE_GLANCE_MS     = 1500;                 // ...di 1,5 
 static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT spento da 20 s = carica completa
 static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
+static const uint32_t EVT_MAX_AGE_MS       = 8000;                 // tasto non confermato entro 8 s: non vale più, va ripremuto
+static const uint32_t EVT_SEND_MAX_MS      = 6500;                 // oltre non si (ri)manda: la conferma deve arrivare prima degli 8 s
+
+// Tasti dell'M5StickS3 (gli stessi pin di M5Unified), premuto = basso. Sono pin RTC (0-21 sull'S3):
+// possono svegliare il braccialetto dal deep sleep.
+static const gpio_num_t KEY1_PIN = GPIO_NUM_11;
+static const gpio_num_t KEY2_PIN = GPIO_NUM_12;
 
 // Testi mostrati dal braccialetto (solo ASCII, maiuscolo), una riga per lingua: vedi TXT[] più sotto.
 enum : uint8_t { L_IT, L_EN, L_FR, L_DE, L_ES, L_PT, N_LANG };
 static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "pt" };
 enum : uint8_t {
-  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_IDLE,
+  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_NOT_SENT, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
   T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, N_TXT
 };
@@ -73,6 +84,7 @@ enum : uint8_t {
 #define TXT_BATTERY    txt(T_BATTERY)
 #define TXT_CHARGING   txt(T_CHARGING)
 #define TXT_NO_LINK    txt(T_NO_LINK)
+#define TXT_NOT_SENT   txt(T_NOT_SENT)
 #define TXT_IDLE       txt(T_IDLE)
 #define TXT_HOLD_KEY1  txt(T_HOLD_KEY1)
 #define TXT_EMPTY      txt(T_EMPTY)
@@ -84,7 +96,7 @@ enum : uint8_t {
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
-#define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
+#define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // [tipo, seq, extra] + dalla 2.3 [id accensione x4, età in 1/10 s]
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
@@ -120,27 +132,27 @@ static char defaultName[13];
 // (%s durata, %d minuti, %ld secondi al conto alla rovescia).
 static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
-    "NON CONNESSO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
+    "NON CONNESSO", "NON INVIATO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
     "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
-    "NOT CONNECTED", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
+    "NOT CONNECTED", "NOT SENT", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
     "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
-    "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
+    "NON CONNECTE", "NON ENVOYE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
     "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
-    "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
+    "NICHT VERBUNDEN", "NICHT GESENDET", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
     "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
   { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
-    "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
+    "NO CONECTADO", "NO ENVIADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
     "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
   { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
-    "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
+    "SEM CONEXAO", "NAO ENVIADO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
     "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
 };
@@ -167,6 +179,23 @@ static char cfgBuf[192];
 static volatile bool cfgReady = false;
 
 static uint8_t  seqNo = 0;
+
+// Eventi dei tasti (dalla 2.3). Un evento parte solo se l'app ha attivato le notifiche di EVENT: prima
+// NimBLE non manda niente e non lo rimanda dopo. Resta in coda finché l'app non lo conferma ("K|seq");
+// a ogni nuova iscrizione (riconnessione) si rimanda quello che non è confermato, finché ha meno di 6,5 s;
+// a 8 s dalla pressione un evento non confermato è perso ("NON INVIATO").
+struct PendingEvt { uint8_t type; uint8_t seq; uint32_t at; bool sent; };
+static const uint8_t PEND_MAX = 6;
+static PendingEvt pending[PEND_MAX];
+static uint8_t  pendingN = 0;
+static uint32_t bootId = 0;                    // casuale a ogni accensione: l'app riconosce i doppioni anche dopo una riconnessione
+static volatile uint16_t connHandle = BLE_HS_CONN_HANDLE_NONE;
+static volatile bool subscribed = false;       // l'app ascolta EVENT su questa connessione
+static volatile bool justSubscribed = false;
+static volatile bool ackMode = false;          // l'app conferma gli eventi ("H|1" su questa connessione): bip alla conferma
+static uint8_t  ackBuf[8];                     // conferme ricevute dal task BLE, le usa il loop
+static volatile uint8_t ackN = 0;
+
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
 static uint32_t pairedOffAt = 0;       // displayOffAt del messaggio "PAIRING OK": finché è lo stesso, è ancora a schermo
@@ -368,11 +397,26 @@ static int socFromMv(int mv) {
   return 0;
 }
 
+// Letture dal PM1. Se la lettura I2C fallisce M5Unified dà 0 mV e, per CHG_STAT, "in carica": qui una
+// lettura fallita dà 0 mV (si riprova una volta) e "non in carica".
+static int batteryMv() {
+  int mv = M5.Power.getBatteryVoltage();
+  if (mv <= 2500) mv = M5.Power.getBatteryVoltage();
+  return mv > 2500 ? mv : 0;
+}
+
+static bool chargingNow() {
+  if (M5.getBoard() != m5::board_t::board_M5StickS3) return M5.Power.isCharging() == m5::Power_Class::is_charging;
+  uint8_t bits;
+  if (!M5.Power.M5pm1.getGPIOInputBits(&bits)) return false;
+  return !(bits & 0x01);  // PM1 G0 = CHG_STAT, basso = in carica
+}
+
 // Percentuale da mostrare: col cavo USB quella della carica, altrimenti dalla tensione (-1 = lettura fallita).
 static int batteryPct() {
   if (usbOn) return chgPct;
-  const int mv = M5.Power.getBatteryVoltage();
-  return mv > 2500 ? socFromMv(mv) : -1;
+  const int mv = batteryMv();
+  return mv > 0 ? socFromMv(mv) : -1;
 }
 
 // "42 MIN" oppure "1H 25"
@@ -672,6 +716,9 @@ static void identifyStep(uint32_t now) {
 // ------------------------------------------------------------------ BLE
 class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* s, NimBLEConnInfo& info) override {
+    connHandle = info.getConnHandle();
+    subscribed = false;
+    ackMode = false;   // ogni connessione la riannuncia ("H|1"): un'app vecchia non conferma
     connected = true;
     justConnected = true;
     // Intervallo 80-120 ms con latenza 3: senza traffico la radio si sveglia 2-3 volte al secondo
@@ -683,8 +730,19 @@ class ServerCallbacks : public NimBLEServerCallbacks {
     // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
     // (spegnerebbe il braccialetto in piena partita).
     advSince = millis();
+    subscribed = false;
+    ackMode = false;
     connected = false;
     justDisconnect = true;
+  }
+};
+
+// L'app attiva le notifiche di EVENT dopo aver scoperto i servizi: prima di allora un evento andrebbe perso.
+class EventCallbacks : public NimBLECharacteristicCallbacks {
+  void onSubscribe(NimBLECharacteristic* c, NimBLEConnInfo& info, uint16_t subValue) override {
+    const bool on = (subValue & 1) != 0;
+    if (on) justSubscribed = true;  // prima di "subscribed": il loop non deve inviare senza saperlo
+    subscribed = on;
   }
 };
 
@@ -699,8 +757,34 @@ static void copyValue(NimBLECharacteristic* c, char* buf, size_t size, volatile 
   portEXIT_CRITICAL(&rxMux);
 }
 
+// "H|1" (l'app conferma gli eventi) e "K|<seq>" (conferma) si gestiscono qui, senza passare da rxBuf:
+// così non cancellano un punteggio arrivato subito prima. I firmware vecchi ignorano i tipi che non conoscono.
 class DisplayCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override { copyValue(c, rxBuf, sizeof(rxBuf), rxReady); }
+  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override {
+    NimBLEAttValue v = c->getValue();
+    const size_t len = v.length();
+    if (len >= 2 && len <= 6 && v.data()[1] == '|') {
+      if (v.data()[0] == 'H') {
+        ackMode = true;
+        return;
+      }
+      if (v.data()[0] == 'K') {
+        char num[8];
+        memcpy(num, v.data() + 2, len - 2);
+        num[len - 2] = 0;
+        const uint8_t seq = (uint8_t)atoi(num);
+        portENTER_CRITICAL(&rxMux);
+        const uint8_t n = ackN;
+        if (n < sizeof(ackBuf)) {
+          ackBuf[n] = seq;
+          ackN = n + 1;
+        }
+        portEXIT_CRITICAL(&rxMux);
+        return;
+      }
+    }
+    copyValue(c, rxBuf, sizeof(rxBuf), rxReady);
+  }
 };
 
 class ConfigCallbacks : public NimBLECharacteristicCallbacks {
@@ -718,15 +802,106 @@ static void startAdvertising(bool fast) {
   advFast = fast;
 }
 
-static void sendEvent(uint8_t type, uint8_t extra = 0) {
-  if (!connected || !evtChr) return;
-  uint8_t data[3] = { type, ++seqNo, extra };
-  evtChr->setValue(data, 3);
-  evtChr->notify();
+// [tipo, seq, extra] come prima (le app vecchie leggono solo questi), poi id di accensione (4 byte) ed età
+// dell'evento in decimi di secondo. Si manda col valore nel pacchetto e alla sola connessione: due eventi di
+// fila non si sovrascrivono come con setValue() + notify().
+static bool sendEvent(uint8_t type, uint8_t seq, uint8_t extra, uint32_t ageMs) {
+  if (!connected || !subscribed || !evtChr) return false;
+  const uint32_t age = ageMs / 100;
+  const uint8_t data[8] = { type, seq, extra, (uint8_t)bootId, (uint8_t)(bootId >> 8), (uint8_t)(bootId >> 16),
+                            (uint8_t)(bootId >> 24), (uint8_t)(age > 255 ? 255 : age) };
+  evtChr->setValue(data, sizeof(data));
+  return evtChr->notify(data, sizeof(data), connHandle);
+}
+
+// Evento informativo (batteria, spegnimento): parte subito se l'app ascolta, senza conferma.
+static void sendNow(uint8_t type, uint8_t extra = 0) {
+  sendEvent(type, ++seqNo, extra, 0);
+}
+
+static void confirmBeep(uint8_t type) {
+  if (type == EVT_UNDO) beep(1800, 40);
+  else beep(2700, 40);
+}
+
+// Tasto mai arrivato al telefono: avviso ben diverso dal bip di conferma, va ripremuto.
+static void notSent(uint8_t type) {
+  identifyUntil = 0;
+  drawMessage(TXT_NOT_SENT, type == EVT_UNDO ? "KEY2" : "KEY1", C_RED);
+  showFor(2500);
+  blinkShown = false;           // il lampeggio "RICONNESSIONE" non lo copre subito
+  nextBlink = millis() + 2500;
+  beep(500, 120);
+  beep(350, 300);
+}
+
+static void removePending(uint8_t i) {
+  memmove(&pending[i], &pending[i + 1], (pendingN - i - 1) * sizeof(PendingEvt));
+  pendingN--;
+}
+
+// KEY1/KEY2 da collegati: in coda, li manda serviceEvents() (subito, se l'app ascolta già).
+static void queueEvent(uint8_t type, uint32_t now) {
+  if (pendingN == PEND_MAX) {
+    notSent(pending[0].type);
+    removePending(0);
+  }
+  pending[pendingN++] = { type, ++seqNo, now, false };
+}
+
+// A ogni giro del loop: conferme, rinvio dopo una riconnessione, scadenza e invio.
+static void serviceEvents(uint32_t now) {
+  uint8_t acks[sizeof(ackBuf)];
+  portENTER_CRITICAL(&rxMux);
+  const uint8_t nAck = ackN;
+  memcpy(acks, ackBuf, nAck);
+  ackN = 0;
+  portEXIT_CRITICAL(&rxMux);
+  for (uint8_t a = 0; a < nAck; a++) {
+    for (uint8_t i = 0; i < pendingN; i++) {
+      if (pending[i].seq != acks[a]) continue;
+      confirmBeep(pending[i].type);  // il telefono l'ha ricevuto: solo ora il bip di conferma
+      removePending(i);
+      break;
+    }
+  }
+  if (justSubscribed) {
+    justSubscribed = false;
+    for (uint8_t i = 0; i < pendingN; i++) pending[i].sent = false;  // l'invio precedente può essere andato perso
+  }
+  uint8_t lost = 0;
+  for (uint8_t i = 0; i < pendingN;) {
+    if ((int32_t)(now - pending[i].at) >= (int32_t)EVT_MAX_AGE_MS) {
+      lost = pending[i].type;
+      removePending(i);
+    } else {
+      i++;
+    }
+  }
+  if (lost) notSent(lost);
+  for (uint8_t i = 0; i < pendingN;) {
+    PendingEvt& e = pending[i];
+    // Già mandato, o troppo vecchio per avere la conferma in tempo (l'app lo applicherebbe mentre qui
+    // compare "NON INVIATO", e il tasto ripremuto conterebbe due volte).
+    if (e.sent || (int32_t)(now - e.at) >= (int32_t)EVT_SEND_MAX_MS) {
+      i++;
+      continue;
+    }
+    if (!sendEvent(e.type, e.seq, 0, now - e.at)) break;
+    if (ackMode) {
+      e.sent = true;
+      i++;
+    } else {
+      // App vecchia (non conferma): vale l'invio, come nei firmware 2.2.
+      confirmBeep(e.type);
+      removePending(i);
+    }
+  }
 }
 
 static void updateBattery(bool notify) {
-  const int level = batteryPct();
+  const int mv = batteryMv();
+  const int level = usbOn ? chgPct : (mv > 0 ? socFromMv(mv) : -1);
   if (level >= 0) {
     uint8_t v = (uint8_t)constrain(level, 0, 100);
     battChr->setValue(&v, 1);
@@ -735,11 +910,14 @@ static void updateBattery(bool notify) {
   // Stato per l'app: tensione in mV (più precisa della percentuale), alimentato da USB (chg=1 anche a carica
   // completa: non c'è consumo da misurare), secondi di accensione e di display acceso (consumo e autonomia
   // reali); dal firmware 2.1 anche tensione USB, carica completa e la percentuale mostrata dal braccialetto.
+  // Lettura della tensione fallita: niente stato (dalla 2.3). Con "mv=0" l'app vedeva la batteria a zero:
+  // falso allarme e stima dei consumi sbagliata. Si riprova al giro successivo.
+  if (mv <= 0) return;
   char buf[96];
   uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
-  const bool chg = usbOn || M5.Power.isCharging() == m5::Power_Class::is_charging;
+  const bool chg = usbOn || chargingNow();
   snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu;usb=%d;full=%d;pct=%d",
-           (int)M5.Power.getBatteryVoltage(), chg ? 1 : 0,
+           mv, chg ? 1 : 0,
            (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000),
            usbOn ? lastVbus : 0, chgState == CHG_FULL ? 1 : 0, level);
   statusChr->setValue((const uint8_t*)buf, strlen(buf));
@@ -754,12 +932,14 @@ static void setupBle() {
   NimBLEDevice::setPower(9);  // dBm: portata sufficiente per un campo da tennis col polso in mezzo
   NimBLEDevice::setMTU(185);
 
+  bootId = esp_random();  // col Bluetooth acceso è un numero casuale vero
   server = NimBLEDevice::createServer();
   server->setCallbacks(new ServerCallbacks());
   server->advertiseOnDisconnect(false);  // la ripartenza la gestisce il loop
 
   NimBLEService* svc = server->createService(SERVICE_UUID);
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+  evtChr->setCallbacks(new EventCallbacks());
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
   statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -785,10 +965,29 @@ static void setupBle() {
 }
 
 // ------------------------------------------------------------------ spegnimento
+// Col cavo USB il PM1 può non togliere corrente e M5Unified va in deep sleep senza un modo per svegliarsi
+// (resterebbe "spento" finché non si stacca il cavo). Si arma il risveglio da KEY1/KEY2, dopo che sono stati
+// rilasciati: KEY2 è ancora premuto se lo spegnimento viene dal tasto. Se il PM1 spegne, non conta.
+static void armKeyWake() {
+  const uint32_t t0 = millis();
+  while ((!gpio_get_level(KEY1_PIN) || !gpio_get_level(KEY2_PIN)) && millis() - t0 < 5000) delay(20);
+  uint64_t mask = 0;
+  if (gpio_get_level(KEY1_PIN)) mask |= 1ULL << KEY1_PIN;
+  if (gpio_get_level(KEY2_PIN)) mask |= 1ULL << KEY2_PIN;
+  // Ancora premuti dopo 5 s: meglio riaccendersi subito che non svegliarsi più.
+  if (!mask) mask = (1ULL << KEY1_PIN) | (1ULL << KEY2_PIN);
+  // I tasti hanno già le loro resistenze di pull-up; queste interne tengono alto il pin anche in deep sleep.
+  rtc_gpio_pullup_en(KEY1_PIN);
+  rtc_gpio_pulldown_dis(KEY1_PIN);
+  rtc_gpio_pullup_en(KEY2_PIN);
+  rtc_gpio_pulldown_dis(KEY2_PIN);
+  esp_sleep_enable_ext1_wakeup_io(mask, ESP_EXT1_WAKEUP_ANY_LOW);
+}
+
 static void powerOff(const char* l1, const char* why, uint8_t reason) {
   // L'app deve sapere che il braccialetto si è spento (e perché), non che l'ha perso.
   if (connected) {
-    sendEvent(EVT_POWER_OFF, reason);
+    sendNow(EVT_POWER_OFF, reason);
     delay(300);  // lascia partire la notifica
   }
   drawMessage(l1, why, C_ORANGE);
@@ -803,6 +1002,7 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
   if (spkOn) speakerOff();
   M5.Display.setBrightness(0);
   M5.Display.sleep();
+  armKeyWake();
   M5.Power.powerOff();  // col cavo USB collegato il PM1 può non togliere corrente: allora deep sleep
   while (true) delay(1000);
 }
@@ -814,7 +1014,7 @@ static void onUsbIn(uint32_t now) {
   fullAt = 0;
   notChgSince = 0;
   cvSince = 0;
-  chgState = M5.Power.isCharging() == m5::Power_Class::is_charging ? CHG_ACTIVE : CHG_IDLE;
+  chgState = chargingNow() ? CHG_ACTIVE : CHG_IDLE;
   chgPct = restMv > 2500 ? socFromMv(restMv) : 0;
   pctHistN = 0;
   lastPctSample = now - 60000UL;
@@ -856,7 +1056,7 @@ static void pollPower(uint32_t now) {
   if (now - lastPowerPoll < POWER_POLL_MS) return;
   lastPowerPoll = now;
   const int vbus = M5.Power.getVBUSVoltage();
-  const bool chg = M5.Power.isCharging() == m5::Power_Class::is_charging;  // CHG_STAT basso = in carica
+  const bool chg = chargingNow();  // CHG_STAT basso = in carica (lettura fallita = no: non deve sembrare un cavo)
   const int mv = M5.Power.getBatteryVoltage();
   if (vbus > 0) lastVbus = vbus;
   if (mv > 2500) {
@@ -933,6 +1133,12 @@ static void chargeDisplay(uint32_t now) {
 // ------------------------------------------------------------------ setup / loop
 void setup() {
   setCpuFrequencyMhz(80);  // il minimo che tiene in piedi il Bluetooth: consumo molto più basso di 240 MHz
+  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+    // Riacceso da un tasto (era spento col cavo USB): i due pin tornano GPIO normali, altrimenti restano
+    // al dominio RTC e i tasti non si leggono.
+    rtc_gpio_deinit(KEY1_PIN);
+    rtc_gpio_deinit(KEY2_PIN);
+  }
 
   auto cfgM5 = M5.config();
   cfgM5.clear_display = true;
@@ -1025,8 +1231,7 @@ void loop() {
     lastActivity = now;
     idleWarned = false;
     if (connected) {
-      sendEvent(EVT_POINT);
-      beep(2700, 40);
+      queueEvent(EVT_POINT, now);  // il bip arriva con la conferma del telefono (vedi serviceEvents)
     } else if (usbOn) {
       chargeScreenFor(CHARGE_SHOW_MS);
     } else {
@@ -1038,14 +1243,13 @@ void loop() {
     idleWarned = false;
     if (!connected) advSince = now;
     drawBattery();
-    sendEvent(EVT_BATTERY);
+    sendNow(EVT_BATTERY);
   }
   if (M5.BtnB.wasClicked()) {
     lastActivity = now;
     idleWarned = false;
     if (connected) {
-      sendEvent(EVT_UNDO);
-      beep(1800, 40);
+      queueEvent(EVT_UNDO, now);
     } else if (usbOn) {
       chargeScreenFor(CHARGE_SHOW_MS);
     } else {
@@ -1053,6 +1257,7 @@ void loop() {
     }
   }
   if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
+  serviceEvents(now);
 
   // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
   if (!connected && !justDisconnect && usbOn) {
@@ -1111,7 +1316,7 @@ void loop() {
   if (now - lastBattCheck > BATT_CHECK_MS) {
     lastBattCheck = now;
     const int mv = M5.Power.getBatteryVoltage();
-    const bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
+    const bool charging = chargingNow();
     if (!charging && !usbOn && mv > 2500 && mv < BATT_EMPTY_MV) {
       if (++battEmptyCount >= 2) powerOff(TXT_POWER_OFF, TXT_EMPTY, OFF_BATTERY);
     } else {
