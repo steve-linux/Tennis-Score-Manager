@@ -61,6 +61,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
@@ -74,15 +75,33 @@ import com.tennis.scoremanager.ui.screens.SummaryScreen
 @Composable
 fun AppRoot(c: MatchController) {
     val screen by c.screen.collectAsState()
-    // Subito dopo un cambio di schermata i tocchi si ignorano: il secondo tocco di un doppio tocco finirebbe
-    // sul pulsante che sta nello stesso punto della schermata nuova ("Inizia partita" due volte = "Sospendi").
-    var guard by remember { mutableStateOf(false) }
-    LaunchedEffect(screen) {
-        guard = true
-        delay(TAP_GUARD_MS)
-        guard = false
-    }
-    Surface(color = TsmColors.Background, modifier = Modifier.fillMaxSize()) {
+    Surface(
+        color = TsmColors.Background,
+        modifier = Modifier.fillMaxSize().pointerInput(c) {
+            // Il secondo tocco di un doppio tocco finirebbe sul pulsante che sta nello stesso punto della schermata
+            // nuova ("Inizia partita" due volte = "Sospendi", "Avanti" due volte salta la pagina 2). Si decide al
+            // momento del tocco, leggendo la schermata dal controller: un overlay comparirebbe solo al fotogramma
+            // dopo, troppo tardi su un telefono lento.
+            var upAt = 0L
+            var screenAtUp: Screen? = null
+            var blocking = false
+            awaitPointerEventScope {
+                while (true) {
+                    val e = awaitPointerEvent(PointerEventPass.Initial)
+                    val now = e.changes.firstOrNull()?.uptimeMillis ?: continue
+                    if (e.type == PointerEventType.Press) {
+                        blocking = now - upAt < TAP_GUARD_MS && c.screen.value != screenAtUp
+                    }
+                    if (blocking) e.changes.forEach { it.consume() }
+                    if (e.type == PointerEventType.Release) {
+                        // Nel passaggio Initial il clic non è ancora avvenuto: questa è la schermata su cui si è toccato.
+                        upAt = now
+                        screenAtUp = c.screen.value
+                    }
+                }
+            }
+        },
+    ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
                 Screen.SETUP -> SetupScreen(c)
@@ -91,15 +110,6 @@ fun AppRoot(c: MatchController) {
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
             }
-        }
-        if (guard) {
-            Box(
-                Modifier.fillMaxSize().pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
-                    }
-                },
-            )
         }
     }
 }
