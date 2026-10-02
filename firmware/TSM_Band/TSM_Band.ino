@@ -36,7 +36,7 @@
 #include <Preferences.h>
 #include <driver/rtc_io.h>
 
-#define FW_VERSION "2.2.2"
+#define FW_VERSION "2.3"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
