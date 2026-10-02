@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para llevar el tanteo del tenis según la
 | `deliver/installa_tsm.sh` | Alternativa a clonar el repositorio: crea **todo** el proyecto Android y el sketch solo con bloques `cat << 'TSM_EOF'` (el jar del Gradle wrapper va en base64). |
 | `deliver/GUIDE.es.md` | Esta guía (en español); el original en italiano es `deliver/GUIDA.md` y las demás traducciones son `deliver/GUIDE.en.md`, `.fr`, `.de`, `.pt`. |
 
-Versiones usadas y verificadas: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versiones usadas y verificadas: app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 

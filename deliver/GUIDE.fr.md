@@ -13,7 +13,7 @@ Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis sel
 | `deliver/installa_tsm.sh` | Alternative au clone : crée **tout** le projet Android et le sketch uniquement avec des blocs `cat << 'TSM_EOF'` (le jar du Gradle wrapper est en base64). |
 | `deliver/GUIDE.fr.md` | Ce guide (en français) ; l'original italien est `deliver/GUIDA.md`, les autres traductions sont `deliver/GUIDE.en.md`, `.de`, `.es`, `.pt`. |
 
-Versions utilisées et vérifiées : app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versions utilisées et vérifiées : app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 

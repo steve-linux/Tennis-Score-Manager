@@ -65,8 +65,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "2.3.1"
+        versionCode = 7
+        versionName = "2.3.2"
     }
 
     buildTypes {
@@ -845,6 +845,11 @@ class MatchController(
     private var lastBandUndoAt = 0L
     private var lastAutosave = 0L
     private var messageJob: Job? = null
+    /**
+     * Lingua già chiesta a ciascun braccialetto, per non riscriverla a ogni aggiornamento prima che risponda.
+     * Va dichiarata prima di `init`: lì watchBands() la usa subito con i braccialetti salvati (altrimenti è null).
+     */
+    private val bandLangSent = mutableMapOf<Side, String>()
 
     init {
         announcer.lang = options.value.lang
@@ -1171,9 +1176,6 @@ class MatchController(
             syncBandLanguage(bands)
         }
     }
-
-    /** Lingua già chiesta a ciascun braccialetto, per non riscriverla a ogni aggiornamento prima che risponda. */
-    private val bandLangSent = mutableMapOf<Side, String>()
 
     /**
      * I braccialetti dal firmware 2.2 parlano la lingua dell'app: la si manda quando si collegano e quando

@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.3.1** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versões usadas e verificadas: app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
