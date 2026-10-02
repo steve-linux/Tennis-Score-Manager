@@ -65,8 +65,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 7
-        versionName = "2.3.2"
+        versionCode = 8
+        versionName = "2.4.0"
     }
 
     buildTypes {
@@ -131,9 +131,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <!-- Bluetooth LE per i braccialetti (Android 12+ usa SCAN/CONNECT, prima BLUETOOTH/ADMIN) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- La ricerca serve solo a trovare i braccialetti, non a localizzare: da Android 12 niente posizione -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!-- Posizione: richiesta per i braccialetti e per il luogo nel riepilogo -->
+    <!-- Posizione: per il luogo nel riepilogo e, fino ad Android 11, per la ricerca dei braccialetti -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Servizio in primo piano durante la partita con i braccialetti -->
@@ -218,7 +221,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   Riceve lo stato in diretta da /events (un JSON a ogni punto e ogni 5 secondi) e fa scorrere
   da sé il tempo partita e i cronometri tra un aggiornamento e l'altro.
   Stile "LED affiancato": cifre a 7 segmenti con i segmenti spenti visibili.
-  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, idle, doubles)
+  Anteprima senza telefono: scoreboard.html?demo=1 (&lang=en, fr, de, es, pt; &state=ad, tb, end, mtb, long, idle, doubles)
 -->
 <style>
   :root {
@@ -270,7 +273,8 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 
   #foot {
     border-top: 2px solid var(--line); margin: 0 calc(2.1 * var(--vw)); min-height: 0;
-    display: grid; grid-template-columns: minmax(0, auto) 1fr minmax(0, auto); column-gap: calc(2 * var(--vw));
+    /* la scritta al centro tiene sempre un po' di posto: un messaggio lungo si rimpicciolisce (fitText) invece di schiacciarla */
+    display: grid; grid-template-columns: minmax(0, auto) minmax(calc(14 * var(--vw)), 1fr) minmax(0, auto); column-gap: calc(2 * var(--vw));
     padding: calc(2.4 * var(--vh)) calc(1.2 * var(--vw)) calc(3 * var(--vh));
   }
   #fl, #fr { display: grid; grid-template-rows: 1fr 1.5fr; min-height: 0; min-width: 0; }
@@ -278,7 +282,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
   #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
-  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: .calc(6 * var(--vh)); }
+  #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
   #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
   #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
   #timer { font-size: min(calc(5.4 * var(--vh)), calc(3.1 * var(--vw))); color: var(--p2); white-space: nowrap; align-self: end; letter-spacing: .05em; }
@@ -422,7 +426,7 @@ buildSeg($("clock"), "88:88:88");
 const TEXTS = JSON.parse($("texts").textContent);
 const FALLBACK = (TEXTS[(navigator.language || "it").slice(0, 2).toLowerCase()] || TEXTS.en).labels;
 document.title = FALLBACK.page;
-let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalled = false;
+let S = null, recvAt = 0, lastMsg = performance.now(), lostSince = 0, lostCalledAt = 0;
 const inApp = typeof window.TSMDisplay !== "undefined" || /[?&]display=app/.test(location.search);
 const color = i => (S && S.players[i] && S.players[i].color) || (i ? "#FF3030" : "#FFD600");
 
@@ -486,7 +490,7 @@ function render() {
   else if (S.phase === "suspended") { text = L.suspended; blink = true; }
   else if (S.phase === "finished" && S.winner != null) { text = `${L.winner} ${S.players[S.winner].name}`.toUpperCase(); col = color(S.winner); }
   else if (S.message) text = S.message.toUpperCase();
-  setText(msg, text);
+  if (msg.textContent !== text) { msg.textContent = text; fitText(msg); }
   msg.style.color = col;
   msg.classList.toggle("blink", blink);
   tick();
@@ -514,10 +518,16 @@ function tick() {
   if (silent > 12000) {
     setText($("banner"), S ? S.labels.lost : FALLBACK.lost);
     if (!lostSince) lostSince = now;
-    if (inApp && !lostCalled && now - lostSince > 20000 && window.TSMDisplay) { lostCalled = true; try { TSMDisplay.lost(); } catch (e) {} }
+    // nell'app: dopo 20" si chiede al telefono di ricollegarsi, poi di nuovo ogni 30" finché non torna
+    if (inApp && window.TSMDisplay && now - lostSince > 20000 && (!lostCalledAt || now - lostCalledAt > 30000)) {
+      lostCalledAt = now;
+      try { TSMDisplay.lost(); } catch (e) {}
+    }
+    // il collegamento può essere morto senza che il browser se ne accorga (Wi-Fi caduto): se ne apre uno nuovo
+    if (now - reopenAt > 15000) reopen();
   } else {
     lostSince = 0;
-    lostCalled = false;
+    lostCalledAt = 0;
   }
 }
 
@@ -528,10 +538,24 @@ function onState(json) {
 }
 
 // ------------------------------------------------------------------ collegamento
+let es = null, retryMs = 2000, retryTimer = 0, reopenAt = 0;
 function connect() {
+  clearTimeout(retryTimer);
   if (!window.EventSource) { poll(); return; }
-  const es = new EventSource("events");
-  es.onmessage = e => { try { onState(JSON.parse(e.data)); } catch (err) {} };
+  if (es) es.close();
+  const src = es = new EventSource("events");
+  src.onmessage = e => { retryMs = 2000; try { onState(JSON.parse(e.data)); } catch (err) {} };
+  src.onerror = () => {
+    // Risposta non valida (es. server pieno): l'EventSource si chiude per sempre, si riprova da qui sempre più piano.
+    // Gli altri errori (rete) li riprova da solo.
+    if (src !== es || src.readyState !== EventSource.CLOSED) return;
+    retryTimer = setTimeout(connect, retryMs);
+    retryMs = Math.min(retryMs * 2, 30000);
+  };
+}
+function reopen() {
+  reopenAt = performance.now();
+  if (window.EventSource && !isDemo) connect();
 }
 function poll() {
   fetch("state", { cache: "no-store" }).then(r => r.json()).then(onState).catch(() => {}).finally(() => setTimeout(poll, 1000));
@@ -568,12 +592,13 @@ function viewportUnits() {
   }
 }
 viewportUnits();
-window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); });
+window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); fitText($("msg")); });
 keepAwake();
 setInterval(tick, 200);
 
 // ------------------------------------------------------------------ anteprima senza telefono (?demo=1)
-if (/[?&]demo=1/.test(location.search)) {
+const isDemo = /[?&]demo=1/.test(location.search);
+if (isDemo) {
   const lm = location.search.match(/[?&]lang=([a-z]{2})/);
   const lang = lm && TEXTS[lm[1]] ? lm[1] : "it";
   const { labels, demo } = TEXTS[lang];
@@ -590,7 +615,11 @@ if (/[?&]demo=1/.test(location.search)) {
     play: {},
     ad: { points: ["AD", "40"], games: [5, 4], message: demo.setPoint, server: 1 },
     tb: { points: ["6", "5"], games: [6, 6], tiebreak: "set", done: [{ g1: 6, g2: 0 }], countdown: { label: demo.changeover, leftMs: 30000, shot: false } },
-    end: { phase: "finished", server: null, points: ["", ""], games: [6, 3], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    end: { phase: "finished", server: null, points: ["", ""], games: [7, 6], sets: [2, 0], done: [{ g1: 6, g2: 0 }, { g1: 7, g2: 6, tb1: 7, tb2: 5 }], winner: 0, clockRunning: false, countdown: null },
+    // vinta al match tie-break: vale come set vinto 1-0, i punti stanno tra i set conclusi
+    mtb: { phase: "finished", server: null, points: ["", ""], games: [1, 0], sets: [2, 1], done: [{ g1: 6, g2: 3 }, { g1: 4, g2: 6 }, { g1: 1, g2: 0, tb1: 10, tb2: 8, mtb: true }], winner: 0, clockRunning: false, countdown: null },
+    // messaggio lungo (doppio, fine set + match tie-break + cambio campo): si rimpicciolisce senza schiacciare la scritta
+    long: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["0", "0"], games: [0, 0], sets: [1, 1], done: [{ g1: 6, g2: 4 }, { g1: 6, g2: 7, tb1: 5, tb2: 7 }], tiebreak: "match", message: `Rossi / Bianchi · ${labels.matchTiebreak} · ${demo.changeover}`, countdown: { label: demo.changeover, leftMs: 90000, shot: false } },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
   };
@@ -635,6 +664,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        controller.onActivityCreated(restored = savedInstanceState != null)
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -667,6 +697,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         controller.envTick.value++
+        controller.onForeground()
         controller.ble.refreshLocation()
         if (controller.options.value.mode == PlayMode.BANDS) controller.ble.reconnectAll()
     }
@@ -785,6 +816,10 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
+        /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
+        private const val UNDO_GAP_MS = 1_000L
+        /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
+        private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
@@ -804,6 +839,8 @@ class MatchController(
     val endDialog = MutableStateFlow(false)
     val serveOrderPrompt = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
+    /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
+    val summaryKept = MutableStateFlow(false)
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
@@ -832,6 +869,8 @@ class MatchController(
     private val tvMessage = MutableStateFlow<String?>(null)
     private var tvMessageJob: Job? = null
     private var tvSeq = 0L
+    /** Fine del cronometro in corso (null = nessuno): a ogni nuovo cronometro il tabellone riceve subito il tempo giusto. */
+    private val tvCountdownEnd = MutableStateFlow<Long?>(null)
     private val tvJson = Json { encodeDefaults = true }
 
     val strings: Strings get() = stringsFor(options.value.lang)
@@ -843,6 +882,11 @@ class MatchController(
     private var cdEnd = 0L
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
+    private var lastUndoAt = 0L
+    private var locationJob: Job? = null
+    private var locationFor: String? = null
+    /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
+    private var restoreChecked = false
     private var lastAutosave = 0L
     private var messageJob: Job? = null
     /**
@@ -872,19 +916,22 @@ class MatchController(
             }
         }
         scope.launch {
+            var first = true
             tv.map { it.enabled }.distinctUntilChanged().collect { on ->
                 if (on) tvServer.start() else tvServer.stop()
                 publishTv()
-                // Il servizio in primo piano tiene vivo il server anche a schermo spento.
-                if (on && (screen.value == Screen.START || screen.value == Screen.MATCH)) MatchService.start(app)
-                if (!on && options.value.mode != PlayMode.BANDS) MatchService.stop(app)
+                // Il servizio in primo piano tiene vivo il server anche a schermo spento, in ogni schermata (anche il
+                // riepilogo). Non all'avvio dell'app (first): lì parte con la partita, quando l'app è di sicuro visibile.
+                val bandsMatch = options.value.mode == PlayMode.BANDS && (screen.value == Screen.START || screen.value == Screen.MATCH)
+                if (on && !first || !on && bandsMatch) MatchService.start(app)  // anche per aggiornare il testo della notifica
+                else if (!on) MatchService.stop(app)
+                first = false
             }
         }
         scope.launch {
-            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé)...
+            // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients,
-                countdown.map { it?.kind }.distinctUntilChanged(),
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -986,7 +1033,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.START -> {
-                MatchService.stop(app)
+                if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
                 Screen.OPTIONS
             }
             else -> screen.value
@@ -1319,9 +1366,12 @@ class MatchController(
 
     fun awardPoint(side: Side, fromBand: Boolean = false) {
         val lm = live.value ?: return
-        if (lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastPointAt < if (fromBand) BAND_GAP_MS else TAP_GAP_MS) return
+        // Il secondo tocco di un doppio tocco su "Annulla" può cadere su un tasto punto (o il popup di fine
+        // partita sparisce sotto il dito): non è un punto.
+        if (!fromBand && now - lastUndoAt < TAP_GAP_MS) return
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
@@ -1378,8 +1428,10 @@ class MatchController(
         return when {
             next.any { it.matchWinner != null } -> s.msgMatchPoint
             next.any { it.setWinner != null } -> s.msgSetPoint
-            ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
+            // Nel No-Ad sul 40-40 chi riceve vince il game col prossimo punto, quindi è sempre anche palla break:
+            // il punto decisivo va controllato prima.
             state.rules.noAd && state.isDeuce -> s.msgDecidingPoint
+            ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
             else -> null
         }
     }
@@ -1387,10 +1439,14 @@ class MatchController(
     /** Annulla l'ultimo punto: si rigiocano gli eventi, quindi funziona anche dopo fine game, set o partita. */
     fun undo() {
         val lm = live.value ?: return
+        if (closing) return
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastUndoAt < UNDO_GAP_MS) return
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
         events.removeAt(events.lastIndex)
+        lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
         val rec = lm.record.copy(events = events, endedAt = if (wasFinished) null else lm.record.endedAt)
@@ -1460,12 +1516,16 @@ class MatchController(
             storage.deleteMatch(rec.id)
             storage.saveLastFinished(rec)
         }
+        // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
+        storage.summaryOpen = rec.id
+        summaryKept.value = false
         summary.value = LiveMatch(rec, lm.state)
         live.value = null
         endDialog.value = false
         stopCountdown()
         screen.value = Screen.SUMMARY
-        MatchService.stop(app)
+        // Col tabellone acceso il servizio resta (il risultato è ancora sul tabellone): si riavvia solo per il testo della notifica.
+        if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         // I braccialetti hanno finito: si spengono subito invece di aspettare l'inattività.
         if (rec.options.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) {
             val s = strings
@@ -1484,13 +1544,14 @@ class MatchController(
         announcer.stop()
         live.value = null
         summary.value = null
+        storage.summaryOpen = null
         runningSince = null
         clockMs.value = 0
         stopCountdown()
         endDialog.value = false
         serveOrderPrompt.value = false
         message.value = null
-        MatchService.stop(app)
+        if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
         updateOptions { it.copy(tossWinner = null) }
         refreshSaved()
         screen.value = Screen.SETUP
@@ -1503,6 +1564,7 @@ class MatchController(
             ttsEngine = cur.ttsEngine, ttsVoice = cur.ttsVoice, voiceFiles = cur.voiceFiles,
         )
         setup.value = rec.setup
+        storage.setup = rec.setup
         options.value = o
         storage.options = o
         val state = ScoreEngine.replay(rec.rules, rec.events)
@@ -1552,11 +1614,13 @@ class MatchController(
         cdKind = kind
         cdEnd = SystemClock.elapsedRealtime() + seconds * 1000L
         countdown.value = CountdownUi(kind, seconds)
+        tvCountdownEnd.value = cdEnd
     }
 
     private fun stopCountdown() {
         cdKind = null
         countdown.value = null
+        tvCountdownEnd.value = null
     }
 
     private fun tick() {
@@ -1596,6 +1660,8 @@ class MatchController(
 
     /** Salvataggio automatico su file a ogni punto (e ogni 15" col tempo che scorre). */
     fun persist() {
+        // In chiusura il file giusto l'ha già scritto shutdown(): un salvataggio dopo lo sovrascriverebbe.
+        if (closing) return
         val lm = live.value ?: return
         lastAutosave = SystemClock.elapsedRealtime()
         val snapshot = lm.record.copy(clockMs = currentClock(), updatedAt = System.currentTimeMillis())
@@ -1603,8 +1669,11 @@ class MatchController(
     }
 
     private fun fetchLocation() {
-        val id = live.value?.record?.id ?: return
-        scope.launch {
+        val id = (live.value ?: summary.value)?.record?.id ?: return
+        if (locationJob?.isActive == true && locationFor == id) return
+        locationJob?.cancel()
+        locationFor = id
+        locationJob = scope.launch {
             val loc = LocationHelper.current(app) ?: return@launch
             updateLocation(id, MatchLocation(loc.latitude, loc.longitude))
             val address = LocationHelper.address(app, loc, Reports.locale(options.value.lang))
@@ -1642,19 +1711,25 @@ class MatchController(
         val l = options.value.lang
         scope.launch {
             voiceProgress.value = 0 to com.tennis.scoremanager.voice.Phrases.keys.size
-            val ok = announcer.generateVoicePack(l) { i, n -> voiceProgress.value = i to n }
-            voiceProgress.value = null
+            val r = try {
+                announcer.generateVoicePack(l) { i, n -> voiceProgress.value = i to n }
+            } finally {
+                voiceProgress.value = null
+            }
             refreshVoiceCount()
-            _toasts.tryEmit(strings.voiceFiles(ok, com.tennis.scoremanager.voice.Phrases.keys.size))
+            _toasts.tryEmit(if (r.installed) strings.voiceFiles(r.created, r.total) else strings.voiceGenerationFailed)
         }
     }
 
     fun importVoiceZip(uri: Uri) {
         val l = options.value.lang
         scope.launch {
-            val n = withContext(io) { runCatching { voice.importZip(uri, l) }.getOrDefault(0) }
+            // ZIP rovinato o troncato: le registrazioni restano com'erano e si avvisa (non "0 file").
+            val n = withContext(io) {
+                runCatching { voice.importZip(uri, l) }.onFailure { android.util.Log.w("Voice", "Import ZIP", it) }.getOrNull()
+            }
             refreshVoiceCount()
-            _toasts.tryEmit(strings.voiceFiles(n, com.tennis.scoremanager.voice.Phrases.keys.size))
+            _toasts.tryEmit(if (n == null) strings.voiceImportFailed else strings.voiceFiles(n, com.tennis.scoremanager.voice.Phrases.keys.size))
         }
     }
 
@@ -1745,14 +1820,26 @@ class MatchController(
                         }
                         folderLabel()
                     } else {
+                        // Come fa il selettore di sistema: "Finale (1).txt" invece di sovrascrivere "Finale.txt".
                         val dir = storage.defaultHistoryDir
-                        for ((file, _, write) in outputs) File(dir, file).outputStream().use(write)
+                        val suffix = generateSequence(0) { it + 1 }.map { if (it == 0) "" else " ($it)" }
+                            .first { sfx -> outputs.none { (file, _, _) -> File(dir, withSuffix(file, sfx)).exists() } }
+                        for ((file, _, write) in outputs) File(dir, withSuffix(file, suffix)).outputStream().use(write)
                         dir.absolutePath
                     }
                 }.getOrNull()
             }
+            if (where != null) summaryKept.value = true
             _toasts.tryEmit(if (where != null) s.savedTo(where) else s.saveError)
         }
+    }
+
+    private fun withSuffix(file: String, suffix: String) =
+        if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
+
+    /** Il riepilogo è stato condiviso: c'è una copia fuori dall'app. */
+    fun markSummaryKept() {
+        summaryKept.value = true
     }
 
     /** Immagine + testo del risultato da condividere sui social. */
@@ -1791,6 +1878,7 @@ class MatchController(
         if (closing) return
         closing = true
         val s = strings
+        storage.summaryOpen = null
         scope.launch {
             announcer.stop()
             live.value?.let { lm ->
@@ -1798,6 +1886,8 @@ class MatchController(
                     suspended = !lm.state.isFinished, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
                 )
                 runningSince = null
+                // Anche in memoria: nei secondi in cui si spengono i braccialetti nulla deve ripartire dal vecchio stato.
+                live.value = lm.copy(record = snapshot)
                 withContext(io) { storage.saveMatch(snapshot) }
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
@@ -1811,6 +1901,38 @@ class MatchController(
 
     /** Chiamato quando l'Activity va in secondo piano. */
     fun onBackground() = persist()
+
+    /**
+     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
+     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Un'apertura normale riparte invece dalla prima schermata.
+     */
+    fun onActivityCreated(restored: Boolean) {
+        if (restoreChecked) return
+        restoreChecked = true
+        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        val id = storage.summaryOpen ?: return
+        val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
+        summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
+        summaryKept.value = false
+        screen.value = Screen.SUMMARY
+    }
+
+    /**
+     * L'app torna in primo piano. Se la partita è partita da un braccialetto a schermo bloccato la posizione
+     * non è arrivata (Android la nega in background): la si chiede ora.
+     */
+    fun onForeground() {
+        val lm = live.value
+        val sm = summary.value
+        when {
+            lm != null -> if (lm.record.location == null) fetchLocation()
+            sm != null -> {
+                val ended = sm.record.endedAt ?: return
+                if (sm.record.location == null && System.currentTimeMillis() - ended < LATE_LOCATION_MS) fetchLocation()
+            }
+        }
+    }
 }
 TSM_EOF
 
@@ -1847,15 +1969,24 @@ import java.util.UUID
 /**
  * Protocollo BLE condiviso con il firmware del braccialetto (TSM_Band.ino): tenere allineati gli UUID.
  *
- * Braccialetto -> telefono (notify su EVENT): [tipo, sequenza] più, dal firmware 2.0, il motivo dello spegnimento.
+ * Braccialetto -> telefono (notify su EVENT): [tipo, sequenza] più, dal firmware 2.0, il motivo dello spegnimento;
+ * dal firmware 2.3 anche [id di accensione (4 byte, little endian), età dell'evento in decimi di secondo]: vedi [parseEvent].
  * Telefono -> braccialetto (write su DISPLAY): testo ASCII con campi separati da '|':
  *   P|<mio>|<avversario>|<servizio 0/1/2>|<intestazione>        punteggio del game (grande)
  *   G|<miei game>|<game avv>|<miei set>|<set avv>|<intestazione> riepilogo a fine game
  *   M|<riga 1>|<riga 2>|<secondi>                                messaggio
  *   I|<riga 1>|<riga 2>|<secondi>|<RRGGBB>                       "Identifica": lampeggia e suona (firmware 2.0)
  *   O|<riga 1>|<riga 2>                                          si spegne (firmware 2.0)
+ *   H|1                                                          confermo gli eventi (app 2.4): prima delle notifiche
+ *   K|<sequenza>                                                 conferma di un evento (solo ai firmware 2.3)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
  * I firmware vecchi ignorano i tipi che non conoscono.
+ *
+ * Conferma dei tasti (firmware 2.3 + app 2.4): il braccialetto tiene in coda KEY1/KEY2 finché l'app non li conferma
+ * e suona il bip di conferma solo allora; dopo una riconnessione rimanda quelli non confermati (fino a 6,5 s dalla
+ * pressione) e a 8 s li dà per persi ("NON INVIATO"). L'app conferma anche i doppioni ma li applica una volta sola
+ * ([EventDedupe]). Senza "H|1" (app vecchia) il firmware 2.3 suona all'invio come prima; senza id di accensione
+ * (firmware vecchio) l'app non manda conferme.
  */
 object BandProtocol {
     val SERVICE: UUID = UUID.fromString("7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10")
@@ -1901,6 +2032,51 @@ object BandProtocol {
         "I|${clean(line1)}|${clean(line2, 28)}|$seconds|${"%06X".format(rgb and 0xFFFFFF)}"
 
     fun powerOff(line1: String, line2: String) = "O|${clean(line1)}|${clean(line2, 28)}"
+
+    /** L'app conferma gli eventi su questa connessione. Va scritto prima di attivare le notifiche di EVENT. */
+    const val HELLO = "H|1"
+
+    /** Conferma dell'evento [seq]: il braccialetto suona il bip di conferma. */
+    fun ack(seq: Int) = "K|$seq"
+
+    /** Evento da EVENT; null se troppo corto. Gli eventi dei firmware prima della 2.3 hanno [boot] null. */
+    fun parseEvent(b: ByteArray): RawBandEvent? {
+        if (b.size < 2) return null
+        fun u(i: Int) = b[i].toInt() and 0xFF
+        val boot = if (b.size >= 7) u(3).toLong() or (u(4).toLong() shl 8) or (u(5).toLong() shl 16) or (u(6).toLong() shl 24) else null
+        return RawBandEvent(
+            type = u(0),
+            seq = u(1),
+            extra = if (b.size >= 3) u(2) else null,
+            boot = boot,
+            ageMs = if (b.size >= 8) u(7) * 100 else 0,
+        )
+    }
+}
+
+/**
+ * Evento così come arriva dal braccialetto. [boot]: id casuale di quell'accensione (firmware 2.3), null prima;
+ * [ageMs]: da quanto è stato premuto il tasto (più di zero se rimandato dopo una riconnessione).
+ */
+data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: Long?, val ageMs: Int)
+
+/**
+ * Eventi già ricevuti, per braccialetto e accensione. Un evento rimandato dopo una riconnessione (la conferma
+ * era andata persa) si conferma di nuovo ma non si applica una seconda volta. Il braccialetto rimanda solo
+ * eventi di meno di 8 s: la finestra di 30 s basta e la sequenza (8 bit) non fa in tempo a ripetersi.
+ */
+class EventDedupe(private val windowMs: Long = 30_000) {
+    private val seen = mutableMapOf<String, MutableMap<Int, Long>>()
+
+    /** true la prima volta che arriva quell'evento ([now] in ms, orologio monotono). */
+    fun firstTime(address: String, boot: Long, seq: Int, now: Long): Boolean {
+        seen.values.forEach { m -> m.values.removeAll { now - it > windowMs } }
+        seen.values.removeAll { it.isEmpty() }
+        val m = seen.getOrPut("$address/$boot") { mutableMapOf() }
+        if (seq in m) return false
+        m[seq] = now
+        return true
+    }
 }
 
 /**
@@ -2049,17 +2225,24 @@ object BatteryModel {
         3770 to 30, 3750 to 25, 3730 to 20, 3710 to 15, 3690 to 10, 3610 to 5, 3270 to 0,
     )
 
+    /** Tensioni plausibili per la LiPo: fuori da qui la lettura del braccialetto è fallita (i firmware 2.2 mandano "mv=0"). */
+    val PLAUSIBLE_MV = 2500..5000
+
+    /**
+     * null se il testo non è uno stato valido. Uno stato con una tensione impossibile si scarta tutto: con "mv=0"
+     * la batteria risultava allo 0 % (falso allarme che zittiva quelli veri) e la stima dei consumi si sballava.
+     */
     fun parse(text: String): BandStatus? {
         val map = text.split(';').mapNotNull { part ->
             val kv = part.split('=', limit = 2)
             if (kv.size == 2) kv[0].trim() to kv[1].trim() else null
         }.toMap()
-        val mv = map["mv"]?.toIntOrNull() ?: return null
+        val mv = map["mv"]?.toIntOrNull()?.takeIf { it in PLAUSIBLE_MV } ?: return null
         return BandStatus(
             millivolts = mv,
             charging = map["chg"] == "1",
-            uptimeS = map["up"]?.toLongOrNull() ?: 0,
-            displayS = map["dsp"]?.toLongOrNull() ?: 0,
+            uptimeS = map["up"]?.toLongOrNull()?.takeIf { it >= 0 } ?: 0,
+            displayS = map["dsp"]?.toLongOrNull()?.takeIf { it >= 0 } ?: 0,
             usbMv = map["usb"]?.toIntOrNull(),
             full = map["full"] == "1",
             percent = map["pct"]?.toIntOrNull()?.takeIf { it in 0..100 },
@@ -2184,6 +2367,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
 import android.os.SystemClock
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.model.Side
@@ -2261,6 +2445,13 @@ class BleManager(context: Context) {
     private var scanJob: Job? = null
     /** Ricerca automatica voluta (pagina dei braccialetti aperta): riparte da sola se Bluetooth o posizione tornano. */
     private var autoScan = false
+    /** La ricerca è davvero avviata nel sistema (startScan riuscito e non fallito dopo). */
+    private var scanRunning = false
+    private var scanStartJob: Job? = null
+    private var scanStopJob: Job? = null
+    private val scanThrottle = ScanThrottle()
+    /** Eventi già ricevuti (per braccialetto e accensione): vale anche tra una connessione e l'altra. */
+    private val dedupe = EventDedupe()
 
     init {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -2270,10 +2461,10 @@ class BleManager(context: Context) {
                 _adapterOn.value = st == BluetoothAdapter.STATE_ON
                 if (st == BluetoothAdapter.STATE_ON) {
                     links.values.forEach { it.connect() }
-                    if (autoScan) startScan()
+                    if (autoScan) ensureScan()
                 }
                 if (st == BluetoothAdapter.STATE_OFF) {
-                    stopScan()
+                    stopScanNow()
                     links.values.forEach { it.onAdapterOff() }
                 }
             }
@@ -2293,15 +2484,27 @@ class BleManager(context: Context) {
         val on = LocationHelper.isEnabled(app)
         val was = _locationOn.value
         _locationOn.value = on
-        if (on && !was && autoScan) startScan()
+        // Fino ad Android 11 senza posizione la ricerca non restituisce niente: quando torna la si riavvia.
+        if (on && !was && autoScan) restartScan()
     }
 
     val isSupported: Boolean get() = adapter != null && app.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
     val isEnabled: Boolean get() = adapter?.isEnabled == true
 
-    fun hasPermissions(): Boolean = requiredPermissions().all {
-        ContextCompat.checkSelfPermission(app, it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun granted(p: String) = ContextCompat.checkSelfPermission(app, p) == PackageManager.PERMISSION_GRANTED
+
+    /** Per collegarsi a un braccialetto già associato: da Android 12 basta BLUETOOTH_CONNECT (la posizione no). */
+    fun canConnect(): Boolean = Build.VERSION.SDK_INT < 31 || granted(Manifest.permission.BLUETOOTH_CONNECT)
+
+    /**
+     * Per la ricerca: da Android 12 BLUETOOTH_SCAN, dichiarato "neverForLocation" nel manifest, quindi la posizione
+     * non serve (va bene anche quella approssimativa); prima di Android 12 serve la posizione precisa.
+     */
+    fun canScan(): Boolean =
+        if (Build.VERSION.SDK_INT >= 31) granted(Manifest.permission.BLUETOOTH_SCAN) else granted(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    /** Tutto quello che serve ai braccialetti (ricerca e collegamento). La richiesta ([requiredPermissions]) chiede anche la posizione. */
+    fun hasPermissions(): Boolean = canScan() && canConnect()
 
     /**
      * Ricerca automatica e continua dei braccialetti finché [on] (la pagina dei braccialetti è aperta).
@@ -2310,45 +2513,89 @@ class BleManager(context: Context) {
      */
     fun setAutoScan(on: Boolean) {
         autoScan = on
-        if (on) startScan() else stopScan()
+        if (on) {
+            scanStopJob?.cancel()
+            ensureScan()
+        } else {
+            // Si ferma con un attimo di ritardo: una pausa breve (dialogo dei permessi, Bluetooth da attivare)
+            // non deve costare un nuovo avvio. Android ne permette 5 in 30 s, poi la ricerca non parte e basta.
+            scanStopJob?.cancel()
+            scanStopJob = scope.launch {
+                delay(SCAN_STOP_GRACE_MS)
+                stopScanNow()
+            }
+        }
     }
 
-    private fun startScan(): Boolean {
-        val scanner = adapter?.bluetoothLeScanner ?: return false
-        if (!hasPermissions() || !isEnabled) return false
-        stopScan()
-        val filters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
-        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-        return runCatching {
-            scanner.startScan(filters, settings, scanCallback)
-            _scanning.value = true
-            scanJob = scope.launch {
-                var sinceRestart = 0L
-                while (true) {
-                    delay(2_000)
-                    val now = SystemClock.elapsedRealtime()
-                    _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
-                    // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
-                    sinceRestart += 2_000
-                    if (sinceRestart >= 10 * 60_000L) {
-                        sinceRestart = 0
-                        runCatching {
-                            scanner.stopScan(scanCallback)
-                            scanner.startScan(filters, settings, scanCallback)
-                        }
-                    }
+    /** Avvia la ricerca se è voluta e non è già avviata (o in partenza), rispettando il limite di avvii di Android. */
+    private fun ensureScan(retryInMs: Long = 0) {
+        if (!autoScan || scanRunning || scanStartJob?.isActive == true) return
+        if (!canScan() || !isEnabled || adapter?.bluetoothLeScanner == null) {
+            _scanning.value = false
+            return
+        }
+        _scanning.value = true  // in partenza: per chi guarda è già "ricerca in corso"
+        scanStartJob = scope.launch {
+            delay(maxOf(retryInMs, scanThrottle.delayBeforeStart(SystemClock.elapsedRealtime())))
+            startScanNow()
+        }
+    }
+
+    private fun restartScan() {
+        if (scanRunning) {
+            scanJob?.cancel()
+            runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+            scanRunning = false
+        }
+        ensureScan()
+    }
+
+    private fun startScanNow() {
+        val scanner = adapter?.bluetoothLeScanner
+        if (!autoScan || scanner == null || !canScan() || !isEnabled) {
+            _scanning.value = false
+            return
+        }
+        val ok = runCatching { scanner.startScan(scanFilters, scanSettings, scanCallback) }.isSuccess
+        scanThrottle.recordStart(SystemClock.elapsedRealtime())
+        if (!ok) {
+            _scanning.value = false
+            ensureScan(retryInMs = SCAN_RETRY_MS)
+            return
+        }
+        scanRunning = true
+        _scanning.value = true
+        scanJob?.cancel()
+        scanJob = scope.launch {
+            var sinceRestart = 0L
+            while (true) {
+                delay(2_000)
+                val now = SystemClock.elapsedRealtime()
+                _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
+                // Android declassa le ricerche che durano più di 30 minuti: si riparte ogni 10.
+                sinceRestart += 2_000
+                if (sinceRestart >= 10 * 60_000L) {
+                    sinceRestart = 0
+                    restartScan()
+                    break
                 }
             }
-        }.isSuccess
+        }
     }
 
-    private fun stopScan() {
+    private fun stopScanNow() {
+        scanStopJob?.cancel()
+        scanStartJob?.cancel()
         scanJob?.cancel()
         scanJob = null
-        if (_scanning.value) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+        if (scanRunning) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+        scanRunning = false
         _scanning.value = false
         _found.value = emptyList()
     }
+
+    private val scanFilters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(BandProtocol.SERVICE)).build())
+    private val scanSettings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -2356,6 +2603,20 @@ class BleManager(context: Context) {
             val name = result.scanRecord?.deviceName ?: runCatching { result.device.name }.getOrNull() ?: "TSM-Band"
             val band = FoundBand(addr, name, result.rssi, SystemClock.elapsedRealtime())
             _found.update { list -> (list.filterNot { it.address == addr } + band).sortedBy { it.name } }
+            // Un braccialetto associato che trasmette è acceso e libero: lo si collega subito.
+            scope.launch { links.values.firstOrNull { it.address == addr }?.onSeen() }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            scope.launch {
+                Log.w(TAG, "ricerca fallita: $errorCode")
+                if (errorCode == SCAN_FAILED_ALREADY_STARTED) return@launch  // è già avviata: i risultati arrivano
+                scanJob?.cancel()
+                scanRunning = false
+                _scanning.value = false
+                // Troppi avvii (Android 13+ lo dice, prima tace) o errore del sistema: si riprova più tardi.
+                ensureScan(retryInMs = if (errorCode == SCAN_FAILED_TOO_FREQUENTLY) 30_000 else SCAN_RETRY_MS)
+            }
         }
     }
 
@@ -2382,8 +2643,11 @@ class BleManager(context: Context) {
         publish()
     }
 
-    /** Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi). */
-    fun reconnectAll() = links.values.forEach { it.connect() }
+    /**
+     * Riprova a collegare i braccialetti associati (es. dopo aver concesso i permessi, o tornando nell'app):
+     * un braccialetto che non rispondeva si riprova subito; uno spento resta in attesa in background.
+     */
+    fun reconnectAll() = links.values.forEach { it.retryNow() }
 
     /** Punteggi e messaggi: se ne arrivano altri prima dell'invio vale l'ultimo. */
     fun send(side: Side, payload: String) {
@@ -2422,6 +2686,8 @@ class BleManager(context: Context) {
         }
     }
 
+    private enum class OpKind { MTU, DESCRIPTOR, WRITE, READ }
+
     private inner class BandLink(var side: Side, val address: String, val name: String) {
         var state = LinkState.IDLE
             private set
@@ -2434,16 +2700,33 @@ class BleManager(context: Context) {
         private var setupWatchdog: Job? = null
         private val opLock = Mutex()
         @Volatile private var pendingOp: CompletableDeferred<Int>? = null
+        @Volatile private var pendingKind: OpKind? = null
         private val wake = Channel<Unit>(Channel.CONFLATED)
         private var latest: String? = null
         private var lastSeq = -1
+        /** Tentativo in corso in background (connectGatt con autoConnect): aspetta il braccialetto senza scadenza. */
+        private var background = false
+        /** Tentativi di fila finiti senza arrivare a READY. */
+        private var failures = 0
+        @Volatile private var mtu = DEFAULT_MTU
+        /** Fino a quando non si scrive sul display: "PAIRING OK" resta a schermo i suoi 3 secondi. */
+        private var quietUntil = 0L
+        private val acks = Channel<Int>(Channel.UNLIMITED)
         private val sender: Job = scope.launch {
             for (tick in wake) {
+                if (state != LinkState.READY) continue
+                val wait = quietUntil - SystemClock.elapsedRealtime()
+                if (wait > 0) delay(wait)
                 if (state != LinkState.READY) continue
                 val msg = latest ?: continue
                 latest = null
                 if (!write(msg) && latest == null) latest = msg
             }
+        }
+        /** Conferme dei tasti: partono subito, anche durante la configurazione (il braccialetto rimanda gli eventi appena ascoltiamo). */
+        private val acker: Job = scope.launch {
+            // Persa? Il braccialetto rimanda l'evento alla prossima connessione e lo si conferma di nuovo.
+            for (seq in acks) if (gatt != null) write(BandProtocol.ack(seq))
         }
 
         private fun changeState(s: LinkState) {
@@ -2451,13 +2734,43 @@ class BleManager(context: Context) {
             publish()
         }
 
-        fun connect() {
-            if (closed || gatt != null || !hasPermissions() || !isEnabled) return
+        /**
+         * Tentativo diretto (veloce, ma Android lo chiude dopo ~30 s) finché il braccialetto risponde; dopo uno
+         * spegnimento o [DIRECT_TRIES] tentativi a vuoto si aspetta in background: Android collega da solo il
+         * braccialetto quando torna a trasmettere, senza riprovare ogni pochi secondi per sempre.
+         */
+        fun connect(direct: Boolean = false) {
+            if (closed || !canConnect() || !isEnabled) return
+            if (gatt != null) {
+                // Un tentativo diretto prende il posto solo di un'attesa in background.
+                if (!direct || !background || state == LinkState.READY) return
+                runCatching { gatt?.close() }
+                gatt = null
+            }
             val dev = runCatching { adapter?.getRemoteDevice(address) }.getOrNull() ?: return
             retryJob?.cancel()
-            if (state != LinkState.POWERED_OFF) changeState(LinkState.CONNECTING)
-            gatt = runCatching { dev.connectGatt(app, false, callback, BluetoothDevice.TRANSPORT_LE) }.getOrNull()
-            if (gatt == null) scheduleReconnect()
+            val bg = !direct && (state == LinkState.POWERED_OFF || failures >= DIRECT_TRIES)
+            background = bg
+            if (state != LinkState.POWERED_OFF) changeState(if (bg) LinkState.IDLE else LinkState.CONNECTING)
+            gatt = runCatching { dev.connectGatt(app, bg, callback, BluetoothDevice.TRANSPORT_LE) }.getOrNull()
+            if (gatt == null) scheduleReconnect(wasBackground = bg, afterLoss = false)
+        }
+
+        /** Dall'app (ritorno in primo piano, permessi): chi non rispondeva si riprova subito, chi è spento no. */
+        fun retryNow() {
+            if (state == LinkState.POWERED_OFF) {
+                connect()
+            } else {
+                failures = 0
+                connect(direct = true)
+            }
+        }
+
+        /** La ricerca lo vede trasmettere: è acceso e libero, il tentativo diretto è più rapido dell'attesa in background. */
+        fun onSeen() {
+            if (!background || state == LinkState.READY) return
+            failures = 0
+            connect(direct = true)
         }
 
         fun onAdapterOff() {
@@ -2476,19 +2789,30 @@ class BleManager(context: Context) {
             closed = true
             retryJob?.cancel()
             sender.cancel()
+            acker.cancel()
             pendingOp?.complete(-1)
             runCatching { gatt?.disconnect() }
             runCatching { gatt?.close() }
             gatt = null
         }
 
-        private fun scheduleReconnect() {
+        private fun scheduleReconnect(wasBackground: Boolean, afterLoss: Boolean) {
             if (closed) return
             retryJob?.cancel()
             retryJob = scope.launch {
-                delay(if (state == LinkState.POWERED_OFF) 5_000 else 2_500)
+                delay(
+                    when {
+                        wasBackground -> 30_000   // l'attesa in background è finita male da sola: niente raffiche
+                        afterLoss -> 500          // collegamento appena perso: il braccialetto trasmette già di nuovo
+                        else -> 2_500
+                    },
+                )
                 connect()
             }
+        }
+
+        private fun completeOp(kind: OpKind, status: Int) {
+            if (pendingKind == kind) pendingOp?.complete(status)
         }
 
         private val callback = object : BluetoothGattCallback() {
@@ -2496,13 +2820,19 @@ class BleManager(context: Context) {
                 scope.launch {
                     if (g !== gatt) return@launch
                     if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
-                        lastSeq = -1  // il braccialetto può essere stato riacceso: la sequenza riparte
+                        lastSeq = -1  // firmware vecchi: il braccialetto può essere stato riacceso, la sequenza riparte
+                        background = false
+                        mtu = DEFAULT_MTU
+                        quietUntil = SystemClock.elapsedRealtime() + PAIRED_MSG_MS
                         setupWatchdog?.cancel()
                         setupWatchdog = scope.launch {
                             // Se la configurazione non finisce (callback persa) si ricomincia da capo.
                             delay(15_000)
                             if (gatt === g && state != LinkState.READY) runCatching { g.disconnect() }
                         }
+                        // Pausa prima della scoperta dei servizi (le librerie BLE di riferimento ne fanno una simile):
+                        // su alcuni telefoni la scoperta fallisce se parte mentre il braccialetto chiede i suoi
+                        // parametri di connessione. Dal firmware 2.3 un tasto premuto intanto resta in coda.
                         delay(400)
                         runCatching { g.discoverServices() }
                     } else {
@@ -2510,8 +2840,10 @@ class BleManager(context: Context) {
                         pendingOp?.complete(-1)
                         runCatching { g.close() }
                         gatt = null
+                        val wasReady = state == LinkState.READY
+                        if (wasReady) failures = 0 else failures++
                         if (state != LinkState.POWERED_OFF) changeState(LinkState.IDLE)
-                        scheduleReconnect()
+                        scheduleReconnect(wasBackground = background, afterLoss = wasReady)
                     }
                 }
             }
@@ -2521,55 +2853,54 @@ class BleManager(context: Context) {
             }
 
             override fun onMtuChanged(g: BluetoothGatt, mtu: Int, status: Int) {
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) this@BandLink.mtu = mtu
+                completeOp(OpKind.MTU, status)
             }
 
             override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
-                pendingOp?.complete(status)
+                completeOp(OpKind.DESCRIPTOR, status)
             }
 
             override fun onCharacteristicWrite(g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int) {
-                pendingOp?.complete(status)
+                completeOp(OpKind.WRITE, status)
             }
 
             override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray, status: Int) {
-                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, value)
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, value, fromRead = true)
+                completeOp(OpKind.READ, status)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
             override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int) {
                 if (Build.VERSION.SDK_INT >= 33) return
                 @Suppress("DEPRECATION")
-                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, c.value ?: byteArrayOf())
-                pendingOp?.complete(status)
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, c.value ?: byteArrayOf(), fromRead = true)
+                completeOp(OpKind.READ, status)
             }
 
             override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray) {
-                handle(c.uuid, value)
+                handle(c.uuid, value, fromRead = false)
             }
 
             @Suppress("OVERRIDE_DEPRECATION")
             override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic) {
                 if (Build.VERSION.SDK_INT >= 33) return
                 @Suppress("DEPRECATION")
-                handle(c.uuid, c.value ?: byteArrayOf())
+                handle(c.uuid, c.value ?: byteArrayOf(), fromRead = false)
             }
         }
 
-        private fun handle(uuid: UUID, value: ByteArray) {
+        private fun handle(uuid: UUID, value: ByteArray, fromRead: Boolean) {
             val copy = value.copyOf()
             scope.launch {
+                // Con l'MTU minimo (23) le notifiche si fermano a 20 byte: impostazioni e stato arriverebbero
+                // tronchi. Una notifica piena si rilegge: la lettura prende il valore intero, a pezzi.
+                if (!fromRead && (uuid == BandProtocol.CONFIG || uuid == BandProtocol.STATUS) && copy.size >= mtu - 3) {
+                    readFull(uuid)
+                    return@launch
+                }
                 when (uuid) {
-                    BandProtocol.EVENT -> if (copy.size >= 2) {
-                        val type = copy[0].toInt() and 0xFF
-                        val seq = copy[1].toInt() and 0xFF
-                        if (seq == lastSeq) return@launch // stessa pressione ricevuta due volte
-                        lastSeq = seq
-                        if (type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
-                        val reason = if (type == BandProtocol.EVT_POWER_OFF && copy.size >= 3) copy[2].toInt() and 0xFF else null
-                        _events.tryEmit(BandEvent(side, type, reason))
-                    }
+                    BandProtocol.EVENT -> onEvent(copy)
                     BandProtocol.CONFIG -> BandSettings.parse(String(copy, Charsets.US_ASCII))?.let {
                         settings = it
                         publish()
@@ -2587,48 +2918,82 @@ class BleManager(context: Context) {
             }
         }
 
+        private fun onEvent(bytes: ByteArray) {
+            val ev = BandProtocol.parseEvent(bytes) ?: return
+            if (ev.boot != null) {
+                // Firmware 2.3: si conferma sempre (anche un doppione: la conferma di prima può essere andata
+                // persa), ma si applica una volta sola.
+                acks.trySend(ev.seq)
+                if (!dedupe.firstTime(address, ev.boot, ev.seq, SystemClock.elapsedRealtime())) {
+                    Log.i(TAG, "${side.name}: evento ${ev.seq} già ricevuto, solo confermato")
+                    return
+                }
+                if (ev.ageMs > 0) Log.i(TAG, "${side.name}: evento ${ev.seq} rimandato dopo ${ev.ageMs} ms")
+            } else {
+                if (ev.seq == lastSeq) return // stessa pressione ricevuta due volte
+                lastSeq = ev.seq
+            }
+            if (ev.type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
+            val reason = if (ev.type == BandProtocol.EVT_POWER_OFF) ev.extra else null
+            _events.tryEmit(BandEvent(side, ev.type, reason))
+        }
+
+        private suspend fun readFull(uuid: UUID) {
+            val g = gatt ?: return
+            val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return
+            op(OpKind.READ) { g.readCharacteristic(c) }
+        }
+
         private suspend fun setup(g: BluetoothGatt) {
             val svc = g.getService(BandProtocol.SERVICE)
-            if (svc == null) {
+            val evt = svc?.getCharacteristic(BandProtocol.EVENT)
+            if (svc == null || evt == null) {
                 runCatching { g.disconnect() }
                 return
             }
-            op { g.requestMtu(185) }
+            // Prima di tutto i tasti: finché le notifiche di EVENT non sono attive il braccialetto non può
+            // mandarli (i firmware prima della 2.3 li perdono). "H|1" va prima: con le notifiche il firmware 2.3
+            // rimanda subito i tasti in coda e deve già sapere che li confermiamo. I firmware vecchi lo ignorano.
+            write(BandProtocol.HELLO)
             // Senza notifiche i tasti del braccialetto andrebbero persi: meglio riconnettersi.
-            val evt = svc.getCharacteristic(BandProtocol.EVENT)
-            if (evt == null || !enableNotify(g, evt)) {
+            if (!enableNotify(g, evt)) {
                 runCatching { g.disconnect() }
                 return
             }
+            // Senza risposta resta l'MTU minimo: le notifiche lunghe si rileggono (vedi handle()).
+            op(OpKind.MTU) { g.requestMtu(185) }
             g.getService(BandProtocol.BATTERY_SERVICE)?.getCharacteristic(BandProtocol.BATTERY_LEVEL)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.STATUS)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             svc.getCharacteristic(BandProtocol.CONFIG)?.let {
                 enableNotify(g, it)
-                op { g.readCharacteristic(it) }
+                op(OpKind.READ) { g.readCharacteristic(it) }
             }
             // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
             // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
             runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
             if (g !== gatt) return
             setupWatchdog?.cancel()
+            failures = 0
             changeState(LinkState.READY)
             _ready.tryEmit(side)
-            wake.trySend(Unit)
+            wake.trySend(Unit)  // un messaggio rimasto in sospeso parte quando finisce "PAIRING OK" (quietUntil)
         }
 
         /** Android esegue un'operazione GATT alla volta: le serializziamo e aspettiamo la callback. */
-        private suspend fun op(start: () -> Boolean): Boolean = opLock.withLock {
+        private suspend fun op(kind: OpKind, start: () -> Boolean): Boolean = opLock.withLock {
             val d = CompletableDeferred<Int>()
+            pendingKind = kind
             pendingOp = d
             val started = runCatching(start).getOrDefault(false)
             val result = if (started) withTimeoutOrNull(5_000) { d.await() } else null
             pendingOp = null
+            pendingKind = null
             result == BluetoothGatt.GATT_SUCCESS
         }
 
@@ -2636,7 +3001,7 @@ class BleManager(context: Context) {
             runCatching { g.setCharacteristicNotification(c, true) }
             val d = c.getDescriptor(BandProtocol.CCCD) ?: return false
             val value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            return op {
+            return op(OpKind.DESCRIPTOR) {
                 if (Build.VERSION.SDK_INT >= 33) {
                     g.writeDescriptor(d, value) == BluetoothStatusCodes.SUCCESS
                 } else {
@@ -2656,7 +3021,7 @@ class BleManager(context: Context) {
             val g = gatt ?: return false
             val c = g.getService(BandProtocol.SERVICE)?.getCharacteristic(uuid) ?: return false
             val bytes = msg.toByteArray(Charsets.US_ASCII).copyOf(minOf(msg.length, 180))
-            return op {
+            return op(OpKind.WRITE) {
                 if (Build.VERSION.SDK_INT >= 33) {
                     g.writeCharacteristic(c, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT) == BluetoothStatusCodes.SUCCESS
                 } else {
@@ -2672,6 +3037,17 @@ class BleManager(context: Context) {
     }
 
     companion object {
+        private const val TAG = "BleManager"
+        /** Tentativi diretti a vuoto prima di aspettare il braccialetto in background (~1,5 minuti). */
+        private const val DIRECT_TRIES = 3
+        private const val DEFAULT_MTU = 23
+        /** Il firmware mostra "PAIRING OK" per 3 s dal collegamento: prima nessun messaggio sul display. */
+        private const val PAIRED_MSG_MS = 3_200L
+        private const val SCAN_STOP_GRACE_MS = 1_500L
+        private const val SCAN_RETRY_MS = 5_000L
+        private const val SCAN_FAILED_ALREADY_STARTED = 1  // ScanCallback.SCAN_FAILED_ALREADY_STARTED
+        private const val SCAN_FAILED_TOO_FREQUENTLY = 6   // ScanCallback.SCAN_FAILED_SCANNING_TOO_FREQUENTLY (API 33)
+
         fun requiredPermissions(): Array<String> =
             if (Build.VERSION.SDK_INT >= 31) {
                 arrayOf(
@@ -2683,6 +3059,25 @@ class BleManager(context: Context) {
             } else {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+    }
+}
+
+/**
+ * Android blocca la sesta ricerca avviata in 30 s (fino ad Android 12 in silenzio: nessun errore, nessun
+ * risultato). Si tiene il conto degli avvii e si aspetta, con un margine: al massimo [maxStarts] ogni [windowMs].
+ */
+internal class ScanThrottle(private val maxStarts: Int = 4, private val windowMs: Long = 30_000) {
+    private val starts = ArrayDeque<Long>()
+
+    /** Millisecondi da aspettare prima del prossimo avvio (0 = subito). */
+    fun delayBeforeStart(now: Long): Long {
+        while (starts.isNotEmpty() && now - starts.first() >= windowMs) starts.removeFirst()
+        return if (starts.size < maxStarts) 0 else starts.first() + windowMs - now + 500
+    }
+
+    fun recordStart(now: Long) {
+        starts.addLast(now)
+        while (starts.size > maxStarts) starts.removeFirst()
     }
 }
 TSM_EOF
@@ -3032,14 +3427,14 @@ object Reports {
 
         c.drawText("TENNIS SCORE MANAGER", w / 2f, 110f, paint(40f, Color.rgb(198, 244, 50), true, Paint.Align.CENTER).apply { letterSpacing = 0.2f })
         val header = listOfNotNull(rec.setup.club.ifBlank { null }, rec.setup.court.ifBlank { null }?.let { "${s.court} $it" }).joinToString(" · ")
-        if (header.isNotEmpty()) c.drawText(ellipsize(header, 56), w / 2f, 175f, paint(46f, white, true, Paint.Align.CENTER))
+        if (header.isNotEmpty()) paint(46f, white, true, Paint.Align.CENTER).let { c.drawText(fit(header, it, w - 120f), w / 2f, 175f, it) }
         c.drawText(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }, w / 2f, 235f, paint(36f, grey, false, Paint.Align.CENTER))
 
         // Riquadro del vincitore
         val box = RectF(60f, 290f, w - 60f, 470f)
         c.drawRoundRect(box, 36f, 36f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(60, 255, 255, 255) })
         c.drawText("🏆  ${s.winner.uppercase()}", w / 2f, 355f, paint(38f, grey, true, Paint.Align.CENTER))
-        c.drawText(ellipsize(names.side(winner), 28), w / 2f, 440f, paint(66f, if (winner == Side.P1) yellow else red, true, Paint.Align.CENTER))
+        paint(66f, if (winner == Side.P1) yellow else red, true, Paint.Align.CENTER).let { c.drawText(fit(names.side(winner), it, box.width() - 60f), w / 2f, 440f, it) }
 
         // Tabella punteggio
         val top = 540f
@@ -3053,11 +3448,13 @@ object Reports {
             c.drawRoundRect(rect, 28f, 28f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(40, 255, 255, 255) })
             c.drawRoundRect(RectF(60f, y, 84f, y + rowH), 12f, 12f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = if (side == Side.P1) yellow else red })
             val players = names.players(side)
+            // I nomi non devono finire sotto la colonna del primo set.
+            val nameW = firstCol - 120f - 20f
             if (players.size == 1) {
-                c.drawText(ellipsize(players[0], 18), 120f, y + rowH / 2 + 22f, paint(58f, white, side == winner))
+                paint(58f, white, side == winner).let { c.drawText(fit(players[0], it, nameW), 120f, y + rowH / 2 + 22f, it) }
             } else {
-                c.drawText(ellipsize(players[0], 18), 120f, y + rowH / 2 - 14f, paint(50f, white, side == winner))
-                c.drawText(ellipsize(players[1], 18), 120f, y + rowH / 2 + 50f, paint(50f, white, side == winner))
+                paint(50f, white, side == winner).let { c.drawText(fit(players[0], it, nameW), 120f, y + rowH / 2 - 14f, it) }
+                paint(50f, white, side == winner).let { c.drawText(fit(players[1], it, nameW), 120f, y + rowH / 2 + 50f, it) }
             }
             for ((j, set) in state.sets.withIndex()) {
                 val x = firstCol + j * colW + colW / 2
@@ -3071,11 +3468,9 @@ object Reports {
 
         // Dati della partita
         var y = top + 2 * (rowH + 30f) + 70f
-        val label = paint(34f, grey)
-        val value = paint(40f, white, true)
         fun row(l: String, v: String) {
-            c.drawText(l, 80f, y, label)
-            c.drawText(ellipsize(v, 40), 380f, y, value)
+            paint(34f, grey).let { c.drawText(fit(l, it, 380f - 80f - 16f), 80f, y, it) }
+            paint(40f, white, true).let { c.drawText(fit(v, it, w - 60f - 380f), 380f, y, it) }
             y += 66f
         }
         row(s.duration, duration(rec.clockMs))
@@ -3086,7 +3481,19 @@ object Reports {
         return bmp
     }
 
-    private fun ellipsize(t: String, max: Int) = if (t.length <= max) t else t.take(max - 1) + "…"
+    /**
+     * Testo che sta in [maxWidth] pixel (non in un numero di lettere: "WWW" e "iii" sono larghe diverse):
+     * prima si rimpicciolisce il carattere di [p] fino al 75%, poi si tronca con "…".
+     */
+    private fun fit(t: String, p: Paint, maxWidth: Float): String {
+        val minSize = p.textSize * 0.75f
+        while (p.measureText(t) > maxWidth && p.textSize > minSize) p.textSize -= 2f
+        if (p.measureText(t) <= maxWidth) return t
+        var end = t.length
+        while (end > 1 && p.measureText(t, 0, end) + p.measureText("…") > maxWidth) end--
+        if (end > 1 && Character.isHighSurrogate(t[end - 1])) end--
+        return t.substring(0, end).trimEnd() + "…"
+    }
 }
 TSM_EOF
 
@@ -3160,6 +3567,11 @@ class Storage(context: Context) {
     var historyTree: String?
         get() = prefs.getString("history_tree", null)
         set(v) = prefs.edit().putString("history_tree", v).apply()
+
+    /** Id della partita il cui riepilogo è a schermo (null dopo "Nuova partita" o "Esci"). */
+    var summaryOpen: String?
+        get() = prefs.getString("summary_open", null)
+        set(v) = prefs.edit().putString("summary_open", v).apply()
 
     /** Scrittura atomica: prima su file temporaneo, poi rinomina (sicuro anche se il telefono si spegne). */
     @Synchronized
@@ -3561,11 +3973,12 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MainActivity
 import com.tennis.scoremanager.R
+import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.TsmApp
 
 /**
- * Servizio in primo piano durante la partita con i braccialetti o col tabellone TV: tiene attivo il processo
- * (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
+ * Servizio in primo piano durante la partita con i braccialetti, e sempre col tabellone TV acceso: tiene attivo il
+ * processo (Bluetooth, server del tabellone, voce e cronometri) anche con lo schermo spento o l'app in secondo piano.
  */
 class MatchService : Service() {
 
@@ -3589,10 +4002,12 @@ class MatchService : Service() {
         )
         val bands = c.options.value.mode == com.tennis.scoremanager.data.PlayMode.BANDS
         val tv = c.tv.value.enabled
+        // Fuori dalla partita (riepilogo, nuova partita, impostazioni) il servizio resta solo per il tabellone TV.
+        val inMatch = c.screen.value == Screen.START || c.screen.value == Screen.MATCH
         val notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_tennis)
             .setContentTitle("Tennis Score Manager")
-            .setContentText(s.notifText(bands, tv))
+            .setContentText(if (tv && !inMatch) s.notifTvOnly else s.notifText(bands, tv))
             .setOngoing(true)
             .setContentIntent(open)
             .build()
@@ -3640,6 +4055,9 @@ import android.content.pm.ApplicationInfo
 import android.graphics.Color
 import android.hardware.display.DisplayManager
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -3707,9 +4125,11 @@ import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * "Usa come tabellone": questo telefono trova da solo il telefono dell'arbitro sulla rete dell'hotspot
@@ -3724,17 +4144,30 @@ class DisplayActivity : ComponentActivity() {
     private val s: Strings get() = stringsFor(controller.options.value.lang)
     private lateinit var finder: ScoreboardFinder
     private lateinit var displays: DisplayManager
+    private var cm: ConnectivityManager? = null
 
     private val found = MutableStateFlow<FoundScoreboard?>(null)
+    /** Pagina da mostrare: cambia a ogni collegamento, così si ricarica anche se l'indirizzo è lo stesso. */
+    private val page = MutableStateFlow<ScoreboardPage?>(null)
+    private var loads = 0
     private val searching = MutableStateFlow(false)
     private val notFound = MutableStateFlow(false)
     private val external = MutableStateFlow<Display?>(null)
     private val showHere = MutableStateFlow(false)
     private var presentation: ScoreboardPresentation? = null
+    /** Tabellone sul monitor esterno, per l'interfaccia ([presentation] da sola non la aggiorna). */
+    private val onMonitor = MutableStateFlow(false)
+    private var systemDismissAt = 0L
     private var searchJob: Job? = null
     private var lastBack = 0L
     /** Solo per le prove (adb): accetta anche il server di questo stesso telefono. */
     private var allowSelf = false
+
+    /** La rete Wi-Fi (anche senza internet): se cade o cambia (hotspot spento e riacceso) ci si ricollega. */
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) = runOnUiThread { onNetwork(network) }
+        override fun onLost(network: Network) = runOnUiThread { onNetworkLost(network) }
+    }
 
     private val displayListener = object : DisplayManager.DisplayListener {
         override fun onDisplayAdded(id: Int) = refreshExternal()
@@ -3765,15 +4198,21 @@ class DisplayActivity : ComponentActivity() {
         })
         displays.registerDisplayListener(displayListener, Handler(Looper.getMainLooper()))
         refreshExternal()
+        cm = getSystemService(ConnectivityManager::class.java)
         setContent { TsmTheme { DisplayContent() } }
         search()
+        val wifi = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        runCatching { cm?.requestNetwork(wifi, networkCallback) }.onFailure { Log.w("Tabellone", "requestNetwork", it) }
     }
 
     override fun onDestroy() {
         displays.unregisterDisplayListener(displayListener)
-        presentation?.dismiss()
-        presentation = null
-        getSystemService(ConnectivityManager::class.java)?.bindProcessToNetwork(null)
+        runCatching { cm?.unregisterNetworkCallback(networkCallback) }
+        presentation.also { presentation = null }?.dismiss()
+        cm?.bindProcessToNetwork(null)
         super.onDestroy()
     }
 
@@ -3785,31 +4224,64 @@ class DisplayActivity : ComponentActivity() {
         searching.value = true
         searchJob = lifecycleScope.launch {
             val result = if (manual != null) {
-                ScoreboardFinder.parseAddress(manual)?.let { (h, p) -> kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { finder.verify(h, p) } }
+                ScoreboardFinder.parseAddress(manual)?.let { (h, p) -> withContext(Dispatchers.IO) { finder.verify(h, p) } }
             } else {
-                finder.find(controller.storage.lastScoreboardHost)?.takeIf { allowSelf || it.host !in TvServer.localAddresses() }
+                // Il server di questo telefono (tabellone acceso anche qui) si salta e la ricerca continua.
+                finder.find(controller.storage.lastScoreboardHost, accept = ::notSelf)
             }
             searching.value = false
             if (result != null) connect(result) else notFound.value = found.value == null
         }
     }
 
+    /** Il server di questo stesso telefono non è il tabellone da mostrare (tranne che nelle prove). */
+    private fun notSelf(f: FoundScoreboard) = allowSelf || f.host !in TvServer.localAddresses()
+
     private fun connect(f: FoundScoreboard) {
         // Collegato all'hotspot dell'altro telefono: il traffico della pagina deve passare dal Wi-Fi anche se
         // Android, non vedendo internet lì, preferirebbe i dati mobili.
-        getSystemService(ConnectivityManager::class.java)?.bindProcessToNetwork(f.network)
+        cm?.bindProcessToNetwork(f.network)
         controller.storage.lastScoreboardHost = f.label
         found.value = f
+        page.value = ScoreboardPage(f.url, ++loads)
         updatePresentation()
     }
 
-    /** Dalla pagina: niente aggiornamenti da 20 secondi. Si cerca di nuovo (l'indirizzo può essere cambiato). */
-    private fun onLost() {
-        if (searchJob?.isActive == true) return
-        searchJob = lifecycleScope.launch {
-            val again = finder.find(null, timeoutMs = 30_000)?.takeIf { allowSelf || it.host !in TvServer.localAddresses() }
-            if (again != null && again.label != found.value?.label) connect(again)
+    /**
+     * Collegamento perso: la pagina tace da 20 secondi (poi lo ridice ogni 30), oppure la rete Wi-Fi è caduta o
+     * cambiata. Si ritrova lo stesso tabellone, anche a un indirizzo nuovo, si ricollega la rete e si ricarica la
+     * pagina. Mai un altro campo della stessa rete: per quello si esce e si cerca di nuovo.
+     */
+    private fun recover(restart: Boolean = false) {
+        val prev = found.value ?: return
+        if (searchJob?.isActive == true) {
+            if (!restart) return
+            searchJob?.cancel()
         }
+        searchJob = lifecycleScope.launch {
+            val again = finder.find(prev.label, timeoutMs = 30_000) { notSelf(it) && it.sameAs(prev) }
+            if (again != null) connect(again)
+        }
+    }
+
+    /** Rete Wi-Fi disponibile: si riprova la ricerca andata a vuoto, o si passa alla rete nuova (hotspot riacceso). */
+    private fun onNetwork(network: Network) {
+        if (isDestroyed) return
+        val f = found.value
+        if (f == null) {
+            if (searchJob?.isActive != true) search()
+        } else if (f.network != null && f.network != network) {
+            recover(restart = true)
+        }
+    }
+
+    private fun onNetworkLost(network: Network) {
+        if (isDestroyed) return
+        val f = found.value ?: return
+        if (f.network != network) return
+        // Legati a una rete che non c'è più, anche dopo il ritorno del Wi-Fi fallirebbe tutto: si slega e si cerca.
+        cm?.bindProcessToNetwork(null)
+        recover(restart = true)
     }
 
     // ---------------------------------------------------------------- monitor esterno
@@ -3821,17 +4293,36 @@ class DisplayActivity : ComponentActivity() {
 
     private fun updatePresentation() {
         val d = external.value
-        val f = found.value
+        val p = page.value
         val current = presentation
-        if (d == null || f == null) {
-            current?.dismiss()
+        if (d == null || p == null) {
             presentation = null
-        } else if (current == null || current.display.displayId != d.displayId || current.url != f.url) {
             current?.dismiss()
-            presentation = ScoreboardPresentation(this, d, f.url) { runOnUiThread { onLost() } }.also {
-                runCatching { it.show() }.onFailure { presentation = null }
+        } else if (current == null || current.display.displayId != d.displayId) {
+            presentation = null
+            current?.dismiss()
+            presentation = ScoreboardPresentation(this, d, p) { runOnUiThread { recover() } }.also { pr ->
+                pr.setOnDismissListener { onPresentationDismissed(pr) }
+                runCatching { pr.show() }.onFailure { presentation = null }
             }
+        } else {
+            current.load(p)
         }
+        monitorChanged()
+    }
+
+    /** Chiuso dal sistema (monitor staccato o preso da un'altra app): si riprova una volta, poi resta sul telefono. */
+    private fun onPresentationDismissed(pr: ScoreboardPresentation) {
+        if (presentation !== pr || isDestroyed) return  // chiuso da qui
+        presentation = null
+        val now = SystemClock.elapsedRealtime()
+        val retry = now - systemDismissAt > 10_000
+        systemDismissAt = now
+        if (retry) refreshExternal() else monitorChanged()
+    }
+
+    private fun monitorChanged() {
+        onMonitor.value = presentation != null
         // Tabellone sul monitor: il telefono si abbassa al minimo (resta acceso, se no si spegne anche l'uscita video).
         window.attributes = window.attributes.apply {
             screenBrightness = if (presentation != null && !showHere.value) 0.05f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
@@ -3843,16 +4334,22 @@ class DisplayActivity : ComponentActivity() {
     @Composable
     private fun DisplayContent() {
         val f by found.collectAsState()
-        val ext by external.collectAsState()
+        val p by page.collectAsState()
+        val monitor by onMonitor.collectAsState()
         val here by showHere.collectAsState()
         val busy by searching.collectAsState()
         val missing by notFound.collectAsState()
+        val shown = f
+        val current = p
         when {
-            f == null -> SearchScreen(busy, missing)
-            ext != null && presentation != null && !here -> OnMonitorScreen(f!!)
+            shown == null || current == null -> SearchScreen(busy, missing)
+            monitor && !here -> OnMonitorScreen(shown)
             else -> AndroidView(
-                factory = { ctx -> scoreboardWebView(ctx) { runOnUiThread { onLost() } } },
-                update = { web -> if (web.tag != f!!.url) { web.tag = f!!.url; web.loadUrl(f!!.url) } },
+                factory = { ctx -> scoreboardWebView(ctx) { runOnUiThread { recover() } } },
+                update = { web -> web.showPage(current) },
+                // WebView non più mostrata (es. il tabellone passa al monitor): va distrutta, se no il suo
+                // collegamento in diretta resta aperto e occupa un posto sul server.
+                onRelease = { web -> web.release() },
                 modifier = Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black),
             )
         }
@@ -3917,7 +4414,7 @@ class DisplayActivity : ComponentActivity() {
             Text(f.label, color = TsmColors.TextDim, fontSize = 14.sp)
             Spacer(Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                GhostButton(str.displayShowHere, Icons.Filled.Tv, { showHere.value = true; updatePresentation() })
+                GhostButton(str.displayShowHere, Icons.Filled.Tv, { showHere.value = true; monitorChanged() })
                 GhostButton(str.exit, Icons.AutoMirrored.Filled.ExitToApp, { finish() })
             }
         }
@@ -3928,15 +4425,47 @@ class DisplayActivity : ComponentActivity() {
 class ScoreboardPresentation(
     context: Context,
     display: Display,
-    val url: String,
+    private var page: ScoreboardPage,
     private val onLost: () -> Unit,
 ) : Presentation(context, display) {
+    private var web: WebView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val page = url  // dentro apply "url" sarebbe quello della WebView
-        setContentView(scoreboardWebView(context, onLost).apply { tag = page; loadUrl(page) })
+        setContentView(scoreboardWebView(context, onLost).also { web = it; it.showPage(page) })
     }
+
+    /** Collegamento nuovo sullo stesso monitor: si ricarica la pagina senza ricreare la finestra. */
+    fun load(p: ScoreboardPage) {
+        page = p
+        web?.showPage(p)
+    }
+
+    /** Chiuso (da qui o dal sistema): la WebView si distrugge insieme al suo collegamento in diretta. */
+    override fun onStop() {
+        web?.release()
+        web = null
+        super.onStop()
+    }
+}
+
+/** Pagina del tabellone: [n] cambia a ogni collegamento, così si ricarica anche allo stesso indirizzo. */
+data class ScoreboardPage(val url: String, val n: Int)
+
+/** Carica [page] se non è già quella mostrata. */
+fun WebView.showPage(page: ScoreboardPage) {
+    if (tag != page) {
+        tag = page
+        loadUrl(page.url)
+    }
+}
+
+/** WebView non più usata: si distrugge (chiude anche il collegamento /events). */
+fun WebView.release() {
+    tag = null
+    stopLoading()
+    destroy()
 }
 
 /** WebView del tabellone: JavaScript acceso, fondo nero, ricarica da sola se la pagina non arriva. */
@@ -3965,7 +4494,9 @@ fun scoreboardWebView(context: Context, onLost: () -> Unit): WebView = WebView(c
     }
     webViewClient = object : WebViewClient() {
         override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-            if (request.isForMainFrame) view.postDelayed({ (view.tag as? String)?.let { url -> view.loadUrl(url) } }, 3_000)
+            val page = view.tag as? ScoreboardPage ?: return
+            // se intanto la pagina è cambiata (o la WebView è stata distrutta) non si ricarica più quella vecchia
+            if (request.isForMainFrame) view.postDelayed({ if (view.tag == page) view.loadUrl(page.url) }, 3_000)
         }
     }
 }
@@ -3994,15 +4525,35 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.net.Inet4Address
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
 import javax.net.SocketFactory
 
-/** Telefono dell'arbitro trovato: [network] è la rete da usare per raggiungerlo (null = quella normale). */
-data class FoundScoreboard(val host: String, val port: Int, val network: Network?) {
+/**
+ * Telefono dell'arbitro trovato: [network] è la rete da usare per raggiungerlo (null = quella normale).
+ * [id] identifica il telefono (null = versione dell'app senza), [title] è la scritta del tabellone (circolo e campo).
+ */
+data class FoundScoreboard(
+    val host: String,
+    val port: Int,
+    val network: Network?,
+    val id: String? = null,
+    val title: String = "",
+) {
     val url: String get() = "http://$host:$port/?display=app"
     val label: String get() = "$host:$port"
+
+    /**
+     * Lo stesso tabellone di prima, per riprendere dopo un'interruzione senza saltare su un altro campo della
+     * stessa rete: stesso telefono, oppure stesso indirizzo, oppure stessa scritta (stesso circolo e campo).
+     */
+    fun sameAs(prev: FoundScoreboard): Boolean =
+        (id != null && id == prev.id) || label == prev.label || (title.isNotEmpty() && title == prev.title)
 }
 
 /**
@@ -4017,14 +4568,22 @@ class ScoreboardFinder(context: Context) {
     private val app = context.applicationContext
     private val cm = app.getSystemService(ConnectivityManager::class.java)
 
-    suspend fun find(lastKnown: String?, timeoutMs: Long = 20_000): FoundScoreboard? = withContext(Dispatchers.IO) {
-        lastKnown?.let { parseAddress(it) }?.let { (h, p) -> verify(h, p)?.let { return@withContext it } }
+    /**
+     * [accept] scarta i tabelloni che non vanno bene (questo stesso telefono, un altro campo) e la ricerca continua:
+     * vale anche per [lastKnown].
+     */
+    suspend fun find(
+        lastKnown: String?,
+        timeoutMs: Long = 20_000,
+        accept: (FoundScoreboard) -> Boolean = { true },
+    ): FoundScoreboard? = withContext(Dispatchers.IO) {
+        lastKnown?.let { parseAddress(it) }?.let { (h, p) -> verify(h, p)?.takeIf(accept)?.let { return@withContext it } }
         val result = CompletableDeferred<FoundScoreboard?>()
         val job = launch {
-            launch { nsd()?.let { result.complete(it) } }
+            launch { nsd(accept)?.let { result.complete(it) } }
             for (port in listOf(TvServer.PORT, TvServer.PORT + 1, TvServer.PORT + 2)) {
                 if (result.isCompleted) break
-                scan(port)?.let { result.complete(it) }
+                scan(port, accept)?.let { result.complete(it) }
             }
             // scansione finita senza risultato: qualche secondo ancora per l'annuncio NSD
             delay(3_000)
@@ -4045,15 +4604,18 @@ class ScoreboardFinder(context: Context) {
                 s.connect(InetSocketAddress(host, port), 700)
                 s.soTimeout = 1_500
                 s.getOutputStream().write("GET /state HTTP/1.0\r\nHost: $host\r\n\r\n".toByteArray())
-                val body = readAll(s.getInputStream(), 16_384)
-                if ("\"tsm\":1" in body) FoundScoreboard(host, port, network) else null
+                val response = readAll(s.getInputStream(), 16_384)
+                if ("\"tsm\":1" in response) {
+                    val (id, title) = identity(response)
+                    FoundScoreboard(host, port, network, id, title)
+                } else null
             }
         }.getOrNull()
     }
 
     // ---------------------------------------------------------------- NSD
 
-    private suspend fun nsd(): FoundScoreboard? {
+    private suspend fun nsd(accept: (FoundScoreboard) -> Boolean): FoundScoreboard? {
         val nsd = app.getSystemService(NsdManager::class.java) ?: return null
         val services = kotlinx.coroutines.channels.Channel<NsdServiceInfo>(8)
         val listener = object : NsdManager.DiscoveryListener {
@@ -4070,7 +4632,7 @@ class ScoreboardFinder(context: Context) {
                 val resolved = resolve(nsd, info) ?: continue
                 @Suppress("DEPRECATION")
                 val host = (resolved.host as? Inet4Address)?.hostAddress ?: continue
-                verify(host, resolved.port)?.let { return it }
+                verify(host, resolved.port)?.takeIf(accept)?.let { return it }
             }
         } finally {
             runCatching { nsd.stopServiceDiscovery(listener) }
@@ -4107,7 +4669,7 @@ class ScoreboardFinder(context: Context) {
             }
     }.getOrDefault(emptyList())
 
-    private suspend fun scan(port: Int): FoundScoreboard? = coroutineScope {
+    private suspend fun scan(port: Int, accept: (FoundScoreboard) -> Boolean): FoundScoreboard? = coroutineScope {
         val gate = Semaphore(48)
         for (lan in lans()) {
             val mask = -1 shl (32 - lan.prefix)
@@ -4120,7 +4682,7 @@ class ScoreboardFinder(context: Context) {
                 async {
                     gate.withPermit {
                         ensureActive()
-                        if (!found.isCompleted) verify(fromInt(ipInt), port)?.let { found.complete(it) }
+                        if (!found.isCompleted) verify(fromInt(ipInt), port)?.takeIf(accept)?.let { found.complete(it) }
                     }
                 }
             }
@@ -4170,6 +4732,17 @@ class ScoreboardFinder(context: Context) {
     private fun fromInt(v: Int): String = "${v ushr 24 and 0xFF}.${v ushr 16 and 0xFF}.${v ushr 8 and 0xFF}.${v and 0xFF}"
 
     companion object {
+        /** Identità e scritta del tabellone dalla risposta di /state (intestazioni + JSON); vuote se mancano. */
+        fun identity(response: String): Pair<String?, String> {
+            val head = response.substringBefore("\r\n\r\n")
+            val id = head.lineSequence().firstOrNull { it.startsWith(TvServer.ID_HEADER + ":", ignoreCase = true) }
+                ?.substringAfter(':')?.trim()?.takeIf { it.isNotEmpty() }
+            val title = runCatching {
+                Json.parseToJsonElement(response.substringAfter("\r\n\r\n")).jsonObject["title"]?.jsonPrimitive?.contentOrNull
+            }.getOrNull().orEmpty()
+            return id to title
+        }
+
         /** "192.168.43.1", "192.168.43.1:8081" o "http://192.168.43.1:8080/" -> host e porta. */
         fun parseAddress(text: String): Pair<String, Int>? {
             val t = text.trim().removePrefix("http://").removePrefix("https://").substringBefore('/')
@@ -4330,10 +4903,11 @@ object TvSnapshots {
             st.isFinished -> listOf("", "")
             else -> sides.map { st.pointLabel(it) }
         }
-        // A partita finita i game del set in corso sono azzerati: si mostrano quelli dell'ultimo set.
+        // A partita finita i game del set in corso sono azzerati: si mostrano quelli dell'ultimo set. Il match tie-break
+        // vale come set vinto 1-0, come sui tabelloni a LED (una cifra per i game); i punti, es. [10-8], stanno tra i set conclusi.
         val games = when {
             st == null -> listOf(0, 0)
-            st.isFinished -> st.sets.lastOrNull()?.let { set -> sides.map { set.shown(it) } } ?: listOf(0, 0)
+            st.isFinished -> st.sets.lastOrNull()?.let { set -> sides.map { set.games(it) } } ?: listOf(0, 0)
             else -> sides.map { st.games(it) }
         }
         val server = when {
@@ -4406,6 +4980,10 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.ParcelFileDescriptor
+import android.os.SystemClock
+import android.system.Os
+import android.system.OsConstants
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -4421,6 +4999,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
@@ -4435,17 +5015,39 @@ import java.util.concurrent.TimeUnit
  *   /        la pagina del tabellone (assets/scoreboard.html)
  *   /events  aggiornamenti in diretta (Server-Sent Events): un JSON a ogni punto e ogni 5 secondi
  *   /state   l'ultimo JSON (serve anche alla ricerca automatica del telefono-tabellone)
- * Solo lettura: dal tabellone non si può cambiare niente. Si annuncia sulla rete come "_tsm._tcp"
- * e tiene agganciata la rete Wi-Fi anche se non ha internet (hotspot dell'altro telefono).
+ * Solo lettura: dal tabellone non si può cambiare niente, e risponde solo alla rete locale (non ai dati mobili).
+ * Si annuncia sulla rete come "_tsm._tcp" e tiene agganciata la rete Wi-Fi anche se non ha internet
+ * (hotspot dell'altro telefono).
  */
 class TvServer(context: Context) {
 
     companion object {
         const val PORT = 8080
         const val SERVICE_TYPE = "_tsm._tcp"
+        /** Intestazione di /state con l'identità del telefono (vedi [ScoreboardFinder]). */
+        const val ID_HEADER = "X-TSM-Id"
         private const val MAX_STREAMS = 12
+        /** Scrittura ferma da tanto = tabellone sparito senza chiudere: si chiude il collegamento. */
+        private const val WRITE_TIMEOUT_MS = 20_000L
+        /** Linux: chiude la connessione se i dati inviati restano senza conferma per troppo tempo. */
+        private const val TCP_USER_TIMEOUT = 18
         private const val STOP = "\u0000stop"
         private const val TAG = "TvServer"
+
+        /**
+         * Chi può collegarsi: solo la rete locale (Wi-Fi, hotspot, USB). Il server ascolta su tutte le interfacce
+         * (il telefono può essere lui l'hotspot), quindi si scartano i dati mobili, IPv6 pubblico compreso.
+         * Niente 100.64/10: lo usano gli operatori mobili (CGNAT), non gli hotspot Android né iPhone.
+         */
+        fun isLocalPeer(a: InetAddress): Boolean {
+            val b = a.address
+            // IPv4 scritto in IPv6 (::ffff:192.168.43.5)
+            if (a is Inet6Address && b.size == 16 && (0 until 10).all { b[it] == 0.toByte() } && b[10] == (-1).toByte() && b[11] == (-1).toByte()) {
+                return isLocalPeer(InetAddress.getByAddress(b.copyOfRange(12, 16)))
+            }
+            return a.isLoopbackAddress || a.isLinkLocalAddress || a.isSiteLocalAddress ||
+                (a is Inet6Address && (b[0].toInt() and 0xFE) == 0xFC)  // IPv6 locale (ULA, fc00::/7)
+        }
 
         /**
          * Indirizzi IPv4 locali del telefono, prima Wi-Fi e hotspot. Esclusi i dati mobili e le VPN:
@@ -4489,13 +5091,32 @@ class TvServer(context: Context) {
     private val _addresses = MutableStateFlow<List<String>>(emptyList())
     val addresses: StateFlow<List<String>> = _addresses
 
+    /** Un tabellone collegato a /events. */
+    private class Stream(val socket: Socket) {
+        val queue = LinkedBlockingQueue<String>()
+        /** Da quando è ferma la scrittura in corso (0 = non sta scrivendo). */
+        @Volatile var writingSince = 0L
+
+        fun close() {
+            queue.offer(STOP)
+            runCatching { socket.close() }  // sblocca anche una scrittura ferma
+        }
+    }
+
     @Volatile private var latest: String = "{}"
     @Volatile private var server: ServerSocket? = null
-    private val streams = CopyOnWriteArrayList<LinkedBlockingQueue<String>>()
+    /** Modifiche ed elenco dei collegati sotto synchronized(streams), così il numero mostrato resta giusto. */
+    private val streams = CopyOnWriteArrayList<Stream>()
     private var addressJob: Job? = null
+    private var watchdogJob: Job? = null
     private var nsdListener: NsdManager.RegistrationListener? = null
     private var wifiCallback: ConnectivityManager.NetworkCallback? = null
     private val page: ByteArray by lazy { app.assets.open("scoreboard.html").use { it.readBytes() } }
+    /** Identità di questo telefono: dopo un'interruzione il telefono-tabellone lo ritrova anche se l'indirizzo è cambiato. */
+    private val serverId: String by lazy {
+        val prefs = app.getSharedPreferences("tv_server", Context.MODE_PRIVATE)
+        prefs.getString("id", null) ?: java.util.UUID.randomUUID().toString().take(8).also { prefs.edit().putString("id", it).apply() }
+    }
 
     /** Indirizzo da mostrare e da mettere nel QR, es. http://192.168.43.1:8080/ (null = nessuna rete locale). */
     fun url(address: String? = _addresses.value.firstOrNull()): String? {
@@ -4524,6 +5145,16 @@ class TvServer(context: Context) {
                 delay(3_000)
             }
         }
+        watchdogJob = scope.launch {
+            while (isActive) {
+                delay(5_000)
+                val now = SystemClock.elapsedRealtime()
+                streams.filter { it.writingSince != 0L && now - it.writingSince > WRITE_TIMEOUT_MS }.forEach {
+                    Log.d(TAG, "tabellone fermo da ${WRITE_TIMEOUT_MS / 1000}\": chiuso")
+                    it.close()
+                }
+            }
+        }
         Log.i(TAG, "Tabellone su porta ${socket.localPort}")
     }
 
@@ -4532,13 +5163,17 @@ class TvServer(context: Context) {
         val socket = server ?: return
         server = null
         runCatching { socket.close() }
-        streams.forEach { it.offer(STOP) }
-        streams.clear()
-        _clients.value = 0
+        synchronized(streams) {
+            streams.forEach { it.close() }
+            streams.clear()
+            _clients.value = 0
+        }
         _running.value = false
         _port.value = null
         addressJob?.cancel()
         addressJob = null
+        watchdogJob?.cancel()
+        watchdogJob = null
         unregisterNsd()
         releaseWifi()
     }
@@ -4546,9 +5181,9 @@ class TvServer(context: Context) {
     /** Nuovo stato del tabellone: va subito a tutti i tabelloni collegati. */
     fun publish(json: String) {
         latest = json
-        for (q in streams) {
-            if (q.size > 16) q.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
-            q.offer(json)
+        for (st in streams) {
+            if (st.queue.size > 16) st.queue.clear()  // tabellone bloccato: meglio perdere i vecchi che riempire la memoria
+            st.queue.offer(json)
         }
     }
 
@@ -4559,7 +5194,16 @@ class TvServer(context: Context) {
             val client = try {
                 socket.accept()
             } catch (e: IOException) {
-                break
+                if (socket.isClosed) break
+                // errore passeggero (es. troppi file aperti): si riprova, se no il tabellone sparirebbe per sempre
+                Log.w(TAG, "accept: $e")
+                runCatching { Thread.sleep(500) }
+                continue
+            }
+            if (!isLocalPeer(client.inetAddress)) {
+                Log.d(TAG, "rifiutato ${client.inetAddress}")
+                runCatching { client.close() }
+                continue
             }
             pool.execute { runCatching { handle(client) }.onFailure { Log.d(TAG, "richiesta interrotta: $it") } }
         }
@@ -4587,7 +5231,7 @@ class TvServer(context: Context) {
             }
             when (path) {
                 "/", "/index.html" -> respond(out, "200 OK", "text/html; charset=utf-8", page, head)
-                "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head)
+                "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
                 else -> respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
@@ -4607,50 +5251,70 @@ class TvServer(context: Context) {
         return sb.toString()
     }
 
-    private fun respond(out: OutputStream, status: String, type: String, body: ByteArray, head: Boolean) {
+    private fun respond(out: OutputStream, status: String, type: String, body: ByteArray, head: Boolean, extra: String = "") {
         val headers = "HTTP/1.1 $status\r\n" +
             "Content-Type: $type\r\n" +
             "Content-Length: ${body.size}\r\n" +
             "Cache-Control: no-store\r\n" +
             "Access-Control-Allow-Origin: *\r\n" +
+            extra +
             "Connection: close\r\n\r\n"
         out.write(headers.toByteArray(Charsets.ISO_8859_1))
         if (!head) out.write(body)
         out.flush()
     }
 
-    /** Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace. */
+    /**
+     * Flusso SSE: lo stato attuale subito, poi ogni aggiornamento; un commento ogni 15" se tutto tace.
+     * Un tabellone sparito senza chiudere (Wi-Fi caduto) non tiene il posto per sempre: buffer piccolo e
+     * TCP_USER_TIMEOUT fanno fallire presto la scrittura, il controllo chiude chi resta fermo, e a posti esauriti
+     * si libera il collegamento più vecchio invece di rifiutare il nuovo.
+     */
     private fun stream(s: Socket, out: OutputStream) {
-        if (streams.size >= MAX_STREAMS) {
-            respond(out, "503 Service Unavailable", "text/plain", "Too many scoreboards (max $MAX_STREAMS)".toByteArray(), false)
-            return
+        val st = Stream(s)
+        synchronized(streams) {
+            while (streams.size >= MAX_STREAMS) streams.removeAt(0).close()
+            streams += st
+            _clients.value = streams.size
         }
-        val q = LinkedBlockingQueue<String>()
-        streams += q
-        _clients.value = streams.size
         try {
             s.soTimeout = 0
-            out.write(
-                ("HTTP/1.1 200 OK\r\n" +
+            s.sendBufferSize = 16 * 1024
+            runCatching {
+                ParcelFileDescriptor.fromSocket(s).use { Os.setsockoptInt(it.fileDescriptor, OsConstants.IPPROTO_TCP, TCP_USER_TIMEOUT, 30_000) }
+            }
+            send(
+                st, out,
+                "HTTP/1.1 200 OK\r\n" +
                     "Content-Type: text/event-stream; charset=utf-8\r\n" +
                     "Cache-Control: no-store\r\n" +
                     "Access-Control-Allow-Origin: *\r\n" +
                     "Connection: keep-alive\r\n\r\n" +
-                    "retry: 2000\n\n").toByteArray(Charsets.UTF_8),
+                    "retry: 2000\n\n" +
+                    "data: $latest\n\n",
             )
-            out.write("data: $latest\n\n".toByteArray(Charsets.UTF_8))
-            out.flush()
             while (server != null) {
-                val msg = q.poll(15, TimeUnit.SECONDS)
+                val msg = st.queue.poll(15, TimeUnit.SECONDS)
                 if (msg == STOP) break
-                out.write((if (msg == null) ": ping\n\n" else "data: $msg\n\n").toByteArray(Charsets.UTF_8))
-                out.flush()
+                send(st, out, if (msg == null) ": ping\n\n" else "data: $msg\n\n")
             }
         } catch (e: IOException) {
             // tabellone chiuso o fuori portata: se ne va da solo
         } finally {
-            streams -= q
-            _clients.value = streams.size
+            synchronized(streams) {
+                streams -= st
+                _clients.value = streams.size
+            }
+        }
+    }
+
+    private fun send(st: Stream, out: OutputStream, text: String) {
+        st.writingSince = SystemClock.elapsedRealtime()
+        try {
+            out.write(text.toByteArray(Charsets.UTF_8))
+            out.flush()
+        } finally {
+            st.writingSince = 0L
         }
     }
 
@@ -4797,6 +5461,8 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
     }
     // Bozza locale: i cursori la cambiano subito, il braccialetto riceve il valore al rilascio.
     var draft by remember(band.address, settings) { mutableStateOf(settings) }
+    var confirmOff by remember(band.address) { mutableStateOf(false) }
+    val locale = c.options.collectAsState().value.lang.locale
     fun commit(v: BandSettings) {
         draft = v
         if (v != settings) c.writeBandSettings(side, v)
@@ -4833,16 +5499,31 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
             commit(draft.copy(idleTimeoutMin = it))
         }
 
-        Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery)
+        Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery, locale)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PanelButton(s.identify, Icons.Filled.FlashOn, Modifier.weight(1f)) { c.identifyBand(side) }
-            PanelButton(s.powerOff, Icons.Filled.PowerSettingsNew, Modifier.weight(1f), danger = true) { c.powerOffBand(side) }
+            // Anche a partita in corso: spegnere per sbaglio il braccialetto di un giocatore va confermato.
+            PanelButton(s.powerOff, Icons.Filled.PowerSettingsNew, Modifier.weight(1f), danger = true) { confirmOff = true }
         }
         val other = bands[side.other]
         PanelButton(s.copyToOther, Icons.Filled.ContentCopy, Modifier.fillMaxWidth(),
             enabled = other?.state == LinkState.READY && other.settings != null) { c.copyBandSettings(side) }
         if (settings.firmware.isNotEmpty()) Text(s.bandFirmware(settings.firmware), color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+    if (confirmOff) {
+        ConfirmDialog(
+            icon = Icons.Filled.PowerSettingsNew,
+            title = s.bandPowerOffTitle,
+            text = s.bandPowerOffText(settings.name.ifBlank { band.name }),
+            confirm = s.powerOff,
+            danger = true,
+            onConfirm = {
+                confirmOff = false
+                c.powerOffBand(side)
+            },
+            onDismiss = { confirmOff = false },
+        )
     }
 }
 
@@ -4853,10 +5534,11 @@ private fun duration(seconds: Int): String = when {
     else -> "${seconds / 60} min ${seconds % 60} s"
 }
 
-private fun ma(v: Double): String = String.format(Locale.getDefault(), if (v >= 10) "%.0f" else "%.1f", v)
+/** Milliampere con la virgola o il punto della lingua dell'app (non del telefono). */
+private fun ma(v: Double, locale: Locale): String = String.format(locale, if (v >= 10) "%.0f" else "%.1f", v)
 
 @Composable
-private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: Int?) {
+private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: Int?, locale: Locale) {
     val s = LocalStrings.current
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Ball.copy(alpha = 0.10f)).padding(12.dp),
@@ -4868,7 +5550,7 @@ private fun Estimate(est: com.tennis.scoremanager.ble.PowerEstimate, percent: In
             Text(s.estimateFull(BatteryModel.formatHours(est.hoursFull)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
         }
         if (percent != null) Text(s.estimateNow(BatteryModel.formatHours(est.hoursAt(percent)), percent), color = TsmColors.Ball, fontWeight = FontWeight.SemiBold)
-        Text(s.estimateBreakdown(ma(est.totalMa), ma(est.baseMa), ma(est.displayMa), ma(est.soundMa)), color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(s.estimateBreakdown(ma(est.totalMa, locale), ma(est.baseMa, locale), ma(est.displayMa, locale), ma(est.soundMa, locale)), color = TsmColors.TextDim, fontSize = 12.sp)
         Text(if (est.measured) s.estimateMeasured else s.estimateTheory, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }
@@ -5009,6 +5691,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -5018,6 +5701,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ui.screens.MatchScreen
@@ -5029,7 +5719,33 @@ import com.tennis.scoremanager.ui.screens.SummaryScreen
 @Composable
 fun AppRoot(c: MatchController) {
     val screen by c.screen.collectAsState()
-    Surface(color = TsmColors.Background, modifier = Modifier.fillMaxSize()) {
+    Surface(
+        color = TsmColors.Background,
+        modifier = Modifier.fillMaxSize().pointerInput(c) {
+            // Il secondo tocco di un doppio tocco finirebbe sul pulsante che sta nello stesso punto della schermata
+            // nuova ("Inizia partita" due volte = "Sospendi", "Avanti" due volte salta la pagina 2). Si decide al
+            // momento del tocco, leggendo la schermata dal controller: un overlay comparirebbe solo al fotogramma
+            // dopo, troppo tardi su un telefono lento.
+            var upAt = 0L
+            var screenAtUp: Screen? = null
+            var blocking = false
+            awaitPointerEventScope {
+                while (true) {
+                    val e = awaitPointerEvent(PointerEventPass.Initial)
+                    val now = e.changes.firstOrNull()?.uptimeMillis ?: continue
+                    if (e.type == PointerEventType.Press) {
+                        blocking = now - upAt < TAP_GUARD_MS && c.screen.value != screenAtUp
+                    }
+                    if (blocking) e.changes.forEach { it.consume() }
+                    if (e.type == PointerEventType.Release) {
+                        // Nel passaggio Initial il clic non è ancora avvenuto: questa è la schermata su cui si è toccato.
+                        upAt = now
+                        screenAtUp = c.screen.value
+                    }
+                }
+            }
+        },
+    ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
                 Screen.SETUP -> SetupScreen(c)
@@ -5040,6 +5756,52 @@ fun AppRoot(c: MatchController) {
             }
         }
     }
+}
+
+/** Quanto restano sordi ai tocchi una schermata o un popup appena aperti. */
+const val TAP_GUARD_MS = 450L
+
+/**
+ * Diventa true [TAP_GUARD_MS] dopo l'apertura: i pulsanti di un popup appena comparso ignorano il secondo
+ * tocco di un doppio tocco fatto sotto (es. il punto della partita e poi "Annulla ultimo punto").
+ */
+@Composable
+fun rememberArmed(): Boolean {
+    var armed by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(TAP_GUARD_MS)
+        armed = true
+    }
+    return armed
+}
+
+/** Conferma di un'azione che non si può annullare (cancellare, spegnere, chiudere). */
+@Composable
+fun ConfirmDialog(
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirm: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    danger: Boolean = false,
+) {
+    val s = LocalStrings.current
+    val armed = rememberArmed()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(icon, null, tint = if (danger) TsmColors.Danger else TsmColors.Orange) },
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            Button(
+                onClick = { if (armed) onConfirm() },
+                colors = if (danger) ButtonDefaults.buttonColors(containerColor = TsmColors.Danger, contentColor = TsmColors.TextMain)
+                else ButtonDefaults.buttonColors(),
+            ) { Text(confirm) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(s.cancel) } },
+    )
 }
 
 /** Schermata standard: intestazione, contenuto scorrevole, barra pulsanti in basso. */
@@ -5101,9 +5863,13 @@ data class SegOption(val label: String, val icon: ImageVector? = null, val color
 
 /** Selettore a segmenti (uno solo attivo). Con [columns] minore del numero di opzioni va a capo in più righe. */
 @Composable
-fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size) {
+fun Segmented(
+    options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, columns: Int = options.size,
+    enabled: Boolean = true,
+) {
     Column(
-        modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
+        modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(14.dp))
+            .border(1.dp, TsmColors.Outline, RoundedCornerShape(14.dp)),
     ) {
         options.chunked(columns.coerceAtLeast(1)).forEachIndexed { r, row ->
             Row(Modifier.fillMaxWidth()) {
@@ -5113,7 +5879,7 @@ fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, 
                     Row(
                         Modifier.weight(1f)
                             .background(if (sel) o.color else Color.Transparent)
-                            .clickable(role = Role.RadioButton) { onSelect(i) }
+                            .clickable(enabled = enabled, role = Role.RadioButton) { onSelect(i) }
                             .padding(vertical = 12.dp, horizontal = 8.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
@@ -5140,9 +5906,10 @@ fun Segmented(options: List<SegOption>, selected: Int, onSelect: (Int) -> Unit, 
 }
 
 @Composable
-fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
+fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { onChange(!checked) }.padding(vertical = 4.dp),
+        Modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(12.dp))
+            .clickable(enabled = enabled) { onChange(!checked) }.padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, null, tint = TsmColors.TextDim)
@@ -5154,6 +5921,7 @@ fun SwitchRow(icon: ImageVector, title: String, hint: String?, checked: Boolean,
         Switch(
             checked = checked,
             onCheckedChange = onChange,
+            enabled = enabled,
             colors = SwitchDefaults.colors(checkedTrackColor = TsmColors.Ball, checkedThumbColor = TsmColors.OnBall),
         )
     }
@@ -5236,13 +6004,13 @@ fun Pill(text: String, color: Color, onColor: Color, icon: ImageVector? = null, 
 
 /** Campo a tendina semplice: etichetta, valore attuale e voci del menu (chiave, testo). */
 @Composable
-fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, onSelect: (T) -> Unit) {
+fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, enabled: Boolean = true, onSelect: (T) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.4f)) {
         Text(label, color = TsmColors.TextDim, fontSize = 13.sp)
         Spacer(Modifier.height(4.dp))
         Box {
-            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), enabled = enabled, shape = RoundedCornerShape(12.dp)) {
                 Text(value, color = TsmColors.TextMain, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
             }
@@ -5353,6 +6121,9 @@ interface Strings {
     val estimateTheory: String
     val copyToOther: String
     val powerOff: String
+    /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
+    val bandPowerOffTitle: String
+    val bandPowerOffText: (String) -> String
     val languageSection: String
     val languageHint: String
     val audioSection: String
@@ -5361,8 +6132,13 @@ interface Strings {
     val voiceFilesHint: String
     val generateVoice: String
     val generating: (Int, Int) -> String
+    /** "Genera file" non arrivato in fondo: restano i file di prima. */
+    val voiceGenerationFailed: String
     val importVoiceZip: String
+    val voiceImportFailed: String
     val deleteCustomVoice: String
+    val deleteCustomConfirmTitle: String
+    val deleteCustomConfirmText: (Int) -> String
     val ttsEngine: String
     val engineDefault: String
     val ttsVoice: String
@@ -5380,6 +6156,9 @@ interface Strings {
     val stopVoiceTest: String
     val ttsMissing: String
     val installVoice: String
+    /** Il motore di sintesi vocale non parte: installare una voce non serve. */
+    val ttsEngineError: String
+    val openTtsSettings: String
     val formatSection: String
     val formatBestOfThree: String
     val formatBestOfThreeHint: String
@@ -5409,7 +6188,8 @@ interface Strings {
     val bandsRequiredTitle: String
     val bandsRequiredText: String
     val bandsMissingTitle: String
-    val bandsMissingText: (String) -> String
+    /** Giocatori senza braccialetto (uno o due: singolare o plurale). */
+    val bandsMissingText: (List<String>) -> String
     val continueAnyway: String
     val cancel: String
 
@@ -5422,6 +6202,9 @@ interface Strings {
     val noSavedMatches: String
     val savedMatchesTitle: String
     val delete: String
+    /** Conferma prima di eliminare una partita sospesa ("Rossi vs Bianchi"). */
+    val deleteSavedTitle: String
+    val deleteSavedText: (String) -> String
     val vs: String
 
     // Partita
@@ -5443,7 +6226,8 @@ interface Strings {
     val newMatchConfirmTitle: String
     val newMatchConfirmText: String
     val endDialogTitle: String
-    val endDialogText: (String, String) -> String
+    /** Vincitore, punteggio, doppio (il verbo va al plurale: "Vincono Rossi e Bianchi"). */
+    val endDialogText: (String, String, Boolean) -> String
     val matchConcluded: String
     val undoLastPoint: String
     val serveOrderTitle: (Int) -> String
@@ -5478,6 +6262,8 @@ interface Strings {
     // Notifica mentre la partita è in corso
     val notifChannel: String
     val notifText: (bands: Boolean, tv: Boolean) -> String
+    /** Nessuna partita in corso (riepilogo, nuova partita) ma tabellone TV acceso. */
+    val notifTvOnly: String
 
     // Braccialetti (solo ASCII, poche lettere)
     val bandPaired: String
@@ -5507,6 +6293,9 @@ interface Strings {
     val gamesWon: String
     val result: String
     val saveHistory: String
+    /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
+    val summaryLeaveTitle: String
+    val summaryLeaveText: String
     val share: String
     val saveDialogTitle: String
     val fileName: String
@@ -5655,6 +6444,8 @@ object ItStrings : Strings {
     override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
     override val copyToOther = "Copia sull'altro braccialetto"
     override val powerOff = "Spegni"
+    override val bandPowerOffTitle = "Spegnere il braccialetto?"
+    override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
     override val languageSection = "Lingua"
     override val languageHint = "Vale per le schermate, la voce dell'arbitro, il tabellone TV e i braccialetti."
     override val audioSection = "Audio e voce"
@@ -5663,8 +6454,12 @@ object ItStrings : Strings {
     override val voiceFilesHint = "Tutto funziona senza internet con le voci installate sul telefono. Le registrazioni personalizzate (ZIP) hanno sempre la precedenza sulla sintesi vocale."
     override val generateVoice = "Genera file"
     override val generating: (Int, Int) -> String = { n, tot -> "Generazione $n/$tot…" }
+    override val voiceGenerationFailed = "Generazione non completata: i file vocali di prima restano com'erano."
     override val importVoiceZip = "Importa ZIP"
+    override val voiceImportFailed = "ZIP non leggibile o incompleto: nessuna registrazione è cambiata."
     override val deleteCustomVoice = "Rimuovi registrazioni"
+    override val deleteCustomConfirmTitle = "Rimuovere le registrazioni?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Le registrazioni personalizzate in italiano ($n) vengono cancellate dal telefono. Per riaverle bisogna importare di nuovo lo ZIP." }
     override val ttsEngine = "Motore sintesi vocale"
     override val engineDefault = "Predefinito del telefono"
     override val ttsVoice = "Voce"
@@ -5686,6 +6481,8 @@ object ItStrings : Strings {
     override val stopVoiceTest = "Ferma la prova"
     override val ttsMissing = "Voce italiana della sintesi vocale non installata sul telefono."
     override val installVoice = "Installa voce"
+    override val ttsEngineError = "Sintesi vocale non disponibile: controlla il motore in Impostazioni di Android."
+    override val openTtsSettings = "Apri impostazioni"
     override val formatSection = "Formato partita"
     override val formatBestOfThree = "3 set · tie-break a 7"
     override val formatBestOfThreeHint = "Al meglio dei tre set, tie-break sul 6-6 in ogni set."
@@ -5713,7 +6510,9 @@ object ItStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth e posizione obbligatori"
     override val bandsRequiredText = "Per usare i braccialetti devi attivare il Bluetooth, concedere il permesso di posizione e tenere attiva la posizione."
     override val bandsMissingTitle = "Braccialetti non associati"
-    override val bandsMissingText: (String) -> String = { "Manca il braccialetto per: $it. Continuare lo stesso?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Mancano i braccialetti per: " else "Manca il braccialetto per: ") + it.joinToString(", ") + ". Continuare lo stesso?"
+    }
     override val continueAnyway = "Continua"
     override val cancel = "Annulla"
 
@@ -5725,6 +6524,8 @@ object ItStrings : Strings {
     override val noSavedMatches = "Nessuna partita sospesa salvata."
     override val savedMatchesTitle = "Partite sospese"
     override val delete = "Elimina"
+    override val deleteSavedTitle = "Eliminare la partita sospesa?"
+    override val deleteSavedText: (String) -> String = { "La partita $it non si potrà più riprendere." }
     override val vs = "vs"
 
     override val matchTime = "Match Time"
@@ -5740,7 +6541,7 @@ object ItStrings : Strings {
     override val newMatchConfirmTitle = "Nuova partita?"
     override val newMatchConfirmText = "La partita in corso resta salvata tra le partite sospese e potrai riprenderla."
     override val endDialogTitle = "Gioco, set, partita"
-    override val endDialogText: (String, String) -> String = { name, score -> "Vince $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Vincono" else "Vince"} $name\n$score" }
     override val matchConcluded = "Partita conclusa"
     override val undoLastPoint = "Annulla ultimo punto"
     override val serveOrderTitle: (Int) -> String = { "Ordine di servizio · set $it" }
@@ -5786,6 +6587,7 @@ object ItStrings : Strings {
             else -> "braccialetti attivi"
         }
     }
+    override val notifTvOnly = "Tabellone TV attivo"
 
     override val bandPaired = "ASSOCIATO A"
     override val bandPlay = "GIOCO"
@@ -5813,6 +6615,8 @@ object ItStrings : Strings {
     override val gamesWon = "Game vinti"
     override val result = "Risultato"
     override val saveHistory = "Salva nello storico"
+    override val summaryLeaveTitle = "Riepilogo non salvato"
+    override val summaryLeaveText = "Non hai salvato né condiviso il riepilogo della partita: dopo non potrai più rivederlo."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva nello storico"
     override val fileName = "Nome"
@@ -5951,6 +6755,8 @@ object EnStrings : Strings {
     override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
     override val copyToOther = "Copy to the other wristband"
     override val powerOff = "Power off"
+    override val bandPowerOffTitle = "Power off the wristband?"
+    override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
     override val languageSection = "Language"
     override val languageHint = "Applies to the screens, the umpire's voice, the TV scoreboard and the wristbands."
     override val audioSection = "Audio and voice"
@@ -5959,8 +6765,12 @@ object EnStrings : Strings {
     override val voiceFilesHint = "Everything works offline with the voices installed on the phone. Custom recordings (ZIP) always take precedence over text-to-speech."
     override val generateVoice = "Generate files"
     override val generating: (Int, Int) -> String = { n, tot -> "Generating $n/$tot…" }
+    override val voiceGenerationFailed = "Generation not completed: the previous voice files are unchanged."
     override val importVoiceZip = "Import ZIP"
+    override val voiceImportFailed = "ZIP unreadable or incomplete: no recordings were changed."
     override val deleteCustomVoice = "Remove recordings"
+    override val deleteCustomConfirmTitle = "Remove the recordings?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "The custom English recordings ($n) are deleted from the phone. To get them back, import the ZIP again." }
     override val ttsEngine = "Speech engine"
     override val engineDefault = "Phone default"
     override val ttsVoice = "Voice"
@@ -5982,6 +6792,8 @@ object EnStrings : Strings {
     override val stopVoiceTest = "Stop the test"
     override val ttsMissing = "English text-to-speech voice is not installed on this phone."
     override val installVoice = "Install voice"
+    override val ttsEngineError = "Text-to-speech is not available: check the engine in Android Settings."
+    override val openTtsSettings = "Open settings"
     override val formatSection = "Match format"
     override val formatBestOfThree = "3 sets · tie-break to 7"
     override val formatBestOfThreeHint = "Best of three sets, tie-break at 6-6 in every set."
@@ -6009,7 +6821,9 @@ object EnStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth and location required"
     override val bandsRequiredText = "To use the wristbands turn on Bluetooth, allow location and keep location on."
     override val bandsMissingTitle = "Wristbands not assigned"
-    override val bandsMissingText: (String) -> String = { "No wristband for: $it. Continue anyway?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "No wristbands for: " else "No wristband for: ") + it.joinToString(", ") + ". Continue anyway?"
+    }
     override val continueAnyway = "Continue"
     override val cancel = "Cancel"
 
@@ -6021,6 +6835,8 @@ object EnStrings : Strings {
     override val noSavedMatches = "No suspended match saved."
     override val savedMatchesTitle = "Suspended matches"
     override val delete = "Delete"
+    override val deleteSavedTitle = "Delete the suspended match?"
+    override val deleteSavedText: (String) -> String = { "The match $it can no longer be resumed." }
     override val vs = "vs"
 
     override val matchTime = "Match Time"
@@ -6036,7 +6852,7 @@ object EnStrings : Strings {
     override val newMatchConfirmTitle = "New match?"
     override val newMatchConfirmText = "The current match stays saved among suspended matches and can be resumed."
     override val endDialogTitle = "Game, set and match"
-    override val endDialogText: (String, String) -> String = { name, score -> "$name wins\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "$name ${if (team) "win" else "wins"}\n$score" }
     override val matchConcluded = "Match concluded"
     override val undoLastPoint = "Undo last point"
     override val serveOrderTitle: (Int) -> String = { "Serving order · set $it" }
@@ -6082,6 +6898,7 @@ object EnStrings : Strings {
             else -> "wristbands on"
         }
     }
+    override val notifTvOnly = "TV scoreboard on"
 
     override val bandPaired = "PAIRED WITH"
     override val bandPlay = "PLAY"
@@ -6109,6 +6926,8 @@ object EnStrings : Strings {
     override val gamesWon = "Games won"
     override val result = "Result"
     override val saveHistory = "Save to history"
+    override val summaryLeaveTitle = "Summary not saved"
+    override val summaryLeaveText = "You have neither saved nor shared the match summary: you won't be able to see it again."
     override val share = "Share"
     override val saveDialogTitle = "Save to history"
     override val fileName = "Name"
@@ -6267,6 +7086,8 @@ object DeStrings : Strings {
     override val estimateTheory = "Theoretische Schätzung: Nach 20 Minuten Nutzung wird sie mit dem gemessenen Verbrauch korrigiert."
     override val copyToOther = "Auf das andere Armband kopieren"
     override val powerOff = "Ausschalten"
+    override val bandPowerOffTitle = "Armband ausschalten?"
+    override val bandPowerOffText: (String) -> String = { "$it schaltet sich sofort aus. Zum Einschalten: ein Klick auf die Seitentaste." }
     override val languageSection = "Sprache"
     override val languageHint = "Gilt für die Bildschirme, die Stimme des Schiedsrichters, die TV-Anzeigetafel und die Armbänder."
     override val audioSection = "Audio und Stimme"
@@ -6275,8 +7096,12 @@ object DeStrings : Strings {
     override val voiceFilesHint = "Alles funktioniert ohne Internet mit den auf dem Telefon installierten Stimmen. Eigene Aufnahmen (ZIP) haben immer Vorrang vor der Sprachausgabe."
     override val generateVoice = "Dateien erzeugen"
     override val generating: (Int, Int) -> String = { n, tot -> "Erzeuge $n/$tot…" }
+    override val voiceGenerationFailed = "Erzeugung nicht abgeschlossen: Die bisherigen Sprachdateien bleiben unverändert."
     override val importVoiceZip = "ZIP importieren"
+    override val voiceImportFailed = "ZIP nicht lesbar oder unvollständig: Keine Aufnahme wurde geändert."
     override val deleteCustomVoice = "Aufnahmen entfernen"
+    override val deleteCustomConfirmTitle = "Aufnahmen entfernen?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Die eigenen deutschen Aufnahmen ($n) werden vom Telefon gelöscht. Um sie zurückzubekommen, importiere das ZIP erneut." }
     override val ttsEngine = "Sprachausgabe-Engine"
     override val engineDefault = "Standard des Telefons"
     override val ttsVoice = "Stimme"
@@ -6298,6 +7123,8 @@ object DeStrings : Strings {
     override val stopVoiceTest = "Test beenden"
     override val ttsMissing = "Die deutsche Stimme der Sprachausgabe ist auf dem Telefon nicht installiert."
     override val installVoice = "Stimme installieren"
+    override val ttsEngineError = "Sprachausgabe nicht verfügbar: Prüfe die Engine in den Android-Einstellungen."
+    override val openTtsSettings = "Einstellungen öffnen"
     override val formatSection = "Matchformat"
     override val formatBestOfThree = "2 Gewinnsätze · Tie-Break bis 7"
     override val formatBestOfThreeHint = "Auf zwei Gewinnsätze, Tie-Break bei 6 beide in jedem Satz."
@@ -6325,7 +7152,9 @@ object DeStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth und Standort erforderlich"
     override val bandsRequiredText = "Für die Armbänder Bluetooth einschalten, die Standortberechtigung erteilen und den Standort eingeschaltet lassen."
     override val bandsMissingTitle = "Armbänder nicht zugeordnet"
-    override val bandsMissingText: (String) -> String = { "Es fehlt das Armband für: $it. Trotzdem fortfahren?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Es fehlen die Armbänder für: " else "Es fehlt das Armband für: ") + it.joinToString(", ") + ". Trotzdem fortfahren?"
+    }
     override val continueAnyway = "Fortfahren"
     override val cancel = "Abbrechen"
 
@@ -6337,6 +7166,8 @@ object DeStrings : Strings {
     override val noSavedMatches = "Kein unterbrochenes Match gespeichert."
     override val savedMatchesTitle = "Unterbrochene Matches"
     override val delete = "Löschen"
+    override val deleteSavedTitle = "Unterbrochenes Match löschen?"
+    override val deleteSavedText: (String) -> String = { "Das Match $it kann danach nicht mehr fortgesetzt werden." }
     override val vs = "gegen"
 
     override val matchTime = "Match Time"
@@ -6352,7 +7183,7 @@ object DeStrings : Strings {
     override val newMatchConfirmTitle = "Neues Match?"
     override val newMatchConfirmText = "Das laufende Match bleibt bei den unterbrochenen Matches gespeichert und kann fortgesetzt werden."
     override val endDialogTitle = "Spiel, Satz und Sieg"
-    override val endDialogText: (String, String) -> String = { name, score -> "Sieg für $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Sieg für $name\n$score" }
     override val matchConcluded = "Match beendet"
     override val undoLastPoint = "Letzten Punkt zurücknehmen"
     override val serveOrderTitle: (Int) -> String = { "Aufschlagfolge · Satz $it" }
@@ -6398,6 +7229,7 @@ object DeStrings : Strings {
             else -> "Armbänder aktiv"
         }
     }
+    override val notifTvOnly = "TV-Anzeigetafel aktiv"
 
     override val bandPaired = "GEKOPPELT MIT"
     override val bandPlay = "SPIELEN"
@@ -6425,6 +7257,8 @@ object DeStrings : Strings {
     override val gamesWon = "Gewonnene Spiele"
     override val result = "Ergebnis"
     override val saveHistory = "Im Verlauf speichern"
+    override val summaryLeaveTitle = "Zusammenfassung nicht gespeichert"
+    override val summaryLeaveText = "Die Zusammenfassung des Matches wurde weder gespeichert noch geteilt: Danach ist sie nicht mehr abrufbar."
     override val share = "Teilen"
     override val saveDialogTitle = "Im Verlauf speichern"
     override val fileName = "Name"
@@ -6575,6 +7409,8 @@ object EsStrings : Strings {
     override val estimateTheory = "Estimación teórica: tras 20 minutos de uso se corrige con el consumo medido."
     override val copyToOther = "Copiar a la otra pulsera"
     override val powerOff = "Apagar"
+    override val bandPowerOffTitle = "¿Apagar la pulsera?"
+    override val bandPowerOffText: (String) -> String = { "$it se apaga ahora mismo. Para volver a encenderla: un clic en el botón lateral." }
     override val languageSection = "Idioma"
     override val languageHint = "Se aplica a las pantallas, la voz del juez, el marcador de TV y las pulseras."
     override val audioSection = "Audio y voz"
@@ -6583,8 +7419,12 @@ object EsStrings : Strings {
     override val voiceFilesHint = "Todo funciona sin internet con las voces instaladas en el teléfono. Las grabaciones personalizadas (ZIP) siempre tienen prioridad sobre la síntesis de voz."
     override val generateVoice = "Generar archivos"
     override val generating: (Int, Int) -> String = { n, tot -> "Generando $n/$tot…" }
+    override val voiceGenerationFailed = "Generación no completada: los archivos de voz anteriores no cambian."
     override val importVoiceZip = "Importar ZIP"
+    override val voiceImportFailed = "ZIP ilegible o incompleto: no se ha cambiado ninguna grabación."
     override val deleteCustomVoice = "Quitar grabaciones"
+    override val deleteCustomConfirmTitle = "¿Quitar las grabaciones?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Las grabaciones personalizadas en español ($n) se borran del teléfono. Para recuperarlas, importa de nuevo el ZIP." }
     override val ttsEngine = "Motor de síntesis de voz"
     override val engineDefault = "Predeterminado del teléfono"
     override val ttsVoice = "Voz"
@@ -6606,6 +7446,8 @@ object EsStrings : Strings {
     override val stopVoiceTest = "Detener la prueba"
     override val ttsMissing = "La voz en español de la síntesis de voz no está instalada en el teléfono."
     override val installVoice = "Instalar voz"
+    override val ttsEngineError = "Síntesis de voz no disponible: revisa el motor en los Ajustes de Android."
+    override val openTtsSettings = "Abrir ajustes"
     override val formatSection = "Formato del partido"
     override val formatBestOfThree = "3 sets · tie-break a 7"
     override val formatBestOfThreeHint = "Al mejor de tres sets, tie-break con 6-6 en cada set."
@@ -6634,7 +7476,9 @@ object EsStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth y ubicación obligatorios"
     override val bandsRequiredText = "Para usar las pulseras activa el Bluetooth, concede el permiso de ubicación y mantén la ubicación activada."
     override val bandsMissingTitle = "Pulseras no vinculadas"
-    override val bandsMissingText: (String) -> String = { "Falta la pulsera de: $it. ¿Continuar de todos modos?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltan las pulseras de: " else "Falta la pulsera de: ") + it.joinToString(", ") + ". ¿Continuar de todos modos?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
@@ -6646,6 +7490,8 @@ object EsStrings : Strings {
     override val noSavedMatches = "No hay partidos suspendidos guardados."
     override val savedMatchesTitle = "Partidos suspendidos"
     override val delete = "Eliminar"
+    override val deleteSavedTitle = "¿Eliminar el partido suspendido?"
+    override val deleteSavedText: (String) -> String = { "El partido $it ya no se podrá reanudar." }
     override val vs = "contra"
 
     override val matchTime = "Match Time"
@@ -6661,7 +7507,7 @@ object EsStrings : Strings {
     override val newMatchConfirmTitle = "¿Nuevo partido?"
     override val newMatchConfirmText = "El partido en curso queda guardado entre los partidos suspendidos y podrás reanudarlo."
     override val endDialogTitle = "Juego, set y partido"
-    override val endDialogText: (String, String) -> String = { name, score -> "Gana $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, team -> "${if (team) "Ganan" else "Gana"} $name\n$score" }
     override val matchConcluded = "Partido terminado"
     override val undoLastPoint = "Anular el último punto"
     override val serveOrderTitle: (Int) -> String = { "Orden de saque · set $it" }
@@ -6707,6 +7553,7 @@ object EsStrings : Strings {
             else -> "pulseras activas"
         }
     }
+    override val notifTvOnly = "Marcador de TV activo"
 
     override val bandPaired = "VINCULADA A"
     override val bandPlay = "JUEGUEN"
@@ -6734,6 +7581,8 @@ object EsStrings : Strings {
     override val gamesWon = "Juegos ganados"
     override val result = "Resultado"
     override val saveHistory = "Guardar en el historial"
+    override val summaryLeaveTitle = "Resumen no guardado"
+    override val summaryLeaveText = "No has guardado ni compartido el resumen del partido: después ya no podrás volver a verlo."
     override val share = "Compartir"
     override val saveDialogTitle = "Guardar en el historial"
     override val fileName = "Nombre"
@@ -6887,6 +7736,8 @@ object FrStrings : Strings {
     override val estimateTheory = "Estimation théorique : après 20 minutes d'utilisation, elle se corrige avec la consommation mesurée."
     override val copyToOther = "Copier sur l'autre bracelet"
     override val powerOff = "Éteindre"
+    override val bandPowerOffTitle = "Éteindre le bracelet ?"
+    override val bandPowerOffText: (String) -> String = { "$it s'éteint tout de suite. Pour le rallumer : un clic sur le bouton latéral." }
     override val languageSection = "Langue"
     override val languageHint = "S'applique aux écrans, à la voix de l'arbitre, au tableau d'affichage TV et aux bracelets."
     override val audioSection = "Audio et voix"
@@ -6895,8 +7746,12 @@ object FrStrings : Strings {
     override val voiceFilesHint = "Tout fonctionne sans internet avec les voix installées sur le téléphone. Les enregistrements personnalisés (ZIP) ont toujours la priorité sur la synthèse vocale."
     override val generateVoice = "Générer les fichiers"
     override val generating: (Int, Int) -> String = { n, tot -> "Génération $n/$tot…" }
+    override val voiceGenerationFailed = "Génération non terminée : les fichiers vocaux précédents restent inchangés."
     override val importVoiceZip = "Importer un ZIP"
+    override val voiceImportFailed = "ZIP illisible ou incomplet : aucun enregistrement n'a été modifié."
     override val deleteCustomVoice = "Supprimer les enregistrements"
+    override val deleteCustomConfirmTitle = "Supprimer les enregistrements ?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "Les enregistrements personnalisés en français ($n) sont effacés du téléphone. Pour les récupérer, importez de nouveau le ZIP." }
     override val ttsEngine = "Moteur de synthèse vocale"
     override val engineDefault = "Par défaut du téléphone"
     override val ttsVoice = "Voix"
@@ -6918,6 +7773,8 @@ object FrStrings : Strings {
     override val stopVoiceTest = "Arrêter le test"
     override val ttsMissing = "La voix française de la synthèse vocale n'est pas installée sur ce téléphone."
     override val installVoice = "Installer la voix"
+    override val ttsEngineError = "Synthèse vocale indisponible : vérifiez le moteur dans les Paramètres d'Android."
+    override val openTtsSettings = "Ouvrir les paramètres"
     override val formatSection = "Format du match"
     override val formatBestOfThree = "3 manches · jeu décisif à 7"
     override val formatBestOfThreeHint = "Au meilleur des trois manches, jeu décisif à 6-6 dans chaque manche."
@@ -6945,7 +7802,9 @@ object FrStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth et localisation obligatoires"
     override val bandsRequiredText = "Pour utiliser les bracelets, activez le Bluetooth, autorisez la localisation et laissez-la activée."
     override val bandsMissingTitle = "Bracelets non associés"
-    override val bandsMissingText: (String) -> String = { "Il manque le bracelet de : $it. Continuer quand même ?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Il manque les bracelets de : " else "Il manque le bracelet de : ") + it.joinToString(", ") + ". Continuer quand même ?"
+    }
     override val continueAnyway = "Continuer"
     override val cancel = "Annuler"
 
@@ -6957,6 +7816,8 @@ object FrStrings : Strings {
     override val noSavedMatches = "Aucun match suspendu enregistré."
     override val savedMatchesTitle = "Matchs suspendus"
     override val delete = "Supprimer"
+    override val deleteSavedTitle = "Supprimer le match suspendu ?"
+    override val deleteSavedText: (String) -> String = { "Le match $it ne pourra plus être repris." }
     override val vs = "contre"
 
     override val matchTime = "Match Time"
@@ -6972,7 +7833,7 @@ object FrStrings : Strings {
     override val newMatchConfirmTitle = "Nouveau match ?"
     override val newMatchConfirmText = "Le match en cours reste enregistré parmi les matchs suspendus et pourra être repris."
     override val endDialogTitle = "Jeu, set et match"
-    override val endDialogText: (String, String) -> String = { name, score -> "Victoire de $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Victoire de $name\n$score" }
     override val matchConcluded = "Match terminé"
     override val undoLastPoint = "Annuler le dernier point"
     override val serveOrderTitle: (Int) -> String = { "Ordre de service · manche $it" }
@@ -7018,6 +7879,7 @@ object FrStrings : Strings {
             else -> "bracelets actifs"
         }
     }
+    override val notifTvOnly = "Tableau TV actif"
 
     override val bandPaired = "ASSOCIE A"
     override val bandPlay = "JOUEZ"
@@ -7045,6 +7907,8 @@ object FrStrings : Strings {
     override val gamesWon = "Jeux gagnés"
     override val result = "Résultat"
     override val saveHistory = "Enregistrer dans l'historique"
+    override val summaryLeaveTitle = "Résumé non enregistré"
+    override val summaryLeaveText = "Vous n'avez ni enregistré ni partagé le résumé du match : vous ne pourrez plus le revoir."
     override val share = "Partager"
     override val saveDialogTitle = "Enregistrer dans l'historique"
     override val fileName = "Nom"
@@ -7198,6 +8062,8 @@ object PtStrings : Strings {
     override val estimateTheory = "Estimativa teórica: após 20 minutos de uso ela é corrigida com o consumo medido."
     override val copyToOther = "Copiar para a outra pulseira"
     override val powerOff = "Desligar"
+    override val bandPowerOffTitle = "Desligar a pulseira?"
+    override val bandPowerOffText: (String) -> String = { "$it desliga agora. Para ligá-la de novo: um clique no botão lateral." }
     override val languageSection = "Idioma"
     override val languageHint = "Vale para as telas, a voz do árbitro, o placar na TV e as pulseiras."
     override val audioSection = "Áudio e voz"
@@ -7206,8 +8072,12 @@ object PtStrings : Strings {
     override val voiceFilesHint = "Tudo funciona sem internet com as vozes instaladas no telefone. As gravações personalizadas (ZIP) sempre têm prioridade sobre a síntese de voz."
     override val generateVoice = "Gerar arquivos"
     override val generating: (Int, Int) -> String = { n, tot -> "Gerando $n/$tot…" }
+    override val voiceGenerationFailed = "Geração não concluída: os arquivos de voz anteriores continuam iguais."
     override val importVoiceZip = "Importar ZIP"
+    override val voiceImportFailed = "ZIP ilegível ou incompleto: nenhuma gravação foi alterada."
     override val deleteCustomVoice = "Remover gravações"
+    override val deleteCustomConfirmTitle = "Remover as gravações?"
+    override val deleteCustomConfirmText: (Int) -> String = { n -> "As gravações personalizadas em português ($n) são apagadas do telefone. Para recuperá-las, importe o ZIP de novo." }
     override val ttsEngine = "Mecanismo de síntese de voz"
     override val engineDefault = "Padrão do telefone"
     override val ttsVoice = "Voz"
@@ -7229,6 +8099,8 @@ object PtStrings : Strings {
     override val stopVoiceTest = "Parar o teste"
     override val ttsMissing = "A voz em português da síntese de voz não está instalada no telefone."
     override val installVoice = "Instalar voz"
+    override val ttsEngineError = "Síntese de voz indisponível: verifique o mecanismo nas Configurações do Android."
+    override val openTtsSettings = "Abrir configurações"
     override val formatSection = "Formato da partida"
     override val formatBestOfThree = "3 sets · tie-break a 7"
     override val formatBestOfThreeHint = "Melhor de três sets, tie-break no 6-6 em cada set."
@@ -7257,7 +8129,9 @@ object PtStrings : Strings {
     override val bandsRequiredTitle = "Bluetooth e localização obrigatórios"
     override val bandsRequiredText = "Para usar as pulseiras, ative o Bluetooth, conceda a permissão de localização e mantenha a localização ativada."
     override val bandsMissingTitle = "Pulseiras não associadas"
-    override val bandsMissingText: (String) -> String = { "Falta a pulseira de: $it. Continuar mesmo assim?" }
+    override val bandsMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltam as pulseiras de: " else "Falta a pulseira de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
@@ -7269,6 +8143,8 @@ object PtStrings : Strings {
     override val noSavedMatches = "Nenhuma partida suspensa salva."
     override val savedMatchesTitle = "Partidas suspensas"
     override val delete = "Excluir"
+    override val deleteSavedTitle = "Excluir a partida suspensa?"
+    override val deleteSavedText: (String) -> String = { "A partida $it não poderá mais ser retomada." }
     override val vs = "x"
 
     override val matchTime = "Match Time"
@@ -7284,7 +8160,7 @@ object PtStrings : Strings {
     override val newMatchConfirmTitle = "Nova partida?"
     override val newMatchConfirmText = "A partida em andamento fica salva entre as partidas suspensas e você poderá retomá-la."
     override val endDialogTitle = "Jogo, set e partida"
-    override val endDialogText: (String, String) -> String = { name, score -> "Vitória de $name\n$score" }
+    override val endDialogText: (String, String, Boolean) -> String = { name, score, _ -> "Vitória de $name\n$score" }
     override val matchConcluded = "Partida encerrada"
     override val undoLastPoint = "Anular o último ponto"
     override val serveOrderTitle: (Int) -> String = { "Ordem de serviço · set $it" }
@@ -7330,6 +8206,7 @@ object PtStrings : Strings {
             else -> "pulseiras ativas"
         }
     }
+    override val notifTvOnly = "Placar na TV ativo"
 
     override val bandPaired = "PAREADA COM"
     override val bandPlay = "JOGUEM"
@@ -7357,6 +8234,8 @@ object PtStrings : Strings {
     override val gamesWon = "Jogos ganhos"
     override val result = "Resultado"
     override val saveHistory = "Salvar no histórico"
+    override val summaryLeaveTitle = "Resumo não salvo"
+    override val summaryLeaveText = "Você não salvou nem compartilhou o resumo da partida: depois não poderá mais vê-lo."
     override val share = "Compartilhar"
     override val saveDialogTitle = "Salvar no histórico"
     override val fileName = "Nome"
@@ -7723,6 +8602,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -7785,7 +8665,9 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -7793,6 +8675,7 @@ import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvChip
+import com.tennis.scoremanager.ui.rememberArmed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -7835,7 +8718,7 @@ fun MatchScreen(c: MatchController) {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
-                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, fontWeight = FontWeight.Black)
+                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -7863,20 +8746,16 @@ fun MatchScreen(c: MatchController) {
     }
 
     if (confirmExit) {
-        AlertDialog(
-            onDismissRequest = { confirmExit = false },
-            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, tint = TsmColors.Orange) },
-            title = { Text(s.exitConfirmTitle) },
-            text = {
-                Text(s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "")
+        ConfirmDialog(
+            icon = Icons.AutoMirrored.Filled.ExitToApp,
+            title = s.exitConfirmTitle,
+            text = s.exitConfirmText + if (o.mode == PlayMode.BANDS && o.bandsOffAtEnd) " " + s.exitConfirmBands else "",
+            confirm = s.exit,
+            onConfirm = {
+                confirmExit = false
+                activity?.let { c.exitApp(it) }
             },
-            confirmButton = {
-                Button(onClick = {
-                    confirmExit = false
-                    activity?.let { c.exitApp(it) }
-                }) { Text(s.exit) }
-            },
-            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text(s.cancel) } },
+            onDismiss = { confirmExit = false },
         )
     }
 
@@ -7900,6 +8779,7 @@ fun MatchScreen(c: MatchController) {
 
     if (end && state.isFinished) {
         val w = state.winner ?: Side.P1
+        val armed = rememberArmed()
         AlertDialog(
             onDismissRequest = {},
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -7907,13 +8787,13 @@ fun MatchScreen(c: MatchController) {
             title = { Text(s.endDialogTitle, fontWeight = FontWeight.Black) },
             text = {
                 Text(
-                    s.endDialogText(names.side(w), Reports.scoreLine(state, w)),
+                    s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
                 Button(
-                    onClick = { c.confirmEnd() },
+                    onClick = { if (armed) c.confirmEnd() },
                     colors = ButtonDefaults.buttonColors(containerColor = TsmColors.Ball, contentColor = TsmColors.OnBall),
                 ) {
                     Icon(Icons.Filled.Check, null)
@@ -7922,7 +8802,7 @@ fun MatchScreen(c: MatchController) {
                 }
             },
             dismissButton = {
-                OutlinedButton(onClick = { c.undo() }) {
+                OutlinedButton(onClick = { if (armed) c.undo() }) {
                     Icon(Icons.AutoMirrored.Filled.Undo, null, tint = TsmColors.TextMain)
                     Spacer(Modifier.width(6.dp))
                     Text(s.undoLastPoint, color = TsmColors.TextMain)
@@ -7932,18 +8812,16 @@ fun MatchScreen(c: MatchController) {
     }
 
     if (confirmNew) {
-        AlertDialog(
-            onDismissRequest = { confirmNew = false },
-            icon = { Icon(Icons.Filled.AddCircle, null, tint = TsmColors.Orange) },
-            title = { Text(s.newMatchConfirmTitle) },
-            text = { Text(s.newMatchConfirmText) },
-            confirmButton = {
-                Button(onClick = {
-                    confirmNew = false
-                    c.newMatch()
-                }) { Text(s.newMatch) }
+        ConfirmDialog(
+            icon = Icons.Filled.AddCircle,
+            title = s.newMatchConfirmTitle,
+            text = s.newMatchConfirmText,
+            confirm = s.newMatch,
+            onConfirm = {
+                confirmNew = false
+                c.newMatch()
             },
-            dismissButton = { TextButton(onClick = { confirmNew = false }) { Text(s.cancel) } },
+            onDismiss = { confirmNew = false },
         )
     }
 
@@ -8040,18 +8918,25 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
     }
 }
 
-/** Riquadro arancione: spento, si accende 5 secondi con il messaggio. */
+/**
+ * Riquadro arancione: spento, si accende 5 secondi con il messaggio.
+ * Altezza minima, non fissa: con il carattere di sistema ingrandito la seconda riga non va persa.
+ */
 @Composable
 private fun MessageBox(msg: String?) {
     val bg by animateColorAsState(if (msg != null) TsmColors.Orange else TsmColors.Surface, label = "msg")
     Box(
-        Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(14.dp)).background(bg)
-            .border(1.dp, if (msg != null) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(14.dp)),
+        Modifier.fillMaxWidth().heightIn(min = 50.dp).clip(RoundedCornerShape(14.dp)).background(bg)
+            .border(1.dp, if (msg != null) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(14.dp))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedContent(msg, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "msgText") { m ->
             if (m != null) {
-                Text(m, color = TsmColors.OnOrange, fontWeight = FontWeight.Black, fontSize = 18.sp, maxLines = 2, textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis)
+                Text(
+                    m, color = TsmColors.OnOrange, fontWeight = FontWeight.Black, fontSize = 18.sp, lineHeight = 21.sp,
+                    maxLines = 2, textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -8159,8 +9044,13 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
                                 fontSize = (sizeDp.value * 0.42f).coerceIn(40f, 110f).sp, fontWeight = FontWeight.Black,
                             )
                             Text(
-                                if (state.inTiebreak) "TIE-BREAK" else " ", color = TsmColors.onPlayer(side).copy(alpha = 0.8f),
-                                fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                                when (state.tiebreak) {
+                                    TiebreakKind.SET -> s.msgTiebreak
+                                    TiebreakKind.MATCH -> s.msgMatchTiebreak
+                                    TiebreakKind.NONE -> " "
+                                },
+                                color = TsmColors.onPlayer(side).copy(alpha = 0.8f),
+                                fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
@@ -8210,6 +9100,7 @@ package com.tennis.scoremanager.ui.screens
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
@@ -8280,6 +9171,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -8302,6 +9194,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
@@ -8364,6 +9257,17 @@ fun OptionsScreen(c: MatchController) {
     }
 
     fun requestLocation() = permLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+
+    // Col tabellone TV il servizio in primo piano parte anche senza braccialetti: su Android 13+ senza questo
+    // permesso la sua notifica non compare e non si torna all'app toccandola.
+    val tvOn = c.tv.collectAsState().value.enabled
+    LaunchedEffect(tvOn) {
+        if (tvOn && Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        }
+    }
     fun openLocationSettings() = runCatching { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
     fun enableBluetooth() {
         if (!blePerms) requestBandPermissions() else runCatching { btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
@@ -8371,7 +9275,7 @@ fun OptionsScreen(c: MatchController) {
 
     var locationDialog by remember { mutableStateOf(false) }
     var bandsRequired by remember { mutableStateOf(false) }
-    var missingBands by remember { mutableStateOf<String?>(null) }
+    var missingBands by remember { mutableStateOf<List<String>?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
@@ -8384,7 +9288,7 @@ fun OptionsScreen(c: MatchController) {
             val bands = c.ble.bands.value
             val missing = Side.entries.filter { bands[it] == null }.map { names.short(it) }
             if (missing.isNotEmpty()) {
-                missingBands = missing.joinToString(", ")
+                missingBands = missing
                 return
             }
         } else if (!(locPerm && locOn)) {
@@ -8423,11 +9327,14 @@ fun OptionsScreen(c: MatchController) {
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
+            // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
+            val generating = c.voiceProgress.collectAsState().value != null
             Segmented(
                 Lang.entries.map { SegOption("${it.flag}  ${it.label}") },
                 selected = o.lang.ordinal,
                 onSelect = { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } },
                 columns = 2,
+                enabled = !generating,
             )
             Text(s.languageHint, color = TsmColors.TextDim, fontSize = 13.sp)
         }
@@ -8556,6 +9463,7 @@ private fun BandPicker(
     battery: com.tennis.scoremanager.BandBattery?,
 ) {
     val s = LocalStrings.current
+    val locale = c.options.collectAsState().value.lang.locale
     var open by remember { mutableStateOf(false) }
     var settingsOpen by remember { mutableStateOf(false) }
     val accent = TsmColors.player(side)
@@ -8581,7 +9489,7 @@ private fun BandPicker(
                             LinkState.POWERED_OFF -> s.bandOff
                             LinkState.IDLE -> s.bandIdle
                         }
-                        val volts = current.millivolts?.let { String.format(java.util.Locale.ROOT, " (%.2f V)", it / 1000.0) } ?: ""
+                        val volts = current.millivolts?.let { String.format(locale, " (%.2f V)", it / 1000.0) } ?: ""
                         val batteryText = when {
                             current.chargeFull -> " · ${s.bandChargeFull}"
                             current.charging && current.battery != null -> " · ${s.bandCharging(current.battery)}$volts"
@@ -8649,9 +9557,12 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
     val currentEngine by c.announcer.currentEngineFlow.collectAsState()
     val zipLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { c.importVoiceZip(it) } }
     val total = Phrases.keys.size
+    // Durante "Genera file" motore, voce, lingua, prova e audio non si toccano: i file uscirebbero misti o interrotti.
+    val generating = progress != null
+    var confirmDelete by remember { mutableStateOf(false) }
 
     SectionCard(s.audioSection, Icons.AutoMirrored.Filled.VolumeUp) {
-        SwitchRow(Icons.Filled.RecordVoiceOver, s.voiceCalls, null, o.audio) { v -> c.updateOptions { it.copy(audio = v) } }
+        SwitchRow(Icons.Filled.RecordVoiceOver, s.voiceCalls, null, o.audio, enabled = !generating) { v -> c.updateOptions { it.copy(audio = v) } }
 
         // Motore: Samsung, Google, ... (i nomi delle voci cambiano col motore, quindi si riparte da "automatica")
         val engineLabel = engines.firstOrNull { it.pkg == (o.ttsEngine ?: currentEngine) }?.label
@@ -8659,6 +9570,7 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             label = s.ttsEngine,
             value = if (o.ttsEngine == null) "${s.engineDefault}${engineLabel?.let { " ($it)" } ?: ""}" else engineLabel ?: o.ttsEngine,
             options = listOf<Pair<String?, String>>(null to s.engineDefault) + engines.map { it.pkg to it.label },
+            enabled = !generating,
         ) { pkg -> c.updateOptions { it.copy(ttsEngine = pkg, ttsVoice = null) } }
 
         Picker(
@@ -8667,14 +9579,26 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             else voiceLabel(o.ttsVoice, s),
             options = listOf<Pair<String?, String>>(null to s.voiceAuto) +
                 voices.map { it.name to "${voiceLabel(it.name, s)} · ${if (it.online) s.online else s.offline}" },
+            enabled = !generating,
         ) { name -> c.updateOptions { it.copy(ttsVoice = name) } }
 
-        if (tts == TtsStatus.MISSING_LANGUAGE || tts == TtsStatus.ERROR) {
+        if (tts == TtsStatus.MISSING_LANGUAGE) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(s.ttsMissing, color = TsmColors.Orange, modifier = Modifier.weight(1f), fontSize = 13.sp)
                 TextButton(onClick = {
                     runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
                 }) { Text(s.installVoice) }
+            }
+        }
+        // Il motore non parte: installare una voce non serve, si apre la pagina "Sintesi vocale" di Android
+        // (o le Impostazioni, se il telefono non ce l'ha).
+        if (tts == TtsStatus.ERROR) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(s.ttsEngineError, color = TsmColors.Orange, modifier = Modifier.weight(1f), fontSize = 13.sp)
+                TextButton(onClick = {
+                    runCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
+                        .onFailure { runCatching { context.startActivity(Intent(Settings.ACTION_SETTINGS)) } }
+                }) { Text(s.openTtsSettings) }
             }
         }
         // Lo stesso tasto avvia e ferma la prova; uscendo dalla pagina si ferma da sola.
@@ -8685,6 +9609,7 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             if (testing) s.stopVoiceTest else s.testVoice,
             if (testing) Icons.Filled.StopCircle else Icons.Filled.PlayCircle,
             Modifier.fillMaxWidth(),
+            enabled = !generating,
         ) { if (testing) c.stopVoiceTest() else c.testVoice() }
         Text(s.voiceFilesHint, color = TsmColors.TextDim, fontSize = 13.sp)
 
@@ -8694,20 +9619,39 @@ private fun VoiceSection(c: MatchController, o: MatchOptions) {
             SmallAction(s.importVoiceZip, Icons.Filled.FolderZip, Modifier.weight(1f)) {
                 zipLauncher.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
             }
-            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = custom > 0) { c.deleteCustomVoice() }
+            SmallAction(s.deleteCustomVoice, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = custom > 0) { confirmDelete = true }
         }
 
         // File pre-generati (facoltativi)
-        SwitchRow(Icons.Filled.FolderZip, s.voiceFilesMode, s.voiceFilesModeHint, o.voiceFiles) { v -> c.updateOptions { it.copy(voiceFiles = v) } }
+        SwitchRow(Icons.Filled.FolderZip, s.voiceFilesMode, s.voiceFilesModeHint, o.voiceFiles, enabled = !generating) { v ->
+            c.updateOptions { it.copy(voiceFiles = v) }
+        }
         if (o.voiceFiles) {
             Text(s.voiceFiles(generated, total), color = if (generated == total) TsmColors.Ok else TsmColors.Orange, fontWeight = FontWeight.Bold)
             progress?.let { (i, n) ->
                 Text(s.generating(i, n), color = TsmColors.TextMain)
                 LinearProgressIndicator(progress = { if (n == 0) 0f else i / n.toFloat() }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
             }
-            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.fillMaxWidth(), enabled = progress == null) { c.generateVoice() }
+            SmallAction(s.generateVoice, Icons.Filled.RecordVoiceOver, Modifier.fillMaxWidth(), enabled = !generating) { c.generateVoice() }
         }
         Text(c.voice.baseDir.absolutePath, color = TsmColors.TextDim, fontSize = 11.sp)
+    }
+
+    // Le registrazioni rimosse non si recuperano: si chiede conferma come per "Nuova partita" ed "Esci".
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            icon = { Icon(Icons.Filled.DeleteOutline, null, tint = TsmColors.Orange) },
+            title = { Text(s.deleteCustomConfirmTitle) },
+            text = { Text(s.deleteCustomConfirmText(custom)) },
+            confirmButton = {
+                Button(onClick = {
+                    confirmDelete = false
+                    c.deleteCustomVoice()
+                }) { Text(s.deleteCustomVoice) }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(s.cancel) } },
+        )
     }
 }
 
@@ -9097,10 +10041,12 @@ import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
@@ -9116,6 +10062,7 @@ fun StartScreen(c: MatchController) {
     val bands by c.ble.bands.collectAsState()
     val names = remember(su, s) { Names(su, s) }
     var showSaved by remember { mutableStateOf(false) }
+    var toDelete by remember { mutableStateOf<MatchRecord?>(null) }
     BackHandler { c.back() }
 
     val pulse = rememberInfiniteTransition(label = "pulse")
@@ -9203,10 +10150,10 @@ fun StartScreen(c: MatchController) {
                 } else {
                     LazyColumn(Modifier.heightIn(max = 420.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(saved, key = { it.id }) { rec ->
-                            SavedRow(rec, onOpen = {
+                            SavedRow(rec, o.lang, onOpen = {
                                 showSaved = false
                                 c.resumeSaved(rec)
-                            }, onDelete = { c.deleteSaved(rec) })
+                            }, onDelete = { toDelete = rec })
                         }
                     }
                 }
@@ -9214,10 +10161,27 @@ fun StartScreen(c: MatchController) {
             confirmButton = { TextButton(onClick = { showSaved = false }) { Text(s.cancel) } },
         )
     }
+
+    // Il cestino sta nella stessa riga che riprende la partita: un tocco storto non deve cancellarla.
+    toDelete?.let { rec ->
+        val n = Names(rec.setup, s)
+        ConfirmDialog(
+            icon = Icons.Filled.Delete,
+            title = s.deleteSavedTitle,
+            text = s.deleteSavedText("${n.short(Side.P1)} ${s.vs} ${n.short(Side.P2)}"),
+            confirm = s.delete,
+            danger = true,
+            onConfirm = {
+                toDelete = null
+                c.deleteSaved(rec)
+            },
+            onDismiss = { toDelete = null },
+        )
+    }
 }
 
 @Composable
-private fun SavedRow(rec: MatchRecord, onOpen: () -> Unit, onDelete: () -> Unit) {
+private fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete: () -> Unit) {
     val s = LocalStrings.current
     val names = remember(rec.id) { Names(rec.setup, s) }
     val state = remember(rec.id, rec.events.size) { ScoreEngine.replay(rec.rules, rec.events) }
@@ -9230,7 +10194,7 @@ private fun SavedRow(rec: MatchRecord, onOpen: () -> Unit, onDelete: () -> Unit)
             val score = (Reports.scoreLine(state, Side.P1) + "  " + "${state.g1}-${state.g2}").trim()
             Text(score, color = TsmColors.Ball)
             Text(
-                "${Reports.date(rec.startedAt ?: rec.updatedAt, rec.options.lang)} · ${Reports.time(rec.updatedAt, rec.options.lang)}",
+                "${Reports.date(rec.startedAt ?: rec.updatedAt, lang)} · ${Reports.time(rec.updatedAt, lang)}",
                 color = TsmColors.TextDim, fontSize = 12.sp,
             )
         }
@@ -9309,6 +10273,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.TsmColors
@@ -9327,6 +10292,12 @@ fun SummaryScreen(c: MatchController) {
     val w = state.winner ?: Side.P1
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
+    val kept by c.summaryKept.collectAsState()
+    /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
+    var leaving by remember { mutableStateOf<Boolean?>(null) }
+    fun leave(exit: Boolean) {
+        if (exit) activity?.let { c.exitApp(it) } else c.newMatch()
+    }
     BackHandler { }
 
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
@@ -9334,7 +10305,7 @@ fun SummaryScreen(c: MatchController) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(s.summaryTitle, fontSize = 26.sp, fontWeight = FontWeight.Black, color = TsmColors.TextMain)
+            Text(s.summaryTitle, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, color = TsmColors.TextMain)
 
             // Vincitore
             Column(
@@ -9343,7 +10314,7 @@ fun SummaryScreen(c: MatchController) {
             ) {
                 Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-                Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
                 Text(Reports.scoreLine(state, w), color = TsmColors.TextMain, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
@@ -9414,17 +10385,31 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) }.onSuccess { c.markSummaryKept() } }
                 }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
-                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                // Senza salvataggio né condivisione il riepilogo si perde: un tocco solo non basta.
+                GhostButton(s.newMatch, Icons.Filled.Replay, { if (kept) leave(false) else leaving = false }, Modifier.weight(1f))
+                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { if (kept) leave(true) else leaving = true }, Modifier.weight(1f))
             }
         }
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
+    leaving?.let { exit ->
+        ConfirmDialog(
+            icon = if (exit) Icons.AutoMirrored.Filled.ExitToApp else Icons.Filled.Replay,
+            title = s.summaryLeaveTitle,
+            text = s.summaryLeaveText,
+            confirm = if (exit) s.exit else s.newMatch,
+            onConfirm = {
+                leaving = null
+                leave(exit)
+            },
+            onDismiss = { leaving = null },
+        )
+    }
 }
 
 @Composable
@@ -9539,6 +10524,9 @@ data class EngineOption(val pkg: String, val label: String)
 /** Voce disponibile per la lingua corrente. */
 data class VoiceOption(val name: String, val online: Boolean, val quality: Int)
 
+/** Esito di "Genera file": file creati su [total]; [installed] = hanno preso il posto di quelli di prima. */
+data class GenResult(val created: Int, val total: Int, val installed: Boolean)
+
 /**
  * Legge le chiamate. Di norma ogni chiamata è detta dalla sintesi vocale in un'unica frase (suona naturale e
  * funziona offline con le voci installate); le registrazioni personalizzate, se ci sono, hanno la precedenza.
@@ -9560,6 +10548,9 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
     private var job: Job? = null
     private var player: MediaPlayer? = null
+    /** Aumentano a ogni [stop] e a ogni cambio di motore, voce o lingua: la generazione dei file li controlla. */
+    private var stops = 0
+    private var configs = 0
 
     private val _status = MutableStateFlow(TtsStatus.INIT)
     val status: StateFlow<TtsStatus> = _status
@@ -9587,6 +10578,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         set(value) {
             if (field != value) {
                 field = value
+                configs++
                 applyLanguage(value)
             }
         }
@@ -9597,6 +10589,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     /** Sceglie motore (null = predefinito del telefono) e voce (null = la migliore offline). */
     fun configure(engine: String?, voiceName: String?) {
+        configs++
         preferredVoice = voiceName
         if (engine != enginePkg) {
             enginePkg = engine
@@ -9668,7 +10661,8 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         val tag: String?
 
         data class Speech(val text: String, override val tag: String?) : Part
-        data class Audio(val file: File, override val tag: String?) : Part
+        /** File della frase [key]: se non si riesce a riprodurre, la frase la dice il TTS. */
+        data class Audio(val file: File, val key: String, override val tag: String?) : Part
         data class Silence(val ms: Long) : Part {
             override val tag: String? get() = null
         }
@@ -9694,7 +10688,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     val f = fileFor(s.key, l)
                     if (f != null) {
                         flush()
-                        parts += Part.Audio(f, s.tag)
+                        parts += Part.Audio(f, s.key, s.tag)
                     } else {
                         if (s.tag != null) { flush(); tag = s.tag }
                         text.append(Phrases.text(s.key, l)).append(' ')
@@ -9740,7 +10734,11 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
                     p.tag?.let { fired += it; onTag(it) }
                     when (p) {
                         is Part.Silence -> delay(p.ms)
-                        is Part.Audio -> playFile(p.file)
+                        is Part.Audio -> if (!playFile(p.file)) {
+                            // File rovinato: non si usa più e la frase la dice la sintesi vocale (non si salta).
+                            voice.markBroken(p.file)
+                            speak(Pronunciation.fix(Phrases.text(p.key, l), l, currentEngine))
+                        }
                         is Part.Speech -> speak(Pronunciation.fix(p.text, l, currentEngine))
                     }
                 }
@@ -9758,6 +10756,7 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
     }
 
     fun stop() {
+        stops++
         job?.cancel()
         job = null
         _playing.value = null
@@ -9783,24 +10782,29 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
         pending.remove(id)
     }
 
-    private suspend fun playFile(file: File) {
+    /** Riproduce il file; false se il telefono non riesce a leggerlo. */
+    private suspend fun playFile(file: File): Boolean {
         val mp = MediaPlayer()
         player = mp
         try {
             mp.setAudioAttributes(attrs)
             mp.setDataSource(file.absolutePath)
             mp.prepare()
-            withTimeoutOrNull(mp.duration.toLong().coerceAtLeast(500L) + 1_500L) {
-                suspendCancellableCoroutine<Unit> { cont ->
-                    mp.setOnCompletionListener { if (cont.isActive) cont.resume(Unit) }
-                    mp.setOnErrorListener { _, _, _ -> if (cont.isActive) cont.resume(Unit); true }
+            // Allo scadere del tempo (null) il file è comunque stato suonato: conta come riuscito.
+            val ok = withTimeoutOrNull(mp.duration.toLong().coerceAtLeast(500L) + 1_500L) {
+                suspendCancellableCoroutine<Boolean> { cont ->
+                    mp.setOnCompletionListener { if (cont.isActive) cont.resume(true) }
+                    mp.setOnErrorListener { _, _, _ -> if (cont.isActive) cont.resume(false); true }
                     mp.start()
                 }
-            }
+            } ?: true
+            if (!ok) Log.w("Announcer", "Errore durante la riproduzione: ${file.name}")
+            return ok
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Log.w("Announcer", "File audio non leggibile: ${file.name}", e)
+            return false
         } finally {
             if (player === mp) player = null
             runCatching { mp.release() }
@@ -9809,37 +10813,60 @@ class Announcer(context: Context, private val voice: VoicePack) : TextToSpeech.O
 
     /**
      * Genera i file vocali di [l] con la voce scelta (anche una voce online: dopo funzionano senza rete).
-     * Ritorna quanti file sono stati creati.
+     * I file nuovi si creano in una cartella a parte e prendono il posto di quelli di prima solo se la generazione
+     * arriva in fondo e non ne crea meno di prima; se a metà cambiano motore, voce o lingua si lascia perdere.
      */
-    suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): Int {
-        val t = tts ?: return 0
+    suspend fun generateVoicePack(l: Lang, onProgress: (Int, Int) -> Unit): GenResult {
+        val keys = Phrases.keys
+        val none = GenResult(0, keys.size, false)
         withTimeoutOrNull(5_000) { while (_status.value == TtsStatus.INIT) delay(100) }
-        if (_status.value == TtsStatus.ERROR) return 0
+        val t = tts ?: return none
+        if (_status.value == TtsStatus.ERROR) return none
         stop()
         applyLanguage(l)
         if (_status.value != TtsStatus.READY) {
             applyLanguage(lang)
-            return 0
+            return none
         }
-        voice.deleteGenerated(l)
-        val dir = voice.ttsDir(l)
-        val keys = Phrases.keys
+        val config = configs
+        val before = voice.generatedCount(l)
+        val dir = voice.newGeneratedDir(l)
         val engine = currentEngine
         var ok = 0
-        for ((i, key) in keys.withIndex()) {
-            val f = File(dir, "$key.wav")
-            val id = "gen_${key}_${UUID.randomUUID()}"
+        var installed = false
+        try {
+            for ((i, key) in keys.withIndex()) {
+                if (tts !== t || configs != config) break
+                if (synthesize(t, Pronunciation.fix(Phrases.text(key, l), l, engine), File(dir, "$key.wav"))) ok++
+                onProgress(i + 1, keys.size)
+            }
+            val complete = tts === t && configs == config
+            installed = complete && ok > 0 && ok >= before && voice.installGenerated(l, dir)
+        } finally {
+            if (!installed) dir.deleteRecursively()
+            if (tts === t) applyLanguage(lang)
+        }
+        return GenResult(ok, keys.size, installed)
+    }
+
+    /**
+     * Un file della generazione. Se intanto [stop] interrompe la sintesi (una chiamata, la prova voce, l'audio spento)
+     * si riprova, al massimo tre volte: [TextToSpeech.stop] ferma anche i file in scrittura.
+     */
+    private suspend fun synthesize(t: TextToSpeech, text: String, f: File): Boolean {
+        repeat(3) {
+            val stopsBefore = stops
+            val id = "gen_${UUID.randomUUID()}"
             val done = CompletableDeferred<Boolean>()
             pending[id] = done
-            val r = t.synthesizeToFile(Pronunciation.fix(Phrases.text(key, l), l, engine), Bundle(), f, id)
+            val r = runCatching { t.synthesizeToFile(text, Bundle(), f, id) }.getOrDefault(TextToSpeech.ERROR)
             val good = r == TextToSpeech.SUCCESS && withTimeoutOrNull(20_000) { done.await() } == true
             pending.remove(id)
-            if (good && f.length() > 64) ok++ else f.delete()
-            onProgress(i + 1, keys.size)
+            if (good && f.length() > VoicePack.MIN_BYTES) return true
+            f.delete()
+            if (stops == stopsBefore) return false
         }
-        applyLanguage(lang)
-        voice.refresh(l)
-        return ok
+        return false
     }
 
     fun shutdown() {
@@ -9872,6 +10899,9 @@ internal abstract class CallWords {
     abstract val points: List<String>
 
     fun number(n: Int): String = numbers.getOrElse(n) { n.toString() }
+
+    /** Lo zero nei set letti a fine partita ([Phrases.SET_ZERO]): di norma è il numero. */
+    open val setZero: String get() = number(0)
 
     /** Punteggio del game dal lato di chi serve (mai 0-0 né 40-40): "quindici zero", "trenta pari". */
     open fun score(s: Int, r: Int): String =
@@ -9971,6 +11001,8 @@ internal object EnWords : CallWords() {
         "twenty-six", "twenty-seven", "twenty-eight", "twenty-nine", "thirty",
     )
     override val points = listOf("love", "fifteen", "thirty", "forty")
+    // ITF: i set si leggono "six love, six four"; nel tie-break invece "one zero".
+    override val setZero = "love"
     private fun g(n: Int) = if (n == 1) "one game" else "${number(n)} games"
     override fun games(a: Int, b: Int) = "${g(a)} to ${if (b == 0) "love" else number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} all"
@@ -10185,8 +11217,18 @@ object Phrases {
             }
             for (n in 1..6) add("games_all_$n")
             for (n in 0..MAX_NUMBER) add("num_$n")
+            add(SET_ZERO)
         }
     }
+
+    /** Lo zero nei set letti a fine partita: "zero" quasi ovunque, ma in inglese "love" ("six love"). */
+    const val SET_ZERO = "set_zero"
+
+    /** Chiavi che in alcune lingue dicono la stessa cosa di un'altra: lì basta il file dell'altra. */
+    private val sameAs = mapOf(SET_ZERO to "num_0")
+
+    /** Chiave con lo stesso testo di [key] in [lang] (il suo file va bene anche per [key]), se c'è. */
+    fun alias(key: String, lang: Lang): String? = sameAs[key]?.takeIf { text(it, lang) == text(key, lang) }
 
     fun text(key: String, lang: Lang): String {
         val w = CallWords.of(lang)
@@ -10197,6 +11239,7 @@ object Phrases {
             key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
             key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
             key.startsWith("num_") -> w.number(parts[1].toInt())
+            key == SET_ZERO -> w.setZero
             else -> key
         }
     }
@@ -10302,12 +11345,14 @@ class CallBuilder(private val lang: Lang) {
         val b = minOf(s.pt1, s.pt2)
         if (a == b) return listOf(num(a), Seg.Clip("all"))
         val leader = if (s.pt1 > s.pt2) Side.P1 else Side.P2
-        return pair(a, b, words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
+        return pair(num(a), num(b), words.tiebreakTo(a, b)) + Seg.Say(names.side(leader))
     }
 
     /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
-    private fun pair(a: Int, b: Int, to: Boolean): List<Seg> =
-        if (to) listOf(num(a), Seg.Clip("to"), num(b)) else listOf(num(a), num(b))
+    private fun pair(a: Seg, b: Seg, to: Boolean): List<Seg> = if (to) listOf(a, Seg.Clip("to"), b) else listOf(a, b)
+
+    /** Game di un set a fine partita: lo zero è [Phrases.SET_ZERO] ("six love"), nel match tie-break resta "zero". */
+    private fun setNum(n: Int, matchTiebreak: Boolean): Seg = if (n == 0 && !matchTiebreak) Seg.Clip(Phrases.SET_ZERO) else num(n)
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
@@ -10334,7 +11379,7 @@ class CallBuilder(private val lang: Lang) {
             val a = set.shown(winner)
             val b = set.shown(winner.other)
             out += Seg.Pause(SHORT)
-            out += pair(a, b, words.setScoreTo(a, b))
+            out += pair(setNum(a, set.matchTiebreak), setNum(b, set.matchTiebreak), words.setScoreTo(a, b))
         }
         return out
     }
@@ -10397,7 +11442,11 @@ import android.net.Uri
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.ui.Strings
 import java.io.File
-import java.util.zip.ZipInputStream
+import java.io.IOException
+import java.util.zip.CRC32
+import java.util.zip.CheckedInputStream
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 
 /**
  * Cartella locale con i file audio delle chiamate (uso senza internet).
@@ -10410,9 +11459,19 @@ import java.util.zip.ZipInputStream
  */
 class VoicePack(private val context: Context) {
 
-    private val exts = listOf("wav", "mp3", "ogg", "m4a", "aac", "flac")
+    companion object {
+        val EXTS = listOf("wav", "mp3", "ogg", "m4a", "aac", "flac")
+
+        /** File più piccoli di così sono vuoti o rovinati: non si usano. */
+        const val MIN_BYTES = 64L
+    }
+
     private val custom = mutableMapOf<Lang, Map<String, File>>()
     private val generated = mutableMapOf<Lang, Map<String, File>>()
+
+    /** File che non si sono potuti riprodurre: esclusi fino al riavvio dell'app, o finché non vengono sostituiti. */
+    private val broken = mutableSetOf<String>()
+    private fun id(f: File) = "${f.absolutePath}|${f.length()}|${f.lastModified()}"
 
     val baseDir: File
         get() = File(context.getExternalFilesDir(null) ?: context.filesDir, "voice")
@@ -10422,11 +11481,24 @@ class VoicePack(private val context: Context) {
 
     /** Registrazione personalizzata (voce vera) della frase, se c'è: ha sempre la precedenza. */
     @Synchronized
-    fun customFor(key: String, lang: Lang): File? = custom.getOrPut(lang) { scan(dir(lang)) }[key]
+    fun customFor(key: String, lang: Lang): File? = lookup(custom.getOrPut(lang) { scan(dir(lang)) }, key, lang)
 
     /** File generato dal TTS del telefono (usato solo con l'opzione "File audio offline"). */
     @Synchronized
-    fun generatedFor(key: String, lang: Lang): File? = generated.getOrPut(lang) { scan(ttsDir(lang)) }[key]
+    fun generatedFor(key: String, lang: Lang): File? = lookup(generated.getOrPut(lang) { scan(ttsDir(lang)) }, key, lang)
+
+    /** Se manca il file della frase va bene quello di una frase con lo stesso testo ([Phrases.alias]). */
+    private fun lookup(files: Map<String, File>, key: String, lang: Lang): File? =
+        files[key] ?: Phrases.alias(key, lang)?.let { files[it] }
+
+    /** Il file non si riesce a riprodurre (rovinato o in un formato che il telefono non legge): non si usa più. */
+    @Synchronized
+    fun markBroken(f: File) {
+        broken += id(f)
+        for (m in listOf(custom, generated)) {
+            for (l in m.keys.toList()) m[l] = m.getValue(l).filterValues { it != f }
+        }
+    }
 
     @Synchronized
     fun refresh(lang: Lang) {
@@ -10440,53 +11512,66 @@ class VoicePack(private val context: Context) {
     private fun scan(folder: File): Map<String, File> {
         val out = HashMap<String, File>()
         folder.listFiles()?.forEach { f ->
-            if (f.isFile && f.extension.lowercase() in exts && f.length() > 64 && f.nameWithoutExtension in Phrases.keys) {
+            if (f.isFile && f.extension.lowercase() in EXTS && f.length() > MIN_BYTES && f.nameWithoutExtension in Phrases.keys &&
+                id(f) !in broken
+            ) {
                 out[f.nameWithoutExtension] = f
             }
         }
         return out
     }
 
-    /** Importa uno ZIP di registrazioni: `it/score_1_0.mp3`, `fr/deuce.wav` o file alla radice (lingua corrente). */
+    /**
+     * Importa uno ZIP di registrazioni (quali file e in che lingua: [VoiceZip.target]). Lo ZIP viene prima copiato
+     * ed estratto tutto in una cartella a parte: se è rovinato o troncato lancia un'eccezione e le registrazioni
+     * restano com'erano. Ritorna quante registrazioni ha importato.
+     */
     fun importZip(uri: Uri, fallback: Lang): Int {
-        var n = 0
-        context.contentResolver.openInputStream(uri)?.use { input ->
-            ZipInputStream(input).use { zip ->
-                while (true) {
-                    val entry = zip.nextEntry ?: break
-                    if (entry.isDirectory) continue
-                    val path = entry.name.replace('\\', '/')
-                    val file = File(path.substringAfterLast('/'))
-                    val key = file.nameWithoutExtension
-                    val ext = file.extension.lowercase()
-                    if (key !in Phrases.keys || ext !in exts) continue
-                    val folders = path.lowercase().split('/').dropLast(1)
-                    val lang = Lang.entries.firstOrNull { it.code in folders } ?: fallback
-                    exts.forEach { File(dir(lang), "$key.$it").delete() }
-                    File(dir(lang), "$key.$ext").outputStream().use { zip.copyTo(it) }
-                    n++
-                }
-            }
+        val tmp = File(context.cacheDir, "voice-import.zip")
+        // Sotto voice/, così i file si spostano al loro posto senza copiarli di nuovo.
+        val staging = File(baseDir, ".import")
+        try {
+            val input = context.contentResolver.openInputStream(uri) ?: throw IOException("ZIP non leggibile")
+            input.use { i -> tmp.outputStream().use { i.copyTo(it) } }
+            staging.deleteRecursively()
+            staging.mkdirs()
+            VoiceZip.extract(tmp, staging, fallback)
+            return synchronized(this) { VoiceZip.install(staging) { dir(it) } }
+        } finally {
+            tmp.delete()
+            staging.deleteRecursively()
+            Lang.entries.forEach { refresh(it) }
         }
-        Lang.entries.forEach { refresh(it) }
-        return n
     }
 
     fun deleteCustom(lang: Lang) {
-        dir(lang).listFiles()?.filter { it.isFile && it.extension.lowercase() in exts }?.forEach { it.delete() }
+        dir(lang).listFiles()?.filter { it.isFile && it.extension.lowercase() in EXTS }?.forEach { it.delete() }
         refresh(lang)
     }
 
-    fun deleteGenerated(lang: Lang) {
-        ttsDir(lang).listFiles()?.forEach { it.delete() }
+    /** Cartella dove si generano i file nuovi: quelli di prima restano in tts/ finché i nuovi non sono pronti. */
+    fun newGeneratedDir(lang: Lang): File = File(dir(lang), ".tts-new").apply { deleteRecursively(); mkdirs() }
+
+    /** Mette i file generati in [fresh] al posto di quelli di tts/; se non ci riesce restano quelli di prima. */
+    @Synchronized
+    fun installGenerated(lang: Lang, fresh: File): Boolean {
+        val cur = ttsDir(lang)
+        val old = File(dir(lang), ".tts-old").apply { deleteRecursively() }
+        val ok = when {
+            !cur.renameTo(old) -> false
+            !fresh.renameTo(cur) -> { old.renameTo(cur); false }
+            else -> { old.deleteRecursively(); true }
+        }
+        fresh.deleteRecursively()
         refresh(lang)
+        return ok
     }
 
     /** Elenco delle frasi da registrare, scritto nella cartella voce (di nuovo a ogni cambio di lingua). */
     @Synchronized
     fun writeReadme(s: Strings) {
         val sb = StringBuilder()
-        sb.appendLine(s.voiceReadme(Lang.entries.joinToString(", ") { it.code }, exts.joinToString()))
+        sb.appendLine(s.voiceReadme(Lang.entries.joinToString(", ") { it.code }, EXTS.joinToString()))
         // Una colonna per lingua, separate da tabulazioni: si apre bene anche come foglio di calcolo.
         sb.appendLine()
         sb.appendLine((listOf(s.voiceReadmeKey) + Lang.entries.map { it.label.uppercase() }).joinToString("\t"))
@@ -10494,6 +11579,71 @@ class VoicePack(private val context: Context) {
             sb.appendLine((listOf(k) + Lang.entries.map { Phrases.text(k, it) }).joinToString("\t"))
         }
         runCatching { File(baseDir.apply { mkdirs() }, "LEGGIMI.txt").writeText(sb.toString()) }
+    }
+}
+
+/** Lettura degli ZIP di registrazioni, senza Android: si prova nei test. */
+internal object VoiceZip {
+
+    /**
+     * Dove va un file dello ZIP: (lingua, nome del file) oppure null se va ignorato.
+     * - `it/deuce.mp3`, anche dentro altre cartelle (`voice/it/deuce.mp3`): lingua = la cartella che contiene il file;
+     * - file fuori da ogni cartella di lingua (`deuce.mp3`, `Registrazioni/deuce.mp3`): lingua [fallback];
+     * - si ignora quello che sta in una cartella `tts` (i file generati dall'app: importando la cartella voice/
+     *   non devono diventare registrazioni) o più in fondo dentro una cartella di lingua (`it/vecchie/deuce.mp3`).
+     */
+    fun target(entryName: String, fallback: Lang): Pair<Lang, String>? {
+        val parts = entryName.replace('\\', '/').split('/').filter { it.isNotEmpty() }
+        val file = File(parts.lastOrNull() ?: return null)
+        val ext = file.extension.lowercase()
+        if (file.nameWithoutExtension !in Phrases.keys || ext !in VoicePack.EXTS) return null
+        val folders = parts.dropLast(1).map { it.lowercase() }
+        if ("tts" in folders) return null
+        val parent = folders.lastOrNull()?.let { Lang.fromCode(it) }
+        val lang = when {
+            parent != null -> parent
+            folders.any { Lang.fromCode(it) != null } -> return null
+            else -> fallback
+        }
+        return lang to "${file.nameWithoutExtension}.$ext"
+    }
+
+    /**
+     * Estrae i file validi dello ZIP in [staging]/`<lingua>`/. ZipFile legge l'indice in fondo all'archivio, quindi
+     * uno ZIP troncato fallisce subito; un file rovinato fallisce sul controllo CRC. In entrambi i casi eccezione.
+     * Ritorna quanti file ha estratto.
+     */
+    fun extract(zipFile: File, staging: File, fallback: Lang): Int {
+        ZipFile(zipFile).use { zip ->
+            for (entry in zip.entries()) {
+                if (entry.isDirectory) continue
+                val (lang, name) = target(entry.name, fallback) ?: continue
+                val dir = File(staging, lang.code).apply { mkdirs() }
+                val out = File(dir, name)
+                val crc = CRC32()
+                CheckedInputStream(zip.getInputStream(entry), crc).use { input -> out.outputStream().use { input.copyTo(it) } }
+                if (entry.crc != -1L && crc.value != entry.crc) throw ZipException("CRC errato: ${entry.name}")
+                if (out.length() <= VoicePack.MIN_BYTES) { out.delete(); continue }
+                // La stessa frase in due formati: vale l'ultima.
+                VoicePack.EXTS.forEach { e -> File(dir, "${out.nameWithoutExtension}.$e").takeIf { it != out }?.delete() }
+            }
+        }
+        return staging.listFiles().orEmpty().sumOf { it.listFiles().orEmpty().size }
+    }
+
+    /** Sposta i file estratti nella cartella della loro lingua ([dir]), togliendo la stessa frase negli altri formati. */
+    fun install(staging: File, dir: (Lang) -> File): Int {
+        var n = 0
+        for (langDir in staging.listFiles().orEmpty()) {
+            val dest = dir(Lang.fromCode(langDir.name) ?: continue)
+            for (f in langDir.listFiles().orEmpty()) {
+                VoicePack.EXTS.forEach { File(dest, "${f.nameWithoutExtension}.$it").delete() }
+                val to = File(dest, f.name)
+                if (!f.renameTo(to)) f.copyTo(to, overwrite = true)
+                n++
+            }
+        }
+        return n
     }
 }
 TSM_EOF
@@ -10612,6 +11762,87 @@ cat > "$DEST/app/src/main/res/xml/network_security_config.xml" << 'TSM_EOF'
 </network-security-config>
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BandEventTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BandEventTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.ble
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class BandEventTest {
+
+    private fun bytes(vararg v: Int) = ByteArray(v.size) { v[it].toByte() }
+
+    @Test
+    fun parseOldAndNewEvents() {
+        // firmware prima della 2.0: solo tipo e sequenza
+        val v1 = BandProtocol.parseEvent(bytes(1, 7))!!
+        assertEquals(RawBandEvent(1, 7, null, null, 0), v1)
+        // firmware 2.0-2.2: terzo byte = motivo dello spegnimento
+        val v2 = BandProtocol.parseEvent(bytes(3, 200, 4))!!
+        assertEquals(BandProtocol.EVT_POWER_OFF, v2.type)
+        assertEquals(4, v2.extra)
+        assertNull(v2.boot)
+        // firmware 2.3: id di accensione little endian ed età in decimi di secondo
+        val v3 = BandProtocol.parseEvent(bytes(2, 255, 0, 0x78, 0x56, 0x34, 0xF2, 63))!!
+        assertEquals(BandProtocol.EVT_UNDO, v3.type)
+        assertEquals(255, v3.seq)
+        assertEquals(0xF2345678L, v3.boot)
+        assertEquals(6_300, v3.ageMs)
+        assertNull(BandProtocol.parseEvent(bytes(1)))
+    }
+
+    @Test
+    fun helloAndAckMessages() {
+        assertEquals("H|1", BandProtocol.HELLO)
+        assertEquals("K|0", BandProtocol.ack(0))
+        assertEquals("K|255", BandProtocol.ack(255))
+        // il firmware li riconosce dal secondo carattere e dalla lunghezza (2-6)
+        assertTrue(BandProtocol.ack(255).length in 2..6 && BandProtocol.ack(255)[1] == '|')
+    }
+
+    @Test
+    fun resentEventIsAppliedOnce() {
+        val d = EventDedupe()
+        val boot = 0xCAFEL
+        assertTrue(d.firstTime("AA", boot, 5, 1_000))
+        // rimandato dopo una riconnessione: già visto
+        assertFalse(d.firstTime("AA", boot, 5, 7_000))
+        // il seguente è nuovo
+        assertTrue(d.firstTime("AA", boot, 6, 7_100))
+        // stessa sequenza, ma il braccialetto è stato riacceso: è un altro tasto
+        assertTrue(d.firstTime("AA", 0xBEEFL, 5, 7_200))
+        // stessa sequenza e accensione, ma dall'altro braccialetto
+        assertTrue(d.firstTime("BB", boot, 5, 7_300))
+    }
+
+    @Test
+    fun dedupeWindowLetsTheSequenceWrap() {
+        val d = EventDedupe(windowMs = 30_000)
+        assertTrue(d.firstTime("AA", 1L, 9, 0))
+        assertFalse(d.firstTime("AA", 1L, 9, 29_000))
+        // dopo 256 tasti la sequenza torna a 9: fuori dalla finestra vale di nuovo
+        assertTrue(d.firstTime("AA", 1L, 9, 61_000))
+    }
+
+    @Test
+    fun scanThrottleKeepsUnderAndroidLimit() {
+        val t = ScanThrottle(maxStarts = 4, windowMs = 30_000)
+        for (i in 0 until 4) {
+            assertEquals(0, t.delayBeforeStart(i * 1_000L))
+            t.recordStart(i * 1_000L)
+        }
+        // quinto avvio a 4 s: si aspetta che il primo (a 0 s) esca dalla finestra, più un margine
+        assertEquals(26_500, t.delayBeforeStart(4_000))
+        // passato quel tempo si riparte subito
+        assertEquals(0, t.delayBeforeStart(30_000))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/BandSettingsTest.kt" << 'TSM_EOF'
 package com.tennis.scoremanager.ble
@@ -10686,6 +11917,17 @@ class BatteryModelTest {
         assertEquals(1234L, s.uptimeS)
         assertEquals(56L, s.displayS)
         assertNull(BatteryModel.parse("garbage"))
+    }
+
+    @Test
+    fun failedVoltageReadIsDiscarded() {
+        // firmware 2.2 con la lettura del PM1 fallita: "mv=0" (e "chg=1"), non una batteria a zero
+        assertNull(BatteryModel.parse("mv=0;chg=1;up=600;dsp=20;usb=0;full=0;pct=-1"))
+        assertNull(BatteryModel.parse("mv=2400;chg=0;up=600;dsp=20"))
+        assertNull(BatteryModel.parse("mv=65535;chg=0;up=600;dsp=20"))
+        // ai limiti della LiPo vale ancora
+        assertEquals(3300, BatteryModel.parse("mv=3300;chg=0;up=600;dsp=20")!!.millivolts)
+        assertNull(BatteryModel.parse("mv=3300;chg=0;up=600;dsp=20;usb=0;full=0;pct=-1")!!.percent)
     }
 
     @Test
@@ -11134,12 +12376,14 @@ import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
 import com.tennis.scoremanager.ui.stringsFor
 import java.io.File
+import java.net.InetAddress
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -11155,7 +12399,7 @@ class TvSnapshotTest {
     private val setup = SetupData(club = "TC Roma", court = "3", p1a = "Stefano", p2a = "Mario")
     private val rules = RulesConfig()
 
-    private fun match(points: List<Side>, started: Boolean = true, suspended: Boolean = false): LiveMatch {
+    private fun match(points: List<Side>, started: Boolean = true, suspended: Boolean = false, rules: RulesConfig = this.rules): LiveMatch {
         val events = points.map { MatchEvent.Point(it) }
         val rec = MatchRecord(
             id = "m1", setup = setup, options = MatchOptions(), rules = rules, events = events,
@@ -11227,6 +12471,19 @@ class TvSnapshotTest {
     }
 
     @Test
+    fun finishedInMatchTiebreakShowsItAsOneSet() {
+        // 6-0 0-6 [10-8] per Stefano: una cifra per i game, quindi 1-0 (non 10-8, che diventerebbe 0-8)
+        val pts = List(24) { Side.P1 } + List(24) { Side.P2 } + List(8) { listOf(Side.P1, Side.P2) }.flatten() + listOf(Side.P1, Side.P1)
+        val s = TvSnapshots.build(input(screen = Screen.SUMMARY, match = match(pts, rules = RulesConfig(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK))))
+        assertEquals("finished", s.phase)
+        assertEquals(0, s.winner)
+        assertEquals(listOf(1, 0), s.games)
+        assertEquals(listOf(2, 1), s.sets)
+        assertEquals(TvSet(1, 0, 10, 8, mtb = true), s.done.last())
+        assertEquals(listOf("", ""), s.points)
+    }
+
+    @Test
     fun suspendedHidesTimersAndMessages() {
         val s = TvSnapshots.build(input(match = match(listOf(Side.P1), suspended = true), countdown = CountdownKind.SHOT_CLOCK, message = "x"))
         assertEquals("suspended", s.phase)
@@ -11267,6 +12524,33 @@ class TvSnapshotTest {
         assertEquals("192.168.43.1" to 8081, ScoreboardFinder.parseAddress(" http://192.168.43.1:8081/ "))
         assertNull(ScoreboardFinder.parseAddress(""))
         assertNull(ScoreboardFinder.parseAddress("10.0.0.2:99999"))
+    }
+
+    @Test
+    fun onlyLocalNetworkMayConnect() {
+        val ok = listOf("192.168.43.5", "10.0.0.2", "172.20.10.2", "127.0.0.1", "169.254.1.1", "::1", "fe80::1", "fd12:3456::1", "::ffff:192.168.1.2")
+        val no = listOf("8.8.8.8", "100.64.1.1", "2001:db8::1", "2a01:4f8::1", "::ffff:8.8.8.8")
+        ok.forEach { assertTrue(it, TvServer.isLocalPeer(InetAddress.getByName(it))) }
+        no.forEach { assertFalse(it, TvServer.isLocalPeer(InetAddress.getByName(it))) }
+    }
+
+    @Test
+    fun identityFromStateResponse() {
+        val response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nX-TSM-Id: ab12cd34\r\nConnection: close\r\n\r\n" +
+            "{\"tsm\":1,\"title\":\"TC Roma · Campo 3\"}"
+        assertEquals("ab12cd34" to "TC Roma · Campo 3", ScoreboardFinder.identity(response))
+        // server di una versione precedente: niente identità
+        assertEquals(null to "", ScoreboardFinder.identity("HTTP/1.1 200 OK\r\n\r\n{\"tsm\":1}"))
+    }
+
+    @Test
+    fun recoveryStaysOnTheSameCourt() {
+        val prev = FoundScoreboard("192.168.43.1", 8080, null, "ab12cd34", "TC Roma · Campo 3")
+        assertTrue(FoundScoreboard("192.168.43.7", 8080, null, "ab12cd34", "").sameAs(prev))  // stesso telefono, indirizzo nuovo
+        assertTrue(FoundScoreboard("192.168.43.1", 8080, null, null).sameAs(prev))  // stesso indirizzo
+        assertTrue(FoundScoreboard("192.168.43.9", 8081, null, "ffff0000", "TC Roma · Campo 3").sameAs(prev))  // stesso campo
+        assertFalse(FoundScoreboard("192.168.43.9", 8080, null, "ffff0000", "TC Roma · Campo 4").sameAs(prev))
+        assertFalse(FoundScoreboard("192.168.43.9", 8080, null, null, "").sameAs(prev.copy(title = "")))
     }
 
     /** Il blocco id="texts" di scoreboard.html deve avere gli stessi testi dell'app, lingua per lingua. */
@@ -11324,10 +12608,14 @@ class StringsTest {
                 val name = m.name.removePrefix("get")
                 val text = when (val v = m.invoke(s)) {
                     is String -> v
-                    is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi")))
+                    is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi"), listOf(listOf("Rossi"))))
                     is Function2<*, *, *> -> call(
                         { (v as Function2<Any?, Any?, Any?>)(it[0], it[1]) },
                         listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(true, false)),
+                    )
+                    is Function3<*, *, *, *> -> call(
+                        { (v as Function3<Any?, Any?, Any?, Any?>)(it[0], it[1], it[2]) },
+                        listOf(listOf("Rossi", "6-4", false)),
                     )
                     is Function4<*, *, *, *, *> -> call(
                         { (v as Function4<Any?, Any?, Any?, Any?, Any?>)(it[0], it[1], it[2], it[3]) },
@@ -11346,6 +12634,22 @@ class StringsTest {
             val t = texts(stringsFor(lang))
             assertEquals(it.keys, t.keys)
             for ((k, v) in t) assertTrue("$lang $k", v.isNotBlank() || k == "TeamJoiner")
+        }
+    }
+
+    @Test
+    fun doublesAndTwoBandsUsePlural() {
+        assertEquals("Vince Rossi\n6-4 6-3", ItStrings.endDialogText("Rossi", "6-4 6-3", false))
+        assertEquals("Vincono Rossi e Bianchi\n6-4 6-3", ItStrings.endDialogText("Rossi e Bianchi", "6-4 6-3", true))
+        assertEquals("Rossi and Bianchi win\n6-4", EnStrings.endDialogText("Rossi and Bianchi", "6-4", true))
+        assertEquals("Ganan Rossi y Bianchi\n6-4", stringsFor(Lang.ES).endDialogText("Rossi y Bianchi", "6-4", true))
+        for (lang in Lang.entries) {
+            val s = stringsFor(lang)
+            val one = s.bandsMissingText(listOf("Rossi"))
+            val two = s.bandsMissingText(listOf("Rossi", "Bianchi"))
+            assertTrue("$lang: $two", "Rossi, Bianchi" in two)
+            // Al plurale cambia anche il resto della frase, non solo l'elenco dei nomi.
+            assertTrue("$lang: $one / $two", two.replace(", Bianchi", "") != one)
         }
     }
 
@@ -11710,7 +13014,7 @@ class LanguagesTest {
             tiebreak = listOf("game Bianchi six games all tie-break", "one zero Rossi", "one all", "two one Bianchi"),
             matchEnd = "game, set and match Rossi six four three six seven five",
             noAd = "deuce deciding point",
-            superTiebreakEnd = "game, set and match Rossi six zero zero six ten eight",
+            superTiebreakEnd = "game, set and match Rossi six love love six ten eight",
         ),
     )
 
@@ -11853,6 +13157,159 @@ class PronunciationTest {
     fun otherLanguagesUntouched() {
         assertEquals("juego Rossi seis juegos iguales tie-break", Pronunciation.fix("juego Rossi seis juegos iguales tie-break", Lang.ES, null))
         assertEquals("primeiro set", Pronunciation.fix("primeiro set", Lang.PT, null))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/voice/VoiceFilesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/voice/VoiceFilesTest.kt" << 'TSM_EOF'
+package com.tennis.scoremanager.voice
+
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import java.io.File
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+/** ZIP di registrazioni (quali file, in che lingua, ZIP rovinati) e lo zero dei set a fine partita. */
+class VoiceFilesTest {
+
+    @get:Rule
+    val tmp = TemporaryFolder()
+
+    private val audio = ByteArray(200) { (it * 7).toByte() }
+
+    // ---------------------------------------------------------------- dove va ogni file dello ZIP
+
+    @Test
+    fun languageIsTheFolderThatContainsTheFile() {
+        assertEquals(Lang.IT to "deuce.mp3", VoiceZip.target("it/deuce.mp3", Lang.FR))
+        assertEquals(Lang.EN to "game.wav", VoiceZip.target("voice/EN/game.WAV", Lang.FR))
+        assertEquals(Lang.FR to "deuce.wav", VoiceZip.target("Registrazioni\\fr\\deuce.wav", Lang.IT))
+    }
+
+    @Test
+    fun filesOutsideLanguageFoldersUseTheCurrentLanguage() {
+        assertEquals(Lang.DE to "deuce.ogg", VoiceZip.target("deuce.ogg", Lang.DE))
+        assertEquals(Lang.DE to "deuce.ogg", VoiceZip.target("Registrazioni/deuce.ogg", Lang.DE))
+    }
+
+    @Test
+    fun generatedFilesAndUnknownNamesAreIgnored() {
+        // La cartella voice/ dell'app zippata così com'è: i file generati non diventano registrazioni.
+        assertNull(VoiceZip.target("it/tts/deuce.wav", Lang.IT))
+        assertNull(VoiceZip.target("voice/it/tts/deuce.wav", Lang.IT))
+        assertNull(VoiceZip.target("tts/deuce.wav", Lang.IT))
+        assertNull(VoiceZip.target("voice/it/.tts-new/deuce.wav", Lang.IT))
+        assertNull(VoiceZip.target("it/vecchie/deuce.mp3", Lang.IT))
+        assertNull(VoiceZip.target("it/sconosciuta.mp3", Lang.IT))
+        assertNull(VoiceZip.target("it/deuce.txt", Lang.IT))
+        assertNull(VoiceZip.target("__MACOSX/it/._deuce.mp3", Lang.IT))
+        assertNull(VoiceZip.target("it/", Lang.IT))
+    }
+
+    // ---------------------------------------------------------------- estrazione e installazione
+
+    private fun zip(vararg entries: Pair<String, ByteArray>, stored: Boolean = false): File {
+        val f = tmp.newFile()
+        ZipOutputStream(f.outputStream()).use { z ->
+            for ((name, data) in entries) {
+                val e = ZipEntry(name)
+                if (stored) {
+                    e.method = ZipEntry.STORED
+                    e.size = data.size.toLong()
+                    e.crc = CRC32().apply { update(data) }.value
+                }
+                z.putNextEntry(e)
+                z.write(data)
+                z.closeEntry()
+            }
+        }
+        return f
+    }
+
+    @Test
+    fun importOfTheAppVoiceFolderKeepsRecordings() {
+        val base = tmp.newFolder("voice")
+        File(base, "it").mkdirs()
+        File(base, "it/deuce.wav").writeBytes(audio)
+        val z = zip(
+            "voice/it/deuce.mp3" to audio,
+            "voice/it/tts/deuce.wav" to audio, // dopo it/deuce.mp3 in ordine alfabetico: prima lo sostituiva
+            "voice/en/game.wav" to audio,
+            "voice/it/play.wav" to ByteArray(10), // troppo piccolo: si ignora
+            "advantage.ogg" to audio,
+        )
+        val staging = tmp.newFolder("staging")
+        assertEquals(3, VoiceZip.extract(z, staging, Lang.DE))
+        assertEquals(3, VoiceZip.install(staging) { File(base, it.code).apply { mkdirs() } })
+        assertEquals(setOf("deuce.mp3"), File(base, "it").list()!!.toSet())
+        assertTrue(File(base, "en/game.wav").isFile)
+        assertTrue(File(base, "de/advantage.ogg").isFile)
+    }
+
+    @Test
+    fun truncatedZipFailsBeforeTouchingAnything() {
+        val full = zip("it/deuce.mp3" to audio, "it/game.mp3" to audio).readBytes()
+        // Tagliato alla fine dei dati: ZipInputStream lo leggeva "tutto" senza accorgersene.
+        val cut = tmp.newFile().apply { writeBytes(full.copyOf(full.size - 60)) }
+        val staging = tmp.newFolder("staging")
+        assertTrue(runCatching { VoiceZip.extract(cut, staging, Lang.IT) }.isFailure)
+    }
+
+    @Test
+    fun corruptedEntryFailsTheCrcCheck() {
+        val bytes = zip("it/deuce.wav" to audio, stored = true).readBytes()
+        // Un byte del file audio cambiato (i dati iniziano dopo l'intestazione locale: 30 byte + nome).
+        val at = 30 + "it/deuce.wav".length + 50
+        bytes[at] = (bytes[at] + 1).toByte()
+        val bad = tmp.newFile().apply { writeBytes(bytes) }
+        assertTrue(runCatching { VoiceZip.extract(bad, tmp.newFolder("staging"), Lang.IT) }.isFailure)
+    }
+
+    // ---------------------------------------------------------------- zero dei set
+
+    @Test
+    fun setZeroIsLoveOnlyInEnglish() {
+        assertEquals("love", Phrases.text(Phrases.SET_ZERO, Lang.EN))
+        assertNull(Phrases.alias(Phrases.SET_ZERO, Lang.EN))
+        for (lang in Lang.entries - Lang.EN) {
+            assertEquals(Phrases.text("num_0", lang), Phrases.text(Phrases.SET_ZERO, lang))
+            // Stesso testo: va bene il file di "num_0" (le registrazioni già fatte restano complete).
+            assertEquals("num_0", Phrases.alias(Phrases.SET_ZERO, lang))
+        }
+        assertFalse(Phrases.alias("num_0", Lang.IT) != null)
+    }
+
+    @Test
+    fun matchTiebreakKeepsZero() {
+        val calls = CallBuilder(Lang.EN)
+        var s = ScoreEngine.initial(RulesConfig(firstServer = Side.P1, format = MatchFormat.TWO_SETS_MATCH_TIEBREAK))
+        fun game(w: Side) = repeat(4) { s = ScoreEngine.pointWonBy(s, w).state }
+        repeat(6) { game(Side.P1) }
+        repeat(6) { game(Side.P2) }
+        repeat(9) { s = ScoreEngine.pointWonBy(s, Side.P1).state }
+        val step = ScoreEngine.pointWonBy(s, Side.P1)
+        assertEquals(
+            "game, set and match Rossi six love love six ten zero",
+            calls.render(calls.afterPoint(step.state, step.transition!!, names)),
+        )
+    }
+
+    private val names = object : CallNames {
+        override fun side(side: Side) = if (side == Side.P1) "Rossi" else "Bianchi"
+        override fun player(side: Side, index: Int) = side(side)
     }
 }
 TSM_EOF
@@ -13089,6 +14546,9 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   KEY2 corto  : annulla l'ultimo punto
   KEY2 lungo  : spegne il braccialetto (riaccensione: tasto laterale, un clic)
   Se non è collegato, un tasto qualsiasi rimanda lo spegnimento automatico.
+  Conferma dei tasti (dalla 2.3, con l'app 2.4): il bip di KEY1/KEY2 suona quando il telefono ha
+  ricevuto il tasto, non alla pressione. Un tasto non confermato entro 8 s (collegamento perso) non vale:
+  "NON INVIATO" e due bip bassi, va ripremuto. Con le app vecchie il bip suona all'invio, come prima.
 
   Ricarica (cavo USB): il braccialetto non si spegne da solo finché è alimentato e mostra la
   schermata di carica (percentuale, tensioni, da quanto è in carica, fine stimata) per 30 s,
@@ -13114,8 +14574,9 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <M5Unified.h>
 #include <NimBLEDevice.h>
 #include <Preferences.h>
+#include <driver/rtc_io.h>
 
-#define FW_VERSION "2.2.2"
+#define FW_VERSION "2.3"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -13139,12 +14600,19 @@ static const uint32_t CHARGE_GLANCE_MS     = 1500;                 // ...di 1,5 
 static const uint32_t FULL_DEBOUNCE_MS     = 20000;                // CHG_STAT spento da 20 s = carica completa
 static const int      CV_FULL_MV           = 4180;                 // riserva: 45 min sopra 4,18 V = carica completa
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
+static const uint32_t EVT_MAX_AGE_MS       = 8000;                 // tasto non confermato entro 8 s: non vale più, va ripremuto
+static const uint32_t EVT_SEND_MAX_MS      = 6500;                 // oltre non si (ri)manda: la conferma deve arrivare prima degli 8 s
+
+// Tasti dell'M5StickS3 (gli stessi pin di M5Unified), premuto = basso. Sono pin RTC (0-21 sull'S3):
+// possono svegliare il braccialetto dal deep sleep.
+static const gpio_num_t KEY1_PIN = GPIO_NUM_11;
+static const gpio_num_t KEY2_PIN = GPIO_NUM_12;
 
 // Testi mostrati dal braccialetto (solo ASCII, maiuscolo), una riga per lingua: vedi TXT[] più sotto.
 enum : uint8_t { L_IT, L_EN, L_FR, L_DE, L_ES, L_PT, N_LANG };
 static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "pt" };
 enum : uint8_t {
-  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_IDLE,
+  T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_NOT_SENT, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
   T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, N_TXT
 };
@@ -13156,6 +14624,7 @@ enum : uint8_t {
 #define TXT_BATTERY    txt(T_BATTERY)
 #define TXT_CHARGING   txt(T_CHARGING)
 #define TXT_NO_LINK    txt(T_NO_LINK)
+#define TXT_NOT_SENT   txt(T_NOT_SENT)
 #define TXT_IDLE       txt(T_IDLE)
 #define TXT_HOLD_KEY1  txt(T_HOLD_KEY1)
 #define TXT_EMPTY      txt(T_EMPTY)
@@ -13167,7 +14636,7 @@ enum : uint8_t {
 
 // ------------------------------------------------------------------ protocollo (uguale all'app)
 #define SERVICE_UUID "7a1e0001-5c3b-4f6e-9d2a-3e7b1c9a0f10"
-#define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"
+#define EVENT_UUID   "7a1e0002-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // [tipo, seq, extra] + dalla 2.3 [id accensione x4, età in 1/10 s]
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
@@ -13203,27 +14672,27 @@ static char defaultName[13];
 // (%s durata, %d minuti, %ld secondi al conto alla rovescia).
 static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
-    "NON CONNESSO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
+    "NON CONNESSO", "NON INVIATO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
     "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
-    "NOT CONNECTED", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
+    "NOT CONNECTED", "NOT SENT", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
     "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
-    "NON CONNECTE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
+    "NON CONNECTE", "NON ENVOYE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
     "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
-    "NICHT VERBUNDEN", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
+    "NICHT VERBUNDEN", "NICHT GESENDET", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
     "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
   { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
-    "NO CONECTADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
+    "NO CONECTADO", "NO ENVIADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
     "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
   { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
-    "SEM CONEXAO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
+    "SEM CONEXAO", "NAO ENVIADO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
     "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
 };
@@ -13250,6 +14719,23 @@ static char cfgBuf[192];
 static volatile bool cfgReady = false;
 
 static uint8_t  seqNo = 0;
+
+// Eventi dei tasti (dalla 2.3). Un evento parte solo se l'app ha attivato le notifiche di EVENT: prima
+// NimBLE non manda niente e non lo rimanda dopo. Resta in coda finché l'app non lo conferma ("K|seq");
+// a ogni nuova iscrizione (riconnessione) si rimanda quello che non è confermato, finché ha meno di 6,5 s;
+// a 8 s dalla pressione un evento non confermato è perso ("NON INVIATO").
+struct PendingEvt { uint8_t type; uint8_t seq; uint32_t at; bool sent; };
+static const uint8_t PEND_MAX = 6;
+static PendingEvt pending[PEND_MAX];
+static uint8_t  pendingN = 0;
+static uint32_t bootId = 0;                    // casuale a ogni accensione: l'app riconosce i doppioni anche dopo una riconnessione
+static volatile uint16_t connHandle = BLE_HS_CONN_HANDLE_NONE;
+static volatile bool subscribed = false;       // l'app ascolta EVENT su questa connessione
+static volatile bool justSubscribed = false;
+static volatile bool ackMode = false;          // l'app conferma gli eventi ("H|1" su questa connessione): bip alla conferma
+static uint8_t  ackBuf[8];                     // conferme ricevute dal task BLE, le usa il loop
+static volatile uint8_t ackN = 0;
+
 static bool     displayOn = false;
 static uint32_t displayOffAt = 0;
 static uint32_t pairedOffAt = 0;       // displayOffAt del messaggio "PAIRING OK": finché è lo stesso, è ancora a schermo
@@ -13451,11 +14937,26 @@ static int socFromMv(int mv) {
   return 0;
 }
 
+// Letture dal PM1. Se la lettura I2C fallisce M5Unified dà 0 mV e, per CHG_STAT, "in carica": qui una
+// lettura fallita dà 0 mV (si riprova una volta) e "non in carica".
+static int batteryMv() {
+  int mv = M5.Power.getBatteryVoltage();
+  if (mv <= 2500) mv = M5.Power.getBatteryVoltage();
+  return mv > 2500 ? mv : 0;
+}
+
+static bool chargingNow() {
+  if (M5.getBoard() != m5::board_t::board_M5StickS3) return M5.Power.isCharging() == m5::Power_Class::is_charging;
+  uint8_t bits;
+  if (!M5.Power.M5pm1.getGPIOInputBits(&bits)) return false;
+  return !(bits & 0x01);  // PM1 G0 = CHG_STAT, basso = in carica
+}
+
 // Percentuale da mostrare: col cavo USB quella della carica, altrimenti dalla tensione (-1 = lettura fallita).
 static int batteryPct() {
   if (usbOn) return chgPct;
-  const int mv = M5.Power.getBatteryVoltage();
-  return mv > 2500 ? socFromMv(mv) : -1;
+  const int mv = batteryMv();
+  return mv > 0 ? socFromMv(mv) : -1;
 }
 
 // "42 MIN" oppure "1H 25"
@@ -13755,6 +15256,9 @@ static void identifyStep(uint32_t now) {
 // ------------------------------------------------------------------ BLE
 class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* s, NimBLEConnInfo& info) override {
+    connHandle = info.getConnHandle();
+    subscribed = false;
+    ackMode = false;   // ogni connessione la riannuncia ("H|1"): un'app vecchia non conferma
     connected = true;
     justConnected = true;
     // Intervallo 80-120 ms con latenza 3: senza traffico la radio si sveglia 2-3 volte al secondo
@@ -13766,8 +15270,19 @@ class ServerCallbacks : public NimBLEServerCallbacks {
     // Prima il tempo, poi lo stato: il loop non deve mai vedere "non connesso" con un advSince vecchio
     // (spegnerebbe il braccialetto in piena partita).
     advSince = millis();
+    subscribed = false;
+    ackMode = false;
     connected = false;
     justDisconnect = true;
+  }
+};
+
+// L'app attiva le notifiche di EVENT dopo aver scoperto i servizi: prima di allora un evento andrebbe perso.
+class EventCallbacks : public NimBLECharacteristicCallbacks {
+  void onSubscribe(NimBLECharacteristic* c, NimBLEConnInfo& info, uint16_t subValue) override {
+    const bool on = (subValue & 1) != 0;
+    if (on) justSubscribed = true;  // prima di "subscribed": il loop non deve inviare senza saperlo
+    subscribed = on;
   }
 };
 
@@ -13782,8 +15297,34 @@ static void copyValue(NimBLECharacteristic* c, char* buf, size_t size, volatile 
   portEXIT_CRITICAL(&rxMux);
 }
 
+// "H|1" (l'app conferma gli eventi) e "K|<seq>" (conferma) si gestiscono qui, senza passare da rxBuf:
+// così non cancellano un punteggio arrivato subito prima. I firmware vecchi ignorano i tipi che non conoscono.
 class DisplayCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override { copyValue(c, rxBuf, sizeof(rxBuf), rxReady); }
+  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& info) override {
+    NimBLEAttValue v = c->getValue();
+    const size_t len = v.length();
+    if (len >= 2 && len <= 6 && v.data()[1] == '|') {
+      if (v.data()[0] == 'H') {
+        ackMode = true;
+        return;
+      }
+      if (v.data()[0] == 'K') {
+        char num[8];
+        memcpy(num, v.data() + 2, len - 2);
+        num[len - 2] = 0;
+        const uint8_t seq = (uint8_t)atoi(num);
+        portENTER_CRITICAL(&rxMux);
+        const uint8_t n = ackN;
+        if (n < sizeof(ackBuf)) {
+          ackBuf[n] = seq;
+          ackN = n + 1;
+        }
+        portEXIT_CRITICAL(&rxMux);
+        return;
+      }
+    }
+    copyValue(c, rxBuf, sizeof(rxBuf), rxReady);
+  }
 };
 
 class ConfigCallbacks : public NimBLECharacteristicCallbacks {
@@ -13801,15 +15342,106 @@ static void startAdvertising(bool fast) {
   advFast = fast;
 }
 
-static void sendEvent(uint8_t type, uint8_t extra = 0) {
-  if (!connected || !evtChr) return;
-  uint8_t data[3] = { type, ++seqNo, extra };
-  evtChr->setValue(data, 3);
-  evtChr->notify();
+// [tipo, seq, extra] come prima (le app vecchie leggono solo questi), poi id di accensione (4 byte) ed età
+// dell'evento in decimi di secondo. Si manda col valore nel pacchetto e alla sola connessione: due eventi di
+// fila non si sovrascrivono come con setValue() + notify().
+static bool sendEvent(uint8_t type, uint8_t seq, uint8_t extra, uint32_t ageMs) {
+  if (!connected || !subscribed || !evtChr) return false;
+  const uint32_t age = ageMs / 100;
+  const uint8_t data[8] = { type, seq, extra, (uint8_t)bootId, (uint8_t)(bootId >> 8), (uint8_t)(bootId >> 16),
+                            (uint8_t)(bootId >> 24), (uint8_t)(age > 255 ? 255 : age) };
+  evtChr->setValue(data, sizeof(data));
+  return evtChr->notify(data, sizeof(data), connHandle);
+}
+
+// Evento informativo (batteria, spegnimento): parte subito se l'app ascolta, senza conferma.
+static void sendNow(uint8_t type, uint8_t extra = 0) {
+  sendEvent(type, ++seqNo, extra, 0);
+}
+
+static void confirmBeep(uint8_t type) {
+  if (type == EVT_UNDO) beep(1800, 40);
+  else beep(2700, 40);
+}
+
+// Tasto mai arrivato al telefono: avviso ben diverso dal bip di conferma, va ripremuto.
+static void notSent(uint8_t type) {
+  identifyUntil = 0;
+  drawMessage(TXT_NOT_SENT, type == EVT_UNDO ? "KEY2" : "KEY1", C_RED);
+  showFor(2500);
+  blinkShown = false;           // il lampeggio "RICONNESSIONE" non lo copre subito
+  nextBlink = millis() + 2500;
+  beep(500, 120);
+  beep(350, 300);
+}
+
+static void removePending(uint8_t i) {
+  memmove(&pending[i], &pending[i + 1], (pendingN - i - 1) * sizeof(PendingEvt));
+  pendingN--;
+}
+
+// KEY1/KEY2 da collegati: in coda, li manda serviceEvents() (subito, se l'app ascolta già).
+static void queueEvent(uint8_t type, uint32_t now) {
+  if (pendingN == PEND_MAX) {
+    notSent(pending[0].type);
+    removePending(0);
+  }
+  pending[pendingN++] = { type, ++seqNo, now, false };
+}
+
+// A ogni giro del loop: conferme, rinvio dopo una riconnessione, scadenza e invio.
+static void serviceEvents(uint32_t now) {
+  uint8_t acks[sizeof(ackBuf)];
+  portENTER_CRITICAL(&rxMux);
+  const uint8_t nAck = ackN;
+  memcpy(acks, ackBuf, nAck);
+  ackN = 0;
+  portEXIT_CRITICAL(&rxMux);
+  for (uint8_t a = 0; a < nAck; a++) {
+    for (uint8_t i = 0; i < pendingN; i++) {
+      if (pending[i].seq != acks[a]) continue;
+      confirmBeep(pending[i].type);  // il telefono l'ha ricevuto: solo ora il bip di conferma
+      removePending(i);
+      break;
+    }
+  }
+  if (justSubscribed) {
+    justSubscribed = false;
+    for (uint8_t i = 0; i < pendingN; i++) pending[i].sent = false;  // l'invio precedente può essere andato perso
+  }
+  uint8_t lost = 0;
+  for (uint8_t i = 0; i < pendingN;) {
+    if ((int32_t)(now - pending[i].at) >= (int32_t)EVT_MAX_AGE_MS) {
+      lost = pending[i].type;
+      removePending(i);
+    } else {
+      i++;
+    }
+  }
+  if (lost) notSent(lost);
+  for (uint8_t i = 0; i < pendingN;) {
+    PendingEvt& e = pending[i];
+    // Già mandato, o troppo vecchio per avere la conferma in tempo (l'app lo applicherebbe mentre qui
+    // compare "NON INVIATO", e il tasto ripremuto conterebbe due volte).
+    if (e.sent || (int32_t)(now - e.at) >= (int32_t)EVT_SEND_MAX_MS) {
+      i++;
+      continue;
+    }
+    if (!sendEvent(e.type, e.seq, 0, now - e.at)) break;
+    if (ackMode) {
+      e.sent = true;
+      i++;
+    } else {
+      // App vecchia (non conferma): vale l'invio, come nei firmware 2.2.
+      confirmBeep(e.type);
+      removePending(i);
+    }
+  }
 }
 
 static void updateBattery(bool notify) {
-  const int level = batteryPct();
+  const int mv = batteryMv();
+  const int level = usbOn ? chgPct : (mv > 0 ? socFromMv(mv) : -1);
   if (level >= 0) {
     uint8_t v = (uint8_t)constrain(level, 0, 100);
     battChr->setValue(&v, 1);
@@ -13818,11 +15450,14 @@ static void updateBattery(bool notify) {
   // Stato per l'app: tensione in mV (più precisa della percentuale), alimentato da USB (chg=1 anche a carica
   // completa: non c'è consumo da misurare), secondi di accensione e di display acceso (consumo e autonomia
   // reali); dal firmware 2.1 anche tensione USB, carica completa e la percentuale mostrata dal braccialetto.
+  // Lettura della tensione fallita: niente stato (dalla 2.3). Con "mv=0" l'app vedeva la batteria a zero:
+  // falso allarme e stima dei consumi sbagliata. Si riprova al giro successivo.
+  if (mv <= 0) return;
   char buf[96];
   uint32_t dsp = displayOnTotalMs + (displayOn ? millis() - displayOnSince : 0);
-  const bool chg = usbOn || M5.Power.isCharging() == m5::Power_Class::is_charging;
+  const bool chg = usbOn || chargingNow();
   snprintf(buf, sizeof(buf), "mv=%d;chg=%d;up=%lu;dsp=%lu;usb=%d;full=%d;pct=%d",
-           (int)M5.Power.getBatteryVoltage(), chg ? 1 : 0,
+           mv, chg ? 1 : 0,
            (unsigned long)(millis() / 1000), (unsigned long)(dsp / 1000),
            usbOn ? lastVbus : 0, chgState == CHG_FULL ? 1 : 0, level);
   statusChr->setValue((const uint8_t*)buf, strlen(buf));
@@ -13837,12 +15472,14 @@ static void setupBle() {
   NimBLEDevice::setPower(9);  // dBm: portata sufficiente per un campo da tennis col polso in mezzo
   NimBLEDevice::setMTU(185);
 
+  bootId = esp_random();  // col Bluetooth acceso è un numero casuale vero
   server = NimBLEDevice::createServer();
   server->setCallbacks(new ServerCallbacks());
   server->advertiseOnDisconnect(false);  // la ripartenza la gestisce il loop
 
   NimBLEService* svc = server->createService(SERVICE_UUID);
   evtChr = svc->createCharacteristic(EVENT_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+  evtChr->setCallbacks(new EventCallbacks());
   NimBLECharacteristic* disp = svc->createCharacteristic(DISPLAY_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
   disp->setCallbacks(new DisplayCallbacks());
   statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -13868,10 +15505,29 @@ static void setupBle() {
 }
 
 // ------------------------------------------------------------------ spegnimento
+// Col cavo USB il PM1 può non togliere corrente e M5Unified va in deep sleep senza un modo per svegliarsi
+// (resterebbe "spento" finché non si stacca il cavo). Si arma il risveglio da KEY1/KEY2, dopo che sono stati
+// rilasciati: KEY2 è ancora premuto se lo spegnimento viene dal tasto. Se il PM1 spegne, non conta.
+static void armKeyWake() {
+  const uint32_t t0 = millis();
+  while ((!gpio_get_level(KEY1_PIN) || !gpio_get_level(KEY2_PIN)) && millis() - t0 < 5000) delay(20);
+  uint64_t mask = 0;
+  if (gpio_get_level(KEY1_PIN)) mask |= 1ULL << KEY1_PIN;
+  if (gpio_get_level(KEY2_PIN)) mask |= 1ULL << KEY2_PIN;
+  // Ancora premuti dopo 5 s: meglio riaccendersi subito che non svegliarsi più.
+  if (!mask) mask = (1ULL << KEY1_PIN) | (1ULL << KEY2_PIN);
+  // I tasti hanno già le loro resistenze di pull-up; queste interne tengono alto il pin anche in deep sleep.
+  rtc_gpio_pullup_en(KEY1_PIN);
+  rtc_gpio_pulldown_dis(KEY1_PIN);
+  rtc_gpio_pullup_en(KEY2_PIN);
+  rtc_gpio_pulldown_dis(KEY2_PIN);
+  esp_sleep_enable_ext1_wakeup_io(mask, ESP_EXT1_WAKEUP_ANY_LOW);
+}
+
 static void powerOff(const char* l1, const char* why, uint8_t reason) {
   // L'app deve sapere che il braccialetto si è spento (e perché), non che l'ha perso.
   if (connected) {
-    sendEvent(EVT_POWER_OFF, reason);
+    sendNow(EVT_POWER_OFF, reason);
     delay(300);  // lascia partire la notifica
   }
   drawMessage(l1, why, C_ORANGE);
@@ -13886,6 +15542,7 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
   if (spkOn) speakerOff();
   M5.Display.setBrightness(0);
   M5.Display.sleep();
+  armKeyWake();
   M5.Power.powerOff();  // col cavo USB collegato il PM1 può non togliere corrente: allora deep sleep
   while (true) delay(1000);
 }
@@ -13897,7 +15554,7 @@ static void onUsbIn(uint32_t now) {
   fullAt = 0;
   notChgSince = 0;
   cvSince = 0;
-  chgState = M5.Power.isCharging() == m5::Power_Class::is_charging ? CHG_ACTIVE : CHG_IDLE;
+  chgState = chargingNow() ? CHG_ACTIVE : CHG_IDLE;
   chgPct = restMv > 2500 ? socFromMv(restMv) : 0;
   pctHistN = 0;
   lastPctSample = now - 60000UL;
@@ -13939,7 +15596,7 @@ static void pollPower(uint32_t now) {
   if (now - lastPowerPoll < POWER_POLL_MS) return;
   lastPowerPoll = now;
   const int vbus = M5.Power.getVBUSVoltage();
-  const bool chg = M5.Power.isCharging() == m5::Power_Class::is_charging;  // CHG_STAT basso = in carica
+  const bool chg = chargingNow();  // CHG_STAT basso = in carica (lettura fallita = no: non deve sembrare un cavo)
   const int mv = M5.Power.getBatteryVoltage();
   if (vbus > 0) lastVbus = vbus;
   if (mv > 2500) {
@@ -14016,6 +15673,12 @@ static void chargeDisplay(uint32_t now) {
 // ------------------------------------------------------------------ setup / loop
 void setup() {
   setCpuFrequencyMhz(80);  // il minimo che tiene in piedi il Bluetooth: consumo molto più basso di 240 MHz
+  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+    // Riacceso da un tasto (era spento col cavo USB): i due pin tornano GPIO normali, altrimenti restano
+    // al dominio RTC e i tasti non si leggono.
+    rtc_gpio_deinit(KEY1_PIN);
+    rtc_gpio_deinit(KEY2_PIN);
+  }
 
   auto cfgM5 = M5.config();
   cfgM5.clear_display = true;
@@ -14108,8 +15771,7 @@ void loop() {
     lastActivity = now;
     idleWarned = false;
     if (connected) {
-      sendEvent(EVT_POINT);
-      beep(2700, 40);
+      queueEvent(EVT_POINT, now);  // il bip arriva con la conferma del telefono (vedi serviceEvents)
     } else if (usbOn) {
       chargeScreenFor(CHARGE_SHOW_MS);
     } else {
@@ -14121,14 +15783,13 @@ void loop() {
     idleWarned = false;
     if (!connected) advSince = now;
     drawBattery();
-    sendEvent(EVT_BATTERY);
+    sendNow(EVT_BATTERY);
   }
   if (M5.BtnB.wasClicked()) {
     lastActivity = now;
     idleWarned = false;
     if (connected) {
-      sendEvent(EVT_UNDO);
-      beep(1800, 40);
+      queueEvent(EVT_UNDO, now);
     } else if (usbOn) {
       chargeScreenFor(CHARGE_SHOW_MS);
     } else {
@@ -14136,6 +15797,7 @@ void loop() {
     }
   }
   if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
+  serviceEvents(now);
 
   // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
   if (!connected && !justDisconnect && usbOn) {
@@ -14194,7 +15856,7 @@ void loop() {
   if (now - lastBattCheck > BATT_CHECK_MS) {
     lastBattCheck = now;
     const int mv = M5.Power.getBatteryVoltage();
-    const bool charging = M5.Power.isCharging() == m5::Power_Class::is_charging;
+    const bool charging = chargingNow();
     if (!charging && !usbOn && mv > 2500 && mv < BATT_EMPTY_MV) {
       if (++battEmptyCount >= 2) powerOff(TXT_POWER_OFF, TXT_EMPTY, OFF_BATTERY);
     } else {
@@ -14215,6 +15877,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto / done: 67 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 69 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

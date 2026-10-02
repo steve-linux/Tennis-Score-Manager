@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versões usadas e verificadas: app **2.4** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Se o Android Studio sugerir o **AGP Upgrade Assistant**, pode ignorá-lo: estas versões foram compiladas e testadas assim.
 6. JDK do Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (o incluído, que é o padrão).
 7. **Build › Make Project**: deve terminar com *BUILD SUCCESSFUL*.
-8. Opcional: os testes (76: regras, voz, idiomas, bateria e recarga, ajustes das pulseiras, placar na TV) são executados com o botão direito em `app/src/test` › **Run Tests**.
+8. Opcional: os testes (95: regras, voz, idiomas, bateria e recarga, ajustes das pulseiras, placar na TV) são executados com o botão direito em `app/src/test` › **Run Tests**.
 
 ## 3. Instalar o app no telefone
 
@@ -101,17 +101,17 @@ bash installa_tsm.sh
   - **Mecanismo de síntese de voz**: *Padrão do telefone* (nos Samsung é o Samsung TTS) ou um mecanismo à sua escolha, por exemplo *Serviços de voz do Google*. Nos testes, feitos em italiano, o Google soou mais natural.
   - **Voz**: *Automática (melhor offline)* ou uma voz específica (o Google lista as vozes por código, como *Voz* seguido de três letras; as marcadas como *online* precisam de internet).
   - **Testar voz**: lê uma sequência de anúncios de exemplo com os nomes digitados. Enquanto lê, o botão vira **Parar o teste**: toque de novo para interrompê-lo (ele também para sozinho quando você sai da página). A síntese de voz não pode ser pausada no meio de uma frase, por isso o botão a interrompe; tocando de novo, ela recomeça do início.
-- Se faltar a voz do idioma escolhido: **Configurações › Gerenciamento geral › Idioma › Conversão de texto em voz** (ou *Saída de conversão de texto em voz*) → baixe a voz desse idioma para o mecanismo escolhido (o app também mostra o botão **Instalar voz**).
+- Se faltar a voz do idioma escolhido: **Configurações › Gerenciamento geral › Idioma › Conversão de texto em voz** (ou *Saída de conversão de texto em voz*) → baixe a voz desse idioma para o mecanismo escolhido (o app também mostra o botão **Instalar voz**). Se a síntese de voz nem chega a iniciar, o app avisa com uma mensagem própria e o botão **Abrir configurações** (configurações de síntese de voz do Android).
 - **Pronúncia**: alguns mecanismos erram palavras do tênis (em italiano, "primo set" lido como "primo settembre", "tie-break" lido como "time break"). O app as corrige sozinho (`voice/Pronunciation.kt`); as correções foram verificadas transcrevendo o áudio real do Samsung e do Google.
-- **Gravações personalizadas** (a voz mais natural de todas: a sua ou a de um árbitro): na pasta `Android/data/com.tennis.scoremanager/files/voice/` há o `LEGGIMI.txt` ("leia-me"; as explicações do início ficam no idioma do app e são reescritas quando você o muda) com a lista das 84 chaves e das frases. Grave os arquivos com esses nomes (`score_1_0.mp3` = "quinze-zero"…), coloque-os num ZIP com uma pasta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e use **Importar ZIP**. O `LEGGIMI.txt` tem uma coluna por idioma, separadas por tabulações, então também abre bem como planilha. As gravações sempre têm prioridade sobre a síntese; os nomes continuam sendo lidos pela síntese.
-- **Usar arquivos de áudio pré-gerados** (opcional): com **Gerar arquivos** o app cria uma vez os 84 arquivos com a voz escolhida (até mesmo uma voz *online*, se naquele momento houver internet) e depois os usa no lugar da síntese contínua. Soa mais "picotado", mas é útil para levar offline uma voz online.
+- **Gravações personalizadas** (a voz mais natural de todas: a sua ou a de um árbitro): na pasta `Android/data/com.tennis.scoremanager/files/voice/` há o `LEGGIMI.txt` ("leia-me"; as explicações do início ficam no idioma do app e são reescritas quando você o muda) com a lista das 85 chaves e das frases. Grave os arquivos com esses nomes (`score_1_0.mp3` = "quinze-zero"…), coloque-os num ZIP com uma pasta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e use **Importar ZIP**. O `LEGGIMI.txt` tem uma coluna por idioma, separadas por tabulações, então também abre bem como planilha. As gravações sempre têm prioridade sobre a síntese; os nomes continuam sendo lidos pela síntese. No ZIP vale a pasta que contém o arquivo (também dentro de outras pastas, ex. `voice/pt/`); arquivos fora de uma pasta de idioma vão para o idioma atual e as pastas `tts/` são ignoradas, então dá para compactar também a pasta `voice/` do app. Um ZIP danificado ou incompleto não muda nada (*ZIP ilegível ou incompleto*). **Remover gravações** pede confirmação. Se um arquivo não puder ser reproduzido, a frase é dita pela síntese de voz e o arquivo não é mais usado até o app reiniciar.
+- **Usar arquivos de áudio pré-gerados** (opcional): com **Gerar arquivos** o app cria uma vez os 85 arquivos com a voz escolhida (até mesmo uma voz *online*, se naquele momento houver internet) e depois os usa no lugar da síntese contínua. Soa mais "picotado", mas é útil para levar offline uma voz online. Os arquivos anteriores ficam até os novos estarem prontos (se a geração não chegar ao fim: *Geração não concluída*); durante a geração, idioma, mecanismo, voz, teste de voz e áudio ficam bloqueados.
 - **Caixa de som externa** (coluna): basta pareá-la com o telefone por Bluetooth; a voz sai pelo canal de mídia (ajuste o volume de mídia).
 
 ### 4.1 Idiomas (app 2.3, firmware 2.2)
 
 Página 2 › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito no próprio idioma, para que você o encontre mesmo com o app num idioma que não lê). A escolha vale ao mesmo tempo para **telas, voz do árbitro, placar na TV, resumo/compartilhamento e pulseiras**. As datas seguem o idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
-Os anúncios não são traduções palavra por palavra: seguem os textos oficiais para árbitros de cadeira de cada federação, ou seja, FFT *L'arbitrage en 255 questions* e ITF em francês, os materiais DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (o único roteiro português publicado). O inglês segue a ITF.
+Os anúncios não são traduções palavra por palavra: seguem os textos oficiais para árbitros de cadeira de cada federação, ou seja, FFT *L'arbitrage en 255 questions* e ITF em francês, os materiais DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (o único roteiro português publicado). O inglês segue a ITF. Em inglês, o zero dos sets no fim da partida é dito *love* ("six love, six four"), como nos pontos.
 
 | | Italiano | English | Français | Deutsch | Español | Português |
 |---|---|---|---|---|---|---|
@@ -146,21 +146,21 @@ Particularidades:
    **Depois do envio**, se a tela continuar preta (a pulseira ficou no modo de programação), pressione **uma vez** o botão lateral: ela reinicia com o programa novo.
 8. Ao iniciar, a pulseira mostra o seu nome, ex. **TSM-3FA2** (pode ser mudado pelo app, veja 6.1). Repita para a segunda pulseira.
 
-> **Firmware 2.2.2**: a mensagem de conexão passa para o idioma do app assim que ele chega (4.1); em espanhol *VINCULANDO…/VINCULADA* e em português *PAREADA*, como no app; em francês *MANCHES* na tela dos jogos. **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
+> **Firmware 2.3** (com o app 2.4): o bipe de KEY1/KEY2 toca quando o telefone recebeu o toque, os toques feitos durante uma queda curta são enviados assim que ela reconecta, *NAO ENVIADO* se o telefone não confirmar (6); depois de desligada com o cabo conectado, KEY1 ou KEY2 também a ligam de novo; leituras de bateria com falha não chegam mais ao app como 0 %. Com um app mais antigo, uma pulseira 2.3 funciona como antes. **Firmware 2.2.2**: a mensagem de conexão passa para o idioma do app assim que ele chega (4.1); em espanhol *VINCULANDO…/VINCULADA* e em português *PAREADA*, como no app; em francês *MANCHES* na tela dos jogos. **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
 
 ## 6. Usar as pulseiras
 
 | Botão | Ação |
 |---|---|
-| **KEY1** (frontal) curto | ponto para quem está usando a pulseira (também inicia a partida na página INÍCIO DA PARTIDA); um bipe confirma |
+| **KEY1** (frontal) curto | ponto para quem está usando a pulseira (também inicia a partida na página INÍCIO DA PARTIDA); um bipe confirma (firmware 2.3 + app 2.4: quando o telefone o recebeu, cerca de meio segundo depois) |
 | **KEY1** longo (1 s) | mostra a bateria (e mantém a pulseira ligada se ela estiver prestes a se desligar por inatividade) |
-| **KEY2** curto | anula o último ponto (também no popup de fim de partida); dois bipes mais graves |
-| **KEY2** longo (2 s) | desliga a pulseira (com o cabo conectado mostra *CONTINUA CARREGANDO*: ela carrega mesmo desligada) |
+| **KEY2** curto | anula o último ponto (também no popup de fim de partida); dois bipes mais graves (com o firmware 2.3, quando o telefone confirma) |
+| **KEY2** longo (2 s) | desliga a pulseira (com o cabo conectado mostra *CONTINUA CARREGANDO*: ela carrega mesmo desligada; a partir do firmware 2.3, KEY1 ou KEY2 também a ligam de novo) |
 | Botão lateral | um clique liga; clique duplo desliga (função do hardware) |
 
 - Ao ligar, pisca **PAREANDO...** (acesa 0,35 s a cada 2 s, para economizar). O app se conecta sozinho às pulseiras que já conhece assim que é aberto; as novas ele encontra na página 2.
 - Conectada: **PAREADA** por 3 segundos com dois bipes, depois **PAREADA COM** + o nome do jogador.
-- A cada ponto a tela acende com o placar do jogo em tamanho grande (à esquerda o seu, à direita o do adversário; a bolinha verde indica quem serve) e depois apaga. No fim do jogo mostra jogos e sets.
+- A cada ponto a tela acende com o placar do jogo em tamanho grande (à esquerda o seu, à direita o do adversário; a bolinha verde indica quem serve) e depois apaga. No fim do jogo mostra jogos e sets. Se o telefone não confirmar um toque em 8 segundos (conexão perdida), aparece **NAO ENVIADO** em vermelho com dois bipes graves: pressione de novo quando ela tiver reconectado. Já um toque feito durante uma queda curta não se perde: é enviado assim que a pulseira reconecta, e o bipe toca nesse momento.
 
 **Desligamento automático** (os tempos são mudados no app, 6.1):
 
@@ -173,7 +173,7 @@ Particularidades:
 | Bateria vazia (abaixo de 3,30 V em duas leituras seguidas) | mostra BATERIA VAZIA e se desliga, para não ficar funcionando pela metade | sempre |
 
 - Nos últimos 10 segundos antes de se desligar sem telefone, mostra **DESLIGANDO · 8s - APERTE UM BOTAO** com um bipe: qualquer botão reinicia a contagem do desligamento.
-- Quando se desliga sozinha, ela avisa o telefone: na partida, o quadro laranja mostra *PULSEIRA 1 DESLIGADA (SEM USO)*, *(BATERIA VAZIA)*…
+- Quando se desliga sozinha, ela avisa o telefone: na partida, o quadro laranja mostra *PULSEIRA 1 DESLIGADA (SEM USO)*, *(BATERIA VAZIA)*… Depois do desligamento no fim da partida, o telefone para de procurá-la o tempo todo e reconecta sozinho quando você a liga de novo.
 
 **Duração da bateria**: o que mais pesa é a placa ESP32-S3 com o Bluetooth conectado (cerca de 35 mA): o core Arduino é compilado sem a economia de energia profunda (light sleep) quando o Bluetooth está ligado, então não dá para descer muito abaixo disso. Tela, brilho e bipes acrescentam poucos mA. Com a bateria de 250 mAh a estimativa é de **cerca de 7 horas com a carga completa**, mais do que qualquer partida em melhor de três sets. O painel de ajustes mostra a estimativa em tempo real e, após 20 minutos de uso, a corrige com o consumo **medido** naquela pulseira. O registro completo fica em `files/battery_log.csv` do app.
 
@@ -194,7 +194,7 @@ Na página 2 (**Ajustes** embaixo da pulseira de cada jogador) ou durante a part
 | Desligamento: se perder a conexão com o telefone | 1-10 min | 3 min |
 | Desligamento: se ficar conectada mas sem uso | 10-60 min | 30 min |
 
-Embaixo fica a **estimativa de autonomia** (com a carga completa e com a carga atual), com o consumo dividido por item: ela muda enquanto você move os controles, antes mesmo de confirmar. Depois vêm **Identificar**, **Desligar** e **Copiar para a outra pulseira** (mesmos ajustes; o nome continua o dela).
+Embaixo fica a **estimativa de autonomia** (com a carga completa e com a carga atual), com o consumo dividido por item: ela muda enquanto você move os controles, antes mesmo de confirmar. Depois vêm **Identificar**, **Desligar** e **Copiar para a outra pulseira** (mesmos ajustes; o nome continua o dela). **Desligar** pede confirmação, também durante a partida.
 
 ### 6.2 Recarga (firmware 2.1)
 
@@ -230,13 +230,13 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
    - Idioma (seis idiomas, 4.1), voz ligada/desligada, formato (*3 sets · tie-break a 7* ou *2 sets + tie-break decisivo a 10*), *Sem vantagem* (No-Ad).
    - **Sorteio**: a moeda gira e indica quem vence; você define quem serve e os lados da quadra **vistos da cadeira do árbitro** (esquema da quadra com **Inverter lados**). Nas duplas, escolha também quem serve primeiro em cada equipe.
 3. **INÍCIO DA PARTIDA** pisca: toque no botão ou pressione KEY1 de uma pulseira. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 2 segundos entre as frases; o **Match Time** começa em "joguem".
-4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira.
-5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**.
-6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar no histórico** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png), **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**.
+4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova.
+5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**. Por meio segundo depois de aparecer, os botões dele ignoram toques: um toque duplo no último ponto não anula nada.
+6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar no histórico** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png), **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Se o resumo não foi salvo nem compartilhado, **Nova partida** e **Sair** pedem confirmação. Se o Android fechar o app enquanto você está no resumo (por exemplo, ao compartilhar), ele volta quando o app é reaberto. Salvando duas vezes com o mesmo nome na pasta padrão, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela primeira página.
 
-**Salvamento**: a partida é salva sozinha a cada ponto. *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar partida suspensa** (página 3) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida.
+**Salvamento**: a partida é salva sozinha a cada ponto. *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar partida suspensa** (página 3) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
 ## 8. Placar na TV ou no monitor
 
@@ -260,29 +260,29 @@ O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o pl
 
 ### 8.2 No telefone do árbitro
 
-1. Página 2 › **Placar na TV** › ative **Placar na TV ou monitor**.
+1. Página 2 › **Placar na TV** › ative **Placar na TV ou monitor**. No Android 13 ou mais recente o app pede a permissão de notificações: ela é necessária para a notificação do serviço que mantém o placar ativo.
 2. Aparecem o **endereço** (ex. `192.168.43.1:8080`), o **QR** e quantos placares estão conectados. Se aparecer *Sem rede*, ative o hotspot ou conecte-se ao do outro telefone.
 3. **Prévia neste telefone** abre o placar no navegador do próprio telefone.
 4. **Aparência do placar**: cor de cada jogador (8 cores), tempo de partida, relógio de serviço e pausas, sets terminados, mensagens (break point, set point, troca de lado…), bola ao lado de quem serve, segmentos apagados visíveis, texto embaixo (vazio = clube e quadra da página 1). As mudanças chegam na hora ao monitor.
 5. Na partida, no alto ao centro, fica **TV · 1** (placares conectados): tocando nele, você vê de novo o endereço e o QR.
 
-Com o placar ativado, um serviço em primeiro plano (notificação *Partida em andamento · placar na TV ativo*) mantém o servidor vivo mesmo com a tela apagada, também no modo árbitro. O placar é **somente leitura**: não é possível mudar nada por ali.
+Com o placar ativado, um serviço em primeiro plano (notificação *Partida em andamento · placar na TV ativo*) mantém o servidor vivo mesmo com a tela apagada, também no modo árbitro. O placar é **somente leitura**: não é possível mudar nada por ali. Ele continua ativo também no resumo e nas outras páginas enquanto o placar estiver ativado (notificação *Placar na TV ativo*), assim o resultado final fica no monitor mesmo com o telefone bloqueado.
 
-O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início, *PRONTOS PARA JOGAR* na página INÍCIO DA PARTIDA, **TIE-BREAK** / **TIE-BREAK DECISIVO** no lugar de *VS*, *PARTIDA SUSPENSA* piscando, **VENCEDOR [nome]** no fim da partida com todos os sets; as vantagens aparecem como **AD** também nos dígitos de LED.
+O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início, *PRONTOS PARA JOGAR* na página INÍCIO DA PARTIDA, **TIE-BREAK** / **TIE-BREAK DECISIVO** no lugar de *VS*, *PARTIDA SUSPENSA* piscando, **VENCEDOR [nome]** no fim da partida com todos os sets; as vantagens aparecem como **AD** também nos dígitos de LED. Uma partida vencida no tie-break decisivo termina com 1-0 nos jogos e 2-1 nos sets, com [10-8] entre os sets concluídos; mensagens longas diminuem para caber na tela.
 
 ### 8.3 No telefone-placar
 
 1. Página 1 › no fim, **Usar como placar**.
-2. O telefone **procura sozinho** o telefone do árbitro (anúncio na rede e varredura do hotspot, poucos segundos) e lembra o último endereço. Se não o encontrar: verifique o hotspot e o *Placar na TV*, depois **Procurar de novo**, ou digite o endereço mostrado pelo árbitro e toque em **Conectar**.
+2. O telefone **procura sozinho** o telefone do árbitro (anúncio na rede e varredura do hotspot, poucos segundos) e lembra o último endereço. Se não o encontrar: verifique o hotspot e o *Placar na TV*, depois **Procurar de novo**, ou digite o endereço mostrado pelo árbitro e toque em **Conectar**. Ele o encontra mesmo se neste telefone também estiver ativado *Placar na TV ou monitor*; se o Wi-Fi só conectar depois, procura de novo sozinho.
 3. O placar fica em tela cheia, na horizontal, com a tela sempre acesa.
    - **Com o cabo HDMI**: o placar vai para o monitor, no formato dele; o telefone mostra *O placar está no monitor externo* com o brilho no mínimo (**Mostrar aqui também** para vê-lo também no telefone). Tirando o cabo, ele volta para o telefone.
    - **Com o Chromecast**: abra o painel de configurações rápidas › **Transmitir** (ou **Transmissão**, **Transmissão de tela**) / **Smart View** › escolha o Chromecast.
-4. Se o telefone do árbitro sumir (fora de alcance, app fechado), aparece *CONEXÃO PERDIDA - RECONECTANDO...* e depois de 20 segundos ele o procura de novo sozinho, mesmo que o endereço tenha mudado.
+4. Se o telefone do árbitro sumir (fora de alcance, app fechado), aparece *CONEXÃO PERDIDA - RECONECTANDO...* e depois de 20 segundos ele o procura de novo sozinho, mesmo que o endereço tenha mudado. Mesmo depois de uma queda do hotspot ele reconecta sozinho assim que a rede volta. Nunca passa para o telefone de outra quadra: para mudar de quadra, saia de *Usar como placar* e procure de novo.
 5. Para sair: **voltar duas vezes**.
 
-**Num navegador** (computador portátil, TV box): leia o QR ou digite o endereço, depois toque em **TELA CHEIA** (aparece ao mover o mouse ou tocar na tela). Configure o tempo limite da tela para *nunca*: numa página http o navegador não consegue mantê-la acesa sozinho.
+**Num navegador** (computador portátil, TV box): leia o QR ou digite o endereço, depois toque em **TELA CHEIA** (aparece ao mover o mouse ou tocar na tela). Configure o tempo limite da tela para *nunca*: numa página http o navegador não consegue mantê-la acesa sozinho. Depois de uma queda a página reconecta sozinha; placares demais abertos não bloqueiam mais um novo (o mais antigo é fechado).
 
-**Prévia sem telefones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` num navegador (também `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`) mostra o placar com dados de teste.
+**Prévia sem telefones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` num navegador (também `&lang=en`, `fr`, `de`, `es`, `pt` e `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) mostra o placar com dados de teste.
 
 ## 9. Regras aplicadas (ITF) e escolhas combinadas
 
@@ -324,6 +324,7 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 ## 11. Problemas comuns
 
 - **Pulseira não encontrada**: Bluetooth e localização ativados (linhas verdes)? A pulseira está piscando PAREANDO? (Se já estiver conectada a outro telefone, ela não aparece.) Se nesse meio-tempo ela se desligou sozinha (30 s), ligue-a de novo com um clique no botão lateral.
+- **A pulseira mostra NAO ENVIADO**: o telefone não confirmou o toque em 8 segundos (conexão perdida ou app fechado). Pressione de novo quando a pulseira tiver reconectado. Caso raro: se o toque tinha chegado e só a confirmação se perdeu, o ponto conta duas vezes; a voz anuncia o placar, corrija com *Anular ponto*.
 - **No painel de ajustes aparece "O firmware desta pulseira não tem ajustes"**: essa pulseira ainda tem o sketch antigo; carregue-o de novo (capítulo 5).
 - **O Android Studio não reconhece o telefone**: Depuração USB ativada e impressão digital RSA aceita no telefone (3)? No Windows às vezes é preciso o driver do fabricante; no Linux, as regras udev e uma nova sessão (1.1). Ou use a depuração por Wi-Fi (3).
 - **O Arduino IDE não mostra a porta da pulseira**: cabo USB-C de dados, e não só de carga; no Linux, grupo `dialout` e nova sessão (1.1); depois, o modo download (5, passo 7).

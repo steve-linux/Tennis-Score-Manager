@@ -13,7 +13,7 @@ Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis sel
 | `deliver/installa_tsm.sh` | Alternative au clone : crée **tout** le projet Android et le sketch uniquement avec des blocs `cat << 'TSM_EOF'` (le jar du Gradle wrapper est en base64). |
 | `deliver/GUIDE.fr.md` | Ce guide (en français) ; l'original italien est `deliver/GUIDA.md`, les autres traductions sont `deliver/GUIDE.en.md`, `.de`, `.es`, `.pt`. |
 
-Versions utilisées et vérifiées : app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
+Versions utilisées et vérifiées : app **2.4** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Si Android Studio propose l'**AGP Upgrade Assistant**, vous pouvez l'ignorer : ces versions ont été compilées et testées telles quelles.
 6. JDK de Gradle : **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (celui qui est fourni, c'est la valeur par défaut).
 7. **Build › Make Project** : doit se terminer par *BUILD SUCCESSFUL*.
-8. Facultatif : les tests (76 : règles, voix, langues, batterie et charge, réglages des bracelets, tableau TV) se lancent par un clic droit sur `app/src/test` › **Run Tests**.
+8. Facultatif : les tests (95 : règles, voix, langues, batterie et charge, réglages des bracelets, tableau TV) se lancent par un clic droit sur `app/src/test` › **Run Tests**.
 
 ## 3. Installer l'application sur le téléphone
 
@@ -101,17 +101,17 @@ bash installa_tsm.sh
   - **Moteur de synthèse vocale** : *Par défaut du téléphone* (sur les Samsung, c'est Samsung TTS) ou un moteur au choix, par exemple *Services vocaux Google*. Lors des tests, faits en italien, Google sonnait plus naturel.
   - **Voix** : *Automatique (meilleure hors ligne)* ou une voix précise (Google désigne ses voix par un code, que l'application affiche sous la forme « Voix » + code ; celles marquées *en ligne* nécessitent internet).
   - **Tester la voix** : lit une séquence d'annonces d'exemple avec les noms saisis. Pendant la lecture, le bouton devient **Arrêter le test** : touchez-le à nouveau pour l'interrompre (la lecture s'arrête aussi d'elle-même quand vous quittez la page). La synthèse vocale ne peut pas être mise en pause au milieu d'une phrase, donc le bouton l'arrête ; si vous appuyez de nouveau, elle reprend depuis le début.
-- S'il manque la voix de la langue choisie : **Paramètres › Gestion globale › Langue › Synthèse vocale** (ou *Sortie de la synthèse vocale*) → téléchargez la voix de cette langue pour le moteur choisi (l'application affiche aussi le bouton **Installer la voix**).
+- S'il manque la voix de la langue choisie : **Paramètres › Gestion globale › Langue › Synthèse vocale** (ou *Sortie de la synthèse vocale*) → téléchargez la voix de cette langue pour le moteur choisi (l'application affiche aussi le bouton **Installer la voix**). Si la synthèse vocale ne démarre pas du tout, l'application l'indique par un message distinct avec le bouton **Ouvrir les paramètres** (paramètres de synthèse vocale d'Android).
 - **Prononciation** : certains moteurs lisent mal des mots du tennis (en italien, « primo set » était lu « primo settembre », « tie-break » était lu « time break »). L'application les corrige d'elle-même (`voice/Pronunciation.kt`) ; les corrections ont été vérifiées en transcrivant l'audio réel de Samsung et de Google.
-- **Enregistrements personnalisés** (la voix la plus naturelle qui soit : la vôtre ou celle d'un arbitre) : le dossier `Android/data/com.tennis.scoremanager/files/voice/` contient `LEGGIMI.txt` (le fichier « lisez-moi », dont les explications en tête sont dans la langue de l'application et sont réécrites quand vous la changez) avec la liste des 84 clés et des phrases. Enregistrez les fichiers sous ces noms (`score_1_0.mp3` = « quinze-zéro »…), mettez-les dans un ZIP avec un dossier par langue (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) et utilisez **Importer un ZIP**. `LEGGIMI.txt` a une colonne par langue, séparées par des tabulations : il s'ouvre donc aussi très bien comme feuille de calcul. Les enregistrements ont toujours la priorité sur la synthèse ; les noms restent lus par la synthèse.
-- **Utiliser des fichiers audio pré-générés** (facultatif) : avec **Générer les fichiers**, l'application crée une fois pour toutes les 84 fichiers avec la voix choisie (même une voix *en ligne*, si internet est disponible à ce moment-là), puis les utilise à la place de la synthèse en continu. Le rendu est plus « haché », mais c'est utile pour emporter hors ligne une voix en ligne.
+- **Enregistrements personnalisés** (la voix la plus naturelle qui soit : la vôtre ou celle d'un arbitre) : le dossier `Android/data/com.tennis.scoremanager/files/voice/` contient `LEGGIMI.txt` (le fichier « lisez-moi », dont les explications en tête sont dans la langue de l'application et sont réécrites quand vous la changez) avec la liste des 85 clés et des phrases. Enregistrez les fichiers sous ces noms (`score_1_0.mp3` = « quinze-zéro »…), mettez-les dans un ZIP avec un dossier par langue (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) et utilisez **Importer un ZIP**. `LEGGIMI.txt` a une colonne par langue, séparées par des tabulations : il s'ouvre donc aussi très bien comme feuille de calcul. Les enregistrements ont toujours la priorité sur la synthèse ; les noms restent lus par la synthèse. Dans le ZIP, c'est le dossier qui contient le fichier qui compte (même à l'intérieur d'autres dossiers, par ex. `voice/fr/`) ; les fichiers hors d'un dossier de langue vont à la langue actuelle et les dossiers `tts/` sont ignorés, on peut donc aussi zipper le dossier `voice/` de l'application. Un ZIP abîmé ou incomplet ne change rien (*ZIP illisible ou incomplet*). **Supprimer les enregistrements** demande une confirmation. Si un fichier ne peut pas être lu, la phrase est dite par la synthèse vocale et le fichier n'est plus utilisé jusqu'au redémarrage de l'application.
+- **Utiliser des fichiers audio pré-générés** (facultatif) : avec **Générer les fichiers**, l'application crée une fois pour toutes les 85 fichiers avec la voix choisie (même une voix *en ligne*, si internet est disponible à ce moment-là), puis les utilise à la place de la synthèse en continu. Le rendu est plus « haché », mais c'est utile pour emporter hors ligne une voix en ligne. Les fichiers précédents restent en place jusqu'à ce que les nouveaux soient prêts (si la génération n'aboutit pas : *Génération non terminée*) ; pendant la génération, langue, moteur, voix, test de la voix et audio sont bloqués.
 - **Enceinte externe** : il suffit de l'appairer au téléphone en Bluetooth ; la voix sort sur le canal multimédia (réglez le volume multimédia).
 
 ### 4.1 Langues (app 2.3, firmware 2.2)
 
 Page 2 › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
-Les annonces ne sont pas des traductions mot à mot : elles suivent les textes officiels pour les arbitres de chaise de chaque fédération, à savoir *L'arbitrage en 255 questions* de la FFT et l'ITF en français, les documents DTB/BTV et Swiss Tennis, *Deberes y procedimientos* de la RFET, *Deveres e Procedimentos* de la FPT (le seul script portugais publié). L'anglais suit l'ITF.
+Les annonces ne sont pas des traductions mot à mot : elles suivent les textes officiels pour les arbitres de chaise de chaque fédération, à savoir *L'arbitrage en 255 questions* de la FFT et l'ITF en français, les documents DTB/BTV et Swiss Tennis, *Deberes y procedimientos* de la RFET, *Deveres e Procedimentos* de la FPT (le seul script portugais publié). L'anglais suit l'ITF. En anglais, le zéro des manches en fin de match se dit *love* (« six love, six four »), comme pour les points.
 
 | | Italiano | English | Français | Deutsch | Español | Português |
 |---|---|---|---|---|---|---|
@@ -146,21 +146,21 @@ Particularités :
    **Après le téléversement**, si l'écran reste noir (le bracelet est resté en mode programmation), appuyez **une fois** sur le bouton latéral : il redémarre avec le nouveau programme.
 8. Au démarrage, le bracelet affiche son nom, ex. **TSM-3FA2** (modifiable depuis l'application, voir 6.1). Recommencez pour le second bracelet.
 
-> **Firmware 2.2.2** : le message de connexion passe à la langue de l'application dès qu'elle arrive (4.1) ; *VINCULANDO…/VINCULADA* en espagnol et *PAREADA* en portugais comme dans l'application, *MANCHES* en français sur l'écran des jeux. **Firmware 2.2.1** : le compte à rebours avant l'extinction est lui aussi dans la langue de l'application (6). **Firmware 2.2** : les textes du bracelet dans la langue de l'application (4.1). **Firmware 2.1** : l'écran de charge (6.2) ; les réglages, *Identifier* et l'extinction depuis l'application demandent au moins la 2.0. Chargez `TSM_Band.ino` sur **les deux** bracelets ; avec un ancien firmware, l'application le signale dans le panneau des réglages et tout le reste continue de fonctionner.
+> **Firmware 2.3** (avec l'application 2.4) : le bip de KEY1/KEY2 retentit quand le téléphone a reçu l'appui, les appuis faits pendant une courte coupure partent dès la reconnexion, *NON ENVOYE* si le téléphone ne confirme pas (6) ; après une extinction câble branché, KEY1 ou KEY2 le rallument aussi ; les lectures de batterie ratées n'arrivent plus à l'application comme 0 %. Avec une application plus ancienne, un bracelet 2.3 fonctionne comme avant. **Firmware 2.2.2** : le message de connexion passe à la langue de l'application dès qu'elle arrive (4.1) ; *VINCULANDO…/VINCULADA* en espagnol et *PAREADA* en portugais comme dans l'application, *MANCHES* en français sur l'écran des jeux. **Firmware 2.2.1** : le compte à rebours avant l'extinction est lui aussi dans la langue de l'application (6). **Firmware 2.2** : les textes du bracelet dans la langue de l'application (4.1). **Firmware 2.1** : l'écran de charge (6.2) ; les réglages, *Identifier* et l'extinction depuis l'application demandent au moins la 2.0. Chargez `TSM_Band.ino` sur **les deux** bracelets ; avec un ancien firmware, l'application le signale dans le panneau des réglages et tout le reste continue de fonctionner.
 
 ## 6. Utiliser les bracelets
 
 | Bouton | Action |
 |---|---|
-| **KEY1** (en façade), appui court | point pour le joueur qui porte le bracelet (lance aussi le match depuis la page DÉBUT DU MATCH) ; un bip confirme |
+| **KEY1** (en façade), appui court | point pour le joueur qui porte le bracelet (lance aussi le match depuis la page DÉBUT DU MATCH) ; un bip confirme (firmware 2.3 + application 2.4 : quand le téléphone l'a reçu, environ une demi-seconde après) |
 | **KEY1**, appui long (1 s) | affiche la batterie (et garde le bracelet allumé s'il est sur le point de s'éteindre pour inactivité) |
-| **KEY2**, appui court | annule le dernier point (aussi depuis la fenêtre de fin de match) ; deux bips plus graves |
-| **KEY2**, appui long (2 s) | éteint le bracelet (câble branché, il affiche *LA CHARGE CONTINUE* : il se recharge même éteint) |
+| **KEY2**, appui court | annule le dernier point (aussi depuis la fenêtre de fin de match) ; deux bips plus graves (avec le firmware 2.3, à la confirmation du téléphone) |
+| **KEY2**, appui long (2 s) | éteint le bracelet (câble branché, il affiche *LA CHARGE CONTINUE* : il se recharge même éteint ; depuis le firmware 2.3, KEY1 ou KEY2 le rallument aussi) |
 | Bouton latéral | un clic allume ; un double clic éteint (fonction matérielle) |
 
 - À l'allumage, **APPAIRAGE...** clignote (allumé 0,35 s toutes les 2 s, pour économiser la batterie). L'application se connecte d'elle-même aux bracelets qu'elle connaît dès qu'elle est ouverte ; les nouveaux, elle les trouve sur la page 2.
 - Une fois connecté : **APPAIRE** pendant 3 secondes avec deux bips, puis **ASSOCIE A** + le nom du joueur.
-- À chaque point, l'écran s'allume avec le score du jeu en grand (à gauche le vôtre, à droite celui de l'adversaire ; la balle verte indique qui sert), puis s'éteint. À la fin d'un jeu, il affiche les jeux et les manches.
+- À chaque point, l'écran s'allume avec le score du jeu en grand (à gauche le vôtre, à droite celui de l'adversaire ; la balle verte indique qui sert), puis s'éteint. À la fin d'un jeu, il affiche les jeux et les manches. Si le téléphone ne confirme pas un appui dans les 8 secondes (liaison perdue), **NON ENVOYE** s'affiche en rouge avec deux bips graves : appuyez de nouveau une fois reconnecté. Un appui fait pendant une courte coupure n'est en revanche pas perdu : il part dès que le bracelet se reconnecte, et le bip retentit à ce moment-là.
 
 **Extinction automatique** (les délais se modifient depuis l'application, 6.1) :
 
@@ -173,7 +173,7 @@ Particularités :
 | Batterie vide (sous 3,30 V sur deux lectures consécutives) | affiche BATTERIE VIDE et s'éteint, pour ne pas rester allumé à moitié | toujours |
 
 - Pendant les 10 dernières secondes avant une extinction faute de téléphone, il affiche **EXTINCTION · 8s - APPUYER SUR UNE TOUCHE** avec un bip : n'importe quel bouton relance le délai depuis le début.
-- Quand il s'éteint tout seul, il le signale au téléphone : en match, le cadre orange affiche *BRACELET 1 ÉTEINT (INACTIF)*, *(BATTERIE VIDE)*…
+- Quand il s'éteint tout seul, il le signale au téléphone : en match, le cadre orange affiche *BRACELET 1 ÉTEINT (INACTIF)*, *(BATTERIE VIDE)*… Après l'extinction en fin de match, le téléphone arrête de le chercher en continu et se reconnecte tout seul quand vous le rallumez.
 
 **Autonomie de la batterie** : le poste le plus lourd est la carte ESP32-S3 avec le Bluetooth connecté (environ 35 mA) : le core Arduino est compilé sans l'économie d'énergie profonde (light sleep) quand le Bluetooth est actif, on ne peut donc pas descendre beaucoup plus bas. L'écran, la luminosité et les bips n'ajoutent que quelques mA. Avec la batterie de 250 mAh, l'estimation est d'**environ 7 heures avec une charge complète**, plus que n'importe quel match au meilleur des trois manches. Le panneau des réglages affiche l'estimation en temps réel et, après 20 minutes d'utilisation, la corrige avec la consommation **mesurée** sur ce bracelet. Le journal complet se trouve dans `files/battery_log.csv` de l'application.
 
@@ -194,7 +194,7 @@ Depuis la page 2 (**Réglages** sous le bracelet de chaque joueur) ou pendant le
 | Extinction : téléphone perdu | 1-10 min | 3 min |
 | Extinction : connecté mais inactif | 10-60 min | 30 min |
 
-En dessous se trouve l'**estimation de l'autonomie** (avec une charge complète et avec la charge actuelle), avec la consommation détaillée par poste : elle change pendant que vous déplacez les curseurs, avant même de valider. Puis **Identifier**, **Éteindre** et **Copier sur l'autre bracelet** (mêmes réglages, mais chaque bracelet garde son nom).
+En dessous se trouve l'**estimation de l'autonomie** (avec une charge complète et avec la charge actuelle), avec la consommation détaillée par poste : elle change pendant que vous déplacez les curseurs, avant même de valider. Puis **Identifier**, **Éteindre** et **Copier sur l'autre bracelet** (mêmes réglages, mais chaque bracelet garde son nom). **Éteindre** demande une confirmation, même en cours de match.
 
 ### 6.2 Charge (firmware 2.1)
 
@@ -230,13 +230,13 @@ Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de cha
    - Langue (six langues, 4.1), voix activée ou non, format (*3 manches · jeu décisif à 7* ou *2 manches + super jeu décisif à 10*), No-Ad.
    - **Tirage au sort** : la pièce tourne et désigne le gagnant ; vous indiquez qui sert et les côtés du court **vus depuis la chaise d'arbitre** (schéma du court avec **Inverser les côtés**). En double, choisissez aussi qui sert en premier dans chaque équipe.
 3. **DÉBUT DU MATCH** clignote : appuyez sur le bouton ou sur KEY1 d'un bracelet. La voix annonce *« Première manche » · « au service [nom] » · « jouez »* avec 2 secondes entre les phrases ; le **Match Time** démarre sur « jouez ».
-4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), *Nouveau match*, **Quitter**. En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet.
-5. Au dernier point apparaît la fenêtre **Match terminé / Annuler le dernier point**. « Match terminé » se confirme **uniquement sur le téléphone**.
-6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer dans l'historique** (nom du fichier + dossier au choix + formats .txt/.json/.png), **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Quitter**.
+4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), *Nouveau match*, **Quitter**. En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet. Un double appui sur *Annuler le point* n'enlève qu'un point (un second appui dans la seconde ne compte pas) ; juste après un changement de page, le second appui d'un double appui est ignoré, pour qu'il ne tombe pas sur un bouton de la nouvelle page.
+5. Au dernier point apparaît la fenêtre **Match terminé / Annuler le dernier point**. « Match terminé » se confirme **uniquement sur le téléphone**. Pendant une demi-seconde après son apparition, ses boutons ignorent les appuis : un double appui sur le dernier point n'annule rien.
+6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer dans l'historique** (nom du fichier + dossier au choix + formats .txt/.json/.png), **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Quitter**. Si le récapitulatif n'a été ni enregistré ni partagé, **Nouveau match** et **Quitter** demandent une confirmation. Si Android ferme l'application pendant que vous êtes sur le récapitulatif (par exemple pendant un partage), vous le retrouvez en la rouvrant. En enregistrant deux fois sous le même nom dans le dossier par défaut, le second devient *nom (1)* ; dans l'image, les textes longs (noms, adresse) s'adaptent à la largeur.
 
 **Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de la première page.
 
-**Sauvegardes** : le match s'enregistre tout seul à chaque point. *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre un match suspendu** (page 3) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match.
+**Sauvegardes** : le match s'enregistre tout seul à chaque point. *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre un match suspendu** (page 3) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ## 8. Tableau d'affichage sur TV ou écran
 
@@ -260,29 +260,29 @@ Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-F
 
 ### 8.2 Sur le téléphone de l'arbitre
 
-1. Page 2 › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**.
+1. Page 2 › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
 2. L'**adresse** (ex. `192.168.43.1:8080`), le **QR code** et le nombre de tableaux connectés apparaissent. S'il est écrit *Aucun réseau*, activez le point d'accès ou connectez-vous à celui de l'autre téléphone.
 3. **Aperçu sur ce téléphone** ouvre le tableau dans le navigateur du téléphone lui-même.
 4. **Apparence du tableau** : couleur de chaque joueur (8 couleurs), durée du match, chrono du service et des pauses, manches terminées, messages (balle de break, balle de set, changement de côté…), balle à côté du serveur, segments éteints visibles, texte en bas (vide = club et court de la page 1). Les modifications arrivent aussitôt sur l'écran.
 5. En match, en haut au centre, se trouve **TV · 1** (tableaux connectés) : touchez-le pour revoir l'adresse et le QR code.
 
-Tant que le tableau est activé, un service au premier plan (notification *Match en cours · tableau TV actif*) maintient le serveur en marche même écran éteint, y compris en mode arbitre. Le tableau est en **lecture seule** : on ne peut rien y modifier.
+Tant que le tableau est activé, un service au premier plan (notification *Match en cours · tableau TV actif*) maintient le serveur en marche même écran éteint, y compris en mode arbitre. Le tableau est en **lecture seule** : on ne peut rien y modifier. Il reste actif aussi sur le récapitulatif et les autres pages tant que le tableau est activé (notification *Tableau TV actif*), donc le résultat final reste à l'écran même téléphone verrouillé.
 
-Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊTS À JOUER* sur la page DÉBUT DU MATCH, **JEU DÉCISIF** / **SUPER JEU DÉCISIF** à la place de *VS*, *MATCH SUSPENDU* en clignotant, **VAINQUEUR [nom]** en fin de match avec toutes les manches ; les avantages s'affichent **AD**, y compris sur les chiffres à LED.
+Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊTS À JOUER* sur la page DÉBUT DU MATCH, **JEU DÉCISIF** / **SUPER JEU DÉCISIF** à la place de *VS*, *MATCH SUSPENDU* en clignotant, **VAINQUEUR [nom]** en fin de match avec toutes les manches ; les avantages s'affichent **AD**, y compris sur les chiffres à LED. Un match gagné au super jeu décisif se termine avec 1-0 dans les jeux et 2-1 dans les manches, avec [10-8] parmi les manches terminées ; les messages longs rapetissent pour tenir à l'écran.
 
 ### 8.3 Sur le téléphone-tableau
 
 1. Page 1 › tout en bas, **Utiliser comme tableau**.
-2. Le téléphone **cherche tout seul** le téléphone de l'arbitre (annonce sur le réseau et balayage du point d'accès, quelques secondes) et mémorise la dernière adresse. S'il ne le trouve pas : vérifiez le point d'accès et *Tableau d'affichage TV*, puis **Chercher à nouveau**, ou tapez l'adresse affichée par l'arbitre et **Connecter**.
+2. Le téléphone **cherche tout seul** le téléphone de l'arbitre (annonce sur le réseau et balayage du point d'accès, quelques secondes) et mémorise la dernière adresse. S'il ne le trouve pas : vérifiez le point d'accès et *Tableau d'affichage TV*, puis **Chercher à nouveau**, ou tapez l'adresse affichée par l'arbitre et **Connecter**. Il le trouve même si *Tableau d'affichage sur TV ou écran* est aussi activé sur ce téléphone ; si le Wi-Fi se connecte plus tard, il cherche de nouveau tout seul.
 3. Le tableau passe en plein écran, à l'horizontale, avec l'écran toujours allumé.
    - **Avec le câble HDMI** : le tableau s'affiche sur l'écran externe dans son format ; le téléphone affiche *Le tableau est sur l'écran externe* avec la luminosité au minimum (**Afficher aussi ici** pour le voir aussi sur le téléphone). Si on débranche le câble, il revient sur le téléphone.
    - **Avec le Chromecast** : ouvrez le volet des réglages rapides › **Caster** (ou **Diffusion de l'écran**) / **Smart View** › choisissez le Chromecast.
-4. Si le téléphone de l'arbitre disparaît (hors de portée, application fermée), *CONNEXION PERDUE - RECONNEXION...* apparaît et, au bout de 20 secondes, le téléphone-tableau le recherche tout seul, même s'il a changé d'adresse.
+4. Si le téléphone de l'arbitre disparaît (hors de portée, application fermée), *CONNEXION PERDUE - RECONNEXION...* apparaît et, au bout de 20 secondes, le téléphone-tableau le recherche tout seul, même s'il a changé d'adresse. Même après une coupure du point d'accès, il se reconnecte tout seul dès que le réseau revient. Il ne passe jamais au téléphone d'un autre court : pour changer de court, quittez *Utiliser comme tableau* et cherchez de nouveau.
 5. Pour quitter : **retour deux fois**.
 
-**Depuis un navigateur** (ordinateur portable, box TV) : scannez le QR code ou tapez l'adresse, puis touchez **PLEIN ÉCRAN** (le bouton apparaît quand on bouge la souris ou qu'on touche l'écran). Réglez la mise en veille de l'écran sur *jamais* : sur une page http, le navigateur ne peut pas le garder allumé tout seul.
+**Depuis un navigateur** (ordinateur portable, box TV) : scannez le QR code ou tapez l'adresse, puis touchez **PLEIN ÉCRAN** (le bouton apparaît quand on bouge la souris ou qu'on touche l'écran). Réglez la mise en veille de l'écran sur *jamais* : sur une page http, le navigateur ne peut pas le garder allumé tout seul. Après une coupure, la page se reconnecte toute seule ; trop de tableaux ouverts ne bloquent plus le nouveau (le plus ancien est fermé).
 
-**Aperçu sans téléphone** : `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` dans un navigateur (aussi `&lang=en`, `fr`, `de`, `es`, `pt` et `&state=ad`, `tb`, `end`, `idle`, `doubles`) affiche le tableau avec des données de test.
+**Aperçu sans téléphone** : `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` dans un navigateur (aussi `&lang=en`, `fr`, `de`, `es`, `pt` et `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) affiche le tableau avec des données de test.
 
 ## 9. Règles appliquées (ITF) et choix convenus
 
@@ -324,6 +324,7 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 ## 11. Problèmes courants
 
 - **Bracelet introuvable** : Bluetooth et localisation activés (lignes vertes) ? Le bracelet clignote-t-il APPAIRAGE ? (S'il est déjà connecté à un autre téléphone, il n'est pas visible.) S'il s'est éteint tout seul entre-temps (30 s), rallumez-le d'un clic sur le bouton latéral.
+- **Le bracelet affiche NON ENVOYE** : le téléphone n'a pas confirmé l'appui dans les 8 secondes (liaison perdue ou application fermée). Appuyez de nouveau quand le bracelet est reconnecté. Cas rare : si l'appui était arrivé et que seule la confirmation s'est perdue, le point compte deux fois ; la voix annonce le score, corrigez avec *Annuler le point*.
 - **Le panneau des réglages affiche « Le firmware de ce bracelet n'a pas de réglages »** : ce bracelet a encore l'ancien sketch, rechargez-le (chapitre 5).
 - **Android Studio ne voit pas le téléphone** : Débogage USB activé et empreinte RSA acceptée sur le téléphone (3) ? Sous Windows, il faut parfois le pilote du fabricant, sous Linux les règles udev et une nouvelle session (1.1). Ou bien le débogage sans fil (3).
 - **Arduino IDE n'affiche pas le port du bracelet** : câble USB-C de données et pas seulement de charge ; sous Linux, groupe `dialout` et nouvelle session (1.1) ; puis le mode téléchargement (5, point 7).

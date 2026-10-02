@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.3.2** · Firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x.
+Verwendete und geprüfte Versionen: App **2.4** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. Schlägt Android Studio den **AGP Upgrade Assistant** vor, kannst du ihn ignorieren: Diese Versionen wurden genau so gebaut und getestet.
 6. JDK für Gradle: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (das mitgelieferte, ist voreingestellt).
 7. **Build › Make Project**: muss mit *BUILD SUCCESSFUL* enden.
-8. Optional: Die Tests (76: Regeln, Stimme, Sprachen, Akku und Laden, Armband-Einstellungen, TV-Anzeigetafel) startest du per Rechtsklick auf `app/src/test` › **Run Tests**.
+8. Optional: Die Tests (95: Regeln, Stimme, Sprachen, Akku und Laden, Armband-Einstellungen, TV-Anzeigetafel) startest du per Rechtsklick auf `app/src/test` › **Run Tests**.
 
 ## 3. App auf dem Telefon installieren
 
@@ -101,17 +101,17 @@ bash installa_tsm.sh
   - **Sprachausgabe-Engine**: *Standard des Telefons* (bei Samsung ist das Samsung TTS) oder eine Engine deiner Wahl, z. B. *Sprachdienste von Google*. In den Tests, auf Italienisch durchgeführt, klang Google natürlicher.
   - **Stimme**: *Automatisch (beste offline)* oder eine bestimmte Stimme (Google führt seine Stimmen mit einem Code auf, als *Stimme …*; die als *online* markierten brauchen Internet).
   - **Stimme testen**: spricht eine Folge von Beispielansagen mit den eingegebenen Namen. Während des Sprechens wird die Taste zu **Test beenden**: Tippe erneut darauf, um abzubrechen (der Test stoppt auch von selbst, wenn du die Seite verlässt). Die Sprachausgabe lässt sich nicht mitten im Satz anhalten, deshalb beendet die Taste sie; drückst du erneut, beginnt sie wieder von vorn.
-- Fehlt die Stimme der gewählten Sprache: **Einstellungen › Allgemeine Verwaltung › Sprache › Text-zu-Sprache** (oder *Text-zu-Sprache-Ausgabe*) → die Stimme dieser Sprache für die gewählte Engine herunterladen (die App zeigt auch die Taste **Stimme installieren**).
+- Fehlt die Stimme der gewählten Sprache: **Einstellungen › Allgemeine Verwaltung › Sprache › Text-zu-Sprache** (oder *Text-zu-Sprache-Ausgabe*) → die Stimme dieser Sprache für die gewählte Engine herunterladen (die App zeigt auch die Taste **Stimme installieren**). Startet die Sprachausgabe gar nicht, sagt die App das mit einer eigenen Meldung und der Taste **Einstellungen öffnen** (Sprachausgabe-Einstellungen von Android).
 - **Aussprache**: Manche Engines sprechen Tenniswörter falsch aus (auf Italienisch z. B. „primo set“ als „primo settembre“, „tie-break“ als „time break“). Die App korrigiert sie selbst (`voice/Pronunciation.kt`); die Korrekturen wurden geprüft, indem das echte Audio von Samsung und Google transkribiert wurde.
-- **Eigene Aufnahmen** (die natürlichste Stimme überhaupt: deine oder die eines Schiedsrichters): Im Ordner `Android/data/com.tennis.scoremanager/files/voice/` liegt `LEGGIMI.txt` (die „Lies mich“-Datei; die Erklärungen oben stehen in der Sprache der App und werden bei einem Sprachwechsel neu geschrieben) mit der Liste der 84 Schlüssel und Sätze. Nimm die Dateien unter diesen Namen auf (`score_1_0.mp3` = „fünfzehn null“ …), pack sie in ein ZIP mit einem Ordner pro Sprache (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) und verwende **ZIP importieren**. `LEGGIMI.txt` hat eine Spalte pro Sprache, durch Tabulatoren getrennt, und lässt sich daher auch gut als Tabelle öffnen. Aufnahmen haben immer Vorrang vor der Sprachausgabe; die Namen spricht weiterhin die Sprachausgabe.
-- **Vorab erzeugte Audiodateien verwenden** (optional): Mit **Dateien erzeugen** legt die App einmalig die 84 Dateien mit der gewählten Stimme an (auch mit einer *Online*-Stimme, wenn gerade Internet da ist) und verwendet sie dann statt der laufenden Sprachausgabe. Das klingt eher „zusammengestückelt“, ist aber praktisch, um eine Online-Stimme offline mitzunehmen.
+- **Eigene Aufnahmen** (die natürlichste Stimme überhaupt: deine oder die eines Schiedsrichters): Im Ordner `Android/data/com.tennis.scoremanager/files/voice/` liegt `LEGGIMI.txt` (die „Lies mich“-Datei; die Erklärungen oben stehen in der Sprache der App und werden bei einem Sprachwechsel neu geschrieben) mit der Liste der 85 Schlüssel und Sätze. Nimm die Dateien unter diesen Namen auf (`score_1_0.mp3` = „fünfzehn null“ …), pack sie in ein ZIP mit einem Ordner pro Sprache (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) und verwende **ZIP importieren**. `LEGGIMI.txt` hat eine Spalte pro Sprache, durch Tabulatoren getrennt, und lässt sich daher auch gut als Tabelle öffnen. Aufnahmen haben immer Vorrang vor der Sprachausgabe; die Namen spricht weiterhin die Sprachausgabe. Im ZIP zählt der Ordner, in dem die Datei liegt (auch innerhalb anderer Ordner, z. B. `voice/de/`); Dateien außerhalb eines Sprachordners gehen an die aktuelle Sprache, `tts/`-Ordner werden ignoriert – man kann also auch den Ordner `voice/` der App zippen. Ein beschädigtes oder unvollständiges ZIP ändert nichts (*ZIP nicht lesbar oder unvollständig*). **Aufnahmen entfernen** fragt nach. Lässt sich eine Datei nicht abspielen, spricht die Sprachausgabe diesen Satz, und die Datei wird bis zum Neustart der App nicht mehr verwendet.
+- **Vorab erzeugte Audiodateien verwenden** (optional): Mit **Dateien erzeugen** legt die App einmalig die 85 Dateien mit der gewählten Stimme an (auch mit einer *Online*-Stimme, wenn gerade Internet da ist) und verwendet sie dann statt der laufenden Sprachausgabe. Das klingt eher „zusammengestückelt“, ist aber praktisch, um eine Online-Stimme offline mitzunehmen. Die bisherigen Dateien bleiben, bis die neuen fertig sind (kommt die Erzeugung nicht ans Ende: *Erzeugung nicht abgeschlossen*); währenddessen sind Sprache, Engine, Stimme, Stimmtest und Audio gesperrt.
 - **Externer Lautsprecher**: einfach per Bluetooth mit dem Telefon koppeln; die Stimme kommt über den Medienkanal (Medienlautstärke einstellen).
 
 ### 4.1 Sprachen (App 2.3, Firmware 2.2)
 
 Seite 2 › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
 
-Die Ansagen sind keine Wort-für-Wort-Übersetzungen: Sie folgen den offiziellen Texten für Stuhlschiedsrichter des jeweiligen Verbands, also FFT *L'arbitrage en 255 questions* und ITF auf Französisch, den Unterlagen von DTB/BTV und Swiss Tennis, RFET *Deberes y procedimientos* und FPT *Deveres e Procedimentos* (dem einzigen veröffentlichten portugiesischen Ansagetext). Das Englische folgt der ITF.
+Die Ansagen sind keine Wort-für-Wort-Übersetzungen: Sie folgen den offiziellen Texten für Stuhlschiedsrichter des jeweiligen Verbands, also FFT *L'arbitrage en 255 questions* und ITF auf Französisch, den Unterlagen von DTB/BTV und Swiss Tennis, RFET *Deberes y procedimientos* und FPT *Deveres e Procedimentos* (dem einzigen veröffentlichten portugiesischen Ansagetext). Das Englische folgt der ITF. Im Englischen heißt die Null in den Satzergebnissen am Matchende *love* („six love, six four“), wie bei den Punkten.
 
 | | Italiano | English | Français | Deutsch | Español | Português |
 |---|---|---|---|---|---|---|
@@ -146,21 +146,21 @@ Besonderheiten:
    **Nach dem Hochladen**: Bleibt das Display schwarz (das Armband ist im Programmiermodus geblieben), drücke **einmal** die Seitentaste: Es startet mit dem neuen Programm.
 8. Beim Start zeigt das Armband seinen Namen, z. B. **TSM-3FA2** (in der App änderbar, siehe 6.1). Wiederhole das Ganze für das zweite Armband.
 
-> **Firmware 2.2.2**: Die Verbindungsmeldung wechselt in die Sprache der App, sobald diese ankommt (4.1); Spanisch *VINCULANDO…/VINCULADA* und Portugiesisch *PAREADA* wie in der App, Französisch *MANCHES* auf dem Spielstand-Bildschirm. **Firmware 2.2.1**: auch der Countdown vor dem Ausschalten in der Sprache der App (6). **Firmware 2.2**: die Texte des Armbands in der Sprache der App (4.1). **Firmware 2.1**: der Ladebildschirm (6.2); die Einstellungen, *Erkennen* und das Ausschalten aus der App brauchen mindestens 2.0. Lade `TSM_Band.ino` auf **beide** Armbänder; bei alter Firmware sagt die App das im Einstellungsbereich, und alles andere funktioniert weiter.
+> **Firmware 2.3** (mit App 2.4): Der Piepton von KEY1/KEY2 kommt, wenn das Telefon den Tastendruck empfangen hat; Tastendrücke während einer kurzen Unterbrechung werden gesendet, sobald die Verbindung wieder steht; *NICHT GESENDET*, wenn das Telefon nicht bestätigt (6). Nach dem Ausschalten mit angeschlossenem Kabel schalten es auch KEY1 oder KEY2 wieder ein; fehlgeschlagene Akkumessungen kommen nicht mehr als 0 % in der App an. Mit einer älteren App funktioniert ein 2.3-Armband wie bisher. **Firmware 2.2.2**: Die Verbindungsmeldung wechselt in die Sprache der App, sobald diese ankommt (4.1); Spanisch *VINCULANDO…/VINCULADA* und Portugiesisch *PAREADA* wie in der App, Französisch *MANCHES* auf dem Spielstand-Bildschirm. **Firmware 2.2.1**: auch der Countdown vor dem Ausschalten in der Sprache der App (6). **Firmware 2.2**: die Texte des Armbands in der Sprache der App (4.1). **Firmware 2.1**: der Ladebildschirm (6.2); die Einstellungen, *Erkennen* und das Ausschalten aus der App brauchen mindestens 2.0. Lade `TSM_Band.ino` auf **beide** Armbänder; bei alter Firmware sagt die App das im Einstellungsbereich, und alles andere funktioniert weiter.
 
 ## 6. Die Armbänder benutzen
 
 | Taste | Aktion |
 |---|---|
-| **KEY1** (vorn) kurz | Punkt für den Träger des Armbands (startet auch das Match auf der Seite MATCHBEGINN); ein Piepton bestätigt |
+| **KEY1** (vorn) kurz | Punkt für den Träger des Armbands (startet auch das Match auf der Seite MATCHBEGINN); ein Piepton bestätigt (Firmware 2.3 + App 2.4: sobald das Telefon ihn empfangen hat, etwa eine halbe Sekunde später) |
 | **KEY1** lang (1 s) | zeigt den Akku (und hält das Armband eingeschaltet, wenn es sich gleich wegen Inaktivität ausschalten würde) |
-| **KEY2** kurz | nimmt den letzten Punkt zurück (auch im Popup am Matchende); zwei tiefere Pieptöne |
-| **KEY2** lang (2 s) | schaltet das Armband aus (bei angeschlossenem Kabel steht dort *LAEDT WEITER*: Es lädt auch ausgeschaltet) |
+| **KEY2** kurz | nimmt den letzten Punkt zurück (auch im Popup am Matchende); zwei tiefere Pieptöne (mit Firmware 2.3 bei der Bestätigung durch das Telefon) |
+| **KEY2** lang (2 s) | schaltet das Armband aus (bei angeschlossenem Kabel steht dort *LAEDT WEITER*: Es lädt auch ausgeschaltet; ab Firmware 2.3 schalten es auch KEY1 oder KEY2 wieder ein) |
 | Seitentaste | ein Klick schaltet ein; Doppelklick schaltet aus (Hardwarefunktion) |
 
 - Beim Einschalten blinkt **KOPPELN...** (0,35 s an alle 2 s, um Strom zu sparen). Die App verbindet sich von selbst mit den Armbändern, die sie kennt, sobald sie geöffnet ist; neue findet sie auf Seite 2.
 - Verbunden: **GEKOPPELT** für 3 Sekunden mit zwei Pieptönen, dann **GEKOPPELT MIT** + der Name des Spielers.
-- Bei jedem Punkt geht das Display an und zeigt den Spielstand des laufenden Spiels groß (links deiner, rechts der des Gegners; der grüne Ball zeigt, wer aufschlägt), dann geht es wieder aus. Am Spielende zeigt es Spiele und Sätze.
+- Bei jedem Punkt geht das Display an und zeigt den Spielstand des laufenden Spiels groß (links deiner, rechts der des Gegners; der grüne Ball zeigt, wer aufschlägt), dann geht es wieder aus. Am Spielende zeigt es Spiele und Sätze. Bestätigt das Telefon einen Tastendruck nicht innerhalb von 8 Sekunden (Verbindung verloren), erscheint **NICHT GESENDET** in Rot mit zwei tiefen Pieptönen: Drücke erneut, sobald die Verbindung wieder steht. Ein Tastendruck während einer kurzen Unterbrechung geht dagegen nicht verloren: Er wird gesendet, sobald sich das Armband wieder verbindet, und erst dann piept es.
 
 **Automatisches Ausschalten** (die Zeiten änderst du in der App, 6.1):
 
@@ -173,7 +173,7 @@ Besonderheiten:
 | Akku leer (unter 3,30 V bei zwei Messungen hintereinander) | zeigt AKKU LEER und schaltet sich aus, statt halb eingeschaltet zu bleiben | immer |
 
 - In den letzten 10 Sekunden vor dem Ausschalten ohne Telefon zeigt es **AUSSCHALTEN · 8s - TASTE DRUECKEN** mit einem Piepton: Jede beliebige Taste lässt die Frist bis zum Ausschalten von vorn beginnen.
-- Wenn es sich von selbst ausschaltet, meldet es das dem Telefon: Im Match zeigt der orange Kasten *ARMBAND 1 AUS (INAKTIV)*, *(AKKU LEER)* …
+- Wenn es sich von selbst ausschaltet, meldet es das dem Telefon: Im Match zeigt der orange Kasten *ARMBAND 1 AUS (INAKTIV)*, *(AKKU LEER)* … Nach dem Ausschalten am Matchende sucht das Telefon nicht mehr ständig danach und verbindet sich von selbst, sobald du es wieder einschaltest.
 
 **Akkulaufzeit**: Am meisten verbraucht die ESP32-S3-Platine bei verbundenem Bluetooth (etwa 35 mA): Der Arduino-Core ist so kompiliert, dass der tiefe Stromsparmodus (Light Sleep) bei eingeschaltetem Bluetooth nicht verfügbar ist, deshalb lässt sich der Verbrauch kaum weiter senken. Display, Helligkeit und Pieptöne kommen mit wenigen mA dazu. Mit dem 250-mAh-Akku liegt die Schätzung bei **etwa 7 Stunden bei voller Ladung**, mehr als jedes Match auf zwei Gewinnsätze. Der Einstellungsbereich zeigt die Schätzung live und korrigiert sie nach 20 Minuten Nutzung mit dem an diesem Armband **gemessenen** Verbrauch. Das vollständige Protokoll liegt in `files/battery_log.csv` der App.
 
@@ -194,7 +194,7 @@ Auf Seite 2 (**Einstellungen** unter dem Armband jedes Spielers) oder während d
 | Ausschalten: Telefon verloren | 1–10 min | 3 min |
 | Ausschalten: verbunden, aber inaktiv | 10–60 min | 30 min |
 
-Darunter steht die **geschätzte Laufzeit** (bei voller Ladung und mit der aktuellen Ladung) mit dem Verbrauch nach Posten aufgeschlüsselt: Sie ändert sich schon, während du die Regler bewegst, noch vor dem Bestätigen. Dann folgen **Erkennen**, **Ausschalten** und **Auf das andere Armband kopieren** (gleiche Einstellungen, das andere Armband behält seinen Namen).
+Darunter steht die **geschätzte Laufzeit** (bei voller Ladung und mit der aktuellen Ladung) mit dem Verbrauch nach Posten aufgeschlüsselt: Sie ändert sich schon, während du die Regler bewegst, noch vor dem Bestätigen. Dann folgen **Erkennen**, **Ausschalten** und **Auf das andere Armband kopieren** (gleiche Einstellungen, das andere Armband behält seinen Namen). **Ausschalten** fragt nach, auch während eines Matches.
 
 ### 6.2 Laden (Firmware 2.1)
 
@@ -230,13 +230,13 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
    - Sprache (sechs Sprachen, 4.1), Stimme an/aus, Format (*2 Gewinnsätze · Tie-Break bis 7* oder *2 Sätze + Match-Tie-Break bis 10*), No-Ad.
    - **Wahl (Münzwurf)**: Die Münze dreht sich und zeigt, wer gewinnt; du stellst ein, wer aufschlägt, und die Platzseiten **vom Schiedsrichterstuhl aus gesehen** (Platzskizze mit **Seiten tauschen**). Im Doppel wählst du außerdem, wer in jedem Team zuerst aufschlägt.
 3. **MATCHBEGINN** blinkt: Drücke die Schaltfläche oder KEY1 an einem Armband. Die Stimme sagt *„erster Satz“ · „Aufschlag [Name]“ · „spielen“* mit 2 Sekunden zwischen den Sätzen; die **Match Time** startet bei „spielen“.
-4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), *Neues Match*, **Beenden**. Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen.
-5. Beim letzten Punkt erscheint das Popup **Match beendet / Letzten Punkt zurücknehmen**. „Match beendet“ wird **nur am Telefon** bestätigt.
-6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Im Verlauf speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png), **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Beenden**.
+4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), *Neues Match*, **Beenden**. Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen. Ein Doppeltipp auf *Punkt zurück* nimmt nur einen Punkt zurück (ein zweiter Tipp innerhalb 1 s zählt nicht); direkt nach einem Seitenwechsel wird der zweite Tipp eines Doppeltipps ignoriert, damit er nicht auf einer Schaltfläche der neuen Seite landet.
+5. Beim letzten Punkt erscheint das Popup **Match beendet / Letzten Punkt zurücknehmen**. „Match beendet“ wird **nur am Telefon** bestätigt. Eine halbe Sekunde nach dem Erscheinen ignorieren seine Schaltflächen Tipps: Ein Doppeltipp auf den letzten Punkt nimmt nichts zurück.
+6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Im Verlauf speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png), **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Beenden**. Wurde die Zusammenfassung weder gespeichert noch geteilt, fragen **Neues Match** und **Beenden** nach. Schließt Android die App, während du auf der Zusammenfassung bist (zum Beispiel beim Teilen), findest du sie beim erneuten Öffnen wieder. Wird zweimal unter demselben Namen im Standardordner gespeichert, heißt die zweite Datei *Name (1)*; im Bild werden lange Texte (Namen, Adresse) an die Breite angepasst.
 
 **App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie auf der ersten Seite.
 
-**Speichern**: Das Match speichert sich bei jedem Punkt von selbst. *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Unterbrochenes Match fortsetzen** (Seite 3) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches.
+**Speichern**: Das Match speichert sich bei jedem Punkt von selbst. *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Unterbrochenes Match fortsetzen** (Seite 3) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
 ## 8. Anzeigetafel auf TV oder Monitor
 
@@ -260,29 +260,29 @@ Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anz
 
 ### 8.2 Auf dem Telefon des Schiedsrichters
 
-1. Seite 2 › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten.
+1. Seite 2 › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
 2. Es erscheinen die **Adresse** (z. B. `192.168.43.1:8080`), der **QR-Code** und wie viele Anzeigetafeln verbunden sind. Steht dort *Kein Netz*, schalte den Hotspot ein oder verbinde dich mit dem des anderen Telefons.
 3. **Vorschau auf diesem Telefon** öffnet die Anzeigetafel im Browser des Telefons selbst.
 4. **Aussehen der Anzeigetafel**: Farbe jedes Spielers (8 Farben), Matchdauer, Aufschlaguhr und Pausen, beendete Sätze, Meldungen (Breakball, Satzball, Seitenwechsel …), Ball beim Aufschläger, ausgeschaltete Segmente sichtbar, Text unten (leer = Verein und Platz von Seite 1). Änderungen erscheinen sofort auf dem Monitor.
 5. Im Match steht oben in der Mitte **TV · 1** (verbundene Anzeigetafeln): Ein Tippen darauf zeigt Adresse und QR-Code wieder an.
 
-Bei eingeschalteter Anzeigetafel hält ein Vordergrunddienst (Benachrichtigung *Match läuft · TV-Anzeigetafel aktiv*) den Server auch bei ausgeschaltetem Bildschirm am Laufen, auch im Schiedsrichtermodus. Die Anzeigetafel ist **nur zum Anzeigen** da: Dort lässt sich nichts ändern.
+Bei eingeschalteter Anzeigetafel hält ein Vordergrunddienst (Benachrichtigung *Match läuft · TV-Anzeigetafel aktiv*) den Server auch bei ausgeschaltetem Bildschirm am Laufen, auch im Schiedsrichtermodus. Die Anzeigetafel ist **nur zum Anzeigen** da: Dort lässt sich nichts ändern. Er bleibt auch auf der Zusammenfassung und den anderen Seiten aktiv, solange die Anzeigetafel eingeschaltet ist (Benachrichtigung *TV-Anzeigetafel aktiv*); so bleibt das Endergebnis auch bei gesperrtem Telefon auf dem Monitor.
 
-Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT ZUM SPIELEN* auf der Seite MATCHBEGINN, **TIE-BREAK** / **MATCH-TIE-BREAK** anstelle von *VS*, blinkend *MATCH UNTERBROCHEN*, **SIEGER [Name]** am Matchende mit allen Sätzen; Vorteil wird als **AD** angezeigt, auch auf den LED-Ziffern.
+Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT ZUM SPIELEN* auf der Seite MATCHBEGINN, **TIE-BREAK** / **MATCH-TIE-BREAK** anstelle von *VS*, blinkend *MATCH UNTERBROCHEN*, **SIEGER [Name]** am Matchende mit allen Sätzen; Vorteil wird als **AD** angezeigt, auch auf den LED-Ziffern. Ein im Match-Tie-Break gewonnenes Match endet mit 1:0 bei den Spielen und 2:1 bei den Sätzen, [10-8] steht bei den beendeten Sätzen; lange Meldungen werden verkleinert, damit sie auf den Bildschirm passen.
 
 ### 8.3 Auf dem Anzeigetafel-Telefon
 
 1. Seite 1 › ganz unten **Als Anzeigetafel verwenden**.
-2. Das Telefon **sucht selbst** nach dem Telefon des Schiedsrichters (Ankündigung im Netz und Scan des Hotspots, wenige Sekunden) und merkt sich die letzte Adresse. Findet es ihn nicht: Hotspot und *TV-Anzeigetafel* prüfen, dann **Erneut suchen**, oder die vom Schiedsrichter angezeigte Adresse eintippen und **Verbinden**.
+2. Das Telefon **sucht selbst** nach dem Telefon des Schiedsrichters (Ankündigung im Netz und Scan des Hotspots, wenige Sekunden) und merkt sich die letzte Adresse. Findet es ihn nicht: Hotspot und *TV-Anzeigetafel* prüfen, dann **Erneut suchen**, oder die vom Schiedsrichter angezeigte Adresse eintippen und **Verbinden**. Es findet es auch, wenn auf diesem Telefon ebenfalls *Anzeigetafel auf TV oder Monitor* eingeschaltet ist; verbindet sich das WLAN erst später, sucht es von selbst erneut.
 3. Die Anzeigetafel läuft im Vollbild, im Querformat, mit dauerhaft eingeschaltetem Bildschirm.
    - **Mit HDMI-Kabel**: Die Anzeigetafel erscheint im Format des Monitors auf dem Monitor; das Telefon zeigt *Die Anzeigetafel ist auf dem externen Monitor* bei minimaler Helligkeit (**Auch hier zeigen**, um sie auch auf dem Telefon zu sehen). Nach dem Abziehen des Kabels kehrt sie auf das Telefon zurück.
    - **Mit Chromecast**: Schnelleinstellungen öffnen › **Streamen** (oder **Bildschirm übertragen**) / **Smart View** › den Chromecast wählen.
-4. Verschwindet das Telefon des Schiedsrichters (außer Reichweite, App geschlossen), erscheint *VERBINDUNG VERLOREN - NEUER VERSUCH...*, und nach 20 Sekunden sucht es von selbst erneut danach, auch wenn sich die Adresse geändert hat.
+4. Verschwindet das Telefon des Schiedsrichters (außer Reichweite, App geschlossen), erscheint *VERBINDUNG VERLOREN - NEUER VERSUCH...*, und nach 20 Sekunden sucht es von selbst erneut danach, auch wenn sich die Adresse geändert hat. Auch nach einer Unterbrechung des Hotspots verbindet es sich von selbst wieder, sobald das Netz zurück ist. Es wechselt nie zum Telefon eines anderen Platzes: Um den Platz zu wechseln, *Als Anzeigetafel verwenden* verlassen und erneut suchen.
 5. Zum Beenden: **zweimal Zurück**.
 
-**Aus einem Browser** (Laptop, TV-Box): QR-Code scannen oder Adresse eintippen, dann **VOLLBILD** antippen (erscheint, wenn du die Maus bewegst oder den Bildschirm berührst). Stell das automatische Ausschalten des Bildschirms auf *nie*: Auf einer http-Seite kann der Browser den Bildschirm nicht selbst eingeschaltet halten.
+**Aus einem Browser** (Laptop, TV-Box): QR-Code scannen oder Adresse eintippen, dann **VOLLBILD** antippen (erscheint, wenn du die Maus bewegst oder den Bildschirm berührst). Stell das automatische Ausschalten des Bildschirms auf *nie*: Auf einer http-Seite kann der Browser den Bildschirm nicht selbst eingeschaltet halten. Nach einer Unterbrechung verbindet sich die Seite von selbst wieder; zu viele offene Anzeigetafeln sperren eine neue nicht mehr aus (die älteste wird geschlossen).
 
-**Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `de`, `es`, `pt` und `&state=ad`, `tb`, `end`, `idle`, `doubles`) zeigt die Anzeigetafel mit Testdaten.
+**Vorschau ohne Telefone**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in einem Browser (auch `&lang=en`, `fr`, `de`, `es`, `pt` und `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) zeigt die Anzeigetafel mit Testdaten.
 
 ## 9. Angewandte Regeln (ITF) und abgestimmte Entscheidungen
 
@@ -324,6 +324,7 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 ## 11. Häufige Probleme
 
 - **Armband nicht gefunden**: Bluetooth und Standort an (grüne Zeilen)? Blinkt das Armband KOPPELN? (Ist es schon mit einem anderen Telefon verbunden, ist es nicht sichtbar.) Hat es sich inzwischen von selbst ausgeschaltet (30 s), schalte es mit einem Klick auf die Seitentaste wieder ein.
+- **Das Armband zeigt NICHT GESENDET**: Das Telefon hat den Tastendruck nicht innerhalb von 8 Sekunden bestätigt (Verbindung verloren oder App geschlossen). Drücke erneut, sobald das Armband wieder verbunden ist. Seltener Fall: War der Tastendruck angekommen und ging nur die Bestätigung verloren, zählt der Punkt doppelt; die Stimme sagt den Spielstand an, korrigiere mit *Punkt zurück*.
 - **Im Einstellungsbereich steht „Die Firmware dieses Armbands hat keine Einstellungen“**: Auf diesem Armband ist noch der alte Sketch, lade ihn neu hoch (Kapitel 5).
 - **Android Studio sieht das Telefon nicht**: USB-Debugging an und RSA-Fingerabdruck auf dem Telefon bestätigt (3)? Unter Windows braucht es manchmal den Treiber des Herstellers, unter Linux die udev-Regeln und eine neue Sitzung (1.1). Oder Debugging über WLAN (3).
 - **Arduino IDE zeigt den Port des Armbands nicht**: USB-C-Datenkabel, nicht nur ein Ladekabel; unter Linux Gruppe `dialout` und neue Sitzung (1.1); dann der Download-Modus (5, Schritt 7).

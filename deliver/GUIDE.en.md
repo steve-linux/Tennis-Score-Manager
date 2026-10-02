@@ -13,7 +13,7 @@ Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according
 | `deliver/installa_tsm.sh` | An alternative to cloning: it creates the **whole** Android project and the sketch using only `cat << 'TSM_EOF'` blocks (the Gradle wrapper jar is in base64). |
 | `deliver/GUIDE.en.md` | This guide (in English); the Italian original is `deliver/GUIDA.md`, the other translations are `deliver/GUIDE.fr.md`, `.de`, `.es`, `.pt`. |
 
-Versions used and verified: app **2.3.2** · firmware **2.2.2** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x.
+Versions used and verified: app **2.4** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x.
 
 ---
 
@@ -85,7 +85,7 @@ bash installa_tsm.sh
 5. If Android Studio offers the **AGP Upgrade Assistant**, you can ignore it: these versions were built and tested as they are.
 6. Gradle JDK: **Settings › Build, Execution, Deployment › Build Tools › Gradle › Gradle JDK** = *jbr-21* (the bundled one, which is the default).
 7. **Build › Make Project**: it must end with *BUILD SUCCESSFUL*.
-8. Optional: the tests (76: rules, voice, languages, battery and charging, wristband settings, TV scoreboard) are run by right-clicking `app/src/test` › **Run Tests**.
+8. Optional: the tests (95: rules, voice, languages, battery and charging, wristband settings, TV scoreboard) are run by right-clicking `app/src/test` › **Run Tests**.
 
 ## 3. Installing the app on the phone
 
@@ -101,17 +101,17 @@ bash installa_tsm.sh
   - **Speech engine**: *Phone default* (on Samsung phones this is Samsung TTS) or an engine of your choice, for example *Speech Services by Google*. In our tests, which were done in Italian, Google sounded more natural.
   - **Voice**: *Automatic (best offline)* or a specific voice (with Google the voices are listed by code, as *Voice* followed by a few letters; those marked *online* need internet).
   - **Test voice**: reads a sequence of sample calls with the names you entered. While it is reading, the button becomes **Stop the test**: tap it again to stop (it also stops by itself when you leave the page). Text-to-speech can't be paused mid-sentence, so the button stops it; pressing it again starts over from the beginning.
-- If the voice for the chosen language is missing: **Settings › General management › Language › Text-to-speech** (or *Text-to-speech output*) → download the voice for that language for the chosen engine (the app also shows an **Install voice** button).
+- If the voice for the chosen language is missing: **Settings › General management › Language › Text-to-speech** (or *Text-to-speech output*) → download the voice for that language for the chosen engine (the app also shows an **Install voice** button). If text-to-speech doesn't start at all, the app says so in a separate message with an **Open settings** button (Android's text-to-speech settings).
 - **Pronunciation**: some engines get tennis words wrong (in Italian, "primo set" read as "primo settembre", i.e. "first of September", and "tie-break" read as "time break"). The app corrects them by itself (`voice/Pronunciation.kt`); the corrections were checked by transcribing the real audio from Samsung and Google.
-- **Custom recordings** (the most natural voice of all: yours or an umpire's): the folder `Android/data/com.tennis.scoremanager/files/voice/` contains `LEGGIMI.txt` (the "read me" file; the explanations at the top are in the app's language and are rewritten when you change it) listing the 84 keys and their phrases. Record the files with those names (`score_1_0.mp3` = "fifteen love"…), put them in a ZIP with one folder per language (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) and use **Import ZIP**. `LEGGIMI.txt` has one tab-separated column per language, so it also opens neatly as a spreadsheet. Recordings always take precedence over text-to-speech; the names are still read by text-to-speech.
-- **Use pre-generated audio files** (optional): with **Generate files** the app creates the 84 files once with the chosen voice (even an *online* voice, if there is internet at that moment) and then plays them instead of running text-to-speech live. It sounds more "stitched together", but it is useful for taking an online voice offline.
+- **Custom recordings** (the most natural voice of all: yours or an umpire's): the folder `Android/data/com.tennis.scoremanager/files/voice/` contains `LEGGIMI.txt` (the "read me" file; the explanations at the top are in the app's language and are rewritten when you change it) listing the 85 keys and their phrases. Record the files with those names (`score_1_0.mp3` = "fifteen love"…), put them in a ZIP with one folder per language (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) and use **Import ZIP**. `LEGGIMI.txt` has one tab-separated column per language, so it also opens neatly as a spreadsheet. Recordings always take precedence over text-to-speech; the names are still read by text-to-speech. In the ZIP what counts is the folder that contains the file (also inside other folders, e.g. `voice/en/`); files outside a language folder go to the current language and `tts/` folders are ignored, so you can also zip the app's own `voice/` folder. A damaged or incomplete ZIP changes nothing (*ZIP unreadable or incomplete*). **Remove recordings** asks for confirmation. If a file can't be played, that phrase is spoken by text-to-speech and the file isn't used again until the app restarts.
+- **Use pre-generated audio files** (optional): with **Generate files** the app creates the 85 files once with the chosen voice (even an *online* voice, if there is internet at that moment) and then plays them instead of running text-to-speech live. It sounds more "stitched together", but it is useful for taking an online voice offline. The previous files stay until the new ones are ready (if generation doesn't finish: *Generation not completed*); while it runs, language, engine, voice, voice test and audio are locked.
 - **External speaker**: just pair it with the phone over Bluetooth; the voice comes out on the media channel (adjust the media volume).
 
 ### 4.1 Languages (app 2.3, firmware 2.2)
 
 Page 2 › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
-The calls are not word-for-word translations: they follow each federation's official texts for chair umpires, namely the FFT *L'arbitrage en 255 questions* and the ITF in French, the DTB/BTV and Swiss Tennis materials, RFET *Deberes y procedimientos*, and FPT *Deveres e Procedimentos* (the only published Portuguese script). English follows the ITF.
+The calls are not word-for-word translations: they follow each federation's official texts for chair umpires, namely the FFT *L'arbitrage en 255 questions* and the ITF in French, the DTB/BTV and Swiss Tennis materials, RFET *Deberes y procedimientos*, and FPT *Deveres e Procedimentos* (the only published Portuguese script). English follows the ITF. At the end of the match a zero in the set scores is read *love* ("six love, six four"), as in the points.
 
 | | Italiano | English | Français | Deutsch | Español | Português |
 |---|---|---|---|---|---|---|
@@ -146,21 +146,21 @@ Particulars:
    **After the upload**, if the display stays black (the wristband has stayed in programming mode), press the side button **once**: it restarts with the new program.
 8. At start-up the wristband shows its name, e.g. **TSM-3FA2** (it can be changed from the app, see 6.1). Repeat for the second wristband.
 
-> **Firmware 2.2.2**: the connection message switches to the app's language as soon as it arrives (4.1); Spanish *VINCULANDO…/VINCULADA* and Portuguese *PAREADA* as in the app, French *MANCHES* on the games screen. **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
+> **Firmware 2.3** (with app 2.4): the KEY1/KEY2 beep sounds when the phone has received the press, presses made during a short dropout are sent as soon as it reconnects, *NOT SENT* if the phone doesn't confirm (6); after switching off with the cable plugged in, KEY1 or KEY2 also turn it back on; failed battery readings no longer reach the app as 0 %. With an older app a 2.3 wristband works as before. **Firmware 2.2.2**: the connection message switches to the app's language as soon as it arrives (4.1); Spanish *VINCULANDO…/VINCULADA* and Portuguese *PAREADA* as in the app, French *MANCHES* on the games screen. **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
 
 ## 6. Using the wristbands
 
 | Button | Action |
 |---|---|
-| **KEY1** (front) short | point to the wearer (it also starts the match from the MATCH START page); a beep confirms |
+| **KEY1** (front) short | point to the wearer (it also starts the match from the MATCH START page); a beep confirms (firmware 2.3 + app 2.4: once the phone has received it, about half a second later) |
 | **KEY1** long (1 s) | shows the battery (and keeps the wristband on if it is about to switch off through inactivity) |
-| **KEY2** short | undoes the last point (also from the end-of-match popup); two lower beeps |
-| **KEY2** long (2 s) | switches the wristband off (with the cable plugged in it shows *STILL CHARGING*: it charges even when off) |
+| **KEY2** short | undoes the last point (also from the end-of-match popup); two lower beeps (with firmware 2.3, once the phone confirms) |
+| **KEY2** long (2 s) | switches the wristband off (with the cable plugged in it shows *STILL CHARGING*: it charges even when off; from firmware 2.3 KEY1 or KEY2 also turn it back on) |
 | Side button | one click switches it on; a double click switches it off (hardware function) |
 
 - At power-on **PAIRING...** flashes (on for 0.35 s every 2 s to save power). As soon as it is open, the app connects by itself to the wristbands it knows; new ones are found on page 2.
 - Connected: **PAIRED** for 3 seconds with two beeps, then **PAIRED WITH** + the player's name.
-- At every point the display lights up with the game score in large digits (yours on the left, the opponent's on the right; the green ball shows who is serving), then switches off. At the end of a game it shows games and sets.
+- At every point the display lights up with the game score in large digits (yours on the left, the opponent's on the right; the green ball shows who is serving), then switches off. At the end of a game it shows games and sets. If the phone doesn't confirm a press within 8 seconds (link lost), **NOT SENT** appears in red with two low beeps: press again once it has reconnected. A press made during a short dropout is not lost: it is sent as soon as the wristband reconnects, and the beep comes then.
 
 **Automatic power-off** (the times can be changed from the app, 6.1):
 
@@ -173,7 +173,7 @@ Particulars:
 | Battery empty (below 3.30 V for two readings in a row) | shows BATTERY EMPTY and switches off, rather than staying on half-working | always |
 
 - In the last 10 seconds before switching off for lack of a phone it shows **POWERING OFF · 8s - PRESS ANY KEY** with a beep: any button postpones the power-off and restarts the countdown.
-- When it switches itself off it tells the phone: during a match the orange box shows *WRISTBAND 1 OFF (IDLE)*, *(BATTERY EMPTY)*…
+- When it switches itself off it tells the phone: during a match the orange box shows *WRISTBAND 1 OFF (IDLE)*, *(BATTERY EMPTY)*… After the end-of-match switch-off the phone stops searching for it continuously and reconnects by itself when you switch it back on.
 
 **Battery life**: the biggest consumer is the ESP32-S3 board with Bluetooth connected (about 35 mA): the Arduino core is built without deep power saving (light sleep) while Bluetooth is on, so it can't go much lower. Display, brightness and beeps add a few mA. With the 250 mAh battery the estimate is **about 7 hours from a full charge**, more than any best-of-three-sets match. The settings panel shows the estimate in real time and, after 20 minutes of use, corrects it with the draw **measured** on that wristband. The full log is in the app's `files/battery_log.csv`.
 
@@ -194,7 +194,7 @@ From page 2 (**Settings** under each player's wristband) or during the match (ta
 | Power-off: if the phone link is lost | 1-10 min | 3 min |
 | Power-off: if connected but idle | 10-60 min | 30 min |
 
-Below them is the **battery life estimate** (from a full charge and at the current charge) with the draw broken down by item: it changes as you move the sliders, even before you confirm. Then **Identify**, **Power off** and **Copy to the other wristband** (same settings; the other wristband keeps its own name).
+Below them is the **battery life estimate** (from a full charge and at the current charge) with the draw broken down by item: it changes as you move the sliders, even before you confirm. Then **Identify**, **Power off** and **Copy to the other wristband** (same settings; the other wristband keeps its own name). **Power off** asks for confirmation, also during a match.
 
 ### 6.2 Charging (firmware 2.1)
 
@@ -230,13 +230,13 @@ Plug in the USB-C cable: the wristband beeps and shows the **charging screen** f
    - Language (six languages, 4.1), voice on/off, format (*3 sets · tie-break to 7* or *2 sets + match tie-break to 10*), No-Ad.
    - **Coin toss**: the coin spins and shows who wins; you set who serves and the court ends **as seen by the chair umpire** (court diagram with **Swap ends**). In doubles you also choose who serves first in each team.
 3. **MATCH START** flashes: press the button or KEY1 on a wristband. The voice says *"First set" · "[name] to serve" · "play"* with 2 seconds between the phrases; the **Match Time** starts on "play".
-4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings.
-5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**.
-6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save to history** (file name + folder of your choice + .txt/.json/.png formats), **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**.
+4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page.
+5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**. For half a second after it appears its buttons ignore taps: a double tap on the last point doesn't undo anything.
+6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save to history** (file name + folder of your choice + .txt/.json/.png formats), **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. If the summary has been neither saved nor shared, **New match** and **Exit** ask for confirmation. If Android closes the app while you are on the summary (for example while sharing), you find it again when you reopen the app. Saving twice with the same name in the default folder makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the first page.
 
-**Saving**: the match saves itself at every point. *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume suspended match** (page 3) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match.
+**Saving**: the match saves itself at every point. *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume suspended match** (page 3) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ## 8. Scoreboard on a TV or monitor
 
@@ -260,29 +260,29 @@ The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboa
 
 ### 8.2 On the umpire's phone
 
-1. Page 2 › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**.
+1. Page 2 › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
 2. The **address** (e.g. `192.168.43.1:8080`), the **QR code** and the number of connected scoreboards appear. If it says *No network*, turn on the hotspot or connect to the other phone's hotspot.
 3. **Preview on this phone** opens the scoreboard in the phone's own browser.
 4. **Scoreboard look**: each player's colour (8 colours), match time, serve clock and breaks, finished sets, messages (break point, set point, change ends…), ball next to the server, unlit segments visible, bottom line (empty = club and court from page 1). Changes reach the monitor straight away.
 5. During the match, **TV · 1** (connected scoreboards) appears at the top centre: tap it to see the address and QR code again.
 
-While the scoreboard is on, a foreground service (notification *Match in progress · TV scoreboard on*) keeps the server running even with the screen off, in Umpire mode too. The scoreboard is **read-only**: nothing can be changed from it.
+While the scoreboard is on, a foreground service (notification *Match in progress · TV scoreboard on*) keeps the server running even with the screen off, in Umpire mode too. The scoreboard is **read-only**: nothing can be changed from it. It stays on also on the summary and the other pages as long as the scoreboard is on (notification *TV scoreboard on*), so the final result stays on the monitor even with the phone locked.
 
-What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READY TO PLAY* on the MATCH START page, **TIE-BREAK** / **MATCH TIE-BREAK** in place of *VS*, a flashing *MATCH SUSPENDED*, **WINNER [name]** at the end of the match with all the sets; advantages read **AD** on the LED digits too.
+What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READY TO PLAY* on the MATCH START page, **TIE-BREAK** / **MATCH TIE-BREAK** in place of *VS*, a flashing *MATCH SUSPENDED*, **WINNER [name]** at the end of the match with all the sets; advantages read **AD** on the LED digits too. A match won in the match tie-break ends with 1-0 in games and 2-1 in sets, with [10-8] among the finished sets; long messages shrink to fit on the screen.
 
 ### 8.3 On the scoreboard phone
 
 1. Page 1 › at the bottom, **Use as scoreboard**.
-2. The phone **finds the umpire's phone by itself** (network announcement and hotspot scan, a few seconds) and remembers the last address. If it can't find it: check the hotspot and *TV scoreboard*, then tap **Search again**, or type in the address shown on the umpire's phone and tap **Connect**.
+2. The phone **finds the umpire's phone by itself** (network announcement and hotspot scan, a few seconds) and remembers the last address. If it can't find it: check the hotspot and *TV scoreboard*, then tap **Search again**, or type in the address shown on the umpire's phone and tap **Connect**. It finds it even if *Scoreboard on a TV or monitor* is on on this phone too; if Wi-Fi only connects later, it searches again by itself.
 3. The scoreboard goes full screen, in landscape, with the screen always on.
    - **With the HDMI cable**: the scoreboard goes to the monitor in the monitor's format; the phone shows *The scoreboard is on the external monitor* with brightness at minimum (**Show here too** to see it on the phone as well). Unplug the cable and it comes back to the phone.
    - **With the Chromecast**: open the Quick Settings panel › **Cast** (or **Screen Cast**) / **Smart View** › choose the Chromecast.
-4. If the umpire's phone disappears (out of range, app closed), *CONNECTION LOST - RECONNECTING...* appears and after 20 seconds it searches again by itself, even if the address has changed.
+4. If the umpire's phone disappears (out of range, app closed), *CONNECTION LOST - RECONNECTING...* appears and after 20 seconds it searches again by itself, even if the address has changed. Even after a hotspot dropout it reconnects by itself as soon as the network is back. It never switches to another court's phone: to change court, leave *Use as scoreboard* and search again.
 5. To exit: press **back twice**.
 
-**From a browser** (laptop, TV box): scan the QR code or type in the address, then tap **FULL SCREEN** (it appears when you move the mouse or touch the screen). Set the screen timeout to *Never*: on an http page the browser can't keep the screen on by itself.
+**From a browser** (laptop, TV box): scan the QR code or type in the address, then tap **FULL SCREEN** (it appears when you move the mouse or touch the screen). Set the screen timeout to *Never*: on an http page the browser can't keep the screen on by itself. After an outage the page reconnects by itself; too many open scoreboards no longer lock out a new one (the oldest is closed).
 
-**Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&lang=en`, `fr`, `de`, `es`, `pt` and `&state=ad`, `tb`, `end`, `idle`, `doubles`) shows the scoreboard with test data.
+**Preview without phones**: `TennisScoreManager/app/src/main/assets/scoreboard.html?demo=1` in a browser (also `&lang=en`, `fr`, `de`, `es`, `pt` and `&state=ad`, `tb`, `end`, `idle`, `doubles`, `mtb`, `long`) shows the scoreboard with test data.
 
 ## 9. Rules applied (ITF) and agreed choices
 
@@ -324,6 +324,7 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 ## 11. Common problems
 
 - **Wristband not found**: are Bluetooth and location on (green rows)? Is the wristband flashing PAIRING? (If it is already connected to another phone, it isn't visible.) If in the meantime it has switched itself off (30 s), switch it back on with one click of the side button.
+- **The wristband shows NOT SENT**: the phone didn't confirm the press within 8 seconds (link lost or app closed). Press again once the wristband has reconnected. Rare case: if the press had arrived and only the confirmation was lost, the point counts twice; the voice calls the score, fix it with *Undo point*.
 - **The settings panel says "This wristband's firmware has no settings"**: that wristband still has the old sketch; upload the new one (chapter 5).
 - **Android Studio doesn't see the phone**: is USB debugging on and has the RSA key fingerprint been accepted on the phone (3)? On Windows you sometimes need the manufacturer's driver, on Linux the udev rules and a new session (1.1). Or use wireless debugging (3).
 - **Arduino IDE doesn't show the wristband's port**: use a USB-C data cable, not a charge-only one; on Linux, the `dialout` group and a new session (1.1); then download mode (5, step 7).
