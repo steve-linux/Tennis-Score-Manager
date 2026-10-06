@@ -45,3 +45,7 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Testi nelle sei lingue, grafica | `app/.../ui/Strings.kt` (+ `StringsFr/De/Es/Pt.kt`), `ui/screens/`, `ui/Theme.kt` |
 | Tabellone TV (pagina, server, telefono-tabellone) | `app/src/main/assets/scoreboard.html`, `app/.../tv/`, `ui/TvSection.kt` — anteprima: `scoreboard.html?demo=1` |
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+
+## Licenza
+
+Questo progetto è distribuito sotto i termini della licenza **GNU General Public License v3.0 o successiva** (`GPL-3.0-or-later`). Per maggiori dettagli, consulta il file [LICENSE](LICENSE).
