@@ -67,7 +67,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.tennis.scoremanager"
+        applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
         versionCode = 9
@@ -11627,8 +11627,8 @@ import java.util.zip.ZipFile
 /**
  * Cartella locale con i file audio delle chiamate (uso senza internet).
  *
- *   Android/data/com.tennis.scoremanager/files/voice/it/        registrazioni personalizzate (priorità)
- *   Android/data/com.tennis.scoremanager/files/voice/it/tts/    file generati dal TTS del telefono
+ *   Android/data/io.github.steve_linux.tsm/files/voice/it/        registrazioni personalizzate (priorità)
+ *   Android/data/io.github.steve_linux.tsm/files/voice/it/tts/    file generati dal TTS del telefono
  *
  * Il nome di ogni file è la chiave della frase (vedi LEGGIMI.txt), es. `score_1_0.mp3` = "quindici zero".
  * LEGGIMI.txt ha sempre questo nome (lo citano le guide); le spiegazioni in testa sono nella lingua dell'app.

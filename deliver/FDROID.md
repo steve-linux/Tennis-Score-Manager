@@ -21,7 +21,7 @@ F-Droid accetta solo app libere che si possono compilare dal sorgente. Tennis Sc
    oppure su GitHub › *Releases* › *Draft a new release* › tag `v2.4.1` › *Publish release*.
 3. **Chiedere l'inserimento in F-Droid**, in uno dei due modi:
    - **Il più semplice**: un account su GitLab e una richiesta *Request For Packaging* su <https://gitlab.com/fdroid/rfp/-/issues> con il link al repository. Un volontario prepara il file del capitolo 3; può volerci qualche settimana.
-   - **Il più rapido**: fork di <https://gitlab.com/fdroid/fdroiddata>, aggiungere il file `metadata/com.tennis.scoremanager.yml` del capitolo 3 e aprire una *merge request*. I controlli automatici di F-Droid lo compilano e dicono se manca qualcosa.
+   - **Il più rapido**: fork di <https://gitlab.com/fdroid/fdroiddata>, aggiungere il file `metadata/io.github.steve_linux.tsm.yml` del capitolo 3 e aprire una *merge request*. I controlli automatici di F-Droid lo compilano e dicono se manca qualcosa.
 
 Dopo l'approvazione F-Droid compila l'app e la pubblica nel suo catalogo, di solito entro qualche giorno.
 
@@ -58,8 +58,8 @@ Con `UpdateCheckMode: Tags` e `AutoUpdateMode: Version`, ogni nuovo tag `vX.Y.Z`
 
 ## 4. Da sapere
 
-- **Firma**: l'APK di F-Droid lo firma F-Droid con la sua chiave. Su un telefono che ha già l'app installata da Android Studio, prima di installare quella di F-Droid bisogna disinstallarla: stesso nome di pacchetto, firma diversa. Disinstallando si perdono le partite sospese e lo storico salvato nella cartella predefinita dell'app (`Android/data/com.tennis.scoremanager/files/Storico`): copialo prima, se serve. I riepiloghi salvati in un'altra cartella scelta col selettore restano.
-- **Nome del pacchetto** `com.tennis.scoremanager`: F-Droid lo userà per sempre, cambiarlo dopo vorrebbe dire pubblicare un'app nuova. Se si vuole un nome legato a un proprio dominio o all'account GitHub (per esempio `io.github.steve_linux.tsm`), va cambiato **prima** della pubblicazione (`applicationId` in `app/build.gradle.kts`).
+- **Firma**: l'APK di F-Droid lo firma F-Droid con la sua chiave. Dalla 2.4.1 il nome del pacchetto è `io.github.steve_linux.tsm`, quindi l'app di F-Droid si installa accanto a una vecchia versione `com.tennis.scoremanager` installata da Android Studio, senza conflitti. Le partite sospese e lo storico della vecchia app (`Android/data/com.tennis.scoremanager/files/Storico`) non passano da soli alla nuova (`Android/data/io.github.steve_linux.tsm/files/Storico`): copiali a mano se servono, poi la vecchia app si può disinstallare.
+- **Nome del pacchetto** `io.github.steve_linux.tsm` (`applicationId` in `app/build.gradle.kts`; il `namespace` del codice resta `com.tennis.scoremanager`): F-Droid lo userà per sempre, cambiarlo dopo vorrebbe dire pubblicare un'app nuova.
 - **Schermate** (facoltative, ma rendono la scheda più chiara): file PNG o JPG presi dal telefono in `fastlane/metadata/android/en-US/images/phoneScreenshots/` con nomi `1.png`, `2.png`… Le altre lingue usano quelle inglesi se non hanno le proprie.
 - **Ogni nuova versione**: aumentare `versionCode` e `versionName` in `app/build.gradle.kts`, scrivere `changelogs/<versionCode>.txt` nelle sei lingue (massimo 500 caratteri), poi il tag `vX.Y.Z`.
 - **Firmware dei braccialetti**: F-Droid distribuisce solo l'app. I braccialetti si programmano dal sorgente con Arduino IDE (guida, capitolo 5).
