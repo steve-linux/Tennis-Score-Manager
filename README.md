@@ -10,10 +10,12 @@ App Android per tenere il punteggio del tennis secondo le regole ITF, con chiama
 | `firmware/TSM_Band/` | Sketch Arduino per i braccialetti M5StickS3 |
 | `deliver/GUIDA.md` | **Guida passo passo**: installazione su Windows, Ubuntu e Fedora, Android Studio, Arduino IDE, uso dell'app, regole applicate. Tradotta in `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`, `.pt` |
 | `deliver/installa_tsm.sh` | Tutto il progetto come blocchi `cat` (alternativa al clone), rigenerabile con `make_installer.py` |
+| `deliver/FDROID.md` | Come pubblicare l'app su F-Droid |
+| `fastlane/metadata/android/` | Testi e icona della scheda di F-Droid, nelle sei lingue |
 
 ## Avvio rapido
 
-Servono Git, Android Studio e Arduino IDE 2: come installarli su Windows, Ubuntu e Fedora è nella guida, capitolo 1. Il repository è privato, serve un account GitHub con accesso.
+Servono Git, Android Studio e Arduino IDE 2: come installarli su Windows, Ubuntu e Fedora è nella guida, capitolo 1. Finché il repository è privato serve un account GitHub con accesso.
 
 ```bash
 git clone https://github.com/steve-linux/Tennis-Score-Manager.git
@@ -45,7 +47,24 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Testi nelle sei lingue, grafica | `app/.../ui/Strings.kt` (+ `StringsFr/De/Es/Pt.kt`), `ui/screens/`, `ui/Theme.kt` |
 | Tabellone TV (pagina, server, telefono-tabellone) | `app/src/main/assets/scoreboard.html`, `app/.../tv/`, `ui/TvSection.kt` — anteprima: `scoreboard.html?demo=1` |
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Scheda F-Droid (descrizioni, novità di ogni versione) | `fastlane/metadata/android/<lingua>/`, `changelogs/<versionCode>.txt` |
 
 ## Licenza
 
-Questo progetto è distribuito sotto i termini della licenza **GNU General Public License v3.0 o successiva** (`GPL-3.0-or-later`). Per maggiori dettagli, consulta il file [LICENSE](LICENSE).
+Tennis Score Manager (app e firmware dei braccialetti) è software libero: puoi ridistribuirlo e modificarlo secondo i termini della **GNU General Public License versione 3 o, a tua scelta, qualsiasi versione successiva** (`GPL-3.0-or-later`), pubblicata dalla Free Software Foundation. È distribuito senza alcuna garanzia. Il testo completo è nel file [LICENSE](LICENSE); ogni file sorgente lo dichiara nell'intestazione (`SPDX-License-Identifier: GPL-3.0-or-later`). L'app mostra versione, licenza e link al codice sorgente in fondo alla prima pagina.
+
+### Componenti di terze parti
+
+Sono tutti compatibili con la GPL 3:
+
+| Componente | Usato da | Licenza |
+|---|---|---|
+| AndroidX, Jetpack Compose, Material 3 | app | Apache 2.0 |
+| Kotlin, kotlinx.coroutines, kotlinx.serialization | app | Apache 2.0 |
+| ZXing core (QR del tabellone) | app | Apache 2.0 |
+| Gradle wrapper (`gradlew`, `gradle/wrapper/`) | compilazione | Apache 2.0 |
+| M5Unified, M5GFX | firmware | MIT (i font FreeSans arrivano da Adafruit GFX: BSD) |
+| NimBLE-Arduino | firmware | Apache 2.0 |
+| Core Arduino per ESP32, ESP-IDF | firmware | LGPL 2.1 o successiva, Apache 2.0 |
+
+Il codice Apache 2.0 si può unire a un programma GPL 3, non a uno "solo GPL 2": per questo la licenza è la 3 o successiva. Il firmware compilato contiene anche le librerie radio e Bluetooth di Espressif, fornite solo in binario: conta solo se un giorno si distribuisce il file `.bin` già compilato (oltre al sorgente), ed è la stessa situazione di firmware GPL per ESP32 come Tasmota e Meshtastic.
