@@ -3,11 +3,14 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,9 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +40,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.BuildConfig
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
@@ -86,6 +94,26 @@ fun SetupScreen(c: MatchController) {
             GhostButton(s.displayMode, Icons.Filled.Tv, {
                 context.startActivity(Intent(context, DisplayActivity::class.java))
             }, Modifier.fillMaxWidth())
+        }
+        AboutFooter()
+    }
+}
+
+/** Indirizzo del codice sorgente, mostrato in fondo alla pagina 1. */
+private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Manager"
+
+/** Versione, licenza e assenza di garanzia (la GPL chiede di mostrarle nei programmi con interfaccia), più il link al codice. */
+@Composable
+private fun AboutFooter() {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    Column(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(s.aboutLicense(BuildConfig.VERSION_NAME), color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center)
+        TextButton(onClick = {
+            // Nessun browser installato: il tocco non fa nulla invece di chiudere l'app.
+            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_URL))) }
+        }) {
+            Text("${s.aboutSource}: ${SOURCE_URL.removePrefix("https://")}", color = TsmColors.Ball, fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }
 }

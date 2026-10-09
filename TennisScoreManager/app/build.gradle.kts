@@ -18,8 +18,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "2.4.0"
+        versionCode = 9
+        versionName = "2.4.1"
     }
 
     buildTypes {
@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true  // BuildConfig.VERSION_NAME in fondo alla pagina 1
     }
     testOptions {
         unitTests.isReturnDefaultValues = true

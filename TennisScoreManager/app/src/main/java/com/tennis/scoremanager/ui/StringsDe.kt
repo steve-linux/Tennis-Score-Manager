@@ -319,4 +319,7 @@ object DeStrings : Strings {
     override val displayShowHere = "Auch hier zeigen"
     override val displayBackAgain = "Zum Beenden noch einmal Zurück drücken"
     override val displayRetry = "Erneut suchen"
+
+    override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · freie Software unter der GNU GPL Version 3 oder später, ohne jegliche Gewährleistung." }
+    override val aboutSource = "Quellcode"
 }

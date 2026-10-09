@@ -322,4 +322,7 @@ object FrStrings : Strings {
     override val displayShowHere = "Afficher aussi ici"
     override val displayBackAgain = "Appuyez encore sur retour pour quitter"
     override val displayRetry = "Chercher à nouveau"
+
+    override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · logiciel libre sous licence GNU GPL version 3 ou ultérieure, sans aucune garantie." }
+    override val aboutSource = "Code source"
 }

@@ -338,6 +338,10 @@ interface Strings {
     val displayShowHere: String
     val displayBackAgain: String
     val displayRetry: String
+
+    // In fondo alla pagina 1: versione, licenza (GPL) e link al codice sorgente
+    val aboutLicense: (String) -> String
+    val aboutSource: String
 }
 
 object ItStrings : Strings {
@@ -649,6 +653,9 @@ object ItStrings : Strings {
     override val displayShowHere = "Mostra anche qui"
     override val displayBackAgain = "Premi di nuovo indietro per uscire"
     override val displayRetry = "Cerca di nuovo"
+
+    override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libero con licenza GNU GPL versione 3 o successiva, senza alcuna garanzia." }
+    override val aboutSource = "Codice sorgente"
 }
 
 object EnStrings : Strings {
@@ -961,6 +968,9 @@ object EnStrings : Strings {
     override val displayShowHere = "Show here too"
     override val displayBackAgain = "Press back again to exit"
     override val displayRetry = "Search again"
+
+    override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · free software under the GNU GPL version 3 or later, with absolutely no warranty." }
+    override val aboutSource = "Source code"
 }
 
 fun stringsFor(lang: Lang): Strings = when (lang) {
