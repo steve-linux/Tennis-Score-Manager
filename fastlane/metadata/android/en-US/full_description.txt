@@ -1,0 +1,11 @@
+Tennis Score Manager keeps the score of a tennis match by the ITF rules and calls it out like a chair umpire.
+
+* Singles and doubles: three sets with a tie-break at 6-6, or two sets and a 10-point match tie-break; optional No-Ad scoring.
+* Chair umpire calls in six languages (Italian, English, French, German, Spanish, Portuguese) with the phone's text-to-speech, no internet needed. You can also import your own recordings.
+* Shot clock (25 s), changeover (90 s) and set break (120 s); changes of ends and serving order are handled for you.
+* Undo any point, even after the end of a game, set or match: the score is recomputed from the start.
+* Optional M5StickS3 wristbands over Bluetooth LE: each player presses KEY1 to win the point and KEY2 to undo it. Their Arduino firmware is in the same repository.
+* LED-style scoreboard on a TV or monitor: a second phone with an HDMI cable, a Chromecast (screen cast), or any browser on the phone's hotspot.
+* Match summary with the score set by set, duration, club, court and place; save it as text, JSON or image, or share it.
+
+No ads, no account, no tracking. The network is used only for the scoreboard on the local network. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands.

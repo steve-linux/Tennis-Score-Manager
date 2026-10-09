@@ -42,6 +42,11 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    // F-Droid: niente blocco "dependency metadata" (cifrato con la chiave di Google) nell'APK firmato
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 kotlin {

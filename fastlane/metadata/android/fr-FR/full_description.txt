@@ -1,0 +1,11 @@
+Tennis Score Manager compte les points d'un match de tennis selon les règles de l'ITF et les annonce comme un arbitre de chaise.
+
+* Simple et double : trois sets avec jeu décisif à 6-6, ou deux sets et un super jeu décisif en 10 points ; point décisif (No-Ad) en option.
+* Annonces d'arbitre de chaise en six langues (italien, anglais, français, allemand, espagnol, portugais) avec la synthèse vocale du téléphone, sans internet. Vous pouvez aussi importer vos propres enregistrements.
+* Shot clock (25 s), changement de côté (90 s) et pause entre les sets (120 s) ; changements de côté et ordre de service sont gérés par l'application.
+* N'importe quel point peut être annulé, même après la fin d'un jeu, d'un set ou du match : le score est recalculé depuis le début.
+* Bracelets M5StickS3 en Bluetooth LE (facultatifs) : chaque joueur appuie sur KEY1 pour marquer le point et sur KEY2 pour l'annuler. Leur firmware Arduino est dans le même dépôt.
+* Tableau d'affichage à LED sur une TV ou un écran : un second téléphone avec un câble HDMI, un Chromecast (diffusion de l'écran) ou n'importe quel navigateur sur le point d'accès du téléphone.
+* Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON ou image, ou à partager.
+
+Sans publicité, sans compte, sans pistage. Le réseau sert uniquement au tableau d'affichage sur le réseau local. La localisation sert au lieu du match dans le résumé et, comme l'exige Android, à la recherche Bluetooth des bracelets.

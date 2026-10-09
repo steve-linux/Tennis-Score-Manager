@@ -1,0 +1,11 @@
+Tennis Score Manager tiene il punteggio di una partita di tennis secondo le regole ITF e lo annuncia come un giudice di sedia.
+
+* Singolare e doppio: tre set con tie-break sul 6-6, oppure due set e super tie-break a 10; punto decisivo (No-Ad) a scelta.
+* Chiamate da giudice di sedia in sei lingue (italiano, inglese, francese, tedesco, spagnolo, portoghese) con la sintesi vocale del telefono, senza internet. Si possono anche importare registrazioni proprie.
+* Shot clock (25 s), cambio campo (90 s) e pausa tra i set (120 s); cambi di campo e turni di servizio li gestisce l'app.
+* Qualsiasi punto si può annullare, anche dopo la fine di un game, di un set o della partita: il punteggio viene ricalcolato dall'inizio.
+* Braccialetti M5StickS3 in Bluetooth LE (facoltativi): ogni giocatore preme KEY1 per assegnarsi il punto e KEY2 per annullarlo. Il firmware Arduino è nello stesso repository.
+* Tabellone a LED su TV o monitor: un secondo telefono col cavo HDMI, un Chromecast (trasmissione dello schermo) o un browser qualsiasi sull'hotspot del telefono.
+* Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON o immagine, oppure si condivide.
+
+Niente pubblicità, niente account, niente tracciamento. La rete serve solo al tabellone sulla rete locale. La posizione serve per il luogo della partita nel riepilogo e, come chiede Android, per la ricerca Bluetooth dei braccialetti.
