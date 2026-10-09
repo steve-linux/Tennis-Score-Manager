@@ -15,7 +15,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.tennis.scoremanager"
+        applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
         versionCode = 9
