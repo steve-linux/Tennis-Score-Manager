@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (il jar del wrapper in base64)."""
 import base64
 import pathlib
