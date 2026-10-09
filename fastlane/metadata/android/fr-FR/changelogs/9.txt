@@ -1,0 +1,1 @@
+Sous licence GNU GPL version 3 ou ultérieure. En bas de la première page : version de l'application, licence et lien vers le code source.

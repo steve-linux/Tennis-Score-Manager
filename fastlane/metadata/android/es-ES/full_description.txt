@@ -1,0 +1,11 @@
+Tennis Score Manager lleva el marcador de un partido de tenis según las reglas de la ITF y lo canta como un juez de silla.
+
+* Individual y dobles: tres sets con tie-break en 6-6, o dos sets y un super tie-break a 10 puntos; punto de oro (No-Ad) opcional.
+* Voz de juez de silla en seis idiomas (italiano, inglés, francés, alemán, español, portugués) con la síntesis de voz del teléfono, sin internet. También se pueden importar grabaciones propias.
+* Shot clock (25 s), cambio de lado (90 s) y descanso entre sets (120 s); los cambios de lado y el orden de saque los gestiona la app.
+* Cualquier punto se puede deshacer, incluso después del final de un juego, de un set o del partido: el marcador se vuelve a calcular desde el principio.
+* Pulseras M5StickS3 por Bluetooth LE (opcionales): cada jugador pulsa KEY1 para anotarse el punto y KEY2 para deshacerlo. Su firmware de Arduino está en el mismo repositorio.
+* Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono.
+* Resumen del partido con el resultado set a set, duración, club, pista y lugar; se guarda como texto, JSON o imagen, o se comparte.
+
+Sin anuncios, sin cuenta, sin rastreo. La red solo se usa para el marcador en la red local. La ubicación se usa para el lugar del partido en el resumen y, como exige Android, para la búsqueda Bluetooth de las pulseras.

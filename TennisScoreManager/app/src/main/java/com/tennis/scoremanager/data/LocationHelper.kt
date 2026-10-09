@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package com.tennis.scoremanager.data
 
 import android.Manifest

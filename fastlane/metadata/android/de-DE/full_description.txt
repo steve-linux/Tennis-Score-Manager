@@ -1,0 +1,11 @@
+Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln und sagt sie an wie ein Stuhlschiedsrichter.
+
+* Einzel und Doppel: drei Sätze mit Tiebreak bei 6:6 oder zwei Sätze und ein Match-Tiebreak bis 10; No-Ad wahlweise.
+* Schiedsrichteransagen in sechs Sprachen (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch) über die Sprachausgabe des Telefons, ohne Internet. Eigene Aufnahmen lassen sich importieren.
+* Shot Clock (25 s), Seitenwechsel (90 s) und Satzpause (120 s); Seitenwechsel und Aufschlagfolge regelt die App.
+* Jeder Punkt lässt sich zurücknehmen, auch nach dem Ende eines Spiels, Satzes oder Matches: der Spielstand wird von Anfang an neu berechnet.
+* M5StickS3-Armbänder über Bluetooth LE (optional): jeder Spieler drückt KEY1 für den Punkt und KEY2 zum Zurücknehmen. Die Arduino-Firmware liegt im selben Repository.
+* LED-Anzeigetafel auf einem Fernseher oder Monitor: ein zweites Telefon mit HDMI-Kabel, ein Chromecast (Bildschirmübertragung) oder ein beliebiger Browser im Hotspot des Telefons.
+* Spielbericht mit dem Ergebnis Satz für Satz, Dauer, Verein, Platz und Ort; als Text, JSON oder Bild speichern oder teilen.
+
+Keine Werbung, kein Konto, kein Tracking. Das Netzwerk dient nur der Anzeigetafel im lokalen Netz. Der Standort dient dem Ort des Matches im Spielbericht und, wie Android es verlangt, der Bluetooth-Suche nach den Armbändern.

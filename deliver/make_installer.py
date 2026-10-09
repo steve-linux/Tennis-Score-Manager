@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (il jar del wrapper in base64)."""
 import base64
 import pathlib
@@ -18,6 +20,8 @@ files = [f for f in files if not f.endswith("local.properties")]
 
 lines = [
     "#!/usr/bin/env bash",
+    "# SPDX-FileCopyrightText: 2026 Stefano Spagnolo",
+    "# SPDX-License-Identifier: GPL-3.0-or-later",
     "# ============================================================================",
     "#  Tennis Score Manager - installazione completa del progetto (app + firmware)",
     "#  Tennis Score Manager - complete project installer (app + firmware)",
@@ -70,6 +74,14 @@ for f in files:
     count += 1
 
 lines.append('chmod +x "$DEST/gradlew"')
+lines.append("")
+# Il testo della GPL accompagna sempre il codice (anche quando arriva da questo script invece che dal clone)
+lic = (ROOT / "LICENSE").read_text()
+assert DELIM not in lic
+lines.append("# ---------------------------------------------------------------- LICENSE (GPL-3.0-or-later)")
+lines.append(f"cat > \"$DEST/LICENSE\" << '{DELIM}'")
+lines.append(lic.rstrip("\n"))
+lines.append(DELIM)
 lines.append("")
 fw = FW.read_text()
 assert DELIM not in fw

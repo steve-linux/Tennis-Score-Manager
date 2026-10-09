@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -15,8 +18,8 @@ android {
         applicationId = "com.tennis.scoremanager"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "2.4.0"
+        versionCode = 9
+        versionName = "2.4.1"
     }
 
     buildTypes {
@@ -34,9 +37,15 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true  // BuildConfig.VERSION_NAME in fondo alla pagina 1
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+    // F-Droid: niente blocco "dependency metadata" (cifrato con la chiave di Google) nell'APK firmato
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 

@@ -1,0 +1,1 @@
+Licensed under the GNU GPL version 3 or later. At the bottom of the first page: app version, license and a link to the source code.

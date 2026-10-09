@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /*
   Tennis Score Manager - firmware braccialetto M5StickS3
   --------------------------------------------------------

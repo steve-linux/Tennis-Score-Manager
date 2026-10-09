@@ -1,0 +1,11 @@
+O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regras da ITF e os anuncia como um árbitro de cadeira.
+
+* Simples e duplas: três sets com tie-break no 6-6, ou dois sets e um match tie-break de 10 pontos; ponto decisivo (No-Ad) opcional.
+* Anúncios de árbitro de cadeira em seis idiomas (italiano, inglês, francês, alemão, espanhol, português) com a síntese de voz do telefone, sem internet. Também é possível importar gravações próprias.
+* Shot clock (25 s), troca de lado (90 s) e intervalo entre sets (120 s); as trocas de lado e a ordem de saque ficam por conta do app.
+* Qualquer ponto pode ser desfeito, mesmo depois do fim de um game, de um set ou da partida: o placar é recalculado desde o início.
+* Pulseiras M5StickS3 via Bluetooth LE (opcionais): cada jogador aperta KEY1 para marcar o ponto e KEY2 para desfazer. O firmware Arduino está no mesmo repositório.
+* Placar de LED numa TV ou monitor: um segundo telefone com cabo HDMI, um Chromecast (transmissão de tela) ou qualquer navegador no hotspot do telefone.
+* Resumo da partida com o placar set a set, duração, clube, quadra e local; pode ser salvo como texto, JSON ou imagem, ou compartilhado.
+
+Sem anúncios, sem conta, sem rastreamento. A rede é usada só para o placar na rede local. A localização é usada para o local da partida no resumo e, como o Android exige, para a busca Bluetooth das pulseiras.

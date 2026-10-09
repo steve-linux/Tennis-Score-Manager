@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package com.tennis.scoremanager.ui
 
 import com.tennis.scoremanager.ble.BandProtocol
@@ -319,4 +322,7 @@ object FrStrings : Strings {
     override val displayShowHere = "Afficher aussi ici"
     override val displayBackAgain = "Appuyez encore sur retour pour quitter"
     override val displayRetry = "Chercher à nouveau"
+
+    override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · logiciel libre sous licence GNU GPL version 3 ou ultérieure, sans aucune garantie." }
+    override val aboutSource = "Code source"
 }

@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.4** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x.
+Verwendete und geprüfte Versionen: App **2.4.1** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unten auf der ersten Seite.
 
 ---
 

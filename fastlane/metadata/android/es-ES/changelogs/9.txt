@@ -1,0 +1,1 @@
+Licencia GNU GPL versión 3 o posterior. Al final de la primera página: versión de la app, licencia y enlace al código fuente.
