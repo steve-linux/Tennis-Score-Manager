@@ -8,4 +8,4 @@ Tennis Score Manager lleva el marcador de un partido de tenis según las reglas 
 * Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono.
 * Resumen del partido con el resultado set a set, duración, club, pista y lugar; se guarda como texto, JSON o imagen, o se comparte.
 
-Sin anuncios, sin cuenta, sin rastreo. La red solo se usa para el marcador en la red local. La ubicación se usa para el lugar del partido en el resumen y, como exige Android, para la búsqueda Bluetooth de las pulseras.
+Sin anuncios, sin cuenta, sin rastreo. La red solo se usa para el marcador en la red local. La ubicación se usa para el lugar del partido en el resumen y, como exige Android, para la búsqueda Bluetooth de las pulseras. La dirección de la pista solo se busca si activas la opción: usa el servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google.

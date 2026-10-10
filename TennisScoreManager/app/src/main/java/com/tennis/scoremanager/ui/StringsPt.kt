@@ -149,6 +149,8 @@ object PtStrings : Strings {
     override val locationDialogTitle = "Ative a localização"
     override val locationDialogText = "Sem a localização, o local não aparece no resumo da partida."
     override val continueWithout = "Continuar sem"
+    override val addressLookup = "Buscar o endereço da quadra"
+    override val addressLookupHint = "Aparece no resumo junto com as coordenadas. Usa o serviço de geocodificação do telefone: com os serviços do Google, as coordenadas são enviadas ao Google."
     override val bandsRequiredTitle = "Bluetooth e localização obrigatórios"
     override val bandsRequiredText = "Para usar as pulseiras, ative o Bluetooth, conceda a permissão de localização e mantenha a localização ativada."
     override val bandsMissingTitle = "Pulseiras não associadas"

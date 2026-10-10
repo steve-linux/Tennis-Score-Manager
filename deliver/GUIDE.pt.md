@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.4.1** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença no fim da primeira página.
+Versões usadas e verificadas: app **2.4.2** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença no fim da primeira página.
 
 ---
 
@@ -221,7 +221,7 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
 
 ## 7. Como usar o app
 
-1. **Nova partida** (opcional): clube, quadra, simples/duplas, nomes (nas duplas, dois nomes por equipe). **Avançar**.
+1. **Nova partida** (opcional): clube, quadra, simples/duplas, nomes (nas duplas, dois nomes por equipe). **Buscar o endereço da quadra** (desativado por padrão) acrescenta ao resumo o endereço junto com as coordenadas: ele é pedido ao serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google. **Avançar**.
 2. **Modo e regras**:
    - *Árbitro* ou *Pulseiras*. Com as pulseiras são obrigatórios Bluetooth ligado, permissão de localização e localização ativada: as linhas dos **Requisitos** se atualizam em tempo real (mesmo se você desligar o Bluetooth ou a localização pelo painel de notificações) e ficam vermelhas, com o botão para corrigir.
    - A **busca é automática e contínua** enquanto a página estiver aberta: ligue as pulseiras e elas ocupam sozinhas os lugares livres (primeiro Jogador 1, depois Jogador 2). **Identificar** faz aquela pulseira piscar na cor do jogador (amarelo ou vermelho) com bipes, para você ver logo qual tem na mão; **Trocar J1 ↔ J2** as inverte sem desconectá-las. No menu suspenso você sempre pode escolher outra ou *Nenhuma* (a que for tirada à mão não é recolocada pela busca). Uma pulseira não pode ficar com dois jogadores.

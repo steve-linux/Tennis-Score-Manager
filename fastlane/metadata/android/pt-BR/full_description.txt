@@ -8,4 +8,4 @@ O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regra
 * Placar de LED numa TV ou monitor: um segundo telefone com cabo HDMI, um Chromecast (transmissão de tela) ou qualquer navegador no hotspot do telefone.
 * Resumo da partida com o placar set a set, duração, clube, quadra e local; pode ser salvo como texto, JSON ou imagem, ou compartilhado.
 
-Sem anúncios, sem conta, sem rastreamento. A rede é usada só para o placar na rede local. A localização é usada para o local da partida no resumo e, como o Android exige, para a busca Bluetooth das pulseiras.
+Sem anúncios, sem conta, sem rastreamento. A rede é usada só para o placar na rede local. A localização é usada para o local da partida no resumo e, como o Android exige, para a busca Bluetooth das pulseiras. O endereço da quadra só é buscado se você ativar a opção: ela usa o serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google.

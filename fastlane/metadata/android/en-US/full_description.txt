@@ -8,4 +8,4 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 * LED-style scoreboard on a TV or monitor: a second phone with an HDMI cable, a Chromecast (screen cast), or any browser on the phone's hotspot.
 * Match summary with the score set by set, duration, club, court and place; save it as text, JSON or image, or share it.
 
-No ads, no account, no tracking. The network is used only for the scoreboard on the local network. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands.
+No ads, no account, no tracking. The network is used only for the scoreboard on the local network. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands. The court address is looked up only if you turn on the option: it uses the phone's geocoding service, which with Google services sends the coordinates to Google.

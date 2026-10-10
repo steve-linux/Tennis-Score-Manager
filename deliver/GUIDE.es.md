@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para llevar el tanteo del tenis según la
 | `deliver/installa_tsm.sh` | Alternativa a clonar el repositorio: crea **todo** el proyecto Android y el sketch solo con bloques `cat << 'TSM_EOF'` (el jar del Gradle wrapper va en base64). |
 | `deliver/GUIDE.es.md` | Esta guía (en español); el original en italiano es `deliver/GUIDA.md` y las demás traducciones son `deliver/GUIDE.en.md`, `.fr`, `.de`, `.pt`. |
 
-Versiones usadas y verificadas: app **2.4.1** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licencia: GNU GPL versión 3 o posterior (`LICENSE`); la app muestra su versión y licencia al final de la primera página.
+Versiones usadas y verificadas: app **2.4.2** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licencia: GNU GPL versión 3 o posterior (`LICENSE`); la app muestra su versión y licencia al final de la primera página.
 
 ---
 
@@ -221,7 +221,7 @@ Conecta el cable USB-C: la pulsera emite un pitido y muestra la **pantalla de ca
 
 ## 7. Cómo se usa la app
 
-1. **Nuevo partido** (opcional): club, pista, individual/dobles, nombres (en dobles, dos nombres por pareja). **Siguiente**.
+1. **Nuevo partido** (opcional): club, pista, individual/dobles, nombres (en dobles, dos nombres por pareja). **Buscar la dirección de la pista** (desactivado por defecto) añade al resumen la dirección junto a las coordenadas: se la pide al servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google. **Siguiente**.
 2. **Modo y reglas**:
    - *Juez* o *Pulseras*. Con las pulseras son obligatorios el Bluetooth activado, el permiso de ubicación y la ubicación activada: las filas de **Requisitos** se actualizan en tiempo real (aunque desactives el Bluetooth o la ubicación desde los ajustes rápidos) y se ponen en rojo, con el botón para arreglarlo.
    - La **búsqueda es automática y continua** mientras la página está abierta: enciende las pulseras y ocupan solas los puestos libres (primero Jugador 1, luego Jugador 2). **Identificar** hace parpadear esa pulsera en el color del jugador (amarillo o rojo) con unos pitidos, así ves enseguida cuál tienes en la mano; **Intercambiar J1 ↔ J2** las invierte sin desconectarlas. En el menú desplegable siempre puedes elegir otra o *Ninguna* (la que quitas a mano no la vuelve a poner la búsqueda). Una pulsera no puede estar asignada a dos jugadores.

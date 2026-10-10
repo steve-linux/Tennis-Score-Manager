@@ -145,6 +145,8 @@ object DeStrings : Strings {
     override val locationDialogTitle = "Standort einschalten"
     override val locationDialogText = "Ohne Standort kann der Ort nicht in der Match-Zusammenfassung stehen."
     override val continueWithout = "Ohne weiter"
+    override val addressLookup = "Adresse des Platzes suchen"
+    override val addressLookupHint = "Steht im Spielbericht neben den Koordinaten. Nutzt den Geocoding-Dienst des Telefons: Mit Google-Diensten werden die Koordinaten an Google gesendet."
     override val bandsRequiredTitle = "Bluetooth und Standort erforderlich"
     override val bandsRequiredText = "Für die Armbänder Bluetooth einschalten, die Standortberechtigung erteilen und den Standort eingeschaltet lassen."
     override val bandsMissingTitle = "Armbänder nicht zugeordnet"

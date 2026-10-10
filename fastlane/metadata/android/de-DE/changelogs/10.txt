@@ -1,0 +1,1 @@
+Neue Option «Adresse des Platzes suchen» auf der ersten Seite, standardmäßig aus: Ohne sie enthält der Spielbericht nur die Koordinaten. Die Adresse liefert der Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet.

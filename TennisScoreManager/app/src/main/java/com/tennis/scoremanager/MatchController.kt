@@ -966,6 +966,7 @@ class MatchController(
         locationJob = scope.launch {
             val loc = LocationHelper.current(app) ?: return@launch
             updateLocation(id, MatchLocation(loc.latitude, loc.longitude))
+            if (!options.value.addressLookup) return@launch
             val address = LocationHelper.address(app, loc, Reports.locale(options.value.lang))
             if (address != null) updateLocation(id, MatchLocation(loc.latitude, loc.longitude, address))
         }

@@ -70,8 +70,8 @@ android {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "2.4.1"
+        versionCode = 10
+        versionName = "2.4.2"
     }
 
     buildTypes {
@@ -1700,6 +1700,7 @@ class MatchController(
         locationJob = scope.launch {
             val loc = LocationHelper.current(app) ?: return@launch
             updateLocation(id, MatchLocation(loc.latitude, loc.longitude))
+            if (!options.value.addressLookup) return@launch
             val address = LocationHelper.address(app, loc, Reports.locale(options.value.lang))
             if (address != null) updateLocation(id, MatchLocation(loc.latitude, loc.longitude, address))
         }
@@ -3262,6 +3263,8 @@ data class MatchOptions(
     val voiceFiles: Boolean = false,
     /** Spegne i braccialetti quando si conferma la fine della partita (e quando si esce dall'app). */
     val bandsOffAtEnd: Boolean = true,
+    /** Cerca l'indirizzo del campo dalle coordinate (Geocoder: con i servizi Google le coordinate vanno a Google). Spento di default. */
+    val addressLookup: Boolean = false,
 )
 
 @Serializable
@@ -6263,6 +6266,8 @@ interface Strings {
     val locationDialogTitle: String
     val locationDialogText: String
     val continueWithout: String
+    val addressLookup: String
+    val addressLookupHint: String
     val bandsRequiredTitle: String
     val bandsRequiredText: String
     val bandsMissingTitle: String
@@ -6589,6 +6594,8 @@ object ItStrings : Strings {
     override val locationDialogTitle = "Abilita la posizione"
     override val locationDialogText = "Se non abiliti la posizione non potrai averla nei dati riepilogativi della partita."
     override val continueWithout = "Continua senza"
+    override val addressLookup = "Cerca l'indirizzo del campo"
+    override val addressLookupHint = "Nel riepilogo, accanto alle coordinate. Usa il servizio di geocodifica del telefono: con i servizi Google le coordinate vengono inviate a Google."
     override val bandsRequiredTitle = "Bluetooth e posizione obbligatori"
     override val bandsRequiredText = "Per usare i braccialetti devi attivare il Bluetooth, concedere il permesso di posizione e tenere attiva la posizione."
     override val bandsMissingTitle = "Braccialetti non associati"
@@ -6903,6 +6910,8 @@ object EnStrings : Strings {
     override val locationDialogTitle = "Turn on location"
     override val locationDialogText = "Without location it cannot be included in the match summary."
     override val continueWithout = "Continue without"
+    override val addressLookup = "Look up the court address"
+    override val addressLookupHint = "Shown in the summary next to the coordinates. Uses the phone's geocoding service: with Google services the coordinates are sent to Google."
     override val bandsRequiredTitle = "Bluetooth and location required"
     override val bandsRequiredText = "To use the wristbands turn on Bluetooth, allow location and keep location on."
     override val bandsMissingTitle = "Wristbands not assigned"
@@ -7240,6 +7249,8 @@ object DeStrings : Strings {
     override val locationDialogTitle = "Standort einschalten"
     override val locationDialogText = "Ohne Standort kann der Ort nicht in der Match-Zusammenfassung stehen."
     override val continueWithout = "Ohne weiter"
+    override val addressLookup = "Adresse des Platzes suchen"
+    override val addressLookupHint = "Steht im Spielbericht neben den Koordinaten. Nutzt den Geocoding-Dienst des Telefons: Mit Google-Diensten werden die Koordinaten an Google gesendet."
     override val bandsRequiredTitle = "Bluetooth und Standort erforderlich"
     override val bandsRequiredText = "Für die Armbänder Bluetooth einschalten, die Standortberechtigung erteilen und den Standort eingeschaltet lassen."
     override val bandsMissingTitle = "Armbänder nicht zugeordnet"
@@ -7570,6 +7581,8 @@ object EsStrings : Strings {
     override val locationDialogTitle = "Activa la ubicación"
     override val locationDialogText = "Si no activas la ubicación, el lugar no aparecerá en el resumen del partido."
     override val continueWithout = "Continuar sin ella"
+    override val addressLookup = "Buscar la dirección de la pista"
+    override val addressLookupHint = "Aparece en el resumen junto a las coordenadas. Usa el servicio de geocodificación del teléfono: con los servicios de Google, las coordenadas se envían a Google."
     override val bandsRequiredTitle = "Bluetooth y ubicación obligatorios"
     override val bandsRequiredText = "Para usar las pulseras activa el Bluetooth, concede el permiso de ubicación y mantén la ubicación activada."
     override val bandsMissingTitle = "Pulseras no vinculadas"
@@ -7902,6 +7915,8 @@ object FrStrings : Strings {
     override val locationDialogTitle = "Activer la localisation"
     override val locationDialogText = "Sans la localisation, le lieu ne pourra pas figurer dans le résumé du match."
     override val continueWithout = "Continuer sans"
+    override val addressLookup = "Rechercher l'adresse du court"
+    override val addressLookupHint = "Affichée dans le résumé à côté des coordonnées. Utilise le service de géocodage du téléphone : avec les services Google, les coordonnées sont envoyées à Google."
     override val bandsRequiredTitle = "Bluetooth et localisation obligatoires"
     override val bandsRequiredText = "Pour utiliser les bracelets, activez le Bluetooth, autorisez la localisation et laissez-la activée."
     override val bandsMissingTitle = "Bracelets non associés"
@@ -8235,6 +8250,8 @@ object PtStrings : Strings {
     override val locationDialogTitle = "Ative a localização"
     override val locationDialogText = "Sem a localização, o local não aparece no resumo da partida."
     override val continueWithout = "Continuar sem"
+    override val addressLookup = "Buscar o endereço da quadra"
+    override val addressLookupHint = "Aparece no resumo junto com as coordenadas. Usa o serviço de geocodificação do telefone: com os serviços do Google, as coordenadas são enviadas ao Google."
     override val bandsRequiredTitle = "Bluetooth e localização obrigatórios"
     override val bandsRequiredText = "Para usar as pulseiras, ative o Bluetooth, conceda a permissão de localização e mantenha a localização ativada."
     override val bandsMissingTitle = "Pulseiras não associadas"
@@ -9977,6 +9994,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Tv
@@ -10014,6 +10032,7 @@ import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
@@ -10021,6 +10040,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
+    val o by c.options.collectAsState()
     val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
@@ -10034,6 +10054,10 @@ fun SetupScreen(c: MatchController) {
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
             Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+            // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
+            SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                c.updateOptions { it.copy(addressLookup = v) }
+            }
         }
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(

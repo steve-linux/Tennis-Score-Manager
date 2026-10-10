@@ -1,0 +1,1 @@
+Nova opção «Buscar o endereço da quadra» na primeira página, desativada por padrão: sem ela, o resumo guarda só as coordenadas. O endereço vem do serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google.

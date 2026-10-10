@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Tv
@@ -57,6 +58,7 @@ import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SectionCard
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
@@ -64,6 +66,7 @@ import com.tennis.scoremanager.ui.TsmColors
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
+    val o by c.options.collectAsState()
     val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
@@ -77,6 +80,10 @@ fun SetupScreen(c: MatchController) {
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
             Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+            // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
+            SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                c.updateOptions { it.copy(addressLookup = v) }
+            }
         }
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(

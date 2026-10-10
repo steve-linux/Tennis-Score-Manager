@@ -1,0 +1,1 @@
+Nouvelle option « Rechercher l'adresse du court » sur la première page, désactivée par défaut : sans elle, le résumé ne garde que les coordonnées. L'adresse vient du service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google.

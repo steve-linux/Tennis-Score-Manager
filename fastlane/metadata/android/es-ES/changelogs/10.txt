@@ -1,0 +1,1 @@
+Nueva opción «Buscar la dirección de la pista» en la primera página, desactivada por defecto: sin ella, el resumen solo guarda las coordenadas. La dirección la da el servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google.

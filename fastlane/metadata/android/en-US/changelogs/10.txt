@@ -1,0 +1,1 @@
+New option «Look up the court address» on the first page, off by default: without it the summary keeps only the coordinates. The address comes from the phone's geocoding service, which with Google services sends the coordinates to Google.

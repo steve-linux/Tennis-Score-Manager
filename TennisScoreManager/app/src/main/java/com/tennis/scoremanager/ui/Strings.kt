@@ -157,6 +157,8 @@ interface Strings {
     val locationDialogTitle: String
     val locationDialogText: String
     val continueWithout: String
+    val addressLookup: String
+    val addressLookupHint: String
     val bandsRequiredTitle: String
     val bandsRequiredText: String
     val bandsMissingTitle: String
@@ -483,6 +485,8 @@ object ItStrings : Strings {
     override val locationDialogTitle = "Abilita la posizione"
     override val locationDialogText = "Se non abiliti la posizione non potrai averla nei dati riepilogativi della partita."
     override val continueWithout = "Continua senza"
+    override val addressLookup = "Cerca l'indirizzo del campo"
+    override val addressLookupHint = "Nel riepilogo, accanto alle coordinate. Usa il servizio di geocodifica del telefono: con i servizi Google le coordinate vengono inviate a Google."
     override val bandsRequiredTitle = "Bluetooth e posizione obbligatori"
     override val bandsRequiredText = "Per usare i braccialetti devi attivare il Bluetooth, concedere il permesso di posizione e tenere attiva la posizione."
     override val bandsMissingTitle = "Braccialetti non associati"
@@ -797,6 +801,8 @@ object EnStrings : Strings {
     override val locationDialogTitle = "Turn on location"
     override val locationDialogText = "Without location it cannot be included in the match summary."
     override val continueWithout = "Continue without"
+    override val addressLookup = "Look up the court address"
+    override val addressLookupHint = "Shown in the summary next to the coordinates. Uses the phone's geocoding service: with Google services the coordinates are sent to Google."
     override val bandsRequiredTitle = "Bluetooth and location required"
     override val bandsRequiredText = "To use the wristbands turn on Bluetooth, allow location and keep location on."
     override val bandsMissingTitle = "Wristbands not assigned"

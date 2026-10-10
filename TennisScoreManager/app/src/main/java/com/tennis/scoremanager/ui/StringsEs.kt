@@ -146,6 +146,8 @@ object EsStrings : Strings {
     override val locationDialogTitle = "Activa la ubicación"
     override val locationDialogText = "Si no activas la ubicación, el lugar no aparecerá en el resumen del partido."
     override val continueWithout = "Continuar sin ella"
+    override val addressLookup = "Buscar la dirección de la pista"
+    override val addressLookupHint = "Aparece en el resumen junto a las coordenadas. Usa el servicio de geocodificación del teléfono: con los servicios de Google, las coordenadas se envían a Google."
     override val bandsRequiredTitle = "Bluetooth y ubicación obligatorios"
     override val bandsRequiredText = "Para usar las pulseras activa el Bluetooth, concede el permiso de ubicación y mantén la ubicación activada."
     override val bandsMissingTitle = "Pulseras no vinculadas"

@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.4.1** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unten auf der ersten Seite.
+Verwendete und geprüfte Versionen: App **2.4.2** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unten auf der ersten Seite.
 
 ---
 
@@ -221,7 +221,7 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
 
 ## 7. So benutzt du die App
 
-1. **Neues Match** (optional): Verein, Platz, Einzel/Doppel, Namen (im Doppel zwei Namen pro Team). **Weiter**.
+1. **Neues Match** (optional): Verein, Platz, Einzel/Doppel, Namen (im Doppel zwei Namen pro Team). **Adresse des Platzes suchen** (standardmäßig aus) ergänzt den Spielbericht um die Adresse neben den Koordinaten: Sie kommt vom Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet. **Weiter**.
 2. **Modus und Regeln**:
    - *Schiedsrichter* oder *Armbänder*. Mit den Armbändern sind eingeschaltetes Bluetooth, Standortberechtigung und aktivierter Standort Pflicht: Die Zeilen unter **Voraussetzungen** aktualisieren sich live (auch wenn du Bluetooth oder Standort in den Schnelleinstellungen ausschaltest) und werden rot, mit einer Schaltfläche zum Beheben.
    - Die **Suche läuft automatisch und ohne Unterbrechung**, solange die Seite offen ist: Schalte die Armbänder ein, und sie belegen von selbst die freien Plätze (erst Spieler 1, dann Spieler 2). **Erkennen** lässt das jeweilige Armband in der Farbe des Spielers (gelb oder rot) blinken und piepen, so siehst du sofort, welches du in der Hand hast; **S1 ↔ S2 tauschen** vertauscht sie, ohne die Verbindung zu trennen. Im Auswahlmenü kannst du jederzeit ein anderes wählen oder *Keins* (ein von Hand entferntes Armband setzt die Suche nicht wieder ein). Ein Armband kann nicht zwei Spielern zugeordnet sein.

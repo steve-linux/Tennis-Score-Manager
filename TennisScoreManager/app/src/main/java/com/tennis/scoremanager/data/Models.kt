@@ -47,6 +47,8 @@ data class MatchOptions(
     val voiceFiles: Boolean = false,
     /** Spegne i braccialetti quando si conferma la fine della partita (e quando si esce dall'app). */
     val bandsOffAtEnd: Boolean = true,
+    /** Cerca l'indirizzo del campo dalle coordinate (Geocoder: con i servizi Google le coordinate vanno a Google). Spento di default. */
+    val addressLookup: Boolean = false,
 )
 
 @Serializable

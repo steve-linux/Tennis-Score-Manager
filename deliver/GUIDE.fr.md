@@ -13,7 +13,7 @@ Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis sel
 | `deliver/installa_tsm.sh` | Alternative au clone : crée **tout** le projet Android et le sketch uniquement avec des blocs `cat << 'TSM_EOF'` (le jar du Gradle wrapper est en base64). |
 | `deliver/GUIDE.fr.md` | Ce guide (en français) ; l'original italien est `deliver/GUIDA.md`, les autres traductions sont `deliver/GUIDE.en.md`, `.de`, `.es`, `.pt`. |
 
-Versions utilisées et vérifiées : app **2.4.1** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence en bas de la première page.
+Versions utilisées et vérifiées : app **2.4.2** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence en bas de la première page.
 
 ---
 
@@ -221,7 +221,7 @@ Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de cha
 
 ## 7. Utiliser l'application
 
-1. **Nouveau match** (facultatif) : club, court, simple/double, noms (en double, deux noms par équipe). **Suivant**.
+1. **Nouveau match** (facultatif) : club, court, simple/double, noms (en double, deux noms par équipe). **Rechercher l'adresse du court** (désactivé par défaut) ajoute l'adresse au résumé à côté des coordonnées : elle est demandée au service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google. **Suivant**.
 2. **Mode et règles** :
    - *Arbitre* ou *Bracelets*. Avec les bracelets, le Bluetooth activé, l'autorisation de localisation et la localisation activée sont obligatoires : les lignes des **Prérequis** se mettent à jour en temps réel (même si vous coupez le Bluetooth ou la localisation depuis le volet des réglages rapides) et deviennent rouges, avec le bouton pour corriger.
    - La **recherche est automatique et continue** tant que la page est ouverte : allumez les bracelets et ils se placent tout seuls sur les emplacements libres (d'abord Joueur 1, puis Joueur 2). **Identifier** fait clignoter le bracelet concerné dans la couleur du joueur (jaune ou rouge) avec des bips, pour voir tout de suite lequel vous avez en main ; **Échanger J1 ↔ J2** les inverse sans les déconnecter. Dans le menu déroulant, vous pouvez toujours en choisir un autre ou *Aucun* (un bracelet retiré à la main n'est pas remis par la recherche). Un bracelet ne peut pas être attribué à deux joueurs.

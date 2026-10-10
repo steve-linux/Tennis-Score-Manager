@@ -8,4 +8,4 @@ Tennis Score Manager tiene il punteggio di una partita di tennis secondo le rego
 * Tabellone a LED su TV o monitor: un secondo telefono col cavo HDMI, un Chromecast (trasmissione dello schermo) o un browser qualsiasi sull'hotspot del telefono.
 * Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON o immagine, oppure si condivide.
 
-Niente pubblicità, niente account, niente tracciamento. La rete serve solo al tabellone sulla rete locale. La posizione serve per il luogo della partita nel riepilogo e, come chiede Android, per la ricerca Bluetooth dei braccialetti.
+Niente pubblicità, niente account, niente tracciamento. La rete serve solo al tabellone sulla rete locale. La posizione serve per il luogo della partita nel riepilogo e, come chiede Android, per la ricerca Bluetooth dei braccialetti. L'indirizzo del campo si cerca solo se attivi l'opzione apposita: usa il servizio di geocodifica del telefono, che con i servizi Google invia le coordinate a Google.

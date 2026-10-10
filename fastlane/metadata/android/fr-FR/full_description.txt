@@ -8,4 +8,4 @@ Tennis Score Manager compte les points d'un match de tennis selon les règles de
 * Tableau d'affichage à LED sur une TV ou un écran : un second téléphone avec un câble HDMI, un Chromecast (diffusion de l'écran) ou n'importe quel navigateur sur le point d'accès du téléphone.
 * Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON ou image, ou à partager.
 
-Sans publicité, sans compte, sans pistage. Le réseau sert uniquement au tableau d'affichage sur le réseau local. La localisation sert au lieu du match dans le résumé et, comme l'exige Android, à la recherche Bluetooth des bracelets.
+Sans publicité, sans compte, sans pistage. Le réseau sert uniquement au tableau d'affichage sur le réseau local. La localisation sert au lieu du match dans le résumé et, comme l'exige Android, à la recherche Bluetooth des bracelets. L'adresse du court n'est recherchée que si vous activez l'option : elle utilise le service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google.

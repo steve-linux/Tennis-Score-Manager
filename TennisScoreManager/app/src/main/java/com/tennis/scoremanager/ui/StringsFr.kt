@@ -148,6 +148,8 @@ object FrStrings : Strings {
     override val locationDialogTitle = "Activer la localisation"
     override val locationDialogText = "Sans la localisation, le lieu ne pourra pas figurer dans le résumé du match."
     override val continueWithout = "Continuer sans"
+    override val addressLookup = "Rechercher l'adresse du court"
+    override val addressLookupHint = "Affichée dans le résumé à côté des coordonnées. Utilise le service de géocodage du téléphone : avec les services Google, les coordonnées sont envoyées à Google."
     override val bandsRequiredTitle = "Bluetooth et localisation obligatoires"
     override val bandsRequiredText = "Pour utiliser les bracelets, activez le Bluetooth, autorisez la localisation et laissez-la activée."
     override val bandsMissingTitle = "Bracelets non associés"

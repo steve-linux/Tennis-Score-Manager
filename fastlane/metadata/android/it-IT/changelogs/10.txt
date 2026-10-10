@@ -1,0 +1,1 @@
+Nuova opzione «Cerca l'indirizzo del campo» nella prima pagina, spenta di default: senza, nel riepilogo restano solo le coordinate. L'indirizzo si ottiene dal servizio di geocodifica del telefono, che con i servizi Google invia le coordinate a Google.
