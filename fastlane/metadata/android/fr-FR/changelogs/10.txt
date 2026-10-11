@@ -1,1 +1,2 @@
 Nouvelle option « Rechercher l'adresse du court » sur la première page, désactivée par défaut : sans elle, le résumé ne garde que les coordonnées. L'adresse vient du service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google.
+Application bien plus légère (environ 2 Mo au lieu de 13). Le texte partagé du résumé affiche le score sur une seule ligne.

@@ -1,1 +1,2 @@
 Nuova opzione «Cerca l'indirizzo del campo» nella prima pagina, spenta di default: senza, nel riepilogo restano solo le coordinate. L'indirizzo si ottiene dal servizio di geocodifica del telefono, che con i servizi Google invia le coordinate a Google.
+App più leggera (circa 2 MB invece di 13). Il testo condiviso del riepilogo mostra il risultato in una sola riga.

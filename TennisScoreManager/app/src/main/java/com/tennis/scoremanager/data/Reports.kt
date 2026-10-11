@@ -98,15 +98,6 @@ object Reports {
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")
         sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${scoreLine(state, w)}")
         sb.appendLine()
-        for (side in listOf(Side.P1, Side.P2)) {
-            val sets = state.sets.joinToString("  ") { set ->
-                val tb = if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) "(${set.tb(side)})" else ""
-                "${set.shown(side)}$tb"
-            }
-            val mark = if (side == w) " ✔" else ""
-            sb.appendLine("${names.short(side)}: $sets$mark")
-        }
-        sb.appendLine()
         sb.appendLine("⏱ ${s.duration}: ${duration(rec.clockMs)}")
         sb.appendLine("🕘 ${s.startTime}: ${time(rec.startedAt, lang)} · ${s.endTime}: ${time(rec.endedAt, lang)}")
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
