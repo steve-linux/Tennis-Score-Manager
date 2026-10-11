@@ -70,13 +70,15 @@ android {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "2.4.2"
+        versionCode = 11
+        versionName = "2.4.3"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8: riduce e ottimizza il codice, toglie le risorse inutilizzate
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -131,7 +133,18 @@ cat > "$DEST/app/proguard-rules.pro" << 'TSM_EOF'
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Nessuna regola particolare: la build release non usa la minificazione.
+# Regole R8 della build release. Le librerie (AndroidX, Compose, coroutine,
+# kotlinx-serialization) portano già le loro regole; qui solo ciò che R8 non può dedurre.
+
+# Tabellone (DisplayActivity): scoreboard.html chiama window.TSMDisplay.lost(), un metodo
+# visibile solo da JavaScript che R8 altrimenti rinominerebbe o toglierebbe.
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# Numeri di riga leggibili negli stack trace delle segnalazioni di errore
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/AndroidManifest.xml
@@ -3359,6 +3372,10 @@ object Reports {
 
     fun locale(lang: Lang): Locale = lang.locale
 
+    /** Sito dell'app, nella pagina della lingua scelta (l'italiano è la pagina principale). */
+    fun siteUrl(lang: Lang): String = SITE_URL + if (lang == Lang.IT) "" else "${lang.code}/"
+    private const val SITE_URL = "https://tennis-score-manager.netlify.app/"
+
     fun duration(ms: Long): String {
         val s = ms / 1000
         return String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60)
@@ -3429,15 +3446,6 @@ object Reports {
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")
         sb.appendLine("${s.result}: ${names.short(w)} ${s.vs} ${names.short(w.other)}  ${scoreLine(state, w)}")
         sb.appendLine()
-        for (side in listOf(Side.P1, Side.P2)) {
-            val sets = state.sets.joinToString("  ") { set ->
-                val tb = if (set.hasTiebreak && !set.matchTiebreak && set.winner != side) "(${set.tb(side)})" else ""
-                "${set.shown(side)}$tb"
-            }
-            val mark = if (side == w) " ✔" else ""
-            sb.appendLine("${names.short(side)}: $sets$mark")
-        }
-        sb.appendLine()
         sb.appendLine("⏱ ${s.duration}: ${duration(rec.clockMs)}")
         sb.appendLine("🕘 ${s.startTime}: ${time(rec.startedAt, lang)} · ${s.endTime}: ${time(rec.endedAt, lang)}")
         sb.appendLine("📍 ${s.place}: ${place(rec, s)}")
@@ -3445,7 +3453,8 @@ object Reports {
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
         sb.appendLine()
-        sb.append("#tennis · ${s.generatedWith}")
+        sb.appendLine("#tennis · ${s.generatedWith}")
+        sb.append(siteUrl(lang))
         return sb.toString()
     }
 
@@ -3525,7 +3534,17 @@ object Reports {
         row("${s.startTime} / ${s.endTime}", "${time(rec.startedAt, lang)} – ${time(rec.endedAt, lang)}")
         row(s.place, rec.location?.address?.ifBlank { null } ?: place(rec, s))
         row(s.format, formatLabel(rec, s))
-        c.drawText(s.generatedWith, w / 2f, h - 50f, paint(30f, grey, false, Paint.Align.CENTER))
+        // "Creato con Tennis Score Manager · indirizzo del sito", rimpicciolito se non ci sta
+        val credit = "${s.generatedWith} · "
+        val site = siteUrl(lang).removePrefix("https://").removeSuffix("/")
+        val creditPaint = paint(30f, grey)
+        val sitePaint = paint(30f, Color.rgb(198, 244, 50), true)
+        val scale = minOf(1f, (w - 80f) / (creditPaint.measureText(credit) + sitePaint.measureText(site)))
+        creditPaint.textSize *= scale
+        sitePaint.textSize *= scale
+        val creditX = (w - creditPaint.measureText(credit) - sitePaint.measureText(site)) / 2f
+        c.drawText(credit, creditX, h - 50f, creditPaint)
+        c.drawText(site, creditX + creditPaint.measureText(credit), h - 50f, sitePaint)
         return bmp
     }
 

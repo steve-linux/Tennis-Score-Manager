@@ -1,0 +1,1 @@
+El resumen compartido (texto e imagen) ahora incluye el enlace al sitio web de la app, en el idioma elegido.

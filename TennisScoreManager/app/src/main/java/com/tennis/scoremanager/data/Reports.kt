@@ -28,6 +28,10 @@ object Reports {
 
     fun locale(lang: Lang): Locale = lang.locale
 
+    /** Sito dell'app, nella pagina della lingua scelta (l'italiano è la pagina principale). */
+    fun siteUrl(lang: Lang): String = SITE_URL + if (lang == Lang.IT) "" else "${lang.code}/"
+    private const val SITE_URL = "https://tennis-score-manager.netlify.app/"
+
     fun duration(ms: Long): String {
         val s = ms / 1000
         return String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60)
@@ -105,7 +109,8 @@ object Reports {
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
         sb.appendLine()
-        sb.append("#tennis · ${s.generatedWith}")
+        sb.appendLine("#tennis · ${s.generatedWith}")
+        sb.append(siteUrl(lang))
         return sb.toString()
     }
 
@@ -185,7 +190,17 @@ object Reports {
         row("${s.startTime} / ${s.endTime}", "${time(rec.startedAt, lang)} – ${time(rec.endedAt, lang)}")
         row(s.place, rec.location?.address?.ifBlank { null } ?: place(rec, s))
         row(s.format, formatLabel(rec, s))
-        c.drawText(s.generatedWith, w / 2f, h - 50f, paint(30f, grey, false, Paint.Align.CENTER))
+        // "Creato con Tennis Score Manager · indirizzo del sito", rimpicciolito se non ci sta
+        val credit = "${s.generatedWith} · "
+        val site = siteUrl(lang).removePrefix("https://").removeSuffix("/")
+        val creditPaint = paint(30f, grey)
+        val sitePaint = paint(30f, Color.rgb(198, 244, 50), true)
+        val scale = minOf(1f, (w - 80f) / (creditPaint.measureText(credit) + sitePaint.measureText(site)))
+        creditPaint.textSize *= scale
+        sitePaint.textSize *= scale
+        val creditX = (w - creditPaint.measureText(credit) - sitePaint.measureText(site)) / 2f
+        c.drawText(credit, creditX, h - 50f, creditPaint)
+        c.drawText(site, creditX + creditPaint.measureText(credit), h - 50f, sitePaint)
         return bmp
     }
 

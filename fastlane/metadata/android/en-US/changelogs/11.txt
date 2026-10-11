@@ -1,0 +1,1 @@
+The shared summary (text and image) now includes a link to the app's website, in the chosen language.

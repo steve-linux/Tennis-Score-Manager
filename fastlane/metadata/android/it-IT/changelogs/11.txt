@@ -1,0 +1,1 @@
+Il riepilogo condiviso (testo e immagine) ora contiene il link al sito dell'app, nella lingua scelta.

@@ -1,0 +1,1 @@
+Le résumé partagé (texte et image) contient désormais le lien vers le site de l'application, dans la langue choisie.
