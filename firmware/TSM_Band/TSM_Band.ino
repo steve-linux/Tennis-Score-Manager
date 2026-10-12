@@ -87,7 +87,7 @@ static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "p
 enum : uint8_t {
   T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_NOT_SENT, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
-  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, T_CALIB, N_TXT
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, T_CALIB, T_MEM_FULL, N_TXT
 };
 #define TXT_PAIRING    txt(T_PAIRING)
 #define TXT_PAIRED     txt(T_PAIRED)
@@ -151,27 +151,27 @@ static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
     "NON CONNESSO", "NON INVIATO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
-    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO", "CALIBRAZIONE" },
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO", "CALIBRAZIONE", "MEMORIA PIENA" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
     "NOT CONNECTED", "NOT SENT", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
-    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY", "CALIBRATION" },
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY", "CALIBRATION", "MEMORY FULL" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "NON ENVOYE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE", "CALIBRAGE" },
+    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE", "CALIBRAGE", "MEMOIRE PLEINE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "NICHT GESENDET", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
-    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN", "KALIBRIERUNG" },
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN", "KALIBRIERUNG", "SPEICHER VOLL" },
   { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "NO ENVIADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
-    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON", "CALIBRACION" },
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON", "CALIBRACION", "MEMORIA LLENA" },
   { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "NAO ENVIADO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
-    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO", "CALIBRACAO" },
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO", "CALIBRACAO", "MEMORIA CHEIA" },
 };
 
 static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
@@ -716,18 +716,76 @@ static void imuUpdateNeeded() {
   else if (!want && imuOn) imuStop();
 }
 
-// Esempi di calibrazione salvati nel braccialetto (un buffer solo: si usa da una funzione alla volta).
-static uint8_t modelBlob[swing::StrokeClassifier::kMaxSerializedSize];
+// Esempi di calibrazione salvati nel braccialetto, un blocco per colpo ("knn0".."knn3"): ogni nuovo esempio
+// riscrive solo il suo (~0,4 KB). Con un blocco unico da 3,6 KB riscritto a ogni esempio lo spazio delle
+// impostazioni (NVS, ~20 KB condivisi col Bluetooth) finiva e i salvataggi fallivano in silenzio.
+// Blocco: [versione, numero di esempi] + per esempio 11 feature in int16 (millesimi, little endian).
+static const uint8_t MODEL_VERSION = 2;
+static const float   FEATURE_SCALE = 1000.0f;
+static const size_t  EXAMPLE_SIZE  = 1 + swing::kFeatureCount * sizeof(float);  // in serialize(): [colpo, 11 float]
+static uint8_t modelBlob[swing::StrokeClassifier::kMaxSerializedSize];            // serialize() del classificatore
+static uint8_t strokeBlob[2 + swing::StrokeClassifier::kMaxPerClass * swing::kFeatureCount * 2];
 
-static void saveModel() {
+static void modelKey(char* key, size_t size, uint8_t stroke) { snprintf(key, size, "knn%u", stroke); }
+
+static bool saveStroke(uint8_t stroke) {
   const size_t len = classifier.serialize(modelBlob, sizeof(modelBlob));
-  if (len) prefs.putBytes("knn", modelBlob, len);
+  uint8_t n = 0;
+  uint8_t* p = strokeBlob + 2;
+  for (size_t off = 8; off + EXAMPLE_SIZE <= len; off += EXAMPLE_SIZE) {
+    if (modelBlob[off] != stroke) continue;
+    for (int k = 0; k < swing::kFeatureCount; k++) {
+      float v;
+      memcpy(&v, modelBlob + off + 1 + k * sizeof(float), sizeof(float));
+      const int16_t q = (int16_t)constrain(lroundf(v * FEATURE_SCALE), -32767L, 32767L);
+      *p++ = (uint8_t)q;
+      *p++ = (uint8_t)(q >> 8);
+    }
+    n++;
+  }
+  strokeBlob[0] = MODEL_VERSION;
+  strokeBlob[1] = n;
+  char key[8];
+  modelKey(key, sizeof(key), stroke);
+  const size_t size = p - strokeBlob;
+  return prefs.putBytes(key, strokeBlob, size) == size;
+}
+
+// [stroke] = il colpo cambiato, -1 = tutti. Memoria piena: lo si dice invece di perdere gli esempi in silenzio.
+static void saveModel(int stroke = -1) {
+  bool ok = true;
+  for (uint8_t s = 0; s < swing::kStrokeCount; s++) {
+    if (stroke < 0 || s == stroke) ok = saveStroke(s) && ok;
+  }
+  if (!ok) {
+    drawMessage(txt(T_MEM_FULL), "", C_RED);
+    showFor(3000);
+    beep(500, 120);
+    beep(350, 300);
+  }
 }
 
 static void loadModel() {
-  if (!prefs.isKey("knn")) return;
-  const size_t len = prefs.getBytes("knn", modelBlob, sizeof(modelBlob));
-  if (len) classifier.deserialize(modelBlob, len);
+  for (uint8_t s = 0; s < swing::kStrokeCount; s++) {
+    char key[8];
+    modelKey(key, sizeof(key), s);
+    if (!prefs.isKey(key)) continue;
+    const size_t len = prefs.getBytes(key, strokeBlob, sizeof(strokeBlob));
+    if (len < 2 || strokeBlob[0] != MODEL_VERSION) continue;
+    const size_t n = min<size_t>(strokeBlob[1], (len - 2) / (swing::kFeatureCount * 2));
+    for (size_t i = 0; i < n; i++) {
+      swing::Features f;
+      for (int k = 0; k < swing::kFeatureCount; k++) f[k] = le16(strokeBlob + 2 + (i * swing::kFeatureCount + k) * 2) / FEATURE_SCALE;
+      classifier.add(s, f);
+    }
+  }
+  // Prima versione del 2.4: tutti gli esempi nel blocco unico "knn". Lo si toglie (libera spazio) e, se non ci
+  // sono ancora esempi nel formato nuovo, lo si converte.
+  if (prefs.isKey("knn")) {
+    const size_t len = prefs.getBytes("knn", modelBlob, sizeof(modelBlob));
+    prefs.remove("knn");
+    if (len && classifier.total() == 0 && classifier.deserialize(modelBlob, len)) saveModel();
+  }
 }
 
 static void drawCalib() {
@@ -761,12 +819,66 @@ static void sendStroke(const swing::StrokeClassifier::Result& r, const swing::Sw
   strokeChr->notify(data, sizeof(data), connHandle);
 }
 
+// Diagnostica sulla seriale USB (solo con un PC collegato), per tarare il riconoscimento:
+//   swing,<cal|play>,<colpo 0-3 / 255>,<confidenza %>,<picco °/s>,<picco g>,<11 feature>
+// e, scrivendo "d" nel monitor seriale, gli esempi salvati (knn,...), una lettura del sensore (imu,...) e gli
+// ultimi colpi riconosciuti (recent,...): così si prova anche col braccialetto staccato e lo si collega dopo.
+static swing::ImuSample lastSample{};
+
+struct RecentSwing {
+  uint8_t stroke, conf;
+  uint16_t gyro;
+  float acc;
+  swing::Features f;
+};
+static const uint8_t RECENT_MAX = 40;
+static RecentSwing recent[RECENT_MAX];
+static uint8_t recentN = 0, recentNext = 0;
+
+static void printFeatures(const swing::Features& f) {
+  for (float v : f) Serial.printf(",%.3f", v);
+  Serial.println();
+}
+
+static void debugSwing(const char* kind, uint8_t stroke, float conf, const swing::Swing& sw) {
+  if (kind[0] == 'p') {
+    recent[recentNext] = { stroke, (uint8_t)lroundf(conf * 100.0f), (uint16_t)lroundf(sw.peakGyro), sw.peakAccel, sw.features };
+    recentNext = (recentNext + 1) % RECENT_MAX;
+    if (recentN < RECENT_MAX) recentN++;
+  }
+  if (!Serial) return;
+  Serial.printf("swing,%s,%u,%d,%.0f,%.2f", kind, stroke, (int)lroundf(conf * 100.0f), sw.peakGyro, sw.peakAccel);
+  printFeatures(sw.features);
+}
+
+static void debugDump() {
+  const swing::ImuSample& a = lastSample;
+  Serial.printf("imu,on=%d,accFirst=%d,acc_g=%.2f,%.2f,%.2f,gyro_dps=%.1f,%.1f,%.1f\n", imuOn, fifoAccFirst,
+                a.ax, a.ay, a.az, a.gx, a.gy, a.gz);
+  // Gli esempi si leggono dal blob salvato: 8 byte di intestazione, poi [colpo, 11 float] per esempio.
+  const size_t len = classifier.serialize(modelBlob, sizeof(modelBlob));
+  const size_t ex = 1 + swing::kFeatureCount * sizeof(float);
+  for (size_t off = 8; off + ex <= len; off += ex) {
+    swing::Features f;
+    memcpy(f.data(), modelBlob + off + 1, swing::kFeatureCount * sizeof(float));
+    Serial.printf("knn,%u", modelBlob[off]);
+    printFeatures(f);
+  }
+  for (uint8_t i = 0; i < recentN; i++) {
+    const RecentSwing& r = recent[(recentNext + RECENT_MAX - recentN + i) % RECENT_MAX];  // dal più vecchio
+    Serial.printf("recent,%u,%u,%u,%.2f", r.stroke, r.conf, r.gyro, r.acc);
+    printFeatures(r.f);
+  }
+  Serial.println("fine");
+}
+
 static void onSwing(const swing::Swing& sw, uint32_t now) {
   lastActivity = now;  // un colpo vuol dire che si sta giocando: niente spegnimento per inattività
   idleWarned = false;
   if (calStroke >= 0) {
     classifier.add(calStroke, sw.features);
-    saveModel();
+    debugSwing("cal", calStroke, 1.0f, sw);
+    saveModel(calStroke);
     beep(2400, 60);
     drawCalib();
     publishConfig(true);
@@ -774,6 +886,7 @@ static void onSwing(const swing::Swing& sw, uint32_t now) {
   }
   if (!cfg.sw) return;
   const swing::StrokeClassifier::Result r = classifier.classify(sw.features);
+  debugSwing("play", r.stroke, r.confidence, sw);
   strokeIndex++;
   sendStroke(r, sw);
   // A schermo solo se non copre altro (punteggio, messaggi): display spento o col colpo precedente.
@@ -795,6 +908,7 @@ static void onImuFrame(const uint8_t* f, uint32_t now) {
     le16(g + 2) * GYR_LSB_DPS, -le16(g) * GYR_LSB_DPS, le16(g + 4) * GYR_LSB_DPS,
   };
   swing::Swing sw;
+  lastSample = s;
   if (detector.push(s, sw)) onSwing(sw, now);
 }
 
@@ -955,7 +1069,7 @@ static void handleMessage(char* msg) {
       const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
       if (k >= 0 && k < swing::kStrokeCount) {
         classifier.clear((uint8_t)k);
-        saveModel();
+        saveModel(k);
       }
       if (calStroke >= 0) drawCalib();
       publishConfig(true);
@@ -1422,6 +1536,7 @@ void setup() {
   cfgM5.internal_spk  = true;    // configurato ma spento: si accende solo per i bip
   cfgM5.internal_mic  = false;
   cfgM5.led_brightness = 0;
+  cfgM5.serial_baudrate = 115200;  // solo diagnostica dei colpi: senza PC collegato non si scrive niente
   M5.begin(cfgM5);
 
   setupBle();  // carica anche le impostazioni
@@ -1536,6 +1651,9 @@ void loop() {
   if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
   serviceEvents(now);
   drainImu(now);
+  while (Serial.available()) {
+    if (Serial.read() == 'd') debugDump();
+  }
 
   // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
   if (!connected && !justDisconnect && usbOn) {

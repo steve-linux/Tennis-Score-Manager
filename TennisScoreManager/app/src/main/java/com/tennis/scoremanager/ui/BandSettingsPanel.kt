@@ -190,7 +190,7 @@ private fun StrokesSection(c: MatchController, side: Side, settings: BandSetting
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(s.strokeName(stroke), color = if (active) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("$n/${BandSettings.MAX_EXAMPLES}", color = if (n >= BandSettings.MIN_EXAMPLES) TsmColors.Ball else TsmColors.TextDim,
                 fontWeight = FontWeight.Bold)
             IconButton(onClick = { confirmClear = stroke }, enabled = n > 0) {

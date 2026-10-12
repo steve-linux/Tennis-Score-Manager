@@ -35,7 +35,10 @@ class StrokeClassifier {
   static constexpr int   kMaxPerClass = 20;  // oltre, l'esempio più vecchio viene sostituito
   static constexpr int   kMinPerClass = 3;   // esempi minimi perché una classe conti
   static constexpr int   kK = 3;
-  static constexpr float kRejectDistance = 2.5f;  // distanza RMS in deviazioni standard
+  // Distanza RMS (in deviazioni standard) oltre la quale il colpo è "sconosciuto". Sui colpi veri il più
+  // vicino della classe giusta sta entro ~0,7 (mediana 0,3); colpi diversi da tutti gli esempi, come con lo
+  // stick girato rispetto alla calibrazione, partono da ~1,0: meglio "?" che un nome a caso.
+  static constexpr float kRejectDistance = 0.9f;
 
   struct Result {
     uint8_t stroke;      // Stroke o kUnknown
