@@ -25,6 +25,11 @@
   per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento; dalla 2.2.1 anche
   il conto alla rovescia prima dello spegnimento).
 
+  Colpi (dalla 2.4, da SwingSense): con "Riconoscimento colpi" acceso nelle impostazioni il
+  braccialetto riconosce dritto, rovescio, servizio e volée dall'IMU e li manda all'app (STROKE).
+  Il riconoscimento impara da chi lo indossa: la calibrazione si fa dall'app (qualche colpo per
+  tipo, salvato nel braccialetto). swing_detector.* e stroke_classifier.* sono copiati da SwingSense.
+
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
     - NimBLE-Arduino >= 2.1     (di h2zero)
@@ -39,7 +44,10 @@
 #include <Preferences.h>
 #include <driver/rtc_io.h>
 
-#define FW_VERSION "2.3"
+#include "stroke_classifier.h"
+#include "swing_detector.h"
+
+#define FW_VERSION "2.4"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -65,6 +73,8 @@ static const int      CV_FULL_MV           = 4180;                 // riserva: 4
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 static const uint32_t EVT_MAX_AGE_MS       = 8000;                 // tasto non confermato entro 8 s: non vale più, va ripremuto
 static const uint32_t EVT_SEND_MAX_MS      = 6500;                 // oltre non si (ri)manda: la conferma deve arrivare prima degli 8 s
+static const uint32_t STROKE_SHOW_MS       = 1200;                 // colpo riconosciuto a schermo
+static const uint32_t CALIB_SHOW_MS        = 60000;                // schermata di calibrazione (si rinnova a ogni colpo)
 
 // Tasti dell'M5StickS3 (gli stessi pin di M5Unified), premuto = basso. Sono pin RTC (0-21 sull'S3):
 // possono svegliare il braccialetto dal deep sleep.
@@ -77,7 +87,7 @@ static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "p
 enum : uint8_t {
   T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_NOT_SENT, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
-  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, N_TXT
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, T_CALIB, N_TXT
 };
 #define TXT_PAIRING    txt(T_PAIRING)
 #define TXT_PAIRED     txt(T_PAIRED)
@@ -103,6 +113,8 @@ enum : uint8_t {
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
+                                                             // dalla 2.4 anche ";sw=0;swd=1;swc=8,9,10,7;cal=-1" (colpi)
+#define STROKE_UUID  "7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // colpo riconosciuto (2.4): vedi sendStroke()
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
 enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
@@ -126,6 +138,8 @@ struct Settings {
   uint16_t lostS;      // spegnimento se il telefono si scollega (s)
   uint16_t idleMin;    // spegnimento se collegato ma inattivo (min)
   uint8_t  lang;       // lingua dei testi (L_IT...), la imposta l'app
+  bool     sw;         // riconoscimento colpi (dalla 2.4): IMU acceso, consuma di più
+  bool     swd;        // mostra a schermo il colpo riconosciuto
 };
 static Settings cfg;
 static Preferences prefs;
@@ -137,30 +151,44 @@ static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
     "NON CONNESSO", "NON INVIATO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
-    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO" },
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO", "CALIBRAZIONE" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
     "NOT CONNECTED", "NOT SENT", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
-    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY" },
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY", "CALIBRATION" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "NON ENVOYE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
+    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE", "CALIBRAGE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "NICHT GESENDET", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
-    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN", "KALIBRIERUNG" },
   { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "NO ENVIADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
-    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON", "CALIBRACION" },
   { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "NAO ENVIADO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
-    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO", "CALIBRACAO" },
 };
 
 static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
+
+// Nomi dei colpi (stesso ordine di swing::Stroke), una riga per lingua.
+static const char* const STROKE_TXT[N_LANG][swing::kStrokeCount] = {
+  { "DRITTO", "ROVESCIO", "SERVIZIO", "VOLEE" },
+  { "FOREHAND", "BACKHAND", "SERVE", "VOLLEY" },
+  { "COUP DROIT", "REVERS", "SERVICE", "VOLEE" },
+  { "VORHAND", "RUECKHAND", "AUFSCHLAG", "VOLLEY" },
+  { "DERECHA", "REVES", "SAQUE", "VOLEA" },
+  { "FOREHAND", "BACKHAND", "SAQUE", "VOLEIO" },
+};
+
+static const char* strokeName(uint8_t stroke) {
+  return stroke < swing::kStrokeCount ? STROKE_TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][stroke] : "?";
+}
 
 // ------------------------------------------------------------------ stato
 static NimBLEServer*         server   = nullptr;
@@ -168,6 +196,7 @@ static NimBLECharacteristic* evtChr   = nullptr;
 static NimBLECharacteristic* battChr  = nullptr;
 static NimBLECharacteristic* statusChr = nullptr;
 static NimBLECharacteristic* configChr = nullptr;
+static NimBLECharacteristic* strokeChr = nullptr;
 
 static volatile bool connected      = false;
 static volatile bool justConnected  = false;
@@ -249,6 +278,17 @@ static char     identifyL2[32];
 // Cicalino: acceso solo mentre suona
 static bool     spkOn = false;
 static uint32_t spkOffAt = 0;
+
+// Colpi (dalla 2.4): vedi la sezione "colpi"
+static swing::SwingDetector    detector;
+static swing::StrokeClassifier classifier;
+static bool     imuReady = false;      // BMI270 inizializzato (file di configurazione caricato una volta)
+static bool     imuOn = false;         // sensori accesi e FIFO attiva
+static uint8_t  imuAddr = 0;
+static bool     fifoAccFirst = false;  // ordine dei dati nella FIFO (vedi imuStart)
+static int8_t   calStroke = -1;        // colpo in calibrazione (0-3), -1 = nessuno
+static uint16_t strokeIndex = 0;       // colpi riconosciuti da questa accensione
+static uint32_t strokeOffAt = 0;       // displayOffAt dell'ultimo colpo a schermo: finché è lo stesso lo si può sostituire
 
 // ------------------------------------------------------------------ cicalino
 static void beep(float freq, uint32_t ms) {
@@ -540,6 +580,8 @@ static void loadSettings() {
   cfg.lostS   = prefs.getUShort("lost", 180);
   cfg.idleMin = prefs.getUShort("idle", 30);
   cfg.lang    = prefs.getUChar("lang", L_IT);
+  cfg.sw      = prefs.getBool("sw", false);
+  cfg.swd     = prefs.getBool("swd", true);
   clampSettings();
 }
 
@@ -554,13 +596,20 @@ static void saveSettings() {
   prefs.putUShort("lost", cfg.lostS);
   prefs.putUShort("idle", cfg.idleMin);
   prefs.putUChar("lang", cfg.lang);
+  prefs.putBool("sw", cfg.sw);
+  prefs.putBool("swd", cfg.swd);
 }
 
+// Dalla 2.4 anche i colpi: riconoscimento acceso, colpo a schermo, esempi di calibrazione per colpo
+// (dritto, rovescio, servizio, volée) e colpo in calibrazione (-1 = nessuno).
 static void publishConfig(bool notify) {
-  char buf[128];
-  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s",
+  char buf[192];
+  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s"
+           ";sw=%u;swd=%u;swc=%d,%d,%d,%d;cal=%d",
            FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin,
-           LANG_CODES[cfg.lang]);
+           LANG_CODES[cfg.lang], cfg.sw ? 1 : 0, cfg.swd ? 1 : 0,
+           classifier.count(swing::kForehand), classifier.count(swing::kBackhand),
+           classifier.count(swing::kServe), classifier.count(swing::kVolley), calStroke);
   configChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) configChr->notify();
 }
@@ -574,6 +623,191 @@ static void applyName() {
   if (wasOn) adv->stop();
   adv->setScanResponseData(scanData);
   if (wasOn) adv->start();
+}
+
+// ------------------------------------------------------------------ colpi (dalla 2.4)
+// Il BMI270 mette accelerometro (±16 g) e giroscopio (±2000 °/s) a 100 Hz nella sua FIFO (~1,7 s) e il loop
+// la svuota a ogni giro. Tutto l'I2C resta così nel loop (le letture di M5Unified non hanno un lucchetto:
+// un task a parte si scontrerebbe con PM1 e codec), nessun campione si perde mentre il display si ridisegna
+// e la CPU non si sveglia 100 volte al secondo. Registri dal datasheet BMI270.
+static const uint8_t BMI_FIFO_LEN  = 0x24;  // 2 byte, 14 bit: byte nella FIFO
+static const uint8_t BMI_FIFO_DATA = 0x26;
+static const uint8_t BMI_ACC_CONF  = 0x40;
+static const uint8_t BMI_ACC_RANGE = 0x41;
+static const uint8_t BMI_GYR_CONF  = 0x42;
+static const uint8_t BMI_GYR_RANGE = 0x43;
+static const uint8_t BMI_FIFO_CFG0 = 0x48;
+static const uint8_t BMI_FIFO_CFG1 = 0x49;
+static const uint8_t BMI_PWR_CONF  = 0x7C;
+static const uint8_t BMI_PWR_CTRL  = 0x7D;
+static const uint8_t BMI_CMD       = 0x7E;
+static const uint8_t FIFO_FRAME    = 12;    // senza header: due terne da 3 x int16
+static const uint8_t FIFO_CHUNK    = 10;    // frame per lettura I2C
+static const float   ACC_LSB_G     = 16.0f / 32768.0f;
+static const float   GYR_LSB_DPS   = 2000.0f / 32768.0f;
+
+static void imuWrite(uint8_t reg, uint8_t val) { M5.In_I2C.writeRegister8(imuAddr, reg, val, 400000); }
+
+static uint16_t fifoBytes() {
+  uint8_t b[2];
+  if (!M5.In_I2C.readRegister(imuAddr, BMI_FIFO_LEN, b, 2, 400000)) return 0;
+  return (uint16_t)((b[0] | (b[1] << 8)) & 0x3FFF);
+}
+
+static int16_t le16(const uint8_t* p) { return (int16_t)(p[0] | (p[1] << 8)); }
+
+static float norm3(const uint8_t* p) {
+  const float x = le16(p), y = le16(p + 2), z = le16(p + 4);
+  return sqrtf(x * x + y * y + z * z);
+}
+
+static bool imuStart() {
+  if (!imuReady) {
+    // Prima volta: M5Unified carica nel BMI270 il suo file di configurazione (~8 KB).
+    if (!M5.Imu.begin(&M5.In_I2C, M5.getBoard()) || M5.Imu.getType() != m5::imu_bmi270) return false;
+    imuAddr = M5.Imu.getImuInstancePtr(0)->getAddress();
+    imuReady = true;
+  }
+  imuWrite(BMI_PWR_CONF, 0x00);   // niente risparmio avanzato: serve a campionare con continuità
+  delay(2);
+  imuWrite(BMI_PWR_CTRL, 0x06);   // accelerometro + giroscopio
+  imuWrite(BMI_ACC_CONF, 0xA8);   // 100 Hz, filtro normale, alte prestazioni
+  imuWrite(BMI_ACC_RANGE, 0x03);  // ±16 g: al polso un servizio supera gli 8 g
+  imuWrite(BMI_GYR_CONF, 0xA8);   // 100 Hz
+  imuWrite(BMI_GYR_RANGE, 0x00);  // ±2000 °/s
+  imuWrite(BMI_FIFO_CFG0, 0x00);  // continua (a FIFO piena si perdono i più vecchi), senza sensortime
+  imuWrite(BMI_FIFO_CFG1, 0xC0);  // giroscopio + accelerometro, senza header
+  delay(60);                      // avvio del giroscopio
+  imuWrite(BMI_CMD, 0xB0);        // svuota la FIFO
+  if (M5.In_I2C.readRegister8(imuAddr, BMI_ACC_RANGE, 400000) != 0x03) return false;
+
+  // Il datasheet mette il giroscopio prima dell'accelerometro. Verifica sul campo: col braccialetto quasi
+  // fermo l'accelerometro vale ~1 g (2048) e il giroscopio quasi 0; si cambia ordine solo se è evidente.
+  delay(120);
+  uint8_t buf[FIFO_FRAME * FIFO_CHUNK];
+  const uint16_t n = min<uint16_t>(fifoBytes() / FIFO_FRAME, FIFO_CHUNK);
+  if (n >= 3 && M5.In_I2C.readRegister(imuAddr, BMI_FIFO_DATA, buf, n * FIFO_FRAME, 400000)) {
+    float first = 0, second = 0;
+    for (uint16_t i = 0; i < n; i++) {
+      first += norm3(buf + i * FIFO_FRAME) * ACC_LSB_G;
+      second += norm3(buf + i * FIFO_FRAME + 6) * ACC_LSB_G;
+    }
+    first /= n;
+    second /= n;
+    fifoAccFirst = first > 0.7f && first < 1.3f && second < 0.3f;
+  }
+  detector.reset();
+  imuOn = true;
+  return true;
+}
+
+static void imuStop() {
+  if (!imuOn) return;
+  imuWrite(BMI_FIFO_CFG1, 0x00);
+  imuWrite(BMI_PWR_CTRL, 0x00);   // sensori spenti
+  imuWrite(BMI_PWR_CONF, 0x03);   // risparmio avanzato, come all'accensione
+  imuOn = false;
+}
+
+// L'IMU è acceso solo se serve: riconoscimento attivo o calibrazione in corso.
+static void imuUpdateNeeded() {
+  const bool want = cfg.sw || calStroke >= 0;
+  if (want && !imuOn) imuStart();
+  else if (!want && imuOn) imuStop();
+}
+
+// Esempi di calibrazione salvati nel braccialetto (un buffer solo: si usa da una funzione alla volta).
+static uint8_t modelBlob[swing::StrokeClassifier::kMaxSerializedSize];
+
+static void saveModel() {
+  const size_t len = classifier.serialize(modelBlob, sizeof(modelBlob));
+  if (len) prefs.putBytes("knn", modelBlob, len);
+}
+
+static void loadModel() {
+  if (!prefs.isKey("knn")) return;
+  const size_t len = prefs.getBytes("knn", modelBlob, sizeof(modelBlob));
+  if (len) classifier.deserialize(modelBlob, len);
+}
+
+static void drawCalib() {
+  char l2[32];
+  snprintf(l2, sizeof(l2), "%s  %d/%d", txt(T_CALIB), classifier.count(calStroke), swing::StrokeClassifier::kMaxPerClass);
+  drawMessage(strokeName(calStroke), l2, C_BALL);
+  showFor(CALIB_SHOW_MS);
+}
+
+static void stopCalibration(bool show) {
+  if (calStroke < 0) return;
+  calStroke = -1;
+  imuUpdateNeeded();
+  if (show) {
+    drawMessage(txt(T_CALIB), "OK", C_BALL);
+    showFor(1500);
+  }
+}
+
+// [indice (2 byte), colpo (0-3, 255 = sconosciuto), confidenza %, picco giroscopio °/s (2 byte),
+//  picco accelerazione in centesimi di g (2 byte), id di accensione (4 byte)], little endian.
+static void sendStroke(const swing::StrokeClassifier::Result& r, const swing::Swing& sw) {
+  if (!connected || !strokeChr) return;
+  const uint16_t gyro = (uint16_t)constrain(lroundf(sw.peakGyro), 0L, 65535L);
+  const uint16_t acc = (uint16_t)constrain(lroundf(sw.peakAccel * 100.0f), 0L, 65535L);
+  const uint8_t data[12] = {
+    (uint8_t)strokeIndex, (uint8_t)(strokeIndex >> 8), r.stroke, (uint8_t)lroundf(r.confidence * 100.0f),
+    (uint8_t)gyro, (uint8_t)(gyro >> 8), (uint8_t)acc, (uint8_t)(acc >> 8),
+    (uint8_t)bootId, (uint8_t)(bootId >> 8), (uint8_t)(bootId >> 16), (uint8_t)(bootId >> 24),
+  };
+  strokeChr->notify(data, sizeof(data), connHandle);
+}
+
+static void onSwing(const swing::Swing& sw, uint32_t now) {
+  lastActivity = now;  // un colpo vuol dire che si sta giocando: niente spegnimento per inattività
+  idleWarned = false;
+  if (calStroke >= 0) {
+    classifier.add(calStroke, sw.features);
+    saveModel();
+    beep(2400, 60);
+    drawCalib();
+    publishConfig(true);
+    return;
+  }
+  if (!cfg.sw) return;
+  const swing::StrokeClassifier::Result r = classifier.classify(sw.features);
+  strokeIndex++;
+  sendStroke(r, sw);
+  // A schermo solo se non copre altro (punteggio, messaggi): display spento o col colpo precedente.
+  if (cfg.swd && connected && r.stroke != swing::kUnknown && (!displayOn || displayOffAt == strokeOffAt)) {
+    char l2[8];
+    snprintf(l2, sizeof(l2), "%d%%", (int)lroundf(r.confidence * 100.0f));
+    drawMessage(strokeName(r.stroke), l2, C_BALL);
+    showFor(STROKE_SHOW_MS);
+    strokeOffAt = displayOffAt;
+  }
+}
+
+// Assi come M5Unified sullo StickS3 (X = +Y del sensore, Y = -X): gli stessi di SwingSense.
+static void onImuFrame(const uint8_t* f, uint32_t now) {
+  const uint8_t* g = fifoAccFirst ? f + 6 : f;
+  const uint8_t* a = fifoAccFirst ? f : f + 6;
+  const swing::ImuSample s{
+    le16(a + 2) * ACC_LSB_G, -le16(a) * ACC_LSB_G, le16(a + 4) * ACC_LSB_G,
+    le16(g + 2) * GYR_LSB_DPS, -le16(g) * GYR_LSB_DPS, le16(g + 4) * GYR_LSB_DPS,
+  };
+  swing::Swing sw;
+  if (detector.push(s, sw)) onSwing(sw, now);
+}
+
+static void drainImu(uint32_t now) {
+  if (!imuOn) return;
+  uint16_t frames = fifoBytes() / FIFO_FRAME;
+  uint8_t buf[FIFO_FRAME * FIFO_CHUNK];
+  while (frames) {
+    const uint16_t n = min<uint16_t>(frames, FIFO_CHUNK);
+    if (!M5.In_I2C.readRegister(imuAddr, BMI_FIFO_DATA, buf, n * FIFO_FRAME, 400000)) return;
+    for (uint16_t i = 0; i < n; i++) onImuFrame(buf + i * FIFO_FRAME, now);
+    frames -= n;
+  }
 }
 
 // "chiave=valore;chiave=valore": si applicano solo le chiavi presenti, le altre restano come sono.
@@ -611,6 +845,8 @@ static void handleConfig(char* text) {
     else if (!strcmp(k, "pair")) cfg.pairS   = atoi(v);
     else if (!strcmp(k, "lost")) cfg.lostS   = atoi(v);
     else if (!strcmp(k, "idle")) cfg.idleMin = atoi(v);
+    else if (!strcmp(k, "sw"))   cfg.sw      = atoi(v) != 0;
+    else if (!strcmp(k, "swd"))  cfg.swd     = atoi(v) != 0;
   }
   clampSettings();
   if (onlyLang) {
@@ -626,6 +862,7 @@ static void handleConfig(char* text) {
     return;
   }
   saveSettings();
+  imuUpdateNeeded();
   if (strcmp(oldName, cfg.name) != 0) applyName();
   M5.Display.setRotation(cfg.flip ? 3 : 1);
   if (displayOn) M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
@@ -640,6 +877,7 @@ static void handleConfig(char* text) {
 // ------------------------------------------------------------------ messaggi dal telefono
 // P|mio|avversario|servizio|intestazione   G|mieiG|loroG|mieiS|loroS|intestazione   M|riga1|riga2|secondi
 // I|riga1|riga2|secondi|RRGGBB (identifica)   O|riga1|riga2 (spegni)
+// Colpi (2.4): C|n calibra il colpo n (0-3; senza n finisce)   U| annulla l'ultimo esempio   X|n cancella il colpo n
 static int splitFields(char* s, char** out, int maxOut) {
   int n = 0;
   out[n++] = s;
@@ -692,6 +930,37 @@ static void handleMessage(char* msg) {
     case 'O':
       powerOff(n >= 2 && f[1][0] ? f[1] : TXT_POWER_OFF, n >= 3 ? f[2] : "", OFF_APP);
       break;
+    case 'C': {
+      const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
+      if (k >= 0 && k < swing::kStrokeCount) {
+        calStroke = (int8_t)k;
+        imuUpdateNeeded();
+        if (imuOn) drawCalib();
+        else calStroke = -1;  // IMU non disponibile: l'app vede cal=-1
+      } else {
+        stopCalibration(true);
+      }
+      publishConfig(true);
+      break;
+    }
+    case 'U':
+      if (classifier.removeLast()) {
+        saveModel();
+        beep(1200, 60);
+      }
+      if (calStroke >= 0) drawCalib();
+      publishConfig(true);
+      break;
+    case 'X': {
+      const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
+      if (k >= 0 && k < swing::kStrokeCount) {
+        classifier.clear((uint8_t)k);
+        saveModel();
+      }
+      if (calStroke >= 0) drawCalib();
+      publishConfig(true);
+      break;
+    }
   }
 }
 
@@ -948,6 +1217,7 @@ static void setupBle() {
   statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   configChr = svc->createCharacteristic(CONFIG_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   configChr->setCallbacks(new ConfigCallbacks());
+  strokeChr = svc->createCharacteristic(STROKE_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -1003,6 +1273,7 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
     delay(200);
   }
   if (spkOn) speakerOff();
+  imuStop();
   M5.Display.setBrightness(0);
   M5.Display.sleep();
   armKeyWake();
@@ -1154,6 +1425,8 @@ void setup() {
   M5.begin(cfgM5);
 
   setupBle();  // carica anche le impostazioni
+  loadModel();
+  imuUpdateNeeded();
 
   M5.Display.setRotation(cfg.flip ? 3 : 1);
   M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
@@ -1205,6 +1478,7 @@ void loop() {
     justDisconnect = false;
     advSince = now;
     identifyUntil = 0;
+    stopCalibration(false);
     startAdvertising(true);
   }
   if (rxReady) {
@@ -1261,6 +1535,7 @@ void loop() {
   }
   if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
   serviceEvents(now);
+  drainImu(now);
 
   // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
   if (!connected && !justDisconnect && usbOn) {

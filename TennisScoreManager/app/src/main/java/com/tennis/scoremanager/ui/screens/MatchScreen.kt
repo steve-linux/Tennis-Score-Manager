@@ -83,10 +83,12 @@ import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -131,6 +133,7 @@ fun MatchScreen(c: MatchController) {
     ) {
         TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
+        if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -339,6 +342,22 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             Icons.Filled.Tune, null, tint = TsmColors.TextDim,
             modifier = Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).clickable { onOpen(Side.P1) },
         )
+    }
+}
+
+/** Colpi riconosciuti dai braccialetti finora: "G1  D 12 · R 8 · S 5 · V 3". */
+@Composable
+private fun StrokesRow(strokes: Map<Side, StrokeStats>) {
+    val s = LocalStrings.current
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (side in Side.entries) {
+            val st = strokes[side] ?: continue
+            Text(s.playerTag(side.ordinal + 1), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            Text(
+                (0 until BandProtocol.STROKE_COUNT).joinToString(" · ") { "${s.strokeAbbr(it)} ${st.count(it)}" },
+                color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 1,
+            )
+        }
     }
 }
 

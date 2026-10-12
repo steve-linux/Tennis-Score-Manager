@@ -18,6 +18,7 @@ import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.BandStroke
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
 import com.tennis.scoremanager.ble.FoundBand
@@ -31,6 +32,7 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.RulesConfig
@@ -198,6 +200,7 @@ class MatchController(
         scope.launch { ble.ready.collect { onBandReady(it) } }
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
+        scope.launch { ble.strokes.collect { onBandStroke(it) } }
         scope.launch { watchBands() }
         scope.launch {
             while (true) {
@@ -402,6 +405,18 @@ class MatchController(
         writeBandSettings(from.other, src.copy(name = dst.name))
     }
 
+    /** Calibrazione dei colpi sul braccialetto: [stroke] = BandProtocol.STROKE_*, null = fine. */
+    fun calibrateStroke(side: Side, stroke: Int?) = bandCommand(side, BandProtocol.calibrate(stroke))
+
+    fun undoStrokeExample(side: Side) = bandCommand(side, BandProtocol.UNDO_EXAMPLE)
+
+    fun clearStrokeExamples(side: Side, stroke: Int) = bandCommand(side, BandProtocol.clearExamples(stroke))
+
+    private fun bandCommand(side: Side, payload: String) {
+        val s = strings
+        scope.launch { if (!ble.command(side, payload)) _toasts.tryEmit(s.bandNotReady) }
+    }
+
     fun powerOffBand(side: Side) {
         val s = strings
         scope.launch { if (!ble.command(side, BandProtocol.powerOff(s.bandOffFromApp, ""))) _toasts.tryEmit(s.bandNotReady) }
@@ -564,6 +579,14 @@ class MatchController(
                 undo()
             }
         }
+    }
+
+    /** I colpi contano solo a partita avviata e in corso (non durante la calibrazione o il riscaldamento). */
+    private fun onBandStroke(e: BandStroke) {
+        val lm = live.value ?: return
+        if (screen.value != Screen.MATCH || lm.record.startedAt == null || lm.record.suspended || lm.state.isFinished) return
+        val stats = (lm.record.strokes[e.side] ?: StrokeStats()) + e.stroke.stroke
+        setRecord(lm.record.copy(strokes = lm.record.strokes + (e.side to stats)))
     }
 
     /** Invia ai braccialetti il punteggio visto da chi li indossa. */

@@ -70,6 +70,9 @@ data class BandInfo(
 /** [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. */
 data class BandEvent(val side: Side, val type: Int, val reason: Int? = null)
 
+/** Colpo riconosciuto dal braccialetto di [side] (firmware 2.4). */
+data class BandStroke(val side: Side, val stroke: RawStroke)
+
 /**
  * Gestisce i due braccialetti. Ogni lato (Giocatore 1 / Giocatore 2) ha al massimo un braccialetto:
  * il legame lato <-> indirizzo è l'unica fonte di verità, così i punti non finiscono mai al giocatore sbagliato.
@@ -95,6 +98,9 @@ class BleManager(context: Context) {
     private val _status = MutableSharedFlow<Pair<Side, BandStatus>>(extraBufferCapacity = 8)
     /** Stato batteria ricevuto dai braccialetti (per stima autonomia e registro consumi). */
     val status: SharedFlow<Pair<Side, BandStatus>> = _status
+    private val _strokes = MutableSharedFlow<BandStroke>(extraBufferCapacity = 32)
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4 con il riconoscimento acceso). */
+    val strokes: SharedFlow<BandStroke> = _strokes
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
     private val _locationOn = MutableStateFlow(LocationHelper.isEnabled(app))
@@ -574,6 +580,7 @@ class BleManager(context: Context) {
                         publish()
                         _status.tryEmit(side to it)
                     }
+                    BandProtocol.STROKE -> if (!fromRead) BandProtocol.parseStroke(copy)?.let { _strokes.tryEmit(BandStroke(side, it)) }
                 }
             }
         }
@@ -634,6 +641,8 @@ class BleManager(context: Context) {
                 enableNotify(g, it)
                 op(OpKind.READ) { g.readCharacteristic(it) }
             }
+            // Colpi (firmware 2.4): arrivano solo se il riconoscimento è acceso nelle impostazioni.
+            svc.getCharacteristic(BandProtocol.STROKE)?.let { enableNotify(g, it) }
             // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
             // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
             runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }

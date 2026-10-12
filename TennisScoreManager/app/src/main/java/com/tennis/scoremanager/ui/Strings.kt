@@ -92,6 +92,27 @@ interface Strings {
     val estimateMeasured: String
     val estimateTheory: String
     val copyToOther: String
+
+    // Colpi (braccialetti con firmware 2.4)
+    val strokes: String
+    /** Nome del colpo BandProtocol.STROKE_* ("Dritto"). */
+    val strokeName: (Int) -> String
+    /** Sigla del colpo per la schermata partita ("D"). */
+    val strokeAbbr: (Int) -> String
+    val strokeOther: String
+    val strokeRecognition: String
+    val strokeRecognitionHint: String
+    val strokeOnBand: String
+    val strokeOnBandHint: String
+    val strokeCalibration: String
+    val strokeCalibrationHint: String
+    val calibrate: String
+    val calibrateStop: String
+    val undoExample: String
+    val clearExamples: String
+    val strokesReady: String
+    val strokesNotReady: String
+    val strokesFirmwareOld: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -421,6 +442,23 @@ object ItStrings : Strings {
     override val estimateMeasured = "Base misurata su questo braccialetto durante l'uso."
     override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
     override val copyToOther = "Copia sull'altro braccialetto"
+    override val strokes = "Colpi"
+    override val strokeName: (Int) -> String = { listOf("Dritto", "Rovescio", "Servizio", "Volée").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("D", "R", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Non riconosciuti"
+    override val strokeRecognition = "Riconoscimento colpi"
+    override val strokeRecognitionHint = "Il braccialetto riconosce dritto, rovescio, servizio e volée di chi lo indossa. Il sensore di movimento acceso consuma un po' di più."
+    override val strokeOnBand = "Mostra il colpo sul braccialetto"
+    override val strokeOnBandHint = "Per un attimo, solo se il display non mostra altro."
+    override val strokeCalibration = "Calibrazione"
+    override val strokeCalibrationHint = "Indossa il braccialetto come in partita, tocca Calibra e fai 5-10 colpi di quel tipo, con una pausa tra uno e l'altro. Gli esempi restano nel braccialetto."
+    override val calibrate = "Calibra"
+    override val calibrateStop = "Fine"
+    override val undoExample = "Annulla l'ultimo"
+    override val clearExamples = "Cancella gli esempi"
+    override val strokesReady = "Pronto: riconosce i colpi calibrati."
+    override val strokesNotReady = "Servono almeno 3 esempi per 2 colpi."
+    override val strokesFirmwareOld = "Per riconoscere i colpi carica il firmware TSM_Band 2.4."
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -737,6 +775,23 @@ object EnStrings : Strings {
     override val estimateMeasured = "Base draw measured on this wristband while in use."
     override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
     override val copyToOther = "Copy to the other wristband"
+    override val strokes = "Strokes"
+    override val strokeName: (Int) -> String = { listOf("Forehand", "Backhand", "Serve", "Volley").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("F", "B", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Not recognized"
+    override val strokeRecognition = "Stroke recognition"
+    override val strokeRecognitionHint = "The wristband recognizes the wearer's forehand, backhand, serve and volley. The motion sensor uses a little more battery."
+    override val strokeOnBand = "Show the stroke on the wristband"
+    override val strokeOnBandHint = "Briefly, only when the display shows nothing else."
+    override val strokeCalibration = "Calibration"
+    override val strokeCalibrationHint = "Wear the wristband as in a match, tap Calibrate and play 5-10 strokes of that type, with a short pause between them. The examples are stored in the wristband."
+    override val calibrate = "Calibrate"
+    override val calibrateStop = "Done"
+    override val undoExample = "Undo the last one"
+    override val clearExamples = "Clear the examples"
+    override val strokesReady = "Ready: it recognizes the calibrated strokes."
+    override val strokesNotReady = "At least 3 examples for 2 strokes are needed."
+    override val strokesFirmwareOld = "To recognize strokes, upload the TSM_Band 2.4 firmware."
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }

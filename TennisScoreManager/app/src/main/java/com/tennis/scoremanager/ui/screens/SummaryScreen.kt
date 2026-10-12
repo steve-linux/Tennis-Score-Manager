@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -171,6 +172,9 @@ fun SummaryScreen(c: MatchController) {
                 InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
                 if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
                     InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
+                }
+                for (side in Side.entries) {
+                    Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
                 }
             }
         }

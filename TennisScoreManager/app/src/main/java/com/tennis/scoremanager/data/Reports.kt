@@ -11,6 +11,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -69,6 +70,14 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
+    /** "Dritto 12 · Rovescio 8 · Servizio 5 · Volée 3" (+ i non riconosciuti, se ce ne sono); null senza colpi. */
+    fun strokesLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side]?.takeIf { it.total > 0 } ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).map { "${s.strokeName(it)} ${st.count(it)}" } +
+            listOfNotNull(st.unknown.takeIf { it > 0 }?.let { "${s.strokeOther} $it" })
+        return parts.joinToString(" · ")
+    }
+
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
@@ -108,6 +117,7 @@ object Reports {
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
+        for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))

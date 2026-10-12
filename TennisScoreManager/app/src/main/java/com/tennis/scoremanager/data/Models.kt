@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.data
 
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -75,7 +76,24 @@ data class MatchRecord(
     /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
     val batteryStart: Map<Side, Int> = emptyMap(),
     val batteryEnd: Map<Side, Int> = emptyMap(),
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
+    val strokes: Map<Side, StrokeStats> = emptyMap(),
 )
+
+/** Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti. */
+@Serializable
+data class StrokeStats(
+    val counts: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+    val unknown: Int = 0,
+) {
+    val total: Int get() = counts.sum() + unknown
+
+    fun count(stroke: Int): Int = counts.getOrElse(stroke) { 0 }
+
+    operator fun plus(stroke: Int): StrokeStats =
+        if (stroke in counts.indices) copy(counts = counts.mapIndexed { i, n -> if (i == stroke) n + 1 else n })
+        else copy(unknown = unknown + 1)
+}
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
 class Names(private val setup: SetupData, private val strings: Strings) : CallNames {
