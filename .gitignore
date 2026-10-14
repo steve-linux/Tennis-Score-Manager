@@ -9,3 +9,4 @@ firmware/**/build/
 deliver/out/
 deliver/*.apk
 deliver/TSM_Band.ino
+.netlify/

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tennis-score-manager.netlify.app/sitemap.xml

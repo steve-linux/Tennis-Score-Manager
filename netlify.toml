@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Sito tennis-score-manager.netlify.app: pagine statiche in website/, senza build.
+# Netlify pubblica da GitHub: il ramo main è il sito ufficiale, gli altri rami e le pull request
+# diventano anteprime (così il sito di una versione nuova va online insieme alla versione).
+[build]
+  publish = "website"
+  # Si ripubblica solo se cambia il sito, non a ogni commit dell'app (uscita 1 = pubblica, 0 = salta).
+  # Al primo deploy, o ripetendo lo stesso commit, si pubblica sempre.
+  ignore = "if [ -z \"$CACHED_COMMIT_REF\" ] || [ \"$CACHED_COMMIT_REF\" = \"$COMMIT_REF\" ]; then exit 1; fi; git diff --quiet \"$CACHED_COMMIT_REF\" \"$COMMIT_REF\" -- website netlify.toml"
