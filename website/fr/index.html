@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Tennis Score Manager – Score de tennis avec annonces d'arbitre, bracelets et tableau sur TV</title>
+<meta name="description" content="Application Android libre et gratuite pour compter les points au tennis selon les règles de l'ITF : annonces vocales de l'arbitre, bracelets Bluetooth M5StickS3 et tableau d'affichage sur TV. Fonctionne hors ligne, en six langues, sans publicité.">
+<meta name="theme-color" content="#0a0f1c">
+<link rel="canonical" href="https://tennis-score-manager.netlify.app/fr/">
+<link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
+<link rel="alternate" hreflang="en" href="https://tennis-score-manager.netlify.app/en/">
+<link rel="alternate" hreflang="fr" href="https://tennis-score-manager.netlify.app/fr/">
+<link rel="alternate" hreflang="de" href="https://tennis-score-manager.netlify.app/de/">
+<link rel="alternate" hreflang="es" href="https://tennis-score-manager.netlify.app/es/">
+<link rel="alternate" hreflang="pt" href="https://tennis-score-manager.netlify.app/pt/">
+<link rel="alternate" hreflang="x-default" href="https://tennis-score-manager.netlify.app/en/">
+<link rel="icon" type="image/png" sizes="48x48" href="../img/icon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../img/icon-192.png">
+<link rel="apple-touch-icon" href="../img/icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="en_GB">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="pt_BR">
+<meta property="og:title" content="Tennis Score Manager">
+<meta property="og:description" content="Score de tennis selon les règles de l'ITF, avec annonces d'arbitre, bracelets Bluetooth et tableau sur TV. Libre, hors ligne, sans publicité.">
+<meta property="og:url" content="https://tennis-score-manager.netlify.app/fr/">
+<meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --bg:#0a0f1c; --bg2:#0e1526; --surface:#161d2f; --surface2:#1c2540; --line:#26304a;
+  --text:#e6ebf5; --muted:#9aa6bf; --dim:#6b7792;
+  --ball:#ccff00; --ball-soft:rgba(204,255,0,.12); --ball-glow:rgba(204,255,0,.35);
+  --p1:#ffd60a; --p2:#ef4444; --blue:#60a5fa; --orange:#fb923c; --violet:#c084fc;
+  --radius:18px; --max:1160px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+::selection{background:var(--ball);color:var(--bg)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+.icon{width:1.25em;height:1.25em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--ball);outline-offset:3px;border-radius:6px}
+
+/* Navigazione */
+.nav{position:sticky;top:0;z-index:50;background:rgba(10,15,28,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;letter-spacing:-.01em}
+.brand img{width:36px;height:36px;border-radius:10px}
+.nav-links{display:flex;align-items:center;gap:24px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem}
+.nav-links a:hover{color:var(--ball)}
+.nav-links .pill{color:var(--text);border:1px solid var(--line);background:var(--surface);padding:7px 16px;border-radius:999px;display:inline-flex;align-items:center;gap:8px}
+.nav-links .pill:hover{border-color:var(--ball)}
+.menu-btn{display:none;background:none;border:0;color:var(--text);font-size:1.5rem;cursor:pointer;padding:6px}
+@media (max-width:1060px){
+  .menu-btn{display:block}
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 20px 16px}
+  .nav-links.open{display:flex}
+  .nav-links a{display:block;padding:12px 0;font-size:1.05rem}
+  .nav-links .pill{justify-content:center;margin-top:8px}
+}
+
+/* Pulsanti */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 26px;border-radius:999px;font-weight:800;font-size:1.05rem;text-decoration:none;border:2px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;font-family:inherit}
+.btn-primary{background:var(--ball);color:var(--bg);box-shadow:0 0 24px var(--ball-glow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 34px var(--ball-glow)}
+.btn-ghost{background:var(--surface);color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--muted)}
+
+/* Hero */
+.hero{position:relative;padding:72px 0 88px;overflow:hidden;
+  background:
+   radial-gradient(800px 420px at 85% 30%,rgba(204,255,0,.10),transparent 60%),
+   radial-gradient(600px 400px at 5% 90%,rgba(96,165,250,.08),transparent 60%)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:6px 14px;border-radius:999px;background:var(--ball-soft);border:1px solid rgba(204,255,0,.25);color:var(--ball);font-weight:700;font-size:.85rem;margin-bottom:22px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ball);box-shadow:0 0 0 0 var(--ball-glow);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(204,255,0,.6)}70%{box-shadow:0 0 0 10px rgba(204,255,0,0)}100%{box-shadow:0 0 0 0 rgba(204,255,0,0)}}
+h1{font-size:clamp(2.2rem,5.2vw,3.9rem);line-height:1.08;letter-spacing:-.03em;font-weight:900;margin-bottom:22px}
+h1 em{font-style:normal;color:var(--ball)}
+.lead{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--muted);max-width:36em;margin-bottom:32px}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;list-style:none;color:var(--muted);font-size:.92rem}
+.facts li{display:flex;align-items:center;gap:7px}
+.facts .icon{color:var(--ball);width:1.05em;height:1.05em}
+.phone{position:relative;width:min(320px,78vw);margin:0 auto;border:9px solid #1f2937;border-radius:40px;overflow:hidden;background:var(--bg);box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 70px -10px rgba(204,255,0,.18);aspect-ratio:1080/2305}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top}
+@media (max-width:900px){.hero{padding:44px 0 64px}.hero-grid{grid-template-columns:1fr;gap:44px;text-align:center}.lead{margin-left:auto;margin-right:auto}.cta,.facts{justify-content:center}}
+
+/* Sezioni */
+section{padding:88px 0;border-top:1px solid rgba(38,48,74,.6)}
+.alt{background:var(--bg2)}
+.head{text-align:center;max-width:44em;margin:0 auto 52px}
+.eyebrow{color:var(--ball);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;margin-bottom:10px}
+h2{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.15;letter-spacing:-.02em;font-weight:900;margin-bottom:14px}
+.head p{color:var(--muted);font-size:1.1rem}
+h3{font-size:1.22rem;font-weight:800;letter-spacing:-.01em}
+
+/* Funzioni */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s,transform .25s}
+.card:hover{border-color:color-mix(in srgb,var(--accent,var(--ball)) 55%,transparent);transform:translateY(-3px)}
+.card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;color:var(--accent,var(--ball));background:color-mix(in srgb,var(--accent,var(--ball)) 13%,transparent)}
+.card .ico .icon{width:26px;height:26px}
+.card p{color:var(--muted);font-size:.97rem;flex:1}
+.more{align-self:flex-start;background:none;border:0;color:var(--accent,var(--ball));font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 0}
+.more:hover{text-decoration:underline}
+.more .icon{width:1em;height:1em}
+
+/* Blocchi affiancati */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split + .split{margin-top:88px}
+@media (max-width:900px){.split{grid-template-columns:1fr;gap:36px}.split .media{order:-1}}
+.split p{color:var(--muted);font-size:1.05rem;margin:14px 0 22px}
+.tv{border:12px solid #111827;border-bottom-width:22px;border-radius:14px;background:#000;box-shadow:0 30px 60px -20px rgba(0,0,0,.9);overflow:hidden}
+.tv img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.steps{list-style:none;counter-reset:s;display:grid;gap:12px}
+.steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--text)}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--ball-soft);color:var(--ball);font-weight:900;font-size:.9rem}
+.steps small{display:block;color:var(--muted);font-size:.92rem}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;list-style:none}
+.chips li{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:.92rem;color:var(--muted)}
+.chips .icon{color:var(--ball);width:1em;height:1em}
+.chips b{color:var(--text);font-family:var(--mono)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.duo img{border-radius:var(--radius);border:1px solid var(--line);aspect-ratio:1;object-fit:cover;width:100%}
+.link{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:10px 18px;border-radius:999px;font-weight:700}
+.link:hover{border-color:var(--ball);color:var(--ball)}
+
+/* Galleria */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;list-style:none}
+@media (max-width:960px){.gallery{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.gallery{grid-template-columns:repeat(2,1fr);gap:12px}}
+.shot{all:unset;cursor:zoom-in;display:block;width:100%}
+.shot img{width:100%;aspect-ratio:1080/2305;object-fit:cover;object-position:top;border-radius:16px;border:1px solid var(--line);transition:transform .35s,border-color .35s}
+.shot:hover img,.shot:focus-visible img{transform:scale(1.03);border-color:var(--ball)}
+.shot span{display:block;text-align:center;color:var(--muted);font-size:.88rem;margin-top:10px}
+
+/* Download */
+.get{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+@media (max-width:860px){.get{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.panel.hl{border-color:rgba(204,255,0,.35);background:linear-gradient(160deg,rgba(204,255,0,.07),var(--surface) 55%)}
+.panel p{color:var(--muted);margin:10px 0 20px}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.3);border-radius:999px;padding:4px 12px;margin-bottom:14px}
+.checks{list-style:none;display:grid;gap:10px;margin-top:6px}
+.checks li{display:flex;gap:10px;align-items:flex-start;color:var(--text)}
+.checks .icon{color:var(--ball);margin-top:3px;width:1.05em;height:1.05em}
+.checks small{display:block;color:var(--muted);font-size:.9rem}
+.req{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin-top:6px;font-size:.95rem}
+.req dt{color:var(--dim)}
+.req dd{color:var(--text)}
+
+/* Footer */
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--dim);font-size:.92rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between}
+footer nav{display:flex;flex-wrap:wrap;gap:18px}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--ball)}
+
+/* Finestre di dettaglio */
+dialog{margin:auto;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--text);width:min(720px,calc(100% - 32px));max-height:min(88vh,900px);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
+.dlg{padding:30px;overflow:auto;max-height:min(88vh,900px)}
+.dlg-head{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-right:44px}
+.dlg-head .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
+.close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:0;background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.close:hover{color:var(--text)}
+.dlg p{color:var(--muted);margin-bottom:14px}
+.dlg ul{color:var(--muted);padding-left:20px;display:grid;gap:8px;margin-bottom:14px}
+.dlg strong{color:var(--text)}
+.dlg h4{margin:18px 0 8px;font-size:1.02rem}
+.dlg .note{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.93rem}
+#lightbox{width:auto;max-width:calc(100% - 32px);background:transparent;border:0;box-shadow:none;overflow:visible}
+#lightbox img{max-height:86vh;width:auto;border-radius:18px;border:1px solid var(--line)}
+#lightbox figcaption{text-align:center;color:var(--muted);margin-top:10px}
+#lightbox .close{top:-14px;right:-14px;background:var(--surface)}
+
+/* Lingue */
+.lang{position:relative}
+.lang-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 12px;font:inherit;font-weight:700;font-size:.88rem;letter-spacing:.04em;cursor:pointer}
+.lang-btn:hover,.lang.open .lang-btn{color:var(--text);border-color:var(--muted)}
+.lang-btn .icon{width:1.1em;height:1.1em}
+.lang-list{display:none;position:absolute;right:0;top:calc(100% + 10px);list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:190px;box-shadow:0 20px 40px rgba(0,0,0,.5);z-index:60}
+.lang.open .lang-list{display:block}
+.nav-links .lang-list a{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:9px 12px;border-radius:9px;color:var(--text);font-size:.95rem}
+.nav-links .lang-list a:hover{background:var(--surface2);color:var(--text)}
+.nav-links .lang-list a[aria-current]{color:var(--ball)}
+.lang-list small{color:var(--dim);font-family:var(--mono);font-size:.78rem}
+@media (max-width:1060px){
+  .lang{border-top:1px solid var(--line);margin-top:12px;padding-top:4px}
+  .lang-btn{display:none}
+  .lang-list{display:flex;flex-wrap:wrap;gap:8px;position:static;background:none;border:0;box-shadow:none;padding:12px 0 0;min-width:0}
+  .nav-links .lang-list a{border:1px solid var(--line);padding:6px 14px;border-radius:999px;font-size:.92rem}
+  .lang-list small{display:none}
+}
+.foot-langs{display:flex;flex-wrap:wrap;gap:6px 16px;width:100%;padding-top:16px;border-top:1px solid var(--line);font-size:.88rem}
+.foot-langs a[aria-current]{color:var(--ball)}
+.courts{margin-top:80px}
+.courts h3{font-size:1.35rem;margin-bottom:8px}
+.courts > p{color:var(--muted);margin-bottom:22px;max-width:64ch}
+.courts-grid{display:flex;gap:18px;list-style:none}
+.courts-grid li{flex:var(--r) 1 0;min-width:0}
+.courts-grid .shot img{aspect-ratio:auto;height:auto;object-position:center}
+@media (max-width:760px){.courts-grid{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-rules" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><polyline points="9 14 11 16 15 12"/></symbol>
+  <symbol id="i-voice" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></symbol>
+  <symbol id="i-bt" viewBox="0 0 24 24"><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="../img/icon-192.png" width="36" height="36" alt=""> Tennis Score Manager</a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu" data-label-open="Ouvrir le menu" data-label-close="Fermer le menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+    <ul class="nav-links" id="menu">
+      <li><a href="#features">Fonctionnalités</a></li>
+      <li><a href="#scoreboard">Tableau TV</a></li>
+      <li><a href="#wristbands">Bracelets</a></li>
+      <li><a href="#gallery">Galerie</a></li>
+      <li><a href="#download">Télécharger</a></li>
+      <li><a class="pill" href="https://github.com/steve-linux/Tennis-Score-Manager" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> GitHub</a></li>
+      <li class="lang">
+        <button class="lang-btn" aria-expanded="false" aria-controls="langs" aria-label="Langue"><svg class="icon"><use href="#i-globe"/></svg> FR</button>
+        <ul class="lang-list" id="langs" aria-label="Langue">
+          <li><a href="../" hreflang="it" lang="it" data-lang="it">Italiano <small>IT</small></a></li>
+          <li><a href="../en/" hreflang="en" lang="en" data-lang="en">English <small>EN</small></a></li>
+          <li><a href="../fr/" hreflang="fr" lang="fr" data-lang="fr" aria-current="true">Français <small>FR</small></a></li>
+          <li><a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch <small>DE</small></a></li>
+          <li><a href="../es/" hreflang="es" lang="es" data-lang="es">Español <small>ES</small></a></li>
+          <li><a href="../pt/" hreflang="pt" lang="pt-BR" data-lang="pt">Português <small>PT</small></a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero" style="border-top:0">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="badge"><span class="dot"></span> Libre et gratuite · licence GPL-3.0</div>
+      <h1>Votre score de tennis, <em>comme un vrai Pro.</em></h1>
+      <p class="lead">L'application Android qui compte les points selon les règles de l'ITF et les annonce à voix haute comme un arbitre de chaise. On marque depuis le téléphone ou avec deux bracelets Bluetooth, et le score peut s'afficher en direct sur une TV.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Obtenir l'application</a>
+        <a class="btn btn-ghost" href="#features">Découvrir les fonctions <svg class="icon"><use href="#i-down"/></svg></a>
+      </div>
+      <ul class="facts">
+        <li><svg class="icon"><use href="#i-wifi"/></svg> Fonctionne sans internet</li>
+        <li><svg class="icon"><use href="#i-globe"/></svg> 6 langues</li>
+        <li><svg class="icon"><use href="#i-shield"/></svg> Sans publicité ni pistage</li>
+      </ul>
+    </div>
+    <div class="phone"><img src="../img/partita.jpg" width="720" height="1537" alt="Écran de jeu : chronomètre, score des sets et des jeux, et les cases jaune et rouge pour attribuer le point"></div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Fonctionnalités</div>
+      <h2>Tout ce qu'il vous faut sur le court</h2>
+      <p>Pensée pour de vrais matchs, même sans arbitre : touchez celui qui a gagné le point, l'application s'occupe du reste.</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div>
+        <h3>Règles de l'ITF</h3>
+        <p>Simple et double, jeux décisifs, super jeu décisif en 10 points, point décisif No-Ad, changements de côté et ordre de service toujours justes.</p>
+        <button class="more" data-open="d-itf">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-voice"/></svg></div>
+        <h3>Voix de l'arbitre</h3>
+        <p>Le téléphone annonce les points, les jeux, les sets et les changements de côté dans votre langue, même hors ligne. Vous pouvez aussi utiliser vos propres enregistrements.</p>
+        <button class="more" data-open="d-voice">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div>
+        <h3>Tableau sur TV</h3>
+        <p>Un deuxième téléphone, une tablette ou un ordinateur affiche le score en direct sur une TV ou un écran, avec les chronomètres de jeu et de pause.</p>
+        <button class="more" data-open="d-tv">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-bt"/></svg></div>
+        <h3>Bracelets Bluetooth</h3>
+        <p>Avec deux M5StickS3 au poignet, chaque joueur marque son point d'un bouton, et le téléphone peut rester dans le sac.</p>
+        <button class="more" data-open="d-ble">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-archive"/></svg></div>
+        <h3>Historique et résumés</h3>
+        <p>En fin de match, vous avez le résultat, la durée, les points et jeux gagnés et le lieu : enregistrez-les en texte, données ou image dans le dossier de votre choix et partagez-les avec n'importe quelle application. Les matchs se suspendent et se reprennent, même après avoir fermé l'application.</p>
+      </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-globe"/></svg></div>
+        <h3>Six langues, partout</h3>
+        <p>Italien, anglais, français, allemand, espagnol et portugais : la langue choisie vaut pour les écrans, la voix, le tableau et les bracelets.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Tableau TV</div>
+      <h2>Le spectacle sur le court</h2>
+      <p>N'importe quel écran devient un tableau d'affichage, sans matériel spécial et sans internet.</p>
+    </div>
+    <div class="split">
+      <div class="media"><div class="tv"><img src="../img/tabellone-tv.jpg" width="1280" height="720" loading="lazy" alt="Tableau d'affichage TV style LED : noms des équipes, points, jeux et sets, temps de match et compte à rebours du service"></div></div>
+      <div>
+        <h3>Comment le connecter</h3>
+        <p>L'application contient un petit serveur web. Les deux appareils doivent simplement être sur le même réseau Wi-Fi : le point d'accès de l'un des téléphones suffit, sans consommer de données.</p>
+        <ol class="steps">
+          <li><div>Un autre téléphone avec Tennis Score Manager<small>Touchez « Utiliser comme tableau » : il trouve tout seul le téléphone de l'arbitre. Avec un câble HDMI ou un Chromecast, vous l'affichez sur la TV.</small></div></li>
+          <li><div>N'importe quel navigateur<small>Scannez le QR code affiché par l'application, ou saisissez l'adresse (ex. 192.168.43.1:8080).</small></div></li>
+        </ol>
+        <ul class="chips">
+          <li><svg class="icon"><use href="#i-clock"/></svg> service <b>25"</b></li>
+          <li><svg class="icon"><use href="#i-clock"/></svg> changement de côté <b>90"</b></li>
+          <li><svg class="icon"><use href="#i-clock"/></svg> fin de set <b>120"</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="wristbands">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Bracelets</div>
+        <h2>Le point se marque au poignet</h2>
+        <p>Deux M5StickS3 se connectent au téléphone en Bluetooth LE. Chaque joueur appuie sur KEY1 de son bracelet quand il gagne le point (KEY2 l'annule) : l'application le compte, l'annonce et met à jour le tableau.</p>
+        <ul class="checks">
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Le score sur l'écran du bracelet<small>Dans la même langue que l'application, avec luminosité réglable.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Nom et réglages depuis le téléphone<small>Donnez un nom à chaque bracelet et réglez luminosité, volume et extinction automatique ; d'un geste, vous les copiez sur l'autre.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Autonomie sous contrôle<small>L'application affiche la charge et estime l'autonomie restante ; en fin de match, elle éteint les bracelets.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Prêts en un instant<small>Allumez les bracelets et l'application les trouve toute seule ; « Identifier » vous montre lequel est lequel.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Firmware libre<small>Le code Arduino est dans le dépôt : installez-le avec l'Arduino IDE.</small></div></li>
+        </ul>
+        <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware des bracelets</a></p>
+      </div>
+      <div class="media duo">
+        <img src="../img/braccialetto-polso.jpg" width="720" height="720" loading="lazy" alt="Bracelet M5StickS3 à sangle orange porté au poignet : l'écran affiche jeux 4-2 et sets 1-0">
+        <img src="../img/braccialetto.jpg" width="720" height="720" loading="lazy" alt="Bracelet M5StickS3 à sangle orange sur fond blanc : l'écran affiche le score 40-15, avec la balle sous le serveur">
+      </div>
+    </div>
+    <div class="courts">
+      <h3>Sur toutes les surfaces</h3>
+      <p>Terre battue, gazon ou dur : chaque bracelet affiche le score du point de vue de celui qui le porte, et la balle verte indique qui sert.</p>
+      <ul class="courts-grid">
+        <li style="--r:1.684"><button class="shot"><img src="../img/superficie-terra.jpg" width="990" height="588" loading="lazy" alt="Deux bracelets M5StickS3 sur un court en terre battue : l'un affiche 40-15, l'autre 15-40, avec la balle à côté du joueur au service"><span>Terre battue</span></button></li>
+        <li style="--r:1.838"><button class="shot"><img src="../img/superficie-erba.jpg" width="1000" height="544" loading="lazy" alt="Deux bracelets M5StickS3 sur un court en gazon : l'un affiche 40-15, l'autre 15-40, avec la balle à côté du joueur au service"><span>Gazon</span></button></li>
+        <li style="--r:2.141"><button class="shot"><img src="../img/superficie-cemento.jpg" width="1060" height="495" loading="lazy" alt="Deux bracelets M5StickS3 sur un court en dur : l'un affiche 40-15, l'autre 15-40, avec la balle à côté du joueur au service"><span>Dur</span></button></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="alt">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Galerie</div>
+      <h2>L'application en action</h2>
+      <p>Thème sombre à fort contraste, lisible même en plein soleil. Touchez une image pour l'agrandir.</p>
+    </div>
+    <ul class="gallery">
+      <li><button class="shot"><img src="../img/inizio.jpg" width="540" height="1152" loading="lazy" alt="Écran de début de match avec les noms des équipes et le format"><span>Début du match</span></button></li>
+      <li><button class="shot"><img src="../img/partita.jpg" width="720" height="1537" loading="lazy" alt="Écran de jeu avec le score et les chronomètres"><span>Pendant le jeu</span></button></li>
+      <li><button class="shot"><img src="../img/formato.jpg" width="540" height="1152" loading="lazy" alt="Choix du format : trois sets ou deux sets avec super jeu décisif, No-Ad et tirage au sort"><span>Format et tirage au sort</span></button></li>
+      <li><button class="shot"><img src="../img/lingue-fr.jpg" width="540" height="1152" loading="lazy" alt="Mode arbitre ou bracelets et choix parmi six langues"><span>Mode et langue</span></button></li>
+      <li><button class="shot"><img src="../img/voci.jpg" width="540" height="1152" loading="lazy" alt="Liste des voix de synthèse installées, disponibles hors ligne"><span>Voix de l'arbitre</span></button></li>
+      <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Connexion des bracelets avec état du Bluetooth et de la batterie"><span>Bracelets</span></button></li>
+      <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Adresse et QR code pour ouvrir le tableau sur un autre appareil"><span>Connecter le tableau</span></button></li>
+      <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Résumé de fin de match avec vainqueur, score, durée et lieu"><span>Résumé final</span></button></li>
+    </ul>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Télécharger</div>
+      <h2>Libre, gratuite, sans surprises</h2>
+      <p>Pas de compte, pas de publicité, aucune donnée envoyée à des serveurs externes.</p>
+    </div>
+    <div class="get">
+      <div class="panel hl">
+        <h3>Disponible sur F&#8209;Droid</h3>
+        <p>Installez Tennis Score Manager depuis F&#8209;Droid, la boutique d'applications libres pour Android : les mises à jour arrivent automatiquement par là.</p>
+        <a class="btn btn-primary" href="https://f-droid.org/fr/packages/io.github.steve_linux.tsm/" rel="noopener"><svg class="icon"><use href="#i-download"/></svg> Télécharger sur F&#8209;Droid</a>
+      </div>
+      <div class="panel">
+        <h3>Configuration et autorisations</h3>
+        <dl class="req">
+          <dt>Système</dt><dd>Android 8.0 ou plus récent</dd>
+          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Licence</dt><dd>GNU GPL v3 ou ultérieure</dd>
+        </dl>
+        <ul class="checks" style="margin-top:18px">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Uniquement pour les bracelets.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Localisation<small>Facultative : le lieu du court dans le résumé. Jusqu'à Android 11, elle sert aussi à la recherche Bluetooth.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Réseau<small>Uniquement pour le tableau sur le réseau local.</small></div></li>
+        </ul>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:28px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Code source sur GitHub</a></p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 Stefano Spagnolo · Distribuée sous licence <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a></div>
+    <nav aria-label="GitHub">
+      <a href="https://github.com/steve-linux/Tennis-Score-Manager" rel="noopener">Code source</a>
+      <a href="https://github.com/steve-linux/Tennis-Score-Manager/issues" rel="noopener">Signaler un problème</a>
+    </nav>
+    <nav class="foot-langs" aria-label="Langues">
+      <a href="../" hreflang="it" lang="it" data-lang="it">Italiano</a>
+      <a href="../en/" hreflang="en" lang="en" data-lang="en">English</a>
+      <a href="../fr/" hreflang="fr" lang="fr" data-lang="fr" aria-current="true">Français</a>
+      <a href="../de/" hreflang="de" lang="de" data-lang="de">Deutsch</a>
+      <a href="../es/" hreflang="es" lang="es" data-lang="es">Español</a>
+      <a href="../pt/" hreflang="pt" lang="pt-BR" data-lang="pt">Português</a>
+    </nav>
+  </div>
+</footer>
+
+<dialog id="d-itf" aria-labelledby="t-itf" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-rules"/></svg></div><h3 id="t-itf">Règles de l'ITF</h3></div>
+    <p>Le score suit le règlement de l'ITF : plus besoin de se rappeler qui sert ni quand changer de côté.</p>
+    <ul>
+      <li><strong>Deux formats :</strong> au meilleur des trois sets avec jeu décisif en 7 points à 6-6, ou deux sets puis, à un set partout, un super jeu décisif en 10 points.</li>
+      <li><strong>Simple et double,</strong> avec l'ordre de service de l'équipe choisi à chaque set.</li>
+      <li><strong>No-Ad :</strong> si vous le souhaitez, à 40-40 on joue un point décisif.</li>
+      <li><strong>Tirage au sort et côtés du court</strong> se règlent avant de commencer ; l'application prévient à chaque changement de côté.</li>
+      <li><strong>Annulation sûre :</strong> le match est enregistré comme une suite de points et recalculé à chaque annulation, donc serveur, côté et score sont toujours exacts, même en annulant plusieurs points de suite.</li>
+      <li><strong>Messages de jeu :</strong> balle de break, balle de set, balle de match et point décisif s'affichent sur le téléphone et sur le tableau, avec les tie-breaks et les changements de côté.</li>
+    </ul>
+  </div>
+</dialog>
+
+<dialog id="d-voice" aria-labelledby="t-voice" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-voice"/></svg></div><h3 id="t-voice">Voix de l'arbitre et langues</h3></div>
+    <p>Pendant le match, le téléphone annonce les points, les jeux, les sets et les changements de côté, avec les formules d'un arbitre de chaise et la prononciation correcte dans chacune des six langues.</p>
+    <h4>Trois façons de donner une voix à l'arbitre</h4>
+    <ul>
+      <li><strong>La synthèse vocale du téléphone :</strong> choisissez l'une des voix installées ; celles marquées « hors ligne » fonctionnent sans internet.</li>
+      <li><strong>Fichiers audio pré-générés :</strong> l'application prépare chaque annonce à l'avance, pour une lecture plus naturelle et entièrement hors ligne.</li>
+      <li><strong>Vos enregistrements :</strong> enregistrez les phrases avec votre voix (ou celle d'un arbitre) et importez-les dans un fichier ZIP ; ils sont toujours prioritaires.</li>
+    </ul>
+    <div class="note"><strong>Six langues :</strong> italien, anglais, français, allemand, espagnol et portugais. La langue choisie s'applique à la fois aux écrans, à la voix, au tableau TV et à l'écran des bracelets.</div>
+  </div>
+</dialog>
+
+<dialog id="d-tv" aria-labelledby="t-tv" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-tv"/></svg></div><h3 id="t-tv">Tableau sur TV</h3></div>
+    <p>Un tableau style LED, sombre et à fort contraste, avec noms, points, jeux, sets, temps de match et compte à rebours du service. Les couleurs des équipes et le texte du bas (par exemple club et court) se personnalisent dans l'application. Choisissez ce qui s'affiche (temps de jeu, chronomètres, sets terminés, messages, balle à côté du serveur) et vérifiez le résultat dans l'aperçu sur le téléphone. Si la connexion tombe, le tableau se reconnecte tout seul.</p>
+    <h4>Comment le connecter</h4>
+    <ul>
+      <li>Mettez les deux appareils sur le même réseau Wi-Fi : le point d'accès de l'un des téléphones convient parfaitement, sans consommer de données.</li>
+      <li>Sur un autre téléphone avec l'application, touchez <strong>« Utiliser comme tableau »</strong> : il se connecte tout seul.</li>
+      <li>Sur n'importe quel autre appareil, <strong>scannez le QR code</strong> ou ouvrez dans le navigateur l'adresse affichée par l'application.</li>
+      <li>Pour la TV, utilisez un câble HDMI ou la diffusion de l'écran (Chromecast, Smart View…).</li>
+    </ul>
+    <div class="note"><strong>Chronomètres ITF :</strong> 25 secondes entre deux points, 90 au changement de côté, 120 en fin de set.</div>
+  </div>
+</dialog>
+
+<dialog id="d-ble" aria-labelledby="t-ble" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-bt"/></svg></div><h3 id="t-ble">Bracelets Bluetooth (M5StickS3)</h3></div>
+    <p>Laissez le téléphone au bord du court : avec deux bracelets M5StickS3, chaque joueur, ou équipe, marque le point en appuyant sur KEY1 de son bracelet, et KEY2 l'annule.</p>
+    <ul>
+      <li><strong>Tout est synchronisé :</strong> vous appuyez, l'application compte le point, l'annonce et met à jour le tableau TV. Chaque appui est confirmé, aucun point ne se perd.</li>
+      <li><strong>Écran dans votre langue :</strong> le bracelet affiche le score et les messages dans la langue de l'application.</li>
+      <li><strong>Batterie :</strong> l'application affiche la charge de chaque bracelet et estime son autonomie, et le bracelet prévient quand la batterie est faible. En fin de match et à la sortie, l'application les éteint ; le bouton latéral les rallume.</li>
+      <li><strong>Réglages depuis le téléphone :</strong> nom (jusqu'à 12 caractères, enregistré dans le bracelet), luminosité, durée d'affichage du score, volume du buzzer, écran retourné pour l'autre poignet et extinction automatique. D'un geste, vous les copiez sur l'autre bracelet.</li>
+      <li><strong>Recherche automatique :</strong> allumez les bracelets et l'application les trouve et les associe toute seule. « Identifier » fait clignoter celui que vous choisissez, « Échanger J1 ↔ J2 » inverse les joueurs sans nouvelle association, et le match peut aussi démarrer avec KEY1.</li>
+      <li><strong>Téléphone dans la poche :</strong> même écran éteint, l'application continue de recevoir les points, de les annoncer et de mettre à jour le tableau.</li>
+    </ul>
+    <div class="note">Le firmware est libre (GPL-3.0) et s'installe avec l'Arduino IDE : le code et les instructions sont dans le <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">dépôt</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="lightbox" aria-label="Image agrandie">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <figure><img src="" alt=""><figcaption></figcaption></figure>
+</dialog>
+
+<script>
+(function(){
+  var btn=document.querySelector('.menu-btn'), menu=document.getElementById('menu');
+  function setMenu(open){
+    menu.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',open);
+    btn.setAttribute('aria-label',open?btn.dataset.labelClose:btn.dataset.labelOpen);
+  }
+  btn.addEventListener('click',function(){ setMenu(!menu.classList.contains('open')); });
+  menu.addEventListener('click',function(e){ var a=e.target.closest('a'); if(a && a.getAttribute('href').charAt(0)==='#') setMenu(false); });
+
+  var lang=document.querySelector('.lang'), langBtn=lang.querySelector('.lang-btn');
+  function setLang(open){ lang.classList.toggle('open',open); langBtn.setAttribute('aria-expanded',open); }
+  langBtn.addEventListener('click',function(e){ e.stopPropagation(); setLang(!lang.classList.contains('open')); });
+  document.addEventListener('click',function(e){ if(!lang.contains(e.target)) setLang(false); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') setLang(false); });
+  document.querySelectorAll('a[data-lang]').forEach(function(a){
+    a.addEventListener('click',function(){ try{ localStorage.setItem('tsm-lang',a.dataset.lang); }catch(err){} });
+  });
+
+  function show(d){ if(d.showModal){ d.showModal(); } else { d.setAttribute('open',''); } }
+  function hide(d){ if(d.close){ d.close(); } else { d.removeAttribute('open'); } }
+  document.querySelectorAll('[data-open]').forEach(function(b){
+    b.addEventListener('click',function(){ show(document.getElementById(b.dataset.open)); });
+  });
+  document.querySelectorAll('dialog').forEach(function(d){
+    d.addEventListener('click',function(e){ if(e.target===d || e.target.closest('[data-close]')) hide(d); });
+  });
+
+  var lb=document.getElementById('lightbox'), lbImg=lb.querySelector('img'), lbCap=lb.querySelector('figcaption');
+  document.querySelectorAll('.shot').forEach(function(s){
+    s.addEventListener('click',function(){
+      var img=s.querySelector('img');
+      lbImg.src=img.src; lbImg.alt=img.alt; lbCap.textContent=s.querySelector('span').textContent;
+      show(lb);
+    });
+  });
+})();
+</script>
+</body>
+</html>
