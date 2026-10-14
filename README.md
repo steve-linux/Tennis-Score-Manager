@@ -4,9 +4,7 @@
 
 **Sito / Website:** [tennis-score-manager.netlify.app](https://tennis-score-manager.netlify.app/)
 
-<!-- Quando l'app sarà su F-Droid, togli i segni di commento attorno al badge:
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/io.github.steve_linux.tsm/)
--->
 
 **Guida / Guide / Anleitung / Guía / Guia:** [Italiano](deliver/GUIDA.md) · [English](deliver/GUIDE.en.md) · [Français](deliver/GUIDE.fr.md) · [Deutsch](deliver/GUIDE.de.md) · [Español](deliver/GUIDE.es.md) · [Português](deliver/GUIDE.pt.md)
 
