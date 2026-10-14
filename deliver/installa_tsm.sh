@@ -4364,7 +4364,7 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
     }
 
     private fun connectedNow(): Set<String> =
-        InputDevice.getDeviceIds().mapNotNull { InputDevice.getDevice(it)?.descriptor }.toSet()
+        InputDevice.getDeviceIds().asList().mapNotNull { InputDevice.getDevice(it)?.descriptor }.toSet()
 }
 TSM_EOF
 
