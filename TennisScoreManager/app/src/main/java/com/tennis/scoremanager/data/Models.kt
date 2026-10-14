@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.data
 
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -81,7 +82,46 @@ data class MatchRecord(
     /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
     val batteryStart: Map<Side, Int> = emptyMap(),
     val batteryEnd: Map<Side, Int> = emptyMap(),
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
+    val strokes: Map<Side, StrokeStats> = emptyMap(),
 )
+
+/**
+ * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.
+ * [gyroSum]/[gyroMax]: velocità di rotazione del polso al picco (°/s) per tipo di colpo, per media e massimo.
+ */
+@Serializable
+data class StrokeStats(
+    val counts: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+    val unknown: Int = 0,
+    val gyroSum: List<Long> = List(BandProtocol.STROKE_COUNT) { 0L },
+    val gyroMax: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+) {
+    val total: Int get() = counts.sum() + unknown
+
+    fun count(stroke: Int): Int = counts.getOrElse(stroke) { 0 }
+
+    /** Media della velocità del polso per quel colpo; null se non ce ne sono (o partita salvata senza velocità). */
+    fun avgGyro(stroke: Int): Int? {
+        val n = count(stroke)
+        val sum = gyroSum.getOrElse(stroke) { 0L }
+        return if (n > 0 && sum > 0) (sum / n).toInt() else null
+    }
+
+    fun maxGyro(stroke: Int): Int? = gyroMax.getOrElse(stroke) { 0 }.takeIf { it > 0 }
+
+    fun add(stroke: Int, peakGyroDps: Int): StrokeStats {
+        if (stroke !in counts.indices) return copy(unknown = unknown + 1)
+        fun <T> List<T>.at(i: Int, f: (T) -> T) = mapIndexed { j, v -> if (j == i) f(v) else v }
+        val sums = gyroSum.takeIf { it.size == counts.size } ?: List(counts.size) { 0L }
+        val maxs = gyroMax.takeIf { it.size == counts.size } ?: List(counts.size) { 0 }
+        return copy(
+            counts = counts.at(stroke) { it + 1 },
+            gyroSum = sums.at(stroke) { it + peakGyroDps },
+            gyroMax = maxs.at(stroke) { maxOf(it, peakGyroDps) },
+        )
+    }
+}
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
 class Names(private val setup: SetupData, private val strings: Strings) : CallNames {

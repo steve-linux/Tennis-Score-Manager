@@ -109,6 +109,71 @@ interface Strings {
     val estimateMeasured: String
     val estimateTheory: String
     val copyToOther: String
+
+    // Colpi (braccialetti con firmware 2.4)
+    val strokes: String
+    /** Nome del colpo BandProtocol.STROKE_* ("Dritto"). */
+    val strokeName: (Int) -> String
+    /** Sigla del colpo per la schermata partita ("D"). */
+    val strokeAbbr: (Int) -> String
+    val strokeOther: String
+    val strokeRecognition: String
+    val strokeRecognitionHint: String
+    val strokeOnBand: String
+    val strokeOnBandHint: String
+    val strokeCalibration: String
+    val strokeCalibrationHint: String
+    val calibrate: String
+    val calibrateStop: String
+    val undoExample: String
+    val clearExamples: String
+    val strokesReady: String
+    val strokesNotReady: String
+    val strokesFirmwareOld: String
+    /** Riepilogo: velocità di rotazione del polso al picco del colpo (°/s). */
+    val wristSpeed: String
+    val maxShort: String
+    /** Riepilogo: colpi per punto (lunghezza degli scambi). */
+    val strokesPerPoint: String
+    val rallyAverage: String
+    val rallyLongest: String
+    val rallyShort: String
+    val rallyMedium: String
+    val rallyLong: String
+    // Riepilogo: schede, statistiche e cronologia punto per punto
+    val tabSummary: String
+    val tabStats: String
+    val tabChronology: String
+    val periodMatch: String
+    /** "Set 1", "Set 2"... */
+    val periodSet: (Int) -> String
+    val statsHint: String
+    val statServe: String
+    val statReturn: String
+    val statPoints: String
+    val statGames: String
+    val statServicePoints: String
+    val statServiceGames: String
+    val statBreakSaved: String
+    val statReturnPoints: String
+    val statReturnGames: String
+    val statBreakWon: String
+    val statTotalPoints: String
+    val statStreak: String
+    val statLast10: String
+    val statMatchPointsSaved: String
+    val statTotalGames: String
+    val statStrokesTotal: String
+    val statAvgWristSpeed: String
+    val serveLost: String
+    val markerBreak: String
+    val markerSet: String
+    val markerMatch: String
+    val chronoGame: String
+    val chronoBreak: String
+    val chronoSet: String
+    val chronoMatch: String
+    val chronoTiebreak: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -463,6 +528,63 @@ object ItStrings : Strings {
     override val estimateMeasured = "Base misurata su questo braccialetto durante l'uso."
     override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
     override val copyToOther = "Copia sull'altro braccialetto"
+    override val strokes = "Colpi"
+    override val strokeName: (Int) -> String = { listOf("Dritto", "Rovescio", "Servizio", "Volée").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("D", "R", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Non riconosciuti"
+    override val strokeRecognition = "Riconoscimento colpi"
+    override val strokeRecognitionHint = "Il braccialetto riconosce dritto, rovescio, servizio e volée di chi lo indossa. Il sensore di movimento acceso consuma un po' di più."
+    override val strokeOnBand = "Mostra il colpo sul braccialetto"
+    override val strokeOnBandHint = "Per un attimo, solo se il display non mostra altro."
+    override val strokeCalibration = "Calibrazione"
+    override val strokeCalibrationHint = "Indossa il braccialetto come in partita, tocca Calibra e fai 5-10 colpi di quel tipo, con una pausa tra uno e l'altro. Gli esempi restano nel braccialetto."
+    override val calibrate = "Calibra"
+    override val calibrateStop = "Fine"
+    override val undoExample = "Annulla l'ultimo"
+    override val clearExamples = "Cancella gli esempi"
+    override val strokesReady = "Pronto: riconosce i colpi calibrati."
+    override val strokesNotReady = "Servono almeno 3 esempi per 2 colpi."
+    override val strokesFirmwareOld = "Per riconoscere i colpi carica il firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocità del polso"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Colpi per punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "più lungo"
+    override val rallyShort = "brevi"
+    override val rallyMedium = "medi"
+    override val rallyLong = "lunghi"
+    override val tabSummary = "Riassunto"
+    override val tabStats = "Statistiche"
+    override val tabChronology = "Cronologia"
+    override val periodMatch = "Partita"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statServe = "Servizio"
+    override val statReturn = "Risposta"
+    override val statPoints = "Punti"
+    override val statGames = "Game"
+    override val statServicePoints = "Punti vinti al servizio"
+    override val statServiceGames = "Game vinti al servizio"
+    override val statBreakSaved = "Palle break salvate"
+    override val statReturnPoints = "Punti vinti in risposta"
+    override val statReturnGames = "Game vinti in risposta"
+    override val statBreakWon = "Palle break vinte"
+    override val statTotalPoints = "Totale punti vinti"
+    override val statStreak = "Punti di fila (max)"
+    override val statLast10 = "Ultimi 10 punti"
+    override val statMatchPointsSaved = "Match point annullati"
+    override val statTotalGames = "Totale game vinti"
+    override val statStrokesTotal = "Colpi totali"
+    override val statAvgWristSpeed = "Velocità media del polso"
+    override val serveLost = "Servizio perso"
+    override val markerBreak = "PB"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTITA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -806,6 +928,63 @@ object EnStrings : Strings {
     override val estimateMeasured = "Base draw measured on this wristband while in use."
     override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
     override val copyToOther = "Copy to the other wristband"
+    override val strokes = "Strokes"
+    override val strokeName: (Int) -> String = { listOf("Forehand", "Backhand", "Serve", "Volley").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("F", "B", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Not recognized"
+    override val strokeRecognition = "Stroke recognition"
+    override val strokeRecognitionHint = "The wristband recognizes the wearer's forehand, backhand, serve and volley. The motion sensor uses a little more battery."
+    override val strokeOnBand = "Show the stroke on the wristband"
+    override val strokeOnBandHint = "Briefly, only when the display shows nothing else."
+    override val strokeCalibration = "Calibration"
+    override val strokeCalibrationHint = "Wear the wristband as in a match, tap Calibrate and play 5-10 strokes of that type, with a short pause between them. The examples are stored in the wristband."
+    override val calibrate = "Calibrate"
+    override val calibrateStop = "Done"
+    override val undoExample = "Undo the last one"
+    override val clearExamples = "Clear the examples"
+    override val strokesReady = "Ready: it recognizes the calibrated strokes."
+    override val strokesNotReady = "At least 3 examples for 2 strokes are needed."
+    override val strokesFirmwareOld = "To recognize strokes, upload the TSM_Band 2.4 firmware."
+    override val wristSpeed = "Wrist speed"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Strokes per point"
+    override val rallyAverage = "average"
+    override val rallyLongest = "longest"
+    override val rallyShort = "short"
+    override val rallyMedium = "medium"
+    override val rallyLong = "long"
+    override val tabSummary = "Summary"
+    override val tabStats = "Statistics"
+    override val tabChronology = "Point by point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statServe = "Serve"
+    override val statReturn = "Return"
+    override val statPoints = "Points"
+    override val statGames = "Games"
+    override val statServicePoints = "Service points won"
+    override val statServiceGames = "Service games won"
+    override val statBreakSaved = "Break points saved"
+    override val statReturnPoints = "Return points won"
+    override val statReturnGames = "Return games won"
+    override val statBreakWon = "Break points won"
+    override val statTotalPoints = "Total points won"
+    override val statStreak = "Points in a row (max)"
+    override val statLast10 = "Last 10 points"
+    override val statMatchPointsSaved = "Match points saved"
+    override val statTotalGames = "Total games won"
+    override val statStrokesTotal = "Total strokes"
+    override val statAvgWristSpeed = "Average wrist speed"
+    override val serveLost = "Lost serve"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }

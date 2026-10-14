@@ -38,6 +38,9 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -66,12 +69,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Ultima schermata: tutti i dati della partita, salvataggio, condivisione, nuova partita, uscita. */
@@ -88,6 +96,8 @@ fun SummaryScreen(c: MatchController) {
     val w = state.winner ?: Side.P1
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
+    /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
+    var tab by remember(rec.id) { mutableStateOf(0) }
     val kept by c.summaryKept.collectAsState()
     /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
     var leaving by remember { mutableStateOf<Boolean?>(null) }
@@ -154,24 +164,11 @@ fun SummaryScreen(c: MatchController) {
                 }
             }
 
-            // Dati partita
-            Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
-                InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
-                InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
-                InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
-                if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
-                if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
-                InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
-                InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
-                InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
-                InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
-                if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
-                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
-                }
+            Segmented(listOf(SegOption(s.tabSummary), SegOption(s.tabStats), SegOption(s.tabChronology)), selected = tab, onSelect = { tab = it })
+            when (tab) {
+                1 -> MatchStatsTab(rec, names)
+                2 -> MatchChronologyTab(rec, names)
+                else -> SummaryInfo(rec, state, names)
             }
         }
         Column(
@@ -205,6 +202,38 @@ fun SummaryScreen(c: MatchController) {
             },
             onDismiss = { leaving = null },
         )
+    }
+}
+
+/** Scheda "Riassunto": durata, orari, luogo, formato, punti e game, batteria e colpi dei braccialetti. */
+@Composable
+private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
+    val s = LocalStrings.current
+    val lang = rec.options.lang
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
+        InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
+        InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
+        InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
+        if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
+        if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
+        InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
+        InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
+        InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
+        InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
+            InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
+        }
+        for (side in Side.entries) {
+            Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
+        }
+        for (side in Side.entries) {
+            Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
+        }
+        Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
     }
 }
 

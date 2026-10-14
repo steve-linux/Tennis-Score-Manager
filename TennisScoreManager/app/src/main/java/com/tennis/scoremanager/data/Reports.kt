@@ -11,6 +11,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -69,6 +70,44 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
+    /** "Dritto 12 · Rovescio 8 · Servizio 5 · Volée 3" (+ i non riconosciuti, se ce ne sono); null senza colpi. */
+    fun strokesLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side]?.takeIf { it.total > 0 } ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).map { "${s.strokeName(it)} ${st.count(it)}" } +
+            listOfNotNull(st.unknown.takeIf { it > 0 }?.let { "${s.strokeOther} $it" })
+        return parts.joinToString(" · ")
+    }
+
+    /** "Dritto 1450 °/s (max 1980) · Servizio 1620 °/s (max 2010)": velocità del polso al picco; null senza dati. */
+    fun wristSpeedLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side] ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).mapNotNull { k ->
+            val avg = st.avgGyro(k) ?: return@mapNotNull null
+            "${s.strokeName(k)} $avg °/s (${s.maxShort} ${st.maxGyro(k) ?: avg})"
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
+    data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
+
+    /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
+    fun rallyStats(rec: MatchRecord): RallyStats? = rallyStats(rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes })
+
+    /** Da una lista di lunghezze di scambio (colpi per punto); null se vuota. */
+    fun rallyStats(r: List<Int>): RallyStats? {
+        if (r.isEmpty()) return null
+        fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
+        val short = pct(r.count { it <= 3 })
+        val long = pct(r.count { it >= 9 })
+        return RallyStats(r.size, r.average(), r.max(), short, (100 - short - long).coerceAtLeast(0), long)
+    }
+
+    /** "media 4,2 · più lungo 15 · brevi (1-3) 45% · medi (4-8) 40% · lunghi (9+) 15%" */
+    fun rallyLine(st: RallyStats, s: Strings, lang: Lang): String =
+        "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
+            "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
+
     fun formatLabel(rec: MatchRecord, s: Strings): String {
         val padel = rec.setup.sport == Sport.PADEL
         return (if (padel) "${s.sportPadel} · " else "") +
@@ -111,6 +150,9 @@ object Reports {
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
+        for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
+        for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
+        rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))

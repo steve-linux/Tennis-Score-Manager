@@ -8,7 +8,9 @@ import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROJ = ROOT / "TennisScoreManager"
-FW = ROOT / "firmware" / "TSM_Band" / "TSM_Band.ino"
+# Lo sketch è la cartella intera: dalla 2.4 accanto a TSM_Band.ino ci sono anche i .cpp/.h dei colpi.
+FW_DIR = ROOT / "firmware" / "TSM_Band"
+FW_FILES = sorted(p for p in FW_DIR.iterdir() if p.is_file())
 OUT = ROOT / "deliver" / "installa_tsm.sh"
 DELIM = "TSM_EOF"
 
@@ -83,18 +85,19 @@ lines.append(f"cat > \"$DEST/LICENSE\" << '{DELIM}'")
 lines.append(lic.rstrip("\n"))
 lines.append(DELIM)
 lines.append("")
-fw = FW.read_text()
-assert DELIM not in fw
 lines.append("# ---------------------------------------------------------------- firmware M5StickS3")
 lines.append('mkdir -p "$FWDIR"')
-lines.append(f"cat > \"$FWDIR/TSM_Band.ino\" << '{DELIM}'")
-lines.append(fw.rstrip("\n"))
-lines.append(DELIM)
-lines.append("")
+for f in FW_FILES:
+    fw = f.read_text()
+    assert DELIM not in fw, f.name
+    lines.append(f"cat > \"$FWDIR/{f.name}\" << '{DELIM}'")
+    lines.append(fw.rstrip("\n"))
+    lines.append(DELIM)
+    lines.append("")
 lines.append(f'echo ">> Fatto / done: {count} file del progetto / project files in $DEST"')
 lines.append('echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"')
 lines.append('echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."')
 
 OUT.write_text("\n".join(lines) + "\n")
 OUT.chmod(0o755)
-print(f"{OUT} ({count} file + firmware, {OUT.stat().st_size // 1024} KB)")
+print(f"{OUT} ({count} file + firmware ({len(FW_FILES)} file), {OUT.stat().st_size // 1024} KB)")

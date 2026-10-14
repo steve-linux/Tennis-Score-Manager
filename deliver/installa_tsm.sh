@@ -703,7 +703,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        controller.onActivityCreated(restored = savedInstanceState != null)
+        controller.onActivityCreated()
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -774,6 +774,7 @@ import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.BandStroke
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
 import com.tennis.scoremanager.ble.FoundBand
@@ -788,6 +789,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.RulesConfig
@@ -936,6 +938,8 @@ class MatchController(
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
     private var lastUndoAt = 0L
+    /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
+    private var rallyStrokes = 0
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -963,6 +967,7 @@ class MatchController(
         scope.launch { ble.ready.collect { onBandReady(it) } }
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
+        scope.launch { ble.strokes.collect { onBandStroke(it) } }
         scope.launch { watchBands() }
         scope.launch { watchRemotes() }
         scope.launch {
@@ -1169,6 +1174,18 @@ class MatchController(
         writeBandSettings(from.other, src.copy(name = dst.name))
     }
 
+    /** Calibrazione dei colpi sul braccialetto: [stroke] = BandProtocol.STROKE_*, null = fine. */
+    fun calibrateStroke(side: Side, stroke: Int?) = bandCommand(side, BandProtocol.calibrate(stroke))
+
+    fun undoStrokeExample(side: Side) = bandCommand(side, BandProtocol.UNDO_EXAMPLE)
+
+    fun clearStrokeExamples(side: Side, stroke: Int) = bandCommand(side, BandProtocol.clearExamples(stroke))
+
+    private fun bandCommand(side: Side, payload: String) {
+        val s = strings
+        scope.launch { if (!ble.command(side, payload)) _toasts.tryEmit(s.bandNotReady) }
+    }
+
     fun powerOffBand(side: Side) {
         val s = strings
         scope.launch { if (!ble.command(side, BandProtocol.powerOff(s.bandOffFromApp, ""))) _toasts.tryEmit(s.bandNotReady) }
@@ -1370,6 +1387,15 @@ class MatchController(
         }
     }
 
+    /** I colpi contano solo a partita avviata e in corso (non durante la calibrazione o il riscaldamento). */
+    private fun onBandStroke(e: BandStroke) {
+        val lm = live.value ?: return
+        if (screen.value != Screen.MATCH || lm.record.startedAt == null || lm.record.suspended || lm.state.isFinished) return
+        val stats = (lm.record.strokes[e.side] ?: StrokeStats()).add(e.stroke.stroke, e.stroke.peakGyroDps)
+        setRecord(lm.record.copy(strokes = lm.record.strokes + (e.side to stats)))
+        rallyStrokes++
+    }
+
     /** Invia ai braccialetti il punteggio visto da chi li indossa. */
     private fun pushScore(state: MatchState, t: Transition?, only: Side? = null) {
         if (options.value.mode != PlayMode.BANDS) return
@@ -1436,6 +1462,7 @@ class MatchController(
         serveOrderPrompt.value = false
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -1471,7 +1498,10 @@ class MatchController(
         val current = live.value ?: return
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis()))
+        // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
+        val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
+        rallyStrokes = 0
+        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -1539,7 +1569,8 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
-        events.removeAt(events.lastIndex)
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -1668,6 +1699,7 @@ class MatchController(
         clockMs.value = rec.clockMs
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
@@ -1998,14 +2030,15 @@ class MatchController(
     fun onBackground() = persist()
 
     /**
-     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
-     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
-     * Un'apertura normale riparte invece dalla prima schermata.
+     * Prima Activity del processo: se il processo si era chiuso sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Vale sia quando Android lo chiude in background sia dopo un aggiornamento dell'app, un crash o un riavvio del
+     * telefono. Chi esce di proposito ("Nuova partita", "Esci", app tolta dalle recenti) cancella [Storage.summaryOpen]:
+     * allora si riparte dalla prima schermata.
      */
-    fun onActivityCreated(restored: Boolean) {
+    fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
@@ -2080,6 +2113,9 @@ import java.util.UUID
  *   O|<riga 1>|<riga 2>                                          si spegne (firmware 2.0)
  *   H|1                                                          confermo gli eventi (app 2.4): prima delle notifiche
  *   K|<sequenza>                                                 conferma di un evento (solo ai firmware 2.3)
+ *   C|<colpo> oppure C|                                          calibra quel colpo / fine calibrazione (firmware 2.4)
+ *   U|                                                           annulla l'ultimo esempio di calibrazione (firmware 2.4)
+ *   X|<colpo>                                                    cancella gli esempi di quel colpo (firmware 2.4)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
  * I firmware vecchi ignorano i tipi che non conoscono.
  *
@@ -2097,6 +2133,8 @@ object BandProtocol {
     val STATUS: UUID = UUID.fromString("7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     /** Impostazioni del braccialetto (lettura, scrittura, notify): vedi [BandSettings]. Dal firmware 2.0. */
     val CONFIG: UUID = UUID.fromString("7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Colpo riconosciuto (notify): vedi [parseStroke]. Dal firmware 2.4. */
+    val STROKE: UUID = UUID.fromString("7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -2112,6 +2150,14 @@ object BandProtocol {
     const val OFF_BATTERY = 2    // batteria scarica
     const val OFF_APP = 3        // l'ha chiesto l'app
     const val OFF_TIMEOUT = 4    // nessun telefono
+
+    // Colpi (firmware 2.4), stesso ordine di swing::Stroke nel firmware
+    const val STROKE_FOREHAND = 0
+    const val STROKE_BACKHAND = 1
+    const val STROKE_SERVE = 2
+    const val STROKE_VOLLEY = 3
+    const val STROKE_COUNT = 4
+    const val STROKE_UNKNOWN = 255
 
     /** Il font del braccialetto è ASCII: niente accenti, niente '|', maiuscolo. */
     fun clean(s: String, max: Int = 18): String {
@@ -2140,6 +2186,32 @@ object BandProtocol {
     /** Conferma dell'evento [seq]: il braccialetto suona il bip di conferma. */
     fun ack(seq: Int) = "K|$seq"
 
+    /** Calibrazione del colpo [stroke]: ogni colpo eseguito diventa un esempio; null = fine calibrazione. */
+    fun calibrate(stroke: Int?) = if (stroke == null) "C|" else "C|$stroke"
+
+    /** Toglie l'ultimo esempio di calibrazione (un colpo venuto male). */
+    const val UNDO_EXAMPLE = "U|"
+
+    /** Cancella gli esempi di un colpo, per rifarli. */
+    fun clearExamples(stroke: Int) = "X|$stroke"
+
+    /**
+     * Colpo da STROKE: [indice (2 byte), colpo, confidenza %, picco giroscopio °/s (2 byte),
+     * picco accelerazione in centesimi di g (2 byte), id di accensione (4 byte)], little endian. Null se troppo corto.
+     */
+    fun parseStroke(b: ByteArray): RawStroke? {
+        if (b.size < 12) return null
+        fun u(i: Int) = b[i].toInt() and 0xFF
+        return RawStroke(
+            index = u(0) or (u(1) shl 8),
+            stroke = u(2),
+            confidence = u(3),
+            peakGyroDps = u(4) or (u(5) shl 8),
+            peakAccelG = (u(6) or (u(7) shl 8)) / 100.0,
+            boot = u(8).toLong() or (u(9).toLong() shl 8) or (u(10).toLong() shl 16) or (u(11).toLong() shl 24),
+        )
+    }
+
     /** Evento da EVENT; null se troppo corto. Gli eventi dei firmware prima della 2.3 hanno [boot] null. */
     fun parseEvent(b: ByteArray): RawBandEvent? {
         if (b.size < 2) return null
@@ -2160,6 +2232,16 @@ object BandProtocol {
  * [ageMs]: da quanto è stato premuto il tasto (più di zero se rimandato dopo una riconnessione).
  */
 data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: Long?, val ageMs: Int)
+
+/** Colpo riconosciuto dal braccialetto. [stroke]: BandProtocol.STROKE_*; [confidence] 0-100. */
+data class RawStroke(
+    val index: Int,
+    val stroke: Int,
+    val confidence: Int,
+    val peakGyroDps: Int,
+    val peakAccelG: Double,
+    val boot: Long,
+)
 
 /**
  * Eventi già ricevuti, per braccialetto e accensione. Un evento rimandato dopo una riconnessione (la conferma
@@ -2182,7 +2264,8 @@ class EventDedupe(private val windowMs: Long = 30_000) {
 
 /**
  * Impostazioni salvate nel braccialetto. Testo sulla caratteristica CONFIG:
- * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it".
+ * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it",
+ * dal 2.4 anche i colpi: ";sw=0;swd=1;swc=8,9,10,7;cal=-1" (swc e cal solo in lettura).
  * In scrittura bastano le chiavi da cambiare; il braccialetto risponde con tutte.
  * La lingua non passa da [encode]: la manda l'app da sola ([languageConfig]) e il braccialetto la salva senza anteprima.
  */
@@ -2205,7 +2288,20 @@ data class BandSettings(
     val firmware: String = "",
     /** Lingua dei testi del braccialetto ("it", "en", ...); vuota = firmware senza lingue (prima della 2.2). */
     val lang: String = "",
+    /** Riconoscimento dei colpi acceso (firmware 2.4): l'IMU resta acceso e consuma di più. */
+    val strokes: Boolean = false,
+    /** Il braccialetto mostra il colpo riconosciuto. */
+    val strokeDisplay: Boolean = true,
+    /** Esempi di calibrazione per colpo (BandProtocol.STROKE_*); null = firmware senza colpi (prima della 2.4). */
+    val strokeExamples: List<Int>? = null,
+    /** Colpo in calibrazione adesso, -1 = nessuno. */
+    val calibrating: Int = -1,
 ) {
+    val supportsStrokes: Boolean get() = strokeExamples != null
+
+    /** Come nel firmware (StrokeClassifier::ready): almeno due colpi con [MIN_EXAMPLES] esempi. */
+    val strokesReady: Boolean get() = (strokeExamples ?: emptyList()).count { it >= MIN_EXAMPLES } >= 2
+
     fun clamped() = copy(
         name = cleanName(name),
         brightness = brightness.coerceIn(5, 100),
@@ -2228,11 +2324,19 @@ data class BandSettings(
             add("pair=${c.pairTimeoutS}")
             add("lost=${c.lostTimeoutS}")
             add("idle=${c.idleTimeoutMin}")
+            // I firmware senza colpi le salverebbero senza usarle: solo a chi le capisce.
+            if (c.supportsStrokes) {
+                add("sw=${if (c.strokes) 1 else 0}")
+                add("swd=${if (c.strokeDisplay) 1 else 0}")
+            }
         }.joinToString(";")
     }
 
     companion object {
         const val NAME_MAX = 12
+        /** Esempi minimi perché un colpo conti, e massimi che il braccialetto tiene per colpo (firmware). */
+        const val MIN_EXAMPLES = 3
+        const val MAX_EXAMPLES = 20
 
         /** Solo la lingua: il braccialetto la salva in silenzio (niente "IMPOSTAZIONI OK"). */
         fun languageConfig(code: String) = "lang=$code"
@@ -2261,6 +2365,11 @@ data class BandSettings(
                 idleTimeoutMin = map["idle"]?.toIntOrNull() ?: d.idleTimeoutMin,
                 firmware = map["fw"] ?: "",
                 lang = map["lang"] ?: "",
+                strokes = map["sw"] == "1",
+                strokeDisplay = map["swd"] != "0",
+                strokeExamples = map["swc"]?.split(',')?.map { it.trim().toIntOrNull() ?: 0 }
+                    ?.takeIf { it.size == BandProtocol.STROKE_COUNT },
+                calibrating = map["cal"]?.toIntOrNull()?.takeIf { it in 0 until BandProtocol.STROKE_COUNT } ?: -1,
             )
         }
     }
@@ -2315,6 +2424,9 @@ object BatteryModel {
      * che pesa di più. Valore stimato: appena c'è una misura sul campo si usa quella ([baseFromMeasure]).
      */
     const val BASE_MA = 35.0
+
+    /** Riconoscimento colpi (firmware 2.4): BMI270 con accelerometro e giroscopio a 100 Hz (datasheet ~0,9 mA). */
+    const val IMU_MA = 1.0
 
     // Uso tipico in partita per ogni braccialetto: ~60 punti e ~10 game all'ora, ~1 minuto di messaggi,
     // ~40 bip (i tasti premuti da chi lo indossa più gli avvisi).
@@ -2414,9 +2526,15 @@ object BatteryModel {
     fun soundMa(volume: Int): Double =
         if (volume <= 0) 0.0 else BEEPS_PER_HOUR * 1.6 / 3600.0 * (15.0 + 0.6 * volume.coerceIn(0, 100))
 
-    /** Consumo medio con le impostazioni scelte; [measuredBaseMa] sostituisce la base stimata se c'è. */
+    /** Sensore di movimento acceso per il riconoscimento dei colpi. */
+    fun imuMa(s: BandSettings): Double = if (s.strokes) IMU_MA else 0.0
+
+    /**
+     * Consumo medio con le impostazioni scelte; [measuredBaseMa] sostituisce la base stimata se c'è.
+     * Il sensore dei colpi si conta nella base: è acceso sempre, come il Bluetooth.
+     */
     fun estimate(s: BandSettings, measuredBaseMa: Double? = null): PowerEstimate = PowerEstimate(
-        baseMa = measuredBaseMa ?: BASE_MA,
+        baseMa = (measuredBaseMa ?: BASE_MA) + imuMa(s),
         displayMa = displayOnMa(s.brightness) * displayDuty(s.pointSeconds),
         soundMa = soundMa(s.volume),
         measured = measuredBaseMa != null,
@@ -2424,11 +2542,11 @@ object BatteryModel {
 
     /**
      * Consumo di base ricavato da una misura: calo % all'ora × capacità, meno il display
-     * (acceso per [displayDuty] del tempo, misurato dal braccialetto) e il cicalino.
+     * (acceso per [displayDuty] del tempo, misurato dal braccialetto), il cicalino e il sensore dei colpi.
      */
     fun baseFromMeasure(drainPctPerHour: Double, displayDuty: Double, s: BandSettings): Double {
         val total = drainPctPerHour * CAPACITY_MAH / 100.0
-        return (total - displayOnMa(s.brightness) * displayDuty - soundMa(s.volume)).coerceIn(10.0, 150.0)
+        return (total - displayOnMa(s.brightness) * displayDuty - soundMa(s.volume) - imuMa(s)).coerceIn(10.0, 150.0)
     }
 
     /** "~7 h 10 min" oppure "~40 min". */
@@ -2517,6 +2635,9 @@ data class BandInfo(
 /** [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. */
 data class BandEvent(val side: Side, val type: Int, val reason: Int? = null)
 
+/** Colpo riconosciuto dal braccialetto di [side] (firmware 2.4). */
+data class BandStroke(val side: Side, val stroke: RawStroke)
+
 /**
  * Gestisce i due braccialetti. Ogni lato (Giocatore 1 / Giocatore 2) ha al massimo un braccialetto:
  * il legame lato <-> indirizzo è l'unica fonte di verità, così i punti non finiscono mai al giocatore sbagliato.
@@ -2542,6 +2663,9 @@ class BleManager(context: Context) {
     private val _status = MutableSharedFlow<Pair<Side, BandStatus>>(extraBufferCapacity = 8)
     /** Stato batteria ricevuto dai braccialetti (per stima autonomia e registro consumi). */
     val status: SharedFlow<Pair<Side, BandStatus>> = _status
+    private val _strokes = MutableSharedFlow<BandStroke>(extraBufferCapacity = 32)
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4 con il riconoscimento acceso). */
+    val strokes: SharedFlow<BandStroke> = _strokes
     private val _adapterOn = MutableStateFlow(adapter?.isEnabled == true)
     val adapterOn: StateFlow<Boolean> = _adapterOn
     private val _locationOn = MutableStateFlow(LocationHelper.isEnabled(app))
@@ -3021,6 +3145,7 @@ class BleManager(context: Context) {
                         publish()
                         _status.tryEmit(side to it)
                     }
+                    BandProtocol.STROKE -> if (!fromRead) BandProtocol.parseStroke(copy)?.let { _strokes.tryEmit(BandStroke(side, it)) }
                 }
             }
         }
@@ -3081,6 +3206,8 @@ class BleManager(context: Context) {
                 enableNotify(g, it)
                 op(OpKind.READ) { g.readCharacteristic(it) }
             }
+            // Colpi (firmware 2.4): arrivano solo se il riconoscimento è acceso nelle impostazioni.
+            svc.getCharacteristic(BandProtocol.STROKE)?.let { enableNotify(g, it) }
             // Connessione a basso consumo (intervallo ~100 ms, latenza 2): la radio del braccialetto
             // si sveglia molto meno spesso; un tasto arriva comunque entro ~125 ms.
             runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
@@ -3282,6 +3409,223 @@ object LocationHelper {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/MatchStats.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/MatchStats.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+
+/**
+ * Statistiche di fine partita e cronologia punto per punto, ricavate rigiocando i punti (come le pagine
+ * "statistiche" e "cronologia" dei siti di risultati). Ace, doppi falli, prime di servizio, vincenti ed errori
+ * non si possono sapere: l'app conosce solo chi ha vinto ogni punto (e, coi braccialetti 2.4, i colpi).
+ */
+object MatchStats {
+
+    /** Un punto giocato. [breakPoint] e [matchPointFor] valgono per la situazione prima del punto. */
+    data class PlayedPoint(
+        /** Set in cui si è giocato il punto (0 = primo). */
+        val set: Int,
+        val after: MatchState,
+        val winner: Side,
+        val server: Side,
+        val tiebreak: TiebreakKind,
+        val breakPoint: Boolean,
+        val matchPointFor: Side?,
+        /** Chi ha vinto il game (o il tie-break) con questo punto; null se il game continua. */
+        val gameWinner: Side?,
+        /** Colpi dei braccialetti nello scambio (null = non contati). */
+        val strokes: Int?,
+    )
+
+    fun points(rec: MatchRecord): List<PlayedPoint> {
+        var s = ScoreEngine.initial(rec.rules)
+        val out = mutableListOf<PlayedPoint>()
+        for (e in rec.events) {
+            val step = ScoreEngine.apply(s, e)
+            val t = step.transition
+            if (e is MatchEvent.Point && t != null) {
+                out += PlayedPoint(
+                    set = s.sets.size,
+                    after = step.state,
+                    winner = e.winner,
+                    server = s.server,
+                    tiebreak = s.tiebreak,
+                    breakPoint = ScoreEngine.isBreakPoint(s),
+                    matchPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.matchWinner == it },
+                    gameWinner = t.gameWinner,
+                    strokes = e.strokes,
+                )
+            }
+            s = step.state
+        }
+        return out
+    }
+
+    /** Numeri di un giocatore (o squadra) in un periodo. Le coppie "vinti / giocati" danno le percentuali. */
+    data class SideTotals(
+        val servePointsWon: Int = 0,
+        val servePoints: Int = 0,
+        val serviceGamesWon: Int = 0,
+        val serviceGames: Int = 0,
+        val breakPointsSaved: Int = 0,
+        val breakPointsFaced: Int = 0,
+        val returnPointsWon: Int = 0,
+        val returnPoints: Int = 0,
+        val returnGamesWon: Int = 0,
+        val returnGames: Int = 0,
+        val breakPointsWon: Int = 0,
+        val breakPoints: Int = 0,
+        val pointsWon: Int = 0,
+        val points: Int = 0,
+        val gamesWon: Int = 0,
+        val games: Int = 0,
+        /** Punti vinti di fila (il massimo nel periodo). */
+        val maxStreak: Int = 0,
+        /** Punti vinti tra gli ultimi 10 del periodo. */
+        val last10: Int = 0,
+        val matchPointsSaved: Int = 0,
+    )
+
+    /** [set] = null: tutta la partita; altrimenti solo quel set (0 = primo). */
+    fun totals(all: List<PlayedPoint>, set: Int? = null): Map<Side, SideTotals> {
+        val pts = if (set == null) all else all.filter { it.set == set }
+        return Side.entries.associateWith { totalsFor(pts, it) }
+    }
+
+    private fun totalsFor(pts: List<PlayedPoint>, me: Side): SideTotals {
+        val serve = pts.filter { it.server == me }
+        val ret = pts.filter { it.server != me }
+        // Game chiusi: il tie-break di set conta come un game (7-6), il match tie-break no.
+        val games = pts.filter { it.gameWinner != null && it.tiebreak != TiebreakKind.MATCH }
+        // Game al servizio e in risposta: solo quelli normali (nel tie-break si serve a turno).
+        val regular = games.filter { it.tiebreak == TiebreakKind.NONE }
+        var streak = 0
+        var best = 0
+        for (p in pts) {
+            streak = if (p.winner == me) streak + 1 else 0
+            best = maxOf(best, streak)
+        }
+        return SideTotals(
+            servePointsWon = serve.count { it.winner == me },
+            servePoints = serve.size,
+            serviceGamesWon = regular.count { it.server == me && it.gameWinner == me },
+            serviceGames = regular.count { it.server == me },
+            breakPointsSaved = serve.count { it.breakPoint && it.winner == me },
+            breakPointsFaced = serve.count { it.breakPoint },
+            returnPointsWon = ret.count { it.winner == me },
+            returnPoints = ret.size,
+            returnGamesWon = regular.count { it.server != me && it.gameWinner == me },
+            returnGames = regular.count { it.server != me },
+            breakPointsWon = ret.count { it.breakPoint && it.winner == me },
+            breakPoints = ret.count { it.breakPoint },
+            pointsWon = pts.count { it.winner == me },
+            points = pts.size,
+            gamesWon = games.count { it.gameWinner == me },
+            games = games.size,
+            maxStreak = best,
+            last10 = pts.takeLast(10).count { it.winner == me },
+            matchPointsSaved = pts.count { it.matchPointFor == me.other && it.winner == me },
+        )
+    }
+
+    /** Colpi per punto nel periodo (punti con la lunghezza dello scambio); null se non ce ne sono. */
+    fun rally(all: List<PlayedPoint>, set: Int? = null): Reports.RallyStats? =
+        Reports.rallyStats(all.filter { set == null || it.set == set }.mapNotNull { it.strokes })
+
+    // ------------------------------------------------------------------ cronologia
+
+    /** Cosa si gioca il punto successivo: palla break, set point o match point. */
+    enum class Marker { BREAK_POINT, SET_POINT, MATCH_POINT }
+
+    /** Punteggio dopo un punto ("30", "40", "AD"; numeri nel tie-break) e la palla che si gioca dopo. */
+    data class ScoreStep(val p1: String, val p2: String, val marker: Marker?)
+
+    data class GameLog(
+        val set: Int,
+        /** Chi serve il game (nel tie-break: chi serve il primo punto). */
+        val server: Side,
+        val tiebreak: TiebreakKind,
+        /** Game nel set dopo questo game; per il match tie-break i punti del tie-break. */
+        val games1: Int,
+        val games2: Int,
+        /** null = game in corso (partita sospesa). */
+        val winner: Side?,
+        /** Game perso da chi serviva (fuori dal tie-break). */
+        val broken: Boolean,
+        /** Punteggi dopo ogni punto tranne quello che chiude il game. */
+        val steps: List<ScoreStep>,
+        /** Punti del tie-break (solo se [tiebreak] non è NONE e il tie-break è finito). */
+        val tb1: Int? = null,
+        val tb2: Int? = null,
+        val closesSet: Boolean = false,
+        val closesMatch: Boolean = false,
+    )
+
+    fun chronology(all: List<PlayedPoint>): List<GameLog> {
+        val out = mutableListOf<GameLog>()
+        var cur = mutableListOf<PlayedPoint>()
+        for (p in all) {
+            cur += p
+            if (p.gameWinner != null) {
+                out += game(cur)
+                cur = mutableListOf()
+            }
+        }
+        if (cur.isNotEmpty()) out += game(cur)
+        return out
+    }
+
+    private fun marker(s: MatchState): Marker? = when {
+        s.isFinished -> null
+        Side.entries.any { ScoreEngine.lookahead(s, it)?.matchWinner == it } -> Marker.MATCH_POINT
+        Side.entries.any { ScoreEngine.lookahead(s, it)?.setWinner == it } -> Marker.SET_POINT
+        ScoreEngine.isBreakPoint(s) -> Marker.BREAK_POINT
+        else -> null
+    }
+
+    private fun game(pts: List<PlayedPoint>): GameLog {
+        val first = pts.first()
+        val last = pts.last()
+        val winner = last.gameWinner
+        val steps = pts.filter { it.gameWinner == null }
+            .map { ScoreStep(it.after.pointLabel(Side.P1), it.after.pointLabel(Side.P2), marker(it.after)) }
+        // Game che chiude il set: il punteggio sta nel set appena aggiunto, altrimenti nei game in corso.
+        val closedSet = last.after.sets.getOrNull(first.set)?.takeIf { winner != null }
+        val mtb = first.tiebreak == TiebreakKind.MATCH
+        return GameLog(
+            set = first.set,
+            server = first.server,
+            tiebreak = first.tiebreak,
+            games1 = when {
+                closedSet == null -> last.after.g1
+                mtb -> closedSet.tb1 ?: 0
+                else -> closedSet.g1
+            },
+            games2 = when {
+                closedSet == null -> last.after.g2
+                mtb -> closedSet.tb2 ?: 0
+                else -> closedSet.g2
+            },
+            winner = winner,
+            broken = first.tiebreak == TiebreakKind.NONE && winner != null && winner != first.server,
+            steps = steps,
+            tb1 = closedSet?.tb1.takeIf { first.tiebreak != TiebreakKind.NONE },
+            tb2 = closedSet?.tb2.takeIf { first.tiebreak != TiebreakKind.NONE },
+            closesSet = closedSet != null,
+            closesMatch = winner != null && last.after.isFinished,
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Models.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Models.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -3289,6 +3633,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Models.kt" << 'TSM_E
 
 package com.tennis.scoremanager.data
 
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -3367,7 +3712,46 @@ data class MatchRecord(
     /** Carica dei braccialetti (%) all'inizio e alla fine della partita, per verificare l'autonomia. */
     val batteryStart: Map<Side, Int> = emptyMap(),
     val batteryEnd: Map<Side, Int> = emptyMap(),
+    /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
+    val strokes: Map<Side, StrokeStats> = emptyMap(),
 )
+
+/**
+ * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.
+ * [gyroSum]/[gyroMax]: velocità di rotazione del polso al picco (°/s) per tipo di colpo, per media e massimo.
+ */
+@Serializable
+data class StrokeStats(
+    val counts: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+    val unknown: Int = 0,
+    val gyroSum: List<Long> = List(BandProtocol.STROKE_COUNT) { 0L },
+    val gyroMax: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
+) {
+    val total: Int get() = counts.sum() + unknown
+
+    fun count(stroke: Int): Int = counts.getOrElse(stroke) { 0 }
+
+    /** Media della velocità del polso per quel colpo; null se non ce ne sono (o partita salvata senza velocità). */
+    fun avgGyro(stroke: Int): Int? {
+        val n = count(stroke)
+        val sum = gyroSum.getOrElse(stroke) { 0L }
+        return if (n > 0 && sum > 0) (sum / n).toInt() else null
+    }
+
+    fun maxGyro(stroke: Int): Int? = gyroMax.getOrElse(stroke) { 0 }.takeIf { it > 0 }
+
+    fun add(stroke: Int, peakGyroDps: Int): StrokeStats {
+        if (stroke !in counts.indices) return copy(unknown = unknown + 1)
+        fun <T> List<T>.at(i: Int, f: (T) -> T) = mapIndexed { j, v -> if (j == i) f(v) else v }
+        val sums = gyroSum.takeIf { it.size == counts.size } ?: List(counts.size) { 0L }
+        val maxs = gyroMax.takeIf { it.size == counts.size } ?: List(counts.size) { 0 }
+        return copy(
+            counts = counts.at(stroke) { it + 1 },
+            gyroSum = sums.at(stroke) { it + peakGyroDps },
+            gyroMax = maxs.at(stroke) { maxOf(it, peakGyroDps) },
+        )
+    }
+}
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
 class Names(private val setup: SetupData, private val strings: Strings) : CallNames {
@@ -3418,6 +3802,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
@@ -3476,6 +3861,44 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
+    /** "Dritto 12 · Rovescio 8 · Servizio 5 · Volée 3" (+ i non riconosciuti, se ce ne sono); null senza colpi. */
+    fun strokesLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side]?.takeIf { it.total > 0 } ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).map { "${s.strokeName(it)} ${st.count(it)}" } +
+            listOfNotNull(st.unknown.takeIf { it > 0 }?.let { "${s.strokeOther} $it" })
+        return parts.joinToString(" · ")
+    }
+
+    /** "Dritto 1450 °/s (max 1980) · Servizio 1620 °/s (max 2010)": velocità del polso al picco; null senza dati. */
+    fun wristSpeedLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side] ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).mapNotNull { k ->
+            val avg = st.avgGyro(k) ?: return@mapNotNull null
+            "${s.strokeName(k)} $avg °/s (${s.maxShort} ${st.maxGyro(k) ?: avg})"
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
+    data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
+
+    /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
+    fun rallyStats(rec: MatchRecord): RallyStats? = rallyStats(rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes })
+
+    /** Da una lista di lunghezze di scambio (colpi per punto); null se vuota. */
+    fun rallyStats(r: List<Int>): RallyStats? {
+        if (r.isEmpty()) return null
+        fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
+        val short = pct(r.count { it <= 3 })
+        val long = pct(r.count { it >= 9 })
+        return RallyStats(r.size, r.average(), r.max(), short, (100 - short - long).coerceAtLeast(0), long)
+    }
+
+    /** "media 4,2 · più lungo 15 · brevi (1-3) 45% · medi (4-8) 40% · lunghi (9+) 15%" */
+    fun rallyLine(st: RallyStats, s: Strings, lang: Lang): String =
+        "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
+            "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
+
     fun formatLabel(rec: MatchRecord, s: Strings): String {
         val padel = rec.setup.sport == Sport.PADEL
         return (if (padel) "${s.sportPadel} · " else "") +
@@ -3518,6 +3941,9 @@ object Reports {
         sb.appendLine("📋 ${s.format}: ${formatLabel(rec, s)}")
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
+        for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
+        for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
+        rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))
@@ -3824,7 +4250,8 @@ data class RulesConfig(
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    data class Point(val winner: Side, val at: Long = 0L) : MatchEvent()
+    /** [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati. */
+    data class Point(val winner: Side, val at: Long = 0L, val strokes: Int? = null) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable
@@ -5842,15 +6269,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.Sensors
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -5860,10 +6292,12 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -5877,6 +6311,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.LinkState
@@ -5942,6 +6377,8 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
             commit(draft.copy(idleTimeoutMin = it))
         }
 
+        StrokesSection(c, side, settings, draft) { commit(it) }
+
         Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery, locale)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -5966,6 +6403,81 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
                 c.powerOffBand(side)
             },
             onDismiss = { confirmOff = false },
+        )
+    }
+}
+
+/**
+ * Colpi (firmware 2.4): riconoscimento, colpo a schermo e calibrazione. Gli esempi li raccoglie il braccialetto
+ * (un colpo eseguito = un esempio) e i contatori arrivano con le impostazioni. Chiudendo il pannello la
+ * calibrazione finisce, così il braccialetto non continua a raccogliere esempi a pannello chiuso.
+ */
+@Composable
+private fun StrokesSection(c: MatchController, side: Side, settings: BandSettings, draft: BandSettings, commit: (BandSettings) -> Unit) {
+    val s = LocalStrings.current
+    Label(Icons.Filled.SportsTennis, s.strokes)
+    val examples = settings.strokeExamples
+    if (examples == null) {
+        Text(s.strokesFirmwareOld, color = TsmColors.TextDim, fontSize = 13.sp)
+        return
+    }
+    val calibrating by rememberUpdatedState(settings.calibrating)
+    DisposableEffect(side) { onDispose { if (calibrating >= 0) c.calibrateStroke(side, null) } }
+    var confirmClear by remember(side) { mutableStateOf<Int?>(null) }
+
+    SwitchRow(Icons.Filled.Sensors, s.strokeRecognition, s.strokeRecognitionHint, draft.strokes) { commit(draft.copy(strokes = it)) }
+    SwitchRow(Icons.Filled.Visibility, s.strokeOnBand, s.strokeOnBandHint, draft.strokeDisplay, enabled = draft.strokes) {
+        commit(draft.copy(strokeDisplay = it))
+    }
+
+    Text(s.strokeCalibration, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+    Text(s.strokeCalibrationHint, color = TsmColors.TextDim, fontSize = 12.sp)
+    for (stroke in 0 until BandProtocol.STROKE_COUNT) {
+        val active = settings.calibrating == stroke
+        val n = examples.getOrElse(stroke) { 0 }
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                .background(if (active) TsmColors.Ball.copy(alpha = 0.12f) else TsmColors.SurfaceHigh.copy(alpha = 0.5f))
+                .padding(start = 12.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(s.strokeName(stroke), color = if (active) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("$n/${BandSettings.MAX_EXAMPLES}", color = if (n >= BandSettings.MIN_EXAMPLES) TsmColors.Ball else TsmColors.TextDim,
+                fontWeight = FontWeight.Bold)
+            IconButton(onClick = { confirmClear = stroke }, enabled = n > 0) {
+                Icon(Icons.Filled.DeleteOutline, s.clearExamples, tint = if (n > 0) TsmColors.TextDim else TsmColors.Outline)
+            }
+            Button(
+                onClick = { c.calibrateStroke(side, if (active) null else stroke) },
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (active) TsmColors.Ball else TsmColors.SurfaceHigh,
+                    contentColor = if (active) TsmColors.OnBall else TsmColors.TextMain,
+                ),
+            ) { Text(if (active) s.calibrateStop else s.calibrate, fontSize = 13.sp, maxLines = 1) }
+        }
+    }
+    PanelButton(s.undoExample, Icons.AutoMirrored.Filled.Undo, Modifier.fillMaxWidth(), enabled = examples.sum() > 0) {
+        c.undoStrokeExample(side)
+    }
+    Text(
+        if (settings.strokesReady) s.strokesReady else s.strokesNotReady,
+        color = if (settings.strokesReady) TsmColors.Ball else TsmColors.Orange, fontSize = 12.sp,
+    )
+
+    confirmClear?.let { stroke ->
+        ConfirmDialog(
+            icon = Icons.Filled.DeleteOutline,
+            title = s.clearExamples,
+            text = s.strokeName(stroke),
+            confirm = s.clearExamples,
+            danger = true,
+            onConfirm = {
+                confirmClear = null
+                c.clearStrokeExamples(side, stroke)
+            },
+            onDismiss = { confirmClear = null },
         )
     }
 }
@@ -6100,6 +6612,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -6111,6 +6624,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -6146,6 +6660,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -6389,14 +6904,29 @@ fun BigButton(
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = onColor),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(
-            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center, lineHeight = 17.sp,
-        )
+        ButtonLabel(text, bold = true)
     }
+}
+
+/** Margini interni dei pulsanti grandi: più stretti di quelli di Material (24 dp) per lasciare posto al testo. */
+private val ButtonPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+
+/**
+ * Testo dei pulsanti grandi: al massimo due righe e, se non ci sta (carattere grande del telefono, lingue lunghe),
+ * si rimpicciolisce quanto basta invece di troncarsi. L'altezza del pulsante resta fissa: due pulsanti affiancati
+ * restano uguali.
+ */
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified, bold: Boolean = false) {
+    Text(
+        text, color = color, fontWeight = if (bold) FontWeight.Bold else null, maxLines = 2, overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center, lineHeight = 1.1.em,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp, stepSize = 0.5.sp),
+    )
 }
 
 @Composable
@@ -6406,10 +6936,11 @@ fun GhostButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: 
         enabled = enabled,
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null, tint = TsmColors.TextMain)
         Spacer(Modifier.width(8.dp))
-        Text(text, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        ButtonLabel(text, color = TsmColors.TextMain)
     }
 }
 
@@ -6623,6 +7154,71 @@ interface Strings {
     val estimateMeasured: String
     val estimateTheory: String
     val copyToOther: String
+
+    // Colpi (braccialetti con firmware 2.4)
+    val strokes: String
+    /** Nome del colpo BandProtocol.STROKE_* ("Dritto"). */
+    val strokeName: (Int) -> String
+    /** Sigla del colpo per la schermata partita ("D"). */
+    val strokeAbbr: (Int) -> String
+    val strokeOther: String
+    val strokeRecognition: String
+    val strokeRecognitionHint: String
+    val strokeOnBand: String
+    val strokeOnBandHint: String
+    val strokeCalibration: String
+    val strokeCalibrationHint: String
+    val calibrate: String
+    val calibrateStop: String
+    val undoExample: String
+    val clearExamples: String
+    val strokesReady: String
+    val strokesNotReady: String
+    val strokesFirmwareOld: String
+    /** Riepilogo: velocità di rotazione del polso al picco del colpo (°/s). */
+    val wristSpeed: String
+    val maxShort: String
+    /** Riepilogo: colpi per punto (lunghezza degli scambi). */
+    val strokesPerPoint: String
+    val rallyAverage: String
+    val rallyLongest: String
+    val rallyShort: String
+    val rallyMedium: String
+    val rallyLong: String
+    // Riepilogo: schede, statistiche e cronologia punto per punto
+    val tabSummary: String
+    val tabStats: String
+    val tabChronology: String
+    val periodMatch: String
+    /** "Set 1", "Set 2"... */
+    val periodSet: (Int) -> String
+    val statsHint: String
+    val statServe: String
+    val statReturn: String
+    val statPoints: String
+    val statGames: String
+    val statServicePoints: String
+    val statServiceGames: String
+    val statBreakSaved: String
+    val statReturnPoints: String
+    val statReturnGames: String
+    val statBreakWon: String
+    val statTotalPoints: String
+    val statStreak: String
+    val statLast10: String
+    val statMatchPointsSaved: String
+    val statTotalGames: String
+    val statStrokesTotal: String
+    val statAvgWristSpeed: String
+    val serveLost: String
+    val markerBreak: String
+    val markerSet: String
+    val markerMatch: String
+    val chronoGame: String
+    val chronoBreak: String
+    val chronoSet: String
+    val chronoMatch: String
+    val chronoTiebreak: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -6977,6 +7573,63 @@ object ItStrings : Strings {
     override val estimateMeasured = "Base misurata su questo braccialetto durante l'uso."
     override val estimateTheory = "Stima teorica: dopo 20 minuti di uso si corregge col consumo misurato."
     override val copyToOther = "Copia sull'altro braccialetto"
+    override val strokes = "Colpi"
+    override val strokeName: (Int) -> String = { listOf("Dritto", "Rovescio", "Servizio", "Volée").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("D", "R", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Non riconosciuti"
+    override val strokeRecognition = "Riconoscimento colpi"
+    override val strokeRecognitionHint = "Il braccialetto riconosce dritto, rovescio, servizio e volée di chi lo indossa. Il sensore di movimento acceso consuma un po' di più."
+    override val strokeOnBand = "Mostra il colpo sul braccialetto"
+    override val strokeOnBandHint = "Per un attimo, solo se il display non mostra altro."
+    override val strokeCalibration = "Calibrazione"
+    override val strokeCalibrationHint = "Indossa il braccialetto come in partita, tocca Calibra e fai 5-10 colpi di quel tipo, con una pausa tra uno e l'altro. Gli esempi restano nel braccialetto."
+    override val calibrate = "Calibra"
+    override val calibrateStop = "Fine"
+    override val undoExample = "Annulla l'ultimo"
+    override val clearExamples = "Cancella gli esempi"
+    override val strokesReady = "Pronto: riconosce i colpi calibrati."
+    override val strokesNotReady = "Servono almeno 3 esempi per 2 colpi."
+    override val strokesFirmwareOld = "Per riconoscere i colpi carica il firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocità del polso"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Colpi per punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "più lungo"
+    override val rallyShort = "brevi"
+    override val rallyMedium = "medi"
+    override val rallyLong = "lunghi"
+    override val tabSummary = "Riassunto"
+    override val tabStats = "Statistiche"
+    override val tabChronology = "Cronologia"
+    override val periodMatch = "Partita"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statServe = "Servizio"
+    override val statReturn = "Risposta"
+    override val statPoints = "Punti"
+    override val statGames = "Game"
+    override val statServicePoints = "Punti vinti al servizio"
+    override val statServiceGames = "Game vinti al servizio"
+    override val statBreakSaved = "Palle break salvate"
+    override val statReturnPoints = "Punti vinti in risposta"
+    override val statReturnGames = "Game vinti in risposta"
+    override val statBreakWon = "Palle break vinte"
+    override val statTotalPoints = "Totale punti vinti"
+    override val statStreak = "Punti di fila (max)"
+    override val statLast10 = "Ultimi 10 punti"
+    override val statMatchPointsSaved = "Match point annullati"
+    override val statTotalGames = "Totale game vinti"
+    override val statStrokesTotal = "Colpi totali"
+    override val statAvgWristSpeed = "Velocità media del polso"
+    override val serveLost = "Servizio perso"
+    override val markerBreak = "PB"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTITA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -7320,6 +7973,63 @@ object EnStrings : Strings {
     override val estimateMeasured = "Base draw measured on this wristband while in use."
     override val estimateTheory = "Theoretical estimate: after 20 minutes of use it switches to the measured draw."
     override val copyToOther = "Copy to the other wristband"
+    override val strokes = "Strokes"
+    override val strokeName: (Int) -> String = { listOf("Forehand", "Backhand", "Serve", "Volley").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("F", "B", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Not recognized"
+    override val strokeRecognition = "Stroke recognition"
+    override val strokeRecognitionHint = "The wristband recognizes the wearer's forehand, backhand, serve and volley. The motion sensor uses a little more battery."
+    override val strokeOnBand = "Show the stroke on the wristband"
+    override val strokeOnBandHint = "Briefly, only when the display shows nothing else."
+    override val strokeCalibration = "Calibration"
+    override val strokeCalibrationHint = "Wear the wristband as in a match, tap Calibrate and play 5-10 strokes of that type, with a short pause between them. The examples are stored in the wristband."
+    override val calibrate = "Calibrate"
+    override val calibrateStop = "Done"
+    override val undoExample = "Undo the last one"
+    override val clearExamples = "Clear the examples"
+    override val strokesReady = "Ready: it recognizes the calibrated strokes."
+    override val strokesNotReady = "At least 3 examples for 2 strokes are needed."
+    override val strokesFirmwareOld = "To recognize strokes, upload the TSM_Band 2.4 firmware."
+    override val wristSpeed = "Wrist speed"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Strokes per point"
+    override val rallyAverage = "average"
+    override val rallyLongest = "longest"
+    override val rallyShort = "short"
+    override val rallyMedium = "medium"
+    override val rallyLong = "long"
+    override val tabSummary = "Summary"
+    override val tabStats = "Statistics"
+    override val tabChronology = "Point by point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statServe = "Serve"
+    override val statReturn = "Return"
+    override val statPoints = "Points"
+    override val statGames = "Games"
+    override val statServicePoints = "Service points won"
+    override val statServiceGames = "Service games won"
+    override val statBreakSaved = "Break points saved"
+    override val statReturnPoints = "Return points won"
+    override val statReturnGames = "Return games won"
+    override val statBreakWon = "Break points won"
+    override val statTotalPoints = "Total points won"
+    override val statStreak = "Points in a row (max)"
+    override val statLast10 = "Last 10 points"
+    override val statMatchPointsSaved = "Match points saved"
+    override val statTotalGames = "Total games won"
+    override val statStrokesTotal = "Total strokes"
+    override val statAvgWristSpeed = "Average wrist speed"
+    override val serveLost = "Lost serve"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
@@ -7686,6 +8396,63 @@ object DeStrings : Strings {
     override val estimateMeasured = "Grundverbrauch an diesem Armband während der Nutzung gemessen."
     override val estimateTheory = "Theoretische Schätzung: Nach 20 Minuten Nutzung wird sie mit dem gemessenen Verbrauch korrigiert."
     override val copyToOther = "Auf das andere Armband kopieren"
+    override val strokes = "Schläge"
+    override val strokeName: (Int) -> String = { listOf("Vorhand", "Rückhand", "Aufschlag", "Volley").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("VH", "RH", "A", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Nicht erkannt"
+    override val strokeRecognition = "Schlagerkennung"
+    override val strokeRecognitionHint = "Das Armband erkennt Vorhand, Rückhand, Aufschlag und Volley der Person, die es trägt. Der eingeschaltete Bewegungssensor braucht etwas mehr Akku."
+    override val strokeOnBand = "Schlag auf dem Armband anzeigen"
+    override val strokeOnBandHint = "Kurz, nur wenn das Display nichts anderes zeigt."
+    override val strokeCalibration = "Kalibrierung"
+    override val strokeCalibrationHint = "Trage das Armband wie im Match, tippe auf Kalibrieren und spiele 5-10 Schläge dieser Art, mit einer kurzen Pause dazwischen. Die Beispiele bleiben im Armband gespeichert."
+    override val calibrate = "Kalibrieren"
+    override val calibrateStop = "Fertig"
+    override val undoExample = "Letzten rückgängig"
+    override val clearExamples = "Beispiele löschen"
+    override val strokesReady = "Bereit: Es erkennt die kalibrierten Schläge."
+    override val strokesNotReady = "Es braucht mindestens 3 Beispiele für 2 Schläge."
+    override val strokesFirmwareOld = "Für die Schlagerkennung lade die Firmware TSM_Band 2.4 hoch."
+    override val wristSpeed = "Handgelenk-Tempo"
+    override val maxShort = "max."
+    override val strokesPerPoint = "Schläge pro Punkt"
+    override val rallyAverage = "Schnitt"
+    override val rallyLongest = "längster"
+    override val rallyShort = "kurz"
+    override val rallyMedium = "mittel"
+    override val rallyLong = "lang"
+    override val tabSummary = "Übersicht"
+    override val tabStats = "Statistiken"
+    override val tabChronology = "Punkt für Punkt"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "$it. Satz" }
+    override val statsHint = "Berechnet aus den in der App eingetragenen Punkten und, mit den Armbändern, aus den Schlägen. Asse, Doppelfehler, erste Aufschläge und Fehler sind nicht bekannt."
+    override val statServe = "Aufschlag"
+    override val statReturn = "Rückschlag"
+    override val statPoints = "Punkte"
+    override val statGames = "Spiele"
+    override val statServicePoints = "Gewonnene Aufschlagpunkte"
+    override val statServiceGames = "Gewonnene Aufschlagspiele"
+    override val statBreakSaved = "Abgewehrte Breakbälle"
+    override val statReturnPoints = "Gewonnene Returnpunkte"
+    override val statReturnGames = "Gewonnene Returnspiele"
+    override val statBreakWon = "Genutzte Breakbälle"
+    override val statTotalPoints = "Gewonnene Punkte gesamt"
+    override val statStreak = "Punkte in Folge (max.)"
+    override val statLast10 = "Letzte 10 Punkte"
+    override val statMatchPointsSaved = "Abgewehrte Matchbälle"
+    override val statTotalGames = "Gewonnene Spiele gesamt"
+    override val statStrokesTotal = "Schläge gesamt"
+    override val statAvgWristSpeed = "Ø Handgelenk-Tempo"
+    override val serveLost = "Aufschlag verloren"
+    override val markerBreak = "BB"
+    override val markerSet = "SB"
+    override val markerMatch = "MB"
+    override val chronoGame = "SPIEL"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SATZ"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Ausschalten"
     override val bandPowerOffTitle = "Armband ausschalten?"
     override val bandPowerOffText: (String) -> String = { "$it schaltet sich sofort aus. Zum Einschalten: ein Klick auf die Seitentaste." }
@@ -8044,6 +8811,63 @@ object EsStrings : Strings {
     override val estimateMeasured = "Consumo base medido en esta pulsera durante el uso."
     override val estimateTheory = "Estimación teórica: tras 20 minutos de uso se corrige con el consumo medido."
     override val copyToOther = "Copiar a la otra pulsera"
+    override val strokes = "Golpes"
+    override val strokeName: (Int) -> String = { listOf("Derecha", "Revés", "Saque", "Volea").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("D", "R", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "No reconocidos"
+    override val strokeRecognition = "Reconocimiento de golpes"
+    override val strokeRecognitionHint = "La pulsera reconoce la derecha, el revés, el saque y la volea de quien la lleva. El sensor de movimiento encendido gasta un poco más de batería."
+    override val strokeOnBand = "Mostrar el golpe en la pulsera"
+    override val strokeOnBandHint = "Un momento, solo si la pantalla no muestra otra cosa."
+    override val strokeCalibration = "Calibración"
+    override val strokeCalibrationHint = "Ponte la pulsera como en un partido, toca Calibrar y haz 5-10 golpes de ese tipo, con una pausa entre uno y otro. Los ejemplos se guardan en la pulsera."
+    override val calibrate = "Calibrar"
+    override val calibrateStop = "Terminar"
+    override val undoExample = "Deshacer el último"
+    override val clearExamples = "Borrar los ejemplos"
+    override val strokesReady = "Lista: reconoce los golpes calibrados."
+    override val strokesNotReady = "Hacen falta al menos 3 ejemplos de 2 golpes."
+    override val strokesFirmwareOld = "Para reconocer los golpes, carga el firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocidad de muñeca"
+    override val maxShort = "máx."
+    override val strokesPerPoint = "Golpes por punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "más largo"
+    override val rallyShort = "cortos"
+    override val rallyMedium = "medios"
+    override val rallyLong = "largos"
+    override val tabSummary = "Resumen"
+    override val tabStats = "Estadísticas"
+    override val tabChronology = "Punto a punto"
+    override val periodMatch = "Partido"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calculadas a partir de los puntos anotados en la app y, con las pulseras, de los golpes. Aces, dobles faltas, primeros saques y errores no se pueden saber."
+    override val statServe = "Saque"
+    override val statReturn = "Resto"
+    override val statPoints = "Puntos"
+    override val statGames = "Juegos"
+    override val statServicePoints = "Puntos ganados con el saque"
+    override val statServiceGames = "Juegos de saque ganados"
+    override val statBreakSaved = "Bolas de break salvadas"
+    override val statReturnPoints = "Puntos ganados al resto"
+    override val statReturnGames = "Juegos ganados al resto"
+    override val statBreakWon = "Bolas de break ganadas"
+    override val statTotalPoints = "Total de puntos ganados"
+    override val statStreak = "Puntos seguidos (máx.)"
+    override val statLast10 = "Últimos 10 puntos"
+    override val statMatchPointsSaved = "Bolas de partido salvadas"
+    override val statTotalGames = "Total de juegos ganados"
+    override val statStrokesTotal = "Golpes totales"
+    override val statAvgWristSpeed = "Velocidad media de muñeca"
+    override val serveLost = "Saque perdido"
+    override val markerBreak = "BB"
+    override val markerSet = "BS"
+    override val markerMatch = "BP"
+    override val chronoGame = "JUEGO"
+    override val chronoBreak = "ROTURA"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTIDO"
+    override val chronoTiebreak = "Desempate"
     override val powerOff = "Apagar"
     override val bandPowerOffTitle = "¿Apagar la pulsera?"
     override val bandPowerOffText: (String) -> String = { "$it se apaga ahora mismo. Para volver a encenderla: un clic en el botón lateral." }
@@ -8406,6 +9230,63 @@ object FrStrings : Strings {
     override val estimateMeasured = "Consommation de base mesurée sur ce bracelet pendant l'utilisation."
     override val estimateTheory = "Estimation théorique : après 20 minutes d'utilisation, elle se corrige avec la consommation mesurée."
     override val copyToOther = "Copier sur l'autre bracelet"
+    override val strokes = "Coups"
+    override val strokeName: (Int) -> String = { listOf("Coup droit", "Revers", "Service", "Volée").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("CD", "R", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Non reconnus"
+    override val strokeRecognition = "Reconnaissance des coups"
+    override val strokeRecognitionHint = "Le bracelet reconnaît le coup droit, le revers, le service et la volée de la personne qui le porte. Le capteur de mouvement allumé consomme un peu plus."
+    override val strokeOnBand = "Afficher le coup sur le bracelet"
+    override val strokeOnBandHint = "Un instant, seulement si l'écran n'affiche rien d'autre."
+    override val strokeCalibration = "Calibrage"
+    override val strokeCalibrationHint = "Portez le bracelet comme en match, touchez Calibrer et faites 5 à 10 coups de ce type, avec une courte pause entre chacun. Les exemples restent dans le bracelet."
+    override val calibrate = "Calibrer"
+    override val calibrateStop = "Terminer"
+    override val undoExample = "Annuler le dernier"
+    override val clearExamples = "Effacer les exemples"
+    override val strokesReady = "Prêt : il reconnaît les coups calibrés."
+    override val strokesNotReady = "Il faut au moins 3 exemples pour 2 coups."
+    override val strokesFirmwareOld = "Pour reconnaître les coups, chargez le firmware TSM_Band 2.4."
+    override val wristSpeed = "Vitesse du poignet"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Coups par point"
+    override val rallyAverage = "moyenne"
+    override val rallyLongest = "le plus long"
+    override val rallyShort = "courts"
+    override val rallyMedium = "moyens"
+    override val rallyLong = "longs"
+    override val tabSummary = "Résumé"
+    override val tabStats = "Statistiques"
+    override val tabChronology = "Point par point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { if (it == 1) "1re manche" else "${it}e manche" }
+    override val statsHint = "Calculées à partir des points marqués dans l'appli et, avec les bracelets, des coups. Aces, doubles fautes, premières balles et fautes ne peuvent pas être connus."
+    override val statServe = "Service"
+    override val statReturn = "Retour"
+    override val statPoints = "Points"
+    override val statGames = "Jeux"
+    override val statServicePoints = "Points gagnés au service"
+    override val statServiceGames = "Jeux de service gagnés"
+    override val statBreakSaved = "Balles de break sauvées"
+    override val statReturnPoints = "Points gagnés en retour"
+    override val statReturnGames = "Jeux de retour gagnés"
+    override val statBreakWon = "Balles de break converties"
+    override val statTotalPoints = "Total des points gagnés"
+    override val statStreak = "Points d'affilée (max)"
+    override val statLast10 = "10 derniers points"
+    override val statMatchPointsSaved = "Balles de match sauvées"
+    override val statTotalGames = "Total des jeux gagnés"
+    override val statStrokesTotal = "Total des coups"
+    override val statAvgWristSpeed = "Vitesse moyenne du poignet"
+    override val serveLost = "Service perdu"
+    override val markerBreak = "BB"
+    override val markerSet = "BS"
+    override val markerMatch = "BM"
+    override val chronoGame = "JEU"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "MANCHE"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Jeu décisif"
     override val powerOff = "Éteindre"
     override val bandPowerOffTitle = "Éteindre le bracelet ?"
     override val bandPowerOffText: (String) -> String = { "$it s'éteint tout de suite. Pour le rallumer : un clic sur le bouton latéral." }
@@ -8767,6 +9648,63 @@ object PtStrings : Strings {
     override val estimateMeasured = "Consumo base medido nesta pulseira durante o uso."
     override val estimateTheory = "Estimativa teórica: após 20 minutos de uso ela é corrigida com o consumo medido."
     override val copyToOther = "Copiar para a outra pulseira"
+    override val strokes = "Golpes"
+    override val strokeName: (Int) -> String = { listOf("Forehand", "Backhand", "Saque", "Voleio").getOrElse(it) { "?" } }
+    override val strokeAbbr: (Int) -> String = { listOf("F", "B", "S", "V").getOrElse(it) { "?" } }
+    override val strokeOther = "Não reconhecidos"
+    override val strokeRecognition = "Reconhecimento de golpes"
+    override val strokeRecognitionHint = "A pulseira reconhece forehand, backhand, saque e voleio de quem a usa. O sensor de movimento ligado gasta um pouco mais de bateria."
+    override val strokeOnBand = "Mostrar o golpe na pulseira"
+    override val strokeOnBandHint = "Por um instante, só se a tela não estiver mostrando outra coisa."
+    override val strokeCalibration = "Calibração"
+    override val strokeCalibrationHint = "Use a pulseira como numa partida, toque em Calibrar e faça 5-10 golpes desse tipo, com uma pausa entre eles. Os exemplos ficam salvos na pulseira."
+    override val calibrate = "Calibrar"
+    override val calibrateStop = "Concluir"
+    override val undoExample = "Desfazer o último"
+    override val clearExamples = "Apagar os exemplos"
+    override val strokesReady = "Pronta: reconhece os golpes calibrados."
+    override val strokesNotReady = "São necessários pelo menos 3 exemplos de 2 golpes."
+    override val strokesFirmwareOld = "Para reconhecer golpes, carregue o firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocidade do pulso"
+    override val maxShort = "máx."
+    override val strokesPerPoint = "Golpes por ponto"
+    override val rallyAverage = "média"
+    override val rallyLongest = "mais longo"
+    override val rallyShort = "curtos"
+    override val rallyMedium = "médios"
+    override val rallyLong = "longos"
+    override val tabSummary = "Resumo"
+    override val tabStats = "Estatísticas"
+    override val tabChronology = "Ponto a ponto"
+    override val periodMatch = "Partida"
+    override val periodSet: (Int) -> String = { "${it}º set" }
+    override val statsHint = "Calculadas a partir dos pontos marcados no app e, com as pulseiras, dos golpes. Aces, duplas faltas, primeiros saques e erros não podem ser conhecidos."
+    override val statServe = "Saque"
+    override val statReturn = "Devolução"
+    override val statPoints = "Pontos"
+    override val statGames = "Jogos"
+    override val statServicePoints = "Pontos ganhos no saque"
+    override val statServiceGames = "Jogos de saque ganhos"
+    override val statBreakSaved = "Break points salvos"
+    override val statReturnPoints = "Pontos ganhos na devolução"
+    override val statReturnGames = "Jogos ganhos na devolução"
+    override val statBreakWon = "Break points convertidos"
+    override val statTotalPoints = "Total de pontos ganhos"
+    override val statStreak = "Pontos seguidos (máx.)"
+    override val statLast10 = "Últimos 10 pontos"
+    override val statMatchPointsSaved = "Match points salvos"
+    override val statTotalGames = "Total de jogos ganhos"
+    override val statStrokesTotal = "Total de golpes"
+    override val statAvgWristSpeed = "Velocidade média do pulso"
+    override val serveLost = "Saque perdido"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "JOGO"
+    override val chronoBreak = "QUEBRA"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTIDA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Desligar"
     override val bandPowerOffTitle = "Desligar a pulseira?"
     override val bandPowerOffText: (String) -> String = { "$it desliga agora. Para ligá-la de novo: um clique no botão lateral." }
@@ -9389,10 +10327,12 @@ import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.LinkState
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -9438,6 +10378,7 @@ fun MatchScreen(c: MatchController) {
     ) {
         TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
+        if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -9651,6 +10592,22 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
     }
 }
 
+/** Colpi riconosciuti dai braccialetti finora: "G1  D 12 · R 8 · S 5 · V 3". */
+@Composable
+private fun StrokesRow(strokes: Map<Side, StrokeStats>) {
+    val s = LocalStrings.current
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (side in Side.entries) {
+            val st = strokes[side] ?: continue
+            Text(s.playerTag(side.ordinal + 1), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            Text(
+                (0 until BandProtocol.STROKE_COUNT).joinToString(" · ") { "${s.strokeAbbr(it)} ${st.count(it)}" },
+                color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 1,
+            )
+        }
+    }
+}
+
 /**
  * Riquadro arancione: spento, si accende 5 secondi con il messaggio.
  * Altezza minima, non fissa: con il carattere di sistema ingrandito la seconda riga non va persa.
@@ -9823,6 +10780,300 @@ private fun ControlButton(
             }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPanels.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPanels.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.MatchStats
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Come si mostra un dato: percentuale con "vinti/giocati", rapporto "5/9" o numero semplice. */
+private enum class StatKind { PERCENT, RATIO, COUNT }
+
+private data class Stat(val label: String, val a: Int, val aOf: Int, val b: Int, val bOf: Int, val kind: StatKind) {
+    constructor(label: String, a: Int, b: Int) : this(label, a, 0, b, 0, StatKind.COUNT)
+}
+
+private fun pct(v: Int, of: Int) = if (of > 0) Math.round(v * 100.0 / of).toInt() else 0
+
+/** Testo del valore e lunghezza della barra (0..1) per un lato. */
+private fun shown(st: Stat, v: Int, of: Int, other: Int): Pair<String, Float> = when (st.kind) {
+    StatKind.PERCENT -> "${pct(v, of)}% ($v/$of)" to (if (of > 0) v.toFloat() / of else 0f)
+    StatKind.RATIO -> "$v/$of" to (if (of > 0) v.toFloat() / of else 0f)
+    StatKind.COUNT -> "$v" to (if (maxOf(v, other) > 0) v.toFloat() / maxOf(v, other) else 0f)
+}
+
+/**
+ * Statistiche come nelle pagine dei risultati: per la partita o per set, valori dei due giocatori ai lati e barre
+ * che partono dal centro (colorata quella di chi è avanti). Solo dati che l'app conosce davvero.
+ */
+@Composable
+fun MatchStatsTab(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val pts = remember(rec) { MatchStats.points(rec) }
+    val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1
+    var period by remember(rec.id) { mutableStateOf<Int?>(null) }
+    val t = MatchStats.totals(pts, period)
+    val a = t.getValue(Side.P1)
+    val b = t.getValue(Side.P2)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (sets > 1) {
+            Segmented(
+                listOf(SegOption(s.periodMatch)) + (1..sets).map { SegOption(s.periodSet(it)) },
+                selected = period?.plus(1) ?: 0,
+                onSelect = { period = if (it == 0) null else it - 1 },
+            )
+        }
+        NamesHeader(names)
+        StatSection(s.statServe, listOf(
+            Stat(s.statServicePoints, a.servePointsWon, a.servePoints, b.servePointsWon, b.servePoints, StatKind.PERCENT),
+            Stat(s.statServiceGames, a.serviceGamesWon, a.serviceGames, b.serviceGamesWon, b.serviceGames, StatKind.PERCENT),
+            Stat(s.statBreakSaved, a.breakPointsSaved, a.breakPointsFaced, b.breakPointsSaved, b.breakPointsFaced, StatKind.RATIO),
+        ))
+        StatSection(s.statReturn, listOf(
+            Stat(s.statReturnPoints, a.returnPointsWon, a.returnPoints, b.returnPointsWon, b.returnPoints, StatKind.PERCENT),
+            Stat(s.statReturnGames, a.returnGamesWon, a.returnGames, b.returnGamesWon, b.returnGames, StatKind.PERCENT),
+            Stat(s.statBreakWon, a.breakPointsWon, a.breakPoints, b.breakPointsWon, b.breakPoints, StatKind.RATIO),
+        ))
+        StatSection(s.statPoints, listOf(
+            Stat(s.statTotalPoints, a.pointsWon, a.points, b.pointsWon, b.points, StatKind.PERCENT),
+            Stat(s.statStreak, a.maxStreak, b.maxStreak),
+            Stat(s.statLast10, a.last10, b.last10),
+            Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
+        ))
+        StatSection(s.statGames, listOf(
+            Stat(s.statTotalGames, a.gamesWon, a.games, b.gamesWon, b.games, StatKind.PERCENT),
+        ))
+        // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
+        if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
+        MatchStats.rally(pts, period)?.let { r ->
+            StatCard(s.strokesPerPoint) {
+                Text(Reports.rallyLine(r, s, rec.options.lang), color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth())
+            }
+        }
+        Text(s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+    }
+}
+
+private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
+    val a = rec.strokes[Side.P1]
+    val b = rec.strokes[Side.P2]
+    if ((a?.total ?: 0) + (b?.total ?: 0) == 0) return null
+    fun avg(st: com.tennis.scoremanager.data.StrokeStats?): Int {
+        val n = st?.counts?.sum() ?: 0
+        val sum = st?.gyroSum?.sum() ?: 0L
+        return if (n > 0 && sum > 0) (sum / n).toInt() else 0
+    }
+    return listOf(Stat(s.statStrokesTotal, a?.total ?: 0, b?.total ?: 0)) +
+        (0 until BandProtocol.STROKE_COUNT).map { Stat(s.strokeName(it), a?.count(it) ?: 0, b?.count(it) ?: 0) } +
+        listOfNotNull(Stat("${s.statAvgWristSpeed} (°/s)", avg(a), avg(b)).takeIf { it.a > 0 || it.b > 0 })
+}
+
+@Composable
+private fun NamesHeader(names: Names) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(names.short(Side.P1), color = TsmColors.player(Side.P1), fontWeight = FontWeight.Bold, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Spacer(Modifier.width(12.dp))
+        Text(names.short(Side.P2), color = TsmColors.player(Side.P2), fontWeight = FontWeight.Bold, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+    }
+}
+
+@Composable
+private fun StatCard(title: String, content: @Composable () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(title.uppercase(), color = TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
+            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        content()
+    }
+}
+
+@Composable
+private fun StatSection(title: String, rows: List<Stat>) = StatCard(title) { rows.forEach { StatBar(it) } }
+
+@Composable
+private fun StatBar(st: Stat) {
+    val (ta, fa) = shown(st, st.a, st.aOf, st.b)
+    val (tb, fb) = shown(st, st.b, st.bOf, st.a)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(ta, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(st.label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
+                modifier = Modifier.weight(2f))
+            Text(tb, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f))
+        }
+        Row(Modifier.fillMaxWidth().height(6.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            HalfBar(fa, if (fa >= fb && fa > 0) TsmColors.player(Side.P1) else TsmColors.TextDim.copy(alpha = 0.5f), fromRight = true,
+                modifier = Modifier.weight(1f))
+            HalfBar(fb, if (fb >= fa && fb > 0) TsmColors.player(Side.P2) else TsmColors.TextDim.copy(alpha = 0.5f), fromRight = false,
+                modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+/** Mezza barra che parte dal centro: a sinistra cresce verso sinistra ([fromRight]), a destra verso destra. */
+@Composable
+private fun HalfBar(fraction: Float, color: Color, fromRight: Boolean, modifier: Modifier) {
+    Box(
+        modifier.height(6.dp).clip(RoundedCornerShape(3.dp)).background(TsmColors.SurfaceHigh),
+        contentAlignment = if (fromRight) Alignment.CenterEnd else Alignment.CenterStart,
+    ) {
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).height(6.dp).clip(RoundedCornerShape(3.dp)).background(color))
+    }
+}
+
+/** Cronologia punto per punto, set per set: chi serve, punteggio in game, servizi persi e palle importanti. */
+@Composable
+fun MatchChronologyTab(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val games = remember(rec) { MatchStats.chronology(MatchStats.points(rec)) }
+    val sets = (games.maxOfOrNull { it.set } ?: -1) + 1
+    var set by remember(rec.id) { mutableStateOf(0) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (sets > 1) {
+            Segmented((1..sets).map { SegOption(s.periodSet(it)) }, selected = set.coerceIn(0, sets - 1), onSelect = { set = it })
+        }
+        NamesHeader(names)
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(vertical = 4.dp),
+        ) {
+            games.filter { it.set == set }.forEachIndexed { i, g ->
+                if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(TsmColors.Outline.copy(alpha = 0.5f)))
+                GameRow(g, s)
+            }
+        }
+    }
+}
+
+@Composable
+private fun GameRow(g: MatchStats.GameLog, s: Strings) {
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        // Punteggio sempre al centro; pallina e "servizio perso" dalla parte di chi serviva.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
+                if (g.broken && g.server == Side.P1) Badge(s.serveLost)
+                ServeBall(g.server == Side.P1)
+            }
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = if (g.winner == Side.P1) TsmColors.player(Side.P1) else TsmColors.TextMain)) { append("${g.games1}") }
+                    append(" - ")
+                    withStyle(SpanStyle(color = if (g.winner == Side.P2) TsmColors.player(Side.P2) else TsmColors.TextMain)) { append("${g.games2}") }
+                    if (g.tiebreak == TiebreakKind.SET && g.tb1 != null && g.tb2 != null) append("  (${g.tb1}-${g.tb2})")
+                },
+                color = TsmColors.TextMain, fontWeight = FontWeight.Black, fontSize = 16.sp,
+                modifier = Modifier.padding(horizontal = 10.dp),
+            )
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                ServeBall(g.server == Side.P2)
+                if (g.broken && g.server == Side.P2) Badge(s.serveLost)
+            }
+        }
+        Text(
+            buildAnnotatedString {
+                if (g.tiebreak != TiebreakKind.NONE) {
+                    withStyle(SpanStyle(color = TsmColors.Orange, fontWeight = FontWeight.Bold)) { append(s.chronoTiebreak.uppercase()) }
+                    append("  ")
+                }
+                g.steps.forEachIndexed { i, st ->
+                    if (i > 0) append(", ")
+                    append("${st.p1}:${st.p2}")
+                    st.marker?.let { m ->
+                        val (label, color) = when (m) {
+                            MatchStats.Marker.BREAK_POINT -> s.markerBreak to TsmColors.Outline
+                            MatchStats.Marker.SET_POINT -> s.markerSet to Color(0xFF1E88E5)
+                            MatchStats.Marker.MATCH_POINT -> s.markerMatch to TsmColors.Danger
+                        }
+                        append(" ")
+                        withStyle(SpanStyle(background = color, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)) { append(" $label ") }
+                    }
+                }
+                if (g.winner != null) {
+                    if (g.steps.isNotEmpty()) append(", ")
+                    val end = when {
+                        g.closesMatch -> s.chronoMatch
+                        g.closesSet -> s.chronoSet
+                        g.broken -> s.chronoBreak
+                        else -> s.chronoGame
+                    }
+                    withStyle(SpanStyle(color = TsmColors.player(g.winner), fontWeight = FontWeight.Bold)) { append(end) }
+                }
+            },
+            color = TsmColors.TextDim, fontSize = 11.sp, lineHeight = 16.sp, textAlign = TextAlign.Center,
+        )
+    }
+}
+
+/** Pallina di chi serve il game, come sul braccialetto (lo spazio resta anche quando non c'è). */
+@Composable
+private fun ServeBall(visible: Boolean) {
+    Box(Modifier.size(12.dp).clip(CircleShape).background(if (visible) TsmColors.Ball else Color.Transparent))
+}
+
+@Composable
+private fun Badge(text: String) {
+    Text(
+        text.uppercase(), color = TsmColors.TextMain, fontSize = 9.sp, fontWeight = FontWeight.Bold,
+        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(TsmColors.Danger).padding(horizontal = 5.dp, vertical = 1.dp),
+    )
 }
 TSM_EOF
 
@@ -11219,6 +12470,9 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -11247,12 +12501,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Ultima schermata: tutti i dati della partita, salvataggio, condivisione, nuova partita, uscita. */
@@ -11269,6 +12528,8 @@ fun SummaryScreen(c: MatchController) {
     val w = state.winner ?: Side.P1
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
+    /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
+    var tab by remember(rec.id) { mutableStateOf(0) }
     val kept by c.summaryKept.collectAsState()
     /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
     var leaving by remember { mutableStateOf<Boolean?>(null) }
@@ -11335,24 +12596,11 @@ fun SummaryScreen(c: MatchController) {
                 }
             }
 
-            // Dati partita
-            Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
-                InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
-                InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
-                InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
-                if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
-                if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
-                InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
-                InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
-                InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
-                InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
-                if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
-                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
-                }
+            Segmented(listOf(SegOption(s.tabSummary), SegOption(s.tabStats), SegOption(s.tabChronology)), selected = tab, onSelect = { tab = it })
+            when (tab) {
+                1 -> MatchStatsTab(rec, names)
+                2 -> MatchChronologyTab(rec, names)
+                else -> SummaryInfo(rec, state, names)
             }
         }
         Column(
@@ -11386,6 +12634,38 @@ fun SummaryScreen(c: MatchController) {
             },
             onDismiss = { leaving = null },
         )
+    }
+}
+
+/** Scheda "Riassunto": durata, orari, luogo, formato, punti e game, batteria e colpi dei braccialetti. */
+@Composable
+private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
+    val s = LocalStrings.current
+    val lang = rec.options.lang
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
+        InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
+        InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
+        InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
+        if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
+        if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
+        InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
+        InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
+        InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
+        InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
+            InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
+        }
+        for (side in Side.entries) {
+            Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
+        }
+        for (side in Side.entries) {
+            Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
+        }
+        Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
     }
 }
 
@@ -13031,6 +14311,121 @@ class BatteryModelTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/StrokeProtocolTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/StrokeProtocolTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ble
+
+import com.tennis.scoremanager.data.StrokeStats
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Colpi dal firmware 2.4: stesso formato di sendStroke() e publishConfig() in TSM_Band.ino. */
+class StrokeProtocolTest {
+
+    @Test
+    fun parseStrokeLikeTheFirmwareSendsIt() {
+        // indice 300, servizio, 91 %, 1480 °/s, 12,34 g, accensione 0xA1B2C3D4
+        val b = byteArrayOf(
+            0x2C, 0x01, 2, 91,
+            0xC8.toByte(), 0x05, 0xD2.toByte(), 0x04,
+            0xD4.toByte(), 0xC3.toByte(), 0xB2.toByte(), 0xA1.toByte(),
+        )
+        val r = BandProtocol.parseStroke(b)!!
+        assertEquals(300, r.index)
+        assertEquals(BandProtocol.STROKE_SERVE, r.stroke)
+        assertEquals(91, r.confidence)
+        assertEquals(1480, r.peakGyroDps)
+        assertEquals(12.34, r.peakAccelG, 1e-9)
+        assertEquals(0xA1B2C3D4L, r.boot)
+        assertNull(BandProtocol.parseStroke(b.copyOf(11)))
+    }
+
+    @Test
+    fun unknownStrokeIs255() {
+        val b = ByteArray(12).also { it[2] = 0xFF.toByte() }
+        assertEquals(BandProtocol.STROKE_UNKNOWN, BandProtocol.parseStroke(b)!!.stroke)
+    }
+
+    @Test
+    fun calibrationCommands() {
+        assertEquals("C|1", BandProtocol.calibrate(BandProtocol.STROKE_BACKHAND))
+        assertEquals("C|", BandProtocol.calibrate(null))
+        assertEquals("U|", BandProtocol.UNDO_EXAMPLE)
+        assertEquals("X|3", BandProtocol.clearExamples(BandProtocol.STROKE_VOLLEY))
+    }
+
+    @Test
+    fun settingsWithStrokes() {
+        val s = BandSettings.parse(
+            "fw=2.4;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it;sw=1;swd=0;swc=8,9,0,2;cal=1",
+        )!!
+        assertTrue(s.supportsStrokes)
+        assertTrue(s.strokes)
+        assertFalse(s.strokeDisplay)
+        assertEquals(listOf(8, 9, 0, 2), s.strokeExamples)
+        assertEquals(BandProtocol.STROKE_BACKHAND, s.calibrating)
+        assertTrue(s.strokesReady)  // dritto e rovescio hanno almeno 3 esempi
+        assertEquals("bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;sw=1;swd=0", s.copy(name = "").encode())
+    }
+
+    @Test
+    fun oldFirmwareHasNoStrokes() {
+        val s = BandSettings.parse("fw=2.3;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it")!!
+        assertFalse(s.supportsStrokes)
+        assertFalse(s.strokesReady)
+        assertEquals(-1, s.calibrating)
+        // Al firmware vecchio non si mandano chiavi che non conosce.
+        assertFalse("sw=" in s.copy(strokes = true).encode())
+    }
+
+    @Test
+    fun readyNeedsTwoStrokesWithThreeExamples() {
+        fun ready(vararg n: Int) = BandSettings(strokeExamples = n.toList()).strokesReady
+        assertFalse(ready(20, 2, 2, 0))
+        assertTrue(ready(3, 3, 0, 0))
+        assertFalse(ready(0, 0, 0, 0))
+    }
+
+    @Test
+    fun badCalibrationValuesAreIgnored() {
+        val s = BandSettings.parse("fw=2.4;bri=20;swc=1,2,3;cal=7")!!
+        assertNull(s.strokeExamples)  // servono quattro contatori
+        assertEquals(-1, s.calibrating)
+    }
+
+    @Test
+    fun strokeStatsCount() {
+        val st = StrokeStats().add(BandProtocol.STROKE_FOREHAND, 1400).add(BandProtocol.STROKE_FOREHAND, 1600)
+            .add(BandProtocol.STROKE_VOLLEY, 900).add(BandProtocol.STROKE_UNKNOWN, 700)
+        assertEquals(2, st.count(BandProtocol.STROKE_FOREHAND))
+        assertEquals(0, st.count(BandProtocol.STROKE_SERVE))
+        assertEquals(1, st.count(BandProtocol.STROKE_VOLLEY))
+        assertEquals(1, st.unknown)
+        assertEquals(4, st.total)
+        assertEquals(1500, st.avgGyro(BandProtocol.STROKE_FOREHAND))
+        assertEquals(1600, st.maxGyro(BandProtocol.STROKE_FOREHAND))
+        assertNull(st.avgGyro(BandProtocol.STROKE_SERVE))
+    }
+
+    @Test
+    fun imuCountsInTheBatteryEstimate() {
+        val off = BandSettings(strokes = false)
+        val on = BandSettings(strokes = true)
+        assertEquals(BatteryModel.IMU_MA, BatteryModel.estimate(on).totalMa - BatteryModel.estimate(off).totalMa, 1e-9)
+        // Una misura fatta col sensore acceso non lo conta due volte: 15 %/h = 37,5 mA misurati, sensore compreso.
+        val s = on.copy(volume = 0)
+        val e = BatteryModel.estimate(s, BatteryModel.baseFromMeasure(15.0, 0.0, s))
+        assertEquals(37.5, e.totalMa - e.displayMa, 1e-9)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DataTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DataTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -13110,6 +14505,192 @@ class DataTest {
         assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         // Senza punto d'oro (ai vantaggi) resta solo il nome dello sport.
         assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.data.MatchStats.Marker
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Statistiche e cronologia su partite costruite punto per punto (serve per primo il Giocatore 1). */
+class MatchStatsTest {
+
+    private val p1 = Side.P1
+    private val p2 = Side.P2
+
+    private fun rec(vararg winners: Side, strokes: Int? = null) = MatchRecord(
+        id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(firstServer = Side.P1),
+        events = winners.map { MatchEvent.Point(it, strokes = strokes) },
+    )
+
+    private fun game(w: Side) = Array(4) { w }
+
+    /** G1 tiene il servizio a zero, poi strappa il servizio a G2 a zero, poi tiene da 0-30. */
+    private val holdBreakHold = arrayOf(*game(p1), *game(p1), p2, p2, p1, p1, p1, p1)
+
+    @Test
+    fun serveReturnAndBreakPoints() {
+        val t = MatchStats.totals(MatchStats.points(rec(*holdBreakHold)))
+        val a = t.getValue(p1)
+        val b = t.getValue(p2)
+        assertEquals(8, a.servePointsWon); assertEquals(10, a.servePoints)
+        assertEquals(2, a.serviceGamesWon); assertEquals(2, a.serviceGames)
+        assertEquals(4, a.returnPointsWon); assertEquals(4, a.returnPoints)
+        assertEquals(1, a.returnGamesWon); assertEquals(1, a.returnGames)
+        // Sul 40-0 del secondo game G1 ha palla break e la trasforma subito.
+        assertEquals(1, a.breakPointsWon); assertEquals(1, a.breakPoints)
+        assertEquals(0, b.breakPointsSaved); assertEquals(1, b.breakPointsFaced)
+        assertEquals(12, a.pointsWon); assertEquals(14, a.points)
+        assertEquals(3, a.gamesWon); assertEquals(0, b.gamesWon)
+        assertEquals(8, a.maxStreak); assertEquals(2, b.maxStreak)
+        assertEquals(8, a.last10); assertEquals(2, b.last10)
+    }
+
+    @Test
+    fun chronologyShowsBreaksAndBreakPoints() {
+        val games = MatchStats.chronology(MatchStats.points(rec(*holdBreakHold)))
+        assertEquals(3, games.size)
+        val g2 = games[1]
+        assertEquals(p2, g2.server)
+        assertTrue(g2.broken)
+        assertEquals(2, g2.games1); assertEquals(0, g2.games2)
+        assertEquals(listOf("15" to "0", "30" to "0", "40" to "0"), g2.steps.map { it.p1 to it.p2 })
+        assertEquals(listOf(null, null, Marker.BREAK_POINT), g2.steps.map { it.marker })
+        assertFalse(games[2].broken)
+        assertEquals(listOf("0" to "15", "0" to "30", "15" to "30", "30" to "30", "40" to "30"), games[2].steps.map { it.p1 to it.p2 })
+    }
+
+    @Test
+    fun setPointAndMatchPoint() {
+        val pts = MatchStats.points(rec(*Array(48) { p1 }))  // 6-0 6-0
+        val games = MatchStats.chronology(pts)
+        assertEquals(12, games.size)
+        assertEquals(Marker.SET_POINT, games[5].steps.last().marker)   // 40-0 sul 5-0: set point (vale più della palla break)
+        assertEquals(Marker.MATCH_POINT, games[11].steps.last().marker)
+        assertTrue(games[5].closesSet); assertFalse(games[5].closesMatch); assertFalse(games[4].closesSet)
+        assertTrue(games[11].closesMatch)
+        assertEquals(6, MatchStats.totals(pts, set = 1).getValue(p1).gamesWon)
+        assertEquals(24, MatchStats.totals(pts, set = 0).getValue(p1).points)
+    }
+
+    @Test
+    fun tiebreakCountsAsOneGameButNotAsServiceGame() {
+        // Ogni game al servizio fino al 6-6 (serve chi è di turno), poi tie-break 7-0 per G1.
+        val holds = (0 until 12).flatMap { g -> game(if (g % 2 == 0) p1 else p2).toList() }
+        val pts = MatchStats.points(rec(*(holds + List(7) { p1 }).toTypedArray()))
+        val tb = MatchStats.chronology(pts).last()
+        assertEquals(TiebreakKind.SET, tb.tiebreak)
+        assertEquals(7, tb.games1); assertEquals(6, tb.games2)
+        assertEquals(7, tb.tb1); assertEquals(0, tb.tb2)
+        assertFalse(tb.broken)
+        val a = MatchStats.totals(pts).getValue(p1)
+        assertEquals(7, a.gamesWon); assertEquals(13, a.games)
+        assertEquals(6, a.serviceGames)
+    }
+
+    @Test
+    fun savedMatchPoint() {
+        // 6-0 5-0, G2 al servizio sotto 0-40: annulla i tre match point (40-0, 40-15, 40-30) e tiene il game.
+        val pts = MatchStats.points(rec(*Array(24 + 20 + 3) { p1 }, *game(p2), p2))
+        assertEquals(3, MatchStats.totals(pts).getValue(p2).matchPointsSaved)
+        val last = MatchStats.chronology(pts).last()
+        assertEquals(p2, last.server)
+        assertFalse(last.broken)
+        // Dopo 15-0 e 30-0 niente; 40-0, 40-15 e 40-30 sono match point; sulla parità non più.
+        assertEquals(listOf(null, null, Marker.MATCH_POINT, Marker.MATCH_POINT, Marker.MATCH_POINT, null), last.steps.take(6).map { it.marker })
+    }
+
+    @Test
+    fun rallyPerSet() {
+        val pts = MatchStats.points(rec(*holdBreakHold, strokes = 5))
+        assertEquals(5.0, MatchStats.rally(pts, set = 0)!!.average, 1e-9)
+        assertNull(MatchStats.rally(pts, set = 1))
+        assertNull(MatchStats.rally(MatchStats.points(rec(*holdBreakHold))))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ItStrings
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+/** Colpi nel riepilogo: velocità del polso per tipo di colpo e colpi per punto. */
+class StrokeReportTest {
+
+    private fun record(events: List<MatchEvent> = emptyList(), strokes: Map<Side, StrokeStats> = emptyMap()) =
+        MatchRecord(id = "m1", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(), events = events, strokes = strokes)
+
+    @Test
+    fun wristSpeedPerStroke() {
+        val st = StrokeStats().add(BandProtocol.STROKE_FOREHAND, 1400).add(BandProtocol.STROKE_FOREHAND, 1500)
+            .add(BandProtocol.STROKE_SERVE, 2010)
+        val rec = record(strokes = mapOf(Side.P1 to st))
+        assertEquals("Dritto 1450 °/s (max 1500) · Servizio 2010 °/s (max 2010)", Reports.wristSpeedLine(rec, Side.P1, ItStrings))
+        assertNull(Reports.wristSpeedLine(rec, Side.P2, ItStrings))
+    }
+
+    @Test
+    fun rallyLengths() {
+        val points = listOf(2, 3, 5, 12, 4, 1, 9, 6).map { MatchEvent.Point(Side.P1, strokes = it) } +
+            MatchEvent.Point(Side.P2)  // punto senza colpi contati: non conta
+        val st = Reports.rallyStats(record(points))!!
+        assertEquals(8, st.points)
+        assertEquals(5.25, st.average, 1e-9)
+        assertEquals(12, st.longest)
+        assertEquals(38, st.shortPct)   // 3 su 8
+        assertEquals(37, st.mediumPct)  // 3 su 8 (il resto, così la somma fa 100)
+        assertEquals(25, st.longPct)    // 2 su 8
+        assertEquals(
+            "media 5,3 · più lungo 12 · brevi (1-3) 38% · medi (4-8) 37% · lunghi (9+) 25%",
+            Reports.rallyLine(st, ItStrings, Lang.IT),
+        )
+        assertNull(Reports.rallyStats(record(listOf(MatchEvent.Point(Side.P1)))))
+    }
+
+    @Test
+    fun matchesSavedBeforeStillLoad() {
+        // Partita salvata dalla prima versione dei colpi: punti senza "strokes", conteggi senza velocità.
+        val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+        val old = """{"id":"m1","setup":{},"options":{},"rules":{},
+            "events":[{"type":"point","winner":"P1","at":5}],
+            "strokes":{"P1":{"counts":[3,0,1,0],"unknown":1}}}"""
+        val rec = json.decodeFromString(MatchRecord.serializer(), old)
+        assertNull((rec.events.single() as MatchEvent.Point).strokes)
+        val st = rec.strokes.getValue(Side.P1)
+        assertEquals(3, st.count(BandProtocol.STROKE_FOREHAND))
+        assertNull(st.avgGyro(BandProtocol.STROKE_FOREHAND))  // nessuna velocità salvata: non si inventa uno zero
+        assertNull(Reports.wristSpeedLine(rec, Side.P1, ItStrings))
+        // E i colpi nuovi si aggiungono senza problemi.
+        assertEquals(1200, st.add(BandProtocol.STROKE_SERVE, 1200).maxGyro(BandProtocol.STROKE_SERVE))
     }
 }
 TSM_EOF
@@ -13822,8 +15403,9 @@ class StringsTest {
         val en = texts(EnStrings)
         for (lang in listOf(Lang.FR, Lang.DE, Lang.ES, Lang.PT)) {
             val t = texts(stringsFor(lang))
-            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } }.keys
-            // Restano uguali solo nomi propri e sigle: Bluetooth, OK, Firmware, Audio On/Off, online...
+            // Le sigle (BP, SP, OK, SET...) restano uguali in ogni lingua: non contano come copie.
+            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
+            // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             assertTrue("$lang copia l'inglese in: $same", same.size < 30)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
@@ -16431,6 +18013,11 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
   per i messaggi da scollegato (ricarica, ricerca del telefono, spegnimento; dalla 2.2.1 anche
   il conto alla rovescia prima dello spegnimento).
 
+  Colpi (dalla 2.4, da SwingSense): con "Riconoscimento colpi" acceso nelle impostazioni il
+  braccialetto riconosce dritto, rovescio, servizio e volée dall'IMU e li manda all'app (STROKE).
+  Il riconoscimento impara da chi lo indossa: la calibrazione si fa dall'app (qualche colpo per
+  tipo, salvato nel braccialetto). swing_detector.* e stroke_classifier.* sono copiati da SwingSense.
+
   Librerie (Gestore librerie di Arduino IDE):
     - M5Unified      >= 0.2.12  (installa anche M5GFX)
     - NimBLE-Arduino >= 2.1     (di h2zero)
@@ -16445,7 +18032,10 @@ cat > "$FWDIR/TSM_Band.ino" << 'TSM_EOF'
 #include <Preferences.h>
 #include <driver/rtc_io.h>
 
-#define FW_VERSION "2.3"
+#include "stroke_classifier.h"
+#include "swing_detector.h"
+
+#define FW_VERSION "2.4"
 
 // ------------------------------------------------------------------ tempi fissi
 static const uint32_t FAST_ADV_MS          = 30UL * 1000UL;        // primi 30 s: advertising veloce
@@ -16471,6 +18061,8 @@ static const int      CV_FULL_MV           = 4180;                 // riserva: 4
 static const uint32_t CV_FULL_MS           = 45UL * 60UL * 1000UL;
 static const uint32_t EVT_MAX_AGE_MS       = 8000;                 // tasto non confermato entro 8 s: non vale più, va ripremuto
 static const uint32_t EVT_SEND_MAX_MS      = 6500;                 // oltre non si (ri)manda: la conferma deve arrivare prima degli 8 s
+static const uint32_t STROKE_SHOW_MS       = 1200;                 // colpo riconosciuto a schermo
+static const uint32_t CALIB_SHOW_MS        = 60000;                // schermata di calibrazione (si rinnova a ogni colpo)
 
 // Tasti dell'M5StickS3 (gli stessi pin di M5Unified), premuto = basso. Sono pin RTC (0-21 sull'S3):
 // possono svegliare il braccialetto dal deep sleep.
@@ -16483,7 +18075,7 @@ static const char* const LANG_CODES[N_LANG] = { "it", "en", "fr", "de", "es", "p
 enum : uint8_t {
   T_PAIRING, T_PAIRED, T_RECONNECT, T_NO_PHONE, T_POWER_OFF, T_BATTERY, T_CHARGING, T_NO_LINK, T_NOT_SENT, T_IDLE,
   T_HOLD_KEY1, T_EMPTY, T_SAVED, T_FULL, T_USB_POWER, T_USB_OUT, T_KEEPS_CHG,
-  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, N_TXT
+  T_GAMES, T_SETS, T_CHARGED_IN, T_SINCE, T_LEFT, T_PRESS_KEY, T_CALIB, T_MEM_FULL, N_TXT
 };
 #define TXT_PAIRING    txt(T_PAIRING)
 #define TXT_PAIRED     txt(T_PAIRED)
@@ -16509,6 +18101,8 @@ enum : uint8_t {
 #define DISPLAY_UUID "7a1e0003-5c3b-4f6e-9d2a-3e7b1c9a0f10"
 #define STATUS_UUID  "7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // "mv=3987;chg=0;up=1234;dsp=56;usb=0;full=0;pct=71" (consumi e carica)
 #define CONFIG_UUID  "7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // impostazioni: "fw=2.2;name=...;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30;lang=it"
+                                                             // dalla 2.4 anche ";sw=0;swd=1;swc=8,9,10,7;cal=-1" (colpi)
+#define STROKE_UUID  "7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10"  // colpo riconosciuto (2.4): vedi sendStroke()
 enum : uint8_t { EVT_POINT = 1, EVT_UNDO = 2, EVT_POWER_OFF = 3, EVT_BATTERY = 4 };
 // Terzo byte di EVT_POWER_OFF: perché si spegne
 enum : uint8_t { OFF_KEY = 0, OFF_IDLE = 1, OFF_BATTERY = 2, OFF_APP = 3, OFF_TIMEOUT = 4 };
@@ -16532,6 +18126,8 @@ struct Settings {
   uint16_t lostS;      // spegnimento se il telefono si scollega (s)
   uint16_t idleMin;    // spegnimento se collegato ma inattivo (min)
   uint8_t  lang;       // lingua dei testi (L_IT...), la imposta l'app
+  bool     sw;         // riconoscimento colpi (dalla 2.4): IMU acceso, consuma di più
+  bool     swd;        // mostra a schermo il colpo riconosciuto
 };
 static Settings cfg;
 static Preferences prefs;
@@ -16543,30 +18139,44 @@ static const char* const TXT[N_LANG][N_TXT] = {
   { "PAIRING...", "PAIRING OK", "RICONNESSIONE", "NESSUN TELEFONO", "SPEGNIMENTO", "BATTERIA", "IN CARICA",
     "NON CONNESSO", "NON INVIATO", "INATTIVO", "TIENI PREMUTO KEY1", "BATTERIA SCARICA", "IMPOSTAZIONI OK", "CARICA COMPLETA",
     "ALIMENTATO DA USB", "USB SCOLLEGATO", "LA CARICA CONTINUA",
-    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO" },
+    "GAME", "SET", "CARICATA IN %s", "DA %s", "FINE ~%d MIN", "%lds - PREMI UN TASTO", "CALIBRAZIONE", "MEMORIA PIENA" },
   { "PAIRING...", "PAIRED", "RECONNECTING", "NO PHONE", "POWERING OFF", "BATTERY", "CHARGING",
     "NOT CONNECTED", "NOT SENT", "IDLE", "HOLD KEY1", "BATTERY EMPTY", "SETTINGS SAVED", "FULLY CHARGED",
     "USB POWERED", "USB UNPLUGGED", "STILL CHARGING",
-    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY" },
+    "GAMES", "SETS", "CHARGED IN %s", "%s IN", "~%d MIN LEFT", "%lds - PRESS ANY KEY", "CALIBRATION", "MEMORY FULL" },
   { "APPAIRAGE...", "APPAIRE", "RECONNEXION", "AUCUN TELEPHONE", "EXTINCTION", "BATTERIE", "EN CHARGE",
     "NON CONNECTE", "NON ENVOYE", "INACTIF", "MAINTENIR KEY1", "BATTERIE VIDE", "REGLAGES OK", "CHARGE TERMINEE",
     "ALIMENTE PAR USB", "USB DEBRANCHE", "LA CHARGE CONTINUE",
-    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE" },
+    "JEUX", "MANCHES", "CHARGEE EN %s", "DEPUIS %s", "FIN ~%d MIN", "%lds - APPUYER SUR UNE TOUCHE", "CALIBRAGE", "MEMOIRE PLEINE" },
   { "KOPPELN...", "GEKOPPELT", "VERBINDE NEU", "KEIN TELEFON", "AUSSCHALTEN", "AKKU", "LAEDT",
     "NICHT VERBUNDEN", "NICHT GESENDET", "INAKTIV", "KEY1 GEDRUECKT HALTEN", "AKKU LEER", "EINSTELLUNGEN OK", "VOLL GELADEN",
     "USB-STROM", "USB GETRENNT", "LAEDT WEITER",
-    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN" },
+    "SPIELE", "SAETZE", "GELADEN IN %s", "SEIT %s", "ENDE ~%d MIN", "%lds - TASTE DRUECKEN", "KALIBRIERUNG", "SPEICHER VOLL" },
   { "VINCULANDO...", "VINCULADA", "RECONECTANDO", "SIN TELEFONO", "APAGANDO", "BATERIA", "CARGANDO",
     "NO CONECTADO", "NO ENVIADO", "INACTIVO", "MANTEN PULSADO KEY1", "BATERIA AGOTADA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "SIGUE CARGANDO",
-    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON" },
+    "JUEGOS", "SETS", "CARGADA EN %s", "HACE %s", "FIN ~%d MIN", "%lds - PULSA UN BOTON", "CALIBRACION", "MEMORIA LLENA" },
   { "PAREANDO...", "PAREADA", "RECONECTANDO", "SEM TELEFONE", "DESLIGANDO", "BATERIA", "CARREGANDO",
     "SEM CONEXAO", "NAO ENVIADO", "INATIVO", "SEGURE KEY1", "BATERIA VAZIA", "AJUSTES OK", "CARGA COMPLETA",
     "ALIMENTADO POR USB", "USB DESCONECTADO", "CONTINUA CARREGANDO",
-    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO" },
+    "JOGOS", "SETS", "CARREGADA EM %s", "HA %s", "FIM ~%d MIN", "%lds - APERTE UM BOTAO", "CALIBRACAO", "MEMORIA CHEIA" },
 };
 
 static const char* txt(uint8_t id) { return TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][id]; }
+
+// Nomi dei colpi (stesso ordine di swing::Stroke), una riga per lingua.
+static const char* const STROKE_TXT[N_LANG][swing::kStrokeCount] = {
+  { "DRITTO", "ROVESCIO", "SERVIZIO", "VOLEE" },
+  { "FOREHAND", "BACKHAND", "SERVE", "VOLLEY" },
+  { "COUP DROIT", "REVERS", "SERVICE", "VOLEE" },
+  { "VORHAND", "RUECKHAND", "AUFSCHLAG", "VOLLEY" },
+  { "DERECHA", "REVES", "SAQUE", "VOLEA" },
+  { "FOREHAND", "BACKHAND", "SAQUE", "VOLEIO" },
+};
+
+static const char* strokeName(uint8_t stroke) {
+  return stroke < swing::kStrokeCount ? STROKE_TXT[cfg.lang < N_LANG ? cfg.lang : L_IT][stroke] : "?";
+}
 
 // ------------------------------------------------------------------ stato
 static NimBLEServer*         server   = nullptr;
@@ -16574,6 +18184,7 @@ static NimBLECharacteristic* evtChr   = nullptr;
 static NimBLECharacteristic* battChr  = nullptr;
 static NimBLECharacteristic* statusChr = nullptr;
 static NimBLECharacteristic* configChr = nullptr;
+static NimBLECharacteristic* strokeChr = nullptr;
 
 static volatile bool connected      = false;
 static volatile bool justConnected  = false;
@@ -16655,6 +18266,17 @@ static char     identifyL2[32];
 // Cicalino: acceso solo mentre suona
 static bool     spkOn = false;
 static uint32_t spkOffAt = 0;
+
+// Colpi (dalla 2.4): vedi la sezione "colpi"
+static swing::SwingDetector    detector;
+static swing::StrokeClassifier classifier;
+static bool     imuReady = false;      // BMI270 inizializzato (file di configurazione caricato una volta)
+static bool     imuOn = false;         // sensori accesi e FIFO attiva
+static uint8_t  imuAddr = 0;
+static bool     fifoAccFirst = false;  // ordine dei dati nella FIFO (vedi imuStart)
+static int8_t   calStroke = -1;        // colpo in calibrazione (0-3), -1 = nessuno
+static uint16_t strokeIndex = 0;       // colpi riconosciuti da questa accensione
+static uint32_t strokeOffAt = 0;       // displayOffAt dell'ultimo colpo a schermo: finché è lo stesso lo si può sostituire
 
 // ------------------------------------------------------------------ cicalino
 static void beep(float freq, uint32_t ms) {
@@ -16946,6 +18568,8 @@ static void loadSettings() {
   cfg.lostS   = prefs.getUShort("lost", 180);
   cfg.idleMin = prefs.getUShort("idle", 30);
   cfg.lang    = prefs.getUChar("lang", L_IT);
+  cfg.sw      = prefs.getBool("sw", false);
+  cfg.swd     = prefs.getBool("swd", true);
   clampSettings();
 }
 
@@ -16960,13 +18584,20 @@ static void saveSettings() {
   prefs.putUShort("lost", cfg.lostS);
   prefs.putUShort("idle", cfg.idleMin);
   prefs.putUChar("lang", cfg.lang);
+  prefs.putBool("sw", cfg.sw);
+  prefs.putBool("swd", cfg.swd);
 }
 
+// Dalla 2.4 anche i colpi: riconoscimento acceso, colpo a schermo, esempi di calibrazione per colpo
+// (dritto, rovescio, servizio, volée) e colpo in calibrazione (-1 = nessuno).
 static void publishConfig(bool notify) {
-  char buf[128];
-  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s",
+  char buf[192];
+  snprintf(buf, sizeof(buf), "fw=%s;name=%s;bri=%u;pt=%u;vol=%u;flip=%u;pair=%u;lost=%u;idle=%u;lang=%s"
+           ";sw=%u;swd=%u;swc=%d,%d,%d,%d;cal=%d",
            FW_VERSION, cfg.name, cfg.bri, cfg.pointS, cfg.vol, cfg.flip ? 1 : 0, cfg.pairS, cfg.lostS, cfg.idleMin,
-           LANG_CODES[cfg.lang]);
+           LANG_CODES[cfg.lang], cfg.sw ? 1 : 0, cfg.swd ? 1 : 0,
+           classifier.count(swing::kForehand), classifier.count(swing::kBackhand),
+           classifier.count(swing::kServe), classifier.count(swing::kVolley), calStroke);
   configChr->setValue((const uint8_t*)buf, strlen(buf));
   if (notify && connected) configChr->notify();
 }
@@ -16980,6 +18611,305 @@ static void applyName() {
   if (wasOn) adv->stop();
   adv->setScanResponseData(scanData);
   if (wasOn) adv->start();
+}
+
+// ------------------------------------------------------------------ colpi (dalla 2.4)
+// Il BMI270 mette accelerometro (±16 g) e giroscopio (±2000 °/s) a 100 Hz nella sua FIFO (~1,7 s) e il loop
+// la svuota a ogni giro. Tutto l'I2C resta così nel loop (le letture di M5Unified non hanno un lucchetto:
+// un task a parte si scontrerebbe con PM1 e codec), nessun campione si perde mentre il display si ridisegna
+// e la CPU non si sveglia 100 volte al secondo. Registri dal datasheet BMI270.
+static const uint8_t BMI_FIFO_LEN  = 0x24;  // 2 byte, 14 bit: byte nella FIFO
+static const uint8_t BMI_FIFO_DATA = 0x26;
+static const uint8_t BMI_ACC_CONF  = 0x40;
+static const uint8_t BMI_ACC_RANGE = 0x41;
+static const uint8_t BMI_GYR_CONF  = 0x42;
+static const uint8_t BMI_GYR_RANGE = 0x43;
+static const uint8_t BMI_FIFO_CFG0 = 0x48;
+static const uint8_t BMI_FIFO_CFG1 = 0x49;
+static const uint8_t BMI_PWR_CONF  = 0x7C;
+static const uint8_t BMI_PWR_CTRL  = 0x7D;
+static const uint8_t BMI_CMD       = 0x7E;
+static const uint8_t FIFO_FRAME    = 12;    // senza header: due terne da 3 x int16
+static const uint8_t FIFO_CHUNK    = 10;    // frame per lettura I2C
+static const float   ACC_LSB_G     = 16.0f / 32768.0f;
+static const float   GYR_LSB_DPS   = 2000.0f / 32768.0f;
+
+static void imuWrite(uint8_t reg, uint8_t val) { M5.In_I2C.writeRegister8(imuAddr, reg, val, 400000); }
+
+static uint16_t fifoBytes() {
+  uint8_t b[2];
+  if (!M5.In_I2C.readRegister(imuAddr, BMI_FIFO_LEN, b, 2, 400000)) return 0;
+  return (uint16_t)((b[0] | (b[1] << 8)) & 0x3FFF);
+}
+
+static int16_t le16(const uint8_t* p) { return (int16_t)(p[0] | (p[1] << 8)); }
+
+static float norm3(const uint8_t* p) {
+  const float x = le16(p), y = le16(p + 2), z = le16(p + 4);
+  return sqrtf(x * x + y * y + z * z);
+}
+
+static bool imuStart() {
+  if (!imuReady) {
+    // Prima volta: M5Unified carica nel BMI270 il suo file di configurazione (~8 KB).
+    if (!M5.Imu.begin(&M5.In_I2C, M5.getBoard()) || M5.Imu.getType() != m5::imu_bmi270) return false;
+    imuAddr = M5.Imu.getImuInstancePtr(0)->getAddress();
+    imuReady = true;
+  }
+  imuWrite(BMI_PWR_CONF, 0x00);   // niente risparmio avanzato: serve a campionare con continuità
+  delay(2);
+  imuWrite(BMI_PWR_CTRL, 0x06);   // accelerometro + giroscopio
+  imuWrite(BMI_ACC_CONF, 0xA8);   // 100 Hz, filtro normale, alte prestazioni
+  imuWrite(BMI_ACC_RANGE, 0x03);  // ±16 g: al polso un servizio supera gli 8 g
+  imuWrite(BMI_GYR_CONF, 0xA8);   // 100 Hz
+  imuWrite(BMI_GYR_RANGE, 0x00);  // ±2000 °/s
+  imuWrite(BMI_FIFO_CFG0, 0x00);  // continua (a FIFO piena si perdono i più vecchi), senza sensortime
+  imuWrite(BMI_FIFO_CFG1, 0xC0);  // giroscopio + accelerometro, senza header
+  delay(60);                      // avvio del giroscopio
+  imuWrite(BMI_CMD, 0xB0);        // svuota la FIFO
+  if (M5.In_I2C.readRegister8(imuAddr, BMI_ACC_RANGE, 400000) != 0x03) return false;
+
+  // Il datasheet mette il giroscopio prima dell'accelerometro. Verifica sul campo: col braccialetto quasi
+  // fermo l'accelerometro vale ~1 g (2048) e il giroscopio quasi 0; si cambia ordine solo se è evidente.
+  delay(120);
+  uint8_t buf[FIFO_FRAME * FIFO_CHUNK];
+  const uint16_t n = min<uint16_t>(fifoBytes() / FIFO_FRAME, FIFO_CHUNK);
+  if (n >= 3 && M5.In_I2C.readRegister(imuAddr, BMI_FIFO_DATA, buf, n * FIFO_FRAME, 400000)) {
+    float first = 0, second = 0;
+    for (uint16_t i = 0; i < n; i++) {
+      first += norm3(buf + i * FIFO_FRAME) * ACC_LSB_G;
+      second += norm3(buf + i * FIFO_FRAME + 6) * ACC_LSB_G;
+    }
+    first /= n;
+    second /= n;
+    fifoAccFirst = first > 0.7f && first < 1.3f && second < 0.3f;
+  }
+  detector.reset();
+  imuOn = true;
+  return true;
+}
+
+static void imuStop() {
+  if (!imuOn) return;
+  imuWrite(BMI_FIFO_CFG1, 0x00);
+  imuWrite(BMI_PWR_CTRL, 0x00);   // sensori spenti
+  imuWrite(BMI_PWR_CONF, 0x03);   // risparmio avanzato, come all'accensione
+  imuOn = false;
+}
+
+// L'IMU è acceso solo se serve: riconoscimento attivo o calibrazione in corso.
+static void imuUpdateNeeded() {
+  const bool want = cfg.sw || calStroke >= 0;
+  if (want && !imuOn) imuStart();
+  else if (!want && imuOn) imuStop();
+}
+
+// Esempi di calibrazione salvati nel braccialetto, un blocco per colpo ("knn0".."knn3"): ogni nuovo esempio
+// riscrive solo il suo (~0,4 KB). Con un blocco unico da 3,6 KB riscritto a ogni esempio lo spazio delle
+// impostazioni (NVS, ~20 KB condivisi col Bluetooth) finiva e i salvataggi fallivano in silenzio.
+// Blocco: [versione, numero di esempi] + per esempio 11 feature in int16 (millesimi, little endian).
+static const uint8_t MODEL_VERSION = 2;
+static const float   FEATURE_SCALE = 1000.0f;
+static const size_t  EXAMPLE_SIZE  = 1 + swing::kFeatureCount * sizeof(float);  // in serialize(): [colpo, 11 float]
+static uint8_t modelBlob[swing::StrokeClassifier::kMaxSerializedSize];            // serialize() del classificatore
+static uint8_t strokeBlob[2 + swing::StrokeClassifier::kMaxPerClass * swing::kFeatureCount * 2];
+
+static void modelKey(char* key, size_t size, uint8_t stroke) { snprintf(key, size, "knn%u", stroke); }
+
+static bool saveStroke(uint8_t stroke) {
+  const size_t len = classifier.serialize(modelBlob, sizeof(modelBlob));
+  uint8_t n = 0;
+  uint8_t* p = strokeBlob + 2;
+  for (size_t off = 8; off + EXAMPLE_SIZE <= len; off += EXAMPLE_SIZE) {
+    if (modelBlob[off] != stroke) continue;
+    for (int k = 0; k < swing::kFeatureCount; k++) {
+      float v;
+      memcpy(&v, modelBlob + off + 1 + k * sizeof(float), sizeof(float));
+      const int16_t q = (int16_t)constrain(lroundf(v * FEATURE_SCALE), -32767L, 32767L);
+      *p++ = (uint8_t)q;
+      *p++ = (uint8_t)(q >> 8);
+    }
+    n++;
+  }
+  strokeBlob[0] = MODEL_VERSION;
+  strokeBlob[1] = n;
+  char key[8];
+  modelKey(key, sizeof(key), stroke);
+  const size_t size = p - strokeBlob;
+  return prefs.putBytes(key, strokeBlob, size) == size;
+}
+
+// [stroke] = il colpo cambiato, -1 = tutti. Memoria piena: lo si dice invece di perdere gli esempi in silenzio.
+static void saveModel(int stroke = -1) {
+  bool ok = true;
+  for (uint8_t s = 0; s < swing::kStrokeCount; s++) {
+    if (stroke < 0 || s == stroke) ok = saveStroke(s) && ok;
+  }
+  if (!ok) {
+    drawMessage(txt(T_MEM_FULL), "", C_RED);
+    showFor(3000);
+    beep(500, 120);
+    beep(350, 300);
+  }
+}
+
+static void loadModel() {
+  for (uint8_t s = 0; s < swing::kStrokeCount; s++) {
+    char key[8];
+    modelKey(key, sizeof(key), s);
+    if (!prefs.isKey(key)) continue;
+    const size_t len = prefs.getBytes(key, strokeBlob, sizeof(strokeBlob));
+    if (len < 2 || strokeBlob[0] != MODEL_VERSION) continue;
+    const size_t n = min<size_t>(strokeBlob[1], (len - 2) / (swing::kFeatureCount * 2));
+    for (size_t i = 0; i < n; i++) {
+      swing::Features f;
+      for (int k = 0; k < swing::kFeatureCount; k++) f[k] = le16(strokeBlob + 2 + (i * swing::kFeatureCount + k) * 2) / FEATURE_SCALE;
+      classifier.add(s, f);
+    }
+  }
+  // Prima versione del 2.4: tutti gli esempi nel blocco unico "knn". Lo si toglie (libera spazio) e, se non ci
+  // sono ancora esempi nel formato nuovo, lo si converte.
+  if (prefs.isKey("knn")) {
+    const size_t len = prefs.getBytes("knn", modelBlob, sizeof(modelBlob));
+    prefs.remove("knn");
+    if (len && classifier.total() == 0 && classifier.deserialize(modelBlob, len)) saveModel();
+  }
+}
+
+static void drawCalib() {
+  char l2[32];
+  snprintf(l2, sizeof(l2), "%s  %d/%d", txt(T_CALIB), classifier.count(calStroke), swing::StrokeClassifier::kMaxPerClass);
+  drawMessage(strokeName(calStroke), l2, C_BALL);
+  showFor(CALIB_SHOW_MS);
+}
+
+static void stopCalibration(bool show) {
+  if (calStroke < 0) return;
+  calStroke = -1;
+  imuUpdateNeeded();
+  if (show) {
+    drawMessage(txt(T_CALIB), "OK", C_BALL);
+    showFor(1500);
+  }
+}
+
+// [indice (2 byte), colpo (0-3, 255 = sconosciuto), confidenza %, picco giroscopio °/s (2 byte),
+//  picco accelerazione in centesimi di g (2 byte), id di accensione (4 byte)], little endian.
+static void sendStroke(const swing::StrokeClassifier::Result& r, const swing::Swing& sw) {
+  if (!connected || !strokeChr) return;
+  const uint16_t gyro = (uint16_t)constrain(lroundf(sw.peakGyro), 0L, 65535L);
+  const uint16_t acc = (uint16_t)constrain(lroundf(sw.peakAccel * 100.0f), 0L, 65535L);
+  const uint8_t data[12] = {
+    (uint8_t)strokeIndex, (uint8_t)(strokeIndex >> 8), r.stroke, (uint8_t)lroundf(r.confidence * 100.0f),
+    (uint8_t)gyro, (uint8_t)(gyro >> 8), (uint8_t)acc, (uint8_t)(acc >> 8),
+    (uint8_t)bootId, (uint8_t)(bootId >> 8), (uint8_t)(bootId >> 16), (uint8_t)(bootId >> 24),
+  };
+  strokeChr->notify(data, sizeof(data), connHandle);
+}
+
+// Diagnostica sulla seriale USB (solo con un PC collegato), per tarare il riconoscimento:
+//   swing,<cal|play>,<colpo 0-3 / 255>,<confidenza %>,<picco °/s>,<picco g>,<11 feature>
+// e, scrivendo "d" nel monitor seriale, gli esempi salvati (knn,...), una lettura del sensore (imu,...) e gli
+// ultimi colpi riconosciuti (recent,...): così si prova anche col braccialetto staccato e lo si collega dopo.
+static swing::ImuSample lastSample{};
+
+struct RecentSwing {
+  uint8_t stroke, conf;
+  uint16_t gyro;
+  float acc;
+  swing::Features f;
+};
+static const uint8_t RECENT_MAX = 40;
+static RecentSwing recent[RECENT_MAX];
+static uint8_t recentN = 0, recentNext = 0;
+
+static void printFeatures(const swing::Features& f) {
+  for (float v : f) Serial.printf(",%.3f", v);
+  Serial.println();
+}
+
+static void debugSwing(const char* kind, uint8_t stroke, float conf, const swing::Swing& sw) {
+  if (kind[0] == 'p') {
+    recent[recentNext] = { stroke, (uint8_t)lroundf(conf * 100.0f), (uint16_t)lroundf(sw.peakGyro), sw.peakAccel, sw.features };
+    recentNext = (recentNext + 1) % RECENT_MAX;
+    if (recentN < RECENT_MAX) recentN++;
+  }
+  if (!Serial) return;
+  Serial.printf("swing,%s,%u,%d,%.0f,%.2f", kind, stroke, (int)lroundf(conf * 100.0f), sw.peakGyro, sw.peakAccel);
+  printFeatures(sw.features);
+}
+
+static void debugDump() {
+  const swing::ImuSample& a = lastSample;
+  Serial.printf("imu,on=%d,accFirst=%d,acc_g=%.2f,%.2f,%.2f,gyro_dps=%.1f,%.1f,%.1f\n", imuOn, fifoAccFirst,
+                a.ax, a.ay, a.az, a.gx, a.gy, a.gz);
+  // Gli esempi si leggono dal blob salvato: 8 byte di intestazione, poi [colpo, 11 float] per esempio.
+  const size_t len = classifier.serialize(modelBlob, sizeof(modelBlob));
+  const size_t ex = 1 + swing::kFeatureCount * sizeof(float);
+  for (size_t off = 8; off + ex <= len; off += ex) {
+    swing::Features f;
+    memcpy(f.data(), modelBlob + off + 1, swing::kFeatureCount * sizeof(float));
+    Serial.printf("knn,%u", modelBlob[off]);
+    printFeatures(f);
+  }
+  for (uint8_t i = 0; i < recentN; i++) {
+    const RecentSwing& r = recent[(recentNext + RECENT_MAX - recentN + i) % RECENT_MAX];  // dal più vecchio
+    Serial.printf("recent,%u,%u,%u,%.2f", r.stroke, r.conf, r.gyro, r.acc);
+    printFeatures(r.f);
+  }
+  Serial.println("fine");
+}
+
+static void onSwing(const swing::Swing& sw, uint32_t now) {
+  lastActivity = now;  // un colpo vuol dire che si sta giocando: niente spegnimento per inattività
+  idleWarned = false;
+  if (calStroke >= 0) {
+    classifier.add(calStroke, sw.features);
+    debugSwing("cal", calStroke, 1.0f, sw);
+    saveModel(calStroke);
+    beep(2400, 60);
+    drawCalib();
+    publishConfig(true);
+    return;
+  }
+  if (!cfg.sw) return;
+  const swing::StrokeClassifier::Result r = classifier.classify(sw.features);
+  debugSwing("play", r.stroke, r.confidence, sw);
+  strokeIndex++;
+  sendStroke(r, sw);
+  // A schermo solo se non copre altro (punteggio, messaggi): display spento o col colpo precedente.
+  if (cfg.swd && connected && r.stroke != swing::kUnknown && (!displayOn || displayOffAt == strokeOffAt)) {
+    char l2[8];
+    snprintf(l2, sizeof(l2), "%d%%", (int)lroundf(r.confidence * 100.0f));
+    drawMessage(strokeName(r.stroke), l2, C_BALL);
+    showFor(STROKE_SHOW_MS);
+    strokeOffAt = displayOffAt;
+  }
+}
+
+// Assi come M5Unified sullo StickS3 (X = +Y del sensore, Y = -X): gli stessi di SwingSense.
+static void onImuFrame(const uint8_t* f, uint32_t now) {
+  const uint8_t* g = fifoAccFirst ? f + 6 : f;
+  const uint8_t* a = fifoAccFirst ? f : f + 6;
+  const swing::ImuSample s{
+    le16(a + 2) * ACC_LSB_G, -le16(a) * ACC_LSB_G, le16(a + 4) * ACC_LSB_G,
+    le16(g + 2) * GYR_LSB_DPS, -le16(g) * GYR_LSB_DPS, le16(g + 4) * GYR_LSB_DPS,
+  };
+  swing::Swing sw;
+  lastSample = s;
+  if (detector.push(s, sw)) onSwing(sw, now);
+}
+
+static void drainImu(uint32_t now) {
+  if (!imuOn) return;
+  uint16_t frames = fifoBytes() / FIFO_FRAME;
+  uint8_t buf[FIFO_FRAME * FIFO_CHUNK];
+  while (frames) {
+    const uint16_t n = min<uint16_t>(frames, FIFO_CHUNK);
+    if (!M5.In_I2C.readRegister(imuAddr, BMI_FIFO_DATA, buf, n * FIFO_FRAME, 400000)) return;
+    for (uint16_t i = 0; i < n; i++) onImuFrame(buf + i * FIFO_FRAME, now);
+    frames -= n;
+  }
 }
 
 // "chiave=valore;chiave=valore": si applicano solo le chiavi presenti, le altre restano come sono.
@@ -17017,6 +18947,8 @@ static void handleConfig(char* text) {
     else if (!strcmp(k, "pair")) cfg.pairS   = atoi(v);
     else if (!strcmp(k, "lost")) cfg.lostS   = atoi(v);
     else if (!strcmp(k, "idle")) cfg.idleMin = atoi(v);
+    else if (!strcmp(k, "sw"))   cfg.sw      = atoi(v) != 0;
+    else if (!strcmp(k, "swd"))  cfg.swd     = atoi(v) != 0;
   }
   clampSettings();
   if (onlyLang) {
@@ -17032,6 +18964,7 @@ static void handleConfig(char* text) {
     return;
   }
   saveSettings();
+  imuUpdateNeeded();
   if (strcmp(oldName, cfg.name) != 0) applyName();
   M5.Display.setRotation(cfg.flip ? 3 : 1);
   if (displayOn) M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
@@ -17046,6 +18979,7 @@ static void handleConfig(char* text) {
 // ------------------------------------------------------------------ messaggi dal telefono
 // P|mio|avversario|servizio|intestazione   G|mieiG|loroG|mieiS|loroS|intestazione   M|riga1|riga2|secondi
 // I|riga1|riga2|secondi|RRGGBB (identifica)   O|riga1|riga2 (spegni)
+// Colpi (2.4): C|n calibra il colpo n (0-3; senza n finisce)   U| annulla l'ultimo esempio   X|n cancella il colpo n
 static int splitFields(char* s, char** out, int maxOut) {
   int n = 0;
   out[n++] = s;
@@ -17098,6 +19032,37 @@ static void handleMessage(char* msg) {
     case 'O':
       powerOff(n >= 2 && f[1][0] ? f[1] : TXT_POWER_OFF, n >= 3 ? f[2] : "", OFF_APP);
       break;
+    case 'C': {
+      const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
+      if (k >= 0 && k < swing::kStrokeCount) {
+        calStroke = (int8_t)k;
+        imuUpdateNeeded();
+        if (imuOn) drawCalib();
+        else calStroke = -1;  // IMU non disponibile: l'app vede cal=-1
+      } else {
+        stopCalibration(true);
+      }
+      publishConfig(true);
+      break;
+    }
+    case 'U':
+      if (classifier.removeLast()) {
+        saveModel();
+        beep(1200, 60);
+      }
+      if (calStroke >= 0) drawCalib();
+      publishConfig(true);
+      break;
+    case 'X': {
+      const int k = n >= 2 && f[1][0] ? atoi(f[1]) : -1;
+      if (k >= 0 && k < swing::kStrokeCount) {
+        classifier.clear((uint8_t)k);
+        saveModel(k);
+      }
+      if (calStroke >= 0) drawCalib();
+      publishConfig(true);
+      break;
+    }
   }
 }
 
@@ -17354,6 +19319,7 @@ static void setupBle() {
   statusChr = svc->createCharacteristic(STATUS_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
   configChr = svc->createCharacteristic(CONFIG_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   configChr->setCallbacks(new ConfigCallbacks());
+  strokeChr = svc->createCharacteristic(STROKE_UUID, NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   NimBLEService* bas = server->createService("180F");
   battChr = bas->createCharacteristic("2A19", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
@@ -17409,6 +19375,7 @@ static void powerOff(const char* l1, const char* why, uint8_t reason) {
     delay(200);
   }
   if (spkOn) speakerOff();
+  imuStop();
   M5.Display.setBrightness(0);
   M5.Display.sleep();
   armKeyWake();
@@ -17557,9 +19524,12 @@ void setup() {
   cfgM5.internal_spk  = true;    // configurato ma spento: si accende solo per i bip
   cfgM5.internal_mic  = false;
   cfgM5.led_brightness = 0;
+  cfgM5.serial_baudrate = 115200;  // solo diagnostica dei colpi: senza PC collegato non si scrive niente
   M5.begin(cfgM5);
 
   setupBle();  // carica anche le impostazioni
+  loadModel();
+  imuUpdateNeeded();
 
   M5.Display.setRotation(cfg.flip ? 3 : 1);
   M5.Display.setBrightness((uint8_t)(cfg.bri * 255 / 100));
@@ -17611,6 +19581,7 @@ void loop() {
     justDisconnect = false;
     advSince = now;
     identifyUntil = 0;
+    stopCalibration(false);
     startAdvertising(true);
   }
   if (rxReady) {
@@ -17667,6 +19638,10 @@ void loop() {
   }
   if (M5.BtnB.wasHold()) powerOff(TXT_POWER_OFF, usbOn ? TXT_KEEPS_CHG : "", OFF_KEY);
   serviceEvents(now);
+  drainImu(now);
+  while (Serial.available()) {
+    if (Serial.read() == 'd') debugDump();
+  }
 
   // --- col cavo USB e senza telefono: niente spegnimento automatico, schermata di carica
   if (!connected && !justDisconnect && usbOn) {
@@ -17746,6 +19721,442 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto / done: 73 file del progetto / project files in $DEST"
+cat > "$FWDIR/stroke_classifier.cpp" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copia di SwingSense (firmware/lib/swing): tenere allineate le due versioni.
+
+#include "stroke_classifier.h"
+
+#include <cmath>
+#include <cstring>
+
+namespace swing {
+
+static constexpr uint8_t kMagic[4] = {'S', 'W', 'S', 1};  // "SWS" + versione formato
+static constexpr size_t  kExampleSize = 1 + kFeatureCount * sizeof(float);
+static constexpr float   kMinStd = 0.1f;  // evita che feature quasi costanti dominino
+
+const char* strokeName(uint8_t stroke) {
+  static const char* const kNames[kStrokeCount] = {"dritto", "rovescio", "servizio", "volee"};
+  return stroke < kStrokeCount ? kNames[stroke] : "?";
+}
+
+void StrokeClassifier::add(uint8_t stroke, const Features& f) {
+  if (stroke >= kStrokeCount) return;
+  if (count(stroke) >= kMaxPerClass) {
+    for (int i = 0; i < n_; i++) {
+      if (ex_[i].stroke == stroke) {
+        removeAt(i);
+        break;
+      }
+    }
+  }
+  ex_[n_++] = Example{stroke, f};
+  updateStats();
+}
+
+bool StrokeClassifier::removeLast() {
+  if (n_ == 0) return false;
+  n_--;
+  updateStats();
+  return true;
+}
+
+void StrokeClassifier::clear(uint8_t stroke) {
+  for (int i = n_ - 1; i >= 0; i--) {
+    if (ex_[i].stroke == stroke) removeAt(i);
+  }
+  updateStats();
+}
+
+void StrokeClassifier::clearAll() {
+  n_ = 0;
+  updateStats();
+}
+
+int StrokeClassifier::count(uint8_t stroke) const {
+  int c = 0;
+  for (int i = 0; i < n_; i++) c += ex_[i].stroke == stroke;
+  return c;
+}
+
+bool StrokeClassifier::ready() const {
+  int classes = 0;
+  for (uint8_t s = 0; s < kStrokeCount; s++) classes += count(s) >= kMinPerClass;
+  return classes >= 2;
+}
+
+void StrokeClassifier::removeAt(int i) {
+  for (int j = i; j < n_ - 1; j++) ex_[j] = ex_[j + 1];
+  n_--;
+}
+
+void StrokeClassifier::updateStats() {
+  for (int k = 0; k < kFeatureCount; k++) {
+    float sum = 0, sq = 0;
+    for (int i = 0; i < n_; i++) {
+      sum += ex_[i].f[k];
+      sq += ex_[i].f[k] * ex_[i].f[k];
+    }
+    float var = n_ > 1 ? (sq - sum * sum / n_) / (n_ - 1) : 0.0f;
+    std_[k] = std::fmax(std::sqrt(std::fmax(var, 0.0f)), kMinStd);
+  }
+}
+
+// Distanza euclidea sulle feature normalizzate, divisa per il numero di
+// feature (RMS): 1.0 significa "in media una deviazione standard".
+float StrokeClassifier::distance(const Features& a, const Features& b) const {
+  float d = 0;
+  for (int k = 0; k < kFeatureCount; k++) {
+    float z = (a[k] - b[k]) / std_[k];
+    d += z * z;
+  }
+  return std::sqrt(d / kFeatureCount);
+}
+
+StrokeClassifier::Result StrokeClassifier::classify(const Features& f) const {
+  Result r{kUnknown, 0.0f, INFINITY};
+  if (!ready()) return r;
+
+  bool usable[kStrokeCount];
+  for (uint8_t s = 0; s < kStrokeCount; s++) usable[s] = count(s) >= kMinPerClass;
+
+  // I k esempi più vicini, ordinati per distanza.
+  float   bestD[kK];
+  uint8_t bestS[kK];
+  int     found = 0;
+  for (int i = 0; i < n_; i++) {
+    if (!usable[ex_[i].stroke]) continue;
+    float d = distance(f, ex_[i].f);
+    int pos = found < kK ? found++ : kK;
+    while (pos > 0 && bestD[pos - 1] > d) {
+      if (pos < kK) {
+        bestD[pos] = bestD[pos - 1];
+        bestS[pos] = bestS[pos - 1];
+      }
+      pos--;
+    }
+    if (pos < kK) {
+      bestD[pos] = d;
+      bestS[pos] = ex_[i].stroke;
+    }
+  }
+
+  float votes[kStrokeCount] = {};
+  float total = 0;
+  for (int i = 0; i < found; i++) {
+    float w = 1.0f / (bestD[i] + 0.1f);
+    votes[bestS[i]] += w;
+    total += w;
+  }
+  uint8_t winner = 0;
+  for (uint8_t s = 1; s < kStrokeCount; s++) {
+    if (votes[s] > votes[winner]) winner = s;
+  }
+
+  r.distance = bestD[0];
+  r.confidence = votes[winner] / total;
+  r.stroke = bestD[0] <= kRejectDistance ? winner : (uint8_t)kUnknown;
+  return r;
+}
+
+size_t StrokeClassifier::serialize(uint8_t* buf, size_t cap) const {
+  const size_t len = 8 + n_ * kExampleSize;
+  if (cap < len) return 0;
+  memcpy(buf, kMagic, 4);
+  buf[4] = (uint8_t)(n_ & 0xFF);
+  buf[5] = (uint8_t)(n_ >> 8);
+  buf[6] = buf[7] = 0;
+  uint8_t* p = buf + 8;
+  for (int i = 0; i < n_; i++) {
+    *p++ = ex_[i].stroke;
+    memcpy(p, ex_[i].f.data(), kFeatureCount * sizeof(float));
+    p += kFeatureCount * sizeof(float);
+  }
+  return len;
+}
+
+bool StrokeClassifier::deserialize(const uint8_t* buf, size_t len) {
+  if (len < 8 || memcmp(buf, kMagic, 4) != 0) return false;
+  const int n = buf[4] | (buf[5] << 8);
+  if (n > kMaxPerClass * kStrokeCount || len < 8 + n * kExampleSize) return false;
+
+  for (int i = 0; i < n; i++) {
+    if (buf[8 + i * kExampleSize] >= kStrokeCount) return false;
+  }
+
+  const uint8_t* p = buf + 8;
+  for (int i = 0; i < n; i++) {
+    ex_[i].stroke = p[0];
+    memcpy(ex_[i].f.data(), p + 1, kFeatureCount * sizeof(float));
+    p += kExampleSize;
+  }
+  n_ = n;
+  updateStats();
+  return true;
+}
+
+}  // namespace swing
+TSM_EOF
+
+cat > "$FWDIR/stroke_classifier.h" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copia di SwingSense (firmware/lib/swing): tenere allineate le due versioni.
+
+// Classificatore k-NN dei colpi, allenato direttamente sullo stick.
+//
+// In calibrazione ogni colpo rilevato diventa un esempio con la sua etichetta.
+// In gioco un nuovo colpo viene confrontato con gli esempi (feature
+// normalizzate z-score) e vince la classe con più voti tra i k più vicini.
+// Se anche l'esempio più vicino è troppo distante il colpo resta "sconosciuto".
+
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+
+#include "swing_detector.h"
+
+namespace swing {
+
+enum Stroke : uint8_t {
+  kForehand = 0,
+  kBackhand,
+  kServe,
+  kVolley,
+  kStrokeCount,
+  kUnknown = 0xFF,
+};
+
+const char* strokeName(uint8_t stroke);
+
+class StrokeClassifier {
+ public:
+  static constexpr int   kMaxPerClass = 20;  // oltre, l'esempio più vecchio viene sostituito
+  static constexpr int   kMinPerClass = 3;   // esempi minimi perché una classe conti
+  static constexpr int   kK = 3;
+  // Distanza RMS (in deviazioni standard) oltre la quale il colpo è "sconosciuto". Sui colpi veri il più
+  // vicino della classe giusta sta entro ~0,7 (mediana 0,3); colpi diversi da tutti gli esempi, come con lo
+  // stick girato rispetto alla calibrazione, partono da ~1,0: meglio "?" che un nome a caso.
+  static constexpr float kRejectDistance = 0.9f;
+
+  struct Result {
+    uint8_t stroke;      // Stroke o kUnknown
+    float   confidence;  // 0..1, quota dei voti della classe vincente
+    float   distance;    // distanza dall'esempio più vicino
+  };
+
+  void add(uint8_t stroke, const Features& f);
+  bool removeLast();  // annulla l'ultimo esempio aggiunto
+  void clear(uint8_t stroke);
+  void clearAll();
+
+  int  count(uint8_t stroke) const;
+  int  total() const { return n_; }
+  bool ready() const;  // almeno due classi con kMinPerClass esempi
+
+  Result classify(const Features& f) const;
+
+  // Persistenza (blob binario per NVS / file).
+  static constexpr size_t kMaxSerializedSize = 8 + kMaxPerClass * kStrokeCount * (1 + kFeatureCount * 4);
+  size_t serialize(uint8_t* buf, size_t cap) const;
+  bool   deserialize(const uint8_t* buf, size_t len);
+
+ private:
+  struct Example {
+    uint8_t  stroke;
+    Features f;
+  };
+
+  void removeAt(int i);
+  void updateStats();
+  float distance(const Features& a, const Features& b) const;
+
+  Example ex_[kMaxPerClass * kStrokeCount];
+  int     n_ = 0;  // esempi in ordine di inserimento
+  Features std_{};  // deviazione standard di ogni feature sugli esempi
+};
+
+}  // namespace swing
+TSM_EOF
+
+cat > "$FWDIR/swing_detector.cpp" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copia di SwingSense (firmware/lib/swing): tenere allineate le due versioni.
+
+#include "swing_detector.h"
+
+#include <cmath>
+
+namespace swing {
+
+static float norm3(float x, float y, float z) { return std::sqrt(x * x + y * y + z * z); }
+
+SwingDetector::SwingDetector(const DetectorConfig& cfg) : cfg_(cfg) { reset(); }
+
+void SwingDetector::reset() {
+  count_ = 0;
+  inSwing_ = false;
+  peakIdx_ = 0;
+  peakVal_ = 0.0f;
+  refractoryUntil_ = 0;
+}
+
+bool SwingDetector::push(const ImuSample& s, Swing& out) {
+  const uint32_t idx = count_++;
+  buf_[idx % kBufSize] = s;
+  const float mag = norm3(s.gx, s.gy, s.gz);
+
+  if (!inSwing_) {
+    // Serve abbastanza storia per la parte di finestra prima del picco.
+    if (mag >= cfg_.triggerDps && idx >= refractoryUntil_ && idx >= (uint32_t)cfg_.preSamples) {
+      inSwing_ = true;
+      peakIdx_ = idx;
+      peakVal_ = mag;
+    }
+    return false;
+  }
+
+  if (mag > peakVal_) {
+    peakIdx_ = idx;
+    peakVal_ = mag;
+  }
+  if (idx - peakIdx_ < (uint32_t)cfg_.postSamples) return false;
+
+  inSwing_ = false;
+  refractoryUntil_ = idx + cfg_.refractorySamples;
+  out.peakIndex = peakIdx_;
+  out.peakGyro = peakVal_;
+  computeFeatures(peakIdx_, out);
+  return out.peakAccel >= cfg_.minPeakAccelG;
+}
+
+// Feature (scalate per stare tutte attorno a ±1..3):
+//   0-2   accelerazione media nei primi 200 ms della finestra (postura del braccio), g
+//   3-5   rotazione integrata su ogni asse nella finestra, centinaia di gradi
+//   6-8   velocità angolare al picco su ogni asse, migliaia di °/s
+//   9     modulo massimo dell'accelerazione, unità di 8 g
+//   10    durata con |gyro| > metà soglia, unità di 0.5 s
+void SwingDetector::computeFeatures(uint32_t peak, Swing& out) const {
+  const uint32_t start = peak - cfg_.preSamples;
+  const uint32_t end = peak + cfg_.postSamples;  // incluso
+  const float dt = 1.0f / cfg_.sampleRateHz;
+  const int postureSamples = (int)(0.2f * cfg_.sampleRateHz);
+
+  float pax = 0, pay = 0, paz = 0;
+  float rx = 0, ry = 0, rz = 0;
+  float maxAcc = 0;
+  int activeSamples = 0;
+
+  for (uint32_t i = start; i <= end; i++) {
+    const ImuSample& s = at(i);
+    if ((int)(i - start) < postureSamples) {
+      pax += s.ax;
+      pay += s.ay;
+      paz += s.az;
+    }
+    rx += s.gx * dt;
+    ry += s.gy * dt;
+    rz += s.gz * dt;
+    const float acc = norm3(s.ax, s.ay, s.az);
+    if (acc > maxAcc) maxAcc = acc;
+    if (norm3(s.gx, s.gy, s.gz) > cfg_.triggerDps * 0.5f) activeSamples++;
+  }
+
+  const ImuSample& p = at(peak);
+  out.peakAccel = maxAcc;
+  out.features = {
+      pax / postureSamples, pay / postureSamples, paz / postureSamples,
+      rx / 100.0f,          ry / 100.0f,          rz / 100.0f,
+      p.gx / 1000.0f,       p.gy / 1000.0f,       p.gz / 1000.0f,
+      maxAcc / 8.0f,
+      activeSamples / (0.5f * cfg_.sampleRateHz),
+  };
+}
+
+}  // namespace swing
+TSM_EOF
+
+cat > "$FWDIR/swing_detector.h" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copia di SwingSense (firmware/lib/swing): tenere allineate le due versioni.
+
+// Rilevamento dei colpi dal flusso IMU ed estrazione delle feature.
+//
+// Un colpo inizia quando il modulo della velocità angolare supera una soglia.
+// Il picco viene seguito finché il segnale resta alto; quando sono passati
+// `postSamples` campioni dal picco, la finestra [picco - pre, picco + post]
+// viene riassunta in un vettore di feature per il classificatore.
+//
+// Codice C++ puro (niente Arduino), così si può testare sul PC.
+
+#pragma once
+
+#include <array>
+#include <cstdint>
+
+namespace swing {
+
+struct ImuSample {
+  float ax, ay, az;  // g
+  float gx, gy, gz;  // gradi/s
+};
+
+constexpr int kFeatureCount = 11;
+using Features = std::array<float, kFeatureCount>;
+
+struct Swing {
+  uint32_t peakIndex;  // indice (contatore campioni) del picco
+  float    peakGyro;   // modulo velocità angolare al picco, °/s
+  float    peakAccel;  // modulo accelerazione massimo nella finestra, g
+  Features features;
+};
+
+struct DetectorConfig {
+  float sampleRateHz      = 100.0f;
+  float triggerDps        = 400.0f;  // sotto questa soglia non è un colpo
+  float minPeakAccelG     = 2.5f;    // braccio che ruota piano senza un vero colpo
+  int   preSamples        = 60;      // finestra prima del picco
+  int   postSamples       = 40;      // finestra dopo il picco
+  int   refractorySamples = 50;      // pausa dopo un colpo (ignora il follow-through)
+};
+
+class SwingDetector {
+ public:
+  static constexpr int kBufSize = 128;  // deve contenere pre + post + 1 campioni
+
+  explicit SwingDetector(const DetectorConfig& cfg = DetectorConfig());
+
+  // Aggiunge un campione. Restituisce true quando un colpo è completo e lo scrive in `out`.
+  bool push(const ImuSample& s, Swing& out);
+  void reset();
+
+  const DetectorConfig& config() const { return cfg_; }
+
+ private:
+  const ImuSample& at(uint32_t idx) const { return buf_[idx % kBufSize]; }
+  void computeFeatures(uint32_t peak, Swing& out) const;
+
+  DetectorConfig cfg_;
+  ImuSample buf_[kBufSize];
+  uint32_t  count_ = 0;          // campioni ricevuti in totale
+  bool      inSwing_ = false;
+  uint32_t  peakIdx_ = 0;
+  float     peakVal_ = 0.0f;
+  uint32_t  refractoryUntil_ = 0;
+};
+
+}  // namespace swing
+TSM_EOF
+
+echo ">> Fatto / done: 78 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

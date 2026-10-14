@@ -17,15 +17,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.Sensors
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -35,10 +40,12 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.LinkState
@@ -117,6 +125,8 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
             commit(draft.copy(idleTimeoutMin = it))
         }
 
+        StrokesSection(c, side, settings, draft) { commit(it) }
+
         Estimate(BatteryModel.estimate(draft, baseMa[band.address]), batteries[side]?.takeIf { !it.charging }?.percent ?: band.battery, locale)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -141,6 +151,81 @@ fun BandSettingsPanel(c: MatchController, side: Side) {
                 c.powerOffBand(side)
             },
             onDismiss = { confirmOff = false },
+        )
+    }
+}
+
+/**
+ * Colpi (firmware 2.4): riconoscimento, colpo a schermo e calibrazione. Gli esempi li raccoglie il braccialetto
+ * (un colpo eseguito = un esempio) e i contatori arrivano con le impostazioni. Chiudendo il pannello la
+ * calibrazione finisce, così il braccialetto non continua a raccogliere esempi a pannello chiuso.
+ */
+@Composable
+private fun StrokesSection(c: MatchController, side: Side, settings: BandSettings, draft: BandSettings, commit: (BandSettings) -> Unit) {
+    val s = LocalStrings.current
+    Label(Icons.Filled.SportsTennis, s.strokes)
+    val examples = settings.strokeExamples
+    if (examples == null) {
+        Text(s.strokesFirmwareOld, color = TsmColors.TextDim, fontSize = 13.sp)
+        return
+    }
+    val calibrating by rememberUpdatedState(settings.calibrating)
+    DisposableEffect(side) { onDispose { if (calibrating >= 0) c.calibrateStroke(side, null) } }
+    var confirmClear by remember(side) { mutableStateOf<Int?>(null) }
+
+    SwitchRow(Icons.Filled.Sensors, s.strokeRecognition, s.strokeRecognitionHint, draft.strokes) { commit(draft.copy(strokes = it)) }
+    SwitchRow(Icons.Filled.Visibility, s.strokeOnBand, s.strokeOnBandHint, draft.strokeDisplay, enabled = draft.strokes) {
+        commit(draft.copy(strokeDisplay = it))
+    }
+
+    Text(s.strokeCalibration, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+    Text(s.strokeCalibrationHint, color = TsmColors.TextDim, fontSize = 12.sp)
+    for (stroke in 0 until BandProtocol.STROKE_COUNT) {
+        val active = settings.calibrating == stroke
+        val n = examples.getOrElse(stroke) { 0 }
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                .background(if (active) TsmColors.Ball.copy(alpha = 0.12f) else TsmColors.SurfaceHigh.copy(alpha = 0.5f))
+                .padding(start = 12.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(s.strokeName(stroke), color = if (active) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("$n/${BandSettings.MAX_EXAMPLES}", color = if (n >= BandSettings.MIN_EXAMPLES) TsmColors.Ball else TsmColors.TextDim,
+                fontWeight = FontWeight.Bold)
+            IconButton(onClick = { confirmClear = stroke }, enabled = n > 0) {
+                Icon(Icons.Filled.DeleteOutline, s.clearExamples, tint = if (n > 0) TsmColors.TextDim else TsmColors.Outline)
+            }
+            Button(
+                onClick = { c.calibrateStroke(side, if (active) null else stroke) },
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (active) TsmColors.Ball else TsmColors.SurfaceHigh,
+                    contentColor = if (active) TsmColors.OnBall else TsmColors.TextMain,
+                ),
+            ) { Text(if (active) s.calibrateStop else s.calibrate, fontSize = 13.sp, maxLines = 1) }
+        }
+    }
+    PanelButton(s.undoExample, Icons.AutoMirrored.Filled.Undo, Modifier.fillMaxWidth(), enabled = examples.sum() > 0) {
+        c.undoStrokeExample(side)
+    }
+    Text(
+        if (settings.strokesReady) s.strokesReady else s.strokesNotReady,
+        color = if (settings.strokesReady) TsmColors.Ball else TsmColors.Orange, fontSize = 12.sp,
+    )
+
+    confirmClear?.let { stroke ->
+        ConfirmDialog(
+            icon = Icons.Filled.DeleteOutline,
+            title = s.clearExamples,
+            text = s.strokeName(stroke),
+            confirm = s.clearExamples,
+            danger = true,
+            onConfirm = {
+                confirmClear = null
+                c.clearStrokeExamples(side, stroke)
+            },
+            onDismiss = { confirmClear = null },
         )
     }
 }

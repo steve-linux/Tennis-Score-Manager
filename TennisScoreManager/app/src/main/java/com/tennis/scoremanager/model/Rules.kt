@@ -63,7 +63,8 @@ data class RulesConfig(
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    data class Point(val winner: Side, val at: Long = 0L) : MatchEvent()
+    /** [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati. */
+    data class Point(val winner: Side, val at: Long = 0L, val strokes: Int? = null) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable

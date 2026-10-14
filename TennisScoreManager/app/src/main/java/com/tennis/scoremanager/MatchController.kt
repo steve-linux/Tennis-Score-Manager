@@ -18,6 +18,7 @@ import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.BandSettings
 import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.BandStroke
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
 import com.tennis.scoremanager.ble.FoundBand
@@ -32,6 +33,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.RulesConfig
@@ -180,6 +182,8 @@ class MatchController(
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
     private var lastUndoAt = 0L
+    /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
+    private var rallyStrokes = 0
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -207,6 +211,7 @@ class MatchController(
         scope.launch { ble.ready.collect { onBandReady(it) } }
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
+        scope.launch { ble.strokes.collect { onBandStroke(it) } }
         scope.launch { watchBands() }
         scope.launch { watchRemotes() }
         scope.launch {
@@ -413,6 +418,18 @@ class MatchController(
         writeBandSettings(from.other, src.copy(name = dst.name))
     }
 
+    /** Calibrazione dei colpi sul braccialetto: [stroke] = BandProtocol.STROKE_*, null = fine. */
+    fun calibrateStroke(side: Side, stroke: Int?) = bandCommand(side, BandProtocol.calibrate(stroke))
+
+    fun undoStrokeExample(side: Side) = bandCommand(side, BandProtocol.UNDO_EXAMPLE)
+
+    fun clearStrokeExamples(side: Side, stroke: Int) = bandCommand(side, BandProtocol.clearExamples(stroke))
+
+    private fun bandCommand(side: Side, payload: String) {
+        val s = strings
+        scope.launch { if (!ble.command(side, payload)) _toasts.tryEmit(s.bandNotReady) }
+    }
+
     fun powerOffBand(side: Side) {
         val s = strings
         scope.launch { if (!ble.command(side, BandProtocol.powerOff(s.bandOffFromApp, ""))) _toasts.tryEmit(s.bandNotReady) }
@@ -614,6 +631,15 @@ class MatchController(
         }
     }
 
+    /** I colpi contano solo a partita avviata e in corso (non durante la calibrazione o il riscaldamento). */
+    private fun onBandStroke(e: BandStroke) {
+        val lm = live.value ?: return
+        if (screen.value != Screen.MATCH || lm.record.startedAt == null || lm.record.suspended || lm.state.isFinished) return
+        val stats = (lm.record.strokes[e.side] ?: StrokeStats()).add(e.stroke.stroke, e.stroke.peakGyroDps)
+        setRecord(lm.record.copy(strokes = lm.record.strokes + (e.side to stats)))
+        rallyStrokes++
+    }
+
     /** Invia ai braccialetti il punteggio visto da chi li indossa. */
     private fun pushScore(state: MatchState, t: Transition?, only: Side? = null) {
         if (options.value.mode != PlayMode.BANDS) return
@@ -680,6 +706,7 @@ class MatchController(
         serveOrderPrompt.value = false
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -715,7 +742,10 @@ class MatchController(
         val current = live.value ?: return
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis()))
+        // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
+        val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
+        rallyStrokes = 0
+        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -783,7 +813,8 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
-        events.removeAt(events.lastIndex)
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -912,6 +943,7 @@ class MatchController(
         clockMs.value = rec.clockMs
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
@@ -1242,14 +1274,15 @@ class MatchController(
     fun onBackground() = persist()
 
     /**
-     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
-     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
-     * Un'apertura normale riparte invece dalla prima schermata.
+     * Prima Activity del processo: se il processo si era chiuso sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Vale sia quando Android lo chiude in background sia dopo un aggiornamento dell'app, un crash o un riavvio del
+     * telefono. Chi esce di proposito ("Nuova partita", "Esci", app tolta dalle recenti) cancella [Storage.summaryOpen]:
+     * allora si riparte dalla prima schermata.
      */
-    fun onActivityCreated(restored: Boolean) {
+    fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))

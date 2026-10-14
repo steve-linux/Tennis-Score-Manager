@@ -19,6 +19,9 @@ import java.util.UUID
  *   O|<riga 1>|<riga 2>                                          si spegne (firmware 2.0)
  *   H|1                                                          confermo gli eventi (app 2.4): prima delle notifiche
  *   K|<sequenza>                                                 conferma di un evento (solo ai firmware 2.3)
+ *   C|<colpo> oppure C|                                          calibra quel colpo / fine calibrazione (firmware 2.4)
+ *   U|                                                           annulla l'ultimo esempio di calibrazione (firmware 2.4)
+ *   X|<colpo>                                                    cancella gli esempi di quel colpo (firmware 2.4)
  * "mio" è sempre il giocatore che indossa il braccialetto; servizio 1 = serve lui, 2 = serve l'avversario.
  * I firmware vecchi ignorano i tipi che non conoscono.
  *
@@ -36,6 +39,8 @@ object BandProtocol {
     val STATUS: UUID = UUID.fromString("7a1e0004-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     /** Impostazioni del braccialetto (lettura, scrittura, notify): vedi [BandSettings]. Dal firmware 2.0. */
     val CONFIG: UUID = UUID.fromString("7a1e0005-5c3b-4f6e-9d2a-3e7b1c9a0f10")
+    /** Colpo riconosciuto (notify): vedi [parseStroke]. Dal firmware 2.4. */
+    val STROKE: UUID = UUID.fromString("7a1e0006-5c3b-4f6e-9d2a-3e7b1c9a0f10")
     val BATTERY_SERVICE: UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb")
     val BATTERY_LEVEL: UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb")
     val CCCD: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -51,6 +56,14 @@ object BandProtocol {
     const val OFF_BATTERY = 2    // batteria scarica
     const val OFF_APP = 3        // l'ha chiesto l'app
     const val OFF_TIMEOUT = 4    // nessun telefono
+
+    // Colpi (firmware 2.4), stesso ordine di swing::Stroke nel firmware
+    const val STROKE_FOREHAND = 0
+    const val STROKE_BACKHAND = 1
+    const val STROKE_SERVE = 2
+    const val STROKE_VOLLEY = 3
+    const val STROKE_COUNT = 4
+    const val STROKE_UNKNOWN = 255
 
     /** Il font del braccialetto è ASCII: niente accenti, niente '|', maiuscolo. */
     fun clean(s: String, max: Int = 18): String {
@@ -79,6 +92,32 @@ object BandProtocol {
     /** Conferma dell'evento [seq]: il braccialetto suona il bip di conferma. */
     fun ack(seq: Int) = "K|$seq"
 
+    /** Calibrazione del colpo [stroke]: ogni colpo eseguito diventa un esempio; null = fine calibrazione. */
+    fun calibrate(stroke: Int?) = if (stroke == null) "C|" else "C|$stroke"
+
+    /** Toglie l'ultimo esempio di calibrazione (un colpo venuto male). */
+    const val UNDO_EXAMPLE = "U|"
+
+    /** Cancella gli esempi di un colpo, per rifarli. */
+    fun clearExamples(stroke: Int) = "X|$stroke"
+
+    /**
+     * Colpo da STROKE: [indice (2 byte), colpo, confidenza %, picco giroscopio °/s (2 byte),
+     * picco accelerazione in centesimi di g (2 byte), id di accensione (4 byte)], little endian. Null se troppo corto.
+     */
+    fun parseStroke(b: ByteArray): RawStroke? {
+        if (b.size < 12) return null
+        fun u(i: Int) = b[i].toInt() and 0xFF
+        return RawStroke(
+            index = u(0) or (u(1) shl 8),
+            stroke = u(2),
+            confidence = u(3),
+            peakGyroDps = u(4) or (u(5) shl 8),
+            peakAccelG = (u(6) or (u(7) shl 8)) / 100.0,
+            boot = u(8).toLong() or (u(9).toLong() shl 8) or (u(10).toLong() shl 16) or (u(11).toLong() shl 24),
+        )
+    }
+
     /** Evento da EVENT; null se troppo corto. Gli eventi dei firmware prima della 2.3 hanno [boot] null. */
     fun parseEvent(b: ByteArray): RawBandEvent? {
         if (b.size < 2) return null
@@ -99,6 +138,16 @@ object BandProtocol {
  * [ageMs]: da quanto è stato premuto il tasto (più di zero se rimandato dopo una riconnessione).
  */
 data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: Long?, val ageMs: Int)
+
+/** Colpo riconosciuto dal braccialetto. [stroke]: BandProtocol.STROKE_*; [confidence] 0-100. */
+data class RawStroke(
+    val index: Int,
+    val stroke: Int,
+    val confidence: Int,
+    val peakGyroDps: Int,
+    val peakAccelG: Double,
+    val boot: Long,
+)
 
 /**
  * Eventi già ricevuti, per braccialetto e accensione. Un evento rimandato dopo una riconnessione (la conferma
@@ -121,7 +170,8 @@ class EventDedupe(private val windowMs: Long = 30_000) {
 
 /**
  * Impostazioni salvate nel braccialetto. Testo sulla caratteristica CONFIG:
- * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it".
+ * "fw=2.0;name=TSM-1A2B;bri=20;pt=3;vol=50;flip=0;pair=30;lost=180;idle=30", dal firmware 2.2 anche ";lang=it",
+ * dal 2.4 anche i colpi: ";sw=0;swd=1;swc=8,9,10,7;cal=-1" (swc e cal solo in lettura).
  * In scrittura bastano le chiavi da cambiare; il braccialetto risponde con tutte.
  * La lingua non passa da [encode]: la manda l'app da sola ([languageConfig]) e il braccialetto la salva senza anteprima.
  */
@@ -144,7 +194,20 @@ data class BandSettings(
     val firmware: String = "",
     /** Lingua dei testi del braccialetto ("it", "en", ...); vuota = firmware senza lingue (prima della 2.2). */
     val lang: String = "",
+    /** Riconoscimento dei colpi acceso (firmware 2.4): l'IMU resta acceso e consuma di più. */
+    val strokes: Boolean = false,
+    /** Il braccialetto mostra il colpo riconosciuto. */
+    val strokeDisplay: Boolean = true,
+    /** Esempi di calibrazione per colpo (BandProtocol.STROKE_*); null = firmware senza colpi (prima della 2.4). */
+    val strokeExamples: List<Int>? = null,
+    /** Colpo in calibrazione adesso, -1 = nessuno. */
+    val calibrating: Int = -1,
 ) {
+    val supportsStrokes: Boolean get() = strokeExamples != null
+
+    /** Come nel firmware (StrokeClassifier::ready): almeno due colpi con [MIN_EXAMPLES] esempi. */
+    val strokesReady: Boolean get() = (strokeExamples ?: emptyList()).count { it >= MIN_EXAMPLES } >= 2
+
     fun clamped() = copy(
         name = cleanName(name),
         brightness = brightness.coerceIn(5, 100),
@@ -167,11 +230,19 @@ data class BandSettings(
             add("pair=${c.pairTimeoutS}")
             add("lost=${c.lostTimeoutS}")
             add("idle=${c.idleTimeoutMin}")
+            // I firmware senza colpi le salverebbero senza usarle: solo a chi le capisce.
+            if (c.supportsStrokes) {
+                add("sw=${if (c.strokes) 1 else 0}")
+                add("swd=${if (c.strokeDisplay) 1 else 0}")
+            }
         }.joinToString(";")
     }
 
     companion object {
         const val NAME_MAX = 12
+        /** Esempi minimi perché un colpo conti, e massimi che il braccialetto tiene per colpo (firmware). */
+        const val MIN_EXAMPLES = 3
+        const val MAX_EXAMPLES = 20
 
         /** Solo la lingua: il braccialetto la salva in silenzio (niente "IMPOSTAZIONI OK"). */
         fun languageConfig(code: String) = "lang=$code"
@@ -200,6 +271,11 @@ data class BandSettings(
                 idleTimeoutMin = map["idle"]?.toIntOrNull() ?: d.idleTimeoutMin,
                 firmware = map["fw"] ?: "",
                 lang = map["lang"] ?: "",
+                strokes = map["sw"] == "1",
+                strokeDisplay = map["swd"] != "0",
+                strokeExamples = map["swc"]?.split(',')?.map { it.trim().toIntOrNull() ?: 0 }
+                    ?.takeIf { it.size == BandProtocol.STROKE_COUNT },
+                calibrating = map["cal"]?.toIntOrNull()?.takeIf { it in 0 until BandProtocol.STROKE_COUNT } ?: -1,
             )
         }
     }

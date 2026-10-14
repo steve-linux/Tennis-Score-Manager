@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -60,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -303,14 +306,29 @@ fun BigButton(
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = onColor),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(
-            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center, lineHeight = 17.sp,
-        )
+        ButtonLabel(text, bold = true)
     }
+}
+
+/** Margini interni dei pulsanti grandi: più stretti di quelli di Material (24 dp) per lasciare posto al testo. */
+private val ButtonPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+
+/**
+ * Testo dei pulsanti grandi: al massimo due righe e, se non ci sta (carattere grande del telefono, lingue lunghe),
+ * si rimpicciolisce quanto basta invece di troncarsi. L'altezza del pulsante resta fissa: due pulsanti affiancati
+ * restano uguali.
+ */
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified, bold: Boolean = false) {
+    Text(
+        text, color = color, fontWeight = if (bold) FontWeight.Bold else null, maxLines = 2, overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center, lineHeight = 1.1.em,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp, stepSize = 0.5.sp),
+    )
 }
 
 @Composable
@@ -320,10 +338,11 @@ fun GhostButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: 
         enabled = enabled,
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null, tint = TsmColors.TextMain)
         Spacer(Modifier.width(8.dp))
-        Text(text, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        ButtonLabel(text, color = TsmColors.TextMain)
     }
 }
 
