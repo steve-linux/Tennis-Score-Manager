@@ -38,7 +38,9 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -176,6 +178,10 @@ fun SummaryScreen(c: MatchController) {
                 for (side in Side.entries) {
                     Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
                 }
+                for (side in Side.entries) {
+                    Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
+                }
+                Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
             }
         }
         Column(

@@ -922,6 +922,8 @@ class MatchController(
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
     private var lastUndoAt = 0L
+    /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
+    private var rallyStrokes = 0
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -1332,8 +1334,9 @@ class MatchController(
     private fun onBandStroke(e: BandStroke) {
         val lm = live.value ?: return
         if (screen.value != Screen.MATCH || lm.record.startedAt == null || lm.record.suspended || lm.state.isFinished) return
-        val stats = (lm.record.strokes[e.side] ?: StrokeStats()) + e.stroke.stroke
+        val stats = (lm.record.strokes[e.side] ?: StrokeStats()).add(e.stroke.stroke, e.stroke.peakGyroDps)
         setRecord(lm.record.copy(strokes = lm.record.strokes + (e.side to stats)))
+        rallyStrokes++
     }
 
     /** Invia ai braccialetti il punteggio visto da chi li indossa. */
@@ -1402,6 +1405,7 @@ class MatchController(
         serveOrderPrompt.value = false
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -1437,7 +1441,10 @@ class MatchController(
         val current = live.value ?: return
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis()))
+        // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
+        val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
+        rallyStrokes = 0
+        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -1505,7 +1512,8 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
-        events.removeAt(events.lastIndex)
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -1634,6 +1642,7 @@ class MatchController(
         clockMs.value = rec.clockMs
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
@@ -3426,19 +3435,41 @@ data class MatchRecord(
     val strokes: Map<Side, StrokeStats> = emptyMap(),
 )
 
-/** Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti. */
+/**
+ * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.
+ * [gyroSum]/[gyroMax]: velocità di rotazione del polso al picco (°/s) per tipo di colpo, per media e massimo.
+ */
 @Serializable
 data class StrokeStats(
     val counts: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
     val unknown: Int = 0,
+    val gyroSum: List<Long> = List(BandProtocol.STROKE_COUNT) { 0L },
+    val gyroMax: List<Int> = List(BandProtocol.STROKE_COUNT) { 0 },
 ) {
     val total: Int get() = counts.sum() + unknown
 
     fun count(stroke: Int): Int = counts.getOrElse(stroke) { 0 }
 
-    operator fun plus(stroke: Int): StrokeStats =
-        if (stroke in counts.indices) copy(counts = counts.mapIndexed { i, n -> if (i == stroke) n + 1 else n })
-        else copy(unknown = unknown + 1)
+    /** Media della velocità del polso per quel colpo; null se non ce ne sono (o partita salvata senza velocità). */
+    fun avgGyro(stroke: Int): Int? {
+        val n = count(stroke)
+        val sum = gyroSum.getOrElse(stroke) { 0L }
+        return if (n > 0 && sum > 0) (sum / n).toInt() else null
+    }
+
+    fun maxGyro(stroke: Int): Int? = gyroMax.getOrElse(stroke) { 0 }.takeIf { it > 0 }
+
+    fun add(stroke: Int, peakGyroDps: Int): StrokeStats {
+        if (stroke !in counts.indices) return copy(unknown = unknown + 1)
+        fun <T> List<T>.at(i: Int, f: (T) -> T) = mapIndexed { j, v -> if (j == i) f(v) else v }
+        val sums = gyroSum.takeIf { it.size == counts.size } ?: List(counts.size) { 0L }
+        val maxs = gyroMax.takeIf { it.size == counts.size } ?: List(counts.size) { 0 }
+        return copy(
+            counts = counts.at(stroke) { it + 1 },
+            gyroSum = sums.at(stroke) { it + peakGyroDps },
+            gyroMax = maxs.at(stroke) { maxOf(it, peakGyroDps) },
+        )
+    }
 }
 
 /** Nomi mostrati e letti, sempre legati al lato giusto. */
@@ -3557,6 +3588,34 @@ object Reports {
         return parts.joinToString(" · ")
     }
 
+    /** "Dritto 1450 °/s (max 1980) · Servizio 1620 °/s (max 2010)": velocità del polso al picco; null senza dati. */
+    fun wristSpeedLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val st = rec.strokes[side] ?: return null
+        val parts = (0 until BandProtocol.STROKE_COUNT).mapNotNull { k ->
+            val avg = st.avgGyro(k) ?: return@mapNotNull null
+            "${s.strokeName(k)} $avg °/s (${s.maxShort} ${st.maxGyro(k) ?: avg})"
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
+    data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
+
+    /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
+    fun rallyStats(rec: MatchRecord): RallyStats? {
+        val r = rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes }
+        if (r.isEmpty()) return null
+        fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
+        val short = pct(r.count { it <= 3 })
+        val long = pct(r.count { it >= 9 })
+        return RallyStats(r.size, r.average(), r.max(), short, (100 - short - long).coerceAtLeast(0), long)
+    }
+
+    /** "media 4,2 · più lungo 15 · brevi (1-3) 45% · medi (4-8) 40% · lunghi (9+) 15%" */
+    fun rallyLine(st: RallyStats, s: Strings, lang: Lang): String =
+        "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
+            "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
+
     fun formatLabel(rec: MatchRecord, s: Strings): String =
         (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
@@ -3597,6 +3656,8 @@ object Reports {
         sb.appendLine("${s.pointsWon}: ${pointsWon(rec, Side.P1)} - ${pointsWon(rec, Side.P2)} · ${s.gamesWon}: ${gamesWon(state, Side.P1)} - ${gamesWon(state, Side.P2)}")
         if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) sb.appendLine("🔋 ${s.bandsBattery}: ${batteryLine(rec, s)}")
         for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
+        for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
+        rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))
@@ -3893,7 +3954,8 @@ data class RulesConfig(
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    data class Point(val winner: Side, val at: Long = 0L) : MatchEvent()
+    /** [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati. */
+    data class Point(val winner: Side, val at: Long = 0L, val strokes: Int? = null) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable
@@ -6471,6 +6533,16 @@ interface Strings {
     val strokesReady: String
     val strokesNotReady: String
     val strokesFirmwareOld: String
+    /** Riepilogo: velocità di rotazione del polso al picco del colpo (°/s). */
+    val wristSpeed: String
+    val maxShort: String
+    /** Riepilogo: colpi per punto (lunghezza degli scambi). */
+    val strokesPerPoint: String
+    val rallyAverage: String
+    val rallyLongest: String
+    val rallyShort: String
+    val rallyMedium: String
+    val rallyLong: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -6817,6 +6889,14 @@ object ItStrings : Strings {
     override val strokesReady = "Pronto: riconosce i colpi calibrati."
     override val strokesNotReady = "Servono almeno 3 esempi per 2 colpi."
     override val strokesFirmwareOld = "Per riconoscere i colpi carica il firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocità del polso"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Colpi per punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "più lungo"
+    override val rallyShort = "brevi"
+    override val rallyMedium = "medi"
+    override val rallyLong = "lunghi"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -7150,6 +7230,14 @@ object EnStrings : Strings {
     override val strokesReady = "Ready: it recognizes the calibrated strokes."
     override val strokesNotReady = "At least 3 examples for 2 strokes are needed."
     override val strokesFirmwareOld = "To recognize strokes, upload the TSM_Band 2.4 firmware."
+    override val wristSpeed = "Wrist speed"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Strokes per point"
+    override val rallyAverage = "average"
+    override val rallyLongest = "longest"
+    override val rallyShort = "short"
+    override val rallyMedium = "medium"
+    override val rallyLong = "long"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
@@ -7506,6 +7594,14 @@ object DeStrings : Strings {
     override val strokesReady = "Bereit: Es erkennt die kalibrierten Schläge."
     override val strokesNotReady = "Es braucht mindestens 3 Beispiele für 2 Schläge."
     override val strokesFirmwareOld = "Für die Schlagerkennung lade die Firmware TSM_Band 2.4 hoch."
+    override val wristSpeed = "Handgelenk-Tempo"
+    override val maxShort = "max."
+    override val strokesPerPoint = "Schläge pro Punkt"
+    override val rallyAverage = "Schnitt"
+    override val rallyLongest = "längster"
+    override val rallyShort = "kurz"
+    override val rallyMedium = "mittel"
+    override val rallyLong = "lang"
     override val powerOff = "Ausschalten"
     override val bandPowerOffTitle = "Armband ausschalten?"
     override val bandPowerOffText: (String) -> String = { "$it schaltet sich sofort aus. Zum Einschalten: ein Klick auf die Seitentaste." }
@@ -7854,6 +7950,14 @@ object EsStrings : Strings {
     override val strokesReady = "Lista: reconoce los golpes calibrados."
     override val strokesNotReady = "Hacen falta al menos 3 ejemplos de 2 golpes."
     override val strokesFirmwareOld = "Para reconocer los golpes, carga el firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocidad de muñeca"
+    override val maxShort = "máx."
+    override val strokesPerPoint = "Golpes por punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "más largo"
+    override val rallyShort = "cortos"
+    override val rallyMedium = "medios"
+    override val rallyLong = "largos"
     override val powerOff = "Apagar"
     override val bandPowerOffTitle = "¿Apagar la pulsera?"
     override val bandPowerOffText: (String) -> String = { "$it se apaga ahora mismo. Para volver a encenderla: un clic en el botón lateral." }
@@ -8206,6 +8310,14 @@ object FrStrings : Strings {
     override val strokesReady = "Prêt : il reconnaît les coups calibrés."
     override val strokesNotReady = "Il faut au moins 3 exemples pour 2 coups."
     override val strokesFirmwareOld = "Pour reconnaître les coups, chargez le firmware TSM_Band 2.4."
+    override val wristSpeed = "Vitesse du poignet"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Coups par point"
+    override val rallyAverage = "moyenne"
+    override val rallyLongest = "le plus long"
+    override val rallyShort = "courts"
+    override val rallyMedium = "moyens"
+    override val rallyLong = "longs"
     override val powerOff = "Éteindre"
     override val bandPowerOffTitle = "Éteindre le bracelet ?"
     override val bandPowerOffText: (String) -> String = { "$it s'éteint tout de suite. Pour le rallumer : un clic sur le bouton latéral." }
@@ -8557,6 +8669,14 @@ object PtStrings : Strings {
     override val strokesReady = "Pronta: reconhece os golpes calibrados."
     override val strokesNotReady = "São necessários pelo menos 3 exemplos de 2 golpes."
     override val strokesFirmwareOld = "Para reconhecer golpes, carregue o firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocidade do pulso"
+    override val maxShort = "máx."
+    override val strokesPerPoint = "Golpes por ponto"
+    override val rallyAverage = "média"
+    override val rallyLongest = "mais longo"
+    override val rallyShort = "curtos"
+    override val rallyMedium = "médios"
+    override val rallyLong = "longos"
     override val powerOff = "Desligar"
     override val bandPowerOffTitle = "Desligar a pulseira?"
     override val bandPowerOffText: (String) -> String = { "$it desliga agora. Para ligá-la de novo: um clique no botão lateral." }
@@ -10818,7 +10938,9 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
@@ -10956,6 +11078,10 @@ fun SummaryScreen(c: MatchController) {
                 for (side in Side.entries) {
                     Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
                 }
+                for (side in Side.entries) {
+                    Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
+                }
+                Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
             }
         }
         Column(
@@ -12724,13 +12850,16 @@ class StrokeProtocolTest {
 
     @Test
     fun strokeStatsCount() {
-        val st = StrokeStats() + BandProtocol.STROKE_FOREHAND + BandProtocol.STROKE_FOREHAND +
-            BandProtocol.STROKE_VOLLEY + BandProtocol.STROKE_UNKNOWN
+        val st = StrokeStats().add(BandProtocol.STROKE_FOREHAND, 1400).add(BandProtocol.STROKE_FOREHAND, 1600)
+            .add(BandProtocol.STROKE_VOLLEY, 900).add(BandProtocol.STROKE_UNKNOWN, 700)
         assertEquals(2, st.count(BandProtocol.STROKE_FOREHAND))
         assertEquals(0, st.count(BandProtocol.STROKE_SERVE))
         assertEquals(1, st.count(BandProtocol.STROKE_VOLLEY))
         assertEquals(1, st.unknown)
         assertEquals(4, st.total)
+        assertEquals(1500, st.avgGyro(BandProtocol.STROKE_FOREHAND))
+        assertEquals(1600, st.maxGyro(BandProtocol.STROKE_FOREHAND))
+        assertNull(st.avgGyro(BandProtocol.STROKE_SERVE))
     }
 
     @Test
@@ -12813,6 +12942,76 @@ class DataTest {
         assertEquals("3 set · tie-break a 7 · No-Ad · Singolare", Reports.formatLabel(rec, ItStrings))
         assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ItStrings
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+/** Colpi nel riepilogo: velocità del polso per tipo di colpo e colpi per punto. */
+class StrokeReportTest {
+
+    private fun record(events: List<MatchEvent> = emptyList(), strokes: Map<Side, StrokeStats> = emptyMap()) =
+        MatchRecord(id = "m1", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(), events = events, strokes = strokes)
+
+    @Test
+    fun wristSpeedPerStroke() {
+        val st = StrokeStats().add(BandProtocol.STROKE_FOREHAND, 1400).add(BandProtocol.STROKE_FOREHAND, 1500)
+            .add(BandProtocol.STROKE_SERVE, 2010)
+        val rec = record(strokes = mapOf(Side.P1 to st))
+        assertEquals("Dritto 1450 °/s (max 1500) · Servizio 2010 °/s (max 2010)", Reports.wristSpeedLine(rec, Side.P1, ItStrings))
+        assertNull(Reports.wristSpeedLine(rec, Side.P2, ItStrings))
+    }
+
+    @Test
+    fun rallyLengths() {
+        val points = listOf(2, 3, 5, 12, 4, 1, 9, 6).map { MatchEvent.Point(Side.P1, strokes = it) } +
+            MatchEvent.Point(Side.P2)  // punto senza colpi contati: non conta
+        val st = Reports.rallyStats(record(points))!!
+        assertEquals(8, st.points)
+        assertEquals(5.25, st.average, 1e-9)
+        assertEquals(12, st.longest)
+        assertEquals(38, st.shortPct)   // 3 su 8
+        assertEquals(37, st.mediumPct)  // 3 su 8 (il resto, così la somma fa 100)
+        assertEquals(25, st.longPct)    // 2 su 8
+        assertEquals(
+            "media 5,3 · più lungo 12 · brevi (1-3) 38% · medi (4-8) 37% · lunghi (9+) 25%",
+            Reports.rallyLine(st, ItStrings, Lang.IT),
+        )
+        assertNull(Reports.rallyStats(record(listOf(MatchEvent.Point(Side.P1)))))
+    }
+
+    @Test
+    fun matchesSavedBeforeStillLoad() {
+        // Partita salvata dalla prima versione dei colpi: punti senza "strokes", conteggi senza velocità.
+        val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+        val old = """{"id":"m1","setup":{},"options":{},"rules":{},
+            "events":[{"type":"point","winner":"P1","at":5}],
+            "strokes":{"P1":{"counts":[3,0,1,0],"unknown":1}}}"""
+        val rec = json.decodeFromString(MatchRecord.serializer(), old)
+        assertNull((rec.events.single() as MatchEvent.Point).strokes)
+        val st = rec.strokes.getValue(Side.P1)
+        assertEquals(3, st.count(BandProtocol.STROKE_FOREHAND))
+        assertNull(st.avgGyro(BandProtocol.STROKE_FOREHAND))  // nessuna velocità salvata: non si inventa uno zero
+        assertNull(Reports.wristSpeedLine(rec, Side.P1, ItStrings))
+        // E i colpi nuovi si aggiungono senza problemi.
+        assertEquals(1200, st.add(BandProtocol.STROKE_SERVE, 1200).maxGyro(BandProtocol.STROKE_SERVE))
     }
 }
 TSM_EOF
@@ -18159,6 +18358,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 70 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 71 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

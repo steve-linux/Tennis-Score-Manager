@@ -113,6 +113,16 @@ interface Strings {
     val strokesReady: String
     val strokesNotReady: String
     val strokesFirmwareOld: String
+    /** Riepilogo: velocità di rotazione del polso al picco del colpo (°/s). */
+    val wristSpeed: String
+    val maxShort: String
+    /** Riepilogo: colpi per punto (lunghezza degli scambi). */
+    val strokesPerPoint: String
+    val rallyAverage: String
+    val rallyLongest: String
+    val rallyShort: String
+    val rallyMedium: String
+    val rallyLong: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -459,6 +469,14 @@ object ItStrings : Strings {
     override val strokesReady = "Pronto: riconosce i colpi calibrati."
     override val strokesNotReady = "Servono almeno 3 esempi per 2 colpi."
     override val strokesFirmwareOld = "Per riconoscere i colpi carica il firmware TSM_Band 2.4."
+    override val wristSpeed = "Velocità del polso"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Colpi per punto"
+    override val rallyAverage = "media"
+    override val rallyLongest = "più lungo"
+    override val rallyShort = "brevi"
+    override val rallyMedium = "medi"
+    override val rallyLong = "lunghi"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -792,6 +810,14 @@ object EnStrings : Strings {
     override val strokesReady = "Ready: it recognizes the calibrated strokes."
     override val strokesNotReady = "At least 3 examples for 2 strokes are needed."
     override val strokesFirmwareOld = "To recognize strokes, upload the TSM_Band 2.4 firmware."
+    override val wristSpeed = "Wrist speed"
+    override val maxShort = "max"
+    override val strokesPerPoint = "Strokes per point"
+    override val rallyAverage = "average"
+    override val rallyLongest = "longest"
+    override val rallyShort = "short"
+    override val rallyMedium = "medium"
+    override val rallyLong = "long"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }

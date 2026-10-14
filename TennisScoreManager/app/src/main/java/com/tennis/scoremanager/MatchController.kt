@@ -175,6 +175,8 @@ class MatchController(
     private var lastPointAt = 0L
     private var lastBandUndoAt = 0L
     private var lastUndoAt = 0L
+    /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
+    private var rallyStrokes = 0
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -585,8 +587,9 @@ class MatchController(
     private fun onBandStroke(e: BandStroke) {
         val lm = live.value ?: return
         if (screen.value != Screen.MATCH || lm.record.startedAt == null || lm.record.suspended || lm.state.isFinished) return
-        val stats = (lm.record.strokes[e.side] ?: StrokeStats()) + e.stroke.stroke
+        val stats = (lm.record.strokes[e.side] ?: StrokeStats()).add(e.stroke.stroke, e.stroke.peakGyroDps)
         setRecord(lm.record.copy(strokes = lm.record.strokes + (e.side to stats)))
+        rallyStrokes++
     }
 
     /** Invia ai braccialetti il punteggio visto da chi li indossa. */
@@ -655,6 +658,7 @@ class MatchController(
         serveOrderPrompt.value = false
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -690,7 +694,10 @@ class MatchController(
         val current = live.value ?: return
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis()))
+        // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
+        val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
+        rallyStrokes = 0
+        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -758,7 +765,8 @@ class MatchController(
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
-        events.removeAt(events.lastIndex)
+        // I colpi dello scambio annullato tornano allo scambio in corso: il punto ridato li ritrova.
+        rallyStrokes += (events.removeAt(events.lastIndex) as MatchEvent.Point).strokes ?: 0
         lastUndoAt = now
         val wasFinished = lm.state.isFinished
         val state = ScoreEngine.replay(lm.record.rules, events)
@@ -887,6 +895,7 @@ class MatchController(
         clockMs.value = rec.clockMs
         stopCountdown()
         lastPointAt = 0
+        rallyStrokes = 0
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH

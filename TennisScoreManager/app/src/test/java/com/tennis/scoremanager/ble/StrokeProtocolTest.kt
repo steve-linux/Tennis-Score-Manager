@@ -86,13 +86,16 @@ class StrokeProtocolTest {
 
     @Test
     fun strokeStatsCount() {
-        val st = StrokeStats() + BandProtocol.STROKE_FOREHAND + BandProtocol.STROKE_FOREHAND +
-            BandProtocol.STROKE_VOLLEY + BandProtocol.STROKE_UNKNOWN
+        val st = StrokeStats().add(BandProtocol.STROKE_FOREHAND, 1400).add(BandProtocol.STROKE_FOREHAND, 1600)
+            .add(BandProtocol.STROKE_VOLLEY, 900).add(BandProtocol.STROKE_UNKNOWN, 700)
         assertEquals(2, st.count(BandProtocol.STROKE_FOREHAND))
         assertEquals(0, st.count(BandProtocol.STROKE_SERVE))
         assertEquals(1, st.count(BandProtocol.STROKE_VOLLEY))
         assertEquals(1, st.unknown)
         assertEquals(4, st.total)
+        assertEquals(1500, st.avgGyro(BandProtocol.STROKE_FOREHAND))
+        assertEquals(1600, st.maxGyro(BandProtocol.STROKE_FOREHAND))
+        assertNull(st.avgGyro(BandProtocol.STROKE_SERVE))
     }
 
     @Test
