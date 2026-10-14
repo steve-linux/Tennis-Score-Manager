@@ -698,7 +698,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        controller.onActivityCreated(restored = savedInstanceState != null)
+        controller.onActivityCreated()
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -1973,14 +1973,15 @@ class MatchController(
     fun onBackground() = persist()
 
     /**
-     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
-     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
-     * Un'apertura normale riparte invece dalla prima schermata.
+     * Prima Activity del processo: se il processo si era chiuso sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Vale sia quando Android lo chiude in background sia dopo un aggiornamento dell'app, un crash o un riavvio del
+     * telefono. Chi esce di proposito ("Nuova partita", "Esci", app tolta dalle recenti) cancella [Storage.summaryOpen]:
+     * allora si riparte dalla prima schermata.
      */
-    fun onActivityCreated(restored: Boolean) {
+    fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
@@ -3351,6 +3352,223 @@ object LocationHelper {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/MatchStats.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/MatchStats.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+
+/**
+ * Statistiche di fine partita e cronologia punto per punto, ricavate rigiocando i punti (come le pagine
+ * "statistiche" e "cronologia" dei siti di risultati). Ace, doppi falli, prime di servizio, vincenti ed errori
+ * non si possono sapere: l'app conosce solo chi ha vinto ogni punto (e, coi braccialetti 2.4, i colpi).
+ */
+object MatchStats {
+
+    /** Un punto giocato. [breakPoint] e [matchPointFor] valgono per la situazione prima del punto. */
+    data class PlayedPoint(
+        /** Set in cui si è giocato il punto (0 = primo). */
+        val set: Int,
+        val after: MatchState,
+        val winner: Side,
+        val server: Side,
+        val tiebreak: TiebreakKind,
+        val breakPoint: Boolean,
+        val matchPointFor: Side?,
+        /** Chi ha vinto il game (o il tie-break) con questo punto; null se il game continua. */
+        val gameWinner: Side?,
+        /** Colpi dei braccialetti nello scambio (null = non contati). */
+        val strokes: Int?,
+    )
+
+    fun points(rec: MatchRecord): List<PlayedPoint> {
+        var s = ScoreEngine.initial(rec.rules)
+        val out = mutableListOf<PlayedPoint>()
+        for (e in rec.events) {
+            val step = ScoreEngine.apply(s, e)
+            val t = step.transition
+            if (e is MatchEvent.Point && t != null) {
+                out += PlayedPoint(
+                    set = s.sets.size,
+                    after = step.state,
+                    winner = e.winner,
+                    server = s.server,
+                    tiebreak = s.tiebreak,
+                    breakPoint = ScoreEngine.isBreakPoint(s),
+                    matchPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.matchWinner == it },
+                    gameWinner = t.gameWinner,
+                    strokes = e.strokes,
+                )
+            }
+            s = step.state
+        }
+        return out
+    }
+
+    /** Numeri di un giocatore (o squadra) in un periodo. Le coppie "vinti / giocati" danno le percentuali. */
+    data class SideTotals(
+        val servePointsWon: Int = 0,
+        val servePoints: Int = 0,
+        val serviceGamesWon: Int = 0,
+        val serviceGames: Int = 0,
+        val breakPointsSaved: Int = 0,
+        val breakPointsFaced: Int = 0,
+        val returnPointsWon: Int = 0,
+        val returnPoints: Int = 0,
+        val returnGamesWon: Int = 0,
+        val returnGames: Int = 0,
+        val breakPointsWon: Int = 0,
+        val breakPoints: Int = 0,
+        val pointsWon: Int = 0,
+        val points: Int = 0,
+        val gamesWon: Int = 0,
+        val games: Int = 0,
+        /** Punti vinti di fila (il massimo nel periodo). */
+        val maxStreak: Int = 0,
+        /** Punti vinti tra gli ultimi 10 del periodo. */
+        val last10: Int = 0,
+        val matchPointsSaved: Int = 0,
+    )
+
+    /** [set] = null: tutta la partita; altrimenti solo quel set (0 = primo). */
+    fun totals(all: List<PlayedPoint>, set: Int? = null): Map<Side, SideTotals> {
+        val pts = if (set == null) all else all.filter { it.set == set }
+        return Side.entries.associateWith { totalsFor(pts, it) }
+    }
+
+    private fun totalsFor(pts: List<PlayedPoint>, me: Side): SideTotals {
+        val serve = pts.filter { it.server == me }
+        val ret = pts.filter { it.server != me }
+        // Game chiusi: il tie-break di set conta come un game (7-6), il match tie-break no.
+        val games = pts.filter { it.gameWinner != null && it.tiebreak != TiebreakKind.MATCH }
+        // Game al servizio e in risposta: solo quelli normali (nel tie-break si serve a turno).
+        val regular = games.filter { it.tiebreak == TiebreakKind.NONE }
+        var streak = 0
+        var best = 0
+        for (p in pts) {
+            streak = if (p.winner == me) streak + 1 else 0
+            best = maxOf(best, streak)
+        }
+        return SideTotals(
+            servePointsWon = serve.count { it.winner == me },
+            servePoints = serve.size,
+            serviceGamesWon = regular.count { it.server == me && it.gameWinner == me },
+            serviceGames = regular.count { it.server == me },
+            breakPointsSaved = serve.count { it.breakPoint && it.winner == me },
+            breakPointsFaced = serve.count { it.breakPoint },
+            returnPointsWon = ret.count { it.winner == me },
+            returnPoints = ret.size,
+            returnGamesWon = regular.count { it.server != me && it.gameWinner == me },
+            returnGames = regular.count { it.server != me },
+            breakPointsWon = ret.count { it.breakPoint && it.winner == me },
+            breakPoints = ret.count { it.breakPoint },
+            pointsWon = pts.count { it.winner == me },
+            points = pts.size,
+            gamesWon = games.count { it.gameWinner == me },
+            games = games.size,
+            maxStreak = best,
+            last10 = pts.takeLast(10).count { it.winner == me },
+            matchPointsSaved = pts.count { it.matchPointFor == me.other && it.winner == me },
+        )
+    }
+
+    /** Colpi per punto nel periodo (punti con la lunghezza dello scambio); null se non ce ne sono. */
+    fun rally(all: List<PlayedPoint>, set: Int? = null): Reports.RallyStats? =
+        Reports.rallyStats(all.filter { set == null || it.set == set }.mapNotNull { it.strokes })
+
+    // ------------------------------------------------------------------ cronologia
+
+    /** Cosa si gioca il punto successivo: palla break, set point o match point. */
+    enum class Marker { BREAK_POINT, SET_POINT, MATCH_POINT }
+
+    /** Punteggio dopo un punto ("30", "40", "AD"; numeri nel tie-break) e la palla che si gioca dopo. */
+    data class ScoreStep(val p1: String, val p2: String, val marker: Marker?)
+
+    data class GameLog(
+        val set: Int,
+        /** Chi serve il game (nel tie-break: chi serve il primo punto). */
+        val server: Side,
+        val tiebreak: TiebreakKind,
+        /** Game nel set dopo questo game; per il match tie-break i punti del tie-break. */
+        val games1: Int,
+        val games2: Int,
+        /** null = game in corso (partita sospesa). */
+        val winner: Side?,
+        /** Game perso da chi serviva (fuori dal tie-break). */
+        val broken: Boolean,
+        /** Punteggi dopo ogni punto tranne quello che chiude il game. */
+        val steps: List<ScoreStep>,
+        /** Punti del tie-break (solo se [tiebreak] non è NONE e il tie-break è finito). */
+        val tb1: Int? = null,
+        val tb2: Int? = null,
+        val closesSet: Boolean = false,
+        val closesMatch: Boolean = false,
+    )
+
+    fun chronology(all: List<PlayedPoint>): List<GameLog> {
+        val out = mutableListOf<GameLog>()
+        var cur = mutableListOf<PlayedPoint>()
+        for (p in all) {
+            cur += p
+            if (p.gameWinner != null) {
+                out += game(cur)
+                cur = mutableListOf()
+            }
+        }
+        if (cur.isNotEmpty()) out += game(cur)
+        return out
+    }
+
+    private fun marker(s: MatchState): Marker? = when {
+        s.isFinished -> null
+        Side.entries.any { ScoreEngine.lookahead(s, it)?.matchWinner == it } -> Marker.MATCH_POINT
+        Side.entries.any { ScoreEngine.lookahead(s, it)?.setWinner == it } -> Marker.SET_POINT
+        ScoreEngine.isBreakPoint(s) -> Marker.BREAK_POINT
+        else -> null
+    }
+
+    private fun game(pts: List<PlayedPoint>): GameLog {
+        val first = pts.first()
+        val last = pts.last()
+        val winner = last.gameWinner
+        val steps = pts.filter { it.gameWinner == null }
+            .map { ScoreStep(it.after.pointLabel(Side.P1), it.after.pointLabel(Side.P2), marker(it.after)) }
+        // Game che chiude il set: il punteggio sta nel set appena aggiunto, altrimenti nei game in corso.
+        val closedSet = last.after.sets.getOrNull(first.set)?.takeIf { winner != null }
+        val mtb = first.tiebreak == TiebreakKind.MATCH
+        return GameLog(
+            set = first.set,
+            server = first.server,
+            tiebreak = first.tiebreak,
+            games1 = when {
+                closedSet == null -> last.after.g1
+                mtb -> closedSet.tb1 ?: 0
+                else -> closedSet.g1
+            },
+            games2 = when {
+                closedSet == null -> last.after.g2
+                mtb -> closedSet.tb2 ?: 0
+                else -> closedSet.g2
+            },
+            winner = winner,
+            broken = first.tiebreak == TiebreakKind.NONE && winner != null && winner != first.server,
+            steps = steps,
+            tb1 = closedSet?.tb1.takeIf { first.tiebreak != TiebreakKind.NONE },
+            tb2 = closedSet?.tb2.takeIf { first.tiebreak != TiebreakKind.NONE },
+            closesSet = closedSet != null,
+            closesMatch = winner != null && last.after.isFinished,
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Models.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Models.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -3602,8 +3820,10 @@ object Reports {
     data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
 
     /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
-    fun rallyStats(rec: MatchRecord): RallyStats? {
-        val r = rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes }
+    fun rallyStats(rec: MatchRecord): RallyStats? = rallyStats(rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes })
+
+    /** Da una lista di lunghezze di scambio (colpi per punto); null se vuota. */
+    fun rallyStats(r: List<Int>): RallyStats? {
         if (r.isEmpty()) return null
         fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
         val short = pct(r.count { it <= 3 })
@@ -6043,6 +6263,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -6054,6 +6275,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -6089,6 +6311,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -6332,14 +6555,29 @@ fun BigButton(
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = onColor),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null)
         Spacer(Modifier.width(8.dp))
-        Text(
-            text, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center, lineHeight = 17.sp,
-        )
+        ButtonLabel(text, bold = true)
     }
+}
+
+/** Margini interni dei pulsanti grandi: più stretti di quelli di Material (24 dp) per lasciare posto al testo. */
+private val ButtonPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+
+/**
+ * Testo dei pulsanti grandi: al massimo due righe e, se non ci sta (carattere grande del telefono, lingue lunghe),
+ * si rimpicciolisce quanto basta invece di troncarsi. L'altezza del pulsante resta fissa: due pulsanti affiancati
+ * restano uguali.
+ */
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified, bold: Boolean = false) {
+    Text(
+        text, color = color, fontWeight = if (bold) FontWeight.Bold else null, maxLines = 2, overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center, lineHeight = 1.1.em,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp, stepSize = 0.5.sp),
+    )
 }
 
 @Composable
@@ -6349,10 +6587,11 @@ fun GhostButton(text: String, icon: ImageVector, onClick: () -> Unit, modifier: 
         enabled = enabled,
         modifier = modifier.height(54.dp),
         shape = RoundedCornerShape(16.dp),
+        contentPadding = ButtonPadding,
     ) {
         Icon(icon, null, tint = TsmColors.TextMain)
         Spacer(Modifier.width(8.dp))
-        Text(text, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        ButtonLabel(text, color = TsmColors.TextMain)
     }
 }
 
@@ -6543,6 +6782,40 @@ interface Strings {
     val rallyShort: String
     val rallyMedium: String
     val rallyLong: String
+    // Riepilogo: schede, statistiche e cronologia punto per punto
+    val tabSummary: String
+    val tabStats: String
+    val tabChronology: String
+    val periodMatch: String
+    /** "Set 1", "Set 2"... */
+    val periodSet: (Int) -> String
+    val statsHint: String
+    val statServe: String
+    val statReturn: String
+    val statPoints: String
+    val statGames: String
+    val statServicePoints: String
+    val statServiceGames: String
+    val statBreakSaved: String
+    val statReturnPoints: String
+    val statReturnGames: String
+    val statBreakWon: String
+    val statTotalPoints: String
+    val statStreak: String
+    val statLast10: String
+    val statMatchPointsSaved: String
+    val statTotalGames: String
+    val statStrokesTotal: String
+    val statAvgWristSpeed: String
+    val serveLost: String
+    val markerBreak: String
+    val markerSet: String
+    val markerMatch: String
+    val chronoGame: String
+    val chronoBreak: String
+    val chronoSet: String
+    val chronoMatch: String
+    val chronoTiebreak: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -6897,6 +7170,38 @@ object ItStrings : Strings {
     override val rallyShort = "brevi"
     override val rallyMedium = "medi"
     override val rallyLong = "lunghi"
+    override val tabSummary = "Riassunto"
+    override val tabStats = "Statistiche"
+    override val tabChronology = "Cronologia"
+    override val periodMatch = "Partita"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statServe = "Servizio"
+    override val statReturn = "Risposta"
+    override val statPoints = "Punti"
+    override val statGames = "Game"
+    override val statServicePoints = "Punti vinti al servizio"
+    override val statServiceGames = "Game vinti al servizio"
+    override val statBreakSaved = "Palle break salvate"
+    override val statReturnPoints = "Punti vinti in risposta"
+    override val statReturnGames = "Game vinti in risposta"
+    override val statBreakWon = "Palle break vinte"
+    override val statTotalPoints = "Totale punti vinti"
+    override val statStreak = "Punti di fila (max)"
+    override val statLast10 = "Ultimi 10 punti"
+    override val statMatchPointsSaved = "Match point annullati"
+    override val statTotalGames = "Totale game vinti"
+    override val statStrokesTotal = "Colpi totali"
+    override val statAvgWristSpeed = "Velocità media del polso"
+    override val serveLost = "Servizio perso"
+    override val markerBreak = "PB"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTITA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -7238,6 +7543,38 @@ object EnStrings : Strings {
     override val rallyShort = "short"
     override val rallyMedium = "medium"
     override val rallyLong = "long"
+    override val tabSummary = "Summary"
+    override val tabStats = "Statistics"
+    override val tabChronology = "Point by point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statServe = "Serve"
+    override val statReturn = "Return"
+    override val statPoints = "Points"
+    override val statGames = "Games"
+    override val statServicePoints = "Service points won"
+    override val statServiceGames = "Service games won"
+    override val statBreakSaved = "Break points saved"
+    override val statReturnPoints = "Return points won"
+    override val statReturnGames = "Return games won"
+    override val statBreakWon = "Break points won"
+    override val statTotalPoints = "Total points won"
+    override val statStreak = "Points in a row (max)"
+    override val statLast10 = "Last 10 points"
+    override val statMatchPointsSaved = "Match points saved"
+    override val statTotalGames = "Total games won"
+    override val statStrokesTotal = "Total strokes"
+    override val statAvgWristSpeed = "Average wrist speed"
+    override val serveLost = "Lost serve"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
@@ -7602,6 +7939,38 @@ object DeStrings : Strings {
     override val rallyShort = "kurz"
     override val rallyMedium = "mittel"
     override val rallyLong = "lang"
+    override val tabSummary = "Übersicht"
+    override val tabStats = "Statistiken"
+    override val tabChronology = "Punkt für Punkt"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "$it. Satz" }
+    override val statsHint = "Berechnet aus den in der App eingetragenen Punkten und, mit den Armbändern, aus den Schlägen. Asse, Doppelfehler, erste Aufschläge und Fehler sind nicht bekannt."
+    override val statServe = "Aufschlag"
+    override val statReturn = "Rückschlag"
+    override val statPoints = "Punkte"
+    override val statGames = "Spiele"
+    override val statServicePoints = "Gewonnene Aufschlagpunkte"
+    override val statServiceGames = "Gewonnene Aufschlagspiele"
+    override val statBreakSaved = "Abgewehrte Breakbälle"
+    override val statReturnPoints = "Gewonnene Returnpunkte"
+    override val statReturnGames = "Gewonnene Returnspiele"
+    override val statBreakWon = "Genutzte Breakbälle"
+    override val statTotalPoints = "Gewonnene Punkte gesamt"
+    override val statStreak = "Punkte in Folge (max.)"
+    override val statLast10 = "Letzte 10 Punkte"
+    override val statMatchPointsSaved = "Abgewehrte Matchbälle"
+    override val statTotalGames = "Gewonnene Spiele gesamt"
+    override val statStrokesTotal = "Schläge gesamt"
+    override val statAvgWristSpeed = "Ø Handgelenk-Tempo"
+    override val serveLost = "Aufschlag verloren"
+    override val markerBreak = "BB"
+    override val markerSet = "SB"
+    override val markerMatch = "MB"
+    override val chronoGame = "SPIEL"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SATZ"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Ausschalten"
     override val bandPowerOffTitle = "Armband ausschalten?"
     override val bandPowerOffText: (String) -> String = { "$it schaltet sich sofort aus. Zum Einschalten: ein Klick auf die Seitentaste." }
@@ -7958,6 +8327,38 @@ object EsStrings : Strings {
     override val rallyShort = "cortos"
     override val rallyMedium = "medios"
     override val rallyLong = "largos"
+    override val tabSummary = "Resumen"
+    override val tabStats = "Estadísticas"
+    override val tabChronology = "Punto a punto"
+    override val periodMatch = "Partido"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calculadas a partir de los puntos anotados en la app y, con las pulseras, de los golpes. Aces, dobles faltas, primeros saques y errores no se pueden saber."
+    override val statServe = "Saque"
+    override val statReturn = "Resto"
+    override val statPoints = "Puntos"
+    override val statGames = "Juegos"
+    override val statServicePoints = "Puntos ganados con el saque"
+    override val statServiceGames = "Juegos de saque ganados"
+    override val statBreakSaved = "Bolas de break salvadas"
+    override val statReturnPoints = "Puntos ganados al resto"
+    override val statReturnGames = "Juegos ganados al resto"
+    override val statBreakWon = "Bolas de break ganadas"
+    override val statTotalPoints = "Total de puntos ganados"
+    override val statStreak = "Puntos seguidos (máx.)"
+    override val statLast10 = "Últimos 10 puntos"
+    override val statMatchPointsSaved = "Bolas de partido salvadas"
+    override val statTotalGames = "Total de juegos ganados"
+    override val statStrokesTotal = "Golpes totales"
+    override val statAvgWristSpeed = "Velocidad media de muñeca"
+    override val serveLost = "Saque perdido"
+    override val markerBreak = "BB"
+    override val markerSet = "BS"
+    override val markerMatch = "BP"
+    override val chronoGame = "JUEGO"
+    override val chronoBreak = "ROTURA"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTIDO"
+    override val chronoTiebreak = "Desempate"
     override val powerOff = "Apagar"
     override val bandPowerOffTitle = "¿Apagar la pulsera?"
     override val bandPowerOffText: (String) -> String = { "$it se apaga ahora mismo. Para volver a encenderla: un clic en el botón lateral." }
@@ -8318,6 +8719,38 @@ object FrStrings : Strings {
     override val rallyShort = "courts"
     override val rallyMedium = "moyens"
     override val rallyLong = "longs"
+    override val tabSummary = "Résumé"
+    override val tabStats = "Statistiques"
+    override val tabChronology = "Point par point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { if (it == 1) "1re manche" else "${it}e manche" }
+    override val statsHint = "Calculées à partir des points marqués dans l'appli et, avec les bracelets, des coups. Aces, doubles fautes, premières balles et fautes ne peuvent pas être connus."
+    override val statServe = "Service"
+    override val statReturn = "Retour"
+    override val statPoints = "Points"
+    override val statGames = "Jeux"
+    override val statServicePoints = "Points gagnés au service"
+    override val statServiceGames = "Jeux de service gagnés"
+    override val statBreakSaved = "Balles de break sauvées"
+    override val statReturnPoints = "Points gagnés en retour"
+    override val statReturnGames = "Jeux de retour gagnés"
+    override val statBreakWon = "Balles de break converties"
+    override val statTotalPoints = "Total des points gagnés"
+    override val statStreak = "Points d'affilée (max)"
+    override val statLast10 = "10 derniers points"
+    override val statMatchPointsSaved = "Balles de match sauvées"
+    override val statTotalGames = "Total des jeux gagnés"
+    override val statStrokesTotal = "Total des coups"
+    override val statAvgWristSpeed = "Vitesse moyenne du poignet"
+    override val serveLost = "Service perdu"
+    override val markerBreak = "BB"
+    override val markerSet = "BS"
+    override val markerMatch = "BM"
+    override val chronoGame = "JEU"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "MANCHE"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Jeu décisif"
     override val powerOff = "Éteindre"
     override val bandPowerOffTitle = "Éteindre le bracelet ?"
     override val bandPowerOffText: (String) -> String = { "$it s'éteint tout de suite. Pour le rallumer : un clic sur le bouton latéral." }
@@ -8677,6 +9110,38 @@ object PtStrings : Strings {
     override val rallyShort = "curtos"
     override val rallyMedium = "médios"
     override val rallyLong = "longos"
+    override val tabSummary = "Resumo"
+    override val tabStats = "Estatísticas"
+    override val tabChronology = "Ponto a ponto"
+    override val periodMatch = "Partida"
+    override val periodSet: (Int) -> String = { "${it}º set" }
+    override val statsHint = "Calculadas a partir dos pontos marcados no app e, com as pulseiras, dos golpes. Aces, duplas faltas, primeiros saques e erros não podem ser conhecidos."
+    override val statServe = "Saque"
+    override val statReturn = "Devolução"
+    override val statPoints = "Pontos"
+    override val statGames = "Jogos"
+    override val statServicePoints = "Pontos ganhos no saque"
+    override val statServiceGames = "Jogos de saque ganhos"
+    override val statBreakSaved = "Break points salvos"
+    override val statReturnPoints = "Pontos ganhos na devolução"
+    override val statReturnGames = "Jogos ganhos na devolução"
+    override val statBreakWon = "Break points convertidos"
+    override val statTotalPoints = "Total de pontos ganhos"
+    override val statStreak = "Pontos seguidos (máx.)"
+    override val statLast10 = "Últimos 10 pontos"
+    override val statMatchPointsSaved = "Match points salvos"
+    override val statTotalGames = "Total de jogos ganhos"
+    override val statStrokesTotal = "Total de golpes"
+    override val statAvgWristSpeed = "Velocidade média do pulso"
+    override val serveLost = "Saque perdido"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "JOGO"
+    override val chronoBreak = "QUEBRA"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTIDA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Desligar"
     override val bandPowerOffTitle = "Desligar a pulseira?"
     override val bandPowerOffText: (String) -> String = { "$it desliga agora. Para ligá-la de novo: um clique no botão lateral." }
@@ -9739,6 +10204,300 @@ private fun ControlButton(
             }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPanels.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPanels.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.MatchStats
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Come si mostra un dato: percentuale con "vinti/giocati", rapporto "5/9" o numero semplice. */
+private enum class StatKind { PERCENT, RATIO, COUNT }
+
+private data class Stat(val label: String, val a: Int, val aOf: Int, val b: Int, val bOf: Int, val kind: StatKind) {
+    constructor(label: String, a: Int, b: Int) : this(label, a, 0, b, 0, StatKind.COUNT)
+}
+
+private fun pct(v: Int, of: Int) = if (of > 0) Math.round(v * 100.0 / of).toInt() else 0
+
+/** Testo del valore e lunghezza della barra (0..1) per un lato. */
+private fun shown(st: Stat, v: Int, of: Int, other: Int): Pair<String, Float> = when (st.kind) {
+    StatKind.PERCENT -> "${pct(v, of)}% ($v/$of)" to (if (of > 0) v.toFloat() / of else 0f)
+    StatKind.RATIO -> "$v/$of" to (if (of > 0) v.toFloat() / of else 0f)
+    StatKind.COUNT -> "$v" to (if (maxOf(v, other) > 0) v.toFloat() / maxOf(v, other) else 0f)
+}
+
+/**
+ * Statistiche come nelle pagine dei risultati: per la partita o per set, valori dei due giocatori ai lati e barre
+ * che partono dal centro (colorata quella di chi è avanti). Solo dati che l'app conosce davvero.
+ */
+@Composable
+fun MatchStatsTab(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val pts = remember(rec) { MatchStats.points(rec) }
+    val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1
+    var period by remember(rec.id) { mutableStateOf<Int?>(null) }
+    val t = MatchStats.totals(pts, period)
+    val a = t.getValue(Side.P1)
+    val b = t.getValue(Side.P2)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (sets > 1) {
+            Segmented(
+                listOf(SegOption(s.periodMatch)) + (1..sets).map { SegOption(s.periodSet(it)) },
+                selected = period?.plus(1) ?: 0,
+                onSelect = { period = if (it == 0) null else it - 1 },
+            )
+        }
+        NamesHeader(names)
+        StatSection(s.statServe, listOf(
+            Stat(s.statServicePoints, a.servePointsWon, a.servePoints, b.servePointsWon, b.servePoints, StatKind.PERCENT),
+            Stat(s.statServiceGames, a.serviceGamesWon, a.serviceGames, b.serviceGamesWon, b.serviceGames, StatKind.PERCENT),
+            Stat(s.statBreakSaved, a.breakPointsSaved, a.breakPointsFaced, b.breakPointsSaved, b.breakPointsFaced, StatKind.RATIO),
+        ))
+        StatSection(s.statReturn, listOf(
+            Stat(s.statReturnPoints, a.returnPointsWon, a.returnPoints, b.returnPointsWon, b.returnPoints, StatKind.PERCENT),
+            Stat(s.statReturnGames, a.returnGamesWon, a.returnGames, b.returnGamesWon, b.returnGames, StatKind.PERCENT),
+            Stat(s.statBreakWon, a.breakPointsWon, a.breakPoints, b.breakPointsWon, b.breakPoints, StatKind.RATIO),
+        ))
+        StatSection(s.statPoints, listOf(
+            Stat(s.statTotalPoints, a.pointsWon, a.points, b.pointsWon, b.points, StatKind.PERCENT),
+            Stat(s.statStreak, a.maxStreak, b.maxStreak),
+            Stat(s.statLast10, a.last10, b.last10),
+            Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
+        ))
+        StatSection(s.statGames, listOf(
+            Stat(s.statTotalGames, a.gamesWon, a.games, b.gamesWon, b.games, StatKind.PERCENT),
+        ))
+        // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
+        if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
+        MatchStats.rally(pts, period)?.let { r ->
+            StatCard(s.strokesPerPoint) {
+                Text(Reports.rallyLine(r, s, rec.options.lang), color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth())
+            }
+        }
+        Text(s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+    }
+}
+
+private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
+    val a = rec.strokes[Side.P1]
+    val b = rec.strokes[Side.P2]
+    if ((a?.total ?: 0) + (b?.total ?: 0) == 0) return null
+    fun avg(st: com.tennis.scoremanager.data.StrokeStats?): Int {
+        val n = st?.counts?.sum() ?: 0
+        val sum = st?.gyroSum?.sum() ?: 0L
+        return if (n > 0 && sum > 0) (sum / n).toInt() else 0
+    }
+    return listOf(Stat(s.statStrokesTotal, a?.total ?: 0, b?.total ?: 0)) +
+        (0 until BandProtocol.STROKE_COUNT).map { Stat(s.strokeName(it), a?.count(it) ?: 0, b?.count(it) ?: 0) } +
+        listOfNotNull(Stat("${s.statAvgWristSpeed} (°/s)", avg(a), avg(b)).takeIf { it.a > 0 || it.b > 0 })
+}
+
+@Composable
+private fun NamesHeader(names: Names) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(names.short(Side.P1), color = TsmColors.player(Side.P1), fontWeight = FontWeight.Bold, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Spacer(Modifier.width(12.dp))
+        Text(names.short(Side.P2), color = TsmColors.player(Side.P2), fontWeight = FontWeight.Bold, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+    }
+}
+
+@Composable
+private fun StatCard(title: String, content: @Composable () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(title.uppercase(), color = TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
+            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        content()
+    }
+}
+
+@Composable
+private fun StatSection(title: String, rows: List<Stat>) = StatCard(title) { rows.forEach { StatBar(it) } }
+
+@Composable
+private fun StatBar(st: Stat) {
+    val (ta, fa) = shown(st, st.a, st.aOf, st.b)
+    val (tb, fb) = shown(st, st.b, st.bOf, st.a)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(ta, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(st.label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
+                modifier = Modifier.weight(2f))
+            Text(tb, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f))
+        }
+        Row(Modifier.fillMaxWidth().height(6.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            HalfBar(fa, if (fa >= fb && fa > 0) TsmColors.player(Side.P1) else TsmColors.TextDim.copy(alpha = 0.5f), fromRight = true,
+                modifier = Modifier.weight(1f))
+            HalfBar(fb, if (fb >= fa && fb > 0) TsmColors.player(Side.P2) else TsmColors.TextDim.copy(alpha = 0.5f), fromRight = false,
+                modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+/** Mezza barra che parte dal centro: a sinistra cresce verso sinistra ([fromRight]), a destra verso destra. */
+@Composable
+private fun HalfBar(fraction: Float, color: Color, fromRight: Boolean, modifier: Modifier) {
+    Box(
+        modifier.height(6.dp).clip(RoundedCornerShape(3.dp)).background(TsmColors.SurfaceHigh),
+        contentAlignment = if (fromRight) Alignment.CenterEnd else Alignment.CenterStart,
+    ) {
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).height(6.dp).clip(RoundedCornerShape(3.dp)).background(color))
+    }
+}
+
+/** Cronologia punto per punto, set per set: chi serve, punteggio in game, servizi persi e palle importanti. */
+@Composable
+fun MatchChronologyTab(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val games = remember(rec) { MatchStats.chronology(MatchStats.points(rec)) }
+    val sets = (games.maxOfOrNull { it.set } ?: -1) + 1
+    var set by remember(rec.id) { mutableStateOf(0) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (sets > 1) {
+            Segmented((1..sets).map { SegOption(s.periodSet(it)) }, selected = set.coerceIn(0, sets - 1), onSelect = { set = it })
+        }
+        NamesHeader(names)
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(vertical = 4.dp),
+        ) {
+            games.filter { it.set == set }.forEachIndexed { i, g ->
+                if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(TsmColors.Outline.copy(alpha = 0.5f)))
+                GameRow(g, s)
+            }
+        }
+    }
+}
+
+@Composable
+private fun GameRow(g: MatchStats.GameLog, s: Strings) {
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        // Punteggio sempre al centro; pallina e "servizio perso" dalla parte di chi serviva.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
+                if (g.broken && g.server == Side.P1) Badge(s.serveLost)
+                ServeBall(g.server == Side.P1)
+            }
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = if (g.winner == Side.P1) TsmColors.player(Side.P1) else TsmColors.TextMain)) { append("${g.games1}") }
+                    append(" - ")
+                    withStyle(SpanStyle(color = if (g.winner == Side.P2) TsmColors.player(Side.P2) else TsmColors.TextMain)) { append("${g.games2}") }
+                    if (g.tiebreak == TiebreakKind.SET && g.tb1 != null && g.tb2 != null) append("  (${g.tb1}-${g.tb2})")
+                },
+                color = TsmColors.TextMain, fontWeight = FontWeight.Black, fontSize = 16.sp,
+                modifier = Modifier.padding(horizontal = 10.dp),
+            )
+            Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                ServeBall(g.server == Side.P2)
+                if (g.broken && g.server == Side.P2) Badge(s.serveLost)
+            }
+        }
+        Text(
+            buildAnnotatedString {
+                if (g.tiebreak != TiebreakKind.NONE) {
+                    withStyle(SpanStyle(color = TsmColors.Orange, fontWeight = FontWeight.Bold)) { append(s.chronoTiebreak.uppercase()) }
+                    append("  ")
+                }
+                g.steps.forEachIndexed { i, st ->
+                    if (i > 0) append(", ")
+                    append("${st.p1}:${st.p2}")
+                    st.marker?.let { m ->
+                        val (label, color) = when (m) {
+                            MatchStats.Marker.BREAK_POINT -> s.markerBreak to TsmColors.Outline
+                            MatchStats.Marker.SET_POINT -> s.markerSet to Color(0xFF1E88E5)
+                            MatchStats.Marker.MATCH_POINT -> s.markerMatch to TsmColors.Danger
+                        }
+                        append(" ")
+                        withStyle(SpanStyle(background = color, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)) { append(" $label ") }
+                    }
+                }
+                if (g.winner != null) {
+                    if (g.steps.isNotEmpty()) append(", ")
+                    val end = when {
+                        g.closesMatch -> s.chronoMatch
+                        g.closesSet -> s.chronoSet
+                        g.broken -> s.chronoBreak
+                        else -> s.chronoGame
+                    }
+                    withStyle(SpanStyle(color = TsmColors.player(g.winner), fontWeight = FontWeight.Bold)) { append(end) }
+                }
+            },
+            color = TsmColors.TextDim, fontSize = 11.sp, lineHeight = 16.sp, textAlign = TextAlign.Center,
+        )
+    }
+}
+
+/** Pallina di chi serve il game, come sul braccialetto (lo spazio resta anche quando non c'è). */
+@Composable
+private fun ServeBall(visible: Boolean) {
+    Box(Modifier.size(12.dp).clip(CircleShape).background(if (visible) TsmColors.Ball else Color.Transparent))
+}
+
+@Composable
+private fun Badge(text: String) {
+    Text(
+        text.uppercase(), color = TsmColors.TextMain, fontSize = 9.sp, fontWeight = FontWeight.Bold,
+        modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(TsmColors.Danger).padding(horizontal = 5.dp, vertical = 1.dp),
+    )
 }
 TSM_EOF
 
@@ -10969,12 +11728,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Ultima schermata: tutti i dati della partita, salvataggio, condivisione, nuova partita, uscita. */
@@ -10991,6 +11755,8 @@ fun SummaryScreen(c: MatchController) {
     val w = state.winner ?: Side.P1
     val lang = rec.options.lang
     var showSave by remember { mutableStateOf(false) }
+    /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
+    var tab by remember(rec.id) { mutableStateOf(0) }
     val kept by c.summaryKept.collectAsState()
     /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
     var leaving by remember { mutableStateOf<Boolean?>(null) }
@@ -11057,31 +11823,11 @@ fun SummaryScreen(c: MatchController) {
                 }
             }
 
-            // Dati partita
-            Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
-                InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
-                InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
-                InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
-                if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
-                if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
-                InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
-                InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
-                InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
-                InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
-                if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
-                    InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
-                }
-                for (side in Side.entries) {
-                    Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
-                }
-                for (side in Side.entries) {
-                    Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
-                }
-                Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
+            Segmented(listOf(SegOption(s.tabSummary), SegOption(s.tabStats), SegOption(s.tabChronology)), selected = tab, onSelect = { tab = it })
+            when (tab) {
+                1 -> MatchStatsTab(rec, names)
+                2 -> MatchChronologyTab(rec, names)
+                else -> SummaryInfo(rec, state, names)
             }
         }
         Column(
@@ -11115,6 +11861,38 @@ fun SummaryScreen(c: MatchController) {
             },
             onDismiss = { leaving = null },
         )
+    }
+}
+
+/** Scheda "Riassunto": durata, orari, luogo, formato, punti e game, batteria e colpi dei braccialetti. */
+@Composable
+private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
+    val s = LocalStrings.current
+    val lang = rec.options.lang
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        InfoRow(Icons.Filled.Timer, s.duration, Reports.duration(rec.clockMs))
+        InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
+        InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
+        InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
+        if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
+        if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
+        InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
+        InfoRow(Icons.AutoMirrored.Filled.Rule, s.format, Reports.formatLabel(rec, s))
+        InfoRow(Icons.Filled.BarChart, s.pointsWon, "${Reports.pointsWon(rec, Side.P1)} - ${Reports.pointsWon(rec, Side.P2)}")
+        InfoRow(Icons.Filled.BarChart, s.gamesWon, "${Reports.gamesWon(state, Side.P1)} - ${Reports.gamesWon(state, Side.P2)}")
+        if (rec.batteryStart.isNotEmpty() || rec.batteryEnd.isNotEmpty()) {
+            InfoRow(Icons.Filled.BatteryStd, s.bandsBattery, Reports.batteryLine(rec, s))
+        }
+        for (side in Side.entries) {
+            Reports.strokesLine(rec, side, s)?.let { InfoRow(Icons.Filled.SportsTennis, "${s.strokes} ${names.short(side)}", it) }
+        }
+        for (side in Side.entries) {
+            Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
+        }
+        Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
     }
 }
 
@@ -12946,6 +13724,122 @@ class DataTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.data.MatchStats.Marker
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+/** Statistiche e cronologia su partite costruite punto per punto (serve per primo il Giocatore 1). */
+class MatchStatsTest {
+
+    private val p1 = Side.P1
+    private val p2 = Side.P2
+
+    private fun rec(vararg winners: Side, strokes: Int? = null) = MatchRecord(
+        id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(firstServer = Side.P1),
+        events = winners.map { MatchEvent.Point(it, strokes = strokes) },
+    )
+
+    private fun game(w: Side) = Array(4) { w }
+
+    /** G1 tiene il servizio a zero, poi strappa il servizio a G2 a zero, poi tiene da 0-30. */
+    private val holdBreakHold = arrayOf(*game(p1), *game(p1), p2, p2, p1, p1, p1, p1)
+
+    @Test
+    fun serveReturnAndBreakPoints() {
+        val t = MatchStats.totals(MatchStats.points(rec(*holdBreakHold)))
+        val a = t.getValue(p1)
+        val b = t.getValue(p2)
+        assertEquals(8, a.servePointsWon); assertEquals(10, a.servePoints)
+        assertEquals(2, a.serviceGamesWon); assertEquals(2, a.serviceGames)
+        assertEquals(4, a.returnPointsWon); assertEquals(4, a.returnPoints)
+        assertEquals(1, a.returnGamesWon); assertEquals(1, a.returnGames)
+        // Sul 40-0 del secondo game G1 ha palla break e la trasforma subito.
+        assertEquals(1, a.breakPointsWon); assertEquals(1, a.breakPoints)
+        assertEquals(0, b.breakPointsSaved); assertEquals(1, b.breakPointsFaced)
+        assertEquals(12, a.pointsWon); assertEquals(14, a.points)
+        assertEquals(3, a.gamesWon); assertEquals(0, b.gamesWon)
+        assertEquals(8, a.maxStreak); assertEquals(2, b.maxStreak)
+        assertEquals(8, a.last10); assertEquals(2, b.last10)
+    }
+
+    @Test
+    fun chronologyShowsBreaksAndBreakPoints() {
+        val games = MatchStats.chronology(MatchStats.points(rec(*holdBreakHold)))
+        assertEquals(3, games.size)
+        val g2 = games[1]
+        assertEquals(p2, g2.server)
+        assertTrue(g2.broken)
+        assertEquals(2, g2.games1); assertEquals(0, g2.games2)
+        assertEquals(listOf("15" to "0", "30" to "0", "40" to "0"), g2.steps.map { it.p1 to it.p2 })
+        assertEquals(listOf(null, null, Marker.BREAK_POINT), g2.steps.map { it.marker })
+        assertFalse(games[2].broken)
+        assertEquals(listOf("0" to "15", "0" to "30", "15" to "30", "30" to "30", "40" to "30"), games[2].steps.map { it.p1 to it.p2 })
+    }
+
+    @Test
+    fun setPointAndMatchPoint() {
+        val pts = MatchStats.points(rec(*Array(48) { p1 }))  // 6-0 6-0
+        val games = MatchStats.chronology(pts)
+        assertEquals(12, games.size)
+        assertEquals(Marker.SET_POINT, games[5].steps.last().marker)   // 40-0 sul 5-0: set point (vale più della palla break)
+        assertEquals(Marker.MATCH_POINT, games[11].steps.last().marker)
+        assertTrue(games[5].closesSet); assertFalse(games[5].closesMatch); assertFalse(games[4].closesSet)
+        assertTrue(games[11].closesMatch)
+        assertEquals(6, MatchStats.totals(pts, set = 1).getValue(p1).gamesWon)
+        assertEquals(24, MatchStats.totals(pts, set = 0).getValue(p1).points)
+    }
+
+    @Test
+    fun tiebreakCountsAsOneGameButNotAsServiceGame() {
+        // Ogni game al servizio fino al 6-6 (serve chi è di turno), poi tie-break 7-0 per G1.
+        val holds = (0 until 12).flatMap { g -> game(if (g % 2 == 0) p1 else p2).toList() }
+        val pts = MatchStats.points(rec(*(holds + List(7) { p1 }).toTypedArray()))
+        val tb = MatchStats.chronology(pts).last()
+        assertEquals(TiebreakKind.SET, tb.tiebreak)
+        assertEquals(7, tb.games1); assertEquals(6, tb.games2)
+        assertEquals(7, tb.tb1); assertEquals(0, tb.tb2)
+        assertFalse(tb.broken)
+        val a = MatchStats.totals(pts).getValue(p1)
+        assertEquals(7, a.gamesWon); assertEquals(13, a.games)
+        assertEquals(6, a.serviceGames)
+    }
+
+    @Test
+    fun savedMatchPoint() {
+        // 6-0 5-0, G2 al servizio sotto 0-40: annulla i tre match point (40-0, 40-15, 40-30) e tiene il game.
+        val pts = MatchStats.points(rec(*Array(24 + 20 + 3) { p1 }, *game(p2), p2))
+        assertEquals(3, MatchStats.totals(pts).getValue(p2).matchPointsSaved)
+        val last = MatchStats.chronology(pts).last()
+        assertEquals(p2, last.server)
+        assertFalse(last.broken)
+        // Dopo 15-0 e 30-0 niente; 40-0, 40-15 e 40-30 sono match point; sulla parità non più.
+        assertEquals(listOf(null, null, Marker.MATCH_POINT, Marker.MATCH_POINT, Marker.MATCH_POINT, null), last.steps.take(6).map { it.marker })
+    }
+
+    @Test
+    fun rallyPerSet() {
+        val pts = MatchStats.points(rec(*holdBreakHold, strokes = 5))
+        assertEquals(5.0, MatchStats.rally(pts, set = 0)!!.average, 1e-9)
+        assertNull(MatchStats.rally(pts, set = 1))
+        assertNull(MatchStats.rally(MatchStats.points(rec(*holdBreakHold))))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -13605,8 +14499,9 @@ class StringsTest {
         val en = texts(EnStrings)
         for (lang in listOf(Lang.FR, Lang.DE, Lang.ES, Lang.PT)) {
             val t = texts(stringsFor(lang))
-            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } }.keys
-            // Restano uguali solo nomi propri e sigle: Bluetooth, OK, Firmware, Audio On/Off, online...
+            // Le sigle (BP, SP, OK, SET...) restano uguali in ogni lingua: non contano come copie.
+            val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
+            // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             assertTrue("$lang copia l'inglese in: $same", same.size < 30)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
@@ -18358,6 +19253,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 71 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 74 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

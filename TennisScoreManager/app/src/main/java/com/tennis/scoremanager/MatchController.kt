@@ -1226,14 +1226,15 @@ class MatchController(
     fun onBackground() = persist()
 
     /**
-     * Prima Activity del processo. [restored] = Android l'ha ricreata dopo aver chiuso il processo (l'app era
-     * nelle recenti, non è stata chiusa con "Esci"): se era sul riepilogo lo si riapre, altrimenti andrebbe perso.
-     * Un'apertura normale riparte invece dalla prima schermata.
+     * Prima Activity del processo: se il processo si era chiuso sul riepilogo lo si riapre, altrimenti andrebbe perso.
+     * Vale sia quando Android lo chiude in background sia dopo un aggiornamento dell'app, un crash o un riavvio del
+     * telefono. Chi esce di proposito ("Nuova partita", "Esci", app tolta dalle recenti) cancella [Storage.summaryOpen]:
+     * allora si riparte dalla prima schermata.
      */
-    fun onActivityCreated(restored: Boolean) {
+    fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (!restored || live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))

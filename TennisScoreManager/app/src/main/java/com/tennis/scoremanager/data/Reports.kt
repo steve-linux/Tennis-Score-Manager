@@ -92,8 +92,10 @@ object Reports {
     data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
 
     /** Dai punti con la lunghezza dello scambio (braccialetti 2.4 col riconoscimento acceso); null se non ce ne sono. */
-    fun rallyStats(rec: MatchRecord): RallyStats? {
-        val r = rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes }
+    fun rallyStats(rec: MatchRecord): RallyStats? = rallyStats(rec.events.mapNotNull { (it as? MatchEvent.Point)?.strokes })
+
+    /** Da una lista di lunghezze di scambio (colpi per punto); null se vuota. */
+    fun rallyStats(r: List<Int>): RallyStats? {
         if (r.isEmpty()) return null
         fun pct(n: Int) = Math.round(n * 100.0 / r.size).toInt()
         val short = pct(r.count { it <= 3 })

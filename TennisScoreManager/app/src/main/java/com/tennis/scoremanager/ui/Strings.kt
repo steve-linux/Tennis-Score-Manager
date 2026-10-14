@@ -123,6 +123,40 @@ interface Strings {
     val rallyShort: String
     val rallyMedium: String
     val rallyLong: String
+    // Riepilogo: schede, statistiche e cronologia punto per punto
+    val tabSummary: String
+    val tabStats: String
+    val tabChronology: String
+    val periodMatch: String
+    /** "Set 1", "Set 2"... */
+    val periodSet: (Int) -> String
+    val statsHint: String
+    val statServe: String
+    val statReturn: String
+    val statPoints: String
+    val statGames: String
+    val statServicePoints: String
+    val statServiceGames: String
+    val statBreakSaved: String
+    val statReturnPoints: String
+    val statReturnGames: String
+    val statBreakWon: String
+    val statTotalPoints: String
+    val statStreak: String
+    val statLast10: String
+    val statMatchPointsSaved: String
+    val statTotalGames: String
+    val statStrokesTotal: String
+    val statAvgWristSpeed: String
+    val serveLost: String
+    val markerBreak: String
+    val markerSet: String
+    val markerMatch: String
+    val chronoGame: String
+    val chronoBreak: String
+    val chronoSet: String
+    val chronoMatch: String
+    val chronoTiebreak: String
     val powerOff: String
     /** Conferma di "Spegni" dal pannello del braccialetto (nome del braccialetto). */
     val bandPowerOffTitle: String
@@ -477,6 +511,38 @@ object ItStrings : Strings {
     override val rallyShort = "brevi"
     override val rallyMedium = "medi"
     override val rallyLong = "lunghi"
+    override val tabSummary = "Riassunto"
+    override val tabStats = "Statistiche"
+    override val tabChronology = "Cronologia"
+    override val periodMatch = "Partita"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statServe = "Servizio"
+    override val statReturn = "Risposta"
+    override val statPoints = "Punti"
+    override val statGames = "Game"
+    override val statServicePoints = "Punti vinti al servizio"
+    override val statServiceGames = "Game vinti al servizio"
+    override val statBreakSaved = "Palle break salvate"
+    override val statReturnPoints = "Punti vinti in risposta"
+    override val statReturnGames = "Game vinti in risposta"
+    override val statBreakWon = "Palle break vinte"
+    override val statTotalPoints = "Totale punti vinti"
+    override val statStreak = "Punti di fila (max)"
+    override val statLast10 = "Ultimi 10 punti"
+    override val statMatchPointsSaved = "Match point annullati"
+    override val statTotalGames = "Totale game vinti"
+    override val statStrokesTotal = "Colpi totali"
+    override val statAvgWristSpeed = "Velocità media del polso"
+    override val serveLost = "Servizio perso"
+    override val markerBreak = "PB"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "PARTITA"
+    override val chronoTiebreak = "Tie-break"
     override val powerOff = "Spegni"
     override val bandPowerOffTitle = "Spegnere il braccialetto?"
     override val bandPowerOffText: (String) -> String = { "$it si spegne subito. Per riaccenderlo: un clic sul tasto laterale." }
@@ -818,6 +884,38 @@ object EnStrings : Strings {
     override val rallyShort = "short"
     override val rallyMedium = "medium"
     override val rallyLong = "long"
+    override val tabSummary = "Summary"
+    override val tabStats = "Statistics"
+    override val tabChronology = "Point by point"
+    override val periodMatch = "Match"
+    override val periodSet: (Int) -> String = { "Set $it" }
+    override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statServe = "Serve"
+    override val statReturn = "Return"
+    override val statPoints = "Points"
+    override val statGames = "Games"
+    override val statServicePoints = "Service points won"
+    override val statServiceGames = "Service games won"
+    override val statBreakSaved = "Break points saved"
+    override val statReturnPoints = "Return points won"
+    override val statReturnGames = "Return games won"
+    override val statBreakWon = "Break points won"
+    override val statTotalPoints = "Total points won"
+    override val statStreak = "Points in a row (max)"
+    override val statLast10 = "Last 10 points"
+    override val statMatchPointsSaved = "Match points saved"
+    override val statTotalGames = "Total games won"
+    override val statStrokesTotal = "Total strokes"
+    override val statAvgWristSpeed = "Average wrist speed"
+    override val serveLost = "Lost serve"
+    override val markerBreak = "BP"
+    override val markerSet = "SP"
+    override val markerMatch = "MP"
+    override val chronoGame = "GAME"
+    override val chronoBreak = "BREAK"
+    override val chronoSet = "SET"
+    override val chronoMatch = "MATCH"
+    override val chronoTiebreak = "Tiebreak"
     override val powerOff = "Power off"
     override val bandPowerOffTitle = "Power off the wristband?"
     override val bandPowerOffText: (String) -> String = { "$it switches off now. To turn it back on: one click on the side button." }
