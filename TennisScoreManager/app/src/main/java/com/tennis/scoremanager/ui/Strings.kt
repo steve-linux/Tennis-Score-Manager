@@ -632,8 +632,8 @@ object ItStrings : Strings {
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
-    override val goldenPoint = "Punto d'oro"
-    override val goldenPointHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game. Toglilo per giocare ai vantaggi."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "Punto d'oro: sul 40-40 si gioca un solo punto e chi lo vince vince il game. Toglilo per giocare ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }

@@ -1,7 +1,7 @@
 Tennis Score Manager compte les points d'un match de tennis selon les règles de l'ITF et les annonce comme un arbitre de chaise.
 
 * Simple et double : trois sets avec jeu décisif à 6-6, ou deux sets et un super jeu décisif en 10 points ; point décisif (No-Ad) en option.
-* Aussi pour le padel : mêmes règles que le tennis, double et point en or déjà réglés.
+* Aussi pour le padel : mêmes règles que le tennis, double et golden point (point en or) déjà réglés.
 * Annonces d'arbitre de chaise en six langues (italien, anglais, français, allemand, espagnol, portugais) avec la synthèse vocale du téléphone, sans internet. Vous pouvez aussi importer vos propres enregistrements.
 * Shot clock (25 s), changement de côté (90 s) et pause entre les sets (120 s) ; changements de côté et ordre de service sont gérés par l'application.
 * N'importe quel point peut être annulé, même après la fin d'un jeu, d'un set ou du match : le score est recalculé depuis le début.

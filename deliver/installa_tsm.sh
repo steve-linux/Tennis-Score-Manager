@@ -7677,8 +7677,8 @@ object ItStrings : Strings {
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
-    override val goldenPoint = "Punto d'oro"
-    override val goldenPointHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game. Toglilo per giocare ai vantaggi."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "Punto d'oro: sul 40-40 si gioca un solo punto e chi lo vince vince il game. Toglilo per giocare ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -9334,8 +9334,8 @@ object FrStrings : Strings {
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
-    override val goldenPoint = "Point en or"
-    override val goldenPointHint = "À égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "Point en or : à égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
@@ -9752,8 +9752,8 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
-    override val goldenPoint = "Ponto de ouro"
-    override val goldenPointHint = "No 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "Ponto de ouro: no 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
@@ -14501,9 +14501,9 @@ class DataTest {
             id = "m", setup = SetupData(doubles = true, sport = Sport.PADEL), options = MatchOptions(),
             rules = RulesConfig(noAd = true, doubles = true),
         )
-        assertEquals("Padel · 3 set · tie-break a 7 · Punto d'oro · Doppio", Reports.formatLabel(rec, ItStrings))
+        assertEquals("Padel · 3 set · tie-break a 7 · Golden point · Doppio", Reports.formatLabel(rec, ItStrings))
         assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
-        // Senza punto d'oro (ai vantaggi) resta solo il nome dello sport.
+        // Senza golden point (ai vantaggi) resta solo il nome dello sport.
         assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
     }
 }

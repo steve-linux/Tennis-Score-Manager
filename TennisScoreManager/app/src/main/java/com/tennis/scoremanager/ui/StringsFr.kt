@@ -205,8 +205,8 @@ object FrStrings : Strings {
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
-    override val goldenPoint = "Point en or"
-    override val goldenPointHint = "À égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "Point en or : à égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
