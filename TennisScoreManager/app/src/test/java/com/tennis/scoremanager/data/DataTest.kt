@@ -64,4 +64,16 @@ class DataTest {
         assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
     }
+
+    @Test
+    fun padelIsNamedWithItsGoldenPoint() {
+        val rec = MatchRecord(
+            id = "m", setup = SetupData(doubles = true, sport = Sport.PADEL), options = MatchOptions(),
+            rules = RulesConfig(noAd = true, doubles = true),
+        )
+        assertEquals("Padel · 3 set · tie-break a 7 · Punto d'oro · Doppio", Reports.formatLabel(rec, ItStrings))
+        assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
+        // Senza punto d'oro (ai vantaggi) resta solo il nome dello sport.
+        assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
+    }
 }

@@ -30,6 +30,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
@@ -37,6 +38,8 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
+import com.tennis.scoremanager.remote.Gesture
+import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.tv.TvInput
 import com.tennis.scoremanager.tv.TvServer
@@ -61,6 +64,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -117,6 +121,9 @@ class MatchController(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val io = Dispatchers.IO.limitedParallelism(1)
+
+    /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
+    val remotes = RemoteInput(app, storage, scope)
 
     val screen = MutableStateFlow(Screen.SETUP)
     val setup = MutableStateFlow(storage.setup)
@@ -193,12 +200,15 @@ class MatchController(
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
+        remotes.enabled = options.value.mode == PlayMode.REMOTES
+        remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
+        scope.launch { watchRemotes() }
         scope.launch {
             while (true) {
                 tick()
@@ -307,6 +317,7 @@ class MatchController(
         }
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
+            remotes.enabled = v.mode == PlayMode.REMOTES
         }
     }
 
@@ -546,23 +557,60 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
-        val now = SystemClock.elapsedRealtime()
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
                 showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))
             }
-            BandProtocol.EVT_POINT -> when (screen.value) {
-                Screen.START -> startMatch()
-                // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
-                Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(e.side, fromBand = true)
-                else -> Unit
+            BandProtocol.EVT_POINT -> playerPoint(e.side)
+            BandProtocol.EVT_UNDO -> playerUndo()
+        }
+    }
+
+    /** Punto chiesto da un giocatore (KEY1 del braccialetto o clic del telecomando). */
+    private fun playerPoint(side: Side) {
+        when (screen.value) {
+            Screen.START -> startMatch()
+            // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
+            Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(side, fromBand = true)
+            else -> Unit
+        }
+    }
+
+    /**
+     * KEY2 (o doppio clic / pressione lunga del telecomando) annulla l'ultimo punto, anche dal popup di fine
+     * partita. Non può mai confermare la fine. Due annulla ravvicinati (anche da giocatori diversi) tolgono un solo punto.
+     */
+    private fun playerUndo() {
+        val now = SystemClock.elapsedRealtime()
+        if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
+            lastBandUndoAt = now
+            undo()
+        }
+    }
+
+    // ---------------------------------------------------------------- telecomandi
+
+    private fun onRemoteGesture(side: Side, g: Gesture) {
+        if (options.value.mode != PlayMode.REMOTES) return
+        when (g) {
+            Gesture.POINT -> playerPoint(side)
+            Gesture.UNDO -> playerUndo()
+        }
+    }
+
+    /** Telecomando che si spegne o si riaccende durante la partita: lo si dice, come per i braccialetti. */
+    private suspend fun watchRemotes() {
+        var prev: Map<Side, Boolean> = emptyMap()
+        combine(remotes.assigned, remotes.connected) { assigned, connected ->
+            assigned.mapValues { it.value.descriptor in connected }
+        }.collect { now ->
+            if (screen.value == Screen.MATCH && options.value.mode == PlayMode.REMOTES) {
+                for ((side, on) in now) {
+                    val before = prev[side] ?: continue
+                    if (before != on) showMessage(if (on) strings.msgRemoteConnected(bandLabel(side)) else strings.msgRemoteLost(bandLabel(side)))
+                }
             }
-            // KEY2 annulla l'ultimo punto, anche dal popup di fine partita. Non può mai confermare la fine.
-            // Due KEY2 ravvicinati (anche da braccialetti diversi) annullano un solo punto.
-            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
-                lastBandUndoAt = now
-                undo()
-            }
+            prev = now
         }
     }
 
@@ -1147,7 +1195,7 @@ class MatchController(
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
-            putExtra(Intent.EXTRA_SUBJECT, s.shareSubject)
+            putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)
             clipData = ClipData.newRawUri("", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }

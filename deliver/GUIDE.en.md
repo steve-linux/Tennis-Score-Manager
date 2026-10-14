@@ -2,7 +2,7 @@
 
 [Italiano](GUIDA.md) · **English** · [Français](GUIDE.fr.md) · [Deutsch](GUIDE.de.md) · [Español](GUIDE.es.md) · [Português](GUIDE.pt.md)
 
-Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according to the ITF rules, with chair umpire voice calls **in six languages** (Italian, English, French, German, Spanish, Portuguese: chapter 4.1), two **M5StickS3** wristbands connected over Bluetooth LE and an **LED scoreboard on a TV or monitor** (chapter 8).
+Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according to the ITF rules, with chair umpire voice calls **in six languages** (Italian, English, French, German, Spanish, Portuguese: chapter 4.1), two **M5StickS3** wristbands connected over Bluetooth LE (or two **Bluetooth selfie remotes** costing a couple of euros: chapter 6.3) and an **LED scoreboard on a TV or monitor** (chapter 8).
 
 ## 0. What's in the repository
 
@@ -13,7 +13,7 @@ Android app (Kotlin + Jetpack Compose) for keeping the score in tennis according
 | `deliver/installa_tsm.sh` | An alternative to cloning: it creates the **whole** Android project and the sketch using only `cat << 'TSM_EOF'` blocks (the Gradle wrapper jar is in base64). |
 | `deliver/GUIDE.en.md` | This guide (in English); the Italian original is `deliver/GUIDA.md`, the other translations are `deliver/GUIDE.fr.md`, `.de`, `.es`, `.pt`. |
 
-Versions used and verified: app **2.4.3** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x. License: GNU GPL version 3 or later (`LICENSE`); the app shows its version and license at the bottom of the first page.
+Versions used and verified: app **2.5.0** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32 core 3.x. License: GNU GPL version 3 or later (`LICENSE`); the app shows its version and license at the bottom of the first page.
 
 ---
 
@@ -219,17 +219,37 @@ Plug in the USB-C cable: the wristband beeps and shows the **charging screen** f
 
 > Still to be checked with real wristbands: charging could not be tested on the hardware. In particular, how often the charger reports *fully charged* and how accurate the percentage is while charging.
 
+### 6.3 Without wristbands: Bluetooth remotes (app 2.5)
+
+The cheapest way to let the players score: two **Bluetooth selfie remotes** (the ones with a shutter button, often sold as *AB Shutter3*), €1–3 each. Android sees them as a keyboard: no firmware to flash and no permissions for the app. Any other Bluetooth (or USB) keypad or keyboard works too.
+
+1. Switch the remote on and pair it in the phone's **Bluetooth settings**, like a headset (page 2 › *Bluetooth settings* opens them). Repeat with the second one.
+2. Page 2 › **Remotes** mode › **Assign** under Player 1 › press a key on their remote; then the same for Player 2. Every click of an assigned remote shows **Key received** on its row, so you can test before playing. **Swap P1 ↔ P2** swaps them.
+3. **MATCH START**: one click on a remote starts the match, like KEY1 on the wristbands. At the top, **P1**/**P2** are coloured when the remotes are connected.
+
+| Gesture | Action |
+|---|---|
+| one click | point to whoever holds the remote (it arrives half a second later: the app waits to see whether it is a double click) |
+| double click | undo the last point (also from the end-of-match popup) |
+| hold for 1 s | undo the last point |
+
+- The wristband safeguards apply: two points less than 2 seconds apart count once, two undos close together remove a single point, *Match concluded* is confirmed on the phone only.
+- Many selfie remotes have two buttons (*iOS* and *Android*) or send two keys per press: the app treats them the same and one press stays one click.
+- **The screen must stay on with the app in front** (during the match the app keeps it on by itself). Unlike the wristbands, the keys of a Bluetooth keyboard only reach the visible app: with the screen locked or another app open they don't count. For long matches keep the phone charging.
+- If a remote disconnects during the match (switched off, flat, too far) the orange box shows *REMOTE 1 DISCONNECTED*, and *CONNECTED* when it is back. Many remotes go to sleep after a few minutes without clicks: the first click wakes them up and is sometimes lost. If the voice doesn't call the point, press again.
+- Range: about ten metres, like Bluetooth headphones; with the phone near the net, at mid-court, both ends are covered. Battery: usually a CR2032 coin cell that lasts for months.
+
 ## 7. Using the app
 
-1. **New match** (optional): club, court, singles/doubles, names (in doubles, two names per team). **Look up the court address** (off by default) adds the address to the summary next to the coordinates: it asks the phone's geocoding service, which with Google services sends the coordinates to Google. **Next**.
+1. **New match** (optional): **Tennis** or **Padel** (app 2.5: same rules, timers and calls; choosing Padel sets doubles and golden point by itself, both can be changed, and the summary says *Padel*), club, court, singles/doubles, names (in doubles, two names per team). **Look up the court address** (off by default) adds the address to the summary next to the coordinates: it asks the phone's geocoding service, which with Google services sends the coordinates to Google. **Next**.
 2. **Mode and rules**:
-   - *Umpire* or *Wristbands*. With the wristbands, Bluetooth on, location permission and location on are required: the **Requirements** rows update in real time (even if you turn Bluetooth or location off from the Quick Settings panel) and turn red, with a button to fix them.
+   - *Umpire*, *Wristbands* or *Remotes* (6.3). With the wristbands, Bluetooth on, location permission and location on are required: the **Requirements** rows update in real time (even if you turn Bluetooth or location off from the Quick Settings panel) and turn red, with a button to fix them.
    - The **search is automatic and continuous** while the page is open: switch the wristbands on and they fill the free slots by themselves (Player 1 first, then Player 2). **Identify** makes that wristband flash in the player's colour (yellow or red) with beeps, so you can see at once which one you are holding; **Swap P1 ↔ P2** swaps them without disconnecting them. From the drop-down menu you can always choose another one or *None* (a wristband removed by hand is not put back by the search). A wristband can't be assigned to both players.
    - **Switch the wristbands off at match end and on exit** (on by default): when *Match concluded* is confirmed and with *Exit*, the wristbands switch off instead of waiting for the idle timeout.
    - In Umpire mode, if you press **Next** without location you are asked to turn it on (otherwise the place won't appear in the summary).
    - Language (six languages, 4.1), voice on/off, format (*3 sets · tie-break to 7* or *2 sets + match tie-break to 10*), No-Ad.
    - **Coin toss**: the coin spins and shows who wins; you set who serves and the court ends **as seen by the chair umpire** (court diagram with **Swap ends**). In doubles you also choose who serves first in each team.
-3. **MATCH START** flashes: press the button or KEY1 on a wristband. The voice says *"First set" · "[name] to serve" · "play"* with 2 seconds between the phrases; the **Match Time** starts on "play".
+3. **MATCH START** flashes: press the button, KEY1 on a wristband or a remote. The voice says *"First set" · "[name] to serve" · "play"* with 2 seconds between the phrases; the **Match Time** starts on "play".
 4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page.
 5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**. For half a second after it appears its buttons ignore taps: a double tap on the last point doesn't undo anything.
 6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save to history** (file name + folder of your choice + .txt/.json/.png formats), **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. If the summary has been neither saved nor shared, **New match** and **Exit** ask for confirmation. If Android closes the app while you are on the summary (for example while sharing), you find it again when you reopen the app. Saving twice with the same name in the default folder makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
@@ -319,6 +339,7 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 | TV scoreboard: data sent, server, settings | `tv/TvModels.kt`, `tv/TvServer.kt`, `ui/TvSection.kt` |
 | Phone used as a scoreboard (search, external monitor) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Wristband charging screen | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Bluetooth remotes (gestures, assignment) | `remote/PressDetector.kt` (+ tests), `remote/RemoteInput.kt` |
 
 
 ## 11. Common problems
@@ -329,7 +350,8 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 - **Android Studio doesn't see the phone**: is USB debugging on and has the RSA key fingerprint been accepted on the phone (3)? On Windows you sometimes need the manufacturer's driver, on Linux the udev rules and a new session (1.1). Or use wireless debugging (3).
 - **Arduino IDE doesn't show the wristband's port**: use a USB-C data cable, not a charge-only one; on Linux, the `dialout` group and a new session (1.1); then download mode (5, step 7).
 - **The voice doesn't speak or reads badly**: media volume, *Audio On*, voice for the chosen language installed (4); try another engine or another voice in *Audio and voice*.
-- **Screen goes off during the match**: in Wristbands mode a foreground service (notification "Match in progress") keeps Bluetooth, voice and timers running; in Umpire mode the screen stays on.
+- **Screen goes off during the match**: in Wristbands mode a foreground service (notification "Match in progress") keeps Bluetooth, voice and timers running; in Umpire and Remotes mode the screen stays on (with the remotes it has to: 6.3).
+- **The remote does nothing**: is it assigned to the player (page 2, row with their name)? The app must be open on the match, with the screen on (6.3). If the row says *Not connected*, press a key to wake it up or pair it again in the Bluetooth settings.
 - **Gradle sync fails because of the JDK**: set Gradle JDK = jbr-21 (step 2.6).
 - **The scoreboard phone can't find the umpire's phone**: are they on the same network? (one of the two provides the hotspot, the other is connected to it). Is *TV scoreboard* on on the umpire's phone? Try typing the address by hand. Some hotspots isolate connected devices from each other ("client isolation"): if so, turn it off.
 - **The phone's browser won't open the address** while mobile data is on: Android sends the traffic over mobile data because the hotspot has no internet. Use the app in *Use as scoreboard* (it handles this by itself) or turn off mobile data on that phone.

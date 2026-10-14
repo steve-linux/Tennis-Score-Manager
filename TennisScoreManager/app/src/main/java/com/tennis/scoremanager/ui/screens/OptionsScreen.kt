@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.ExpandLess
@@ -58,9 +60,11 @@ import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -112,9 +116,11 @@ import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.remote.RemoteInfo
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
@@ -131,6 +137,7 @@ import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -182,6 +189,7 @@ fun OptionsScreen(c: MatchController) {
     var locationDialog by remember { mutableStateOf(false) }
     var bandsRequired by remember { mutableStateOf(false) }
     var missingBands by remember { mutableStateOf<List<String>?>(null) }
+    var missingRemotes by remember { mutableStateOf<List<String>?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
@@ -197,9 +205,19 @@ fun OptionsScreen(c: MatchController) {
                 missingBands = missing
                 return
             }
-        } else if (!(locPerm && locOn)) {
-            locationDialog = true
-            return
+        } else {
+            if (o.mode == PlayMode.REMOTES) {
+                val remotes = c.remotes.assigned.value
+                val missing = Side.entries.filter { remotes[it] == null }.map { names.short(it) }
+                if (missing.isNotEmpty()) {
+                    missingRemotes = missing
+                    return
+                }
+            }
+            if (!(locPerm && locOn)) {
+                locationDialog = true
+                return
+            }
         }
         c.go(Screen.START)
     }
@@ -215,12 +233,25 @@ fun OptionsScreen(c: MatchController) {
     ) {
         // Modalità
         SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
             Segmented(
-                listOf(SegOption(s.modeReferee, Icons.Filled.Gavel), SegOption(s.modeBands, Icons.Filled.Watch)),
-                selected = if (o.mode == PlayMode.BANDS) 1 else 0,
-                onSelect = { i -> c.updateOptions { it.copy(mode = if (i == 1) PlayMode.BANDS else PlayMode.REFEREE) } },
+                listOf(
+                    SegOption(s.modeReferee, Icons.Filled.Gavel),
+                    SegOption(s.modeBands, Icons.Filled.Watch),
+                    SegOption(s.modeRemotes, Icons.Filled.SettingsRemote),
+                ),
+                selected = o.mode.ordinal,
+                onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
+                columns = 1,
             )
-            Text(if (o.mode == PlayMode.BANDS) s.modeBandsHint else s.modeRefereeHint, color = TsmColors.TextDim)
+            Text(
+                when (o.mode) {
+                    PlayMode.REFEREE -> s.modeRefereeHint
+                    PlayMode.BANDS -> s.modeBandsHint
+                    PlayMode.REMOTES -> s.modeRemotesHint
+                },
+                color = TsmColors.TextDim,
+            )
             if (o.mode == PlayMode.BANDS) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
@@ -228,6 +259,7 @@ fun OptionsScreen(c: MatchController) {
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
                 BandsSection(c, names, enabled = bandsReadyEnv)
             }
+            if (o.mode == PlayMode.REMOTES) RemotesSection(c, names)
         }
 
         // Lingua
@@ -259,7 +291,10 @@ fun OptionsScreen(c: MatchController) {
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
                 c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
             }
-            SwitchRow(Icons.Filled.Timer, s.noAd, s.noAdHint, o.noAd) { v -> c.updateOptions { it.copy(noAd = v) } }
+            val padel = su.sport == Sport.PADEL
+            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+                c.updateOptions { it.copy(noAd = v) }
+            }
         }
 
         // Sorteggio
@@ -303,6 +338,21 @@ fun OptionsScreen(c: MatchController) {
                 }) { Text(s.enable) }
             },
             dismissButton = { TextButton(onClick = { bandsRequired = false }) { Text(s.cancel) } },
+        )
+    }
+    missingRemotes?.let { list ->
+        AlertDialog(
+            onDismissRequest = { missingRemotes = null },
+            icon = { Icon(Icons.Filled.SettingsRemote, null, tint = TsmColors.Orange) },
+            title = { Text(s.remotesMissingTitle) },
+            text = { Text(s.remotesMissingText(list)) },
+            confirmButton = {
+                Button(onClick = {
+                    missingRemotes = null
+                    if (!(locPerm && locOn)) locationDialog = true else c.go(Screen.START)
+                }) { Text(s.continueAnyway) }
+            },
+            dismissButton = { TextButton(onClick = { missingRemotes = null }) { Text(s.cancel) } },
         )
     }
     missingBands?.let { list ->
@@ -355,6 +405,111 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     }
     SwitchRow(Icons.Filled.PowerSettingsNew, s.bandsOffAtEnd, s.bandsOffAtEndHint, o.bandsOffAtEnd) { v ->
         c.updateOptions { it.copy(bandsOffAtEnd = v) }
+    }
+}
+
+/**
+ * Telecomandini Bluetooth: si accoppiano dalle impostazioni di Android, poi "Associa" e un tasto del telecomando.
+ * Ogni clic di un telecomando associato si vede qui ("Tasto ricevuto"): così si prova prima di giocare.
+ */
+@Composable
+private fun RemotesSection(c: MatchController, names: Names) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val assigned by c.remotes.assigned.collectAsState()
+    val connected by c.remotes.connected.collectAsState()
+    val capture by c.remotes.capture.collectAsState()
+    val lastPress by c.remotes.lastPress.collectAsState()
+    // Un'associazione lasciata a metà non deve prendersi il primo tasto premuto più tardi.
+    DisposableEffect(Unit) { onDispose { c.remotes.cancelCapture() } }
+
+    Text(s.remotesHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
+    GhostButton(
+        s.bluetoothSettings, Icons.Filled.Bluetooth,
+        { runCatching { context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) } },
+        Modifier.fillMaxWidth(),
+    )
+    for (side in Side.entries) {
+        val current = assigned[side]
+        RemotePicker(
+            c, side, names.short(side), current,
+            online = current != null && current.descriptor in connected,
+            capturing = capture == side,
+            pressedAt = lastPress?.takeIf { it.first == side }?.second,
+        )
+    }
+    if (assigned.size == 2) {
+        GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.remotes.swap() }, Modifier.fillMaxWidth())
+    }
+    Text(s.remotesScreenOn, color = TsmColors.TextDim, fontSize = 13.sp)
+}
+
+@Composable
+private fun RemotePicker(
+    c: MatchController,
+    side: Side,
+    playerName: String,
+    current: RemoteInfo?,
+    online: Boolean,
+    capturing: Boolean,
+    pressedAt: Long?,
+) {
+    val s = LocalStrings.current
+    val accent = TsmColors.player(side)
+    // "Tasto ricevuto" per 2 secondi dopo ogni clic (non per un clic di prima, ritrovato tornando sulla pagina).
+    var pressed by remember { mutableStateOf(false) }
+    LaunchedEffect(pressedAt) {
+        val left = pressedAt?.let { 2_000 - (SystemClock.uptimeMillis() - it) } ?: 0L
+        if (left <= 0) return@LaunchedEffect
+        pressed = true
+        delay(left)
+        pressed = false
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Text(s.remoteFor(playerName), color = accent, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                .border(1.dp, if (capturing) accent else TsmColors.Outline, RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val (icon, tint) = when {
+                capturing -> Icons.Filled.TouchApp to accent
+                current == null -> Icons.Filled.SettingsRemote to TsmColors.TextDim
+                online -> Icons.Filled.BluetoothConnected to TsmColors.Ok
+                else -> Icons.Filled.BluetoothDisabled to TsmColors.Orange
+            }
+            Icon(icon, null, tint = tint)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (capturing) s.pressRemoteKey else current?.name ?: s.noRemote,
+                    color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+                if (!capturing && current != null) {
+                    Text(
+                        when {
+                            pressed -> s.remotePressed
+                            online -> s.remoteConnected
+                            else -> s.remoteNotConnected
+                        },
+                        color = if (pressed) TsmColors.Ok else TsmColors.TextDim, fontSize = 12.sp,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (capturing) {
+                SmallAction(s.cancel, Icons.Filled.Close, Modifier.weight(1f)) { c.remotes.cancelCapture() }
+            } else {
+                SmallAction(s.assignRemote, Icons.Filled.TouchApp, Modifier.weight(1f)) { c.remotes.startCapture(side) }
+            }
+            SmallAction(s.removeRemote, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = current != null && !capturing) {
+                c.remotes.remove(side)
+            }
+        }
     }
 }
 

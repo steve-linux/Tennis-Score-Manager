@@ -21,6 +21,10 @@ object FrStrings : Strings {
     override val singles = "Simple"
     override val doubles = "Double"
     override val doublesHint = "En double, saisissez deux noms par équipe : le décompte suit les règles ITF du double."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mêmes règles que le tennis : le double et le point en or sont déjà réglés, mais modifiables."
     override val player1 = "Joueur 1"
     override val player2 = "Joueur 2"
     override val playerName = "Nom"
@@ -34,6 +38,19 @@ object FrStrings : Strings {
     override val modeBands = "Bracelets"
     override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
     override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
+    override val modeRemotes = "Télécommandes"
+    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler."
+    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur une touche de sa télécommande."
+    override val bluetoothSettings = "Réglages Bluetooth"
+    override val remoteFor: (String) -> String = { "Télécommande ${de(it)}" }
+    override val noRemote = "Aucune"
+    override val remoteConnected = "Connectée"
+    override val remoteNotConnected = "Non connectée : appuyez sur une touche pour la réveiller"
+    override val assignRemote = "Associer"
+    override val removeRemote = "Retirer"
+    override val pressRemoteKey = "Appuyez sur une touche de la télécommande…"
+    override val remotePressed = "Touche reçue"
+    override val remotesScreenOn = "Pendant le match, gardez l'appli ouverte : l'écran reste allumé tout seul. Écran verrouillé ou autre appli au premier plan, les touches n'arrivent pas."
     override val requirements = "Prérequis"
     override val bluetooth = "Bluetooth"
     override val location = "Autorisation de localisation"
@@ -131,6 +148,8 @@ object FrStrings : Strings {
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
+    override val goldenPoint = "Point en or"
+    override val goldenPointHint = "À égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
@@ -156,12 +175,17 @@ object FrStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Il manque les bracelets de : " else "Il manque le bracelet de : ") + it.joinToString(", ") + ". Continuer quand même ?"
     }
+    override val remotesMissingTitle = "Télécommandes non associées"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Il manque les télécommandes de : " else "Il manque la télécommande de : ") + it.joinToString(", ") + ". Continuer quand même ?"
+    }
     override val continueAnyway = "Continuer"
     override val cancel = "Annuler"
 
     override val startMatch = "DÉBUT DU MATCH"
     override val startHint = "Appuyez sur le bouton pour commencer"
     override val startHintBands = "Appuyez sur le bouton ou sur KEY1 d'un bracelet"
+    override val startHintRemotes = "Appuyez sur le bouton ou sur une télécommande"
     override val startButton = "Commencer le match"
     override val resumeSaved = "Reprendre un match suspendu"
     override val noSavedMatches = "Aucun match suspendu enregistré."
@@ -209,6 +233,8 @@ object FrStrings : Strings {
     override val msgResumed = "REPRISE DU MATCH"
     override val msgBandConnected: (String) -> String = { "BRACELET $it CONNECTÉ" }
     override val msgBandLost: (String) -> String = { "BRACELET $it DÉCONNECTÉ" }
+    override val msgRemoteConnected: (String) -> String = { "TÉLÉCOMMANDE $it CONNECTÉE" }
+    override val msgRemoteLost: (String) -> String = { "TÉLÉCOMMANDE $it DÉCONNECTÉE" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "BRACELET $n ÉTEINT" + when (why) {
             BandProtocol.OFF_IDLE -> " (INACTIF)"
@@ -273,6 +299,7 @@ object FrStrings : Strings {
     override val savedTo: (String) -> String = { "Enregistré dans $it" }
     override val saveError = "Échec de l'enregistrement"
     override val shareSubject = "Résultat du match de tennis"
+    override val shareSubjectPadel = "Résultat du match de padel"
     override val playerDefault: (Int) -> String = { "Joueur $it" }
     override val teamJoiner = " et "
     override val generatedWith = "Créé avec Tennis Score Manager"

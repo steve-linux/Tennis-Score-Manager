@@ -30,6 +30,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/service"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui"
@@ -42,6 +43,7 @@ mkdir -p "$DEST/app/src/main/res/xml"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
@@ -70,8 +72,8 @@ android {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "2.4.3"
+        versionCode = 12
+        versionName = "2.5.0"
     }
 
     buildTypes {
@@ -196,11 +198,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="36">
 
+        <!-- configChanges: un telecomando Bluetooth è una tastiera, collegarlo non deve ricreare la schermata -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden|navigation"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
@@ -672,6 +676,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/MainActivity.kt" << 'TSM_
 package com.tennis.scoremanager
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import android.graphics.Color
@@ -728,6 +733,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Tasti dei telecomandi Bluetooth (modalità Telecomandi): arrivano qui prima che diventino volume o clic. */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        controller.remotes.onKey(event) || super.dispatchKeyEvent(event)
+
     override fun onResume() {
         super.onResume()
         controller.envTick.value++
@@ -777,6 +786,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
@@ -784,6 +794,8 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
+import com.tennis.scoremanager.remote.Gesture
+import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.tv.TvInput
 import com.tennis.scoremanager.tv.TvServer
@@ -808,6 +820,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -864,6 +877,9 @@ class MatchController(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val io = Dispatchers.IO.limitedParallelism(1)
+
+    /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
+    val remotes = RemoteInput(app, storage, scope)
 
     val screen = MutableStateFlow(Screen.SETUP)
     val setup = MutableStateFlow(storage.setup)
@@ -940,12 +956,15 @@ class MatchController(
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
+        remotes.enabled = options.value.mode == PlayMode.REMOTES
+        remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
         refreshSaved()
         scope.launch { ble.events.collect { onBandEvent(it) } }
         scope.launch { ble.ready.collect { onBandReady(it) } }
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { watchBands() }
+        scope.launch { watchRemotes() }
         scope.launch {
             while (true) {
                 tick()
@@ -1054,6 +1073,7 @@ class MatchController(
         }
         if (old.mode != v.mode) {
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
+            remotes.enabled = v.mode == PlayMode.REMOTES
         }
     }
 
@@ -1293,23 +1313,60 @@ class MatchController(
     }
 
     private fun onBandEvent(e: BandEvent) {
-        val now = SystemClock.elapsedRealtime()
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
                 showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))
             }
-            BandProtocol.EVT_POINT -> when (screen.value) {
-                Screen.START -> startMatch()
-                // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
-                Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(e.side, fromBand = true)
-                else -> Unit
+            BandProtocol.EVT_POINT -> playerPoint(e.side)
+            BandProtocol.EVT_UNDO -> playerUndo()
+        }
+    }
+
+    /** Punto chiesto da un giocatore (KEY1 del braccialetto o clic del telecomando). */
+    private fun playerPoint(side: Side) {
+        when (screen.value) {
+            Screen.START -> startMatch()
+            // Finché la voce non ha detto "gioco" i KEY1 servono solo ad avviare: niente punti sullo 0-0.
+            Screen.MATCH -> if (!endDialog.value && live.value?.record?.startedAt != null) awardPoint(side, fromBand = true)
+            else -> Unit
+        }
+    }
+
+    /**
+     * KEY2 (o doppio clic / pressione lunga del telecomando) annulla l'ultimo punto, anche dal popup di fine
+     * partita. Non può mai confermare la fine. Due annulla ravvicinati (anche da giocatori diversi) tolgono un solo punto.
+     */
+    private fun playerUndo() {
+        val now = SystemClock.elapsedRealtime()
+        if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
+            lastBandUndoAt = now
+            undo()
+        }
+    }
+
+    // ---------------------------------------------------------------- telecomandi
+
+    private fun onRemoteGesture(side: Side, g: Gesture) {
+        if (options.value.mode != PlayMode.REMOTES) return
+        when (g) {
+            Gesture.POINT -> playerPoint(side)
+            Gesture.UNDO -> playerUndo()
+        }
+    }
+
+    /** Telecomando che si spegne o si riaccende durante la partita: lo si dice, come per i braccialetti. */
+    private suspend fun watchRemotes() {
+        var prev: Map<Side, Boolean> = emptyMap()
+        combine(remotes.assigned, remotes.connected) { assigned, connected ->
+            assigned.mapValues { it.value.descriptor in connected }
+        }.collect { now ->
+            if (screen.value == Screen.MATCH && options.value.mode == PlayMode.REMOTES) {
+                for ((side, on) in now) {
+                    val before = prev[side] ?: continue
+                    if (before != on) showMessage(if (on) strings.msgRemoteConnected(bandLabel(side)) else strings.msgRemoteLost(bandLabel(side)))
+                }
             }
-            // KEY2 annulla l'ultimo punto, anche dal popup di fine partita. Non può mai confermare la fine.
-            // Due KEY2 ravvicinati (anche da braccialetti diversi) annullano un solo punto.
-            BandProtocol.EVT_UNDO -> if (screen.value == Screen.MATCH && now - lastBandUndoAt >= BAND_GAP_MS) {
-                lastBandUndoAt = now
-                undo()
-            }
+            prev = now
         }
     }
 
@@ -1894,7 +1951,7 @@ class MatchController(
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
-            putExtra(Intent.EXTRA_SUBJECT, s.shareSubject)
+            putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)
             clipData = ClipData.newRawUri("", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -3241,6 +3298,10 @@ import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.voice.CallNames
 import kotlinx.serialization.Serializable
 
+/** Il padel si conta come il tennis (ITF/FIP): cambiano solo i nomi e le impostazioni proposte. */
+@Serializable
+enum class Sport { TENNIS, PADEL }
+
 /** Pagina 1: dati facoltativi. p1a/p1b sono sempre del Giocatore 1, p2a/p2b del Giocatore 2. */
 @Serializable
 data class SetupData(
@@ -3251,10 +3312,12 @@ data class SetupData(
     val p1b: String = "",
     val p2a: String = "",
     val p2b: String = "",
+    val sport: Sport = Sport.TENNIS,
 )
 
+/** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
 @Serializable
-enum class PlayMode { REFEREE, BANDS }
+enum class PlayMode { REFEREE, BANDS, REMOTES }
 
 /** Pagina 2: modalità, lingua, audio, formato e sorteggio. */
 @Serializable
@@ -3413,10 +3476,13 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
-    fun formatLabel(rec: MatchRecord, s: Strings): String =
-        (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
+    fun formatLabel(rec: MatchRecord, s: Strings): String {
+        val padel = rec.setup.sport == Sport.PADEL
+        return (if (padel) "${s.sportPadel} · " else "") +
+            (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
+            (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
+    }
 
     fun place(rec: MatchRecord, s: Strings): String {
         val loc = rec.location ?: return s.placeUnavailable
@@ -3623,6 +3689,16 @@ class Storage(context: Context) {
         prefs.edit()
             .putString(if (p1) "band_p1" else "band_p2", address)
             .putString(if (p1) "band_p1_name" else "band_p2_name", name)
+            .apply()
+    }
+
+    /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
+    fun remoteDescriptor(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1" else "remote_p2", null)
+    fun remoteName(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1_name" else "remote_p2_name", null)
+    fun setRemote(p1: Boolean, descriptor: String?, name: String?) {
+        prefs.edit()
+            .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
+            .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
             .apply()
     }
 
@@ -4025,6 +4101,279 @@ object ScoreEngine {
         if (s.isFinished || s.inTiebreak) return false
         return lookahead(s, s.receiver)?.gameWinner == s.receiver
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/remote/PressDetector.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/remote/PressDetector.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.remote
+
+enum class Gesture { POINT, UNDO }
+
+/**
+ * Riconosce i gesti di un telecomandino a un tasto, uno per dispositivo ([dev]):
+ * - un clic = [Gesture.POINT], dato dopo [doubleMs] se non arriva un secondo clic;
+ * - doppio clic = [Gesture.UNDO], subito alla seconda pressione (il punto del primo clic non si dà);
+ * - pressione lunga ([longMs]) = [Gesture.UNDO], appena scade se il telecomando ripete il tasto, altrimenti al rilascio.
+ *
+ * Molti telecomandi da selfie mandano due tasti per ogni pressione (es. VOLUME SU + INVIO): i tasti che arrivano
+ * entro [mergeMs] dalla fine della pressione precedente, o mentre un altro tasto è ancora giù, fanno parte della
+ * stessa pressione. I tempi sono in millisecondi (SystemClock.uptimeMillis, come KeyEvent).
+ */
+class PressDetector(
+    private val doubleMs: Long = 450,
+    private val longMs: Long = 900,
+    private val mergeMs: Long = 60,
+) {
+    private class Dev {
+        val held = mutableSetOf<Int>()
+        var downAt = 0L
+        var lastUpAt = Long.MIN_VALUE / 2
+        /** La pressione in corso ha già dato il suo gesto (doppio clic o pressione lunga): il rilascio non conta. */
+        var consumed = false
+        /** Clic singolo in attesa: diventa un punto a questa ora se nel frattempo non arriva il secondo. */
+        var pointAt: Long? = null
+    }
+
+    private val devs = mutableMapOf<String, Dev>()
+
+    /** Tasto premuto, anche ripetuto dal telecomando tenendolo giù. */
+    fun down(dev: String, key: Int, t: Long): Gesture? {
+        val d = devs.getOrPut(dev) { Dev() }
+        if (key in d.held) {
+            // Ripetizione del tasto tenuto giù.
+            if (!d.consumed && t - d.downAt >= longMs) {
+                d.consumed = true
+                d.pointAt = null
+                return Gesture.UNDO
+            }
+            return null
+        }
+        val samePress = d.held.isNotEmpty() || t - d.lastUpAt < mergeMs
+        d.held += key
+        if (samePress) return null
+        d.downAt = t
+        d.consumed = false
+        val pending = d.pointAt
+        if (pending != null && t <= pending) {
+            d.pointAt = null
+            d.consumed = true
+            return Gesture.UNDO
+        }
+        return null
+    }
+
+    /** Tasto rilasciato. Un rilascio senza pressione (es. tasto premuto prima dell'associazione) non conta. */
+    fun up(dev: String, key: Int, t: Long): Gesture? {
+        val d = devs[dev] ?: return null
+        if (!d.held.remove(key)) return null
+        if (d.held.isNotEmpty()) return null
+        d.lastUpAt = t
+        if (d.consumed) return null
+        if (t - d.downAt >= longMs) {
+            d.consumed = true
+            return Gesture.UNDO
+        }
+        d.pointAt = t + doubleMs
+        return null
+    }
+
+    /** Clic singoli scaduti: diventano punti. */
+    fun due(t: Long): List<String> {
+        val out = mutableListOf<String>()
+        for ((dev, d) in devs) {
+            val at = d.pointAt ?: continue
+            if (t >= at) {
+                d.pointAt = null
+                out += dev
+            }
+        }
+        return out
+    }
+
+    /** Prima ora a cui chiamare [due] (null = nessun clic in attesa). */
+    fun nextDeadline(): Long? = devs.values.mapNotNull { it.pointAt }.minOrNull()
+
+    /** Dimentica tutto (telecomando tolto, partita finita...). */
+    fun reset() = devs.clear()
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/remote/RemoteInput.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/remote/RemoteInput.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.remote
+
+import android.content.Context
+import android.hardware.input.InputManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.view.InputDevice
+import android.view.KeyEvent
+import com.tennis.scoremanager.data.Storage
+import com.tennis.scoremanager.model.Side
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+
+/** Telecomando associato a un giocatore: [descriptor] è l'identità stabile di Android, [name] quello che si mostra. */
+data class RemoteInfo(val descriptor: String, val name: String)
+
+/**
+ * Telecomandini Bluetooth da selfie (o qualsiasi tastiera Bluetooth/USB) al posto dei braccialetti.
+ * Android li vede come tastiere: si accoppiano dalle impostazioni Bluetooth del telefono, senza permessi per l'app,
+ * e i loro tasti arrivano all'Activity in primo piano (quindi solo a schermo acceso, con l'app davanti).
+ * Ogni telecomando è di un giocatore: un clic = punto, doppio clic o pressione lunga = annulla ([PressDetector]).
+ */
+class RemoteInput(context: Context, private val storage: Storage, private val scope: CoroutineScope) {
+
+    private val app = context.applicationContext
+    private val inputManager = app.getSystemService(Context.INPUT_SERVICE) as InputManager
+    private val detector = PressDetector()
+    private var timer: Job? = null
+
+    private val _assigned = MutableStateFlow(load())
+    val assigned: StateFlow<Map<Side, RemoteInfo>> = _assigned
+
+    /** Descrittori dei dispositivi collegati adesso. */
+    private val _connected = MutableStateFlow(connectedNow())
+    val connected: StateFlow<Set<String>> = _connected
+
+    /** Giocatore per cui si aspetta il tasto da associare (null = nessuna associazione in corso). */
+    val capture = MutableStateFlow<Side?>(null)
+
+    /** Ultimo clic ricevuto da un telecomando associato (giocatore, ora): la pagina delle opzioni lo mostra come prova. */
+    val lastPress = MutableStateFlow<Pair<Side, Long>?>(null)
+
+    /** Attivo solo nella modalità Telecomandi: altrimenti i tasti fanno quello che fanno sempre. */
+    var enabled = false
+        set(v) {
+            field = v
+            if (!v) {
+                capture.value = null
+                detector.reset()
+                timer?.cancel()
+            }
+        }
+
+    /** Gesto di un giocatore, già riconosciuto. */
+    var onGesture: (Side, Gesture) -> Unit = { _, _ -> }
+
+    init {
+        inputManager.registerInputDeviceListener(object : InputManager.InputDeviceListener {
+            override fun onInputDeviceAdded(deviceId: Int) = refreshConnected()
+            override fun onInputDeviceRemoved(deviceId: Int) = refreshConnected()
+            override fun onInputDeviceChanged(deviceId: Int) = refreshConnected()
+        }, Handler(Looper.getMainLooper()))
+    }
+
+    fun startCapture(side: Side) {
+        capture.value = side
+    }
+
+    fun cancelCapture() {
+        capture.value = null
+    }
+
+    fun remove(side: Side) {
+        set(side, null)
+    }
+
+    fun swap() {
+        val a = _assigned.value
+        set(Side.P1, a[Side.P2])
+        set(Side.P2, a[Side.P1])
+        detector.reset()
+    }
+
+    /**
+     * Da Activity.dispatchKeyEvent. true = tasto usato qui (non arriva ad Android: niente volume che cambia).
+     * Solo i tasti dei telecomandi associati (o quello da associare) vengono presi, gli altri passano.
+     */
+    fun onKey(event: KeyEvent): Boolean {
+        if (!enabled) return false
+        val device = event.device ?: return false
+        val wanted = capture.value
+        if (wanted != null) {
+            if (!canAssign(device, event.keyCode)) return false
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                set(wanted, RemoteInfo(device.descriptor, device.name.orEmpty().ifBlank { "?" }))
+                capture.value = null
+            }
+            return true
+        }
+        val side = _assigned.value.entries.firstOrNull { it.value.descriptor == device.descriptor }?.key ?: return false
+        val dev = side.name
+        val gesture = when (event.action) {
+            KeyEvent.ACTION_DOWN -> detector.down(dev, event.keyCode, event.eventTime)
+            KeyEvent.ACTION_UP -> detector.up(dev, event.keyCode, event.eventTime)
+            else -> null
+        }
+        if (gesture != null) emit(side, gesture)
+        schedule()
+        return true
+    }
+
+    private fun emit(side: Side, g: Gesture) {
+        lastPress.value = side to SystemClock.uptimeMillis()
+        onGesture(side, g)
+    }
+
+    /** Il punto del clic singolo arriva quando scade l'attesa del doppio clic. */
+    private fun schedule() {
+        timer?.cancel()
+        val at = detector.nextDeadline() ?: return
+        timer = scope.launch {
+            delay((at - SystemClock.uptimeMillis()).coerceAtLeast(0))
+            for (dev in detector.due(SystemClock.uptimeMillis())) emit(Side.valueOf(dev), Gesture.POINT)
+            schedule()
+        }
+    }
+
+    /**
+     * Tastiere vere, collegate dall'esterno: non i tasti del telefono (volume, indietro) né quelli simulati.
+     * Prima di Android 10 non si sa se un dispositivo è esterno: si escludono almeno i tasti di sistema.
+     */
+    private fun canAssign(device: InputDevice, keyCode: Int): Boolean {
+        if (device.isVirtual) return false
+        if (Build.VERSION.SDK_INT >= 29) return device.isExternal
+        return keyCode !in setOf(
+            KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_HOME, KeyEvent.KEYCODE_POWER, KeyEvent.KEYCODE_APP_SWITCH, KeyEvent.KEYCODE_MENU,
+        )
+    }
+
+    private fun set(side: Side, info: RemoteInfo?) {
+        val m = _assigned.value.toMutableMap()
+        // Un telecomando appartiene a un solo giocatore: se era dell'altro lo si toglie.
+        if (info != null) m.entries.removeAll { it.key != side && it.value.descriptor == info.descriptor }
+        if (info == null) m.remove(side) else m[side] = info
+        _assigned.value = m
+        for (s in Side.entries) storage.setRemote(s == Side.P1, m[s]?.descriptor, m[s]?.name)
+    }
+
+    private fun load(): Map<Side, RemoteInfo> = buildMap {
+        for (s in Side.entries) {
+            val d = storage.remoteDescriptor(s == Side.P1) ?: continue
+            put(s, RemoteInfo(d, storage.remoteName(s == Side.P1) ?: "?"))
+        }
+    }
+
+    private fun refreshConnected() {
+        _connected.value = connectedNow()
+    }
+
+    private fun connectedNow(): Set<String> =
+        InputDevice.getDeviceIds().asList().mapNotNull { InputDevice.getDevice(it)?.descriptor }.toSet()
 }
 TSM_EOF
 
@@ -6124,6 +6473,43 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.view.KeyEvent
+import android.view.Window
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogWindowProvider
+import com.tennis.scoremanager.MatchController
+
+/**
+ * Un dialogo è una finestra a parte: mentre è aperto i tasti dei telecomandi arrivano a lui e non a MainActivity.
+ * Messo nel contenuto di un dialogo che compare durante il gioco (fine partita, ordine di servizio nel doppio),
+ * gira i tasti ai telecomandi: il doppio clic annulla anche da lì e nessun punto va perso.
+ */
+@Composable
+fun RemoteKeysInDialog(c: MatchController) {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val window = (view.parent as? DialogWindowProvider)?.window
+        val original = window?.callback
+        if (window != null && original != null) {
+            window.callback = object : Window.Callback by original {
+                override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+                    c.remotes.onKey(event) || original.dispatchKeyEvent(event)
+            }
+        }
+        onDispose { if (window != null && original != null) window.callback = original }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Strings.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Strings.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -6157,6 +6543,10 @@ interface Strings {
     val singles: String
     val doubles: String
     val doublesHint: String
+    val sportSection: String
+    val sportTennis: String
+    val sportPadel: String
+    val padelHint: String
     val player1: String
     val player2: String
     val playerName: String
@@ -6171,6 +6561,19 @@ interface Strings {
     val modeBands: String
     val modeRefereeHint: String
     val modeBandsHint: String
+    val modeRemotes: String
+    val modeRemotesHint: String
+    val remotesHowTo: String
+    val bluetoothSettings: String
+    val remoteFor: (String) -> String
+    val noRemote: String
+    val remoteConnected: String
+    val remoteNotConnected: String
+    val assignRemote: String
+    val removeRemote: String
+    val pressRemoteKey: String
+    val remotePressed: String
+    val remotesScreenOn: String
     val requirements: String
     val bluetooth: String
     val location: String
@@ -6266,6 +6669,8 @@ interface Strings {
     val formatMatchTiebreakHint: String
     val noAd: String
     val noAdHint: String
+    val goldenPoint: String
+    val goldenPointHint: String
     /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
     val noAdShort: String get() = "No-Ad"
     val coinToss: String
@@ -6292,6 +6697,8 @@ interface Strings {
     val bandsMissingTitle: String
     /** Giocatori senza braccialetto (uno o due: singolare o plurale). */
     val bandsMissingText: (List<String>) -> String
+    val remotesMissingTitle: String
+    val remotesMissingText: (List<String>) -> String
     val continueAnyway: String
     val cancel: String
 
@@ -6299,6 +6706,7 @@ interface Strings {
     val startMatch: String
     val startHint: String
     val startHintBands: String
+    val startHintRemotes: String
     val startButton: String
     val resumeSaved: String
     val noSavedMatches: String
@@ -6355,6 +6763,8 @@ interface Strings {
     val msgResumed: String
     val msgBandConnected: (String) -> String
     val msgBandLost: (String) -> String
+    val msgRemoteConnected: (String) -> String
+    val msgRemoteLost: (String) -> String
     val msgBandOff: (String, Int?) -> String
     val msgBandBatteryLow: (String, Int) -> String
     val bandBatteryLow: String
@@ -6411,6 +6821,7 @@ interface Strings {
     val savedTo: (String) -> String
     val saveError: String
     val shareSubject: String
+    val shareSubjectPadel: String
     val playerDefault: (Int) -> String
     val teamJoiner: String
     val generatedWith: String
@@ -6486,6 +6897,10 @@ object ItStrings : Strings {
     override val singles = "Singolare"
     override val doubles = "Doppio"
     override val doublesHint = "Nel doppio inserisci due nomi per squadra: il conteggio segue le regole ITF del doppio."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Stesse regole del tennis: doppio e punto d'oro sono già impostati, ma si possono cambiare."
     override val player1 = "Giocatore 1"
     override val player2 = "Giocatore 2"
     override val playerName = "Nome"
@@ -6499,6 +6914,19 @@ object ItStrings : Strings {
     override val modeBands = "Braccialetti"
     override val modeRefereeHint = "Il punteggio si assegna dal telefono, come il giudice di sedia."
     override val modeBandsHint = "Ogni giocatore assegna il punto con KEY1 del proprio M5StickS3."
+    override val modeRemotes = "Telecomandi"
+    override val modeRemotesHint = "Ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie (1–3 €): un clic = punto, doppio clic o pressione lunga = annulla."
+    override val remotesHowTo = "1. Accoppia i telecomandi nelle impostazioni Bluetooth del telefono, come una tastiera. 2. Tocca «Associa» sotto il giocatore e premi un tasto del suo telecomando."
+    override val bluetoothSettings = "Impostazioni Bluetooth"
+    override val remoteFor: (String) -> String = { "Telecomando di $it" }
+    override val noRemote = "Nessuno"
+    override val remoteConnected = "Collegato"
+    override val remoteNotConnected = "Non collegato: premi un tasto per svegliarlo"
+    override val assignRemote = "Associa"
+    override val removeRemote = "Togli"
+    override val pressRemoteKey = "Premi un tasto del telecomando…"
+    override val remotePressed = "Tasto ricevuto"
+    override val remotesScreenOn = "Durante la partita tieni l'app aperta: lo schermo resta acceso da solo. A schermo bloccato o con un'altra app davanti i tasti non arrivano."
     override val requirements = "Requisiti"
     override val bluetooth = "Bluetooth"
     override val location = "Permesso posizione"
@@ -6596,6 +7024,8 @@ object ItStrings : Strings {
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
+    override val goldenPoint = "Punto d'oro"
+    override val goldenPointHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game. Toglilo per giocare ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -6621,12 +7051,17 @@ object ItStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Mancano i braccialetti per: " else "Manca il braccialetto per: ") + it.joinToString(", ") + ". Continuare lo stesso?"
     }
+    override val remotesMissingTitle = "Telecomandi non associati"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Mancano i telecomandi per: " else "Manca il telecomando per: ") + it.joinToString(", ") + ". Continuare lo stesso?"
+    }
     override val continueAnyway = "Continua"
     override val cancel = "Annulla"
 
     override val startMatch = "INIZIO PARTITA"
     override val startHint = "Premi il pulsante per iniziare"
     override val startHintBands = "Premi il pulsante oppure KEY1 su un braccialetto"
+    override val startHintRemotes = "Premi il pulsante oppure un telecomando"
     override val startButton = "Inizia partita"
     override val resumeSaved = "Riprendi partita sospesa"
     override val noSavedMatches = "Nessuna partita sospesa salvata."
@@ -6674,6 +7109,8 @@ object ItStrings : Strings {
     override val msgResumed = "PARTITA RIPRESA"
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
     override val msgBandLost: (String) -> String = { "BRACCIALETTO $it DISCONNESSO" }
+    override val msgRemoteConnected: (String) -> String = { "TELECOMANDO $it COLLEGATO" }
+    override val msgRemoteLost: (String) -> String = { "TELECOMANDO $it SCOLLEGATO" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "BRACCIALETTO $n SPENTO" + when (why) {
             BandProtocol.OFF_IDLE -> " (INATTIVO)"
@@ -6738,6 +7175,7 @@ object ItStrings : Strings {
     override val savedTo: (String) -> String = { "Salvato in $it" }
     override val saveError = "Salvataggio non riuscito"
     override val shareSubject = "Risultato partita di tennis"
+    override val shareSubjectPadel = "Risultato partita di padel"
     override val playerDefault: (Int) -> String = { "Giocatore $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Creato con Tennis Score Manager"
@@ -6802,6 +7240,10 @@ object EnStrings : Strings {
     override val singles = "Singles"
     override val doubles = "Doubles"
     override val doublesHint = "In doubles enter two names per team: scoring follows the ITF doubles rules."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Same rules as tennis: doubles and golden point are already set, but you can change them."
     override val player1 = "Player 1"
     override val player2 = "Player 2"
     override val playerName = "Name"
@@ -6815,6 +7257,19 @@ object EnStrings : Strings {
     override val modeBands = "Wristbands"
     override val modeRefereeHint = "Points are scored on the phone, like a chair umpire."
     override val modeBandsHint = "Each player scores with KEY1 on their own M5StickS3."
+    override val modeRemotes = "Remotes"
+    override val modeRemotesHint = "Each player scores with a Bluetooth selfie remote (€1–3): one click = point, double click or long press = undo."
+    override val remotesHowTo = "1. Pair the remotes in the phone's Bluetooth settings, like a keyboard. 2. Tap “Assign” under the player and press a key on their remote."
+    override val bluetoothSettings = "Bluetooth settings"
+    override val remoteFor: (String) -> String = { "$it's remote" }
+    override val noRemote = "None"
+    override val remoteConnected = "Connected"
+    override val remoteNotConnected = "Not connected: press a key to wake it up"
+    override val assignRemote = "Assign"
+    override val removeRemote = "Remove"
+    override val pressRemoteKey = "Press a key on the remote…"
+    override val remotePressed = "Key received"
+    override val remotesScreenOn = "Keep the app open during the match: the screen stays on by itself. With the screen locked or another app in front, the keys don't get through."
     override val requirements = "Requirements"
     override val bluetooth = "Bluetooth"
     override val location = "Location permission"
@@ -6912,6 +7367,8 @@ object EnStrings : Strings {
     override val formatMatchTiebreakHint = "At one set all the third set is a 10-point match tie-break (win by 2)."
     override val noAd = "No-Ad (deciding point)"
     override val noAdHint = "At deuce a single deciding point is played."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "At deuce a single point decides the game. Turn it off to play advantages."
     override val coinToss = "Coin toss"
     override val tossCoin = "Toss the coin"
     override val tossWinner: (String) -> String = { "Toss won by: $it" }
@@ -6937,12 +7394,17 @@ object EnStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "No wristbands for: " else "No wristband for: ") + it.joinToString(", ") + ". Continue anyway?"
     }
+    override val remotesMissingTitle = "Remotes not assigned"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Missing remotes for: " else "Missing remote for: ") + it.joinToString(", ") + ". Continue anyway?"
+    }
     override val continueAnyway = "Continue"
     override val cancel = "Cancel"
 
     override val startMatch = "MATCH START"
     override val startHint = "Press the button to start"
     override val startHintBands = "Press the button or KEY1 on a wristband"
+    override val startHintRemotes = "Press the button or a remote"
     override val startButton = "Start match"
     override val resumeSaved = "Resume suspended match"
     override val noSavedMatches = "No suspended match saved."
@@ -6990,6 +7452,8 @@ object EnStrings : Strings {
     override val msgResumed = "MATCH RESUMED"
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
     override val msgBandLost: (String) -> String = { "WRISTBAND $it DISCONNECTED" }
+    override val msgRemoteConnected: (String) -> String = { "REMOTE $it CONNECTED" }
+    override val msgRemoteLost: (String) -> String = { "REMOTE $it DISCONNECTED" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "WRISTBAND $n OFF" + when (why) {
             BandProtocol.OFF_IDLE -> " (IDLE)"
@@ -7054,6 +7518,7 @@ object EnStrings : Strings {
     override val savedTo: (String) -> String = { "Saved to $it" }
     override val saveError = "Saving failed"
     override val shareSubject = "Tennis match result"
+    override val shareSubjectPadel = "Padel match result"
     override val playerDefault: (Int) -> String = { "Player $it" }
     override val teamJoiner = " and "
     override val generatedWith = "Made with Tennis Score Manager"
@@ -7141,6 +7606,10 @@ object DeStrings : Strings {
     override val singles = "Einzel"
     override val doubles = "Doppel"
     override val doublesHint = "Im Doppel zwei Namen pro Team eingeben: Die Zählung folgt den ITF-Regeln für das Doppel."
+    override val sportSection = "Sportart"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Gleiche Regeln wie beim Tennis: Doppel und Golden Point sind schon eingestellt, lassen sich aber ändern."
     override val player1 = "Spieler 1"
     override val player2 = "Spieler 2"
     override val playerName = "Name"
@@ -7154,6 +7623,19 @@ object DeStrings : Strings {
     override val modeBands = "Armbänder"
     override val modeRefereeHint = "Die Punkte werden am Telefon vergeben, wie vom Stuhlschiedsrichter."
     override val modeBandsHint = "Jeder Spieler vergibt den Punkt mit KEY1 an seinem eigenen M5StickS3."
+    override val modeRemotes = "Fernbedienungen"
+    override val modeRemotesHint = "Jeder Spieler vergibt den Punkt mit einer Bluetooth-Selfie-Fernbedienung (1–3 €): ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig."
+    override val remotesHowTo = "1. Die Fernbedienungen in den Bluetooth-Einstellungen des Telefons koppeln, wie eine Tastatur. 2. Unter dem Spieler auf „Zuordnen“ tippen und eine Taste seiner Fernbedienung drücken."
+    override val bluetoothSettings = "Bluetooth-Einstellungen"
+    override val remoteFor: (String) -> String = { "Fernbedienung von $it" }
+    override val noRemote = "Keine"
+    override val remoteConnected = "Verbunden"
+    override val remoteNotConnected = "Nicht verbunden: eine Taste drücken, um sie aufzuwecken"
+    override val assignRemote = "Zuordnen"
+    override val removeRemote = "Entfernen"
+    override val pressRemoteKey = "Eine Taste an der Fernbedienung drücken …"
+    override val remotePressed = "Taste empfangen"
+    override val remotesScreenOn = "Während des Matches die App geöffnet lassen: Der Bildschirm bleibt von selbst an. Bei gesperrtem Bildschirm oder einer anderen App im Vordergrund kommen die Tasten nicht an."
     override val requirements = "Voraussetzungen"
     override val bluetooth = "Bluetooth"
     override val location = "Standortberechtigung"
@@ -7251,6 +7733,8 @@ object DeStrings : Strings {
     override val formatMatchTiebreakHint = "Bei 1:1 Sätzen entscheidet ein Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
     override val noAd = "No-Ad (entscheidender Punkt)"
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
+    override val goldenPoint = "Golden Point"
+    override val goldenPointHint = "Bei Einstand entscheidet ein einziger Punkt das Spiel. Ausschalten, um mit Vorteil zu spielen."
     override val coinToss = "Wahl (Münzwurf)"
     override val tossCoin = "Münze werfen"
     override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }
@@ -7276,12 +7760,17 @@ object DeStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Es fehlen die Armbänder für: " else "Es fehlt das Armband für: ") + it.joinToString(", ") + ". Trotzdem fortfahren?"
     }
+    override val remotesMissingTitle = "Fernbedienungen nicht zugeordnet"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Es fehlen die Fernbedienungen für: " else "Es fehlt die Fernbedienung für: ") + it.joinToString(", ") + ". Trotzdem fortfahren?"
+    }
     override val continueAnyway = "Fortfahren"
     override val cancel = "Abbrechen"
 
     override val startMatch = "MATCHBEGINN"
     override val startHint = "Drücke die Taste, um zu beginnen"
     override val startHintBands = "Drücke die Taste oder KEY1 an einem Armband"
+    override val startHintRemotes = "Drücke die Taste oder eine Fernbedienung"
     override val startButton = "Match starten"
     override val resumeSaved = "Unterbrochenes Match fortsetzen"
     override val noSavedMatches = "Kein unterbrochenes Match gespeichert."
@@ -7329,6 +7818,8 @@ object DeStrings : Strings {
     override val msgResumed = "MATCH FORTGESETZT"
     override val msgBandConnected: (String) -> String = { "ARMBAND $it VERBUNDEN" }
     override val msgBandLost: (String) -> String = { "ARMBAND $it GETRENNT" }
+    override val msgRemoteConnected: (String) -> String = { "FERNBEDIENUNG $it VERBUNDEN" }
+    override val msgRemoteLost: (String) -> String = { "FERNBEDIENUNG $it GETRENNT" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "ARMBAND $n AUS" + when (why) {
             BandProtocol.OFF_IDLE -> " (INAKTIV)"
@@ -7393,6 +7884,7 @@ object DeStrings : Strings {
     override val savedTo: (String) -> String = { "Gespeichert in $it" }
     override val saveError = "Speichern fehlgeschlagen"
     override val shareSubject = "Ergebnis des Tennismatches"
+    override val shareSubjectPadel = "Padel-Ergebnis"
     override val playerDefault: (Int) -> String = { "Spieler $it" }
     override val teamJoiner = " und "
     override val generatedWith = "Erstellt mit Tennis Score Manager"
@@ -7472,6 +7964,10 @@ object EsStrings : Strings {
     override val singles = "Individual"
     override val doubles = "Dobles"
     override val doublesHint = "En dobles escribe dos nombres por pareja: el tanteo sigue las reglas ITF de dobles."
+    override val sportSection = "Deporte"
+    override val sportTennis = "Tenis"
+    override val sportPadel = "Pádel"
+    override val padelHint = "Mismas reglas que el tenis: el dobles y el punto de oro ya están puestos, pero se pueden cambiar."
     override val player1 = "Jugador 1"
     override val player2 = "Jugador 2"
     override val playerName = "Nombre"
@@ -7485,6 +7981,19 @@ object EsStrings : Strings {
     override val modeBands = "Pulseras"
     override val modeRefereeHint = "Los puntos se asignan desde el teléfono, como hace el juez de silla."
     override val modeBandsHint = "Cada jugador se anota el punto con KEY1 de su propio M5StickS3."
+    override val modeRemotes = "Mandos"
+    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer."
+    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa una tecla de su mando."
+    override val bluetoothSettings = "Ajustes de Bluetooth"
+    override val remoteFor: (String) -> String = { "Mando de $it" }
+    override val noRemote = "Ninguno"
+    override val remoteConnected = "Conectado"
+    override val remoteNotConnected = "No conectado: pulsa una tecla para despertarlo"
+    override val assignRemote = "Asignar"
+    override val removeRemote = "Quitar"
+    override val pressRemoteKey = "Pulsa una tecla del mando…"
+    override val remotePressed = "Tecla recibida"
+    override val remotesScreenOn = "Durante el partido deja la app abierta: la pantalla se mantiene encendida sola. Con la pantalla bloqueada u otra app delante, las teclas no llegan."
     override val requirements = "Requisitos"
     override val bluetooth = "Bluetooth"
     override val location = "Permiso de ubicación"
@@ -7582,6 +8091,8 @@ object EsStrings : Strings {
     override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
     override val noAd = "Sin ventaja (punto decisivo)"
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
+    override val goldenPoint = "Punto de oro"
+    override val goldenPointHint = "En el 40-40 se juega un solo punto que decide el juego. Desactívalo para jugar con ventajas."
     override val noAdShort = "Sin ventaja"
     override val coinToss = "Sorteo"
     override val tossCoin = "Lanzar la moneda"
@@ -7608,12 +8119,17 @@ object EsStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Faltan las pulseras de: " else "Falta la pulsera de: ") + it.joinToString(", ") + ". ¿Continuar de todos modos?"
     }
+    override val remotesMissingTitle = "Mandos no asignados"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltan los mandos de: " else "Falta el mando de: ") + it.joinToString(", ") + ". ¿Continuar igualmente?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
     override val startMatch = "INICIO DEL PARTIDO"
     override val startHint = "Pulsa el botón para empezar"
     override val startHintBands = "Pulsa el botón o KEY1 en una pulsera"
+    override val startHintRemotes = "Pulsa el botón o un mando"
     override val startButton = "Empezar partido"
     override val resumeSaved = "Reanudar partido suspendido"
     override val noSavedMatches = "No hay partidos suspendidos guardados."
@@ -7661,6 +8177,8 @@ object EsStrings : Strings {
     override val msgResumed = "PARTIDO REANUDADO"
     override val msgBandConnected: (String) -> String = { "PULSERA $it CONECTADA" }
     override val msgBandLost: (String) -> String = { "PULSERA $it DESCONECTADA" }
+    override val msgRemoteConnected: (String) -> String = { "MANDO $it CONECTADO" }
+    override val msgRemoteLost: (String) -> String = { "MANDO $it DESCONECTADO" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "PULSERA $n APAGADA" + when (why) {
             BandProtocol.OFF_IDLE -> " (SIN USO)"
@@ -7725,6 +8243,7 @@ object EsStrings : Strings {
     override val savedTo: (String) -> String = { "Guardado en $it" }
     override val saveError = "No se pudo guardar"
     override val shareSubject = "Resultado del partido de tenis"
+    override val shareSubjectPadel = "Resultado del partido de pádel"
     override val playerDefault: (Int) -> String = { "Jugador $it" }
     override val teamJoiner = " y "
     override val generatedWith = "Creado con Tennis Score Manager"
@@ -7807,6 +8326,10 @@ object FrStrings : Strings {
     override val singles = "Simple"
     override val doubles = "Double"
     override val doublesHint = "En double, saisissez deux noms par équipe : le décompte suit les règles ITF du double."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mêmes règles que le tennis : le double et le point en or sont déjà réglés, mais modifiables."
     override val player1 = "Joueur 1"
     override val player2 = "Joueur 2"
     override val playerName = "Nom"
@@ -7820,6 +8343,19 @@ object FrStrings : Strings {
     override val modeBands = "Bracelets"
     override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
     override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
+    override val modeRemotes = "Télécommandes"
+    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler."
+    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur une touche de sa télécommande."
+    override val bluetoothSettings = "Réglages Bluetooth"
+    override val remoteFor: (String) -> String = { "Télécommande ${de(it)}" }
+    override val noRemote = "Aucune"
+    override val remoteConnected = "Connectée"
+    override val remoteNotConnected = "Non connectée : appuyez sur une touche pour la réveiller"
+    override val assignRemote = "Associer"
+    override val removeRemote = "Retirer"
+    override val pressRemoteKey = "Appuyez sur une touche de la télécommande…"
+    override val remotePressed = "Touche reçue"
+    override val remotesScreenOn = "Pendant le match, gardez l'appli ouverte : l'écran reste allumé tout seul. Écran verrouillé ou autre appli au premier plan, les touches n'arrivent pas."
     override val requirements = "Prérequis"
     override val bluetooth = "Bluetooth"
     override val location = "Autorisation de localisation"
@@ -7917,6 +8453,8 @@ object FrStrings : Strings {
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
+    override val goldenPoint = "Point en or"
+    override val goldenPointHint = "À égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
@@ -7942,12 +8480,17 @@ object FrStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Il manque les bracelets de : " else "Il manque le bracelet de : ") + it.joinToString(", ") + ". Continuer quand même ?"
     }
+    override val remotesMissingTitle = "Télécommandes non associées"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Il manque les télécommandes de : " else "Il manque la télécommande de : ") + it.joinToString(", ") + ". Continuer quand même ?"
+    }
     override val continueAnyway = "Continuer"
     override val cancel = "Annuler"
 
     override val startMatch = "DÉBUT DU MATCH"
     override val startHint = "Appuyez sur le bouton pour commencer"
     override val startHintBands = "Appuyez sur le bouton ou sur KEY1 d'un bracelet"
+    override val startHintRemotes = "Appuyez sur le bouton ou sur une télécommande"
     override val startButton = "Commencer le match"
     override val resumeSaved = "Reprendre un match suspendu"
     override val noSavedMatches = "Aucun match suspendu enregistré."
@@ -7995,6 +8538,8 @@ object FrStrings : Strings {
     override val msgResumed = "REPRISE DU MATCH"
     override val msgBandConnected: (String) -> String = { "BRACELET $it CONNECTÉ" }
     override val msgBandLost: (String) -> String = { "BRACELET $it DÉCONNECTÉ" }
+    override val msgRemoteConnected: (String) -> String = { "TÉLÉCOMMANDE $it CONNECTÉE" }
+    override val msgRemoteLost: (String) -> String = { "TÉLÉCOMMANDE $it DÉCONNECTÉE" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "BRACELET $n ÉTEINT" + when (why) {
             BandProtocol.OFF_IDLE -> " (INACTIF)"
@@ -8059,6 +8604,7 @@ object FrStrings : Strings {
     override val savedTo: (String) -> String = { "Enregistré dans $it" }
     override val saveError = "Échec de l'enregistrement"
     override val shareSubject = "Résultat du match de tennis"
+    override val shareSubjectPadel = "Résultat du match de padel"
     override val playerDefault: (Int) -> String = { "Joueur $it" }
     override val teamJoiner = " et "
     override val generatedWith = "Créé avec Tennis Score Manager"
@@ -8141,6 +8687,10 @@ object PtStrings : Strings {
     override val singles = "Simples"
     override val doubles = "Duplas"
     override val doublesHint = "Nas duplas, escreva dois nomes por equipe: a contagem segue as regras ITF de duplas."
+    override val sportSection = "Esporte"
+    override val sportTennis = "Tênis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mesmas regras do tênis: dupla e ponto de ouro já vêm configurados, mas dá para mudar."
     override val player1 = "Jogador 1"
     override val player2 = "Jogador 2"
     override val playerName = "Nome"
@@ -8154,6 +8704,19 @@ object PtStrings : Strings {
     override val modeBands = "Pulseiras"
     override val modeRefereeHint = "Os pontos são marcados no telefone, como faz o árbitro de cadeira."
     override val modeBandsHint = "Cada jogador marca o ponto com o KEY1 do seu próprio M5StickS3."
+    override val modeRemotes = "Controles"
+    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer."
+    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte uma tecla do controle dele."
+    override val bluetoothSettings = "Configurações de Bluetooth"
+    override val remoteFor: (String) -> String = { "Controle de $it" }
+    override val noRemote = "Nenhum"
+    override val remoteConnected = "Conectado"
+    override val remoteNotConnected = "Desconectado: aperte uma tecla para despertá-lo"
+    override val assignRemote = "Associar"
+    override val removeRemote = "Remover"
+    override val pressRemoteKey = "Aperte uma tecla do controle…"
+    override val remotePressed = "Tecla recebida"
+    override val remotesScreenOn = "Durante a partida, deixe o app aberto: a tela fica ligada sozinha. Com a tela bloqueada ou outro app na frente, as teclas não chegam."
     override val requirements = "Requisitos"
     override val bluetooth = "Bluetooth"
     override val location = "Permissão de localização"
@@ -8251,6 +8814,8 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val goldenPoint = "Ponto de ouro"
+    override val goldenPointHint = "No 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
@@ -8277,12 +8842,17 @@ object PtStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Faltam as pulseiras de: " else "Falta a pulseira de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
     }
+    override val remotesMissingTitle = "Controles não associados"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltam os controles de: " else "Falta o controle de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
     override val startMatch = "INÍCIO DA PARTIDA"
     override val startHint = "Toque no botão para começar"
     override val startHintBands = "Toque no botão ou aperte KEY1 numa pulseira"
+    override val startHintRemotes = "Toque no botão ou aperte um controle"
     override val startButton = "Começar partida"
     override val resumeSaved = "Retomar partida suspensa"
     override val noSavedMatches = "Nenhuma partida suspensa salva."
@@ -8330,6 +8900,8 @@ object PtStrings : Strings {
     override val msgResumed = "PARTIDA RETOMADA"
     override val msgBandConnected: (String) -> String = { "PULSEIRA $it CONECTADA" }
     override val msgBandLost: (String) -> String = { "PULSEIRA $it DESCONECTADA" }
+    override val msgRemoteConnected: (String) -> String = { "CONTROLE $it CONECTADO" }
+    override val msgRemoteLost: (String) -> String = { "CONTROLE $it DESCONECTADO" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "PULSEIRA $n DESLIGADA" + when (why) {
             BandProtocol.OFF_IDLE -> " (SEM USO)"
@@ -8394,6 +8966,7 @@ object PtStrings : Strings {
     override val savedTo: (String) -> String = { "Salvo em $it" }
     override val saveError = "Não foi possível salvar"
     override val shareSubject = "Resultado da partida de tênis"
+    override val shareSubjectPadel = "Resultado da partida de padel"
     override val playerDefault: (Int) -> String = { "Jogador $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Criado com Tennis Score Manager"
@@ -8825,6 +9398,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -8943,6 +9517,7 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(40.dp)) },
             title = { Text(s.endDialogTitle, fontWeight = FontWeight.Black) },
             text = {
+                RemoteKeysInDialog(c)
                 Text(
                     s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
@@ -8990,6 +9565,7 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball) },
             title = { Text(s.serveOrderTitle(state.setNumber)) },
             text = {
+                RemoteKeysInDialog(c)
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     for (side in listOf(state.setStartServer, state.setStartServer.other)) {
                         Text(s.whoServesFirst(names.short(side)), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
@@ -9262,6 +9838,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
@@ -9298,6 +9875,7 @@ import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.ExpandLess
@@ -9312,9 +9890,11 @@ import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
+import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -9366,9 +9946,11 @@ import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.remote.RemoteInfo
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
@@ -9385,6 +9967,7 @@ import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -9436,6 +10019,7 @@ fun OptionsScreen(c: MatchController) {
     var locationDialog by remember { mutableStateOf(false) }
     var bandsRequired by remember { mutableStateOf(false) }
     var missingBands by remember { mutableStateOf<List<String>?>(null) }
+    var missingRemotes by remember { mutableStateOf<List<String>?>(null) }
     val bandsReadyEnv = blePerms && btOn && locPerm && locOn
     BackHandler { c.back() }
 
@@ -9451,9 +10035,19 @@ fun OptionsScreen(c: MatchController) {
                 missingBands = missing
                 return
             }
-        } else if (!(locPerm && locOn)) {
-            locationDialog = true
-            return
+        } else {
+            if (o.mode == PlayMode.REMOTES) {
+                val remotes = c.remotes.assigned.value
+                val missing = Side.entries.filter { remotes[it] == null }.map { names.short(it) }
+                if (missing.isNotEmpty()) {
+                    missingRemotes = missing
+                    return
+                }
+            }
+            if (!(locPerm && locOn)) {
+                locationDialog = true
+                return
+            }
         }
         c.go(Screen.START)
     }
@@ -9469,12 +10063,25 @@ fun OptionsScreen(c: MatchController) {
     ) {
         // Modalità
         SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+            // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
             Segmented(
-                listOf(SegOption(s.modeReferee, Icons.Filled.Gavel), SegOption(s.modeBands, Icons.Filled.Watch)),
-                selected = if (o.mode == PlayMode.BANDS) 1 else 0,
-                onSelect = { i -> c.updateOptions { it.copy(mode = if (i == 1) PlayMode.BANDS else PlayMode.REFEREE) } },
+                listOf(
+                    SegOption(s.modeReferee, Icons.Filled.Gavel),
+                    SegOption(s.modeBands, Icons.Filled.Watch),
+                    SegOption(s.modeRemotes, Icons.Filled.SettingsRemote),
+                ),
+                selected = o.mode.ordinal,
+                onSelect = { i -> c.updateOptions { it.copy(mode = PlayMode.entries[i]) } },
+                columns = 1,
             )
-            Text(if (o.mode == PlayMode.BANDS) s.modeBandsHint else s.modeRefereeHint, color = TsmColors.TextDim)
+            Text(
+                when (o.mode) {
+                    PlayMode.REFEREE -> s.modeRefereeHint
+                    PlayMode.BANDS -> s.modeBandsHint
+                    PlayMode.REMOTES -> s.modeRemotesHint
+                },
+                color = TsmColors.TextDim,
+            )
             if (o.mode == PlayMode.BANDS) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
@@ -9482,6 +10089,7 @@ fun OptionsScreen(c: MatchController) {
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
                 BandsSection(c, names, enabled = bandsReadyEnv)
             }
+            if (o.mode == PlayMode.REMOTES) RemotesSection(c, names)
         }
 
         // Lingua
@@ -9513,7 +10121,10 @@ fun OptionsScreen(c: MatchController) {
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
                 c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
             }
-            SwitchRow(Icons.Filled.Timer, s.noAd, s.noAdHint, o.noAd) { v -> c.updateOptions { it.copy(noAd = v) } }
+            val padel = su.sport == Sport.PADEL
+            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+                c.updateOptions { it.copy(noAd = v) }
+            }
         }
 
         // Sorteggio
@@ -9557,6 +10168,21 @@ fun OptionsScreen(c: MatchController) {
                 }) { Text(s.enable) }
             },
             dismissButton = { TextButton(onClick = { bandsRequired = false }) { Text(s.cancel) } },
+        )
+    }
+    missingRemotes?.let { list ->
+        AlertDialog(
+            onDismissRequest = { missingRemotes = null },
+            icon = { Icon(Icons.Filled.SettingsRemote, null, tint = TsmColors.Orange) },
+            title = { Text(s.remotesMissingTitle) },
+            text = { Text(s.remotesMissingText(list)) },
+            confirmButton = {
+                Button(onClick = {
+                    missingRemotes = null
+                    if (!(locPerm && locOn)) locationDialog = true else c.go(Screen.START)
+                }) { Text(s.continueAnyway) }
+            },
+            dismissButton = { TextButton(onClick = { missingRemotes = null }) { Text(s.cancel) } },
         )
     }
     missingBands?.let { list ->
@@ -9609,6 +10235,111 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
     }
     SwitchRow(Icons.Filled.PowerSettingsNew, s.bandsOffAtEnd, s.bandsOffAtEndHint, o.bandsOffAtEnd) { v ->
         c.updateOptions { it.copy(bandsOffAtEnd = v) }
+    }
+}
+
+/**
+ * Telecomandini Bluetooth: si accoppiano dalle impostazioni di Android, poi "Associa" e un tasto del telecomando.
+ * Ogni clic di un telecomando associato si vede qui ("Tasto ricevuto"): così si prova prima di giocare.
+ */
+@Composable
+private fun RemotesSection(c: MatchController, names: Names) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val assigned by c.remotes.assigned.collectAsState()
+    val connected by c.remotes.connected.collectAsState()
+    val capture by c.remotes.capture.collectAsState()
+    val lastPress by c.remotes.lastPress.collectAsState()
+    // Un'associazione lasciata a metà non deve prendersi il primo tasto premuto più tardi.
+    DisposableEffect(Unit) { onDispose { c.remotes.cancelCapture() } }
+
+    Text(s.remotesHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
+    GhostButton(
+        s.bluetoothSettings, Icons.Filled.Bluetooth,
+        { runCatching { context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) } },
+        Modifier.fillMaxWidth(),
+    )
+    for (side in Side.entries) {
+        val current = assigned[side]
+        RemotePicker(
+            c, side, names.short(side), current,
+            online = current != null && current.descriptor in connected,
+            capturing = capture == side,
+            pressedAt = lastPress?.takeIf { it.first == side }?.second,
+        )
+    }
+    if (assigned.size == 2) {
+        GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.remotes.swap() }, Modifier.fillMaxWidth())
+    }
+    Text(s.remotesScreenOn, color = TsmColors.TextDim, fontSize = 13.sp)
+}
+
+@Composable
+private fun RemotePicker(
+    c: MatchController,
+    side: Side,
+    playerName: String,
+    current: RemoteInfo?,
+    online: Boolean,
+    capturing: Boolean,
+    pressedAt: Long?,
+) {
+    val s = LocalStrings.current
+    val accent = TsmColors.player(side)
+    // "Tasto ricevuto" per 2 secondi dopo ogni clic (non per un clic di prima, ritrovato tornando sulla pagina).
+    var pressed by remember { mutableStateOf(false) }
+    LaunchedEffect(pressedAt) {
+        val left = pressedAt?.let { 2_000 - (SystemClock.uptimeMillis() - it) } ?: 0L
+        if (left <= 0) return@LaunchedEffect
+        pressed = true
+        delay(left)
+        pressed = false
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Text(s.remoteFor(playerName), color = accent, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                .border(1.dp, if (capturing) accent else TsmColors.Outline, RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val (icon, tint) = when {
+                capturing -> Icons.Filled.TouchApp to accent
+                current == null -> Icons.Filled.SettingsRemote to TsmColors.TextDim
+                online -> Icons.Filled.BluetoothConnected to TsmColors.Ok
+                else -> Icons.Filled.BluetoothDisabled to TsmColors.Orange
+            }
+            Icon(icon, null, tint = tint)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (capturing) s.pressRemoteKey else current?.name ?: s.noRemote,
+                    color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+                if (!capturing && current != null) {
+                    Text(
+                        when {
+                            pressed -> s.remotePressed
+                            online -> s.remoteConnected
+                            else -> s.remoteNotConnected
+                        },
+                        color = if (pressed) TsmColors.Ok else TsmColors.TextDim, fontSize = 12.sp,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (capturing) {
+                SmallAction(s.cancel, Icons.Filled.Close, Modifier.weight(1f)) { c.remotes.cancelCapture() }
+            } else {
+                SmallAction(s.assignRemote, Icons.Filled.TouchApp, Modifier.weight(1f)) { c.remotes.startCapture(side) }
+            }
+            SmallAction(s.removeRemote, Icons.Filled.DeleteOutline, Modifier.weight(1f), enabled = current != null && !capturing) {
+                c.remotes.remove(side)
+            }
+        }
     }
 }
 
@@ -10041,6 +10772,7 @@ import com.tennis.scoremanager.BuildConfig
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
 import android.content.Intent
@@ -10066,10 +10798,29 @@ fun SetupScreen(c: MatchController) {
         subtitle = s.setupSubtitle,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
-            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles) } }, Modifier.weight(1f))
+            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
     ) {
+        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+            Segmented(
+                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
+                selected = su.sport.ordinal,
+                onSelect = { i ->
+                    val sport = Sport.entries[i]
+                    if (sport != su.sport) {
+                        if (sport == Sport.PADEL) {
+                            c.updateSetup { it.copy(sport = sport, doubles = true) }
+                            c.updateOptions { it.copy(noAd = true) }
+                        } else {
+                            c.updateSetup { it.copy(sport = sport) }
+                        }
+                    }
+                },
+            )
+            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
+        }
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
             Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
@@ -10208,6 +10959,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.AlertDialog
@@ -10261,6 +11013,8 @@ fun StartScreen(c: MatchController) {
     val su by c.setup.collectAsState()
     val saved by c.saved.collectAsState()
     val bands by c.ble.bands.collectAsState()
+    val remotes by c.remotes.assigned.collectAsState()
+    val remotesOnline by c.remotes.connected.collectAsState()
     val names = remember(su, s) { Names(su, s) }
     var showSaved by remember { mutableStateOf(false) }
     var toDelete by remember { mutableStateOf<MatchRecord?>(null) }
@@ -10286,6 +11040,18 @@ fun StartScreen(c: MatchController) {
                         if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
                         if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
                         Icons.Filled.Watch,
+                    )
+                    Spacer(Modifier.width(6.dp))
+                }
+            }
+            if (o.mode == PlayMode.REMOTES) {
+                for (side in Side.entries) {
+                    val ready = remotes[side]?.descriptor?.let { it in remotesOnline } == true
+                    Pill(
+                        s.playerTag(side.ordinal + 1),
+                        if (ready) TsmColors.player(side) else TsmColors.SurfaceHigh,
+                        if (ready) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                        Icons.Filled.SettingsRemote,
                     )
                     Spacer(Modifier.width(6.dp))
                 }
@@ -10319,7 +11085,14 @@ fun StartScreen(c: MatchController) {
             modifier = Modifier.graphicsLayer { this.alpha = alpha },
         )
         Spacer(Modifier.height(8.dp))
-        Text(if (o.mode == PlayMode.BANDS) s.startHintBands else s.startHint, color = TsmColors.TextDim, textAlign = TextAlign.Center)
+        Text(
+            when (o.mode) {
+                PlayMode.REFEREE -> s.startHint
+                PlayMode.BANDS -> s.startHintBands
+                PlayMode.REMOTES -> s.startHintRemotes
+            },
+            color = TsmColors.TextDim, textAlign = TextAlign.Center,
+        )
         Spacer(Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(names.short(Side.P1), color = TsmColors.Player1, fontWeight = FontWeight.Bold, fontSize = 18.sp, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
@@ -12326,6 +13099,18 @@ class DataTest {
         assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
     }
+
+    @Test
+    fun padelIsNamedWithItsGoldenPoint() {
+        val rec = MatchRecord(
+            id = "m", setup = SetupData(doubles = true, sport = Sport.PADEL), options = MatchOptions(),
+            rules = RulesConfig(noAd = true, doubles = true),
+        )
+        assertEquals("Padel · 3 set · tie-break a 7 · Punto d'oro · Doppio", Reports.formatLabel(rec, ItStrings))
+        assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
+        // Senza punto d'oro (ai vantaggi) resta solo il nome dello sport.
+        assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
+    }
 }
 TSM_EOF
 
@@ -12614,6 +13399,125 @@ class ScoreEngineTest {
         assertTrue(ScoreEngine.isBreakPoint(s))
         val t = play(ScoreEngine.initial(RulesConfig(firstServer = P1)), P1, P1, P1)
         assertFalse(ScoreEngine.isBreakPoint(t))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/remote/PressDetectorTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/remote/PressDetectorTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.remote
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class PressDetectorTest {
+
+    private val volUp = 24
+    private val enter = 66
+
+    @Test
+    fun singleClickIsAPointAfterTheDoubleClickWindow() {
+        val d = PressDetector()
+        assertNull(d.down("a", volUp, 1_000))
+        assertNull(d.up("a", volUp, 1_080))
+        assertEquals(1_530L, d.nextDeadline())
+        assertEquals(emptyList<String>(), d.due(1_500))
+        assertEquals(listOf("a"), d.due(1_530))
+        assertNull(d.nextDeadline())
+    }
+
+    @Test
+    fun doubleClickUndoesWithoutGivingThePoint() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_080)
+        assertEquals(Gesture.UNDO, d.down("a", volUp, 1_300))
+        assertNull(d.up("a", volUp, 1_380))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun twoClicksFarApartAreTwoPoints() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_080)
+        assertEquals(listOf("a"), d.due(1_600))
+        assertNull(d.down("a", volUp, 3_000))
+        d.up("a", volUp, 3_080)
+        assertEquals(listOf("a"), d.due(3_600))
+    }
+
+    @Test
+    fun longPressUndoesOnReleaseWhenTheRemoteDoesNotRepeat() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        assertEquals(Gesture.UNDO, d.up("a", volUp, 2_000))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun longPressUndoesOnceWhileHeldWhenTheRemoteRepeats() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        assertNull(d.down("a", volUp, 1_500))
+        assertEquals(Gesture.UNDO, d.down("a", volUp, 1_950))
+        assertNull(d.down("a", volUp, 2_000))
+        assertNull(d.up("a", volUp, 2_400))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun twoKeysSentForOnePressAreOneClick() {
+        val d = PressDetector()
+        // Insieme...
+        d.down("a", volUp, 1_000)
+        d.down("a", enter, 1_005)
+        d.up("a", volUp, 1_070)
+        assertNull(d.up("a", enter, 1_075))
+        assertEquals(listOf("a"), d.due(2_000))
+        // ...o uno dopo l'altro.
+        d.down("a", volUp, 3_000)
+        d.up("a", volUp, 3_010)
+        assertNull(d.down("a", enter, 3_020))
+        assertNull(d.up("a", enter, 3_030))
+        assertEquals(listOf("a"), d.due(4_000))
+    }
+
+    @Test
+    fun doubleClickOnATwoKeyRemote() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_010)
+        d.down("a", enter, 1_020)
+        d.up("a", enter, 1_030)
+        assertEquals(Gesture.UNDO, d.down("a", volUp, 1_250))
+        d.up("a", volUp, 1_260)
+        assertNull(d.down("a", enter, 1_270))
+        assertNull(d.up("a", enter, 1_280))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun remotesAreIndependent() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_050)
+        // Il clic dell'altro telecomando non è un doppio clic del primo.
+        assertNull(d.down("b", volUp, 1_100))
+        d.up("b", volUp, 1_150)
+        assertEquals(listOf("a"), d.due(1_500))
+        assertEquals(listOf("b"), d.due(1_600))
+    }
+
+    @Test
+    fun releaseWithoutPressIsIgnored() {
+        val d = PressDetector()
+        assertNull(d.up("a", volUp, 1_000))
+        assertNull(d.nextDeadline())
     }
 }
 TSM_EOF
@@ -16842,6 +17746,6 @@ void loop() {
 }
 TSM_EOF
 
-echo ">> Fatto / done: 69 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 73 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

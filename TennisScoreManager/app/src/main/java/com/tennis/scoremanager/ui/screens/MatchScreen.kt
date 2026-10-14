@@ -92,6 +92,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
 import com.tennis.scoremanager.ui.SegOption
@@ -210,6 +211,7 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(40.dp)) },
             title = { Text(s.endDialogTitle, fontWeight = FontWeight.Black) },
             text = {
+                RemoteKeysInDialog(c)
                 Text(
                     s.endDialogText(names.side(w), Reports.scoreLine(state, w), state.rules.doubles),
                     fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
@@ -257,6 +259,7 @@ fun MatchScreen(c: MatchController) {
             icon = { Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball) },
             title = { Text(s.serveOrderTitle(state.setNumber)) },
             text = {
+                RemoteKeysInDialog(c)
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     for (side in listOf(state.setStartServer, state.setStartServer.other)) {
                         Text(s.whoServesFirst(names.short(side)), color = TsmColors.player(side), fontWeight = FontWeight.Bold)

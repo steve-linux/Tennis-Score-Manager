@@ -48,6 +48,7 @@ import com.tennis.scoremanager.BuildConfig
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
 import android.content.Intent
@@ -73,10 +74,29 @@ fun SetupScreen(c: MatchController) {
         subtitle = s.setupSubtitle,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
-            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles) } }, Modifier.weight(1f))
+            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
     ) {
+        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+            Segmented(
+                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
+                selected = su.sport.ordinal,
+                onSelect = { i ->
+                    val sport = Sport.entries[i]
+                    if (sport != su.sport) {
+                        if (sport == Sport.PADEL) {
+                            c.updateSetup { it.copy(sport = sport, doubles = true) }
+                            c.updateOptions { it.copy(noAd = true) }
+                        } else {
+                            c.updateSetup { it.copy(sport = sport) }
+                        }
+                    }
+                },
+            )
+            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
+        }
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
             Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }

@@ -2,7 +2,7 @@
 
 **Italiano** · [English](GUIDE.en.md) · [Français](GUIDE.fr.md) · [Deutsch](GUIDE.de.md) · [Español](GUIDE.es.md) · [Português](GUIDE.pt.md)
 
-App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia **in sei lingue** (italiano, inglese, francese, tedesco, spagnolo, portoghese: capitolo 4.1), due braccialetti **M5StickS3** collegati in Bluetooth LE e un **tabellone a LED su TV o monitor** (capitolo 8).
+App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia **in sei lingue** (italiano, inglese, francese, tedesco, spagnolo, portoghese: capitolo 4.1), due braccialetti **M5StickS3** collegati in Bluetooth LE (oppure due **telecomandini Bluetooth da selfie** da pochi euro: capitolo 6.3) e un **tabellone a LED su TV o monitor** (capitolo 8).
 
 ## 0. Cosa c'è nel repository
 
@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) per tenere il punteggio del tennis second
 | `deliver/installa_tsm.sh` | In alternativa al clone: crea **tutto** il progetto Android e lo sketch con soli blocchi `cat << 'TSM_EOF'` (il jar del Gradle wrapper è in base64). |
 | `deliver/GUIDA.md` | Questa guida (in italiano); le traduzioni sono `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`, `.pt`. |
 
-Versioni usate e verificate: app **2.4.3** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licenza: GNU GPL versione 3 o successiva (`LICENSE`); versione e licenza sono anche in fondo alla prima pagina dell'app.
+Versioni usate e verificate: app **2.5.0** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licenza: GNU GPL versione 3 o successiva (`LICENSE`); versione e licenza sono anche in fondo alla prima pagina dell'app.
 
 ---
 
@@ -219,17 +219,37 @@ Collega il cavo USB-C: il braccialetto fa un bip e mostra la **schermata di cari
 
 > Da verificare coi braccialetti veri: la ricarica non si è potuta provare sull'hardware. In particolare quanto spesso il caricabatterie segnala *carica completa* e quanto è precisa la percentuale in carica.
 
+### 6.3 Senza braccialetti: telecomandi Bluetooth (app 2.5)
+
+Il sistema più economico per far segnare i punti ai giocatori: due **telecomandini Bluetooth da selfie** (quelli col tasto di scatto, spesso venduti come *AB Shutter3*), da 1 a 3 € l'uno. Android li vede come una tastiera: niente firmware da caricare e nessun permesso per l'app. Va bene anche qualsiasi altra pulsantiera o tastiera Bluetooth (o USB).
+
+1. Accendi il telecomando e accoppialo dalle **impostazioni Bluetooth** del telefono, come una cuffia (pagina 2 › *Impostazioni Bluetooth* le apre). Ripeti col secondo.
+2. Pagina 2 › modalità **Telecomandi** › **Associa** sotto il Giocatore 1 › premi un tasto del suo telecomando; poi lo stesso per il Giocatore 2. A ogni clic di un telecomando associato la sua riga mostra **Tasto ricevuto**: così si prova prima di giocare. **Scambia G1 ↔ G2** li inverte.
+3. **INIZIO PARTITA**: un clic su un telecomando avvia la partita, come KEY1 dei braccialetti. In alto **G1**/**G2** sono colorati quando i telecomandi sono collegati.
+
+| Gesto | Azione |
+|---|---|
+| un clic | punto a chi ha il telecomando (arriva dopo mezzo secondo: l'app aspetta di vedere se è un doppio clic) |
+| doppio clic | annulla l'ultimo punto (anche dal popup di fine partita) |
+| tenere premuto 1 s | annulla l'ultimo punto |
+
+- Valgono le protezioni dei braccialetti: due punti a meno di 2 secondi contano una volta sola, due annulla ravvicinati tolgono un solo punto, *Partita conclusa* si conferma solo dal telefono.
+- Molti telecomandi da selfie hanno due tasti (*iOS* e *Android*) o mandano due tasti a ogni pressione: per l'app sono uguali e una pressione resta un clic.
+- **Lo schermo deve restare acceso con l'app davanti** (in partita l'app lo tiene acceso da sola). A differenza dei braccialetti, i tasti di una tastiera Bluetooth arrivano solo all'app visibile: a schermo bloccato o con un'altra app aperta non contano. Per partite lunghe tieni il telefono in carica.
+- Se un telecomando si scollega in partita (spento, scarico, troppo lontano) il riquadro arancione mostra *TELECOMANDO 1 SCOLLEGATO*, e *COLLEGATO* quando torna. Molti telecomandi si addormentano dopo qualche minuto senza clic: il primo clic li risveglia e a volte va perso. Se la voce non dice il punto, premi ancora.
+- Portata: una decina di metri, come le cuffie Bluetooth; col telefono vicino alla rete, a metà campo, si coprono entrambi i lati. Pila: di solito una CR2032, che dura mesi.
+
 ## 7. Come si usa l'app
 
-1. **Nuova partita** (facoltativa): circolo, campo, singolare/doppio, nomi (nel doppio due nomi per squadra). **Cerca l'indirizzo del campo** (spento di serie) aggiunge al riepilogo l'indirizzo oltre alle coordinate: lo chiede al servizio di geocodifica del telefono, che con i servizi Google manda le coordinate a Google. **Avanti**.
+1. **Nuova partita** (facoltativa): **Tennis** o **Padel** (app 2.5: stesse regole, tempi e chiamate; scegliendo Padel si impostano da soli doppio e punto d'oro, che si possono cambiare, e il riepilogo dice *Padel*), circolo, campo, singolare/doppio, nomi (nel doppio due nomi per squadra). **Cerca l'indirizzo del campo** (spento di serie) aggiunge al riepilogo l'indirizzo oltre alle coordinate: lo chiede al servizio di geocodifica del telefono, che con i servizi Google manda le coordinate a Google. **Avanti**.
 2. **Modalità e regole**:
-   - *Arbitro* o *Braccialetti*. Con i braccialetti sono obbligatori Bluetooth acceso, permesso posizione e posizione attiva: le righe dei **Requisiti** si aggiornano in tempo reale (anche se spegni Bluetooth o posizione dalla tendina) e diventano rosse con il pulsante per sistemarle.
+   - *Arbitro*, *Braccialetti* o *Telecomandi* (6.3). Con i braccialetti sono obbligatori Bluetooth acceso, permesso posizione e posizione attiva: le righe dei **Requisiti** si aggiornano in tempo reale (anche se spegni Bluetooth o posizione dalla tendina) e diventano rosse con il pulsante per sistemarle.
    - La **ricerca è automatica e continua** finché la pagina è aperta: accendi i braccialetti e vanno da soli nei posti liberi (prima Giocatore 1, poi Giocatore 2). **Identifica** fa lampeggiare quel braccialetto nel colore del giocatore (giallo o rosso) con dei bip, così vedi subito quale hai in mano; **Scambia G1 ↔ G2** li inverte senza scollegarli. Dal menu a tendina puoi sempre sceglierne un altro o *Nessuno* (quello tolto a mano non viene rimesso dalla ricerca). Un braccialetto non può stare su due giocatori.
    - **Spegni i braccialetti a fine partita e all'uscita** (attivo di serie): alla conferma di *Partita conclusa* e con *Esci* i braccialetti si spengono invece di aspettare l'inattività.
    - In modalità arbitro, premendo **Avanti** senza posizione compare l'invito ad attivarla (altrimenti il luogo non sarà nel riepilogo).
    - Lingua (sei lingue, 4.1), voce on/off, formato (*3 set con tie-break a 7* oppure *2 set + super tie-break a 10*), No-Ad.
    - **Sorteggio**: la moneta gira e indica chi vince; imposti chi serve e i lati del campo **visti dal giudice di sedia** (schema del campo con **Inverti lati**). Nel doppio scegli anche chi serve per primo in ogni squadra.
-3. **INIZIO PARTITA** lampeggia: premi il pulsante o KEY1 di un braccialetto. La voce dice *"Primo set" · "[nome] al servizio" · "gioco"* con 2 secondi tra le frasi; il **Match Time** parte su "gioco".
+3. **INIZIO PARTITA** lampeggia: premi il pulsante, KEY1 di un braccialetto o un telecomando. La voce dice *"Primo set" · "[nome] al servizio" · "gioco"* con 2 secondi tra le frasi; il **Match Time** parte su "gioco".
 4. **Partita**: in alto a sinistra il tempo partita, a destra il countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rosso negli ultimi 5 s). Il riquadro arancione si accende 5 s per *cambio campo, tie-break, set point, match point, palla break…*. I due tasti quadrati (giallo = Giocatore 1, rosso = Giocatore 2) stanno dal lato in cui si trovano davvero i giocatori e si scambiano a ogni cambio campo; sotto chi serve compare **On Serve**. Sotto: *Annulla punto*, *Sospendi/Riprendi*, audio (icona dell'altoparlante, barrata = spento), *Nuova partita*, **Esci**. In modalità braccialetti, sotto i tempi ci sono **G1**/**G2** con batteria e autonomia: toccandoli si aprono le impostazioni del braccialetto. Un doppio tocco su *Annulla punto* toglie un solo punto (il secondo tocco entro 1 s non conta); subito dopo un cambio di pagina il secondo tocco di un doppio tocco viene ignorato, così non finisce sul pulsante della pagina nuova.
 5. All'ultimo punto compare il popup **Partita conclusa / Annulla ultimo punto**. "Partita conclusa" si conferma **solo dal telefono**. Per mezzo secondo dopo la comparsa i suoi pulsanti ignorano i tocchi: un doppio tocco sull'ultimo punto non annulla niente.
 6. **Riepilogo**: vincitore, nomi, punteggio set per set con i punti del tie-break, durata, ora di inizio e fine, data, circolo, campo, luogo, formato, punti e game vinti. Pulsanti **Salva nello storico** (nome file + cartella a scelta + formati .txt/.json/.png), **Condividi** (immagine 1080×1350 + testo per WhatsApp/Instagram/…), **Nuova partita**, **Esci**. Se il riepilogo non è stato né salvato né condiviso, **Nuova partita** ed **Esci** chiedono conferma. Se Android chiude l'app mentre sei sul riepilogo (per esempio mentre condividi), riaprendola lo ritrovi. Salvando due volte con lo stesso nome nella cartella predefinita il secondo diventa *nome (1)*; nell'immagine i testi lunghi (nomi, indirizzo) si adattano alla larghezza.
@@ -319,6 +339,7 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 | Tabellone TV: dati inviati, server, impostazioni | `tv/TvModels.kt`, `tv/TvServer.kt`, `ui/TvSection.kt` |
 | Telefono usato come tabellone (ricerca, monitor esterno) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Telecomandi Bluetooth (gesti, associazione) | `remote/PressDetector.kt` (+ test), `remote/RemoteInput.kt` |
 
 
 ## 11. Problemi comuni
@@ -329,7 +350,8 @@ Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *I
 - **Android Studio non vede il telefono**: Debug USB attivo e impronta RSA accettata sul telefono (3)? Su Windows serve a volte il driver del produttore, su Linux le regole udev e una nuova sessione (1.1). Oppure il debug wireless (3).
 - **Arduino IDE non mostra la porta del braccialetto**: cavo USB-C dati e non solo di ricarica; su Linux gruppo `dialout` e nuova sessione (1.1); poi la modalità download (5, punto 7).
 - **La voce non parla o legge male**: volume multimediale, *Audio On*, voce della lingua scelta installata (4); prova un altro motore o un'altra voce in *Audio e voce*.
-- **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro lo schermo resta acceso.
+- **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro e telecomandi lo schermo resta acceso (con i telecomandi deve restarlo: 6.3).
+- **Il telecomando non fa niente**: è associato al giocatore (pagina 2, riga col suo nome)? L'app deve essere aperta sulla partita, a schermo acceso (6.3). Se la riga dice *Non collegato*, premi un tasto per svegliarlo oppure riaccoppialo dalle impostazioni Bluetooth.
 - **Sync Gradle fallita per il JDK**: imposta Gradle JDK = jbr-21 (punto 2.6).
 - **Il telefono-tabellone non trova l'arbitro**: stessa rete? (uno dei due fa l'hotspot, l'altro è collegato). *Tabellone su TV* acceso sull'arbitro? Prova l'indirizzo a mano. Alcuni hotspot isolano i dispositivi collegati tra loro ("isolamento client"): se c'è, disattivalo.
 - **Il browser del telefono non apre l'indirizzo** con i dati mobili accesi: Android manda il traffico sui dati perché l'hotspot non ha internet. Usa l'app in *Usa come tabellone* (lo gestisce da sola) oppure spegni i dati mobili su quel telefono.
