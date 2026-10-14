@@ -2,7 +2,7 @@
 
 [Italiano](GUIDA.md) · [English](GUIDE.en.md) · **Français** · [Deutsch](GUIDE.de.md) · [Español](GUIDE.es.md) · [Português](GUIDE.pt.md)
 
-Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis selon les règles ITF, avec les annonces vocales d'un arbitre de chaise **en six langues** (italien, anglais, français, allemand, espagnol, portugais : chapitre 4.1), deux bracelets **M5StickS3** connectés en Bluetooth LE et un **tableau d'affichage à LED sur TV ou écran** (chapitre 8).
+Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis selon les règles ITF, avec les annonces vocales d'un arbitre de chaise **en six langues** (italien, anglais, français, allemand, espagnol, portugais : chapitre 4.1), deux bracelets **M5StickS3** connectés en Bluetooth LE (ou deux **télécommandes Bluetooth pour selfie** à quelques euros : chapitre 6.3) et un **tableau d'affichage à LED sur TV ou écran** (chapitre 8).
 
 ## 0. Contenu du dépôt
 
@@ -13,7 +13,7 @@ Application Android (Kotlin + Jetpack Compose) pour tenir le score au tennis sel
 | `deliver/installa_tsm.sh` | Alternative au clone : crée **tout** le projet Android et le sketch uniquement avec des blocs `cat << 'TSM_EOF'` (le jar du Gradle wrapper est en base64). |
 | `deliver/GUIDE.fr.md` | Ce guide (en français) ; l'original italien est `deliver/GUIDA.md`, les autres traductions sont `deliver/GUIDE.en.md`, `.de`, `.es`, `.pt`. |
 
-Versions utilisées et vérifiées : app **2.4.3** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence en bas de la première page.
+Versions utilisées et vérifiées : app **2.5.0** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware : M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licence : GNU GPL version 3 ou ultérieure (`LICENSE`) ; l'application affiche sa version et sa licence en bas de la première page.
 
 ---
 
@@ -219,17 +219,37 @@ Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de cha
 
 > À vérifier avec les vrais bracelets : la charge n'a pas pu être testée sur le matériel. En particulier, à quelle fréquence le chargeur signale *charge terminée* et quelle est la précision du pourcentage pendant la charge.
 
+### 6.3 Sans bracelets : télécommandes Bluetooth (app 2.5)
+
+La solution la plus économique pour laisser les joueurs marquer : deux **télécommandes Bluetooth pour selfie** (celles avec un bouton de déclenchement, souvent vendues sous le nom *AB Shutter3*), de 1 à 3 € pièce. Android les voit comme un clavier : pas de firmware à charger et aucune autorisation pour l'application. N'importe quel autre pavé ou clavier Bluetooth (ou USB) convient aussi.
+
+1. Allumez la télécommande et appairez-la dans les **réglages Bluetooth** du téléphone, comme un casque (page 2 › *Réglages Bluetooth* les ouvre). Recommencez avec la seconde.
+2. Page 2 › mode **Télécommandes** › **Associer** sous le Joueur 1 › appuyez sur une touche de sa télécommande ; puis pareil pour le Joueur 2. À chaque clic d'une télécommande associée, sa ligne affiche **Touche reçue** : on peut ainsi tester avant de jouer. **Échanger J1 ↔ J2** les inverse.
+3. **DÉBUT DU MATCH** : un clic sur une télécommande lance le match, comme KEY1 des bracelets. En haut, **J1**/**J2** sont en couleur quand les télécommandes sont connectées.
+
+| Geste | Action |
+|---|---|
+| un clic | point pour celui qui tient la télécommande (il arrive une demi-seconde plus tard : l'application attend de voir si c'est un double clic) |
+| double clic | annule le dernier point (même depuis la fenêtre de fin de match) |
+| appui de 1 s | annule le dernier point |
+
+- Les protections des bracelets s'appliquent : deux points à moins de 2 secondes d'intervalle ne comptent qu'une fois, deux annulations rapprochées n'enlèvent qu'un point, *Match terminé* ne se confirme que sur le téléphone.
+- Beaucoup de télécommandes pour selfie ont deux boutons (*iOS* et *Android*) ou envoient deux touches à chaque appui : pour l'application c'est pareil et un appui reste un clic.
+- **L'écran doit rester allumé avec l'application au premier plan** (pendant le match, l'application le garde allumé toute seule). Contrairement aux bracelets, les touches d'un clavier Bluetooth n'arrivent qu'à l'application visible : écran verrouillé ou autre application ouverte, elles ne comptent pas. Pour les longs matchs, laissez le téléphone en charge.
+- Si une télécommande se déconnecte pendant le match (éteinte, pile vide, trop loin), l'encadré orange affiche *TÉLÉCOMMANDE 1 DÉCONNECTÉE*, puis *CONNECTÉE* à son retour. Beaucoup de télécommandes se mettent en veille après quelques minutes sans clic : le premier clic les réveille et se perd parfois. Si la voix n'annonce pas le point, appuyez de nouveau.
+- Portée : une dizaine de mètres, comme un casque Bluetooth ; avec le téléphone près du filet, au milieu du court, les deux côtés sont couverts. Pile : en général une CR2032, qui dure des mois.
+
 ## 7. Utiliser l'application
 
 1. **Nouveau match** (facultatif) : club, court, simple/double, noms (en double, deux noms par équipe). **Rechercher l'adresse du court** (désactivé par défaut) ajoute l'adresse au résumé à côté des coordonnées : elle est demandée au service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google. **Suivant**.
 2. **Mode et règles** :
-   - *Arbitre* ou *Bracelets*. Avec les bracelets, le Bluetooth activé, l'autorisation de localisation et la localisation activée sont obligatoires : les lignes des **Prérequis** se mettent à jour en temps réel (même si vous coupez le Bluetooth ou la localisation depuis le volet des réglages rapides) et deviennent rouges, avec le bouton pour corriger.
+   - *Arbitre*, *Bracelets* ou *Télécommandes* (6.3). Avec les bracelets, le Bluetooth activé, l'autorisation de localisation et la localisation activée sont obligatoires : les lignes des **Prérequis** se mettent à jour en temps réel (même si vous coupez le Bluetooth ou la localisation depuis le volet des réglages rapides) et deviennent rouges, avec le bouton pour corriger.
    - La **recherche est automatique et continue** tant que la page est ouverte : allumez les bracelets et ils se placent tout seuls sur les emplacements libres (d'abord Joueur 1, puis Joueur 2). **Identifier** fait clignoter le bracelet concerné dans la couleur du joueur (jaune ou rouge) avec des bips, pour voir tout de suite lequel vous avez en main ; **Échanger J1 ↔ J2** les inverse sans les déconnecter. Dans le menu déroulant, vous pouvez toujours en choisir un autre ou *Aucun* (un bracelet retiré à la main n'est pas remis par la recherche). Un bracelet ne peut pas être attribué à deux joueurs.
    - **Éteindre les bracelets en fin de match et en quittant** (activé par défaut) : à la confirmation de *Match terminé* et avec *Quitter*, les bracelets s'éteignent au lieu d'attendre l'inactivité.
    - En mode arbitre, si vous appuyez sur **Suivant** sans localisation, l'application vous invite à l'activer (sinon le lieu ne figurera pas dans le récapitulatif).
    - Langue (six langues, 4.1), voix activée ou non, format (*3 manches · jeu décisif à 7* ou *2 manches + super jeu décisif à 10*), No-Ad.
    - **Tirage au sort** : la pièce tourne et désigne le gagnant ; vous indiquez qui sert et les côtés du court **vus depuis la chaise d'arbitre** (schéma du court avec **Inverser les côtés**). En double, choisissez aussi qui sert en premier dans chaque équipe.
-3. **DÉBUT DU MATCH** clignote : appuyez sur le bouton ou sur KEY1 d'un bracelet. La voix annonce *« Première manche » · « au service [nom] » · « jouez »* avec 2 secondes entre les phrases ; le **Match Time** démarre sur « jouez ».
+3. **DÉBUT DU MATCH** clignote : appuyez sur le bouton, sur KEY1 d'un bracelet ou sur une télécommande. La voix annonce *« Première manche » · « au service [nom] » · « jouez »* avec 2 secondes entre les phrases ; le **Match Time** démarre sur « jouez ».
 4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), *Nouveau match*, **Quitter**. En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet. Un double appui sur *Annuler le point* n'enlève qu'un point (un second appui dans la seconde ne compte pas) ; juste après un changement de page, le second appui d'un double appui est ignoré, pour qu'il ne tombe pas sur un bouton de la nouvelle page.
 5. Au dernier point apparaît la fenêtre **Match terminé / Annuler le dernier point**. « Match terminé » se confirme **uniquement sur le téléphone**. Pendant une demi-seconde après son apparition, ses boutons ignorent les appuis : un double appui sur le dernier point n'annule rien.
 6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer dans l'historique** (nom du fichier + dossier au choix + formats .txt/.json/.png), **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Quitter**. Si le récapitulatif n'a été ni enregistré ni partagé, **Nouveau match** et **Quitter** demandent une confirmation. Si Android ferme l'application pendant que vous êtes sur le récapitulatif (par exemple pendant un partage), vous le retrouvez en la rouvrant. En enregistrant deux fois sous le même nom dans le dossier par défaut, le second devient *nom (1)* ; dans l'image, les textes longs (noms, adresse) s'adaptent à la largeur.
@@ -319,6 +339,7 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 | Tableau TV : données envoyées, serveur, réglages | `tv/TvModels.kt`, `tv/TvServer.kt`, `ui/TvSection.kt` |
 | Téléphone utilisé comme tableau (recherche, écran externe) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Écran de charge du bracelet | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Télécommandes Bluetooth (gestes, association) | `remote/PressDetector.kt` (+ tests), `remote/RemoteInput.kt` |
 
 
 ## 11. Problèmes courants
@@ -329,7 +350,8 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 - **Android Studio ne voit pas le téléphone** : Débogage USB activé et empreinte RSA acceptée sur le téléphone (3) ? Sous Windows, il faut parfois le pilote du fabricant, sous Linux les règles udev et une nouvelle session (1.1). Ou bien le débogage sans fil (3).
 - **Arduino IDE n'affiche pas le port du bracelet** : câble USB-C de données et pas seulement de charge ; sous Linux, groupe `dialout` et nouvelle session (1.1) ; puis le mode téléchargement (5, point 7).
 - **La voix ne parle pas ou lit mal** : volume multimédia, *Audio On*, voix de la langue choisie installée (4) ; essayez un autre moteur ou une autre voix dans *Audio et voix*.
-- **Écran éteint pendant le match** : en mode bracelets, un service au premier plan (notification « Match en cours ») garde actifs le Bluetooth, la voix et les chronomètres ; en mode arbitre, l'écran reste allumé.
+- **Écran éteint pendant le match** : en mode bracelets, un service au premier plan (notification « Match en cours ») garde actifs le Bluetooth, la voix et les chronomètres ; en mode arbitre et télécommandes, l'écran reste allumé (avec les télécommandes, il le doit : 6.3).
+- **La télécommande ne fait rien** : est-elle associée au joueur (page 2, ligne avec son nom) ? L'application doit être ouverte sur le match, écran allumé (6.3). Si la ligne indique *Non connectée*, appuyez sur une touche pour la réveiller ou appairez-la de nouveau dans les réglages Bluetooth.
 - **Échec de la synchronisation Gradle à cause du JDK** : réglez Gradle JDK = jbr-21 (point 2.6).
 - **Le téléphone-tableau ne trouve pas l'arbitre** : même réseau ? (l'un des deux fait point d'accès, l'autre y est connecté). *Tableau d'affichage TV* activé sur le téléphone de l'arbitre ? Essayez l'adresse à la main. Certains points d'accès isolent les appareils connectés les uns des autres (« isolation des clients ») : si c'est le cas, désactivez-la.
 - **Le navigateur du téléphone n'ouvre pas l'adresse** quand les données mobiles sont activées : Android envoie le trafic sur les données mobiles parce que le point d'accès n'a pas internet. Utilisez l'application en mode *Utiliser comme tableau* (elle gère cela toute seule) ou désactivez les données mobiles sur ce téléphone.

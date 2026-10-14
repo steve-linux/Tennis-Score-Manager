@@ -5,6 +5,7 @@ Tennis Score Manager lleva el marcador de un partido de tenis según las reglas 
 * Shot clock (25 s), cambio de lado (90 s) y descanso entre sets (120 s); los cambios de lado y el orden de saque los gestiona la app.
 * Cualquier punto se puede deshacer, incluso después del final de un juego, de un set o del partido: el marcador se vuelve a calcular desde el principio.
 * Pulseras M5StickS3 por Bluetooth LE (opcionales): cada jugador pulsa KEY1 para anotarse el punto y KEY2 para deshacerlo. Su firmware de Arduino está en el mismo repositorio.
+* Sin pulseras: dos mandos Bluetooth para selfies (1–3 € cada uno), emparejados como un teclado. Un clic = punto, doble clic o pulsación larga = deshacer.
 * Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono.
 * Resumen del partido con el resultado set a set, duración, club, pista y lugar; se guarda como texto, JSON o imagen, o se comparte.
 

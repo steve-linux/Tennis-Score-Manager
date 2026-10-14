@@ -2,7 +2,7 @@
 
 [Italiano](GUIDA.md) · [English](GUIDE.en.md) · [Français](GUIDE.fr.md) · **Deutsch** · [Español](GUIDE.es.md) · [Português](GUIDE.pt.md)
 
-Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln, mit Ansagen wie vom Stuhlschiedsrichter **in sechs Sprachen** (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch: Kapitel 4.1), zwei per Bluetooth LE verbundenen **M5StickS3**-Armbändern und einer **LED-Anzeigetafel auf TV oder Monitor** (Kapitel 8).
+Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln, mit Ansagen wie vom Stuhlschiedsrichter **in sechs Sprachen** (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch: Kapitel 4.1), zwei per Bluetooth LE verbundenen **M5StickS3**-Armbändern (oder zwei **Bluetooth-Selfie-Fernbedienungen** für wenige Euro: Kapitel 6.3) und einer **LED-Anzeigetafel auf TV oder Monitor** (Kapitel 8).
 
 ## 0. Was im Repository liegt
 
@@ -13,7 +13,7 @@ Android-App (Kotlin + Jetpack Compose) zum Zählen im Tennis nach den ITF-Regeln
 | `deliver/installa_tsm.sh` | Alternative zum Klonen: erzeugt das **gesamte** Android-Projekt und den Sketch allein aus `cat << 'TSM_EOF'`-Blöcken (das JAR des Gradle-Wrappers liegt base64-kodiert darin). |
 | `deliver/GUIDE.de.md` | Diese Anleitung (auf Deutsch); das italienische Original ist `deliver/GUIDA.md`, die weiteren Übersetzungen sind `deliver/GUIDE.en.md`, `.fr`, `.es`, `.pt`. |
 
-Verwendete und geprüfte Versionen: App **2.4.3** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unten auf der ersten Seite.
+Verwendete und geprüfte Versionen: App **2.5.0** · Firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, ESP32-Core 3.x. Lizenz: GNU GPL Version 3 oder später (`LICENSE`); Version und Lizenz zeigt die App unten auf der ersten Seite.
 
 ---
 
@@ -219,17 +219,37 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
 
 > Mit echten Armbändern noch zu prüfen: Das Laden konnte nicht auf der Hardware getestet werden. Vor allem, wie oft das Ladegerät *voll geladen* meldet und wie genau der Prozentwert beim Laden ist.
 
+### 6.3 Ohne Armbänder: Bluetooth-Fernbedienungen (App 2.5)
+
+Die günstigste Lösung, damit die Spieler selbst zählen: zwei **Bluetooth-Selfie-Fernbedienungen** (die mit dem Auslöseknopf, oft als *AB Shutter3* verkauft), 1 bis 3 € pro Stück. Android sieht sie als Tastatur: keine Firmware zum Aufspielen und keine Berechtigungen für die App. Jedes andere Bluetooth- (oder USB-)Tastenfeld oder jede Tastatur geht auch.
+
+1. Die Fernbedienung einschalten und in den **Bluetooth-Einstellungen** des Telefons koppeln, wie einen Kopfhörer (Seite 2 › *Bluetooth-Einstellungen* öffnet sie). Mit der zweiten wiederholen.
+2. Seite 2 › Modus **Fernbedienungen** › **Zuordnen** unter Spieler 1 › eine Taste seiner Fernbedienung drücken; dann dasselbe für Spieler 2. Bei jedem Klick einer zugeordneten Fernbedienung zeigt ihre Zeile **Taste empfangen**: So lässt sich vor dem Spiel testen. **S1 ↔ S2 tauschen** vertauscht sie.
+3. **MATCHBEGINN**: Ein Klick auf eine Fernbedienung startet das Match, wie KEY1 an den Armbändern. Oben sind **S1**/**S2** farbig, wenn die Fernbedienungen verbunden sind.
+
+| Geste | Aktion |
+|---|---|
+| ein Klick | Punkt für den, der die Fernbedienung hält (kommt eine halbe Sekunde später: Die App wartet, ob es ein Doppelklick ist) |
+| Doppelklick | macht den letzten Punkt rückgängig (auch im Popup am Matchende) |
+| 1 s gedrückt halten | macht den letzten Punkt rückgängig |
+
+- Es gelten die Schutzregeln der Armbänder: Zwei Punkte im Abstand von weniger als 2 Sekunden zählen einmal, zwei kurz aufeinanderfolgende Rücknahmen entfernen nur einen Punkt, *Match beendet* wird nur am Telefon bestätigt.
+- Viele Selfie-Fernbedienungen haben zwei Knöpfe (*iOS* und *Android*) oder senden bei jedem Druck zwei Tasten: Für die App ist das gleich, ein Druck bleibt ein Klick.
+- **Der Bildschirm muss mit der App im Vordergrund an bleiben** (während des Matches hält die App ihn selbst an). Anders als bei den Armbändern kommen die Tasten einer Bluetooth-Tastatur nur bei der sichtbaren App an: Bei gesperrtem Bildschirm oder einer anderen geöffneten App zählen sie nicht. Bei langen Matches das Telefon laden lassen.
+- Trennt sich eine Fernbedienung während des Matches (aus, leer, zu weit weg), zeigt der orange Kasten *FERNBEDIENUNG 1 GETRENNT* und *VERBUNDEN*, wenn sie zurück ist. Viele Fernbedienungen schlafen nach einigen Minuten ohne Klick ein: Der erste Klick weckt sie und geht manchmal verloren. Sagt die Stimme den Punkt nicht an, noch einmal drücken.
+- Reichweite: etwa zehn Meter, wie Bluetooth-Kopfhörer; mit dem Telefon am Netz, in Platzmitte, sind beide Seiten abgedeckt. Batterie: meist eine Knopfzelle CR2032, die monatelang hält.
+
 ## 7. So benutzt du die App
 
 1. **Neues Match** (optional): Verein, Platz, Einzel/Doppel, Namen (im Doppel zwei Namen pro Team). **Adresse des Platzes suchen** (standardmäßig aus) ergänzt den Spielbericht um die Adresse neben den Koordinaten: Sie kommt vom Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet. **Weiter**.
 2. **Modus und Regeln**:
-   - *Schiedsrichter* oder *Armbänder*. Mit den Armbändern sind eingeschaltetes Bluetooth, Standortberechtigung und aktivierter Standort Pflicht: Die Zeilen unter **Voraussetzungen** aktualisieren sich live (auch wenn du Bluetooth oder Standort in den Schnelleinstellungen ausschaltest) und werden rot, mit einer Schaltfläche zum Beheben.
+   - *Schiedsrichter*, *Armbänder* oder *Fernbedienungen* (6.3). Mit den Armbändern sind eingeschaltetes Bluetooth, Standortberechtigung und aktivierter Standort Pflicht: Die Zeilen unter **Voraussetzungen** aktualisieren sich live (auch wenn du Bluetooth oder Standort in den Schnelleinstellungen ausschaltest) und werden rot, mit einer Schaltfläche zum Beheben.
    - Die **Suche läuft automatisch und ohne Unterbrechung**, solange die Seite offen ist: Schalte die Armbänder ein, und sie belegen von selbst die freien Plätze (erst Spieler 1, dann Spieler 2). **Erkennen** lässt das jeweilige Armband in der Farbe des Spielers (gelb oder rot) blinken und piepen, so siehst du sofort, welches du in der Hand hast; **S1 ↔ S2 tauschen** vertauscht sie, ohne die Verbindung zu trennen. Im Auswahlmenü kannst du jederzeit ein anderes wählen oder *Keins* (ein von Hand entferntes Armband setzt die Suche nicht wieder ein). Ein Armband kann nicht zwei Spielern zugeordnet sein.
    - **Armbänder am Matchende und beim Beenden ausschalten** (standardmäßig an): Beim Bestätigen von *Match beendet* und mit *Beenden* schalten sich die Armbänder aus, statt auf die Inaktivität zu warten.
    - Im Schiedsrichtermodus erscheint beim Tippen auf **Weiter** ohne Standort die Aufforderung, ihn einzuschalten (sonst fehlt der Ort in der Zusammenfassung).
    - Sprache (sechs Sprachen, 4.1), Stimme an/aus, Format (*2 Gewinnsätze · Tie-Break bis 7* oder *2 Sätze + Match-Tie-Break bis 10*), No-Ad.
    - **Wahl (Münzwurf)**: Die Münze dreht sich und zeigt, wer gewinnt; du stellst ein, wer aufschlägt, und die Platzseiten **vom Schiedsrichterstuhl aus gesehen** (Platzskizze mit **Seiten tauschen**). Im Doppel wählst du außerdem, wer in jedem Team zuerst aufschlägt.
-3. **MATCHBEGINN** blinkt: Drücke die Schaltfläche oder KEY1 an einem Armband. Die Stimme sagt *„erster Satz“ · „Aufschlag [Name]“ · „spielen“* mit 2 Sekunden zwischen den Sätzen; die **Match Time** startet bei „spielen“.
+3. **MATCHBEGINN** blinkt: Drücke die Schaltfläche, KEY1 an einem Armband oder eine Fernbedienung. Die Stimme sagt *„erster Satz“ · „Aufschlag [Name]“ · „spielen“* mit 2 Sekunden zwischen den Sätzen; die **Match Time** startet bei „spielen“.
 4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), *Neues Match*, **Beenden**. Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen. Ein Doppeltipp auf *Punkt zurück* nimmt nur einen Punkt zurück (ein zweiter Tipp innerhalb 1 s zählt nicht); direkt nach einem Seitenwechsel wird der zweite Tipp eines Doppeltipps ignoriert, damit er nicht auf einer Schaltfläche der neuen Seite landet.
 5. Beim letzten Punkt erscheint das Popup **Match beendet / Letzten Punkt zurücknehmen**. „Match beendet“ wird **nur am Telefon** bestätigt. Eine halbe Sekunde nach dem Erscheinen ignorieren seine Schaltflächen Tipps: Ein Doppeltipp auf den letzten Punkt nimmt nichts zurück.
 6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Im Verlauf speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png), **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Beenden**. Wurde die Zusammenfassung weder gespeichert noch geteilt, fragen **Neues Match** und **Beenden** nach. Schließt Android die App, während du auf der Zusammenfassung bist (zum Beispiel beim Teilen), findest du sie beim erneuten Öffnen wieder. Wird zweimal unter demselben Namen im Standardordner gespeichert, heißt die zweite Datei *Name (1)*; im Bild werden lange Texte (Namen, Adresse) an die Breite angepasst.
@@ -319,6 +339,7 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 | TV-Anzeigetafel: gesendete Daten, Server, Einstellungen | `tv/TvModels.kt`, `tv/TvServer.kt`, `ui/TvSection.kt` |
 | Telefon als Anzeigetafel (Suche, externer Monitor) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Ladebildschirm des Armbands | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Bluetooth-Fernbedienungen (Gesten, Zuordnung) | `remote/PressDetector.kt` (+ Tests), `remote/RemoteInput.kt` |
 
 
 ## 11. Häufige Probleme
@@ -329,7 +350,8 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 - **Android Studio sieht das Telefon nicht**: USB-Debugging an und RSA-Fingerabdruck auf dem Telefon bestätigt (3)? Unter Windows braucht es manchmal den Treiber des Herstellers, unter Linux die udev-Regeln und eine neue Sitzung (1.1). Oder Debugging über WLAN (3).
 - **Arduino IDE zeigt den Port des Armbands nicht**: USB-C-Datenkabel, nicht nur ein Ladekabel; unter Linux Gruppe `dialout` und neue Sitzung (1.1); dann der Download-Modus (5, Schritt 7).
 - **Die Stimme spricht nicht oder spricht falsch**: Medienlautstärke, *Audio On*, Stimme der gewählten Sprache installiert (4); probiere eine andere Engine oder eine andere Stimme unter *Audio und Stimme*.
-- **Bildschirm während des Matches aus**: Im Armbandmodus hält ein Vordergrunddienst (Benachrichtigung „Match läuft“) Bluetooth, Stimme und Uhren aktiv; im Schiedsrichtermodus bleibt der Bildschirm an.
+- **Bildschirm während des Matches aus**: Im Armbandmodus hält ein Vordergrunddienst (Benachrichtigung „Match läuft“) Bluetooth, Stimme und Uhren aktiv; im Schiedsrichter- und Fernbedienungsmodus bleibt der Bildschirm an (mit den Fernbedienungen muss er das: 6.3).
+- **Die Fernbedienung tut nichts**: Ist sie dem Spieler zugeordnet (Seite 2, Zeile mit seinem Namen)? Die App muss auf dem Match geöffnet sein, bei eingeschaltetem Bildschirm (6.3). Steht in der Zeile *Nicht verbunden*, eine Taste drücken, um sie aufzuwecken, oder sie in den Bluetooth-Einstellungen neu koppeln.
 - **Gradle-Sync scheitert wegen des JDK**: Gradle JDK = jbr-21 setzen (Schritt 2.6).
 - **Das Anzeigetafel-Telefon findet den Schiedsrichter nicht**: Selbes Netz? (Eines der beiden macht den Hotspot, das andere ist damit verbunden.) *TV-Anzeigetafel* beim Schiedsrichter eingeschaltet? Probiere die Adresse von Hand. Manche Hotspots isolieren die verbundenen Geräte voneinander („Client-Isolierung“): Falls vorhanden, schalte sie aus.
 - **Der Browser des Telefons öffnet die Adresse nicht**, wenn die mobilen Daten an sind: Android leitet den Verkehr über die mobilen Daten, weil der Hotspot kein Internet hat. Nutze die App mit *Als Anzeigetafel verwenden* (sie regelt das selbst) oder schalte die mobilen Daten auf diesem Telefon aus.

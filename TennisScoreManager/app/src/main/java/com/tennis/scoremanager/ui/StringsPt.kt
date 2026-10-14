@@ -34,6 +34,19 @@ object PtStrings : Strings {
     override val modeBands = "Pulseiras"
     override val modeRefereeHint = "Os pontos são marcados no telefone, como faz o árbitro de cadeira."
     override val modeBandsHint = "Cada jogador marca o ponto com o KEY1 do seu próprio M5StickS3."
+    override val modeRemotes = "Controles"
+    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer."
+    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte uma tecla do controle dele."
+    override val bluetoothSettings = "Configurações de Bluetooth"
+    override val remoteFor: (String) -> String = { "Controle de $it" }
+    override val noRemote = "Nenhum"
+    override val remoteConnected = "Conectado"
+    override val remoteNotConnected = "Desconectado: aperte uma tecla para despertá-lo"
+    override val assignRemote = "Associar"
+    override val removeRemote = "Remover"
+    override val pressRemoteKey = "Aperte uma tecla do controle…"
+    override val remotePressed = "Tecla recebida"
+    override val remotesScreenOn = "Durante a partida, deixe o app aberto: a tela fica ligada sozinha. Com a tela bloqueada ou outro app na frente, as teclas não chegam."
     override val requirements = "Requisitos"
     override val bluetooth = "Bluetooth"
     override val location = "Permissão de localização"
@@ -157,12 +170,17 @@ object PtStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Faltam as pulseiras de: " else "Falta a pulseira de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
     }
+    override val remotesMissingTitle = "Controles não associados"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltam os controles de: " else "Falta o controle de: ") + it.joinToString(", ") + ". Continuar mesmo assim?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
     override val startMatch = "INÍCIO DA PARTIDA"
     override val startHint = "Toque no botão para começar"
     override val startHintBands = "Toque no botão ou aperte KEY1 numa pulseira"
+    override val startHintRemotes = "Toque no botão ou aperte um controle"
     override val startButton = "Começar partida"
     override val resumeSaved = "Retomar partida suspensa"
     override val noSavedMatches = "Nenhuma partida suspensa salva."
@@ -210,6 +228,8 @@ object PtStrings : Strings {
     override val msgResumed = "PARTIDA RETOMADA"
     override val msgBandConnected: (String) -> String = { "PULSEIRA $it CONECTADA" }
     override val msgBandLost: (String) -> String = { "PULSEIRA $it DESCONECTADA" }
+    override val msgRemoteConnected: (String) -> String = { "CONTROLE $it CONECTADO" }
+    override val msgRemoteLost: (String) -> String = { "CONTROLE $it DESCONECTADO" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "PULSEIRA $n DESLIGADA" + when (why) {
             BandProtocol.OFF_IDLE -> " (SEM USO)"

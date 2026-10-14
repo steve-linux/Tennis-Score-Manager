@@ -4,6 +4,7 @@
 package com.tennis.scoremanager
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.Toast
 import android.graphics.Color
@@ -59,6 +60,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    /** Tasti dei telecomandi Bluetooth (modalità Telecomandi): arrivano qui prima che diventino volume o clic. */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+        controller.remotes.onKey(event) || super.dispatchKeyEvent(event)
 
     override fun onResume() {
         super.onResume()

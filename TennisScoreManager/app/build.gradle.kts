@@ -18,8 +18,8 @@ android {
         applicationId = "io.github.steve_linux.tsm"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "2.4.3"
+        versionCode = 12
+        versionName = "2.5.0"
     }
 
     buildTypes {

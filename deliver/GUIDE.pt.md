@@ -2,7 +2,7 @@
 
 [Italiano](GUIDA.md) · [English](GUIDE.en.md) · [Français](GUIDE.fr.md) · [Deutsch](GUIDE.de.md) · [Español](GUIDE.es.md) · **Português**
 
-App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as regras da ITF, com anúncios por voz de árbitro de cadeira **em seis idiomas** (italiano, inglês, francês, alemão, espanhol, português: capítulo 4.1), duas pulseiras **M5StickS3** conectadas por Bluetooth LE e um **placar de LED na TV ou no monitor** (capítulo 8).
+App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as regras da ITF, com anúncios por voz de árbitro de cadeira **em seis idiomas** (italiano, inglês, francês, alemão, espanhol, português: capítulo 4.1), duas pulseiras **M5StickS3** conectadas por Bluetooth LE (ou dois **controles Bluetooth de selfie** bem baratos: capítulo 6.3) e um **placar de LED na TV ou no monitor** (capítulo 8).
 
 ## 0. O que há no repositório
 
@@ -13,7 +13,7 @@ App Android (Kotlin + Jetpack Compose) para marcar o placar do tênis segundo as
 | `deliver/installa_tsm.sh` | Alternativa ao clone: cria **todo** o projeto Android e o sketch só com blocos `cat << 'TSM_EOF'` (o jar do Gradle wrapper está em base64). |
 | `deliver/GUIDE.pt.md` | Este guia (em português); o original em italiano é `deliver/GUIDA.md` e as outras traduções são `deliver/GUIDE.en.md`, `.fr`, `.de`, `.es`. |
 
-Versões usadas e verificadas: app **2.4.3** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença no fim da primeira página.
+Versões usadas e verificadas: app **2.5.0** · firmware **2.3** · Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · Compose BOM 2025.12.00 · compileSdk/targetSdk 36 · minSdk 26 (Android 8.0). Firmware: M5Unified ≥ 0.2.12, NimBLE-Arduino ≥ 2.1, core ESP32 3.x. Licença: GNU GPL versão 3 ou posterior (`LICENSE`); o app mostra a versão e a licença no fim da primeira página.
 
 ---
 
@@ -219,17 +219,37 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
 
 > A verificar com as pulseiras reais: a recarga não pôde ser testada no hardware. Em especial, com que frequência o carregador indica *carga completa* e quão precisa é a porcentagem durante a carga.
 
+### 6.3 Sem pulseiras: controles Bluetooth (app 2.5)
+
+O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles Bluetooth de selfie** (os de botão de disparo, muitas vezes vendidos como *AB Shutter3*), que custam muito pouco. O Android os vê como um teclado: nenhum firmware para gravar e nenhuma permissão para o app. Qualquer outro teclado ou botoeira Bluetooth (ou USB) também serve.
+
+1. Ligue o controle e pareie nas **configurações de Bluetooth** do telefone, como um fone de ouvido (página 2 › *Configurações de Bluetooth* abre a tela). Repita com o segundo.
+2. Página 2 › modo **Controles** › **Associar** embaixo do Jogador 1 › aperte uma tecla do controle dele; depois o mesmo para o Jogador 2. A cada clique de um controle associado a linha dele mostra **Tecla recebida**: assim dá para testar antes de jogar. **Trocar J1 ↔ J2** inverte os dois.
+3. **INÍCIO DA PARTIDA**: um clique num controle começa a partida, como o KEY1 das pulseiras. No alto, **J1**/**J2** ficam coloridos quando os controles estão conectados.
+
+| Gesto | Ação |
+|---|---|
+| um clique | ponto para quem está com o controle (chega meio segundo depois: o app espera para ver se é um clique duplo) |
+| clique duplo | desfaz o último ponto (também na janela de fim de partida) |
+| segurar 1 s | desfaz o último ponto |
+
+- Valem as proteções das pulseiras: dois pontos com menos de 2 segundos de diferença contam uma vez só, dois desfazer seguidos tiram um ponto só, *Partida encerrada* só se confirma no telefone.
+- Muitos controles de selfie têm dois botões (*iOS* e *Android*) ou mandam duas teclas a cada aperto: para o app é tudo igual e um aperto continua sendo um clique.
+- **A tela precisa ficar acesa com o app na frente** (durante a partida o app a mantém acesa sozinho). Diferente das pulseiras, as teclas de um teclado Bluetooth só chegam ao app visível: com a tela bloqueada ou outro app aberto elas não contam. Em partidas longas, deixe o telefone carregando.
+- Se um controle se desconecta durante a partida (desligado, sem bateria, longe demais) o quadro laranja mostra *CONTROLE 1 DESCONECTADO*, e *CONECTADO* quando volta. Muitos controles dormem depois de alguns minutos sem clique: o primeiro clique os desperta e às vezes se perde. Se a voz não anunciar o ponto, aperte de novo.
+- Alcance: uns dez metros, como um fone Bluetooth; com o telefone perto da rede, no meio da quadra, os dois lados ficam cobertos. Bateria: em geral uma CR2032, que dura meses.
+
 ## 7. Como usar o app
 
 1. **Nova partida** (opcional): clube, quadra, simples/duplas, nomes (nas duplas, dois nomes por equipe). **Buscar o endereço da quadra** (desativado por padrão) acrescenta ao resumo o endereço junto com as coordenadas: ele é pedido ao serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google. **Avançar**.
 2. **Modo e regras**:
-   - *Árbitro* ou *Pulseiras*. Com as pulseiras são obrigatórios Bluetooth ligado, permissão de localização e localização ativada: as linhas dos **Requisitos** se atualizam em tempo real (mesmo se você desligar o Bluetooth ou a localização pelo painel de notificações) e ficam vermelhas, com o botão para corrigir.
+   - *Árbitro*, *Pulseiras* ou *Controles* (6.3). Com as pulseiras são obrigatórios Bluetooth ligado, permissão de localização e localização ativada: as linhas dos **Requisitos** se atualizam em tempo real (mesmo se você desligar o Bluetooth ou a localização pelo painel de notificações) e ficam vermelhas, com o botão para corrigir.
    - A **busca é automática e contínua** enquanto a página estiver aberta: ligue as pulseiras e elas ocupam sozinhas os lugares livres (primeiro Jogador 1, depois Jogador 2). **Identificar** faz aquela pulseira piscar na cor do jogador (amarelo ou vermelho) com bipes, para você ver logo qual tem na mão; **Trocar J1 ↔ J2** as inverte sem desconectá-las. No menu suspenso você sempre pode escolher outra ou *Nenhuma* (a que for tirada à mão não é recolocada pela busca). Uma pulseira não pode ficar com dois jogadores.
    - **Desligar as pulseiras no fim da partida e ao sair** (ativado por padrão): ao confirmar *Partida encerrada* e com *Sair*, as pulseiras se desligam em vez de esperar a inatividade.
    - No modo árbitro, tocando em **Avançar** sem localização aparece o convite para ativá-la (senão o local não vai constar no resumo).
    - Idioma (seis idiomas, 4.1), voz ligada/desligada, formato (*3 sets · tie-break a 7* ou *2 sets + tie-break decisivo a 10*), *Sem vantagem* (No-Ad).
    - **Sorteio**: a moeda gira e indica quem vence; você define quem serve e os lados da quadra **vistos da cadeira do árbitro** (esquema da quadra com **Inverter lados**). Nas duplas, escolha também quem serve primeiro em cada equipe.
-3. **INÍCIO DA PARTIDA** pisca: toque no botão ou pressione KEY1 de uma pulseira. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 2 segundos entre as frases; o **Match Time** começa em "joguem".
+3. **INÍCIO DA PARTIDA** pisca: toque no botão, pressione KEY1 de uma pulseira ou aperte um controle. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 2 segundos entre as frases; o **Match Time** começa em "joguem".
 4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova.
 5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**. Por meio segundo depois de aparecer, os botões dele ignoram toques: um toque duplo no último ponto não anula nada.
 6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar no histórico** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png), **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Se o resumo não foi salvo nem compartilhado, **Nova partida** e **Sair** pedem confirmação. Se o Android fechar o app enquanto você está no resumo (por exemplo, ao compartilhar), ele volta quando o app é reaberto. Salvando duas vezes com o mesmo nome na pasta padrão, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
@@ -319,6 +339,7 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 | Placar na TV: dados enviados, servidor, ajustes | `tv/TvModels.kt`, `tv/TvServer.kt`, `ui/TvSection.kt` |
 | Telefone usado como placar (busca, monitor externo) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Tela de recarga da pulseira | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
+| Controles Bluetooth (gestos, associação) | `remote/PressDetector.kt` (+ testes), `remote/RemoteInput.kt` |
 
 
 ## 11. Problemas comuns
@@ -329,7 +350,8 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 - **O Android Studio não reconhece o telefone**: Depuração USB ativada e impressão digital RSA aceita no telefone (3)? No Windows às vezes é preciso o driver do fabricante; no Linux, as regras udev e uma nova sessão (1.1). Ou use a depuração por Wi-Fi (3).
 - **O Arduino IDE não mostra a porta da pulseira**: cabo USB-C de dados, e não só de carga; no Linux, grupo `dialout` e nova sessão (1.1); depois, o modo download (5, passo 7).
 - **A voz não fala ou lê errado**: volume de mídia, *Audio On*, voz do idioma escolhido instalada (4); tente outro mecanismo ou outra voz em *Áudio e voz*.
-- **Tela apagada durante a partida**: no modo pulseiras, um serviço em primeiro plano (notificação "Partida em andamento") mantém ativos Bluetooth, voz e cronômetros; no modo árbitro a tela fica acesa.
+- **Tela apagada durante a partida**: no modo pulseiras, um serviço em primeiro plano (notificação "Partida em andamento") mantém ativos Bluetooth, voz e cronômetros; nos modos árbitro e controles a tela fica acesa (com os controles ela precisa ficar: 6.3).
+- **O controle não faz nada**: ele está associado ao jogador (página 2, linha com o nome dele)? O app precisa estar aberto na partida, com a tela acesa (6.3). Se a linha diz *Desconectado*, aperte uma tecla para despertá-lo ou pareie de novo nas configurações de Bluetooth.
 - **Falha no sync do Gradle por causa do JDK**: defina Gradle JDK = jbr-21 (passo 2.6).
 - **O telefone-placar não encontra o árbitro**: mesma rede? (um dos dois faz o hotspot, o outro está conectado a ele). *Placar na TV* ativado no telefone do árbitro? Tente o endereço à mão. Alguns hotspots isolam os dispositivos conectados entre si ("isolamento de clientes"): se houver essa opção, desative-a.
 - **O navegador do telefone não abre o endereço** com os dados móveis ativados: o Android manda o tráfego pelos dados móveis porque o hotspot não tem internet. Use o app em *Usar como placar* (ele resolve isso sozinho) ou desligue os dados móveis nesse telefone.

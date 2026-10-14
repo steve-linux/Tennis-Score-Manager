@@ -24,8 +24,9 @@ data class SetupData(
     val p2b: String = "",
 )
 
+/** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
 @Serializable
-enum class PlayMode { REFEREE, BANDS }
+enum class PlayMode { REFEREE, BANDS, REMOTES }
 
 /** Pagina 2: modalità, lingua, audio, formato e sorteggio. */
 @Serializable

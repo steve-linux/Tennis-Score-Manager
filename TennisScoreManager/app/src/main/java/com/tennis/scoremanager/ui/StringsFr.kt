@@ -34,6 +34,19 @@ object FrStrings : Strings {
     override val modeBands = "Bracelets"
     override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
     override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
+    override val modeRemotes = "Télécommandes"
+    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler."
+    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur une touche de sa télécommande."
+    override val bluetoothSettings = "Réglages Bluetooth"
+    override val remoteFor: (String) -> String = { "Télécommande ${de(it)}" }
+    override val noRemote = "Aucune"
+    override val remoteConnected = "Connectée"
+    override val remoteNotConnected = "Non connectée : appuyez sur une touche pour la réveiller"
+    override val assignRemote = "Associer"
+    override val removeRemote = "Retirer"
+    override val pressRemoteKey = "Appuyez sur une touche de la télécommande…"
+    override val remotePressed = "Touche reçue"
+    override val remotesScreenOn = "Pendant le match, gardez l'appli ouverte : l'écran reste allumé tout seul. Écran verrouillé ou autre appli au premier plan, les touches n'arrivent pas."
     override val requirements = "Prérequis"
     override val bluetooth = "Bluetooth"
     override val location = "Autorisation de localisation"
@@ -156,12 +169,17 @@ object FrStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Il manque les bracelets de : " else "Il manque le bracelet de : ") + it.joinToString(", ") + ". Continuer quand même ?"
     }
+    override val remotesMissingTitle = "Télécommandes non associées"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Il manque les télécommandes de : " else "Il manque la télécommande de : ") + it.joinToString(", ") + ". Continuer quand même ?"
+    }
     override val continueAnyway = "Continuer"
     override val cancel = "Annuler"
 
     override val startMatch = "DÉBUT DU MATCH"
     override val startHint = "Appuyez sur le bouton pour commencer"
     override val startHintBands = "Appuyez sur le bouton ou sur KEY1 d'un bracelet"
+    override val startHintRemotes = "Appuyez sur le bouton ou sur une télécommande"
     override val startButton = "Commencer le match"
     override val resumeSaved = "Reprendre un match suspendu"
     override val noSavedMatches = "Aucun match suspendu enregistré."
@@ -209,6 +227,8 @@ object FrStrings : Strings {
     override val msgResumed = "REPRISE DU MATCH"
     override val msgBandConnected: (String) -> String = { "BRACELET $it CONNECTÉ" }
     override val msgBandLost: (String) -> String = { "BRACELET $it DÉCONNECTÉ" }
+    override val msgRemoteConnected: (String) -> String = { "TÉLÉCOMMANDE $it CONNECTÉE" }
+    override val msgRemoteLost: (String) -> String = { "TÉLÉCOMMANDE $it DÉCONNECTÉE" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "BRACELET $n ÉTEINT" + when (why) {
             BandProtocol.OFF_IDLE -> " (INACTIF)"

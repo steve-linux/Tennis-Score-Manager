@@ -58,6 +58,16 @@ class Storage(context: Context) {
             .apply()
     }
 
+    /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
+    fun remoteDescriptor(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1" else "remote_p2", null)
+    fun remoteName(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1_name" else "remote_p2_name", null)
+    fun setRemote(p1: Boolean, descriptor: String?, name: String?) {
+        prefs.edit()
+            .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
+            .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
+            .apply()
+    }
+
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
     fun bandBaseMa(address: String): Double? =
         prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()

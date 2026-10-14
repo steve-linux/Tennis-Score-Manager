@@ -31,6 +31,19 @@ object EsStrings : Strings {
     override val modeBands = "Pulseras"
     override val modeRefereeHint = "Los puntos se asignan desde el teléfono, como hace el juez de silla."
     override val modeBandsHint = "Cada jugador se anota el punto con KEY1 de su propio M5StickS3."
+    override val modeRemotes = "Mandos"
+    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer."
+    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa una tecla de su mando."
+    override val bluetoothSettings = "Ajustes de Bluetooth"
+    override val remoteFor: (String) -> String = { "Mando de $it" }
+    override val noRemote = "Ninguno"
+    override val remoteConnected = "Conectado"
+    override val remoteNotConnected = "No conectado: pulsa una tecla para despertarlo"
+    override val assignRemote = "Asignar"
+    override val removeRemote = "Quitar"
+    override val pressRemoteKey = "Pulsa una tecla del mando…"
+    override val remotePressed = "Tecla recibida"
+    override val remotesScreenOn = "Durante el partido deja la app abierta: la pantalla se mantiene encendida sola. Con la pantalla bloqueada u otra app delante, las teclas no llegan."
     override val requirements = "Requisitos"
     override val bluetooth = "Bluetooth"
     override val location = "Permiso de ubicación"
@@ -154,12 +167,17 @@ object EsStrings : Strings {
     override val bandsMissingText: (List<String>) -> String = {
         (if (it.size > 1) "Faltan las pulseras de: " else "Falta la pulsera de: ") + it.joinToString(", ") + ". ¿Continuar de todos modos?"
     }
+    override val remotesMissingTitle = "Mandos no asignados"
+    override val remotesMissingText: (List<String>) -> String = {
+        (if (it.size > 1) "Faltan los mandos de: " else "Falta el mando de: ") + it.joinToString(", ") + ". ¿Continuar igualmente?"
+    }
     override val continueAnyway = "Continuar"
     override val cancel = "Cancelar"
 
     override val startMatch = "INICIO DEL PARTIDO"
     override val startHint = "Pulsa el botón para empezar"
     override val startHintBands = "Pulsa el botón o KEY1 en una pulsera"
+    override val startHintRemotes = "Pulsa el botón o un mando"
     override val startButton = "Empezar partido"
     override val resumeSaved = "Reanudar partido suspendido"
     override val noSavedMatches = "No hay partidos suspendidos guardados."
@@ -207,6 +225,8 @@ object EsStrings : Strings {
     override val msgResumed = "PARTIDO REANUDADO"
     override val msgBandConnected: (String) -> String = { "PULSERA $it CONECTADA" }
     override val msgBandLost: (String) -> String = { "PULSERA $it DESCONECTADA" }
+    override val msgRemoteConnected: (String) -> String = { "MANDO $it CONECTADO" }
+    override val msgRemoteLost: (String) -> String = { "MANDO $it DESCONECTADO" }
     override val msgBandOff: (String, Int?) -> String = { n, why ->
         "PULSERA $n APAGADA" + when (why) {
             BandProtocol.OFF_IDLE -> " (SIN USO)"
