@@ -69,10 +69,13 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
-    fun formatLabel(rec: MatchRecord, s: Strings): String =
-        (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
+    fun formatLabel(rec: MatchRecord, s: Strings): String {
+        val padel = rec.setup.sport == Sport.PADEL
+        return (if (padel) "${s.sportPadel} · " else "") +
+            (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
+            (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
+    }
 
     fun place(rec: MatchRecord, s: Strings): String {
         val loc = rec.location ?: return s.placeUnavailable

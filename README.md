@@ -10,7 +10,7 @@
 
 **Guida / Guide / Anleitung / Guía / Guia:** [Italiano](deliver/GUIDA.md) · [English](deliver/GUIDE.en.md) · [Français](deliver/GUIDE.fr.md) · [Deutsch](deliver/GUIDE.de.md) · [Español](deliver/GUIDE.es.md) · [Português](deliver/GUIDE.pt.md)
 
-App Android per tenere il punteggio del tennis secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano, inglese, francese, tedesco, spagnolo e portoghese, anche senza internet), due braccialetti **M5StickS3** collegati in Bluetooth LE (oppure, per pochi euro, due **telecomandini Bluetooth da selfie**: guida, capitolo 6.3) e un tabellone a LED su TV o monitor (secondo telefono col cavo HDMI, Chromecast o browser, sull'hotspot di un telefono).
+App Android per tenere il punteggio del tennis (e del padel, che si conta allo stesso modo) secondo le regole ITF, con chiamate vocali da giudice di sedia (italiano, inglese, francese, tedesco, spagnolo e portoghese, anche senza internet), due braccialetti **M5StickS3** collegati in Bluetooth LE (oppure, per pochi euro, due **telecomandini Bluetooth da selfie**: guida, capitolo 6.3) e un tabellone a LED su TV o monitor (secondo telefono col cavo HDMI, Chromecast o browser, sull'hotspot di un telefono).
 
 | Cartella | Contenuto |
 |---|---|

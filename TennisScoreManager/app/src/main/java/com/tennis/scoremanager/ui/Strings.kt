@@ -29,6 +29,10 @@ interface Strings {
     val singles: String
     val doubles: String
     val doublesHint: String
+    val sportSection: String
+    val sportTennis: String
+    val sportPadel: String
+    val padelHint: String
     val player1: String
     val player2: String
     val playerName: String
@@ -151,6 +155,8 @@ interface Strings {
     val formatMatchTiebreakHint: String
     val noAd: String
     val noAdHint: String
+    val goldenPoint: String
+    val goldenPointHint: String
     /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
     val noAdShort: String get() = "No-Ad"
     val coinToss: String
@@ -301,6 +307,7 @@ interface Strings {
     val savedTo: (String) -> String
     val saveError: String
     val shareSubject: String
+    val shareSubjectPadel: String
     val playerDefault: (Int) -> String
     val teamJoiner: String
     val generatedWith: String
@@ -376,6 +383,10 @@ object ItStrings : Strings {
     override val singles = "Singolare"
     override val doubles = "Doppio"
     override val doublesHint = "Nel doppio inserisci due nomi per squadra: il conteggio segue le regole ITF del doppio."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Stesse regole del tennis: doppio e punto d'oro sono già impostati, ma si possono cambiare."
     override val player1 = "Giocatore 1"
     override val player2 = "Giocatore 2"
     override val playerName = "Nome"
@@ -499,6 +510,8 @@ object ItStrings : Strings {
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
+    override val goldenPoint = "Punto d'oro"
+    override val goldenPointHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game. Toglilo per giocare ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -648,6 +661,7 @@ object ItStrings : Strings {
     override val savedTo: (String) -> String = { "Salvato in $it" }
     override val saveError = "Salvataggio non riuscito"
     override val shareSubject = "Risultato partita di tennis"
+    override val shareSubjectPadel = "Risultato partita di padel"
     override val playerDefault: (Int) -> String = { "Giocatore $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Creato con Tennis Score Manager"
@@ -712,6 +726,10 @@ object EnStrings : Strings {
     override val singles = "Singles"
     override val doubles = "Doubles"
     override val doublesHint = "In doubles enter two names per team: scoring follows the ITF doubles rules."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Same rules as tennis: doubles and golden point are already set, but you can change them."
     override val player1 = "Player 1"
     override val player2 = "Player 2"
     override val playerName = "Name"
@@ -835,6 +853,8 @@ object EnStrings : Strings {
     override val formatMatchTiebreakHint = "At one set all the third set is a 10-point match tie-break (win by 2)."
     override val noAd = "No-Ad (deciding point)"
     override val noAdHint = "At deuce a single deciding point is played."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "At deuce a single point decides the game. Turn it off to play advantages."
     override val coinToss = "Coin toss"
     override val tossCoin = "Toss the coin"
     override val tossWinner: (String) -> String = { "Toss won by: $it" }
@@ -984,6 +1004,7 @@ object EnStrings : Strings {
     override val savedTo: (String) -> String = { "Saved to $it" }
     override val saveError = "Saving failed"
     override val shareSubject = "Tennis match result"
+    override val shareSubjectPadel = "Padel match result"
     override val playerDefault: (Int) -> String = { "Player $it" }
     override val teamJoiner = " and "
     override val generatedWith = "Made with Tennis Score Manager"

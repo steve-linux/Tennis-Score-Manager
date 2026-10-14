@@ -116,6 +116,7 @@ import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
@@ -290,7 +291,10 @@ fun OptionsScreen(c: MatchController) {
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
                 c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
             }
-            SwitchRow(Icons.Filled.Timer, s.noAd, s.noAdHint, o.noAd) { v -> c.updateOptions { it.copy(noAd = v) } }
+            val padel = su.sport == Sport.PADEL
+            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+                c.updateOptions { it.copy(noAd = v) }
+            }
         }
 
         // Sorteggio

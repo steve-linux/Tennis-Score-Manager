@@ -18,6 +18,10 @@ object EsStrings : Strings {
     override val singles = "Individual"
     override val doubles = "Dobles"
     override val doublesHint = "En dobles escribe dos nombres por pareja: el tanteo sigue las reglas ITF de dobles."
+    override val sportSection = "Deporte"
+    override val sportTennis = "Tenis"
+    override val sportPadel = "Pádel"
+    override val padelHint = "Mismas reglas que el tenis: el dobles y el punto de oro ya están puestos, pero se pueden cambiar."
     override val player1 = "Jugador 1"
     override val player2 = "Jugador 2"
     override val playerName = "Nombre"
@@ -141,6 +145,8 @@ object EsStrings : Strings {
     override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
     override val noAd = "Sin ventaja (punto decisivo)"
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
+    override val goldenPoint = "Punto de oro"
+    override val goldenPointHint = "En el 40-40 se juega un solo punto que decide el juego. Desactívalo para jugar con ventajas."
     override val noAdShort = "Sin ventaja"
     override val coinToss = "Sorteo"
     override val tossCoin = "Lanzar la moneda"
@@ -291,6 +297,7 @@ object EsStrings : Strings {
     override val savedTo: (String) -> String = { "Guardado en $it" }
     override val saveError = "No se pudo guardar"
     override val shareSubject = "Resultado del partido de tenis"
+    override val shareSubjectPadel = "Resultado del partido de pádel"
     override val playerDefault: (Int) -> String = { "Jugador $it" }
     override val teamJoiner = " y "
     override val generatedWith = "Creado con Tennis Score Manager"

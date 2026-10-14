@@ -1,6 +1,7 @@
 O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regras da ITF e os anuncia como um árbitro de cadeira.
 
 * Simples e duplas: três sets com tie-break no 6-6, ou dois sets e um match tie-break de 10 pontos; ponto decisivo (No-Ad) opcional.
+* Também para padel: mesmas regras do tênis, com dupla e ponto de ouro já configurados.
 * Anúncios de árbitro de cadeira em seis idiomas (italiano, inglês, francês, alemão, espanhol, português) com a síntese de voz do telefone, sem internet. Também é possível importar gravações próprias.
 * Shot clock (25 s), troca de lado (90 s) e intervalo entre sets (120 s); as trocas de lado e a ordem de saque ficam por conta do app.
 * Qualquer ponto pode ser desfeito, mesmo depois do fim de um game, de um set ou da partida: o placar é recalculado desde o início.

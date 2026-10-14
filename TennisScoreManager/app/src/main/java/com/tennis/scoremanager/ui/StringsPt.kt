@@ -21,6 +21,10 @@ object PtStrings : Strings {
     override val singles = "Simples"
     override val doubles = "Duplas"
     override val doublesHint = "Nas duplas, escreva dois nomes por equipe: a contagem segue as regras ITF de duplas."
+    override val sportSection = "Esporte"
+    override val sportTennis = "Tênis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mesmas regras do tênis: dupla e ponto de ouro já vêm configurados, mas dá para mudar."
     override val player1 = "Jogador 1"
     override val player2 = "Jogador 2"
     override val playerName = "Nome"
@@ -144,6 +148,8 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val goldenPoint = "Ponto de ouro"
+    override val goldenPointHint = "No 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
@@ -294,6 +300,7 @@ object PtStrings : Strings {
     override val savedTo: (String) -> String = { "Salvo em $it" }
     override val saveError = "Não foi possível salvar"
     override val shareSubject = "Resultado da partida de tênis"
+    override val shareSubjectPadel = "Resultado da partida de padel"
     override val playerDefault: (Int) -> String = { "Jogador $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Criado com Tennis Score Manager"

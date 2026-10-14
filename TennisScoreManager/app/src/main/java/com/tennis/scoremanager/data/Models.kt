@@ -12,6 +12,10 @@ import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.voice.CallNames
 import kotlinx.serialization.Serializable
 
+/** Il padel si conta come il tennis (ITF/FIP): cambiano solo i nomi e le impostazioni proposte. */
+@Serializable
+enum class Sport { TENNIS, PADEL }
+
 /** Pagina 1: dati facoltativi. p1a/p1b sono sempre del Giocatore 1, p2a/p2b del Giocatore 2. */
 @Serializable
 data class SetupData(
@@ -22,6 +26,7 @@ data class SetupData(
     val p1b: String = "",
     val p2a: String = "",
     val p2b: String = "",
+    val sport: Sport = Sport.TENNIS,
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */

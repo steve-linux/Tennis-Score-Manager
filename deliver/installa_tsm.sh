@@ -786,6 +786,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
@@ -1950,7 +1951,7 @@ class MatchController(
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
-            putExtra(Intent.EXTRA_SUBJECT, s.shareSubject)
+            putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)
             clipData = ClipData.newRawUri("", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -3297,6 +3298,10 @@ import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.voice.CallNames
 import kotlinx.serialization.Serializable
 
+/** Il padel si conta come il tennis (ITF/FIP): cambiano solo i nomi e le impostazioni proposte. */
+@Serializable
+enum class Sport { TENNIS, PADEL }
+
 /** Pagina 1: dati facoltativi. p1a/p1b sono sempre del Giocatore 1, p2a/p2b del Giocatore 2. */
 @Serializable
 data class SetupData(
@@ -3307,6 +3312,7 @@ data class SetupData(
     val p1b: String = "",
     val p2a: String = "",
     val p2b: String = "",
+    val sport: Sport = Sport.TENNIS,
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
@@ -3470,10 +3476,13 @@ object Reports {
             else "${s.playerTag(side.ordinal + 1)} ${a?.let { "$it%" } ?: "?"} → ${b?.let { "$it%" } ?: "?"}"
         }.joinToString(" · ")
 
-    fun formatLabel(rec: MatchRecord, s: Strings): String =
-        (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
-            (if (rec.rules.noAd) " · ${s.noAdShort}" else "") +
+    fun formatLabel(rec: MatchRecord, s: Strings): String {
+        val padel = rec.setup.sport == Sport.PADEL
+        return (if (padel) "${s.sportPadel} · " else "") +
+            (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
+            (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
+    }
 
     fun place(rec: MatchRecord, s: Strings): String {
         val loc = rec.location ?: return s.placeUnavailable
@@ -6534,6 +6543,10 @@ interface Strings {
     val singles: String
     val doubles: String
     val doublesHint: String
+    val sportSection: String
+    val sportTennis: String
+    val sportPadel: String
+    val padelHint: String
     val player1: String
     val player2: String
     val playerName: String
@@ -6656,6 +6669,8 @@ interface Strings {
     val formatMatchTiebreakHint: String
     val noAd: String
     val noAdHint: String
+    val goldenPoint: String
+    val goldenPointHint: String
     /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
     val noAdShort: String get() = "No-Ad"
     val coinToss: String
@@ -6806,6 +6821,7 @@ interface Strings {
     val savedTo: (String) -> String
     val saveError: String
     val shareSubject: String
+    val shareSubjectPadel: String
     val playerDefault: (Int) -> String
     val teamJoiner: String
     val generatedWith: String
@@ -6881,6 +6897,10 @@ object ItStrings : Strings {
     override val singles = "Singolare"
     override val doubles = "Doppio"
     override val doublesHint = "Nel doppio inserisci due nomi per squadra: il conteggio segue le regole ITF del doppio."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Stesse regole del tennis: doppio e punto d'oro sono già impostati, ma si possono cambiare."
     override val player1 = "Giocatore 1"
     override val player2 = "Giocatore 2"
     override val playerName = "Nome"
@@ -7004,6 +7024,8 @@ object ItStrings : Strings {
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
+    override val goldenPoint = "Punto d'oro"
+    override val goldenPointHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game. Toglilo per giocare ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -7153,6 +7175,7 @@ object ItStrings : Strings {
     override val savedTo: (String) -> String = { "Salvato in $it" }
     override val saveError = "Salvataggio non riuscito"
     override val shareSubject = "Risultato partita di tennis"
+    override val shareSubjectPadel = "Risultato partita di padel"
     override val playerDefault: (Int) -> String = { "Giocatore $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Creato con Tennis Score Manager"
@@ -7217,6 +7240,10 @@ object EnStrings : Strings {
     override val singles = "Singles"
     override val doubles = "Doubles"
     override val doublesHint = "In doubles enter two names per team: scoring follows the ITF doubles rules."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Same rules as tennis: doubles and golden point are already set, but you can change them."
     override val player1 = "Player 1"
     override val player2 = "Player 2"
     override val playerName = "Name"
@@ -7340,6 +7367,8 @@ object EnStrings : Strings {
     override val formatMatchTiebreakHint = "At one set all the third set is a 10-point match tie-break (win by 2)."
     override val noAd = "No-Ad (deciding point)"
     override val noAdHint = "At deuce a single deciding point is played."
+    override val goldenPoint = "Golden point"
+    override val goldenPointHint = "At deuce a single point decides the game. Turn it off to play advantages."
     override val coinToss = "Coin toss"
     override val tossCoin = "Toss the coin"
     override val tossWinner: (String) -> String = { "Toss won by: $it" }
@@ -7489,6 +7518,7 @@ object EnStrings : Strings {
     override val savedTo: (String) -> String = { "Saved to $it" }
     override val saveError = "Saving failed"
     override val shareSubject = "Tennis match result"
+    override val shareSubjectPadel = "Padel match result"
     override val playerDefault: (Int) -> String = { "Player $it" }
     override val teamJoiner = " and "
     override val generatedWith = "Made with Tennis Score Manager"
@@ -7576,6 +7606,10 @@ object DeStrings : Strings {
     override val singles = "Einzel"
     override val doubles = "Doppel"
     override val doublesHint = "Im Doppel zwei Namen pro Team eingeben: Die Zählung folgt den ITF-Regeln für das Doppel."
+    override val sportSection = "Sportart"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Gleiche Regeln wie beim Tennis: Doppel und Golden Point sind schon eingestellt, lassen sich aber ändern."
     override val player1 = "Spieler 1"
     override val player2 = "Spieler 2"
     override val playerName = "Name"
@@ -7699,6 +7733,8 @@ object DeStrings : Strings {
     override val formatMatchTiebreakHint = "Bei 1:1 Sätzen entscheidet ein Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
     override val noAd = "No-Ad (entscheidender Punkt)"
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
+    override val goldenPoint = "Golden Point"
+    override val goldenPointHint = "Bei Einstand entscheidet ein einziger Punkt das Spiel. Ausschalten, um mit Vorteil zu spielen."
     override val coinToss = "Wahl (Münzwurf)"
     override val tossCoin = "Münze werfen"
     override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }
@@ -7848,6 +7884,7 @@ object DeStrings : Strings {
     override val savedTo: (String) -> String = { "Gespeichert in $it" }
     override val saveError = "Speichern fehlgeschlagen"
     override val shareSubject = "Ergebnis des Tennismatches"
+    override val shareSubjectPadel = "Padel-Ergebnis"
     override val playerDefault: (Int) -> String = { "Spieler $it" }
     override val teamJoiner = " und "
     override val generatedWith = "Erstellt mit Tennis Score Manager"
@@ -7927,6 +7964,10 @@ object EsStrings : Strings {
     override val singles = "Individual"
     override val doubles = "Dobles"
     override val doublesHint = "En dobles escribe dos nombres por pareja: el tanteo sigue las reglas ITF de dobles."
+    override val sportSection = "Deporte"
+    override val sportTennis = "Tenis"
+    override val sportPadel = "Pádel"
+    override val padelHint = "Mismas reglas que el tenis: el dobles y el punto de oro ya están puestos, pero se pueden cambiar."
     override val player1 = "Jugador 1"
     override val player2 = "Jugador 2"
     override val playerName = "Nombre"
@@ -8050,6 +8091,8 @@ object EsStrings : Strings {
     override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
     override val noAd = "Sin ventaja (punto decisivo)"
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
+    override val goldenPoint = "Punto de oro"
+    override val goldenPointHint = "En el 40-40 se juega un solo punto que decide el juego. Desactívalo para jugar con ventajas."
     override val noAdShort = "Sin ventaja"
     override val coinToss = "Sorteo"
     override val tossCoin = "Lanzar la moneda"
@@ -8200,6 +8243,7 @@ object EsStrings : Strings {
     override val savedTo: (String) -> String = { "Guardado en $it" }
     override val saveError = "No se pudo guardar"
     override val shareSubject = "Resultado del partido de tenis"
+    override val shareSubjectPadel = "Resultado del partido de pádel"
     override val playerDefault: (Int) -> String = { "Jugador $it" }
     override val teamJoiner = " y "
     override val generatedWith = "Creado con Tennis Score Manager"
@@ -8282,6 +8326,10 @@ object FrStrings : Strings {
     override val singles = "Simple"
     override val doubles = "Double"
     override val doublesHint = "En double, saisissez deux noms par équipe : le décompte suit les règles ITF du double."
+    override val sportSection = "Sport"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mêmes règles que le tennis : le double et le point en or sont déjà réglés, mais modifiables."
     override val player1 = "Joueur 1"
     override val player2 = "Joueur 2"
     override val playerName = "Nom"
@@ -8405,6 +8453,8 @@ object FrStrings : Strings {
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
+    override val goldenPoint = "Point en or"
+    override val goldenPointHint = "À égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
@@ -8554,6 +8604,7 @@ object FrStrings : Strings {
     override val savedTo: (String) -> String = { "Enregistré dans $it" }
     override val saveError = "Échec de l'enregistrement"
     override val shareSubject = "Résultat du match de tennis"
+    override val shareSubjectPadel = "Résultat du match de padel"
     override val playerDefault: (Int) -> String = { "Joueur $it" }
     override val teamJoiner = " et "
     override val generatedWith = "Créé avec Tennis Score Manager"
@@ -8636,6 +8687,10 @@ object PtStrings : Strings {
     override val singles = "Simples"
     override val doubles = "Duplas"
     override val doublesHint = "Nas duplas, escreva dois nomes por equipe: a contagem segue as regras ITF de duplas."
+    override val sportSection = "Esporte"
+    override val sportTennis = "Tênis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Mesmas regras do tênis: dupla e ponto de ouro já vêm configurados, mas dá para mudar."
     override val player1 = "Jogador 1"
     override val player2 = "Jogador 2"
     override val playerName = "Nome"
@@ -8759,6 +8814,8 @@ object PtStrings : Strings {
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
+    override val goldenPoint = "Ponto de ouro"
+    override val goldenPointHint = "No 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
@@ -8909,6 +8966,7 @@ object PtStrings : Strings {
     override val savedTo: (String) -> String = { "Salvo em $it" }
     override val saveError = "Não foi possível salvar"
     override val shareSubject = "Resultado da partida de tênis"
+    override val shareSubjectPadel = "Resultado da partida de padel"
     override val playerDefault: (Int) -> String = { "Jogador $it" }
     override val teamJoiner = " e "
     override val generatedWith = "Criado com Tennis Score Manager"
@@ -9888,6 +9946,7 @@ import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
@@ -10062,7 +10121,10 @@ fun OptionsScreen(c: MatchController) {
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
                 c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
             }
-            SwitchRow(Icons.Filled.Timer, s.noAd, s.noAdHint, o.noAd) { v -> c.updateOptions { it.copy(noAd = v) } }
+            val padel = su.sport == Sport.PADEL
+            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+                c.updateOptions { it.copy(noAd = v) }
+            }
         }
 
         // Sorteggio
@@ -10710,6 +10772,7 @@ import com.tennis.scoremanager.BuildConfig
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.data.SetupData
+import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
 import android.content.Intent
@@ -10735,10 +10798,29 @@ fun SetupScreen(c: MatchController) {
         subtitle = s.setupSubtitle,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
-            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles) } }, Modifier.weight(1f))
+            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
     ) {
+        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+            Segmented(
+                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
+                selected = su.sport.ordinal,
+                onSelect = { i ->
+                    val sport = Sport.entries[i]
+                    if (sport != su.sport) {
+                        if (sport == Sport.PADEL) {
+                            c.updateSetup { it.copy(sport = sport, doubles = true) }
+                            c.updateOptions { it.copy(noAd = true) }
+                        } else {
+                            c.updateSetup { it.copy(sport = sport) }
+                        }
+                    }
+                },
+            )
+            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
+        }
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
             Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
@@ -13016,6 +13098,18 @@ class DataTest {
         assertEquals("3 set · tie-break a 7 · No-Ad · Singolare", Reports.formatLabel(rec, ItStrings))
         assertEquals("3 sets · tie-break a 7 · Sin ventaja · Individual", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         assertEquals("3 sets · tie-break a 7 · Sem vantagem · Simples", Reports.formatLabel(rec, stringsFor(Lang.PT)))
+    }
+
+    @Test
+    fun padelIsNamedWithItsGoldenPoint() {
+        val rec = MatchRecord(
+            id = "m", setup = SetupData(doubles = true, sport = Sport.PADEL), options = MatchOptions(),
+            rules = RulesConfig(noAd = true, doubles = true),
+        )
+        assertEquals("Padel · 3 set · tie-break a 7 · Punto d'oro · Doppio", Reports.formatLabel(rec, ItStrings))
+        assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
+        // Senza punto d'oro (ai vantaggi) resta solo il nome dello sport.
+        assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
     }
 }
 TSM_EOF

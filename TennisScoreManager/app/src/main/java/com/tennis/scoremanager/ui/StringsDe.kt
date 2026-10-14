@@ -18,6 +18,10 @@ object DeStrings : Strings {
     override val singles = "Einzel"
     override val doubles = "Doppel"
     override val doublesHint = "Im Doppel zwei Namen pro Team eingeben: Die Zählung folgt den ITF-Regeln für das Doppel."
+    override val sportSection = "Sportart"
+    override val sportTennis = "Tennis"
+    override val sportPadel = "Padel"
+    override val padelHint = "Gleiche Regeln wie beim Tennis: Doppel und Golden Point sind schon eingestellt, lassen sich aber ändern."
     override val player1 = "Spieler 1"
     override val player2 = "Spieler 2"
     override val playerName = "Name"
@@ -141,6 +145,8 @@ object DeStrings : Strings {
     override val formatMatchTiebreakHint = "Bei 1:1 Sätzen entscheidet ein Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
     override val noAd = "No-Ad (entscheidender Punkt)"
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
+    override val goldenPoint = "Golden Point"
+    override val goldenPointHint = "Bei Einstand entscheidet ein einziger Punkt das Spiel. Ausschalten, um mit Vorteil zu spielen."
     override val coinToss = "Wahl (Münzwurf)"
     override val tossCoin = "Münze werfen"
     override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }
@@ -290,6 +296,7 @@ object DeStrings : Strings {
     override val savedTo: (String) -> String = { "Gespeichert in $it" }
     override val saveError = "Speichern fehlgeschlagen"
     override val shareSubject = "Ergebnis des Tennismatches"
+    override val shareSubjectPadel = "Padel-Ergebnis"
     override val playerDefault: (Int) -> String = { "Spieler $it" }
     override val teamJoiner = " und "
     override val generatedWith = "Erstellt mit Tennis Score Manager"
