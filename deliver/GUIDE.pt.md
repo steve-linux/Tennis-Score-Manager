@@ -139,14 +139,14 @@ Particularidades:
    `https://static-cdn.m5stack.com/resource/arduino/package_m5stack_index.json`
 3. **Boards Manager** → procure **M5Stack** → instale a versão **≥ 3.2.5**.
 4. **Library Manager** → instale **M5Unified** (aceite "Install all" para a M5GFX) e **NimBLE-Arduino** de *h2zero* (≥ 2.1).
-5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` do clone ou do ZIP (ou `~/Arduino/TSM_Band/TSM_Band.ino` se você usou o script).
+5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` do clone ou do ZIP (ou `~/Arduino/TSM_Band/TSM_Band.ino` se você usou o script). A partir do firmware 2.4 a pasta `TSM_Band` contém também `swing_detector.cpp/.h` e `stroke_classifier.cpp/.h`: eles precisam ficar ao lado de `TSM_Band.ino` (copiando só o arquivo `.ino`, a compilação falha).
 6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → a porta da pulseira: no Linux `/dev/ttyACM0`, no Windows `COM3`, `COM4`… (a que aparece quando você conecta o cabo).
    *(Sem o pacote M5Stack também serve "ESP32S3 Dev Module": USB CDC On Boot = Enabled, Flash Size = 8MB, Partition = 8M with spiffs.)*
 7. **Upload (→)**. Se a porta não aparecer ou o envio falhar: tente outro cabo USB-C (alguns servem só para carregar), depois mantenha o **botão lateral** pressionado por alguns segundos (modo download) e tente de novo; no modo download, no Windows, o número da porta COM pode mudar.
    **Depois do envio**, se a tela continuar preta (a pulseira ficou no modo de programação), pressione **uma vez** o botão lateral: ela reinicia com o programa novo.
 8. Ao iniciar, a pulseira mostra o seu nome, ex. **TSM-3FA2** (pode ser mudado pelo app, veja 6.1). Repita para a segunda pulseira.
 
-> **Firmware 2.3** (com o app 2.4): o bipe de KEY1/KEY2 toca quando o telefone recebeu o toque, os toques feitos durante uma queda curta são enviados assim que ela reconecta, *NAO ENVIADO* se o telefone não confirmar (6); depois de desligada com o cabo conectado, KEY1 ou KEY2 também a ligam de novo; leituras de bateria com falha não chegam mais ao app como 0 %. Com um app mais antigo, uma pulseira 2.3 funciona como antes. **Firmware 2.2.2**: a mensagem de conexão passa para o idioma do app assim que ele chega (4.1); em espanhol *VINCULANDO…/VINCULADA* e em português *PAREADA*, como no app; em francês *MANCHES* na tela dos jogos. **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
+> **Firmware 2.4** (com o app 2.5): reconhecimento de golpes (6.4); os exemplos de calibração ficam salvos na pulseira. **Firmware 2.3** (com o app 2.4): o bipe de KEY1/KEY2 toca quando o telefone recebeu o toque, os toques feitos durante uma queda curta são enviados assim que ela reconecta, *NAO ENVIADO* se o telefone não confirmar (6); depois de desligada com o cabo conectado, KEY1 ou KEY2 também a ligam de novo; leituras de bateria com falha não chegam mais ao app como 0 %. Com um app mais antigo, uma pulseira 2.3 funciona como antes. **Firmware 2.2.2**: a mensagem de conexão passa para o idioma do app assim que ele chega (4.1); em espanhol *VINCULANDO…/VINCULADA* e em português *PAREADA*, como no app; em francês *MANCHES* na tela dos jogos. **Firmware 2.2.1**: também a contagem regressiva antes de desligar no idioma do app (6). **Firmware 2.2**: os textos da pulseira no idioma do app (4.1). **Firmware 2.1**: a tela de recarga (6.2); os ajustes, *Identificar* e o desligamento pelo app exigem pelo menos o 2.0. Carregue o `TSM_Band.ino` em **ambas** as pulseiras; com um firmware antigo o app avisa no painel de ajustes e o resto continua funcionando.
 
 ## 6. Usar as pulseiras
 
@@ -177,11 +177,11 @@ Particularidades:
 
 **Duração da bateria**: o que mais pesa é a placa ESP32-S3 com o Bluetooth conectado (cerca de 35 mA): o core Arduino é compilado sem a economia de energia profunda (light sleep) quando o Bluetooth está ligado, então não dá para descer muito abaixo disso. Tela, brilho e bipes acrescentam poucos mA. Com a bateria de 250 mAh a estimativa é de **cerca de 7 horas com a carga completa**, mais do que qualquer partida em melhor de três sets. O painel de ajustes mostra a estimativa em tempo real e, após 20 minutos de uso, a corrige com o consumo **medido** naquela pulseira. O registro completo fica em `files/battery_log.csv` do app.
 
-O resto da economia: CPU a 80 MHz, tela apagada quando não é necessária, Bluetooth de baixo consumo (o rádio acorda 2-3 vezes por segundo, mas o toque no botão é enviado mesmo assim em até ~120 ms), bipe alimentado só enquanto toca, microfone/IMU/5V desligados.
+O resto da economia: CPU a 80 MHz, tela apagada quando não é necessária, Bluetooth de baixo consumo (o rádio acorda 2-3 vezes por segundo, mas o toque no botão é enviado mesmo assim em até ~120 ms), bipe alimentado só enquanto toca, microfone e 5V desligados, sensor de movimento (IMU) ligado só com o reconhecimento de golpes (6.4).
 
 ### 6.1 Ajustes da pulseira
 
-Na página 2 (**Ajustes** embaixo da pulseira de cada jogador) ou durante a partida (toque em **J1**/**J2** no alto, ou no ícone dos controles deslizantes). Eles são salvos **na pulseira** e continuam valendo mesmo depois de desligá-la; a cada mudança a pulseira mostra o nome com *AJUSTES OK*.
+Na página 2 (**Ajustes** embaixo da pulseira de cada jogador) ou durante a partida (toque em **J1**/**J2** no alto, ou no ícone dos controles deslizantes). Eles são salvos **na pulseira** e continuam valendo mesmo depois de desligá-la; a cada mudança a pulseira mostra o nome com *AJUSTES OK*. Com o firmware 2.4 há também a seção **Golpes** (6.4).
 
 | Ajuste | Valores | Padrão |
 |---|---|---|
@@ -239,6 +239,23 @@ O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles 
 - Se um controle se desconecta durante a partida (desligado, sem bateria, longe demais) o quadro laranja mostra *CONTROLE 1 DESCONECTADO*, e *CONECTADO* quando volta. Muitos controles dormem depois de alguns minutos sem clique: o primeiro clique os desperta e às vezes se perde. Se a voz não anunciar o ponto, aperte de novo.
 - Alcance: uns dez metros, como um fone Bluetooth; com o telefone perto da rede, no meio da quadra, os dois lados ficam cobertos. Bateria: em geral uma CR2032, que dura meses.
 
+### 6.4 Reconhecimento de golpes (firmware 2.4, app 2.5)
+
+Com o firmware 2.4 a pulseira reconhece **forehand, backhand, saque e voleio** com o sensor de movimento (IMU) e os envia ao app, que os conta por jogador. O reconhecimento aprende com quem usa a pulseira: antes é preciso uma breve **calibração**, cujos exemplos ficam salvos na pulseira.
+
+1. **Prenda a pulseira no pulso**, sempre do mesmo jeito (mesmo pulso, mesmo sentido). O reconhecimento se baseia na direção dos movimentos: uma pulseira virada em relação à calibração confunde os golpes.
+2. Ajustes da pulseira (6.1) › **Golpes** › **Calibração**: toque em **Calibrar** ao lado de *Forehand*. A pulseira mostra *FOREHAND · CALIBRACAO 0/20*.
+3. Faça **5-10 forehands** com uma pausa entre eles: a cada golpe o contador sobe, na pulseira e no app (com um bipe, se o volume não estiver no zero). Se um golpe saiu errado, toque em **Desfazer o último**. Depois **Concluir**.
+4. Repita para backhand, saque e voleio. A lixeira apaga os exemplos de um golpe, para refazê-los. São mantidos no máximo 20 exemplos por golpe (acima disso o mais antigo é substituído). Bastam 3 exemplos de pelo menos dois golpes (*Pronta: reconhece os golpes calibrados*), mas mais exemplos, e mais variados, dão um reconhecimento melhor.
+5. Ative **Reconhecimento de golpes**. Com **Mostrar o golpe na pulseira** o golpe aparece por um instante com a confiança do reconhecimento (ex. *BACKHAND 87%*), só se a tela não estiver mostrando o placar ou uma mensagem.
+
+- Durante a partida, abaixo dos tempos, uma linha mostra os golpes de cada jogador (*J1 F 12 · B 8 · S 5 · V 3*). Eles contam só com a partida iniciada, não no aquecimento nem na calibração.
+- O resumo (7) traz os golpes por tipo, a **velocidade do pulso** (média e máxima, em °/s: a força do golpe, não a velocidade da bola) e os **golpes por ponto** (duração das trocas de bola). Se só um jogador tem pulseira com golpes, as trocas contam só os golpes dele.
+- Um golpe que não se parece com nenhum exemplo não é mostrado e conta como *não reconhecido*: se acontecer muito, confira como você usa a pulseira ou acrescente exemplos.
+- Movimentos lentos (voltar à posição, pegar a bola) não contam: um golpe precisa passar de 400 °/s de rotação do pulso e 2,5 g de aceleração.
+- **Bateria**: o sensor gasta cerca de 1 mA a mais, uns vinte minutos de uma carga completa (a estimativa nos ajustes já considera isso). Sem reconhecimento, o sensor fica desligado.
+- Nos golpes muito fortes o giroscópio chega ao máximo (2000 °/s): o reconhecimento não é afetado, mas a velocidade mostrada fica um pouco abaixo da real.
+
 ## 7. Como usar o app
 
 1. **Nova partida** (opcional): **Tênis** ou **Padel** (app 2.5: mesmas regras, tempos e anúncios; escolhendo Padel, dupla e golden point (ponto de ouro) são configurados sozinhos, dá para mudar, e o resumo diz *Padel*), clube, quadra, simples/duplas, nomes (nas duplas, dois nomes por equipe). **Buscar o endereço da quadra** (desativado por padrão) acrescenta ao resumo o endereço junto com as coordenadas: ele é pedido ao serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google. **Avançar**.
@@ -252,7 +269,9 @@ O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles 
 3. **INÍCIO DA PARTIDA** pisca: toque no botão, pressione KEY1 de uma pulseira ou aperte um controle. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 2 segundos entre as frases; o **Match Time** começa em "joguem".
 4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova.
 5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**. Por meio segundo depois de aparecer, os botões dele ignoram toques: um toque duplo no último ponto não anula nada.
-6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar no histórico** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png), **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Se o resumo não foi salvo nem compartilhado, **Nova partida** e **Sair** pedem confirmação. Se o Android fechar o app enquanto você está no resumo (por exemplo, ao compartilhar), ele volta quando o app é reaberto. Salvando duas vezes com o mesmo nome na pasta padrão, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
+6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar no histórico** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png), **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Se o resumo não foi salvo nem compartilhado, **Nova partida** e **Sair** pedem confirmação. Se o app fechar enquanto você está no resumo (o Android fechando o app em segundo plano, uma atualização, uma reinicialização do telefone), ele volta quando o app é reaberto; não se você mesmo saiu com *Nova partida*, *Sair* ou tirando o app dos recentes. Salvando duas vezes com o mesmo nome na pasta padrão, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
+
+   O resumo tem três abas. **Resumo**: os dados acima e, com as pulseiras 2.4, golpes, velocidade do pulso e golpes por ponto (6.4). **Estatísticas**, da partida ou de um set: os dois jogadores comparados com barras que saem do centro (colorida a de quem está à frente) para pontos e jogos ganhos no saque e na devolução, break points salvos e convertidos, total de pontos e jogos, pontos seguidos, últimos 10 pontos, match points salvos; com as pulseiras 2.4 também golpes por tipo e velocidade média do pulso. **Ponto a ponto**: set a set, cada jogo com a bola de quem saca, *SAQUE PERDIDO* nas quebras, o placar depois de cada ponto com **BP** (break point), **SP** (set point) e **MP** (match point) e o resultado (*JOGO*, *QUEBRA*, *SET*, *PARTIDA*). Tudo é calculado a partir de quem ganhou cada ponto: aces, duplas faltas, primeiros saques e erros não podem ser conhecidos.
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela primeira página.
 
@@ -340,6 +359,8 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 | Telefone usado como placar (busca, monitor externo) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Tela de recarga da pulseira | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
 | Controles Bluetooth (gestos, associação) | `remote/PressDetector.kt` (+ testes), `remote/RemoteInput.kt` |
+| Estatísticas e histórico ponto a ponto do resumo | `data/MatchStats.kt` (+ testes), `ui/screens/MatchStatsPanels.kt` |
+| Reconhecimento de golpes | `TSM_Band.ino` (seção "colpi"), `swing_detector.*` e `stroke_classifier.*` (copiados do SwingSense); app: `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
 
 
 ## 11. Problemas comuns
@@ -352,6 +373,9 @@ O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início,
 - **A voz não fala ou lê errado**: volume de mídia, *Audio On*, voz do idioma escolhido instalada (4); tente outro mecanismo ou outra voz em *Áudio e voz*.
 - **Tela apagada durante a partida**: no modo pulseiras, um serviço em primeiro plano (notificação "Partida em andamento") mantém ativos Bluetooth, voz e cronômetros; nos modos árbitro e controles a tela fica acesa (com os controles ela precisa ficar: 6.3).
 - **O controle não faz nada**: ele está associado ao jogador (página 2, linha com o nome dele)? O app precisa estar aberto na partida, com a tela acesa (6.3). Se a linha diz *Desconectado*, aperte uma tecla para despertá-lo ou pareie de novo nas configurações de Bluetooth.
+- **Os golpes são confundidos ou saem como não reconhecidos**: use a pulseira como durante a calibração (mesmo pulso, mesmo sentido); senão refaça a calibração usando-a como na partida (6.4).
+- **A pulseira mostra MEMORIA CHEIA**: um exemplo de calibração não pôde ser salvo. Apague os exemplos de um golpe (lixeira) e refaça.
+- **Entender por que dois golpes se confundem**: com a pulseira ligada ao computador, abra o monitor serial (115200 baud) e digite `d`: aparecem os exemplos salvos e os últimos 40 golpes, cada um com suas 11 medidas. Os últimos golpes ficam guardados até a pulseira desligar ou reiniciar.
 - **Falha no sync do Gradle por causa do JDK**: defina Gradle JDK = jbr-21 (passo 2.6).
 - **O telefone-placar não encontra o árbitro**: mesma rede? (um dos dois faz o hotspot, o outro está conectado a ele). *Placar na TV* ativado no telefone do árbitro? Tente o endereço à mão. Alguns hotspots isolam os dispositivos conectados entre si ("isolamento de clientes"): se houver essa opção, desative-a.
 - **O navegador do telefone não abre o endereço** com os dados móveis ativados: o Android manda o tráfego pelos dados móveis porque o hotspot não tem internet. Use o app em *Usar como placar* (ele resolve isso sozinho) ou desligue os dados móveis nesse telefone.

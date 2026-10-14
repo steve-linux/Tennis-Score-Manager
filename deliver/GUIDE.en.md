@@ -139,14 +139,14 @@ Particulars:
    `https://static-cdn.m5stack.com/resource/arduino/package_m5stack_index.json`
 3. **Boards Manager** → search for **M5Stack** → install version **≥ 3.2.5**.
 4. **Library Manager** → install **M5Unified** (accept "Install all" for M5GFX) and **NimBLE-Arduino** by *h2zero* (≥ 2.1).
-5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` from the clone or the ZIP (or `~/Arduino/TSM_Band/TSM_Band.ino` if you used the script).
+5. **File › Open** → `firmware/TSM_Band/TSM_Band.ino` from the clone or the ZIP (or `~/Arduino/TSM_Band/TSM_Band.ino` if you used the script). From firmware 2.4 the `TSM_Band` folder also contains `swing_detector.cpp/.h` and `stroke_classifier.cpp/.h`: they must stay next to `TSM_Band.ino` (copying only the `.ino` file makes the build fail).
 6. **Tools › Board › M5Stack › M5StickS3**, **Tools › Port** → the wristband's port: on Linux `/dev/ttyACM0`, on Windows `COM3`, `COM4`… (the one that appears when you plug in the cable).
    *(Without the M5Stack package, "ESP32S3 Dev Module" also works: USB CDC On Boot = Enabled, Flash Size = 8MB, Partition = 8M with spiffs.)*
 7. **Upload (→)**. If the port doesn't appear or the upload fails: try another USB-C cable (some are charge-only), then press and hold the **side button** (download mode) and try again; in download mode the COM port number may change on Windows.
    **After the upload**, if the display stays black (the wristband has stayed in programming mode), press the side button **once**: it restarts with the new program.
 8. At start-up the wristband shows its name, e.g. **TSM-3FA2** (it can be changed from the app, see 6.1). Repeat for the second wristband.
 
-> **Firmware 2.3** (with app 2.4): the KEY1/KEY2 beep sounds when the phone has received the press, presses made during a short dropout are sent as soon as it reconnects, *NOT SENT* if the phone doesn't confirm (6); after switching off with the cable plugged in, KEY1 or KEY2 also turn it back on; failed battery readings no longer reach the app as 0 %. With an older app a 2.3 wristband works as before. **Firmware 2.2.2**: the connection message switches to the app's language as soon as it arrives (4.1); Spanish *VINCULANDO…/VINCULADA* and Portuguese *PAREADA* as in the app, French *MANCHES* on the games screen. **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
+> **Firmware 2.4** (with app 2.5): stroke recognition (6.4); the calibration examples are stored in the wristband. **Firmware 2.3** (with app 2.4): the KEY1/KEY2 beep sounds when the phone has received the press, presses made during a short dropout are sent as soon as it reconnects, *NOT SENT* if the phone doesn't confirm (6); after switching off with the cable plugged in, KEY1 or KEY2 also turn it back on; failed battery readings no longer reach the app as 0 %. With an older app a 2.3 wristband works as before. **Firmware 2.2.2**: the connection message switches to the app's language as soon as it arrives (4.1); Spanish *VINCULANDO…/VINCULADA* and Portuguese *PAREADA* as in the app, French *MANCHES* on the games screen. **Firmware 2.2.1**: the countdown before switching off is in the app's language too (6). **Firmware 2.2**: wristband texts in the app's language (4.1). **Firmware 2.1**: the charging screen (6.2); the settings, *Identify* and powering off from the app need at least 2.0. Upload `TSM_Band.ino` to **both** wristbands; with old firmware the app says so in the settings panel and everything else keeps working.
 
 ## 6. Using the wristbands
 
@@ -177,11 +177,11 @@ Particulars:
 
 **Battery life**: the biggest consumer is the ESP32-S3 board with Bluetooth connected (about 35 mA): the Arduino core is built without deep power saving (light sleep) while Bluetooth is on, so it can't go much lower. Display, brightness and beeps add a few mA. With the 250 mAh battery the estimate is **about 7 hours from a full charge**, more than any best-of-three-sets match. The settings panel shows the estimate in real time and, after 20 minutes of use, corrects it with the draw **measured** on that wristband. The full log is in the app's `files/battery_log.csv`.
 
-The rest of the power saving: CPU at 80 MHz, display off when not needed, Bluetooth Low Energy (the radio wakes up 2-3 times a second, and a button press still gets through within ~120 ms), beeper powered only during beeps, microphone/IMU/5V off.
+The rest of the power saving: CPU at 80 MHz, display off when not needed, Bluetooth Low Energy (the radio wakes up 2-3 times a second, and a button press still gets through within ~120 ms), beeper powered only during beeps, microphone and 5V off, motion sensor (IMU) on only with stroke recognition (6.4).
 
 ### 6.1 Wristband settings
 
-From page 2 (**Settings** under each player's wristband) or during the match (tap **P1**/**P2** at the top, or the sliders icon). They are saved **in the wristband** and are kept even when it is switched off; after every change the wristband shows its name with *SETTINGS SAVED*.
+From page 2 (**Settings** under each player's wristband) or during the match (tap **P1**/**P2** at the top, or the sliders icon). They are saved **in the wristband** and are kept even when it is switched off; after every change the wristband shows its name with *SETTINGS SAVED*. With firmware 2.4 there is also the **Strokes** section (6.4).
 
 | Setting | Values | Default |
 |---|---|---|
@@ -239,6 +239,23 @@ The cheapest way to let the players score: two **Bluetooth selfie remotes** (the
 - If a remote disconnects during the match (switched off, flat, too far) the orange box shows *REMOTE 1 DISCONNECTED*, and *CONNECTED* when it is back. Many remotes go to sleep after a few minutes without clicks: the first click wakes them up and is sometimes lost. If the voice doesn't call the point, press again.
 - Range: about ten metres, like Bluetooth headphones; with the phone near the net, at mid-court, both ends are covered. Battery: usually a CR2032 coin cell that lasts for months.
 
+### 6.4 Stroke recognition (firmware 2.4, app 2.5)
+
+With firmware 2.4 the wristband recognizes **forehand, backhand, serve and volley** with its motion sensor (IMU) and sends them to the app, which counts them per player. Recognition learns from the person wearing the wristband: first a short **calibration** is needed, and its examples are stored in the wristband.
+
+1. **Strap the wristband to your wrist**, always the same way (same wrist, same direction). Recognition relies on the direction of the movements: a wristband turned around compared with the calibration mixes up the strokes.
+2. Wristband settings (6.1) › **Strokes** › **Calibration**: tap **Calibrate** next to *Forehand*. The wristband shows *FOREHAND · CALIBRATION 0/20*.
+3. Play **5-10 forehands** with a short pause between them: at each stroke the counter goes up, on the wristband and in the app (with a beep, if the volume is not zero). If a stroke went wrong, tap **Undo the last one**. Then **Done**.
+4. Repeat for backhand, serve and volley. The bin clears the examples of one stroke, to redo them. Up to 20 examples per stroke are kept (beyond that the oldest is replaced). 3 examples for at least two strokes are enough (*Ready: it recognizes the calibrated strokes*), but more and more varied examples give better recognition.
+5. Turn on **Stroke recognition**. With **Show the stroke on the wristband** the stroke appears for a moment with the recognition confidence (e.g. *BACKHAND 87%*), only when the display is not showing the score or a message.
+
+- During the match a row under the timers shows each player's strokes (*P1 F 12 · B 8 · S 5 · V 3*). They count only once the match has started, not during the warm-up or calibration.
+- The summary (7) has the strokes by type, the **wrist speed** (average and maximum, in °/s: how hard the stroke is hit, not the ball speed) and the **strokes per point** (rally length). If only one player has a wristband with strokes, rallies count only their strokes.
+- A stroke that looks like none of the examples is not shown and counts as *not recognized*: if it happens often, check how you wear the wristband or add examples.
+- Slow movements (getting back into position, picking up the ball) don't count: a stroke must exceed 400 °/s of wrist rotation and 2.5 g of acceleration.
+- **Battery**: the sensor uses about 1 mA more, around twenty minutes of a full charge (the estimate in the settings includes it). With recognition off the sensor stays off.
+- On very hard strokes the gyroscope reaches its maximum (2000 °/s): recognition is not affected, but the speed shown is slightly underestimated.
+
 ## 7. Using the app
 
 1. **New match** (optional): **Tennis** or **Padel** (app 2.5: same rules, timers and calls; choosing Padel sets doubles and golden point by itself, both can be changed, and the summary says *Padel*), club, court, singles/doubles, names (in doubles, two names per team). **Look up the court address** (off by default) adds the address to the summary next to the coordinates: it asks the phone's geocoding service, which with Google services sends the coordinates to Google. **Next**.
@@ -252,7 +269,9 @@ The cheapest way to let the players score: two **Bluetooth selfie remotes** (the
 3. **MATCH START** flashes: press the button, KEY1 on a wristband or a remote. The voice says *"First set" · "[name] to serve" · "play"* with 2 seconds between the phrases; the **Match Time** starts on "play".
 4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page.
 5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**. For half a second after it appears its buttons ignore taps: a double tap on the last point doesn't undo anything.
-6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save to history** (file name + folder of your choice + .txt/.json/.png formats), **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. If the summary has been neither saved nor shared, **New match** and **Exit** ask for confirmation. If Android closes the app while you are on the summary (for example while sharing), you find it again when you reopen the app. Saving twice with the same name in the default folder makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
+6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save to history** (file name + folder of your choice + .txt/.json/.png formats), **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. If the summary has been neither saved nor shared, **New match** and **Exit** ask for confirmation. If the app closes while you are on the summary (Android closing it in the background, an update, a phone restart), you find it again when you reopen it; not if you left it yourself with *New match*, *Exit* or by removing the app from the recent apps. Saving twice with the same name in the default folder makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
+
+   The summary has three tabs. **Summary**: the data above and, with 2.4 wristbands, strokes, wrist speed and strokes per point (6.4). **Statistics**, for the match or for one set: the two players compared with bars starting from the centre (coloured for whoever is ahead) for service and return points and games won, break points saved and won, total points and games, points in a row, last 10 points, match points saved; with 2.4 wristbands also strokes by type and average wrist speed. **Point by point**: set by set, every game with the ball of the server, *LOST SERVE* on breaks, the score after each point with **BP** (break point), **SP** (set point) and **MP** (match point) and the outcome (*GAME*, *BREAK*, *SET*, *MATCH*). Everything is worked out from who won each point: aces, double faults, first serves and errors can't be known.
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the first page.
 
@@ -340,6 +359,8 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 | Phone used as a scoreboard (search, external monitor) | `tv/DisplayActivity.kt`, `tv/ScoreboardFinder.kt` |
 | Wristband charging screen | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
 | Bluetooth remotes (gestures, assignment) | `remote/PressDetector.kt` (+ tests), `remote/RemoteInput.kt` |
+| Summary statistics and point-by-point log | `data/MatchStats.kt` (+ tests), `ui/screens/MatchStatsPanels.kt` |
+| Stroke recognition | `TSM_Band.ino` ("colpi" section), `swing_detector.*` and `stroke_classifier.*` (copied from SwingSense); app: `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
 
 
 ## 11. Common problems
@@ -352,6 +373,9 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 - **The voice doesn't speak or reads badly**: media volume, *Audio On*, voice for the chosen language installed (4); try another engine or another voice in *Audio and voice*.
 - **Screen goes off during the match**: in Wristbands mode a foreground service (notification "Match in progress") keeps Bluetooth, voice and timers running; in Umpire and Remotes mode the screen stays on (with the remotes it has to: 6.3).
 - **The remote does nothing**: is it assigned to the player (page 2, row with their name)? The app must be open on the match, with the screen on (6.3). If the row says *Not connected*, press a key to wake it up or pair it again in the Bluetooth settings.
+- **Strokes are mixed up or come out as not recognized**: wear the wristband as during calibration (same wrist, same direction); otherwise redo the calibration wearing it as in a match (6.4).
+- **The wristband shows MEMORY FULL**: a calibration example could not be saved. Clear the examples of one stroke (bin) and redo them.
+- **Finding out why two strokes get mixed up**: with the wristband connected to the computer, open the serial monitor (115200 baud) and type `d`: you get the saved examples and the last 40 strokes, each with its 11 measurements. The last strokes are kept until the wristband switches off or restarts.
 - **Gradle sync fails because of the JDK**: set Gradle JDK = jbr-21 (step 2.6).
 - **The scoreboard phone can't find the umpire's phone**: are they on the same network? (one of the two provides the hotspot, the other is connected to it). Is *TV scoreboard* on on the umpire's phone? Try typing the address by hand. Some hotspots isolate connected devices from each other ("client isolation"): if so, turn it off.
 - **The phone's browser won't open the address** while mobile data is on: Android sends the traffic over mobile data because the hotspot has no internet. Use the app in *Use as scoreboard* (it handles this by itself) or turn off mobile data on that phone.

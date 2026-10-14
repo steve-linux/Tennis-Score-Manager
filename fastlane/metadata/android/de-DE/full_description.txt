@@ -5,9 +5,10 @@ Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln u
 * Schiedsrichteransagen in sechs Sprachen (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch) über die Sprachausgabe des Telefons, ohne Internet. Eigene Aufnahmen lassen sich importieren.
 * Shot Clock (25 s), Seitenwechsel (90 s) und Satzpause (120 s); Seitenwechsel und Aufschlagfolge regelt die App.
 * Jeder Punkt lässt sich zurücknehmen, auch nach dem Ende eines Spiels, Satzes oder Matches: der Spielstand wird von Anfang an neu berechnet.
-* M5StickS3-Armbänder über Bluetooth LE (optional): jeder Spieler drückt KEY1 für den Punkt und KEY2 zum Zurücknehmen. Die Arduino-Firmware liegt im selben Repository.
+* M5StickS3-Armbänder über Bluetooth LE (optional): jeder Spieler drückt KEY1 für den Punkt und KEY2 zum Zurücknehmen. Die Arduino-Firmware liegt im selben Repository. Ab Firmware 2.4 erkennen sie nach einer kurzen Kalibrierung auch Vorhand, Rückhand, Aufschlag und Volley.
 * Ohne Armbänder: zwei Bluetooth-Selfie-Fernbedienungen (1–3 € pro Stück), wie eine Tastatur gekoppelt. Ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig.
 * LED-Anzeigetafel auf einem Fernseher oder Monitor: ein zweites Telefon mit HDMI-Kabel, ein Chromecast (Bildschirmübertragung) oder ein beliebiger Browser im Hotspot des Telefons.
 * Spielbericht mit dem Ergebnis Satz für Satz, Dauer, Verein, Platz und Ort; als Text, JSON oder Bild speichern oder teilen.
+* Statistiken zum Matchende, für das ganze Match oder je Satz (Aufschlag, Return, Breakbälle, Punkte in Folge…), und Verlauf Punkt für Punkt mit Break-, Satz- und Matchbällen.
 
 Keine Werbung, kein Konto, kein Tracking. Das Netzwerk dient nur der Anzeigetafel im lokalen Netz. Der Standort dient dem Ort des Matches im Spielbericht und, wie Android es verlangt, der Bluetooth-Suche nach den Armbändern. Die Adresse des Platzes wird nur gesucht, wenn die Option eingeschaltet ist: Dafür dient der Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet.

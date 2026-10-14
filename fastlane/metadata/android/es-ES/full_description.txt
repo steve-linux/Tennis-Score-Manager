@@ -5,9 +5,10 @@ Tennis Score Manager lleva el marcador de un partido de tenis según las reglas 
 * Voz de juez de silla en seis idiomas (italiano, inglés, francés, alemán, español, portugués) con la síntesis de voz del teléfono, sin internet. También se pueden importar grabaciones propias.
 * Shot clock (25 s), cambio de lado (90 s) y descanso entre sets (120 s); los cambios de lado y el orden de saque los gestiona la app.
 * Cualquier punto se puede deshacer, incluso después del final de un juego, de un set o del partido: el marcador se vuelve a calcular desde el principio.
-* Pulseras M5StickS3 por Bluetooth LE (opcionales): cada jugador pulsa KEY1 para anotarse el punto y KEY2 para deshacerlo. Su firmware de Arduino está en el mismo repositorio.
+* Pulseras M5StickS3 por Bluetooth LE (opcionales): cada jugador pulsa KEY1 para anotarse el punto y KEY2 para deshacerlo. Su firmware de Arduino está en el mismo repositorio. Desde el firmware 2.4 reconocen también derecha, revés, saque y volea tras una breve calibración.
 * Sin pulseras: dos mandos Bluetooth para selfies (1–3 € cada uno), emparejados como un teclado. Un clic = punto, doble clic o pulsación larga = deshacer.
 * Marcador LED en un televisor o monitor: un segundo teléfono con cable HDMI, un Chromecast (enviar pantalla) o cualquier navegador en el punto de acceso del teléfono.
 * Resumen del partido con el resultado set a set, duración, club, pista y lugar; se guarda como texto, JSON o imagen, o se comparte.
+* Estadísticas de final de partido, del partido o por set (saque, resto, bolas de break, puntos seguidos…), e historial punto a punto con bolas de break, de set y de partido.
 
 Sin anuncios, sin cuenta, sin rastreo. La red solo se usa para el marcador en la red local. La ubicación se usa para el lugar del partido en el resumen y, como exige Android, para la búsqueda Bluetooth de las pulseras. La dirección de la pista solo se busca si activas la opción: usa el servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google.
