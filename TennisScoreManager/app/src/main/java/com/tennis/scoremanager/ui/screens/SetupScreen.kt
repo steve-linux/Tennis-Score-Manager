@@ -32,6 +32,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,6 +72,9 @@ fun SetupScreen(c: MatchController) {
     val su by c.setup.collectAsState()
     val o by c.options.collectAsState()
     val context = LocalContext.current
+    // No-Ad e doppio com'erano prima di scegliere Padel, da rimettere tornando a Tennis.
+    var tennisNoAd by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var tennisDoubles by rememberSaveable { mutableStateOf<Boolean?>(null) }
     ScreenScaffold(
         title = s.setupTitle,
         subtitle = s.setupSubtitle,
@@ -79,6 +85,8 @@ fun SetupScreen(c: MatchController) {
         },
     ) {
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        // Tornando a Tennis si rimettono com'erano: il No-Ad sta in un'altra pagina e acceso per sbaglio non si nota.
+        // Se non si sa com'erano (app riaperta col padel già scelto) il No-Ad si spegne, come nel tennis di default.
         SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
@@ -87,10 +95,14 @@ fun SetupScreen(c: MatchController) {
                     val sport = Sport.entries[i]
                     if (sport != su.sport) {
                         if (sport == Sport.PADEL) {
+                            tennisNoAd = o.noAd
+                            tennisDoubles = su.doubles
                             c.updateSetup { it.copy(sport = sport, doubles = true) }
                             c.updateOptions { it.copy(noAd = true) }
                         } else {
-                            c.updateSetup { it.copy(sport = sport) }
+                            val doubles = tennisDoubles
+                            c.updateSetup { it.copy(sport = sport, doubles = doubles ?: it.doubles) }
+                            c.updateOptions { it.copy(noAd = tennisNoAd ?: false) }
                         }
                     }
                 },
