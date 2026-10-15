@@ -1061,6 +1061,29 @@ class MatchController(
         storage.setup = v
     }
 
+    /** Doppio e No-Ad com'erano prima di scegliere Padel: tornando a Tennis si rimettono. */
+    private var tennisDoubles: Boolean? = null
+    private var tennisNoAd: Boolean? = null
+
+    /**
+     * Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+     * Tornando a Tennis si rimettono com'erano, perché il No-Ad sta in un'altra pagina e rimasto acceso non si nota.
+     * Se non si sa com'erano (app riaperta col padel già scelto) il No-Ad si spegne e il doppio resta com'è.
+     */
+    fun selectSport(sport: Sport) {
+        if (sport == setup.value.sport) return
+        if (sport == Sport.PADEL) {
+            tennisDoubles = setup.value.doubles
+            tennisNoAd = options.value.noAd
+            updateSetup { it.copy(sport = sport, doubles = true) }
+            updateOptions { it.copy(noAd = true) }
+        } else {
+            val doubles = tennisDoubles
+            updateSetup { it.copy(sport = sport, doubles = doubles ?: it.doubles) }
+            updateOptions { it.copy(noAd = tennisNoAd ?: false) }
+        }
+    }
+
     fun updateOptions(transform: (MatchOptions) -> MatchOptions) {
         val old = options.value
         val v = transform(old)
@@ -6258,6 +6281,7 @@ package com.tennis.scoremanager.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -6266,6 +6290,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -6441,8 +6466,10 @@ private fun StrokesSection(c: MatchController, side: Side, settings: BandSetting
                 .padding(start = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Col carattere grande del telefono il nome si rimpicciolisce invece di troncarsi ("Roves…").
             Text(s.strokeName(stroke), color = if (active) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                modifier = Modifier.weight(1f).padding(end = 6.dp), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                autoSize = TextAutoSize.StepBased(minFontSize = 11.sp, maxFontSize = 16.sp, stepSize = 0.5.sp))
             Text("$n/${BandSettings.MAX_EXAMPLES}", color = if (n >= BandSettings.MIN_EXAMPLES) TsmColors.Ball else TsmColors.TextDim,
                 fontWeight = FontWeight.Bold)
             IconButton(onClick = { confirmClear = stroke }, enabled = n > 0) {
@@ -6451,6 +6478,7 @@ private fun StrokesSection(c: MatchController, side: Side, settings: BandSetting
             Button(
                 onClick = { c.calibrateStroke(side, if (active) null else stroke) },
                 shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (active) TsmColors.Ball else TsmColors.SurfaceHigh,
                     contentColor = if (active) TsmColors.OnBall else TsmColors.TextMain,
@@ -7496,7 +7524,7 @@ object ItStrings : Strings {
     override val sportSection = "Sport"
     override val sportTennis = "Tennis"
     override val sportPadel = "Padel"
-    override val padelHint = "Stesse regole del tennis: doppio e punto d'oro sono già impostati, ma si possono cambiare."
+    override val padelHint = "Stesse regole del tennis: doppio e golden point (punto d'oro) sono già impostati, ma si possono cambiare."
     override val player1 = "Giocatore 1"
     override val player2 = "Giocatore 2"
     override val playerName = "Nome"
@@ -9153,7 +9181,7 @@ object FrStrings : Strings {
     override val sportSection = "Sport"
     override val sportTennis = "Tennis"
     override val sportPadel = "Padel"
-    override val padelHint = "Mêmes règles que le tennis : le double et le point en or sont déjà réglés, mais modifiables."
+    override val padelHint = "Mêmes règles que le tennis : le double et le golden point (point en or) sont déjà réglés, mais modifiables."
     override val player1 = "Joueur 1"
     override val player2 = "Joueur 2"
     override val playerName = "Nom"
@@ -9571,7 +9599,7 @@ object PtStrings : Strings {
     override val sportSection = "Esporte"
     override val sportTennis = "Tênis"
     override val sportPadel = "Padel"
-    override val padelHint = "Mesmas regras do tênis: dupla e ponto de ouro já vêm configurados, mas dá para mudar."
+    override val padelHint = "Mesmas regras do tênis: dupla e golden point (ponto de ouro) já vêm configurados, mas dá para mudar."
     override val player1 = "Jogador 1"
     override val player2 = "Jogador 2"
     override val playerName = "Nome"
@@ -12058,17 +12086,7 @@ fun SetupScreen(c: MatchController) {
             Segmented(
                 listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
                 selected = su.sport.ordinal,
-                onSelect = { i ->
-                    val sport = Sport.entries[i]
-                    if (sport != su.sport) {
-                        if (sport == Sport.PADEL) {
-                            c.updateSetup { it.copy(sport = sport, doubles = true) }
-                            c.updateOptions { it.copy(noAd = true) }
-                        } else {
-                            c.updateSetup { it.copy(sport = sport) }
-                        }
-                    }
-                },
+                onSelect = { i -> c.selectSport(Sport.entries[i]) },
             )
             if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
         }
