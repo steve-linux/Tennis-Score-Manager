@@ -113,6 +113,7 @@ h3{font-size:1.22rem;font-weight:800;letter-spacing:-.01em}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media (max-width:960px){.cards{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:600px){.cards{grid-template-columns:1fr}}
+@media (min-width:961px){.card.wide{grid-column:1/-1}.card.wide p{max-width:80ch}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s,transform .25s}
 .card:hover{border-color:color-mix(in srgb,var(--accent,var(--ball)) 55%,transparent);transform:translateY(-3px)}
 .card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;color:var(--accent,var(--ball));background:color-mix(in srgb,var(--accent,var(--ball)) 13%,transparent)}
@@ -243,6 +244,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
@@ -324,7 +326,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <article class="card" style="--accent:var(--violet)">
         <div class="ico"><svg class="icon"><use href="#i-bt"/></svg></div>
         <h3>Pulseiras Bluetooth</h3>
-        <p>Com duas M5StickS3 no pulso, cada jogador marca o próprio ponto com um botão, e o telefone pode ficar na bolsa. Com o firmware 2.4 reconhecem também forehand, backhand, saque e voleio de quem as usa.</p>
+        <p>Com duas M5StickS3 no pulso, cada jogador marca o próprio ponto com um botão, e o telefone pode ficar na bolsa.</p>
         <button class="more" data-open="d-ble">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
       <article class="card">
@@ -353,6 +355,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Controles bem baratos</h3>
         <p>No lugar das pulseiras, dois controles Bluetooth de selfie bem baratos: um clique marca o ponto, o clique duplo desfaz. Sem firmware para carregar.</p>
         <button class="more" data-open="d-remote">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card wide" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+        <h3>Reconhece seus golpes</h3>
+        <p>Com o firmware 2.4 a pulseira distingue forehand, backhand, saque e voleio de quem a usa, depois de uma breve calibração. No fim você vê os golpes de cada jogador, a velocidade do pulso e quantos golpes dura cada troca de bola.</p>
+        <button class="more" data-open="d-ble">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
     </div>
   </div>
