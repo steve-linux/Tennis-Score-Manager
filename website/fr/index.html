@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Score de tennis avec annonces d'arbitre, bracelets et tableau sur TV</title>
-<meta name="description" content="Application Android libre et gratuite pour compter les points au tennis selon les règles de l'ITF : annonces vocales de l'arbitre, bracelets Bluetooth M5StickS3 et tableau d'affichage sur TV. Fonctionne hors ligne, en six langues, sans publicité.">
+<title>Tennis Score Manager – Score de tennis et de padel avec annonces d'arbitre, statistiques, bracelets et tableau sur TV</title>
+<meta name="description" content="Application Android libre et gratuite pour compter les points au tennis et au padel selon les règles de l'ITF : annonces vocales de l'arbitre, statistiques et déroulé point par point, bracelets Bluetooth M5StickS3 ou télécommandes pour selfie, tableau d'affichage sur TV. Fonctionne hors ligne, en six langues, sans publicité.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/fr/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Score de tennis selon les règles de l'ITF, avec annonces d'arbitre, bracelets Bluetooth et tableau sur TV. Libre, hors ligne, sans publicité.">
+<meta property="og:description" content="Score de tennis et de padel selon les règles de l'ITF, avec annonces d'arbitre, statistiques de fin de match, bracelets Bluetooth et tableau sur TV. Libre, hors ligne, sans publicité.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/fr/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -241,6 +241,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,6 +252,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu" data-label-open="Ouvrir le menu" data-label-close="Fermer le menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Fonctionnalités</a></li>
+      <li><a href="#stats">Statistiques</a></li>
       <li><a href="#scoreboard">Tableau TV</a></li>
       <li><a href="#wristbands">Bracelets</a></li>
       <li><a href="#gallery">Galerie</a></li>
@@ -276,7 +280,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Libre et gratuite · licence GPL-3.0</div>
       <h1>Votre score de tennis, <em>comme un vrai Pro.</em></h1>
-      <p class="lead">L'application Android qui compte les points selon les règles de l'ITF et les annonce à voix haute comme un arbitre de chaise. On marque depuis le téléphone ou avec deux bracelets Bluetooth, et le score peut s'afficher en direct sur une TV.</p>
+      <p class="lead">L'application Android qui compte les points au tennis et au padel selon les règles de l'ITF et les annonce à voix haute comme un arbitre de chaise. On marque depuis le téléphone, avec deux bracelets ou deux télécommandes Bluetooth ; en fin de match, statistiques et déroulé point par point, et le score peut s'afficher en direct sur une TV.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Obtenir l'application</a>
         <a class="btn btn-ghost" href="#features">Découvrir les fonctions <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +337,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Six langues, partout</h3>
         <p>Italien, anglais, français, allemand, espagnol et portugais : la langue choisie vaut pour les écrans, la voix, le tableau et les bracelets.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Aussi pour le padel</h3>
+        <p>Le padel se compte comme le tennis : choisissez Padel et l'application règle d'elle-même le double et le golden point. Le récapitulatif et le partage indiquent « Padel ».</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistiques et point par point</h3>
+        <p>En fin de match, comme sur les sites de résultats : service, retour, balles de break, points d'affilée et déroulé point par point, pour tout le match ou manche par manche.</p>
+        <button class="more" data-open="d-stats">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Des télécommandes à quelques euros</h3>
+        <p>À la place des bracelets, deux télécommandes Bluetooth pour selfie (1 à 3 €) : un clic donne le point, un double clic l'annule. Aucun firmware à charger.</p>
+        <button class="more" data-open="d-remote">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistiques</div>
+        <h2>Le match en chiffres</h2>
+        <p>En fin de match, le récapitulatif a trois onglets : Résumé, Statistiques et Point par point. Tout vient des points que vous marquez, donc cela marche aussi sans bracelets.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Service et retour<small>Points et jeux gagnés au service et en retour, balles de break sauvées et converties, avec des barres qui comparent les deux joueurs.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Tout le match ou une manche<small>Total des points et des jeux, points d'affilée, 10 derniers points, balles de match sauvées : pour tout le match ou manche par manche.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Point par point<small>Jeu par jeu : qui sert, les services perdus et le score après chaque point, avec balles de break, de set et de match mises en évidence.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Avec les bracelets, aussi les coups<small>Coups droits, revers, services et volées de chaque joueur, vitesse du poignet et nombre de coups de chaque échange.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, doubles fautes et fautes ne peuvent pas être connus : l'application sait seulement qui gagne chaque point.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiques de fin de match : service, retour et balles de break des deux joueurs comparés"><span>Statistiques</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Déroulé point par point de la première manche, avec le serveur, les services perdus et les balles de break"><span>Point par point</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Tableau TV</div>
@@ -363,7 +409,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands">
+<section id="wristbands" class="alt">
   <div class="wrap">
     <div class="split">
       <div>
@@ -376,6 +422,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Autonomie sous contrôle<small>L'application affiche la charge et estime l'autonomie restante ; en fin de match, elle éteint les bracelets.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Prêts en un instant<small>Allumez les bracelets et l'application les trouve toute seule ; « Identifier » vous montre lequel est lequel.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Firmware libre<small>Le code Arduino est dans le dépôt : installez-le avec l'Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Reconnaît vos coups<small>Avec le firmware 2.4, il distingue coup droit, revers, service et volée après un court calibrage : les statistiques des coups arrivent dans le récapitulatif.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware des bracelets</a></p>
       </div>
@@ -396,7 +443,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery" class="alt">
+<section id="gallery">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galerie</div>
@@ -412,11 +459,15 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Connexion des bracelets avec état du Bluetooth et de la batterie"><span>Bracelets</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Adresse et QR code pour ouvrir le tableau sur un autre appareil"><span>Connecter le tableau</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Résumé de fin de match avec vainqueur, score, durée et lieu"><span>Résumé final</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Choix du sport : tennis ou padel, avec double et golden point déjà réglés"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Mode Télécommandes : chaque joueur marque le point avec une télécommande Bluetooth pour selfie"><span>Télécommandes</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiques de fin de match : service, retour et balles de break des deux joueurs comparés"><span>Statistiques</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Reconnaissance des coups : calibrage du coup droit, du revers, du service et de la volée sur le bracelet"><span>Reconnaissance des coups</span></button></li>
     </ul>
   </div>
 </section>
 
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Télécharger</div>
@@ -433,11 +484,11 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Configuration et autorisations</h3>
         <dl class="req">
           <dt>Système</dt><dd>Android 8.0 ou plus récent</dd>
-          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Version</dt><dd>2.5.0</dd>
           <dt>Licence</dt><dd>GNU GPL v3 ou ultérieure</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Uniquement pour les bracelets.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Pour les bracelets. Les télécommandes s'appairent depuis les réglages Bluetooth du téléphone.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Localisation<small>Facultative : le lieu du court dans le résumé. Jusqu'à Android 11, elle sert aussi à la recherche Bluetooth.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Réseau<small>Uniquement pour le tableau sur le réseau local.</small></div></li>
         </ul>
@@ -479,6 +530,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Tirage au sort et côtés du court</strong> se règlent avant de commencer ; l'application prévient à chaque changement de côté.</li>
       <li><strong>Annulation sûre :</strong> le match est enregistré comme une suite de points et recalculé à chaque annulation, donc serveur, côté et score sont toujours exacts, même en annulant plusieurs points de suite.</li>
       <li><strong>Messages de jeu :</strong> balle de break, balle de set, balle de match et point décisif s'affichent sur le téléphone et sur le tableau, avec les tie-breaks et les changements de côté.</li>
+      <li><strong>Padel :</strong> il se compte comme le tennis ; en choisissant Padel, l'application règle le double et le golden point (à 40-40, un seul point décide du jeu).</li>
     </ul>
   </div>
 </dialog>
@@ -526,8 +578,38 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Réglages depuis le téléphone :</strong> nom (jusqu'à 12 caractères, enregistré dans le bracelet), luminosité, durée d'affichage du score, volume du buzzer, écran retourné pour l'autre poignet et extinction automatique. D'un geste, vous les copiez sur l'autre bracelet.</li>
       <li><strong>Recherche automatique :</strong> allumez les bracelets et l'application les trouve et les associe toute seule. « Identifier » fait clignoter celui que vous choisissez, « Échanger J1 ↔ J2 » inverse les joueurs sans nouvelle association, et le match peut aussi démarrer avec KEY1.</li>
       <li><strong>Téléphone dans la poche :</strong> même écran éteint, l'application continue de recevoir les points, de les annoncer et de mettre à jour le tableau.</li>
+      <li><strong>Reconnaissance des coups</strong> (firmware 2.4) : après un court calibrage, le bracelet distingue le coup droit, le revers, le service et la volée de la personne qui le porte ; le récapitulatif donne les coups par type, la vitesse du poignet et les coups par point. Le capteur de mouvement consomme environ 1 mA de plus.</li>
     </ul>
     <div class="note">Le firmware est libre (GPL-3.0) et s'installe avec l'Arduino IDE : le code et les instructions sont dans le <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">dépôt</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistiques et point par point</h3></div>
+    <p>Le récapitulatif de fin de match a trois onglets.</p>
+    <ul>
+      <li><strong>Résumé :</strong> résultat, durée, lieu, points et jeux gagnés et, avec les bracelets 2.4, coups, vitesse du poignet et coups par point.</li>
+      <li><strong>Statistiques :</strong> pour le match ou une manche, les deux joueurs comparés avec des barres : points et jeux au service et en retour, balles de break sauvées et converties, total des points et des jeux, points d'affilée, 10 derniers points, balles de match sauvées.</li>
+      <li><strong>Point par point :</strong> manche par manche, chaque jeu avec le serveur, les services perdus et le score après chaque point, avec balles de break, de set et de match mises en évidence.</li>
+    </ul>
+    <div class="note">Tout est calculé à partir de qui a gagné chaque point : aces, doubles fautes, premières balles et fautes ne peuvent pas être connus.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Télécommandes Bluetooth</h3></div>
+    <p>Le moyen le plus économique de faire marquer les points aux joueurs : deux télécommandes Bluetooth pour selfie, de 1 à 3 € chacune.</p>
+    <ul>
+      <li>Appairez-les dans les réglages Bluetooth du téléphone, comme un clavier.</li>
+      <li>Choisissez le mode <strong>Télécommandes</strong> et associez chaque télécommande à son joueur d'un simple appui.</li>
+      <li><strong>Un clic</strong> donne le point ; un <strong>double clic</strong> ou un <strong>appui long</strong> l'annule, avec les mêmes protections que les bracelets.</li>
+      <li>Pendant le match, l'application reste ouverte, écran allumé : les touches d'un clavier Bluetooth n'arrivent qu'à l'application visible.</li>
+    </ul>
+    <div class="note">Aucun firmware et aucune autorisation : Android les voit comme un clavier.</div>
   </div>
 </dialog>
 

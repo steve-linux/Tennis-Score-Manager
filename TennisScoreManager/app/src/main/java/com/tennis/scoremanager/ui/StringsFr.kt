@@ -24,7 +24,7 @@ object FrStrings : Strings {
     override val sportSection = "Sport"
     override val sportTennis = "Tennis"
     override val sportPadel = "Padel"
-    override val padelHint = "Mêmes règles que le tennis : le double et le point en or sont déjà réglés, mais modifiables."
+    override val padelHint = "Mêmes règles que le tennis : le double et le golden point (point en or) sont déjà réglés, mais modifiables."
     override val player1 = "Joueur 1"
     override val player2 = "Joueur 2"
     override val playerName = "Nom"

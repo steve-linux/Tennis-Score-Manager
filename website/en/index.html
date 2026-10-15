@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Tennis scoring with umpire calls, wristbands and a TV scoreboard</title>
-<meta name="description" content="Free and open source Android app that keeps the tennis score by the ITF rules: chair umpire voice calls, M5StickS3 Bluetooth wristbands and a TV scoreboard. Works offline, in six languages, with no ads.">
+<title>Tennis Score Manager – Tennis and padel scoring with umpire calls, statistics, wristbands and a TV scoreboard</title>
+<meta name="description" content="Free and open source Android app that keeps the tennis and padel score by the ITF rules: chair umpire voice calls, statistics and a point-by-point log, M5StickS3 Bluetooth wristbands or cheap selfie remotes, and a TV scoreboard. Works offline, in six languages, with no ads.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/en/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Tennis scoring by the ITF rules, with umpire calls, Bluetooth wristbands and a TV scoreboard. Free, offline, no ads.">
+<meta property="og:description" content="Tennis and padel scoring by the ITF rules, with umpire calls, end-of-match statistics, Bluetooth wristbands and a TV scoreboard. Free, offline, no ads.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/en/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -241,6 +241,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,6 +252,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-label-open="Open menu" data-label-close="Close menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Features</a></li>
+      <li><a href="#stats">Statistics</a></li>
       <li><a href="#scoreboard">TV scoreboard</a></li>
       <li><a href="#wristbands">Wristbands</a></li>
       <li><a href="#gallery">Gallery</a></li>
@@ -276,7 +280,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Free and open source · GPL-3.0 licence</div>
       <h1>Your tennis score, <em>like a real Pro.</em></h1>
-      <p class="lead">The Android app that keeps the score by the ITF rules and calls it out loud like a chair umpire. Score from the phone or from two Bluetooth wristbands, and show the result live on a TV.</p>
+      <p class="lead">The Android app that keeps the tennis and padel score by the ITF rules and calls it out loud like a chair umpire. Score from the phone, from two wristbands or from two Bluetooth remotes; at the end you get statistics and a point-by-point log, and the result can go live on a TV.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Get the app</a>
         <a class="btn btn-ghost" href="#features">Explore the features <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +337,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Six languages, everywhere</h3>
         <p>Italian, English, French, German, Spanish and Portuguese: the chosen language applies to the screens, the voice, the scoreboard and the wristbands.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Padel too</h3>
+        <p>Padel is scored like tennis: choose Padel and the app sets doubles and golden point for you. The summary and sharing say “Padel”.</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistics and point by point</h3>
+        <p>At the end of the match, like on results websites: serve, return, break points, points in a row and a point-by-point log, for the whole match or set by set.</p>
+        <button class="more" data-open="d-stats">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Remotes for a few euros</h3>
+        <p>Instead of wristbands, two Bluetooth selfie remotes (€1–3): one click wins the point, a double click undoes it. No firmware to upload.</p>
+        <button class="more" data-open="d-remote">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistics</div>
+        <h2>The match in numbers</h2>
+        <p>At the end the summary has three tabs: Summary, Statistics and Point by point. Everything comes from the points you score, so it works without wristbands too.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Serve and return<small>Service and return points and games won, break points saved and won, with bars comparing the two players.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Whole match or one set<small>Total points and games, points in a row, last 10 points, match points saved: for the whole match or set by set.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Point by point<small>Game by game: who serves, lost serves and the score after every point, with break points, set points and match points highlighted.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>With wristbands, strokes too<small>Each player's forehands, backhands, serves and volleys, wrist speed and how many strokes each rally lasts.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, double faults and errors can't be known: the app only knows who wins each point.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="End-of-match statistics: serve, return and break points of the two players compared"><span>Statistics</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Point-by-point log of the first set, with the server, lost serves and break points"><span>Point by point</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">TV scoreboard</div>
@@ -363,7 +409,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands">
+<section id="wristbands" class="alt">
   <div class="wrap">
     <div class="split">
       <div>
@@ -376,6 +422,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Battery under control<small>The app shows the charge and estimates how long it lasts; at the end of the match it switches the wristbands off.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Ready in a moment<small>Switch the wristbands on and the app finds them by itself; «Identify» tells you which is which.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Free firmware<small>The Arduino code is in the repository: install it with the Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Recognizes your strokes<small>With firmware 2.4 it tells forehand, backhand, serve and volley apart after a short calibration: stroke statistics end up in the summary.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Wristband firmware</a></p>
       </div>
@@ -396,7 +443,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery" class="alt">
+<section id="gallery">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Gallery</div>
@@ -412,11 +459,15 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Wristband connection with Bluetooth and battery status"><span>Wristbands</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Address and QR code to open the scoreboard on another device"><span>Connect the scoreboard</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="End-of-match summary with winner, score, duration and place"><span>Final summary</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Choosing the sport: tennis or padel, with doubles and golden point already set"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Remotes mode: each player wins the point with a Bluetooth selfie remote"><span>Remotes</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="End-of-match statistics: serve, return and break points of the two players compared"><span>Statistics</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Stroke recognition: calibrating forehand, backhand, serve and volley on the wristband"><span>Stroke recognition</span></button></li>
     </ul>
   </div>
 </section>
 
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Download</div>
@@ -433,11 +484,11 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requirements and permissions</h3>
         <dl class="req">
           <dt>System</dt><dd>Android 8.0 or later</dd>
-          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Version</dt><dd>2.5.0</dd>
           <dt>Licence</dt><dd>GNU GPL v3 or later</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Only for the wristbands.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>For the wristbands. Remotes are paired from the phone's Bluetooth settings.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Location<small>Optional: the place of the court in the summary. Up to Android 11 it is also needed for the Bluetooth search.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Network<small>Only for the scoreboard on the local network.</small></div></li>
         </ul>
@@ -479,6 +530,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Coin toss and sides of the court</strong> are set before you start; the app tells you at every change of ends.</li>
       <li><strong>Safe undo:</strong> the match is stored as a sequence of points and recomputed at every undo, so server, side and score are always exact, even when you undo several points in a row.</li>
       <li><strong>Match messages:</strong> break point, set point, match point and deciding point appear on the phone and on the scoreboard, along with tie-breaks and changes of ends.</li>
+      <li><strong>Padel:</strong> scored like tennis; choosing Padel sets doubles and golden point (at 40-40 a single point decides the game).</li>
     </ul>
   </div>
 </dialog>
@@ -526,8 +578,38 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Settings from the phone:</strong> name (up to 12 characters, stored in the wristband), brightness, how long the score stays on the display, buzzer volume, flipped display for the other wrist and automatic power-off. One tap copies them to the other wristband.</li>
       <li><strong>Automatic search:</strong> switch the wristbands on and the app finds and pairs them by itself. «Identify» flashes the one you pick, «Swap P1 ↔ P2» swaps the players without pairing again, and the match can also start with KEY1.</li>
       <li><strong>Phone in your pocket:</strong> even with the screen off, the app keeps receiving the points, calling them out and updating the scoreboard.</li>
+      <li><strong>Stroke recognition</strong> (firmware 2.4): after a short calibration the wristband tells the wearer's forehand, backhand, serve and volley apart; the summary shows strokes by type, wrist speed and strokes per point. The motion sensor uses about 1 mA more.</li>
     </ul>
     <div class="note">The firmware is free software (GPL-3.0) and is installed with the Arduino IDE: code and instructions are in the <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">repository</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistics and point by point</h3></div>
+    <p>The end-of-match summary has three tabs.</p>
+    <ul>
+      <li><strong>Summary:</strong> result, duration, place, points and games won and, with 2.4 wristbands, strokes, wrist speed and strokes per point.</li>
+      <li><strong>Statistics:</strong> for the match or one set, the two players compared with bars: service and return points and games, break points saved and won, total points and games, points in a row, last 10 points, match points saved.</li>
+      <li><strong>Point by point:</strong> set by set, every game with the server, lost serves and the score after each point, with break points, set points and match points highlighted.</li>
+    </ul>
+    <div class="note">Everything comes from who won each point: aces, double faults, first serves and errors can't be known.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Bluetooth remotes</h3></div>
+    <p>The cheapest way to let the players score: two Bluetooth selfie remotes, €1–3 each.</p>
+    <ul>
+      <li>Pair them in the phone's Bluetooth settings, like a keyboard.</li>
+      <li>Choose the <strong>Remotes</strong> mode and assign each remote to its player with a single press.</li>
+      <li><strong>One click</strong> wins the point; a <strong>double click</strong> or a <strong>long press</strong> undoes it, with the same safeguards as the wristbands.</li>
+      <li>During the match the app stays open with the screen on: the keys of a Bluetooth keyboard only reach the visible app.</li>
+    </ul>
+    <div class="note">No firmware and no permissions: Android sees them as a keyboard.</div>
   </div>
 </dialog>
 

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Tennis-Zählung mit Schiedsrichteransagen, Armbändern und TV-Anzeigetafel</title>
-<meta name="description" content="Freie und kostenlose Android-App, die den Tennis-Spielstand nach den ITF-Regeln zählt: Ansagen des Schiedsrichters, Bluetooth-Armbänder M5StickS3 und Anzeigetafel auf dem Fernseher. Funktioniert offline, in sechs Sprachen, ohne Werbung.">
+<title>Tennis Score Manager – Tennis- und Padel-Zählung mit Schiedsrichteransagen, Statistiken, Armbändern und TV-Anzeigetafel</title>
+<meta name="description" content="Freie und kostenlose Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt: Ansagen des Schiedsrichters, Statistiken und Punkt-für-Punkt-Verlauf, Bluetooth-Armbänder M5StickS3 oder günstige Selfie-Fernbedienungen und Anzeigetafel auf dem Fernseher. Funktioniert offline, in sechs Sprachen, ohne Werbung.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/de/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Tennis-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Bluetooth-Armbändern und TV-Anzeigetafel. Frei, offline, ohne Werbung.">
+<meta property="og:description" content="Tennis- und Padel-Zählung nach den ITF-Regeln, mit Schiedsrichteransagen, Statistiken zum Matchende, Bluetooth-Armbändern und TV-Anzeigetafel. Frei, offline, ohne Werbung.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/de/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -241,6 +241,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,6 +252,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Menü öffnen" data-label-open="Menü öffnen" data-label-close="Menü schließen"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Funktionen</a></li>
+      <li><a href="#stats">Statistiken</a></li>
       <li><a href="#scoreboard">Anzeigetafel</a></li>
       <li><a href="#wristbands">Armbänder</a></li>
       <li><a href="#gallery">Galerie</a></li>
@@ -276,7 +280,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Frei und kostenlos · Lizenz GPL-3.0</div>
       <h1>Dein Spielstand im Tennis, <em>wie bei den Profis.</em></h1>
-      <p class="lead">Die Android-App, die den Spielstand nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon oder mit zwei Bluetooth-Armbändern, und das Ergebnis kann live auf einem Fernseher erscheinen.</p>
+      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken und den Verlauf Punkt für Punkt, und das Ergebnis kann live auf einem Fernseher erscheinen.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> App holen</a>
         <a class="btn btn-ghost" href="#features">Funktionen entdecken <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +337,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Sechs Sprachen, überall</h3>
         <p>Italienisch, Englisch, Französisch, Deutsch, Spanisch und Portugiesisch: Die gewählte Sprache gilt für die Bildschirme, die Stimme, die Anzeigetafel und die Armbänder.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Auch für Padel</h3>
+        <p>Padel wird wie Tennis gezählt: Wähle Padel, und die App stellt Doppel und Golden Point von selbst ein. Zusammenfassung und Teilen nennen „Padel“.</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistiken und Punkt für Punkt</h3>
+        <p>Zum Matchende wie auf Ergebnisseiten: Aufschlag, Return, Breakbälle, Punkte in Folge und der Verlauf Punkt für Punkt, für das ganze Match oder Satz für Satz.</p>
+        <button class="more" data-open="d-stats">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Fernbedienungen für wenige Euro</h3>
+        <p>Statt Armbändern zwei Bluetooth-Selfie-Fernbedienungen (1–3 €): Ein Klick gibt den Punkt, ein Doppelklick nimmt ihn zurück. Keine Firmware nötig.</p>
+        <button class="more" data-open="d-remote">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistiken</div>
+        <h2>Das Match in Zahlen</h2>
+        <p>Zum Matchende hat die Zusammenfassung drei Reiter: Übersicht, Statistiken und Punkt für Punkt. Alles ergibt sich aus den eingetragenen Punkten, also klappt es auch ohne Armbänder.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Aufschlag und Return<small>Gewonnene Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, mit Balken, die beide Spieler vergleichen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Ganzes Match oder ein Satz<small>Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle: für das ganze Match oder Satz für Satz.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Punkt für Punkt<small>Spiel für Spiel: wer aufschlägt, verlorene Aufschläge und der Stand nach jedem Punkt, mit hervorgehobenen Break-, Satz- und Matchbällen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Mit Armbändern auch die Schläge<small>Vorhände, Rückhände, Aufschläge und Volleys jedes Spielers, Handgelenk-Tempo und wie viele Schläge jeder Ballwechsel dauert.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Asse, Doppelfehler und Fehler sind nicht bekannt: Die App weiß nur, wer jeden Punkt gewinnt.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiken zum Matchende: Aufschlag, Return und Breakbälle beider Spieler im Vergleich"><span>Statistiken</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Verlauf Punkt für Punkt des ersten Satzes, mit Aufschläger, verlorenen Aufschlägen und Breakbällen"><span>Punkt für Punkt</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Anzeigetafel</div>
@@ -363,7 +409,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands">
+<section id="wristbands" class="alt">
   <div class="wrap">
     <div class="split">
       <div>
@@ -376,6 +422,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Akku im Blick<small>Die App zeigt den Ladestand und schätzt die Laufzeit; am Ende des Matches schaltet sie die Armbänder aus.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Sofort startklar<small>Schalte die Armbänder ein, die App findet sie von selbst; «Erkennen» zeigt dir, welches welches ist.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Freie Firmware<small>Der Arduino-Code liegt im Repository: Du installierst ihn mit der Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Erkennt deine Schläge<small>Mit Firmware 2.4 unterscheidet es nach einer kurzen Kalibrierung Vorhand, Rückhand, Aufschlag und Volley: Die Schlagstatistiken landen in der Zusammenfassung.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware der Armbänder</a></p>
       </div>
@@ -396,7 +443,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery" class="alt">
+<section id="gallery">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galerie</div>
@@ -412,11 +459,15 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Verbindung der Armbänder mit Bluetooth- und Akkustatus"><span>Armbänder</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Adresse und QR-Code, um die Anzeigetafel auf einem anderen Gerät zu öffnen"><span>Anzeigetafel verbinden</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Spielbericht am Matchende mit Sieger, Ergebnis, Dauer und Ort"><span>Spielbericht</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Wahl der Sportart: Tennis oder Padel, mit schon eingestelltem Doppel und Golden Point"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modus Fernbedienungen: Jeder Spieler holt sich den Punkt mit einer Bluetooth-Selfie-Fernbedienung"><span>Fernbedienungen</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiken zum Matchende: Aufschlag, Return und Breakbälle beider Spieler im Vergleich"><span>Statistiken</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Schlagerkennung: Kalibrierung von Vorhand, Rückhand, Aufschlag und Volley am Armband"><span>Schlagerkennung</span></button></li>
     </ul>
   </div>
 </section>
 
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Download</div>
@@ -433,11 +484,11 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Voraussetzungen und Berechtigungen</h3>
         <dl class="req">
           <dt>System</dt><dd>Android 8.0 oder neuer</dd>
-          <dt>Version</dt><dd>2.4.3</dd>
+          <dt>Version</dt><dd>2.5.0</dd>
           <dt>Lizenz</dt><dd>GNU GPL v3 oder neuer</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Nur für die Armbänder.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Für die Armbänder. Fernbedienungen werden in den Bluetooth-Einstellungen des Telefons gekoppelt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Standort<small>Optional: der Ort des Platzes im Spielbericht. Bis Android 11 wird er auch für die Bluetooth-Suche benötigt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Nur für die Anzeigetafel im lokalen Netz.</small></div></li>
         </ul>
@@ -479,6 +530,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Münzwurf und Platzseiten</strong> werden vor Beginn festgelegt; die App meldet jeden Seitenwechsel.</li>
       <li><strong>Sicheres Zurücknehmen:</strong> Das Match wird als Folge von Punkten gespeichert und bei jedem Zurücknehmen neu berechnet – Aufschläger, Seite und Spielstand stimmen immer, auch wenn du mehrere Punkte hintereinander zurücknimmst.</li>
       <li><strong>Spielhinweise:</strong> Breakball, Satzball, Matchball und entscheidender Punkt erscheinen auf dem Handy und auf der Anzeigetafel, zusammen mit Tiebreaks und Seitenwechseln.</li>
+      <li><strong>Padel:</strong> wird wie Tennis gezählt; mit Padel stellt die App Doppel und Golden Point ein (bei 40:40 entscheidet ein einziger Punkt das Spiel).</li>
     </ul>
   </div>
 </dialog>
@@ -526,8 +578,38 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Einstellungen vom Handy:</strong> Name (bis zu 12 Zeichen, im Armband gespeichert), Helligkeit, Anzeigedauer des Spielstands, Lautstärke des Summers, gedrehtes Display für das andere Handgelenk und automatisches Ausschalten. Ein Tipp überträgt sie auf das andere Armband.</li>
       <li><strong>Automatische Suche:</strong> Schalte die Armbänder ein, die App findet und koppelt sie von selbst. «Erkennen» lässt das gewählte Armband blinken, «S1 ↔ S2 tauschen» vertauscht die Spieler ohne neue Kopplung, und das Match startet auch mit KEY1.</li>
       <li><strong>Handy in der Tasche:</strong> auch bei ausgeschaltetem Bildschirm empfängt die App die Punkte, sagt sie an und aktualisiert die Anzeigetafel.</li>
+      <li><strong>Schlagerkennung</strong> (Firmware 2.4): Nach einer kurzen Kalibrierung unterscheidet das Armband Vorhand, Rückhand, Aufschlag und Volley der Person, die es trägt; die Zusammenfassung zeigt Schläge nach Art, Handgelenk-Tempo und Schläge pro Punkt. Der Bewegungssensor braucht etwa 1 mA mehr.</li>
     </ul>
     <div class="note">Die Firmware ist frei (GPL-3.0) und wird mit der Arduino IDE installiert: Code und Anleitung findest du im <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">Repository</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistiken und Punkt für Punkt</h3></div>
+    <p>Die Zusammenfassung zum Matchende hat drei Reiter.</p>
+    <ul>
+      <li><strong>Übersicht:</strong> Ergebnis, Dauer, Ort, gewonnene Punkte und Spiele und, mit Armbändern 2.4, Schläge, Handgelenk-Tempo und Schläge pro Punkt.</li>
+      <li><strong>Statistiken:</strong> für das Match oder einen Satz, beide Spieler im Balkenvergleich: Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle.</li>
+      <li><strong>Punkt für Punkt:</strong> Satz für Satz jedes Spiel mit Aufschläger, verlorenen Aufschlägen und dem Stand nach jedem Punkt, mit hervorgehobenen Break-, Satz- und Matchbällen.</li>
+    </ul>
+    <div class="note">Alles wird daraus berechnet, wer jeden Punkt gewonnen hat: Asse, Doppelfehler, erste Aufschläge und Fehler sind nicht bekannt.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Bluetooth-Fernbedienungen</h3></div>
+    <p>Die günstigste Art, die Spieler selbst zählen zu lassen: zwei Bluetooth-Selfie-Fernbedienungen für je 1 bis 3 €.</p>
+    <ul>
+      <li>Kopple sie in den Bluetooth-Einstellungen des Telefons wie eine Tastatur.</li>
+      <li>Wähle den Modus <strong>Fernbedienungen</strong> und ordne jede Fernbedienung mit einem Tastendruck ihrem Spieler zu.</li>
+      <li><strong>Ein Klick</strong> gibt den Punkt; <strong>Doppelklick</strong> oder <strong>langes Drücken</strong> nimmt ihn zurück, mit denselben Schutzmechanismen wie bei den Armbändern.</li>
+      <li>Während des Matches bleibt die App bei eingeschaltetem Bildschirm geöffnet: Die Tasten einer Bluetooth-Tastatur erreichen nur die sichtbare App.</li>
+    </ul>
+    <div class="note">Keine Firmware und keine Berechtigungen: Android sieht sie als Tastatur.</div>
   </div>
 </dialog>
 

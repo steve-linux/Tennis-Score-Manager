@@ -6,6 +6,7 @@ package com.tennis.scoremanager.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -189,8 +191,10 @@ private fun StrokesSection(c: MatchController, side: Side, settings: BandSetting
                 .padding(start = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Col carattere grande del telefono il nome si rimpicciolisce invece di troncarsi ("Roves…").
             Text(s.strokeName(stroke), color = if (active) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f).padding(end = 8.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                modifier = Modifier.weight(1f).padding(end = 6.dp), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                autoSize = TextAutoSize.StepBased(minFontSize = 11.sp, maxFontSize = 16.sp, stepSize = 0.5.sp))
             Text("$n/${BandSettings.MAX_EXAMPLES}", color = if (n >= BandSettings.MIN_EXAMPLES) TsmColors.Ball else TsmColors.TextDim,
                 fontWeight = FontWeight.Bold)
             IconButton(onClick = { confirmClear = stroke }, enabled = n > 0) {
@@ -199,6 +203,7 @@ private fun StrokesSection(c: MatchController, side: Side, settings: BandSetting
             Button(
                 onClick = { c.calibrateStroke(side, if (active) null else stroke) },
                 shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (active) TsmColors.Ball else TsmColors.SurfaceHigh,
                     contentColor = if (active) TsmColors.OnBall else TsmColors.TextMain,

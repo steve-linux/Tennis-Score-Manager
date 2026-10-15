@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Tennis Score Manager – Placar de tênis com voz de árbitro, pulseiras e placar na TV</title>
-<meta name="description" content="App Android livre e gratuito para marcar o placar do tênis segundo as regras da ITF: voz do árbitro de cadeira, pulseiras Bluetooth M5StickS3 e placar na TV. Funciona offline, em seis idiomas, sem anúncios.">
+<title>Tennis Score Manager – Placar de tênis e padel com voz de árbitro, estatísticas, pulseiras e placar na TV</title>
+<meta name="description" content="App Android livre e gratuito para marcar o placar do tênis e do padel segundo as regras da ITF: voz do árbitro de cadeira, estatísticas e histórico ponto a ponto, pulseiras Bluetooth M5StickS3 ou controles de selfie, e placar na TV. Funciona offline, em seis idiomas, sem anúncios.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/pt/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -26,7 +26,7 @@
 <meta property="og:locale:alternate" content="de_DE">
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Placar de tênis segundo as regras da ITF, com voz do árbitro, pulseiras Bluetooth e placar na TV. Livre, offline, sem anúncios.">
+<meta property="og:description" content="Placar de tênis e padel segundo as regras da ITF, com voz do árbitro, estatísticas de fim de partida, pulseiras Bluetooth e placar na TV. Livre, offline, sem anúncios.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/pt/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -241,6 +241,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
 <header class="nav">
@@ -249,6 +252,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Abrir o menu" data-label-open="Abrir o menu" data-label-close="Fechar o menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Recursos</a></li>
+      <li><a href="#stats">Estatísticas</a></li>
       <li><a href="#scoreboard">Placar na TV</a></li>
       <li><a href="#wristbands">Pulseiras</a></li>
       <li><a href="#gallery">Galeria</a></li>
@@ -276,7 +280,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Livre e gratuito · licença GPL-3.0</div>
       <h1>Seu placar de tênis, <em>como um verdadeiro Pro.</em></h1>
-      <p class="lead">O app Android que marca o placar segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone ou com duas pulseiras Bluetooth, e o resultado pode aparecer ao vivo numa TV.</p>
+      <p class="lead">O app Android que marca o placar do tênis e do padel segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone, com duas pulseiras ou com dois controles Bluetooth; no fim você tem estatísticas e histórico ponto a ponto, e o resultado pode aparecer ao vivo numa TV.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Baixar o app</a>
         <a class="btn btn-ghost" href="#features">Conheça os recursos <svg class="icon"><use href="#i-down"/></svg></a>
@@ -333,11 +337,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Seis idiomas, em tudo</h3>
         <p>Italiano, inglês, francês, alemão, espanhol e português: o idioma escolhido vale para as telas, a voz, o placar e as pulseiras.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Também para padel</h3>
+        <p>O padel se conta como o tênis: escolha Padel e o app configura sozinho dupla e golden point. O resumo e o compartilhamento dizem “Padel”.</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Estatísticas e ponto a ponto</h3>
+        <p>No fim da partida, como nos sites de resultados: saque, devolução, break points, pontos seguidos e o histórico ponto a ponto, da partida inteira ou set a set.</p>
+        <button class="more" data-open="d-stats">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Controles bem baratos</h3>
+        <p>No lugar das pulseiras, dois controles Bluetooth de selfie bem baratos: um clique marca o ponto, o clique duplo desfaz. Sem firmware para carregar.</p>
+        <button class="more" data-open="d-remote">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Estatísticas</div>
+        <h2>A partida em números</h2>
+        <p>No fim, o resumo tem três abas: Resumo, Estatísticas e Ponto a ponto. Tudo vem dos pontos que você marca, então funciona também sem pulseiras.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Saque e devolução<small>Pontos e jogos ganhos no saque e na devolução, break points salvos e convertidos, com barras que comparam os dois jogadores.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Partida inteira ou um set<small>Total de pontos e jogos, pontos seguidos, últimos 10 pontos, match points salvos: da partida inteira ou set a set.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Ponto a ponto<small>Jogo a jogo: quem saca, os saques perdidos e o placar depois de cada ponto, com break points, set points e match points em destaque.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Com as pulseiras, também os golpes<small>Forehands, backhands, saques e voleios de cada jogador, velocidade do pulso e quantos golpes dura cada troca de bola.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, duplas faltas e erros não podem ser conhecidos: o app só sabe quem ganha cada ponto.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Estatísticas de fim de partida: saque, devolução e break points dos dois jogadores comparados"><span>Estatísticas</span></button></li>
+          <li><button class="shot"><img src="../img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Histórico ponto a ponto do primeiro set, com quem saca, os saques perdidos e os break points"><span>Ponto a ponto</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Placar na TV</div>
@@ -363,7 +409,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands">
+<section id="wristbands" class="alt">
   <div class="wrap">
     <div class="split">
       <div>
@@ -376,6 +422,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Bateria sob controle<small>O app mostra a carga e estima quanto dura; no fim da partida ele desliga as pulseiras.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Prontas num instante<small>Ligue as pulseiras e o app as encontra sozinho; «Identificar» mostra qual é qual.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Firmware livre<small>O código Arduino está no repositório: você instala com o Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Reconhece seus golpes<small>Com o firmware 2.4 distingue forehand, backhand, saque e voleio depois de uma breve calibração: as estatísticas dos golpes vão para o resumo.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware das pulseiras</a></p>
       </div>
@@ -396,7 +443,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery" class="alt">
+<section id="gallery">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galeria</div>
@@ -412,11 +459,15 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Conexão das pulseiras com status do Bluetooth e da bateria"><span>Pulseiras</span></button></li>
       <li><button class="shot"><img src="../img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Endereço e QR code para abrir o placar em outro aparelho"><span>Conectar o placar</span></button></li>
       <li><button class="shot"><img src="../img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Resumo do fim da partida com vencedor, placar, duração e local"><span>Resumo final</span></button></li>
+      <li><button class="shot"><img src="../img/padel.jpg" width="540" height="1152" loading="lazy" alt="Escolha do esporte: tênis ou padel, com dupla e golden point já configurados"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modo Controles: cada jogador marca o ponto com um controle Bluetooth de selfie"><span>Controles</span></button></li>
+      <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Estatísticas de fim de partida: saque, devolução e break points dos dois jogadores comparados"><span>Estatísticas</span></button></li>
+      <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Reconhecimento de golpes: calibração de forehand, backhand, saque e voleio na pulseira"><span>Reconhecimento de golpes</span></button></li>
     </ul>
   </div>
 </section>
 
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Baixar</div>
@@ -433,11 +484,11 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requisitos e permissões</h3>
         <dl class="req">
           <dt>Sistema</dt><dd>Android 8.0 ou mais recente</dd>
-          <dt>Versão</dt><dd>2.4.3</dd>
+          <dt>Versão</dt><dd>2.5.0</dd>
           <dt>Licença</dt><dd>GNU GPL v3 ou posterior</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Só para as pulseiras.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Para as pulseiras. Os controles são pareados nos ajustes Bluetooth do telefone.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Localização<small>Opcional: o local da quadra no resumo. Até o Android 11 também é necessária para a busca Bluetooth.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Rede<small>Só para o placar na rede local.</small></div></li>
         </ul>
@@ -479,6 +530,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Sorteio e lados da quadra</strong> definidos antes de começar; o app avisa a cada troca de lado.</li>
       <li><strong>Desfazer seguro:</strong> a partida é salva como uma sequência de pontos e recalculada a cada desfazer, então sacador, lado e placar ficam sempre exatos, mesmo desfazendo vários pontos seguidos.</li>
       <li><strong>Mensagens de jogo:</strong> break point, set point, match point e ponto decisivo aparecem no celular e no placar, junto com tie-breaks e trocas de lado.</li>
+      <li><strong>Padel:</strong> se conta como o tênis; escolhendo Padel o app configura dupla e golden point (no 40-40 um só ponto decide o jogo).</li>
     </ul>
   </div>
 </dialog>
@@ -526,8 +578,38 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Ajustes pelo celular:</strong> nome (até 12 caracteres, salvo na pulseira), brilho, tempo do placar na tela, volume do bipe, tela invertida para o outro pulso e desligamento automático. Com um toque você copia tudo para a outra pulseira.</li>
       <li><strong>Busca automática:</strong> ligue as pulseiras e o app as encontra e pareia sozinho. «Identificar» faz piscar a que você escolher, «Trocar J1 ↔ J2» inverte os jogadores sem parear de novo, e a partida também pode começar com KEY1.</li>
       <li><strong>Celular no bolso:</strong> mesmo com a tela apagada, o app continua recebendo os pontos, anunciando e atualizando o placar.</li>
+      <li><strong>Reconhecimento de golpes</strong> (firmware 2.4): depois de uma breve calibração a pulseira distingue forehand, backhand, saque e voleio de quem a usa; o resumo mostra golpes por tipo, velocidade do pulso e golpes por ponto. O sensor de movimento gasta cerca de 1 mA a mais.</li>
     </ul>
     <div class="note">O firmware é livre (GPL-3.0) e se instala com o Arduino IDE: o código e as instruções estão no <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">repositório</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Estatísticas e ponto a ponto</h3></div>
+    <p>O resumo de fim de partida tem três abas.</p>
+    <ul>
+      <li><strong>Resumo:</strong> resultado, duração, local, pontos e jogos ganhos e, com as pulseiras 2.4, golpes, velocidade do pulso e golpes por ponto.</li>
+      <li><strong>Estatísticas:</strong> da partida ou de um set, os dois jogadores comparados com barras: pontos e jogos no saque e na devolução, break points salvos e convertidos, total de pontos e jogos, pontos seguidos, últimos 10 pontos, match points salvos.</li>
+      <li><strong>Ponto a ponto:</strong> set a set, cada jogo com quem saca, os saques perdidos e o placar depois de cada ponto, com break points, set points e match points em destaque.</li>
+    </ul>
+    <div class="note">Tudo é calculado a partir de quem ganhou cada ponto: aces, duplas faltas, primeiros saques e erros não podem ser conhecidos.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Controles Bluetooth</h3></div>
+    <p>O jeito mais barato de os jogadores marcarem os pontos: dois controles Bluetooth de selfie, bem baratos.</p>
+    <ul>
+      <li>Pareie os controles nos ajustes Bluetooth do telefone, como um teclado.</li>
+      <li>Escolha o modo <strong>Controles</strong> e associe cada controle ao seu jogador com um toque.</li>
+      <li><strong>Um clique</strong> marca o ponto; <strong>clique duplo</strong> ou <strong>toque longo</strong> desfaz, com as mesmas proteções das pulseiras.</li>
+      <li>Durante a partida o app fica aberto com a tela acesa: as teclas de um teclado Bluetooth só chegam ao app visível.</li>
+    </ul>
+    <div class="note">Sem firmware e sem permissões: o Android os vê como um teclado.</div>
   </div>
 </dialog>
 

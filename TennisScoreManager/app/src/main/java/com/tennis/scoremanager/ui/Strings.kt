@@ -451,7 +451,7 @@ object ItStrings : Strings {
     override val sportSection = "Sport"
     override val sportTennis = "Tennis"
     override val sportPadel = "Padel"
-    override val padelHint = "Stesse regole del tennis: doppio e punto d'oro sono già impostati, ma si possono cambiare."
+    override val padelHint = "Stesse regole del tennis: doppio e golden point (punto d'oro) sono già impostati, ma si possono cambiare."
     override val player1 = "Giocatore 1"
     override val player2 = "Giocatore 2"
     override val playerName = "Nome"

@@ -17,8 +17,8 @@
   if(sup.indexOf(pick)>=0)location.replace(pick+'/'+location.hash);
 })();
 </script>
-<title>Tennis Score Manager – Punteggio del tennis con voce dell'arbitro, braccialetti e tabellone TV</title>
-<meta name="description" content="App Android libera e gratuita per tenere il punteggio del tennis secondo le regole ITF: chiamate vocali dell'arbitro, braccialetti Bluetooth M5StickS3 e tabellone su TV. Funziona offline, in sei lingue, senza pubblicità.">
+<title>Tennis Score Manager – Punteggio di tennis e padel con voce dell'arbitro, statistiche, braccialetti e tabellone TV</title>
+<meta name="description" content="App Android libera e gratuita per tenere il punteggio di tennis e padel secondo le regole ITF: chiamate vocali dell'arbitro, statistiche e cronologia punto per punto, braccialetti Bluetooth M5StickS3 o telecomandini da selfie e tabellone su TV. Funziona offline, in sei lingue, senza pubblicità.">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="canonical" href="https://tennis-score-manager.netlify.app/">
 <link rel="alternate" hreflang="it" href="https://tennis-score-manager.netlify.app/">
@@ -39,7 +39,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="pt_BR">
 <meta property="og:title" content="Tennis Score Manager">
-<meta property="og:description" content="Punteggio del tennis secondo le regole ITF, con voce dell'arbitro, braccialetti Bluetooth e tabellone su TV. Libera, offline, senza pubblicità.">
+<meta property="og:description" content="Punteggio di tennis e padel secondo le regole ITF, con voce dell'arbitro, statistiche di fine partita, braccialetti Bluetooth e tabellone su TV. Libera, offline, senza pubblicità.">
 <meta property="og:url" content="https://tennis-score-manager.netlify.app/">
 <meta property="og:image" content="https://tennis-score-manager.netlify.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -254,6 +254,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
+  <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
 </svg>
 
 <header class="nav">
@@ -262,6 +265,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <button class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Apri il menu" data-label-open="Apri il menu" data-label-close="Chiudi il menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <ul class="nav-links" id="menu">
       <li><a href="#features">Funzionalità</a></li>
+      <li><a href="#stats">Statistiche</a></li>
       <li><a href="#scoreboard">Tabellone TV</a></li>
       <li><a href="#wristbands">Braccialetti</a></li>
       <li><a href="#gallery">Galleria</a></li>
@@ -289,7 +293,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Libera e gratuita · licenza GPL-3.0</div>
       <h1>Il tuo punteggio tennis, <em>come un vero Pro.</em></h1>
-      <p class="lead">L'app Android che tiene il punteggio secondo le regole ITF e lo chiama ad alta voce come un giudice di sedia. Si segna dal telefono o da due braccialetti Bluetooth, e il risultato può andare in diretta su una TV.</p>
+      <p class="lead">L'app Android che tiene il punteggio di tennis e padel secondo le regole ITF e lo chiama ad alta voce come un giudice di sedia. Si segna dal telefono, da due braccialetti o da due telecomandini Bluetooth; a fine partita hai statistiche e cronologia punto per punto, e il risultato può andare in diretta su una TV.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Scarica l'app</a>
         <a class="btn btn-ghost" href="#features">Scopri le funzioni <svg class="icon"><use href="#i-down"/></svg></a>
@@ -346,11 +350,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Sei lingue, ovunque</h3>
         <p>Italiano, inglese, francese, tedesco, spagnolo e portoghese: la lingua scelta vale per lo schermo, la voce, il tabellone e i braccialetti.</p>
       </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-padel"/></svg></div>
+        <h3>Anche per il padel</h3>
+        <p>Il padel si conta come il tennis: scegli Padel e l'app imposta da sola doppio e golden point. Riepilogo e condivisione dicono «Padel».</p>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <h3>Statistiche e cronologia</h3>
+        <p>A fine partita, come nei siti di risultati: servizio, risposta, palle break, punti di fila e la cronologia punto per punto, per tutta la partita o set per set.</p>
+        <button class="more" data-open="d-stats">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div>
+        <h3>Telecomandi da pochi euro</h3>
+        <p>Al posto dei braccialetti, due telecomandini Bluetooth da selfie (1–3 €): un clic assegna il punto, il doppio clic lo annulla. Niente firmware da caricare.</p>
+        <button class="more" data-open="d-remote">Dettagli <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
 
-<section id="scoreboard" class="alt">
+<section id="stats" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Statistiche</div>
+        <h2>La partita in numeri</h2>
+        <p>A fine partita il riepilogo ha tre schede: Riassunto, Statistiche e Cronologia. Tutto si ricava dai punti che segni, quindi funziona anche senza braccialetti.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Servizio e risposta<small>Punti e game vinti al servizio e in risposta, palle break salvate e vinte, con barre che mettono a confronto i due giocatori.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Partita o singolo set<small>Totale punti e game, punti di fila, ultimi 10 punti, match point annullati: per tutta la partita o set per set.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Cronologia punto per punto<small>Game per game: chi serve, i servizi persi e il punteggio dopo ogni punto, con palle break, set point e match point in evidenza.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Coi braccialetti, anche i colpi<small>Dritti, rovesci, servizi e volée di ogni giocatore, la velocità del polso e quanti colpi dura ogni scambio.</small></div></li>
+        </ul>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Ace, doppi falli ed errori non si possono sapere: l'app conosce solo chi vince ogni punto.</p>
+      </div>
+      <div class="media">
+        <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
+          <li><button class="shot"><img src="img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiche di fine partita: servizio, risposta e palle break dei due giocatori a confronto"><span>Statistiche</span></button></li>
+          <li><button class="shot"><img src="img/cronologia.jpg" width="540" height="1152" loading="lazy" alt="Cronologia punto per punto del primo set, con chi serve, i servizi persi e le palle break"><span>Cronologia</span></button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scoreboard">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Tabellone TV</div>
@@ -376,7 +422,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands">
+<section id="wristbands" class="alt">
   <div class="wrap">
     <div class="split">
       <div>
@@ -389,6 +435,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
            <li><svg class="icon"><use href="#i-check"/></svg><div>Autonomia sotto controllo<small>L'app mostra la carica e stima quanto dura; a fine partita spegne i braccialetti.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Pronti in un attimo<small>Accendi i braccialetti e l'app li trova da sola; «Identifica» ti dice qual è quale.</small></div></li>
            <li><svg class="icon"><use href="#i-check"/></svg><div>Firmware libero<small>Il codice Arduino è nel repository: lo installi da Arduino IDE.</small></div></li>
+           <li><svg class="icon"><use href="#i-check"/></svg><div>Riconosce i tuoi colpi<small>Col firmware 2.4 distingue dritto, rovescio, servizio e volée dopo una breve calibrazione: le statistiche dei colpi finiscono nel riepilogo.</small></div></li>
         </ul>
         <p style="margin-top:24px"><a class="link" href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener"><svg class="icon"><use href="#i-github"/></svg> Firmware dei braccialetti</a></p>
       </div>
@@ -409,7 +456,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery" class="alt">
+<section id="gallery">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galleria</div>
@@ -425,11 +472,15 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="img/braccialetti.jpg" width="540" height="1152" loading="lazy" alt="Collegamento dei braccialetti con stato di Bluetooth e batteria"><span>Braccialetti</span></button></li>
       <li><button class="shot"><img src="img/qr-tabellone.jpg" width="540" height="1152" loading="lazy" alt="Indirizzo e QR code per aprire il tabellone su un altro dispositivo"><span>Collega il tabellone</span></button></li>
       <li><button class="shot"><img src="img/riepilogo.jpg" width="540" height="1152" loading="lazy" alt="Riepilogo di fine partita con vincitore, punteggio, durata e luogo"><span>Riepilogo finale</span></button></li>
+      <li><button class="shot"><img src="img/padel.jpg" width="540" height="1152" loading="lazy" alt="Scelta dello sport: tennis o padel, con doppio e golden point già impostati"><span>Padel</span></button></li>
+      <li><button class="shot"><img src="img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modalità Telecomandi: ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie"><span>Telecomandi</span></button></li>
+      <li><button class="shot"><img src="img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiche di fine partita: servizio, risposta e palle break dei due giocatori a confronto"><span>Statistiche</span></button></li>
+      <li><button class="shot"><img src="img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Riconoscimento dei colpi: calibrazione di dritto, rovescio, servizio e volée nel braccialetto"><span>Riconoscimento colpi</span></button></li>
     </ul>
   </div>
 </section>
 
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Scarica</div>
@@ -446,11 +497,11 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <h3>Requisiti e permessi</h3>
         <dl class="req">
           <dt>Sistema</dt><dd>Android 8.0 o successivo</dd>
-          <dt>Versione</dt><dd>2.4.3</dd>
+          <dt>Versione</dt><dd>2.5.0</dd>
           <dt>Licenza</dt><dd>GNU GPL v3 o successiva</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Solo per i braccialetti.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Per i braccialetti. I telecomandi si accoppiano dalle impostazioni del telefono.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Posizione<small>Facoltativa: il luogo del campo nel riepilogo. Fino ad Android 11 serve anche alla ricerca Bluetooth.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Rete<small>Solo per il tabellone sulla rete locale.</small></div></li>
         </ul>
@@ -492,6 +543,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Sorteggio e lati del campo</strong> impostati prima di iniziare; l'app avvisa a ogni cambio campo.</li>
       <li><strong>Annulla sicuro:</strong> la partita è salvata come sequenza di punti e viene ricalcolata a ogni annullamento, quindi servizio, lato e punteggio tornano sempre esatti, anche annullando più punti di fila.</li>
       <li><strong>Messaggi di gioco:</strong> palla break, set point, match point e punto decisivo compaiono sul telefono e sul tabellone, insieme a tie-break e cambi di campo.</li>
+      <li><strong>Padel:</strong> si conta come il tennis; scegliendo Padel l'app imposta doppio e golden point (sul 40-40 un solo punto decide il game).</li>
     </ul>
   </div>
 </dialog>
@@ -539,8 +591,38 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Impostazioni dal telefono:</strong> nome (fino a 12 caratteri, resta salvato nel braccialetto), luminosità, durata del punteggio sul display, volume del cicalino, display capovolto per l'altro polso e spegnimento automatico. Con un tocco le copi sull'altro braccialetto.</li>
       <li><strong>Ricerca automatica:</strong> accendi i braccialetti e l'app li trova e li associa da sola. «Identifica» fa lampeggiare quello scelto, «Scambia G1 ↔ G2» inverte i giocatori senza riassociarli, e la partita può partire anche con KEY1.</li>
       <li><strong>Telefono in tasca:</strong> anche a schermo spento l'app continua a ricevere i punti, ad annunciarli e ad aggiornare il tabellone.</li>
+      <li><strong>Riconoscimento dei colpi</strong> (firmware 2.4): dopo una breve calibrazione il braccialetto distingue dritto, rovescio, servizio e volée di chi lo indossa; nel riepilogo trovi colpi per tipo, velocità del polso e colpi per punto. Il sensore di movimento acceso consuma circa 1 mA in più.</li>
     </ul>
     <div class="note">Il firmware è libero (GPL-3.0) e si installa con Arduino IDE: trovi codice e istruzioni nel <a href="https://github.com/steve-linux/Tennis-Score-Manager/tree/main/firmware/TSM_Band" rel="noopener">repository</a>.</div>
+  </div>
+</dialog>
+
+<dialog id="d-stats" aria-labelledby="t-stats" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-chart"/></svg></div><h3 id="t-stats">Statistiche e cronologia</h3></div>
+    <p>Il riepilogo di fine partita ha tre schede.</p>
+    <ul>
+      <li><strong>Riassunto:</strong> risultato, durata, luogo, punti e game vinti e, coi braccialetti 2.4, colpi, velocità del polso e colpi per punto.</li>
+      <li><strong>Statistiche:</strong> per la partita o per un set, i due giocatori a confronto con barre: punti e game al servizio e in risposta, palle break salvate e vinte, totale punti e game, punti di fila, ultimi 10 punti, match point annullati.</li>
+      <li><strong>Cronologia:</strong> set per set, ogni game con chi serve, i servizi persi e il punteggio dopo ogni punto, con palle break, set point e match point in evidenza.</li>
+    </ul>
+    <div class="note">Tutto si ricava da chi ha vinto ogni punto: ace, doppi falli, prime di servizio ed errori non si possono sapere.</div>
+  </div>
+</dialog>
+
+<dialog id="d-remote" aria-labelledby="t-remote" style="--accent:var(--ball)">
+  <button class="close" data-close aria-label="Chiudi"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-remote"/></svg></div><h3 id="t-remote">Telecomandi Bluetooth</h3></div>
+    <p>Il modo più economico per far segnare i punti ai giocatori: due telecomandini Bluetooth da selfie, da 1 a 3 € l'uno.</p>
+    <ul>
+      <li>Accoppiali dalle impostazioni Bluetooth del telefono, come una tastiera.</li>
+      <li>In <strong>Modalità e regole</strong> scegli <strong>Telecomandi</strong>, tocca «Associa» sotto ogni giocatore e premi un tasto del suo telecomando.</li>
+      <li><strong>Un clic</strong> assegna il punto; <strong>doppio clic</strong> o <strong>pressione lunga</strong> lo annulla, con le stesse protezioni dei braccialetti.</li>
+      <li>Durante la partita l'app resta aperta a schermo acceso: i tasti di una tastiera Bluetooth arrivano solo all'app visibile.</li>
+    </ul>
+    <div class="note">Niente firmware e nessun permesso: Android li vede come una tastiera.</div>
   </div>
 </dialog>
 

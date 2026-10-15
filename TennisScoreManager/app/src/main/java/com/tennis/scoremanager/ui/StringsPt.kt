@@ -24,7 +24,7 @@ object PtStrings : Strings {
     override val sportSection = "Esporte"
     override val sportTennis = "Tênis"
     override val sportPadel = "Padel"
-    override val padelHint = "Mesmas regras do tênis: dupla e ponto de ouro já vêm configurados, mas dá para mudar."
+    override val padelHint = "Mesmas regras do tênis: dupla e golden point (ponto de ouro) já vêm configurados, mas dá para mudar."
     override val player1 = "Jogador 1"
     override val player2 = "Jogador 2"
     override val playerName = "Nome"
