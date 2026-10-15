@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Use pre-generated audio files** (optional): with **Generate files** the app creates the 85 files once with the chosen voice (even an *online* voice, if there is internet at that moment) and then plays them instead of running text-to-speech live. It sounds more "stitched together", but it is useful for taking an online voice offline. The previous files stay until the new ones are ready (if generation doesn't finish: *Generation not completed*); while it runs, language, engine, voice, voice test and audio are locked.
 - **External speaker**: just pair it with the phone over Bluetooth; the voice comes out on the media channel (adjust the media volume).
 - **Bluetooth headphones or earbuds**: pair them the same way and only you hear the voice, without disturbing the courts next to you; also handy for whoever keeps score from the side of the court. The wristbands can stay connected at the same time.
+- **Two audio devices at once**: many phones can send audio to two Bluetooth devices at the same time. On Samsung: connect both, open the quick panel › **Media output** and tick both. Each player can then have their own earbuds, or the speaker plays for the court and headphones for whoever keeps score.
 
 ### 4.1 Languages (app 2.3, firmware 2.2)
 

@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Utiliser des fichiers audio pré-générés** (facultatif) : avec **Générer les fichiers**, l'application crée une fois pour toutes les 85 fichiers avec la voix choisie (même une voix *en ligne*, si internet est disponible à ce moment-là), puis les utilise à la place de la synthèse en continu. Le rendu est plus « haché », mais c'est utile pour emporter hors ligne une voix en ligne. Les fichiers précédents restent en place jusqu'à ce que les nouveaux soient prêts (si la génération n'aboutit pas : *Génération non terminée*) ; pendant la génération, langue, moteur, voix, test de la voix et audio sont bloqués.
 - **Enceinte externe** : il suffit de l'appairer au téléphone en Bluetooth ; la voix sort sur le canal multimédia (réglez le volume multimédia).
 - **Casque ou écouteurs Bluetooth** : ils s'appairent de la même façon et vous êtes seul à entendre la voix, sans déranger les courts voisins ; pratique aussi pour qui marque les points depuis le bord du court. Les bracelets peuvent rester connectés en même temps.
+- **Deux appareils audio à la fois** : beaucoup de téléphones envoient le son à deux appareils Bluetooth en même temps. Sur Samsung : connectez les deux, ouvrez le panneau rapide › **Sortie multimédia** et cochez-les tous les deux. Chaque joueur peut ainsi avoir ses écouteurs, ou l'enceinte joue pour le court et le casque pour qui marque les points.
 
 ### 4.1 Langues (app 2.3, firmware 2.2)
 

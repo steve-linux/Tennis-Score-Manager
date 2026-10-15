@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Vorab erzeugte Audiodateien verwenden** (optional): Mit **Dateien erzeugen** legt die App einmalig die 85 Dateien mit der gewählten Stimme an (auch mit einer *Online*-Stimme, wenn gerade Internet da ist) und verwendet sie dann statt der laufenden Sprachausgabe. Das klingt eher „zusammengestückelt“, ist aber praktisch, um eine Online-Stimme offline mitzunehmen. Die bisherigen Dateien bleiben, bis die neuen fertig sind (kommt die Erzeugung nicht ans Ende: *Erzeugung nicht abgeschlossen*); währenddessen sind Sprache, Engine, Stimme, Stimmtest und Audio gesperrt.
 - **Externer Lautsprecher**: einfach per Bluetooth mit dem Telefon koppeln; die Stimme kommt über den Medienkanal (Medienlautstärke einstellen).
 - **Bluetooth-Kopfhörer oder -Ohrhörer**: werden genauso gekoppelt, und nur du hörst die Stimme, ohne die Nachbarplätze zu stören; praktisch auch für alle, die vom Platzrand aus zählen. Die Armbänder können gleichzeitig verbunden bleiben.
+- **Zwei Audiogeräte gleichzeitig**: Viele Telefone geben den Ton auf zwei Bluetooth-Geräten zugleich aus. Bei Samsung: beide verbinden, Schnelleinstellungen › **Medienausgabe** öffnen und beide anhaken. So hat jeder Spieler seine eigenen Ohrhörer, oder der Lautsprecher spielt für den Platz und Kopfhörer für die Person, die zählt.
 
 ### 4.1 Sprachen (App 2.3, Firmware 2.2)
 

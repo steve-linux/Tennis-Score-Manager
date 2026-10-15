@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Usar archivos de audio pregenerados** (opcional): con **Generar archivos** la app crea una sola vez los 85 archivos con la voz elegida (incluso una voz *en línea*, si en ese momento hay internet) y después los usa en lugar de la síntesis continua. Suena más «a trozos», pero sirve para llevarse sin conexión una voz en línea. Los archivos anteriores se mantienen hasta que los nuevos estén listos (si la generación no termina: *Generación no completada*); mientras genera, idioma, motor, voz, prueba de voz y audio quedan bloqueados.
 - **Altavoz externo**: basta con emparejarlo por Bluetooth con el teléfono; la voz sale por el canal multimedia (ajusta el volumen multimedia).
 - **Auriculares Bluetooth**: se emparejan igual y la voz solo la oyes tú, sin molestar a las pistas de al lado; también sirven a quien lleva el marcador desde fuera de la pista. Las pulseras pueden seguir conectadas a la vez.
+- **Dos dispositivos de audio a la vez**: muchos teléfonos envían el audio a dos dispositivos Bluetooth al mismo tiempo. En Samsung: conecta los dos, abre el panel rápido › **Salida multimedia** y marca los dos. Así cada jugador puede tener sus auriculares, o el altavoz suena para la pista y los auriculares para quien lleva el marcador.
 
 ### 4.1 Idiomas (app 2.3, firmware 2.2)
 

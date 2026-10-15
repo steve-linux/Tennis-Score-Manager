@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Usa file audio pre-generati** (facoltativo): con **Genera file** l'app crea una volta gli 85 file con la voce scelta (anche una voce *online*, se in quel momento c'è internet) e poi li usa al posto della sintesi continua. Suona più "a pezzi", ma è utile per portarsi offline una voce online. I file di prima restano finché quelli nuovi non sono pronti (se la generazione non arriva in fondo: *Generazione non completata*); mentre genera, lingua, motore, voce, prova voce e audio sono bloccati.
 - **Cassa esterna**: basta accoppiarla al telefono in Bluetooth; la voce esce sul canale multimediale (regola il volume media).
 - **Cuffie o auricolari Bluetooth**: si accoppiano allo stesso modo e la voce la senti solo tu, senza disturbare i campi vicini; vanno bene anche per chi segna da bordo campo. I braccialetti possono restare collegati insieme alle cuffie.
+- **Due dispositivi audio insieme**: molti telefoni mandano l'audio a due dispositivi Bluetooth contemporaneamente. Sui Samsung: connetti entrambi, apri il pannello rapido › **Uscita multimediale** e spunta tutti e due. Così ogni giocatore può avere i suoi auricolari, oppure la cassa suona per il campo e le cuffie per chi segna.
 
 ### 4.1 Lingue (app 2.3, firmware 2.2)
 

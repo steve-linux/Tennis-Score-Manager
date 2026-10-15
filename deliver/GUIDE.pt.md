@@ -107,6 +107,7 @@ bash installa_tsm.sh
 - **Usar arquivos de áudio pré-gerados** (opcional): com **Gerar arquivos** o app cria uma vez os 85 arquivos com a voz escolhida (até mesmo uma voz *online*, se naquele momento houver internet) e depois os usa no lugar da síntese contínua. Soa mais "picotado", mas é útil para levar offline uma voz online. Os arquivos anteriores ficam até os novos estarem prontos (se a geração não chegar ao fim: *Geração não concluída*); durante a geração, idioma, mecanismo, voz, teste de voz e áudio ficam bloqueados.
 - **Caixa de som externa** (coluna): basta pareá-la com o telefone por Bluetooth; a voz sai pelo canal de mídia (ajuste o volume de mídia).
 - **Fones de ouvido Bluetooth**: são pareados do mesmo jeito e só você ouve a voz, sem incomodar as quadras vizinhas; servem também para quem marca o placar da beira da quadra. As pulseiras podem continuar conectadas ao mesmo tempo.
+- **Dois dispositivos de áudio ao mesmo tempo**: muitos telefones mandam o áudio para dois dispositivos Bluetooth juntos. No Samsung: conecte os dois, abra o painel rápido › **Saída de mídia** e marque os dois. Assim cada jogador pode ter o seu fone, ou a caixa de som toca para a quadra e o fone para quem marca o placar.
 
 ### 4.1 Idiomas (app 2.3, firmware 2.2)
 
