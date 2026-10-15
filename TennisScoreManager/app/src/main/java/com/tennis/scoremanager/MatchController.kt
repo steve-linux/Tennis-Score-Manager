@@ -305,6 +305,29 @@ class MatchController(
         storage.setup = v
     }
 
+    /** Doppio e No-Ad com'erano prima di scegliere Padel: tornando a Tennis si rimettono. */
+    private var tennisDoubles: Boolean? = null
+    private var tennisNoAd: Boolean? = null
+
+    /**
+     * Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+     * Tornando a Tennis si rimettono com'erano, perché il No-Ad sta in un'altra pagina e rimasto acceso non si nota.
+     * Se non si sa com'erano (app riaperta col padel già scelto) il No-Ad si spegne e il doppio resta com'è.
+     */
+    fun selectSport(sport: Sport) {
+        if (sport == setup.value.sport) return
+        if (sport == Sport.PADEL) {
+            tennisDoubles = setup.value.doubles
+            tennisNoAd = options.value.noAd
+            updateSetup { it.copy(sport = sport, doubles = true) }
+            updateOptions { it.copy(noAd = true) }
+        } else {
+            val doubles = tennisDoubles
+            updateSetup { it.copy(sport = sport, doubles = doubles ?: it.doubles) }
+            updateOptions { it.copy(noAd = tennisNoAd ?: false) }
+        }
+    }
+
     fun updateOptions(transform: (MatchOptions) -> MatchOptions) {
         val old = options.value
         val v = transform(old)
