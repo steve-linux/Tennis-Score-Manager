@@ -226,7 +226,7 @@ Plug in the USB-C cable: the wristband beeps and shows the **charging screen** f
 The cheapest way to let the players score: two **Bluetooth selfie remotes** (the ones with a shutter button, often sold as *AB Shutter3*), €1–3 each. Android sees them as a keyboard: no firmware to flash and no permissions for the app. Any other Bluetooth (or USB) keypad or keyboard works too.
 
 1. Switch the remote on and pair it in the phone's **Bluetooth settings**, like a headset (page 2 › *Bluetooth settings* opens them). Repeat with the second one.
-2. Page 2 › **Remotes** mode › **Assign** under Player 1 › press a key on their remote; then the same for Player 2. Every click of an assigned remote shows **Key received** on its row, so you can test before playing. **Swap P1 ↔ P2** swaps them.
+2. Page 2 › **Remotes** mode › **Assign** under Player 1 › press the button on their remote that will give the point; then the same for Player 2. Every click of an assigned remote shows **Key received** on its row, so you can test before playing. **Swap P1 ↔ P2** swaps them.
 3. **MATCH START**: one click on a remote starts the match, like KEY1 on the wristbands. At the top, **P1**/**P2** are coloured when the remotes are connected.
 
 | Gesture | Action |
@@ -234,9 +234,10 @@ The cheapest way to let the players score: two **Bluetooth selfie remotes** (the
 | one click | point to whoever holds the remote (it arrives half a second later: the app waits to see whether it is a double click) |
 | double click | undo the last point (also from the end-of-match popup) |
 | hold for 1 s | undo the last point |
+| the other button (two-button remotes) | undo the last point, at once; pressed within half a second of a click, it cancels that click |
 
 - The wristband safeguards apply: two points less than 2 seconds apart count once, two undos close together remove a single point, *Match concluded* is confirmed on the phone only.
-- Many selfie remotes have two buttons (*iOS* and *Android*) or send two keys per press: the app treats them the same and one press stays one click.
+- Many selfie remotes have two buttons (*iOS* and *Android*): the button pressed when assigning gives the point, the other one undoes. On the CAMKIX (an *AB Shutter3*) the big button sends VOLUME UP and the small one ENTER: assign it with the big button and the small one becomes “undo”. If a remote sends two keys per press, one press stays one click.
 - **The screen must stay on with the app in front** (during the match the app keeps it on by itself). Unlike the wristbands, the keys of a Bluetooth keyboard only reach the visible app: with the screen locked or another app open they don't count. For long matches keep the phone charging.
 - If a remote disconnects during the match (switched off, flat, too far) the orange box shows *REMOTE 1 DISCONNECTED*, and *CONNECTED* when it is back. Many remotes go to sleep after a few minutes without clicks: the first click wakes them up and is sometimes lost. If the voice doesn't call the point, press again.
 - Range: about ten metres, like Bluetooth headphones; with the phone near the net, at mid-court, both ends are covered. Battery: usually a CR2032 coin cell that lasts for months.

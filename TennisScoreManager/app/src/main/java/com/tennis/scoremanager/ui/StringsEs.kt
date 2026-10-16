@@ -36,8 +36,8 @@ object EsStrings : Strings {
     override val modeRefereeHint = "Los puntos se asignan desde el teléfono, como hace el juez de silla."
     override val modeBandsHint = "Cada jugador se anota el punto con KEY1 de su propio M5StickS3."
     override val modeRemotes = "Mandos"
-    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer."
-    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa una tecla de su mando."
+    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer. Si el mando tiene dos teclas, la otra deshace con un clic."
+    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa en su mando la tecla del punto: si hay una segunda tecla, servirá para deshacer."
     override val bluetoothSettings = "Ajustes de Bluetooth"
     override val remoteFor: (String) -> String = { "Mando de $it" }
     override val noRemote = "Ninguno"

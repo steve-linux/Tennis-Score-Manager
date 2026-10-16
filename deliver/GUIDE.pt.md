@@ -226,7 +226,7 @@ Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 
 O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles Bluetooth de selfie** (os de botão de disparo, muitas vezes vendidos como *AB Shutter3*), que custam muito pouco. O Android os vê como um teclado: nenhum firmware para gravar e nenhuma permissão para o app. Qualquer outro teclado ou botoeira Bluetooth (ou USB) também serve.
 
 1. Ligue o controle e pareie nas **configurações de Bluetooth** do telefone, como um fone de ouvido (página 2 › *Configurações de Bluetooth* abre a tela). Repita com o segundo.
-2. Página 2 › modo **Controles** › **Associar** embaixo do Jogador 1 › aperte uma tecla do controle dele; depois o mesmo para o Jogador 2. A cada clique de um controle associado a linha dele mostra **Tecla recebida**: assim dá para testar antes de jogar. **Trocar J1 ↔ J2** inverte os dois.
+2. Página 2 › modo **Controles** › **Associar** embaixo do Jogador 1 › aperte a tecla do controle dele que vai dar o ponto; depois o mesmo para o Jogador 2. A cada clique de um controle associado a linha dele mostra **Tecla recebida**: assim dá para testar antes de jogar. **Trocar J1 ↔ J2** inverte os dois.
 3. **INÍCIO DA PARTIDA**: um clique num controle começa a partida, como o KEY1 das pulseiras. No alto, **J1**/**J2** ficam coloridos quando os controles estão conectados.
 
 | Gesto | Ação |
@@ -234,9 +234,10 @@ O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles 
 | um clique | ponto para quem está com o controle (chega meio segundo depois: o app espera para ver se é um clique duplo) |
 | clique duplo | desfaz o último ponto (também na janela de fim de partida) |
 | segurar 1 s | desfaz o último ponto |
+| a outra tecla (controles de duas teclas) | desfaz o último ponto, na hora; apertada menos de meio segundo depois de um clique, cancela esse clique |
 
 - Valem as proteções das pulseiras: dois pontos com menos de 2 segundos de diferença contam uma vez só, dois desfazer seguidos tiram um ponto só, *Partida encerrada* só se confirma no telefone.
-- Muitos controles de selfie têm dois botões (*iOS* e *Android*) ou mandam duas teclas a cada aperto: para o app é tudo igual e um aperto continua sendo um clique.
+- Muitos controles de selfie têm dois botões (*iOS* e *Android*): a tecla apertada ao associar dá o ponto e a outra desfaz. No CAMKIX (um *AB Shutter3*) o botão grande manda AUMENTAR VOLUME e o pequeno ENTER: associe com o botão grande e o pequeno vira “desfazer”. Se um controle manda duas teclas a cada aperto, um aperto continua sendo um clique.
 - **A tela precisa ficar acesa com o app na frente** (durante a partida o app a mantém acesa sozinho). Diferente das pulseiras, as teclas de um teclado Bluetooth só chegam ao app visível: com a tela bloqueada ou outro app aberto elas não contam. Em partidas longas, deixe o telefone carregando.
 - Se um controle se desconecta durante a partida (desligado, sem bateria, longe demais) o quadro laranja mostra *CONTROLE 1 DESCONECTADO*, e *CONECTADO* quando volta. Muitos controles dormem depois de alguns minutos sem clique: o primeiro clique os desperta e às vezes se perde. Se a voz não anunciar o ponto, aperte de novo.
 - Alcance: uns dez metros, como um fone Bluetooth; com o telefone perto da rede, no meio da quadra, os dois lados ficam cobertos. Bateria: em geral uma CR2032, que dura meses.

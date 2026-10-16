@@ -226,7 +226,7 @@ Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de cha
 La solution la plus économique pour laisser les joueurs marquer : deux **télécommandes Bluetooth pour selfie** (celles avec un bouton de déclenchement, souvent vendues sous le nom *AB Shutter3*), de 1 à 3 € pièce. Android les voit comme un clavier : pas de firmware à charger et aucune autorisation pour l'application. N'importe quel autre pavé ou clavier Bluetooth (ou USB) convient aussi.
 
 1. Allumez la télécommande et appairez-la dans les **réglages Bluetooth** du téléphone, comme un casque (page 2 › *Réglages Bluetooth* les ouvre). Recommencez avec la seconde.
-2. Page 2 › mode **Télécommandes** › **Associer** sous le Joueur 1 › appuyez sur une touche de sa télécommande ; puis pareil pour le Joueur 2. À chaque clic d'une télécommande associée, sa ligne affiche **Touche reçue** : on peut ainsi tester avant de jouer. **Échanger J1 ↔ J2** les inverse.
+2. Page 2 › mode **Télécommandes** › **Associer** sous le Joueur 1 › appuyez sur la touche de sa télécommande qui donnera le point ; puis pareil pour le Joueur 2. À chaque clic d'une télécommande associée, sa ligne affiche **Touche reçue** : on peut ainsi tester avant de jouer. **Échanger J1 ↔ J2** les inverse.
 3. **DÉBUT DU MATCH** : un clic sur une télécommande lance le match, comme KEY1 des bracelets. En haut, **J1**/**J2** sont en couleur quand les télécommandes sont connectées.
 
 | Geste | Action |
@@ -234,9 +234,10 @@ La solution la plus économique pour laisser les joueurs marquer : deux **télé
 | un clic | point pour celui qui tient la télécommande (il arrive une demi-seconde plus tard : l'application attend de voir si c'est un double clic) |
 | double clic | annule le dernier point (même depuis la fenêtre de fin de match) |
 | appui de 1 s | annule le dernier point |
+| l'autre touche (télécommandes à deux touches) | annule le dernier point, tout de suite ; pressée moins d'une demi-seconde après un clic, elle annule ce clic |
 
 - Les protections des bracelets s'appliquent : deux points à moins de 2 secondes d'intervalle ne comptent qu'une fois, deux annulations rapprochées n'enlèvent qu'un point, *Match terminé* ne se confirme que sur le téléphone.
-- Beaucoup de télécommandes pour selfie ont deux boutons (*iOS* et *Android*) ou envoient deux touches à chaque appui : pour l'application c'est pareil et un appui reste un clic.
+- Beaucoup de télécommandes pour selfie ont deux boutons (*iOS* et *Android*) : la touche pressée lors de l'association donne le point, l'autre annule. Sur la CAMKIX (une *AB Shutter3*), le gros bouton envoie VOLUME HAUT et le petit ENTRÉE : associez-la avec le gros bouton et le petit devient « annuler ». Si une télécommande envoie deux touches à chaque appui, un appui reste un clic.
 - **L'écran doit rester allumé avec l'application au premier plan** (pendant le match, l'application le garde allumé toute seule). Contrairement aux bracelets, les touches d'un clavier Bluetooth n'arrivent qu'à l'application visible : écran verrouillé ou autre application ouverte, elles ne comptent pas. Pour les longs matchs, laissez le téléphone en charge.
 - Si une télécommande se déconnecte pendant le match (éteinte, pile vide, trop loin), l'encadré orange affiche *TÉLÉCOMMANDE 1 DÉCONNECTÉE*, puis *CONNECTÉE* à son retour. Beaucoup de télécommandes se mettent en veille après quelques minutes sans clic : le premier clic les réveille et se perd parfois. Si la voix n'annonce pas le point, appuyez de nouveau.
 - Portée : une dizaine de mètres, comme un casque Bluetooth ; avec le téléphone près du filet, au milieu du court, les deux côtés sont couverts. Pile : en général une CR2032, qui dure des mois.

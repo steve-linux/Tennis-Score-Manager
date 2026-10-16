@@ -20,14 +20,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/** Telecomando associato a un giocatore: [descriptor] è l'identità stabile di Android, [name] quello che si mostra. */
-data class RemoteInfo(val descriptor: String, val name: String)
+/**
+ * Telecomando associato a un giocatore: [descriptor] è l'identità stabile di Android, [name] quello che si mostra,
+ * [pointKey] il tasto premuto all'associazione, che dà il punto (null: associato prima della 2.5, ogni tasto dà il punto).
+ */
+data class RemoteInfo(val descriptor: String, val name: String, val pointKey: Int? = null)
 
 /**
  * Telecomandini Bluetooth da selfie (o qualsiasi tastiera Bluetooth/USB) al posto dei braccialetti.
  * Android li vede come tastiere: si accoppiano dalle impostazioni Bluetooth del telefono, senza permessi per l'app,
  * e i loro tasti arrivano all'Activity in primo piano (quindi solo a schermo acceso, con l'app davanti).
- * Ogni telecomando è di un giocatore: un clic = punto, doppio clic o pressione lunga = annulla ([PressDetector]).
+ * Ogni telecomando è di un giocatore: un clic = punto, doppio clic o pressione lunga = annulla ([PressDetector]);
+ * sui telecomandi a due tasti (es. VOLUME SU + INVIO) il tasto premuto all'associazione dà il punto e l'altro annulla.
  */
 class RemoteInput(context: Context, private val storage: Storage, private val scope: CoroutineScope) {
 
@@ -101,15 +105,18 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
         if (wanted != null) {
             if (!canAssign(device, event.keyCode)) return false
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
-                set(wanted, RemoteInfo(device.descriptor, device.name.orEmpty().ifBlank { "?" }))
+                set(wanted, RemoteInfo(device.descriptor, device.name.orEmpty().ifBlank { "?" }, event.keyCode))
                 capture.value = null
             }
             return true
         }
-        val side = _assigned.value.entries.firstOrNull { it.value.descriptor == device.descriptor }?.key ?: return false
+        val (side, info) = _assigned.value.entries.firstOrNull { it.value.descriptor == device.descriptor } ?: return false
         val dev = side.name
+        val undoKey = info.pointKey != null && event.keyCode != info.pointKey
+        // Un clic già scaduto ma non ancora contato dal timer diventa punto prima di questo tasto, non dopo.
+        for (d in detector.due(event.eventTime)) emit(Side.valueOf(d), Gesture.POINT)
         val gesture = when (event.action) {
-            KeyEvent.ACTION_DOWN -> detector.down(dev, event.keyCode, event.eventTime)
+            KeyEvent.ACTION_DOWN -> detector.down(dev, event.keyCode, event.eventTime, undoKey)
             KeyEvent.ACTION_UP -> detector.up(dev, event.keyCode, event.eventTime)
             else -> null
         }
@@ -152,13 +159,13 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
         if (info != null) m.entries.removeAll { it.key != side && it.value.descriptor == info.descriptor }
         if (info == null) m.remove(side) else m[side] = info
         _assigned.value = m
-        for (s in Side.entries) storage.setRemote(s == Side.P1, m[s]?.descriptor, m[s]?.name)
+        for (s in Side.entries) storage.setRemote(s == Side.P1, m[s]?.descriptor, m[s]?.name, m[s]?.pointKey)
     }
 
     private fun load(): Map<Side, RemoteInfo> = buildMap {
         for (s in Side.entries) {
             val d = storage.remoteDescriptor(s == Side.P1) ?: continue
-            put(s, RemoteInfo(d, storage.remoteName(s == Side.P1) ?: "?"))
+            put(s, RemoteInfo(d, storage.remoteName(s == Side.P1) ?: "?", storage.remoteKey(s == Side.P1)))
         }
     }
 

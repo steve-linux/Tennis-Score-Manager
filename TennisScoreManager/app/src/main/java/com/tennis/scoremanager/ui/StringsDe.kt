@@ -36,8 +36,8 @@ object DeStrings : Strings {
     override val modeRefereeHint = "Die Punkte werden am Telefon vergeben, wie vom Stuhlschiedsrichter."
     override val modeBandsHint = "Jeder Spieler vergibt den Punkt mit KEY1 an seinem eigenen M5StickS3."
     override val modeRemotes = "Fernbedienungen"
-    override val modeRemotesHint = "Jeder Spieler vergibt den Punkt mit einer Bluetooth-Selfie-Fernbedienung (1–3 €): ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig."
-    override val remotesHowTo = "1. Die Fernbedienungen in den Bluetooth-Einstellungen des Telefons koppeln, wie eine Tastatur. 2. Unter dem Spieler auf „Zuordnen“ tippen und eine Taste seiner Fernbedienung drücken."
+    override val modeRemotesHint = "Jeder Spieler vergibt den Punkt mit einer Bluetooth-Selfie-Fernbedienung (1–3 €): ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig. Hat die Fernbedienung zwei Tasten, nimmt die andere den Punkt mit einem Klick zurück."
+    override val remotesHowTo = "1. Die Fernbedienungen in den Bluetooth-Einstellungen des Telefons koppeln, wie eine Tastatur. 2. Unter dem Spieler auf „Zuordnen“ tippen und auf seiner Fernbedienung die Taste für den Punkt drücken: Eine zweite Taste, falls vorhanden, macht rückgängig."
     override val bluetoothSettings = "Bluetooth-Einstellungen"
     override val remoteFor: (String) -> String = { "Fernbedienung von $it" }
     override val noRemote = "Keine"

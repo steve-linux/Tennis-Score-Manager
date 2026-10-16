@@ -39,8 +39,8 @@ object PtStrings : Strings {
     override val modeRefereeHint = "Os pontos são marcados no telefone, como faz o árbitro de cadeira."
     override val modeBandsHint = "Cada jogador marca o ponto com o KEY1 do seu próprio M5StickS3."
     override val modeRemotes = "Controles"
-    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer."
-    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte uma tecla do controle dele."
+    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer. Se o controle tiver duas teclas, a outra desfaz com um clique."
+    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte no controle dele a tecla do ponto: uma segunda tecla, se houver, vai desfazer."
     override val bluetoothSettings = "Configurações de Bluetooth"
     override val remoteFor: (String) -> String = { "Controle de $it" }
     override val noRemote = "Nenhum"

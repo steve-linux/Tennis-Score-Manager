@@ -9,7 +9,9 @@ enum class Gesture { POINT, UNDO }
  * Riconosce i gesti di un telecomandino a un tasto, uno per dispositivo ([dev]):
  * - un clic = [Gesture.POINT], dato dopo [doubleMs] se non arriva un secondo clic;
  * - doppio clic = [Gesture.UNDO], subito alla seconda pressione (il punto del primo clic non si dà);
- * - pressione lunga ([longMs]) = [Gesture.UNDO], appena scade se il telecomando ripete il tasto, altrimenti al rilascio.
+ * - pressione lunga ([longMs]) = [Gesture.UNDO], appena scade se il telecomando ripete il tasto, altrimenti al rilascio;
+ * - tasto per annullare (`undoKey`, l'altro tasto dei telecomandi a due tasti) = [Gesture.UNDO] subito; se c'è un clic
+ *   in attesa annulla quello, che non diventa punto (come chi si corregge subito dopo aver premuto).
  *
  * Molti telecomandi da selfie mandano due tasti per ogni pressione (es. VOLUME SU + INVIO): i tasti che arrivano
  * entro [mergeMs] dalla fine della pressione precedente, o mentre un altro tasto è ancora giù, fanno parte della
@@ -32,8 +34,8 @@ class PressDetector(
 
     private val devs = mutableMapOf<String, Dev>()
 
-    /** Tasto premuto, anche ripetuto dal telecomando tenendolo giù. */
-    fun down(dev: String, key: Int, t: Long): Gesture? {
+    /** Tasto premuto, anche ripetuto dal telecomando tenendolo giù. [undoKey] = è il tasto per annullare. */
+    fun down(dev: String, key: Int, t: Long, undoKey: Boolean = false): Gesture? {
         val d = devs.getOrPut(dev) { Dev() }
         if (key in d.held) {
             // Ripetizione del tasto tenuto giù.
@@ -50,6 +52,11 @@ class PressDetector(
         d.downAt = t
         d.consumed = false
         val pending = d.pointAt
+        if (undoKey) {
+            d.consumed = true
+            d.pointAt = null
+            return if (pending != null && t <= pending) null else Gesture.UNDO
+        }
         if (pending != null && t <= pending) {
             d.pointAt = null
             d.consumed = true

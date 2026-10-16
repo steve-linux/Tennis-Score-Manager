@@ -112,4 +112,43 @@ class PressDetectorTest {
         assertNull(d.up("a", volUp, 1_000))
         assertNull(d.nextDeadline())
     }
+
+    @Test
+    fun undoKeyUndoesAtOnce() {
+        val d = PressDetector()
+        assertEquals(Gesture.UNDO, d.down("a", enter, 1_000, undoKey = true))
+        assertNull(d.up("a", enter, 1_150))
+        assertNull(d.nextDeadline())
+    }
+
+    @Test
+    fun undoKeyRightAfterAClickCancelsThatClickOnly() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_150)
+        assertNull(d.down("a", enter, 1_300, undoKey = true))
+        assertNull(d.up("a", enter, 1_450))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun undoKeyHeldDownUndoesOnce() {
+        val d = PressDetector()
+        assertEquals(Gesture.UNDO, d.down("a", enter, 1_000, undoKey = true))
+        assertNull(d.down("a", enter, 1_500, undoKey = true))
+        assertNull(d.down("a", enter, 2_000, undoKey = true))
+        assertNull(d.up("a", enter, 3_000))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun aSecondKeyInsideThePointPressIsNotAnUndo() {
+        // Telecomandi che mandano due tasti per pressione: il secondo fa parte della stessa pressione.
+        val d = PressDetector()
+        assertNull(d.down("a", volUp, 1_000))
+        assertNull(d.down("a", enter, 1_010, undoKey = true))
+        assertNull(d.up("a", volUp, 1_100))
+        assertNull(d.up("a", enter, 1_110))
+        assertEquals(listOf("a"), d.due(1_600))
+    }
 }

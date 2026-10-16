@@ -226,7 +226,7 @@ Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **
 Die günstigste Lösung, damit die Spieler selbst zählen: zwei **Bluetooth-Selfie-Fernbedienungen** (die mit dem Auslöseknopf, oft als *AB Shutter3* verkauft), 1 bis 3 € pro Stück. Android sieht sie als Tastatur: keine Firmware zum Aufspielen und keine Berechtigungen für die App. Jedes andere Bluetooth- (oder USB-)Tastenfeld oder jede Tastatur geht auch.
 
 1. Die Fernbedienung einschalten und in den **Bluetooth-Einstellungen** des Telefons koppeln, wie einen Kopfhörer (Seite 2 › *Bluetooth-Einstellungen* öffnet sie). Mit der zweiten wiederholen.
-2. Seite 2 › Modus **Fernbedienungen** › **Zuordnen** unter Spieler 1 › eine Taste seiner Fernbedienung drücken; dann dasselbe für Spieler 2. Bei jedem Klick einer zugeordneten Fernbedienung zeigt ihre Zeile **Taste empfangen**: So lässt sich vor dem Spiel testen. **S1 ↔ S2 tauschen** vertauscht sie.
+2. Seite 2 › Modus **Fernbedienungen** › **Zuordnen** unter Spieler 1 › die Taste seiner Fernbedienung drücken, die den Punkt geben soll; dann dasselbe für Spieler 2. Bei jedem Klick einer zugeordneten Fernbedienung zeigt ihre Zeile **Taste empfangen**: So lässt sich vor dem Spiel testen. **S1 ↔ S2 tauschen** vertauscht sie.
 3. **MATCHBEGINN**: Ein Klick auf eine Fernbedienung startet das Match, wie KEY1 an den Armbändern. Oben sind **S1**/**S2** farbig, wenn die Fernbedienungen verbunden sind.
 
 | Geste | Aktion |
@@ -234,9 +234,10 @@ Die günstigste Lösung, damit die Spieler selbst zählen: zwei **Bluetooth-Self
 | ein Klick | Punkt für den, der die Fernbedienung hält (kommt eine halbe Sekunde später: Die App wartet, ob es ein Doppelklick ist) |
 | Doppelklick | macht den letzten Punkt rückgängig (auch im Popup am Matchende) |
 | 1 s gedrückt halten | macht den letzten Punkt rückgängig |
+| die andere Taste (Fernbedienungen mit zwei Tasten) | macht den letzten Punkt sofort rückgängig; innerhalb einer halben Sekunde nach einem Klick gedrückt, verwirft sie diesen Klick |
 
 - Es gelten die Schutzregeln der Armbänder: Zwei Punkte im Abstand von weniger als 2 Sekunden zählen einmal, zwei kurz aufeinanderfolgende Rücknahmen entfernen nur einen Punkt, *Match beendet* wird nur am Telefon bestätigt.
-- Viele Selfie-Fernbedienungen haben zwei Knöpfe (*iOS* und *Android*) oder senden bei jedem Druck zwei Tasten: Für die App ist das gleich, ein Druck bleibt ein Klick.
+- Viele Selfie-Fernbedienungen haben zwei Knöpfe (*iOS* und *Android*): Die beim Zuordnen gedrückte Taste gibt den Punkt, die andere macht rückgängig. Bei der CAMKIX (eine *AB Shutter3*) sendet der große Knopf LAUTER und der kleine EINGABE: Ordne sie mit dem großen Knopf zu, dann wird der kleine zu „rückgängig“. Sendet eine Fernbedienung bei jedem Druck zwei Tasten, bleibt ein Druck ein Klick.
 - **Der Bildschirm muss mit der App im Vordergrund an bleiben** (während des Matches hält die App ihn selbst an). Anders als bei den Armbändern kommen die Tasten einer Bluetooth-Tastatur nur bei der sichtbaren App an: Bei gesperrtem Bildschirm oder einer anderen geöffneten App zählen sie nicht. Bei langen Matches das Telefon laden lassen.
 - Trennt sich eine Fernbedienung während des Matches (aus, leer, zu weit weg), zeigt der orange Kasten *FERNBEDIENUNG 1 GETRENNT* und *VERBUNDEN*, wenn sie zurück ist. Viele Fernbedienungen schlafen nach einigen Minuten ohne Klick ein: Der erste Klick weckt sie und geht manchmal verloren. Sagt die Stimme den Punkt nicht an, noch einmal drücken.
 - Reichweite: etwa zehn Meter, wie Bluetooth-Kopfhörer; mit dem Telefon am Netz, in Platzmitte, sind beide Seiten abgedeckt. Batterie: meist eine Knopfzelle CR2032, die monatelang hält.

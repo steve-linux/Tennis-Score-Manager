@@ -61,10 +61,13 @@ class Storage(context: Context) {
     /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
     fun remoteDescriptor(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1" else "remote_p2", null)
     fun remoteName(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1_name" else "remote_p2_name", null)
-    fun setRemote(p1: Boolean, descriptor: String?, name: String?) {
+    /** Tasto premuto all'associazione: dà il punto; gli altri tasti dello stesso telecomando annullano (null = tutti punto). */
+    fun remoteKey(p1: Boolean): Int? = prefs.getInt(if (p1) "remote_p1_key" else "remote_p2_key", -1).takeIf { it >= 0 }
+    fun setRemote(p1: Boolean, descriptor: String?, name: String?, key: Int?) {
         prefs.edit()
             .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
             .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
+            .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
             .apply()
     }
 

@@ -226,7 +226,7 @@ Collega il cavo USB-C: il braccialetto fa un bip e mostra la **schermata di cari
 Il sistema più economico per far segnare i punti ai giocatori: due **telecomandini Bluetooth da selfie** (quelli col tasto di scatto, spesso venduti come *AB Shutter3*), da 1 a 3 € l'uno. Android li vede come una tastiera: niente firmware da caricare e nessun permesso per l'app. Va bene anche qualsiasi altra pulsantiera o tastiera Bluetooth (o USB).
 
 1. Accendi il telecomando e accoppialo dalle **impostazioni Bluetooth** del telefono, come una cuffia (pagina 2 › *Impostazioni Bluetooth* le apre). Ripeti col secondo.
-2. Pagina 2 › modalità **Telecomandi** › **Associa** sotto il Giocatore 1 › premi un tasto del suo telecomando; poi lo stesso per il Giocatore 2. A ogni clic di un telecomando associato la sua riga mostra **Tasto ricevuto**: così si prova prima di giocare. **Scambia G1 ↔ G2** li inverte.
+2. Pagina 2 › modalità **Telecomandi** › **Associa** sotto il Giocatore 1 › premi il tasto del suo telecomando che darà il punto; poi lo stesso per il Giocatore 2. A ogni clic di un telecomando associato la sua riga mostra **Tasto ricevuto**: così si prova prima di giocare. **Scambia G1 ↔ G2** li inverte.
 3. **INIZIO PARTITA**: un clic su un telecomando avvia la partita, come KEY1 dei braccialetti. In alto **G1**/**G2** sono colorati quando i telecomandi sono collegati.
 
 | Gesto | Azione |
@@ -234,9 +234,10 @@ Il sistema più economico per far segnare i punti ai giocatori: due **telecomand
 | un clic | punto a chi ha il telecomando (arriva dopo mezzo secondo: l'app aspetta di vedere se è un doppio clic) |
 | doppio clic | annulla l'ultimo punto (anche dal popup di fine partita) |
 | tenere premuto 1 s | annulla l'ultimo punto |
+| l'altro tasto (telecomandi a due tasti) | annulla l'ultimo punto, subito; premuto entro mezzo secondo da un clic, annulla quel clic |
 
 - Valgono le protezioni dei braccialetti: due punti a meno di 2 secondi contano una volta sola, due annulla ravvicinati tolgono un solo punto, *Partita conclusa* si conferma solo dal telefono.
-- Molti telecomandi da selfie hanno due tasti (*iOS* e *Android*) o mandano due tasti a ogni pressione: per l'app sono uguali e una pressione resta un clic.
+- Molti telecomandi da selfie hanno due tasti (*iOS* e *Android*): il tasto premuto all'associazione dà il punto, l'altro annulla. Sul CAMKIX (un *AB Shutter3*) il tasto grande manda VOLUME SU e il piccolo INVIO: associalo col tasto grande e il piccolo diventa «annulla». Se un telecomando manda due tasti a ogni pressione, una pressione resta un clic.
 - **Lo schermo deve restare acceso con l'app davanti** (in partita l'app lo tiene acceso da sola). A differenza dei braccialetti, i tasti di una tastiera Bluetooth arrivano solo all'app visibile: a schermo bloccato o con un'altra app aperta non contano. Per partite lunghe tieni il telefono in carica.
 - Se un telecomando si scollega in partita (spento, scarico, troppo lontano) il riquadro arancione mostra *TELECOMANDO 1 SCOLLEGATO*, e *COLLEGATO* quando torna. Molti telecomandi si addormentano dopo qualche minuto senza clic: il primo clic li risveglia e a volte va perso. Se la voce non dice il punto, premi ancora.
 - Portata: una decina di metri, come le cuffie Bluetooth; col telefono vicino alla rete, a metà campo, si coprono entrambi i lati. Pila: di solito una CR2032, che dura mesi.

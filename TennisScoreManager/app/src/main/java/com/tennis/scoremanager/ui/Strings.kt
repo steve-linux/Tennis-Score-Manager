@@ -466,8 +466,8 @@ object ItStrings : Strings {
     override val modeRefereeHint = "Il punteggio si assegna dal telefono, come il giudice di sedia."
     override val modeBandsHint = "Ogni giocatore assegna il punto con KEY1 del proprio M5StickS3."
     override val modeRemotes = "Telecomandi"
-    override val modeRemotesHint = "Ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie (1–3 €): un clic = punto, doppio clic o pressione lunga = annulla."
-    override val remotesHowTo = "1. Accoppia i telecomandi nelle impostazioni Bluetooth del telefono, come una tastiera. 2. Tocca «Associa» sotto il giocatore e premi un tasto del suo telecomando."
+    override val modeRemotesHint = "Ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie (1–3 €): un clic = punto, doppio clic o pressione lunga = annulla. Se il telecomando ha due tasti, l'altro annulla con un clic."
+    override val remotesHowTo = "1. Accoppia i telecomandi nelle impostazioni Bluetooth del telefono, come una tastiera. 2. Tocca «Associa» sotto il giocatore e premi sul suo telecomando il tasto per il punto: un eventuale secondo tasto annullerà."
     override val bluetoothSettings = "Impostazioni Bluetooth"
     override val remoteFor: (String) -> String = { "Telecomando di $it" }
     override val noRemote = "Nessuno"
@@ -866,8 +866,8 @@ object EnStrings : Strings {
     override val modeRefereeHint = "Points are scored on the phone, like a chair umpire."
     override val modeBandsHint = "Each player scores with KEY1 on their own M5StickS3."
     override val modeRemotes = "Remotes"
-    override val modeRemotesHint = "Each player scores with a Bluetooth selfie remote (€1–3): one click = point, double click or long press = undo."
-    override val remotesHowTo = "1. Pair the remotes in the phone's Bluetooth settings, like a keyboard. 2. Tap “Assign” under the player and press a key on their remote."
+    override val modeRemotesHint = "Each player scores with a Bluetooth selfie remote (€1–3): one click = point, double click or long press = undo. If the remote has two buttons, the other one undoes with a single click."
+    override val remotesHowTo = "1. Pair the remotes in the phone's Bluetooth settings, like a keyboard. 2. Tap “Assign” under the player and press the button for the point on their remote: a second button, if any, will undo."
     override val bluetoothSettings = "Bluetooth settings"
     override val remoteFor: (String) -> String = { "$it's remote" }
     override val noRemote = "None"

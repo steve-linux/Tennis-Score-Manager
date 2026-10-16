@@ -39,8 +39,8 @@ object FrStrings : Strings {
     override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
     override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
     override val modeRemotes = "Télécommandes"
-    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler."
-    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur une touche de sa télécommande."
+    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler. Si la télécommande a deux touches, l'autre annule d'un simple clic."
+    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur la touche du point de sa télécommande : une éventuelle deuxième touche servira à annuler."
     override val bluetoothSettings = "Réglages Bluetooth"
     override val remoteFor: (String) -> String = { "Télécommande ${de(it)}" }
     override val noRemote = "Aucune"

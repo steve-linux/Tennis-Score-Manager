@@ -4144,10 +4144,13 @@ class Storage(context: Context) {
     /** Telecomandi Bluetooth: descrittore del dispositivo (identità stabile di Android) e nome mostrato. */
     fun remoteDescriptor(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1" else "remote_p2", null)
     fun remoteName(p1: Boolean): String? = prefs.getString(if (p1) "remote_p1_name" else "remote_p2_name", null)
-    fun setRemote(p1: Boolean, descriptor: String?, name: String?) {
+    /** Tasto premuto all'associazione: dà il punto; gli altri tasti dello stesso telecomando annullano (null = tutti punto). */
+    fun remoteKey(p1: Boolean): Int? = prefs.getInt(if (p1) "remote_p1_key" else "remote_p2_key", -1).takeIf { it >= 0 }
+    fun setRemote(p1: Boolean, descriptor: String?, name: String?, key: Int?) {
         prefs.edit()
             .putString(if (p1) "remote_p1" else "remote_p2", descriptor)
             .putString(if (p1) "remote_p1_name" else "remote_p2_name", name)
+            .putInt(if (p1) "remote_p1_key" else "remote_p2_key", key ?: -1)
             .apply()
     }
 
@@ -4567,7 +4570,9 @@ enum class Gesture { POINT, UNDO }
  * Riconosce i gesti di un telecomandino a un tasto, uno per dispositivo ([dev]):
  * - un clic = [Gesture.POINT], dato dopo [doubleMs] se non arriva un secondo clic;
  * - doppio clic = [Gesture.UNDO], subito alla seconda pressione (il punto del primo clic non si dà);
- * - pressione lunga ([longMs]) = [Gesture.UNDO], appena scade se il telecomando ripete il tasto, altrimenti al rilascio.
+ * - pressione lunga ([longMs]) = [Gesture.UNDO], appena scade se il telecomando ripete il tasto, altrimenti al rilascio;
+ * - tasto per annullare (`undoKey`, l'altro tasto dei telecomandi a due tasti) = [Gesture.UNDO] subito; se c'è un clic
+ *   in attesa annulla quello, che non diventa punto (come chi si corregge subito dopo aver premuto).
  *
  * Molti telecomandi da selfie mandano due tasti per ogni pressione (es. VOLUME SU + INVIO): i tasti che arrivano
  * entro [mergeMs] dalla fine della pressione precedente, o mentre un altro tasto è ancora giù, fanno parte della
@@ -4590,8 +4595,8 @@ class PressDetector(
 
     private val devs = mutableMapOf<String, Dev>()
 
-    /** Tasto premuto, anche ripetuto dal telecomando tenendolo giù. */
-    fun down(dev: String, key: Int, t: Long): Gesture? {
+    /** Tasto premuto, anche ripetuto dal telecomando tenendolo giù. [undoKey] = è il tasto per annullare. */
+    fun down(dev: String, key: Int, t: Long, undoKey: Boolean = false): Gesture? {
         val d = devs.getOrPut(dev) { Dev() }
         if (key in d.held) {
             // Ripetizione del tasto tenuto giù.
@@ -4608,6 +4613,11 @@ class PressDetector(
         d.downAt = t
         d.consumed = false
         val pending = d.pointAt
+        if (undoKey) {
+            d.consumed = true
+            d.pointAt = null
+            return if (pending != null && t <= pending) null else Gesture.UNDO
+        }
         if (pending != null && t <= pending) {
             d.pointAt = null
             d.consumed = true
@@ -4676,14 +4686,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/** Telecomando associato a un giocatore: [descriptor] è l'identità stabile di Android, [name] quello che si mostra. */
-data class RemoteInfo(val descriptor: String, val name: String)
+/**
+ * Telecomando associato a un giocatore: [descriptor] è l'identità stabile di Android, [name] quello che si mostra,
+ * [pointKey] il tasto premuto all'associazione, che dà il punto (null: associato prima della 2.5, ogni tasto dà il punto).
+ */
+data class RemoteInfo(val descriptor: String, val name: String, val pointKey: Int? = null)
 
 /**
  * Telecomandini Bluetooth da selfie (o qualsiasi tastiera Bluetooth/USB) al posto dei braccialetti.
  * Android li vede come tastiere: si accoppiano dalle impostazioni Bluetooth del telefono, senza permessi per l'app,
  * e i loro tasti arrivano all'Activity in primo piano (quindi solo a schermo acceso, con l'app davanti).
- * Ogni telecomando è di un giocatore: un clic = punto, doppio clic o pressione lunga = annulla ([PressDetector]).
+ * Ogni telecomando è di un giocatore: un clic = punto, doppio clic o pressione lunga = annulla ([PressDetector]);
+ * sui telecomandi a due tasti (es. VOLUME SU + INVIO) il tasto premuto all'associazione dà il punto e l'altro annulla.
  */
 class RemoteInput(context: Context, private val storage: Storage, private val scope: CoroutineScope) {
 
@@ -4757,15 +4771,18 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
         if (wanted != null) {
             if (!canAssign(device, event.keyCode)) return false
             if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
-                set(wanted, RemoteInfo(device.descriptor, device.name.orEmpty().ifBlank { "?" }))
+                set(wanted, RemoteInfo(device.descriptor, device.name.orEmpty().ifBlank { "?" }, event.keyCode))
                 capture.value = null
             }
             return true
         }
-        val side = _assigned.value.entries.firstOrNull { it.value.descriptor == device.descriptor }?.key ?: return false
+        val (side, info) = _assigned.value.entries.firstOrNull { it.value.descriptor == device.descriptor } ?: return false
         val dev = side.name
+        val undoKey = info.pointKey != null && event.keyCode != info.pointKey
+        // Un clic già scaduto ma non ancora contato dal timer diventa punto prima di questo tasto, non dopo.
+        for (d in detector.due(event.eventTime)) emit(Side.valueOf(d), Gesture.POINT)
         val gesture = when (event.action) {
-            KeyEvent.ACTION_DOWN -> detector.down(dev, event.keyCode, event.eventTime)
+            KeyEvent.ACTION_DOWN -> detector.down(dev, event.keyCode, event.eventTime, undoKey)
             KeyEvent.ACTION_UP -> detector.up(dev, event.keyCode, event.eventTime)
             else -> null
         }
@@ -4808,13 +4825,13 @@ class RemoteInput(context: Context, private val storage: Storage, private val sc
         if (info != null) m.entries.removeAll { it.key != side && it.value.descriptor == info.descriptor }
         if (info == null) m.remove(side) else m[side] = info
         _assigned.value = m
-        for (s in Side.entries) storage.setRemote(s == Side.P1, m[s]?.descriptor, m[s]?.name)
+        for (s in Side.entries) storage.setRemote(s == Side.P1, m[s]?.descriptor, m[s]?.name, m[s]?.pointKey)
     }
 
     private fun load(): Map<Side, RemoteInfo> = buildMap {
         for (s in Side.entries) {
             val d = storage.remoteDescriptor(s == Side.P1) ?: continue
-            put(s, RemoteInfo(d, storage.remoteName(s == Side.P1) ?: "?"))
+            put(s, RemoteInfo(d, storage.remoteName(s == Side.P1) ?: "?", storage.remoteKey(s == Side.P1)))
         }
     }
 
@@ -7539,8 +7556,8 @@ object ItStrings : Strings {
     override val modeRefereeHint = "Il punteggio si assegna dal telefono, come il giudice di sedia."
     override val modeBandsHint = "Ogni giocatore assegna il punto con KEY1 del proprio M5StickS3."
     override val modeRemotes = "Telecomandi"
-    override val modeRemotesHint = "Ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie (1–3 €): un clic = punto, doppio clic o pressione lunga = annulla."
-    override val remotesHowTo = "1. Accoppia i telecomandi nelle impostazioni Bluetooth del telefono, come una tastiera. 2. Tocca «Associa» sotto il giocatore e premi un tasto del suo telecomando."
+    override val modeRemotesHint = "Ogni giocatore assegna il punto con un telecomandino Bluetooth da selfie (1–3 €): un clic = punto, doppio clic o pressione lunga = annulla. Se il telecomando ha due tasti, l'altro annulla con un clic."
+    override val remotesHowTo = "1. Accoppia i telecomandi nelle impostazioni Bluetooth del telefono, come una tastiera. 2. Tocca «Associa» sotto il giocatore e premi sul suo telecomando il tasto per il punto: un eventuale secondo tasto annullerà."
     override val bluetoothSettings = "Impostazioni Bluetooth"
     override val remoteFor: (String) -> String = { "Telecomando di $it" }
     override val noRemote = "Nessuno"
@@ -7939,8 +7956,8 @@ object EnStrings : Strings {
     override val modeRefereeHint = "Points are scored on the phone, like a chair umpire."
     override val modeBandsHint = "Each player scores with KEY1 on their own M5StickS3."
     override val modeRemotes = "Remotes"
-    override val modeRemotesHint = "Each player scores with a Bluetooth selfie remote (€1–3): one click = point, double click or long press = undo."
-    override val remotesHowTo = "1. Pair the remotes in the phone's Bluetooth settings, like a keyboard. 2. Tap “Assign” under the player and press a key on their remote."
+    override val modeRemotesHint = "Each player scores with a Bluetooth selfie remote (€1–3): one click = point, double click or long press = undo. If the remote has two buttons, the other one undoes with a single click."
+    override val remotesHowTo = "1. Pair the remotes in the phone's Bluetooth settings, like a keyboard. 2. Tap “Assign” under the player and press the button for the point on their remote: a second button, if any, will undo."
     override val bluetoothSettings = "Bluetooth settings"
     override val remoteFor: (String) -> String = { "$it's remote" }
     override val noRemote = "None"
@@ -8362,8 +8379,8 @@ object DeStrings : Strings {
     override val modeRefereeHint = "Die Punkte werden am Telefon vergeben, wie vom Stuhlschiedsrichter."
     override val modeBandsHint = "Jeder Spieler vergibt den Punkt mit KEY1 an seinem eigenen M5StickS3."
     override val modeRemotes = "Fernbedienungen"
-    override val modeRemotesHint = "Jeder Spieler vergibt den Punkt mit einer Bluetooth-Selfie-Fernbedienung (1–3 €): ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig."
-    override val remotesHowTo = "1. Die Fernbedienungen in den Bluetooth-Einstellungen des Telefons koppeln, wie eine Tastatur. 2. Unter dem Spieler auf „Zuordnen“ tippen und eine Taste seiner Fernbedienung drücken."
+    override val modeRemotesHint = "Jeder Spieler vergibt den Punkt mit einer Bluetooth-Selfie-Fernbedienung (1–3 €): ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig. Hat die Fernbedienung zwei Tasten, nimmt die andere den Punkt mit einem Klick zurück."
+    override val remotesHowTo = "1. Die Fernbedienungen in den Bluetooth-Einstellungen des Telefons koppeln, wie eine Tastatur. 2. Unter dem Spieler auf „Zuordnen“ tippen und auf seiner Fernbedienung die Taste für den Punkt drücken: Eine zweite Taste, falls vorhanden, macht rückgängig."
     override val bluetoothSettings = "Bluetooth-Einstellungen"
     override val remoteFor: (String) -> String = { "Fernbedienung von $it" }
     override val noRemote = "Keine"
@@ -8777,8 +8794,8 @@ object EsStrings : Strings {
     override val modeRefereeHint = "Los puntos se asignan desde el teléfono, como hace el juez de silla."
     override val modeBandsHint = "Cada jugador se anota el punto con KEY1 de su propio M5StickS3."
     override val modeRemotes = "Mandos"
-    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer."
-    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa una tecla de su mando."
+    override val modeRemotesHint = "Cada jugador se anota el punto con un mando Bluetooth para selfies (1–3 €): un clic = punto, doble clic o pulsación larga = deshacer. Si el mando tiene dos teclas, la otra deshace con un clic."
+    override val remotesHowTo = "1. Empareja los mandos en los ajustes de Bluetooth del teléfono, como un teclado. 2. Toca «Asignar» debajo del jugador y pulsa en su mando la tecla del punto: si hay una segunda tecla, servirá para deshacer."
     override val bluetoothSettings = "Ajustes de Bluetooth"
     override val remoteFor: (String) -> String = { "Mando de $it" }
     override val noRemote = "Ninguno"
@@ -9196,8 +9213,8 @@ object FrStrings : Strings {
     override val modeRefereeHint = "Les points se donnent sur le téléphone, comme le fait l'arbitre de chaise."
     override val modeBandsHint = "Chaque joueur marque le point avec KEY1 de son propre M5StickS3."
     override val modeRemotes = "Télécommandes"
-    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler."
-    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur une touche de sa télécommande."
+    override val modeRemotesHint = "Chaque joueur marque le point avec une télécommande Bluetooth pour selfie (1–3 €) : un clic = point, double clic ou appui long = annuler. Si la télécommande a deux touches, l'autre annule d'un simple clic."
+    override val remotesHowTo = "1. Appairez les télécommandes dans les réglages Bluetooth du téléphone, comme un clavier. 2. Touchez « Associer » sous le joueur et appuyez sur la touche du point de sa télécommande : une éventuelle deuxième touche servira à annuler."
     override val bluetoothSettings = "Réglages Bluetooth"
     override val remoteFor: (String) -> String = { "Télécommande ${de(it)}" }
     override val noRemote = "Aucune"
@@ -9614,8 +9631,8 @@ object PtStrings : Strings {
     override val modeRefereeHint = "Os pontos são marcados no telefone, como faz o árbitro de cadeira."
     override val modeBandsHint = "Cada jogador marca o ponto com o KEY1 do seu próprio M5StickS3."
     override val modeRemotes = "Controles"
-    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer."
-    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte uma tecla do controle dele."
+    override val modeRemotesHint = "Cada jogador marca o ponto com um controle Bluetooth de selfie, bem barato: um clique = ponto, clique duplo ou toque longo = desfazer. Se o controle tiver duas teclas, a outra desfaz com um clique."
+    override val remotesHowTo = "1. Pareie os controles nas configurações de Bluetooth do telefone, como um teclado. 2. Toque em “Associar” embaixo do jogador e aperte no controle dele a tecla do ponto: uma segunda tecla, se houver, vai desfazer."
     override val bluetoothSettings = "Configurações de Bluetooth"
     override val remoteFor: (String) -> String = { "Controle de $it" }
     override val noRemote = "Nenhum"
@@ -15117,6 +15134,45 @@ class PressDetectorTest {
         val d = PressDetector()
         assertNull(d.up("a", volUp, 1_000))
         assertNull(d.nextDeadline())
+    }
+
+    @Test
+    fun undoKeyUndoesAtOnce() {
+        val d = PressDetector()
+        assertEquals(Gesture.UNDO, d.down("a", enter, 1_000, undoKey = true))
+        assertNull(d.up("a", enter, 1_150))
+        assertNull(d.nextDeadline())
+    }
+
+    @Test
+    fun undoKeyRightAfterAClickCancelsThatClickOnly() {
+        val d = PressDetector()
+        d.down("a", volUp, 1_000)
+        d.up("a", volUp, 1_150)
+        assertNull(d.down("a", enter, 1_300, undoKey = true))
+        assertNull(d.up("a", enter, 1_450))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun undoKeyHeldDownUndoesOnce() {
+        val d = PressDetector()
+        assertEquals(Gesture.UNDO, d.down("a", enter, 1_000, undoKey = true))
+        assertNull(d.down("a", enter, 1_500, undoKey = true))
+        assertNull(d.down("a", enter, 2_000, undoKey = true))
+        assertNull(d.up("a", enter, 3_000))
+        assertEquals(emptyList<String>(), d.due(5_000))
+    }
+
+    @Test
+    fun aSecondKeyInsideThePointPressIsNotAnUndo() {
+        // Telecomandi che mandano due tasti per pressione: il secondo fa parte della stessa pressione.
+        val d = PressDetector()
+        assertNull(d.down("a", volUp, 1_000))
+        assertNull(d.down("a", enter, 1_010, undoKey = true))
+        assertNull(d.up("a", volUp, 1_100))
+        assertNull(d.up("a", enter, 1_110))
+        assertEquals(listOf("a"), d.due(1_600))
     }
 }
 TSM_EOF

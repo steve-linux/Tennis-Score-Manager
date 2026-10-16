@@ -226,7 +226,7 @@ Conecta el cable USB-C: la pulsera emite un pitido y muestra la **pantalla de ca
 El sistema más económico para que los jugadores se anoten los puntos: dos **mandos Bluetooth para selfies** (los del botón de disparo, a menudo vendidos como *AB Shutter3*), de 1 a 3 € cada uno. Android los ve como un teclado: sin firmware que cargar y sin permisos para la app. También sirve cualquier otra botonera o teclado Bluetooth (o USB).
 
 1. Enciende el mando y emparéjalo en los **ajustes de Bluetooth** del teléfono, como unos auriculares (página 2 › *Ajustes de Bluetooth* los abre). Repite con el segundo.
-2. Página 2 › modo **Mandos** › **Asignar** debajo del Jugador 1 › pulsa una tecla de su mando; luego lo mismo para el Jugador 2. Con cada clic de un mando asignado su fila muestra **Tecla recibida**: así se prueba antes de jugar. **Intercambiar J1 ↔ J2** los invierte.
+2. Página 2 › modo **Mandos** › **Asignar** debajo del Jugador 1 › pulsa la tecla de su mando que dará el punto; luego lo mismo para el Jugador 2. Con cada clic de un mando asignado su fila muestra **Tecla recibida**: así se prueba antes de jugar. **Intercambiar J1 ↔ J2** los invierte.
 3. **INICIO DEL PARTIDO**: un clic en un mando empieza el partido, como KEY1 de las pulseras. Arriba, **J1**/**J2** se colorean cuando los mandos están conectados.
 
 | Gesto | Acción |
@@ -234,9 +234,10 @@ El sistema más económico para que los jugadores se anoten los puntos: dos **ma
 | un clic | punto para quien tiene el mando (llega medio segundo después: la app espera a ver si es un doble clic) |
 | doble clic | deshace el último punto (también desde la ventana de fin de partido) |
 | mantener pulsado 1 s | deshace el último punto |
+| la otra tecla (mandos de dos teclas) | deshace el último punto, enseguida; pulsada menos de medio segundo después de un clic, anula ese clic |
 
 - Valen las protecciones de las pulseras: dos puntos con menos de 2 segundos de diferencia cuentan una sola vez, dos deshacer seguidos quitan un solo punto, *Partido terminado* solo se confirma desde el teléfono.
-- Muchos mandos para selfies tienen dos botones (*iOS* y *Android*) o envían dos teclas en cada pulsación: para la app son iguales y una pulsación sigue siendo un clic.
+- Muchos mandos para selfies tienen dos botones (*iOS* y *Android*): la tecla pulsada al asignarlo da el punto y la otra deshace. En el CAMKIX (un *AB Shutter3*) el botón grande envía SUBIR VOLUMEN y el pequeño INTRO: asígnalo con el botón grande y el pequeño pasa a ser «deshacer». Si un mando envía dos teclas en cada pulsación, una pulsación sigue siendo un clic.
 - **La pantalla debe seguir encendida con la app delante** (durante el partido la app la mantiene encendida sola). A diferencia de las pulseras, las teclas de un teclado Bluetooth solo llegan a la app visible: con la pantalla bloqueada u otra app abierta no cuentan. En partidos largos, deja el teléfono cargando.
 - Si un mando se desconecta durante el partido (apagado, sin pila, demasiado lejos) el recuadro naranja muestra *MANDO 1 DESCONECTADO*, y *CONECTADO* cuando vuelve. Muchos mandos se duermen tras unos minutos sin clics: el primer clic los despierta y a veces se pierde. Si la voz no canta el punto, pulsa otra vez.
 - Alcance: unos diez metros, como unos auriculares Bluetooth; con el teléfono junto a la red, en el centro de la pista, se cubren los dos lados. Pila: normalmente una CR2032, que dura meses.
