@@ -113,6 +113,7 @@ object Reports {
         return (if (padel) "${s.sportPadel} · " else "") +
             (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
+            (if (rec.rules.starPoint && !rec.rules.noAd) " · ${s.starPoint}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
     }
 

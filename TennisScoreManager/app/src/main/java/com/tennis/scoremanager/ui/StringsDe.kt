@@ -204,6 +204,8 @@ object DeStrings : Strings {
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
     override val goldenPoint = "Golden Point"
     override val goldenPointHint = "Bei Einstand entscheidet ein einziger Punkt das Spiel. Ausschalten, um mit Vorteil zu spielen."
+    override val starPoint = "Star Point"
+    override val starPointHint = "FIP-Regel seit 2026: Bei Einstand höchstens zwei Vorteile; beim dritten Einstand entscheidet ein einziger Punkt das Spiel. Ohne Golden Point und Star Point wird mit Vorteil gespielt."
     override val coinToss = "Wahl (Münzwurf)"
     override val tossCoin = "Münze werfen"
     override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }

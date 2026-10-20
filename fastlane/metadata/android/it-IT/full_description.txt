@@ -1,12 +1,12 @@
 Tennis Score Manager tiene il punteggio di una partita di tennis secondo le regole ITF e lo annuncia come un giudice di sedia.
 
 * Singolare e doppio: tre set con tie-break sul 6-6, oppure due set e super tie-break a 10; punto decisivo (No-Ad) a scelta.
-* Anche per il padel: stesse regole del tennis, con doppio e golden point (punto d'oro) già impostati.
+* Anche per il padel: stesse regole del tennis, con doppio e golden point (punto d'oro) già impostati; in alternativa lo star point della FIP.
 * Chiamate da giudice di sedia in sei lingue (italiano, inglese, francese, tedesco, spagnolo, portoghese) con la sintesi vocale del telefono, senza internet. Si possono anche importare registrazioni proprie.
 * Shot clock (25 s), cambio campo (90 s) e pausa tra i set (120 s); cambi di campo e turni di servizio li gestisce l'app.
 * Qualsiasi punto si può annullare, anche dopo la fine di un game, di un set o della partita: il punteggio viene ricalcolato dall'inizio.
 * Braccialetti M5StickS3 in Bluetooth LE (facoltativi): ogni giocatore preme KEY1 per assegnarsi il punto e KEY2 per annullarlo. Il firmware Arduino è nello stesso repository. Dal firmware 2.4 riconoscono anche dritto, rovescio, servizio e volée, dopo una breve calibrazione.
-* Senza braccialetti: due telecomandini Bluetooth da selfie (1–3 € l'uno), accoppiati come una tastiera. Un clic = punto, doppio clic o pressione lunga = annulla.
+* Senza braccialetti: due telecomandini Bluetooth da selfie (1–3 € l'uno), accoppiati come una tastiera. Un clic = punto, doppio clic, pressione lunga o l'altro tasto = annulla.
 * Tabellone a LED su TV o monitor: un secondo telefono col cavo HDMI, un Chromecast (trasmissione dello schermo) o un browser qualsiasi sull'hotspot del telefono.
 * Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON o immagine, oppure si condivide.
 * Statistiche di fine partita, per la partita o per set (servizio, risposta, palle break, punti di fila…), e cronologia punto per punto con palle break, set point e match point.

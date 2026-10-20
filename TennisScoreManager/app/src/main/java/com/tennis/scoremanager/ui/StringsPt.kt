@@ -207,6 +207,8 @@ object PtStrings : Strings {
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Ponto de ouro: no 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
+    override val starPoint = "Star point"
+    override val starPointHint = "Regra FIP desde 2026: no 40-40 jogam-se no máximo duas vantagens; no terceiro 40-40 um só ponto decide o game. Sem golden point nem star point, joga-se com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"

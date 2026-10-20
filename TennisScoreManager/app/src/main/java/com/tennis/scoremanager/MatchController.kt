@@ -324,7 +324,7 @@ class MatchController(
         } else {
             val doubles = tennisDoubles
             updateSetup { it.copy(sport = sport, doubles = doubles ?: it.doubles) }
-            updateOptions { it.copy(noAd = tennisNoAd ?: false) }
+            updateOptions { it.copy(noAd = tennisNoAd ?: false, starPoint = false) }
         }
     }
 
@@ -712,6 +712,7 @@ class MatchController(
         val rules = RulesConfig(
             format = o.format,
             noAd = o.noAd,
+            starPoint = su.sport == Sport.PADEL && o.starPoint && !o.noAd,
             doubles = su.doubles,
             firstServer = o.firstServer,
             p1StartsLeft = o.p1Left,
@@ -819,9 +820,9 @@ class MatchController(
         return when {
             next.any { it.matchWinner != null } -> s.msgMatchPoint
             next.any { it.setWinner != null } -> s.msgSetPoint
-            // Nel No-Ad sul 40-40 chi riceve vince il game col prossimo punto, quindi è sempre anche palla break:
-            // il punto decisivo va controllato prima.
-            state.rules.noAd && state.isDeuce -> s.msgDecidingPoint
+            // Sul punto decisivo (No-Ad o star point) chi riceve vince il game col prossimo punto, quindi è sempre
+            // anche palla break: il punto decisivo va controllato prima.
+            state.isDecidingPoint -> s.msgDecidingPoint
             ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
             else -> null
         }

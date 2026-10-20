@@ -163,6 +163,18 @@ class CallBuilderTest {
     }
 
     @Test
+    fun starPointCallsOnlyTheThirdDeuce() {
+        state = ScoreEngine.initial(RulesConfig(starPoint = true))
+        repeat(3) { point(Side.P1) }
+        repeat(2) { point(Side.P2) }
+        assertEquals("parità", point(Side.P2))
+        point(Side.P1)
+        assertEquals("parità", point(Side.P2))
+        point(Side.P1)
+        assertEquals("parità punto decisivo", point(Side.P2))
+    }
+
+    @Test
     fun doublesStartUsesIndividualServer() {
         val d = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = Side.P2, firstServerP2 = 1))
         assertEquals("primo set Neri al servizio gioco", itb.render(itb.start(d, names)))

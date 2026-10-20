@@ -49,6 +49,40 @@ class ScoreEngineTest {
     }
 
     @Test
+    fun starPointTwoAdvantagesThenDecidingPoint() {
+        var s = ScoreEngine.initial(RulesConfig(starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2)
+        assertTrue(s.isDeuce); assertFalse(s.isDecidingPoint)
+        // Primo vantaggio perso, secondo vantaggio perso: terza parità = star point.
+        s = play(s, P1, P2, P2, P1)
+        assertTrue(s.isDeuce); assertTrue(s.isDecidingPoint)
+        assertEquals(0, s.g1 + s.g2)
+        val step = ScoreEngine.pointWonBy(s, P2)
+        assertEquals(P2, step.transition!!.gameWinner)
+        assertEquals(1, step.state.g2)
+    }
+
+    @Test
+    fun starPointAdvantageStillWinsTheGame() {
+        var s = ScoreEngine.initial(RulesConfig(starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2, P1, P2)
+        // Seconda parità (4-4), poi secondo vantaggio a P1: vincendo il punto dopo prende il game.
+        s = play(s, P1)
+        assertEquals("AD", s.pointLabel(P1))
+        assertFalse(s.isDecidingPoint)
+        val step = ScoreEngine.pointWonBy(s, P1)
+        assertEquals(P1, step.transition!!.gameWinner)
+    }
+
+    @Test
+    fun noAdWinsOverStarPoint() {
+        var s = ScoreEngine.initial(RulesConfig(noAd = true, starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2)
+        assertTrue(s.isDecidingPoint)
+        assertEquals(P1, ScoreEngine.pointWonBy(s, P1).transition!!.gameWinner)
+    }
+
+    @Test
     fun noAdDecidingPoint() {
         var s = ScoreEngine.initial(RulesConfig(noAd = true))
         s = play(s, P1, P1, P1, P2, P2, P2)

@@ -10,6 +10,9 @@ package com.tennis.scoremanager.model
  * turno = game giocati nel set (+ turni del tie-break). Nei turni pari serve chi ha iniziato il set.
  * Così la stessa formula copre singolare, doppio (rotazione a 4) e tie-break (1 punto, poi 2 a testa).
  */
+/** Punti di ciascuno alla terza parità (5-5), quella che con lo star point decide il game. */
+private const val STAR_POINT_PTS = 5
+
 data class MatchState(
     val rules: RulesConfig,
     val sets: List<SetScore> = emptyList(),
@@ -71,6 +74,10 @@ data class MatchState(
     }
 
     val isDeuce: Boolean get() = !inTiebreak && pt1 >= 3 && pt1 == pt2
+
+    /** Parità in cui il prossimo punto decide il game: No-Ad, oppure la terza parità con lo star point. */
+    val isDecidingPoint: Boolean
+        get() = isDeuce && (rules.noAd || (rules.starPoint && pt1 >= STAR_POINT_PTS))
 
     companion object {
         val POINT_LABELS = listOf("0", "15", "30", "40")
@@ -152,7 +159,12 @@ object ScoreEngine {
             )
         }
 
-        val gameWon = if (s.rules.noAd) pw >= 4 else pw >= 4 && pw - po >= 2
+        val gameWon = when {
+            s.rules.noAd -> pw >= 4
+            // Star point: la terza parità è il 5-5 in punti, quindi chi arriva a 6 vince comunque.
+            s.rules.starPoint -> pw >= 4 && (pw - po >= 2 || pw >= STAR_POINT_PTS + 1)
+            else -> pw >= 4 && pw - po >= 2
+        }
         if (!gameWon) return Step(played, Transition(pointWinner = w))
 
         val g1 = s.g1 + if (w == Side.P1) 1 else 0

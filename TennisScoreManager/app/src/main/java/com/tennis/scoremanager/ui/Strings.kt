@@ -222,6 +222,8 @@ interface Strings {
     val noAdHint: String
     val goldenPoint: String
     val goldenPointHint: String
+    val starPoint: String
+    val starPointHint: String
     /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
     val noAdShort: String get() = "No-Ad"
     val coinToss: String
@@ -634,6 +636,8 @@ object ItStrings : Strings {
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Punto d'oro: sul 40-40 si gioca un solo punto e chi lo vince vince il game. Toglilo per giocare ai vantaggi."
+    override val starPoint = "Star point"
+    override val starPointHint = "Regola FIP dal 2026: sul 40-40 si giocano al massimo due vantaggi; alla terza parità un solo punto decide il game. Spenti golden point e star point si gioca ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -1034,6 +1038,8 @@ object EnStrings : Strings {
     override val noAdHint = "At deuce a single deciding point is played."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "At deuce a single point decides the game. Turn it off to play advantages."
+    override val starPoint = "Star point"
+    override val starPointHint = "FIP rule since 2026: at deuce at most two advantages are played; at the third deuce a single point decides the game. With golden point and star point both off, advantages are played."
     override val coinToss = "Coin toss"
     override val tossCoin = "Toss the coin"
     override val tossWinner: (String) -> String = { "Toss won by: $it" }

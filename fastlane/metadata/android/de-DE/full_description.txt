@@ -1,12 +1,12 @@
 Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln und sagt sie an wie ein Stuhlschiedsrichter.
 
 * Einzel und Doppel: drei Sätze mit Tiebreak bei 6:6 oder zwei Sätze und ein Match-Tiebreak bis 10; No-Ad wahlweise.
-* Auch für Padel: gleiche Regeln wie beim Tennis, Doppel und Golden Point schon eingestellt.
+* Auch für Padel: gleiche Regeln wie beim Tennis, Doppel und Golden Point schon eingestellt; auch der Star Point der FIP ist wählbar.
 * Schiedsrichteransagen in sechs Sprachen (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch) über die Sprachausgabe des Telefons, ohne Internet. Eigene Aufnahmen lassen sich importieren.
 * Shot Clock (25 s), Seitenwechsel (90 s) und Satzpause (120 s); Seitenwechsel und Aufschlagfolge regelt die App.
 * Jeder Punkt lässt sich zurücknehmen, auch nach dem Ende eines Spiels, Satzes oder Matches: der Spielstand wird von Anfang an neu berechnet.
 * M5StickS3-Armbänder über Bluetooth LE (optional): jeder Spieler drückt KEY1 für den Punkt und KEY2 zum Zurücknehmen. Die Arduino-Firmware liegt im selben Repository. Ab Firmware 2.4 erkennen sie nach einer kurzen Kalibrierung auch Vorhand, Rückhand, Aufschlag und Volley.
-* Ohne Armbänder: zwei Bluetooth-Selfie-Fernbedienungen (1–3 € pro Stück), wie eine Tastatur gekoppelt. Ein Klick = Punkt, Doppelklick oder langes Drücken = rückgängig.
+* Ohne Armbänder: zwei Bluetooth-Selfie-Fernbedienungen (1–3 € pro Stück), wie eine Tastatur gekoppelt. Ein Klick = Punkt, Doppelklick, langes Drücken oder die andere Taste = rückgängig.
 * LED-Anzeigetafel auf einem Fernseher oder Monitor: ein zweites Telefon mit HDMI-Kabel, ein Chromecast (Bildschirmübertragung) oder ein beliebiger Browser im Hotspot des Telefons.
 * Spielbericht mit dem Ergebnis Satz für Satz, Dauer, Verein, Platz und Ort; als Text, JSON oder Bild speichern oder teilen.
 * Statistiken zum Matchende, für das ganze Match oder je Satz (Aufschlag, Return, Breakbälle, Punkte in Folge…), und Verlauf Punkt für Punkt mit Break-, Satz- und Matchbällen.

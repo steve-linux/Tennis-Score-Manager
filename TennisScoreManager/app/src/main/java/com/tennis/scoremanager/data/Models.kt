@@ -42,6 +42,8 @@ data class MatchOptions(
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
     val noAd: Boolean = false,
+    /** Star point del padel; con [noAd] acceso non conta (l'interfaccia ne lascia acceso uno solo). */
+    val starPoint: Boolean = false,
     val tossWinner: Side? = null,
     val firstServer: Side = Side.P1,
     val p1Left: Boolean = true,

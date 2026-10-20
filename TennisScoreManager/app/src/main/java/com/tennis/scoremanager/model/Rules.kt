@@ -48,6 +48,11 @@ data class RulesConfig(
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
     /** No-Ad: sul 40-40 si gioca il punto decisivo. */
     val noAd: Boolean = false,
+    /**
+     * Star point (padel, regola FIP dal 2026): sul 40-40 si giocano al massimo due vantaggi; alla terza parità
+     * si gioca un solo punto che decide il game. Ignorato se è acceso [noAd].
+     */
+    val starPoint: Boolean = false,
     val doubles: Boolean = false,
     /** Chi serve il primo game della partita. */
     val firstServer: Side = Side.P1,

@@ -1,12 +1,12 @@
 Tennis Score Manager compte les points d'un match de tennis selon les règles de l'ITF et les annonce comme un arbitre de chaise.
 
 * Simple et double : trois sets avec jeu décisif à 6-6, ou deux sets et un super jeu décisif en 10 points ; point décisif (No-Ad) en option.
-* Aussi pour le padel : mêmes règles que le tennis, double et golden point (point en or) déjà réglés.
+* Aussi pour le padel : mêmes règles que le tennis, double et golden point (point en or) déjà réglés ; le star point de la FIP est aussi proposé.
 * Annonces d'arbitre de chaise en six langues (italien, anglais, français, allemand, espagnol, portugais) avec la synthèse vocale du téléphone, sans internet. Vous pouvez aussi importer vos propres enregistrements.
 * Shot clock (25 s), changement de côté (90 s) et pause entre les sets (120 s) ; changements de côté et ordre de service sont gérés par l'application.
 * N'importe quel point peut être annulé, même après la fin d'un jeu, d'un set ou du match : le score est recalculé depuis le début.
 * Bracelets M5StickS3 en Bluetooth LE (facultatifs) : chaque joueur appuie sur KEY1 pour marquer le point et sur KEY2 pour l'annuler. Leur firmware Arduino est dans le même dépôt. Depuis le firmware 2.4, ils reconnaissent aussi coup droit, revers, service et volée après un court calibrage.
-* Sans bracelets : deux télécommandes Bluetooth pour selfie (1 à 3 € pièce), appairées comme un clavier. Un clic = point, double clic ou appui long = annuler.
+* Sans bracelets : deux télécommandes Bluetooth pour selfie (1 à 3 € pièce), appairées comme un clavier. Un clic = point, double clic, appui long ou l'autre touche = annuler.
 * Tableau d'affichage à LED sur une TV ou un écran : un second téléphone avec un câble HDMI, un Chromecast (diffusion de l'écran) ou n'importe quel navigateur sur le point d'accès du téléphone.
 * Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON ou image, ou à partager.
 * Statistiques de fin de match, pour le match ou par manche (service, retour, balles de break, points d'affilée…), et déroulé point par point avec balles de break, de set et de match.

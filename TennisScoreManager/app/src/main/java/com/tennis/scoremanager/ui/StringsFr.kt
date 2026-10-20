@@ -207,6 +207,8 @@ object FrStrings : Strings {
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Point en or : à égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
+    override val starPoint = "Star point"
+    override val starPointHint = "Règle FIP depuis 2026 : à égalité, deux avantages au maximum ; à la troisième égalité, un seul point décide du jeu. Sans golden point ni star point, on joue les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }

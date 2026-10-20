@@ -168,7 +168,7 @@ class CallBuilder(private val lang: Lang) {
         val rp = s.points(s.receiver)
         if (sp >= 3 && rp >= 3) {
             if (sp == rp) {
-                return if (s.rules.noAd) listOf(Seg.Clip("deuce"), Seg.Clip("deciding_point")) else listOf(Seg.Clip("deuce"))
+                return if (s.isDecidingPoint) listOf(Seg.Clip("deuce"), Seg.Clip("deciding_point")) else listOf(Seg.Clip("deuce"))
             }
             val leader = if (sp > rp) s.server else s.receiver
             return listOf(Seg.Clip("advantage"), Seg.Say(names.side(leader)))

@@ -1080,7 +1080,7 @@ class MatchController(
         } else {
             val doubles = tennisDoubles
             updateSetup { it.copy(sport = sport, doubles = doubles ?: it.doubles) }
-            updateOptions { it.copy(noAd = tennisNoAd ?: false) }
+            updateOptions { it.copy(noAd = tennisNoAd ?: false, starPoint = false) }
         }
     }
 
@@ -1468,6 +1468,7 @@ class MatchController(
         val rules = RulesConfig(
             format = o.format,
             noAd = o.noAd,
+            starPoint = su.sport == Sport.PADEL && o.starPoint && !o.noAd,
             doubles = su.doubles,
             firstServer = o.firstServer,
             p1StartsLeft = o.p1Left,
@@ -1575,9 +1576,9 @@ class MatchController(
         return when {
             next.any { it.matchWinner != null } -> s.msgMatchPoint
             next.any { it.setWinner != null } -> s.msgSetPoint
-            // Nel No-Ad sul 40-40 chi riceve vince il game col prossimo punto, quindi è sempre anche palla break:
-            // il punto decisivo va controllato prima.
-            state.rules.noAd && state.isDeuce -> s.msgDecidingPoint
+            // Sul punto decisivo (No-Ad o star point) chi riceve vince il game col prossimo punto, quindi è sempre
+            // anche palla break: il punto decisivo va controllato prima.
+            state.isDecidingPoint -> s.msgDecidingPoint
             ScoreEngine.isBreakPoint(state) -> s.msgBreakPoint
             else -> null
         }
@@ -3695,6 +3696,8 @@ data class MatchOptions(
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
     val noAd: Boolean = false,
+    /** Star point del padel; con [noAd] acceso non conta (l'interfaccia ne lascia acceso uno solo). */
+    val starPoint: Boolean = false,
     val tossWinner: Side? = null,
     val firstServer: Side = Side.P1,
     val p1Left: Boolean = true,
@@ -3927,6 +3930,7 @@ object Reports {
         return (if (padel) "${s.sportPadel} · " else "") +
             (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
             (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
+            (if (rec.rules.starPoint && !rec.rules.noAd) " · ${s.starPoint}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
     }
 
@@ -4261,6 +4265,11 @@ data class RulesConfig(
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
     /** No-Ad: sul 40-40 si gioca il punto decisivo. */
     val noAd: Boolean = false,
+    /**
+     * Star point (padel, regola FIP dal 2026): sul 40-40 si giocano al massimo due vantaggi; alla terza parità
+     * si gioca un solo punto che decide il game. Ignorato se è acceso [noAd].
+     */
+    val starPoint: Boolean = false,
     val doubles: Boolean = false,
     /** Chi serve il primo game della partita. */
     val firstServer: Side = Side.P1,
@@ -4321,6 +4330,9 @@ package com.tennis.scoremanager.model
  * turno = game giocati nel set (+ turni del tie-break). Nei turni pari serve chi ha iniziato il set.
  * Così la stessa formula copre singolare, doppio (rotazione a 4) e tie-break (1 punto, poi 2 a testa).
  */
+/** Punti di ciascuno alla terza parità (5-5), quella che con lo star point decide il game. */
+private const val STAR_POINT_PTS = 5
+
 data class MatchState(
     val rules: RulesConfig,
     val sets: List<SetScore> = emptyList(),
@@ -4382,6 +4394,10 @@ data class MatchState(
     }
 
     val isDeuce: Boolean get() = !inTiebreak && pt1 >= 3 && pt1 == pt2
+
+    /** Parità in cui il prossimo punto decide il game: No-Ad, oppure la terza parità con lo star point. */
+    val isDecidingPoint: Boolean
+        get() = isDeuce && (rules.noAd || (rules.starPoint && pt1 >= STAR_POINT_PTS))
 
     companion object {
         val POINT_LABELS = listOf("0", "15", "30", "40")
@@ -4463,7 +4479,12 @@ object ScoreEngine {
             )
         }
 
-        val gameWon = if (s.rules.noAd) pw >= 4 else pw >= 4 && pw - po >= 2
+        val gameWon = when {
+            s.rules.noAd -> pw >= 4
+            // Star point: la terza parità è il 5-5 in punti, quindi chi arriva a 6 vince comunque.
+            s.rules.starPoint -> pw >= 4 && (pw - po >= 2 || pw >= STAR_POINT_PTS + 1)
+            else -> pw >= 4 && pw - po >= 2
+        }
         if (!gameWon) return Step(played, Transition(pointWinner = w))
 
         val g1 = s.g1 + if (w == Side.P1) 1 else 0
@@ -7312,6 +7333,8 @@ interface Strings {
     val noAdHint: String
     val goldenPoint: String
     val goldenPointHint: String
+    val starPoint: String
+    val starPointHint: String
     /** No-Ad nella riga del formato (riepilogo, resoconto, immagine). */
     val noAdShort: String get() = "No-Ad"
     val coinToss: String
@@ -7724,6 +7747,8 @@ object ItStrings : Strings {
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Punto d'oro: sul 40-40 si gioca un solo punto e chi lo vince vince il game. Toglilo per giocare ai vantaggi."
+    override val starPoint = "Star point"
+    override val starPointHint = "Regola FIP dal 2026: sul 40-40 si giocano al massimo due vantaggi; alla terza parità un solo punto decide il game. Spenti golden point e star point si gioca ai vantaggi."
     override val coinToss = "Sorteggio (Coin Toss)"
     override val tossCoin = "Lancia la moneta"
     override val tossWinner: (String) -> String = { "Vince il sorteggio: $it" }
@@ -8124,6 +8149,8 @@ object EnStrings : Strings {
     override val noAdHint = "At deuce a single deciding point is played."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "At deuce a single point decides the game. Turn it off to play advantages."
+    override val starPoint = "Star point"
+    override val starPointHint = "FIP rule since 2026: at deuce at most two advantages are played; at the third deuce a single point decides the game. With golden point and star point both off, advantages are played."
     override val coinToss = "Coin toss"
     override val tossCoin = "Toss the coin"
     override val tossWinner: (String) -> String = { "Toss won by: $it" }
@@ -8547,6 +8574,8 @@ object DeStrings : Strings {
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
     override val goldenPoint = "Golden Point"
     override val goldenPointHint = "Bei Einstand entscheidet ein einziger Punkt das Spiel. Ausschalten, um mit Vorteil zu spielen."
+    override val starPoint = "Star Point"
+    override val starPointHint = "FIP-Regel seit 2026: Bei Einstand höchstens zwei Vorteile; beim dritten Einstand entscheidet ein einziger Punkt das Spiel. Ohne Golden Point und Star Point wird mit Vorteil gespielt."
     override val coinToss = "Wahl (Münzwurf)"
     override val tossCoin = "Münze werfen"
     override val tossWinner: (String) -> String = { "Wahl gewonnen: $it" }
@@ -8962,6 +8991,8 @@ object EsStrings : Strings {
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
     override val goldenPoint = "Punto de oro"
     override val goldenPointHint = "En el 40-40 se juega un solo punto que decide el juego. Desactívalo para jugar con ventajas."
+    override val starPoint = "Star Point"
+    override val starPointHint = "Regla FIP desde 2026: en el 40-40 se juegan como máximo dos ventajas; en el tercer 40-40 un solo punto decide el juego. Sin punto de oro ni Star Point se juega con ventajas."
     override val noAdShort = "Sin ventaja"
     override val coinToss = "Sorteo"
     override val tossCoin = "Lanzar la moneda"
@@ -9381,6 +9412,8 @@ object FrStrings : Strings {
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Point en or : à égalité, un seul point décide du jeu. Désactivez-le pour jouer les avantages."
+    override val starPoint = "Star point"
+    override val starPointHint = "Règle FIP depuis 2026 : à égalité, deux avantages au maximum ; à la troisième égalité, un seul point décide du jeu. Sans golden point ni star point, on joue les avantages."
     override val coinToss = "Tirage au sort (toss)"
     override val tossCoin = "Lancer la pièce"
     override val tossWinner: (String) -> String = { "Tirage au sort gagné par : $it" }
@@ -9799,6 +9832,8 @@ object PtStrings : Strings {
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
     override val goldenPoint = "Golden point"
     override val goldenPointHint = "Ponto de ouro: no 40-40 se joga um só ponto, que decide o game. Desative para jogar com vantagens."
+    override val starPoint = "Star point"
+    override val starPointHint = "Regra FIP desde 2026: no 40-40 jogam-se no máximo duas vantagens; no terceiro 40-40 um só ponto decide o game. Sem golden point nem star point, joga-se com vantagens."
     override val noAdShort = "Sem vantagem"
     override val coinToss = "Sorteio"
     override val tossCoin = "Jogar a moeda"
@@ -11188,6 +11223,7 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
@@ -11419,7 +11455,13 @@ fun OptionsScreen(c: MatchController) {
             }
             val padel = su.sport == Sport.PADEL
             SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
-                c.updateOptions { it.copy(noAd = v) }
+                c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
+            }
+            // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
+            if (padel) {
+                SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
+                    c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
+                }
             }
         }
 
@@ -13632,7 +13674,7 @@ class CallBuilder(private val lang: Lang) {
         val rp = s.points(s.receiver)
         if (sp >= 3 && rp >= 3) {
             if (sp == rp) {
-                return if (s.rules.noAd) listOf(Seg.Clip("deuce"), Seg.Clip("deciding_point")) else listOf(Seg.Clip("deuce"))
+                return if (s.isDecidingPoint) listOf(Seg.Clip("deuce"), Seg.Clip("deciding_point")) else listOf(Seg.Clip("deuce"))
             }
             val leader = if (sp > rp) s.server else s.receiver
             return listOf(Seg.Clip("advantage"), Seg.Say(names.side(leader)))
@@ -14783,6 +14825,40 @@ class ScoreEngineTest {
     }
 
     @Test
+    fun starPointTwoAdvantagesThenDecidingPoint() {
+        var s = ScoreEngine.initial(RulesConfig(starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2)
+        assertTrue(s.isDeuce); assertFalse(s.isDecidingPoint)
+        // Primo vantaggio perso, secondo vantaggio perso: terza parità = star point.
+        s = play(s, P1, P2, P2, P1)
+        assertTrue(s.isDeuce); assertTrue(s.isDecidingPoint)
+        assertEquals(0, s.g1 + s.g2)
+        val step = ScoreEngine.pointWonBy(s, P2)
+        assertEquals(P2, step.transition!!.gameWinner)
+        assertEquals(1, step.state.g2)
+    }
+
+    @Test
+    fun starPointAdvantageStillWinsTheGame() {
+        var s = ScoreEngine.initial(RulesConfig(starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2, P1, P2)
+        // Seconda parità (4-4), poi secondo vantaggio a P1: vincendo il punto dopo prende il game.
+        s = play(s, P1)
+        assertEquals("AD", s.pointLabel(P1))
+        assertFalse(s.isDecidingPoint)
+        val step = ScoreEngine.pointWonBy(s, P1)
+        assertEquals(P1, step.transition!!.gameWinner)
+    }
+
+    @Test
+    fun noAdWinsOverStarPoint() {
+        var s = ScoreEngine.initial(RulesConfig(noAd = true, starPoint = true))
+        s = play(s, P1, P1, P1, P2, P2, P2)
+        assertTrue(s.isDecidingPoint)
+        assertEquals(P1, ScoreEngine.pointWonBy(s, P1).transition!!.gameWinner)
+    }
+
+    @Test
     fun noAdDecidingPoint() {
         var s = ScoreEngine.initial(RulesConfig(noAd = true))
         s = play(s, P1, P1, P1, P2, P2, P2)
@@ -15685,6 +15761,18 @@ class CallBuilderTest {
         state = ScoreEngine.initial(RulesConfig(noAd = true))
         repeat(3) { point(Side.P1) }
         repeat(2) { point(Side.P2) }
+        assertEquals("parità punto decisivo", point(Side.P2))
+    }
+
+    @Test
+    fun starPointCallsOnlyTheThirdDeuce() {
+        state = ScoreEngine.initial(RulesConfig(starPoint = true))
+        repeat(3) { point(Side.P1) }
+        repeat(2) { point(Side.P2) }
+        assertEquals("parità", point(Side.P2))
+        point(Side.P1)
+        assertEquals("parità", point(Side.P2))
+        point(Side.P1)
         assertEquals("parità punto decisivo", point(Side.P2))
     }
 

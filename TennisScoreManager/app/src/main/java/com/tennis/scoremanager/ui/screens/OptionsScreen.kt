@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
@@ -293,7 +294,13 @@ fun OptionsScreen(c: MatchController) {
             }
             val padel = su.sport == Sport.PADEL
             SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
-                c.updateOptions { it.copy(noAd = v) }
+                c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
+            }
+            // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
+            if (padel) {
+                SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
+                    c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
+                }
             }
         }
 
