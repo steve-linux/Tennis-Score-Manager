@@ -40,6 +40,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -253,6 +254,9 @@ fun OptionsScreen(c: MatchController) {
                 },
                 color = TsmColors.TextDim,
             )
+            SwitchRow(Icons.Filled.BarChart, s.detailedStats, s.detailedStatsHint, o.detailedStats) { v ->
+                c.updateOptions { it.copy(detailedStats = v) }
+            }
             if (o.mode == PlayMode.BANDS) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }

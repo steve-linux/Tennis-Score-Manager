@@ -5,6 +5,7 @@ package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.data.MatchStats.Marker
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -29,6 +30,42 @@ class MatchStatsTest {
 
     /** G1 tiene il servizio a zero, poi strappa il servizio a G2 a zero, poi tiene da 0-30. */
     private val holdBreakHold = arrayOf(*game(p1), *game(p1), p2, p2, p1, p1, p1, p1)
+
+    /** Primo game, serve G1: ace, doppio fallo, vincente di G1 sulla seconda, errore di G2, errore di G1, punto semplice. */
+    @Test
+    fun detailedServeAndRallyStats() {
+        fun pt(w: Side, k: PointKind?, second: Boolean = false) = MatchEvent.Point(w, kind = k, secondServe = second)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(
+                pt(p1, PointKind.ACE),
+                pt(p2, PointKind.DOUBLE_FAULT, second = true),
+                pt(p1, PointKind.WINNER, second = true),
+                pt(p1, PointKind.ERROR),
+                pt(p2, PointKind.ERROR),
+                pt(p1, null),
+            ),
+        )
+        val pts = MatchStats.points(r)
+        assertTrue(MatchStats.hasDetail(r, pts))
+        val t = MatchStats.totals(pts)
+        val a = t.getValue(p1)
+        val b = t.getValue(p2)
+        assertEquals(1, a.aces); assertEquals(1, a.doubleFaults); assertEquals(0, b.aces)
+        assertEquals(4, a.firstServesIn); assertEquals(6, a.servePoints)
+        assertEquals(3, a.firstServePointsWon)
+        assertEquals(1, a.secondServePointsWon); assertEquals(2, a.secondServes)
+        assertEquals(1, a.winners); assertEquals(0, b.winners)
+        // L'errore è di chi perde il punto.
+        assertEquals(1, a.errors); assertEquals(1, b.errors)
+        assertEquals(1, a.gamesWon)
+    }
+
+    @Test
+    fun noDetailForPlainMatches() {
+        val r = rec(*holdBreakHold)
+        assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))
+    }
 
     @Test
     fun serveReturnAndBreakPoints() {

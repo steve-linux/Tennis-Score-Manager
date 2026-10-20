@@ -86,7 +86,14 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
             )
         }
         NamesHeader(names)
-        StatSection(s.statServe, listOf(
+        val detail = remember(rec) { MatchStats.hasDetail(rec, pts) }
+        StatSection(s.statServe, (if (detail) listOf(
+            Stat(s.statAces, a.aces, b.aces),
+            Stat(s.statDoubleFaults, a.doubleFaults, b.doubleFaults),
+            Stat(s.statFirstServeIn, a.firstServesIn, a.servePoints, b.firstServesIn, b.servePoints, StatKind.PERCENT),
+            Stat(s.statFirstServeWon, a.firstServePointsWon, a.firstServesIn, b.firstServePointsWon, b.firstServesIn, StatKind.PERCENT),
+            Stat(s.statSecondServeWon, a.secondServePointsWon, a.secondServes, b.secondServePointsWon, b.secondServes, StatKind.PERCENT),
+        ) else emptyList()) + listOf(
             Stat(s.statServicePoints, a.servePointsWon, a.servePoints, b.servePointsWon, b.servePoints, StatKind.PERCENT),
             Stat(s.statServiceGames, a.serviceGamesWon, a.serviceGames, b.serviceGamesWon, b.serviceGames, StatKind.PERCENT),
             Stat(s.statBreakSaved, a.breakPointsSaved, a.breakPointsFaced, b.breakPointsSaved, b.breakPointsFaced, StatKind.RATIO),
@@ -98,6 +105,10 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ))
         StatSection(s.statPoints, listOf(
             Stat(s.statTotalPoints, a.pointsWon, a.points, b.pointsWon, b.points, StatKind.PERCENT),
+        ) + (if (detail) listOf(
+            Stat(s.statWinners, a.winners, b.winners),
+            Stat(s.statErrors, a.errors, b.errors),
+        ) else emptyList()) + listOf(
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
@@ -113,7 +124,7 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
                     modifier = Modifier.fillMaxWidth())
             }
         }
-        Text(s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(if (detail) s.statsHintDetailed else s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }
 

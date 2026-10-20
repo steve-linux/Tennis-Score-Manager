@@ -792,6 +792,7 @@ import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
@@ -893,6 +894,8 @@ class MatchController(
     val message = MutableStateFlow<String?>(null)
     val endDialog = MutableStateFlow(false)
     val serveOrderPrompt = MutableStateFlow(false)
+    /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
+    val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
     val summaryKept = MutableStateFlow(false)
@@ -1487,6 +1490,7 @@ class MatchController(
         stopCountdown()
         lastPointAt = 0
         rallyStrokes = 0
+        faultPending.value = false
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -1509,7 +1513,11 @@ class MatchController(
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }
 
-    fun awardPoint(side: Side, fromBand: Boolean = false) {
+    /**
+     * Statistiche dettagliate: [kind] dice come è finito il punto (null = non detto). La seconda di servizio
+     * viene da [fault]: vale per il punto in corso, anche se poi lo dà un braccialetto o un telecomando.
+     */
+    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null) {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
@@ -1525,7 +1533,10 @@ class MatchController(
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
         val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
         rallyStrokes = 0
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
+        val second = faultPending.value
+        faultPending.value = false
+        val point = MatchEvent.Point(side, System.currentTimeMillis(), strokes, kind, second)
+        val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -1584,12 +1595,35 @@ class MatchController(
         }
     }
 
+    /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
+    fun fault() {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        if (faultPending.value) {
+            awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
+            return
+        }
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastPointAt < TAP_GAP_MS || now - lastUndoAt < TAP_GAP_MS) return
+        if (lm.record.startedAt == null) onPlay()
+        faultPending.value = true
+        showMessage(strings.msgSecondServe)
+        startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+    }
+
     /** Annulla l'ultimo punto: si rigiocano gli eventi, quindi funziona anche dopo fine game, set o partita. */
     fun undo() {
         val lm = live.value ?: return
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
+        if (faultPending.value) {
+            faultPending.value = false
+            lastUndoAt = now
+            showMessage(strings.msgFaultUndone)
+            return
+        }
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
@@ -1724,6 +1758,7 @@ class MatchController(
         stopCountdown()
         lastPointAt = 0
         rallyStrokes = 0
+        faultPending.value = false
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
@@ -3442,6 +3477,7 @@ package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -3449,7 +3485,7 @@ import com.tennis.scoremanager.model.TiebreakKind
 /**
  * Statistiche di fine partita e cronologia punto per punto, ricavate rigiocando i punti (come le pagine
  * "statistiche" e "cronologia" dei siti di risultati). Ace, doppi falli, prime di servizio, vincenti ed errori
- * non si possono sapere: l'app conosce solo chi ha vinto ogni punto (e, coi braccialetti 2.4, i colpi).
+ * ci sono solo se la partita è stata segnata con le statistiche dettagliate.
  */
 object MatchStats {
 
@@ -3467,6 +3503,8 @@ object MatchStats {
         val gameWinner: Side?,
         /** Colpi dei braccialetti nello scambio (null = non contati). */
         val strokes: Int?,
+        val kind: PointKind? = null,
+        val secondServe: Boolean = false,
     )
 
     fun points(rec: MatchRecord): List<PlayedPoint> {
@@ -3486,6 +3524,8 @@ object MatchStats {
                     matchPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.matchWinner == it },
                     gameWinner = t.gameWinner,
                     strokes = e.strokes,
+                    kind = e.kind,
+                    secondServe = e.secondServe,
                 )
             }
             s = step.state
@@ -3516,7 +3556,20 @@ object MatchStats {
         /** Punti vinti tra gli ultimi 10 del periodo. */
         val last10: Int = 0,
         val matchPointsSaved: Int = 0,
+        // Statistiche dettagliate
+        val aces: Int = 0,
+        val doubleFaults: Int = 0,
+        val firstServesIn: Int = 0,
+        val firstServePointsWon: Int = 0,
+        val secondServePointsWon: Int = 0,
+        val secondServes: Int = 0,
+        val winners: Int = 0,
+        val errors: Int = 0,
     )
+
+    /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
+    fun hasDetail(rec: MatchRecord, all: List<PlayedPoint>): Boolean =
+        rec.options.detailedStats || all.any { it.kind != null || it.secondServe }
 
     /** [set] = null: tutta la partita; altrimenti solo quel set (0 = primo). */
     fun totals(all: List<PlayedPoint>, set: Int? = null): Map<Side, SideTotals> {
@@ -3557,6 +3610,14 @@ object MatchStats {
             maxStreak = best,
             last10 = pts.takeLast(10).count { it.winner == me },
             matchPointsSaved = pts.count { it.matchPointFor == me.other && it.winner == me },
+            aces = serve.count { it.kind == PointKind.ACE },
+            doubleFaults = serve.count { it.kind == PointKind.DOUBLE_FAULT },
+            firstServesIn = serve.count { !it.secondServe },
+            firstServePointsWon = serve.count { !it.secondServe && it.winner == me },
+            secondServePointsWon = serve.count { it.secondServe && it.winner == me },
+            secondServes = serve.count { it.secondServe },
+            winners = pts.count { it.kind == PointKind.WINNER && it.winner == me },
+            errors = pts.count { it.kind == PointKind.ERROR && it.winner != me },
         )
     }
 
@@ -3696,6 +3757,8 @@ data class MatchOptions(
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
     val noAd: Boolean = false,
+    /** Statistiche dettagliate: ace, falli, vincenti ed errori si segnano dalla schermata del punteggio. */
+    val detailedStats: Boolean = false,
     /** Star point del padel; con [noAd] acceso non conta (l'interfaccia ne lascia acceso uno solo). */
     val starPoint: Boolean = false,
     val tossWinner: Side? = null,
@@ -4280,13 +4343,29 @@ data class RulesConfig(
     val firstServerP2: Int = 0,
 )
 
+/**
+ * Come è finito un punto, per le statistiche dettagliate. Chi l'ha fatto si ricava dal vincitore e da chi serve:
+ * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
+ */
+@Serializable
+enum class PointKind { ACE, DOUBLE_FAULT, WINNER, ERROR }
+
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    /** [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati. */
-    data class Point(val winner: Side, val at: Long = 0L, val strokes: Int? = null) : MatchEvent()
+    /**
+     * [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati.
+     * [kind]: come è finito il punto (statistiche dettagliate); null = non detto. [secondServe]: la prima era fuori.
+     */
+    data class Point(
+        val winner: Side,
+        val at: Long = 0L,
+        val strokes: Int? = null,
+        val kind: PointKind? = null,
+        val secondServe: Boolean = false,
+    ) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable
@@ -7259,6 +7338,7 @@ interface Strings {
     /** "Set 1", "Set 2"... */
     val periodSet: (Int) -> String
     val statsHint: String
+    val statsHintDetailed: String
     val statServe: String
     val statReturn: String
     val statPoints: String
@@ -7274,6 +7354,25 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statAces: String
+    val statDoubleFaults: String
+    val statFirstServeIn: String
+    val statFirstServeWon: String
+    val statSecondServeWon: String
+    val statWinners: String
+    val statErrors: String
+    val detailedStats: String
+    val detailedStatsHint: String
+    val btnAce: String
+    val btnFault: String
+    val btnDoubleFault: String
+    val btnWinner: String
+    val btnError: String
+    val btnPoint: String
+    val firstServe: String
+    val secondServe: String
+    /** "servizio di Rossi": sotto il tasto Ace. */
+    val serveOf: (String) -> String
     val statStrokesTotal: String
     val statAvgWristSpeed: String
     val serveLost: String
@@ -7423,6 +7522,8 @@ interface Strings {
     val msgBreakPoint: String
     val msgDecidingPoint: String
     val msgPointUndone: String
+    val msgSecondServe: String
+    val msgFaultUndone: String
     val msgSuspended: String
     val msgResumed: String
     val msgBandConnected: (String) -> String
@@ -7672,6 +7773,7 @@ object ItStrings : Strings {
     override val periodMatch = "Partita"
     override val periodSet: (Int) -> String = { "Set $it" }
     override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statsHintDetailed = "Calcolate dai punti segnati nell'app, con ace, falli, vincenti ed errori delle statistiche dettagliate e, coi braccialetti, dai colpi. Un punto dato col tasto «Punto» (o da braccialetti e telecomandi) conta senza dettaglio."
     override val statServe = "Servizio"
     override val statReturn = "Risposta"
     override val statPoints = "Punti"
@@ -7687,6 +7789,24 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statAces = "Ace"
+    override val statDoubleFaults = "Doppi falli"
+    override val statFirstServeIn = "Prime di servizio in campo"
+    override val statFirstServeWon = "Punti vinti con la prima"
+    override val statSecondServeWon = "Punti vinti con la seconda"
+    override val statWinners = "Vincenti"
+    override val statErrors = "Errori"
+    override val detailedStats = "Statistiche dettagliate"
+    override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
+    override val btnAce = "Ace"
+    override val btnFault = "Fallo"
+    override val btnDoubleFault = "Doppio fallo"
+    override val btnWinner = "Vincente"
+    override val btnError = "Errore"
+    override val btnPoint = "Punto"
+    override val firstServe = "prima"
+    override val secondServe = "seconda"
+    override val serveOf: (String) -> String = { "servizio di $it" }
     override val statStrokesTotal = "Colpi totali"
     override val statAvgWristSpeed = "Velocità media del polso"
     override val serveLost = "Servizio perso"
@@ -7828,6 +7948,8 @@ object ItStrings : Strings {
     override val msgBreakPoint = "PALLA BREAK"
     override val msgDecidingPoint = "PUNTO DECISIVO"
     override val msgPointUndone = "PUNTO ANNULLATO"
+    override val msgSecondServe = "SECONDA DI SERVIZIO"
+    override val msgFaultUndone = "FALLO ANNULLATO"
     override val msgSuspended = "PARTITA SOSPESA"
     override val msgResumed = "PARTITA RIPRESA"
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
@@ -8074,6 +8196,7 @@ object EnStrings : Strings {
     override val periodMatch = "Match"
     override val periodSet: (Int) -> String = { "Set $it" }
     override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statsHintDetailed = "Worked out from the points scored in the app, with the aces, faults, winners and errors of the detailed stats and, with the wristbands, from the strokes. A point given with “Point” (or by wristbands and remotes) counts without detail."
     override val statServe = "Serve"
     override val statReturn = "Return"
     override val statPoints = "Points"
@@ -8089,6 +8212,24 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statAces = "Aces"
+    override val statDoubleFaults = "Double faults"
+    override val statFirstServeIn = "First serves in"
+    override val statFirstServeWon = "Points won on 1st serve"
+    override val statSecondServeWon = "Points won on 2nd serve"
+    override val statWinners = "Winners"
+    override val statErrors = "Errors"
+    override val detailedStats = "Detailed stats"
+    override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
+    override val btnAce = "Ace"
+    override val btnFault = "Fault"
+    override val btnDoubleFault = "Double fault"
+    override val btnWinner = "Winner"
+    override val btnError = "Error"
+    override val btnPoint = "Point"
+    override val firstServe = "1st serve"
+    override val secondServe = "2nd serve"
+    override val serveOf: (String) -> String = { "serving: $it" }
     override val statStrokesTotal = "Total strokes"
     override val statAvgWristSpeed = "Average wrist speed"
     override val serveLost = "Lost serve"
@@ -8230,6 +8371,8 @@ object EnStrings : Strings {
     override val msgBreakPoint = "BREAK POINT"
     override val msgDecidingPoint = "DECIDING POINT"
     override val msgPointUndone = "POINT UNDONE"
+    override val msgSecondServe = "SECOND SERVE"
+    override val msgFaultUndone = "FAULT UNDONE"
     override val msgSuspended = "MATCH SUSPENDED"
     override val msgResumed = "MATCH RESUMED"
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }
@@ -8499,6 +8642,7 @@ object DeStrings : Strings {
     override val periodMatch = "Match"
     override val periodSet: (Int) -> String = { "$it. Satz" }
     override val statsHint = "Berechnet aus den in der App eingetragenen Punkten und, mit den Armbändern, aus den Schlägen. Asse, Doppelfehler, erste Aufschläge und Fehler sind nicht bekannt."
+    override val statsHintDetailed = "Berechnet aus den in der App eingetragenen Punkten, mit Assen, Aufschlagfehlern, Winnern und Fehlern der detaillierten Statistik und, mit den Armbändern, aus den Schlägen. Ein mit „Punkt“ (oder von Armbändern und Fernbedienungen) vergebener Punkt zählt ohne Details."
     override val statServe = "Aufschlag"
     override val statReturn = "Rückschlag"
     override val statPoints = "Punkte"
@@ -8514,6 +8658,24 @@ object DeStrings : Strings {
     override val statLast10 = "Letzte 10 Punkte"
     override val statMatchPointsSaved = "Abgewehrte Matchbälle"
     override val statTotalGames = "Gewonnene Spiele gesamt"
+    override val statAces = "Asse"
+    override val statDoubleFaults = "Doppelfehler"
+    override val statFirstServeIn = "Erste Aufschläge im Feld"
+    override val statFirstServeWon = "Punkte mit 1. Aufschlag"
+    override val statSecondServeWon = "Punkte mit 2. Aufschlag"
+    override val statWinners = "Winner"
+    override val statErrors = "Fehler"
+    override val detailedStats = "Detaillierte Statistik"
+    override val detailedStatsHint = "Für jemanden, der vom Spielfeldrand zählt: statt der zwei großen Tasten gibt es Ass, Aufschlagfehler und für jeden Spieler Winner, Fehler und Punkt. Nötig für Asse, Doppelfehler, erste Aufschläge, Winner und Fehler."
+    override val btnAce = "Ass"
+    override val btnFault = "Aufschlagfehler"
+    override val btnDoubleFault = "Doppelfehler"
+    override val btnWinner = "Winner"
+    override val btnError = "Fehler"
+    override val btnPoint = "Punkt"
+    override val firstServe = "1. Aufschlag"
+    override val secondServe = "2. Aufschlag"
+    override val serveOf: (String) -> String = { "Aufschlag: $it" }
     override val statStrokesTotal = "Schläge gesamt"
     override val statAvgWristSpeed = "Ø Handgelenk-Tempo"
     override val serveLost = "Aufschlag verloren"
@@ -8655,6 +8817,8 @@ object DeStrings : Strings {
     override val msgBreakPoint = "BREAKBALL"
     override val msgDecidingPoint = "ENTSCHEIDENDER PUNKT"
     override val msgPointUndone = "PUNKT ZURÜCKGENOMMEN"
+    override val msgSecondServe = "ZWEITER AUFSCHLAG"
+    override val msgFaultUndone = "FEHLER ZURÜCKGENOMMEN"
     override val msgSuspended = "MATCH UNTERBROCHEN"
     override val msgResumed = "MATCH FORTGESETZT"
     override val msgBandConnected: (String) -> String = { "ARMBAND $it VERBUNDEN" }
@@ -8916,6 +9080,7 @@ object EsStrings : Strings {
     override val periodMatch = "Partido"
     override val periodSet: (Int) -> String = { "Set $it" }
     override val statsHint = "Calculadas a partir de los puntos anotados en la app y, con las pulseras, de los golpes. Aces, dobles faltas, primeros saques y errores no se pueden saber."
+    override val statsHintDetailed = "Calculadas a partir de los puntos anotados en la app, con los aces, faltas, golpes ganadores y errores de las estadísticas detalladas y, con las pulseras, de los golpes. Un punto dado con «Punto» (o por pulseras y mandos) cuenta sin detalle."
     override val statServe = "Saque"
     override val statReturn = "Resto"
     override val statPoints = "Puntos"
@@ -8931,6 +9096,24 @@ object EsStrings : Strings {
     override val statLast10 = "Últimos 10 puntos"
     override val statMatchPointsSaved = "Bolas de partido salvadas"
     override val statTotalGames = "Total de juegos ganados"
+    override val statAces = "Aces"
+    override val statDoubleFaults = "Dobles faltas"
+    override val statFirstServeIn = "Primeros saques dentro"
+    override val statFirstServeWon = "Puntos ganados con el 1.er saque"
+    override val statSecondServeWon = "Puntos ganados con el 2.º saque"
+    override val statWinners = "Golpes ganadores"
+    override val statErrors = "Errores"
+    override val detailedStats = "Estadísticas detalladas"
+    override val detailedStatsHint = "Para quien anota desde fuera de la pista: en lugar de los dos botones grandes hay ace, falta y, para cada jugador, ganador, error y punto. Sirven para aces, dobles faltas, primeros saques, golpes ganadores y errores."
+    override val btnAce = "Ace"
+    override val btnFault = "Falta"
+    override val btnDoubleFault = "Doble falta"
+    override val btnWinner = "Ganador"
+    override val btnError = "Error"
+    override val btnPoint = "Punto"
+    override val firstServe = "1.er saque"
+    override val secondServe = "2.º saque"
+    override val serveOf: (String) -> String = { "saca: $it" }
     override val statStrokesTotal = "Golpes totales"
     override val statAvgWristSpeed = "Velocidad media de muñeca"
     override val serveLost = "Saque perdido"
@@ -9073,6 +9256,8 @@ object EsStrings : Strings {
     override val msgBreakPoint = "BOLA DE BREAK"
     override val msgDecidingPoint = "PUNTO DECISIVO"
     override val msgPointUndone = "PUNTO ANULADO"
+    override val msgSecondServe = "SEGUNDO SAQUE"
+    override val msgFaultUndone = "FALTA ANULADA"
     override val msgSuspended = "PARTIDO SUSPENDIDO"
     override val msgResumed = "PARTIDO REANUDADO"
     override val msgBandConnected: (String) -> String = { "PULSERA $it CONECTADA" }
@@ -9337,6 +9522,7 @@ object FrStrings : Strings {
     override val periodMatch = "Match"
     override val periodSet: (Int) -> String = { if (it == 1) "1re manche" else "${it}e manche" }
     override val statsHint = "Calculées à partir des points marqués dans l'appli et, avec les bracelets, des coups. Aces, doubles fautes, premières balles et fautes ne peuvent pas être connus."
+    override val statsHintDetailed = "Calculées à partir des points marqués dans l'appli, avec les aces, fautes, coups gagnants et erreurs des statistiques détaillées et, avec les bracelets, des coups. Un point donné avec « Point » (ou par bracelets et télécommandes) compte sans détail."
     override val statServe = "Service"
     override val statReturn = "Retour"
     override val statPoints = "Points"
@@ -9352,6 +9538,24 @@ object FrStrings : Strings {
     override val statLast10 = "10 derniers points"
     override val statMatchPointsSaved = "Balles de match sauvées"
     override val statTotalGames = "Total des jeux gagnés"
+    override val statAces = "Aces"
+    override val statDoubleFaults = "Doubles fautes"
+    override val statFirstServeIn = "Premières balles réussies"
+    override val statFirstServeWon = "Points gagnés sur 1re balle"
+    override val statSecondServeWon = "Points gagnés sur 2e balle"
+    override val statWinners = "Coups gagnants"
+    override val statErrors = "Erreurs"
+    override val detailedStats = "Statistiques détaillées"
+    override val detailedStatsHint = "Pour qui marque depuis le bord du court : à la place des deux grands boutons, ace, faute et, pour chaque joueur, coup gagnant, erreur et point. Nécessaires pour aces, doubles fautes, premières balles, coups gagnants et erreurs."
+    override val btnAce = "Ace"
+    override val btnFault = "Faute"
+    override val btnDoubleFault = "Double faute"
+    override val btnWinner = "Gagnant"
+    override val btnError = "Erreur"
+    override val btnPoint = "Point"
+    override val firstServe = "1re balle"
+    override val secondServe = "2e balle"
+    override val serveOf: (String) -> String = { "service : $it" }
     override val statStrokesTotal = "Total des coups"
     override val statAvgWristSpeed = "Vitesse moyenne du poignet"
     override val serveLost = "Service perdu"
@@ -9493,6 +9697,8 @@ object FrStrings : Strings {
     override val msgBreakPoint = "BALLE DE BREAK"
     override val msgDecidingPoint = "POINT DÉCISIF"
     override val msgPointUndone = "POINT ANNULÉ"
+    override val msgSecondServe = "DEUXIÈME BALLE"
+    override val msgFaultUndone = "FAUTE ANNULÉE"
     override val msgSuspended = "MATCH SUSPENDU"
     override val msgResumed = "REPRISE DU MATCH"
     override val msgBandConnected: (String) -> String = { "BRACELET $it CONNECTÉ" }
@@ -9757,6 +9963,7 @@ object PtStrings : Strings {
     override val periodMatch = "Partida"
     override val periodSet: (Int) -> String = { "${it}º set" }
     override val statsHint = "Calculadas a partir dos pontos marcados no app e, com as pulseiras, dos golpes. Aces, duplas faltas, primeiros saques e erros não podem ser conhecidos."
+    override val statsHintDetailed = "Calculadas a partir dos pontos marcados no app, com aces, faltas, winners e erros das estatísticas detalhadas e, com as pulseiras, dos golpes. Um ponto dado com “Ponto” (ou por pulseiras e controles) conta sem detalhe."
     override val statServe = "Saque"
     override val statReturn = "Devolução"
     override val statPoints = "Pontos"
@@ -9772,6 +9979,24 @@ object PtStrings : Strings {
     override val statLast10 = "Últimos 10 pontos"
     override val statMatchPointsSaved = "Match points salvos"
     override val statTotalGames = "Total de jogos ganhos"
+    override val statAces = "Aces"
+    override val statDoubleFaults = "Duplas faltas"
+    override val statFirstServeIn = "Primeiros saques dentro"
+    override val statFirstServeWon = "Pontos ganhos com o 1º saque"
+    override val statSecondServeWon = "Pontos ganhos com o 2º saque"
+    override val statWinners = "Winners"
+    override val statErrors = "Erros"
+    override val detailedStats = "Estatísticas detalhadas"
+    override val detailedStatsHint = "Para quem marca da beira da quadra: no lugar dos dois botões grandes há ace, falta e, para cada jogador, winner, erro e ponto. Servem para aces, duplas faltas, primeiros saques, winners e erros."
+    override val btnAce = "Ace"
+    override val btnFault = "Falta"
+    override val btnDoubleFault = "Dupla falta"
+    override val btnWinner = "Winner"
+    override val btnError = "Erro"
+    override val btnPoint = "Ponto"
+    override val firstServe = "1º saque"
+    override val secondServe = "2º saque"
+    override val serveOf: (String) -> String = { "saque: $it" }
     override val statStrokesTotal = "Total de golpes"
     override val statAvgWristSpeed = "Velocidade média do pulso"
     override val serveLost = "Saque perdido"
@@ -9914,6 +10139,8 @@ object PtStrings : Strings {
     override val msgBreakPoint = "BREAK POINT"
     override val msgDecidingPoint = "PONTO DECISIVO"
     override val msgPointUndone = "PONTO ANULADO"
+    override val msgSecondServe = "SEGUNDO SAQUE"
+    override val msgFaultUndone = "FALTA ANULADA"
     override val msgSuspended = "PARTIDA SUSPENSA"
     override val msgResumed = "PARTIDA RETOMADA"
     override val msgBandConnected: (String) -> String = { "PULSEIRA $it CONECTADA" }
@@ -10335,8 +10562,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10414,6 +10643,7 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
@@ -10462,7 +10692,13 @@ fun MatchScreen(c: MatchController) {
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
-            PointButtons(state, names, s, enabled = !suspended && !state.isFinished) { c.awardPoint(it) }
+            val playing = !suspended && !state.isFinished
+            if (lm.record.options.detailedStats) {
+                val fault by c.faultPending.collectAsState()
+                DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
+            } else {
+                PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
+            }
             if (suspended) {
                 Box(
                     Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
@@ -10837,6 +11073,94 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
     }
 }
 
+/**
+ * Statistiche dettagliate: al posto dei due tasti grandi, ace e fallo per chi serve e, per ogni giocatore,
+ * vincente, errore e punto semplice. Ogni tasto dà già il punto a qualcuno; solo la prima fuori non lo dà.
+ * Le colonne seguono la posizione reale dei giocatori, come i tasti grandi.
+ */
+@Composable
+private fun DetailedPointButtons(
+    state: MatchState,
+    names: Names,
+    s: Strings,
+    enabled: Boolean,
+    fault: Boolean,
+    onFault: () -> Unit,
+    onPoint: (Side, PointKind?) -> Unit,
+) {
+    val server = state.server
+    val gap = 8.dp
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+        // Fuori dal tie-break e dal game normale non cambia niente: ace e fallo valgono sempre per chi serve.
+        Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(gap)) {
+            // Nel doppio il nome di chi serve davvero, non della coppia.
+            val serverName = if (state.rules.doubles) names.player(server, state.serverPlayer) else names.short(server)
+            PadButton(s.btnAce, s.serveOf(serverName), TsmColors.player(server), TsmColors.onPlayer(server), enabled,
+                Modifier.weight(1f)) { onPoint(server, PointKind.ACE) }
+            PadButton(if (fault) s.btnDoubleFault else s.btnFault, if (fault) s.secondServe else s.firstServe,
+                TsmColors.Orange, TsmColors.OnOrange, enabled, Modifier.weight(1f)) { onFault() }
+        }
+        Row(Modifier.fillMaxWidth().weight(4f), horizontalArrangement = Arrangement.spacedBy(gap)) {
+            val left = state.leftSide()
+            for (side in listOf(left, left.other)) {
+                Column(Modifier.weight(1f).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+                    // Nome e punteggio del game: qui non ci sono i tasti grandi che li mostrano.
+                    Column(
+                        Modifier.fillMaxWidth().weight(1.3f).clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+                            .border(2.dp, TsmColors.player(side), RoundedCornerShape(16.dp)).padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(state.pointLabel(side), color = TsmColors.TextMain, fontSize = 34.sp, fontWeight = FontWeight.Black)
+                        if (!state.isFinished && server == side) {
+                            Box(Modifier.size(10.dp).clip(CircleShape).background(TsmColors.Ball))
+                        }
+                    }
+                    PadButton(s.btnWinner, null, TsmColors.player(side), TsmColors.onPlayer(side), enabled, Modifier.weight(1f)) {
+                        onPoint(side, PointKind.WINNER)
+                    }
+                    // L'errore è di questo giocatore, quindi il punto va all'altro.
+                    PadButton(s.btnError, null, TsmColors.SurfaceHigh, TsmColors.TextMain, enabled, Modifier.weight(1f),
+                        border = TsmColors.player(side)) { onPoint(side.other, PointKind.ERROR) }
+                    PadButton(s.btnPoint, null, TsmColors.player(side).copy(alpha = 0.55f), TsmColors.onPlayer(side), enabled,
+                        Modifier.weight(0.8f)) { onPoint(side, null) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PadButton(
+    text: String,
+    sub: String?,
+    bg: Color,
+    fg: Color,
+    enabled: Boolean,
+    modifier: Modifier,
+    border: Color? = null,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        shape = RoundedCornerShape(14.dp),
+        color = bg,
+        border = border?.let { BorderStroke(3.dp, it) },
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Column(Modifier.fillMaxSize().padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(text, color = fg, fontWeight = FontWeight.Bold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center)
+            if (sub != null) {
+                Text(sub, color = fg.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+}
+
 @Composable
 private fun ControlButton(
     icon: ImageVector,
@@ -10953,7 +11277,14 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
             )
         }
         NamesHeader(names)
-        StatSection(s.statServe, listOf(
+        val detail = remember(rec) { MatchStats.hasDetail(rec, pts) }
+        StatSection(s.statServe, (if (detail) listOf(
+            Stat(s.statAces, a.aces, b.aces),
+            Stat(s.statDoubleFaults, a.doubleFaults, b.doubleFaults),
+            Stat(s.statFirstServeIn, a.firstServesIn, a.servePoints, b.firstServesIn, b.servePoints, StatKind.PERCENT),
+            Stat(s.statFirstServeWon, a.firstServePointsWon, a.firstServesIn, b.firstServePointsWon, b.firstServesIn, StatKind.PERCENT),
+            Stat(s.statSecondServeWon, a.secondServePointsWon, a.secondServes, b.secondServePointsWon, b.secondServes, StatKind.PERCENT),
+        ) else emptyList()) + listOf(
             Stat(s.statServicePoints, a.servePointsWon, a.servePoints, b.servePointsWon, b.servePoints, StatKind.PERCENT),
             Stat(s.statServiceGames, a.serviceGamesWon, a.serviceGames, b.serviceGamesWon, b.serviceGames, StatKind.PERCENT),
             Stat(s.statBreakSaved, a.breakPointsSaved, a.breakPointsFaced, b.breakPointsSaved, b.breakPointsFaced, StatKind.RATIO),
@@ -10965,6 +11296,10 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ))
         StatSection(s.statPoints, listOf(
             Stat(s.statTotalPoints, a.pointsWon, a.points, b.pointsWon, b.points, StatKind.PERCENT),
+        ) + (if (detail) listOf(
+            Stat(s.statWinners, a.winners, b.winners),
+            Stat(s.statErrors, a.errors, b.errors),
+        ) else emptyList()) + listOf(
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
@@ -10980,7 +11315,7 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
                     modifier = Modifier.fillMaxWidth())
             }
         }
-        Text(s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(if (detail) s.statsHintDetailed else s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
 }
 
@@ -11201,6 +11536,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -11414,6 +11750,9 @@ fun OptionsScreen(c: MatchController) {
                 },
                 color = TsmColors.TextDim,
             )
+            SwitchRow(Icons.Filled.BarChart, s.detailedStats, s.detailedStatsHint, o.detailedStats) { v ->
+                c.updateOptions { it.copy(detailedStats = v) }
+            }
             if (o.mode == PlayMode.BANDS) {
                 Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
@@ -14595,6 +14934,7 @@ package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.data.MatchStats.Marker
 import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -14619,6 +14959,42 @@ class MatchStatsTest {
 
     /** G1 tiene il servizio a zero, poi strappa il servizio a G2 a zero, poi tiene da 0-30. */
     private val holdBreakHold = arrayOf(*game(p1), *game(p1), p2, p2, p1, p1, p1, p1)
+
+    /** Primo game, serve G1: ace, doppio fallo, vincente di G1 sulla seconda, errore di G2, errore di G1, punto semplice. */
+    @Test
+    fun detailedServeAndRallyStats() {
+        fun pt(w: Side, k: PointKind?, second: Boolean = false) = MatchEvent.Point(w, kind = k, secondServe = second)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(
+                pt(p1, PointKind.ACE),
+                pt(p2, PointKind.DOUBLE_FAULT, second = true),
+                pt(p1, PointKind.WINNER, second = true),
+                pt(p1, PointKind.ERROR),
+                pt(p2, PointKind.ERROR),
+                pt(p1, null),
+            ),
+        )
+        val pts = MatchStats.points(r)
+        assertTrue(MatchStats.hasDetail(r, pts))
+        val t = MatchStats.totals(pts)
+        val a = t.getValue(p1)
+        val b = t.getValue(p2)
+        assertEquals(1, a.aces); assertEquals(1, a.doubleFaults); assertEquals(0, b.aces)
+        assertEquals(4, a.firstServesIn); assertEquals(6, a.servePoints)
+        assertEquals(3, a.firstServePointsWon)
+        assertEquals(1, a.secondServePointsWon); assertEquals(2, a.secondServes)
+        assertEquals(1, a.winners); assertEquals(0, b.winners)
+        // L'errore è di chi perde il punto.
+        assertEquals(1, a.errors); assertEquals(1, b.errors)
+        assertEquals(1, a.gamesWon)
+    }
+
+    @Test
+    fun noDetailForPlainMatches() {
+        val r = rec(*holdBreakHold)
+        assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))
+    }
 
     @Test
     fun serveReturnAndBreakPoints() {

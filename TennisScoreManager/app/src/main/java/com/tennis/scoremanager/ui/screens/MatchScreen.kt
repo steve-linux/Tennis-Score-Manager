@@ -11,8 +11,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -90,6 +92,7 @@ import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
@@ -138,7 +141,13 @@ fun MatchScreen(c: MatchController) {
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
-            PointButtons(state, names, s, enabled = !suspended && !state.isFinished) { c.awardPoint(it) }
+            val playing = !suspended && !state.isFinished
+            if (lm.record.options.detailedStats) {
+                val fault by c.faultPending.collectAsState()
+                DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
+            } else {
+                PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
+            }
             if (suspended) {
                 Box(
                     Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
@@ -508,6 +517,94 @@ private fun PointButtons(state: MatchState, names: Names, s: Strings, enabled: B
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Statistiche dettagliate: al posto dei due tasti grandi, ace e fallo per chi serve e, per ogni giocatore,
+ * vincente, errore e punto semplice. Ogni tasto dà già il punto a qualcuno; solo la prima fuori non lo dà.
+ * Le colonne seguono la posizione reale dei giocatori, come i tasti grandi.
+ */
+@Composable
+private fun DetailedPointButtons(
+    state: MatchState,
+    names: Names,
+    s: Strings,
+    enabled: Boolean,
+    fault: Boolean,
+    onFault: () -> Unit,
+    onPoint: (Side, PointKind?) -> Unit,
+) {
+    val server = state.server
+    val gap = 8.dp
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+        // Fuori dal tie-break e dal game normale non cambia niente: ace e fallo valgono sempre per chi serve.
+        Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(gap)) {
+            // Nel doppio il nome di chi serve davvero, non della coppia.
+            val serverName = if (state.rules.doubles) names.player(server, state.serverPlayer) else names.short(server)
+            PadButton(s.btnAce, s.serveOf(serverName), TsmColors.player(server), TsmColors.onPlayer(server), enabled,
+                Modifier.weight(1f)) { onPoint(server, PointKind.ACE) }
+            PadButton(if (fault) s.btnDoubleFault else s.btnFault, if (fault) s.secondServe else s.firstServe,
+                TsmColors.Orange, TsmColors.OnOrange, enabled, Modifier.weight(1f)) { onFault() }
+        }
+        Row(Modifier.fillMaxWidth().weight(4f), horizontalArrangement = Arrangement.spacedBy(gap)) {
+            val left = state.leftSide()
+            for (side in listOf(left, left.other)) {
+                Column(Modifier.weight(1f).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+                    // Nome e punteggio del game: qui non ci sono i tasti grandi che li mostrano.
+                    Column(
+                        Modifier.fillMaxWidth().weight(1.3f).clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+                            .border(2.dp, TsmColors.player(side), RoundedCornerShape(16.dp)).padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(state.pointLabel(side), color = TsmColors.TextMain, fontSize = 34.sp, fontWeight = FontWeight.Black)
+                        if (!state.isFinished && server == side) {
+                            Box(Modifier.size(10.dp).clip(CircleShape).background(TsmColors.Ball))
+                        }
+                    }
+                    PadButton(s.btnWinner, null, TsmColors.player(side), TsmColors.onPlayer(side), enabled, Modifier.weight(1f)) {
+                        onPoint(side, PointKind.WINNER)
+                    }
+                    // L'errore è di questo giocatore, quindi il punto va all'altro.
+                    PadButton(s.btnError, null, TsmColors.SurfaceHigh, TsmColors.TextMain, enabled, Modifier.weight(1f),
+                        border = TsmColors.player(side)) { onPoint(side.other, PointKind.ERROR) }
+                    PadButton(s.btnPoint, null, TsmColors.player(side).copy(alpha = 0.55f), TsmColors.onPlayer(side), enabled,
+                        Modifier.weight(0.8f)) { onPoint(side, null) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PadButton(
+    text: String,
+    sub: String?,
+    bg: Color,
+    fg: Color,
+    enabled: Boolean,
+    modifier: Modifier,
+    border: Color? = null,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        enabled = enabled,
+        shape = RoundedCornerShape(14.dp),
+        color = bg,
+        border = border?.let { BorderStroke(3.dp, it) },
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Column(Modifier.fillMaxSize().padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(text, color = fg, fontWeight = FontWeight.Bold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center)
+            if (sub != null) {
+                Text(sub, color = fg.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

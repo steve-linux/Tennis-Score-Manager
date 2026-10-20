@@ -63,13 +63,29 @@ data class RulesConfig(
     val firstServerP2: Int = 0,
 )
 
+/**
+ * Come è finito un punto, per le statistiche dettagliate. Chi l'ha fatto si ricava dal vincitore e da chi serve:
+ * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
+ */
+@Serializable
+enum class PointKind { ACE, DOUBLE_FAULT, WINNER, ERROR }
+
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable
 sealed class MatchEvent {
     @Serializable
     @SerialName("point")
-    /** [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati. */
-    data class Point(val winner: Side, val at: Long = 0L, val strokes: Int? = null) : MatchEvent()
+    /**
+     * [strokes]: colpi riconosciuti dai braccialetti durante lo scambio (firmware 2.4); null = non contati.
+     * [kind]: come è finito il punto (statistiche dettagliate); null = non detto. [secondServe]: la prima era fuori.
+     */
+    data class Point(
+        val winner: Side,
+        val at: Long = 0L,
+        val strokes: Int? = null,
+        val kind: PointKind? = null,
+        val secondServe: Boolean = false,
+    ) : MatchEvent()
 
     /** Doppio: ordine di servizio scelto all'inizio di un set (ammesso solo prima del primo punto del set). */
     @Serializable

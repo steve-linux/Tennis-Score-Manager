@@ -5,6 +5,7 @@ package com.tennis.scoremanager.data
 
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
@@ -12,7 +13,7 @@ import com.tennis.scoremanager.model.TiebreakKind
 /**
  * Statistiche di fine partita e cronologia punto per punto, ricavate rigiocando i punti (come le pagine
  * "statistiche" e "cronologia" dei siti di risultati). Ace, doppi falli, prime di servizio, vincenti ed errori
- * non si possono sapere: l'app conosce solo chi ha vinto ogni punto (e, coi braccialetti 2.4, i colpi).
+ * ci sono solo se la partita è stata segnata con le statistiche dettagliate.
  */
 object MatchStats {
 
@@ -30,6 +31,8 @@ object MatchStats {
         val gameWinner: Side?,
         /** Colpi dei braccialetti nello scambio (null = non contati). */
         val strokes: Int?,
+        val kind: PointKind? = null,
+        val secondServe: Boolean = false,
     )
 
     fun points(rec: MatchRecord): List<PlayedPoint> {
@@ -49,6 +52,8 @@ object MatchStats {
                     matchPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.matchWinner == it },
                     gameWinner = t.gameWinner,
                     strokes = e.strokes,
+                    kind = e.kind,
+                    secondServe = e.secondServe,
                 )
             }
             s = step.state
@@ -79,7 +84,20 @@ object MatchStats {
         /** Punti vinti tra gli ultimi 10 del periodo. */
         val last10: Int = 0,
         val matchPointsSaved: Int = 0,
+        // Statistiche dettagliate
+        val aces: Int = 0,
+        val doubleFaults: Int = 0,
+        val firstServesIn: Int = 0,
+        val firstServePointsWon: Int = 0,
+        val secondServePointsWon: Int = 0,
+        val secondServes: Int = 0,
+        val winners: Int = 0,
+        val errors: Int = 0,
     )
+
+    /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
+    fun hasDetail(rec: MatchRecord, all: List<PlayedPoint>): Boolean =
+        rec.options.detailedStats || all.any { it.kind != null || it.secondServe }
 
     /** [set] = null: tutta la partita; altrimenti solo quel set (0 = primo). */
     fun totals(all: List<PlayedPoint>, set: Int? = null): Map<Side, SideTotals> {
@@ -120,6 +138,14 @@ object MatchStats {
             maxStreak = best,
             last10 = pts.takeLast(10).count { it.winner == me },
             matchPointsSaved = pts.count { it.matchPointFor == me.other && it.winner == me },
+            aces = serve.count { it.kind == PointKind.ACE },
+            doubleFaults = serve.count { it.kind == PointKind.DOUBLE_FAULT },
+            firstServesIn = serve.count { !it.secondServe },
+            firstServePointsWon = serve.count { !it.secondServe && it.winner == me },
+            secondServePointsWon = serve.count { it.secondServe && it.winner == me },
+            secondServes = serve.count { it.secondServe },
+            winners = pts.count { it.kind == PointKind.WINNER && it.winner == me },
+            errors = pts.count { it.kind == PointKind.ERROR && it.winner != me },
         )
     }
 

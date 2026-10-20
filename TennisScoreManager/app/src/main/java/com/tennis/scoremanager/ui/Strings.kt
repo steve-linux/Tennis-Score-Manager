@@ -148,6 +148,7 @@ interface Strings {
     /** "Set 1", "Set 2"... */
     val periodSet: (Int) -> String
     val statsHint: String
+    val statsHintDetailed: String
     val statServe: String
     val statReturn: String
     val statPoints: String
@@ -163,6 +164,25 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statAces: String
+    val statDoubleFaults: String
+    val statFirstServeIn: String
+    val statFirstServeWon: String
+    val statSecondServeWon: String
+    val statWinners: String
+    val statErrors: String
+    val detailedStats: String
+    val detailedStatsHint: String
+    val btnAce: String
+    val btnFault: String
+    val btnDoubleFault: String
+    val btnWinner: String
+    val btnError: String
+    val btnPoint: String
+    val firstServe: String
+    val secondServe: String
+    /** "servizio di Rossi": sotto il tasto Ace. */
+    val serveOf: (String) -> String
     val statStrokesTotal: String
     val statAvgWristSpeed: String
     val serveLost: String
@@ -312,6 +332,8 @@ interface Strings {
     val msgBreakPoint: String
     val msgDecidingPoint: String
     val msgPointUndone: String
+    val msgSecondServe: String
+    val msgFaultUndone: String
     val msgSuspended: String
     val msgResumed: String
     val msgBandConnected: (String) -> String
@@ -561,6 +583,7 @@ object ItStrings : Strings {
     override val periodMatch = "Partita"
     override val periodSet: (Int) -> String = { "Set $it" }
     override val statsHint = "Calcolate dai punti segnati nell'app e, coi braccialetti, dai colpi. Ace, doppi falli, prime di servizio ed errori non si possono sapere."
+    override val statsHintDetailed = "Calcolate dai punti segnati nell'app, con ace, falli, vincenti ed errori delle statistiche dettagliate e, coi braccialetti, dai colpi. Un punto dato col tasto «Punto» (o da braccialetti e telecomandi) conta senza dettaglio."
     override val statServe = "Servizio"
     override val statReturn = "Risposta"
     override val statPoints = "Punti"
@@ -576,6 +599,24 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statAces = "Ace"
+    override val statDoubleFaults = "Doppi falli"
+    override val statFirstServeIn = "Prime di servizio in campo"
+    override val statFirstServeWon = "Punti vinti con la prima"
+    override val statSecondServeWon = "Punti vinti con la seconda"
+    override val statWinners = "Vincenti"
+    override val statErrors = "Errori"
+    override val detailedStats = "Statistiche dettagliate"
+    override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
+    override val btnAce = "Ace"
+    override val btnFault = "Fallo"
+    override val btnDoubleFault = "Doppio fallo"
+    override val btnWinner = "Vincente"
+    override val btnError = "Errore"
+    override val btnPoint = "Punto"
+    override val firstServe = "prima"
+    override val secondServe = "seconda"
+    override val serveOf: (String) -> String = { "servizio di $it" }
     override val statStrokesTotal = "Colpi totali"
     override val statAvgWristSpeed = "Velocità media del polso"
     override val serveLost = "Servizio perso"
@@ -717,6 +758,8 @@ object ItStrings : Strings {
     override val msgBreakPoint = "PALLA BREAK"
     override val msgDecidingPoint = "PUNTO DECISIVO"
     override val msgPointUndone = "PUNTO ANNULLATO"
+    override val msgSecondServe = "SECONDA DI SERVIZIO"
+    override val msgFaultUndone = "FALLO ANNULLATO"
     override val msgSuspended = "PARTITA SOSPESA"
     override val msgResumed = "PARTITA RIPRESA"
     override val msgBandConnected: (String) -> String = { "BRACCIALETTO $it CONNESSO" }
@@ -963,6 +1006,7 @@ object EnStrings : Strings {
     override val periodMatch = "Match"
     override val periodSet: (Int) -> String = { "Set $it" }
     override val statsHint = "Worked out from the points scored in the app and, with the wristbands, from the strokes. Aces, double faults, first serves and errors can't be known."
+    override val statsHintDetailed = "Worked out from the points scored in the app, with the aces, faults, winners and errors of the detailed stats and, with the wristbands, from the strokes. A point given with “Point” (or by wristbands and remotes) counts without detail."
     override val statServe = "Serve"
     override val statReturn = "Return"
     override val statPoints = "Points"
@@ -978,6 +1022,24 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statAces = "Aces"
+    override val statDoubleFaults = "Double faults"
+    override val statFirstServeIn = "First serves in"
+    override val statFirstServeWon = "Points won on 1st serve"
+    override val statSecondServeWon = "Points won on 2nd serve"
+    override val statWinners = "Winners"
+    override val statErrors = "Errors"
+    override val detailedStats = "Detailed stats"
+    override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
+    override val btnAce = "Ace"
+    override val btnFault = "Fault"
+    override val btnDoubleFault = "Double fault"
+    override val btnWinner = "Winner"
+    override val btnError = "Error"
+    override val btnPoint = "Point"
+    override val firstServe = "1st serve"
+    override val secondServe = "2nd serve"
+    override val serveOf: (String) -> String = { "serving: $it" }
     override val statStrokesTotal = "Total strokes"
     override val statAvgWristSpeed = "Average wrist speed"
     override val serveLost = "Lost serve"
@@ -1119,6 +1181,8 @@ object EnStrings : Strings {
     override val msgBreakPoint = "BREAK POINT"
     override val msgDecidingPoint = "DECIDING POINT"
     override val msgPointUndone = "POINT UNDONE"
+    override val msgSecondServe = "SECOND SERVE"
+    override val msgFaultUndone = "FAULT UNDONE"
     override val msgSuspended = "MATCH SUSPENDED"
     override val msgResumed = "MATCH RESUMED"
     override val msgBandConnected: (String) -> String = { "WRISTBAND $it CONNECTED" }

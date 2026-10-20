@@ -36,6 +36,7 @@ import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.data.StrokeStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
@@ -137,6 +138,8 @@ class MatchController(
     val message = MutableStateFlow<String?>(null)
     val endDialog = MutableStateFlow(false)
     val serveOrderPrompt = MutableStateFlow(false)
+    /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
+    val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
     val summaryKept = MutableStateFlow(false)
@@ -731,6 +734,7 @@ class MatchController(
         stopCountdown()
         lastPointAt = 0
         rallyStrokes = 0
+        faultPending.value = false
         screen.value = Screen.MATCH
         persist()
         if (needsService()) MatchService.start(app)
@@ -753,7 +757,11 @@ class MatchController(
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }
 
-    fun awardPoint(side: Side, fromBand: Boolean = false) {
+    /**
+     * Statistiche dettagliate: [kind] dice come è finito il punto (null = non detto). La seconda di servizio
+     * viene da [fault]: vale per il punto in corso, anche se poi lo dà un braccialetto o un telecomando.
+     */
+    fun awardPoint(side: Side, fromBand: Boolean = false, kind: PointKind? = null) {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
         val now = SystemClock.elapsedRealtime()
@@ -769,7 +777,10 @@ class MatchController(
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
         val strokes = rallyStrokes.takeIf { current.record.strokes.isNotEmpty() }
         rallyStrokes = 0
-        val rec = current.record.copy(events = current.record.events + MatchEvent.Point(side, System.currentTimeMillis(), strokes))
+        val second = faultPending.value
+        faultPending.value = false
+        val point = MatchEvent.Point(side, System.currentTimeMillis(), strokes, kind, second)
+        val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
         afterTransition(step.state, t)
@@ -828,12 +839,35 @@ class MatchController(
         }
     }
 
+    /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
+    fun fault() {
+        val lm = live.value ?: return
+        if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        if (faultPending.value) {
+            awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
+            return
+        }
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastPointAt < TAP_GAP_MS || now - lastUndoAt < TAP_GAP_MS) return
+        if (lm.record.startedAt == null) onPlay()
+        faultPending.value = true
+        showMessage(strings.msgSecondServe)
+        startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
+    }
+
     /** Annulla l'ultimo punto: si rigiocano gli eventi, quindi funziona anche dopo fine game, set o partita. */
     fun undo() {
         val lm = live.value ?: return
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
+        if (faultPending.value) {
+            faultPending.value = false
+            lastUndoAt = now
+            showMessage(strings.msgFaultUndone)
+            return
+        }
         val events = lm.record.events.toMutableList()
         while (events.isNotEmpty() && events[events.lastIndex] !is MatchEvent.Point) events.removeAt(events.lastIndex)
         if (events.isEmpty()) return
@@ -968,6 +1002,7 @@ class MatchController(
         stopCountdown()
         lastPointAt = 0
         rallyStrokes = 0
+        faultPending.value = false
         endDialog.value = state.isFinished
         serveOrderPrompt.value = false
         screen.value = Screen.MATCH
