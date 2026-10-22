@@ -29,6 +29,7 @@ object PdfReport {
     private const val H = 842
     private const val M = 40f
     private const val CONTENT_W = W - 2 * M
+    private const val PX_PER_PT = 1.5f
 
     private val dark = Color.rgb(20, 28, 44)
     private val grey = Color.rgb(110, 120, 135)
@@ -113,7 +114,7 @@ object PdfReport {
         wr.newPage()
         val cardW = 300f
         val cardH = cardW * card.height / card.width
-        wr.canvas.drawBitmap(card, null, RectF((W - cardW) / 2, wr.y, (W + cardW) / 2, wr.y + cardH), Paint(Paint.FILTER_BITMAP_FLAG))
+        wr.canvas.drawBitmap(fit(card, cardW, cardH), null, RectF((W - cardW) / 2, wr.y, (W + cardW) / 2, wr.y + cardH), Paint(Paint.FILTER_BITMAP_FLAG))
         wr.y += cardH + 16
         for (side in Side.entries) {
             val real = PlayerStats.names(rec.setup, side)
@@ -202,7 +203,7 @@ object PdfReport {
                 val scale = minOf(CONTENT_W / b.width, boxH / b.height)
                 val w = b.width * scale
                 val h = b.height * scale
-                wr.canvas.drawBitmap(b, null, RectF((W - w) / 2, wr.y + 10, (W + w) / 2, wr.y + 10 + h), Paint(Paint.FILTER_BITMAP_FLAG))
+                wr.canvas.drawBitmap(fit(b, w, h), null, RectF((W - w) / 2, wr.y + 10, (W + w) / 2, wr.y + 10 + h), Paint(Paint.FILTER_BITMAP_FLAG))
                 wr.y += boxH + 10
             }
         }
@@ -211,10 +212,21 @@ object PdfReport {
         doc.close()
     }
 
+    /**
+     * PdfDocument mette le immagini nel file senza comprimerle in JPEG: una foto grande pesa megabyte. Si
+     * rimpicciolisce alla misura in cui la si disegna, con [PX_PER_PT] pixel per punto (circa 108 dpi, bastano
+     * per lo schermo e per una stampa).
+     */
+    private fun fit(b: Bitmap, wPt: Float, hPt: Float): Bitmap {
+        val tw = (wPt * PX_PER_PT).toInt().coerceAtLeast(1)
+        val th = (hPt * PX_PER_PT).toInt().coerceAtLeast(1)
+        return if (b.width <= tw && b.height <= th) b else Bitmap.createScaledBitmap(b, tw, th, true)
+    }
+
     private fun drawCircle(c: Canvas, b: Bitmap, x: Float, y: Float, size: Float) {
         c.save()
         c.clipPath(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) })
-        c.drawBitmap(b, null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
+        c.drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
         c.restore()
     }
 

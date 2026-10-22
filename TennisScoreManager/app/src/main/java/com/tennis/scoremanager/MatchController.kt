@@ -6,14 +6,17 @@ package com.tennis.scoremanager
 import android.app.Activity
 import android.app.Application
 import android.content.ClipData
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
@@ -32,8 +35,8 @@ import com.tennis.scoremanager.data.MatchLocation
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
-import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PdfReport
+import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
@@ -132,6 +135,8 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Cartella predefinita di "Salva file" da Android 10 (memoria condivisa, visibile a tutte le app). */
+        val DOCUMENTS_DIR = "${Environment.DIRECTORY_DOCUMENTS}/Tennis Score Manager"
         /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
         const val MATCH_PHOTO_PX = 1600
         private const val BAND_GAP_MS = 2_000L
@@ -1668,7 +1673,7 @@ class MatchController(
     }
 
     fun folderLabel(): String {
-        val tree = storage.historyTree ?: return strings.defaultFolder
+        val tree = storage.historyTree ?: return if (Build.VERSION.SDK_INT >= 29) DOCUMENTS_DIR else strings.defaultFolder
         return runCatching { DocumentsContract.getTreeDocumentId(Uri.parse(tree)).substringAfter(':').ifBlank { "/" } }
             .getOrDefault(strings.defaultFolder)
     }
@@ -1712,7 +1717,22 @@ class MatchController(
                             app.contentResolver.openOutputStream(doc)?.use(write) ?: error("openOutputStream")
                         }
                         folderLabel()
+                    } else if (Build.VERSION.SDK_INT >= 29) {
+                        // Documenti/Tennis Score Manager: si apre da qualsiasi app di gestione file e resta anche se
+                        // l'app si disinstalla; niente permessi. Coi nomi uguali Android aggiunge da sé " (1)".
+                        val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                        for ((file, mime, write) in outputs) {
+                            val values = ContentValues().apply {
+                                put(MediaStore.MediaColumns.DISPLAY_NAME, file)
+                                put(MediaStore.MediaColumns.MIME_TYPE, mime)
+                                put(MediaStore.MediaColumns.RELATIVE_PATH, DOCUMENTS_DIR)
+                            }
+                            val uri = app.contentResolver.insert(collection, values) ?: error("MediaStore insert")
+                            app.contentResolver.openOutputStream(uri)?.use(write) ?: error("openOutputStream")
+                        }
+                        DOCUMENTS_DIR
                     } else {
+                        // Android 8 e 9: la cartella dell'app (scrivere in Documenti chiederebbe un permesso in più).
                         // Come fa il selettore di sistema: "Finale (1).txt" invece di sovrascrivere "Finale.txt".
                         val dir = storage.defaultHistoryDir
                         val suffix = generateSequence(0) { it + 1 }.map { if (it == 0) "" else " ($it)" }
