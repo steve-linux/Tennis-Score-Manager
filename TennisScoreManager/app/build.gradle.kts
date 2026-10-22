@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
+    implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

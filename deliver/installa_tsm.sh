@@ -32,6 +32,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/service"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/transfer"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens"
@@ -44,6 +45,7 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/remote"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/transfer"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
@@ -124,6 +126,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
+    implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
@@ -158,6 +161,8 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <!-- Fotocamera solo per leggere il QR quando si riceve lo storico da un altro telefono: facoltativa -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Bluetooth LE per i braccialetti (Android 12+ usa SCAN/CONNECT, prima BLUETOOTH/ADMIN) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -214,6 +219,15 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         </activity>
 
         <!-- Telefono usato come tabellone: pagina del telefono dell'arbitro a schermo intero, in orizzontale -->
+        <!-- Lettore QR (zxing-android-embedded): in verticale come il resto dell'app -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            tools:replace="android:screenOrientation" />
+
         <activity
             android:name=".tv.DisplayActivity"
             android:exported="false"
@@ -797,6 +811,8 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
+import com.tennis.scoremanager.transfer.TransferBundle
+import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
@@ -1833,25 +1849,89 @@ class MatchController(
         val s = strings
         scope.launch {
             val (done, open) = withContext(io) {
-                var done = 0
-                var open = 0
-                for (uri in uris) {
-                    val rec = runCatching {
+                importRecords(uris.mapNotNull { uri ->
+                    runCatching {
                         val text = app.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: return@runCatching null
                         storage.json.decodeFromString(MatchRecord.serializer(), text)
-                    }.getOrNull() ?: continue
-                    val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
-                    if (state.isFinished) {
-                        storage.saveFinished(rec.copy(finished = true, suspended = false))
-                        done++
-                    } else {
-                        storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
-                        open++
-                    }
-                }
-                done to open
+                    }.getOrNull()
+                })
             }
             _toasts.tryEmit(if (done + open == 0) s.historyImportFailed else s.historyImported(done, open))
+            refreshHistory()
+            refreshSaved()
+        }
+    }
+
+    /** Salva partite arrivate da fuori: le finite nello storico, le altre tra le sospese. Restituisce (finite, sospese). */
+    private fun importRecords(recs: List<MatchRecord>): Pair<Int, Int> {
+        var done = 0
+        var open = 0
+        for (rec in recs) {
+            val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
+            if (state.isFinished) {
+                storage.saveFinished(rec.copy(finished = true, suspended = false))
+                done++
+            } else {
+                storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
+                open++
+            }
+        }
+        return done to open
+    }
+
+    // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
+
+    /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
+    val transferUrl = MutableStateFlow<String?>(null)
+    /** Quante volte l'altro telefono ha già scaricato il pacchetto (per dire "Inviato"). */
+    val transferServed = MutableStateFlow(0)
+    private var transferServer: TransferServer? = null
+
+    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui l'altro possa collegarsi. */
+    fun startSending(): Boolean {
+        stopSending()
+        val host = TvServer.localAddresses().firstOrNull() ?: return false
+        val server = TransferServer(
+            payload = {
+                val all = storage.loadFinished() + storage.loadUnfinished()
+                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all)).toByteArray()
+            },
+            onServed = { transferServed.value++ },
+        )
+        val port = runCatching { server.start() }.getOrNull() ?: return false
+        transferServer = server
+        transferServed.value = 0
+        transferUrl.value = TransferServer.url(host, port, server.token)
+        return true
+    }
+
+    fun stopSending() {
+        transferServer?.stop()
+        transferServer = null
+        transferUrl.value = null
+    }
+
+    /** Testo letto dal QR dell'altro telefono: scarica storico e partite sospese e li aggiunge a questo telefono. */
+    fun receiveFrom(text: String) {
+        val s = strings
+        if (!TransferServer.isTransferUrl(text)) {
+            _toasts.tryEmit(s.transferBadCode)
+            return
+        }
+        scope.launch {
+            val result = withContext(io) {
+                runCatching {
+                    val bundle = storage.json.decodeFromString(TransferBundle.serializer(), TransferServer.fetch(text).decodeToString())
+                    importRecords(bundle.matches)
+                }.getOrNull()
+            }
+            _toasts.tryEmit(
+                when {
+                    result == null -> s.transferFailed
+                    result.first + result.second == 0 -> s.transferEmpty
+                    else -> s.historyImported(result.first, result.second)
+                },
+            )
             refreshHistory()
             refreshSaved()
         }
@@ -5216,6 +5296,109 @@ class MatchService : Service() {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.transfer
+
+import com.tennis.scoremanager.data.MatchRecord
+import kotlinx.serialization.Serializable
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.URL
+import java.security.SecureRandom
+import kotlin.concurrent.thread
+
+/** Quello che passa da un telefono all'altro: lo storico e le partite sospese. */
+@Serializable
+data class TransferBundle(val version: Int = 1, val matches: List<MatchRecord> = emptyList())
+
+/**
+ * Trasferimento tra due telefoni sulla stessa rete (Wi-Fi o hotspot): chi invia apre un piccolo server http e
+ * mostra un QR con l'indirizzo; chi riceve lo inquadra e scarica il pacchetto. Il QR contiene solo l'indirizzo
+ * (le partite non ci starebbero) e un codice casuale: senza quel codice il server risponde 404. Il server vive
+ * finché resta aperta la finestra col QR.
+ */
+class TransferServer(private val payload: () -> ByteArray, private val onServed: () -> Unit) {
+    private var socket: ServerSocket? = null
+    val token: String = ByteArray(16).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+
+    /** Avvia il server su una porta libera e la restituisce. */
+    fun start(): Int {
+        val ss = ServerSocket().apply {
+            reuseAddress = true
+            bind(InetSocketAddress(0))
+        }
+        socket = ss
+        thread(name = "tsm-transfer", isDaemon = true) {
+            while (!ss.isClosed) {
+                val client = runCatching { ss.accept() }.getOrNull() ?: break
+                runCatching {
+                    client.soTimeout = 10_000
+                    client.use { c ->
+                        val reader = BufferedReader(InputStreamReader(c.getInputStream(), Charsets.US_ASCII))
+                        val path = reader.readLine()?.split(" ")?.getOrNull(1).orEmpty()
+                        // Si leggono le intestazioni fino alla riga vuota, poi si risponde.
+                        while (true) {
+                            val line = reader.readLine() ?: break
+                            if (line.isEmpty()) break
+                        }
+                        val out = c.getOutputStream()
+                        if (path == "$PATH$token") {
+                            val body = payload()
+                            out.write(header(200, "OK", body.size).toByteArray(Charsets.US_ASCII))
+                            out.write(body)
+                            out.flush()
+                            onServed()
+                        } else {
+                            out.write(header(404, "Not Found", 0).toByteArray(Charsets.US_ASCII))
+                            out.flush()
+                        }
+                    }
+                }
+            }
+        }
+        return ss.localPort
+    }
+
+    fun stop() {
+        runCatching { socket?.close() }
+        socket = null
+    }
+
+    private fun header(code: Int, text: String, length: Int) =
+        "HTTP/1.1 $code $text\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: $length\r\nConnection: close\r\n\r\n"
+
+    companion object {
+        const val PATH = "/tsm-transfer/"
+
+        fun url(host: String, port: Int, token: String) = "http://$host:$port$PATH$token"
+
+        /** Il testo letto dal QR è un indirizzo di trasferimento di questa app? */
+        fun isTransferUrl(text: String): Boolean =
+            Regex("""^http://[0-9.]+:\d+${Regex.escape(PATH)}[0-9a-f]{32}$""").matches(text.trim())
+
+        /** Scarica il pacchetto (da chiamare fuori dal thread principale). */
+        fun fetch(url: String): ByteArray {
+            val conn = URL(url.trim()).openConnection() as HttpURLConnection
+            conn.connectTimeout = 8_000
+            conn.readTimeout = 30_000
+            try {
+                check(conn.responseCode == 200) { "HTTP ${conn.responseCode}" }
+                return conn.inputStream.use { it.readBytes() }
+            } finally {
+                conn.disconnect()
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/tv/DisplayActivity.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/tv/DisplayActivity.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -7770,6 +7953,19 @@ interface Strings {
     /** Partite importate: nello storico e tra le sospese. */
     val historyImported: (Int, Int) -> String
     val historyImportFailed: String
+    // Trasferimento tra telefoni con QR (Storico › Trasferisci)
+    val transferTitle: String
+    val transferHint: String
+    val transferSend: String
+    val transferReceive: String
+    val transferShowQr: String
+    val transferSent: String
+    val transferClose: String
+    val transferScanPrompt: String
+    val transferNoNetwork: String
+    val transferBadCode: String
+    val transferFailed: String
+    val transferEmpty: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -8216,6 +8412,18 @@ object ItStrings : Strings {
     override val historyDeleteText = "La partita sparisce dallo storico di questo telefono. I file già salvati o condivisi restano."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importate: $d nello storico, $o tra le partite sospese" }
     override val historyImportFailed = "Nessuna partita importata: scegli i file JSON salvati dall'app."
+    override val transferTitle = "Trasferisci"
+    override val transferHint = "Sposta storico e partite sospese su un altro telefono con un codice QR. I due telefoni devono essere sulla stessa rete Wi-Fi, oppure uno collegato all'hotspot dell'altro. Su quello nuovo le partite si aggiungono a quelle che ha già."
+    override val transferSend = "Invia"
+    override val transferReceive = "Ricevi"
+    override val transferShowQr = "Sull'altro telefono apri Storico › Trasferisci › Ricevi e inquadra questo codice. Lascia aperta questa finestra finché non ha finito."
+    override val transferSent = "Inviato all'altro telefono. Puoi chiudere."
+    override val transferClose = "Chiudi"
+    override val transferScanPrompt = "Inquadra il codice dell'altro telefono"
+    override val transferNoNetwork = "Questo telefono non è su una rete Wi-Fi o un hotspot: collega i due telefoni alla stessa rete e riprova."
+    override val transferBadCode = "Questo non è un codice di Tennis Score Manager."
+    override val transferFailed = "Trasferimento non riuscito: i due telefoni sono sulla stessa rete? Sull'altro la finestra col codice deve restare aperta."
+    override val transferEmpty = "L'altro telefono non ha partite da inviare."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -8650,6 +8858,18 @@ object EnStrings : Strings {
     override val historyDeleteText = "The match disappears from this phone's history. Files already saved or shared stay."
     override val historyImported: (Int, Int) -> String = { d, o -> "Imported: $d into history, $o into suspended matches" }
     override val historyImportFailed = "No match imported: pick JSON files saved by the app."
+    override val transferTitle = "Transfer"
+    override val transferHint = "Move history and suspended matches to another phone with a QR code. Both phones must be on the same Wi-Fi network, or one connected to the other's hotspot. On the new phone the matches are added to the ones it already has."
+    override val transferSend = "Send"
+    override val transferReceive = "Receive"
+    override val transferShowQr = "On the other phone open History › Transfer › Receive and scan this code. Keep this window open until it has finished."
+    override val transferSent = "Sent to the other phone. You can close."
+    override val transferClose = "Close"
+    override val transferScanPrompt = "Scan the other phone's code"
+    override val transferNoNetwork = "This phone is not on a Wi-Fi network or hotspot: connect both phones to the same network and try again."
+    override val transferBadCode = "This is not a Tennis Score Manager code."
+    override val transferFailed = "Transfer failed: are both phones on the same network? On the other one the window with the code must stay open."
+    override val transferEmpty = "The other phone has no matches to send."
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"
@@ -9107,6 +9327,18 @@ object DeStrings : Strings {
     override val historyDeleteText = "Das Match verschwindet aus dem Verlauf dieses Telefons. Bereits gespeicherte oder geteilte Dateien bleiben."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importiert: $d in den Verlauf, $o zu den unterbrochenen Matches" }
     override val historyImportFailed = "Kein Match importiert: wähle JSON-Dateien, die die App gespeichert hat."
+    override val transferTitle = "Übertragen"
+    override val transferHint = "Verlauf und unterbrochene Matches per QR-Code auf ein anderes Telefon übertragen. Beide Telefone müssen im selben WLAN sein oder eines mit dem Hotspot des anderen verbunden. Auf dem neuen Telefon kommen die Matches zu den vorhandenen hinzu."
+    override val transferSend = "Senden"
+    override val transferReceive = "Empfangen"
+    override val transferShowQr = "Öffne auf dem anderen Telefon Verlauf › Übertragen › Empfangen und scanne diesen Code. Lass dieses Fenster offen, bis es fertig ist."
+    override val transferSent = "An das andere Telefon gesendet. Du kannst schließen."
+    override val transferClose = "Schließen"
+    override val transferScanPrompt = "Scanne den Code des anderen Telefons"
+    override val transferNoNetwork = "Dieses Telefon ist in keinem WLAN oder Hotspot: Verbinde beide Telefone mit demselben Netz und versuche es erneut."
+    override val transferBadCode = "Das ist kein Code von Tennis Score Manager."
+    override val transferFailed = "Übertragung fehlgeschlagen: Sind beide Telefone im selben Netz? Auf dem anderen muss das Fenster mit dem Code offen bleiben."
+    override val transferEmpty = "Das andere Telefon hat keine Matches zum Senden."
     override val share = "Teilen"
     override val saveDialogTitle = "Dateien speichern"
     override val fileName = "Name"
@@ -9557,6 +9789,18 @@ object EsStrings : Strings {
     override val historyDeleteText = "El partido desaparece del historial de este teléfono. Los archivos ya guardados o compartidos se quedan."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importados: $d al historial, $o a los partidos suspendidos" }
     override val historyImportFailed = "Ningún partido importado: elige archivos JSON guardados por la app."
+    override val transferTitle = "Transferir"
+    override val transferHint = "Pasa el historial y los partidos suspendidos a otro teléfono con un código QR. Los dos teléfonos deben estar en la misma red Wi-Fi, o uno conectado al punto de acceso del otro. En el nuevo, los partidos se suman a los que ya tiene."
+    override val transferSend = "Enviar"
+    override val transferReceive = "Recibir"
+    override val transferShowQr = "En el otro teléfono abre Historial › Transferir › Recibir y escanea este código. Deja esta ventana abierta hasta que termine."
+    override val transferSent = "Enviado al otro teléfono. Puedes cerrar."
+    override val transferClose = "Cerrar"
+    override val transferScanPrompt = "Escanea el código del otro teléfono"
+    override val transferNoNetwork = "Este teléfono no está en una red Wi-Fi ni en un punto de acceso: conecta los dos teléfonos a la misma red y vuelve a intentarlo."
+    override val transferBadCode = "Este no es un código de Tennis Score Manager."
+    override val transferFailed = "No se pudo transferir: ¿están los dos teléfonos en la misma red? En el otro, la ventana con el código debe quedarse abierta."
+    override val transferEmpty = "El otro teléfono no tiene partidos para enviar."
     override val share = "Compartir"
     override val saveDialogTitle = "Guardar archivos"
     override val fileName = "Nombre"
@@ -10009,6 +10253,18 @@ object FrStrings : Strings {
     override val historyDeleteText = "Le match disparaît de l'historique de ce téléphone. Les fichiers déjà enregistrés ou partagés restent."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importés : $d dans l'historique, $o dans les matchs suspendus" }
     override val historyImportFailed = "Aucun match importé : choisissez des fichiers JSON enregistrés par l'appli."
+    override val transferTitle = "Transférer"
+    override val transferHint = "Déplacez l'historique et les matchs suspendus vers un autre téléphone avec un code QR. Les deux téléphones doivent être sur le même réseau Wi-Fi, ou l'un connecté au point d'accès de l'autre. Sur le nouveau, les matchs s'ajoutent à ceux qu'il a déjà."
+    override val transferSend = "Envoyer"
+    override val transferReceive = "Recevoir"
+    override val transferShowQr = "Sur l'autre téléphone, ouvrez Historique › Transférer › Recevoir et scannez ce code. Laissez cette fenêtre ouverte jusqu'à la fin."
+    override val transferSent = "Envoyé à l'autre téléphone. Vous pouvez fermer."
+    override val transferClose = "Fermer"
+    override val transferScanPrompt = "Scannez le code de l'autre téléphone"
+    override val transferNoNetwork = "Ce téléphone n'est pas sur un réseau Wi-Fi ou un point d'accès : connectez les deux téléphones au même réseau et réessayez."
+    override val transferBadCode = "Ce n'est pas un code de Tennis Score Manager."
+    override val transferFailed = "Échec du transfert : les deux téléphones sont-ils sur le même réseau ? Sur l'autre, la fenêtre avec le code doit rester ouverte."
+    override val transferEmpty = "L'autre téléphone n'a aucun match à envoyer."
     override val share = "Partager"
     override val saveDialogTitle = "Enregistrer les fichiers"
     override val fileName = "Nom"
@@ -10462,6 +10718,18 @@ object PtStrings : Strings {
     override val historyDeleteText = "A partida some do histórico deste telefone. Os arquivos já salvos ou compartilhados ficam."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importadas: $d no histórico, $o nas partidas suspensas" }
     override val historyImportFailed = "Nenhuma partida importada: escolha arquivos JSON salvos pelo app."
+    override val transferTitle = "Transferir"
+    override val transferHint = "Passe o histórico e as partidas suspensas para outro telefone com um código QR. Os dois telefones precisam estar na mesma rede Wi-Fi, ou um conectado ao hotspot do outro. No novo, as partidas se somam às que ele já tem."
+    override val transferSend = "Enviar"
+    override val transferReceive = "Receber"
+    override val transferShowQr = "No outro telefone abra Histórico › Transferir › Receber e escaneie este código. Deixe esta janela aberta até terminar."
+    override val transferSent = "Enviado para o outro telefone. Pode fechar."
+    override val transferClose = "Fechar"
+    override val transferScanPrompt = "Escaneie o código do outro telefone"
+    override val transferNoNetwork = "Este telefone não está em uma rede Wi-Fi nem em um hotspot: conecte os dois telefones à mesma rede e tente de novo."
+    override val transferBadCode = "Este não é um código do Tennis Score Manager."
+    override val transferFailed = "Falha na transferência: os dois telefones estão na mesma rede? No outro, a janela com o código precisa ficar aberta."
+    override val transferEmpty = "O outro telefone não tem partidas para enviar."
     override val share = "Compartilhar"
     override val saveDialogTitle = "Salvar arquivos"
     override val fileName = "Nome"
@@ -10818,6 +11086,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HistoryScreen.
 
 package com.tennis.scoremanager.ui.screens
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10842,9 +11111,14 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -10855,10 +11129,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
@@ -10869,6 +11146,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.QrCode
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
@@ -10888,6 +11166,10 @@ fun HistoryScreen(c: MatchController) {
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveFrom(it) } }
+    var transferMenu by remember { mutableStateOf(false) }
+    val sendUrl by c.transferUrl.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
     BackHandler { if (player != null) player = null else c.go(Screen.SETUP) }
 
@@ -10900,6 +11182,14 @@ fun HistoryScreen(c: MatchController) {
                 Modifier.weight(1f))
             BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                 Modifier.weight(1f))
+        },
+        action = {
+            Surface(onClick = { transferMenu = true }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.QrCode2, null, tint = TsmColors.Ball)
+                    Text(s.transferTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         },
     ) {
         val open = player
@@ -10917,6 +11207,51 @@ fun HistoryScreen(c: MatchController) {
             players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
         }
     }
+
+    if (transferMenu) {
+        AlertDialog(
+            onDismissRequest = { transferMenu = false },
+            icon = { Icon(Icons.Filled.QrCode2, null, tint = TsmColors.Ball) },
+            title = { Text(s.transferTitle) },
+            text = { Text(s.transferHint) },
+            confirmButton = {
+                TextButton(onClick = {
+                    transferMenu = false
+                    if (!c.startSending()) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+                }) { Text(s.transferSend) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    transferMenu = false
+                    scanner.launch(
+                        ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.transferScanPrompt)
+                            .setBeepEnabled(false).setOrientationLocked(true),
+                    )
+                }) { Text(s.transferReceive) }
+            },
+        )
+    }
+    sendUrl?.let { url -> SendDialog(c, url) }
+}
+
+/** Finestra di chi invia: il QR con l'indirizzo. Chiudendola il server si spegne. */
+@Composable
+private fun SendDialog(c: MatchController, url: String) {
+    val s = LocalStrings.current
+    val served by c.transferServed.collectAsState()
+    DisposableEffect(Unit) { onDispose { c.stopSending() } }
+    AlertDialog(
+        onDismissRequest = { c.stopSending() },
+        title = { Text(s.transferSend) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                QrCode(url, 240.dp)
+                Text(if (served > 0) s.transferSent else s.transferShowQr, color = if (served > 0) TsmColors.Ball else TsmColors.TextMain,
+                    fontWeight = if (served > 0) FontWeight.Bold else FontWeight.Normal)
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.stopSending() }) { Text(s.transferClose) } },
+    )
 }
 
 @Composable
@@ -16169,6 +16504,47 @@ class PressDetectorTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/transfer/TransferTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/transfer/TransferTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.transfer
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class TransferTest {
+
+    @Test
+    fun serverSendsOnlyWithTheRightToken() {
+        var served = 0
+        val server = TransferServer(payload = { "{\"version\":1}".toByteArray() }, onServed = { served++ })
+        val port = server.start()
+        try {
+            val url = TransferServer.url("127.0.0.1", port, server.token)
+            assertTrue(TransferServer.isTransferUrl(url))
+            assertEquals("{\"version\":1}", TransferServer.fetch(url).decodeToString())
+            assertEquals(1, served)
+            val wrong = TransferServer.url("127.0.0.1", port, "0".repeat(32))
+            assertTrue(runCatching { TransferServer.fetch(wrong) }.isFailure)
+            assertEquals(1, served)
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun otherQrCodesAreRejected() {
+        assertFalse(TransferServer.isTransferUrl("https://example.com/tsm-transfer/" + "a".repeat(32)))
+        assertFalse(TransferServer.isTransferUrl("http://192.168.1.5:8080/"))
+        assertFalse(TransferServer.isTransferUrl("WIFI:S:casa;T:WPA;P:segreta;;"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/tv/TvSnapshotTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/tv/TvSnapshotTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -17191,6 +17567,7 @@ coroutines = "1.10.2"
 serialization = "1.9.0"
 junit = "4.13.2"
 zxing = "3.5.3"
+zxingEmbedded = "4.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -17207,6 +17584,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -21235,6 +21613,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 81 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 83 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

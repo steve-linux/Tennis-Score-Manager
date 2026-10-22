@@ -41,6 +41,8 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
+import com.tennis.scoremanager.transfer.TransferBundle
+import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
@@ -1077,25 +1079,89 @@ class MatchController(
         val s = strings
         scope.launch {
             val (done, open) = withContext(io) {
-                var done = 0
-                var open = 0
-                for (uri in uris) {
-                    val rec = runCatching {
+                importRecords(uris.mapNotNull { uri ->
+                    runCatching {
                         val text = app.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: return@runCatching null
                         storage.json.decodeFromString(MatchRecord.serializer(), text)
-                    }.getOrNull() ?: continue
-                    val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
-                    if (state.isFinished) {
-                        storage.saveFinished(rec.copy(finished = true, suspended = false))
-                        done++
-                    } else {
-                        storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
-                        open++
-                    }
-                }
-                done to open
+                    }.getOrNull()
+                })
             }
             _toasts.tryEmit(if (done + open == 0) s.historyImportFailed else s.historyImported(done, open))
+            refreshHistory()
+            refreshSaved()
+        }
+    }
+
+    /** Salva partite arrivate da fuori: le finite nello storico, le altre tra le sospese. Restituisce (finite, sospese). */
+    private fun importRecords(recs: List<MatchRecord>): Pair<Int, Int> {
+        var done = 0
+        var open = 0
+        for (rec in recs) {
+            val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
+            if (state.isFinished) {
+                storage.saveFinished(rec.copy(finished = true, suspended = false))
+                done++
+            } else {
+                storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
+                open++
+            }
+        }
+        return done to open
+    }
+
+    // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
+
+    /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
+    val transferUrl = MutableStateFlow<String?>(null)
+    /** Quante volte l'altro telefono ha già scaricato il pacchetto (per dire "Inviato"). */
+    val transferServed = MutableStateFlow(0)
+    private var transferServer: TransferServer? = null
+
+    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui l'altro possa collegarsi. */
+    fun startSending(): Boolean {
+        stopSending()
+        val host = TvServer.localAddresses().firstOrNull() ?: return false
+        val server = TransferServer(
+            payload = {
+                val all = storage.loadFinished() + storage.loadUnfinished()
+                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all)).toByteArray()
+            },
+            onServed = { transferServed.value++ },
+        )
+        val port = runCatching { server.start() }.getOrNull() ?: return false
+        transferServer = server
+        transferServed.value = 0
+        transferUrl.value = TransferServer.url(host, port, server.token)
+        return true
+    }
+
+    fun stopSending() {
+        transferServer?.stop()
+        transferServer = null
+        transferUrl.value = null
+    }
+
+    /** Testo letto dal QR dell'altro telefono: scarica storico e partite sospese e li aggiunge a questo telefono. */
+    fun receiveFrom(text: String) {
+        val s = strings
+        if (!TransferServer.isTransferUrl(text)) {
+            _toasts.tryEmit(s.transferBadCode)
+            return
+        }
+        scope.launch {
+            val result = withContext(io) {
+                runCatching {
+                    val bundle = storage.json.decodeFromString(TransferBundle.serializer(), TransferServer.fetch(text).decodeToString())
+                    importRecords(bundle.matches)
+                }.getOrNull()
+            }
+            _toasts.tryEmit(
+                when {
+                    result == null -> s.transferFailed
+                    result.first + result.second == 0 -> s.transferEmpty
+                    else -> s.historyImported(result.first, result.second)
+                },
+            )
             refreshHistory()
             refreshSaved()
         }

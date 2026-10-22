@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,9 +28,14 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,10 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.tennis.scoremanager.LiveMatch
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
@@ -54,6 +63,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.QrCode
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
@@ -73,6 +83,10 @@ fun HistoryScreen(c: MatchController) {
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveFrom(it) } }
+    var transferMenu by remember { mutableStateOf(false) }
+    val sendUrl by c.transferUrl.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
     BackHandler { if (player != null) player = null else c.go(Screen.SETUP) }
 
@@ -85,6 +99,14 @@ fun HistoryScreen(c: MatchController) {
                 Modifier.weight(1f))
             BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                 Modifier.weight(1f))
+        },
+        action = {
+            Surface(onClick = { transferMenu = true }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.QrCode2, null, tint = TsmColors.Ball)
+                    Text(s.transferTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         },
     ) {
         val open = player
@@ -102,6 +124,51 @@ fun HistoryScreen(c: MatchController) {
             players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
         }
     }
+
+    if (transferMenu) {
+        AlertDialog(
+            onDismissRequest = { transferMenu = false },
+            icon = { Icon(Icons.Filled.QrCode2, null, tint = TsmColors.Ball) },
+            title = { Text(s.transferTitle) },
+            text = { Text(s.transferHint) },
+            confirmButton = {
+                TextButton(onClick = {
+                    transferMenu = false
+                    if (!c.startSending()) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+                }) { Text(s.transferSend) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    transferMenu = false
+                    scanner.launch(
+                        ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.transferScanPrompt)
+                            .setBeepEnabled(false).setOrientationLocked(true),
+                    )
+                }) { Text(s.transferReceive) }
+            },
+        )
+    }
+    sendUrl?.let { url -> SendDialog(c, url) }
+}
+
+/** Finestra di chi invia: il QR con l'indirizzo. Chiudendola il server si spegne. */
+@Composable
+private fun SendDialog(c: MatchController, url: String) {
+    val s = LocalStrings.current
+    val served by c.transferServed.collectAsState()
+    DisposableEffect(Unit) { onDispose { c.stopSending() } }
+    AlertDialog(
+        onDismissRequest = { c.stopSending() },
+        title = { Text(s.transferSend) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                QrCode(url, 240.dp)
+                Text(if (served > 0) s.transferSent else s.transferShowQr, color = if (served > 0) TsmColors.Ball else TsmColors.TextMain,
+                    fontWeight = if (served > 0) FontWeight.Bold else FontWeight.Normal)
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.stopSending() }) { Text(s.transferClose) } },
+    )
 }
 
 @Composable

@@ -11,6 +11,6 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 * Match summary with the score set by set, duration, club, court and place; save it as text, JSON or image, or share it.
 * End-of-match statistics, for the match or per set (serve, return, break points, points in a row…), and a point-by-point log with break points, set points and match points.
 * Detailed stats, for someone scoring from the side of the court: aces, double faults, first serves, winners and errors.
-* History on the phone: finished matches to reopen, players with wins, losses and head to head; matches saved (JSON) on another phone can be imported.
+* History on the phone: finished matches to reopen, players with wins, losses and head to head; matches saved (JSON) on another phone can be imported, also with a QR code on the same Wi-Fi.
 
-No ads, no account, no tracking. The network is used only for the scoreboard on the local network. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands. The court address is looked up only if you turn on the option: it uses the phone's geocoding service, which with Google services sends the coordinates to Google.
+No ads, no account, no tracking. The network is used only for the scoreboard and the transfer between phones, on the local network. The camera is used only to read the transfer QR code. Location is used for the place of the match in the summary and, as Android requires, for the Bluetooth search for the wristbands. The court address is looked up only if you turn on the option: it uses the phone's geocoding service, which with Google services sends the coordinates to Google.

@@ -395,6 +395,19 @@ interface Strings {
     /** Partite importate: nello storico e tra le sospese. */
     val historyImported: (Int, Int) -> String
     val historyImportFailed: String
+    // Trasferimento tra telefoni con QR (Storico › Trasferisci)
+    val transferTitle: String
+    val transferHint: String
+    val transferSend: String
+    val transferReceive: String
+    val transferShowQr: String
+    val transferSent: String
+    val transferClose: String
+    val transferScanPrompt: String
+    val transferNoNetwork: String
+    val transferBadCode: String
+    val transferFailed: String
+    val transferEmpty: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -841,6 +854,18 @@ object ItStrings : Strings {
     override val historyDeleteText = "La partita sparisce dallo storico di questo telefono. I file già salvati o condivisi restano."
     override val historyImported: (Int, Int) -> String = { d, o -> "Importate: $d nello storico, $o tra le partite sospese" }
     override val historyImportFailed = "Nessuna partita importata: scegli i file JSON salvati dall'app."
+    override val transferTitle = "Trasferisci"
+    override val transferHint = "Sposta storico e partite sospese su un altro telefono con un codice QR. I due telefoni devono essere sulla stessa rete Wi-Fi, oppure uno collegato all'hotspot dell'altro. Su quello nuovo le partite si aggiungono a quelle che ha già."
+    override val transferSend = "Invia"
+    override val transferReceive = "Ricevi"
+    override val transferShowQr = "Sull'altro telefono apri Storico › Trasferisci › Ricevi e inquadra questo codice. Lascia aperta questa finestra finché non ha finito."
+    override val transferSent = "Inviato all'altro telefono. Puoi chiudere."
+    override val transferClose = "Chiudi"
+    override val transferScanPrompt = "Inquadra il codice dell'altro telefono"
+    override val transferNoNetwork = "Questo telefono non è su una rete Wi-Fi o un hotspot: collega i due telefoni alla stessa rete e riprova."
+    override val transferBadCode = "Questo non è un codice di Tennis Score Manager."
+    override val transferFailed = "Trasferimento non riuscito: i due telefoni sono sulla stessa rete? Sull'altro la finestra col codice deve restare aperta."
+    override val transferEmpty = "L'altro telefono non ha partite da inviare."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -1275,6 +1300,18 @@ object EnStrings : Strings {
     override val historyDeleteText = "The match disappears from this phone's history. Files already saved or shared stay."
     override val historyImported: (Int, Int) -> String = { d, o -> "Imported: $d into history, $o into suspended matches" }
     override val historyImportFailed = "No match imported: pick JSON files saved by the app."
+    override val transferTitle = "Transfer"
+    override val transferHint = "Move history and suspended matches to another phone with a QR code. Both phones must be on the same Wi-Fi network, or one connected to the other's hotspot. On the new phone the matches are added to the ones it already has."
+    override val transferSend = "Send"
+    override val transferReceive = "Receive"
+    override val transferShowQr = "On the other phone open History › Transfer › Receive and scan this code. Keep this window open until it has finished."
+    override val transferSent = "Sent to the other phone. You can close."
+    override val transferClose = "Close"
+    override val transferScanPrompt = "Scan the other phone's code"
+    override val transferNoNetwork = "This phone is not on a Wi-Fi network or hotspot: connect both phones to the same network and try again."
+    override val transferBadCode = "This is not a Tennis Score Manager code."
+    override val transferFailed = "Transfer failed: are both phones on the same network? On the other one the window with the code must stay open."
+    override val transferEmpty = "The other phone has no matches to send."
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"
