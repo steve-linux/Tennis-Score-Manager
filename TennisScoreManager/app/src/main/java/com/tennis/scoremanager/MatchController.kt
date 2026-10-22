@@ -151,6 +151,11 @@ class MatchController(
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
+    /**
+     * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
+     * col tabellone acceso, all'avvio publishTv la legge subito.
+     */
+    val photosVersion = MutableStateFlow(0)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -1126,9 +1131,6 @@ class MatchController(
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
-
-    /** Cresce a ogni foto cambiata: chi mostra le foto le ricarica. */
-    val photosVersion = MutableStateFlow(0)
 
     /** Foto del giocatore col nome [name], ritagliata quadrata e rimpicciolita; null se non c'è. */
     fun loadPhoto(name: String): Bitmap? {
