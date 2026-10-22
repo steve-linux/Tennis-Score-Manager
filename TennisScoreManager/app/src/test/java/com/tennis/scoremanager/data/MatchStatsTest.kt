@@ -62,6 +62,21 @@ class MatchStatsTest {
     }
 
     @Test
+    fun unforcedAndForcedErrorsAreAlsoErrors() {
+        fun pt(w: Side, k: PointKind) = MatchEvent.Point(w, kind = k)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(pt(p1, PointKind.UNFORCED_ERROR), pt(p1, PointKind.FORCED_ERROR), pt(p1, PointKind.ERROR), pt(p2, PointKind.UNFORCED_ERROR)),
+        )
+        val t = MatchStats.totals(MatchStats.points(r))
+        val b = t.getValue(p2)
+        assertEquals(3, b.errors)
+        assertEquals(1, b.unforcedErrors)
+        assertEquals(1, b.forcedErrors)
+        assertEquals(1, t.getValue(p1).unforcedErrors)
+    }
+
+    @Test
     fun noDetailForPlainMatches() {
         val r = rec(*holdBreakHold)
         assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))

@@ -93,6 +93,8 @@ object MatchStats {
         val secondServes: Int = 0,
         val winners: Int = 0,
         val errors: Int = 0,
+        val unforcedErrors: Int = 0,
+        val forcedErrors: Int = 0,
     )
 
     /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
@@ -145,7 +147,9 @@ object MatchStats {
             secondServePointsWon = serve.count { it.secondServe && it.winner == me },
             secondServes = serve.count { it.secondServe },
             winners = pts.count { it.kind == PointKind.WINNER && it.winner == me },
-            errors = pts.count { it.kind == PointKind.ERROR && it.winner != me },
+            errors = pts.count { it.kind?.isError == true && it.winner != me },
+            unforcedErrors = pts.count { it.kind == PointKind.UNFORCED_ERROR && it.winner != me },
+            forcedErrors = pts.count { it.kind == PointKind.FORCED_ERROR && it.winner != me },
         )
     }
 

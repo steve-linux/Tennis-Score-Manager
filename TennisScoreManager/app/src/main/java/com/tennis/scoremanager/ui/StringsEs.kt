@@ -152,6 +152,18 @@ object EsStrings : Strings {
     override val statSecondServeWon = "Puntos ganados con el 2.º saque"
     override val statWinners = "Golpes ganadores"
     override val statErrors = "Errores"
+    override val statUnforcedErrors = "Errores no forzados"
+    override val statForcedErrors = "Errores forzados"
+    override val detailAskOutcome = "¿Cómo terminó el punto?"
+    override val detailAskErrorType = "¿Error no forzado o forzado?"
+    override val detailUnforced = "No forzado"
+    override val detailForced = "Forzado"
+    override val detailWinnerOf: (String) -> String = { x -> "Ganador $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Evolución"
+    override val trendHint = "Puntos ganados partido a partido (últimos 12; lleno = partido ganado, línea = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Puntos ganados de media: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medias por partido ($n con estadísticas detalladas)" }
     override val detailedStats = "Estadísticas detalladas"
     override val detailedStatsHint = "Para quien anota desde fuera de la pista: en lugar de los dos botones grandes hay ace, falta y, para cada jugador, ganador, error y punto. Sirven para aces, dobles faltas, primeros saques, golpes ganadores y errores."
     override val btnAce = "Ace"

@@ -155,6 +155,18 @@ object FrStrings : Strings {
     override val statSecondServeWon = "Points gagnés sur 2e balle"
     override val statWinners = "Coups gagnants"
     override val statErrors = "Erreurs"
+    override val statUnforcedErrors = "Fautes directes"
+    override val statForcedErrors = "Fautes provoquées"
+    override val detailAskOutcome = "Comment s'est fini le point ?"
+    override val detailAskErrorType = "Faute directe ou provoquée ?"
+    override val detailUnforced = "Directe"
+    override val detailForced = "Provoquée"
+    override val detailWinnerOf: (String) -> String = { x -> "Coup gagnant $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Faute $x" }
+    override val trendTitle = "Évolution"
+    override val trendHint = "Points gagnés match par match (12 derniers ; plein = match gagné, ligne = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Points gagnés en moyenne : $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Moyennes par match ($n avec statistiques détaillées)" }
     override val detailedStats = "Statistiques détaillées"
     override val detailedStatsHint = "Pour qui marque depuis le bord du court : à la place des deux grands boutons, ace, faute et, pour chaque joueur, coup gagnant, erreur et point. Nécessaires pour aces, doubles fautes, premières balles, coups gagnants et erreurs."
     override val btnAce = "Ace"

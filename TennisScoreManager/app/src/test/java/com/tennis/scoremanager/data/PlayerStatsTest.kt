@@ -65,4 +65,14 @@ class PlayerStatsTest {
         assertEquals(1, p.first { it.key == "neri" }.lost)
         assertEquals(listOf("neri", "verdi"), PlayerStats.rivals(d, "bianchi").map { it.key })
     }
+
+    @Test
+    fun linesFollowTheMatchesInOrder() {
+        val r = PlayerStats.lines(all, "rossi")
+        assertEquals(listOf(1L, 2L, 3L, 4L), r.map { it.rec.endedAt })
+        assertEquals(listOf(true, false, false, true), r.map { it.won })
+        // Partite senza punti: 0%, e niente statistiche dettagliate.
+        assertEquals(0, r.first().pointsWonPct)
+        assertNull(r.first().detail)
+    }
 }

@@ -92,6 +92,12 @@ import kotlinx.serialization.json.Json
 
 enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
 
+/** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
+enum class DetailAsk { OUTCOME, ERROR_TYPE }
+
+/** [winner] ha vinto il punto, [server] serviva. */
+data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
+
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
 data class CountdownUi(val kind: CountdownKind, val seconds: Int)
@@ -132,6 +138,8 @@ class MatchController(
         /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
         private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
+        /** Quanto resta la domanda sul punto appena segnato (statistiche dettagliate). */
+        private const val DETAIL_PROMPT_MS = 6_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
     }
@@ -154,6 +162,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
+    /** Statistiche dettagliate: domanda facoltativa sul punto appena segnato (sparisce da sola dopo qualche secondo). */
+    val detailPrompt = MutableStateFlow<DetailPrompt?>(null)
+    private var detailJob: Job? = null
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /**
      * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
@@ -803,6 +814,7 @@ class MatchController(
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
+        val server = current.state.server
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
@@ -814,6 +826,16 @@ class MatchController(
         val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
+        // Statistiche dettagliate: un punto dal braccialetto o dal telecomando arriva senza dettaglio, e un
+        // "Errore" senza dire di che tipo; si chiede sul telefono, facoltativo.
+        askDetail(
+            when {
+                !current.record.options.detailedStats || step.state.isFinished -> null
+                fromBand && kind == null -> DetailPrompt(DetailAsk.OUTCOME, side, server)
+                kind == PointKind.ERROR -> DetailPrompt(DetailAsk.ERROR_TYPE, side, server)
+                else -> null
+            },
+        )
         afterTransition(step.state, t)
     }
 
@@ -870,10 +892,37 @@ class MatchController(
         }
     }
 
+    private fun askDetail(p: DetailPrompt?) {
+        detailJob?.cancel()
+        detailPrompt.value = p
+        if (p != null) detailJob = scope.launch {
+            delay(DETAIL_PROMPT_MS)
+            detailPrompt.value = null
+        }
+    }
+
+    /**
+     * Risposta alla domanda sul punto appena segnato: cambia solo il "come" dell'ultimo punto, non chi l'ha vinto,
+     * quindi il punteggio resta uguale. Scegliendo "Errore" si chiede ancora se gratuito o forzato.
+     */
+    fun setPointDetail(kind: PointKind?) {
+        val lm = live.value ?: return
+        val last = lm.record.events.lastOrNull() as? MatchEvent.Point
+        val prompt = detailPrompt.value
+        if (last == null || prompt == null || kind == null) {
+            askDetail(null)
+            return
+        }
+        val rec = lm.record.copy(events = lm.record.events.dropLast(1) + last.copy(kind = kind))
+        commit(rec, lm.state)
+        askDetail(if (kind == PointKind.ERROR) prompt.copy(ask = DetailAsk.ERROR_TYPE) else null)
+    }
+
     /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
     fun fault() {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
         if (faultPending.value) {
             awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
             return
@@ -892,6 +941,7 @@ class MatchController(
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        askDetail(null)
         // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
         if (faultPending.value) {
             faultPending.value = false

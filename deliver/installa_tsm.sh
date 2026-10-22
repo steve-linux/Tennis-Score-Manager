@@ -876,6 +876,12 @@ import kotlinx.serialization.json.Json
 
 enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
 
+/** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
+enum class DetailAsk { OUTCOME, ERROR_TYPE }
+
+/** [winner] ha vinto il punto, [server] serviva. */
+data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
+
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
 data class CountdownUi(val kind: CountdownKind, val seconds: Int)
@@ -916,6 +922,8 @@ class MatchController(
         /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
         private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
+        /** Quanto resta la domanda sul punto appena segnato (statistiche dettagliate). */
+        private const val DETAIL_PROMPT_MS = 6_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
     }
@@ -938,6 +946,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
+    /** Statistiche dettagliate: domanda facoltativa sul punto appena segnato (sparisce da sola dopo qualche secondo). */
+    val detailPrompt = MutableStateFlow<DetailPrompt?>(null)
+    private var detailJob: Job? = null
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /**
      * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
@@ -1587,6 +1598,7 @@ class MatchController(
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
+        val server = current.state.server
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
@@ -1598,6 +1610,16 @@ class MatchController(
         val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
+        // Statistiche dettagliate: un punto dal braccialetto o dal telecomando arriva senza dettaglio, e un
+        // "Errore" senza dire di che tipo; si chiede sul telefono, facoltativo.
+        askDetail(
+            when {
+                !current.record.options.detailedStats || step.state.isFinished -> null
+                fromBand && kind == null -> DetailPrompt(DetailAsk.OUTCOME, side, server)
+                kind == PointKind.ERROR -> DetailPrompt(DetailAsk.ERROR_TYPE, side, server)
+                else -> null
+            },
+        )
         afterTransition(step.state, t)
     }
 
@@ -1654,10 +1676,37 @@ class MatchController(
         }
     }
 
+    private fun askDetail(p: DetailPrompt?) {
+        detailJob?.cancel()
+        detailPrompt.value = p
+        if (p != null) detailJob = scope.launch {
+            delay(DETAIL_PROMPT_MS)
+            detailPrompt.value = null
+        }
+    }
+
+    /**
+     * Risposta alla domanda sul punto appena segnato: cambia solo il "come" dell'ultimo punto, non chi l'ha vinto,
+     * quindi il punteggio resta uguale. Scegliendo "Errore" si chiede ancora se gratuito o forzato.
+     */
+    fun setPointDetail(kind: PointKind?) {
+        val lm = live.value ?: return
+        val last = lm.record.events.lastOrNull() as? MatchEvent.Point
+        val prompt = detailPrompt.value
+        if (last == null || prompt == null || kind == null) {
+            askDetail(null)
+            return
+        }
+        val rec = lm.record.copy(events = lm.record.events.dropLast(1) + last.copy(kind = kind))
+        commit(rec, lm.state)
+        askDetail(if (kind == PointKind.ERROR) prompt.copy(ask = DetailAsk.ERROR_TYPE) else null)
+    }
+
     /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
     fun fault() {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
         if (faultPending.value) {
             awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
             return
@@ -1676,6 +1725,7 @@ class MatchController(
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        askDetail(null)
         // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
         if (faultPending.value) {
             faultPending.value = false
@@ -3927,6 +3977,8 @@ object MatchStats {
         val secondServes: Int = 0,
         val winners: Int = 0,
         val errors: Int = 0,
+        val unforcedErrors: Int = 0,
+        val forcedErrors: Int = 0,
     )
 
     /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
@@ -3979,7 +4031,9 @@ object MatchStats {
             secondServePointsWon = serve.count { it.secondServe && it.winner == me },
             secondServes = serve.count { it.secondServe },
             winners = pts.count { it.kind == PointKind.WINNER && it.winner == me },
-            errors = pts.count { it.kind == PointKind.ERROR && it.winner != me },
+            errors = pts.count { it.kind?.isError == true && it.winner != me },
+            unforcedErrors = pts.count { it.kind == PointKind.UNFORCED_ERROR && it.winner != me },
+            forcedErrors = pts.count { it.kind == PointKind.FORCED_ERROR && it.winner != me },
         )
     }
 
@@ -4295,6 +4349,23 @@ object PlayerStats {
     }
 
     fun matchesOf(matches: List<Played>, key: String): List<Played> = matches.filter { sideOf(it.rec, key) != null }
+
+    /** Una partita di un giocatore per l'andamento: [detail] = statistiche della sua parte se la partita le ha. */
+    data class MatchLine(val rec: MatchRecord, val won: Boolean, val pointsWonPct: Int, val detail: MatchStats.SideTotals?)
+
+    /** Partite finite di [key], dalla più vecchia, con la percentuale di punti vinti e le statistiche dettagliate. */
+    fun lines(matches: List<Played>, key: String): List<MatchLine> =
+        matchesOf(matches, key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.map { m ->
+            val side = sideOf(m.rec, key)!!
+            val pts = MatchStats.points(m.rec)
+            val t = MatchStats.totals(pts).getValue(side)
+            MatchLine(
+                rec = m.rec,
+                won = m.winner == side,
+                pointsWonPct = if (t.points > 0) Math.round(t.pointsWon * 100.0 / t.points).toInt() else 0,
+                detail = t.takeIf { MatchStats.hasDetail(m.rec, pts) },
+            )
+        }
 
     /** Avversari di [key] con vittorie e sconfitte, da chi ci ha giocato di più. */
     fun rivals(matches: List<Played>, key: String): List<Rival> {
@@ -5088,7 +5159,16 @@ data class RulesConfig(
  * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
  */
 @Serializable
-enum class PointKind { ACE, DOUBLE_FAULT, WINNER, ERROR }
+enum class PointKind {
+    ACE, DOUBLE_FAULT, WINNER,
+
+    /** Errore senza dire se gratuito o forzato (anche le partite salvate prima della distinzione). */
+    ERROR,
+    UNFORCED_ERROR,
+    FORCED_ERROR;
+
+    val isError: Boolean get() = this == ERROR || this == UNFORCED_ERROR || this == FORCED_ERROR
+}
 
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable
@@ -8363,6 +8443,18 @@ interface Strings {
     val statSecondServeWon: String
     val statWinners: String
     val statErrors: String
+    val statUnforcedErrors: String
+    val statForcedErrors: String
+    val detailAskOutcome: String
+    val detailAskErrorType: String
+    val detailUnforced: String
+    val detailForced: String
+    val detailWinnerOf: (String) -> String
+    val detailErrorOf: (String) -> String
+    val trendTitle: String
+    val trendHint: String
+    val trendPointsAvg: (Int) -> String
+    val trendDetailTitle: (Int) -> String
     val detailedStats: String
     val detailedStatsHint: String
     val btnAce: String
@@ -8898,6 +8990,18 @@ object ItStrings : Strings {
     override val statSecondServeWon = "Punti vinti con la seconda"
     override val statWinners = "Vincenti"
     override val statErrors = "Errori"
+    override val statUnforcedErrors = "Errori gratuiti"
+    override val statForcedErrors = "Errori forzati"
+    override val detailAskOutcome = "Com'è finito il punto?"
+    override val detailAskErrorType = "Errore gratuito o forzato?"
+    override val detailUnforced = "Gratuito"
+    override val detailForced = "Forzato"
+    override val detailWinnerOf: (String) -> String = { x -> "Vincente $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Errore $x" }
+    override val trendTitle = "Andamento"
+    override val trendHint = "Punti vinti partita per partita (ultime 12; piena = partita vinta, linea = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Punti vinti in media: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medie per partita ($n con statistiche dettagliate)" }
     override val detailedStats = "Statistiche dettagliate"
     override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
     override val btnAce = "Ace"
@@ -9416,6 +9520,18 @@ object EnStrings : Strings {
     override val statSecondServeWon = "Points won on 2nd serve"
     override val statWinners = "Winners"
     override val statErrors = "Errors"
+    override val statUnforcedErrors = "Unforced errors"
+    override val statForcedErrors = "Forced errors"
+    override val detailAskOutcome = "How did the point end?"
+    override val detailAskErrorType = "Unforced or forced error?"
+    override val detailUnforced = "Unforced"
+    override val detailForced = "Forced"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Trend"
+    override val trendHint = "Points won match by match (last 12; filled = match won, line = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Average points won: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Averages per match ($n with detailed stats)" }
     override val detailedStats = "Detailed stats"
     override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
     override val btnAce = "Ace"
@@ -9957,6 +10073,18 @@ object DeStrings : Strings {
     override val statSecondServeWon = "Punkte mit 2. Aufschlag"
     override val statWinners = "Winner"
     override val statErrors = "Fehler"
+    override val statUnforcedErrors = "Unerzwungene Fehler"
+    override val statForcedErrors = "Erzwungene Fehler"
+    override val detailAskOutcome = "Wie endete der Punkt?"
+    override val detailAskErrorType = "Unerzwungener oder erzwungener Fehler?"
+    override val detailUnforced = "Unerzwungen"
+    override val detailForced = "Erzwungen"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Fehler $x" }
+    override val trendTitle = "Verlauf"
+    override val trendHint = "Gewonnene Punkte Match für Match (letzte 12; gefüllt = gewonnen, Linie = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Gewonnene Punkte im Schnitt: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Schnitt pro Match ($n mit detaillierter Statistik)" }
     override val detailedStats = "Detaillierte Statistik"
     override val detailedStatsHint = "Für jemanden, der vom Spielfeldrand zählt: statt der zwei großen Tasten gibt es Ass, Aufschlagfehler und für jeden Spieler Winner, Fehler und Punkt. Nötig für Asse, Doppelfehler, erste Aufschläge, Winner und Fehler."
     override val btnAce = "Ass"
@@ -10490,6 +10618,18 @@ object EsStrings : Strings {
     override val statSecondServeWon = "Puntos ganados con el 2.º saque"
     override val statWinners = "Golpes ganadores"
     override val statErrors = "Errores"
+    override val statUnforcedErrors = "Errores no forzados"
+    override val statForcedErrors = "Errores forzados"
+    override val detailAskOutcome = "¿Cómo terminó el punto?"
+    override val detailAskErrorType = "¿Error no forzado o forzado?"
+    override val detailUnforced = "No forzado"
+    override val detailForced = "Forzado"
+    override val detailWinnerOf: (String) -> String = { x -> "Ganador $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Evolución"
+    override val trendHint = "Puntos ganados partido a partido (últimos 12; lleno = partido ganado, línea = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Puntos ganados de media: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medias por partido ($n con estadísticas detalladas)" }
     override val detailedStats = "Estadísticas detalladas"
     override val detailedStatsHint = "Para quien anota desde fuera de la pista: en lugar de los dos botones grandes hay ace, falta y, para cada jugador, ganador, error y punto. Sirven para aces, dobles faltas, primeros saques, golpes ganadores y errores."
     override val btnAce = "Ace"
@@ -11027,6 +11167,18 @@ object FrStrings : Strings {
     override val statSecondServeWon = "Points gagnés sur 2e balle"
     override val statWinners = "Coups gagnants"
     override val statErrors = "Erreurs"
+    override val statUnforcedErrors = "Fautes directes"
+    override val statForcedErrors = "Fautes provoquées"
+    override val detailAskOutcome = "Comment s'est fini le point ?"
+    override val detailAskErrorType = "Faute directe ou provoquée ?"
+    override val detailUnforced = "Directe"
+    override val detailForced = "Provoquée"
+    override val detailWinnerOf: (String) -> String = { x -> "Coup gagnant $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Faute $x" }
+    override val trendTitle = "Évolution"
+    override val trendHint = "Points gagnés match par match (12 derniers ; plein = match gagné, ligne = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Points gagnés en moyenne : $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Moyennes par match ($n avec statistiques détaillées)" }
     override val detailedStats = "Statistiques détaillées"
     override val detailedStatsHint = "Pour qui marque depuis le bord du court : à la place des deux grands boutons, ace, faute et, pour chaque joueur, coup gagnant, erreur et point. Nécessaires pour aces, doubles fautes, premières balles, coups gagnants et erreurs."
     override val btnAce = "Ace"
@@ -11563,6 +11715,18 @@ object PtStrings : Strings {
     override val statSecondServeWon = "Pontos ganhos com o 2º saque"
     override val statWinners = "Winners"
     override val statErrors = "Erros"
+    override val statUnforcedErrors = "Erros não forçados"
+    override val statForcedErrors = "Erros forçados"
+    override val detailAskOutcome = "Como terminou o ponto?"
+    override val detailAskErrorType = "Erro não forçado ou forçado?"
+    override val detailUnforced = "Não forçado"
+    override val detailForced = "Forçado"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Erro $x" }
+    override val trendTitle = "Evolução"
+    override val trendHint = "Pontos ganhos partida a partida (últimas 12; cheia = partida vencida, linha = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Pontos ganhos em média: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Médias por partida ($n com estatísticas detalhadas)" }
     override val detailedStats = "Estatísticas detalhadas"
     override val detailedStatsHint = "Para quem marca da beira da quadra: no lugar dos dois botões grandes há ace, falta e, para cada jogador, winner, erro e ponto. Servem para aces, duplas faltas, primeiros saques, winners e erros."
     override val btnAce = "Ace"
@@ -12239,6 +12403,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12415,6 +12580,8 @@ private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, m
             }
         }
     }
+    val lines = remember(played, key) { PlayerStats.lines(played, key) }
+    if (lines.size >= 2) TrendCard(lines)
     if (rivals.isNotEmpty()) {
         Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         rivals.forEach { r -> PlayerRow(c, r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
@@ -12478,6 +12645,50 @@ private fun PlayerRow(c: MatchController, name: String, record: String, chevron:
         if (chevron) Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
     }
 }
+
+/**
+ * Andamento del giocatore: una colonna per partita (ultime 12) con la percentuale di punti vinti, piena se vinta;
+ * la linea è il 50%. Sotto le medie, e quelle delle statistiche dettagliate se qualche partita le ha.
+ */
+@Composable
+private fun TrendCard(lines: List<PlayerStats.MatchLine>) {
+    val s = LocalStrings.current
+    val last = lines.takeLast(12)
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.trendTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        Box(Modifier.fillMaxWidth().height(90.dp)) {
+            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+                last.forEach { l ->
+                    Box(
+                        Modifier.weight(1f).fillMaxHeight(l.pointsWonPct / 100f).clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(if (l.won) TsmColors.Ball else TsmColors.Outline),
+                    )
+                }
+                repeat(12 - last.size) { Spacer(Modifier.weight(1f)) }
+            }
+            // Linea del 50%: sopra si sono vinti più punti di quanti se ne sono persi.
+            Box(Modifier.fillMaxWidth().height(1.dp).align(Alignment.Center).background(TsmColors.TextDim.copy(alpha = 0.6f)))
+        }
+        Text(s.trendHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(s.trendPointsAvg(Math.round(lines.map { it.pointsWonPct }.average()).toInt()), color = TsmColors.TextMain)
+        val det = lines.mapNotNull { it.detail }
+        if (det.isNotEmpty()) {
+            val n = det.size.toDouble()
+            fun avg(f: (com.tennis.scoremanager.data.MatchStats.SideTotals) -> Int) = String.format(java.util.Locale.ROOT, "%.1f", det.sumOf(f) / n)
+            val serves = det.sumOf { it.servePoints }
+            val firstIn = if (serves > 0) Math.round(det.sumOf { it.firstServesIn } * 100.0 / serves) else 0
+            Text(s.trendDetailTitle(det.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(
+                "${s.statAces} ${avg { it.aces }} · ${s.statDoubleFaults} ${avg { it.doubleFaults }} · ${s.statFirstServeIn} $firstIn% · " +
+                    "${s.statWinners} ${avg { it.winners }} · ${s.statErrors} ${avg { it.errors }}",
+                color = TsmColors.TextDim, fontSize = 13.sp,
+            )
+        }
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/MatchScreen.kt
@@ -12498,10 +12709,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12517,7 +12725,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -12567,6 +12778,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
+import com.tennis.scoremanager.DetailAsk
+import com.tennis.scoremanager.DetailPrompt
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
@@ -12581,9 +12794,9 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
-import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
+import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
@@ -12632,6 +12845,8 @@ fun MatchScreen(c: MatchController) {
             } else {
                 PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
             }
+            val detail by c.detailPrompt.collectAsState()
+            detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
             if (suspended) {
                 Box(
                     Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
@@ -13065,6 +13280,44 @@ private fun DetailedPointButtons(
     }
 }
 
+/**
+ * Domanda facoltativa sul punto appena segnato, sopra i tasti: dal braccialetto o dal telecomando "come è finito?"
+ * (ace solo se l'ha vinto chi serviva), dopo un errore "gratuito o forzato?". Sparisce da sola.
+ */
+@Composable
+private fun DetailBar(p: DetailPrompt, names: Names, s: Strings, modifier: Modifier, onPick: (PointKind?) -> Unit) {
+    val loser = p.winner.other
+    val options: List<Triple<String, PointKind, Color>> = when (p.ask) {
+        DetailAsk.OUTCOME -> listOfNotNull(
+            Triple(s.btnAce, PointKind.ACE, TsmColors.player(p.winner)).takeIf { p.winner == p.server },
+            Triple(s.detailWinnerOf(names.short(p.winner)), PointKind.WINNER, TsmColors.player(p.winner)),
+            Triple(s.detailErrorOf(names.short(loser)), PointKind.ERROR, TsmColors.player(loser)),
+        )
+        DetailAsk.ERROR_TYPE -> listOf(
+            Triple(s.detailUnforced, PointKind.UNFORCED_ERROR, TsmColors.Orange),
+            Triple(s.detailForced, PointKind.FORCED_ERROR, TsmColors.SurfaceHigh),
+        )
+    }
+    Column(
+        modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface)
+            .border(2.dp, TsmColors.Ball, RoundedCornerShape(18.dp)).padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(if (p.ask == DetailAsk.OUTCOME) s.detailAskOutcome else s.detailAskErrorType, color = TsmColors.TextMain,
+                fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("✕", color = TsmColors.TextDim, fontSize = 20.sp, modifier = Modifier.clickable { onPick(null) }.padding(horizontal = 8.dp))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { (label, kind, color) ->
+                val fg = if (color == TsmColors.SurfaceHigh) TsmColors.TextMain else if (color == TsmColors.Orange) TsmColors.OnOrange
+                    else TsmColors.onPlayer(if (color == TsmColors.player(Side.P1)) Side.P1 else Side.P2)
+                PadButton(label, null, color, fg, true, Modifier.weight(1f).height(56.dp)) { onPick(kind) }
+            }
+        }
+    }
+}
+
 @Composable
 private fun PadButton(
     text: String,
@@ -13232,7 +13485,10 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ) + (if (detail) listOf(
             Stat(s.statWinners, a.winners, b.winners),
             Stat(s.statErrors, a.errors, b.errors),
-        ) else emptyList()) + listOf(
+        ) + (if (a.unforcedErrors + b.unforcedErrors + a.forcedErrors + b.forcedErrors > 0) listOf(
+            Stat(s.statUnforcedErrors, a.unforcedErrors, b.unforcedErrors),
+            Stat(s.statForcedErrors, a.forcedErrors, b.forcedErrors),
+        ) else emptyList()) else emptyList()) + listOf(
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
@@ -17529,6 +17785,21 @@ class MatchStatsTest {
     }
 
     @Test
+    fun unforcedAndForcedErrorsAreAlsoErrors() {
+        fun pt(w: Side, k: PointKind) = MatchEvent.Point(w, kind = k)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(pt(p1, PointKind.UNFORCED_ERROR), pt(p1, PointKind.FORCED_ERROR), pt(p1, PointKind.ERROR), pt(p2, PointKind.UNFORCED_ERROR)),
+        )
+        val t = MatchStats.totals(MatchStats.points(r))
+        val b = t.getValue(p2)
+        assertEquals(3, b.errors)
+        assertEquals(1, b.unforcedErrors)
+        assertEquals(1, b.forcedErrors)
+        assertEquals(1, t.getValue(p1).unforcedErrors)
+    }
+
+    @Test
     fun noDetailForPlainMatches() {
         val r = rec(*holdBreakHold)
         assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))
@@ -17684,6 +17955,16 @@ class PlayerStatsTest {
         assertEquals(1, p.first { it.key == "bianchi" }.won)
         assertEquals(1, p.first { it.key == "neri" }.lost)
         assertEquals(listOf("neri", "verdi"), PlayerStats.rivals(d, "bianchi").map { it.key })
+    }
+
+    @Test
+    fun linesFollowTheMatchesInOrder() {
+        val r = PlayerStats.lines(all, "rossi")
+        assertEquals(listOf(1L, 2L, 3L, 4L), r.map { it.rec.endedAt })
+        assertEquals(listOf(true, false, false, true), r.map { it.won })
+        // Partite senza punti: 0%, e niente statistiche dettagliate.
+        assertEquals(0, r.first().pointsWonPct)
+        assertNull(r.first().detail)
     }
 }
 TSM_EOF

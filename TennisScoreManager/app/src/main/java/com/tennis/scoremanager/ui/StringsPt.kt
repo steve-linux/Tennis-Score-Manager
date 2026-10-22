@@ -155,6 +155,18 @@ object PtStrings : Strings {
     override val statSecondServeWon = "Pontos ganhos com o 2º saque"
     override val statWinners = "Winners"
     override val statErrors = "Erros"
+    override val statUnforcedErrors = "Erros não forçados"
+    override val statForcedErrors = "Erros forçados"
+    override val detailAskOutcome = "Como terminou o ponto?"
+    override val detailAskErrorType = "Erro não forçado ou forçado?"
+    override val detailUnforced = "Não forçado"
+    override val detailForced = "Forçado"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Erro $x" }
+    override val trendTitle = "Evolução"
+    override val trendHint = "Pontos ganhos partida a partida (últimas 12; cheia = partida vencida, linha = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Pontos ganhos em média: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Médias por partida ($n com estatísticas detalhadas)" }
     override val detailedStats = "Estatísticas detalhadas"
     override val detailedStatsHint = "Para quem marca da beira da quadra: no lugar dos dois botões grandes há ace, falta e, para cada jogador, winner, erro e ponto. Servem para aces, duplas faltas, primeiros saques, winners e erros."
     override val btnAce = "Ace"

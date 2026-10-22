@@ -152,6 +152,18 @@ object DeStrings : Strings {
     override val statSecondServeWon = "Punkte mit 2. Aufschlag"
     override val statWinners = "Winner"
     override val statErrors = "Fehler"
+    override val statUnforcedErrors = "Unerzwungene Fehler"
+    override val statForcedErrors = "Erzwungene Fehler"
+    override val detailAskOutcome = "Wie endete der Punkt?"
+    override val detailAskErrorType = "Unerzwungener oder erzwungener Fehler?"
+    override val detailUnforced = "Unerzwungen"
+    override val detailForced = "Erzwungen"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Fehler $x" }
+    override val trendTitle = "Verlauf"
+    override val trendHint = "Gewonnene Punkte Match für Match (letzte 12; gefüllt = gewonnen, Linie = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Gewonnene Punkte im Schnitt: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Schnitt pro Match ($n mit detaillierter Statistik)" }
     override val detailedStats = "Detaillierte Statistik"
     override val detailedStatsHint = "Für jemanden, der vom Spielfeldrand zählt: statt der zwei großen Tasten gibt es Ass, Aufschlagfehler und für jeden Spieler Winner, Fehler und Punkt. Nötig für Asse, Doppelfehler, erste Aufschläge, Winner und Fehler."
     override val btnAce = "Ass"

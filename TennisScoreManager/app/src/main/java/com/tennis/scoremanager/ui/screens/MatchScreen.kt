@@ -14,10 +14,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -33,7 +30,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -83,6 +83,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
+import com.tennis.scoremanager.DetailAsk
+import com.tennis.scoremanager.DetailPrompt
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
@@ -97,9 +99,9 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
-import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
+import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
@@ -148,6 +150,8 @@ fun MatchScreen(c: MatchController) {
             } else {
                 PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
             }
+            val detail by c.detailPrompt.collectAsState()
+            detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
             if (suspended) {
                 Box(
                     Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
@@ -576,6 +580,44 @@ private fun DetailedPointButtons(
                     PadButton(s.btnPoint, null, TsmColors.player(side).copy(alpha = 0.55f), TsmColors.onPlayer(side), enabled,
                         Modifier.weight(0.8f)) { onPoint(side, null) }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Domanda facoltativa sul punto appena segnato, sopra i tasti: dal braccialetto o dal telecomando "come è finito?"
+ * (ace solo se l'ha vinto chi serviva), dopo un errore "gratuito o forzato?". Sparisce da sola.
+ */
+@Composable
+private fun DetailBar(p: DetailPrompt, names: Names, s: Strings, modifier: Modifier, onPick: (PointKind?) -> Unit) {
+    val loser = p.winner.other
+    val options: List<Triple<String, PointKind, Color>> = when (p.ask) {
+        DetailAsk.OUTCOME -> listOfNotNull(
+            Triple(s.btnAce, PointKind.ACE, TsmColors.player(p.winner)).takeIf { p.winner == p.server },
+            Triple(s.detailWinnerOf(names.short(p.winner)), PointKind.WINNER, TsmColors.player(p.winner)),
+            Triple(s.detailErrorOf(names.short(loser)), PointKind.ERROR, TsmColors.player(loser)),
+        )
+        DetailAsk.ERROR_TYPE -> listOf(
+            Triple(s.detailUnforced, PointKind.UNFORCED_ERROR, TsmColors.Orange),
+            Triple(s.detailForced, PointKind.FORCED_ERROR, TsmColors.SurfaceHigh),
+        )
+    }
+    Column(
+        modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface)
+            .border(2.dp, TsmColors.Ball, RoundedCornerShape(18.dp)).padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(if (p.ask == DetailAsk.OUTCOME) s.detailAskOutcome else s.detailAskErrorType, color = TsmColors.TextMain,
+                fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("✕", color = TsmColors.TextDim, fontSize = 20.sp, modifier = Modifier.clickable { onPick(null) }.padding(horizontal = 8.dp))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { (label, kind, color) ->
+                val fg = if (color == TsmColors.SurfaceHigh) TsmColors.TextMain else if (color == TsmColors.Orange) TsmColors.OnOrange
+                    else TsmColors.onPlayer(if (color == TsmColors.player(Side.P1)) Side.P1 else Side.P2)
+                PadButton(label, null, color, fg, true, Modifier.weight(1f).height(56.dp)) { onPick(kind) }
             }
         }
     }

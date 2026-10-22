@@ -171,6 +171,18 @@ interface Strings {
     val statSecondServeWon: String
     val statWinners: String
     val statErrors: String
+    val statUnforcedErrors: String
+    val statForcedErrors: String
+    val detailAskOutcome: String
+    val detailAskErrorType: String
+    val detailUnforced: String
+    val detailForced: String
+    val detailWinnerOf: (String) -> String
+    val detailErrorOf: (String) -> String
+    val trendTitle: String
+    val trendHint: String
+    val trendPointsAvg: (Int) -> String
+    val trendDetailTitle: (Int) -> String
     val detailedStats: String
     val detailedStatsHint: String
     val btnAce: String
@@ -706,6 +718,18 @@ object ItStrings : Strings {
     override val statSecondServeWon = "Punti vinti con la seconda"
     override val statWinners = "Vincenti"
     override val statErrors = "Errori"
+    override val statUnforcedErrors = "Errori gratuiti"
+    override val statForcedErrors = "Errori forzati"
+    override val detailAskOutcome = "Com'è finito il punto?"
+    override val detailAskErrorType = "Errore gratuito o forzato?"
+    override val detailUnforced = "Gratuito"
+    override val detailForced = "Forzato"
+    override val detailWinnerOf: (String) -> String = { x -> "Vincente $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Errore $x" }
+    override val trendTitle = "Andamento"
+    override val trendHint = "Punti vinti partita per partita (ultime 12; piena = partita vinta, linea = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Punti vinti in media: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medie per partita ($n con statistiche dettagliate)" }
     override val detailedStats = "Statistiche dettagliate"
     override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
     override val btnAce = "Ace"
@@ -1224,6 +1248,18 @@ object EnStrings : Strings {
     override val statSecondServeWon = "Points won on 2nd serve"
     override val statWinners = "Winners"
     override val statErrors = "Errors"
+    override val statUnforcedErrors = "Unforced errors"
+    override val statForcedErrors = "Forced errors"
+    override val detailAskOutcome = "How did the point end?"
+    override val detailAskErrorType = "Unforced or forced error?"
+    override val detailUnforced = "Unforced"
+    override val detailForced = "Forced"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Trend"
+    override val trendHint = "Points won match by match (last 12; filled = match won, line = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Average points won: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Averages per match ($n with detailed stats)" }
     override val detailedStats = "Detailed stats"
     override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
     override val btnAce = "Ace"

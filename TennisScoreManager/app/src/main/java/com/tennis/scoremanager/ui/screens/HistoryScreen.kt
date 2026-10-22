@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -192,6 +193,8 @@ private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, m
             }
         }
     }
+    val lines = remember(played, key) { PlayerStats.lines(played, key) }
+    if (lines.size >= 2) TrendCard(lines)
     if (rivals.isNotEmpty()) {
         Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         rivals.forEach { r -> PlayerRow(c, r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
@@ -255,3 +258,48 @@ private fun PlayerRow(c: MatchController, name: String, record: String, chevron:
         if (chevron) Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
     }
 }
+
+/**
+ * Andamento del giocatore: una colonna per partita (ultime 12) con la percentuale di punti vinti, piena se vinta;
+ * la linea è il 50%. Sotto le medie, e quelle delle statistiche dettagliate se qualche partita le ha.
+ */
+@Composable
+private fun TrendCard(lines: List<PlayerStats.MatchLine>) {
+    val s = LocalStrings.current
+    val last = lines.takeLast(12)
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.trendTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        Box(Modifier.fillMaxWidth().height(90.dp)) {
+            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+                last.forEach { l ->
+                    Box(
+                        Modifier.weight(1f).fillMaxHeight(l.pointsWonPct / 100f).clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(if (l.won) TsmColors.Ball else TsmColors.Outline),
+                    )
+                }
+                repeat(12 - last.size) { Spacer(Modifier.weight(1f)) }
+            }
+            // Linea del 50%: sopra si sono vinti più punti di quanti se ne sono persi.
+            Box(Modifier.fillMaxWidth().height(1.dp).align(Alignment.Center).background(TsmColors.TextDim.copy(alpha = 0.6f)))
+        }
+        Text(s.trendHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(s.trendPointsAvg(Math.round(lines.map { it.pointsWonPct }.average()).toInt()), color = TsmColors.TextMain)
+        val det = lines.mapNotNull { it.detail }
+        if (det.isNotEmpty()) {
+            val n = det.size.toDouble()
+            fun avg(f: (com.tennis.scoremanager.data.MatchStats.SideTotals) -> Int) = String.format(java.util.Locale.ROOT, "%.1f", det.sumOf(f) / n)
+            val serves = det.sumOf { it.servePoints }
+            val firstIn = if (serves > 0) Math.round(det.sumOf { it.firstServesIn } * 100.0 / serves) else 0
+            Text(s.trendDetailTitle(det.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(
+                "${s.statAces} ${avg { it.aces }} · ${s.statDoubleFaults} ${avg { it.doubleFaults }} · ${s.statFirstServeIn} $firstIn% · " +
+                    "${s.statWinners} ${avg { it.winners }} · ${s.statErrors} ${avg { it.errors }}",
+                color = TsmColors.TextDim, fontSize = 13.sp,
+            )
+        }
+    }
+}
+

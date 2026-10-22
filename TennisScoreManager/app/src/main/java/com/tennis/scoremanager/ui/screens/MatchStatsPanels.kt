@@ -108,7 +108,10 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ) + (if (detail) listOf(
             Stat(s.statWinners, a.winners, b.winners),
             Stat(s.statErrors, a.errors, b.errors),
-        ) else emptyList()) + listOf(
+        ) + (if (a.unforcedErrors + b.unforcedErrors + a.forcedErrors + b.forcedErrors > 0) listOf(
+            Stat(s.statUnforcedErrors, a.unforcedErrors, b.unforcedErrors),
+            Stat(s.statForcedErrors, a.forcedErrors, b.forcedErrors),
+        ) else emptyList()) else emptyList()) + listOf(
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
