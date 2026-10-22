@@ -9,7 +9,7 @@ Tennis Score Manager compte les points d'un match de tennis selon les règles de
 * Bracelets M5StickS3 en Bluetooth LE (facultatifs) : chaque joueur appuie sur KEY1 pour marquer le point et sur KEY2 pour l'annuler. Leur firmware Arduino est dans le même dépôt. Depuis le firmware 2.4, ils reconnaissent aussi coup droit, revers, service et volée après un court calibrage.
 * Sans bracelets : deux télécommandes Bluetooth pour selfie (1 à 3 € pièce), appairées comme un clavier. Un clic = point, double clic, appui long ou l'autre touche = annuler.
 * Tableau d'affichage à LED sur une TV ou un écran : un second téléphone avec un câble HDMI, un Chromecast (diffusion de l'écran) ou n'importe quel navigateur sur le point d'accès du téléphone.
-* Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON ou image, ou à partager.
+* Résumé du match avec le score set par set, la durée, le club, le court et le lieu ; à enregistrer en texte, JSON, image ou PDF complet (statistiques, déroulé et jusqu'à 10 photos du match), ou à partager.
 * Statistiques de fin de match, pour le match ou par manche (service, retour, balles de break, points d'affilée…), et déroulé point par point avec balles de break, de set et de match.
 * Statistiques détaillées, pour qui marque depuis le bord du court : aces, doubles fautes, premières balles, coups gagnants et erreurs.
 * Historique sur le téléphone : matchs terminés à rouvrir, joueurs avec victoires, défaites et face-à-face ; les matchs enregistrés (JSON) sur un autre téléphone s'importent, aussi avec un code QR sur le même Wi-Fi. Photos des joueurs, aussi sur le tableau TV.

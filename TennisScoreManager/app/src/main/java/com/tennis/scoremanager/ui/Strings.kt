@@ -457,6 +457,16 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    val matchPhotosTitle: String
+    val matchPhotosHint: String
+    val addPhotos: String
+    val takePhoto: String
+    val matchPhotosFull: String
+    val formatPdf: String
+    val shareChoose: String
+    val shareChooseHint: String
+    val shareImage: String
+    val sharePdf: String
     // Tornei Americano e Mexicano
     val tournamentButton: String
     val tournamentTitle: String
@@ -1013,6 +1023,16 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val matchPhotosTitle = "Foto della partita"
+    override val matchPhotosHint = "Fino a 10 foto ricordo: restano su questo telefono, finiscono nel PDF e passano all'altro telefono col trasferimento."
+    override val addPhotos = "Aggiungi foto"
+    override val takePhoto = "Scatta"
+    override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
+    override val shareChoose = "Cosa condividi?"
+    override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
+    override val shareImage = "Immagine"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
@@ -1556,6 +1576,16 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val matchPhotosTitle = "Match photos"
+    override val matchPhotosHint = "Up to 10 souvenir photos: they stay on this phone, go into the PDF and move to the other phone with the transfer."
+    override val addPhotos = "Add photos"
+    override val takePhoto = "Take photo"
+    override val matchPhotosFull = "This match already has 10 photos."
+    override val formatPdf = "Full PDF (result, statistics, log, photos)"
+    override val shareChoose = "What do you share?"
+    override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
+    override val shareImage = "Image"
+    override val sharePdf = "Full PDF"
     override val tournamentButton = "Americano or Mexicano tournament"
     override val tournamentTitle = "Tournament"
     override val tournamentSubtitle = "Americano and Mexicano: partners change every round"

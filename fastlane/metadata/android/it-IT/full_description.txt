@@ -9,7 +9,7 @@ Tennis Score Manager tiene il punteggio di una partita di tennis secondo le rego
 * Braccialetti M5StickS3 in Bluetooth LE (facoltativi): ogni giocatore preme KEY1 per assegnarsi il punto e KEY2 per annullarlo. Il firmware Arduino è nello stesso repository. Dal firmware 2.4 riconoscono anche dritto, rovescio, servizio e volée, dopo una breve calibrazione.
 * Senza braccialetti: due telecomandini Bluetooth da selfie (1–3 € l'uno), accoppiati come una tastiera. Un clic = punto, doppio clic, pressione lunga o l'altro tasto = annulla.
 * Tabellone a LED su TV o monitor: un secondo telefono col cavo HDMI, un Chromecast (trasmissione dello schermo) o un browser qualsiasi sull'hotspot del telefono.
-* Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON o immagine, oppure si condivide.
+* Riepilogo con il punteggio set per set, durata, circolo, campo e luogo; si salva come testo, JSON, immagine o PDF completo (statistiche, cronologia e fino a 10 foto della partita), oppure si condivide.
 * Statistiche di fine partita, per la partita o per set (servizio, risposta, palle break, punti di fila…), e cronologia punto per punto con palle break, set point e match point.
 * Statistiche dettagliate, per chi segna da bordo campo: ace, doppi falli, prime di servizio, vincenti ed errori.
 * Storico sul telefono: partite finite da riaprire, giocatori con vittorie, sconfitte e scontri diretti; si importano le partite salvate (JSON) su un altro telefono, anche con un QR sulla stessa rete Wi-Fi. Foto dei giocatori, anche sul tabellone TV.

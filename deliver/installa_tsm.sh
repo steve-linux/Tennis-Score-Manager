@@ -817,6 +817,7 @@ import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
@@ -915,6 +916,8 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
+        const val MATCH_PHOTO_PX = 1600
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
@@ -1924,6 +1927,7 @@ class MatchController(
         scope.launch {
             withContext(io) {
                 storage.deleteFinished(id)
+                storage.deleteMatchPhotos(id)
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
@@ -2130,6 +2134,63 @@ class MatchController(
         }
     }
 
+    // ---------------------------------------------------------------- foto ricordo della partita
+
+    /** Cresce a ogni foto della partita aggiunta o tolta. */
+    val matchPhotosVersion = MutableStateFlow(0)
+
+    fun matchPhotos(id: String): List<File> = storage.matchPhotos(id)
+
+    /** Foto aggiunte al riepilogo a schermo: rimpicciolite a [MATCH_PHOTO_PX] sul lato lungo, fino a 10 per partita. */
+    fun addMatchPhotos(uris: List<Uri>) {
+        val id = summary.value?.record?.id ?: return
+        val s = strings
+        scope.launch {
+            val (added, full) = withContext(io) {
+                var added = 0
+                var full = false
+                for (uri in uris) {
+                    if (storage.matchPhotos(id).size >= Storage.MAX_MATCH_PHOTOS) { full = true; break }
+                    val jpeg = runCatching { scaledJpeg(uri, MATCH_PHOTO_PX) }.getOrNull() ?: continue
+                    if (storage.addMatchPhoto(id, jpeg)) added++
+                }
+                added to full
+            }
+            matchPhotosVersion.value++
+            if (full) _toasts.tryEmit(s.matchPhotosFull)
+            else if (added == 0) _toasts.tryEmit(s.photoError)
+        }
+    }
+
+    fun removeMatchPhoto(file: File) {
+        scope.launch {
+            withContext(io) { file.delete() }
+            matchPhotosVersion.value++
+        }
+    }
+
+    /** Foto [uri] rimpicciolita (lato lungo [maxSide]) in JPEG; ImageDecoder (Android 9+) la raddrizza. */
+    private fun scaledJpeg(uri: Uri, maxSide: Int): ByteArray {
+        val src = if (Build.VERSION.SDK_INT >= 28) {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
+                val long = maxOf(info.size.width, info.size.height)
+                d.setTargetSampleSize((long / maxSide).coerceAtLeast(1))
+                d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        } else {
+            app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
+        }
+        val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
+        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
+        return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
+    }
+
+    /** File dove la fotocamera salva la foto da aggiungere al riepilogo (nella cache condivisibile). */
+    fun cameraUri(): Uri {
+        val f = File(File(app.cacheDir, "share").apply { mkdirs() }, "camera.jpg")
+        return FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", f)
+    }
+
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
     /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
@@ -2147,7 +2208,12 @@ class MatchController(
                 val all = storage.loadFinished() + storage.loadUnfinished()
                 // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
                 val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
-                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all, photos = photos)).toByteArray()
+                val matchPhotos = all.associate { m ->
+                    m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
+                }.filterValues { it.isNotEmpty() }
+                storage.json.encodeToString(
+                    TransferBundle.serializer(), TransferBundle(matches = all, photos = photos, matchPhotos = matchPhotos),
+                ).toByteArray()
             },
             onServed = { transferServed.value++ },
         )
@@ -2178,6 +2244,12 @@ class MatchController(
                     // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
                     bundle.photos.forEach { (k, b64) ->
                         if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
+                    }
+                    // Foto ricordo: solo per le partite che qui non ne hanno già.
+                    bundle.matchPhotos.forEach { (id, list) ->
+                        if (storage.matchPhotos(id).isEmpty()) list.forEach { b64 ->
+                            runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
+                        }
                     }
                     importRecords(bundle.matches)
                 }.getOrNull()
@@ -2397,7 +2469,7 @@ class MatchController(
     }
 
     /** "Salva file": testo, JSON o immagine con nome e cartella scelti dall'utente. */
-    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean) {
+    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean, pdf: Boolean = false) {
         val sm = summary.value ?: return
         val s = strings
         val n = summaryNames()
@@ -2411,6 +2483,7 @@ class MatchController(
                         if (json) add(Triple("$base.json", "application/json") { o ->
                             o.write(storage.json.encodeToString(MatchRecord.serializer(), sm.record).toByteArray())
                         })
+                        if (pdf) add(Triple("$base.pdf", "application/pdf") { o -> writePdf(sm, o) })
                         if (png) add(Triple("$base.png", "image/png") { o ->
                             Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, o)
                         })
@@ -2441,17 +2514,31 @@ class MatchController(
         if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
 
     /** Immagine + testo del risultato da condividere sui social. */
-    fun shareIntent(): Intent? {
+    /** PDF completo del riepilogo [sm]: risultato, statistiche, cronologia e foto ricordo. */
+    private fun writePdf(sm: LiveMatch, out: OutputStream) {
+        val s = strings
+        val n = summaryNames()
+        PdfReport.write(
+            out, sm.record, sm.state, s, n, Reports.renderCard(sm.record, sm.state, s, n),
+            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) },
+        )
+    }
+
+    /** Condivisione del riepilogo: l'immagine col testo per i social, oppure ([pdf]) il PDF completo. */
+    fun shareIntent(pdf: Boolean = false): Intent? {
         val sm = summary.value ?: return null
         val s = strings
         val n = summaryNames()
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.png")
-        runCatching { file.outputStream().use { Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it) } }
-            .onFailure { return null }
+        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.${if (pdf) "pdf" else "png"}")
+        runCatching {
+            file.outputStream().use {
+                if (pdf) writePdf(sm, it) else Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+        }.onFailure { return null }
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
-            type = "image/png"
+            type = if (pdf) "application/pdf" else "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
             putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)
@@ -4396,6 +4483,296 @@ class Names(private val setup: SetupData, private val strings: Strings) : CallNa
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/PdfReport.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/PdfReport.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import com.tennis.scoremanager.ui.Strings
+import java.io.File
+import java.io.OutputStream
+
+/**
+ * Riepilogo completo in PDF (A4), fatto con PdfDocument di Android, senza librerie: risultato con l'immagine del
+ * riepilogo e le foto dei giocatori, statistiche della partita e di ogni set, cronologia game per game e, alla fine,
+ * le foto ricordo della partita (due per pagina).
+ */
+object PdfReport {
+    private const val W = 595
+    private const val H = 842
+    private const val M = 40f
+    private const val CONTENT_W = W - 2 * M
+
+    private val dark = Color.rgb(20, 28, 44)
+    private val grey = Color.rgb(110, 120, 135)
+    private val line = Color.rgb(220, 224, 230)
+    private val yellow = Color.rgb(200, 160, 0)
+    private val red = Color.rgb(205, 45, 42)
+
+    private fun paint(size: Float, color: Int = dark, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = size
+            this.color = color
+            typeface = if (bold) Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) else Typeface.SANS_SERIF
+            textAlign = align
+        }
+
+    /** Pagine una dopo l'altra: [ensure] apre una pagina nuova quando lo spazio rimasto non basta. */
+    private class Writer(val doc: PdfDocument, val footer: String) {
+        private var number = 0
+        var page: PdfDocument.Page? = null
+        var y = M
+
+        val canvas: Canvas get() = page!!.canvas
+
+        fun newPage() {
+            finish()
+            number++
+            page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, number).create())
+            y = M
+        }
+
+        fun ensure(height: Float) {
+            if (page == null || y + height > H - M - 16) newPage()
+        }
+
+        fun finish() {
+            page?.let {
+                it.canvas.drawText(footer, W / 2f, H - M / 2, paint(8f, grey, align = Paint.Align.CENTER))
+                it.canvas.drawText("$number", W - M, H - M / 2, paint(8f, grey, align = Paint.Align.RIGHT))
+                doc.finishPage(it)
+            }
+            page = null
+        }
+
+        fun title(text: String) {
+            ensure(40f)
+            y += 18
+            canvas.drawText(text, M, y, paint(16f, bold = true))
+            y += 12
+        }
+
+        /** Testo che va a capo sulla larghezza della pagina. */
+        fun paragraph(text: String, p: Paint, gap: Float = 4f) {
+            val words = text.split(' ')
+            var cur = ""
+            fun flush() {
+                ensure(p.textSize + gap)
+                y += p.textSize + gap
+                canvas.drawText(cur, M, y, p)
+                cur = ""
+            }
+            for (w in words) {
+                val next = if (cur.isEmpty()) w else "$cur $w"
+                if (p.measureText(next) > CONTENT_W && cur.isNotEmpty()) {
+                    flush()
+                    cur = w
+                } else cur = next
+            }
+            if (cur.isNotEmpty()) flush()
+        }
+    }
+
+    fun write(
+        out: OutputStream, rec: MatchRecord, state: MatchState, s: Strings, names: Names,
+        card: Bitmap, matchPhotos: List<File>, playerPhoto: (String) -> Bitmap?,
+    ) {
+        val doc = PdfDocument()
+        val wr = Writer(doc, "${s.appName} · ${Reports.siteUrl(rec.options.lang)}")
+        val lang = rec.options.lang
+        val pts = MatchStats.points(rec)
+
+        // ---- Pagina 1: immagine del risultato, giocatori con le foto, dati della partita
+        wr.newPage()
+        val cardW = 300f
+        val cardH = cardW * card.height / card.width
+        wr.canvas.drawBitmap(card, null, RectF((W - cardW) / 2, wr.y, (W + cardW) / 2, wr.y + cardH), Paint(Paint.FILTER_BITMAP_FLAG))
+        wr.y += cardH + 16
+        for (side in Side.entries) {
+            val real = PlayerStats.names(rec.setup, side)
+            var x = M
+            val color = if (side == Side.P1) yellow else red
+            for (n in names.players(side)) {
+                val photo = if (n in real) playerPhoto(n) else null
+                if (photo != null) {
+                    drawCircle(wr.canvas, photo, x, wr.y, 28f)
+                    x += 34f
+                }
+                wr.canvas.drawText(n, x, wr.y + 20, paint(12f, color, bold = side == state.winner))
+                x += paint(12f, bold = true).measureText(n) + 18
+            }
+            wr.y += 34
+        }
+        wr.y += 6
+        val body = paint(11f)
+        val info = listOf(
+            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.scoreLine(state, state.winner ?: Side.P1)}",
+            "${s.duration}: ${Reports.duration(rec.clockMs)}",
+            "${Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }} · ${s.startTime} ${Reports.time(rec.startedAt, lang)} · ${s.endTime} ${Reports.time(rec.endedAt, lang)}",
+            listOfNotNull(rec.setup.club.ifBlank { null }, rec.setup.court.ifBlank { null }?.let { "${s.court} $it" }).joinToString(" · "),
+            "${s.place}: ${Reports.place(rec, s)}",
+            "${s.format}: ${Reports.formatLabel(rec, s)}",
+        ).filter { it.isNotBlank() }
+        info.forEach { wr.paragraph(it, body) }
+
+        // ---- Statistiche: partita intera e poi ogni set
+        val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1
+        val periods = listOf<Int?>(null) + if (sets > 1) (0 until sets).toList() else emptyList()
+        wr.newPage()
+        wr.title(s.tabStats)
+        for (period in periods) {
+            wr.ensure(60f)
+            wr.y += 14
+            wr.canvas.drawText(if (period == null) s.periodMatch else s.periodSet(period + 1), M, wr.y, paint(12f, grey, bold = true))
+            wr.y += 6
+            statsTable(wr, statRows(rec, pts, period, s), names)
+        }
+        if (sets > 0) {
+            val durations = MatchStats.setDurations(pts)
+            if (durations.any { it != null }) {
+                wr.paragraph("${s.statSetDurations}: " + durations.joinToString(" · ") { d -> d?.let { minutes(it) } ?: "–" }, body, 10f)
+            }
+            MatchStats.longestGame(pts)?.let { (ms, n) -> wr.paragraph("${s.statLongestGame}: ${s.longestGameValue(minutes(ms), n)}", body) }
+        }
+
+        // ---- Cronologia game per game
+        wr.newPage()
+        wr.title(s.tabChronology)
+        val small = paint(9.5f)
+        for (g in MatchStats.chronology(pts)) {
+            val head = buildString {
+                append("${s.periodSet(g.set + 1)} · ${g.games1}-${g.games2}")
+                if (g.tiebreak == TiebreakKind.SET && g.tb1 != null && g.tb2 != null) append(" (${g.tb1}-${g.tb2})")
+                append(" · ${s.serving}: ${names.short(g.server)}")
+                if (g.broken) append(" · ${s.serveLost}")
+            }
+            val steps = g.steps.joinToString(", ") { st ->
+                "${st.p1}:${st.p2}" + when (st.marker) {
+                    MatchStats.Marker.BREAK_POINT -> " [${s.markerBreak}]"
+                    MatchStats.Marker.SET_POINT -> " [${s.markerSet}]"
+                    MatchStats.Marker.MATCH_POINT -> " [${s.markerMatch}]"
+                    null -> ""
+                }
+            }
+            val end = when {
+                g.winner == null -> ""
+                g.closesMatch -> s.chronoMatch
+                g.closesSet -> s.chronoSet
+                g.broken -> s.chronoBreak
+                else -> s.chronoGame
+            }
+            wr.paragraph(head, paint(10f, bold = true), 8f)
+            if (steps.isNotEmpty() || end.isNotEmpty()) wr.paragraph(listOf(steps, end).filter { it.isNotEmpty() }.joinToString(", "), small, 3f)
+        }
+
+        // ---- Foto ricordo, due per pagina
+        val photos = matchPhotos.mapNotNull { f -> runCatching { BitmapFactory.decodeFile(f.absolutePath) }.getOrNull() }
+        photos.chunked(2).forEach { pair ->
+            wr.newPage()
+            wr.title(s.matchPhotosTitle)
+            val boxH = (H - M - 16 - wr.y - 20) / 2
+            pair.forEach { b ->
+                val scale = minOf(CONTENT_W / b.width, boxH / b.height)
+                val w = b.width * scale
+                val h = b.height * scale
+                wr.canvas.drawBitmap(b, null, RectF((W - w) / 2, wr.y + 10, (W + w) / 2, wr.y + 10 + h), Paint(Paint.FILTER_BITMAP_FLAG))
+                wr.y += boxH + 10
+            }
+        }
+        wr.finish()
+        doc.writeTo(out)
+        doc.close()
+    }
+
+    private fun drawCircle(c: Canvas, b: Bitmap, x: Float, y: Float, size: Float) {
+        c.save()
+        c.clipPath(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) })
+        c.drawBitmap(b, null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
+        c.restore()
+    }
+
+    private fun statsTable(wr: Writer, rows: List<Triple<String, String, String>>, names: Names) {
+        val label = paint(10f)
+        val value = paint(10f, bold = true, align = Paint.Align.RIGHT)
+        val colA = M + CONTENT_W * 0.72f
+        val colB = W - M
+        wr.ensure(18f)
+        wr.y += 14
+        wr.canvas.drawText(names.short(Side.P1).take(22), colA, wr.y, paint(9f, yellow, bold = true, align = Paint.Align.RIGHT))
+        wr.canvas.drawText(names.short(Side.P2).take(22), colB, wr.y, paint(9f, red, bold = true, align = Paint.Align.RIGHT))
+        for ((l, a, b) in rows) {
+            wr.ensure(15f)
+            wr.y += 15
+            wr.canvas.drawText(l, M, wr.y, label)
+            wr.canvas.drawText(a, colA, wr.y, value)
+            wr.canvas.drawText(b, colB, wr.y, value)
+            wr.canvas.drawLine(M, wr.y + 4, W - M, wr.y + 4, Paint().apply { color = line; strokeWidth = 0.5f })
+        }
+        wr.y += 6
+    }
+
+    private fun pct(v: Int, of: Int) = if (of > 0) "${Math.round(v * 100.0 / of)}% ($v/$of)" else "–"
+
+    /** Righe della tabella: le stesse voci della scheda Statistiche. */
+    fun statRows(rec: MatchRecord, pts: List<MatchStats.PlayedPoint>, set: Int?, s: Strings): List<Triple<String, String, String>> {
+        val t = MatchStats.totals(pts, set)
+        val a = t.getValue(Side.P1)
+        val b = t.getValue(Side.P2)
+        fun row(l: String, f: (MatchStats.SideTotals) -> String) = Triple(l, f(a), f(b))
+        val rows = mutableListOf(
+            row(s.statTotalPoints) { pct(it.pointsWon, it.points) },
+            row(s.statServicePoints) { pct(it.servePointsWon, it.servePoints) },
+            row(s.statReturnPoints) { pct(it.returnPointsWon, it.returnPoints) },
+            row(s.statServiceGames) { pct(it.serviceGamesWon, it.serviceGames) },
+            row(s.statReturnGames) { pct(it.returnGamesWon, it.returnGames) },
+            row(s.statBreakWon) { "${it.breakPointsWon}/${it.breakPoints}" },
+            row(s.statBreakSaved) { "${it.breakPointsSaved}/${it.breakPointsFaced}" },
+            row(s.statGamePointsWon) { "${it.gamePointsWon}/${it.gamePoints}" },
+            row(s.statSetPointsWon) { "${it.setPointsWon}/${it.setPoints}" },
+            row(s.statMatchPointsWon) { "${it.matchPointsWon}/${it.matchPoints}" },
+            row(s.statTotalGames) { pct(it.gamesWon, it.games) },
+            row(s.statLoveGames) { "${it.loveGames}" },
+            row(s.statBestGameRun) { "${it.bestGameRun}" },
+            row(s.statStreak) { "${it.maxStreak}" },
+        )
+        if (set == null) rows += row(s.statSetsFromBreakDown) { "${it.setsFromBreakDown}" }
+        if (MatchStats.hasDetail(rec, pts)) {
+            rows += listOf(
+                row(s.statAces) { "${it.aces}" },
+                row(s.statDoubleFaults) { "${it.doubleFaults}" },
+                row(s.statFirstServeIn) { pct(it.firstServesIn, it.servePoints) },
+                row(s.statFirstServeWon) { pct(it.firstServePointsWon, it.firstServesIn) },
+                row(s.statSecondServeWon) { pct(it.secondServePointsWon, it.secondServes) },
+                row(s.statWinners) { "${it.winners}" },
+                row(s.statErrors) { "${it.errors}" },
+                row(s.statUnforcedErrors) { "${it.unforcedErrors}" },
+                row(s.statForcedErrors) { "${it.forcedErrors}" },
+            )
+        }
+        return rows
+    }
+
+    private fun minutes(ms: Long): String {
+        val m = Math.round(ms / 60_000.0).toInt()
+        return if (m >= 60) "${m / 60} h ${"%02d".format(m % 60)}'" else "$m'"
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -4784,6 +5161,11 @@ import java.io.File
 
 /** Preferenze e partite salvate in locale (memoria interna dell'app). */
 class Storage(context: Context) {
+    companion object {
+        /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
+        const val MAX_MATCH_PHOTOS = 10
+    }
+
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
@@ -4821,6 +5203,24 @@ class Storage(context: Context) {
     @Synchronized
     fun deletePhoto(key: String) {
         photoFile(key).delete()
+    }
+
+    /** Foto ricordo di una partita: una cartella per partita, JPEG rimpiccioliti, al massimo [MAX_MATCH_PHOTOS]. */
+    private fun matchPhotoDir(id: String): File = File(File(app.filesDir, "matchphotos"), id)
+
+    fun matchPhotos(id: String): List<File> =
+        matchPhotoDir(id).listFiles { f -> f.extension == "jpg" }.orEmpty().sortedBy { it.name }
+
+    @Synchronized
+    fun addMatchPhoto(id: String, jpeg: ByteArray): Boolean {
+        val dir = matchPhotoDir(id).apply { mkdirs() }
+        if (matchPhotos(id).size >= MAX_MATCH_PHOTOS) return false
+        return runCatching { File(dir, "${System.currentTimeMillis()}.jpg").writeBytes(jpeg) }.isSuccess
+    }
+
+    @Synchronized
+    fun deleteMatchPhotos(id: String) {
+        matchPhotoDir(id).deleteRecursively()
     }
 
     /** Tornei Americano e Mexicano, uno per file. */
@@ -5986,6 +6386,8 @@ data class TransferBundle(
     val version: Int = 1,
     val matches: List<MatchRecord> = emptyList(),
     val photos: Map<String, String> = emptyMap(),
+    /** Foto ricordo per id della partita (JPEG in base64). */
+    val matchPhotos: Map<String, List<String>> = emptyMap(),
 )
 
 /**
@@ -8830,6 +9232,16 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    val matchPhotosTitle: String
+    val matchPhotosHint: String
+    val addPhotos: String
+    val takePhoto: String
+    val matchPhotosFull: String
+    val formatPdf: String
+    val shareChoose: String
+    val shareChooseHint: String
+    val shareImage: String
+    val sharePdf: String
     // Tornei Americano e Mexicano
     val tournamentButton: String
     val tournamentTitle: String
@@ -9386,6 +9798,16 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val matchPhotosTitle = "Foto della partita"
+    override val matchPhotosHint = "Fino a 10 foto ricordo: restano su questo telefono, finiscono nel PDF e passano all'altro telefono col trasferimento."
+    override val addPhotos = "Aggiungi foto"
+    override val takePhoto = "Scatta"
+    override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
+    override val shareChoose = "Cosa condividi?"
+    override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
+    override val shareImage = "Immagine"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
@@ -9929,6 +10351,16 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val matchPhotosTitle = "Match photos"
+    override val matchPhotosHint = "Up to 10 souvenir photos: they stay on this phone, go into the PDF and move to the other phone with the transfer."
+    override val addPhotos = "Add photos"
+    override val takePhoto = "Take photo"
+    override val matchPhotosFull = "This match already has 10 photos."
+    override val formatPdf = "Full PDF (result, statistics, log, photos)"
+    override val shareChoose = "What do you share?"
+    override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
+    override val shareImage = "Image"
+    override val sharePdf = "Full PDF"
     override val tournamentButton = "Americano or Mexicano tournament"
     override val tournamentTitle = "Tournament"
     override val tournamentSubtitle = "Americano and Mexicano: partners change every round"
@@ -10495,6 +10927,16 @@ object DeStrings : Strings {
     override val photoRemove = "Foto entfernen"
     override val photoNeedsName = "Schreibe zuerst den Namen des Spielers: Das Foto wird über den Namen wiedergefunden."
     override val photoError = "Dieses Foto lässt sich nicht lesen."
+    override val matchPhotosTitle = "Fotos vom Match"
+    override val matchPhotosHint = "Bis zu 10 Erinnerungsfotos: Sie bleiben auf diesem Telefon, kommen ins PDF und mit der Übertragung auf das andere Telefon."
+    override val addPhotos = "Fotos hinzufügen"
+    override val takePhoto = "Foto aufnehmen"
+    override val matchPhotosFull = "Dieses Match hat schon 10 Fotos."
+    override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
+    override val shareChoose = "Was teilst du?"
+    override val shareChooseHint = "Das Bild mit Text passt für WhatsApp und soziale Netze; das PDF enthält auch Statistik, Verlauf und Fotos vom Match."
+    override val shareImage = "Bild"
+    override val sharePdf = "Vollständiges PDF"
     override val tournamentButton = "Americano- oder Mexicano-Turnier"
     override val tournamentTitle = "Turnier"
     override val tournamentSubtitle = "Americano und Mexicano: wechselnde Paare in jeder Runde"
@@ -11054,6 +11496,16 @@ object EsStrings : Strings {
     override val photoRemove = "Quitar foto"
     override val photoNeedsName = "Escribe primero el nombre del jugador: la foto se encuentra por el nombre."
     override val photoError = "No se puede leer esta foto."
+    override val matchPhotosTitle = "Fotos del partido"
+    override val matchPhotosHint = "Hasta 10 fotos de recuerdo: se quedan en este teléfono, van al PDF y pasan al otro teléfono con la transferencia."
+    override val addPhotos = "Añadir fotos"
+    override val takePhoto = "Hacer foto"
+    override val matchPhotosFull = "Este partido ya tiene 10 fotos."
+    override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
+    override val shareChoose = "¿Qué compartes?"
+    override val shareChooseHint = "La imagen con texto va bien para WhatsApp y las redes; el PDF tiene también estadísticas, historial y fotos del partido."
+    override val shareImage = "Imagen"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano y Mexicano: parejas que cambian en cada ronda"
@@ -11615,6 +12067,16 @@ object FrStrings : Strings {
     override val photoRemove = "Retirer la photo"
     override val photoNeedsName = "Écrivez d'abord le nom du joueur : la photo se retrouve grâce au nom."
     override val photoError = "Impossible de lire cette photo."
+    override val matchPhotosTitle = "Photos du match"
+    override val matchPhotosHint = "Jusqu'à 10 photos souvenir : elles restent sur ce téléphone, vont dans le PDF et passent sur l'autre téléphone avec le transfert."
+    override val addPhotos = "Ajouter des photos"
+    override val takePhoto = "Prendre une photo"
+    override val matchPhotosFull = "Ce match a déjà 10 photos."
+    override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
+    override val shareChoose = "Que partagez-vous ?"
+    override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."
+    override val shareImage = "Image et texte"
+    override val sharePdf = "PDF complet"
     override val tournamentButton = "Tournoi Americano ou Mexicano"
     override val tournamentTitle = "Tournoi"
     override val tournamentSubtitle = "Americano et Mexicano : les paires changent à chaque tour"
@@ -12177,6 +12639,16 @@ object PtStrings : Strings {
     override val photoRemove = "Remover foto"
     override val photoNeedsName = "Escreva primeiro o nome do jogador: a foto é encontrada pelo nome."
     override val photoError = "Não foi possível ler esta foto."
+    override val matchPhotosTitle = "Fotos da partida"
+    override val matchPhotosHint = "Até 10 fotos de recordação: ficam neste telefone, vão para o PDF e passam para o outro telefone com a transferência."
+    override val addPhotos = "Adicionar fotos"
+    override val takePhoto = "Tirar foto"
+    override val matchPhotosFull = "Esta partida já tem 10 fotos."
+    override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
+    override val shareChoose = "O que você compartilha?"
+    override val shareChooseHint = "A imagem com texto serve para WhatsApp e redes sociais; o PDF tem também estatísticas, histórico e fotos da partida."
+    override val shareImage = "Imagem"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneio Americano ou Mexicano"
     override val tournamentTitle = "Torneio"
     override val tournamentSubtitle = "Americano e Mexicano: duplas que mudam a cada rodada"
@@ -15359,12 +15831,18 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SummaryScreen.
 
 package com.tennis.scoremanager.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15385,6 +15863,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
@@ -15392,6 +15871,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
@@ -15419,18 +15899,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -15460,6 +15944,8 @@ fun SummaryScreen(c: MatchController) {
     var tab by remember(rec.id) { mutableStateOf(0) }
     val fromHistory by c.summaryFromHistory.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
+    /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
+    var shareChoice by remember { mutableStateOf(false) }
     // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
     BackHandler { if (fromHistory) c.backToHistory() }
 
@@ -15541,7 +16027,10 @@ fun SummaryScreen(c: MatchController) {
             when (tab) {
                 1 -> MatchStatsTab(rec, names)
                 2 -> MatchChronologyTab(rec, names)
-                else -> SummaryInfo(rec, state, names)
+                else -> {
+                    SummaryInfo(rec, state, names)
+                    MatchPhotosCard(c, rec.id)
+                }
             }
         }
         Column(
@@ -15550,9 +16039,7 @@ fun SummaryScreen(c: MatchController) {
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
-                BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
-                }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
+                BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
@@ -15568,6 +16055,26 @@ fun SummaryScreen(c: MatchController) {
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
+    if (shareChoice) {
+        AlertDialog(
+            onDismissRequest = { shareChoice = false },
+            icon = { Icon(Icons.Filled.Share, null, tint = TsmColors.Orange) },
+            title = { Text(s.shareChoose) },
+            text = { Text(s.shareChooseHint) },
+            confirmButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent(pdf = true)?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.sharePdf) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.shareImage) }
+            },
+        )
+    }
     if (confirmDelete) {
         ConfirmDialog(
             icon = Icons.Filled.Delete,
@@ -15634,6 +16141,7 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
     var txt by remember { mutableStateOf(true) }
     var json by remember { mutableStateOf(true) }
     var png by remember { mutableStateOf(true) }
+    var pdf by remember { mutableStateOf(true) }
     val treeLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
             c.setHistoryFolder(uri)
@@ -15667,11 +16175,12 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
                 CheckRow(s.formatReport, txt) { txt = it }
                 CheckRow(s.formatData, json) { json = it }
                 CheckRow(s.formatImage, png) { png = it }
+                CheckRow(s.formatPdf, pdf) { pdf = it }
             }
         },
         confirmButton = {
-            Button(enabled = txt || json || png, onClick = {
-                c.saveHistory(name, txt, json, png)
+            Button(enabled = txt || json || png || pdf, onClick = {
+                c.saveHistory(name, txt, json, png, pdf)
                 onDismiss()
             }) { Text(s.save) }
         },
@@ -15685,6 +16194,77 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
         Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = TsmColors.Ball, checkmarkColor = TsmColors.OnBall))
         Text(label, color = TsmColors.TextMain)
     }
+}
+
+/**
+ * Foto ricordo della partita (fino a 10): dalla galleria o dalla fotocamera. Restano sul telefono con la partita,
+ * vanno nel PDF e passano all'altro telefono col trasferimento; non vanno nell'immagine per i social.
+ */
+@Composable
+private fun MatchPhotosCard(c: MatchController, id: String) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val version by c.matchPhotosVersion.collectAsState()
+    val photos = remember(id, version) { c.matchPhotos(id) }
+    val left = Storage.MAX_MATCH_PHOTOS - photos.size
+    var open by remember { mutableStateOf<java.io.File?>(null) }
+    var cameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val pickMany = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Storage.MAX_MATCH_PHOTOS)) { c.addMatchPhotos(it) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        cameraUri?.let { if (ok) c.addMatchPhotos(listOf(it)) }
+    }
+    fun shoot() {
+        val u = c.cameraUri()
+        cameraUri = u
+        camera.launch(u)
+    }
+    val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) shoot() }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text("${s.matchPhotosTitle} (${photos.size}/${Storage.MAX_MATCH_PHOTOS})", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        if (photos.isEmpty()) Text(s.matchPhotosHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (photos.isNotEmpty()) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                photos.forEach { f ->
+                    val bmp = remember(f) { runCatching { thumb(f) }.getOrNull() }
+                    if (bmp != null) {
+                        Image(bmp, null, contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(86.dp).clip(RoundedCornerShape(12.dp)).clickable { open = f })
+                    }
+                }
+            }
+        }
+        if (left > 0) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GhostButton(s.addPhotos, Icons.Filled.AddPhotoAlternate, {
+                    pickMany.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }, Modifier.weight(1f))
+                GhostButton(s.takePhoto, Icons.Filled.PhotoCamera, {
+                    val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    if (granted) shoot() else askCamera.launch(Manifest.permission.CAMERA)
+                }, Modifier.weight(1f))
+            }
+        }
+    }
+    open?.let { f ->
+        val big = remember(f) { runCatching { BitmapFactory.decodeFile(f.absolutePath).asImageBitmap() }.getOrNull() }
+        AlertDialog(
+            onDismissRequest = { open = null },
+            text = { if (big != null) Image(big, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxWidth()) },
+            confirmButton = { TextButton(onClick = { open = null }) { Text(s.ok) } },
+            dismissButton = { TextButton(onClick = { c.removeMatchPhoto(f); open = null }) { Text(s.photoRemove) } },
+        )
+    }
+}
+
+/** Miniatura leggera della foto (lato di circa 256 pixel). */
+private fun thumb(f: java.io.File): androidx.compose.ui.graphics.ImageBitmap {
+    val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(f.absolutePath, o)
+    val sample = (maxOf(o.outWidth, o.outHeight) / 256).coerceAtLeast(1)
+    return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample }).asImageBitmap()
 }
 TSM_EOF
 
@@ -24112,6 +24692,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 87 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 88 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
