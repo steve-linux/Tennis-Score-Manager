@@ -23,6 +23,8 @@ class Storage(context: Context) {
 
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
+    /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
+    private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
     var setup: SetupData
         get() = read(prefs.getString("setup", null)) ?: SetupData()
@@ -111,6 +113,36 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteMatch(id: String) {
         File(matchesDir, "$id.json").delete()
+    }
+
+    @Synchronized
+    fun saveFinished(rec: MatchRecord) {
+        runCatching {
+            val f = File(finishedDir, "${rec.id}.json")
+            val tmp = File(finishedDir, "${rec.id}.tmp")
+            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
+    }
+
+    /** Partite dello storico, dalla più recente. */
+    fun loadFinished(): List<MatchRecord> =
+        finishedDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.endedAt ?: it.updatedAt }
+
+    fun hasFinished(id: String): Boolean = File(finishedDir, "$id.json").exists()
+
+    @Synchronized
+    fun deleteFinished(id: String) {
+        File(finishedDir, "$id.json").delete()
+    }
+
+    fun clearLastFinished() {
+        lastFinishedFile.delete()
     }
 
     fun saveLastFinished(rec: MatchRecord) {

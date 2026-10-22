@@ -26,21 +26,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -48,15 +46,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -64,20 +70,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.ui.screens.HistoryScreen
 import com.tennis.scoremanager.ui.screens.MatchScreen
 import com.tennis.scoremanager.ui.screens.OptionsScreen
 import com.tennis.scoremanager.ui.screens.SetupScreen
 import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun AppRoot(c: MatchController) {
@@ -116,6 +117,7 @@ fun AppRoot(c: MatchController) {
                 Screen.START -> StartScreen(c)
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
+                Screen.HISTORY -> HistoryScreen(c)
             }
         }
     }
@@ -174,6 +176,8 @@ fun ScreenScaffold(
     subtitle: String?,
     icon: ImageVector,
     bottomBar: @Composable RowScope.() -> Unit,
+    /** Pulsante facoltativo a destra del titolo. */
+    action: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
@@ -183,9 +187,13 @@ fun ScreenScaffold(
                 contentAlignment = Alignment.Center,
             ) { Icon(icon, null, tint = TsmColors.OnBall) }
             Spacer(Modifier.width(12.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = TsmColors.TextDim)
+            }
+            if (action != null) {
+                Spacer(Modifier.width(8.dp))
+                action()
             }
         }
         Column(

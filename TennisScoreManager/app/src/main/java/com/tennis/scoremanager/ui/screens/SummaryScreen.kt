@@ -26,10 +26,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Folder
@@ -98,13 +100,10 @@ fun SummaryScreen(c: MatchController) {
     var showSave by remember { mutableStateOf(false) }
     /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
     var tab by remember(rec.id) { mutableStateOf(0) }
-    val kept by c.summaryKept.collectAsState()
-    /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
-    var leaving by remember { mutableStateOf<Boolean?>(null) }
-    fun leave(exit: Boolean) {
-        if (exit) activity?.let { c.exitApp(it) } else c.newMatch()
-    }
-    BackHandler { }
+    val fromHistory by c.summaryFromHistory.collectAsState()
+    var confirmDelete by remember { mutableStateOf(false) }
+    // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
+    BackHandler { if (fromHistory) c.backToHistory() }
 
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         Column(
@@ -178,29 +177,34 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) }.onSuccess { c.markSummaryKept() } }
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
                 }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Senza salvataggio né condivisione il riepilogo si perde: un tocco solo non basta.
-                GhostButton(s.newMatch, Icons.Filled.Replay, { if (kept) leave(false) else leaving = false }, Modifier.weight(1f))
-                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { if (kept) leave(true) else leaving = true }, Modifier.weight(1f))
+                // La partita finita è già nello storico: uscire non fa perdere niente.
+                if (fromHistory) {
+                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.backToHistory() }, Modifier.weight(1f))
+                    GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.weight(1f))
+                } else {
+                    GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
+                    GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                }
             }
         }
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
-    leaving?.let { exit ->
+    if (confirmDelete) {
         ConfirmDialog(
-            icon = if (exit) Icons.AutoMirrored.Filled.ExitToApp else Icons.Filled.Replay,
-            title = s.summaryLeaveTitle,
-            text = s.summaryLeaveText,
-            confirm = if (exit) s.exit else s.newMatch,
+            icon = Icons.Filled.Delete,
+            title = s.historyDeleteTitle,
+            text = s.historyDeleteText,
+            confirm = s.delete,
             onConfirm = {
-                leaving = null
-                leave(exit)
+                confirmDelete = false
+                c.deleteFromHistory(rec.id)
             },
-            onDismiss = { leaving = null },
+            onDismiss = { confirmDelete = false },
         )
     }
 }
@@ -247,7 +251,7 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
     }
 }
 
-/** "Salva nello storico": nome del file, cartella scelta dall'utente e formati. */
+/** "Salva file": nome del file, cartella scelta dall'utente e formati. */
 @Composable
 private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
     val s = LocalStrings.current

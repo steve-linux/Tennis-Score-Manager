@@ -78,7 +78,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.OutputStream
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -141,8 +141,10 @@ class MatchController(
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
-    /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
-    val summaryKept = MutableStateFlow(false)
+    /** Storico: partite finite salvate sul telefono, dalla più recente. */
+    val history = MutableStateFlow<List<LiveMatch>>(emptyList())
+    /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
+    val summaryFromHistory = MutableStateFlow(false)
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
@@ -941,11 +943,12 @@ class MatchController(
         runningSince = null
         scope.launch(io) {
             storage.deleteMatch(rec.id)
+            storage.saveFinished(rec)
             storage.saveLastFinished(rec)
         }
         // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
         storage.summaryOpen = rec.id
-        summaryKept.value = false
+        summaryFromHistory.value = false
         summary.value = LiveMatch(rec, lm.state)
         live.value = null
         endDialog.value = false
@@ -1022,6 +1025,80 @@ class MatchController(
 
     fun refreshSaved() {
         scope.launch { saved.value = withContext(io) { storage.loadUnfinished() } }
+    }
+
+    // ---------------------------------------------------------------- storico
+
+    fun openHistory() {
+        refreshHistory()
+        screen.value = Screen.HISTORY
+    }
+
+    fun refreshHistory() {
+        scope.launch {
+            history.value = withContext(io) {
+                // Prima dello storico l'app teneva solo l'ultima partita finita: entra anche lei.
+                storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
+                storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
+            }
+        }
+    }
+
+    fun openFromHistory(m: LiveMatch) {
+        summary.value = m
+        summaryFromHistory.value = true
+        screen.value = Screen.SUMMARY
+    }
+
+    /** "Indietro" dal riepilogo aperto dallo storico. */
+    fun backToHistory() {
+        summary.value = null
+        summaryFromHistory.value = false
+        openHistory()
+    }
+
+    fun deleteFromHistory(id: String) {
+        scope.launch {
+            withContext(io) {
+                storage.deleteFinished(id)
+                // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
+                if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
+            }
+            if (summary.value?.record?.id == id) backToHistory() else refreshHistory()
+        }
+    }
+
+    /**
+     * Importa partite salvate come JSON ("Salva file" o "Condividi" di un altro telefono). Le finite vanno nello
+     * storico, le altre tra le partite sospese da riprendere. La stessa partita importata due volte si sovrascrive.
+     */
+    fun importMatches(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val s = strings
+        scope.launch {
+            val (done, open) = withContext(io) {
+                var done = 0
+                var open = 0
+                for (uri in uris) {
+                    val rec = runCatching {
+                        val text = app.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: return@runCatching null
+                        storage.json.decodeFromString(MatchRecord.serializer(), text)
+                    }.getOrNull() ?: continue
+                    val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
+                    if (state.isFinished) {
+                        storage.saveFinished(rec.copy(finished = true, suspended = false))
+                        done++
+                    } else {
+                        storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
+                        open++
+                    }
+                }
+                done to open
+            }
+            _toasts.tryEmit(if (done + open == 0) s.historyImportFailed else s.historyImported(done, open))
+            refreshHistory()
+            refreshSaved()
+        }
     }
 
     // ---------------------------------------------------------------- tempi
@@ -1117,7 +1194,10 @@ class MatchController(
             if (it.record.id == id) {
                 val rec = it.record.copy(location = loc)
                 summary.value = it.copy(record = rec)
-                scope.launch(io) { storage.saveLastFinished(rec) }
+                scope.launch(io) {
+                    storage.saveFinished(rec)
+                    storage.saveLastFinished(rec)
+                }
             }
         }
     }
@@ -1222,7 +1302,7 @@ class MatchController(
         storage.historyTree = uri?.toString()
     }
 
-    /** Salva nello storico con nome e cartella scelti dall'utente. */
+    /** "Salva file": testo, JSON o immagine con nome e cartella scelti dall'utente. */
     fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean) {
         val sm = summary.value ?: return
         val s = strings
@@ -1259,18 +1339,12 @@ class MatchController(
                     }
                 }.getOrNull()
             }
-            if (where != null) summaryKept.value = true
             _toasts.tryEmit(if (where != null) s.savedTo(where) else s.saveError)
         }
     }
 
     private fun withSuffix(file: String, suffix: String) =
         if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
-
-    /** Il riepilogo è stato condiviso: c'è una copia fuori dall'app. */
-    fun markSummaryKept() {
-        summaryKept.value = true
-    }
 
     /** Immagine + testo del risultato da condividere sui social. */
     fun shareIntent(): Intent? {
@@ -1345,7 +1419,7 @@ class MatchController(
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
-        summaryKept.value = false
+        summaryFromHistory.value = false
         screen.value = Screen.SUMMARY
     }
 

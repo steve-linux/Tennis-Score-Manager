@@ -380,9 +380,22 @@ interface Strings {
     val gamesWon: String
     val result: String
     val saveHistory: String
+    val historyTitle: String
+    val historySubtitle: String
+    val historyImport: String
+    val historyMatches: String
+    val historyPlayers: String
+    val historyEmpty: String
+    val historyPlayersEmpty: String
+    /** "Vinte 3 · perse 1" */
+    val historyRecord: (Int, Int) -> String
+    val historyHeadToHead: String
+    val historyDeleteTitle: String
+    val historyDeleteText: String
+    /** Partite importate: nello storico e tra le sospese. */
+    val historyImported: (Int, Int) -> String
+    val historyImportFailed: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
-    val summaryLeaveTitle: String
-    val summaryLeaveText: String
     val share: String
     val saveDialogTitle: String
     val fileName: String
@@ -814,11 +827,22 @@ object ItStrings : Strings {
     override val pointsWon = "Punti vinti"
     override val gamesWon = "Game vinti"
     override val result = "Risultato"
-    override val saveHistory = "Salva nello storico"
-    override val summaryLeaveTitle = "Riepilogo non salvato"
-    override val summaryLeaveText = "Non hai salvato né condiviso il riepilogo della partita: dopo non potrai più rivederlo."
+    override val saveHistory = "Salva file"
+    override val historyTitle = "Storico"
+    override val historySubtitle = "Partite finite salvate su questo telefono"
+    override val historyImport = "Importa"
+    override val historyMatches = "Partite"
+    override val historyPlayers = "Giocatori"
+    override val historyEmpty = "Ancora nessuna partita finita. Ogni partita conclusa entra qui da sola; con «Importa» aggiungi quelle salvate come JSON su un altro telefono."
+    override val historyPlayersEmpty = "I giocatori compaiono qui quando finisci una partita coi loro nomi scritti a pagina 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Vinte $w · perse $l" }
+    override val historyHeadToHead = "Scontri diretti"
+    override val historyDeleteTitle = "Eliminare la partita?"
+    override val historyDeleteText = "La partita sparisce dallo storico di questo telefono. I file già salvati o condivisi restano."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importate: $d nello storico, $o tra le partite sospese" }
+    override val historyImportFailed = "Nessuna partita importata: scegli i file JSON salvati dall'app."
     override val share = "Condividi"
-    override val saveDialogTitle = "Salva nello storico"
+    override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
     override val folder = "Cartella"
     override val chooseFolder = "Scegli cartella"
@@ -1237,11 +1261,22 @@ object EnStrings : Strings {
     override val pointsWon = "Points won"
     override val gamesWon = "Games won"
     override val result = "Result"
-    override val saveHistory = "Save to history"
-    override val summaryLeaveTitle = "Summary not saved"
-    override val summaryLeaveText = "You have neither saved nor shared the match summary: you won't be able to see it again."
+    override val saveHistory = "Save files"
+    override val historyTitle = "History"
+    override val historySubtitle = "Finished matches saved on this phone"
+    override val historyImport = "Import"
+    override val historyMatches = "Matches"
+    override val historyPlayers = "Players"
+    override val historyEmpty = "No finished matches yet. Every match you finish lands here by itself; with “Import” you add matches saved as JSON on another phone."
+    override val historyPlayersEmpty = "Players show up here when you finish a match with their names written on page 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Won $w · lost $l" }
+    override val historyHeadToHead = "Head to head"
+    override val historyDeleteTitle = "Delete the match?"
+    override val historyDeleteText = "The match disappears from this phone's history. Files already saved or shared stay."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Imported: $d into history, $o into suspended matches" }
+    override val historyImportFailed = "No match imported: pick JSON files saved by the app."
     override val share = "Share"
-    override val saveDialogTitle = "Save to history"
+    override val saveDialogTitle = "Save files"
     override val fileName = "Name"
     override val folder = "Folder"
     override val chooseFolder = "Choose folder"

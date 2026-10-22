@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SportsTennis
@@ -27,6 +29,7 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,9 +38,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,7 +55,6 @@ import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
-import android.content.Intent
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -76,6 +79,14 @@ fun SetupScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
+        },
+        action = {
+            Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
+                    Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         },
     ) {
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).

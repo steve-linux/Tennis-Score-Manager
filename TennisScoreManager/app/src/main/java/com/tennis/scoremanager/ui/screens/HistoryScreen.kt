@@ -1,0 +1,185 @@
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+
+/**
+ * Storico: le partite finite salvate sul telefono e i giocatori, riconosciuti dal nome, con vittorie, sconfitte
+ * e scontri diretti. Da qui si importano anche partite salvate come JSON su un altro telefono.
+ */
+@Composable
+fun HistoryScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val matches by c.history.collectAsState()
+    /** 0 = partite, 1 = giocatori. */
+    var tab by rememberSaveable { mutableStateOf(0) }
+    /** Giocatore aperto (chiave del nome); null = elenco. */
+    var player by rememberSaveable { mutableStateOf<String?>(null) }
+    val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
+    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
+    LaunchedEffect(Unit) { c.refreshHistory() }
+    BackHandler { if (player != null) player = null else c.go(Screen.SETUP) }
+
+    ScreenScaffold(
+        title = s.historyTitle,
+        subtitle = s.historySubtitle,
+        icon = Icons.Filled.History,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.go(Screen.SETUP) },
+                Modifier.weight(1f))
+            BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+                Modifier.weight(1f))
+        },
+    ) {
+        val open = player
+        if (open != null) {
+            PlayerDetail(c, played, matches, open)
+            return@ScreenScaffold
+        }
+        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers)), selected = tab, onSelect = { tab = it })
+        if (tab == 0) {
+            if (matches.isEmpty()) Text(s.historyEmpty, color = TsmColors.TextDim)
+            matches.forEach { MatchRow(it) { c.openFromHistory(it) } }
+        } else {
+            val players = remember(played) { PlayerStats.players(played) }
+            if (players.isEmpty()) Text(s.historyPlayersEmpty, color = TsmColors.TextDim)
+            players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
+        }
+    }
+}
+
+@Composable
+private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, matches: List<LiveMatch>, key: String) {
+    val s = LocalStrings.current
+    val p = remember(played, key) { PlayerStats.players(played).firstOrNull { it.key == key } }
+    val rivals = remember(played, key) { PlayerStats.rivals(played, key) }
+    val mine = remember(matches, key) { matches.filter { PlayerStats.sideOf(it.record, key) != null } }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
+        if (p != null) {
+            val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
+            Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+    }
+    if (rivals.isNotEmpty()) {
+        Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        rivals.forEach { r -> PlayerRow(r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
+    }
+    Text(s.historyMatches, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+    mine.forEach { MatchRow(it) { c.openFromHistory(it) } }
+}
+
+/** Una partita: data e formato, i due lati (il vincitore colorato) e il punteggio dal punto di vista di chi ha vinto. */
+@Composable
+private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
+    val s = LocalStrings.current
+    val rec = m.record
+    val names = remember(rec.id, s) { Names(rec.setup, s) }
+    val w = m.state.winner
+    val lang = rec.options.lang
+    Row(
+        Modifier.fillMaxWidth().height(IntrinsicSize.Min).clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.width(5.dp).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(w?.let { TsmColors.player(it) } ?: TsmColors.Outline))
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                "${Reports.date(rec.startedAt ?: rec.updatedAt, lang)} · ${Reports.formatLabel(rec, s)}",
+                color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            for (side in Side.entries) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        names.short(side), color = TsmColors.player(side), fontSize = 16.sp,
+                        fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
+                    )
+                    if (side == w) {
+                        Spacer(Modifier.width(6.dp))
+                        Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.Ball, modifier = Modifier.padding(top = 1.dp).width(16.dp))
+                    }
+                }
+            }
+            if (w != null) Text(Reports.scoreLine(m.state, w), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        }
+        Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
+    }
+}
+
+@Composable
+private fun PlayerRow(name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+            .then(if (chevron) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.Person, null, tint = TsmColors.Ball)
+        Spacer(Modifier.width(10.dp))
+        Text(name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Text(record, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (chevron) Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
+    }
+}

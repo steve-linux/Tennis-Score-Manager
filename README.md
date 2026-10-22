@@ -57,6 +57,7 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Schermata di ricarica del braccialetto | `TSM_Band.ino` (`pollPower`, `drawCharge`) |
 | Riconoscimento dei colpi (firmware 2.4) | `TSM_Band.ino` (sezione "colpi": FIFO del BMI270, calibrazione), `swing_detector.*` e `stroke_classifier.*` (copiati da SwingSense); app: `ble/BandProtocol.kt` (`STROKE`, `parseStroke`), `ui/BandSettingsPanel.kt` (`StrokesSection`) |
 | Statistiche e cronologia punto per punto del riepilogo | `app/.../data/MatchStats.kt` (+ test), `ui/screens/MatchStatsPanels.kt` |
+| Storico, giocatori e importazione dei JSON | `app/.../data/PlayerStats.kt` (+ test), `data/Storage.kt` (`saveFinished`), `ui/screens/HistoryScreen.kt`, `MatchController.kt` (`importMatches`) |
 | Scheda F-Droid (descrizioni, novità di ogni versione) | `fastlane/metadata/android/<lingua>/`, `changelogs/<versionCode>.txt` |
 
 ## Licenza

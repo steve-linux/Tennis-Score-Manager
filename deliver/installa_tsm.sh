@@ -834,7 +834,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.OutputStream
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -897,8 +897,10 @@ class MatchController(
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
-    /** Riepilogo salvato nello storico o condiviso: "Nuova partita" ed "Esci" non chiedono conferma. */
-    val summaryKept = MutableStateFlow(false)
+    /** Storico: partite finite salvate sul telefono, dalla più recente. */
+    val history = MutableStateFlow<List<LiveMatch>>(emptyList())
+    /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
+    val summaryFromHistory = MutableStateFlow(false)
     val voiceProgress = MutableStateFlow<Pair<Int, Int>?>(null)
     /** File generati dal TTS e registrazioni personalizzate presenti per la lingua corrente. */
     val voiceCount = MutableStateFlow(0)
@@ -1697,11 +1699,12 @@ class MatchController(
         runningSince = null
         scope.launch(io) {
             storage.deleteMatch(rec.id)
+            storage.saveFinished(rec)
             storage.saveLastFinished(rec)
         }
         // Se Android chiude il processo sul riepilogo (es. mentre si condivide) lo si riapre: vedi onActivityCreated.
         storage.summaryOpen = rec.id
-        summaryKept.value = false
+        summaryFromHistory.value = false
         summary.value = LiveMatch(rec, lm.state)
         live.value = null
         endDialog.value = false
@@ -1778,6 +1781,80 @@ class MatchController(
 
     fun refreshSaved() {
         scope.launch { saved.value = withContext(io) { storage.loadUnfinished() } }
+    }
+
+    // ---------------------------------------------------------------- storico
+
+    fun openHistory() {
+        refreshHistory()
+        screen.value = Screen.HISTORY
+    }
+
+    fun refreshHistory() {
+        scope.launch {
+            history.value = withContext(io) {
+                // Prima dello storico l'app teneva solo l'ultima partita finita: entra anche lei.
+                storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
+                storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
+            }
+        }
+    }
+
+    fun openFromHistory(m: LiveMatch) {
+        summary.value = m
+        summaryFromHistory.value = true
+        screen.value = Screen.SUMMARY
+    }
+
+    /** "Indietro" dal riepilogo aperto dallo storico. */
+    fun backToHistory() {
+        summary.value = null
+        summaryFromHistory.value = false
+        openHistory()
+    }
+
+    fun deleteFromHistory(id: String) {
+        scope.launch {
+            withContext(io) {
+                storage.deleteFinished(id)
+                // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
+                if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
+            }
+            if (summary.value?.record?.id == id) backToHistory() else refreshHistory()
+        }
+    }
+
+    /**
+     * Importa partite salvate come JSON ("Salva file" o "Condividi" di un altro telefono). Le finite vanno nello
+     * storico, le altre tra le partite sospese da riprendere. La stessa partita importata due volte si sovrascrive.
+     */
+    fun importMatches(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val s = strings
+        scope.launch {
+            val (done, open) = withContext(io) {
+                var done = 0
+                var open = 0
+                for (uri in uris) {
+                    val rec = runCatching {
+                        val text = app.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } ?: return@runCatching null
+                        storage.json.decodeFromString(MatchRecord.serializer(), text)
+                    }.getOrNull() ?: continue
+                    val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
+                    if (state.isFinished) {
+                        storage.saveFinished(rec.copy(finished = true, suspended = false))
+                        done++
+                    } else {
+                        storage.saveMatch(rec.copy(finished = false, suspended = true, updatedAt = System.currentTimeMillis()))
+                        open++
+                    }
+                }
+                done to open
+            }
+            _toasts.tryEmit(if (done + open == 0) s.historyImportFailed else s.historyImported(done, open))
+            refreshHistory()
+            refreshSaved()
+        }
     }
 
     // ---------------------------------------------------------------- tempi
@@ -1873,7 +1950,10 @@ class MatchController(
             if (it.record.id == id) {
                 val rec = it.record.copy(location = loc)
                 summary.value = it.copy(record = rec)
-                scope.launch(io) { storage.saveLastFinished(rec) }
+                scope.launch(io) {
+                    storage.saveFinished(rec)
+                    storage.saveLastFinished(rec)
+                }
             }
         }
     }
@@ -1978,7 +2058,7 @@ class MatchController(
         storage.historyTree = uri?.toString()
     }
 
-    /** Salva nello storico con nome e cartella scelti dall'utente. */
+    /** "Salva file": testo, JSON o immagine con nome e cartella scelti dall'utente. */
     fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean) {
         val sm = summary.value ?: return
         val s = strings
@@ -2015,18 +2095,12 @@ class MatchController(
                     }
                 }.getOrNull()
             }
-            if (where != null) summaryKept.value = true
             _toasts.tryEmit(if (where != null) s.savedTo(where) else s.saveError)
         }
     }
 
     private fun withSuffix(file: String, suffix: String) =
         if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
-
-    /** Il riepilogo è stato condiviso: c'è una copia fuori dall'app. */
-    fun markSummaryKept() {
-        summaryKept.value = true
-    }
 
     /** Immagine + testo del risultato da condividere sui social. */
     fun shareIntent(): Intent? {
@@ -2101,7 +2175,7 @@ class MatchController(
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
-        summaryKept.value = false
+        summaryFromHistory.value = false
         screen.value = Screen.SUMMARY
     }
 
@@ -3876,6 +3950,77 @@ class Names(private val setup: SetupData, private val strings: Strings) : CallNa
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Side
+import java.util.Locale
+
+/**
+ * Giocatori dello storico, riconosciuti dal nome scritto nella pagina 1 (maiuscole e spazi non contano).
+ * I nomi lasciati vuoti ("Giocatore 1") non diventano giocatori. Nel doppio ogni giocatore conta per sé:
+ * vince o perde con la sua coppia e ha come avversari i due dell'altra.
+ */
+object PlayerStats {
+
+    /** Una partita dello storico col suo vincitore (null = non finita). */
+    data class Played(val rec: MatchRecord, val winner: Side?)
+
+    data class Player(val key: String, val name: String, val played: Int, val won: Int) {
+        val lost: Int get() = played - won
+    }
+
+    /** Scontri diretti con un avversario: partite vinte e perse contro di lui. */
+    data class Rival(val key: String, val name: String, val won: Int, val lost: Int)
+
+    fun key(name: String): String = name.trim().lowercase(Locale.ROOT)
+
+    /** Nomi scritti di un lato: uno nel singolare, fino a due nel doppio. */
+    fun names(setup: SetupData, side: Side): List<String> {
+        val all = if (side == Side.P1) listOf(setup.p1a, setup.p1b) else listOf(setup.p2a, setup.p2b)
+        return all.take(if (setup.doubles) 2 else 1).map { it.trim() }.filter { it.isNotEmpty() }
+    }
+
+    fun sideOf(rec: MatchRecord, key: String): Side? =
+        Side.entries.firstOrNull { side -> names(rec.setup, side).any { key(it) == key } }
+
+    /** Giocatori dalle partite finite, dal più presente; il nome è scritto come nella partita più recente. */
+    fun players(matches: List<Played>): List<Player> {
+        val out = LinkedHashMap<String, Player>()
+        for (m in matches.filter { it.winner != null }.sortedByDescending { it.rec.endedAt ?: it.rec.updatedAt }) {
+            for (side in Side.entries) {
+                for (n in names(m.rec.setup, side)) {
+                    val k = key(n)
+                    val p = out[k] ?: Player(k, n, 0, 0)
+                    out[k] = p.copy(played = p.played + 1, won = p.won + if (m.winner == side) 1 else 0)
+                }
+            }
+        }
+        return out.values.sortedWith(compareByDescending<Player> { it.played }.thenBy { it.name.lowercase(Locale.ROOT) })
+    }
+
+    fun matchesOf(matches: List<Played>, key: String): List<Played> = matches.filter { sideOf(it.rec, key) != null }
+
+    /** Avversari di [key] con vittorie e sconfitte, da chi ci ha giocato di più. */
+    fun rivals(matches: List<Played>, key: String): List<Rival> {
+        val out = LinkedHashMap<String, Rival>()
+        for (m in matchesOf(matches, key).filter { it.winner != null }.sortedByDescending { it.rec.endedAt ?: it.rec.updatedAt }) {
+            val me = sideOf(m.rec, key) ?: continue
+            for (n in names(m.rec.setup, me.other)) {
+                val k = key(n)
+                val r = out[k] ?: Rival(k, n, 0, 0)
+                out[k] = if (m.winner == me) r.copy(won = r.won + 1) else r.copy(lost = r.lost + 1)
+            }
+        }
+        return out.values.sortedWith(compareByDescending<Rival> { it.won + it.lost }.thenBy { it.name.lowercase(Locale.ROOT) })
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Reports.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Reports.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -4173,6 +4318,8 @@ class Storage(context: Context) {
 
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
+    /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
+    private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
     var setup: SetupData
         get() = read(prefs.getString("setup", null)) ?: SetupData()
@@ -4261,6 +4408,36 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteMatch(id: String) {
         File(matchesDir, "$id.json").delete()
+    }
+
+    @Synchronized
+    fun saveFinished(rec: MatchRecord) {
+        runCatching {
+            val f = File(finishedDir, "${rec.id}.json")
+            val tmp = File(finishedDir, "${rec.id}.tmp")
+            tmp.writeText(json.encodeToString(MatchRecord.serializer(), rec))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio nello storico fallito", it) }
+    }
+
+    /** Partite dello storico, dalla più recente. */
+    fun loadFinished(): List<MatchRecord> =
+        finishedDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.endedAt ?: it.updatedAt }
+
+    fun hasFinished(id: String): Boolean = File(finishedDir, "$id.json").exists()
+
+    @Synchronized
+    fun deleteFinished(id: String) {
+        File(finishedDir, "$id.json").delete()
+    }
+
+    fun clearLastFinished() {
+        lastFinishedFile.delete()
     }
 
     fun saveLastFinished(rec: MatchRecord) {
@@ -6769,21 +6946,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -6791,15 +6966,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -6807,20 +6990,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.delay
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.ui.screens.HistoryScreen
 import com.tennis.scoremanager.ui.screens.MatchScreen
 import com.tennis.scoremanager.ui.screens.OptionsScreen
 import com.tennis.scoremanager.ui.screens.SetupScreen
 import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun AppRoot(c: MatchController) {
@@ -6859,6 +7037,7 @@ fun AppRoot(c: MatchController) {
                 Screen.START -> StartScreen(c)
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
+                Screen.HISTORY -> HistoryScreen(c)
             }
         }
     }
@@ -6917,6 +7096,8 @@ fun ScreenScaffold(
     subtitle: String?,
     icon: ImageVector,
     bottomBar: @Composable RowScope.() -> Unit,
+    /** Pulsante facoltativo a destra del titolo. */
+    action: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
@@ -6926,9 +7107,13 @@ fun ScreenScaffold(
                 contentAlignment = Alignment.Center,
             ) { Icon(icon, null, tint = TsmColors.OnBall) }
             Spacer(Modifier.width(12.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = TsmColors.TextDim)
+            }
+            if (action != null) {
+                Spacer(Modifier.width(8.dp))
+                action()
             }
         }
         Column(
@@ -7570,9 +7755,22 @@ interface Strings {
     val gamesWon: String
     val result: String
     val saveHistory: String
+    val historyTitle: String
+    val historySubtitle: String
+    val historyImport: String
+    val historyMatches: String
+    val historyPlayers: String
+    val historyEmpty: String
+    val historyPlayersEmpty: String
+    /** "Vinte 3 · perse 1" */
+    val historyRecord: (Int, Int) -> String
+    val historyHeadToHead: String
+    val historyDeleteTitle: String
+    val historyDeleteText: String
+    /** Partite importate: nello storico e tra le sospese. */
+    val historyImported: (Int, Int) -> String
+    val historyImportFailed: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
-    val summaryLeaveTitle: String
-    val summaryLeaveText: String
     val share: String
     val saveDialogTitle: String
     val fileName: String
@@ -8004,11 +8202,22 @@ object ItStrings : Strings {
     override val pointsWon = "Punti vinti"
     override val gamesWon = "Game vinti"
     override val result = "Risultato"
-    override val saveHistory = "Salva nello storico"
-    override val summaryLeaveTitle = "Riepilogo non salvato"
-    override val summaryLeaveText = "Non hai salvato né condiviso il riepilogo della partita: dopo non potrai più rivederlo."
+    override val saveHistory = "Salva file"
+    override val historyTitle = "Storico"
+    override val historySubtitle = "Partite finite salvate su questo telefono"
+    override val historyImport = "Importa"
+    override val historyMatches = "Partite"
+    override val historyPlayers = "Giocatori"
+    override val historyEmpty = "Ancora nessuna partita finita. Ogni partita conclusa entra qui da sola; con «Importa» aggiungi quelle salvate come JSON su un altro telefono."
+    override val historyPlayersEmpty = "I giocatori compaiono qui quando finisci una partita coi loro nomi scritti a pagina 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Vinte $w · perse $l" }
+    override val historyHeadToHead = "Scontri diretti"
+    override val historyDeleteTitle = "Eliminare la partita?"
+    override val historyDeleteText = "La partita sparisce dallo storico di questo telefono. I file già salvati o condivisi restano."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importate: $d nello storico, $o tra le partite sospese" }
+    override val historyImportFailed = "Nessuna partita importata: scegli i file JSON salvati dall'app."
     override val share = "Condividi"
-    override val saveDialogTitle = "Salva nello storico"
+    override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
     override val folder = "Cartella"
     override val chooseFolder = "Scegli cartella"
@@ -8427,11 +8636,22 @@ object EnStrings : Strings {
     override val pointsWon = "Points won"
     override val gamesWon = "Games won"
     override val result = "Result"
-    override val saveHistory = "Save to history"
-    override val summaryLeaveTitle = "Summary not saved"
-    override val summaryLeaveText = "You have neither saved nor shared the match summary: you won't be able to see it again."
+    override val saveHistory = "Save files"
+    override val historyTitle = "History"
+    override val historySubtitle = "Finished matches saved on this phone"
+    override val historyImport = "Import"
+    override val historyMatches = "Matches"
+    override val historyPlayers = "Players"
+    override val historyEmpty = "No finished matches yet. Every match you finish lands here by itself; with “Import” you add matches saved as JSON on another phone."
+    override val historyPlayersEmpty = "Players show up here when you finish a match with their names written on page 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Won $w · lost $l" }
+    override val historyHeadToHead = "Head to head"
+    override val historyDeleteTitle = "Delete the match?"
+    override val historyDeleteText = "The match disappears from this phone's history. Files already saved or shared stay."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Imported: $d into history, $o into suspended matches" }
+    override val historyImportFailed = "No match imported: pick JSON files saved by the app."
     override val share = "Share"
-    override val saveDialogTitle = "Save to history"
+    override val saveDialogTitle = "Save files"
     override val fileName = "Name"
     override val folder = "Folder"
     override val chooseFolder = "Choose folder"
@@ -8873,11 +9093,22 @@ object DeStrings : Strings {
     override val pointsWon = "Gewonnene Punkte"
     override val gamesWon = "Gewonnene Spiele"
     override val result = "Ergebnis"
-    override val saveHistory = "Im Verlauf speichern"
-    override val summaryLeaveTitle = "Zusammenfassung nicht gespeichert"
-    override val summaryLeaveText = "Die Zusammenfassung des Matches wurde weder gespeichert noch geteilt: Danach ist sie nicht mehr abrufbar."
+    override val saveHistory = "Dateien speichern"
+    override val historyTitle = "Verlauf"
+    override val historySubtitle = "Beendete Matches auf diesem Telefon"
+    override val historyImport = "Importieren"
+    override val historyMatches = "Matches"
+    override val historyPlayers = "Spieler"
+    override val historyEmpty = "Noch keine beendeten Matches. Jedes beendete Match landet von selbst hier; mit „Importieren“ fügst du Matches hinzu, die auf einem anderen Telefon als JSON gespeichert wurden."
+    override val historyPlayersEmpty = "Spieler erscheinen hier, wenn du ein Match mit ihren auf Seite 1 eingetragenen Namen beendest."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Gewonnen $w · verloren $l" }
+    override val historyHeadToHead = "Direkter Vergleich"
+    override val historyDeleteTitle = "Match löschen?"
+    override val historyDeleteText = "Das Match verschwindet aus dem Verlauf dieses Telefons. Bereits gespeicherte oder geteilte Dateien bleiben."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importiert: $d in den Verlauf, $o zu den unterbrochenen Matches" }
+    override val historyImportFailed = "Kein Match importiert: wähle JSON-Dateien, die die App gespeichert hat."
     override val share = "Teilen"
-    override val saveDialogTitle = "Im Verlauf speichern"
+    override val saveDialogTitle = "Dateien speichern"
     override val fileName = "Name"
     override val folder = "Ordner"
     override val chooseFolder = "Ordner wählen"
@@ -9312,11 +9543,22 @@ object EsStrings : Strings {
     override val pointsWon = "Puntos ganados"
     override val gamesWon = "Juegos ganados"
     override val result = "Resultado"
-    override val saveHistory = "Guardar en el historial"
-    override val summaryLeaveTitle = "Resumen no guardado"
-    override val summaryLeaveText = "No has guardado ni compartido el resumen del partido: después ya no podrás volver a verlo."
+    override val saveHistory = "Guardar archivos"
+    override val historyTitle = "Historial"
+    override val historySubtitle = "Partidos terminados guardados en este teléfono"
+    override val historyImport = "Importar"
+    override val historyMatches = "Partidos"
+    override val historyPlayers = "Jugadores"
+    override val historyEmpty = "Aún no hay partidos terminados. Cada partido que terminas llega aquí solo; con «Importar» añades los guardados como JSON en otro teléfono."
+    override val historyPlayersEmpty = "Los jugadores aparecen aquí cuando terminas un partido con sus nombres escritos en la página 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Ganados $w · perdidos $l" }
+    override val historyHeadToHead = "Cara a cara"
+    override val historyDeleteTitle = "¿Eliminar el partido?"
+    override val historyDeleteText = "El partido desaparece del historial de este teléfono. Los archivos ya guardados o compartidos se quedan."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importados: $d al historial, $o a los partidos suspendidos" }
+    override val historyImportFailed = "Ningún partido importado: elige archivos JSON guardados por la app."
     override val share = "Compartir"
-    override val saveDialogTitle = "Guardar en el historial"
+    override val saveDialogTitle = "Guardar archivos"
     override val fileName = "Nombre"
     override val folder = "Carpeta"
     override val chooseFolder = "Elegir carpeta"
@@ -9753,11 +9995,22 @@ object FrStrings : Strings {
     override val pointsWon = "Points gagnés"
     override val gamesWon = "Jeux gagnés"
     override val result = "Résultat"
-    override val saveHistory = "Enregistrer dans l'historique"
-    override val summaryLeaveTitle = "Résumé non enregistré"
-    override val summaryLeaveText = "Vous n'avez ni enregistré ni partagé le résumé du match : vous ne pourrez plus le revoir."
+    override val saveHistory = "Enregistrer les fichiers"
+    override val historyTitle = "Historique"
+    override val historySubtitle = "Matchs terminés enregistrés sur ce téléphone"
+    override val historyImport = "Importer"
+    override val historyMatches = "Matchs"
+    override val historyPlayers = "Joueurs"
+    override val historyEmpty = "Aucun match terminé pour l'instant. Chaque match fini arrive ici tout seul ; avec « Importer » vous ajoutez ceux enregistrés en JSON sur un autre téléphone."
+    override val historyPlayersEmpty = "Les joueurs apparaissent ici quand vous finissez un match avec leurs noms écrits en page 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Gagnés $w · perdus $l" }
+    override val historyHeadToHead = "Face-à-face"
+    override val historyDeleteTitle = "Supprimer le match ?"
+    override val historyDeleteText = "Le match disparaît de l'historique de ce téléphone. Les fichiers déjà enregistrés ou partagés restent."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importés : $d dans l'historique, $o dans les matchs suspendus" }
+    override val historyImportFailed = "Aucun match importé : choisissez des fichiers JSON enregistrés par l'appli."
     override val share = "Partager"
-    override val saveDialogTitle = "Enregistrer dans l'historique"
+    override val saveDialogTitle = "Enregistrer les fichiers"
     override val fileName = "Nom"
     override val folder = "Dossier"
     override val chooseFolder = "Choisir un dossier"
@@ -10195,11 +10448,22 @@ object PtStrings : Strings {
     override val pointsWon = "Pontos ganhos"
     override val gamesWon = "Jogos ganhos"
     override val result = "Resultado"
-    override val saveHistory = "Salvar no histórico"
-    override val summaryLeaveTitle = "Resumo não salvo"
-    override val summaryLeaveText = "Você não salvou nem compartilhou o resumo da partida: depois não poderá mais vê-lo."
+    override val saveHistory = "Salvar arquivos"
+    override val historyTitle = "Histórico"
+    override val historySubtitle = "Partidas terminadas salvas neste telefone"
+    override val historyImport = "Importar"
+    override val historyMatches = "Partidas"
+    override val historyPlayers = "Jogadores"
+    override val historyEmpty = "Ainda nenhuma partida terminada. Cada partida que você termina entra aqui sozinha; com “Importar” você adiciona as salvas como JSON em outro telefone."
+    override val historyPlayersEmpty = "Os jogadores aparecem aqui quando você termina uma partida com os nomes escritos na página 1."
+    override val historyRecord: (Int, Int) -> String = { w, l -> "Vencidas $w · perdidas $l" }
+    override val historyHeadToHead = "Confronto direto"
+    override val historyDeleteTitle = "Excluir a partida?"
+    override val historyDeleteText = "A partida some do histórico deste telefone. Os arquivos já salvos ou compartilhados ficam."
+    override val historyImported: (Int, Int) -> String = { d, o -> "Importadas: $d no histórico, $o nas partidas suspensas" }
+    override val historyImportFailed = "Nenhuma partida importada: escolha arquivos JSON salvos pelo app."
     override val share = "Compartilhar"
-    override val saveDialogTitle = "Salvar no histórico"
+    override val saveDialogTitle = "Salvar arquivos"
     override val fileName = "Nome"
     override val folder = "Pasta"
     override val chooseFolder = "Escolher pasta"
@@ -10544,6 +10808,195 @@ fun QrCode(text: String, size: Dp) {
         filterQuality = FilterQuality.None,
         modifier = Modifier.size(size).clip(RoundedCornerShape(8.dp)).background(Color.White),
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HistoryScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HistoryScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+
+/**
+ * Storico: le partite finite salvate sul telefono e i giocatori, riconosciuti dal nome, con vittorie, sconfitte
+ * e scontri diretti. Da qui si importano anche partite salvate come JSON su un altro telefono.
+ */
+@Composable
+fun HistoryScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val matches by c.history.collectAsState()
+    /** 0 = partite, 1 = giocatori. */
+    var tab by rememberSaveable { mutableStateOf(0) }
+    /** Giocatore aperto (chiave del nome); null = elenco. */
+    var player by rememberSaveable { mutableStateOf<String?>(null) }
+    val played = remember(matches) { matches.map { PlayerStats.Played(it.record, it.state.winner) } }
+    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
+    LaunchedEffect(Unit) { c.refreshHistory() }
+    BackHandler { if (player != null) player = null else c.go(Screen.SETUP) }
+
+    ScreenScaffold(
+        title = s.historyTitle,
+        subtitle = s.historySubtitle,
+        icon = Icons.Filled.History,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.go(Screen.SETUP) },
+                Modifier.weight(1f))
+            BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+                Modifier.weight(1f))
+        },
+    ) {
+        val open = player
+        if (open != null) {
+            PlayerDetail(c, played, matches, open)
+            return@ScreenScaffold
+        }
+        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers)), selected = tab, onSelect = { tab = it })
+        if (tab == 0) {
+            if (matches.isEmpty()) Text(s.historyEmpty, color = TsmColors.TextDim)
+            matches.forEach { MatchRow(it) { c.openFromHistory(it) } }
+        } else {
+            val players = remember(played) { PlayerStats.players(played) }
+            if (players.isEmpty()) Text(s.historyPlayersEmpty, color = TsmColors.TextDim)
+            players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
+        }
+    }
+}
+
+@Composable
+private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, matches: List<LiveMatch>, key: String) {
+    val s = LocalStrings.current
+    val p = remember(played, key) { PlayerStats.players(played).firstOrNull { it.key == key } }
+    val rivals = remember(played, key) { PlayerStats.rivals(played, key) }
+    val mine = remember(matches, key) { matches.filter { PlayerStats.sideOf(it.record, key) != null } }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
+        if (p != null) {
+            val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
+            Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+    }
+    if (rivals.isNotEmpty()) {
+        Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        rivals.forEach { r -> PlayerRow(r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
+    }
+    Text(s.historyMatches, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+    mine.forEach { MatchRow(it) { c.openFromHistory(it) } }
+}
+
+/** Una partita: data e formato, i due lati (il vincitore colorato) e il punteggio dal punto di vista di chi ha vinto. */
+@Composable
+private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
+    val s = LocalStrings.current
+    val rec = m.record
+    val names = remember(rec.id, s) { Names(rec.setup, s) }
+    val w = m.state.winner
+    val lang = rec.options.lang
+    Row(
+        Modifier.fillMaxWidth().height(IntrinsicSize.Min).clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.width(5.dp).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(w?.let { TsmColors.player(it) } ?: TsmColors.Outline))
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                "${Reports.date(rec.startedAt ?: rec.updatedAt, lang)} · ${Reports.formatLabel(rec, s)}",
+                color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            for (side in Side.entries) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        names.short(side), color = TsmColors.player(side), fontSize = 16.sp,
+                        fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
+                    )
+                    if (side == w) {
+                        Spacer(Modifier.width(6.dp))
+                        Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.Ball, modifier = Modifier.padding(top = 1.dp).width(16.dp))
+                    }
+                }
+            }
+            if (w != null) Text(Reports.scoreLine(m.state, w), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        }
+        Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
+    }
+}
+
+@Composable
+private fun PlayerRow(name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
+            .then(if (chevron) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.Person, null, tint = TsmColors.Ball)
+        Spacer(Modifier.width(10.dp))
+        Text(name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Text(record, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (chevron) Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
+    }
 }
 TSM_EOF
 
@@ -12404,6 +12857,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 
 package com.tennis.scoremanager.ui.screens
 
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12420,6 +12874,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SportsTennis
@@ -12428,6 +12883,7 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -12436,9 +12892,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -12452,7 +12909,6 @@ import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
-import android.content.Intent
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -12477,6 +12933,14 @@ fun SetupScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
+        },
+        action = {
+            Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
+                    Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         },
     ) {
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
@@ -12874,10 +13338,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Folder
@@ -12946,13 +13412,10 @@ fun SummaryScreen(c: MatchController) {
     var showSave by remember { mutableStateOf(false) }
     /** 0 = riassunto, 1 = statistiche, 2 = cronologia punto per punto. */
     var tab by remember(rec.id) { mutableStateOf(0) }
-    val kept by c.summaryKept.collectAsState()
-    /** Uscita da confermare: true = "Esci", false = "Nuova partita". */
-    var leaving by remember { mutableStateOf<Boolean?>(null) }
-    fun leave(exit: Boolean) {
-        if (exit) activity?.let { c.exitApp(it) } else c.newMatch()
-    }
-    BackHandler { }
+    val fromHistory by c.summaryFromHistory.collectAsState()
+    var confirmDelete by remember { mutableStateOf(false) }
+    // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
+    BackHandler { if (fromHistory) c.backToHistory() }
 
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         Column(
@@ -13026,29 +13489,34 @@ fun SummaryScreen(c: MatchController) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
                 BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) }.onSuccess { c.markSummaryKept() } }
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
                 }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Senza salvataggio né condivisione il riepilogo si perde: un tocco solo non basta.
-                GhostButton(s.newMatch, Icons.Filled.Replay, { if (kept) leave(false) else leaving = false }, Modifier.weight(1f))
-                GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { if (kept) leave(true) else leaving = true }, Modifier.weight(1f))
+                // La partita finita è già nello storico: uscire non fa perdere niente.
+                if (fromHistory) {
+                    GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.backToHistory() }, Modifier.weight(1f))
+                    GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.weight(1f))
+                } else {
+                    GhostButton(s.newMatch, Icons.Filled.Replay, { c.newMatch() }, Modifier.weight(1f))
+                    GhostButton(s.exit, Icons.AutoMirrored.Filled.ExitToApp, { activity?.let { c.exitApp(it) } }, Modifier.weight(1f))
+                }
             }
         }
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
-    leaving?.let { exit ->
+    if (confirmDelete) {
         ConfirmDialog(
-            icon = if (exit) Icons.AutoMirrored.Filled.ExitToApp else Icons.Filled.Replay,
-            title = s.summaryLeaveTitle,
-            text = s.summaryLeaveText,
-            confirm = if (exit) s.exit else s.newMatch,
+            icon = Icons.Filled.Delete,
+            title = s.historyDeleteTitle,
+            text = s.historyDeleteText,
+            confirm = s.delete,
             onConfirm = {
-                leaving = null
-                leave(exit)
+                confirmDelete = false
+                c.deleteFromHistory(rec.id)
             },
-            onDismiss = { leaving = null },
+            onDismiss = { confirmDelete = false },
         )
     }
 }
@@ -13095,7 +13563,7 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
     }
 }
 
-/** "Salva nello storico": nome del file, cartella scelta dall'utente e formati. */
+/** "Salva file": nome del file, cartella scelta dall'utente e formati. */
 @Composable
 private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
     val s = LocalStrings.current
@@ -15074,6 +15542,78 @@ class MatchStatsTest {
         assertEquals(5.0, MatchStats.rally(pts, set = 0)!!.average, 1e-9)
         assertNull(MatchStats.rally(pts, set = 1))
         assertNull(MatchStats.rally(MatchStats.points(rec(*holdBreakHold))))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class PlayerStatsTest {
+
+    private fun m(p1: String, p2: String, winner: Side?, at: Long, doubles: Boolean = false, p1b: String = "", p2b: String = "") =
+        PlayerStats.Played(
+            MatchRecord(
+                id = "m$at", setup = SetupData(doubles = doubles, p1a = p1, p1b = p1b, p2a = p2, p2b = p2b),
+                options = MatchOptions(), rules = RulesConfig(doubles = doubles), endedAt = at,
+            ),
+            winner,
+        )
+
+    private val all = listOf(
+        m("Rossi", "Bianchi", Side.P1, 1),
+        m("bianchi ", "ROSSI", Side.P1, 2),
+        m("Rossi", "Verdi", Side.P2, 3),
+        // Nomi vuoti: non diventano giocatori.
+        m("", "Rossi", Side.P2, 4),
+        // Non finita: non conta.
+        m("Rossi", "Neri", null, 5),
+    )
+
+    @Test
+    fun playersAreMatchedByNameIgnoringCaseAndSpaces() {
+        val p = PlayerStats.players(all)
+        val rossi = p.first { it.key == "rossi" }
+        assertEquals(4, rossi.played)
+        assertEquals(2, rossi.won)
+        assertEquals(2, rossi.lost)
+        // Il nome si scrive come nella partita più recente.
+        assertEquals("Rossi", rossi.name)
+        assertEquals("bianchi", p.first { it.key == "bianchi" }.name)
+        assertNull(p.firstOrNull { it.key == "neri" })
+        assertEquals("rossi", p.first().key)
+    }
+
+    @Test
+    fun headToHead() {
+        val r = PlayerStats.rivals(all, "rossi")
+        val bianchi = r.first { it.key == "bianchi" }
+        assertEquals(1, bianchi.won)
+        assertEquals(1, bianchi.lost)
+        val verdi = r.first { it.key == "verdi" }
+        assertEquals(0, verdi.won)
+        assertEquals(1, verdi.lost)
+        assertEquals(2, r.size)
+    }
+
+    @Test
+    fun doublesCountEachPlayer() {
+        val d = listOf(m("Rossi", "Verdi", Side.P1, 1, doubles = true, p1b = "Bianchi", p2b = "Neri"))
+        val p = PlayerStats.players(d)
+        assertEquals(4, p.size)
+        assertEquals(1, p.first { it.key == "bianchi" }.won)
+        assertEquals(1, p.first { it.key == "neri" }.lost)
+        assertEquals(listOf("neri", "verdi"), PlayerStats.rivals(d, "bianchi").map { it.key })
     }
 }
 TSM_EOF
@@ -20695,6 +21235,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 78 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 81 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
