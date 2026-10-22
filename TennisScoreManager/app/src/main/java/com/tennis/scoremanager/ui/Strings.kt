@@ -164,6 +164,17 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statGamePointsWon: String
+    val statSetPointsWon: String
+    val statMatchPointsWon: String
+    val statLoveGames: String
+    val statBestGameRun: String
+    val statSetsFromBreakDown: String
+    val statTimes: String
+    val statSetDurations: String
+    val statLongestGame: String
+    /** "12' (14 punti)" */
+    val longestGameValue: (String, Int) -> String
     val statAces: String
     val statDoubleFaults: String
     val statFirstServeIn: String
@@ -329,6 +340,9 @@ interface Strings {
     val gamesHeader: String
     val onServe: String get() = "On Serve"
     val undoPoint: String
+    val lockScreen: String
+    val lockedTitle: String
+    val unlockHint: String
     val suspend: String
     val resume: String
     val audioOn: String
@@ -711,6 +725,16 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statGamePointsWon = "Palle game trasformate"
+    override val statSetPointsWon = "Set point trasformati"
+    override val statMatchPointsWon = "Match point trasformati"
+    override val statLoveGames = "Game vinti a zero"
+    override val statBestGameRun = "Game di fila (max)"
+    override val statSetsFromBreakDown = "Set vinti da sotto di un break"
+    override val statTimes = "Tempi"
+    override val statSetDurations = "Durata dei set"
+    override val statLongestGame = "Game più lungo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n punti)" }
     override val statAces = "Ace"
     override val statDoubleFaults = "Doppi falli"
     override val statFirstServeIn = "Prime di servizio in campo"
@@ -869,6 +893,9 @@ object ItStrings : Strings {
     override val setsHeader = "SET"
     override val gamesHeader = "GAME"
     override val undoPoint = "Annulla punto"
+    override val lockScreen = "Blocca schermo"
+    override val lockedTitle = "Schermo bloccato"
+    override val unlockHint = "Tieni premuto il lucchetto per sbloccare. Braccialetti e telecomandi continuano a funzionare."
     override val suspend = "Sospendi"
     override val resume = "Riprendi"
     override val audioOn = "Audio On"
@@ -1241,6 +1268,16 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statGamePointsWon = "Game points converted"
+    override val statSetPointsWon = "Set points converted"
+    override val statMatchPointsWon = "Match points converted"
+    override val statLoveGames = "Love games won"
+    override val statBestGameRun = "Games in a row (max)"
+    override val statSetsFromBreakDown = "Sets won from a break down"
+    override val statTimes = "Times"
+    override val statSetDurations = "Set durations"
+    override val statLongestGame = "Longest game"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Double faults"
     override val statFirstServeIn = "First serves in"
@@ -1399,6 +1436,9 @@ object EnStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "GAMES"
     override val undoPoint = "Undo point"
+    override val lockScreen = "Lock screen"
+    override val lockedTitle = "Screen locked"
+    override val unlockHint = "Press and hold the lock to unlock. Wristbands and remotes keep working."
     override val suspend = "Suspend"
     override val resume = "Resume"
     override val audioOn = "Audio On"

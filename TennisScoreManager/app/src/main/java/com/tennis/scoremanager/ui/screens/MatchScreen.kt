@@ -15,6 +15,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -66,12 +68,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -130,60 +134,66 @@ fun MatchScreen(c: MatchController) {
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
+    /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
+    var locked by rememberSaveable { mutableStateOf(false) }
 
     BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
 
-    Column(
-        Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        TimersRow(clock, cd, s) { TvChip(c) }
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
-        if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
-        MessageBox(msg)
-        Scoreboard(state, names, s)
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            val playing = !suspended && !state.isFinished
-            if (lm.record.options.detailedStats) {
-                val fault by c.faultPending.collectAsState()
-                DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
-            } else {
-                PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
-            }
-            val detail by c.detailPrompt.collectAsState()
-            detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
-            if (suspended) {
-                Box(
-                    Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
-                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TimersRow(clock, cd, s) { TvChip(c) }
+            if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
+            if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
+            MessageBox(msg)
+            Scoreboard(state, names, s)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                val playing = !suspended && !state.isFinished
+                if (lm.record.options.detailedStats) {
+                    val fault by c.faultPending.collectAsState()
+                    DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
+                } else {
+                    PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
+                }
+                val detail by c.detailPrompt.collectAsState()
+                detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
+                if (suspended) {
+                    Box(
+                        Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
+                            Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                        }
                     }
                 }
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
+                ControlButton(
+                    if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    if (suspended) s.resume else s.suspend,
+                    Modifier.weight(1f),
+                    highlight = suspended,
+                ) { c.toggleSuspend() }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
+                ControlButton(
+                    if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                    null,
+                    Modifier.width(64.dp),
+                    contentDescription = if (o.audio) s.audioOn else s.audioOff,
+                ) { c.toggleAudio() }
+                ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
+                ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+            }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
-            ControlButton(
-                if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
-                if (suspended) s.resume else s.suspend,
-                Modifier.weight(1f),
-                highlight = suspended,
-            ) { c.toggleSuspend() }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
-            ControlButton(
-                if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                null,
-                Modifier.width(64.dp),
-                contentDescription = if (o.audio) s.audioOn else s.audioOff,
-            ) { c.toggleAudio() }
-            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
-            ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
-        }
+        if (locked) LockOverlay(s) { locked = false }
     }
 
     if (confirmExit) {
@@ -581,6 +591,34 @@ private fun DetailedPointButtons(
                         Modifier.weight(0.8f)) { onPoint(side, null) }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Velo sopra la schermata bloccata: il punteggio resta visibile, i tocchi si fermano qui. Si sblocca tenendo
+ * premuto il lucchetto (un tocco solo non basta, così non si sblocca per sbaglio in tasca).
+ */
+@Composable
+private fun LockOverlay(s: Strings, onUnlock: () -> Unit) {
+    var hint by remember { mutableStateOf(false) }
+    Box(
+        Modifier.fillMaxSize().background(Color(0x660B1220)).pointerInput(Unit) { detectTapGestures { hint = true } },
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Column(
+            Modifier.systemBarsPadding().padding(bottom = 24.dp).clip(RoundedCornerShape(24.dp)).background(TsmColors.Surface)
+                .border(2.dp, if (hint) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(24.dp)).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                Modifier.size(72.dp).clip(CircleShape).background(TsmColors.Ball)
+                    .pointerInput(Unit) { detectTapGestures(onTap = { hint = true }, onLongPress = { onUnlock() }) },
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.Lock, s.lockScreen, tint = TsmColors.OnBall, modifier = Modifier.size(36.dp)) }
+            Text(s.lockedTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(s.unlockHint, color = if (hint) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
         }
     }
 }

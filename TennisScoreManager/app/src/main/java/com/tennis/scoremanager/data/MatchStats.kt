@@ -33,6 +33,11 @@ object MatchStats {
         val strokes: Int?,
         val kind: PointKind? = null,
         val secondServe: Boolean = false,
+        /** Ora del punto (0 nelle partite salvate senza). */
+        val at: Long = 0L,
+        /** Chi aveva palla game, set point (match point compreso) prima del punto. */
+        val gamePointFor: Side? = null,
+        val setPointFor: Side? = null,
     )
 
     fun points(rec: MatchRecord): List<PlayedPoint> {
@@ -54,6 +59,12 @@ object MatchStats {
                     strokes = e.strokes,
                     kind = e.kind,
                     secondServe = e.secondServe,
+                    at = e.at,
+                    // Palla game solo nei game normali: nel tie-break il punto che chiude è set point.
+                    gamePointFor = Side.entries.firstOrNull {
+                        s.tiebreak == TiebreakKind.NONE && ScoreEngine.lookahead(s, it)?.gameWinner == it
+                    },
+                    setPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.setWinner == it },
                 )
             }
             s = step.state
@@ -95,6 +106,18 @@ object MatchStats {
         val errors: Int = 0,
         val unforcedErrors: Int = 0,
         val forcedErrors: Int = 0,
+        // Come le pagine dei risultati: palle trasformate, game a zero, rimonte, game di fila
+        val loveGames: Int = 0,
+        val gamePointsWon: Int = 0,
+        val gamePoints: Int = 0,
+        val setPointsWon: Int = 0,
+        val setPoints: Int = 0,
+        val matchPointsWon: Int = 0,
+        val matchPoints: Int = 0,
+        /** Set vinti dopo essere stati sotto di almeno due game (un break). */
+        val setsFromBreakDown: Int = 0,
+        /** Game vinti di fila (il massimo nel periodo). */
+        val bestGameRun: Int = 0,
     )
 
     /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
@@ -150,7 +173,85 @@ object MatchStats {
             errors = pts.count { it.kind?.isError == true && it.winner != me },
             unforcedErrors = pts.count { it.kind == PointKind.UNFORCED_ERROR && it.winner != me },
             forcedErrors = pts.count { it.kind == PointKind.FORCED_ERROR && it.winner != me },
+            loveGames = loveGames(pts, me),
+            gamePointsWon = pts.count { it.gamePointFor == me && it.winner == me },
+            gamePoints = pts.count { it.gamePointFor == me },
+            setPointsWon = pts.count { it.setPointFor == me && it.matchPointFor != me && it.winner == me },
+            setPoints = pts.count { it.setPointFor == me && it.matchPointFor != me },
+            matchPointsWon = pts.count { it.matchPointFor == me && it.winner == me },
+            matchPoints = pts.count { it.matchPointFor == me },
+            setsFromBreakDown = setsFromBreakDown(pts, me),
+            bestGameRun = bestRun(games.map { it.gameWinner }, me),
         )
+    }
+
+    /** Game normali vinti senza perdere un punto. */
+    private fun loveGames(pts: List<PlayedPoint>, me: Side): Int {
+        var lost = 0
+        var n = 0
+        for (p in pts) {
+            if (p.tiebreak != TiebreakKind.NONE) continue
+            if (p.winner != me) lost++
+            if (p.gameWinner != null) {
+                if (p.gameWinner == me && lost == 0) n++
+                lost = 0
+            }
+        }
+        return n
+    }
+
+    private fun bestRun(winners: List<Side?>, me: Side): Int {
+        var run = 0
+        var best = 0
+        for (w in winners) {
+            run = if (w == me) run + 1 else 0
+            best = maxOf(best, run)
+        }
+        return best
+    }
+
+    /** Set vinti da [me] dopo essere stati, a fine di un game, sotto di due game o più. */
+    private fun setsFromBreakDown(pts: List<PlayedPoint>, me: Side): Int {
+        val other = me.other
+        var n = 0
+        for ((_, setPts) in pts.groupBy { it.set }) {
+            val last = setPts.last()
+            val closed = last.after.sets.getOrNull(last.set) ?: continue
+            if (closed.winner != me) continue
+            val down = setPts.any { p ->
+                p.gameWinner != null && p.after.sets.size == p.set && p.after.games(other) - p.after.games(me) >= 2
+            }
+            if (down) n++
+        }
+        return n
+    }
+
+    /** Durata di ogni set, dal primo all'ultimo punto (null se le ore dei punti non ci sono). */
+    fun setDurations(all: List<PlayedPoint>): List<Long?> =
+        all.groupBy { it.set }.toSortedMap().values.map { p ->
+            val first = p.first().at
+            val last = p.last().at
+            if (first > 0 && last >= first) last - first else null
+        }
+
+    /**
+     * Game più lungo (non tie-break): tempo dal primo all'ultimo punto del game (senza le pause tra un game e
+     * l'altro) e punti giocati; null se le ore dei punti non ci sono.
+     */
+    fun longestGame(all: List<PlayedPoint>): Pair<Long, Int>? {
+        var best: Pair<Long, Int>? = null
+        var cur = mutableListOf<PlayedPoint>()
+        for (p in all) {
+            cur += p
+            if (p.gameWinner == null) continue
+            val first = cur.first().at
+            if (p.tiebreak == TiebreakKind.NONE && first > 0 && p.at >= first) {
+                val d = p.at - first
+                if (best == null || d > best.first) best = d to cur.size
+            }
+            cur = mutableListOf()
+        }
+        return best
     }
 
     /** Colpi per punto nel periodo (punti con la lunghezza dello scambio); null se non ce ne sono. */

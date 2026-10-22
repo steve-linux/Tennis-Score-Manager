@@ -3917,6 +3917,11 @@ object MatchStats {
         val strokes: Int?,
         val kind: PointKind? = null,
         val secondServe: Boolean = false,
+        /** Ora del punto (0 nelle partite salvate senza). */
+        val at: Long = 0L,
+        /** Chi aveva palla game, set point (match point compreso) prima del punto. */
+        val gamePointFor: Side? = null,
+        val setPointFor: Side? = null,
     )
 
     fun points(rec: MatchRecord): List<PlayedPoint> {
@@ -3938,6 +3943,12 @@ object MatchStats {
                     strokes = e.strokes,
                     kind = e.kind,
                     secondServe = e.secondServe,
+                    at = e.at,
+                    // Palla game solo nei game normali: nel tie-break il punto che chiude è set point.
+                    gamePointFor = Side.entries.firstOrNull {
+                        s.tiebreak == TiebreakKind.NONE && ScoreEngine.lookahead(s, it)?.gameWinner == it
+                    },
+                    setPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.setWinner == it },
                 )
             }
             s = step.state
@@ -3979,6 +3990,18 @@ object MatchStats {
         val errors: Int = 0,
         val unforcedErrors: Int = 0,
         val forcedErrors: Int = 0,
+        // Come le pagine dei risultati: palle trasformate, game a zero, rimonte, game di fila
+        val loveGames: Int = 0,
+        val gamePointsWon: Int = 0,
+        val gamePoints: Int = 0,
+        val setPointsWon: Int = 0,
+        val setPoints: Int = 0,
+        val matchPointsWon: Int = 0,
+        val matchPoints: Int = 0,
+        /** Set vinti dopo essere stati sotto di almeno due game (un break). */
+        val setsFromBreakDown: Int = 0,
+        /** Game vinti di fila (il massimo nel periodo). */
+        val bestGameRun: Int = 0,
     )
 
     /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
@@ -4034,7 +4057,85 @@ object MatchStats {
             errors = pts.count { it.kind?.isError == true && it.winner != me },
             unforcedErrors = pts.count { it.kind == PointKind.UNFORCED_ERROR && it.winner != me },
             forcedErrors = pts.count { it.kind == PointKind.FORCED_ERROR && it.winner != me },
+            loveGames = loveGames(pts, me),
+            gamePointsWon = pts.count { it.gamePointFor == me && it.winner == me },
+            gamePoints = pts.count { it.gamePointFor == me },
+            setPointsWon = pts.count { it.setPointFor == me && it.matchPointFor != me && it.winner == me },
+            setPoints = pts.count { it.setPointFor == me && it.matchPointFor != me },
+            matchPointsWon = pts.count { it.matchPointFor == me && it.winner == me },
+            matchPoints = pts.count { it.matchPointFor == me },
+            setsFromBreakDown = setsFromBreakDown(pts, me),
+            bestGameRun = bestRun(games.map { it.gameWinner }, me),
         )
+    }
+
+    /** Game normali vinti senza perdere un punto. */
+    private fun loveGames(pts: List<PlayedPoint>, me: Side): Int {
+        var lost = 0
+        var n = 0
+        for (p in pts) {
+            if (p.tiebreak != TiebreakKind.NONE) continue
+            if (p.winner != me) lost++
+            if (p.gameWinner != null) {
+                if (p.gameWinner == me && lost == 0) n++
+                lost = 0
+            }
+        }
+        return n
+    }
+
+    private fun bestRun(winners: List<Side?>, me: Side): Int {
+        var run = 0
+        var best = 0
+        for (w in winners) {
+            run = if (w == me) run + 1 else 0
+            best = maxOf(best, run)
+        }
+        return best
+    }
+
+    /** Set vinti da [me] dopo essere stati, a fine di un game, sotto di due game o più. */
+    private fun setsFromBreakDown(pts: List<PlayedPoint>, me: Side): Int {
+        val other = me.other
+        var n = 0
+        for ((_, setPts) in pts.groupBy { it.set }) {
+            val last = setPts.last()
+            val closed = last.after.sets.getOrNull(last.set) ?: continue
+            if (closed.winner != me) continue
+            val down = setPts.any { p ->
+                p.gameWinner != null && p.after.sets.size == p.set && p.after.games(other) - p.after.games(me) >= 2
+            }
+            if (down) n++
+        }
+        return n
+    }
+
+    /** Durata di ogni set, dal primo all'ultimo punto (null se le ore dei punti non ci sono). */
+    fun setDurations(all: List<PlayedPoint>): List<Long?> =
+        all.groupBy { it.set }.toSortedMap().values.map { p ->
+            val first = p.first().at
+            val last = p.last().at
+            if (first > 0 && last >= first) last - first else null
+        }
+
+    /**
+     * Game più lungo (non tie-break): tempo dal primo all'ultimo punto del game (senza le pause tra un game e
+     * l'altro) e punti giocati; null se le ore dei punti non ci sono.
+     */
+    fun longestGame(all: List<PlayedPoint>): Pair<Long, Int>? {
+        var best: Pair<Long, Int>? = null
+        var cur = mutableListOf<PlayedPoint>()
+        for (p in all) {
+            cur += p
+            if (p.gameWinner == null) continue
+            val first = cur.first().at
+            if (p.tiebreak == TiebreakKind.NONE && first > 0 && p.at >= first) {
+                val d = p.at - first
+                if (best == null || d > best.first) best = d to cur.size
+            }
+            cur = mutableListOf()
+        }
+        return best
     }
 
     /** Colpi per punto nel periodo (punti con la lunghezza dello scambio); null se non ce ne sono. */
@@ -8436,6 +8537,17 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statGamePointsWon: String
+    val statSetPointsWon: String
+    val statMatchPointsWon: String
+    val statLoveGames: String
+    val statBestGameRun: String
+    val statSetsFromBreakDown: String
+    val statTimes: String
+    val statSetDurations: String
+    val statLongestGame: String
+    /** "12' (14 punti)" */
+    val longestGameValue: (String, Int) -> String
     val statAces: String
     val statDoubleFaults: String
     val statFirstServeIn: String
@@ -8601,6 +8713,9 @@ interface Strings {
     val gamesHeader: String
     val onServe: String get() = "On Serve"
     val undoPoint: String
+    val lockScreen: String
+    val lockedTitle: String
+    val unlockHint: String
     val suspend: String
     val resume: String
     val audioOn: String
@@ -8983,6 +9098,16 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statGamePointsWon = "Palle game trasformate"
+    override val statSetPointsWon = "Set point trasformati"
+    override val statMatchPointsWon = "Match point trasformati"
+    override val statLoveGames = "Game vinti a zero"
+    override val statBestGameRun = "Game di fila (max)"
+    override val statSetsFromBreakDown = "Set vinti da sotto di un break"
+    override val statTimes = "Tempi"
+    override val statSetDurations = "Durata dei set"
+    override val statLongestGame = "Game più lungo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n punti)" }
     override val statAces = "Ace"
     override val statDoubleFaults = "Doppi falli"
     override val statFirstServeIn = "Prime di servizio in campo"
@@ -9141,6 +9266,9 @@ object ItStrings : Strings {
     override val setsHeader = "SET"
     override val gamesHeader = "GAME"
     override val undoPoint = "Annulla punto"
+    override val lockScreen = "Blocca schermo"
+    override val lockedTitle = "Schermo bloccato"
+    override val unlockHint = "Tieni premuto il lucchetto per sbloccare. Braccialetti e telecomandi continuano a funzionare."
     override val suspend = "Sospendi"
     override val resume = "Riprendi"
     override val audioOn = "Audio On"
@@ -9513,6 +9641,16 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statGamePointsWon = "Game points converted"
+    override val statSetPointsWon = "Set points converted"
+    override val statMatchPointsWon = "Match points converted"
+    override val statLoveGames = "Love games won"
+    override val statBestGameRun = "Games in a row (max)"
+    override val statSetsFromBreakDown = "Sets won from a break down"
+    override val statTimes = "Times"
+    override val statSetDurations = "Set durations"
+    override val statLongestGame = "Longest game"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Double faults"
     override val statFirstServeIn = "First serves in"
@@ -9671,6 +9809,9 @@ object EnStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "GAMES"
     override val undoPoint = "Undo point"
+    override val lockScreen = "Lock screen"
+    override val lockedTitle = "Screen locked"
+    override val unlockHint = "Press and hold the lock to unlock. Wristbands and remotes keep working."
     override val suspend = "Suspend"
     override val resume = "Resume"
     override val audioOn = "Audio On"
@@ -10066,6 +10207,16 @@ object DeStrings : Strings {
     override val statLast10 = "Letzte 10 Punkte"
     override val statMatchPointsSaved = "Abgewehrte Matchbälle"
     override val statTotalGames = "Gewonnene Spiele gesamt"
+    override val statGamePointsWon = "Verwandelte Spielbälle"
+    override val statSetPointsWon = "Verwandelte Satzbälle"
+    override val statMatchPointsWon = "Verwandelte Matchbälle"
+    override val statLoveGames = "Zu-null-Spiele"
+    override val statBestGameRun = "Spiele in Folge (max)"
+    override val statSetsFromBreakDown = "Sätze nach Break-Rückstand gewonnen"
+    override val statTimes = "Zeiten"
+    override val statSetDurations = "Satzdauer"
+    override val statLongestGame = "Längstes Spiel"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n Punkte)" }
     override val statAces = "Asse"
     override val statDoubleFaults = "Doppelfehler"
     override val statFirstServeIn = "Erste Aufschläge im Feld"
@@ -10224,6 +10375,9 @@ object DeStrings : Strings {
     override val setsHeader = "SÄTZE"
     override val gamesHeader = "SPIELE"
     override val undoPoint = "Punkt zurück"
+    override val lockScreen = "Bildschirm sperren"
+    override val lockedTitle = "Bildschirm gesperrt"
+    override val unlockHint = "Schloss gedrückt halten zum Entsperren. Armbänder und Fernbedienungen funktionieren weiter."
     override val suspend = "Unterbrechen"
     override val resume = "Fortsetzen"
     override val audioOn = "Audio On"
@@ -10611,6 +10765,16 @@ object EsStrings : Strings {
     override val statLast10 = "Últimos 10 puntos"
     override val statMatchPointsSaved = "Bolas de partido salvadas"
     override val statTotalGames = "Total de juegos ganados"
+    override val statGamePointsWon = "Bolas de juego convertidas"
+    override val statSetPointsWon = "Bolas de set convertidas"
+    override val statMatchPointsWon = "Bolas de partido convertidas"
+    override val statLoveGames = "Juegos en blanco"
+    override val statBestGameRun = "Juegos seguidos (máx.)"
+    override val statSetsFromBreakDown = "Sets ganados tras ir un break abajo"
+    override val statTimes = "Tiempos"
+    override val statSetDurations = "Duración de los sets"
+    override val statLongestGame = "Juego más largo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n puntos)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Dobles faltas"
     override val statFirstServeIn = "Primeros saques dentro"
@@ -10770,6 +10934,9 @@ object EsStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JUEGOS"
     override val undoPoint = "Anular punto"
+    override val lockScreen = "Bloquear pantalla"
+    override val lockedTitle = "Pantalla bloqueada"
+    override val unlockHint = "Mantén pulsado el candado para desbloquear. Las pulseras y los mandos siguen funcionando."
     override val suspend = "Suspender"
     override val resume = "Reanudar"
     override val audioOn = "Audio On"
@@ -11160,6 +11327,16 @@ object FrStrings : Strings {
     override val statLast10 = "10 derniers points"
     override val statMatchPointsSaved = "Balles de match sauvées"
     override val statTotalGames = "Total des jeux gagnés"
+    override val statGamePointsWon = "Balles de jeu converties"
+    override val statSetPointsWon = "Balles de manche converties"
+    override val statMatchPointsWon = "Balles de match converties"
+    override val statLoveGames = "Jeux blancs gagnés"
+    override val statBestGameRun = "Jeux d'affilée (max)"
+    override val statSetsFromBreakDown = "Manches gagnées après un break de retard"
+    override val statTimes = "Durées"
+    override val statSetDurations = "Durée des manches"
+    override val statLongestGame = "Jeu le plus long"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Doubles fautes"
     override val statFirstServeIn = "Premières balles réussies"
@@ -11318,6 +11495,9 @@ object FrStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JEUX"
     override val undoPoint = "Annuler le point"
+    override val lockScreen = "Verrouiller l'écran"
+    override val lockedTitle = "Écran verrouillé"
+    override val unlockHint = "Maintenez le cadenas appuyé pour déverrouiller. Bracelets et télécommandes continuent de fonctionner."
     override val suspend = "Suspendre"
     override val resume = "Reprendre"
     override val audioOn = "Audio On"
@@ -11708,6 +11888,16 @@ object PtStrings : Strings {
     override val statLast10 = "Últimos 10 pontos"
     override val statMatchPointsSaved = "Match points salvos"
     override val statTotalGames = "Total de jogos ganhos"
+    override val statGamePointsWon = "Game points convertidos"
+    override val statSetPointsWon = "Set points convertidos"
+    override val statMatchPointsWon = "Match points convertidos"
+    override val statLoveGames = "Games vencidos a zero"
+    override val statBestGameRun = "Games seguidos (máx.)"
+    override val statSetsFromBreakDown = "Sets vencidos depois de estar um break atrás"
+    override val statTimes = "Tempos"
+    override val statSetDurations = "Duração dos sets"
+    override val statLongestGame = "Game mais longo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n pontos)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Duplas faltas"
     override val statFirstServeIn = "Primeiros saques dentro"
@@ -11867,6 +12057,9 @@ object PtStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JOGOS"
     override val undoPoint = "Anular ponto"
+    override val lockScreen = "Bloquear tela"
+    override val lockedTitle = "Tela bloqueada"
+    override val unlockHint = "Segure o cadeado para desbloquear. As pulseiras e os controles continuam funcionando."
     override val suspend = "Suspender"
     override val resume = "Retomar"
     override val audioOn = "Audio On"
@@ -12710,6 +12903,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12739,6 +12933,7 @@ import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -12761,12 +12956,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -12825,60 +13022,66 @@ fun MatchScreen(c: MatchController) {
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
+    /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
+    var locked by rememberSaveable { mutableStateOf(false) }
 
     BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
 
-    Column(
-        Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        TimersRow(clock, cd, s) { TvChip(c) }
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
-        if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
-        MessageBox(msg)
-        Scoreboard(state, names, s)
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            val playing = !suspended && !state.isFinished
-            if (lm.record.options.detailedStats) {
-                val fault by c.faultPending.collectAsState()
-                DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
-            } else {
-                PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
-            }
-            val detail by c.detailPrompt.collectAsState()
-            detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
-            if (suspended) {
-                Box(
-                    Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
-                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TimersRow(clock, cd, s) { TvChip(c) }
+            if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
+            if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
+            MessageBox(msg)
+            Scoreboard(state, names, s)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                val playing = !suspended && !state.isFinished
+                if (lm.record.options.detailedStats) {
+                    val fault by c.faultPending.collectAsState()
+                    DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
+                } else {
+                    PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
+                }
+                val detail by c.detailPrompt.collectAsState()
+                detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
+                if (suspended) {
+                    Box(
+                        Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
+                            Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                        }
                     }
                 }
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
+                ControlButton(
+                    if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    if (suspended) s.resume else s.suspend,
+                    Modifier.weight(1f),
+                    highlight = suspended,
+                ) { c.toggleSuspend() }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
+                ControlButton(
+                    if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                    null,
+                    Modifier.width(64.dp),
+                    contentDescription = if (o.audio) s.audioOn else s.audioOff,
+                ) { c.toggleAudio() }
+                ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
+                ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+            }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
-            ControlButton(
-                if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
-                if (suspended) s.resume else s.suspend,
-                Modifier.weight(1f),
-                highlight = suspended,
-            ) { c.toggleSuspend() }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
-            ControlButton(
-                if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                null,
-                Modifier.width(64.dp),
-                contentDescription = if (o.audio) s.audioOn else s.audioOff,
-            ) { c.toggleAudio() }
-            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
-            ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
-        }
+        if (locked) LockOverlay(s) { locked = false }
     }
 
     if (confirmExit) {
@@ -13281,6 +13484,34 @@ private fun DetailedPointButtons(
 }
 
 /**
+ * Velo sopra la schermata bloccata: il punteggio resta visibile, i tocchi si fermano qui. Si sblocca tenendo
+ * premuto il lucchetto (un tocco solo non basta, così non si sblocca per sbaglio in tasca).
+ */
+@Composable
+private fun LockOverlay(s: Strings, onUnlock: () -> Unit) {
+    var hint by remember { mutableStateOf(false) }
+    Box(
+        Modifier.fillMaxSize().background(Color(0x660B1220)).pointerInput(Unit) { detectTapGestures { hint = true } },
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Column(
+            Modifier.systemBarsPadding().padding(bottom = 24.dp).clip(RoundedCornerShape(24.dp)).background(TsmColors.Surface)
+                .border(2.dp, if (hint) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(24.dp)).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                Modifier.size(72.dp).clip(CircleShape).background(TsmColors.Ball)
+                    .pointerInput(Unit) { detectTapGestures(onTap = { hint = true }, onLongPress = { onUnlock() }) },
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.Lock, s.lockScreen, tint = TsmColors.OnBall, modifier = Modifier.size(36.dp)) }
+            Text(s.lockedTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(s.unlockHint, color = if (hint) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+/**
  * Domanda facoltativa sul punto appena segnato, sopra i tasti: dal braccialetto o dal telecomando "come è finito?"
  * (ace solo se l'ha vinto chi serviva), dopo un errore "gratuito o forzato?". Sparisce da sola.
  */
@@ -13492,10 +13723,33 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
+            Stat(s.statGamePointsWon, a.gamePointsWon, a.gamePoints, b.gamePointsWon, b.gamePoints, StatKind.RATIO),
+            Stat(s.statSetPointsWon, a.setPointsWon, a.setPoints, b.setPointsWon, b.setPoints, StatKind.RATIO),
+            Stat(s.statMatchPointsWon, a.matchPointsWon, a.matchPoints, b.matchPointsWon, b.matchPoints, StatKind.RATIO),
         ))
         StatSection(s.statGames, listOf(
             Stat(s.statTotalGames, a.gamesWon, a.games, b.gamesWon, b.games, StatKind.PERCENT),
+            Stat(s.statLoveGames, a.loveGames, b.loveGames),
+            Stat(s.statBestGameRun, a.bestGameRun, b.bestGameRun),
+            Stat(s.statSetsFromBreakDown, a.setsFromBreakDown, b.setsFromBreakDown),
         ))
+        // Tempi: durata dei set e game più lungo, dalle ore dei punti (solo sulla partita intera).
+        if (period == null) {
+            val durations = remember(rec) { MatchStats.setDurations(pts) }
+            val longest = remember(rec) { MatchStats.longestGame(pts) }
+            if (durations.any { it != null } || longest != null) {
+                StatCard(s.statTimes) {
+                    if (durations.any { it != null }) {
+                        Text("${s.statSetDurations}: " + durations.joinToString(" · ") { d -> d?.let { minutes(it) } ?: "–" },
+                            color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                    longest?.let { (ms, n) ->
+                        Text("${s.statLongestGame}: ${s.longestGameValue(minutes(ms), n)}", color = TsmColors.TextMain, fontSize = 13.sp,
+                            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        }
         // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
         if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
         MatchStats.rally(pts, period)?.let { r ->
@@ -13506,6 +13760,12 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         }
         Text(if (detail) s.statsHintDetailed else s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
+}
+
+/** "38'" oppure "1 h 05'". */
+private fun minutes(ms: Long): String {
+    val m = Math.round(ms / 60_000.0).toInt()
+    return if (m >= 60) "${m / 60} h ${"%02d".format(m % 60)}'" else "$m'"
 }
 
 private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
@@ -17797,6 +18057,43 @@ class MatchStatsTest {
         assertEquals(1, b.unforcedErrors)
         assertEquals(1, b.forcedErrors)
         assertEquals(1, t.getValue(p1).unforcedErrors)
+    }
+
+    @Test
+    fun loveGamesGamePointsAndRuns() {
+        val a = MatchStats.totals(MatchStats.points(rec(*holdBreakHold))).getValue(p1)
+        // Tiene a zero, strappa il servizio a zero, poi tiene da 0-30.
+        assertEquals(2, a.loveGames)
+        assertEquals(3, a.gamePoints)
+        assertEquals(3, a.gamePointsWon)
+        assertEquals(3, a.bestGameRun)
+        assertEquals(0, a.setPoints)
+    }
+
+    @Test
+    fun setWonFromABreakDownAndSetPoints() {
+        // G2 va 3-0, poi G1 vince sei game di fila: 6-3 da sotto di tre game.
+        val winners = Array(3) { game(p2) }.flatten() + Array(6) { game(p1) }.flatten()
+        val a = MatchStats.totals(MatchStats.points(rec(*winners.toTypedArray()))).getValue(p1)
+        assertEquals(1, a.setsFromBreakDown)
+        assertEquals(1, a.setPoints)
+        assertEquals(1, a.setPointsWon)
+        assertEquals(6, a.bestGameRun)
+    }
+
+    @Test
+    fun setDurationAndLongestGameFromPointTimes() {
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(firstServer = p1),
+            events = holdBreakHold.mapIndexed { i, w -> MatchEvent.Point(w, at = 1_000_000L + i * 10_000L) },
+        )
+        val pts = MatchStats.points(r)
+        // 14 punti a 10 secondi l'uno: dal primo all'ultimo 130 secondi.
+        assertEquals(listOf<Long?>(130_000L), MatchStats.setDurations(pts))
+        // Il terzo game ha 6 punti: 50 secondi dal primo all'ultimo.
+        assertEquals(50_000L to 6, MatchStats.longestGame(pts))
+        // Senza ore (partite vecchie) non si sa.
+        assertEquals(listOf<Long?>(null), MatchStats.setDurations(MatchStats.points(rec(*holdBreakHold))))
     }
 
     @Test

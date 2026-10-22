@@ -115,10 +115,33 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
+            Stat(s.statGamePointsWon, a.gamePointsWon, a.gamePoints, b.gamePointsWon, b.gamePoints, StatKind.RATIO),
+            Stat(s.statSetPointsWon, a.setPointsWon, a.setPoints, b.setPointsWon, b.setPoints, StatKind.RATIO),
+            Stat(s.statMatchPointsWon, a.matchPointsWon, a.matchPoints, b.matchPointsWon, b.matchPoints, StatKind.RATIO),
         ))
         StatSection(s.statGames, listOf(
             Stat(s.statTotalGames, a.gamesWon, a.games, b.gamesWon, b.games, StatKind.PERCENT),
+            Stat(s.statLoveGames, a.loveGames, b.loveGames),
+            Stat(s.statBestGameRun, a.bestGameRun, b.bestGameRun),
+            Stat(s.statSetsFromBreakDown, a.setsFromBreakDown, b.setsFromBreakDown),
         ))
+        // Tempi: durata dei set e game più lungo, dalle ore dei punti (solo sulla partita intera).
+        if (period == null) {
+            val durations = remember(rec) { MatchStats.setDurations(pts) }
+            val longest = remember(rec) { MatchStats.longestGame(pts) }
+            if (durations.any { it != null } || longest != null) {
+                StatCard(s.statTimes) {
+                    if (durations.any { it != null }) {
+                        Text("${s.statSetDurations}: " + durations.joinToString(" · ") { d -> d?.let { minutes(it) } ?: "–" },
+                            color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                    longest?.let { (ms, n) ->
+                        Text("${s.statLongestGame}: ${s.longestGameValue(minutes(ms), n)}", color = TsmColors.TextMain, fontSize = 13.sp,
+                            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        }
         // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
         if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
         MatchStats.rally(pts, period)?.let { r ->
@@ -129,6 +152,12 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         }
         Text(if (detail) s.statsHintDetailed else s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
+}
+
+/** "38'" oppure "1 h 05'". */
+private fun minutes(ms: Long): String {
+    val m = Math.round(ms / 60_000.0).toInt()
+    return if (m >= 60) "${m / 60} h ${"%02d".format(m % 60)}'" else "$m'"
 }
 
 private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
