@@ -408,6 +408,12 @@ interface Strings {
     val transferBadCode: String
     val transferFailed: String
     val transferEmpty: String
+    // Foto dei giocatori
+    val photoHint: String
+    val photoChange: String
+    val photoRemove: String
+    val photoNeedsName: String
+    val photoError: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -866,6 +872,11 @@ object ItStrings : Strings {
     override val transferBadCode = "Questo non è un codice di Tennis Score Manager."
     override val transferFailed = "Trasferimento non riuscito: i due telefoni sono sulla stessa rete? Sull'altro la finestra col codice deve restare aperta."
     override val transferEmpty = "L'altro telefono non ha partite da inviare."
+    override val photoHint = "La foto resta su questo telefono e si ritrova dal nome del giocatore; passa a un altro telefono col trasferimento dello storico."
+    override val photoChange = "Cambia foto"
+    override val photoRemove = "Togli foto"
+    override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
+    override val photoError = "Non riesco a leggere questa foto."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -1312,6 +1323,11 @@ object EnStrings : Strings {
     override val transferBadCode = "This is not a Tennis Score Manager code."
     override val transferFailed = "Transfer failed: are both phones on the same network? On the other one the window with the code must stay open."
     override val transferEmpty = "The other phone has no matches to send."
+    override val photoHint = "The photo stays on this phone and is found again from the player's name; it moves to another phone with the history transfer."
+    override val photoChange = "Change photo"
+    override val photoRemove = "Remove photo"
+    override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
+    override val photoError = "This photo can't be read."
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"

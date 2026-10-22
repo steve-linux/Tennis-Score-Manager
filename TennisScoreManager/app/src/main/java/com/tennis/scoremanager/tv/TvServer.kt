@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.BufferedOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -51,6 +52,9 @@ import java.util.concurrent.TimeUnit
  */
 class TvServer(context: Context) {
 
+    /** Cartella delle foto dei giocatori (la stessa di Storage). */
+    private val photoDir = File(context.filesDir, "players")
+
     companion object {
         const val PORT = 8080
         const val SERVICE_TYPE = "_tsm._tcp"
@@ -62,6 +66,7 @@ class TvServer(context: Context) {
         /** Linux: chiude la connessione se i dati inviati restano senza conferma per troppo tempo. */
         private const val TCP_USER_TIMEOUT = 18
         private const val STOP = "\u0000stop"
+        private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
 
         /**
@@ -264,7 +269,13 @@ class TvServer(context: Context) {
                 "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
-                else -> respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+                else -> {
+                    // Foto dei giocatori: solo nomi di file come li scrive Storage (sha1 del nome + .jpg).
+                    val photo = path.removePrefix("/photo/").takeIf { path.startsWith("/photo/") && PHOTO_NAME.matches(it) }
+                        ?.let { File(photoDir, it) }?.takeIf { it.isFile }
+                    if (photo != null) respond(out, "200 OK", "image/jpeg", photo.readBytes(), head)
+                    else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+                }
             }
         }
     }

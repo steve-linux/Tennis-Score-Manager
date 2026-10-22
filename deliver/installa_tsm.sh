@@ -305,6 +305,9 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
     font-size: min(calc(6.2 * var(--vh)), calc(3.6 * var(--vw))); letter-spacing: .04em; text-transform: uppercase;
   }
   .name .nm { overflow: hidden; text-overflow: clip; }
+  .ph { display: flex; gap: .2em; flex: none; }
+  .ph:empty { display: none; }
+  .ph img { width: 1.35em; height: 1.35em; border-radius: 50%; object-fit: cover; border: .07em solid currentColor; }
   .ball { flex: none; width: .62em; height: .62em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 .35em var(--ball); visibility: hidden; }
   .serving .ball { visibility: visible; }
   .big { padding: calc(2.8 * var(--vh)) 0 calc(3.2 * var(--vh)); min-height: 0; }
@@ -355,7 +358,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
 <div id="board">
   <div id="main">
     <section class="side" id="side0">
-      <div class="name"><span class="nm" id="n0"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph0"></span><span class="nm" id="n0"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt0"></svg></div>
     </section>
     <section id="mid">
@@ -367,7 +370,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
       <div id="setrow"><svg id="s0"></svg><svg id="s1"></svg></div>
     </section>
     <section class="side" id="side1">
-      <div class="name"><span class="nm" id="n1"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph1"></span><span class="nm" id="n1"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt1"></svg></div>
     </section>
   </div>
@@ -510,6 +513,13 @@ function render() {
     const n = $("n" + i);
     n.style.color = color(i);
     if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
+    // Foto dei giocatori accanto al nome (ci sono solo se messe nell'app); si rifanno solo se cambiano.
+    const ph = $("ph" + i), urls = (S.players[i].photos || []).join(" ");
+    if (ph.dataset.u !== urls) {
+      ph.dataset.u = urls;
+      ph.style.color = color(i);
+      ph.replaceChildren(...(S.players[i].photos || []).map(u => { const im = new Image(); im.src = u; im.alt = ""; return im; }));
+    }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
     setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
@@ -778,9 +788,13 @@ import android.app.Application
 import android.content.ClipData
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
@@ -799,6 +813,7 @@ import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
@@ -811,11 +826,11 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
-import com.tennis.scoremanager.transfer.TransferBundle
-import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.transfer.TransferBundle
+import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
 import com.tennis.scoremanager.tv.TvServer
 import com.tennis.scoremanager.tv.TvSettings
@@ -828,6 +843,9 @@ import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.CallBuilder
 import com.tennis.scoremanager.voice.Seg
 import com.tennis.scoremanager.voice.VoicePack
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.OutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -847,8 +865,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.OutputStream
 
 enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
 
@@ -883,6 +899,8 @@ class MatchController(
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
+        /** Lato delle foto dei giocatori salvate (pixel). */
+        const val PHOTO_PX = 320
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
@@ -1036,6 +1054,13 @@ class MatchController(
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
     private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
 
+    /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
+    private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
+        PlayerStats.names(su, side).mapNotNull { n ->
+            storage.photoFile(PlayerStats.key(n)).takeIf { it.exists() }?.let { "/photo/${it.name}?v=${photosVersion.value}" }
+        }
+    }
+
     private fun publishTv() {
         if (!tvServer.running.value) return
         val sc = screen.value
@@ -1057,6 +1082,7 @@ class MatchController(
                 tv = tv.value,
                 strings = strings,
                 seq = ++tvSeq,
+                photos = tvPhotos(match?.record?.setup ?: setup.value),
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -1879,6 +1905,59 @@ class MatchController(
         return done to open
     }
 
+    // ---------------------------------------------------------------- foto dei giocatori
+
+    /** Cresce a ogni foto cambiata: chi mostra le foto le ricarica. */
+    val photosVersion = MutableStateFlow(0)
+
+    /** Foto del giocatore col nome [name], ritagliata quadrata e rimpicciolita; null se non c'è. */
+    fun loadPhoto(name: String): Bitmap? {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return null
+        val f = storage.photoFile(key)
+        return if (f.exists()) BitmapFactory.decodeFile(f.absolutePath) else null
+    }
+
+    /** Foto scelta dalla galleria o scattata: si salva quadrata (centro dell'immagine) a [PHOTO_PX] pixel. */
+    fun setPhoto(name: String, uri: Uri) {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return
+        scope.launch {
+            val ok = withContext(io) {
+                runCatching {
+                    // ImageDecoder (Android 9+) raddrizza le foto girate (EXIF); prima si legge com'è.
+                    val src = if (Build.VERSION.SDK_INT >= 28) {
+                        ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
+                            val side = minOf(info.size.width, info.size.height)
+                            d.setTargetSampleSize((side / (PHOTO_PX * 2)).coerceAtLeast(1))
+                            d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                        }
+                    } else {
+                        app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
+                    }
+                    val side = minOf(src.width, src.height)
+                    val square = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
+                    val small = Bitmap.createScaledBitmap(square, PHOTO_PX, PHOTO_PX, true)
+                    val out = ByteArrayOutputStream()
+                    small.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                    storage.savePhoto(key, out.toByteArray())
+                }.isSuccess
+            }
+            if (ok) photosVersion.value++ else _toasts.tryEmit(strings.photoError)
+            publishTv()
+        }
+    }
+
+    fun removePhoto(name: String) {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return
+        scope.launch {
+            withContext(io) { storage.deletePhoto(key) }
+            photosVersion.value++
+            publishTv()
+        }
+    }
+
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
     /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
@@ -1894,7 +1973,9 @@ class MatchController(
         val server = TransferServer(
             payload = {
                 val all = storage.loadFinished() + storage.loadUnfinished()
-                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all)).toByteArray()
+                // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
+                val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
+                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all, photos = photos)).toByteArray()
             },
             onServed = { transferServed.value++ },
         )
@@ -1922,6 +2003,10 @@ class MatchController(
             val result = withContext(io) {
                 runCatching {
                     val bundle = storage.json.decodeFromString(TransferBundle.serializer(), TransferServer.fetch(text).decodeToString())
+                    // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
+                    bundle.photos.forEach { (k, b64) ->
+                        if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
+                    }
                     importRecords(bundle.matches)
                 }.getOrNull()
             }
@@ -1934,6 +2019,7 @@ class MatchController(
             )
             refreshHistory()
             refreshSaved()
+            photosVersion.value++
         }
     }
 
@@ -4398,6 +4484,33 @@ class Storage(context: Context) {
 
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
+    /** Foto dei giocatori, una per nome (chiave di PlayerStats.key): JPEG quadrati e piccoli. */
+    private val photosDir: File get() = File(app.filesDir, "players").apply { mkdirs() }
+
+    fun photoFile(key: String): File {
+        val hash = java.security.MessageDigest.getInstance("SHA-1").digest(key.toByteArray()).joinToString("") { "%02x".format(it) }
+        return File(photosDir, "$hash.jpg")
+    }
+
+    /** Tutte le foto per chiave del nome (servono al trasferimento). Le chiavi stanno in un indice accanto. */
+    fun photoKeys(): List<String> = runCatching { File(photosDir, "index.txt").readLines().filter { it.isNotBlank() } }.getOrDefault(emptyList())
+        .filter { photoFile(it).exists() }
+
+    @Synchronized
+    fun savePhoto(key: String, jpeg: ByteArray) {
+        runCatching {
+            photoFile(key).writeBytes(jpeg)
+            val idx = File(photosDir, "index.txt")
+            val keys = (runCatching { idx.readLines() }.getOrDefault(emptyList()) + key).filter { it.isNotBlank() }.distinct()
+            idx.writeText(keys.joinToString("\n"))
+        }.onFailure { Log.e("Storage", "Salvataggio foto fallito", it) }
+    }
+
+    @Synchronized
+    fun deletePhoto(key: String) {
+        photoFile(key).delete()
+    }
+
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
@@ -5314,9 +5427,13 @@ import java.net.URL
 import java.security.SecureRandom
 import kotlin.concurrent.thread
 
-/** Quello che passa da un telefono all'altro: lo storico e le partite sospese. */
+/** Quello che passa da un telefono all'altro: storico, partite sospese e foto dei giocatori (JPEG in base64 per nome). */
 @Serializable
-data class TransferBundle(val version: Int = 1, val matches: List<MatchRecord> = emptyList())
+data class TransferBundle(
+    val version: Int = 1,
+    val matches: List<MatchRecord> = emptyList(),
+    val photos: Map<String, String> = emptyMap(),
+)
 
 /**
  * Trasferimento tra due telefoni sulla stessa rete (Wi-Fi o hotspot): chi invia apre un piccolo server http e
@@ -6199,7 +6316,12 @@ data class TvSnapshot(
 )
 
 @Serializable
-data class TvPlayer(val name: String, val color: String)
+data class TvPlayer(
+    val name: String,
+    val color: String,
+    /** Foto dei giocatori del lato (indirizzi sul server del tabellone); vuota = nessuna. */
+    val photos: List<String> = emptyList(),
+)
 
 @Serializable
 data class TvSet(val g1: Int, val g2: Int, val tb1: Int? = null, val tb2: Int? = null, val mtb: Boolean = false)
@@ -6245,6 +6367,8 @@ data class TvInput(
     val tv: TvSettings,
     val strings: Strings,
     val seq: Long,
+    /** Indirizzi delle foto dei giocatori di ogni lato. */
+    val photos: Map<Side, List<String>> = emptyMap(),
 )
 
 object TvSnapshots {
@@ -6296,7 +6420,10 @@ object TvSnapshots {
             lang = i.lang.code,
             phase = phase,
             title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
-            players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),
+            players = listOf(
+                TvPlayer(names.short(Side.P1), i.tv.color1, i.photos[Side.P1].orEmpty()),
+                TvPlayer(names.short(Side.P2), i.tv.color2, i.photos[Side.P2].orEmpty()),
+            ),
             server = server,
             points = points,
             games = games,
@@ -6362,6 +6489,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.BufferedOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -6388,6 +6516,9 @@ import java.util.concurrent.TimeUnit
  */
 class TvServer(context: Context) {
 
+    /** Cartella delle foto dei giocatori (la stessa di Storage). */
+    private val photoDir = File(context.filesDir, "players")
+
     companion object {
         const val PORT = 8080
         const val SERVICE_TYPE = "_tsm._tcp"
@@ -6399,6 +6530,7 @@ class TvServer(context: Context) {
         /** Linux: chiude la connessione se i dati inviati restano senza conferma per troppo tempo. */
         private const val TCP_USER_TIMEOUT = 18
         private const val STOP = "\u0000stop"
+        private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
 
         /**
@@ -6601,7 +6733,13 @@ class TvServer(context: Context) {
                 "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
-                else -> respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+                else -> {
+                    // Foto dei giocatori: solo nomi di file come li scrive Storage (sha1 del nome + .jpg).
+                    val photo = path.removePrefix("/photo/").takeIf { path.startsWith("/photo/") && PHOTO_NAME.matches(it) }
+                        ?.let { File(photoDir, it) }?.takeIf { it.isFile }
+                    if (photo != null) respond(out, "200 OK", "image/jpeg", photo.readBytes(), head)
+                    else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+                }
             }
         }
     }
@@ -7517,6 +7655,128 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PlayerPhoto.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/PlayerPhoto.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/**
+ * Foto del giocatore in un cerchio col bordo del suo colore; senza foto le iniziali. Le foto stanno solo su
+ * questo telefono (passano a un altro col trasferimento) e si ritrovano dal nome.
+ */
+@Composable
+fun PlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modifier: Modifier = Modifier) {
+    val version by c.photosVersion.collectAsState()
+    val photo by produceState<ImageBitmap?>(null, name, version) {
+        value = withContext(Dispatchers.IO) { c.loadPhoto(name)?.asImageBitmap() }
+    }
+    Box(
+        modifier.size(size).clip(CircleShape).background(color.copy(alpha = 0.22f)).border(if (size < 40.dp) 1.5.dp else 2.dp, color, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        val p = photo
+        when {
+            p != null -> Image(p, null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
+            name.isNotBlank() -> Text(initials(name), color = color, fontWeight = FontWeight.Black, fontSize = (size.value * 0.38f).sp)
+            else -> Icon(Icons.Filled.Person, null, tint = color, modifier = Modifier.size(size * 0.55f))
+        }
+    }
+}
+
+private fun initials(name: String): String =
+    name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.take(2).joinToString("") { it.take(1).uppercase() }
+
+/**
+ * Avatar da toccare per mettere la foto: senza foto apre subito il selettore di foto di Android (niente permessi),
+ * con la foto chiede se cambiarla o toglierla. Senza nome non si può: la foto si ritrova dal nome.
+ */
+@Composable
+fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+    val version by c.photosVersion.collectAsState()
+    val hasPhoto = remember(name, version) { c.loadPhoto(name) != null }
+    var ask by remember { mutableStateOf(false) }
+    var needName by remember { mutableStateOf(false) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) c.setPhoto(name, uri)
+    }
+    fun pick() = picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    Box(modifier.clickable {
+        when {
+            name.isBlank() -> needName = true
+            hasPhoto -> ask = true
+            else -> pick()
+        }
+    }) {
+        PlayerAvatar(c, name, color, size)
+        if (!hasPhoto) {
+            Box(
+                Modifier.align(Alignment.BottomEnd).size(size * 0.36f).clip(CircleShape).background(TsmColors.SurfaceHigh),
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.AddAPhoto, null, tint = TsmColors.TextMain, modifier = Modifier.size(size * 0.22f)) }
+        }
+    }
+    if (ask) {
+        AlertDialog(
+            onDismissRequest = { ask = false },
+            icon = { PlayerAvatar(c, name, color, size) },
+            title = { Text(name) },
+            text = { Text(s.photoHint) },
+            confirmButton = { TextButton(onClick = { ask = false; pick() }) { Text(s.photoChange) } },
+            dismissButton = { TextButton(onClick = { ask = false; c.removePhoto(name) }) { Text(s.photoRemove) } },
+        )
+    }
+    if (needName) {
+        AlertDialog(
+            onDismissRequest = { needName = false },
+            text = { Text(s.photoNeedsName) },
+            confirmButton = { TextButton(onClick = { needName = false }) { Text(s.ok) } },
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -7966,6 +8226,12 @@ interface Strings {
     val transferBadCode: String
     val transferFailed: String
     val transferEmpty: String
+    // Foto dei giocatori
+    val photoHint: String
+    val photoChange: String
+    val photoRemove: String
+    val photoNeedsName: String
+    val photoError: String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -8424,6 +8690,11 @@ object ItStrings : Strings {
     override val transferBadCode = "Questo non è un codice di Tennis Score Manager."
     override val transferFailed = "Trasferimento non riuscito: i due telefoni sono sulla stessa rete? Sull'altro la finestra col codice deve restare aperta."
     override val transferEmpty = "L'altro telefono non ha partite da inviare."
+    override val photoHint = "La foto resta su questo telefono e si ritrova dal nome del giocatore; passa a un altro telefono col trasferimento dello storico."
+    override val photoChange = "Cambia foto"
+    override val photoRemove = "Togli foto"
+    override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
+    override val photoError = "Non riesco a leggere questa foto."
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -8870,6 +9141,11 @@ object EnStrings : Strings {
     override val transferBadCode = "This is not a Tennis Score Manager code."
     override val transferFailed = "Transfer failed: are both phones on the same network? On the other one the window with the code must stay open."
     override val transferEmpty = "The other phone has no matches to send."
+    override val photoHint = "The photo stays on this phone and is found again from the player's name; it moves to another phone with the history transfer."
+    override val photoChange = "Change photo"
+    override val photoRemove = "Remove photo"
+    override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
+    override val photoError = "This photo can't be read."
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"
@@ -9339,6 +9615,11 @@ object DeStrings : Strings {
     override val transferBadCode = "Das ist kein Code von Tennis Score Manager."
     override val transferFailed = "Übertragung fehlgeschlagen: Sind beide Telefone im selben Netz? Auf dem anderen muss das Fenster mit dem Code offen bleiben."
     override val transferEmpty = "Das andere Telefon hat keine Matches zum Senden."
+    override val photoHint = "Das Foto bleibt auf diesem Telefon und wird über den Namen des Spielers wiedergefunden; mit der Übertragung des Verlaufs kommt es auf ein anderes Telefon."
+    override val photoChange = "Foto ändern"
+    override val photoRemove = "Foto entfernen"
+    override val photoNeedsName = "Schreibe zuerst den Namen des Spielers: Das Foto wird über den Namen wiedergefunden."
+    override val photoError = "Dieses Foto lässt sich nicht lesen."
     override val share = "Teilen"
     override val saveDialogTitle = "Dateien speichern"
     override val fileName = "Name"
@@ -9801,6 +10082,11 @@ object EsStrings : Strings {
     override val transferBadCode = "Este no es un código de Tennis Score Manager."
     override val transferFailed = "No se pudo transferir: ¿están los dos teléfonos en la misma red? En el otro, la ventana con el código debe quedarse abierta."
     override val transferEmpty = "El otro teléfono no tiene partidos para enviar."
+    override val photoHint = "La foto se queda en este teléfono y se encuentra por el nombre del jugador; pasa a otro teléfono con la transferencia del historial."
+    override val photoChange = "Cambiar foto"
+    override val photoRemove = "Quitar foto"
+    override val photoNeedsName = "Escribe primero el nombre del jugador: la foto se encuentra por el nombre."
+    override val photoError = "No se puede leer esta foto."
     override val share = "Compartir"
     override val saveDialogTitle = "Guardar archivos"
     override val fileName = "Nombre"
@@ -10265,6 +10551,11 @@ object FrStrings : Strings {
     override val transferBadCode = "Ce n'est pas un code de Tennis Score Manager."
     override val transferFailed = "Échec du transfert : les deux téléphones sont-ils sur le même réseau ? Sur l'autre, la fenêtre avec le code doit rester ouverte."
     override val transferEmpty = "L'autre téléphone n'a aucun match à envoyer."
+    override val photoHint = "La photo reste sur ce téléphone et se retrouve grâce au nom du joueur ; elle passe sur un autre téléphone avec le transfert de l'historique."
+    override val photoChange = "Changer la photo"
+    override val photoRemove = "Retirer la photo"
+    override val photoNeedsName = "Écrivez d'abord le nom du joueur : la photo se retrouve grâce au nom."
+    override val photoError = "Impossible de lire cette photo."
     override val share = "Partager"
     override val saveDialogTitle = "Enregistrer les fichiers"
     override val fileName = "Nom"
@@ -10730,6 +11021,11 @@ object PtStrings : Strings {
     override val transferBadCode = "Este não é um código do Tennis Score Manager."
     override val transferFailed = "Falha na transferência: os dois telefones estão na mesma rede? No outro, a janela com o código precisa ficar aberta."
     override val transferEmpty = "O outro telefone não tem partidas para enviar."
+    override val photoHint = "A foto fica neste telefone e é encontrada pelo nome do jogador; passa para outro telefone com a transferência do histórico."
+    override val photoChange = "Trocar foto"
+    override val photoRemove = "Remover foto"
+    override val photoNeedsName = "Escreva primeiro o nome do jogador: a foto é encontrada pelo nome."
+    override val photoError = "Não foi possível ler esta foto."
     override val share = "Compartilhar"
     override val saveDialogTitle = "Salvar arquivos"
     override val fileName = "Nome"
@@ -11110,7 +11406,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -11144,8 +11439,10 @@ import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.EditablePlayerAvatar
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.QrCode
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SegOption
@@ -11204,7 +11501,7 @@ fun HistoryScreen(c: MatchController) {
         } else {
             val players = remember(played) { PlayerStats.players(played) }
             if (players.isEmpty()) Text(s.historyPlayersEmpty, color = TsmColors.TextDim)
-            players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
+            players.forEach { p -> PlayerRow(c, p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
         }
     }
 
@@ -11260,19 +11557,23 @@ private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, m
     val p = remember(played, key) { PlayerStats.players(played).firstOrNull { it.key == key } }
     val rivals = remember(played, key) { PlayerStats.rivals(played, key) }
     val mine = remember(matches, key) { matches.filter { PlayerStats.sideOf(it.record, key) != null } }
-    Column(
+    Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
-        if (p != null) {
-            val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
-            Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        EditablePlayerAvatar(c, p?.name ?: key, TsmColors.Ball, 72.dp)
+        Spacer(Modifier.width(14.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            if (p != null) {
+                val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
+                Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
         }
     }
     if (rivals.isNotEmpty()) {
         Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        rivals.forEach { r -> PlayerRow(r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
+        rivals.forEach { r -> PlayerRow(c, r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
     }
     Text(s.historyMatches, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
     mine.forEach { MatchRow(it) { c.openFromHistory(it) } }
@@ -11318,14 +11619,14 @@ private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PlayerRow(name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
+private fun PlayerRow(c: MatchController, name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
             .then(if (chevron) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Person, null, tint = TsmColors.Ball)
+        PlayerAvatar(c, name, TsmColors.Ball, 36.dp)
         Spacer(Modifier.width(10.dp))
         Text(name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
@@ -13195,8 +13496,10 @@ package com.tennis.scoremanager.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13245,6 +13548,7 @@ import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.EditablePlayerAvatar
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
@@ -13344,12 +13648,23 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
         Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(accent))
         val a = if (side == Side.P1) su.p1a else su.p2a
         val b = if (side == Side.P1) su.p1b else su.p2b
-        Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
-            c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+        // A sinistra di ogni nome la sua foto: si tocca per metterla o cambiarla.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            EditablePlayerAvatar(c, a, accent, 52.dp)
+            Box(Modifier.weight(1f)) {
+                Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
+                    c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+                }
+            }
         }
         if (su.doubles) {
-            Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
-                c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                EditablePlayerAvatar(c, b, accent, 52.dp)
+                Box(Modifier.weight(1f)) {
+                    Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
+                        c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+                    }
+                }
             }
         }
     }
@@ -13675,6 +13990,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
@@ -13684,13 +14000,12 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
@@ -13720,6 +14035,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
@@ -13727,6 +14043,7 @@ import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
@@ -13764,7 +14081,16 @@ fun SummaryScreen(c: MatchController) {
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(TsmColors.player(w).copy(alpha = 0.16f)).padding(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
+                // Le foto dei vincitori, se ci sono nomi veri; altrimenti la coppa.
+                val winners = PlayerStats.names(rec.setup, w)
+                if (winners.isNotEmpty()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        winners.forEach { PlayerAvatar(c, it, TsmColors.player(w), 68.dp) }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                } else {
+                    Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
+                }
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
@@ -13781,11 +14107,18 @@ fun SummaryScreen(c: MatchController) {
                         Box(Modifier.width(6.dp).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(TsmColors.player(side)))
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
+                            val real = PlayerStats.names(rec.setup, side)
                             for (p in names.players(side)) {
-                                Text(
-                                    p, color = TsmColors.player(side), fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 17.sp,
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (p in real) {
+                                        PlayerAvatar(c, p, TsmColors.player(side), 22.dp)
+                                        Spacer(Modifier.width(6.dp))
+                                    }
+                                    Text(
+                                        p, color = TsmColors.player(side), fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
+                                        maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 17.sp,
+                                    )
+                                }
                             }
                         }
                         for (set in state.sets) {
@@ -21613,6 +21946,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 83 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 84 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

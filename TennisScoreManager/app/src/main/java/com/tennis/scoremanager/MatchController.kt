@@ -8,9 +8,13 @@ import android.app.Application
 import android.content.ClipData
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import com.tennis.scoremanager.ble.BandEvent
@@ -29,6 +33,7 @@ import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
@@ -41,11 +46,11 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
-import com.tennis.scoremanager.transfer.TransferBundle
-import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.transfer.TransferBundle
+import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
 import com.tennis.scoremanager.tv.TvServer
 import com.tennis.scoremanager.tv.TvSettings
@@ -58,6 +63,9 @@ import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.CallBuilder
 import com.tennis.scoremanager.voice.Seg
 import com.tennis.scoremanager.voice.VoicePack
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.OutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -77,8 +85,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.OutputStream
 
 enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
 
@@ -113,6 +119,8 @@ class MatchController(
         const val CHANGEOVER_S = 90          // ITF: 90" al cambio campo
         const val SET_BREAK_S = 120          // ITF: 120" a fine set
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
+        /** Lato delle foto dei giocatori salvate (pixel). */
+        const val PHOTO_PX = 320
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
@@ -266,6 +274,13 @@ class MatchController(
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
     private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
 
+    /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
+    private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
+        PlayerStats.names(su, side).mapNotNull { n ->
+            storage.photoFile(PlayerStats.key(n)).takeIf { it.exists() }?.let { "/photo/${it.name}?v=${photosVersion.value}" }
+        }
+    }
+
     private fun publishTv() {
         if (!tvServer.running.value) return
         val sc = screen.value
@@ -287,6 +302,7 @@ class MatchController(
                 tv = tv.value,
                 strings = strings,
                 seq = ++tvSeq,
+                photos = tvPhotos(match?.record?.setup ?: setup.value),
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -1109,6 +1125,59 @@ class MatchController(
         return done to open
     }
 
+    // ---------------------------------------------------------------- foto dei giocatori
+
+    /** Cresce a ogni foto cambiata: chi mostra le foto le ricarica. */
+    val photosVersion = MutableStateFlow(0)
+
+    /** Foto del giocatore col nome [name], ritagliata quadrata e rimpicciolita; null se non c'è. */
+    fun loadPhoto(name: String): Bitmap? {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return null
+        val f = storage.photoFile(key)
+        return if (f.exists()) BitmapFactory.decodeFile(f.absolutePath) else null
+    }
+
+    /** Foto scelta dalla galleria o scattata: si salva quadrata (centro dell'immagine) a [PHOTO_PX] pixel. */
+    fun setPhoto(name: String, uri: Uri) {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return
+        scope.launch {
+            val ok = withContext(io) {
+                runCatching {
+                    // ImageDecoder (Android 9+) raddrizza le foto girate (EXIF); prima si legge com'è.
+                    val src = if (Build.VERSION.SDK_INT >= 28) {
+                        ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
+                            val side = minOf(info.size.width, info.size.height)
+                            d.setTargetSampleSize((side / (PHOTO_PX * 2)).coerceAtLeast(1))
+                            d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                        }
+                    } else {
+                        app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
+                    }
+                    val side = minOf(src.width, src.height)
+                    val square = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
+                    val small = Bitmap.createScaledBitmap(square, PHOTO_PX, PHOTO_PX, true)
+                    val out = ByteArrayOutputStream()
+                    small.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                    storage.savePhoto(key, out.toByteArray())
+                }.isSuccess
+            }
+            if (ok) photosVersion.value++ else _toasts.tryEmit(strings.photoError)
+            publishTv()
+        }
+    }
+
+    fun removePhoto(name: String) {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return
+        scope.launch {
+            withContext(io) { storage.deletePhoto(key) }
+            photosVersion.value++
+            publishTv()
+        }
+    }
+
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
     /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
@@ -1124,7 +1193,9 @@ class MatchController(
         val server = TransferServer(
             payload = {
                 val all = storage.loadFinished() + storage.loadUnfinished()
-                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all)).toByteArray()
+                // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
+                val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
+                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all, photos = photos)).toByteArray()
             },
             onServed = { transferServed.value++ },
         )
@@ -1152,6 +1223,10 @@ class MatchController(
             val result = withContext(io) {
                 runCatching {
                     val bundle = storage.json.decodeFromString(TransferBundle.serializer(), TransferServer.fetch(text).decodeToString())
+                    // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
+                    bundle.photos.forEach { (k, b64) ->
+                        if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
+                    }
                     importRecords(bundle.matches)
                 }.getOrNull()
             }
@@ -1164,6 +1239,7 @@ class MatchController(
             )
             refreshHistory()
             refreshSaved()
+            photosVersion.value++
         }
     }
 

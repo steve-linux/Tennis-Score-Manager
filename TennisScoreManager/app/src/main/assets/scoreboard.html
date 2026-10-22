@@ -48,6 +48,9 @@
     font-size: min(calc(6.2 * var(--vh)), calc(3.6 * var(--vw))); letter-spacing: .04em; text-transform: uppercase;
   }
   .name .nm { overflow: hidden; text-overflow: clip; }
+  .ph { display: flex; gap: .2em; flex: none; }
+  .ph:empty { display: none; }
+  .ph img { width: 1.35em; height: 1.35em; border-radius: 50%; object-fit: cover; border: .07em solid currentColor; }
   .ball { flex: none; width: .62em; height: .62em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 .35em var(--ball); visibility: hidden; }
   .serving .ball { visibility: visible; }
   .big { padding: calc(2.8 * var(--vh)) 0 calc(3.2 * var(--vh)); min-height: 0; }
@@ -98,7 +101,7 @@
 <div id="board">
   <div id="main">
     <section class="side" id="side0">
-      <div class="name"><span class="nm" id="n0"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph0"></span><span class="nm" id="n0"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt0"></svg></div>
     </section>
     <section id="mid">
@@ -110,7 +113,7 @@
       <div id="setrow"><svg id="s0"></svg><svg id="s1"></svg></div>
     </section>
     <section class="side" id="side1">
-      <div class="name"><span class="nm" id="n1"></span><span class="ball"></span></div>
+      <div class="name"><span class="ph" id="ph1"></span><span class="nm" id="n1"></span><span class="ball"></span></div>
       <div class="big"><svg id="pt1"></svg></div>
     </section>
   </div>
@@ -253,6 +256,13 @@ function render() {
     const n = $("n" + i);
     n.style.color = color(i);
     if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
+    // Foto dei giocatori accanto al nome (ci sono solo se messe nell'app); si rifanno solo se cambiano.
+    const ph = $("ph" + i), urls = (S.players[i].photos || []).join(" ");
+    if (ph.dataset.u !== urls) {
+      ph.dataset.u = urls;
+      ph.style.color = color(i);
+      ph.replaceChildren(...(S.players[i].photos || []).map(u => { const im = new Image(); im.src = u; im.alt = ""; return im; }));
+    }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
     setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));

@@ -76,7 +76,12 @@ data class TvSnapshot(
 )
 
 @Serializable
-data class TvPlayer(val name: String, val color: String)
+data class TvPlayer(
+    val name: String,
+    val color: String,
+    /** Foto dei giocatori del lato (indirizzi sul server del tabellone); vuota = nessuna. */
+    val photos: List<String> = emptyList(),
+)
 
 @Serializable
 data class TvSet(val g1: Int, val g2: Int, val tb1: Int? = null, val tb2: Int? = null, val mtb: Boolean = false)
@@ -122,6 +127,8 @@ data class TvInput(
     val tv: TvSettings,
     val strings: Strings,
     val seq: Long,
+    /** Indirizzi delle foto dei giocatori di ogni lato. */
+    val photos: Map<Side, List<String>> = emptyMap(),
 )
 
 object TvSnapshots {
@@ -173,7 +180,10 @@ object TvSnapshots {
             lang = i.lang.code,
             phase = phase,
             title = i.tv.title.trim().ifEmpty { defaultTitle(m?.record?.setup ?: i.setup, s) },
-            players = listOf(TvPlayer(names.short(Side.P1), i.tv.color1), TvPlayer(names.short(Side.P2), i.tv.color2)),
+            players = listOf(
+                TvPlayer(names.short(Side.P1), i.tv.color1, i.photos[Side.P1].orEmpty()),
+                TvPlayer(names.short(Side.P2), i.tv.color2, i.photos[Side.P2].orEmpty()),
+            ),
             server = server,
             points = points,
             games = games,

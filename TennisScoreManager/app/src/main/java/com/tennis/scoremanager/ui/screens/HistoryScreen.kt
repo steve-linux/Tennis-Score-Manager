@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -61,8 +60,10 @@ import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.EditablePlayerAvatar
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.QrCode
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SegOption
@@ -121,7 +122,7 @@ fun HistoryScreen(c: MatchController) {
         } else {
             val players = remember(played) { PlayerStats.players(played) }
             if (players.isEmpty()) Text(s.historyPlayersEmpty, color = TsmColors.TextDim)
-            players.forEach { p -> PlayerRow(p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
+            players.forEach { p -> PlayerRow(c, p.name, s.historyRecord(p.won, p.lost)) { player = p.key } }
         }
     }
 
@@ -177,19 +178,23 @@ private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, m
     val p = remember(played, key) { PlayerStats.players(played).firstOrNull { it.key == key } }
     val rivals = remember(played, key) { PlayerStats.rivals(played, key) }
     val mine = remember(matches, key) { matches.filter { PlayerStats.sideOf(it.record, key) != null } }
-    Column(
+    Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
-        if (p != null) {
-            val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
-            Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        EditablePlayerAvatar(c, p?.name ?: key, TsmColors.Ball, 72.dp)
+        Spacer(Modifier.width(14.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(p?.name ?: key, color = TsmColors.TextMain, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            if (p != null) {
+                val pct = if (p.played > 0) Math.round(p.won * 100.0 / p.played) else 0
+                Text(s.historyRecord(p.won, p.lost) + " · $pct%", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
         }
     }
     if (rivals.isNotEmpty()) {
         Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        rivals.forEach { r -> PlayerRow(r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
+        rivals.forEach { r -> PlayerRow(c, r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
     }
     Text(s.historyMatches, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
     mine.forEach { MatchRow(it) { c.openFromHistory(it) } }
@@ -235,14 +240,14 @@ private fun MatchRow(m: LiveMatch, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PlayerRow(name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
+private fun PlayerRow(c: MatchController, name: String, record: String, chevron: Boolean = true, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface)
             .then(if (chevron) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Person, null, tint = TsmColors.Ball)
+        PlayerAvatar(c, name, TsmColors.Ball, 36.dp)
         Spacer(Modifier.width(10.dp))
         Text(name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))

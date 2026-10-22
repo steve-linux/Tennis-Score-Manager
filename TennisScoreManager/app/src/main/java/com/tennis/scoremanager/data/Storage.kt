@@ -23,6 +23,33 @@ class Storage(context: Context) {
 
     private val matchesDir: File get() = File(app.filesDir, "matches").apply { mkdirs() }
     private val lastFinishedFile: File get() = File(app.filesDir, "last_finished.json")
+    /** Foto dei giocatori, una per nome (chiave di PlayerStats.key): JPEG quadrati e piccoli. */
+    private val photosDir: File get() = File(app.filesDir, "players").apply { mkdirs() }
+
+    fun photoFile(key: String): File {
+        val hash = java.security.MessageDigest.getInstance("SHA-1").digest(key.toByteArray()).joinToString("") { "%02x".format(it) }
+        return File(photosDir, "$hash.jpg")
+    }
+
+    /** Tutte le foto per chiave del nome (servono al trasferimento). Le chiavi stanno in un indice accanto. */
+    fun photoKeys(): List<String> = runCatching { File(photosDir, "index.txt").readLines().filter { it.isNotBlank() } }.getOrDefault(emptyList())
+        .filter { photoFile(it).exists() }
+
+    @Synchronized
+    fun savePhoto(key: String, jpeg: ByteArray) {
+        runCatching {
+            photoFile(key).writeBytes(jpeg)
+            val idx = File(photosDir, "index.txt")
+            val keys = (runCatching { idx.readLines() }.getOrDefault(emptyList()) + key).filter { it.isNotBlank() }.distinct()
+            idx.writeText(keys.joinToString("\n"))
+        }.onFailure { Log.e("Storage", "Salvataggio foto fallito", it) }
+    }
+
+    @Synchronized
+    fun deletePhoto(key: String) {
+        photoFile(key).delete()
+    }
+
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 

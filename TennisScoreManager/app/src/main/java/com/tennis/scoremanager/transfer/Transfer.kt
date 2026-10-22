@@ -14,9 +14,13 @@ import java.net.URL
 import java.security.SecureRandom
 import kotlin.concurrent.thread
 
-/** Quello che passa da un telefono all'altro: lo storico e le partite sospese. */
+/** Quello che passa da un telefono all'altro: storico, partite sospese e foto dei giocatori (JPEG in base64 per nome). */
 @Serializable
-data class TransferBundle(val version: Int = 1, val matches: List<MatchRecord> = emptyList())
+data class TransferBundle(
+    val version: Int = 1,
+    val matches: List<MatchRecord> = emptyList(),
+    val photos: Map<String, String> = emptyMap(),
+)
 
 /**
  * Trasferimento tra due telefoni sulla stessa rete (Wi-Fi o hotspot): chi invia apre un piccolo server http e

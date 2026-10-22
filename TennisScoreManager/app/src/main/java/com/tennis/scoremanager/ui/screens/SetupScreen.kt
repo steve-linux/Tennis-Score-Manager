@@ -6,8 +6,10 @@ package com.tennis.scoremanager.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,6 +58,7 @@ import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.DisplayActivity
 import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.EditablePlayerAvatar
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.ScreenScaffold
@@ -155,12 +158,23 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
         Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(accent))
         val a = if (side == Side.P1) su.p1a else su.p2a
         val b = if (side == Side.P1) su.p1b else su.p2b
-        Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
-            c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+        // A sinistra di ogni nome la sua foto: si tocca per metterla o cambiarla.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            EditablePlayerAvatar(c, a, accent, 52.dp)
+            Box(Modifier.weight(1f)) {
+                Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
+                    c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+                }
+            }
         }
         if (su.doubles) {
-            Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
-                c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                EditablePlayerAvatar(c, b, accent, 52.dp)
+                Box(Modifier.weight(1f)) {
+                    Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
+                        c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+                    }
+                }
             }
         }
     }

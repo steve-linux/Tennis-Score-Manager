@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
@@ -37,13 +38,12 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
@@ -80,6 +81,7 @@ import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
@@ -117,7 +119,16 @@ fun SummaryScreen(c: MatchController) {
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(TsmColors.player(w).copy(alpha = 0.16f)).padding(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
+                // Le foto dei vincitori, se ci sono nomi veri; altrimenti la coppa.
+                val winners = PlayerStats.names(rec.setup, w)
+                if (winners.isNotEmpty()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        winners.forEach { PlayerAvatar(c, it, TsmColors.player(w), 68.dp) }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                } else {
+                    Icon(Icons.Filled.EmojiEvents, null, tint = TsmColors.player(w), modifier = Modifier.size(52.dp))
+                }
                 Text(s.winner.uppercase(), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(names.side(w), color = TsmColors.player(w), fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(6.dp))
@@ -134,11 +145,18 @@ fun SummaryScreen(c: MatchController) {
                         Box(Modifier.width(6.dp).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(TsmColors.player(side)))
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
+                            val real = PlayerStats.names(rec.setup, side)
                             for (p in names.players(side)) {
-                                Text(
-                                    p, color = TsmColors.player(side), fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 17.sp,
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (p in real) {
+                                        PlayerAvatar(c, p, TsmColors.player(side), 22.dp)
+                                        Spacer(Modifier.width(6.dp))
+                                    }
+                                    Text(
+                                        p, color = TsmColors.player(side), fontWeight = if (side == w) FontWeight.Bold else FontWeight.Normal,
+                                        maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 17.sp,
+                                    )
+                                }
                             }
                         }
                         for (set in state.sets) {
