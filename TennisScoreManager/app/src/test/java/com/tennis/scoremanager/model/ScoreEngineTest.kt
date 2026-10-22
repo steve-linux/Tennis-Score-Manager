@@ -30,6 +30,72 @@ class ScoreEngineTest {
         return st
     }
 
+    /** Vince [n] set di fila 6-0 per [w]. */
+    private fun sets(s: MatchState, w: Side, n: Int): MatchState = (1..n).fold(s) { acc, _ -> (1..6).fold(acc) { g, _ -> game(g, w) } }
+
+    @Test
+    fun bestOfFiveNeedsThreeSets() {
+        var s = sets(ScoreEngine.initial(RulesConfig(format = MatchFormat.BEST_OF_FIVE)), P1, 2)
+        assertFalse(s.isFinished)
+        s = sets(s, P2, 2)
+        assertEquals(4, s.sets.size)
+        assertFalse(s.isFinished)
+        s = sets(s, P1, 1)
+        assertEquals(P1, s.winner)
+        assertEquals(5, s.sets.size)
+    }
+
+    @Test
+    fun proSetToEightWithTiebreakAtEightAll() {
+        val r = RulesConfig(format = MatchFormat.PRO_SET, gamesPerSet = 8)
+        var s = games(ScoreEngine.initial(r), 7, 7)
+        assertFalse(s.inTiebreak)
+        s = game(s, P1)
+        assertFalse(s.inTiebreak)
+        s = game(s, P2)
+        assertTrue(s.inTiebreak)
+        s = play(s, *Array(7) { P2 })
+        assertEquals(P2, s.winner)
+        assertEquals(9, s.sets.single().g2)
+        // Un solo set: vinto 8-6 la partita è finita.
+        assertEquals(P1, games(ScoreEngine.initial(r), 8, 6).winner)
+    }
+
+    @Test
+    fun shortSetsToFourWithTiebreakAtFourAll() {
+        val r = RulesConfig(gamesPerSet = 4)
+        assertEquals(1, games(ScoreEngine.initial(r), 4, 2).sets.size)
+        val s = games(ScoreEngine.initial(r), 4, 4)
+        assertTrue(s.inTiebreak)
+        assertEquals(0, s.sets.size)
+    }
+
+    @Test
+    fun setsWithoutTiebreakGoOnUntilTwoGamesAhead() {
+        val r = RulesConfig(setTiebreak = false)
+        var s = games(ScoreEngine.initial(r), 6, 6)
+        assertFalse(s.inTiebreak)
+        s = game(s, P1)
+        assertEquals(0, s.sets.size)
+        s = game(s, P1)
+        assertEquals(1, s.sets.size)
+        assertEquals(8, s.sets.single().g1)
+        assertEquals(6, s.sets.single().g2)
+        assertNull(s.sets.single().tb1)
+    }
+
+    @Test
+    fun matchTiebreakOnly() {
+        var s = ScoreEngine.initial(RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY))
+        assertEquals(TiebreakKind.MATCH, s.tiebreak)
+        s = play(s, *Array(9) { P1 }, *Array(9) { P2 })
+        assertFalse(s.isFinished)
+        s = play(s, P1, P1)
+        assertEquals(P1, s.winner)
+        assertTrue(s.sets.single().matchTiebreak)
+        assertEquals(11, s.sets.single().tb1)
+    }
+
     @Test
     fun pointLabelsAndDeuce() {
         var s = ScoreEngine.initial(RulesConfig())

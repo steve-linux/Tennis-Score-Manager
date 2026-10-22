@@ -238,6 +238,23 @@ interface Strings {
     val formatBestOfThreeHint: String
     val formatMatchTiebreak: String
     val formatMatchTiebreakHint: String
+    val formatBestOfFive: String
+    val formatBestOfFiveHint: String
+    val formatProSet: String
+    val formatProSetHint: String
+    val formatMatchTiebreakOnly: String
+    val formatMatchTiebreakOnlyHint: String
+    val gamesPerSetTitle: String
+    val gamesShort: String
+    val gamesShortHint: String
+    val setTiebreak: String
+    val labelShortSets: String
+    val labelTiebreak7: String
+    val labelNoTiebreak: String
+    val gamesN: (Int) -> String
+    val setTiebreakHint: (Int) -> String
+    val labelSets: (Int) -> String
+    val labelProSet: (Int) -> String
     val noAd: String
     val noAdHint: String
     val goldenPoint: String
@@ -705,6 +722,23 @@ object ItStrings : Strings {
     override val formatBestOfThreeHint = "Al meglio dei tre set, tie-break sul 6-6 in ogni set."
     override val formatMatchTiebreak = "2 set + super tie-break a 10"
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
+    override val formatBestOfFive = "5 set · tie-break a 7"
+    override val formatBestOfFiveHint = "Al meglio dei cinque set, tie-break sul 6-6 in ogni set."
+    override val formatProSet = "Pro set"
+    override val formatProSetHint = "Un solo set a 8 o 10 game con 2 di scarto, tie-break sull'8-8 o sul 10-10."
+    override val formatMatchTiebreakOnly = "Solo super tie-break a 10"
+    override val formatMatchTiebreakOnlyHint = "La partita è un unico match tie-break a 10 punti (2 di scarto)."
+    override val gamesPerSetTitle = "Game per set"
+    override val gamesShort = "4 game (set brevi)"
+    override val gamesShortHint = "Set brevi: vince il set chi arriva a 4 game con 2 di scarto; tie-break sul 4-4."
+    override val setTiebreak = "Tie-break nei set"
+    override val labelShortSets = "set a 4 game"
+    override val labelTiebreak7 = "tie-break a 7"
+    override val labelNoTiebreak = "senza tie-break"
+    override val gamesN: (Int) -> String = { "$it game" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break a 7 quando i game sono $it pari. Spento, il set continua finché uno non ha 2 game di scarto." }
+    override val labelSets: (Int) -> String = { "$it set" }
+    override val labelProSet: (Int) -> String = { "pro set a $it" }
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
     override val goldenPoint = "Golden point"
@@ -1156,6 +1190,23 @@ object EnStrings : Strings {
     override val formatBestOfThreeHint = "Best of three sets, tie-break at 6-6 in every set."
     override val formatMatchTiebreak = "2 sets + match tie-break to 10"
     override val formatMatchTiebreakHint = "At one set all the third set is a 10-point match tie-break (win by 2)."
+    override val formatBestOfFive = "5 sets · tie-break to 7"
+    override val formatBestOfFiveHint = "Best of five sets, tie-break at 6-6 in every set."
+    override val formatProSet = "Pro set"
+    override val formatProSetHint = "A single set to 8 or 10 games, win by 2, tie-break at 8-8 or 10-10."
+    override val formatMatchTiebreakOnly = "Match tie-break to 10 only"
+    override val formatMatchTiebreakOnlyHint = "The match is a single 10-point match tie-break (win by 2)."
+    override val gamesPerSetTitle = "Games per set"
+    override val gamesShort = "4 games (short sets)"
+    override val gamesShortHint = "Short sets: the first to 4 games with a 2-game lead wins the set; tie-break at 4-4."
+    override val setTiebreak = "Tie-break in sets"
+    override val labelShortSets = "sets to 4 games"
+    override val labelTiebreak7 = "tie-break to 7"
+    override val labelNoTiebreak = "no tie-break"
+    override val gamesN: (Int) -> String = { "$it games" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break to 7 at $it-$it. Off, the set goes on until someone leads by 2 games." }
+    override val labelSets: (Int) -> String = { "$it sets" }
+    override val labelProSet: (Int) -> String = { "pro set to $it" }
     override val noAd = "No-Ad (deciding point)"
     override val noAdHint = "At deuce a single deciding point is played."
     override val goldenPoint = "Golden point"

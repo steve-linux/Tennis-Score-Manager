@@ -162,6 +162,7 @@ let ghost = true;
 
 /** Prepara un display: "88" = due cifre, "88:88:88" = orologio. */
 function buildSeg(svg, pattern) {
+  svg.replaceChildren();
   let x = 0;
   const cells = [];
   for (const ch of pattern) {
@@ -265,7 +266,10 @@ function render() {
     }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
-    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
+    // Set senza tie-break o pro set: i game possono superare 9, allora le cifre diventano due (per tutti e due i lati).
+    const gd = Math.max(S.games[0], S.games[1]) >= 10 ? 2 : 1;
+    if (gms[i]._digits !== gd) { buildSeg(gms[i], "8".repeat(gd)); gms[i]._digits = gd; }
+    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 100), color(i));
     setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
   }
   const vs = $("vs");

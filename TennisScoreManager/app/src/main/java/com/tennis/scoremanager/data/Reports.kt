@@ -16,6 +16,7 @@ import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
@@ -108,10 +109,24 @@ object Reports {
         "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
             "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
 
+    /** "3 set · tie-break a 7", "5 set · set a 4 game · senza tie-break", "pro set a 10", "solo super tie-break a 10". */
+    fun formatName(r: RulesConfig, s: Strings): String {
+        val noTb = if (!r.setTiebreak) listOf(s.labelNoTiebreak) else emptyList()
+        val short = if (r.gamesPerSet == 4) listOf(s.labelShortSets) else emptyList()
+        val parts = when (r.format) {
+            MatchFormat.MATCH_TIEBREAK_ONLY -> listOf(s.formatMatchTiebreakOnly)
+            MatchFormat.PRO_SET -> listOf(s.labelProSet(r.gamesPerSet)) + noTb
+            MatchFormat.TWO_SETS_MATCH_TIEBREAK -> listOf(s.formatMatchTiebreak) + short + noTb
+            MatchFormat.BEST_OF_THREE, MatchFormat.BEST_OF_FIVE ->
+                listOf(s.labelSets(if (r.format == MatchFormat.BEST_OF_FIVE) 5 else 3)) + short + (if (r.setTiebreak) listOf(s.labelTiebreak7) else noTb)
+        }
+        return parts.joinToString(" · ")
+    }
+
     fun formatLabel(rec: MatchRecord, s: Strings): String {
         val padel = rec.setup.sport == Sport.PADEL
         return (if (padel) "${s.sportPadel} · " else "") +
-            (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
+            formatName(rec.rules, s) +
             (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
             (if (rec.rules.starPoint && !rec.rules.noAd) " · ${s.starPoint}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)

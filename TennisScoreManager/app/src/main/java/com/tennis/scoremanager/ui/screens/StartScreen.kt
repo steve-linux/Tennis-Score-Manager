@@ -70,7 +70,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Lang
-import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -176,7 +176,7 @@ fun StartScreen(c: MatchController) {
         }
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill(if (o.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak, TsmColors.SurfaceHigh, TsmColors.TextMain)
+            Pill(Reports.formatName(RulesConfig(format = o.format, gamesPerSet = o.gamesPerSet, setTiebreak = o.setTiebreak), s), TsmColors.SurfaceHigh, TsmColors.TextMain)
             Pill("${s.serving}: ${names.short(o.firstServer)}", TsmColors.player(o.firstServer), TsmColors.onPlayer(o.firstServer), Icons.Filled.SportsTennis)
         }
         Spacer(Modifier.weight(1f))

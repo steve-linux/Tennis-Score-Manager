@@ -106,7 +106,8 @@ data class Step(val state: MatchState, val transition: Transition?)
 
 object ScoreEngine {
 
-    fun initial(rules: RulesConfig): MatchState = MatchState(rules = rules)
+    fun initial(rules: RulesConfig): MatchState =
+        MatchState(rules = rules, tiebreak = if (rules.format == MatchFormat.MATCH_TIEBREAK_ONLY) TiebreakKind.MATCH else TiebreakKind.NONE)
 
     /** Ricostruisce lo stato applicando in ordine tutti gli eventi. */
     fun replay(rules: RulesConfig, events: List<MatchEvent>): MatchState =
@@ -173,11 +174,12 @@ object ScoreEngine {
         val go = if (w == Side.P1) g2 else g1
         val total = g1 + g2
 
-        if (gw >= 6 && gw - go >= 2) {
+        val n = s.rules.gamesPerSet
+        if (gw >= n && gw - go >= 2) {
             return closeSet(played, w, SetScore(g1, g2), fromTiebreak = false)
         }
-        if (g1 == 6 && g2 == 6) {
-            // 6-6: dodicesimo game (pari) quindi nessun cambio campo; parte il tie-break.
+        if (s.rules.setTiebreak && g1 == n && g2 == n) {
+            // 6-6 (o 4-4, 8-8...): game totali pari, quindi nessun cambio campo; parte il tie-break.
             return Step(
                 played.copy(g1 = g1, g2 = g2, pt1 = 0, pt2 = 0, tiebreak = TiebreakKind.SET),
                 Transition(pointWinner = w, gameWinner = w, tiebreakStarted = true),
@@ -194,7 +196,7 @@ object ScoreEngine {
     private fun closeSet(s: MatchState, w: Side, set: SetScore, fromTiebreak: Boolean): Step {
         val sets = s.sets + set
         val won = sets.count { it.winner == w }
-        if (won >= 2) {
+        if (won >= s.rules.setsToWin) {
             val final = s.copy(
                 sets = sets, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0,
                 tiebreak = TiebreakKind.NONE, winner = w,

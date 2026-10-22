@@ -40,12 +40,25 @@ enum class MatchFormat {
 
     /** Due set con tie-break a 7 sul 6-6; sull'1-1 si gioca un match tie-break (super tie-break) a 10. */
     TWO_SETS_MATCH_TIEBREAK,
+
+    /** Al meglio dei cinque set. */
+    BEST_OF_FIVE,
+
+    /** Un solo set lungo (pro set) a [RulesConfig.gamesPerSet] game, di solito 8 o 10. */
+    PRO_SET,
+
+    /** Solo un match tie-break a 10 punti. */
+    MATCH_TIEBREAK_ONLY,
 }
 
 /** Regole della partita decise prima dell'inizio (formato, sorteggio, lati del campo). */
 @Serializable
 data class RulesConfig(
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per vincere un set (con 2 di scarto): 6, 4 nei set brevi, 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    /** Tie-break a 7 quando i game arrivano pari a [gamesPerSet]; false = il set va avanti finché uno ha 2 game di scarto. */
+    val setTiebreak: Boolean = true,
     /** No-Ad: sul 40-40 si gioca il punto decisivo. */
     val noAd: Boolean = false,
     /**
@@ -61,7 +74,15 @@ data class RulesConfig(
     /** Doppio: quale giocatore della squadra (0 o 1) serve per primo nel primo set. */
     val firstServerP1: Int = 0,
     val firstServerP2: Int = 0,
-)
+) {
+    /** Set da vincere per vincere la partita (il match tie-break conta come un set). */
+    val setsToWin: Int
+        get() = when (format) {
+            MatchFormat.BEST_OF_FIVE -> 3
+            MatchFormat.PRO_SET, MatchFormat.MATCH_TIEBREAK_ONLY -> 1
+            else -> 2
+        }
+}
 
 /**
  * Come è finito un punto, per le statistiche dettagliate. Chi l'ha fatto si ricava dal vincitore e da chi serve:

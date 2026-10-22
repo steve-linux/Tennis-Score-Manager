@@ -6,6 +6,7 @@ package com.tennis.scoremanager.voice
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.model.Transition
 
 /** Un pezzo di chiamata: frase registrata (file locale o TTS di riserva), testo TTS (nomi) o pausa. */
@@ -53,6 +54,8 @@ object Phrases {
                 add("games_${a}_$b")
             }
             for (n in 1..6) add("games_all_$n")
+            // Set al meglio dei cinque (l'1-0 e l'1-1 stanno tra le chiavi fisse).
+            addAll(listOf("sets_2_0", "sets_2_1", "sets_all_2"))
             for (n in 0..MAX_NUMBER) add("num_$n")
             add(SET_ZERO)
         }
@@ -74,6 +77,8 @@ object Phrases {
         return when {
             key.startsWith("score_") -> w.score(parts[1].toInt(), parts[2].toInt())
             key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
+            key.startsWith("sets_all_") -> w.setsAll(parts[2].toInt())
+            key.startsWith("sets_") -> w.sets(parts[1].toInt(), parts[2].toInt())
             key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
             key.startsWith("num_") -> w.number(parts[1].toInt())
             key == SET_ZERO -> w.setZero
@@ -102,7 +107,8 @@ class CallBuilder(private val lang: Lang) {
 
     /** "Primo set" · "[nome] al servizio" · "gioco" con due secondi tra una frase e l'altra. */
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
-        Seg.Clip("first_set"),
+        // Partita di solo super tie-break: niente "primo set".
+        Seg.Clip(if (s.tiebreak == TiebreakKind.MATCH) "match_tiebreak" else "first_set"),
         Seg.Pause(START_GAP),
     ) + toServe(serverName(s, names)) + listOf(
         Seg.Pause(START_GAP),
@@ -193,20 +199,28 @@ class CallBuilder(private val lang: Lang) {
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
-        if (s.g1 == s.g2) return listOf(Seg.Clip("games_all_${s.g1.coerceIn(1, 6)}"))
+        if (s.g1 == s.g2) return listOf(clipOr("games_all_${s.g1}") { words.gamesAll(s.g1) })
         val leader = if (s.g1 > s.g2) Side.P1 else Side.P2
         val a = maxOf(s.g1, s.g2)
         val b = minOf(s.g1, s.g2)
-        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), Seg.Clip("games_${a}_$b"))
+        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), clipOr("games_${a}_$b") { words.games(a, b) })
     }
+
+    /**
+     * File registrato se la chiave è nel catalogo, altrimenti la sintesi vocale col testo: succede coi game oltre
+     * il 6-5 (set senza tie-break, pro set) che il catalogo non ha.
+     */
+    private fun clipOr(key: String, text: () -> String): Seg = if (key in Phrases.keys) Seg.Clip(key) else Seg.Say(text())
 
     /** "[nome] conduce un set a zero" oppure "un set pari". */
     fun setsStanding(s: MatchState, names: CallNames): List<Seg> {
         val s1 = s.setsWon(Side.P1)
         val s2 = s.setsWon(Side.P2)
-        if (s1 == s2) return listOf(Seg.Clip("sets_all_1"))
+        if (s1 == s2) return listOf(clipOr("sets_all_$s1") { words.setsAll(s1) })
         val leader = if (s1 > s2) Side.P1 else Side.P2
-        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), Seg.Clip("sets_1_0"))
+        val a = maxOf(s1, s2)
+        val b = minOf(s1, s2)
+        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), clipOr("sets_${a}_$b") { words.sets(a, b) })
     }
 
     /** "Gioco, set, partita [nome], sei quattro, tre sei, sette cinque" (punteggi dal lato del vincitore). */

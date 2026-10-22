@@ -419,6 +419,7 @@ let ghost = true;
 
 /** Prepara un display: "88" = due cifre, "88:88:88" = orologio. */
 function buildSeg(svg, pattern) {
+  svg.replaceChildren();
   let x = 0;
   const cells = [];
   for (const ch of pattern) {
@@ -522,7 +523,10 @@ function render() {
     }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
-    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 10), color(i));
+    // Set senza tie-break o pro set: i game possono superare 9, allora le cifre diventano due (per tutti e due i lati).
+    const gd = Math.max(S.games[0], S.games[1]) >= 10 ? 2 : 1;
+    if (gms[i]._digits !== gd) { buildSeg(gms[i], "8".repeat(gd)); gms[i]._digits = gd; }
+    setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 100), color(i));
     setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
   }
   const vs = $("vs");
@@ -931,6 +935,11 @@ class MatchController(
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
+    /**
+     * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
+     * col tabellone acceso, all'avvio publishTv la legge subito.
+     */
+    val photosVersion = MutableStateFlow(0)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -1514,6 +1523,8 @@ class MatchController(
         val su = setup.value
         val rules = RulesConfig(
             format = o.format,
+            gamesPerSet = o.gamesPerSet,
+            setTiebreak = o.setTiebreak,
             noAd = o.noAd,
             starPoint = su.sport == Sport.PADEL && o.starPoint && !o.noAd,
             doubles = su.doubles,
@@ -1906,9 +1917,6 @@ class MatchController(
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
-
-    /** Cresce a ogni foto cambiata: chi mostra le foto le ricarica. */
-    val photosVersion = MutableStateFlow(0)
 
     /** Foto del giocatore col nome [name], ritagliata quadrata e rimpicciolita; null se non c'è. */
     fun loadPhoto(name: String): Bitmap? {
@@ -3996,6 +4004,9 @@ data class MatchOptions(
     val lang: Lang = Lang.IT,
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per set: 6 o 4 (set brevi); 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    val setTiebreak: Boolean = true,
     val noAd: Boolean = false,
     /** Statistiche dettagliate: ace, falli, vincenti ed errori si segnano dalla schermata del punteggio. */
     val detailedStats: Boolean = false,
@@ -4207,6 +4218,7 @@ import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.SetScore
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.Strings
@@ -4299,10 +4311,24 @@ object Reports {
         "${s.rallyAverage} ${String.format(locale(lang), "%.1f", st.average)} · ${s.rallyLongest} ${st.longest} · " +
             "${s.rallyShort} (1-3) ${st.shortPct}% · ${s.rallyMedium} (4-8) ${st.mediumPct}% · ${s.rallyLong} (9+) ${st.longPct}%"
 
+    /** "3 set · tie-break a 7", "5 set · set a 4 game · senza tie-break", "pro set a 10", "solo super tie-break a 10". */
+    fun formatName(r: RulesConfig, s: Strings): String {
+        val noTb = if (!r.setTiebreak) listOf(s.labelNoTiebreak) else emptyList()
+        val short = if (r.gamesPerSet == 4) listOf(s.labelShortSets) else emptyList()
+        val parts = when (r.format) {
+            MatchFormat.MATCH_TIEBREAK_ONLY -> listOf(s.formatMatchTiebreakOnly)
+            MatchFormat.PRO_SET -> listOf(s.labelProSet(r.gamesPerSet)) + noTb
+            MatchFormat.TWO_SETS_MATCH_TIEBREAK -> listOf(s.formatMatchTiebreak) + short + noTb
+            MatchFormat.BEST_OF_THREE, MatchFormat.BEST_OF_FIVE ->
+                listOf(s.labelSets(if (r.format == MatchFormat.BEST_OF_FIVE) 5 else 3)) + short + (if (r.setTiebreak) listOf(s.labelTiebreak7) else noTb)
+        }
+        return parts.joinToString(" · ")
+    }
+
     fun formatLabel(rec: MatchRecord, s: Strings): String {
         val padel = rec.setup.sport == Sport.PADEL
         return (if (padel) "${s.sportPadel} · " else "") +
-            (if (rec.rules.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak) +
+            formatName(rec.rules, s) +
             (if (rec.rules.noAd) " · ${if (padel) s.goldenPoint else s.noAdShort}" else "") +
             (if (rec.rules.starPoint && !rec.rules.noAd) " · ${s.starPoint}" else "") +
             " · " + (if (rec.rules.doubles) s.doubles else s.singles)
@@ -4690,12 +4716,25 @@ enum class MatchFormat {
 
     /** Due set con tie-break a 7 sul 6-6; sull'1-1 si gioca un match tie-break (super tie-break) a 10. */
     TWO_SETS_MATCH_TIEBREAK,
+
+    /** Al meglio dei cinque set. */
+    BEST_OF_FIVE,
+
+    /** Un solo set lungo (pro set) a [RulesConfig.gamesPerSet] game, di solito 8 o 10. */
+    PRO_SET,
+
+    /** Solo un match tie-break a 10 punti. */
+    MATCH_TIEBREAK_ONLY,
 }
 
 /** Regole della partita decise prima dell'inizio (formato, sorteggio, lati del campo). */
 @Serializable
 data class RulesConfig(
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per vincere un set (con 2 di scarto): 6, 4 nei set brevi, 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    /** Tie-break a 7 quando i game arrivano pari a [gamesPerSet]; false = il set va avanti finché uno ha 2 game di scarto. */
+    val setTiebreak: Boolean = true,
     /** No-Ad: sul 40-40 si gioca il punto decisivo. */
     val noAd: Boolean = false,
     /**
@@ -4711,7 +4750,15 @@ data class RulesConfig(
     /** Doppio: quale giocatore della squadra (0 o 1) serve per primo nel primo set. */
     val firstServerP1: Int = 0,
     val firstServerP2: Int = 0,
-)
+) {
+    /** Set da vincere per vincere la partita (il match tie-break conta come un set). */
+    val setsToWin: Int
+        get() = when (format) {
+            MatchFormat.BEST_OF_FIVE -> 3
+            MatchFormat.PRO_SET, MatchFormat.MATCH_TIEBREAK_ONLY -> 1
+            else -> 2
+        }
+}
 
 /**
  * Come è finito un punto, per le statistiche dettagliate. Chi l'ha fatto si ricava dal vincitore e da chi serve:
@@ -4875,7 +4922,8 @@ data class Step(val state: MatchState, val transition: Transition?)
 
 object ScoreEngine {
 
-    fun initial(rules: RulesConfig): MatchState = MatchState(rules = rules)
+    fun initial(rules: RulesConfig): MatchState =
+        MatchState(rules = rules, tiebreak = if (rules.format == MatchFormat.MATCH_TIEBREAK_ONLY) TiebreakKind.MATCH else TiebreakKind.NONE)
 
     /** Ricostruisce lo stato applicando in ordine tutti gli eventi. */
     fun replay(rules: RulesConfig, events: List<MatchEvent>): MatchState =
@@ -4942,11 +4990,12 @@ object ScoreEngine {
         val go = if (w == Side.P1) g2 else g1
         val total = g1 + g2
 
-        if (gw >= 6 && gw - go >= 2) {
+        val n = s.rules.gamesPerSet
+        if (gw >= n && gw - go >= 2) {
             return closeSet(played, w, SetScore(g1, g2), fromTiebreak = false)
         }
-        if (g1 == 6 && g2 == 6) {
-            // 6-6: dodicesimo game (pari) quindi nessun cambio campo; parte il tie-break.
+        if (s.rules.setTiebreak && g1 == n && g2 == n) {
+            // 6-6 (o 4-4, 8-8...): game totali pari, quindi nessun cambio campo; parte il tie-break.
             return Step(
                 played.copy(g1 = g1, g2 = g2, pt1 = 0, pt2 = 0, tiebreak = TiebreakKind.SET),
                 Transition(pointWinner = w, gameWinner = w, tiebreakStarted = true),
@@ -4963,7 +5012,7 @@ object ScoreEngine {
     private fun closeSet(s: MatchState, w: Side, set: SetScore, fromTiebreak: Boolean): Step {
         val sets = s.sets + set
         val won = sets.count { it.winner == w }
-        if (won >= 2) {
+        if (won >= s.rules.setsToWin) {
             val final = s.copy(
                 sets = sets, g1 = 0, g2 = 0, pt1 = 0, pt2 = 0,
                 tiebreak = TiebreakKind.NONE, winner = w,
@@ -8056,6 +8105,23 @@ interface Strings {
     val formatBestOfThreeHint: String
     val formatMatchTiebreak: String
     val formatMatchTiebreakHint: String
+    val formatBestOfFive: String
+    val formatBestOfFiveHint: String
+    val formatProSet: String
+    val formatProSetHint: String
+    val formatMatchTiebreakOnly: String
+    val formatMatchTiebreakOnlyHint: String
+    val gamesPerSetTitle: String
+    val gamesShort: String
+    val gamesShortHint: String
+    val setTiebreak: String
+    val labelShortSets: String
+    val labelTiebreak7: String
+    val labelNoTiebreak: String
+    val gamesN: (Int) -> String
+    val setTiebreakHint: (Int) -> String
+    val labelSets: (Int) -> String
+    val labelProSet: (Int) -> String
     val noAd: String
     val noAdHint: String
     val goldenPoint: String
@@ -8523,6 +8589,23 @@ object ItStrings : Strings {
     override val formatBestOfThreeHint = "Al meglio dei tre set, tie-break sul 6-6 in ogni set."
     override val formatMatchTiebreak = "2 set + super tie-break a 10"
     override val formatMatchTiebreakHint = "Sull'1-1 il terzo set è un match tie-break a 10 punti (2 di scarto)."
+    override val formatBestOfFive = "5 set · tie-break a 7"
+    override val formatBestOfFiveHint = "Al meglio dei cinque set, tie-break sul 6-6 in ogni set."
+    override val formatProSet = "Pro set"
+    override val formatProSetHint = "Un solo set a 8 o 10 game con 2 di scarto, tie-break sull'8-8 o sul 10-10."
+    override val formatMatchTiebreakOnly = "Solo super tie-break a 10"
+    override val formatMatchTiebreakOnlyHint = "La partita è un unico match tie-break a 10 punti (2 di scarto)."
+    override val gamesPerSetTitle = "Game per set"
+    override val gamesShort = "4 game (set brevi)"
+    override val gamesShortHint = "Set brevi: vince il set chi arriva a 4 game con 2 di scarto; tie-break sul 4-4."
+    override val setTiebreak = "Tie-break nei set"
+    override val labelShortSets = "set a 4 game"
+    override val labelTiebreak7 = "tie-break a 7"
+    override val labelNoTiebreak = "senza tie-break"
+    override val gamesN: (Int) -> String = { "$it game" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break a 7 quando i game sono $it pari. Spento, il set continua finché uno non ha 2 game di scarto." }
+    override val labelSets: (Int) -> String = { "$it set" }
+    override val labelProSet: (Int) -> String = { "pro set a $it" }
     override val noAd = "No-Ad (punto decisivo)"
     override val noAdHint = "Sul 40-40 si gioca un solo punto: chi lo vince vince il game."
     override val goldenPoint = "Golden point"
@@ -8974,6 +9057,23 @@ object EnStrings : Strings {
     override val formatBestOfThreeHint = "Best of three sets, tie-break at 6-6 in every set."
     override val formatMatchTiebreak = "2 sets + match tie-break to 10"
     override val formatMatchTiebreakHint = "At one set all the third set is a 10-point match tie-break (win by 2)."
+    override val formatBestOfFive = "5 sets · tie-break to 7"
+    override val formatBestOfFiveHint = "Best of five sets, tie-break at 6-6 in every set."
+    override val formatProSet = "Pro set"
+    override val formatProSetHint = "A single set to 8 or 10 games, win by 2, tie-break at 8-8 or 10-10."
+    override val formatMatchTiebreakOnly = "Match tie-break to 10 only"
+    override val formatMatchTiebreakOnlyHint = "The match is a single 10-point match tie-break (win by 2)."
+    override val gamesPerSetTitle = "Games per set"
+    override val gamesShort = "4 games (short sets)"
+    override val gamesShortHint = "Short sets: the first to 4 games with a 2-game lead wins the set; tie-break at 4-4."
+    override val setTiebreak = "Tie-break in sets"
+    override val labelShortSets = "sets to 4 games"
+    override val labelTiebreak7 = "tie-break to 7"
+    override val labelNoTiebreak = "no tie-break"
+    override val gamesN: (Int) -> String = { "$it games" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break to 7 at $it-$it. Off, the set goes on until someone leads by 2 games." }
+    override val labelSets: (Int) -> String = { "$it sets" }
+    override val labelProSet: (Int) -> String = { "pro set to $it" }
     override val noAd = "No-Ad (deciding point)"
     override val noAdHint = "At deuce a single deciding point is played."
     override val goldenPoint = "Golden point"
@@ -9448,6 +9548,23 @@ object DeStrings : Strings {
     override val formatBestOfThreeHint = "Auf zwei Gewinnsätze, Tie-Break bei 6 beide in jedem Satz."
     override val formatMatchTiebreak = "2 Sätze + Match-Tie-Break bis 10"
     override val formatMatchTiebreakHint = "Bei 1:1 Sätzen entscheidet ein Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
+    override val formatBestOfFive = "3 Gewinnsätze · Tie-Break bis 7"
+    override val formatBestOfFiveHint = "Auf drei Gewinnsätze, Tie-Break bei 6 beide in jedem Satz."
+    override val formatProSet = "Pro-Satz"
+    override val formatProSetHint = "Ein einziger Satz bis 8 oder 10 Spiele mit 2 Spielen Abstand, Tie-Break bei 8 oder 10 beide."
+    override val formatMatchTiebreakOnly = "Nur Match-Tie-Break bis 10"
+    override val formatMatchTiebreakOnlyHint = "Das Match ist ein einziger Match-Tie-Break bis 10 Punkte (2 Punkte Abstand)."
+    override val gamesPerSetTitle = "Spiele pro Satz"
+    override val gamesShort = "4 Spiele (Kurzsätze)"
+    override val gamesShortHint = "Kurzsätze: Den Satz gewinnt, wer zuerst 4 Spiele mit 2 Abstand hat; Tie-Break bei 4 beide."
+    override val setTiebreak = "Tie-Break in den Sätzen"
+    override val labelShortSets = "Sätze bis 4 Spiele"
+    override val labelTiebreak7 = "Tie-Break bis 7"
+    override val labelNoTiebreak = "ohne Tie-Break"
+    override val gamesN: (Int) -> String = { "$it Spiele" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-Break bis 7 bei $it beide. Ausgeschaltet läuft der Satz weiter, bis jemand 2 Spiele vorne liegt." }
+    override val labelSets: (Int) -> String = { "${(it + 1) / 2} Gewinnsätze" }
+    override val labelProSet: (Int) -> String = { "Pro-Satz bis $it" }
     override val noAd = "No-Ad (entscheidender Punkt)"
     override val noAdHint = "Bei Einstand wird ein einziger Punkt gespielt: Wer ihn gewinnt, gewinnt das Spiel."
     override val goldenPoint = "Golden Point"
@@ -9914,6 +10031,23 @@ object EsStrings : Strings {
     override val formatBestOfThreeHint = "Al mejor de tres sets, tie-break con 6-6 en cada set."
     override val formatMatchTiebreak = "2 sets + súper tie-break a 10"
     override val formatMatchTiebreakHint = "Con un set iguales, el tercer set es un match tie-break a 10 puntos (2 de diferencia)."
+    override val formatBestOfFive = "5 sets · tie-break a 7"
+    override val formatBestOfFiveHint = "Al mejor de cinco sets, tie-break con 6-6 en cada set."
+    override val formatProSet = "Pro set"
+    override val formatProSetHint = "Un solo set a 8 o 10 juegos con 2 de diferencia, tie-break con 8-8 o 10-10."
+    override val formatMatchTiebreakOnly = "Solo súper tie-break a 10"
+    override val formatMatchTiebreakOnlyHint = "El partido es un único match tie-break a 10 puntos (2 de diferencia)."
+    override val gamesPerSetTitle = "Juegos por set"
+    override val gamesShort = "4 juegos (sets cortos)"
+    override val gamesShortHint = "Sets cortos: gana el set quien llega a 4 juegos con 2 de diferencia; tie-break con 4-4."
+    override val setTiebreak = "Tie-break en los sets"
+    override val labelShortSets = "sets a 4 juegos"
+    override val labelTiebreak7 = "tie-break a 7"
+    override val labelNoTiebreak = "sin tie-break"
+    override val gamesN: (Int) -> String = { "$it juegos" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break a 7 con $it-$it. Desactivado, el set sigue hasta que alguien saque 2 juegos de ventaja." }
+    override val labelSets: (Int) -> String = { "$it sets" }
+    override val labelProSet: (Int) -> String = { "pro set a $it" }
     override val noAd = "Sin ventaja (punto decisivo)"
     override val noAdHint = "Con iguales se juega un solo punto: quien lo gana se lleva el juego."
     override val goldenPoint = "Punto de oro"
@@ -10384,6 +10518,23 @@ object FrStrings : Strings {
     override val formatBestOfThreeHint = "Au meilleur des trois manches, jeu décisif à 6-6 dans chaque manche."
     override val formatMatchTiebreak = "2 manches + super jeu décisif à 10"
     override val formatMatchTiebreakHint = "À une manche partout, la troisième manche est un super jeu décisif en 10 points (2 points d'écart)."
+    override val formatBestOfFive = "5 manches · jeu décisif à 7"
+    override val formatBestOfFiveHint = "Au meilleur des cinq manches, jeu décisif à 6-6 dans chaque manche."
+    override val formatProSet = "Pro set (manche unique)"
+    override val formatProSetHint = "Une seule manche en 8 ou 10 jeux avec 2 jeux d'écart, jeu décisif à 8-8 ou 10-10."
+    override val formatMatchTiebreakOnly = "Super jeu décisif à 10 seulement"
+    override val formatMatchTiebreakOnlyHint = "Le match est un seul super jeu décisif en 10 points (2 points d'écart)."
+    override val gamesPerSetTitle = "Jeux par manche"
+    override val gamesShort = "4 jeux (manches courtes)"
+    override val gamesShortHint = "Manches courtes : gagne la manche le premier à 4 jeux avec 2 d'écart ; jeu décisif à 4-4."
+    override val setTiebreak = "Jeu décisif dans les manches"
+    override val labelShortSets = "manches en 4 jeux"
+    override val labelTiebreak7 = "jeu décisif à 7"
+    override val labelNoTiebreak = "sans jeu décisif"
+    override val gamesN: (Int) -> String = { "$it jeux" }
+    override val setTiebreakHint: (Int) -> String = { "Jeu décisif à 7 à $it-$it. Désactivé, la manche continue jusqu'à 2 jeux d'écart." }
+    override val labelSets: (Int) -> String = { "$it manches" }
+    override val labelProSet: (Int) -> String = { "pro set en $it" }
     override val noAd = "No-Ad (point décisif)"
     override val noAdHint = "À 40-40, on joue un seul point : celui qui le gagne remporte le jeu."
     override val goldenPoint = "Golden point"
@@ -10853,6 +11004,23 @@ object PtStrings : Strings {
     override val formatBestOfThreeHint = "Melhor de três sets, tie-break no 6-6 em cada set."
     override val formatMatchTiebreak = "2 sets + tie-break decisivo a 10"
     override val formatMatchTiebreakHint = "No 1-1 em sets, o terceiro set é um tie-break decisivo a 10 pontos (2 de diferença)."
+    override val formatBestOfFive = "5 sets · tie-break a 7"
+    override val formatBestOfFiveHint = "Melhor de cinco sets, tie-break no 6-6 em cada set."
+    override val formatProSet = "Pro set (set único)"
+    override val formatProSetHint = "Um único set de 8 ou 10 jogos com 2 de diferença, tie-break no 8-8 ou no 10-10."
+    override val formatMatchTiebreakOnly = "Só tie-break decisivo a 10"
+    override val formatMatchTiebreakOnlyHint = "A partida é um único tie-break decisivo a 10 pontos (2 de diferença)."
+    override val gamesPerSetTitle = "Jogos por set"
+    override val gamesShort = "4 jogos (sets curtos)"
+    override val gamesShortHint = "Sets curtos: vence o set quem chega a 4 jogos com 2 de diferença; tie-break no 4-4."
+    override val setTiebreak = "Tie-break nos sets"
+    override val labelShortSets = "sets de 4 jogos"
+    override val labelTiebreak7 = "tie-break a 7"
+    override val labelNoTiebreak = "sem tie-break"
+    override val gamesN: (Int) -> String = { "$it jogos" }
+    override val setTiebreakHint: (Int) -> String = { "Tie-break a 7 no $it-$it. Desligado, o set continua até alguém ter 2 jogos de vantagem." }
+    override val labelSets: (Int) -> String = { "$it sets" }
+    override val labelProSet: (Int) -> String = { "pro set de $it" }
     override val noAd = "Sem vantagem (ponto decisivo)"
     override val noAdHint = "No 40-40 joga-se um único ponto: quem ganhar leva o jogo."
     override val goldenPoint = "Golden point"
@@ -12623,13 +12791,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
-import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -12644,11 +12812,12 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
+import androidx.compose.material.icons.filled.SportsScore
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
@@ -12724,9 +12893,9 @@ import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /** Pagina 2: modalità, braccialetti, lingua, voce, formato e sorteggio. */
 @Composable
@@ -12875,18 +13044,46 @@ fun OptionsScreen(c: MatchController) {
 
         // Formato
         SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
-            FormatOption(s.formatBestOfThree, s.formatBestOfThreeHint, o.format == MatchFormat.BEST_OF_THREE) {
-                c.updateOptions { it.copy(format = MatchFormat.BEST_OF_THREE) }
+            // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
+            fun pick(f: MatchFormat) = c.updateOptions {
+                val pro = f == MatchFormat.PRO_SET
+                val games = when {
+                    pro && it.gamesPerSet !in listOf(8, 10) -> 8
+                    !pro && it.gamesPerSet !in listOf(4, 6) -> 6
+                    else -> it.gamesPerSet
+                }
+                it.copy(format = f, gamesPerSet = games)
             }
+            FormatOption(s.formatBestOfThree, s.formatBestOfThreeHint, o.format == MatchFormat.BEST_OF_THREE) { pick(MatchFormat.BEST_OF_THREE) }
+            FormatOption(s.formatBestOfFive, s.formatBestOfFiveHint, o.format == MatchFormat.BEST_OF_FIVE) { pick(MatchFormat.BEST_OF_FIVE) }
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
-                c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
+                pick(MatchFormat.TWO_SETS_MATCH_TIEBREAK)
+            }
+            FormatOption(s.formatProSet, s.formatProSetHint, o.format == MatchFormat.PRO_SET) { pick(MatchFormat.PRO_SET) }
+            FormatOption(s.formatMatchTiebreakOnly, s.formatMatchTiebreakOnlyHint, o.format == MatchFormat.MATCH_TIEBREAK_ONLY) {
+                pick(MatchFormat.MATCH_TIEBREAK_ONLY)
+            }
+            // Solo super tie-break: niente game, quindi niente game per set, tie-break dei set né vantaggi.
+            val onlyTiebreak = o.format == MatchFormat.MATCH_TIEBREAK_ONLY
+            if (!onlyTiebreak) {
+                Text(s.gamesPerSetTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                val choices = if (o.format == MatchFormat.PRO_SET) listOf(8, 10) else listOf(6, 4)
+                Segmented(
+                    choices.map { SegOption(if (it == 4) s.gamesShort else s.gamesN(it)) },
+                    selected = choices.indexOf(o.gamesPerSet).coerceAtLeast(0),
+                    onSelect = { i -> c.updateOptions { it.copy(gamesPerSet = choices[i]) } },
+                )
+                if (o.gamesPerSet == 4) Text(s.gamesShortHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                SwitchRow(Icons.Filled.SportsScore, s.setTiebreak, s.setTiebreakHint(o.gamesPerSet), o.setTiebreak) { v ->
+                    c.updateOptions { it.copy(setTiebreak = v) }
+                }
             }
             val padel = su.sport == Sport.PADEL
-            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+            if (!onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
                 c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
             }
             // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
-            if (padel) {
+            if (padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
                 }
@@ -13776,7 +13973,7 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.Lang
-import com.tennis.scoremanager.model.MatchFormat
+import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -13882,7 +14079,7 @@ fun StartScreen(c: MatchController) {
         }
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill(if (o.format == MatchFormat.BEST_OF_THREE) s.formatBestOfThree else s.formatMatchTiebreak, TsmColors.SurfaceHigh, TsmColors.TextMain)
+            Pill(Reports.formatName(RulesConfig(format = o.format, gamesPerSet = o.gamesPerSet, setTiebreak = o.setTiebreak), s), TsmColors.SurfaceHigh, TsmColors.TextMain)
             Pill("${s.serving}: ${names.short(o.firstServer)}", TsmColors.player(o.firstServer), TsmColors.onPlayer(o.firstServer), Icons.Filled.SportsTennis)
         }
         Spacer(Modifier.weight(1f))
@@ -14728,6 +14925,12 @@ internal abstract class CallWords {
     /** Game pari: "due giochi pari". */
     abstract fun gamesAll(n: Int): String
 
+    /** Set dal lato di chi conduce, oltre l'"un set a zero" del catalogo (al meglio dei cinque): "due set a uno". */
+    abstract fun sets(a: Int, b: Int): String
+
+    /** Set pari: "due set pari". */
+    abstract fun setsAll(n: Int): String
+
     /** "Rossi al servizio" (nome prima) oppure "Au service Dupont" (nome dopo). */
     open val nameBeforeToServe: Boolean = true
 
@@ -14785,6 +14988,9 @@ internal object ItWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un gioco" else "${number(n)} giochi"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} pari"
+    private fun st(n: Int) = if (n == 1) "un set" else "${number(n)} set"
+    override fun sets(a: Int, b: Int) = "${st(a)} a ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} pari"
     override fun tiebreakTo(a: Int, b: Int) = true
     override fun setScoreTo(a: Int, b: Int) = false
 }
@@ -14821,6 +15027,9 @@ internal object EnWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "one game" else "${number(n)} games"
     override fun games(a: Int, b: Int) = "${g(a)} to ${if (b == 0) "love" else number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} all"
+    private fun st(n: Int) = if (n == 1) "one set" else "${number(n)} sets"
+    override fun sets(a: Int, b: Int) = "${st(a)} to ${if (b == 0) "love" else number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} all"
     override fun tiebreakTo(a: Int, b: Int) = false
     override fun setScoreTo(a: Int, b: Int) = false
 }
@@ -14857,6 +15066,9 @@ internal object FrWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un jeu" else "${number(n)} jeux"
     override fun games(a: Int, b: Int) = "${g(a)} à ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} partout"
+    private fun st(n: Int) = if (n == 1) "une manche" else "${number(n)} manches"
+    override fun sets(a: Int, b: Int) = "${st(a)} à ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} partout"
     override val nameBeforeToServe = false
 }
 
@@ -14894,6 +15106,9 @@ internal object EsWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un juego" else "${number(n)} juegos"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} iguales"
+    private fun st(n: Int) = if (n == 1) "un set" else "${number(n)} sets"
+    override fun sets(a: Int, b: Int) = "${st(a)} a ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} iguales"
     override val nameBeforeToServe = false
 }
 
@@ -14931,6 +15146,8 @@ internal object DeWords : CallWords() {
     override val points = listOf("null", "fünfzehn", "dreißig", "vierzig")
     override fun games(a: Int, b: Int) = "${number(a)} zu ${number(b)}"
     override fun gamesAll(n: Int) = if (n == 1) "ein Spiel beide" else "${number(n)} beide"
+    override fun sets(a: Int, b: Int) = "${number(a)} zu ${number(b)} in Sätzen"
+    override fun setsAll(n: Int) = if (n == 1) "ein Satz beide" else "${number(n)} Sätze beide"
     override val nameBeforeToServe = false
     override fun tiebreakTo(a: Int, b: Int) = true
     override fun setScoreTo(a: Int, b: Int) = true
@@ -14973,6 +15190,8 @@ internal object PtWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "um jogo" else "${number(n)} jogos"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = if (n == 1) "um jogo igual" else "${g(n)} iguais"
+    override fun sets(a: Int, b: Int) = "${if (a == 1) "um set" else "${number(a)} sets"} a ${number(b)}"
+    override fun setsAll(n: Int) = if (n == 1) "sets iguais" else "${number(n)} sets iguais"
     override fun tiebreakTo(a: Int, b: Int) = true
 }
 TSM_EOF
@@ -14987,6 +15206,7 @@ package com.tennis.scoremanager.voice
 import com.tennis.scoremanager.model.Lang
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.model.Transition
 
 /** Un pezzo di chiamata: frase registrata (file locale o TTS di riserva), testo TTS (nomi) o pausa. */
@@ -15034,6 +15254,8 @@ object Phrases {
                 add("games_${a}_$b")
             }
             for (n in 1..6) add("games_all_$n")
+            // Set al meglio dei cinque (l'1-0 e l'1-1 stanno tra le chiavi fisse).
+            addAll(listOf("sets_2_0", "sets_2_1", "sets_all_2"))
             for (n in 0..MAX_NUMBER) add("num_$n")
             add(SET_ZERO)
         }
@@ -15055,6 +15277,8 @@ object Phrases {
         return when {
             key.startsWith("score_") -> w.score(parts[1].toInt(), parts[2].toInt())
             key.startsWith("games_all_") -> w.gamesAll(parts[2].toInt())
+            key.startsWith("sets_all_") -> w.setsAll(parts[2].toInt())
+            key.startsWith("sets_") -> w.sets(parts[1].toInt(), parts[2].toInt())
             key.startsWith("games_") -> w.games(parts[1].toInt(), parts[2].toInt())
             key.startsWith("num_") -> w.number(parts[1].toInt())
             key == SET_ZERO -> w.setZero
@@ -15083,7 +15307,8 @@ class CallBuilder(private val lang: Lang) {
 
     /** "Primo set" · "[nome] al servizio" · "gioco" con due secondi tra una frase e l'altra. */
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
-        Seg.Clip("first_set"),
+        // Partita di solo super tie-break: niente "primo set".
+        Seg.Clip(if (s.tiebreak == TiebreakKind.MATCH) "match_tiebreak" else "first_set"),
         Seg.Pause(START_GAP),
     ) + toServe(serverName(s, names)) + listOf(
         Seg.Pause(START_GAP),
@@ -15174,20 +15399,28 @@ class CallBuilder(private val lang: Lang) {
 
     /** "[nome] conduce tre giochi a due" oppure "due giochi pari". */
     fun gamesStanding(s: MatchState, names: CallNames): List<Seg> {
-        if (s.g1 == s.g2) return listOf(Seg.Clip("games_all_${s.g1.coerceIn(1, 6)}"))
+        if (s.g1 == s.g2) return listOf(clipOr("games_all_${s.g1}") { words.gamesAll(s.g1) })
         val leader = if (s.g1 > s.g2) Side.P1 else Side.P2
         val a = maxOf(s.g1, s.g2)
         val b = minOf(s.g1, s.g2)
-        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), Seg.Clip("games_${a}_$b"))
+        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), clipOr("games_${a}_$b") { words.games(a, b) })
     }
+
+    /**
+     * File registrato se la chiave è nel catalogo, altrimenti la sintesi vocale col testo: succede coi game oltre
+     * il 6-5 (set senza tie-break, pro set) che il catalogo non ha.
+     */
+    private fun clipOr(key: String, text: () -> String): Seg = if (key in Phrases.keys) Seg.Clip(key) else Seg.Say(text())
 
     /** "[nome] conduce un set a zero" oppure "un set pari". */
     fun setsStanding(s: MatchState, names: CallNames): List<Seg> {
         val s1 = s.setsWon(Side.P1)
         val s2 = s.setsWon(Side.P2)
-        if (s1 == s2) return listOf(Seg.Clip("sets_all_1"))
+        if (s1 == s2) return listOf(clipOr("sets_all_$s1") { words.setsAll(s1) })
         val leader = if (s1 > s2) Side.P1 else Side.P2
-        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), Seg.Clip("sets_1_0"))
+        val a = maxOf(s1, s2)
+        val b = minOf(s1, s2)
+        return listOf(Seg.Say(names.side(leader)), Seg.Clip("leads"), clipOr("sets_${a}_$b") { words.sets(a, b) })
     }
 
     /** "Gioco, set, partita [nome], sei quattro, tre sei, sette cinque" (punteggi dal lato del vincitore). */
@@ -16390,6 +16623,72 @@ class ScoreEngineTest {
         return st
     }
 
+    /** Vince [n] set di fila 6-0 per [w]. */
+    private fun sets(s: MatchState, w: Side, n: Int): MatchState = (1..n).fold(s) { acc, _ -> (1..6).fold(acc) { g, _ -> game(g, w) } }
+
+    @Test
+    fun bestOfFiveNeedsThreeSets() {
+        var s = sets(ScoreEngine.initial(RulesConfig(format = MatchFormat.BEST_OF_FIVE)), P1, 2)
+        assertFalse(s.isFinished)
+        s = sets(s, P2, 2)
+        assertEquals(4, s.sets.size)
+        assertFalse(s.isFinished)
+        s = sets(s, P1, 1)
+        assertEquals(P1, s.winner)
+        assertEquals(5, s.sets.size)
+    }
+
+    @Test
+    fun proSetToEightWithTiebreakAtEightAll() {
+        val r = RulesConfig(format = MatchFormat.PRO_SET, gamesPerSet = 8)
+        var s = games(ScoreEngine.initial(r), 7, 7)
+        assertFalse(s.inTiebreak)
+        s = game(s, P1)
+        assertFalse(s.inTiebreak)
+        s = game(s, P2)
+        assertTrue(s.inTiebreak)
+        s = play(s, *Array(7) { P2 })
+        assertEquals(P2, s.winner)
+        assertEquals(9, s.sets.single().g2)
+        // Un solo set: vinto 8-6 la partita è finita.
+        assertEquals(P1, games(ScoreEngine.initial(r), 8, 6).winner)
+    }
+
+    @Test
+    fun shortSetsToFourWithTiebreakAtFourAll() {
+        val r = RulesConfig(gamesPerSet = 4)
+        assertEquals(1, games(ScoreEngine.initial(r), 4, 2).sets.size)
+        val s = games(ScoreEngine.initial(r), 4, 4)
+        assertTrue(s.inTiebreak)
+        assertEquals(0, s.sets.size)
+    }
+
+    @Test
+    fun setsWithoutTiebreakGoOnUntilTwoGamesAhead() {
+        val r = RulesConfig(setTiebreak = false)
+        var s = games(ScoreEngine.initial(r), 6, 6)
+        assertFalse(s.inTiebreak)
+        s = game(s, P1)
+        assertEquals(0, s.sets.size)
+        s = game(s, P1)
+        assertEquals(1, s.sets.size)
+        assertEquals(8, s.sets.single().g1)
+        assertEquals(6, s.sets.single().g2)
+        assertNull(s.sets.single().tb1)
+    }
+
+    @Test
+    fun matchTiebreakOnly() {
+        var s = ScoreEngine.initial(RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY))
+        assertEquals(TiebreakKind.MATCH, s.tiebreak)
+        s = play(s, *Array(9) { P1 }, *Array(9) { P2 })
+        assertFalse(s.isFinished)
+        s = play(s, P1, P1)
+        assertEquals(P1, s.winner)
+        assertTrue(s.sets.single().matchTiebreak)
+        assertEquals(11, s.sets.single().tb1)
+    }
+
     @Test
     fun pointLabelsAndDeuce() {
         var s = ScoreEngine.initial(RulesConfig())
@@ -17399,6 +17698,33 @@ class CallBuilderTest {
         assertEquals("parità", point(Side.P2))
         point(Side.P1)
         assertEquals("parità punto decisivo", point(Side.P2))
+    }
+
+    @Test
+    fun bestOfFiveSetStandings() {
+        state = ScoreEngine.initial(RulesConfig(format = MatchFormat.BEST_OF_FIVE))
+        repeat(2) { repeat(24) { ScoreEngine.pointWonBy(state, Side.P1).also { state = it.state } } }
+        assertEquals("Rossi conduce due set a zero", itb.render(itb.standing(state, names)))
+        repeat(24) { ScoreEngine.pointWonBy(state, Side.P2).also { state = it.state } }
+        assertEquals("Rossi conduce due set a uno", itb.render(itb.standing(state, names)))
+        repeat(24) { ScoreEngine.pointWonBy(state, Side.P2).also { state = it.state } }
+        assertEquals("due set pari", itb.render(itb.standing(state, names)))
+        assertTrue("sets_2_1" in Phrases.keys)
+    }
+
+    @Test
+    fun longSetsWithoutTiebreakStillCallTheGames() {
+        state = ScoreEngine.initial(RulesConfig(setTiebreak = false))
+        games(7, 7)
+        assertEquals("sette giochi pari", itb.render(itb.gamesStanding(state, names)))
+        repeat(4) { ScoreEngine.pointWonBy(state, Side.P1).also { state = it.state } }
+        assertEquals("Rossi conduce otto giochi a sette", itb.render(itb.gamesStanding(state, names)))
+    }
+
+    @Test
+    fun matchTiebreakOnlyStartsWithoutFirstSet() {
+        val s = ScoreEngine.initial(RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY))
+        assertTrue(itb.render(itb.start(s, names)).startsWith("super tie-break"))
     }
 
     @Test

@@ -1,6 +1,6 @@
 Tennis Score Manager lleva el marcador de un partido de tenis según las reglas de la ITF y lo canta como un juez de silla.
 
-* Individual y dobles: tres sets con tie-break en 6-6, o dos sets y un super tie-break a 10 puntos; punto de oro (No-Ad) opcional.
+* Individual y dobles: tres o cinco sets, dos sets y un super tie-break a 10 puntos, pro set a 8 o 10 juegos o solo super tie-break; sets a 6 o 4 juegos, con o sin tie-break; punto de oro (No-Ad) opcional.
 * También para pádel: mismas reglas que el tenis, con dobles y punto de oro ya puestos; también está el Star Point de la FIP.
 * Voz de juez de silla en seis idiomas (italiano, inglés, francés, alemán, español, portugués) con la síntesis de voz del teléfono, sin internet. También se pueden importar grabaciones propias.
 * Shot clock (25 s), cambio de lado (90 s) y descanso entre sets (120 s); los cambios de lado y el orden de saque los gestiona la app.

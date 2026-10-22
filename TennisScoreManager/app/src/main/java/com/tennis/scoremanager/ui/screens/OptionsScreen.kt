@@ -38,13 +38,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
-import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -59,11 +59,12 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.SettingsRemote
+import androidx.compose.material.icons.filled.SportsScore
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.TouchApp
@@ -139,9 +140,9 @@ import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TvSection
 import com.tennis.scoremanager.voice.Phrases
 import com.tennis.scoremanager.voice.TtsStatus
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /** Pagina 2: modalità, braccialetti, lingua, voce, formato e sorteggio. */
 @Composable
@@ -290,18 +291,46 @@ fun OptionsScreen(c: MatchController) {
 
         // Formato
         SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
-            FormatOption(s.formatBestOfThree, s.formatBestOfThreeHint, o.format == MatchFormat.BEST_OF_THREE) {
-                c.updateOptions { it.copy(format = MatchFormat.BEST_OF_THREE) }
+            // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
+            fun pick(f: MatchFormat) = c.updateOptions {
+                val pro = f == MatchFormat.PRO_SET
+                val games = when {
+                    pro && it.gamesPerSet !in listOf(8, 10) -> 8
+                    !pro && it.gamesPerSet !in listOf(4, 6) -> 6
+                    else -> it.gamesPerSet
+                }
+                it.copy(format = f, gamesPerSet = games)
             }
+            FormatOption(s.formatBestOfThree, s.formatBestOfThreeHint, o.format == MatchFormat.BEST_OF_THREE) { pick(MatchFormat.BEST_OF_THREE) }
+            FormatOption(s.formatBestOfFive, s.formatBestOfFiveHint, o.format == MatchFormat.BEST_OF_FIVE) { pick(MatchFormat.BEST_OF_FIVE) }
             FormatOption(s.formatMatchTiebreak, s.formatMatchTiebreakHint, o.format == MatchFormat.TWO_SETS_MATCH_TIEBREAK) {
-                c.updateOptions { it.copy(format = MatchFormat.TWO_SETS_MATCH_TIEBREAK) }
+                pick(MatchFormat.TWO_SETS_MATCH_TIEBREAK)
+            }
+            FormatOption(s.formatProSet, s.formatProSetHint, o.format == MatchFormat.PRO_SET) { pick(MatchFormat.PRO_SET) }
+            FormatOption(s.formatMatchTiebreakOnly, s.formatMatchTiebreakOnlyHint, o.format == MatchFormat.MATCH_TIEBREAK_ONLY) {
+                pick(MatchFormat.MATCH_TIEBREAK_ONLY)
+            }
+            // Solo super tie-break: niente game, quindi niente game per set, tie-break dei set né vantaggi.
+            val onlyTiebreak = o.format == MatchFormat.MATCH_TIEBREAK_ONLY
+            if (!onlyTiebreak) {
+                Text(s.gamesPerSetTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                val choices = if (o.format == MatchFormat.PRO_SET) listOf(8, 10) else listOf(6, 4)
+                Segmented(
+                    choices.map { SegOption(if (it == 4) s.gamesShort else s.gamesN(it)) },
+                    selected = choices.indexOf(o.gamesPerSet).coerceAtLeast(0),
+                    onSelect = { i -> c.updateOptions { it.copy(gamesPerSet = choices[i]) } },
+                )
+                if (o.gamesPerSet == 4) Text(s.gamesShortHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                SwitchRow(Icons.Filled.SportsScore, s.setTiebreak, s.setTiebreakHint(o.gamesPerSet), o.setTiebreak) { v ->
+                    c.updateOptions { it.copy(setTiebreak = v) }
+                }
             }
             val padel = su.sport == Sport.PADEL
-            SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
+            if (!onlyTiebreak) SwitchRow(Icons.Filled.Timer, if (padel) s.goldenPoint else s.noAd, if (padel) s.goldenPointHint else s.noAdHint, o.noAd) { v ->
                 c.updateOptions { it.copy(noAd = v, starPoint = if (v) false else it.starPoint) }
             }
             // Golden point e star point si escludono: accenderne uno spegne l'altro; spenti tutti e due = vantaggi.
-            if (padel) {
+            if (padel && !onlyTiebreak) {
                 SwitchRow(Icons.Filled.Star, s.starPoint, s.starPointHint, o.starPoint && !o.noAd) { v ->
                     c.updateOptions { it.copy(starPoint = v, noAd = if (v) false else it.noAd) }
                 }

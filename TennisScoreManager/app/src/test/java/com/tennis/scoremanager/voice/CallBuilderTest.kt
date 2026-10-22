@@ -175,6 +175,33 @@ class CallBuilderTest {
     }
 
     @Test
+    fun bestOfFiveSetStandings() {
+        state = ScoreEngine.initial(RulesConfig(format = MatchFormat.BEST_OF_FIVE))
+        repeat(2) { repeat(24) { ScoreEngine.pointWonBy(state, Side.P1).also { state = it.state } } }
+        assertEquals("Rossi conduce due set a zero", itb.render(itb.standing(state, names)))
+        repeat(24) { ScoreEngine.pointWonBy(state, Side.P2).also { state = it.state } }
+        assertEquals("Rossi conduce due set a uno", itb.render(itb.standing(state, names)))
+        repeat(24) { ScoreEngine.pointWonBy(state, Side.P2).also { state = it.state } }
+        assertEquals("due set pari", itb.render(itb.standing(state, names)))
+        assertTrue("sets_2_1" in Phrases.keys)
+    }
+
+    @Test
+    fun longSetsWithoutTiebreakStillCallTheGames() {
+        state = ScoreEngine.initial(RulesConfig(setTiebreak = false))
+        games(7, 7)
+        assertEquals("sette giochi pari", itb.render(itb.gamesStanding(state, names)))
+        repeat(4) { ScoreEngine.pointWonBy(state, Side.P1).also { state = it.state } }
+        assertEquals("Rossi conduce otto giochi a sette", itb.render(itb.gamesStanding(state, names)))
+    }
+
+    @Test
+    fun matchTiebreakOnlyStartsWithoutFirstSet() {
+        val s = ScoreEngine.initial(RulesConfig(format = MatchFormat.MATCH_TIEBREAK_ONLY))
+        assertTrue(itb.render(itb.start(s, names)).startsWith("super tie-break"))
+    }
+
+    @Test
     fun doublesStartUsesIndividualServer() {
         val d = ScoreEngine.initial(RulesConfig(doubles = true, firstServer = Side.P2, firstServerP2 = 1))
         assertEquals("primo set Neri al servizio gioco", itb.render(itb.start(d, names)))

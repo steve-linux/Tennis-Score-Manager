@@ -1,6 +1,6 @@
 Tennis Score Manager zählt die Punkte eines Tennismatches nach den ITF-Regeln und sagt sie an wie ein Stuhlschiedsrichter.
 
-* Einzel und Doppel: drei Sätze mit Tiebreak bei 6:6 oder zwei Sätze und ein Match-Tiebreak bis 10; No-Ad wahlweise.
+* Einzel und Doppel: zwei oder drei Gewinnsätze, zwei Sätze und ein Match-Tiebreak bis 10, Pro-Satz bis 8 oder 10 Spiele oder nur Match-Tiebreak; Sätze bis 6 oder 4 Spiele, mit oder ohne Tiebreak; No-Ad wahlweise.
 * Auch für Padel: gleiche Regeln wie beim Tennis, Doppel und Golden Point schon eingestellt; auch der Star Point der FIP ist wählbar.
 * Schiedsrichteransagen in sechs Sprachen (Italienisch, Englisch, Französisch, Deutsch, Spanisch, Portugiesisch) über die Sprachausgabe des Telefons, ohne Internet. Eigene Aufnahmen lassen sich importieren.
 * Shot Clock (25 s), Seitenwechsel (90 s) und Satzpause (120 s); Seitenwechsel und Aufschlagfolge regelt die App.

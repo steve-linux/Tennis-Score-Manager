@@ -739,6 +739,8 @@ class MatchController(
         val su = setup.value
         val rules = RulesConfig(
             format = o.format,
+            gamesPerSet = o.gamesPerSet,
+            setTiebreak = o.setTiebreak,
             noAd = o.noAd,
             starPoint = su.sport == Sport.PADEL && o.starPoint && !o.noAd,
             doubles = su.doubles,

@@ -41,6 +41,9 @@ data class MatchOptions(
     val lang: Lang = Lang.IT,
     val audio: Boolean = true,
     val format: MatchFormat = MatchFormat.BEST_OF_THREE,
+    /** Game per set: 6 o 4 (set brevi); 8 o 10 nel pro set. */
+    val gamesPerSet: Int = 6,
+    val setTiebreak: Boolean = true,
     val noAd: Boolean = false,
     /** Statistiche dettagliate: ace, falli, vincenti ed errori si segnano dalla schermata del punteggio. */
     val detailedStats: Boolean = false,

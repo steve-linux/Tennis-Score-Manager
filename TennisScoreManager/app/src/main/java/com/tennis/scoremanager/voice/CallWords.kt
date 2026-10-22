@@ -35,6 +35,12 @@ internal abstract class CallWords {
     /** Game pari: "due giochi pari". */
     abstract fun gamesAll(n: Int): String
 
+    /** Set dal lato di chi conduce, oltre l'"un set a zero" del catalogo (al meglio dei cinque): "due set a uno". */
+    abstract fun sets(a: Int, b: Int): String
+
+    /** Set pari: "due set pari". */
+    abstract fun setsAll(n: Int): String
+
     /** "Rossi al servizio" (nome prima) oppure "Au service Dupont" (nome dopo). */
     open val nameBeforeToServe: Boolean = true
 
@@ -92,6 +98,9 @@ internal object ItWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un gioco" else "${number(n)} giochi"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} pari"
+    private fun st(n: Int) = if (n == 1) "un set" else "${number(n)} set"
+    override fun sets(a: Int, b: Int) = "${st(a)} a ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} pari"
     override fun tiebreakTo(a: Int, b: Int) = true
     override fun setScoreTo(a: Int, b: Int) = false
 }
@@ -128,6 +137,9 @@ internal object EnWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "one game" else "${number(n)} games"
     override fun games(a: Int, b: Int) = "${g(a)} to ${if (b == 0) "love" else number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} all"
+    private fun st(n: Int) = if (n == 1) "one set" else "${number(n)} sets"
+    override fun sets(a: Int, b: Int) = "${st(a)} to ${if (b == 0) "love" else number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} all"
     override fun tiebreakTo(a: Int, b: Int) = false
     override fun setScoreTo(a: Int, b: Int) = false
 }
@@ -164,6 +176,9 @@ internal object FrWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un jeu" else "${number(n)} jeux"
     override fun games(a: Int, b: Int) = "${g(a)} à ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} partout"
+    private fun st(n: Int) = if (n == 1) "une manche" else "${number(n)} manches"
+    override fun sets(a: Int, b: Int) = "${st(a)} à ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} partout"
     override val nameBeforeToServe = false
 }
 
@@ -201,6 +216,9 @@ internal object EsWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "un juego" else "${number(n)} juegos"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = "${g(n)} iguales"
+    private fun st(n: Int) = if (n == 1) "un set" else "${number(n)} sets"
+    override fun sets(a: Int, b: Int) = "${st(a)} a ${number(b)}"
+    override fun setsAll(n: Int) = "${st(n)} iguales"
     override val nameBeforeToServe = false
 }
 
@@ -238,6 +256,8 @@ internal object DeWords : CallWords() {
     override val points = listOf("null", "fünfzehn", "dreißig", "vierzig")
     override fun games(a: Int, b: Int) = "${number(a)} zu ${number(b)}"
     override fun gamesAll(n: Int) = if (n == 1) "ein Spiel beide" else "${number(n)} beide"
+    override fun sets(a: Int, b: Int) = "${number(a)} zu ${number(b)} in Sätzen"
+    override fun setsAll(n: Int) = if (n == 1) "ein Satz beide" else "${number(n)} Sätze beide"
     override val nameBeforeToServe = false
     override fun tiebreakTo(a: Int, b: Int) = true
     override fun setScoreTo(a: Int, b: Int) = true
@@ -280,5 +300,7 @@ internal object PtWords : CallWords() {
     private fun g(n: Int) = if (n == 1) "um jogo" else "${number(n)} jogos"
     override fun games(a: Int, b: Int) = "${g(a)} a ${number(b)}"
     override fun gamesAll(n: Int) = if (n == 1) "um jogo igual" else "${g(n)} iguais"
+    override fun sets(a: Int, b: Int) = "${if (a == 1) "um set" else "${number(a)} sets"} a ${number(b)}"
+    override fun setsAll(n: Int) = if (n == 1) "sets iguais" else "${number(n)} sets iguais"
     override fun tiebreakTo(a: Int, b: Int) = true
 }
