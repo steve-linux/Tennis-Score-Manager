@@ -50,6 +50,33 @@ class Storage(context: Context) {
         photoFile(key).delete()
     }
 
+    /** Tornei Americano e Mexicano, uno per file. */
+    private val tournamentsDir: File get() = File(app.filesDir, "tournaments").apply { mkdirs() }
+
+    @Synchronized
+    fun saveTournament(t: Tournament) {
+        runCatching {
+            val f = File(tournamentsDir, "${t.id}.json")
+            val tmp = File(tournamentsDir, "${t.id}.tmp")
+            tmp.writeText(json.encodeToString(Tournament.serializer(), t))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
+    }
+
+    /** Tornei, dal più recente. */
+    fun loadTournaments(): List<Tournament> =
+        tournamentsDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(Tournament.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.createdAt }
+
+    @Synchronized
+    fun deleteTournament(id: String) {
+        File(tournamentsDir, "$id.json").delete()
+    }
+
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 

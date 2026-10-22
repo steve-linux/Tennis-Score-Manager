@@ -431,6 +431,57 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    // Tornei Americano e Mexicano
+    val tournamentButton: String
+    val tournamentTitle: String
+    val tournamentSubtitle: String
+    val tournamentNew: String
+    val tournamentAmericano: String
+    val tournamentMexicano: String
+    val tournamentPlayersCount: (Int) -> String
+    val tournamentRound: (Int) -> String
+    val tournamentFinished: String
+    val tournamentKindTitle: String
+    val tournamentName: String
+    val tournamentAmericanoHint: String
+    val tournamentMexicanoHint: String
+    val tournamentPlayers: String
+    val tournamentPlayersHint: String
+    val tournamentAddPlayer: String
+    val tournamentNeedPlayers: String
+    val tournamentCourts: String
+    val tournamentCourtsHint: (Int, Int) -> String
+    val tournamentScoring: String
+    val tournamentScoringPoints: String
+    val tournamentScoringTime: String
+    val tournamentMinutesN: (Int) -> String
+    val tournamentPointsN: (Int) -> String
+    val tournamentTimeHint: String
+    val tournamentPointsHint: String
+    val tournamentSuggested: (Int) -> String
+    val tournamentCreate: String
+    val tournamentShare: String
+    val tournamentNextRound: String
+    val tournamentRounds: String
+    val tournamentStandings: String
+    val tournamentResting: String
+    val tournamentFinish: String
+    val tournamentMissingResults: String
+    val tournamentFinishText: String
+    val tournamentDeleteTitle: String
+    val tournamentDeleteText: String
+    val tournamentCourt: (Int) -> String
+    val tournamentScoreHint: (Int) -> String
+    val tournamentCount: String
+    val tournamentStartTimer: String
+    val tournamentTimeUp: String
+    val tournamentMatchOver: String
+    val tournamentSave: String
+    val tournamentPointsShort: String
+    val tournamentPlayedShort: String
+    val tournamentWonShort: String
+    val tournamentStandingsHint: String
+    val tournamentRoundsPlayed: (Int) -> String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -911,6 +962,56 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val tournamentButton = "Torneo Americano o Mexicano"
+    override val tournamentTitle = "Torneo"
+    override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
+    override val tournamentNew = "Nuovo torneo"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n giocatori" }
+    override val tournamentRound: (Int) -> String = { n -> "Turno $n" }
+    override val tournamentFinished = "Concluso"
+    override val tournamentKindTitle = "Tipo di torneo"
+    override val tournamentName = "Nome del torneo (facoltativo)"
+    override val tournamentAmericanoHint = "Le coppie cambiano a ogni turno: ognuno gioca con e contro più persone possibile."
+    override val tournamentMexicanoHint = "Primo turno come nell'Americano, poi per classifica: nello stesso campo 1° e 4° contro 2° e 3°."
+    override val tournamentPlayers = "Giocatori"
+    override val tournamentPlayersHint = "Da 4 a 16, ognuno col suo nome: la classifica è personale. Chi ha la foto nello storico la ritrova qui."
+    override val tournamentAddPlayer = "Aggiungi giocatore"
+    override val tournamentNeedPlayers = "Servono almeno 4 giocatori, tutti con nomi diversi."
+    override val tournamentCourts = "Campi"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Partite per turno: $a · a riposo a ogni turno: $b" }
+    override val tournamentScoring = "Punteggio"
+    override val tournamentScoringPoints = "A punti"
+    override val tournamentScoringTime = "A tempo"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minuti" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n punti" }
+    override val tournamentTimeHint = "Si gioca per i minuti scelti, poi si scrive il risultato (o lo si conta punto per punto col cronometro)."
+    override val tournamentPointsHint = "Ogni scambio vale un punto e si serve 4 volte a testa a turno; la partita finisce quando i punti delle due coppie sommati fanno il totale (es. 13-11 a 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Turni consigliati: $n (ognuno gioca una volta con tutti)." }
+    override val tournamentCreate = "Inizia il torneo"
+    override val tournamentShare = "Condividi classifica"
+    override val tournamentNextRound = "Turno successivo"
+    override val tournamentRounds = "Turni"
+    override val tournamentStandings = "Classifica"
+    override val tournamentResting = "A riposo"
+    override val tournamentFinish = "Termina torneo"
+    override val tournamentMissingResults = "Mancano dei risultati in questo turno: scrivili prima di passare al successivo."
+    override val tournamentFinishText = "La classifica resta com'è e il torneo va tra quelli conclusi."
+    override val tournamentDeleteTitle = "Eliminare il torneo?"
+    override val tournamentDeleteText = "Il torneo e la sua classifica spariscono da questo telefono."
+    override val tournamentCourt: (Int) -> String = { n -> "Campo $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "I due punteggi sommati devono fare $n." }
+    override val tournamentCount = "Conta punto per punto"
+    override val tournamentStartTimer = "Avvia il cronometro"
+    override val tournamentTimeUp = "Tempo scaduto: finite lo scambio e salvate il risultato."
+    override val tournamentMatchOver = "Partita finita: salva il risultato."
+    override val tournamentSave = "Salva risultato"
+    override val tournamentPointsShort = "Punti"
+    override val tournamentPlayedShort = "G"
+    override val tournamentWonShort = "V"
+    override val tournamentStandingsHint = "Punti = punti fatti dalla propria coppia in tutte le partite; a parità contano le vittorie (V) e la differenza punti. G = partite giocate."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Turni giocati: $n" }
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -1379,6 +1480,56 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val tournamentButton = "Americano or Mexicano tournament"
+    override val tournamentTitle = "Tournament"
+    override val tournamentSubtitle = "Americano and Mexicano: partners change every round"
+    override val tournamentNew = "New tournament"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n players" }
+    override val tournamentRound: (Int) -> String = { n -> "Round $n" }
+    override val tournamentFinished = "Finished"
+    override val tournamentKindTitle = "Tournament type"
+    override val tournamentName = "Tournament name (optional)"
+    override val tournamentAmericanoHint = "Partners change every round: everyone plays with and against as many people as possible."
+    override val tournamentMexicanoHint = "First round as in the Americano, then by standings: on the same court 1st and 4th against 2nd and 3rd."
+    override val tournamentPlayers = "Players"
+    override val tournamentPlayersHint = "From 4 to 16, each with their own name: the standings are individual. Players with a photo in the history get it here too."
+    override val tournamentAddPlayer = "Add player"
+    override val tournamentNeedPlayers = "At least 4 players are needed, all with different names."
+    override val tournamentCourts = "Courts"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Matches per round: $a · sitting out each round: $b" }
+    override val tournamentScoring = "Scoring"
+    override val tournamentScoringPoints = "By points"
+    override val tournamentScoringTime = "By time"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minutes" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n points" }
+    override val tournamentTimeHint = "Play for the chosen minutes, then write the result (or count it point by point with the timer)."
+    override val tournamentPointsHint = "Every rally is a point and each player serves 4 times in turn; the match ends when the two pairs' points add up to the total (e.g. 13-11 at 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Suggested rounds: $n (everyone partners everyone once)." }
+    override val tournamentCreate = "Start the tournament"
+    override val tournamentShare = "Share standings"
+    override val tournamentNextRound = "Next round"
+    override val tournamentRounds = "Rounds"
+    override val tournamentStandings = "Standings"
+    override val tournamentResting = "Sitting out"
+    override val tournamentFinish = "Finish tournament"
+    override val tournamentMissingResults = "Some results of this round are missing: write them before moving on."
+    override val tournamentFinishText = "The standings stay as they are and the tournament moves to the finished ones."
+    override val tournamentDeleteTitle = "Delete the tournament?"
+    override val tournamentDeleteText = "The tournament and its standings disappear from this phone."
+    override val tournamentCourt: (Int) -> String = { n -> "Court $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "The two scores must add up to $n." }
+    override val tournamentCount = "Count point by point"
+    override val tournamentStartTimer = "Start the timer"
+    override val tournamentTimeUp = "Time is up: finish the rally and save the result."
+    override val tournamentMatchOver = "Match over: save the result."
+    override val tournamentSave = "Save result"
+    override val tournamentPointsShort = "Pts"
+    override val tournamentPlayedShort = "P"
+    override val tournamentWonShort = "W"
+    override val tournamentStandingsHint = "Points = points scored by your pair in all matches; ties are broken by wins (W) and point difference. P = matches played."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Rounds played: $n" }
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"

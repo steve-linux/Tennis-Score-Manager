@@ -39,6 +39,10 @@ import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.data.StrokeStats
+import com.tennis.scoremanager.data.Tournament
+import com.tennis.scoremanager.data.TournamentKind
+import com.tennis.scoremanager.data.TournamentScoring
+import com.tennis.scoremanager.data.Tournaments
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
@@ -86,7 +90,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -1130,6 +1134,116 @@ class MatchController(
             }
         }
         return done to open
+    }
+
+    // ---------------------------------------------------------------- tornei Americano e Mexicano
+
+    /** Tutti i tornei salvati, dal più recente. */
+    val tournaments = MutableStateFlow<List<Tournament>>(emptyList())
+    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
+    val tournament = MutableStateFlow<Tournament?>(null)
+
+    fun openTournaments() {
+        refreshTournaments()
+        // Si riapre da solo l'ultimo torneo non concluso.
+        if (tournament.value == null) {
+            scope.launch {
+                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { tournament.value = it }
+            }
+        }
+        screen.value = Screen.TOURNAMENT
+    }
+
+    private fun refreshTournaments() {
+        scope.launch { tournaments.value = withContext(io) { storage.loadTournaments() } }
+    }
+
+    private fun saveTournament(t: Tournament) {
+        tournament.value = t
+        scope.launch {
+            withContext(io) { storage.saveTournament(t) }
+            refreshTournaments()
+        }
+    }
+
+    fun createTournament(
+        name: String, kind: TournamentKind, players: List<String>, courts: Int,
+        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
+    ) {
+        val now = System.currentTimeMillis()
+        val t = Tournament(
+            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
+            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
+        )
+        saveTournament(t.copy(rounds = listOf(Tournaments.nextRound(t))))
+    }
+
+    fun openTournament(t: Tournament) {
+        tournament.value = t
+    }
+
+    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
+    fun closeTournament() {
+        tournament.value = null
+        refreshTournaments()
+    }
+
+    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
+    fun setTournamentResult(round: Int, court: Int, a: Int?, b: Int?) {
+        val t = tournament.value ?: return
+        val rounds = t.rounds.map { r ->
+            if (r.number != round) r
+            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
+        }
+        saveTournament(t.copy(rounds = rounds))
+    }
+
+    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
+    fun nextTournamentRound(): Boolean {
+        val t = tournament.value ?: return false
+        if (t.current?.complete == false) return false
+        saveTournament(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
+        return true
+    }
+
+    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
+    fun finishTournament() {
+        val t = tournament.value ?: return
+        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
+        saveTournament(t.copy(rounds = rounds, finished = true))
+    }
+
+    fun deleteTournament(id: String) {
+        if (tournament.value?.id == id) tournament.value = null
+        scope.launch {
+            withContext(io) { storage.deleteTournament(id) }
+            refreshTournaments()
+        }
+    }
+
+    /** La voce dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
+    fun announceCounter(a: Int, b: Int) {
+        if (options.value.audio) announcer.announce(calls().counterScore(a, b))
+    }
+
+    /** Classifica del torneo come testo da condividere. */
+    fun tournamentShareIntent(): Intent? {
+        val t = tournament.value ?: return null
+        val s = strings
+        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
+        val text = buildString {
+            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
+            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
+            Tournaments.standings(t).forEachIndexed { i, st ->
+                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
+            }
+            append("Tennis Score Manager · ${Reports.siteUrl(options.value.lang)}")
+        }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        return Intent.createChooser(send, s.tournamentShare)
     }
 
     // ---------------------------------------------------------------- foto dei giocatori

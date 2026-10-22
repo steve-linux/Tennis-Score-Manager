@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
@@ -99,7 +100,11 @@ fun SetupScreen(c: MatchController) {
                 selected = su.sport.ordinal,
                 onSelect = { i -> c.selectSport(Sport.entries[i]) },
             )
-            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
+            if (su.sport == Sport.PADEL) {
+                Text(s.padelHint, color = TsmColors.TextDim)
+                // Tornei a coppie che cambiano: schermata a parte, senza toccare la partita normale.
+                GhostButton(s.tournamentButton, Icons.Filled.EmojiEvents, { c.openTournaments() }, Modifier.fillMaxWidth())
+            }
         }
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }

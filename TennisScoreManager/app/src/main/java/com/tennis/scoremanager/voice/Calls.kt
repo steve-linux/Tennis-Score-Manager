@@ -192,6 +192,10 @@ class CallBuilder(private val lang: Lang) {
     }
 
     /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
+    /** Punteggio di una partita a punti del torneo (Americano/Mexicano): "tredici a undici", "dodici pari". */
+    fun counterScore(a: Int, b: Int): List<Seg> =
+        if (a == b) listOf(num(a), Seg.Clip("all")) else pair(num(a), num(b), words.tiebreakTo(a, b))
+
     private fun pair(a: Seg, b: Seg, to: Boolean): List<Seg> = if (to) listOf(a, Seg.Clip("to"), b) else listOf(a, b)
 
     /** Game di un set a fine partita: lo zero è [Phrases.SET_ZERO] ("six love"), nel match tie-break resta "zero". */

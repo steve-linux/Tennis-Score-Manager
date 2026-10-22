@@ -823,6 +823,10 @@ import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.data.StrokeStats
+import com.tennis.scoremanager.data.Tournament
+import com.tennis.scoremanager.data.TournamentKind
+import com.tennis.scoremanager.data.TournamentScoring
+import com.tennis.scoremanager.data.Tournaments
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
@@ -870,7 +874,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -1914,6 +1918,116 @@ class MatchController(
             }
         }
         return done to open
+    }
+
+    // ---------------------------------------------------------------- tornei Americano e Mexicano
+
+    /** Tutti i tornei salvati, dal più recente. */
+    val tournaments = MutableStateFlow<List<Tournament>>(emptyList())
+    /** Torneo aperto; null = elenco dei tornei e creazione di uno nuovo. */
+    val tournament = MutableStateFlow<Tournament?>(null)
+
+    fun openTournaments() {
+        refreshTournaments()
+        // Si riapre da solo l'ultimo torneo non concluso.
+        if (tournament.value == null) {
+            scope.launch {
+                withContext(io) { storage.loadTournaments() }.firstOrNull { !it.finished }?.let { tournament.value = it }
+            }
+        }
+        screen.value = Screen.TOURNAMENT
+    }
+
+    private fun refreshTournaments() {
+        scope.launch { tournaments.value = withContext(io) { storage.loadTournaments() } }
+    }
+
+    private fun saveTournament(t: Tournament) {
+        tournament.value = t
+        scope.launch {
+            withContext(io) { storage.saveTournament(t) }
+            refreshTournaments()
+        }
+    }
+
+    fun createTournament(
+        name: String, kind: TournamentKind, players: List<String>, courts: Int,
+        scoring: TournamentScoring, pointsPerMatch: Int, minutes: Int,
+    ) {
+        val now = System.currentTimeMillis()
+        val t = Tournament(
+            id = "t$now", name = name.trim(), kind = kind, players = players.map { it.trim() },
+            courts = courts, scoring = scoring, pointsPerMatch = pointsPerMatch, minutes = minutes, createdAt = now,
+        )
+        saveTournament(t.copy(rounds = listOf(Tournaments.nextRound(t))))
+    }
+
+    fun openTournament(t: Tournament) {
+        tournament.value = t
+    }
+
+    /** Torna all'elenco dei tornei (quello aperto resta salvato). */
+    fun closeTournament() {
+        tournament.value = null
+        refreshTournaments()
+    }
+
+    /** Risultato di una partita del turno [round]; null = ancora da giocare. */
+    fun setTournamentResult(round: Int, court: Int, a: Int?, b: Int?) {
+        val t = tournament.value ?: return
+        val rounds = t.rounds.map { r ->
+            if (r.number != round) r
+            else r.copy(matches = r.matches.map { if (it.court == court) it.copy(scoreA = a, scoreB = b) else it })
+        }
+        saveTournament(t.copy(rounds = rounds))
+    }
+
+    /** Turno successivo, solo se tutte le partite del turno in corso hanno il risultato. */
+    fun nextTournamentRound(): Boolean {
+        val t = tournament.value ?: return false
+        if (t.current?.complete == false) return false
+        saveTournament(t.copy(rounds = t.rounds + Tournaments.nextRound(t)))
+        return true
+    }
+
+    /** Conclude il torneo. L'ultimo turno, se non è stato giocato per niente, si toglie. */
+    fun finishTournament() {
+        val t = tournament.value ?: return
+        val rounds = t.rounds.filterIndexed { i, r -> i < t.rounds.size - 1 || r.matches.any { it.played } }
+        saveTournament(t.copy(rounds = rounds, finished = true))
+    }
+
+    fun deleteTournament(id: String) {
+        if (tournament.value?.id == id) tournament.value = null
+        scope.launch {
+            withContext(io) { storage.deleteTournament(id) }
+            refreshTournaments()
+        }
+    }
+
+    /** La voce dice il punteggio di una partita contata punto per punto (se la voce è accesa). */
+    fun announceCounter(a: Int, b: Int) {
+        if (options.value.audio) announcer.announce(calls().counterScore(a, b))
+    }
+
+    /** Classifica del torneo come testo da condividere. */
+    fun tournamentShareIntent(): Intent? {
+        val t = tournament.value ?: return null
+        val s = strings
+        val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
+        val text = buildString {
+            appendLine(listOf(t.name.ifBlank { kind }, kind).distinct().joinToString(" · "))
+            appendLine(s.tournamentRoundsPlayed(t.rounds.count { r -> r.matches.any { it.played } }))
+            Tournaments.standings(t).forEachIndexed { i, st ->
+                appendLine("${i + 1}. ${st.name} – ${st.points} (${s.tournamentWonShort} ${st.won}, ${st.diff.let { if (it > 0) "+$it" else "$it" }})")
+            }
+            append("Tennis Score Manager · ${Reports.siteUrl(options.value.lang)}")
+        }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        return Intent.createChooser(send, s.tournamentShare)
     }
 
     // ---------------------------------------------------------------- foto dei giocatori
@@ -4537,6 +4651,33 @@ class Storage(context: Context) {
         photoFile(key).delete()
     }
 
+    /** Tornei Americano e Mexicano, uno per file. */
+    private val tournamentsDir: File get() = File(app.filesDir, "tournaments").apply { mkdirs() }
+
+    @Synchronized
+    fun saveTournament(t: Tournament) {
+        runCatching {
+            val f = File(tournamentsDir, "${t.id}.json")
+            val tmp = File(tournamentsDir, "${t.id}.tmp")
+            tmp.writeText(json.encodeToString(Tournament.serializer(), t))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio torneo fallito", it) }
+    }
+
+    /** Tornei, dal più recente. */
+    fun loadTournaments(): List<Tournament> =
+        tournamentsDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(Tournament.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.createdAt }
+
+    @Synchronized
+    fun deleteTournament(id: String) {
+        File(tournamentsDir, "$id.json").delete()
+    }
+
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 
@@ -4669,6 +4810,188 @@ class Storage(context: Context) {
     /** Cartella predefinita dello storico se l'utente non ne sceglie una. */
     val defaultHistoryDir: File
         get() = File(app.getExternalFilesDir(null) ?: app.filesDir, "Storico").apply { mkdirs() }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Tournament.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Tournament.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlin.random.Random
+
+/**
+ * Tornei di padel a coppie che cambiano a ogni turno.
+ * Americano: le coppie ruotano in modo che ognuno giochi con e contro più persone possibile.
+ * Mexicano: dal secondo turno si gioca per classifica, 1° e 4° contro 2° e 3° nello stesso campo.
+ * Ogni partita si gioca a punti (chi vince lo scambio fa un punto; si finisce al totale, es. 24) o a tempo.
+ */
+@Serializable
+enum class TournamentKind { AMERICANO, MEXICANO }
+
+@Serializable
+enum class TournamentScoring { POINTS, TIME }
+
+/** Una partita di un turno: [a] e [b] sono gli indici dei giocatori delle due coppie. Punteggio null = da giocare. */
+@Serializable
+data class TMatch(
+    val court: Int,
+    val a: List<Int>,
+    val b: List<Int>,
+    val scoreA: Int? = null,
+    val scoreB: Int? = null,
+) {
+    val played: Boolean get() = scoreA != null && scoreB != null
+}
+
+@Serializable
+data class TRound(val number: Int, val matches: List<TMatch>, val resting: List<Int> = emptyList()) {
+    val complete: Boolean get() = matches.all { it.played }
+}
+
+@Serializable
+data class Tournament(
+    val id: String,
+    val name: String = "",
+    val kind: TournamentKind = TournamentKind.AMERICANO,
+    val players: List<String>,
+    val courts: Int = 1,
+    val scoring: TournamentScoring = TournamentScoring.POINTS,
+    /** Punti totali di una partita a punti (16, 24, 32): i due punteggi sommati fanno questo numero. */
+    val pointsPerMatch: Int = 24,
+    /** Minuti di una partita a tempo. */
+    val minutes: Int = 12,
+    val rounds: List<TRound> = emptyList(),
+    val createdAt: Long = 0L,
+    val finished: Boolean = false,
+) {
+    /** Partite contemporanee in un turno: un campo ogni quattro giocatori. */
+    val matchesPerRound: Int get() = minOf(courts, players.size / 4)
+    val current: TRound? get() = rounds.lastOrNull()
+}
+
+object Tournaments {
+    const val MIN_PLAYERS = 4
+    const val MAX_PLAYERS = 16
+    const val MAX_COURTS = 4
+
+    /** Riga della classifica: [points] = punti fatti dalla sua coppia in tutte le partite giocate. */
+    data class Standing(
+        val player: Int,
+        val name: String,
+        val points: Int,
+        val against: Int,
+        val played: Int,
+        val won: Int,
+        val drawn: Int,
+        val rested: Int,
+    ) {
+        val diff: Int get() = points - against
+    }
+
+    /** Classifica: più punti, poi più vittorie, poi miglior differenza punti; a pari tutto, il nome. */
+    fun standings(t: Tournament): List<Standing> {
+        val pts = IntArray(t.players.size)
+        val ag = IntArray(t.players.size)
+        val pl = IntArray(t.players.size)
+        val won = IntArray(t.players.size)
+        val drawn = IntArray(t.players.size)
+        val rest = IntArray(t.players.size)
+        for (r in t.rounds) {
+            r.resting.forEach { rest[it]++ }
+            for (m in r.matches) {
+                val sa = m.scoreA ?: continue
+                val sb = m.scoreB ?: continue
+                for (p in m.a) {
+                    pts[p] += sa; ag[p] += sb; pl[p]++
+                    if (sa > sb) won[p]++ else if (sa == sb) drawn[p]++
+                }
+                for (p in m.b) {
+                    pts[p] += sb; ag[p] += sa; pl[p]++
+                    if (sb > sa) won[p]++ else if (sa == sb) drawn[p]++
+                }
+            }
+        }
+        return t.players.indices
+            .map { Standing(it, t.players[it], pts[it], ag[it], pl[it], won[it], drawn[it], rest[it]) }
+            .sortedWith(
+                compareByDescending<Standing> { it.points }.thenByDescending { it.won }.thenByDescending { it.diff }
+                    .thenBy { it.name.lowercase() },
+            )
+    }
+
+    /** Il turno successivo (il primo se non ce ne sono). Va chiamato quando il turno in corso è completo. */
+    fun nextRound(t: Tournament): TRound {
+        val number = t.rounds.size + 1
+        val resting = pickResting(t)
+        val playing = t.players.indices.filter { it !in resting }
+        val matches = if (t.kind == TournamentKind.MEXICANO && t.rounds.isNotEmpty()) {
+            mexicano(t, playing)
+        } else {
+            americano(t, playing, number)
+        }
+        return TRound(number, matches, resting.sorted())
+    }
+
+    /**
+     * Chi riposa: chi ha riposato meno finora; a parità, a rotazione dall'ultimo dell'elenco, così tutti
+     * riposano prima che qualcuno riposi due volte.
+     */
+    private fun pickResting(t: Tournament): Set<Int> {
+        val n = t.players.size
+        val out = n - t.matchesPerRound * 4
+        if (out <= 0) return emptySet()
+        val rested = IntArray(n)
+        t.rounds.forEach { r -> r.resting.forEach { rested[it]++ } }
+        val shift = t.rounds.size * out
+        return t.players.indices
+            .sortedWith(compareBy<Int> { rested[it] }.thenBy { (n - 1 - it + shift) % n })
+            .take(out).toSet()
+    }
+
+    /** Mexicano: per classifica, a gruppi di quattro dal campo 1; nel gruppo 1° e 4° contro 2° e 3°. */
+    private fun mexicano(t: Tournament, playing: List<Int>): List<TMatch> {
+        val order = standings(t).map { it.player }.filter { it in playing }
+        return order.chunked(4).mapIndexed { i, g -> TMatch(court = i + 1, a = listOf(g[0], g[3]), b = listOf(g[1], g[2])) }
+    }
+
+    /**
+     * Americano: tra molte disposizioni a caso si tiene quella con meno compagni ripetuti (pesano di più) e meno
+     * avversari ripetuti. Il seme dipende dal torneo e dal turno, così lo stesso turno esce sempre uguale.
+     */
+    private fun americano(t: Tournament, playing: List<Int>, number: Int): List<TMatch> {
+        val n = t.players.size
+        val partner = Array(n) { IntArray(n) }
+        val opponent = Array(n) { IntArray(n) }
+        for (r in t.rounds) for (m in r.matches) {
+            partner[m.a[0]][m.a[1]]++; partner[m.a[1]][m.a[0]]++
+            partner[m.b[0]][m.b[1]]++; partner[m.b[1]][m.b[0]]++
+            for (x in m.a) for (y in m.b) { opponent[x][y]++; opponent[y][x]++ }
+        }
+        val rnd = Random(t.id.hashCode() * 31 + number)
+        var best: List<Int> = playing
+        var bestCost = Int.MAX_VALUE
+        for (attempt in 0 until 3000) {
+            if (bestCost == 0) break
+            val p = playing.shuffled(rnd)
+            var cost = 0
+            for (g in p.chunked(4)) {
+                cost += 100 * (partner[g[0]][g[1]] + partner[g[2]][g[3]])
+                for (x in listOf(g[0], g[1])) for (y in listOf(g[2], g[3])) cost += opponent[x][y]
+            }
+            if (cost < bestCost) {
+                bestCost = cost
+                best = p
+            }
+        }
+        return best.chunked(4).mapIndexed { i, g -> TMatch(court = i + 1, a = listOf(g[0], g[1]), b = listOf(g[2], g[3])) }
+    }
+
+    /** Turni consigliati per l'Americano: ognuno gioca con tutti gli altri una volta (n-1 con un numero pari). */
+    fun suggestedRounds(players: Int): Int = if (players % 2 == 0) players - 1 else players
 }
 TSM_EOF
 
@@ -7368,6 +7691,7 @@ import com.tennis.scoremanager.ui.screens.OptionsScreen
 import com.tennis.scoremanager.ui.screens.SetupScreen
 import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
+import com.tennis.scoremanager.ui.screens.TournamentScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -7408,6 +7732,7 @@ fun AppRoot(c: MatchController) {
                 Screen.MATCH -> MatchScreen(c)
                 Screen.SUMMARY -> SummaryScreen(c)
                 Screen.HISTORY -> HistoryScreen(c)
+                Screen.TOURNAMENT -> TournamentScreen(c)
             }
         }
     }
@@ -8298,6 +8623,57 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    // Tornei Americano e Mexicano
+    val tournamentButton: String
+    val tournamentTitle: String
+    val tournamentSubtitle: String
+    val tournamentNew: String
+    val tournamentAmericano: String
+    val tournamentMexicano: String
+    val tournamentPlayersCount: (Int) -> String
+    val tournamentRound: (Int) -> String
+    val tournamentFinished: String
+    val tournamentKindTitle: String
+    val tournamentName: String
+    val tournamentAmericanoHint: String
+    val tournamentMexicanoHint: String
+    val tournamentPlayers: String
+    val tournamentPlayersHint: String
+    val tournamentAddPlayer: String
+    val tournamentNeedPlayers: String
+    val tournamentCourts: String
+    val tournamentCourtsHint: (Int, Int) -> String
+    val tournamentScoring: String
+    val tournamentScoringPoints: String
+    val tournamentScoringTime: String
+    val tournamentMinutesN: (Int) -> String
+    val tournamentPointsN: (Int) -> String
+    val tournamentTimeHint: String
+    val tournamentPointsHint: String
+    val tournamentSuggested: (Int) -> String
+    val tournamentCreate: String
+    val tournamentShare: String
+    val tournamentNextRound: String
+    val tournamentRounds: String
+    val tournamentStandings: String
+    val tournamentResting: String
+    val tournamentFinish: String
+    val tournamentMissingResults: String
+    val tournamentFinishText: String
+    val tournamentDeleteTitle: String
+    val tournamentDeleteText: String
+    val tournamentCourt: (Int) -> String
+    val tournamentScoreHint: (Int) -> String
+    val tournamentCount: String
+    val tournamentStartTimer: String
+    val tournamentTimeUp: String
+    val tournamentMatchOver: String
+    val tournamentSave: String
+    val tournamentPointsShort: String
+    val tournamentPlayedShort: String
+    val tournamentWonShort: String
+    val tournamentStandingsHint: String
+    val tournamentRoundsPlayed: (Int) -> String
     /** "Nuova partita" o "Esci" dal riepilogo senza averlo salvato né condiviso. */
     val share: String
     val saveDialogTitle: String
@@ -8778,6 +9154,56 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val tournamentButton = "Torneo Americano o Mexicano"
+    override val tournamentTitle = "Torneo"
+    override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
+    override val tournamentNew = "Nuovo torneo"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n giocatori" }
+    override val tournamentRound: (Int) -> String = { n -> "Turno $n" }
+    override val tournamentFinished = "Concluso"
+    override val tournamentKindTitle = "Tipo di torneo"
+    override val tournamentName = "Nome del torneo (facoltativo)"
+    override val tournamentAmericanoHint = "Le coppie cambiano a ogni turno: ognuno gioca con e contro più persone possibile."
+    override val tournamentMexicanoHint = "Primo turno come nell'Americano, poi per classifica: nello stesso campo 1° e 4° contro 2° e 3°."
+    override val tournamentPlayers = "Giocatori"
+    override val tournamentPlayersHint = "Da 4 a 16, ognuno col suo nome: la classifica è personale. Chi ha la foto nello storico la ritrova qui."
+    override val tournamentAddPlayer = "Aggiungi giocatore"
+    override val tournamentNeedPlayers = "Servono almeno 4 giocatori, tutti con nomi diversi."
+    override val tournamentCourts = "Campi"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Partite per turno: $a · a riposo a ogni turno: $b" }
+    override val tournamentScoring = "Punteggio"
+    override val tournamentScoringPoints = "A punti"
+    override val tournamentScoringTime = "A tempo"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minuti" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n punti" }
+    override val tournamentTimeHint = "Si gioca per i minuti scelti, poi si scrive il risultato (o lo si conta punto per punto col cronometro)."
+    override val tournamentPointsHint = "Ogni scambio vale un punto e si serve 4 volte a testa a turno; la partita finisce quando i punti delle due coppie sommati fanno il totale (es. 13-11 a 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Turni consigliati: $n (ognuno gioca una volta con tutti)." }
+    override val tournamentCreate = "Inizia il torneo"
+    override val tournamentShare = "Condividi classifica"
+    override val tournamentNextRound = "Turno successivo"
+    override val tournamentRounds = "Turni"
+    override val tournamentStandings = "Classifica"
+    override val tournamentResting = "A riposo"
+    override val tournamentFinish = "Termina torneo"
+    override val tournamentMissingResults = "Mancano dei risultati in questo turno: scrivili prima di passare al successivo."
+    override val tournamentFinishText = "La classifica resta com'è e il torneo va tra quelli conclusi."
+    override val tournamentDeleteTitle = "Eliminare il torneo?"
+    override val tournamentDeleteText = "Il torneo e la sua classifica spariscono da questo telefono."
+    override val tournamentCourt: (Int) -> String = { n -> "Campo $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "I due punteggi sommati devono fare $n." }
+    override val tournamentCount = "Conta punto per punto"
+    override val tournamentStartTimer = "Avvia il cronometro"
+    override val tournamentTimeUp = "Tempo scaduto: finite lo scambio e salvate il risultato."
+    override val tournamentMatchOver = "Partita finita: salva il risultato."
+    override val tournamentSave = "Salva risultato"
+    override val tournamentPointsShort = "Punti"
+    override val tournamentPlayedShort = "G"
+    override val tournamentWonShort = "V"
+    override val tournamentStandingsHint = "Punti = punti fatti dalla propria coppia in tutte le partite; a parità contano le vittorie (V) e la differenza punti. G = partite giocate."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Turni giocati: $n" }
     override val share = "Condividi"
     override val saveDialogTitle = "Salva file"
     override val fileName = "Nome"
@@ -9246,6 +9672,56 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val tournamentButton = "Americano or Mexicano tournament"
+    override val tournamentTitle = "Tournament"
+    override val tournamentSubtitle = "Americano and Mexicano: partners change every round"
+    override val tournamentNew = "New tournament"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n players" }
+    override val tournamentRound: (Int) -> String = { n -> "Round $n" }
+    override val tournamentFinished = "Finished"
+    override val tournamentKindTitle = "Tournament type"
+    override val tournamentName = "Tournament name (optional)"
+    override val tournamentAmericanoHint = "Partners change every round: everyone plays with and against as many people as possible."
+    override val tournamentMexicanoHint = "First round as in the Americano, then by standings: on the same court 1st and 4th against 2nd and 3rd."
+    override val tournamentPlayers = "Players"
+    override val tournamentPlayersHint = "From 4 to 16, each with their own name: the standings are individual. Players with a photo in the history get it here too."
+    override val tournamentAddPlayer = "Add player"
+    override val tournamentNeedPlayers = "At least 4 players are needed, all with different names."
+    override val tournamentCourts = "Courts"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Matches per round: $a · sitting out each round: $b" }
+    override val tournamentScoring = "Scoring"
+    override val tournamentScoringPoints = "By points"
+    override val tournamentScoringTime = "By time"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minutes" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n points" }
+    override val tournamentTimeHint = "Play for the chosen minutes, then write the result (or count it point by point with the timer)."
+    override val tournamentPointsHint = "Every rally is a point and each player serves 4 times in turn; the match ends when the two pairs' points add up to the total (e.g. 13-11 at 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Suggested rounds: $n (everyone partners everyone once)." }
+    override val tournamentCreate = "Start the tournament"
+    override val tournamentShare = "Share standings"
+    override val tournamentNextRound = "Next round"
+    override val tournamentRounds = "Rounds"
+    override val tournamentStandings = "Standings"
+    override val tournamentResting = "Sitting out"
+    override val tournamentFinish = "Finish tournament"
+    override val tournamentMissingResults = "Some results of this round are missing: write them before moving on."
+    override val tournamentFinishText = "The standings stay as they are and the tournament moves to the finished ones."
+    override val tournamentDeleteTitle = "Delete the tournament?"
+    override val tournamentDeleteText = "The tournament and its standings disappear from this phone."
+    override val tournamentCourt: (Int) -> String = { n -> "Court $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "The two scores must add up to $n." }
+    override val tournamentCount = "Count point by point"
+    override val tournamentStartTimer = "Start the timer"
+    override val tournamentTimeUp = "Time is up: finish the rally and save the result."
+    override val tournamentMatchOver = "Match over: save the result."
+    override val tournamentSave = "Save result"
+    override val tournamentPointsShort = "Pts"
+    override val tournamentPlayedShort = "P"
+    override val tournamentWonShort = "W"
+    override val tournamentStandingsHint = "Points = points scored by your pair in all matches; ties are broken by wins (W) and point difference. P = matches played."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Rounds played: $n" }
     override val share = "Share"
     override val saveDialogTitle = "Save files"
     override val fileName = "Name"
@@ -9737,6 +10213,56 @@ object DeStrings : Strings {
     override val photoRemove = "Foto entfernen"
     override val photoNeedsName = "Schreibe zuerst den Namen des Spielers: Das Foto wird über den Namen wiedergefunden."
     override val photoError = "Dieses Foto lässt sich nicht lesen."
+    override val tournamentButton = "Americano- oder Mexicano-Turnier"
+    override val tournamentTitle = "Turnier"
+    override val tournamentSubtitle = "Americano und Mexicano: wechselnde Paare in jeder Runde"
+    override val tournamentNew = "Neues Turnier"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n Spieler" }
+    override val tournamentRound: (Int) -> String = { n -> "Runde $n" }
+    override val tournamentFinished = "Beendet"
+    override val tournamentKindTitle = "Turnierart"
+    override val tournamentName = "Name des Turniers (optional)"
+    override val tournamentAmericanoHint = "Die Paare wechseln jede Runde: Jeder spielt mit und gegen möglichst viele andere."
+    override val tournamentMexicanoHint = "Erste Runde wie beim Americano, danach nach Tabelle: auf demselben Platz 1. und 4. gegen 2. und 3."
+    override val tournamentPlayers = "Spieler"
+    override val tournamentPlayersHint = "4 bis 16, jeder mit eigenem Namen: Die Tabelle ist persönlich. Wer im Verlauf ein Foto hat, findet es hier wieder."
+    override val tournamentAddPlayer = "Spieler hinzufügen"
+    override val tournamentNeedPlayers = "Es braucht mindestens 4 Spieler, alle mit verschiedenen Namen."
+    override val tournamentCourts = "Plätze"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Spiele pro Runde: $a · Pause pro Runde: $b" }
+    override val tournamentScoring = "Wertung"
+    override val tournamentScoringPoints = "Nach Punkten"
+    override val tournamentScoringTime = "Nach Zeit"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n Minuten" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n Punkte" }
+    override val tournamentTimeHint = "Gespielt wird die gewählte Zeit, dann wird das Ergebnis eingetragen (oder Punkt für Punkt mit der Stoppuhr gezählt)."
+    override val tournamentPointsHint = "Jeder Ballwechsel zählt einen Punkt, jeder schlägt reihum 4-mal auf; das Spiel endet, wenn die Punkte beider Paare zusammen die Summe ergeben (z. B. 13:11 bei 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Empfohlene Runden: $n (jeder spielt einmal mit jedem)." }
+    override val tournamentCreate = "Turnier starten"
+    override val tournamentShare = "Tabelle teilen"
+    override val tournamentNextRound = "Nächste Runde"
+    override val tournamentRounds = "Runden"
+    override val tournamentStandings = "Tabelle"
+    override val tournamentResting = "Pause"
+    override val tournamentFinish = "Turnier beenden"
+    override val tournamentMissingResults = "In dieser Runde fehlen Ergebnisse: Trage sie ein, bevor es weitergeht."
+    override val tournamentFinishText = "Die Tabelle bleibt, wie sie ist, und das Turnier kommt zu den beendeten."
+    override val tournamentDeleteTitle = "Turnier löschen?"
+    override val tournamentDeleteText = "Das Turnier und seine Tabelle verschwinden von diesem Telefon."
+    override val tournamentCourt: (Int) -> String = { n -> "Platz $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "Beide Ergebnisse zusammen müssen $n ergeben." }
+    override val tournamentCount = "Punkt für Punkt zählen"
+    override val tournamentStartTimer = "Stoppuhr starten"
+    override val tournamentTimeUp = "Zeit abgelaufen: Ballwechsel beenden und Ergebnis speichern."
+    override val tournamentMatchOver = "Spiel vorbei: Ergebnis speichern."
+    override val tournamentSave = "Ergebnis speichern"
+    override val tournamentPointsShort = "Pkt"
+    override val tournamentPlayedShort = "Sp"
+    override val tournamentWonShort = "S"
+    override val tournamentStandingsHint = "Punkte = Punkte des eigenen Paares in allen Spielen; bei Gleichstand zählen Siege (S) und Punktedifferenz. Sp = gespielte Spiele."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Gespielte Runden: $n" }
     override val share = "Teilen"
     override val saveDialogTitle = "Dateien speichern"
     override val fileName = "Name"
@@ -10221,6 +10747,56 @@ object EsStrings : Strings {
     override val photoRemove = "Quitar foto"
     override val photoNeedsName = "Escribe primero el nombre del jugador: la foto se encuentra por el nombre."
     override val photoError = "No se puede leer esta foto."
+    override val tournamentButton = "Torneo Americano o Mexicano"
+    override val tournamentTitle = "Torneo"
+    override val tournamentSubtitle = "Americano y Mexicano: parejas que cambian en cada ronda"
+    override val tournamentNew = "Nuevo torneo"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n jugadores" }
+    override val tournamentRound: (Int) -> String = { n -> "Ronda $n" }
+    override val tournamentFinished = "Terminado"
+    override val tournamentKindTitle = "Tipo de torneo"
+    override val tournamentName = "Nombre del torneo (opcional)"
+    override val tournamentAmericanoHint = "Las parejas cambian en cada ronda: cada uno juega con y contra el mayor número de personas posible."
+    override val tournamentMexicanoHint = "Primera ronda como en el Americano, luego por clasificación: en la misma pista 1.º y 4.º contra 2.º y 3.º."
+    override val tournamentPlayers = "Jugadores"
+    override val tournamentPlayersHint = "De 4 a 16, cada uno con su nombre: la clasificación es individual. Quien tiene foto en el historial la encuentra aquí."
+    override val tournamentAddPlayer = "Añadir jugador"
+    override val tournamentNeedPlayers = "Hacen falta al menos 4 jugadores, todos con nombres distintos."
+    override val tournamentCourts = "Pistas"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Partidos por ronda: $a · descansan en cada ronda: $b" }
+    override val tournamentScoring = "Puntuación"
+    override val tournamentScoringPoints = "A puntos"
+    override val tournamentScoringTime = "A tiempo"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minutos" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n puntos" }
+    override val tournamentTimeHint = "Se juega los minutos elegidos y luego se escribe el resultado (o se cuenta punto a punto con el cronómetro)."
+    override val tournamentPointsHint = "Cada punto disputado vale un punto y cada uno saca 4 veces por turno; el partido acaba cuando los puntos de las dos parejas suman el total (p. ej. 13-11 a 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Rondas recomendadas: $n (cada uno juega una vez con todos)." }
+    override val tournamentCreate = "Empezar el torneo"
+    override val tournamentShare = "Compartir clasificación"
+    override val tournamentNextRound = "Ronda siguiente"
+    override val tournamentRounds = "Rondas"
+    override val tournamentStandings = "Clasificación"
+    override val tournamentResting = "Descansan"
+    override val tournamentFinish = "Terminar torneo"
+    override val tournamentMissingResults = "Faltan resultados en esta ronda: escríbelos antes de pasar a la siguiente."
+    override val tournamentFinishText = "La clasificación se queda como está y el torneo pasa a los terminados."
+    override val tournamentDeleteTitle = "¿Eliminar el torneo?"
+    override val tournamentDeleteText = "El torneo y su clasificación desaparecen de este teléfono."
+    override val tournamentCourt: (Int) -> String = { n -> "Pista $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "Los dos resultados deben sumar $n." }
+    override val tournamentCount = "Contar punto a punto"
+    override val tournamentStartTimer = "Iniciar cronómetro"
+    override val tournamentTimeUp = "Tiempo agotado: terminad el punto y guardad el resultado."
+    override val tournamentMatchOver = "Partido terminado: guarda el resultado."
+    override val tournamentSave = "Guardar resultado"
+    override val tournamentPointsShort = "Ptos"
+    override val tournamentPlayedShort = "J"
+    override val tournamentWonShort = "G"
+    override val tournamentStandingsHint = "Puntos = puntos hechos por tu pareja en todos los partidos; en caso de empate cuentan las victorias (G) y la diferencia de puntos. J = partidos jugados."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Rondas jugadas: $n" }
     override val share = "Compartir"
     override val saveDialogTitle = "Guardar archivos"
     override val fileName = "Nombre"
@@ -10707,6 +11283,56 @@ object FrStrings : Strings {
     override val photoRemove = "Retirer la photo"
     override val photoNeedsName = "Écrivez d'abord le nom du joueur : la photo se retrouve grâce au nom."
     override val photoError = "Impossible de lire cette photo."
+    override val tournamentButton = "Tournoi Americano ou Mexicano"
+    override val tournamentTitle = "Tournoi"
+    override val tournamentSubtitle = "Americano et Mexicano : les paires changent à chaque tour"
+    override val tournamentNew = "Nouveau tournoi"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n joueurs" }
+    override val tournamentRound: (Int) -> String = { n -> "Tour $n" }
+    override val tournamentFinished = "Terminé"
+    override val tournamentKindTitle = "Type de tournoi"
+    override val tournamentName = "Nom du tournoi (facultatif)"
+    override val tournamentAmericanoHint = "Les paires changent à chaque tour : chacun joue avec et contre le plus de monde possible."
+    override val tournamentMexicanoHint = "Premier tour comme l'Americano, puis selon le classement : sur le même terrain, 1er et 4e contre 2e et 3e."
+    override val tournamentPlayers = "Joueurs"
+    override val tournamentPlayersHint = "De 4 à 16, chacun avec son nom : le classement est individuel. Ceux qui ont une photo dans l'historique la retrouvent ici."
+    override val tournamentAddPlayer = "Ajouter un joueur"
+    override val tournamentNeedPlayers = "Il faut au moins 4 joueurs, tous avec des noms différents."
+    override val tournamentCourts = "Terrains"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Matchs par tour : $a · au repos à chaque tour : $b" }
+    override val tournamentScoring = "Comptage"
+    override val tournamentScoringPoints = "Aux points"
+    override val tournamentScoringTime = "Au temps"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minutes" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n points" }
+    override val tournamentTimeHint = "On joue pendant les minutes choisies, puis on écrit le résultat (ou on le compte point par point avec le chrono)."
+    override val tournamentPointsHint = "Chaque échange vaut un point et chacun sert 4 fois à son tour ; le match finit quand les points des deux paires additionnés font le total (ex. 13-11 en 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Tours conseillés : $n (chacun joue une fois avec tous)." }
+    override val tournamentCreate = "Commencer le tournoi"
+    override val tournamentShare = "Partager le classement"
+    override val tournamentNextRound = "Tour suivant"
+    override val tournamentRounds = "Tours"
+    override val tournamentStandings = "Classement"
+    override val tournamentResting = "Au repos"
+    override val tournamentFinish = "Terminer le tournoi"
+    override val tournamentMissingResults = "Il manque des résultats dans ce tour : écrivez-les avant de passer au suivant."
+    override val tournamentFinishText = "Le classement reste tel quel et le tournoi passe parmi les terminés."
+    override val tournamentDeleteTitle = "Supprimer le tournoi ?"
+    override val tournamentDeleteText = "Le tournoi et son classement disparaissent de ce téléphone."
+    override val tournamentCourt: (Int) -> String = { n -> "Terrain $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "Les deux scores additionnés doivent faire $n." }
+    override val tournamentCount = "Compter point par point"
+    override val tournamentStartTimer = "Lancer le chrono"
+    override val tournamentTimeUp = "Temps écoulé : finissez l'échange et enregistrez le résultat."
+    override val tournamentMatchOver = "Match terminé : enregistrez le résultat."
+    override val tournamentSave = "Enregistrer le résultat"
+    override val tournamentPointsShort = "Pts"
+    override val tournamentPlayedShort = "J"
+    override val tournamentWonShort = "V"
+    override val tournamentStandingsHint = "Points = points marqués par sa paire dans tous les matchs ; à égalité comptent les victoires (V) et la différence de points. J = matchs joués."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Tours joués : $n" }
     override val share = "Partager"
     override val saveDialogTitle = "Enregistrer les fichiers"
     override val fileName = "Nom"
@@ -11194,6 +11820,56 @@ object PtStrings : Strings {
     override val photoRemove = "Remover foto"
     override val photoNeedsName = "Escreva primeiro o nome do jogador: a foto é encontrada pelo nome."
     override val photoError = "Não foi possível ler esta foto."
+    override val tournamentButton = "Torneio Americano ou Mexicano"
+    override val tournamentTitle = "Torneio"
+    override val tournamentSubtitle = "Americano e Mexicano: duplas que mudam a cada rodada"
+    override val tournamentNew = "Novo torneio"
+    override val tournamentAmericano = "Americano"
+    override val tournamentMexicano = "Mexicano"
+    override val tournamentPlayersCount: (Int) -> String = { n -> "$n jogadores" }
+    override val tournamentRound: (Int) -> String = { n -> "Rodada $n" }
+    override val tournamentFinished = "Concluído"
+    override val tournamentKindTitle = "Tipo de torneio"
+    override val tournamentName = "Nome do torneio (opcional)"
+    override val tournamentAmericanoHint = "As duplas mudam a cada rodada: cada um joga com e contra o maior número possível de pessoas."
+    override val tournamentMexicanoHint = "Primeira rodada como no Americano, depois pela classificação: na mesma quadra 1º e 4º contra 2º e 3º."
+    override val tournamentPlayers = "Jogadores"
+    override val tournamentPlayersHint = "De 4 a 16, cada um com seu nome: a classificação é individual. Quem tem foto no histórico a encontra aqui."
+    override val tournamentAddPlayer = "Adicionar jogador"
+    override val tournamentNeedPlayers = "São necessários pelo menos 4 jogadores, todos com nomes diferentes."
+    override val tournamentCourts = "Quadras"
+    override val tournamentCourtsHint: (Int, Int) -> String = { a, b -> "Partidas por rodada: $a · descansam a cada rodada: $b" }
+    override val tournamentScoring = "Pontuação"
+    override val tournamentScoringPoints = "Por pontos"
+    override val tournamentScoringTime = "Por tempo"
+    override val tournamentMinutesN: (Int) -> String = { n -> "$n minutos" }
+    override val tournamentPointsN: (Int) -> String = { n -> "$n pontos" }
+    override val tournamentTimeHint = "Joga-se pelos minutos escolhidos e depois se escreve o resultado (ou se conta ponto a ponto com o cronômetro)."
+    override val tournamentPointsHint = "Cada troca de bola vale um ponto e cada um saca 4 vezes por vez; a partida termina quando os pontos das duas duplas somados dão o total (ex. 13-11 em 24)."
+    override val tournamentSuggested: (Int) -> String = { n -> "Rodadas recomendadas: $n (cada um joga uma vez com todos)." }
+    override val tournamentCreate = "Começar o torneio"
+    override val tournamentShare = "Compartilhar classificação"
+    override val tournamentNextRound = "Próxima rodada"
+    override val tournamentRounds = "Rodadas"
+    override val tournamentStandings = "Classificação"
+    override val tournamentResting = "Descansam"
+    override val tournamentFinish = "Encerrar torneio"
+    override val tournamentMissingResults = "Faltam resultados nesta rodada: escreva-os antes de passar para a próxima."
+    override val tournamentFinishText = "A classificação fica como está e o torneio vai para os concluídos."
+    override val tournamentDeleteTitle = "Excluir o torneio?"
+    override val tournamentDeleteText = "O torneio e sua classificação somem deste telefone."
+    override val tournamentCourt: (Int) -> String = { n -> "Quadra $n" }
+    override val tournamentScoreHint: (Int) -> String = { n -> "Os dois placares somados devem dar $n." }
+    override val tournamentCount = "Contar ponto a ponto"
+    override val tournamentStartTimer = "Iniciar cronômetro"
+    override val tournamentTimeUp = "Tempo esgotado: terminem a troca e salvem o resultado."
+    override val tournamentMatchOver = "Partida terminada: salve o resultado."
+    override val tournamentSave = "Salvar resultado"
+    override val tournamentPointsShort = "Pts"
+    override val tournamentPlayedShort = "J"
+    override val tournamentWonShort = "V"
+    override val tournamentStandingsHint = "Pontos = pontos feitos pela própria dupla em todas as partidas; no empate contam as vitórias (V) e o saldo de pontos. J = partidas jogadas."
+    override val tournamentRoundsPlayed: (Int) -> String = { n -> "Rodadas jogadas: $n" }
     override val share = "Compartilhar"
     override val saveDialogTitle = "Salvar arquivos"
     override val fileName = "Nome"
@@ -13708,6 +14384,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
@@ -13786,7 +14463,11 @@ fun SetupScreen(c: MatchController) {
                 selected = su.sport.ordinal,
                 onSelect = { i -> c.selectSport(Sport.entries[i]) },
             )
-            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
+            if (su.sport == Sport.PADEL) {
+                Text(s.padelHint, color = TsmColors.TextDim)
+                // Tornei a coppie che cambiano: schermata a parte, senza toccare la partita normale.
+                GhostButton(s.tournamentButton, Icons.Filled.EmojiEvents, { c.openTournaments() }, Modifier.fillMaxWidth())
+            }
         }
         SectionCard(s.clubSection, Icons.Filled.Business) {
             Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
@@ -14488,6 +15169,490 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
         Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = TsmColors.Ball, checkmarkColor = TsmColors.OnBall))
         Text(label, color = TsmColors.TextMain)
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/TournamentScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/TournamentScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.os.SystemClock
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.TMatch
+import com.tennis.scoremanager.data.Tournament
+import com.tennis.scoremanager.data.TournamentKind
+import com.tennis.scoremanager.data.TournamentScoring
+import com.tennis.scoremanager.data.Tournaments
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.delay
+
+/**
+ * Tornei Americano e Mexicano: si crea il torneo (giocatori, campi, punti o tempo), poi a ogni turno si scrivono i
+ * risultati (o si conta una partita punto per punto) e la classifica si aggiorna. Il turno successivo parte quando
+ * tutte le partite del turno hanno il risultato.
+ */
+@Composable
+fun TournamentScreen(c: MatchController) {
+    val t by c.tournament.collectAsState()
+    val cur = t
+    if (cur == null) TournamentList(c) else TournamentView(c, cur)
+}
+
+// ------------------------------------------------------------------ elenco e creazione
+
+@Composable
+private fun TournamentList(c: MatchController) {
+    val s = LocalStrings.current
+    val all by c.tournaments.collectAsState()
+    var creating by rememberSaveable { mutableStateOf(false) }
+    BackHandler { if (creating) creating = false else c.go(Screen.SETUP) }
+    if (creating || all.isEmpty()) {
+        NewTournament(c) { if (all.isEmpty()) c.go(Screen.SETUP) else creating = false }
+        return
+    }
+    ScreenScaffold(
+        title = s.tournamentTitle,
+        subtitle = s.tournamentSubtitle,
+        icon = Icons.Filled.EmojiEvents,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.go(Screen.SETUP) }, Modifier.weight(1f))
+            BigButton(s.tournamentNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
+        },
+    ) {
+        all.forEach { t ->
+            val leader = Tournaments.standings(t).firstOrNull()?.takeIf { t.rounds.any { r -> r.matches.any { it.played } } }
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).clickable { c.openTournament(t) }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(title(t, s), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(
+                        listOfNotNull(
+                            s.tournamentPlayersCount(t.players.size), s.tournamentRound(t.rounds.size),
+                            if (t.finished) s.tournamentFinished else null,
+                        ).joinToString(" · "),
+                        color = TsmColors.TextDim, fontSize = 13.sp,
+                    )
+                    if (leader != null) Text("1. ${leader.name} · ${leader.points}", color = TsmColors.Ball, fontSize = 13.sp)
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+            }
+        }
+    }
+}
+
+private fun title(t: Tournament, s: com.tennis.scoremanager.ui.Strings): String {
+    val kind = if (t.kind == TournamentKind.AMERICANO) s.tournamentAmericano else s.tournamentMexicano
+    return if (t.name.isBlank()) kind else "${t.name} · $kind"
+}
+
+@Composable
+private fun NewTournament(c: MatchController, onCancel: () -> Unit) {
+    val s = LocalStrings.current
+    var name by rememberSaveable { mutableStateOf("") }
+    var mexicano by rememberSaveable { mutableStateOf(false) }
+    val players = remember { mutableStateListOf("", "", "", "") }
+    var courts by rememberSaveable { mutableIntStateOf(1) }
+    var timed by rememberSaveable { mutableStateOf(false) }
+    var points by rememberSaveable { mutableIntStateOf(24) }
+    var minutes by rememberSaveable { mutableIntStateOf(12) }
+    var error by remember { mutableStateOf(false) }
+    val names = players.map { it.trim() }.filter { it.isNotEmpty() }
+    val valid = names.size >= Tournaments.MIN_PLAYERS && names.map { PlayerStats.key(it) }.toSet().size == names.size
+    ScreenScaffold(
+        title = s.tournamentNew,
+        subtitle = s.tournamentSubtitle,
+        icon = Icons.Filled.EmojiEvents,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, onCancel, Modifier.weight(1f))
+            BigButton(s.tournamentCreate, Icons.Filled.PlayArrow, {
+                if (!valid) error = true
+                else c.createTournament(
+                    name, if (mexicano) TournamentKind.MEXICANO else TournamentKind.AMERICANO, names,
+                    courts, if (timed) TournamentScoring.TIME else TournamentScoring.POINTS, points, minutes,
+                )
+            }, Modifier.weight(1f))
+        },
+    ) {
+        SectionCard(s.tournamentKindTitle, Icons.Filled.EmojiEvents) {
+            OutlinedTextField(name, { name = it.take(40) }, label = { Text(s.tournamentName) }, singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences))
+            Segmented(listOf(SegOption(s.tournamentAmericano), SegOption(s.tournamentMexicano)), selected = if (mexicano) 1 else 0,
+                onSelect = { mexicano = it == 1 })
+            Text(if (mexicano) s.tournamentMexicanoHint else s.tournamentAmericanoHint, color = TsmColors.TextDim)
+        }
+        SectionCard(s.tournamentPlayers, Icons.Filled.Groups) {
+            Text(s.tournamentPlayersHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            players.forEachIndexed { i, p ->
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PlayerAvatar(c, p, TsmColors.Ball, 36.dp)
+                    OutlinedTextField(p, { players[i] = it.take(30) }, label = { Text("${s.playerName} ${i + 1}") }, singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words))
+                    if (players.size > Tournaments.MIN_PLAYERS) {
+                        IconButton(onClick = { players.removeAt(i) }) { Icon(Icons.Filled.Close, s.delete, tint = TsmColors.TextDim) }
+                    }
+                }
+            }
+            if (players.size < Tournaments.MAX_PLAYERS) {
+                GhostButton(s.tournamentAddPlayer, Icons.Filled.Add, { players.add("") }, Modifier.fillMaxWidth())
+            }
+            if (error && !valid) Text(s.tournamentNeedPlayers, color = TsmColors.Danger, fontSize = 13.sp)
+        }
+        SectionCard(s.tournamentCourts, Icons.Filled.SportsTennis) {
+            Segmented((1..Tournaments.MAX_COURTS).map { SegOption("$it") }, selected = courts - 1, onSelect = { courts = it + 1 })
+            val per = minOf(courts, names.size / 4)
+            val rest = names.size - per * 4
+            Text(s.tournamentCourtsHint(per, rest), color = TsmColors.TextDim, fontSize = 13.sp)
+        }
+        SectionCard(s.tournamentScoring, Icons.Filled.Timer) {
+            Segmented(listOf(SegOption(s.tournamentScoringPoints), SegOption(s.tournamentScoringTime)), selected = if (timed) 1 else 0,
+                onSelect = { timed = it == 1 })
+            if (timed) {
+                val opts = listOf(10, 12, 15, 20)
+                Segmented(opts.map { SegOption(s.tournamentMinutesN(it)) }, selected = opts.indexOf(minutes).coerceAtLeast(0),
+                    onSelect = { minutes = opts[it] })
+                Text(s.tournamentTimeHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            } else {
+                val opts = listOf(16, 24, 32)
+                Segmented(opts.map { SegOption(s.tournamentPointsN(it)) }, selected = opts.indexOf(points).coerceAtLeast(0),
+                    onSelect = { points = opts[it] })
+                Text(s.tournamentPointsHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+            if (!mexicano && names.size >= Tournaments.MIN_PLAYERS) {
+                Text(s.tournamentSuggested(Tournaments.suggestedRounds(names.size)), color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+// ------------------------------------------------------------------ torneo aperto
+
+@Composable
+private fun TournamentView(c: MatchController, t: Tournament) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    /** 0 = turno, 1 = classifica. */
+    var tab by rememberSaveable(t.id) { mutableIntStateOf(if (t.finished) 1 else 0) }
+    var shownRound by rememberSaveable(t.id) { mutableIntStateOf(0) }
+    var confirmFinish by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    var missing by remember { mutableStateOf(false) }
+    /** Partita contata punto per punto: numero del turno e partita. */
+    var counting by remember { mutableStateOf<Pair<Int, TMatch>?>(null) }
+    // Si mostra sempre l'ultimo turno quando ne arriva uno nuovo.
+    LaunchedEffect(t.rounds.size) { shownRound = t.rounds.size }
+    BackHandler { c.closeTournament() }
+
+    ScreenScaffold(
+        title = title(t, s),
+        subtitle = if (t.scoring == TournamentScoring.POINTS) s.tournamentPointsN(t.pointsPerMatch) else s.tournamentMinutesN(t.minutes),
+        icon = Icons.Filled.EmojiEvents,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.closeTournament() }, Modifier.weight(1f))
+            if (t.finished) {
+                BigButton(s.tournamentShare, Icons.Filled.Share, {
+                    c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+                }, Modifier.weight(1f))
+            } else {
+                BigButton(s.tournamentNextRound, Icons.AutoMirrored.Filled.ArrowForward, {
+                    if (!c.nextTournamentRound()) missing = true
+                }, Modifier.weight(1f))
+            }
+        },
+    ) {
+        Segmented(listOf(SegOption(s.tournamentRounds), SegOption(s.tournamentStandings)), selected = tab, onSelect = { tab = it })
+        if (tab == 1) {
+            StandingsTable(c, t)
+            if (!t.finished) GhostButton(s.tournamentShare, Icons.Filled.Share, {
+                c.tournamentShareIntent()?.let { runCatching { context.startActivity(it) } }
+            }, Modifier.fillMaxWidth())
+        } else {
+            if (t.rounds.size > 1) {
+                Segmented(t.rounds.map { SegOption("${it.number}") }, selected = (shownRound - 1).coerceIn(0, t.rounds.size - 1),
+                    onSelect = { shownRound = it + 1 })
+            }
+            val r = t.rounds.getOrNull(shownRound - 1) ?: t.current
+            if (r != null) {
+                Text(s.tournamentRound(r.number), color = TsmColors.TextMain, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                r.matches.forEach { m ->
+                    MatchCard(c, t, m, editable = !t.finished, onCount = { counting = r.number to m }) { a, b ->
+                        c.setTournamentResult(r.number, m.court, a, b)
+                    }
+                }
+                if (r.resting.isNotEmpty()) {
+                    Text("${s.tournamentResting}: " + r.resting.joinToString(", ") { t.players[it] }, color = TsmColors.TextDim)
+                }
+            }
+        }
+        if (!t.finished) {
+            GhostButton(s.tournamentFinish, Icons.Filled.Flag, { confirmFinish = true }, Modifier.fillMaxWidth())
+        }
+        GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.fillMaxWidth())
+    }
+
+    if (missing) {
+        ConfirmDialog(Icons.Filled.Flag, s.tournamentNextRound, s.tournamentMissingResults, s.ok, onConfirm = { missing = false }, onDismiss = { missing = false })
+    }
+    if (confirmFinish) {
+        ConfirmDialog(Icons.Filled.Flag, s.tournamentFinish, s.tournamentFinishText, s.tournamentFinish,
+            onConfirm = { confirmFinish = false; c.finishTournament(); tab = 1 }, onDismiss = { confirmFinish = false })
+    }
+    if (confirmDelete) {
+        ConfirmDialog(Icons.Filled.Delete, s.tournamentDeleteTitle, s.tournamentDeleteText, s.delete,
+            onConfirm = { confirmDelete = false; c.deleteTournament(t.id) }, onDismiss = { confirmDelete = false })
+    }
+    counting?.let { (roundNo, m) ->
+        LiveCounter(c, t, m, onDismiss = { counting = null }) { a, b ->
+            c.setTournamentResult(roundNo, m.court, a, b)
+            counting = null
+        }
+    }
+}
+
+private fun team(t: Tournament, idx: List<Int>) = idx.joinToString(" / ") { t.players[it] }
+
+/**
+ * Una partita del turno: le due coppie e i punteggi da scrivere. Nelle partite a punti basta scrivere un
+ * punteggio: l'altro si completa da solo (24 - 13 = 11).
+ */
+@Composable
+private fun MatchCard(
+    c: MatchController, t: Tournament, m: TMatch, editable: Boolean, onCount: () -> Unit, onResult: (Int?, Int?) -> Unit,
+) {
+    val s = LocalStrings.current
+    var a by remember(m.scoreA, m.scoreB) { mutableStateOf(m.scoreA?.toString() ?: "") }
+    var b by remember(m.scoreA, m.scoreB) { mutableStateOf(m.scoreB?.toString() ?: "") }
+    val total = t.pointsPerMatch
+    val byPoints = t.scoring == TournamentScoring.POINTS
+    fun commit() {
+        val ia = a.toIntOrNull()
+        val ib = b.toIntOrNull()
+        onResult(ia, ib)
+    }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.tournamentCourt(m.court), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+        for ((side, idx) in listOf(Side.P1 to m.a, Side.P2 to m.b)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                idx.forEach { PlayerAvatar(c, t.players[it], TsmColors.player(side), 30.dp) }
+                Text(team(t, idx), color = TsmColors.player(side), fontWeight = FontWeight.Bold, maxLines = 2,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                OutlinedTextField(
+                    value = if (side == Side.P1) a else b,
+                    onValueChange = { v ->
+                        val clean = v.filter { it.isDigit() }.take(3)
+                        val n = clean.toIntOrNull()
+                        if (side == Side.P1) {
+                            a = clean
+                            if (byPoints && n != null && n <= total) b = (total - n).toString()
+                        } else {
+                            b = clean
+                            if (byPoints && n != null && n <= total) a = (total - n).toString()
+                        }
+                        commit()
+                    },
+                    enabled = editable,
+                    singleLine = true,
+                    textStyle = androidx.compose.ui.text.TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+                        color = TsmColors.TextMain),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.width(76.dp),
+                )
+            }
+        }
+        if (byPoints && a.isNotEmpty() && b.isNotEmpty() && (a.toIntOrNull() ?: 0) + (b.toIntOrNull() ?: 0) != total) {
+            Text(s.tournamentScoreHint(total), color = TsmColors.Orange, fontSize = 13.sp)
+        }
+        if (editable) GhostButton(s.tournamentCount, Icons.Filled.TouchApp, onCount, Modifier.fillMaxWidth())
+    }
+}
+
+/** Conteggio punto per punto di una partita: due tasti grandi, la voce dice il punteggio, e a tempo il conto alla rovescia. */
+@Composable
+private fun LiveCounter(c: MatchController, t: Tournament, m: TMatch, onDismiss: () -> Unit, onSave: (Int, Int) -> Unit) {
+    val s = LocalStrings.current
+    val history = remember { mutableStateListOf<Side>() }
+    val a = history.count { it == Side.P1 }
+    val b = history.count { it == Side.P2 }
+    val byPoints = t.scoring == TournamentScoring.POINTS
+    val over = byPoints && a + b >= t.pointsPerMatch
+    var startedAt by remember { mutableLongStateOf(0L) }
+    var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
+    LaunchedEffect(startedAt) {
+        while (startedAt > 0) {
+            now = SystemClock.elapsedRealtime()
+            delay(250)
+        }
+    }
+    val leftS = if (startedAt > 0) (t.minutes * 60 - ((now - startedAt) / 1000)).coerceAtLeast(0) else t.minutes * 60L
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(color = TsmColors.Background, modifier = Modifier.fillMaxSize()) {
+            Column(
+                Modifier.fillMaxSize().systemBarsPadding().padding(12.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.tournamentCourt(m.court), color = TsmColors.Ball, fontWeight = FontWeight.Black, fontSize = 20.sp, modifier = Modifier.weight(1f))
+                    Text(
+                        if (byPoints) "${a + b} / ${t.pointsPerMatch}" else "%d:%02d".format(leftS / 60, leftS % 60),
+                        color = if (!byPoints && leftS == 0L) TsmColors.Danger else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp,
+                    )
+                }
+                if (!byPoints && startedAt == 0L) {
+                    BigButton(s.tournamentStartTimer, Icons.Filled.Timer, { startedAt = SystemClock.elapsedRealtime() }, Modifier.fillMaxWidth())
+                }
+                if (!byPoints && startedAt > 0 && leftS == 0L) Text(s.tournamentTimeUp, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
+                for ((side, idx) in listOf(Side.P1 to m.a, Side.P2 to m.b)) {
+                    Surface(
+                        onClick = {
+                            if (!over) {
+                                history.add(side)
+                                c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                            }
+                        },
+                        shape = RoundedCornerShape(24.dp),
+                        color = TsmColors.player(side),
+                        modifier = Modifier.fillMaxWidth().height(190.dp),
+                    ) {
+                        Column(Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceBetween) {
+                            Text(team(t, idx), color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                                textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(if (side == Side.P1) "$a" else "$b", color = TsmColors.onPlayer(side), fontSize = 84.sp, fontWeight = FontWeight.Black)
+                            Spacer(Modifier.height(4.dp))
+                        }
+                    }
+                }
+                if (over) Text(s.tournamentMatchOver, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    GhostButton(s.undoPoint, Icons.AutoMirrored.Filled.Undo, {
+                        if (history.isNotEmpty()) {
+                            history.removeAt(history.lastIndex)
+                            c.announceCounter(history.count { it == Side.P1 }, history.count { it == Side.P2 })
+                        }
+                    }, Modifier.weight(1f))
+                    GhostButton(s.cancel, Icons.Filled.Close, onDismiss, Modifier.weight(1f))
+                }
+                BigButton(s.tournamentSave, Icons.Filled.Save, { onSave(a, b) }, Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+/** Classifica: posizione, foto, nome, punti, partite giocate e vinte, differenza punti. */
+@Composable
+private fun StandingsTable(c: MatchController, t: Tournament) {
+    val s = LocalStrings.current
+    val rows = remember(t) { Tournaments.standings(t) }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(vertical = 6.dp),
+    ) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+            Text("", modifier = Modifier.weight(1f))
+            for (h in listOf(s.tournamentPointsShort, s.tournamentPlayedShort, s.tournamentWonShort, "+/-")) {
+                Text(h, color = TsmColors.TextDim, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.width(44.dp))
+            }
+        }
+        rows.forEachIndexed { i, st ->
+            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("${i + 1}", color = if (i == 0) TsmColors.Ball else TsmColors.TextDim, fontWeight = FontWeight.Black, modifier = Modifier.width(26.dp))
+                PlayerAvatar(c, st.name, if (i == 0) TsmColors.Ball else TsmColors.Outline, 30.dp)
+                Spacer(Modifier.width(8.dp))
+                Text(st.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f))
+                for (v in listOf("${st.points}", "${st.played}", "${st.won}", if (st.diff > 0) "+${st.diff}" else "${st.diff}")) {
+                    Text(v, color = TsmColors.TextMain, textAlign = TextAlign.End, modifier = Modifier.width(44.dp))
+                }
+            }
+            if (i < rows.lastIndex) Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp).height(1.dp).background(TsmColors.Outline.copy(alpha = 0.4f)))
+        }
+    }
+    Text(s.tournamentStandingsHint, color = TsmColors.TextDim, fontSize = 12.sp)
 }
 TSM_EOF
 
@@ -15392,6 +16557,10 @@ class CallBuilder(private val lang: Lang) {
     }
 
     /** Due numeri di seguito, con "a" in mezzo se la lingua lo vuole ("tre a uno", "three one"). */
+    /** Punteggio di una partita a punti del torneo (Americano/Mexicano): "tredici a undici", "dodici pari". */
+    fun counterScore(a: Int, b: Int): List<Seg> =
+        if (a == b) listOf(num(a), Seg.Clip("all")) else pair(num(a), num(b), words.tiebreakTo(a, b))
+
     private fun pair(a: Seg, b: Seg, to: Boolean): List<Seg> = if (to) listOf(a, Seg.Clip("to"), b) else listOf(a, b)
 
     /** Game di un set a fine partita: lo zero è [Phrases.SET_ZERO] ("six love"), nel match tie-break resta "zero". */
@@ -16589,6 +17758,98 @@ class StrokeReportTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class TournamentTest {
+
+    private fun names(n: Int) = (1..n).map { "G$it" }
+
+    /** Gioca il turno in corso dando a ogni partita il punteggio scelto da [score] e prepara il successivo. */
+    private fun playRound(t: Tournament, score: (TMatch) -> Pair<Int, Int> = { 13 to 11 }): Tournament {
+        val cur = t.current!!
+        val done = cur.copy(matches = cur.matches.map { m -> score(m).let { (a, b) -> m.copy(scoreA = a, scoreB = b) } })
+        val t2 = t.copy(rounds = t.rounds.dropLast(1) + done)
+        return t2.copy(rounds = t2.rounds + Tournaments.nextRound(t2))
+    }
+
+    private fun start(t: Tournament) = t.copy(rounds = listOf(Tournaments.nextRound(t)))
+
+    @Test
+    fun americanoEightPlayersRotatesPartners() {
+        var t = start(Tournament(id = "t1", players = names(8), courts = 2))
+        repeat(6) { t = playRound(t) }
+        assertEquals(7, t.rounds.size)
+        // Ognuno gioca ogni turno (8 giocatori, 2 campi) e nessuno riposa.
+        t.rounds.forEach { r ->
+            assertEquals(8, r.matches.flatMap { it.a + it.b }.toSet().size)
+            assertTrue(r.resting.isEmpty())
+        }
+        // In 7 turni ognuno ha 7 compagni su 7 possibili: al massimo poche coppie ripetute.
+        val pairs = t.rounds.flatMap { r -> r.matches.flatMap { listOf(it.a.sorted(), it.b.sorted()) } }
+        val repeats = pairs.size - pairs.toSet().size
+        assertTrue("coppie ripetute: $repeats", repeats <= 4)
+    }
+
+    @Test
+    fun restingIsFair() {
+        // 6 giocatori, un campo: due riposano a ogni turno; in tre turni ognuno riposa una volta.
+        var t = start(Tournament(id = "t2", players = names(6), courts = 1))
+        repeat(2) { t = playRound(t) }
+        val rests = t.rounds.flatMap { it.resting }.groupingBy { it }.eachCount()
+        assertEquals(6, rests.size)
+        assertTrue(rests.values.all { it == 1 })
+    }
+
+    @Test
+    fun mexicanoPairsFirstAndFourthAgainstSecondAndThird() {
+        var t = start(Tournament(id = "t3", kind = TournamentKind.MEXICANO, players = names(8), courts = 2))
+        // Primo turno: la coppia "a" vince sempre 20-4.
+        t = playRound(t) { 20 to 4 }
+        val st = Tournaments.standings(t).map { it.player }
+        val court1 = t.current!!.matches.first { it.court == 1 }
+        assertEquals(listOf(st[0], st[3]), court1.a)
+        assertEquals(listOf(st[1], st[2]), court1.b)
+        val court2 = t.current!!.matches.first { it.court == 2 }
+        assertEquals(listOf(st[4], st[7]), court2.a)
+    }
+
+    @Test
+    fun standingsCountPointsWinsAndDraws() {
+        val t = Tournament(
+            id = "t4", players = names(4), courts = 1,
+            rounds = listOf(
+                TRound(1, listOf(TMatch(1, listOf(0, 1), listOf(2, 3), 15, 9))),
+                TRound(2, listOf(TMatch(1, listOf(0, 2), listOf(1, 3), 12, 12))),
+            ),
+        )
+        val s = Tournaments.standings(t)
+        assertEquals(0, s.first().player)
+        assertEquals(27, s.first().points)
+        assertEquals(1, s.first().won)
+        assertEquals(1, s.first().drawn)
+        assertEquals(2, s.first().played)
+        assertEquals(3, s.last().player)
+        assertEquals(21, s.last().points)
+    }
+
+    @Test
+    fun courtsAreLimitedByPlayers() {
+        val t = start(Tournament(id = "t5", players = names(9), courts = 4))
+        assertEquals(2, t.current!!.matches.size)
+        assertEquals(1, t.current!!.resting.size)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/model/ScoreEngineTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -17480,7 +18741,8 @@ class StringsTest {
             // Le sigle (BP, SP, OK, SET...) restano uguali in ogni lingua: non contano come copie.
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
-            assertTrue("$lang copia l'inglese in: $same", same.size < 30)
+            // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese).
+            assertTrue("$lang copia l'inglese in: $same", same.size < 35)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -22272,6 +23534,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 84 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 87 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

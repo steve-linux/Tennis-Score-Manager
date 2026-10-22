@@ -2,6 +2,7 @@ O Tennis Score Manager marca os pontos de uma partida de tênis segundo as regra
 
 * Simples e duplas: três ou cinco sets, dois sets e um match tie-break de 10 pontos, pro set de 8 ou 10 jogos ou só match tie-break; sets de 6 ou 4 jogos, com ou sem tie-break; ponto decisivo (No-Ad) opcional.
 * Também para padel: mesmas regras do tênis, com dupla e golden point (ponto de ouro) já configurados; também há o star point da FIP.
+* Torneios de padel Americano e Mexicano: de 4 a 16 jogadores e até 4 quadras, partidas por pontos ou por tempo, duplas e rodadas automáticas, resultados escritos ou contados ponto a ponto, classificação para compartilhar.
 * Anúncios de árbitro de cadeira em seis idiomas (italiano, inglês, francês, alemão, espanhol, português) com a síntese de voz do telefone, sem internet. Também é possível importar gravações próprias.
 * Shot clock (25 s), troca de lado (90 s) e intervalo entre sets (120 s); as trocas de lado e a ordem de saque ficam por conta do app.
 * Qualquer ponto pode ser desfeito, mesmo depois do fim de um game, de um set ou da partida: o placar é recalculado desde o início.

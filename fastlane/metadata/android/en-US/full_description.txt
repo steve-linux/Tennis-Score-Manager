@@ -2,6 +2,7 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 
 * Singles and doubles: best of three or five sets, two sets and a 10-point match tie-break, pro set to 8 or 10 games or match tie-break only; sets to 6 or 4 games, with or without tie-break; optional No-Ad scoring.
 * Padel too: same rules as tennis, with doubles and golden point already set; the FIP star point is also available.
+* Padel Americano and Mexicano tournaments: 4 to 16 players and up to 4 courts, matches by points or by time, automatic pairs and rounds, results written or counted point by point, standings to share.
 * Chair umpire calls in six languages (Italian, English, French, German, Spanish, Portuguese) with the phone's text-to-speech, no internet needed. You can also import your own recordings.
 * Shot clock (25 s), changeover (90 s) and set break (120 s); changes of ends and serving order are handled for you.
 * Undo any point, even after the end of a game, set or match: the score is recomputed from the start.

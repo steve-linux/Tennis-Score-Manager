@@ -2,6 +2,7 @@ Tennis Score Manager tiene il punteggio di una partita di tennis secondo le rego
 
 * Singolare e doppio: tre o cinque set, due set e super tie-break a 10, pro set a 8 o 10 game o solo super tie-break; set da 6 o 4 game, con o senza tie-break; punto decisivo (No-Ad) a scelta.
 * Anche per il padel: stesse regole del tennis, con doppio e golden point (punto d'oro) già impostati; in alternativa lo star point della FIP.
+* Tornei di padel Americano e Mexicano: da 4 a 16 giocatori e fino a 4 campi, partite a punti o a tempo, coppie e turni automatici, risultati scritti o contati punto per punto, classifica da condividere.
 * Chiamate da giudice di sedia in sei lingue (italiano, inglese, francese, tedesco, spagnolo, portoghese) con la sintesi vocale del telefono, senza internet. Si possono anche importare registrazioni proprie.
 * Shot clock (25 s), cambio campo (90 s) e pausa tra i set (120 s); cambi di campo e turni di servizio li gestisce l'app.
 * Qualsiasi punto si può annullare, anche dopo la fine di un game, di un set o della partita: il punteggio viene ricalcolato dall'inizio.

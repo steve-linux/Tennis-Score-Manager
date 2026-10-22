@@ -60,6 +60,7 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Storico, giocatori e importazione dei JSON | `app/.../data/PlayerStats.kt` (+ test), `data/Storage.kt` (`saveFinished`), `ui/screens/HistoryScreen.kt`, `MatchController.kt` (`importMatches`) |
 | Trasferimento tra telefoni col QR (storico e partite sospese) | `app/.../transfer/Transfer.kt` (server e `TransferBundle`), `MatchController.kt` (`startSending`, `receiveFrom`), `ui/screens/HistoryScreen.kt` (`SendDialog`) |
 | Foto dei giocatori | `app/.../ui/PlayerPhoto.kt` (`PlayerAvatar`, `EditablePlayerAvatar`), `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` e `assets/scoreboard.html` |
+| Tornei Americano e Mexicano | `app/.../data/Tournament.kt` (turni, coppie, classifica + test), `ui/screens/TournamentScreen.kt`, `MatchController.kt` (`createTournament`, `nextTournamentRound`) |
 | Scheda F-Droid (descrizioni, novità di ogni versione) | `fastlane/metadata/android/<lingua>/`, `changelogs/<versionCode>.txt` |
 
 ## Licenza
