@@ -259,6 +259,33 @@ Con el firmware 2.4 la pulsera reconoce **derecha, revés, saque y volea** con s
 - **Batería**: el sensor gasta unos 1 mA más, unos veinte minutos de una carga completa (la estimación de los ajustes lo tiene en cuenta). Sin reconocimiento, el sensor queda apagado.
 - En los golpes muy fuertes el giroscopio llega a su máximo (2000 °/s): el reconocimiento no se resiente, pero la velocidad indicada sale algo por debajo de la real.
 
+### 6.5 Bandas de pecho (app 2.5)
+
+Frecuencia cardíaca y calorías desde **bandas de pecho Bluetooth** con el servicio cardíaco estándar: Coospo (probada la H6), Magene, Polar, Garmin, Wahoo… Valen en todos los modos, incluso sin pulseras.
+
+1. Moja los electrodos y ponte la banda: se enciende sola al contacto con la piel.
+2. Página 2 › **Frecuencia cardíaca** › activa **Bandas de pecho** y elige la banda de cada jugador (una sola vez). **Intercambiar** las invierte.
+3. **Edad, peso y sexo** de quien la lleva (opcionales): para las calorías (fórmula de Keytel, error típico ±20 %) y, con la edad, para las zonas cardíacas (máximo estimado 208 − 0,7 × edad).
+
+- Bajo cada banda: estado, pulso, **señal** en dBm (más cerca de 0 = más fuerte) y **cortes**, es decir, las veces que el pulso no llegó durante más de 3 segundos, con los segundos perdidos (*2 cortes (14 s)*). Cuentan desde el «juego» del partido; antes, desde que se eligió la banda. Sirven para saber hasta dónde llega la banda.
+- En el partido una fila muestra el pulso en directo (*J1 · 142 bpm*). En el resumen (7): pulso medio y máximo, calorías, gráfico en el tiempo y tiempo en las zonas cardíacas. Las pausas no cuentan.
+- **Alcance**: prueba en casa con la H6 y el teléfono quieto: conectada hasta 21 m, pero a −100 dBm, al límite; de espaldas la señal baja 5-10 dBm. En individuales el jugador lejano está a 24-30 m del teléfono: para no perder datos usa el **segundo teléfono** (6.6).
+
+### 6.6 Segundo teléfono detrás de la otra línea de fondo (app 2.5)
+
+Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos que el largo de la pista. Con un segundo teléfono detrás de la otra línea de fondo cada jugador tiene siempre uno cerca: el segundo (**satélite**) capta las bandas y pulseras de los jugadores de su lado y hace de puente con el **principal**, que lleva el partido.
+
+1. **Principal**: página 2 › **Segundo teléfono** › **Usar un segundo teléfono**. La primera vez pide el permiso *Dispositivos cercanos* (la ubicación hasta Android 12). El teléfono crea su **propia red, solo local**: sin SIM ni datos, y sin necesidad del Wi-Fi del club. Aparece un QR.
+2. **Satélite**: página 2 › **Segundo teléfono** › **Hacer de segundo teléfono** › escanea el QR. Android pide una vez conectarse a la red del principal (*AndroidShare_…*): toca **Conectar**. El satélite mantiene sus datos móviles. Debe decir *Conectado al teléfono principal*.
+3. El satélite sigue solo las bandas y pulseras elegidas en el principal, en los mismos lados: no hay que elegir nada. Déjalo detrás de la línea de fondo con la app abierta.
+
+- **Cambio de lado**: no hay que hacer nada. Cada banda y cada pulsera sigue con el teléfono al que está conectada mientras la señal aguante; luego la toma el más cercano (unos segundos). En el principal aparece *Desde el segundo teléfono*; durante el paso una pulsera puede aparecer desconectada un momento.
+- **Sin datos perdidos**: pulso, teclas y golpes del satélite llevan el **ID del partido** y un número correlativo, y el satélite los guarda hasta que el principal los confirma. Si el Wi-Fi entre los teléfonos se corta, el pulso llega después y rellena los huecos del gráfico; los golpes cuentan si son del mismo partido. Una **tecla** de la pulsera que llega más de 5 segundos tarde no da el punto: pulsa otra vez. La misma tecla llegada por dos caminos cuenta una sola vez.
+- Del principal a las pulseras pasan marcador, mensajes, *Identificar*, apagado y ajustes. Conviene cambiar los ajustes con la pulsera conectada al principal.
+- **Marcador**: en el satélite **Mostrar el marcador** abre el marcador del partido a pantalla completa (como en 8.3), ya conectado al principal.
+- Si el principal no puede crear la red (punto de acceso normal ya activo), usa el Wi-Fi en el que está: entonces los dos teléfonos deben estar en la misma red. Con Android 9 o anterior el satélite muestra nombre y contraseña de la red, para elegirla a mano en los ajustes de Wi-Fi.
+- **Detener** cierra la conexión y la red; el satélite vuelve a sus bandas y pulseras.
+
 ## 7. Cómo se usa la app
 
 1. **Nuevo partido** (opcional): **Tenis** o **Pádel** (app 2.5: mismas reglas, tiempos y cantos; al elegir Pádel se ponen solos el dobles y el punto de oro, que se pueden cambiar (en lugar del punto de oro, la página 2 ofrece también el *Star Point* de la FIP: como máximo dos ventajas y luego un punto decisivo), y el resumen dice *Pádel*), club, pista, individual/dobles, nombres (en dobles, dos nombres por pareja). **Buscar la dirección de la pista** (desactivado por defecto) añade al resumen la dirección junto a las coordenadas: se la pide al servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google. **Siguiente**. Con *Pádel* aparece también **Torneo Americano o Mexicano**: de 4 a 16 jugadores y de 1 a 4 pistas, partidos a puntos (16, 24 o 32: los puntos de las dos parejas suman el total) o a tiempo. En el *Americano* las parejas cambian en cada ronda para que cada uno juegue con y contra el mayor número de personas; en el *Mexicano*, desde la segunda ronda, se juega por clasificación (1.º y 4.º contra 2.º y 3.º en la misma pista). En cada ronda se escribe el resultado de cada pista (a puntos basta un número, el otro se completa) o se cuenta con *Contar punto a punto*, con la voz y, a tiempo, el cronómetro; con más jugadores que plazas en pista se descansa por turnos. **Ronda siguiente** empieza cuando están todos los resultados; la **Clasificación** cuenta los puntos de cada uno, luego las victorias y la diferencia de puntos, y se comparte como texto.
@@ -368,6 +395,8 @@ Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LIST
 | Fotos de los jugadores | `ui/PlayerPhoto.kt`, `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` en `tv/TvServer.kt` y `scoreboard.html` |
 | Torneos Americano y Mexicano | `data/Tournament.kt` (+ tests), `ui/screens/TournamentScreen.kt` |
 | Reconocimiento de golpes | `TSM_Band.ino` (sección «colpi»), `swing_detector.*` y `stroke_classifier.*` (copiados de SwingSense); app: `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
+| Bandas de pecho (Bluetooth, pulso, calorías, zonas, cortes) | `ble/HeartRateManager.kt`, `ble/HeartRateProtocol.kt`, `ble/StrapGaps.kt`, `data/HeartStats.kt` (+ tests), `ui/HeartSection.kt` |
+| Segundo teléfono (protocolo, red, puente para bandas y pulseras) | `relay/RelayProtocol.kt`, `relay/RelayLink.kt` (+ tests), `relay/Hotspot.kt`, `relay/PhoneRelay.kt`, `ui/RelaySection.kt`; en `ble/BleManager.kt` `setRemote`, `relayOut`, `inject*` |
 
 
 ## 11. Problemas frecuentes

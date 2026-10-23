@@ -259,6 +259,33 @@ Mit Firmware 2.4 erkennt das Armband **Vorhand, Rückhand, Aufschlag und Volley*
 - **Akku**: Der Sensor braucht etwa 1 mA mehr, rund zwanzig Minuten bei voller Ladung (die Schätzung in den Einstellungen berücksichtigt das). Ohne Schlagerkennung bleibt der Sensor aus.
 - Bei sehr harten Schlägen erreicht das Gyroskop sein Maximum (2000 °/s): Die Erkennung leidet nicht darunter, aber das angezeigte Tempo ist etwas zu niedrig.
 
+### 6.5 Brustgurte (App 2.5)
+
+Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfrequenzdienst: Coospo (getestet mit dem H6), Magene, Polar, Garmin, Wahoo… Sie funktionieren in jedem Modus, auch ohne Armbänder.
+
+1. Befeuchte die Elektroden und lege den Gurt an: Er schaltet sich bei Hautkontakt selbst ein.
+2. Seite 2 › **Herzfrequenz** › **Brustgurte** einschalten und für jeden Spieler den Gurt wählen (nur einmal). **Tauschen** vertauscht sie.
+3. Optional **Alter, Gewicht und Geschlecht** der Person: für die Kalorien (Keytel-Formel, typischer Fehler ±20 %) und, mit dem Alter, für die Herzfrequenzzonen (geschätztes Maximum 208 − 0,7 × Alter).
+
+- Unter jedem Gurt: Status, Herzfrequenz, **Signal** in dBm (näher an 0 = stärker) und **Aussetzer**, also wie oft die Herzfrequenz länger als 3 Sekunden ausblieb, mit den verlorenen Sekunden (*2 Aussetzer (14 s)*). Sie zählen ab dem „Spiel“ des Matches, vorher ab der Wahl des Gurts. Sie zeigen, wie weit der Gurt reicht.
+- Im Match zeigt eine Zeile die Live-Herzfrequenz (*S1 · 142 bpm*). In der Zusammenfassung (7): durchschnittliche und maximale Herzfrequenz, Kalorien, Verlauf und Zeit in den Herzfrequenzzonen. Pausen zählen nicht.
+- **Reichweite**: Test drinnen mit dem H6, Telefon ruhend: verbunden bis 21 m, aber bei −100 dBm, an der Grenze; mit dem Rücken zum Telefon sinkt das Signal um 5-10 dBm. Im Einzel ist der ferne Spieler 24-30 m vom Telefon entfernt: Damit keine Daten verloren gehen, nutze das **zweite Telefon** (6.6).
+
+### 6.6 Zweites Telefon hinter der anderen Grundlinie (App 2.5)
+
+Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar Meter weniger als die Platzlänge. Mit einem zweiten Telefon hinter der anderen Grundlinie hat jeder Spieler immer eines in der Nähe: Das zweite (**Satellit**) empfängt Gurte und Armbänder der Spieler auf seiner Seite und überbrückt zum **Haupttelefon**, das das Match führt.
+
+1. **Haupttelefon**: Seite 2 › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
+2. **Satellit**: Seite 2 › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
+3. Der Satellit folgt selbst den auf dem Haupttelefon gewählten Gurten und Armbändern, auf denselben Seiten: nichts zu wählen. Lass ihn mit geöffneter App hinter der Grundlinie liegen.
+
+- **Seitenwechsel**: nichts zu tun. Jeder Gurt und jedes Armband bleibt beim verbundenen Telefon, solange das Signal hält, dann übernimmt das nähere (ein paar Sekunden). Das Haupttelefon zeigt *Über zweites Telefon*; während der Übergabe kann ein Armband kurz als getrennt erscheinen.
+- **Keine Daten verloren**: Herzfrequenz, Tasten und Schläge des Satelliten tragen die **Match-ID** und eine laufende Nummer, und der Satellit behält sie, bis das Haupttelefon sie bestätigt. Fällt das WLAN zwischen den Telefonen aus, kommt die Herzfrequenz später an und füllt die Lücken im Verlauf; Schläge zählen, wenn sie zum selben Match gehören. Eine **Taste** des Armbands, die mehr als 5 Sekunden später ankommt, gibt keinen Punkt: noch einmal drücken. Dieselbe Taste auf zwei Wegen zählt nur einmal.
+- Vom Haupttelefon zu den Armbändern gehen Spielstand, Meldungen, *Identifizieren*, Ausschalten und Einstellungen. Einstellungen ändert man besser mit dem Armband am Haupttelefon.
+- **Anzeigetafel**: Auf dem Satelliten öffnet **Anzeigetafel zeigen** die Anzeigetafel des Matches im Vollbild (wie in 8.3), bereits mit dem Haupttelefon verbunden.
+- Kann das Haupttelefon das Netz nicht erstellen (normaler Hotspot schon an), nutzt es das WLAN, in dem es ist: Dann müssen beide Telefone im selben Netz sein. Mit Android 9 oder älter zeigt der Satellit Netzname und Passwort, die man in den WLAN-Einstellungen von Hand wählt.
+- **Beenden** schließt Verbindung und Netz; der Satellit kehrt zu seinen eigenen Gurten und Armbändern zurück.
+
 ## 7. So benutzt du die App
 
 1. **Neues Match** (optional): **Tennis** oder **Padel** (App 2.5: gleiche Regeln, Zeiten und Ansagen; mit Padel werden Doppel und Golden Point von selbst eingestellt, beides änderbar (statt Golden Point gibt es auf Seite 2 auch den *Star Point* der FIP: höchstens zwei Vorteile, dann ein entscheidender Punkt), und die Zusammenfassung nennt *Padel*), Verein, Platz, Einzel/Doppel, Namen (im Doppel zwei Namen pro Team). **Adresse des Platzes suchen** (standardmäßig aus) ergänzt den Spielbericht um die Adresse neben den Koordinaten: Sie kommt vom Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet. **Weiter**. Mit *Padel* erscheint auch **Americano- oder Mexicano-Turnier**: 4 bis 16 Spieler und 1 bis 4 Plätze, Spiele nach Punkten (16, 24 oder 32: die Punkte beider Paare ergeben zusammen die Summe) oder nach Zeit. Beim *Americano* wechseln die Paare jede Runde, damit jeder mit und gegen möglichst viele spielt; beim *Mexicano* wird ab der zweiten Runde nach Tabelle gespielt (1. und 4. gegen 2. und 3. auf demselben Platz). In jeder Runde trägt man das Ergebnis jedes Platzes ein (nach Punkten reicht eine Zahl, die andere ergänzt sich) oder zählt es mit *Punkt für Punkt zählen*, mit Ansage und, nach Zeit, Stoppuhr; bei mehr Spielern als Plätzen wird abwechselnd pausiert. **Nächste Runde** startet, wenn alle Ergebnisse da sind; die **Tabelle** zählt die Punkte jedes Spielers, dann Siege und Punktedifferenz, und lässt sich als Text teilen.
@@ -368,6 +395,8 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 | Spielerfotos | `ui/PlayerPhoto.kt`, `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` und `scoreboard.html` |
 | Americano- und Mexicano-Turniere | `data/Tournament.kt` (+ Tests), `ui/screens/TournamentScreen.kt` |
 | Schlagerkennung | `TSM_Band.ino` (Abschnitt „colpi“), `swing_detector.*` und `stroke_classifier.*` (aus SwingSense kopiert); App: `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
+| Brustgurte (Bluetooth, Herzfrequenz, Kalorien, Zonen, Aussetzer) | `ble/HeartRateManager.kt`, `ble/HeartRateProtocol.kt`, `ble/StrapGaps.kt`, `data/HeartStats.kt` (+ Tests), `ui/HeartSection.kt` |
+| Zweites Telefon (Protokoll, Netz, Brücke für Gurte und Armbänder) | `relay/RelayProtocol.kt`, `relay/RelayLink.kt` (+ Tests), `relay/Hotspot.kt`, `relay/PhoneRelay.kt`, `ui/RelaySection.kt`; in `ble/BleManager.kt` `setRemote`, `relayOut`, `inject*` |
 
 
 ## 11. Häufige Probleme

@@ -259,6 +259,33 @@ Avec le firmware 2.4, le bracelet reconnaît **coup droit, revers, service et vo
 - **Batterie** : le capteur consomme environ 1 mA de plus, une vingtaine de minutes sur une charge complète (l'estimation dans les réglages en tient compte). Sans la reconnaissance, le capteur reste éteint.
 - Sur les coups très puissants, le gyroscope atteint son maximum (2000 °/s) : la reconnaissance n'en souffre pas, mais la vitesse affichée est un peu sous-estimée.
 
+### 6.5 Ceintures cardio (app 2.5)
+
+Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** utilisant le service cardio standard : Coospo (testée avec la H6), Magene, Polar, Garmin, Wahoo… Elles fonctionnent dans tous les modes, même sans bracelets.
+
+1. Mouillez les électrodes et mettez la ceinture : elle s'allume toute seule au contact de la peau.
+2. Page 2 › **Fréquence cardiaque** › activez **Ceintures cardio** et choisissez la ceinture de chaque joueur (une seule fois). **Échanger** les inverse.
+3. **Âge, poids et sexe** de la personne (facultatifs) : pour les calories (formule de Keytel, erreur typique ±20 %) et, avec l'âge, pour les zones cardio (maximum estimé 208 − 0,7 × âge).
+
+- Sous chaque ceinture : état, fréquence, **signal** en dBm (plus proche de 0 = plus fort) et **coupures**, c'est-à-dire les fois où la fréquence n'est pas arrivée pendant plus de 3 secondes, avec les secondes perdues (*2 coupures (14 s)*). Elles comptent depuis le « jeu » du match ; avant, depuis le choix de la ceinture. Elles indiquent jusqu'où porte la ceinture.
+- Pendant le match une ligne montre la fréquence en direct (*J1 · 142 bpm*). Dans le récapitulatif (7) : fréquence moyenne et maximale, calories, graphique dans le temps et temps dans les zones cardio. Les pauses ne comptent pas.
+- **Portée** : essai à l'intérieur avec la H6, téléphone immobile : connectée jusqu'à 21 m, mais à −100 dBm, à la limite ; de dos le signal baisse de 5-10 dBm. En simple le joueur éloigné est à 24-30 m du téléphone : pour ne pas perdre de données utilisez le **second téléphone** (6.6).
+
+### 6.6 Second téléphone derrière l'autre ligne de fond (app 2.5)
+
+Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelques mètres de moins que la longueur du court. Avec un second téléphone derrière l'autre ligne de fond, chaque joueur en a toujours un à proximité : le second (**satellite**) capte les ceintures et bracelets des joueurs de son côté et sert de relais vers le **principal**, qui tient le match.
+
+1. **Principal** : page 2 › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
+2. **Satellite** : page 2 › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
+3. Le satellite suit tout seul les ceintures et bracelets choisis sur le principal, des mêmes côtés : rien à choisir. Laissez-le derrière la ligne de fond avec l'app ouverte.
+
+- **Changement de côté** : rien à faire. Chaque ceinture et chaque bracelet reste au téléphone auquel il est connecté tant que le signal tient, puis le téléphone le plus proche le prend (quelques secondes). Le principal affiche *Via le second téléphone* ; pendant le passage un bracelet peut apparaître déconnecté un instant.
+- **Aucune donnée perdue** : fréquence, touches et coups du satellite portent l'**ID du match** et un numéro d'ordre, et le satellite les garde jusqu'à la confirmation du principal. Si le Wi-Fi entre les téléphones tombe, la fréquence arrive plus tard et comble les trous du graphique ; les coups comptent s'ils sont du même match. Une **touche** du bracelet arrivée plus de 5 secondes après ne donne pas le point : appuyez à nouveau. La même touche arrivée par deux chemins compte une seule fois.
+- Du principal vers les bracelets passent score, messages, *Identifier*, extinction et réglages. Mieux vaut changer les réglages avec le bracelet connecté au principal.
+- **Tableau de score** : sur le satellite **Afficher le tableau de score** ouvre le tableau du match en plein écran (comme en 8.3), déjà connecté au principal.
+- Si le principal ne peut pas créer le réseau (point d'accès normal déjà actif), il utilise le Wi-Fi où il se trouve : les deux téléphones doivent alors être sur le même réseau. Avec Android 9 ou antérieur le satellite affiche nom et mot de passe du réseau, à choisir à la main dans les paramètres Wi-Fi.
+- **Arrêter** ferme la liaison et le réseau ; le satellite revient à ses ceintures et bracelets.
+
 ## 7. Utiliser l'application
 
 1. **Nouveau match** (facultatif) : **Tennis** ou **Padel** (app 2.5 : mêmes règles, temps et annonces ; choisir Padel règle tout seul le double et le golden point (point en or), modifiables (à la place du golden point, la page 2 propose aussi le *star point* de la FIP : deux avantages au maximum, puis un point décisif), et le résumé indique *Padel*), club, court, simple/double, noms (en double, deux noms par équipe). **Rechercher l'adresse du court** (désactivé par défaut) ajoute l'adresse au résumé à côté des coordonnées : elle est demandée au service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google. **Suivant**. Avec *Padel* apparaît aussi **Tournoi Americano ou Mexicano** : de 4 à 16 joueurs et de 1 à 4 terrains, matchs aux points (16, 24 ou 32 : les points des deux paires additionnés font le total) ou au temps. Dans l'*Americano* les paires changent à chaque tour pour que chacun joue avec et contre le plus de monde possible ; dans le *Mexicano*, dès le deuxième tour, on joue selon le classement (1er et 4e contre 2e et 3e sur le même terrain). À chaque tour on écrit le résultat de chaque terrain (aux points un seul nombre suffit, l'autre se complète) ou on le compte avec *Compter point par point*, avec la voix et, au temps, le chrono ; s'il y a plus de joueurs que de places, on se repose à tour de rôle. **Tour suivant** démarre quand tous les résultats sont là ; le **Classement** compte les points de chacun, puis les victoires et la différence de points, et se partage en texte.
@@ -368,6 +395,8 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 | Photos des joueurs | `ui/PlayerPhoto.kt`, `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` dans `tv/TvServer.kt` et `scoreboard.html` |
 | Tournois Americano et Mexicano | `data/Tournament.kt` (+ tests), `ui/screens/TournamentScreen.kt` |
 | Reconnaissance des coups | `TSM_Band.ino` (section « colpi »), `swing_detector.*` et `stroke_classifier.*` (copiés de SwingSense) ; app : `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
+| Ceintures cardio (Bluetooth, fréquence, calories, zones, coupures) | `ble/HeartRateManager.kt`, `ble/HeartRateProtocol.kt`, `ble/StrapGaps.kt`, `data/HeartStats.kt` (+ tests), `ui/HeartSection.kt` |
+| Second téléphone (protocole, réseau, relais pour ceintures et bracelets) | `relay/RelayProtocol.kt`, `relay/RelayLink.kt` (+ tests), `relay/Hotspot.kt`, `relay/PhoneRelay.kt`, `ui/RelaySection.kt` ; dans `ble/BleManager.kt` `setRemote`, `relayOut`, `inject*` |
 
 
 ## 11. Problèmes courants

@@ -259,6 +259,33 @@ With firmware 2.4 the wristband recognizes **forehand, backhand, serve and volle
 - **Battery**: the sensor uses about 1 mA more, around twenty minutes of a full charge (the estimate in the settings includes it). With recognition off the sensor stays off.
 - On very hard strokes the gyroscope reaches its maximum (2000 °/s): recognition is not affected, but the speed shown is slightly underestimated.
 
+### 6.5 Heart rate straps (app 2.5)
+
+Heart rate and calories from **Bluetooth chest straps** using the standard heart rate service: Coospo (tested with the H6), Magene, Polar, Garmin, Wahoo… They work in every mode, even without bands.
+
+1. Wet the electrodes and put the strap on: it switches on by itself on contact with the skin.
+2. Page 2 › **Heart rate** › turn on **Heart rate straps** and pick each player's strap (only once). **Swap** exchanges them.
+3. Optional **age, weight and sex** of the wearer: used for calories (Keytel formula, typical error ±20%) and, with the age, for heart rate zones (estimated maximum 208 − 0.7 × age).
+
+- Under each strap: status, heart rate, **signal** in dBm (closer to 0 = stronger) and **dropouts**, i.e. the times the heart rate did not arrive for more than 3 seconds, with the seconds lost (*2 dropouts (14 s)*). They count from the match's "play"; before that, from when the strap was picked. They show how far the strap reaches.
+- During the match a row shows the live heart rate (*P1 · 142 bpm*). In the summary (7): average and maximum heart rate, calories, chart over time and time in heart rate zones. Breaks don't count.
+- **Range**: tested indoors with the H6 and the phone standing still: connected up to 21 m, but at −100 dBm, at the limit; with your back to the phone the signal drops by 5-10 dBm. In singles the far player is 24-30 m from the phone: to avoid losing data use the **second phone** (6.6).
+
+### 6.6 Second phone behind the other baseline (app 2.5)
+
+Straps and bands accept **one phone at a time** and reach a few metres less than the length of the court. With a second phone behind the other baseline every player always has one nearby: the second one (**satellite**) hears the straps and bands of the players on its side and acts as a bridge to the **main** phone, which keeps the match.
+
+1. **Main**: page 2 › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
+2. **Satellite**: page 2 › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
+3. The satellite follows by itself the straps and bands picked on the main phone, on the same sides: nothing to pick. Leave it behind the baseline with the app open.
+
+- **Change of ends**: nothing to do. Each strap and band stays with the phone it is connected to while the signal holds, then the nearer phone takes it (a few seconds). The main phone shows *Via second phone*; during the handover a band may show as disconnected for a moment.
+- **No data lost**: heart rate, key presses and strokes from the satellite carry the **match ID** and a sequence number, and the satellite keeps them until the main phone confirms them. If the Wi-Fi between the phones drops, the heart rate arrives later and fills the gaps in the chart; strokes count if they belong to the same match. A band **key press** arriving more than 5 seconds late does not give the point: press again. The same press arriving by two routes counts once.
+- From the main phone to the bands go score, messages, *Identify*, switch-off and settings. Settings are best changed with the band connected to the main phone.
+- **Scoreboard**: on the satellite **Show the scoreboard** opens the match scoreboard full screen (as in 8.3), already connected to the main phone.
+- If the main phone cannot create the network (normal hotspot already on), it uses the Wi-Fi it is on: then both phones must be on the same network. With Android 9 or earlier the satellite shows the network name and password, to pick by hand in the Wi-Fi settings.
+- **Stop** closes the link and the network; the satellite goes back to its own straps and bands.
+
 ## 7. Using the app
 
 1. **New match** (optional): **Tennis** or **Padel** (app 2.5: same rules, timers and calls; choosing Padel sets doubles and golden point by itself, both can be changed (instead of golden point, page 2 also offers the FIP *star point*: at most two advantages, then a deciding point), and the summary says *Padel*), club, court, singles/doubles, names (in doubles, two names per team). **Look up the court address** (off by default) adds the address to the summary next to the coordinates: it asks the phone's geocoding service, which with Google services sends the coordinates to Google. **Next**. With *Padel* you also get **Americano or Mexicano tournament**: 4 to 16 players and 1 to 4 courts, matches by points (16, 24 or 32: the two pairs' points add up to the total) or by time. In the *Americano* partners change every round so everyone plays with and against as many people as possible; in the *Mexicano*, from the second round, you play by standings (1st and 4th against 2nd and 3rd on the same court). Each round you write every court's result (in matches by points one number is enough, the other fills itself in) or count it with *Count point by point*, with the voice and, by time, the timer; with more players than places on court people sit out in turn. **Next round** starts when all results are in; the **Standings** count each player's points, then wins and point difference, and can be shared as text.
@@ -368,6 +395,8 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 | Player photos | `ui/PlayerPhoto.kt`, `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` and `scoreboard.html` |
 | Americano and Mexicano tournaments | `data/Tournament.kt` (+ tests), `ui/screens/TournamentScreen.kt` |
 | Stroke recognition | `TSM_Band.ino` ("colpi" section), `swing_detector.*` and `stroke_classifier.*` (copied from SwingSense); app: `ble/BandProtocol.kt`, `ui/BandSettingsPanel.kt`, `data/Reports.kt` |
+| Heart rate straps (Bluetooth, heart rate, calories, zones, dropouts) | `ble/HeartRateManager.kt`, `ble/HeartRateProtocol.kt`, `ble/StrapGaps.kt`, `data/HeartStats.kt` (+ tests), `ui/HeartSection.kt` |
+| Second phone (protocol, network, bridge for straps and bands) | `relay/RelayProtocol.kt`, `relay/RelayLink.kt` (+ tests), `relay/Hotspot.kt`, `relay/PhoneRelay.kt`, `ui/RelaySection.kt`; in `ble/BleManager.kt` `setRemote`, `relayOut`, `inject*` |
 
 
 ## 11. Common problems
