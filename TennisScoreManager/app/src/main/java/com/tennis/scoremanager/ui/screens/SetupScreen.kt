@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
 import android.net.Uri
@@ -85,24 +86,13 @@ fun SetupScreen(c: MatchController) {
             GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
-        action = {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Allenamento con la fascia, senza partita: schermata a parte.
-                Surface(onClick = { c.openWorkouts() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.MonitorHeart, null, tint = TsmColors.Danger)
-                        Text(s.workoutTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-                Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
-                        Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-        },
     ) {
+        // Tre scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite.
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
+            HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
+            HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
+        }
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
         SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
@@ -224,4 +214,21 @@ private fun Field(
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.width(0.dp))
+}
+
+@Composable
+private fun HomeShortcut(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    label: String,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
+        Column(Modifier.padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, null, tint = tint)
+            Text(label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        }
+    }
 }

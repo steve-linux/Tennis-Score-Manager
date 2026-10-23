@@ -69,6 +69,8 @@ import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.workout.WorkoutSession
 import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.Progress
+import com.tennis.scoremanager.data.ProgressPdf
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.relay.RelayRole
@@ -112,7 +114,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -534,6 +536,7 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
+            Screen.PROGRESS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1372,6 +1375,61 @@ class MatchController(
     fun openHistory() {
         refreshHistory()
         screen.value = Screen.HISTORY
+    }
+
+    // ---------------------------------------------------------------- progressi
+
+    /** Pagina 1 › Progressi: documenti stampabili, uno per gli allenamenti e uno per le partite di un giocatore. */
+    fun openProgress() {
+        refreshHistory()
+        refreshWorkouts()
+        screen.value = Screen.PROGRESS
+    }
+
+    private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
+
+    /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
+    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
+
+    /** [playerKey] null = allenamenti. */
+    fun progressReport(playerKey: String?): Progress.Report {
+        val s = strings
+        val lang = options.value.lang
+        // Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta.
+        val fmt = java.text.SimpleDateFormat("dd/MM/yy", lang.locale)
+        val date: (Long) -> String = { fmt.format(java.util.Date(it)) }
+        return if (playerKey == null) {
+            Progress.workouts(workouts.value, s, date)
+        } else {
+            val name = PlayerStats.players(played()).firstOrNull { it.key == playerKey }?.name ?: playerKey
+            Progress.matches(PlayerStats.lines(played(), playerKey), name, s, date)
+        }
+    }
+
+    /** Il PDF dei progressi nella cartella di condivisione; null se non si è potuto scrivere. */
+    fun progressPdf(playerKey: String?): File? {
+        val r = progressReport(playerKey)
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val name = (if (playerKey == null) s.progressWorkouts else "${s.progressMatches} ${r.title.substringAfter(": ")}")
+            .replace(Regex("[\\/:*?\"<>|]"), "_")
+        val file = File(dir, "$name.pdf")
+        return runCatching {
+            file.outputStream().use { ProgressPdf.write(r, s, "Tennis Score Manager · ${Reports.date(System.currentTimeMillis(), options.value.lang)}", it) }
+            file
+        }.getOrNull()
+    }
+
+    fun shareFileIntent(file: File, mime: String): Intent {
+        val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = mime
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, file.nameWithoutExtension)
+            clipData = ClipData.newRawUri("", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        return Intent.createChooser(send, strings.share)
     }
 
     // ---------------------------------------------------------------- allenamento

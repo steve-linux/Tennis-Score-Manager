@@ -171,7 +171,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
             if (WorkoutStats.rmssd(w.rr) != null) Text(s.workoutHrvHint, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(s.workoutRecoveryHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        if (w.heart.size > 1) StatCard(s.heartChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
+        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
         StatCard(s.heartZones) { HeartZones(mapOf(Side.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
         val laps = WorkoutStats.laps(w)
         if (laps.size > 1) {

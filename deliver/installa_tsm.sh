@@ -862,6 +862,8 @@ import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.workout.WorkoutSession
 import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.Progress
+import com.tennis.scoremanager.data.ProgressPdf
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.relay.RelayRole
@@ -905,7 +907,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -1327,6 +1329,7 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
+            Screen.PROGRESS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -2165,6 +2168,61 @@ class MatchController(
     fun openHistory() {
         refreshHistory()
         screen.value = Screen.HISTORY
+    }
+
+    // ---------------------------------------------------------------- progressi
+
+    /** Pagina 1 › Progressi: documenti stampabili, uno per gli allenamenti e uno per le partite di un giocatore. */
+    fun openProgress() {
+        refreshHistory()
+        refreshWorkouts()
+        screen.value = Screen.PROGRESS
+    }
+
+    private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
+
+    /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
+    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
+
+    /** [playerKey] null = allenamenti. */
+    fun progressReport(playerKey: String?): Progress.Report {
+        val s = strings
+        val lang = options.value.lang
+        // Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta.
+        val fmt = java.text.SimpleDateFormat("dd/MM/yy", lang.locale)
+        val date: (Long) -> String = { fmt.format(java.util.Date(it)) }
+        return if (playerKey == null) {
+            Progress.workouts(workouts.value, s, date)
+        } else {
+            val name = PlayerStats.players(played()).firstOrNull { it.key == playerKey }?.name ?: playerKey
+            Progress.matches(PlayerStats.lines(played(), playerKey), name, s, date)
+        }
+    }
+
+    /** Il PDF dei progressi nella cartella di condivisione; null se non si è potuto scrivere. */
+    fun progressPdf(playerKey: String?): File? {
+        val r = progressReport(playerKey)
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val name = (if (playerKey == null) s.progressWorkouts else "${s.progressMatches} ${r.title.substringAfter(": ")}")
+            .replace(Regex("[\\/:*?\"<>|]"), "_")
+        val file = File(dir, "$name.pdf")
+        return runCatching {
+            file.outputStream().use { ProgressPdf.write(r, s, "Tennis Score Manager · ${Reports.date(System.currentTimeMillis(), options.value.lang)}", it) }
+            file
+        }.getOrNull()
+    }
+
+    fun shareFileIntent(file: File, mime: String): Intent {
+        val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = mime
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, file.nameWithoutExtension)
+            clipData = ClipData.newRawUri("", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        return Intent.createChooser(send, strings.share)
     }
 
     // ---------------------------------------------------------------- allenamento
@@ -6049,6 +6107,239 @@ object PlayerStats {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Progress.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Progress.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ui.Strings
+import kotlin.math.abs
+
+/**
+ * Progressi: gli stessi numeri allenamento dopo allenamento (o partita dopo partita), per vedere se migliorano.
+ * Ogni voce confronta la media della prima metà del periodo con quella della seconda.
+ */
+object Progress {
+
+    /**
+     * Una voce: un valore per allenamento o partita, dal più vecchio (null = lì non c'è). [better]: true se più alto
+     * è meglio, false se più basso è meglio, null se non si può dire (battito medio).
+     */
+    data class Metric(val label: String, val unit: String, val values: List<Double?>, val better: Boolean?, val decimals: Int = 0) {
+        private val known: List<Double> get() = values.filterNotNull()
+
+        /** Media della prima e della seconda metà dei valori che ci sono; null con meno di 2 valori. */
+        val halves: Pair<Double, Double>?
+            get() {
+                val v = known
+                if (v.size < 2) return null
+                val first = v.take(v.size / 2)
+                val second = v.drop(v.size / 2)
+                return first.average() to second.average()
+            }
+
+        /** +1 migliorato, −1 peggiorato, 0 uguale o non si può dire. */
+        val verdict: Int
+            get() {
+                val (a, b) = halves ?: return 0
+                val goodUp = better ?: return 0
+                if (abs(b - a) < 0.05 * maxOf(abs(a), 1.0)) return 0
+                return if ((b > a) == goodUp) 1 else -1
+            }
+
+        fun format(v: Double): String = if (decimals == 0) "${Math.round(v)}" else String.format(java.util.Locale.ROOT, "%.${decimals}f", v)
+    }
+
+    data class Report(val title: String, val subtitle: String, val count: Int, val metrics: List<Metric>, val rows: List<List<String>>, val header: List<String>)
+
+    private fun pct(a: Int, b: Int): Double? = if (b > 0) a * 100.0 / b else null
+
+    /** Allenamenti dal più vecchio: durata, battito, calorie, HRV, recupero. */
+    fun workouts(list: List<WorkoutRecord>, s: Strings, date: (Long) -> String): Report {
+        val w = list.sortedBy { it.startedAt }
+        val sums = w.map { HeartStats.summary(it.heart) }
+        val metrics = listOf(
+            Metric(s.workoutDuration, "min", w.map { it.durationS / 60.0 }, true),
+            Metric(s.heartAvg, "bpm", sums.map { it?.avg?.toDouble() }, null),
+            Metric(s.heartMax, "bpm", sums.map { it?.max?.toDouble() }, null),
+            Metric(s.heartCalories, "kcal", sums.map { it?.kcal?.toDouble() }, true),
+            Metric(s.workoutHrv, "ms", w.map { WorkoutStats.rmssd(it.rr) }, true),
+            Metric(s.workoutRecovery, "bpm", w.map { WorkoutStats.finalRecovery(it)?.toDouble() }, true),
+        ).filter { m -> m.values.any { it != null } }
+        val rows = w.mapIndexed { i, r ->
+            listOf(
+                date(r.startedAt),
+                Reports.duration(r.durationS * 1000L),
+                sums[i]?.avg?.toString() ?: "–",
+                sums[i]?.max?.toString() ?: "–",
+                WorkoutStats.rmssd(r.rr)?.let { "${Math.round(it)}" } ?: "–",
+                WorkoutStats.finalRecovery(r)?.let { "−$it" } ?: "–",
+            )
+        }
+        val header = listOf(s.progressDate, s.workoutDuration, s.workoutAvgShort, s.workoutMaxShort, "HRV", s.workoutRecShort)
+        val span = if (w.isEmpty()) "" else "${date(w.first().startedAt)} – ${date(w.last().startedAt)}"
+        return Report(s.progressWorkouts, span, w.size, metrics, rows, header)
+    }
+
+    /** Partite finite di un giocatore, dalla più vecchia: vittorie, punti, servizio, ace, doppi falli, vincenti, errori. */
+    fun matches(lines: List<PlayerStats.MatchLine>, player: String, s: Strings, date: (Long) -> String): Report {
+        fun d(f: (MatchStats.SideTotals) -> Double?): List<Double?> = lines.map { l -> l.detail?.let(f) }
+        val metrics = listOf(
+            Metric(s.progressWins, "%", lines.map { if (it.won) 100.0 else 0.0 }, true),
+            Metric(s.progressPointsWon, "%", lines.map { it.pointsWonPct.toDouble() }, true),
+            Metric(s.statAces, "", d { it.aces.toDouble() }, true),
+            Metric(s.statDoubleFaults, "", d { it.doubleFaults.toDouble() }, false),
+            Metric(s.statFirstServeIn, "%", d { pct(it.firstServesIn, it.servePoints) }, true),
+            Metric(s.statWinners, "", d { it.winners.toDouble() }, true),
+            Metric(s.statUnforcedErrors, "", d { it.unforcedErrors.toDouble() }, false),
+        ).filter { m -> m.values.count { it != null } >= 1 }
+        val rows = lines.map { l ->
+            val t = l.detail
+            listOf(
+                date(l.rec.startedAt ?: l.rec.updatedAt),
+                if (l.won) s.progressWon else s.progressLost,
+                "${l.pointsWonPct}%",
+                t?.aces?.toString() ?: "–",
+                t?.doubleFaults?.toString() ?: "–",
+                t?.winners?.toString() ?: "–",
+                t?.unforcedErrors?.toString() ?: "–",
+            )
+        }
+        val header = listOf(s.progressDate, s.progressResult, s.progressPointsShort, "Ace", s.progressDfShort, s.progressWinnersShort, s.progressUeShort)
+        val span = if (lines.isEmpty()) "" else "${date(lines.first().rec.startedAt ?: 0)} – ${date(lines.last().rec.startedAt ?: 0)}"
+        return Report("${s.progressMatches}: $player", span, lines.size, metrics, rows, header)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ProgressPdf.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ProgressPdf.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.ui.Strings
+import java.io.OutputStream
+
+/**
+ * Documento stampabile dei progressi (A4, più pagine se serve): per ogni voce la media della prima e della seconda
+ * metà del periodo, la tendenza (verde se migliora, rossa se peggiora) e l'andamento; poi l'elenco completo.
+ */
+object ProgressPdf {
+    private const val W = 595
+    private const val H = 842
+    private const val M = 40f
+    private val dark = Color.rgb(20, 28, 44)
+    private val grey = Color.rgb(110, 120, 135)
+    private val rule = Color.rgb(220, 224, 230)
+    private val green = Color.rgb(46, 125, 50)
+    private val red = Color.rgb(205, 45, 42)
+
+    private fun paint(size: Float, color: Int = dark, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+        textSize = size
+        this.color = color
+        typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        textAlign = align
+        isAntiAlias = true
+    }
+
+    fun write(r: Progress.Report, s: Strings, footer: String, out: OutputStream) {
+        val doc = PdfDocument()
+        var pageNo = 0
+        var page: PdfDocument.Page? = null
+        var y = 0f
+        fun newPage() {
+            page?.let { doc.finishPage(it) }
+            pageNo++
+            page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, pageNo).create())
+            page!!.canvas.drawText("$footer · $pageNo", W / 2f, H - 20f, paint(8f, grey, align = Paint.Align.CENTER))
+            y = M + 10f
+        }
+        fun ensure(h: Float) { if (y + h > H - 40f) newPage() }
+        newPage()
+        val c = { page!!.canvas }
+        c().drawText(r.title, M, y, paint(20f, bold = true))
+        y += 18f
+        c().drawText("${r.subtitle} · ${s.progressCount(r.count)}", M, y, paint(10f, grey))
+        y += 26f
+        if (r.count < 2) {
+            c().drawText(s.progressTooFew, M, y, paint(11f))
+            y += 20f
+        } else {
+            // Intestazione delle voci
+            val h = paint(9f, grey, bold = true)
+            c().drawText(s.progressFirstHalf, 250f, y, h.apply { textAlign = Paint.Align.RIGHT })
+            c().drawText(s.progressSecondHalf, 330f, y, paint(9f, grey, bold = true, align = Paint.Align.RIGHT))
+            c().drawText(s.progressTrend, 345f, y, paint(9f, grey, bold = true))
+            y += 8f
+            c().drawLine(M, y, W - M, y, Paint().apply { color = rule })
+            y += 16f
+            for (m in r.metrics) {
+                ensure(34f)
+                val halves = m.halves
+                c().drawText(m.label + if (m.unit.isNotEmpty()) " (${m.unit})" else "", M, y, paint(10f))
+                if (halves != null) {
+                    c().drawText(m.format(halves.first), 250f, y, paint(10f, align = Paint.Align.RIGHT))
+                    c().drawText(m.format(halves.second), 330f, y, paint(10f, bold = true, align = Paint.Align.RIGHT))
+                    val (txt, col) = when (m.verdict) {
+                        1 -> "▲ ${s.progressBetter}" to green
+                        -1 -> "▼ ${s.progressWorse}" to red
+                        else -> "= ${s.progressSame}" to grey
+                    }
+                    c().drawText(txt, 345f, y, paint(10f, col, bold = m.verdict != 0))
+                }
+                sparkline(c(), m.values, 440f, y - 18f, W - M - 440f, 22f)
+                y += 30f
+            }
+        }
+        // Elenco completo
+        y += 10f
+        ensure(40f)
+        c().drawText(s.progressList, M, y, paint(13f, bold = true))
+        y += 18f
+        val cols = r.header.size
+        val colW = (W - 2 * M) / cols
+        fun row(cells: List<String>, bold: Boolean) {
+            ensure(16f)
+            cells.forEachIndexed { i, t -> c().drawText(t, M + i * colW, y, paint(9f, if (bold) grey else dark, bold)) }
+            y += 14f
+        }
+        row(r.header, true)
+        for (cells in r.rows) row(cells, false)
+        page?.let { doc.finishPage(it) }
+        doc.writeTo(out)
+        doc.close()
+    }
+
+    /** Andamento di una voce: punti uniti in ordine di tempo, i buchi saltati. */
+    private fun sparkline(c: android.graphics.Canvas, values: List<Double?>, x0: Float, y0: Float, w: Float, h: Float) {
+        val known = values.filterNotNull()
+        if (known.size < 2) return
+        val lo = known.min()
+        val hi = known.max().let { if (it == lo) lo + 1 else it }
+        val n = (values.size - 1).coerceAtLeast(1)
+        val path = Path()
+        var started = false
+        values.forEachIndexed { i, v ->
+            v ?: return@forEachIndexed
+            val x = x0 + i.toFloat() / n * w
+            val y = y0 + h - ((v - lo) / (hi - lo)).toFloat() * h
+            if (!started) path.moveTo(x, y) else path.lineTo(x, y)
+            started = true
+        }
+        c.drawPath(path, Paint().apply { color = Color.rgb(60, 110, 200); strokeWidth = 1.4f; style = Paint.Style.STROKE; isAntiAlias = true })
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Reports.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Reports.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -6985,7 +7276,7 @@ object WorkoutReport {
         }
         y += 14f
         if (w.heart.size > 1) {
-            c.drawText(s.heartChart, 40f, y, head)
+            c.drawText(s.workoutChart, 40f, y, head)
             y += 10f
             chart(c, w.heart, 40f, y, 515f, 160f)
             y += 180f
@@ -10853,6 +11144,7 @@ import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
 import com.tennis.scoremanager.ui.screens.TournamentScreen
 import com.tennis.scoremanager.ui.screens.WorkoutScreen
+import com.tennis.scoremanager.ui.screens.ProgressScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -10895,6 +11187,7 @@ fun AppRoot(c: MatchController) {
                 Screen.HISTORY -> HistoryScreen(c)
                 Screen.TOURNAMENT -> TournamentScreen(c)
                 Screen.WORKOUT -> WorkoutScreen(c)
+                Screen.PROGRESS -> ProgressScreen(c)
             }
         }
     }
@@ -11957,6 +12250,34 @@ interface Strings {
     val workoutSharePdf: String
     val workoutDeleteTitle: String
     val workoutDeleteText: String
+    val workoutChart: String
+    val progressTitle: String
+    val progressHint: String
+    val progressWorkouts: String
+    val progressMatches: String
+    val progressPlayer: String
+    val progressNoPlayers: String
+    val progressCount: (Int) -> String
+    val progressTooFew: String
+    val progressFirstHalf: String
+    val progressSecondHalf: String
+    val progressTrend: String
+    val progressBetter: String
+    val progressWorse: String
+    val progressSame: String
+    val progressList: String
+    val progressDate: String
+    val progressResult: String
+    val progressWon: String
+    val progressLost: String
+    val progressPointsShort: String
+    val progressDfShort: String
+    val progressWinnersShort: String
+    val progressUeShort: String
+    val progressWins: String
+    val progressPointsWon: String
+    val progressPdf: String
+    val progressPrint: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -12616,6 +12937,34 @@ object ItStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Eliminare l'allenamento?"
     override val workoutDeleteText = "Verrà tolto da questo telefono."
+    override val workoutChart = "Battito durante l'allenamento"
+    override val progressTitle = "Progressi"
+    override val progressHint = "Confronta allenamenti e partite nel tempo per vedere se migliori: documento da condividere o stampare."
+    override val progressWorkouts = "Allenamenti"
+    override val progressMatches = "Partite"
+    override val progressPlayer = "Giocatore"
+    override val progressNoPlayers = "Nessuna partita finita nello storico."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 voce" else "$n voci" }
+    override val progressTooFew = "Servono almeno 2 allenamenti o partite per confrontare."
+    override val progressFirstHalf = "Prima metà"
+    override val progressSecondHalf = "Seconda metà"
+    override val progressTrend = "Tendenza"
+    override val progressBetter = "migliora"
+    override val progressWorse = "peggiora"
+    override val progressSame = "stabile"
+    override val progressList = "Elenco"
+    override val progressDate = "Data"
+    override val progressResult = "Esito"
+    override val progressWon = "Vinta"
+    override val progressLost = "Persa"
+    override val progressPointsShort = "Punti"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Vinc."
+    override val progressUeShort = "EG"
+    override val progressWins = "Partite vinte"
+    override val progressPointsWon = "Punti vinti"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Stampa"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -13247,6 +13596,34 @@ object EnStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Delete the workout?"
     override val workoutDeleteText = "It will be removed from this phone."
+    override val workoutChart = "Heart rate during the workout"
+    override val progressTitle = "Progress"
+    override val progressHint = "Compare workouts and matches over time to see whether you are improving: a document to share or print."
+    override val progressWorkouts = "Workouts"
+    override val progressMatches = "Matches"
+    override val progressPlayer = "Player"
+    override val progressNoPlayers = "No finished matches in the history."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 entry" else "$n entries" }
+    override val progressTooFew = "At least 2 workouts or matches are needed to compare."
+    override val progressFirstHalf = "First half"
+    override val progressSecondHalf = "Second half"
+    override val progressTrend = "Trend"
+    override val progressBetter = "better"
+    override val progressWorse = "worse"
+    override val progressSame = "steady"
+    override val progressList = "List"
+    override val progressDate = "Date"
+    override val progressResult = "Result"
+    override val progressWon = "Won"
+    override val progressLost = "Lost"
+    override val progressPointsShort = "Points"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Win."
+    override val progressUeShort = "UE"
+    override val progressWins = "Matches won"
+    override val progressPointsWon = "Points won"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Print"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -13901,6 +14278,34 @@ object DeStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Training löschen?"
     override val workoutDeleteText = "Es wird von diesem Telefon entfernt."
+    override val workoutChart = "Herzfrequenz während des Trainings"
+    override val progressTitle = "Fortschritte"
+    override val progressHint = "Vergleiche Trainings und Matches über die Zeit, um zu sehen, ob du besser wirst: ein Dokument zum Teilen oder Drucken."
+    override val progressWorkouts = "Trainings"
+    override val progressMatches = "Matches"
+    override val progressPlayer = "Spieler"
+    override val progressNoPlayers = "Keine beendeten Matches im Verlauf."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 Eintrag" else "$n Einträge" }
+    override val progressTooFew = "Zum Vergleichen braucht es mindestens 2 Trainings oder Matches."
+    override val progressFirstHalf = "Erste Hälfte"
+    override val progressSecondHalf = "Zweite Hälfte"
+    override val progressTrend = "Tendenz"
+    override val progressBetter = "besser"
+    override val progressWorse = "schlechter"
+    override val progressSame = "gleich"
+    override val progressList = "Liste"
+    override val progressDate = "Datum"
+    override val progressResult = "Ergebnis"
+    override val progressWon = "Gewonnen"
+    override val progressLost = "Verloren"
+    override val progressPointsShort = "Punkte"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Gew."
+    override val progressUeShort = "UF"
+    override val progressWins = "Gewonnene Matches"
+    override val progressPointsWon = "Gewonnene Punkte"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Drucken"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -14547,6 +14952,34 @@ object EsStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "¿Eliminar el entrenamiento?"
     override val workoutDeleteText = "Se quitará de este teléfono."
+    override val workoutChart = "Pulso durante el entrenamiento"
+    override val progressTitle = "Progresos"
+    override val progressHint = "Compara entrenamientos y partidos en el tiempo para ver si mejoras: documento para compartir o imprimir."
+    override val progressWorkouts = "Entrenamientos"
+    override val progressMatches = "Partidos"
+    override val progressPlayer = "Jugador"
+    override val progressNoPlayers = "Ningún partido terminado en el historial."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 elemento" else "$n elementos" }
+    override val progressTooFew = "Hacen falta al menos 2 entrenamientos o partidos para comparar."
+    override val progressFirstHalf = "Primera mitad"
+    override val progressSecondHalf = "Segunda mitad"
+    override val progressTrend = "Tendencia"
+    override val progressBetter = "mejora"
+    override val progressWorse = "empeora"
+    override val progressSame = "estable"
+    override val progressList = "Lista"
+    override val progressDate = "Fecha"
+    override val progressResult = "Resultado"
+    override val progressWon = "Ganado"
+    override val progressLost = "Perdido"
+    override val progressPointsShort = "Puntos"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Gan."
+    override val progressUeShort = "ENF"
+    override val progressWins = "Partidos ganados"
+    override val progressPointsWon = "Puntos ganados"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Imprimir"
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -15197,6 +15630,34 @@ object FrStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Supprimer l'entraînement ?"
     override val workoutDeleteText = "Il sera retiré de ce téléphone."
+    override val workoutChart = "Fréquence pendant l'entraînement"
+    override val progressTitle = "Progrès"
+    override val progressHint = "Comparez entraînements et matchs dans le temps pour voir si vous progressez : document à partager ou imprimer."
+    override val progressWorkouts = "Entraînements"
+    override val progressMatches = "Matchs"
+    override val progressPlayer = "Joueur"
+    override val progressNoPlayers = "Aucun match terminé dans l'historique."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 élément" else "$n éléments" }
+    override val progressTooFew = "Il faut au moins 2 entraînements ou matchs pour comparer."
+    override val progressFirstHalf = "Première moitié"
+    override val progressSecondHalf = "Seconde moitié"
+    override val progressTrend = "Tendance"
+    override val progressBetter = "en hausse"
+    override val progressWorse = "en baisse"
+    override val progressSame = "stable"
+    override val progressList = "Liste"
+    override val progressDate = "Date"
+    override val progressResult = "Résultat"
+    override val progressWon = "Gagné"
+    override val progressLost = "Perdu"
+    override val progressPointsShort = "Points"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Gag."
+    override val progressUeShort = "FD"
+    override val progressWins = "Matchs gagnés"
+    override val progressPointsWon = "Points gagnés"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Imprimer"
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -15846,6 +16307,34 @@ object PtStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Excluir o treino?"
     override val workoutDeleteText = "Ele será removido deste telefone."
+    override val workoutChart = "Frequência durante o treino"
+    override val progressTitle = "Progressos"
+    override val progressHint = "Compare treinos e partidas ao longo do tempo para ver se está melhorando: documento para compartilhar ou imprimir."
+    override val progressWorkouts = "Treinos"
+    override val progressMatches = "Partidas"
+    override val progressPlayer = "Jogador"
+    override val progressNoPlayers = "Nenhuma partida terminada no histórico."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 item" else "$n itens" }
+    override val progressTooFew = "São precisos pelo menos 2 treinos ou partidas para comparar."
+    override val progressFirstHalf = "Primeira metade"
+    override val progressSecondHalf = "Segunda metade"
+    override val progressTrend = "Tendência"
+    override val progressBetter = "melhora"
+    override val progressWorse = "piora"
+    override val progressSame = "estável"
+    override val progressList = "Lista"
+    override val progressDate = "Data"
+    override val progressResult = "Resultado"
+    override val progressWon = "Vencida"
+    override val progressLost = "Perdida"
+    override val progressPointsShort = "Pontos"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Venc."
+    override val progressUeShort = "ENF"
+    override val progressWins = "Partidas vencidas"
+    override val progressPointsWon = "Pontos ganhos"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Imprimir"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -19097,6 +19586,150 @@ fun CourtDiagram(p1Left: Boolean, server: Side, names: Names, s: Strings) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/ProgressScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/ProgressScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Context
+import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.print.PrintManager
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Progress
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.Picker
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+import java.io.File
+
+/**
+ * Pagina 1 › Progressi: un documento per gli allenamenti e uno per le partite di un giocatore, per vedere se i numeri
+ * migliorano. A schermo il confronto tra prima e seconda metà del periodo; PDF da condividere o stampare.
+ */
+@Composable
+fun ProgressScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    BackHandler { c.back() }
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    var matches by rememberSaveable { mutableStateOf(false) }
+    val players = remember(history) { c.progressPlayers() }
+    var player by rememberSaveable { mutableStateOf<String?>(null) }
+    val key = if (matches) (player ?: players.firstOrNull()?.first) else null
+    val report = remember(history, workouts, matches, key) { if (matches && key == null) null else c.progressReport(key) }
+    ScreenScaffold(
+        title = s.progressTitle,
+        subtitle = s.progressHint,
+        icon = Icons.AutoMirrored.Filled.TrendingUp,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        Segmented(
+            listOf(SegOption(s.progressWorkouts), SegOption(s.progressMatches)),
+            selected = if (matches) 1 else 0,
+            onSelect = { matches = it == 1 },
+        )
+        if (matches) {
+            if (players.isEmpty()) {
+                Text(s.progressNoPlayers, color = TsmColors.TextDim)
+            } else {
+                Picker(s.progressPlayer, players.firstOrNull { it.first == key }?.second ?: "", players) { player = it }
+            }
+        }
+        report?.let { r -> ReportCard(r) }
+        if (report != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                GhostButton(s.progressPdf, Icons.Filled.PictureAsPdf, {
+                    c.progressPdf(key)?.let { context.startActivity(c.shareFileIntent(it, "application/pdf")) }
+                }, Modifier.weight(1f))
+                GhostButton(s.progressPrint, Icons.Filled.Print, {
+                    c.progressPdf(key)?.let { printPdf(context, it) }
+                }, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReportCard(r: Progress.Report) {
+    val s = LocalStrings.current
+    SectionCard(r.title, Icons.AutoMirrored.Filled.TrendingUp) {
+        Text("${r.subtitle} · ${s.progressCount(r.count)}", color = TsmColors.TextDim, fontSize = 12.sp)
+        if (r.count < 2) {
+            Text(s.progressTooFew, color = TsmColors.Orange)
+            return@SectionCard
+        }
+        Text("${s.progressFirstHalf} → ${s.progressSecondHalf}", color = TsmColors.TextDim, fontSize = 12.sp)
+        for (m in r.metrics) {
+            val h = m.halves ?: continue
+            val (arrow, col) = when (m.verdict) {
+                1 -> "▲" to TsmColors.Ok
+                -1 -> "▼" to TsmColors.Danger
+                else -> "=" to TsmColors.TextDim
+            }
+            Row(Modifier.fillMaxWidth()) {
+                Text(m.label, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                Text("${m.format(h.first)} → ${m.format(h.second)}${if (m.unit.isNotEmpty()) " ${m.unit}" else ""}  ",
+                    color = TsmColors.TextMain, fontSize = 14.sp)
+                Text(arrow, color = col, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+/** Stampa il PDF con il servizio di stampa di Android (anche "Salva come PDF"). */
+private fun printPdf(context: Context, file: File) {
+    val pm = context.getSystemService(PrintManager::class.java) ?: return
+    val adapter = object : PrintDocumentAdapter() {
+        override fun onLayout(old: PrintAttributes?, new: PrintAttributes, cancel: CancellationSignal, cb: LayoutResultCallback, extras: Bundle?) {
+            if (cancel.isCanceled) return cb.onLayoutCancelled()
+            cb.onLayoutFinished(PrintDocumentInfo.Builder(file.name).setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build(), true)
+        }
+
+        override fun onWrite(pages: Array<out PageRange>, dest: ParcelFileDescriptor, cancel: CancellationSignal, cb: WriteResultCallback) {
+            runCatching {
+                file.inputStream().use { input -> ParcelFileDescriptor.AutoCloseOutputStream(dest).use { input.copyTo(it) } }
+            }.onSuccess { cb.onWriteFinished(arrayOf(PageRange.ALL_PAGES)) }.onFailure { cb.onWriteFailed(it.message) }
+        }
+    }
+    pm.print(file.nameWithoutExtension, adapter, null)
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -19104,6 +19737,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
 import android.net.Uri
@@ -19186,24 +19820,13 @@ fun SetupScreen(c: MatchController) {
             GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
-        action = {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Allenamento con la fascia, senza partita: schermata a parte.
-                Surface(onClick = { c.openWorkouts() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.MonitorHeart, null, tint = TsmColors.Danger)
-                        Text(s.workoutTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-                Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
-                        Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-        },
     ) {
+        // Tre scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite.
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
+            HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
+            HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
+        }
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
         SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
             Segmented(
@@ -19325,6 +19948,23 @@ private fun Field(
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(Modifier.width(0.dp))
+}
+
+@Composable
+private fun HomeShortcut(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    label: String,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
+        Column(Modifier.padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, null, tint = tint)
+            Text(label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        }
+    }
 }
 TSM_EOF
 
@@ -20691,7 +21331,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
             if (WorkoutStats.rmssd(w.rr) != null) Text(s.workoutHrvHint, color = TsmColors.TextDim, fontSize = 12.sp)
             Text(s.workoutRecoveryHint, color = TsmColors.TextDim, fontSize = 12.sp)
         }
-        if (w.heart.size > 1) StatCard(s.heartChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
+        if (w.heart.size > 1) StatCard(s.workoutChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
         StatCard(s.heartZones) { HeartZones(mapOf(Side.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
         val laps = WorkoutStats.laps(w)
         if (laps.size > 1) {
@@ -23160,6 +23800,42 @@ class PlayerStatsTest {
         // Partite senza punti: 0%, e niente statistiche dettagliate.
         assertEquals(0, r.first().pointsWonPct)
         assertNull(r.first().detail)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProgressTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProgressTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class ProgressTest {
+
+    @Test
+    fun halvesSkipMissingValues() {
+        // Senza i valori mancanti restano 2, 4, 6, 8: prima metà 3, seconda 7.
+        val m = Progress.Metric("Ace", "", listOf(2.0, null, 4.0, 6.0, null, 8.0), better = true)
+        assertEquals(3.0 to 7.0, m.halves)
+        assertEquals(1, m.verdict)
+    }
+
+    @Test
+    fun lowerIsBetterForDoubleFaults() {
+        assertEquals(1, Progress.Metric("DF", "", listOf(6.0, 5.0, 3.0, 2.0), better = false).verdict)
+        assertEquals(-1, Progress.Metric("DF", "", listOf(2.0, 2.0, 5.0, 6.0), better = false).verdict)
+    }
+
+    @Test
+    fun smallChangesAndUnknownDirectionAreSteady() {
+        assertEquals(0, Progress.Metric("HRV", "ms", listOf(40.0, 41.0), better = true).verdict)
+        assertEquals(0, Progress.Metric("bpm", "bpm", listOf(120.0, 160.0), better = null).verdict)
+        assertNull(Progress.Metric("x", "", listOf(1.0, null), better = true).halves)
     }
 }
 TSM_EOF
@@ -29295,6 +29971,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 107 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 111 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

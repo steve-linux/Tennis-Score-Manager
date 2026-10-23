@@ -58,7 +58,7 @@ object WorkoutReport {
         }
         y += 14f
         if (w.heart.size > 1) {
-            c.drawText(s.heartChart, 40f, y, head)
+            c.drawText(s.workoutChart, 40f, y, head)
             y += 10f
             chart(c, w.heart, 40f, y, 515f, 160f)
             y += 180f

@@ -124,6 +124,34 @@ interface Strings {
     val workoutSharePdf: String
     val workoutDeleteTitle: String
     val workoutDeleteText: String
+    val workoutChart: String
+    val progressTitle: String
+    val progressHint: String
+    val progressWorkouts: String
+    val progressMatches: String
+    val progressPlayer: String
+    val progressNoPlayers: String
+    val progressCount: (Int) -> String
+    val progressTooFew: String
+    val progressFirstHalf: String
+    val progressSecondHalf: String
+    val progressTrend: String
+    val progressBetter: String
+    val progressWorse: String
+    val progressSame: String
+    val progressList: String
+    val progressDate: String
+    val progressResult: String
+    val progressWon: String
+    val progressLost: String
+    val progressPointsShort: String
+    val progressDfShort: String
+    val progressWinnersShort: String
+    val progressUeShort: String
+    val progressWins: String
+    val progressPointsWon: String
+    val progressPdf: String
+    val progressPrint: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -783,6 +811,34 @@ object ItStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Eliminare l'allenamento?"
     override val workoutDeleteText = "Verrà tolto da questo telefono."
+    override val workoutChart = "Battito durante l'allenamento"
+    override val progressTitle = "Progressi"
+    override val progressHint = "Confronta allenamenti e partite nel tempo per vedere se migliori: documento da condividere o stampare."
+    override val progressWorkouts = "Allenamenti"
+    override val progressMatches = "Partite"
+    override val progressPlayer = "Giocatore"
+    override val progressNoPlayers = "Nessuna partita finita nello storico."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 voce" else "$n voci" }
+    override val progressTooFew = "Servono almeno 2 allenamenti o partite per confrontare."
+    override val progressFirstHalf = "Prima metà"
+    override val progressSecondHalf = "Seconda metà"
+    override val progressTrend = "Tendenza"
+    override val progressBetter = "migliora"
+    override val progressWorse = "peggiora"
+    override val progressSame = "stabile"
+    override val progressList = "Elenco"
+    override val progressDate = "Data"
+    override val progressResult = "Esito"
+    override val progressWon = "Vinta"
+    override val progressLost = "Persa"
+    override val progressPointsShort = "Punti"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Vinc."
+    override val progressUeShort = "EG"
+    override val progressWins = "Partite vinte"
+    override val progressPointsWon = "Punti vinti"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Stampa"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1414,6 +1470,34 @@ object EnStrings : Strings {
     override val workoutSharePdf = "PDF"
     override val workoutDeleteTitle = "Delete the workout?"
     override val workoutDeleteText = "It will be removed from this phone."
+    override val workoutChart = "Heart rate during the workout"
+    override val progressTitle = "Progress"
+    override val progressHint = "Compare workouts and matches over time to see whether you are improving: a document to share or print."
+    override val progressWorkouts = "Workouts"
+    override val progressMatches = "Matches"
+    override val progressPlayer = "Player"
+    override val progressNoPlayers = "No finished matches in the history."
+    override val progressCount: (Int) -> String = { n -> if (n == 1) "1 entry" else "$n entries" }
+    override val progressTooFew = "At least 2 workouts or matches are needed to compare."
+    override val progressFirstHalf = "First half"
+    override val progressSecondHalf = "Second half"
+    override val progressTrend = "Trend"
+    override val progressBetter = "better"
+    override val progressWorse = "worse"
+    override val progressSame = "steady"
+    override val progressList = "List"
+    override val progressDate = "Date"
+    override val progressResult = "Result"
+    override val progressWon = "Won"
+    override val progressLost = "Lost"
+    override val progressPointsShort = "Points"
+    override val progressDfShort = "DF"
+    override val progressWinnersShort = "Win."
+    override val progressUeShort = "UE"
+    override val progressWins = "Matches won"
+    override val progressPointsWon = "Points won"
+    override val progressPdf = "PDF"
+    override val progressPrint = "Print"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
