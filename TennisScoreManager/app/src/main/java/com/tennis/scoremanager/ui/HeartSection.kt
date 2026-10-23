@@ -103,7 +103,7 @@ fun HeartSection(
         }
         val relay by c.relay.ui.collectAsState()
         if (relay.role == RelayRole.SATELLITE) {
-            // Il satellite segue le fasce scelte sul principale: qui solo come le sente.
+            // Il satellite segue le fasce scelte sul principale: qui solo come le sente (vedi RelaySection).
             for (side in Side.entries) {
                 val st = straps[side] ?: continue
                 Column {
@@ -111,7 +111,6 @@ fun HeartSection(
                     Text(strapStatus(st, s), color = TsmColors.TextDim, fontSize = 12.sp)
                 }
             }
-            RelayPanel(c, relay)
             return@SectionCard
         }
         Text(s.heartHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
@@ -131,117 +130,6 @@ fun HeartSection(
         }
         if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        RelayPanel(c, relay)
-    }
-}
-
-/**
- * Secondo telefono a fondo campo: da qui questo telefono diventa il principale (mostra il QR) oppure il satellite
- * (inquadra il QR del principale).
- */
-@Composable
-private fun RelayPanel(c: MatchController, relay: RelayUi) {
-    val s = LocalStrings.current
-    val context = LocalContext.current
-    var showQr by remember { mutableStateOf(false) }
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
-    fun scan() = scanner.launch(
-        ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
-            .setBeepEnabled(false).setOrientationLocked(true),
-    )
-    // Il permesso serve al principale per creare la rete e al satellite per entrarci da solo. Se lo si nega, si
-    // usa il Wi-Fi in cui i telefoni si trovano già.
-    var afterPerms by remember { mutableStateOf<String?>(null) }
-    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        when (afterPerms) {
-            "main" -> {
-                c.startRelayMain(HotspotPermissions.granted(context))
-                showQr = true
-            }
-            "join" -> scan()
-        }
-        afterPerms = null
-    }
-    fun withPerms(then: String, run: () -> Unit) {
-        if (HotspotPermissions.granted(context)) {
-            run()
-        } else {
-            afterPerms = then
-            permLauncher.launch(HotspotPermissions.required())
-        }
-    }
-    Spacer(Modifier.height(4.dp))
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Filled.PhonelinkRing, null, tint = TsmColors.Ball)
-        Spacer(Modifier.width(10.dp))
-        Text(s.relayTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-    }
-    when (relay.role) {
-        RelayRole.OFF -> {
-            Text(s.relayHint, color = TsmColors.TextDim, fontSize = 13.sp)
-            GhostButton(s.relayMain, Icons.Filled.QrCode2, {
-                withPerms("main") {
-                    c.startRelayMain(useHotspot = true)
-                    showQr = true
-                }
-            }, Modifier.fillMaxWidth())
-            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, { withPerms("join") { scan() } }, Modifier.fillMaxWidth())
-        }
-        RelayRole.MAIN -> {
-            Text(
-                when {
-                    relay.url == null -> s.relayPreparing
-                    relay.satellites.isEmpty() -> s.relayNoSatellite
-                    else -> s.relaySatellites(relay.satellites.joinToString(", "))
-                },
-                color = if (relay.satellites.isEmpty()) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp,
-            )
-            relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
-            GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
-            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
-        }
-        RelayRole.SATELLITE -> {
-            Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
-            val net = relay.hotspot
-            val joinText = when {
-                net == null || relay.connected -> null
-                relay.joinByHand -> s.relayJoinByHand(net.ssid, net.pass.orEmpty())
-                relay.join == JoinState.WAITING -> s.relayJoinWaiting
-                relay.join == JoinState.REFUSED -> s.relayJoinRefused
-                relay.join == JoinState.LOST -> s.relayJoinLost
-                else -> null
-            }
-            joinText?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
-            Text(
-                (if (relay.connected) s.relayConnected else s.relayDisconnected) +
-                    (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
-                color = if (relay.connected) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp,
-            )
-            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
-        }
-    }
-    val url = relay.url
-    if (showQr && relay.role == RelayRole.MAIN) {
-        AlertDialog(
-            onDismissRequest = { showQr = false },
-            title = { Text(s.relayTitle) },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (url == null) {
-                        CircularProgressIndicator(Modifier.size(48.dp), color = TsmColors.Ball)
-                        Text(s.relayPreparing, color = TsmColors.TextMain)
-                        return@Column
-                    }
-                    QrCode(url, 240.dp)
-                    relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
-                    Text(
-                        if (relay.satellites.isEmpty()) s.relayShowQr else s.relaySatellites(relay.satellites.joinToString(", ")),
-                        color = if (relay.satellites.isEmpty()) TsmColors.TextMain else TsmColors.Ok,
-                    )
-                }
-            },
-            confirmButton = { TextButton(onClick = { showQr = false }) { Text(s.ok) } },
-        )
     }
 }
 
@@ -294,7 +182,7 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
  * "Collegata · 72 bpm · −68 dBm · 2 stacchi (14 s) · Batteria 90%", oppure perché il battito non arriva. Segnale e
  * stacchi (dall'inizio della partita, o da quando la fascia è stata scelta) dicono fin dove arriva la fascia.
  */
-private fun strapStatus(st: StrapInfo, s: Strings): String {
+internal fun strapStatus(st: StrapInfo, s: Strings): String {
     val state = when {
         st.state != StrapState.READY -> if (st.state == StrapState.CONNECTING) s.strapConnecting else s.strapWaiting
         st.contact == false -> s.strapNoContact

@@ -7,6 +7,7 @@ package com.tennis.scoremanager.ble
  * Stato inviato dal braccialetto ogni minuto: "mv=3987;chg=0;up=1234;dsp=56", dal firmware 2.1 anche
  * ";usb=5010;full=0;pct=71". [charging] = alimentato dal cavo USB (dal 2.1 anche a carica completa).
  */
+@kotlinx.serialization.Serializable
 data class BandStatus(
     val millivolts: Int,
     val charging: Boolean,

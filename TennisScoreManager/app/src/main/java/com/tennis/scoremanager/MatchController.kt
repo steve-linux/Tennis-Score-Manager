@@ -62,7 +62,7 @@ import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
-import com.tennis.scoremanager.relay.HeartRelay
+import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
@@ -238,14 +238,17 @@ class MatchController(
     /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
     private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
 
-    /** Due telefoni per le fasce cardio: principale o satellite (vedi [HeartRelay]). */
-    val relay: HeartRelay = HeartRelay(
-        app, scope, heart,
+    /** Due telefoni per le fasce cardio: principale o satellite (vedi [PhoneRelay]). */
+    val relay: PhoneRelay = PhoneRelay(
+        app, scope, heart, ble,
         matchIds = live.map { it?.record?.id.orEmpty() },
+        tvPorts = tvServer.port,
         onRemoteReading = { addr, m, at, match -> onRemoteHeart(addr, m, at, match) },
         onSatelliteStopped = {
             heart.disconnectAll()
+            ble.disconnectAll()
             if (options.value.heartRate) restoreStraps()
+            if (options.value.mode == PlayMode.BANDS) restoreBands()
             if (!needsService()) MatchService.stop(app)
         },
     )
@@ -291,11 +294,12 @@ class MatchController(
         remotes.enabled = options.value.mode == PlayMode.REMOTES
         remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
         refreshSaved()
-        scope.launch { ble.events.collect { onBandEvent(it) } }
-        scope.launch { ble.ready.collect { onBandReady(it) } }
-        scope.launch { ble.found.collect { autoFill(it) } }
-        scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
-        scope.launch { ble.strokes.collect { onBandStroke(it) } }
+        // Sul telefono satellite i braccialetti li governa il principale: qui si girano soltanto (vedi PhoneRelay).
+        scope.launch { ble.events.collect { if (!relay.isSatellite) onBandEvent(it) } }
+        scope.launch { ble.ready.collect { if (!relay.isSatellite) onBandReady(it) } }
+        scope.launch { ble.found.collect { if (!relay.isSatellite) autoFill(it) } }
+        scope.launch { ble.status.collect { (side, st) -> if (!relay.isSatellite) onBandStatus(side, st) } }
+        scope.launch { ble.strokes.collect { if (!relay.isSatellite) onBandStroke(it) } }
         scope.launch {
             heart.readings.collect { (side, m) ->
                 heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
@@ -333,7 +337,6 @@ class MatchController(
         scope.launch {
             var first = true
             tv.map { it.enabled }.distinctUntilChanged().collect { on ->
-                if (on) tvServer.start() else tvServer.stop()
                 publishTv()
                 // Il servizio in primo piano tiene vivo il server anche a schermo spento, in ogni schermata (anche il
                 // riepilogo). Non all'avvio dell'app (first): lì parte con la partita, quando l'app è di sicuro visibile.
@@ -342,6 +345,15 @@ class MatchController(
                 else if (!on) MatchService.stop(app)
                 first = false
             }
+        }
+        scope.launch {
+            // Il server del tabellone serve anche al telefono satellite, che lo mostra all'altro fondo campo.
+            combine(tv.map { it.enabled }, relay.ui.map { it.role == RelayRole.MAIN }) { a, b -> a || b }
+                .distinctUntilChanged()
+                .collect { on ->
+                    if (on) tvServer.start() else tvServer.stop()
+                    publishTv()
+                }
         }
         scope.launch {
             // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
@@ -682,6 +694,7 @@ class MatchController(
                 }
             }
             prev = bands.mapValues { it.value.state }
+            if (relay.isSatellite) return@collect
             for ((side, info) in bands) {
                 // Nome cambiato dalle impostazioni: lo si ricorda per la prossima volta.
                 val n = info.settings?.name
@@ -881,10 +894,10 @@ class MatchController(
         val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
         val age = System.currentTimeMillis() - at
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
-        if (age <= HeartRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
+        if (age <= PhoneRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
-        if (System.currentTimeMillis() - at <= HeartRelay.LIVE_MS) {
+        if (System.currentTimeMillis() - at <= PhoneRelay.LIVE_MS) {
             onHeartReading(side, m)
         } else {
             val start = lm.record.startedAt ?: return

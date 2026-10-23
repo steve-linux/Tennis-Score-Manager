@@ -97,6 +97,7 @@ interface Strings {
     val relayDisconnected: String
     val relayPending: (Int) -> String
     val relayPreparing: String
+    val relayShowBoard: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -679,11 +680,11 @@ object ItStrings : Strings {
     override val strapNoDrops = "nessuno stacco"
     override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "stacco" else "stacchi"} ($s s)" }
     override val relayTitle = "Secondo telefono"
-    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
+    override val relayHint = "Con un telefono per fondo campo fasce e braccialetti hanno sempre un telefono vicino: il secondo li sente e fa da ponte con questo, che tiene la partita, e può mostrare il tabellone. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
     override val relayMain = "Usa un secondo telefono"
     override val relayJoin = "Fai da secondo telefono"
     override val relayShowCode = "Mostra il codice"
-    override val relayShowQr = "Sull'altro telefono attiva Fasce cardio (pagina 2), tocca Fai da secondo telefono e inquadra questo codice."
+    override val relayShowQr = "Sull'altro telefono, in pagina 2 › Secondo telefono, tocca Fai da secondo telefono e inquadra questo codice."
     override val relayScanPrompt = "Inquadra il codice del telefono principale"
     override val relayNoSatellite = "Nessun secondo telefono collegato"
     override val relaySatellites: (String) -> String = { "Secondo telefono collegato: $it" }
@@ -693,6 +694,7 @@ object ItStrings : Strings {
     override val relayDisconnected = "Telefono principale non raggiungibile: riprovo…"
     override val relayPending: (Int) -> String = { "$it misure da inviare" }
     override val relayPreparing = "Preparazione della rete…"
+    override val relayShowBoard = "Mostra il tabellone"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1248,11 +1250,11 @@ object EnStrings : Strings {
     override val strapNoDrops = "no dropouts"
     override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "dropout" else "dropouts"} ($s s)" }
     override val relayTitle = "Second phone"
-    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
+    override val relayHint = "With one phone behind each baseline, straps and bands always have a phone nearby: the second one hears them and acts as a bridge to this one, which keeps the match, and it can show the scoreboard. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
     override val relayMain = "Use a second phone"
     override val relayJoin = "Act as second phone"
     override val relayShowCode = "Show the code"
-    override val relayShowQr = "On the other phone turn on Heart rate straps (page 2), tap Act as second phone and scan this code."
+    override val relayShowQr = "On the other phone, in page 2 › Second phone, tap Act as second phone and scan this code."
     override val relayScanPrompt = "Scan the main phone's code"
     override val relayNoSatellite = "No second phone connected"
     override val relaySatellites: (String) -> String = { "Second phone connected: $it" }
@@ -1262,6 +1264,7 @@ object EnStrings : Strings {
     override val relayDisconnected = "Main phone not reachable: retrying…"
     override val relayPending: (Int) -> String = { "$it readings to send" }
     override val relayPreparing = "Setting up the network…"
+    override val relayShowBoard = "Show the scoreboard"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

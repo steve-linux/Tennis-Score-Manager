@@ -74,11 +74,11 @@ object PtStrings : Strings {
     override val strapNoDrops = "nenhuma queda"
     override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "queda" else "quedas"} ($s s)" }
     override val relayTitle = "Segundo telefone"
-    override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Este telefone cria a sua própria rede, sem SIM nem dados, e o outro se conecta sozinho escaneando o código."
+    override val relayHint = "Com um telefone atrás de cada linha de fundo, cintas e pulseiras têm sempre um telefone por perto: o segundo as capta e faz a ponte com este, que controla a partida, e pode mostrar o placar. Este telefone cria a sua própria rede, sem SIM nem dados, e o outro se conecta sozinho escaneando o código."
     override val relayMain = "Usar um segundo telefone"
     override val relayJoin = "Servir de segundo telefone"
     override val relayShowCode = "Mostrar o código"
-    override val relayShowQr = "No outro telefone ative Cintas cardíacas (página 2), toque em Servir de segundo telefone e escaneie este código."
+    override val relayShowQr = "No outro telefone, na página 2 › Segundo telefone, toque em Servir de segundo telefone e escaneie este código."
     override val relayScanPrompt = "Escaneie o código do telefone principal"
     override val relayNoSatellite = "Nenhum segundo telefone conectado"
     override val relaySatellites: (String) -> String = { "Segundo telefone conectado: $it" }
@@ -88,6 +88,7 @@ object PtStrings : Strings {
     override val relayDisconnected = "Telefone principal fora de alcance: tentando de novo…"
     override val relayPending: (Int) -> String = { "$it medidas a enviar" }
     override val relayPreparing = "Preparando a rede…"
+    override val relayShowBoard = "Mostrar o placar"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."

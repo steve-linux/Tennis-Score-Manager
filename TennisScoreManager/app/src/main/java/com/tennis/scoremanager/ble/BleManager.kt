@@ -65,10 +65,18 @@ data class BandInfo(
     val chargeFull: Boolean = false,
     /** Impostazioni lette dal braccialetto; null = firmware senza impostazioni (prima della 2.0) o non ancora lette. */
     val settings: BandSettings? = null,
+    /** Collegato al telefono satellite, non a questo: punteggio e messaggi passano da lì. */
+    val relayed: Boolean = false,
 )
 
-/** [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. */
-data class BandEvent(val side: Side, val type: Int, val reason: Int? = null)
+/**
+ * [reason] solo per EVT_POWER_OFF dai firmware 2.0: vedi BandProtocol.OFF_*. [boot] e [seq] (firmware 2.3)
+ * riconoscono lo stesso tasto arrivato da due telefoni.
+ */
+data class BandEvent(val side: Side, val type: Int, val reason: Int? = null, val boot: Long? = null, val seq: Int? = null)
+
+/** Braccialetto come lo vede il telefono satellite. */
+data class RemoteBand(val ready: Boolean, val status: BandStatus? = null, val battery: Int? = null)
 
 /** Colpo riconosciuto dal braccialetto di [side] (firmware 2.4). */
 data class BandStroke(val side: Side, val stroke: RawStroke)
@@ -118,6 +126,14 @@ class BleManager(context: Context) {
     private val scanThrottle = ScanThrottle()
     /** Eventi già ricevuti (per braccialetto e accensione): vale anche tra una connessione e l'altra. */
     private val dedupe = EventDedupe()
+    /** Braccialetti visti dal telefono satellite, per indirizzo (vuoto senza satellite). */
+    private var remote: Map<String, RemoteBand> = emptyMap()
+
+    /**
+     * Telefono principale: manda al satellite un messaggio per un braccialetto che sente solo lui. [kind]: "show"
+     * (punteggio, vale l'ultimo), "cmd" (comando), "cfg" (impostazioni). false se non c'è un satellite che lo sente.
+     */
+    var relayOut: ((address: String, payload: String, kind: String) -> Boolean)? = null
 
     init {
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -317,18 +333,67 @@ class BleManager(context: Context) {
 
     /** Punteggi e messaggi: se ne arrivano altri prima dell'invio vale l'ultimo. */
     fun send(side: Side, payload: String) {
-        links[side]?.send(payload)
+        val l = links[side] ?: return
+        if (l.state != LinkState.READY && viaRelay(l, payload, "show")) return
+        l.send(payload)
     }
 
     /** Comando che non deve andare perso (Identifica, spegnimento): scritto subito, true se è arrivato. */
-    suspend fun command(side: Side, payload: String): Boolean = links[side]?.command(payload) ?: false
+    suspend fun command(side: Side, payload: String): Boolean = raw(side, payload, "cmd")
 
     /** Scrive le impostazioni nel braccialetto; true se le ha ricevute (poi risponde con quelle applicate). */
-    suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = links[side]?.writeConfig(settings.encode()) ?: false
+    suspend fun writeSettings(side: Side, settings: BandSettings): Boolean = raw(side, settings.encode(), "cfg")
 
-    suspend fun writeLanguage(side: Side, code: String): Boolean = links[side]?.writeConfig(BandSettings.languageConfig(code)) ?: false
+    suspend fun writeLanguage(side: Side, code: String): Boolean = raw(side, BandSettings.languageConfig(code), "cfg")
 
-    fun isReady(side: Side): Boolean = links[side]?.state == LinkState.READY
+    /** Dal telefono satellite al braccialetto che segue: [kind] come in [relayOut]. */
+    suspend fun raw(side: Side, payload: String, kind: String): Boolean {
+        val l = links[side] ?: return false
+        if (l.state != LinkState.READY) return viaRelay(l, payload, kind)
+        return when (kind) {
+            "show" -> {
+                l.send(payload)
+                true
+            }
+            "cfg" -> l.writeConfig(payload)
+            else -> l.command(payload)
+        }
+    }
+
+    private fun viaRelay(l: BandLink, payload: String, kind: String): Boolean =
+        remote[l.address]?.ready == true && relayOut?.invoke(l.address, payload, kind) == true
+
+    fun isReady(side: Side): Boolean = links[side]?.let { it.state == LinkState.READY || remote[it.address]?.ready == true } ?: false
+
+    /**
+     * Telefono principale: come il satellite vede i braccialetti. Uno che diventa pronto da lì (e qui non lo
+     * era) vale come appena collegato: riceve il punteggio.
+     */
+    fun setRemote(map: Map<String, RemoteBand>) {
+        val before = links.filterValues { it.state == LinkState.READY || remote[it.address]?.ready == true }.keys
+        remote = map
+        publish()
+        for ((side, l) in links) {
+            if (side !in before && l.state != LinkState.READY && map[l.address]?.ready == true) _ready.tryEmit(side)
+        }
+    }
+
+    /** Tasto arrivato dal satellite: come se l'avesse mandato il braccialetto a questo telefono. */
+    fun injectEvent(address: String, type: Int, reason: Int?, boot: Long?, seq: Int?) {
+        val side = links.entries.firstOrNull { it.value.address == address }?.key ?: return
+        if (boot != null && seq != null && !dedupe.firstTime(address, boot, seq, SystemClock.elapsedRealtime())) return
+        _events.tryEmit(BandEvent(side, type, reason, boot, seq))
+    }
+
+    fun injectStroke(address: String, stroke: RawStroke) {
+        val side = links.entries.firstOrNull { it.value.address == address }?.key ?: return
+        _strokes.tryEmit(BandStroke(side, stroke))
+    }
+
+    fun injectStatus(address: String, status: BandStatus) {
+        val side = links.entries.firstOrNull { it.value.address == address }?.key ?: return
+        _status.tryEmit(side to status)
+    }
 
     fun disconnectAll() {
         setAutoScan(false)
@@ -339,15 +404,18 @@ class BleManager(context: Context) {
 
     private fun publish() {
         _bands.value = links.mapValues { (_, l) ->
+            val r = remote[l.address]?.takeIf { it.ready && l.state != LinkState.READY }
+            val status = r?.status ?: l.status
             BandInfo(
                 address = l.address,
                 name = l.settings?.name?.takeIf { it.isNotEmpty() } ?: l.name,
-                state = l.state,
-                battery = l.status?.let { BatteryModel.shownPercent(it) } ?: l.battery,
-                millivolts = l.status?.millivolts,
-                charging = l.status?.charging == true,
-                chargeFull = l.status?.full == true,
+                state = if (r != null) LinkState.READY else l.state,
+                battery = status?.let { BatteryModel.shownPercent(it) } ?: r?.battery ?: l.battery,
+                millivolts = status?.millivolts,
+                charging = status?.charging == true,
+                chargeFull = status?.full == true,
                 settings = l.settings,
+                relayed = r != null,
             )
         }
     }
@@ -602,7 +670,7 @@ class BleManager(context: Context) {
             }
             if (ev.type == BandProtocol.EVT_POWER_OFF) changeState(LinkState.POWERED_OFF)
             val reason = if (ev.type == BandProtocol.EVT_POWER_OFF) ev.extra else null
-            _events.tryEmit(BandEvent(side, ev.type, reason))
+            _events.tryEmit(BandEvent(side, ev.type, reason, ev.boot, ev.seq))
         }
 
         private suspend fun readFull(uuid: UUID) {

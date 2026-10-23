@@ -140,6 +140,7 @@ object BandProtocol {
 data class RawBandEvent(val type: Int, val seq: Int, val extra: Int?, val boot: Long?, val ageMs: Int)
 
 /** Colpo riconosciuto dal braccialetto. [stroke]: BandProtocol.STROKE_*; [confidence] 0-100. */
+@kotlinx.serialization.Serializable
 data class RawStroke(
     val index: Int,
     val stroke: Int,

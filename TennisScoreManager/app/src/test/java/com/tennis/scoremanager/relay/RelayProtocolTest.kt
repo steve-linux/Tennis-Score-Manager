@@ -3,6 +3,8 @@
 
 package com.tennis.scoremanager.relay
 
+import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.RawStroke
 import com.tennis.scoremanager.data.HeartTrack
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,6 +51,21 @@ class RelayProtocolTest {
         assertNull(RelayCodec.decode("non json"))
         // Un campo sconosciuto (versione più nuova dell'altro telefono) non rompe niente.
         assertEquals(RelayMsg.PING, RelayCodec.decode("""{"t":"ping","c":5,"nuovo":1}""")?.t)
+    }
+
+    @Test
+    fun bandMessagesRoundTrip() {
+        val stroke = RawStroke(index = 12, stroke = 1, confidence = 92, peakGyroDps = 1450, peakAccelG = 7.25, boot = 3_000_000_123L)
+        val st = BandStatus(millivolts = 3950, charging = false, uptimeS = 600, displayS = 120, usbMv = 0, percent = 81)
+        val msgs = listOf(
+            RelayMsg(RelayMsg.BAND_EVT, seq = 3, addr = "AA", evt = 1, boot = 4_000_000_000L, bseq = 250, at = 5L, match = "m1"),
+            RelayMsg(RelayMsg.STROKE, seq = 4, addr = "AA", stroke = stroke, at = 6L, match = "m1"),
+            RelayMsg(RelayMsg.BAND_STATUS, addr = "AA", battery = st),
+            RelayMsg(RelayMsg.BAND_OUT, addr = "AA", payload = "P|15|30|1|", kind = "show"),
+            RelayMsg(RelayMsg.STATUS, bandStatus = listOf(RelayBandStatus("AA", true, 81)), status = emptyList()),
+            RelayMsg(RelayMsg.WELCOME, match = "m1", bands = listOf(RelayStrap("AA", "TSM 1", 0)), tv = "10.0.0.1:8080"),
+        )
+        for (m in msgs) assertEquals(m, RelayCodec.decode(RelayCodec.encode(m)))
     }
 
     @Test

@@ -3,6 +3,8 @@
 
 package com.tennis.scoremanager.relay
 
+import com.tennis.scoremanager.ble.BandStatus
+import com.tennis.scoremanager.ble.RawStroke
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -11,8 +13,11 @@ import kotlinx.serialization.json.Json
  * giocatori vicini a lui e gli gira le misure. Una riga JSON per messaggio, su una connessione TCP nella rete locale
  * (Wi-Fi del circolo o hotspot del principale).
  *
- * Principale → satellite: [WELCOME] (fasce da seguire e partita in corso), [STRAPS], [MATCH], [PONG], [ACK].
- * Satellite → principale: [HELLO], [HR] (una misura), [STATUS] (come vede le fasce), [PING].
+ * Principale → satellite: [WELCOME] (fasce e braccialetti da seguire, partita in corso), [STRAPS], [BANDS], [MATCH],
+ * [BAND_OUT] (punteggio, comando o impostazioni per un braccialetto), [PONG], [ACK].
+ * Satellite → principale: [HELLO], [HR] (una misura), [BAND_EVT] (tasto), [STROKE] (colpo), [BAND_STATUS]
+ * (batteria di un braccialetto), [STATUS] (come vede fasce e braccialetti), [PING].
+ * [HR], [BAND_EVT] e [STROKE] hanno un numero progressivo e il principale li conferma con [ACK].
  */
 @Serializable
 data class RelayMsg(
@@ -35,6 +40,21 @@ data class RelayMsg(
     val straps: List<RelayStrap>? = null,
     val status: List<RelayStrapStatus>? = null,
     val name: String? = null,
+    /** Braccialetti da seguire (stesso formato delle fasce) e come li vede il satellite. */
+    val bands: List<RelayStrap>? = null,
+    val bandStatus: List<RelayBandStatus>? = null,
+    /** Tasto del braccialetto: tipo (BandProtocol.EVT_*), motivo dello spegnimento, accensione e numero (firmware 2.3). */
+    val evt: Int? = null,
+    val reason: Int? = null,
+    val boot: Long? = null,
+    val bseq: Int? = null,
+    val stroke: RawStroke? = null,
+    val battery: BandStatus? = null,
+    /** Per il braccialetto: testo da scrivere e tipo ("show", "cmd", "cfg"). */
+    val payload: String? = null,
+    val kind: String? = null,
+    /** Indirizzo (host:porta) del tabellone del principale, da mostrare sul satellite. */
+    val tv: String? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -46,6 +66,12 @@ data class RelayMsg(
         const val HR = "hr"
         const val ACK = "ack"
         const val STATUS = "status"
+        const val BANDS = "bands"
+        const val BAND_EVT = "bevt"
+        const val STROKE = "stroke"
+        const val BAND_STATUS = "bstat"
+        const val BAND_OUT = "bout"
+        const val TV = "tv"
     }
 }
 
@@ -61,6 +87,10 @@ data class RelayStrapStatus(
     val bpm: Int? = null,
     val rssi: Int? = null,
 )
+
+/** Come il satellite vede un braccialetto: collegato a lui e la carica. */
+@Serializable
+data class RelayBandStatus(val addr: String, val ready: Boolean, val battery: Int? = null)
 
 object RelayCodec {
     private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }

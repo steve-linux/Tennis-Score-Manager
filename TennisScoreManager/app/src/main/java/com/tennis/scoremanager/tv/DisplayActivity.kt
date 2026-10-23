@@ -95,6 +95,11 @@ import kotlinx.coroutines.withContext
  */
 class DisplayActivity : ComponentActivity() {
 
+    companion object {
+        /** host:porta del tabellone da mostrare subito, senza cercarlo. */
+        const val EXTRA_ADDRESS = "address"
+    }
+
     private val controller get() = (application as TsmApp).controller
     private val s: Strings get() = stringsFor(controller.options.value.lang)
     private lateinit var finder: ScoreboardFinder
@@ -135,6 +140,8 @@ class DisplayActivity : ComponentActivity() {
         finder = ScoreboardFinder(this)
         displays = getSystemService(DisplayManager::class.java)
         allowSelf = intent.getBooleanExtra("allowSelf", false)
+        // Aperto dal telefono satellite: l'indirizzo del tabellone del principale si conosce già.
+        val address = intent.getStringExtra(EXTRA_ADDRESS)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.decorView.setBackgroundColor(Color.BLACK)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -155,7 +162,7 @@ class DisplayActivity : ComponentActivity() {
         refreshExternal()
         cm = getSystemService(ConnectivityManager::class.java)
         setContent { TsmTheme { DisplayContent() } }
-        search()
+        search(address)
         val wifi = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)

@@ -71,11 +71,11 @@ object DeStrings : Strings {
     override val strapNoDrops = "keine Aussetzer"
     override val strapDrops: (Int, Int) -> String = { n, s -> "$n Aussetzer ($s s)" }
     override val relayTitle = "Zweites Telefon"
-    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
+    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie haben Gurte und Armbänder immer ein Telefon in der Nähe: Das zweite empfängt sie und überbrückt zu diesem, das das Match führt, und kann die Anzeigetafel zeigen. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
     override val relayMain = "Zweites Telefon verwenden"
     override val relayJoin = "Als zweites Telefon dienen"
     override val relayShowCode = "Code anzeigen"
-    override val relayShowQr = "Schalte auf dem anderen Telefon Brustgurte ein (Seite 2), tippe auf Als zweites Telefon dienen und scanne diesen Code."
+    override val relayShowQr = "Tippe auf dem anderen Telefon auf Seite 2 › Zweites Telefon auf Als zweites Telefon dienen und scanne diesen Code."
     override val relayScanPrompt = "Scanne den Code des Haupttelefons"
     override val relayNoSatellite = "Kein zweites Telefon verbunden"
     override val relaySatellites: (String) -> String = { "Zweites Telefon verbunden: $it" }
@@ -85,6 +85,7 @@ object DeStrings : Strings {
     override val relayDisconnected = "Haupttelefon nicht erreichbar: neuer Versuch…"
     override val relayPending: (Int) -> String = { "$it Messwerte zu senden" }
     override val relayPreparing = "Netz wird eingerichtet…"
+    override val relayShowBoard = "Anzeigetafel zeigen"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."

@@ -126,6 +126,7 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.remote.RemoteInfo
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.HeartSection
+import com.tennis.scoremanager.ui.RelaySection
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -277,6 +278,9 @@ fun OptionsScreen(c: MatchController) {
             onEnableBluetooth = { enableBluetooth() },
             onRequestPermissions = { if (blePerms && !locOn) openLocationSettings() else requestBandPermissions() },
         )
+
+        // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
+        RelaySection(c, names)
 
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
@@ -595,7 +599,7 @@ private fun BandPicker(
                     Text(current?.name ?: s.noBand, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (current != null) {
                         val st = when (current.state) {
-                            LinkState.READY -> s.bandConnected
+                            LinkState.READY -> if (current.relayed) s.strapRelayed else s.bandConnected
                             LinkState.CONNECTING -> s.bandConnecting
                             LinkState.POWERED_OFF -> s.bandOff
                             LinkState.IDLE -> s.bandIdle
