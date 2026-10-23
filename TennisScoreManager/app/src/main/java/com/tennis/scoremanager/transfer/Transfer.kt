@@ -20,6 +20,8 @@ data class TransferBundle(
     val version: Int = 1,
     val matches: List<MatchRecord> = emptyList(),
     val photos: Map<String, String> = emptyMap(),
+    /** Foto ricordo per id della partita (JPEG in base64). */
+    val matchPhotos: Map<String, List<String>> = emptyMap(),
 )
 
 /**

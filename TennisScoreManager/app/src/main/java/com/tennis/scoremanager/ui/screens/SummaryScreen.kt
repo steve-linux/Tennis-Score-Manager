@@ -3,12 +3,18 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
@@ -37,6 +44,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
@@ -64,18 +72,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -105,6 +117,8 @@ fun SummaryScreen(c: MatchController) {
     var tab by remember(rec.id) { mutableStateOf(0) }
     val fromHistory by c.summaryFromHistory.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
+    /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
+    var shareChoice by remember { mutableStateOf(false) }
     // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
     BackHandler { if (fromHistory) c.backToHistory() }
 
@@ -186,7 +200,10 @@ fun SummaryScreen(c: MatchController) {
             when (tab) {
                 1 -> MatchStatsTab(rec, names)
                 2 -> MatchChronologyTab(rec, names)
-                else -> SummaryInfo(rec, state, names)
+                else -> {
+                    SummaryInfo(rec, state, names)
+                    MatchPhotosCard(c, rec.id)
+                }
             }
         }
         Column(
@@ -195,9 +212,7 @@ fun SummaryScreen(c: MatchController) {
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
-                BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
-                }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
+                BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
@@ -213,6 +228,26 @@ fun SummaryScreen(c: MatchController) {
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
+    if (shareChoice) {
+        AlertDialog(
+            onDismissRequest = { shareChoice = false },
+            icon = { Icon(Icons.Filled.Share, null, tint = TsmColors.Orange) },
+            title = { Text(s.shareChoose) },
+            text = { Text(s.shareChooseHint) },
+            confirmButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent(pdf = true)?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.sharePdf) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.shareImage) }
+            },
+        )
+    }
     if (confirmDelete) {
         ConfirmDialog(
             icon = Icons.Filled.Delete,
@@ -282,6 +317,7 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
     var txt by remember { mutableStateOf(true) }
     var json by remember { mutableStateOf(true) }
     var png by remember { mutableStateOf(true) }
+    var pdf by remember { mutableStateOf(true) }
     val treeLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
             c.setHistoryFolder(uri)
@@ -315,11 +351,12 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
                 CheckRow(s.formatReport, txt) { txt = it }
                 CheckRow(s.formatData, json) { json = it }
                 CheckRow(s.formatImage, png) { png = it }
+                CheckRow(s.formatPdf, pdf) { pdf = it }
             }
         },
         confirmButton = {
-            Button(enabled = txt || json || png, onClick = {
-                c.saveHistory(name, txt, json, png)
+            Button(enabled = txt || json || png || pdf, onClick = {
+                c.saveHistory(name, txt, json, png, pdf)
                 onDismiss()
             }) { Text(s.save) }
         },
@@ -334,3 +371,75 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
         Text(label, color = TsmColors.TextMain)
     }
 }
+
+/**
+ * Foto ricordo della partita (fino a 10): dalla galleria o dalla fotocamera. Restano sul telefono con la partita,
+ * vanno nel PDF e passano all'altro telefono col trasferimento; non vanno nell'immagine per i social.
+ */
+@Composable
+private fun MatchPhotosCard(c: MatchController, id: String) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val version by c.matchPhotosVersion.collectAsState()
+    val photos = remember(id, version) { c.matchPhotos(id) }
+    val left = Storage.MAX_MATCH_PHOTOS - photos.size
+    var open by remember { mutableStateOf<java.io.File?>(null) }
+    var cameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val pickMany = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Storage.MAX_MATCH_PHOTOS)) { c.addMatchPhotos(it) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        cameraUri?.let { if (ok) c.addMatchPhotos(listOf(it)) }
+    }
+    fun shoot() {
+        val u = c.cameraUri()
+        cameraUri = u
+        camera.launch(u)
+    }
+    val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) shoot() }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text("${s.matchPhotosTitle} (${photos.size}/${Storage.MAX_MATCH_PHOTOS})", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        if (photos.isEmpty()) Text(s.matchPhotosHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (photos.isNotEmpty()) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                photos.forEach { f ->
+                    val bmp = remember(f) { runCatching { thumb(f) }.getOrNull() }
+                    if (bmp != null) {
+                        Image(bmp, null, contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(86.dp).clip(RoundedCornerShape(12.dp)).clickable { open = f })
+                    }
+                }
+            }
+        }
+        if (left > 0) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GhostButton(s.addPhotos, Icons.Filled.AddPhotoAlternate, {
+                    pickMany.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }, Modifier.weight(1f))
+                GhostButton(s.takePhoto, Icons.Filled.PhotoCamera, {
+                    val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    if (granted) shoot() else askCamera.launch(Manifest.permission.CAMERA)
+                }, Modifier.weight(1f))
+            }
+        }
+    }
+    open?.let { f ->
+        val big = remember(f) { runCatching { BitmapFactory.decodeFile(f.absolutePath).asImageBitmap() }.getOrNull() }
+        AlertDialog(
+            onDismissRequest = { open = null },
+            text = { if (big != null) Image(big, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxWidth()) },
+            confirmButton = { TextButton(onClick = { open = null }) { Text(s.ok) } },
+            dismissButton = { TextButton(onClick = { c.removeMatchPhoto(f); open = null }) { Text(s.photoRemove) } },
+        )
+    }
+}
+
+/** Miniatura leggera della foto (lato di circa 256 pixel). */
+private fun thumb(f: java.io.File): androidx.compose.ui.graphics.ImageBitmap {
+    val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(f.absolutePath, o)
+    val sample = (maxOf(o.outWidth, o.outHeight) / 256).coerceAtLeast(1)
+    return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample }).asImageBitmap()
+}
+

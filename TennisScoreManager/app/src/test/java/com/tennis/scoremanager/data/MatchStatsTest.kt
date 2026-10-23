@@ -62,6 +62,58 @@ class MatchStatsTest {
     }
 
     @Test
+    fun unforcedAndForcedErrorsAreAlsoErrors() {
+        fun pt(w: Side, k: PointKind) = MatchEvent.Point(w, kind = k)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(pt(p1, PointKind.UNFORCED_ERROR), pt(p1, PointKind.FORCED_ERROR), pt(p1, PointKind.ERROR), pt(p2, PointKind.UNFORCED_ERROR)),
+        )
+        val t = MatchStats.totals(MatchStats.points(r))
+        val b = t.getValue(p2)
+        assertEquals(3, b.errors)
+        assertEquals(1, b.unforcedErrors)
+        assertEquals(1, b.forcedErrors)
+        assertEquals(1, t.getValue(p1).unforcedErrors)
+    }
+
+    @Test
+    fun loveGamesGamePointsAndRuns() {
+        val a = MatchStats.totals(MatchStats.points(rec(*holdBreakHold))).getValue(p1)
+        // Tiene a zero, strappa il servizio a zero, poi tiene da 0-30.
+        assertEquals(2, a.loveGames)
+        assertEquals(3, a.gamePoints)
+        assertEquals(3, a.gamePointsWon)
+        assertEquals(3, a.bestGameRun)
+        assertEquals(0, a.setPoints)
+    }
+
+    @Test
+    fun setWonFromABreakDownAndSetPoints() {
+        // G2 va 3-0, poi G1 vince sei game di fila: 6-3 da sotto di tre game.
+        val winners = Array(3) { game(p2) }.flatten() + Array(6) { game(p1) }.flatten()
+        val a = MatchStats.totals(MatchStats.points(rec(*winners.toTypedArray()))).getValue(p1)
+        assertEquals(1, a.setsFromBreakDown)
+        assertEquals(1, a.setPoints)
+        assertEquals(1, a.setPointsWon)
+        assertEquals(6, a.bestGameRun)
+    }
+
+    @Test
+    fun setDurationAndLongestGameFromPointTimes() {
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(firstServer = p1),
+            events = holdBreakHold.mapIndexed { i, w -> MatchEvent.Point(w, at = 1_000_000L + i * 10_000L) },
+        )
+        val pts = MatchStats.points(r)
+        // 14 punti a 10 secondi l'uno: dal primo all'ultimo 130 secondi.
+        assertEquals(listOf<Long?>(130_000L), MatchStats.setDurations(pts))
+        // Il terzo game ha 6 punti: 50 secondi dal primo all'ultimo.
+        assertEquals(50_000L to 6, MatchStats.longestGame(pts))
+        // Senza ore (partite vecchie) non si sa.
+        assertEquals(listOf<Long?>(null), MatchStats.setDurations(MatchStats.points(rec(*holdBreakHold))))
+    }
+
+    @Test
     fun noDetailForPlainMatches() {
         val r = rec(*holdBreakHold)
         assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))

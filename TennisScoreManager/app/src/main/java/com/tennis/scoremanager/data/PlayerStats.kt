@@ -51,6 +51,23 @@ object PlayerStats {
 
     fun matchesOf(matches: List<Played>, key: String): List<Played> = matches.filter { sideOf(it.rec, key) != null }
 
+    /** Una partita di un giocatore per l'andamento: [detail] = statistiche della sua parte se la partita le ha. */
+    data class MatchLine(val rec: MatchRecord, val won: Boolean, val pointsWonPct: Int, val detail: MatchStats.SideTotals?)
+
+    /** Partite finite di [key], dalla più vecchia, con la percentuale di punti vinti e le statistiche dettagliate. */
+    fun lines(matches: List<Played>, key: String): List<MatchLine> =
+        matchesOf(matches, key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.map { m ->
+            val side = sideOf(m.rec, key)!!
+            val pts = MatchStats.points(m.rec)
+            val t = MatchStats.totals(pts).getValue(side)
+            MatchLine(
+                rec = m.rec,
+                won = m.winner == side,
+                pointsWonPct = if (t.points > 0) Math.round(t.pointsWon * 100.0 / t.points).toInt() else 0,
+                detail = t.takeIf { MatchStats.hasDetail(m.rec, pts) },
+            )
+        }
+
     /** Avversari di [key] con vittorie e sconfitte, da chi ci ha giocato di più. */
     fun rivals(matches: List<Played>, key: String): List<Rival> {
         val out = LinkedHashMap<String, Rival>()

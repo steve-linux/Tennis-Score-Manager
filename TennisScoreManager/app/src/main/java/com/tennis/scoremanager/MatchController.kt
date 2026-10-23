@@ -6,14 +6,17 @@ package com.tennis.scoremanager
 import android.app.Activity
 import android.app.Application
 import android.content.ClipData
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
@@ -41,6 +44,7 @@ import com.tennis.scoremanager.data.MatchLocation
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
@@ -110,6 +114,12 @@ import kotlinx.serialization.json.Json
 
 enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT }
 
+/** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
+enum class DetailAsk { OUTCOME, ERROR_TYPE }
+
+/** [winner] ha vinto il punto, [server] serviva. */
+data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
+
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
 data class CountdownUi(val kind: CountdownKind, val seconds: Int)
@@ -144,6 +154,10 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Cartella predefinita di "Salva file" da Android 10 (memoria condivisa, visibile a tutte le app). */
+        val DOCUMENTS_DIR = "${Environment.DIRECTORY_DOCUMENTS}/Tennis Score Manager"
+        /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
+        const val MATCH_PHOTO_PX = 1600
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
@@ -151,6 +165,8 @@ class MatchController(
         /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
         private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
+        /** Quanto resta la domanda sul punto appena segnato (statistiche dettagliate). */
+        private const val DETAIL_PROMPT_MS = 6_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
     }
@@ -173,6 +189,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
+    /** Statistiche dettagliate: domanda facoltativa sul punto appena segnato (sparisce da sola dopo qualche secondo). */
+    val detailPrompt = MutableStateFlow<DetailPrompt?>(null)
+    private var detailJob: Job? = null
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /**
      * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
@@ -1053,6 +1072,7 @@ class MatchController(
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
+        val server = current.state.server
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
@@ -1064,6 +1084,16 @@ class MatchController(
         val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
+        // Statistiche dettagliate: un punto dal braccialetto o dal telecomando arriva senza dettaglio, e un
+        // "Errore" senza dire di che tipo; si chiede sul telefono, facoltativo.
+        askDetail(
+            when {
+                !current.record.options.detailedStats || step.state.isFinished -> null
+                fromBand && kind == null -> DetailPrompt(DetailAsk.OUTCOME, side, server)
+                kind == PointKind.ERROR -> DetailPrompt(DetailAsk.ERROR_TYPE, side, server)
+                else -> null
+            },
+        )
         afterTransition(step.state, t)
     }
 
@@ -1120,10 +1150,37 @@ class MatchController(
         }
     }
 
+    private fun askDetail(p: DetailPrompt?) {
+        detailJob?.cancel()
+        detailPrompt.value = p
+        if (p != null) detailJob = scope.launch {
+            delay(DETAIL_PROMPT_MS)
+            detailPrompt.value = null
+        }
+    }
+
+    /**
+     * Risposta alla domanda sul punto appena segnato: cambia solo il "come" dell'ultimo punto, non chi l'ha vinto,
+     * quindi il punteggio resta uguale. Scegliendo "Errore" si chiede ancora se gratuito o forzato.
+     */
+    fun setPointDetail(kind: PointKind?) {
+        val lm = live.value ?: return
+        val last = lm.record.events.lastOrNull() as? MatchEvent.Point
+        val prompt = detailPrompt.value
+        if (last == null || prompt == null || kind == null) {
+            askDetail(null)
+            return
+        }
+        val rec = lm.record.copy(events = lm.record.events.dropLast(1) + last.copy(kind = kind))
+        commit(rec, lm.state)
+        askDetail(if (kind == PointKind.ERROR) prompt.copy(ask = DetailAsk.ERROR_TYPE) else null)
+    }
+
     /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
     fun fault() {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
         if (faultPending.value) {
             awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
             return
@@ -1142,6 +1199,7 @@ class MatchController(
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        askDetail(null)
         // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
         if (faultPending.value) {
             faultPending.value = false
@@ -1405,6 +1463,7 @@ class MatchController(
         scope.launch {
             withContext(io) {
                 storage.deleteFinished(id)
+                storage.deleteMatchPhotos(id)
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
@@ -1611,6 +1670,63 @@ class MatchController(
         }
     }
 
+    // ---------------------------------------------------------------- foto ricordo della partita
+
+    /** Cresce a ogni foto della partita aggiunta o tolta. */
+    val matchPhotosVersion = MutableStateFlow(0)
+
+    fun matchPhotos(id: String): List<File> = storage.matchPhotos(id)
+
+    /** Foto aggiunte al riepilogo a schermo: rimpicciolite a [MATCH_PHOTO_PX] sul lato lungo, fino a 10 per partita. */
+    fun addMatchPhotos(uris: List<Uri>) {
+        val id = summary.value?.record?.id ?: return
+        val s = strings
+        scope.launch {
+            val (added, full) = withContext(io) {
+                var added = 0
+                var full = false
+                for (uri in uris) {
+                    if (storage.matchPhotos(id).size >= Storage.MAX_MATCH_PHOTOS) { full = true; break }
+                    val jpeg = runCatching { scaledJpeg(uri, MATCH_PHOTO_PX) }.getOrNull() ?: continue
+                    if (storage.addMatchPhoto(id, jpeg)) added++
+                }
+                added to full
+            }
+            matchPhotosVersion.value++
+            if (full) _toasts.tryEmit(s.matchPhotosFull)
+            else if (added == 0) _toasts.tryEmit(s.photoError)
+        }
+    }
+
+    fun removeMatchPhoto(file: File) {
+        scope.launch {
+            withContext(io) { file.delete() }
+            matchPhotosVersion.value++
+        }
+    }
+
+    /** Foto [uri] rimpicciolita (lato lungo [maxSide]) in JPEG; ImageDecoder (Android 9+) la raddrizza. */
+    private fun scaledJpeg(uri: Uri, maxSide: Int): ByteArray {
+        val src = if (Build.VERSION.SDK_INT >= 28) {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
+                val long = maxOf(info.size.width, info.size.height)
+                d.setTargetSampleSize((long / maxSide).coerceAtLeast(1))
+                d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        } else {
+            app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
+        }
+        val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
+        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
+        return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
+    }
+
+    /** File dove la fotocamera salva la foto da aggiungere al riepilogo (nella cache condivisibile). */
+    fun cameraUri(): Uri {
+        val f = File(File(app.cacheDir, "share").apply { mkdirs() }, "camera.jpg")
+        return FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", f)
+    }
+
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
     /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
@@ -1628,7 +1744,12 @@ class MatchController(
                 val all = storage.loadFinished() + storage.loadUnfinished()
                 // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
                 val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
-                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all, photos = photos)).toByteArray()
+                val matchPhotos = all.associate { m ->
+                    m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
+                }.filterValues { it.isNotEmpty() }
+                storage.json.encodeToString(
+                    TransferBundle.serializer(), TransferBundle(matches = all, photos = photos, matchPhotos = matchPhotos),
+                ).toByteArray()
             },
             onServed = { transferServed.value++ },
         )
@@ -1659,6 +1780,12 @@ class MatchController(
                     // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
                     bundle.photos.forEach { (k, b64) ->
                         if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
+                    }
+                    // Foto ricordo: solo per le partite che qui non ne hanno già.
+                    bundle.matchPhotos.forEach { (id, list) ->
+                        if (storage.matchPhotos(id).isEmpty()) list.forEach { b64 ->
+                            runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
+                        }
                     }
                     importRecords(bundle.matches)
                 }.getOrNull()
@@ -1861,7 +1988,7 @@ class MatchController(
     }
 
     fun folderLabel(): String {
-        val tree = storage.historyTree ?: return strings.defaultFolder
+        val tree = storage.historyTree ?: return if (Build.VERSION.SDK_INT >= 29) DOCUMENTS_DIR else strings.defaultFolder
         return runCatching { DocumentsContract.getTreeDocumentId(Uri.parse(tree)).substringAfter(':').ifBlank { "/" } }
             .getOrDefault(strings.defaultFolder)
     }
@@ -1878,7 +2005,7 @@ class MatchController(
     }
 
     /** "Salva file": testo, JSON o immagine con nome e cartella scelti dall'utente. */
-    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean) {
+    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean, pdf: Boolean = false) {
         val sm = summary.value ?: return
         val s = strings
         val n = summaryNames()
@@ -1892,6 +2019,7 @@ class MatchController(
                         if (json) add(Triple("$base.json", "application/json") { o ->
                             o.write(storage.json.encodeToString(MatchRecord.serializer(), sm.record).toByteArray())
                         })
+                        if (pdf) add(Triple("$base.pdf", "application/pdf") { o -> writePdf(sm, o) })
                         if (png) add(Triple("$base.png", "image/png") { o ->
                             Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, o)
                         })
@@ -1904,7 +2032,22 @@ class MatchController(
                             app.contentResolver.openOutputStream(doc)?.use(write) ?: error("openOutputStream")
                         }
                         folderLabel()
+                    } else if (Build.VERSION.SDK_INT >= 29) {
+                        // Documenti/Tennis Score Manager: si apre da qualsiasi app di gestione file e resta anche se
+                        // l'app si disinstalla; niente permessi. Coi nomi uguali Android aggiunge da sé " (1)".
+                        val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                        for ((file, mime, write) in outputs) {
+                            val values = ContentValues().apply {
+                                put(MediaStore.MediaColumns.DISPLAY_NAME, file)
+                                put(MediaStore.MediaColumns.MIME_TYPE, mime)
+                                put(MediaStore.MediaColumns.RELATIVE_PATH, DOCUMENTS_DIR)
+                            }
+                            val uri = app.contentResolver.insert(collection, values) ?: error("MediaStore insert")
+                            app.contentResolver.openOutputStream(uri)?.use(write) ?: error("openOutputStream")
+                        }
+                        DOCUMENTS_DIR
                     } else {
+                        // Android 8 e 9: la cartella dell'app (scrivere in Documenti chiederebbe un permesso in più).
                         // Come fa il selettore di sistema: "Finale (1).txt" invece di sovrascrivere "Finale.txt".
                         val dir = storage.defaultHistoryDir
                         val suffix = generateSequence(0) { it + 1 }.map { if (it == 0) "" else " ($it)" }
@@ -1922,17 +2065,31 @@ class MatchController(
         if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
 
     /** Immagine + testo del risultato da condividere sui social. */
-    fun shareIntent(): Intent? {
+    /** PDF completo del riepilogo [sm]: risultato, statistiche, cronologia e foto ricordo. */
+    private fun writePdf(sm: LiveMatch, out: OutputStream) {
+        val s = strings
+        val n = summaryNames()
+        PdfReport.write(
+            out, sm.record, sm.state, s, n, Reports.renderCard(sm.record, sm.state, s, n),
+            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) },
+        )
+    }
+
+    /** Condivisione del riepilogo: l'immagine col testo per i social, oppure ([pdf]) il PDF completo. */
+    fun shareIntent(pdf: Boolean = false): Intent? {
         val sm = summary.value ?: return null
         val s = strings
         val n = summaryNames()
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.png")
-        runCatching { file.outputStream().use { Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it) } }
-            .onFailure { return null }
+        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.${if (pdf) "pdf" else "png"}")
+        runCatching {
+            file.outputStream().use {
+                if (pdf) writePdf(sm, it) else Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+        }.onFailure { return null }
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
-            type = "image/png"
+            type = if (pdf) "application/pdf" else "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
             putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)

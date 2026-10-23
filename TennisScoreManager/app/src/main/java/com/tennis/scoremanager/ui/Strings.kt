@@ -245,6 +245,17 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statGamePointsWon: String
+    val statSetPointsWon: String
+    val statMatchPointsWon: String
+    val statLoveGames: String
+    val statBestGameRun: String
+    val statSetsFromBreakDown: String
+    val statTimes: String
+    val statSetDurations: String
+    val statLongestGame: String
+    /** "12' (14 punti)" */
+    val longestGameValue: (String, Int) -> String
     val statAces: String
     val statDoubleFaults: String
     val statFirstServeIn: String
@@ -252,6 +263,18 @@ interface Strings {
     val statSecondServeWon: String
     val statWinners: String
     val statErrors: String
+    val statUnforcedErrors: String
+    val statForcedErrors: String
+    val detailAskOutcome: String
+    val detailAskErrorType: String
+    val detailUnforced: String
+    val detailForced: String
+    val detailWinnerOf: (String) -> String
+    val detailErrorOf: (String) -> String
+    val trendTitle: String
+    val trendHint: String
+    val trendPointsAvg: (Int) -> String
+    val trendDetailTitle: (Int) -> String
     val detailedStats: String
     val detailedStatsHint: String
     val btnAce: String
@@ -398,6 +421,9 @@ interface Strings {
     val gamesHeader: String
     val onServe: String get() = "On Serve"
     val undoPoint: String
+    val lockScreen: String
+    val lockedTitle: String
+    val unlockHint: String
     val suspend: String
     val resume: String
     val audioOn: String
@@ -512,6 +538,16 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    val matchPhotosTitle: String
+    val matchPhotosHint: String
+    val addPhotos: String
+    val takePhoto: String
+    val matchPhotosFull: String
+    val formatPdf: String
+    val shareChoose: String
+    val shareChooseHint: String
+    val shareImage: String
+    val sharePdf: String
     // Tornei Americano e Mexicano
     val tournamentButton: String
     val tournamentTitle: String
@@ -858,6 +894,16 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statGamePointsWon = "Palle game trasformate"
+    override val statSetPointsWon = "Set point trasformati"
+    override val statMatchPointsWon = "Match point trasformati"
+    override val statLoveGames = "Game vinti a zero"
+    override val statBestGameRun = "Game di fila (max)"
+    override val statSetsFromBreakDown = "Set vinti da sotto di un break"
+    override val statTimes = "Tempi"
+    override val statSetDurations = "Durata dei set"
+    override val statLongestGame = "Game più lungo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n punti)" }
     override val statAces = "Ace"
     override val statDoubleFaults = "Doppi falli"
     override val statFirstServeIn = "Prime di servizio in campo"
@@ -865,6 +911,18 @@ object ItStrings : Strings {
     override val statSecondServeWon = "Punti vinti con la seconda"
     override val statWinners = "Vincenti"
     override val statErrors = "Errori"
+    override val statUnforcedErrors = "Errori gratuiti"
+    override val statForcedErrors = "Errori forzati"
+    override val detailAskOutcome = "Com'è finito il punto?"
+    override val detailAskErrorType = "Errore gratuito o forzato?"
+    override val detailUnforced = "Gratuito"
+    override val detailForced = "Forzato"
+    override val detailWinnerOf: (String) -> String = { x -> "Vincente $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Errore $x" }
+    override val trendTitle = "Andamento"
+    override val trendHint = "Punti vinti partita per partita (ultime 12; piena = partita vinta, linea = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Punti vinti in media: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medie per partita ($n con statistiche dettagliate)" }
     override val detailedStats = "Statistiche dettagliate"
     override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
     override val btnAce = "Ace"
@@ -1004,6 +1062,9 @@ object ItStrings : Strings {
     override val setsHeader = "SET"
     override val gamesHeader = "GAME"
     override val undoPoint = "Annulla punto"
+    override val lockScreen = "Blocca schermo"
+    override val lockedTitle = "Schermo bloccato"
+    override val unlockHint = "Tieni premuto il lucchetto per sbloccare. Braccialetti e telecomandi continuano a funzionare."
     override val suspend = "Sospendi"
     override val resume = "Riprendi"
     override val audioOn = "Audio On"
@@ -1121,6 +1182,16 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val matchPhotosTitle = "Foto della partita"
+    override val matchPhotosHint = "Fino a 10 foto ricordo: restano su questo telefono, finiscono nel PDF e passano all'altro telefono col trasferimento."
+    override val addPhotos = "Aggiungi foto"
+    override val takePhoto = "Scatta"
+    override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
+    override val shareChoose = "Cosa condividi?"
+    override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
+    override val shareImage = "Immagine"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
@@ -1454,6 +1525,16 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statGamePointsWon = "Game points converted"
+    override val statSetPointsWon = "Set points converted"
+    override val statMatchPointsWon = "Match points converted"
+    override val statLoveGames = "Love games won"
+    override val statBestGameRun = "Games in a row (max)"
+    override val statSetsFromBreakDown = "Sets won from a break down"
+    override val statTimes = "Times"
+    override val statSetDurations = "Set durations"
+    override val statLongestGame = "Longest game"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Double faults"
     override val statFirstServeIn = "First serves in"
@@ -1461,6 +1542,18 @@ object EnStrings : Strings {
     override val statSecondServeWon = "Points won on 2nd serve"
     override val statWinners = "Winners"
     override val statErrors = "Errors"
+    override val statUnforcedErrors = "Unforced errors"
+    override val statForcedErrors = "Forced errors"
+    override val detailAskOutcome = "How did the point end?"
+    override val detailAskErrorType = "Unforced or forced error?"
+    override val detailUnforced = "Unforced"
+    override val detailForced = "Forced"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Trend"
+    override val trendHint = "Points won match by match (last 12; filled = match won, line = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Average points won: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Averages per match ($n with detailed stats)" }
     override val detailedStats = "Detailed stats"
     override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
     override val btnAce = "Ace"
@@ -1600,6 +1693,9 @@ object EnStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "GAMES"
     override val undoPoint = "Undo point"
+    override val lockScreen = "Lock screen"
+    override val lockedTitle = "Screen locked"
+    override val unlockHint = "Press and hold the lock to unlock. Wristbands and remotes keep working."
     override val suspend = "Suspend"
     override val resume = "Resume"
     override val audioOn = "Audio On"
@@ -1717,6 +1813,16 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val matchPhotosTitle = "Match photos"
+    override val matchPhotosHint = "Up to 10 souvenir photos: they stay on this phone, go into the PDF and move to the other phone with the transfer."
+    override val addPhotos = "Add photos"
+    override val takePhoto = "Take photo"
+    override val matchPhotosFull = "This match already has 10 photos."
+    override val formatPdf = "Full PDF (result, statistics, log, photos)"
+    override val shareChoose = "What do you share?"
+    override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
+    override val shareImage = "Image"
+    override val sharePdf = "Full PDF"
     override val tournamentButton = "Americano or Mexicano tournament"
     override val tournamentTitle = "Tournament"
     override val tournamentSubtitle = "Americano and Mexicano: partners change every round"

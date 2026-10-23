@@ -11,6 +11,11 @@ import java.io.File
 
 /** Preferenze e partite salvate in locale (memoria interna dell'app). */
 class Storage(context: Context) {
+    companion object {
+        /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
+        const val MAX_MATCH_PHOTOS = 10
+    }
+
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
@@ -48,6 +53,24 @@ class Storage(context: Context) {
     @Synchronized
     fun deletePhoto(key: String) {
         photoFile(key).delete()
+    }
+
+    /** Foto ricordo di una partita: una cartella per partita, JPEG rimpiccioliti, al massimo [MAX_MATCH_PHOTOS]. */
+    private fun matchPhotoDir(id: String): File = File(File(app.filesDir, "matchphotos"), id)
+
+    fun matchPhotos(id: String): List<File> =
+        matchPhotoDir(id).listFiles { f -> f.extension == "jpg" }.orEmpty().sortedBy { it.name }
+
+    @Synchronized
+    fun addMatchPhoto(id: String, jpeg: ByteArray): Boolean {
+        val dir = matchPhotoDir(id).apply { mkdirs() }
+        if (matchPhotos(id).size >= MAX_MATCH_PHOTOS) return false
+        return runCatching { File(dir, "${System.currentTimeMillis()}.jpg").writeBytes(jpeg) }.isSuccess
+    }
+
+    @Synchronized
+    fun deleteMatchPhotos(id: String) {
+        matchPhotoDir(id).deleteRecursively()
     }
 
     /** Tornei Americano e Mexicano, uno per file. */

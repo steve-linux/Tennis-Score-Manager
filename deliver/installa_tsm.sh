@@ -38,6 +38,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/voice"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/workout"
 mkdir -p "$DEST/app/src/main/res/drawable"
 mkdir -p "$DEST/app/src/main/res/mipmap-anydpi-v26"
 mkdir -p "$DEST/app/src/main/res/values"
@@ -798,14 +799,17 @@ package com.tennis.scoremanager
 import android.app.Activity
 import android.app.Application
 import android.content.ClipData
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.SystemClock
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
@@ -833,6 +837,7 @@ import com.tennis.scoremanager.data.MatchLocation
 import com.tennis.scoremanager.data.MatchOptions
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
@@ -855,6 +860,10 @@ import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
+import com.tennis.scoremanager.workout.WorkoutSession
+import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.WorkoutReport
+import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
@@ -896,7 +905,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT }
+
+/** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
+enum class DetailAsk { OUTCOME, ERROR_TYPE }
+
+/** [winner] ha vinto il punto, [server] serviva. */
+data class DetailPrompt(val ask: DetailAsk, val winner: Side, val server: Side)
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -932,6 +947,10 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Cartella predefinita di "Salva file" da Android 10 (memoria condivisa, visibile a tutte le app). */
+        val DOCUMENTS_DIR = "${Environment.DIRECTORY_DOCUMENTS}/Tennis Score Manager"
+        /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
+        const val MATCH_PHOTO_PX = 1600
         private const val BAND_GAP_MS = 2_000L
         private const val TAP_GAP_MS = 700L
         /** "Annulla punto" dal telefono: un doppio tocco toglierebbe due punti. */
@@ -939,6 +958,8 @@ class MatchController(
         /** Il riepilogo si riprende la posizione solo poco dopo la fine (dopo si è altrove). */
         private const val LATE_LOCATION_MS = 30 * 60_000L
         private const val MESSAGE_MS = 5_000L
+        /** Quanto resta la domanda sul punto appena segnato (statistiche dettagliate). */
+        private const val DETAIL_PROMPT_MS = 6_000L
         /** Nome della prova voce in [Announcer.playing]. */
         const val VOICE_TEST = "test"
     }
@@ -961,6 +982,9 @@ class MatchController(
     val serveOrderPrompt = MutableStateFlow(false)
     /** Statistiche dettagliate: la prima di servizio del punto in corso è fuori (si gioca la seconda). */
     val faultPending = MutableStateFlow(false)
+    /** Statistiche dettagliate: domanda facoltativa sul punto appena segnato (sparisce da sola dopo qualche secondo). */
+    val detailPrompt = MutableStateFlow<DetailPrompt?>(null)
+    private var detailJob: Job? = null
     val saved = MutableStateFlow<List<MatchRecord>>(emptyList())
     /**
      * Cresce a ogni foto cambiata: chi mostra le foto le ricarica. Va dichiarata qui, prima del blocco init:
@@ -1045,6 +1069,14 @@ class MatchController(
         },
     )
 
+    /** Allenamento con la fascia, senza partita (schermata a parte, pulsante in pagina 1). */
+    val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
+    /** Allenamenti salvati, dal più recente. */
+    val workouts = MutableStateFlow<List<WorkoutRecord>>(emptyList())
+    /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
+    val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
+    private var workoutSide = Side.P1
+
     /**
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
@@ -1095,6 +1127,7 @@ class MatchController(
         scope.launch {
             heart.readings.collect { (side, m) ->
                 heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
+                workout.onReading(side, m)
                 onHeartReading(side, m)
                 relay.onLocalReading(side, m)
             }
@@ -1173,7 +1206,7 @@ class MatchController(
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
     private fun needsService(): Boolean =
         options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
-            relay.ui.value.role != RelayRole.OFF
+            relay.ui.value.role != RelayRole.OFF || workout.active
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -1294,6 +1327,13 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
+            // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
+            Screen.WORKOUT -> if (workoutDetail.value != null) {
+                workoutDetail.value = null
+                Screen.WORKOUT
+            } else {
+                Screen.SETUP
+            }
             Screen.START -> {
                 if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
                 Screen.OPTIONS
@@ -1686,7 +1726,10 @@ class MatchController(
         val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
         val age = System.currentTimeMillis() - at
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
-        if (age <= PhoneRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
+        if (age <= PhoneRelay.LIVE_MS) {
+            strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
+            workout.onReading(side, m)
+        }
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= PhoneRelay.LIVE_MS) {
@@ -1822,6 +1865,7 @@ class MatchController(
         lastPointAt = now
         if (lm.record.startedAt == null) onPlay()
         val current = live.value ?: return
+        val server = current.state.server
         val step = ScoreEngine.pointWonBy(current.state, side)
         val t = step.transition ?: return
         // Lunghezza dello scambio solo se i braccialetti mandano i colpi (almeno uno arrivato in questa partita).
@@ -1833,6 +1877,16 @@ class MatchController(
         val rec = current.record.copy(events = current.record.events + point)
         serveOrderPrompt.value = false
         commit(rec, step.state)
+        // Statistiche dettagliate: un punto dal braccialetto o dal telecomando arriva senza dettaglio, e un
+        // "Errore" senza dire di che tipo; si chiede sul telefono, facoltativo.
+        askDetail(
+            when {
+                !current.record.options.detailedStats || step.state.isFinished -> null
+                fromBand && kind == null -> DetailPrompt(DetailAsk.OUTCOME, side, server)
+                kind == PointKind.ERROR -> DetailPrompt(DetailAsk.ERROR_TYPE, side, server)
+                else -> null
+            },
+        )
         afterTransition(step.state, t)
     }
 
@@ -1889,10 +1943,37 @@ class MatchController(
         }
     }
 
+    private fun askDetail(p: DetailPrompt?) {
+        detailJob?.cancel()
+        detailPrompt.value = p
+        if (p != null) detailJob = scope.launch {
+            delay(DETAIL_PROMPT_MS)
+            detailPrompt.value = null
+        }
+    }
+
+    /**
+     * Risposta alla domanda sul punto appena segnato: cambia solo il "come" dell'ultimo punto, non chi l'ha vinto,
+     * quindi il punteggio resta uguale. Scegliendo "Errore" si chiede ancora se gratuito o forzato.
+     */
+    fun setPointDetail(kind: PointKind?) {
+        val lm = live.value ?: return
+        val last = lm.record.events.lastOrNull() as? MatchEvent.Point
+        val prompt = detailPrompt.value
+        if (last == null || prompt == null || kind == null) {
+            askDetail(null)
+            return
+        }
+        val rec = lm.record.copy(events = lm.record.events.dropLast(1) + last.copy(kind = kind))
+        commit(rec, lm.state)
+        askDetail(if (kind == PointKind.ERROR) prompt.copy(ask = DetailAsk.ERROR_TYPE) else null)
+    }
+
     /** Prima di servizio fuori; la seconda fuori è doppio fallo, cioè punto a chi risponde. */
     fun fault() {
         val lm = live.value ?: return
         if (closing || lm.record.suspended || lm.state.isFinished || endDialog.value) return
+        askDetail(null)
         if (faultPending.value) {
             awardPoint(lm.state.receiver, kind = PointKind.DOUBLE_FAULT)
             return
@@ -1911,6 +1992,7 @@ class MatchController(
         if (closing) return
         val now = SystemClock.elapsedRealtime()
         if (now - lastUndoAt < UNDO_GAP_MS) return
+        askDetail(null)
         // Con una prima fuori in sospeso, "Annulla" toglie solo quella.
         if (faultPending.value) {
             faultPending.value = false
@@ -2085,6 +2167,68 @@ class MatchController(
         screen.value = Screen.HISTORY
     }
 
+    // ---------------------------------------------------------------- allenamento
+
+    fun openWorkouts() {
+        workoutDetail.value = null
+        refreshWorkouts()
+        screen.value = Screen.WORKOUT
+    }
+
+    private fun refreshWorkouts() {
+        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() } }
+    }
+
+    /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
+    fun startWorkout(): Boolean {
+        val straps = heart.straps.value
+        val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
+        workoutSide = side
+        workout.start(side, straps[side]?.name)
+        MatchService.start(app)
+        return true
+    }
+
+    private fun onWorkoutFinished(rec: WorkoutRecord) {
+        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]))
+        scope.launch {
+            withContext(io) { storage.saveWorkout(w) }
+            refreshWorkouts()
+        }
+        workoutDetail.value = w
+        if (!needsService()) MatchService.stop(app)
+    }
+
+    fun deleteWorkout(id: String) {
+        scope.launch {
+            withContext(io) { storage.deleteWorkout(id) }
+            workoutDetail.value = null
+            refreshWorkouts()
+        }
+    }
+
+    /** Condivide l'allenamento come CSV (secondo per secondo) o PDF di riepilogo. */
+    fun workoutShareIntent(w: WorkoutRecord, pdf: Boolean): Intent? {
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm", java.util.Locale.ROOT).format(java.util.Date(w.startedAt))
+        val file = File(dir, "${s.workoutTitle}_$stamp.${if (pdf) "pdf" else "csv"}")
+        runCatching {
+            file.outputStream().use { o ->
+                if (pdf) WorkoutReport.pdf(w, s, options.value.lang, o) else o.write(WorkoutStats.csv(w).toByteArray())
+            }
+        }.onFailure { return null }
+        val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = if (pdf) "application/pdf" else "text/csv"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "${s.workoutTitle} ${Reports.date(w.startedAt, options.value.lang)}")
+            clipData = ClipData.newRawUri("", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        return Intent.createChooser(send, s.share)
+    }
+
     fun refreshHistory() {
         scope.launch {
             history.value = withContext(io) {
@@ -2112,6 +2256,7 @@ class MatchController(
         scope.launch {
             withContext(io) {
                 storage.deleteFinished(id)
+                storage.deleteMatchPhotos(id)
                 // Altrimenti l'ultima partita finita rientrerebbe nello storico al prossimo caricamento.
                 if (storage.loadLastFinished()?.id == id) storage.clearLastFinished()
             }
@@ -2318,6 +2463,63 @@ class MatchController(
         }
     }
 
+    // ---------------------------------------------------------------- foto ricordo della partita
+
+    /** Cresce a ogni foto della partita aggiunta o tolta. */
+    val matchPhotosVersion = MutableStateFlow(0)
+
+    fun matchPhotos(id: String): List<File> = storage.matchPhotos(id)
+
+    /** Foto aggiunte al riepilogo a schermo: rimpicciolite a [MATCH_PHOTO_PX] sul lato lungo, fino a 10 per partita. */
+    fun addMatchPhotos(uris: List<Uri>) {
+        val id = summary.value?.record?.id ?: return
+        val s = strings
+        scope.launch {
+            val (added, full) = withContext(io) {
+                var added = 0
+                var full = false
+                for (uri in uris) {
+                    if (storage.matchPhotos(id).size >= Storage.MAX_MATCH_PHOTOS) { full = true; break }
+                    val jpeg = runCatching { scaledJpeg(uri, MATCH_PHOTO_PX) }.getOrNull() ?: continue
+                    if (storage.addMatchPhoto(id, jpeg)) added++
+                }
+                added to full
+            }
+            matchPhotosVersion.value++
+            if (full) _toasts.tryEmit(s.matchPhotosFull)
+            else if (added == 0) _toasts.tryEmit(s.photoError)
+        }
+    }
+
+    fun removeMatchPhoto(file: File) {
+        scope.launch {
+            withContext(io) { file.delete() }
+            matchPhotosVersion.value++
+        }
+    }
+
+    /** Foto [uri] rimpicciolita (lato lungo [maxSide]) in JPEG; ImageDecoder (Android 9+) la raddrizza. */
+    private fun scaledJpeg(uri: Uri, maxSide: Int): ByteArray {
+        val src = if (Build.VERSION.SDK_INT >= 28) {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(app.contentResolver, uri)) { d, info, _ ->
+                val long = maxOf(info.size.width, info.size.height)
+                d.setTargetSampleSize((long / maxSide).coerceAtLeast(1))
+                d.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        } else {
+            app.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: error("foto illeggibile")
+        }
+        val scale = minOf(1f, maxSide.toFloat() / maxOf(src.width, src.height))
+        val img = if (scale < 1f) Bitmap.createScaledBitmap(src, (src.width * scale).toInt(), (src.height * scale).toInt(), true) else src
+        return ByteArrayOutputStream().also { img.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
+    }
+
+    /** File dove la fotocamera salva la foto da aggiungere al riepilogo (nella cache condivisibile). */
+    fun cameraUri(): Uri {
+        val f = File(File(app.cacheDir, "share").apply { mkdirs() }, "camera.jpg")
+        return FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", f)
+    }
+
     // ---------------------------------------------------------------- trasferimento tra telefoni (QR)
 
     /** Indirizzo da mostrare nel QR mentre questo telefono invia; null = non sta inviando. */
@@ -2335,7 +2537,12 @@ class MatchController(
                 val all = storage.loadFinished() + storage.loadUnfinished()
                 // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
                 val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
-                storage.json.encodeToString(TransferBundle.serializer(), TransferBundle(matches = all, photos = photos)).toByteArray()
+                val matchPhotos = all.associate { m ->
+                    m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
+                }.filterValues { it.isNotEmpty() }
+                storage.json.encodeToString(
+                    TransferBundle.serializer(), TransferBundle(matches = all, photos = photos, matchPhotos = matchPhotos),
+                ).toByteArray()
             },
             onServed = { transferServed.value++ },
         )
@@ -2366,6 +2573,12 @@ class MatchController(
                     // Una foto arrivata non sostituisce quella che questo telefono ha già per lo stesso nome.
                     bundle.photos.forEach { (k, b64) ->
                         if (!storage.photoFile(k).exists()) runCatching { storage.savePhoto(k, Base64.decode(b64, Base64.DEFAULT)) }
+                    }
+                    // Foto ricordo: solo per le partite che qui non ne hanno già.
+                    bundle.matchPhotos.forEach { (id, list) ->
+                        if (storage.matchPhotos(id).isEmpty()) list.forEach { b64 ->
+                            runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
+                        }
                     }
                     importRecords(bundle.matches)
                 }.getOrNull()
@@ -2568,7 +2781,7 @@ class MatchController(
     }
 
     fun folderLabel(): String {
-        val tree = storage.historyTree ?: return strings.defaultFolder
+        val tree = storage.historyTree ?: return if (Build.VERSION.SDK_INT >= 29) DOCUMENTS_DIR else strings.defaultFolder
         return runCatching { DocumentsContract.getTreeDocumentId(Uri.parse(tree)).substringAfter(':').ifBlank { "/" } }
             .getOrDefault(strings.defaultFolder)
     }
@@ -2585,7 +2798,7 @@ class MatchController(
     }
 
     /** "Salva file": testo, JSON o immagine con nome e cartella scelti dall'utente. */
-    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean) {
+    fun saveHistory(name: String, txt: Boolean, json: Boolean, png: Boolean, pdf: Boolean = false) {
         val sm = summary.value ?: return
         val s = strings
         val n = summaryNames()
@@ -2599,6 +2812,7 @@ class MatchController(
                         if (json) add(Triple("$base.json", "application/json") { o ->
                             o.write(storage.json.encodeToString(MatchRecord.serializer(), sm.record).toByteArray())
                         })
+                        if (pdf) add(Triple("$base.pdf", "application/pdf") { o -> writePdf(sm, o) })
                         if (png) add(Triple("$base.png", "image/png") { o ->
                             Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, o)
                         })
@@ -2611,7 +2825,22 @@ class MatchController(
                             app.contentResolver.openOutputStream(doc)?.use(write) ?: error("openOutputStream")
                         }
                         folderLabel()
+                    } else if (Build.VERSION.SDK_INT >= 29) {
+                        // Documenti/Tennis Score Manager: si apre da qualsiasi app di gestione file e resta anche se
+                        // l'app si disinstalla; niente permessi. Coi nomi uguali Android aggiunge da sé " (1)".
+                        val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                        for ((file, mime, write) in outputs) {
+                            val values = ContentValues().apply {
+                                put(MediaStore.MediaColumns.DISPLAY_NAME, file)
+                                put(MediaStore.MediaColumns.MIME_TYPE, mime)
+                                put(MediaStore.MediaColumns.RELATIVE_PATH, DOCUMENTS_DIR)
+                            }
+                            val uri = app.contentResolver.insert(collection, values) ?: error("MediaStore insert")
+                            app.contentResolver.openOutputStream(uri)?.use(write) ?: error("openOutputStream")
+                        }
+                        DOCUMENTS_DIR
                     } else {
+                        // Android 8 e 9: la cartella dell'app (scrivere in Documenti chiederebbe un permesso in più).
                         // Come fa il selettore di sistema: "Finale (1).txt" invece di sovrascrivere "Finale.txt".
                         val dir = storage.defaultHistoryDir
                         val suffix = generateSequence(0) { it + 1 }.map { if (it == 0) "" else " ($it)" }
@@ -2629,17 +2858,31 @@ class MatchController(
         if (suffix.isEmpty()) file else file.substringBeforeLast('.') + suffix + "." + file.substringAfterLast('.')
 
     /** Immagine + testo del risultato da condividere sui social. */
-    fun shareIntent(): Intent? {
+    /** PDF completo del riepilogo [sm]: risultato, statistiche, cronologia e foto ricordo. */
+    private fun writePdf(sm: LiveMatch, out: OutputStream) {
+        val s = strings
+        val n = summaryNames()
+        PdfReport.write(
+            out, sm.record, sm.state, s, n, Reports.renderCard(sm.record, sm.state, s, n),
+            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) },
+        )
+    }
+
+    /** Condivisione del riepilogo: l'immagine col testo per i social, oppure ([pdf]) il PDF completo. */
+    fun shareIntent(pdf: Boolean = false): Intent? {
         val sm = summary.value ?: return null
         val s = strings
         val n = summaryNames()
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.png")
-        runCatching { file.outputStream().use { Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it) } }
-            .onFailure { return null }
+        val file = File(dir, "${Reports.fileBaseName(sm.record, n)}.${if (pdf) "pdf" else "png"}")
+        runCatching {
+            file.outputStream().use {
+                if (pdf) writePdf(sm, it) else Reports.renderCard(sm.record, sm.state, s, n).compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+        }.onFailure { return null }
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
-            type = "image/png"
+            type = if (pdf) "application/pdf" else "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, Reports.text(sm.record, sm.state, s, n))
             putExtra(Intent.EXTRA_SUBJECT, if (sm.record.setup.sport == Sport.PADEL) s.shareSubjectPadel else s.shareSubject)
@@ -4894,6 +5137,11 @@ object MatchStats {
         val strokes: Int?,
         val kind: PointKind? = null,
         val secondServe: Boolean = false,
+        /** Ora del punto (0 nelle partite salvate senza). */
+        val at: Long = 0L,
+        /** Chi aveva palla game, set point (match point compreso) prima del punto. */
+        val gamePointFor: Side? = null,
+        val setPointFor: Side? = null,
     )
 
     fun points(rec: MatchRecord): List<PlayedPoint> {
@@ -4915,6 +5163,12 @@ object MatchStats {
                     strokes = e.strokes,
                     kind = e.kind,
                     secondServe = e.secondServe,
+                    at = e.at,
+                    // Palla game solo nei game normali: nel tie-break il punto che chiude è set point.
+                    gamePointFor = Side.entries.firstOrNull {
+                        s.tiebreak == TiebreakKind.NONE && ScoreEngine.lookahead(s, it)?.gameWinner == it
+                    },
+                    setPointFor = Side.entries.firstOrNull { ScoreEngine.lookahead(s, it)?.setWinner == it },
                 )
             }
             s = step.state
@@ -4954,6 +5208,20 @@ object MatchStats {
         val secondServes: Int = 0,
         val winners: Int = 0,
         val errors: Int = 0,
+        val unforcedErrors: Int = 0,
+        val forcedErrors: Int = 0,
+        // Come le pagine dei risultati: palle trasformate, game a zero, rimonte, game di fila
+        val loveGames: Int = 0,
+        val gamePointsWon: Int = 0,
+        val gamePoints: Int = 0,
+        val setPointsWon: Int = 0,
+        val setPoints: Int = 0,
+        val matchPointsWon: Int = 0,
+        val matchPoints: Int = 0,
+        /** Set vinti dopo essere stati sotto di almeno due game (un break). */
+        val setsFromBreakDown: Int = 0,
+        /** Game vinti di fila (il massimo nel periodo). */
+        val bestGameRun: Int = 0,
     )
 
     /** La partita ha dati dettagliati (segnata con l'opzione, o almeno un punto con ace, fallo, vincente o errore). */
@@ -5006,8 +5274,88 @@ object MatchStats {
             secondServePointsWon = serve.count { it.secondServe && it.winner == me },
             secondServes = serve.count { it.secondServe },
             winners = pts.count { it.kind == PointKind.WINNER && it.winner == me },
-            errors = pts.count { it.kind == PointKind.ERROR && it.winner != me },
+            errors = pts.count { it.kind?.isError == true && it.winner != me },
+            unforcedErrors = pts.count { it.kind == PointKind.UNFORCED_ERROR && it.winner != me },
+            forcedErrors = pts.count { it.kind == PointKind.FORCED_ERROR && it.winner != me },
+            loveGames = loveGames(pts, me),
+            gamePointsWon = pts.count { it.gamePointFor == me && it.winner == me },
+            gamePoints = pts.count { it.gamePointFor == me },
+            setPointsWon = pts.count { it.setPointFor == me && it.matchPointFor != me && it.winner == me },
+            setPoints = pts.count { it.setPointFor == me && it.matchPointFor != me },
+            matchPointsWon = pts.count { it.matchPointFor == me && it.winner == me },
+            matchPoints = pts.count { it.matchPointFor == me },
+            setsFromBreakDown = setsFromBreakDown(pts, me),
+            bestGameRun = bestRun(games.map { it.gameWinner }, me),
         )
+    }
+
+    /** Game normali vinti senza perdere un punto. */
+    private fun loveGames(pts: List<PlayedPoint>, me: Side): Int {
+        var lost = 0
+        var n = 0
+        for (p in pts) {
+            if (p.tiebreak != TiebreakKind.NONE) continue
+            if (p.winner != me) lost++
+            if (p.gameWinner != null) {
+                if (p.gameWinner == me && lost == 0) n++
+                lost = 0
+            }
+        }
+        return n
+    }
+
+    private fun bestRun(winners: List<Side?>, me: Side): Int {
+        var run = 0
+        var best = 0
+        for (w in winners) {
+            run = if (w == me) run + 1 else 0
+            best = maxOf(best, run)
+        }
+        return best
+    }
+
+    /** Set vinti da [me] dopo essere stati, a fine di un game, sotto di due game o più. */
+    private fun setsFromBreakDown(pts: List<PlayedPoint>, me: Side): Int {
+        val other = me.other
+        var n = 0
+        for ((_, setPts) in pts.groupBy { it.set }) {
+            val last = setPts.last()
+            val closed = last.after.sets.getOrNull(last.set) ?: continue
+            if (closed.winner != me) continue
+            val down = setPts.any { p ->
+                p.gameWinner != null && p.after.sets.size == p.set && p.after.games(other) - p.after.games(me) >= 2
+            }
+            if (down) n++
+        }
+        return n
+    }
+
+    /** Durata di ogni set, dal primo all'ultimo punto (null se le ore dei punti non ci sono). */
+    fun setDurations(all: List<PlayedPoint>): List<Long?> =
+        all.groupBy { it.set }.toSortedMap().values.map { p ->
+            val first = p.first().at
+            val last = p.last().at
+            if (first > 0 && last >= first) last - first else null
+        }
+
+    /**
+     * Game più lungo (non tie-break): tempo dal primo all'ultimo punto del game (senza le pause tra un game e
+     * l'altro) e punti giocati; null se le ore dei punti non ci sono.
+     */
+    fun longestGame(all: List<PlayedPoint>): Pair<Long, Int>? {
+        var best: Pair<Long, Int>? = null
+        var cur = mutableListOf<PlayedPoint>()
+        for (p in all) {
+            cur += p
+            if (p.gameWinner == null) continue
+            val first = cur.first().at
+            if (p.tiebreak == TiebreakKind.NONE && first > 0 && p.at >= first) {
+                val d = p.at - first
+                if (best == null || d > best.first) best = d to cur.size
+            }
+            cur = mutableListOf()
+        }
+        return best
     }
 
     /** Colpi per punto nel periodo (punti con la lunghezza dello scambio); null se non ce ne sono. */
@@ -5311,6 +5659,308 @@ class Names(private val setup: SetupData, private val strings: Strings) : CallNa
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/PdfReport.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/PdfReport.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.model.TiebreakKind
+import com.tennis.scoremanager.ui.Strings
+import java.io.File
+import java.io.OutputStream
+
+/**
+ * Riepilogo completo in PDF (A4), fatto con PdfDocument di Android, senza librerie: risultato con l'immagine del
+ * riepilogo e le foto dei giocatori, statistiche della partita e di ogni set, cronologia game per game e, alla fine,
+ * le foto ricordo della partita (due per pagina).
+ */
+object PdfReport {
+    private const val W = 595
+    private const val H = 842
+    private const val M = 40f
+    private const val CONTENT_W = W - 2 * M
+    private const val PX_PER_PT = 1.5f
+
+    private val dark = Color.rgb(20, 28, 44)
+    private val grey = Color.rgb(110, 120, 135)
+    private val line = Color.rgb(220, 224, 230)
+    private val yellow = Color.rgb(200, 160, 0)
+    private val red = Color.rgb(205, 45, 42)
+
+    private fun paint(size: Float, color: Int = dark, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = size
+            this.color = color
+            typeface = if (bold) Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) else Typeface.SANS_SERIF
+            textAlign = align
+        }
+
+    /** Pagine una dopo l'altra: [ensure] apre una pagina nuova quando lo spazio rimasto non basta. */
+    private class Writer(val doc: PdfDocument, val footer: String) {
+        private var number = 0
+        var page: PdfDocument.Page? = null
+        var y = M
+
+        val canvas: Canvas get() = page!!.canvas
+
+        fun newPage() {
+            finish()
+            number++
+            page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, number).create())
+            y = M
+        }
+
+        fun ensure(height: Float) {
+            if (page == null || y + height > H - M - 16) newPage()
+        }
+
+        fun finish() {
+            page?.let {
+                it.canvas.drawText(footer, W / 2f, H - M / 2, paint(8f, grey, align = Paint.Align.CENTER))
+                it.canvas.drawText("$number", W - M, H - M / 2, paint(8f, grey, align = Paint.Align.RIGHT))
+                doc.finishPage(it)
+            }
+            page = null
+        }
+
+        fun title(text: String) {
+            ensure(40f)
+            y += 18
+            canvas.drawText(text, M, y, paint(16f, bold = true))
+            y += 12
+        }
+
+        /** Testo che va a capo sulla larghezza della pagina. */
+        fun paragraph(text: String, p: Paint, gap: Float = 4f) {
+            val words = text.split(' ')
+            var cur = ""
+            fun flush() {
+                ensure(p.textSize + gap)
+                y += p.textSize + gap
+                canvas.drawText(cur, M, y, p)
+                cur = ""
+            }
+            for (w in words) {
+                val next = if (cur.isEmpty()) w else "$cur $w"
+                if (p.measureText(next) > CONTENT_W && cur.isNotEmpty()) {
+                    flush()
+                    cur = w
+                } else cur = next
+            }
+            if (cur.isNotEmpty()) flush()
+        }
+    }
+
+    fun write(
+        out: OutputStream, rec: MatchRecord, state: MatchState, s: Strings, names: Names,
+        card: Bitmap, matchPhotos: List<File>, playerPhoto: (String) -> Bitmap?,
+    ) {
+        val doc = PdfDocument()
+        val wr = Writer(doc, "${s.appName} · ${Reports.siteUrl(rec.options.lang)}")
+        val lang = rec.options.lang
+        val pts = MatchStats.points(rec)
+
+        // ---- Pagina 1: immagine del risultato, giocatori con le foto, dati della partita
+        wr.newPage()
+        val cardW = 300f
+        val cardH = cardW * card.height / card.width
+        wr.canvas.drawBitmap(fit(card, cardW, cardH), null, RectF((W - cardW) / 2, wr.y, (W + cardW) / 2, wr.y + cardH), Paint(Paint.FILTER_BITMAP_FLAG))
+        wr.y += cardH + 16
+        for (side in Side.entries) {
+            val real = PlayerStats.names(rec.setup, side)
+            var x = M
+            val color = if (side == Side.P1) yellow else red
+            for (n in names.players(side)) {
+                val photo = if (n in real) playerPhoto(n) else null
+                if (photo != null) {
+                    drawCircle(wr.canvas, photo, x, wr.y, 28f)
+                    x += 34f
+                }
+                wr.canvas.drawText(n, x, wr.y + 20, paint(12f, color, bold = side == state.winner))
+                x += paint(12f, bold = true).measureText(n) + 18
+            }
+            wr.y += 34
+        }
+        wr.y += 6
+        val body = paint(11f)
+        val info = listOf(
+            "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.scoreLine(state, state.winner ?: Side.P1)}",
+            "${s.duration}: ${Reports.duration(rec.clockMs)}",
+            "${Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }} · ${s.startTime} ${Reports.time(rec.startedAt, lang)} · ${s.endTime} ${Reports.time(rec.endedAt, lang)}",
+            listOfNotNull(rec.setup.club.ifBlank { null }, rec.setup.court.ifBlank { null }?.let { "${s.court} $it" }).joinToString(" · "),
+            "${s.place}: ${Reports.place(rec, s)}",
+            "${s.format}: ${Reports.formatLabel(rec, s)}",
+        ).filter { it.isNotBlank() }
+        info.forEach { wr.paragraph(it, body) }
+
+        // ---- Statistiche: partita intera e poi ogni set
+        val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1
+        val periods = listOf<Int?>(null) + if (sets > 1) (0 until sets).toList() else emptyList()
+        wr.newPage()
+        wr.title(s.tabStats)
+        for (period in periods) {
+            wr.ensure(60f)
+            wr.y += 14
+            wr.canvas.drawText(if (period == null) s.periodMatch else s.periodSet(period + 1), M, wr.y, paint(12f, grey, bold = true))
+            wr.y += 6
+            statsTable(wr, statRows(rec, pts, period, s), names)
+        }
+        if (sets > 0) {
+            val durations = MatchStats.setDurations(pts)
+            if (durations.any { it != null }) {
+                wr.paragraph("${s.statSetDurations}: " + durations.joinToString(" · ") { d -> d?.let { minutes(it) } ?: "–" }, body, 10f)
+            }
+            MatchStats.longestGame(pts)?.let { (ms, n) -> wr.paragraph("${s.statLongestGame}: ${s.longestGameValue(minutes(ms), n)}", body) }
+        }
+
+        // ---- Cronologia game per game
+        wr.newPage()
+        wr.title(s.tabChronology)
+        val small = paint(9.5f)
+        for (g in MatchStats.chronology(pts)) {
+            val head = buildString {
+                append("${s.periodSet(g.set + 1)} · ${g.games1}-${g.games2}")
+                if (g.tiebreak == TiebreakKind.SET && g.tb1 != null && g.tb2 != null) append(" (${g.tb1}-${g.tb2})")
+                append(" · ${s.serving}: ${names.short(g.server)}")
+                if (g.broken) append(" · ${s.serveLost}")
+            }
+            val steps = g.steps.joinToString(", ") { st ->
+                "${st.p1}:${st.p2}" + when (st.marker) {
+                    MatchStats.Marker.BREAK_POINT -> " [${s.markerBreak}]"
+                    MatchStats.Marker.SET_POINT -> " [${s.markerSet}]"
+                    MatchStats.Marker.MATCH_POINT -> " [${s.markerMatch}]"
+                    null -> ""
+                }
+            }
+            val end = when {
+                g.winner == null -> ""
+                g.closesMatch -> s.chronoMatch
+                g.closesSet -> s.chronoSet
+                g.broken -> s.chronoBreak
+                else -> s.chronoGame
+            }
+            wr.paragraph(head, paint(10f, bold = true), 8f)
+            if (steps.isNotEmpty() || end.isNotEmpty()) wr.paragraph(listOf(steps, end).filter { it.isNotEmpty() }.joinToString(", "), small, 3f)
+        }
+
+        // ---- Foto ricordo, due per pagina
+        val photos = matchPhotos.mapNotNull { f -> runCatching { BitmapFactory.decodeFile(f.absolutePath) }.getOrNull() }
+        photos.chunked(2).forEach { pair ->
+            wr.newPage()
+            wr.title(s.matchPhotosTitle)
+            val boxH = (H - M - 16 - wr.y - 20) / 2
+            pair.forEach { b ->
+                val scale = minOf(CONTENT_W / b.width, boxH / b.height)
+                val w = b.width * scale
+                val h = b.height * scale
+                wr.canvas.drawBitmap(fit(b, w, h), null, RectF((W - w) / 2, wr.y + 10, (W + w) / 2, wr.y + 10 + h), Paint(Paint.FILTER_BITMAP_FLAG))
+                wr.y += boxH + 10
+            }
+        }
+        wr.finish()
+        doc.writeTo(out)
+        doc.close()
+    }
+
+    /**
+     * PdfDocument mette le immagini nel file senza comprimerle in JPEG: una foto grande pesa megabyte. Si
+     * rimpicciolisce alla misura in cui la si disegna, con [PX_PER_PT] pixel per punto (circa 108 dpi, bastano
+     * per lo schermo e per una stampa).
+     */
+    private fun fit(b: Bitmap, wPt: Float, hPt: Float): Bitmap {
+        val tw = (wPt * PX_PER_PT).toInt().coerceAtLeast(1)
+        val th = (hPt * PX_PER_PT).toInt().coerceAtLeast(1)
+        return if (b.width <= tw && b.height <= th) b else Bitmap.createScaledBitmap(b, tw, th, true)
+    }
+
+    private fun drawCircle(c: Canvas, b: Bitmap, x: Float, y: Float, size: Float) {
+        c.save()
+        c.clipPath(Path().apply { addCircle(x + size / 2, y + size / 2, size / 2, Path.Direction.CW) })
+        c.drawBitmap(fit(b, size, size), null, RectF(x, y, x + size, y + size), Paint(Paint.FILTER_BITMAP_FLAG))
+        c.restore()
+    }
+
+    private fun statsTable(wr: Writer, rows: List<Triple<String, String, String>>, names: Names) {
+        val label = paint(10f)
+        val value = paint(10f, bold = true, align = Paint.Align.RIGHT)
+        val colA = M + CONTENT_W * 0.72f
+        val colB = W - M
+        wr.ensure(18f)
+        wr.y += 14
+        wr.canvas.drawText(names.short(Side.P1).take(22), colA, wr.y, paint(9f, yellow, bold = true, align = Paint.Align.RIGHT))
+        wr.canvas.drawText(names.short(Side.P2).take(22), colB, wr.y, paint(9f, red, bold = true, align = Paint.Align.RIGHT))
+        for ((l, a, b) in rows) {
+            wr.ensure(15f)
+            wr.y += 15
+            wr.canvas.drawText(l, M, wr.y, label)
+            wr.canvas.drawText(a, colA, wr.y, value)
+            wr.canvas.drawText(b, colB, wr.y, value)
+            wr.canvas.drawLine(M, wr.y + 4, W - M, wr.y + 4, Paint().apply { color = line; strokeWidth = 0.5f })
+        }
+        wr.y += 6
+    }
+
+    private fun pct(v: Int, of: Int) = if (of > 0) "${Math.round(v * 100.0 / of)}% ($v/$of)" else "–"
+
+    /** Righe della tabella: le stesse voci della scheda Statistiche. */
+    fun statRows(rec: MatchRecord, pts: List<MatchStats.PlayedPoint>, set: Int?, s: Strings): List<Triple<String, String, String>> {
+        val t = MatchStats.totals(pts, set)
+        val a = t.getValue(Side.P1)
+        val b = t.getValue(Side.P2)
+        fun row(l: String, f: (MatchStats.SideTotals) -> String) = Triple(l, f(a), f(b))
+        val rows = mutableListOf(
+            row(s.statTotalPoints) { pct(it.pointsWon, it.points) },
+            row(s.statServicePoints) { pct(it.servePointsWon, it.servePoints) },
+            row(s.statReturnPoints) { pct(it.returnPointsWon, it.returnPoints) },
+            row(s.statServiceGames) { pct(it.serviceGamesWon, it.serviceGames) },
+            row(s.statReturnGames) { pct(it.returnGamesWon, it.returnGames) },
+            row(s.statBreakWon) { "${it.breakPointsWon}/${it.breakPoints}" },
+            row(s.statBreakSaved) { "${it.breakPointsSaved}/${it.breakPointsFaced}" },
+            row(s.statGamePointsWon) { "${it.gamePointsWon}/${it.gamePoints}" },
+            row(s.statSetPointsWon) { "${it.setPointsWon}/${it.setPoints}" },
+            row(s.statMatchPointsWon) { "${it.matchPointsWon}/${it.matchPoints}" },
+            row(s.statTotalGames) { pct(it.gamesWon, it.games) },
+            row(s.statLoveGames) { "${it.loveGames}" },
+            row(s.statBestGameRun) { "${it.bestGameRun}" },
+            row(s.statStreak) { "${it.maxStreak}" },
+        )
+        if (set == null) rows += row(s.statSetsFromBreakDown) { "${it.setsFromBreakDown}" }
+        if (MatchStats.hasDetail(rec, pts)) {
+            rows += listOf(
+                row(s.statAces) { "${it.aces}" },
+                row(s.statDoubleFaults) { "${it.doubleFaults}" },
+                row(s.statFirstServeIn) { pct(it.firstServesIn, it.servePoints) },
+                row(s.statFirstServeWon) { pct(it.firstServePointsWon, it.firstServesIn) },
+                row(s.statSecondServeWon) { pct(it.secondServePointsWon, it.secondServes) },
+                row(s.statWinners) { "${it.winners}" },
+                row(s.statErrors) { "${it.errors}" },
+                row(s.statUnforcedErrors) { "${it.unforcedErrors}" },
+                row(s.statForcedErrors) { "${it.forcedErrors}" },
+            )
+        }
+        return rows
+    }
+
+    private fun minutes(ms: Long): String {
+        val m = Math.round(ms / 60_000.0).toInt()
+        return if (m >= 60) "${m / 60} h ${"%02d".format(m % 60)}'" else "$m'"
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/PlayerStats.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -5365,6 +6015,23 @@ object PlayerStats {
     }
 
     fun matchesOf(matches: List<Played>, key: String): List<Played> = matches.filter { sideOf(it.rec, key) != null }
+
+    /** Una partita di un giocatore per l'andamento: [detail] = statistiche della sua parte se la partita le ha. */
+    data class MatchLine(val rec: MatchRecord, val won: Boolean, val pointsWonPct: Int, val detail: MatchStats.SideTotals?)
+
+    /** Partite finite di [key], dalla più vecchia, con la percentuale di punti vinti e le statistiche dettagliate. */
+    fun lines(matches: List<Played>, key: String): List<MatchLine> =
+        matchesOf(matches, key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.map { m ->
+            val side = sideOf(m.rec, key)!!
+            val pts = MatchStats.points(m.rec)
+            val t = MatchStats.totals(pts).getValue(side)
+            MatchLine(
+                rec = m.rec,
+                won = m.winner == side,
+                pointsWonPct = if (t.points > 0) Math.round(t.pointsWon * 100.0 / t.points).toInt() else 0,
+                detail = t.takeIf { MatchStats.hasDetail(m.rec, pts) },
+            )
+        }
 
     /** Avversari di [key] con vittorie e sconfitte, da chi ci ha giocato di più. */
     fun rivals(matches: List<Played>, key: String): List<Rival> {
@@ -5689,6 +6356,11 @@ import java.io.File
 
 /** Preferenze e partite salvate in locale (memoria interna dell'app). */
 class Storage(context: Context) {
+    companion object {
+        /** Foto ricordo per partita: bastano per il PDF e lo tengono sui 3-4 MB. */
+        const val MAX_MATCH_PHOTOS = 10
+    }
+
 
     private val app = context.applicationContext
     private val prefs = app.getSharedPreferences("tsm", Context.MODE_PRIVATE)
@@ -5728,6 +6400,24 @@ class Storage(context: Context) {
         photoFile(key).delete()
     }
 
+    /** Foto ricordo di una partita: una cartella per partita, JPEG rimpiccioliti, al massimo [MAX_MATCH_PHOTOS]. */
+    private fun matchPhotoDir(id: String): File = File(File(app.filesDir, "matchphotos"), id)
+
+    fun matchPhotos(id: String): List<File> =
+        matchPhotoDir(id).listFiles { f -> f.extension == "jpg" }.orEmpty().sortedBy { it.name }
+
+    @Synchronized
+    fun addMatchPhoto(id: String, jpeg: ByteArray): Boolean {
+        val dir = matchPhotoDir(id).apply { mkdirs() }
+        if (matchPhotos(id).size >= MAX_MATCH_PHOTOS) return false
+        return runCatching { File(dir, "${System.currentTimeMillis()}.jpg").writeBytes(jpeg) }.isSuccess
+    }
+
+    @Synchronized
+    fun deleteMatchPhotos(id: String) {
+        matchPhotoDir(id).deleteRecursively()
+    }
+
     /** Tornei Americano e Mexicano, uno per file. */
     private val tournamentsDir: File get() = File(app.filesDir, "tournaments").apply { mkdirs() }
 
@@ -5753,6 +6443,33 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteTournament(id: String) {
         File(tournamentsDir, "$id.json").delete()
+    }
+
+    /** Allenamenti con la fascia: a parte dalle partite, uno per file. */
+    private val workoutsDir: File get() = File(app.filesDir, "workouts").apply { mkdirs() }
+
+    @Synchronized
+    fun saveWorkout(w: WorkoutRecord) {
+        runCatching {
+            val f = File(workoutsDir, "${w.id}.json")
+            val tmp = File(workoutsDir, "${w.id}.tmp")
+            tmp.writeText(json.encodeToString(WorkoutRecord.serializer(), w))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
+    }
+
+    /** Allenamenti, dal più recente. */
+    fun loadWorkouts(): List<WorkoutRecord> =
+        workoutsDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(WorkoutRecord.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.startedAt }
+
+    @Synchronized
+    fun deleteWorkout(id: String) {
+        File(workoutsDir, "$id.json").delete()
     }
 
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
@@ -6089,6 +6806,258 @@ object Tournaments {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Workout.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Workout.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlin.math.abs
+import kotlin.math.sqrt
+
+/**
+ * Un allenamento con la fascia cardio, senza partita. [heart]: un valore al secondo, [HeartTrack.t] in secondi di
+ * allenamento (le pause non contano e restano buchi). [laps]: secondo di fine di ciascun giro tranne l'ultimo,
+ * che finisce con l'allenamento. [cooldown]: battito nei secondi dopo "Fine", per il recupero. [rr]: intervalli
+ * tra i battiti (ms) mandati dalla fascia, per l'HRV.
+ */
+@Serializable
+data class WorkoutRecord(
+    val id: String,
+    val startedAt: Long,
+    val endedAt: Long = 0L,
+    val durationS: Int = 0,
+    val heart: HeartTrack = HeartTrack(),
+    val laps: List<Int> = emptyList(),
+    val cooldown: List<Int> = emptyList(),
+    val rr: List<Int> = emptyList(),
+    val strapName: String? = null,
+)
+
+/** Calcoli sugli allenamenti: giri, HRV e recupero. */
+object WorkoutStats {
+    /** Il recupero si misura dopo un minuto. */
+    const val RECOVERY_S = 60
+
+    data class Lap(val number: Int, val startS: Int, val endS: Int, val avg: Int?, val max: Int?, val recovery: Int?) {
+        val durationS: Int get() = endS - startS
+    }
+
+    /** Battito al secondo [sec] (il valore più vicino entro 3 secondi), null se lì la fascia non mandava. */
+    fun bpmAt(track: HeartTrack, sec: Int): Int? {
+        var best: Int? = null
+        var bestD = Int.MAX_VALUE
+        for (i in 0 until track.size) {
+            val d = abs(track.t[i] - sec)
+            if (d < bestD) {
+                bestD = d
+                best = track.bpm[i]
+            }
+        }
+        return best.takeIf { bestD <= 3 }
+    }
+
+    /**
+     * Giri con durata, battito medio e massimo e recupero: quanto scende il battito nel minuto dopo la fine del
+     * giro. Per l'ultimo giro il minuto dopo è quello dopo "Fine" ([WorkoutRecord.cooldown]).
+     */
+    fun laps(w: WorkoutRecord): List<Lap> {
+        val ends = (w.laps.filter { it in 1 until w.durationS } + w.durationS).distinct().sorted()
+        var start = 0
+        return ends.mapIndexed { i, end ->
+            val values = (0 until w.heart.size).filter { w.heart.t[it] in start until end.coerceAtLeast(start + 1) }.map { w.heart.bpm[it] }
+            val last = i == ends.lastIndex
+            val atEnd = bpmAt(w.heart, end)
+            val after = if (last) w.cooldown.getOrNull(RECOVERY_S - 1) else bpmAt(w.heart, end + RECOVERY_S)
+            val lap = Lap(
+                number = i + 1, startS = start, endS = end,
+                avg = values.takeIf { it.isNotEmpty() }?.let { Math.round(it.average()).toInt() },
+                max = values.maxOrNull(),
+                recovery = if (atEnd != null && after != null) atEnd - after else null,
+            )
+            start = end
+            lap
+        }
+    }
+
+    /** Recupero dopo "Fine": battito all'ultimo secondo meno quello un minuto dopo. */
+    fun finalRecovery(w: WorkoutRecord): Int? {
+        val atEnd = bpmAt(w.heart, w.durationS) ?: return null
+        val after = w.cooldown.getOrNull(RECOVERY_S - 1) ?: return null
+        return atEnd - after
+    }
+
+    /**
+     * HRV come RMSSD (ms): radice della media dei quadrati delle differenze tra intervalli consecutivi. Si scartano
+     * gli intervalli impossibili e i salti di oltre il 20% (battiti persi o doppi della fascia). null con meno di
+     * 30 differenze buone.
+     */
+    fun rmssd(rr: List<Int>): Double? {
+        var sum = 0.0
+        var n = 0
+        for (i in 1 until rr.size) {
+            val a = rr[i - 1]
+            val b = rr[i]
+            if (a !in 300..2000 || b !in 300..2000) continue
+            if (abs(b - a) > a * 0.2) continue
+            val d = (b - a).toDouble()
+            sum += d * d
+            n++
+        }
+        return if (n >= 30) sqrt(sum / n) else null
+    }
+
+    /** CSV secondo per secondo: secondo, battito, giro (con il recupero dopo "Fine" in fondo). */
+    fun csv(w: WorkoutRecord): String = buildString {
+        append("second,bpm,lap\n")
+        val ends = (w.laps.filter { it in 1 until w.durationS } + w.durationS).distinct().sorted()
+        for (i in 0 until w.heart.size) {
+            val t = w.heart.t[i]
+            val lap = ends.indexOfFirst { t < it }.let { if (it < 0) ends.size else it + 1 }
+            append("$t,${w.heart.bpm[i]},$lap\n")
+        }
+        w.cooldown.forEachIndexed { i, bpm -> append("${w.durationS + i + 1},$bpm,recovery\n") }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/WorkoutReport.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/WorkoutReport.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import java.io.OutputStream
+
+/** Righe di riepilogo di un allenamento, uguali a schermo e nel PDF. */
+object WorkoutReport {
+
+    fun summaryLines(w: WorkoutRecord, s: Strings): List<Pair<String, String>> {
+        val sum = HeartStats.summary(w.heart)
+        return listOfNotNull(
+            s.workoutDuration to Reports.duration(w.durationS * 1000L),
+            sum?.let { "${s.heartAvg}" to "${it.avg} bpm" },
+            sum?.let { "${s.heartMax}" to "${it.max} bpm" },
+            sum?.kcal?.let { s.heartCalories to "$it kcal" },
+            WorkoutStats.rmssd(w.rr)?.let { s.workoutHrv to "${Math.round(it)} ms" },
+            WorkoutStats.finalRecovery(w)?.let { s.workoutRecovery to "−$it bpm" },
+        )
+    }
+
+    fun lapLine(l: WorkoutStats.Lap, s: Strings): String = listOfNotNull(
+        "${s.workoutLap} ${l.number}",
+        Reports.duration(l.durationS * 1000L),
+        l.avg?.let { "${s.workoutAvgShort} $it" },
+        l.max?.let { "${s.workoutMaxShort} $it" },
+        l.recovery?.let { "${s.workoutRecShort} −$it" },
+    ).joinToString(" · ")
+
+    /** PDF di una pagina A4: riepilogo, grafico del battito, zone e giri. */
+    fun pdf(w: WorkoutRecord, s: Strings, lang: Lang, out: OutputStream) {
+        val doc = PdfDocument()
+        val page = doc.startPage(PdfDocument.PageInfo.Builder(595, 842, 1).create())
+        val c = page.canvas
+        val title = Paint().apply { textSize = 22f; typeface = Typeface.DEFAULT_BOLD; isAntiAlias = true }
+        val head = Paint().apply { textSize = 14f; typeface = Typeface.DEFAULT_BOLD; isAntiAlias = true }
+        val text = Paint().apply { textSize = 11f; isAntiAlias = true }
+        val dim = Paint(text).apply { color = Color.DKGRAY }
+        var y = 50f
+        c.drawText(s.workoutTitle, 40f, y, title)
+        y += 20f
+        c.drawText("${Reports.date(w.startedAt, lang)} ${Reports.time(w.startedAt, lang)}" + (w.strapName?.let { " · $it" } ?: ""), 40f, y, dim)
+        y += 28f
+        for ((k, v) in summaryLines(w, s)) {
+            c.drawText(k, 40f, y, text)
+            c.drawText(v, 300f, y, text)
+            y += 16f
+        }
+        y += 14f
+        if (w.heart.size > 1) {
+            c.drawText(s.heartChart, 40f, y, head)
+            y += 10f
+            chart(c, w.heart, 40f, y, 515f, 160f)
+            y += 180f
+        }
+        val age = w.heart.profile?.age
+        if (age != null) {
+            val z = HeartStats.zoneSeconds(w.heart, age)
+            if (z.sum() > 0) {
+                c.drawText(s.heartZones, 40f, y, head)
+                y += 12f
+                // La stessa torta del riepilogo della partita: a sinistra, con la legenda a destra.
+                val ring = 18f
+                val box = RectF(40f + ring / 2, y + ring / 2, 160f - ring / 2, y + 120f - ring / 2)
+                val arc = Paint().apply { style = Paint.Style.STROKE; strokeWidth = ring; isAntiAlias = true }
+                var start = -90f
+                for (i in z.indices) {
+                    val sweep = z[i] * 360f / z.sum()
+                    if (sweep > 0f) c.drawArc(box, start, sweep, false, arc.apply { color = ZONE_COLORS[i] })
+                    start += sweep
+                }
+                var ly = y + 22f
+                val swatch = Paint()
+                for (i in z.indices) {
+                    c.drawRect(190f, ly - 9f, 200f, ly + 1f, swatch.apply { color = ZONE_COLORS[i] })
+                    c.drawText(s.zoneName(i), 210f, ly, text)
+                    c.drawText("${Math.round(z[i] * 100.0 / z.sum())}% · ${Reports.duration(z[i] * 1000L)}", 420f, ly, text)
+                    ly += 20f
+                }
+                y += 135f
+            }
+        }
+        val laps = WorkoutStats.laps(w)
+        if (laps.size > 1) {
+            c.drawText(s.workoutLaps, 40f, y, head)
+            y += 18f
+            for (l in laps) {
+                if (y > 810f) break
+                c.drawText(lapLine(l, s), 40f, y, text)
+                y += 15f
+            }
+        }
+        doc.finishPage(page)
+        doc.writeTo(out)
+        doc.close()
+    }
+
+    /** Dalla zona 1 alla 5, come nel riepilogo della partita (MatchStatsPanels). */
+    private val ZONE_COLORS = intArrayOf(0xFF9AA8BD.toInt(), 0xFF4CAF50.toInt(), 0xFFC6F432.toInt(), 0xFFFF9800.toInt(), 0xFFFF3B30.toInt())
+
+    private fun chart(c: Canvas, t: HeartTrack, x0: Float, y0: Float, w: Float, h: Float) {
+        val values = t.bpm.take(t.size)
+        val lo = (values.min() - 5).coerceAtLeast(30)
+        val hi = values.max() + 5
+        val end = t.t[t.size - 1].coerceAtLeast(1)
+        val axis = Paint().apply { color = Color.LTGRAY; strokeWidth = 1f }
+        val label = Paint().apply { textSize = 9f; color = Color.DKGRAY; isAntiAlias = true }
+        val line = Paint().apply { color = Color.rgb(0xE5, 0x39, 0x35); strokeWidth = 1.6f; style = Paint.Style.STROKE; isAntiAlias = true }
+        c.drawLine(x0, y0 + h, x0 + w, y0 + h, axis)
+        c.drawText("$hi", x0 - 2f, y0 + 8f, label.apply { textAlign = Paint.Align.RIGHT })
+        c.drawText("$lo", x0 - 2f, y0 + h, label)
+        val path = Path()
+        for (i in 0 until t.size) {
+            val x = x0 + t.t[i].toFloat() / end * w
+            val y = y0 + h - (t.bpm[i] - lo).toFloat() / (hi - lo) * h
+            // Una pausa o una fascia staccata interrompono la linea.
+            if (i == 0 || t.t[i] - t.t[i - 1] > 5) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+        c.drawPath(path, line)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/model/Rules.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/model/Rules.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -6182,7 +7151,16 @@ data class RulesConfig(
  * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
  */
 @Serializable
-enum class PointKind { ACE, DOUBLE_FAULT, WINNER, ERROR }
+enum class PointKind {
+    ACE, DOUBLE_FAULT, WINNER,
+
+    /** Errore senza dire se gratuito o forzato (anche le partite salvate prima della distinzione). */
+    ERROR,
+    UNFORCED_ERROR,
+    FORCED_ERROR;
+
+    val isError: Boolean get() = this == ERROR || this == UNFORCED_ERROR || this == FORCED_ERROR
+}
 
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable
@@ -7978,6 +8956,8 @@ data class TransferBundle(
     val version: Int = 1,
     val matches: List<MatchRecord> = emptyList(),
     val photos: Map<String, String> = emptyMap(),
+    /** Foto ricordo per id della partita (JPEG in base64). */
+    val matchPhotos: Map<String, List<String>> = emptyMap(),
 )
 
 /**
@@ -9872,6 +10852,7 @@ import com.tennis.scoremanager.ui.screens.SetupScreen
 import com.tennis.scoremanager.ui.screens.StartScreen
 import com.tennis.scoremanager.ui.screens.SummaryScreen
 import com.tennis.scoremanager.ui.screens.TournamentScreen
+import com.tennis.scoremanager.ui.screens.WorkoutScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -9913,6 +10894,7 @@ fun AppRoot(c: MatchController) {
                 Screen.SUMMARY -> SummaryScreen(c)
                 Screen.HISTORY -> HistoryScreen(c)
                 Screen.TOURNAMENT -> TournamentScreen(c)
+                Screen.WORKOUT -> WorkoutScreen(c)
             }
         }
     }
@@ -10455,6 +11437,49 @@ private fun NumberField(value: String, label: String, modifier: Modifier, onChan
         modifier = modifier,
     )
 }
+
+/**
+ * Schermata Allenamento: la fascia (una sola, quella del Giocatore 1) si sceglie lì, senza passare dalla pagina 2.
+ * Accende le fasce cardio se erano spente, chiede Bluetooth e permessi, cerca le fasce mentre è aperta.
+ */
+@Composable
+fun WorkoutStrapCard(c: MatchController) {
+    val s = LocalStrings.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val o by c.options.collectAsState()
+    val btOn by c.ble.adapterOn.collectAsState()
+    var permTick by remember { mutableStateOf(0) }
+    val permsOk = remember(permTick) {
+        c.ble.hasPermissions() && (android.os.Build.VERSION.SDK_INT >= 31 || com.tennis.scoremanager.data.LocationHelper.hasPermission(context))
+    }
+    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        permTick++
+        c.heart.reconnectAll()
+    }
+    val btLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { permTick++ }
+    val found by c.heart.found.collectAsState()
+    val straps by c.straps.collectAsState()
+    val profiles by c.heartProfiles.collectAsState()
+    val ready = btOn && permsOk && o.heartRate
+    LifecycleResumeEffect(ready) {
+        c.setStrapScan(ready)
+        onPauseOrDispose { c.setStrapScan(false) }
+    }
+    SectionCard(s.heartSection, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
+        if (!o.heartRate) {
+            SwitchRow(Icons.Filled.Favorite, s.heartRate, s.heartRateHint, false) { v -> c.updateOptions { it.copy(heartRate = v) } }
+            return@SectionCard
+        }
+        if (!permsOk) RequirementRow(Icons.Filled.LocationOn, s.location, false, s.allow) { permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions()) }
+        if (!btOn) RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, false, s.enable) {
+            if (!permsOk) permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions())
+            else runCatching { btLauncher.launch(android.content.Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
+        }
+        StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
+        straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
+        Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PlayerPhoto.kt
@@ -10906,6 +11931,32 @@ interface Strings {
     val relayPending: (Int) -> String
     val relayPreparing: String
     val relayShowBoard: String
+    val workoutTitle: String
+    val workoutHint: String
+    val workoutPickStrap: String
+    val workoutStart: String
+    val workoutPause: String
+    val workoutResume: String
+    val workoutLap: String
+    val workoutEnd: String
+    val workoutRecovering: (Int) -> String
+    val workoutRecoveringHint: String
+    val workoutSaveNow: String
+    val workoutHistory: String
+    val workoutNone: String
+    val workoutDuration: String
+    val workoutHrv: String
+    val workoutHrvHint: String
+    val workoutRecovery: String
+    val workoutRecoveryHint: String
+    val workoutLaps: String
+    val workoutAvgShort: String
+    val workoutMaxShort: String
+    val workoutRecShort: String
+    val workoutShareCsv: String
+    val workoutSharePdf: String
+    val workoutDeleteTitle: String
+    val workoutDeleteText: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -11027,6 +12078,17 @@ interface Strings {
     val statLast10: String
     val statMatchPointsSaved: String
     val statTotalGames: String
+    val statGamePointsWon: String
+    val statSetPointsWon: String
+    val statMatchPointsWon: String
+    val statLoveGames: String
+    val statBestGameRun: String
+    val statSetsFromBreakDown: String
+    val statTimes: String
+    val statSetDurations: String
+    val statLongestGame: String
+    /** "12' (14 punti)" */
+    val longestGameValue: (String, Int) -> String
     val statAces: String
     val statDoubleFaults: String
     val statFirstServeIn: String
@@ -11034,6 +12096,18 @@ interface Strings {
     val statSecondServeWon: String
     val statWinners: String
     val statErrors: String
+    val statUnforcedErrors: String
+    val statForcedErrors: String
+    val detailAskOutcome: String
+    val detailAskErrorType: String
+    val detailUnforced: String
+    val detailForced: String
+    val detailWinnerOf: (String) -> String
+    val detailErrorOf: (String) -> String
+    val trendTitle: String
+    val trendHint: String
+    val trendPointsAvg: (Int) -> String
+    val trendDetailTitle: (Int) -> String
     val detailedStats: String
     val detailedStatsHint: String
     val btnAce: String
@@ -11180,6 +12254,9 @@ interface Strings {
     val gamesHeader: String
     val onServe: String get() = "On Serve"
     val undoPoint: String
+    val lockScreen: String
+    val lockedTitle: String
+    val unlockHint: String
     val suspend: String
     val resume: String
     val audioOn: String
@@ -11294,6 +12371,16 @@ interface Strings {
     val photoRemove: String
     val photoNeedsName: String
     val photoError: String
+    val matchPhotosTitle: String
+    val matchPhotosHint: String
+    val addPhotos: String
+    val takePhoto: String
+    val matchPhotosFull: String
+    val formatPdf: String
+    val shareChoose: String
+    val shareChooseHint: String
+    val shareImage: String
+    val sharePdf: String
     // Tornei Americano e Mexicano
     val tournamentButton: String
     val tournamentTitle: String
@@ -11503,6 +12590,32 @@ object ItStrings : Strings {
     override val relayPending: (Int) -> String = { "$it misure da inviare" }
     override val relayPreparing = "Preparazione della rete…"
     override val relayShowBoard = "Mostra il tabellone"
+    override val workoutTitle = "Allenamento"
+    override val workoutHint = "Battito con la fascia cardio, senza partita: giri, HRV e recupero."
+    override val workoutPickStrap = "Scegli la fascia qui sotto: bagna gli elettrodi e indossala."
+    override val workoutStart = "Avvia"
+    override val workoutPause = "Pausa"
+    override val workoutResume = "Riprendi"
+    override val workoutLap = "Giro"
+    override val workoutEnd = "Fine"
+    override val workoutRecovering: (Int) -> String = { "Recupero: ancora $it s" }
+    override val workoutRecoveringHint = "Resta fermo: si misura quanto scende il battito nel primo minuto."
+    override val workoutSaveNow = "Salva subito"
+    override val workoutHistory = "Allenamenti salvati"
+    override val workoutNone = "Nessun allenamento salvato."
+    override val workoutDuration = "Durata"
+    override val workoutHrv = "HRV (RMSSD)"
+    override val workoutHrvHint = "Variabilità tra un battito e l'altro, misurata durante l'allenamento: confrontala con i tuoi allenamenti simili, non con quelli degli altri."
+    override val workoutRecovery = "Recupero in 1 minuto"
+    override val workoutRecoveryHint = "Recupero: quanto scende il battito nel minuto dopo la fine (più scende, meglio è)."
+    override val workoutLaps = "Giri"
+    override val workoutAvgShort = "media"
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "recupero"
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Eliminare l'allenamento?"
+    override val workoutDeleteText = "Verrà tolto da questo telefono."
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -11614,6 +12727,16 @@ object ItStrings : Strings {
     override val statLast10 = "Ultimi 10 punti"
     override val statMatchPointsSaved = "Match point annullati"
     override val statTotalGames = "Totale game vinti"
+    override val statGamePointsWon = "Palle game trasformate"
+    override val statSetPointsWon = "Set point trasformati"
+    override val statMatchPointsWon = "Match point trasformati"
+    override val statLoveGames = "Game vinti a zero"
+    override val statBestGameRun = "Game di fila (max)"
+    override val statSetsFromBreakDown = "Set vinti da sotto di un break"
+    override val statTimes = "Tempi"
+    override val statSetDurations = "Durata dei set"
+    override val statLongestGame = "Game più lungo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n punti)" }
     override val statAces = "Ace"
     override val statDoubleFaults = "Doppi falli"
     override val statFirstServeIn = "Prime di servizio in campo"
@@ -11621,6 +12744,18 @@ object ItStrings : Strings {
     override val statSecondServeWon = "Punti vinti con la seconda"
     override val statWinners = "Vincenti"
     override val statErrors = "Errori"
+    override val statUnforcedErrors = "Errori gratuiti"
+    override val statForcedErrors = "Errori forzati"
+    override val detailAskOutcome = "Com'è finito il punto?"
+    override val detailAskErrorType = "Errore gratuito o forzato?"
+    override val detailUnforced = "Gratuito"
+    override val detailForced = "Forzato"
+    override val detailWinnerOf: (String) -> String = { x -> "Vincente $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Errore $x" }
+    override val trendTitle = "Andamento"
+    override val trendHint = "Punti vinti partita per partita (ultime 12; piena = partita vinta, linea = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Punti vinti in media: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medie per partita ($n con statistiche dettagliate)" }
     override val detailedStats = "Statistiche dettagliate"
     override val detailedStatsHint = "Per chi segna da bordo campo: al posto dei due tasti grandi ci sono ace, fallo e, per ciascun giocatore, vincente, errore e punto. Servono per ace, doppi falli, prime di servizio, vincenti ed errori."
     override val btnAce = "Ace"
@@ -11760,6 +12895,9 @@ object ItStrings : Strings {
     override val setsHeader = "SET"
     override val gamesHeader = "GAME"
     override val undoPoint = "Annulla punto"
+    override val lockScreen = "Blocca schermo"
+    override val lockedTitle = "Schermo bloccato"
+    override val unlockHint = "Tieni premuto il lucchetto per sbloccare. Braccialetti e telecomandi continuano a funzionare."
     override val suspend = "Sospendi"
     override val resume = "Riprendi"
     override val audioOn = "Audio On"
@@ -11877,6 +13015,16 @@ object ItStrings : Strings {
     override val photoRemove = "Togli foto"
     override val photoNeedsName = "Scrivi prima il nome del giocatore: la foto si ritrova dal nome."
     override val photoError = "Non riesco a leggere questa foto."
+    override val matchPhotosTitle = "Foto della partita"
+    override val matchPhotosHint = "Fino a 10 foto ricordo: restano su questo telefono, finiscono nel PDF e passano all'altro telefono col trasferimento."
+    override val addPhotos = "Aggiungi foto"
+    override val takePhoto = "Scatta"
+    override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
+    override val shareChoose = "Cosa condividi?"
+    override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
+    override val shareImage = "Immagine"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano e Mexicano: coppie che cambiano a ogni turno"
@@ -12073,6 +13221,32 @@ object EnStrings : Strings {
     override val relayPending: (Int) -> String = { "$it readings to send" }
     override val relayPreparing = "Setting up the network…"
     override val relayShowBoard = "Show the scoreboard"
+    override val workoutTitle = "Workout"
+    override val workoutHint = "Heart rate with the chest strap, no match: laps, HRV and recovery."
+    override val workoutPickStrap = "Pick the strap below: wet the electrodes and put it on."
+    override val workoutStart = "Start"
+    override val workoutPause = "Pause"
+    override val workoutResume = "Resume"
+    override val workoutLap = "Lap"
+    override val workoutEnd = "Finish"
+    override val workoutRecovering: (Int) -> String = { "Recovery: $it s left" }
+    override val workoutRecoveringHint = "Stay still: it measures how much your heart rate drops in the first minute."
+    override val workoutSaveNow = "Save now"
+    override val workoutHistory = "Saved workouts"
+    override val workoutNone = "No saved workouts."
+    override val workoutDuration = "Duration"
+    override val workoutHrv = "HRV (RMSSD)"
+    override val workoutHrvHint = "Variability between one beat and the next, measured during the workout: compare it with your own similar workouts, not with other people's."
+    override val workoutRecovery = "Recovery in 1 minute"
+    override val workoutRecoveryHint = "Recovery: how much the heart rate drops in the minute after the end (the more, the better)."
+    override val workoutLaps = "Laps"
+    override val workoutAvgShort = "avg"
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "recovery"
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Delete the workout?"
+    override val workoutDeleteText = "It will be removed from this phone."
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -12184,6 +13358,16 @@ object EnStrings : Strings {
     override val statLast10 = "Last 10 points"
     override val statMatchPointsSaved = "Match points saved"
     override val statTotalGames = "Total games won"
+    override val statGamePointsWon = "Game points converted"
+    override val statSetPointsWon = "Set points converted"
+    override val statMatchPointsWon = "Match points converted"
+    override val statLoveGames = "Love games won"
+    override val statBestGameRun = "Games in a row (max)"
+    override val statSetsFromBreakDown = "Sets won from a break down"
+    override val statTimes = "Times"
+    override val statSetDurations = "Set durations"
+    override val statLongestGame = "Longest game"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Double faults"
     override val statFirstServeIn = "First serves in"
@@ -12191,6 +13375,18 @@ object EnStrings : Strings {
     override val statSecondServeWon = "Points won on 2nd serve"
     override val statWinners = "Winners"
     override val statErrors = "Errors"
+    override val statUnforcedErrors = "Unforced errors"
+    override val statForcedErrors = "Forced errors"
+    override val detailAskOutcome = "How did the point end?"
+    override val detailAskErrorType = "Unforced or forced error?"
+    override val detailUnforced = "Unforced"
+    override val detailForced = "Forced"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Trend"
+    override val trendHint = "Points won match by match (last 12; filled = match won, line = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Average points won: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Averages per match ($n with detailed stats)" }
     override val detailedStats = "Detailed stats"
     override val detailedStatsHint = "For someone scoring from the side of the court: instead of the two big buttons there are ace, fault and, for each player, winner, error and point. Needed for aces, double faults, first serves, winners and errors."
     override val btnAce = "Ace"
@@ -12330,6 +13526,9 @@ object EnStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "GAMES"
     override val undoPoint = "Undo point"
+    override val lockScreen = "Lock screen"
+    override val lockedTitle = "Screen locked"
+    override val unlockHint = "Press and hold the lock to unlock. Wristbands and remotes keep working."
     override val suspend = "Suspend"
     override val resume = "Resume"
     override val audioOn = "Audio On"
@@ -12447,6 +13646,16 @@ object EnStrings : Strings {
     override val photoRemove = "Remove photo"
     override val photoNeedsName = "Write the player's name first: the photo is found again from the name."
     override val photoError = "This photo can't be read."
+    override val matchPhotosTitle = "Match photos"
+    override val matchPhotosHint = "Up to 10 souvenir photos: they stay on this phone, go into the PDF and move to the other phone with the transfer."
+    override val addPhotos = "Add photos"
+    override val takePhoto = "Take photo"
+    override val matchPhotosFull = "This match already has 10 photos."
+    override val formatPdf = "Full PDF (result, statistics, log, photos)"
+    override val shareChoose = "What do you share?"
+    override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
+    override val shareImage = "Image"
+    override val sharePdf = "Full PDF"
     override val tournamentButton = "Americano or Mexicano tournament"
     override val tournamentTitle = "Tournament"
     override val tournamentSubtitle = "Americano and Mexicano: partners change every round"
@@ -12666,6 +13875,32 @@ object DeStrings : Strings {
     override val relayPending: (Int) -> String = { "$it Messwerte zu senden" }
     override val relayPreparing = "Netz wird eingerichtet…"
     override val relayShowBoard = "Anzeigetafel zeigen"
+    override val workoutTitle = "Training"
+    override val workoutHint = "Herzfrequenz mit dem Brustgurt, ohne Match: Runden, HRV und Erholung."
+    override val workoutPickStrap = "Wähle unten den Gurt: Elektroden befeuchten und anlegen."
+    override val workoutStart = "Starten"
+    override val workoutPause = "Pause"
+    override val workoutResume = "Weiter"
+    override val workoutLap = "Runde"
+    override val workoutEnd = "Beenden"
+    override val workoutRecovering: (Int) -> String = { "Erholung: noch $it s" }
+    override val workoutRecoveringHint = "Bleib ruhig: Gemessen wird, wie stark die Herzfrequenz in der ersten Minute sinkt."
+    override val workoutSaveNow = "Jetzt speichern"
+    override val workoutHistory = "Gespeicherte Trainings"
+    override val workoutNone = "Keine gespeicherten Trainings."
+    override val workoutDuration = "Dauer"
+    override val workoutHrv = "HRV (RMSSD)"
+    override val workoutHrvHint = "Schwankung von Schlag zu Schlag, während des Trainings gemessen: vergleiche sie mit deinen ähnlichen Trainings, nicht mit denen anderer."
+    override val workoutRecovery = "Erholung in 1 Minute"
+    override val workoutRecoveryHint = "Erholung: wie stark die Herzfrequenz in der Minute nach dem Ende sinkt (je mehr, desto besser)."
+    override val workoutLaps = "Runden"
+    override val workoutAvgShort = "Ø"
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "Erholung"
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Training löschen?"
+    override val workoutDeleteText = "Es wird von diesem Telefon entfernt."
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -12777,6 +14012,16 @@ object DeStrings : Strings {
     override val statLast10 = "Letzte 10 Punkte"
     override val statMatchPointsSaved = "Abgewehrte Matchbälle"
     override val statTotalGames = "Gewonnene Spiele gesamt"
+    override val statGamePointsWon = "Verwandelte Spielbälle"
+    override val statSetPointsWon = "Verwandelte Satzbälle"
+    override val statMatchPointsWon = "Verwandelte Matchbälle"
+    override val statLoveGames = "Zu-null-Spiele"
+    override val statBestGameRun = "Spiele in Folge (max)"
+    override val statSetsFromBreakDown = "Sätze nach Break-Rückstand gewonnen"
+    override val statTimes = "Zeiten"
+    override val statSetDurations = "Satzdauer"
+    override val statLongestGame = "Längstes Spiel"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n Punkte)" }
     override val statAces = "Asse"
     override val statDoubleFaults = "Doppelfehler"
     override val statFirstServeIn = "Erste Aufschläge im Feld"
@@ -12784,6 +14029,18 @@ object DeStrings : Strings {
     override val statSecondServeWon = "Punkte mit 2. Aufschlag"
     override val statWinners = "Winner"
     override val statErrors = "Fehler"
+    override val statUnforcedErrors = "Unerzwungene Fehler"
+    override val statForcedErrors = "Erzwungene Fehler"
+    override val detailAskOutcome = "Wie endete der Punkt?"
+    override val detailAskErrorType = "Unerzwungener oder erzwungener Fehler?"
+    override val detailUnforced = "Unerzwungen"
+    override val detailForced = "Erzwungen"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Fehler $x" }
+    override val trendTitle = "Verlauf"
+    override val trendHint = "Gewonnene Punkte Match für Match (letzte 12; gefüllt = gewonnen, Linie = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Gewonnene Punkte im Schnitt: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Schnitt pro Match ($n mit detaillierter Statistik)" }
     override val detailedStats = "Detaillierte Statistik"
     override val detailedStatsHint = "Für jemanden, der vom Spielfeldrand zählt: statt der zwei großen Tasten gibt es Ass, Aufschlagfehler und für jeden Spieler Winner, Fehler und Punkt. Nötig für Asse, Doppelfehler, erste Aufschläge, Winner und Fehler."
     override val btnAce = "Ass"
@@ -12923,6 +14180,9 @@ object DeStrings : Strings {
     override val setsHeader = "SÄTZE"
     override val gamesHeader = "SPIELE"
     override val undoPoint = "Punkt zurück"
+    override val lockScreen = "Bildschirm sperren"
+    override val lockedTitle = "Bildschirm gesperrt"
+    override val unlockHint = "Schloss gedrückt halten zum Entsperren. Armbänder und Fernbedienungen funktionieren weiter."
     override val suspend = "Unterbrechen"
     override val resume = "Fortsetzen"
     override val audioOn = "Audio On"
@@ -13040,6 +14300,16 @@ object DeStrings : Strings {
     override val photoRemove = "Foto entfernen"
     override val photoNeedsName = "Schreibe zuerst den Namen des Spielers: Das Foto wird über den Namen wiedergefunden."
     override val photoError = "Dieses Foto lässt sich nicht lesen."
+    override val matchPhotosTitle = "Fotos vom Match"
+    override val matchPhotosHint = "Bis zu 10 Erinnerungsfotos: Sie bleiben auf diesem Telefon, kommen ins PDF und mit der Übertragung auf das andere Telefon."
+    override val addPhotos = "Fotos hinzufügen"
+    override val takePhoto = "Foto aufnehmen"
+    override val matchPhotosFull = "Dieses Match hat schon 10 Fotos."
+    override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
+    override val shareChoose = "Was teilst du?"
+    override val shareChooseHint = "Das Bild mit Text passt für WhatsApp und soziale Netze; das PDF enthält auch Statistik, Verlauf und Fotos vom Match."
+    override val shareImage = "Bild"
+    override val sharePdf = "Vollständiges PDF"
     override val tournamentButton = "Americano- oder Mexicano-Turnier"
     override val tournamentTitle = "Turnier"
     override val tournamentSubtitle = "Americano und Mexicano: wechselnde Paare in jeder Runde"
@@ -13251,6 +14521,32 @@ object EsStrings : Strings {
     override val relayPending: (Int) -> String = { "$it medidas por enviar" }
     override val relayPreparing = "Preparando la red…"
     override val relayShowBoard = "Mostrar el marcador"
+    override val workoutTitle = "Entrenamiento"
+    override val workoutHint = "Pulso con la banda de pecho, sin partido: vueltas, VFC y recuperación."
+    override val workoutPickStrap = "Elige la banda aquí abajo: moja los electrodos y póntela."
+    override val workoutStart = "Iniciar"
+    override val workoutPause = "Pausa"
+    override val workoutResume = "Reanudar"
+    override val workoutLap = "Vuelta"
+    override val workoutEnd = "Terminar"
+    override val workoutRecovering: (Int) -> String = { "Recuperación: faltan $it s" }
+    override val workoutRecoveringHint = "Quédate quieto: se mide cuánto baja el pulso en el primer minuto."
+    override val workoutSaveNow = "Guardar ya"
+    override val workoutHistory = "Entrenamientos guardados"
+    override val workoutNone = "Ningún entrenamiento guardado."
+    override val workoutDuration = "Duración"
+    override val workoutHrv = "VFC (RMSSD)"
+    override val workoutHrvHint = "Variabilidad entre un latido y el siguiente, medida durante el entrenamiento: compárala con tus entrenamientos parecidos, no con los de otros."
+    override val workoutRecovery = "Recuperación en 1 minuto"
+    override val workoutRecoveryHint = "Recuperación: cuánto baja el pulso en el minuto después del final (cuanto más, mejor)."
+    override val workoutLaps = "Vueltas"
+    override val workoutAvgShort = "media"
+    override val workoutMaxShort = "máx"
+    override val workoutRecShort = "recup."
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "¿Eliminar el entrenamiento?"
+    override val workoutDeleteText = "Se quitará de este teléfono."
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -13362,6 +14658,16 @@ object EsStrings : Strings {
     override val statLast10 = "Últimos 10 puntos"
     override val statMatchPointsSaved = "Bolas de partido salvadas"
     override val statTotalGames = "Total de juegos ganados"
+    override val statGamePointsWon = "Bolas de juego convertidas"
+    override val statSetPointsWon = "Bolas de set convertidas"
+    override val statMatchPointsWon = "Bolas de partido convertidas"
+    override val statLoveGames = "Juegos en blanco"
+    override val statBestGameRun = "Juegos seguidos (máx.)"
+    override val statSetsFromBreakDown = "Sets ganados tras ir un break abajo"
+    override val statTimes = "Tiempos"
+    override val statSetDurations = "Duración de los sets"
+    override val statLongestGame = "Juego más largo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n puntos)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Dobles faltas"
     override val statFirstServeIn = "Primeros saques dentro"
@@ -13369,6 +14675,18 @@ object EsStrings : Strings {
     override val statSecondServeWon = "Puntos ganados con el 2.º saque"
     override val statWinners = "Golpes ganadores"
     override val statErrors = "Errores"
+    override val statUnforcedErrors = "Errores no forzados"
+    override val statForcedErrors = "Errores forzados"
+    override val detailAskOutcome = "¿Cómo terminó el punto?"
+    override val detailAskErrorType = "¿Error no forzado o forzado?"
+    override val detailUnforced = "No forzado"
+    override val detailForced = "Forzado"
+    override val detailWinnerOf: (String) -> String = { x -> "Ganador $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Error $x" }
+    override val trendTitle = "Evolución"
+    override val trendHint = "Puntos ganados partido a partido (últimos 12; lleno = partido ganado, línea = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Puntos ganados de media: $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Medias por partido ($n con estadísticas detalladas)" }
     override val detailedStats = "Estadísticas detalladas"
     override val detailedStatsHint = "Para quien anota desde fuera de la pista: en lugar de los dos botones grandes hay ace, falta y, para cada jugador, ganador, error y punto. Sirven para aces, dobles faltas, primeros saques, golpes ganadores y errores."
     override val btnAce = "Ace"
@@ -13509,6 +14827,9 @@ object EsStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JUEGOS"
     override val undoPoint = "Anular punto"
+    override val lockScreen = "Bloquear pantalla"
+    override val lockedTitle = "Pantalla bloqueada"
+    override val unlockHint = "Mantén pulsado el candado para desbloquear. Las pulseras y los mandos siguen funcionando."
     override val suspend = "Suspender"
     override val resume = "Reanudar"
     override val audioOn = "Audio On"
@@ -13626,6 +14947,16 @@ object EsStrings : Strings {
     override val photoRemove = "Quitar foto"
     override val photoNeedsName = "Escribe primero el nombre del jugador: la foto se encuentra por el nombre."
     override val photoError = "No se puede leer esta foto."
+    override val matchPhotosTitle = "Fotos del partido"
+    override val matchPhotosHint = "Hasta 10 fotos de recuerdo: se quedan en este teléfono, van al PDF y pasan al otro teléfono con la transferencia."
+    override val addPhotos = "Añadir fotos"
+    override val takePhoto = "Hacer foto"
+    override val matchPhotosFull = "Este partido ya tiene 10 fotos."
+    override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
+    override val shareChoose = "¿Qué compartes?"
+    override val shareChooseHint = "La imagen con texto va bien para WhatsApp y las redes; el PDF tiene también estadísticas, historial y fotos del partido."
+    override val shareImage = "Imagen"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneo Americano o Mexicano"
     override val tournamentTitle = "Torneo"
     override val tournamentSubtitle = "Americano y Mexicano: parejas que cambian en cada ronda"
@@ -13840,6 +15171,32 @@ object FrStrings : Strings {
     override val relayPending: (Int) -> String = { "$it mesures à envoyer" }
     override val relayPreparing = "Préparation du réseau…"
     override val relayShowBoard = "Afficher le tableau de score"
+    override val workoutTitle = "Entraînement"
+    override val workoutHint = "Fréquence cardiaque avec la ceinture, sans match : tours, VFC et récupération."
+    override val workoutPickStrap = "Choisissez la ceinture ci-dessous : mouillez les électrodes et mettez-la."
+    override val workoutStart = "Démarrer"
+    override val workoutPause = "Pause"
+    override val workoutResume = "Reprendre"
+    override val workoutLap = "Tour"
+    override val workoutEnd = "Terminer"
+    override val workoutRecovering: (Int) -> String = { "Récupération : encore $it s" }
+    override val workoutRecoveringHint = "Restez immobile : on mesure de combien la fréquence baisse dans la première minute."
+    override val workoutSaveNow = "Enregistrer"
+    override val workoutHistory = "Entraînements enregistrés"
+    override val workoutNone = "Aucun entraînement enregistré."
+    override val workoutDuration = "Durée"
+    override val workoutHrv = "VFC (RMSSD)"
+    override val workoutHrvHint = "Variabilité d'un battement à l'autre, mesurée pendant l'entraînement : comparez-la à vos entraînements similaires, pas à ceux des autres."
+    override val workoutRecovery = "Récupération en 1 minute"
+    override val workoutRecoveryHint = "Récupération : de combien la fréquence baisse dans la minute après la fin (plus elle baisse, mieux c'est)."
+    override val workoutLaps = "Tours"
+    override val workoutAvgShort = "moy."
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "récup."
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Supprimer l'entraînement ?"
+    override val workoutDeleteText = "Il sera retiré de ce téléphone."
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -13951,6 +15308,16 @@ object FrStrings : Strings {
     override val statLast10 = "10 derniers points"
     override val statMatchPointsSaved = "Balles de match sauvées"
     override val statTotalGames = "Total des jeux gagnés"
+    override val statGamePointsWon = "Balles de jeu converties"
+    override val statSetPointsWon = "Balles de manche converties"
+    override val statMatchPointsWon = "Balles de match converties"
+    override val statLoveGames = "Jeux blancs gagnés"
+    override val statBestGameRun = "Jeux d'affilée (max)"
+    override val statSetsFromBreakDown = "Manches gagnées après un break de retard"
+    override val statTimes = "Durées"
+    override val statSetDurations = "Durée des manches"
+    override val statLongestGame = "Jeu le plus long"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n points)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Doubles fautes"
     override val statFirstServeIn = "Premières balles réussies"
@@ -13958,6 +15325,18 @@ object FrStrings : Strings {
     override val statSecondServeWon = "Points gagnés sur 2e balle"
     override val statWinners = "Coups gagnants"
     override val statErrors = "Erreurs"
+    override val statUnforcedErrors = "Fautes directes"
+    override val statForcedErrors = "Fautes provoquées"
+    override val detailAskOutcome = "Comment s'est fini le point ?"
+    override val detailAskErrorType = "Faute directe ou provoquée ?"
+    override val detailUnforced = "Directe"
+    override val detailForced = "Provoquée"
+    override val detailWinnerOf: (String) -> String = { x -> "Coup gagnant $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Faute $x" }
+    override val trendTitle = "Évolution"
+    override val trendHint = "Points gagnés match par match (12 derniers ; plein = match gagné, ligne = 50 %)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Points gagnés en moyenne : $n %" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Moyennes par match ($n avec statistiques détaillées)" }
     override val detailedStats = "Statistiques détaillées"
     override val detailedStatsHint = "Pour qui marque depuis le bord du court : à la place des deux grands boutons, ace, faute et, pour chaque joueur, coup gagnant, erreur et point. Nécessaires pour aces, doubles fautes, premières balles, coups gagnants et erreurs."
     override val btnAce = "Ace"
@@ -14097,6 +15476,9 @@ object FrStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JEUX"
     override val undoPoint = "Annuler le point"
+    override val lockScreen = "Verrouiller l'écran"
+    override val lockedTitle = "Écran verrouillé"
+    override val unlockHint = "Maintenez le cadenas appuyé pour déverrouiller. Bracelets et télécommandes continuent de fonctionner."
     override val suspend = "Suspendre"
     override val resume = "Reprendre"
     override val audioOn = "Audio On"
@@ -14214,6 +15596,16 @@ object FrStrings : Strings {
     override val photoRemove = "Retirer la photo"
     override val photoNeedsName = "Écrivez d'abord le nom du joueur : la photo se retrouve grâce au nom."
     override val photoError = "Impossible de lire cette photo."
+    override val matchPhotosTitle = "Photos du match"
+    override val matchPhotosHint = "Jusqu'à 10 photos souvenir : elles restent sur ce téléphone, vont dans le PDF et passent sur l'autre téléphone avec le transfert."
+    override val addPhotos = "Ajouter des photos"
+    override val takePhoto = "Prendre une photo"
+    override val matchPhotosFull = "Ce match a déjà 10 photos."
+    override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
+    override val shareChoose = "Que partagez-vous ?"
+    override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."
+    override val shareImage = "Image et texte"
+    override val sharePdf = "PDF complet"
     override val tournamentButton = "Tournoi Americano ou Mexicano"
     override val tournamentTitle = "Tournoi"
     override val tournamentSubtitle = "Americano et Mexicano : les paires changent à chaque tour"
@@ -14428,6 +15820,32 @@ object PtStrings : Strings {
     override val relayPending: (Int) -> String = { "$it medidas a enviar" }
     override val relayPreparing = "Preparando a rede…"
     override val relayShowBoard = "Mostrar o placar"
+    override val workoutTitle = "Treino"
+    override val workoutHint = "Frequência cardíaca com a cinta, sem partida: voltas, VFC e recuperação."
+    override val workoutPickStrap = "Escolha a cinta abaixo: molhe os eletrodos e coloque-a."
+    override val workoutStart = "Iniciar"
+    override val workoutPause = "Pausar"
+    override val workoutResume = "Retomar"
+    override val workoutLap = "Volta"
+    override val workoutEnd = "Terminar"
+    override val workoutRecovering: (Int) -> String = { "Recuperação: faltam $it s" }
+    override val workoutRecoveringHint = "Fique parado: mede-se quanto a frequência cai no primeiro minuto."
+    override val workoutSaveNow = "Salvar já"
+    override val workoutHistory = "Treinos salvos"
+    override val workoutNone = "Nenhum treino salvo."
+    override val workoutDuration = "Duração"
+    override val workoutHrv = "VFC (RMSSD)"
+    override val workoutHrvHint = "Variabilidade entre um batimento e o seguinte, medida durante o treino: compare com os seus treinos parecidos, não com os dos outros."
+    override val workoutRecovery = "Recuperação em 1 minuto"
+    override val workoutRecoveryHint = "Recuperação: quanto a frequência cai no minuto após o fim (quanto mais, melhor)."
+    override val workoutLaps = "Voltas"
+    override val workoutAvgShort = "média"
+    override val workoutMaxShort = "máx"
+    override val workoutRecShort = "recup."
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Excluir o treino?"
+    override val workoutDeleteText = "Ele será removido deste telefone."
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -14539,6 +15957,16 @@ object PtStrings : Strings {
     override val statLast10 = "Últimos 10 pontos"
     override val statMatchPointsSaved = "Match points salvos"
     override val statTotalGames = "Total de jogos ganhos"
+    override val statGamePointsWon = "Game points convertidos"
+    override val statSetPointsWon = "Set points convertidos"
+    override val statMatchPointsWon = "Match points convertidos"
+    override val statLoveGames = "Games vencidos a zero"
+    override val statBestGameRun = "Games seguidos (máx.)"
+    override val statSetsFromBreakDown = "Sets vencidos depois de estar um break atrás"
+    override val statTimes = "Tempos"
+    override val statSetDurations = "Duração dos sets"
+    override val statLongestGame = "Game mais longo"
+    override val longestGameValue: (String, Int) -> String = { t, n -> "$t ($n pontos)" }
     override val statAces = "Aces"
     override val statDoubleFaults = "Duplas faltas"
     override val statFirstServeIn = "Primeiros saques dentro"
@@ -14546,6 +15974,18 @@ object PtStrings : Strings {
     override val statSecondServeWon = "Pontos ganhos com o 2º saque"
     override val statWinners = "Winners"
     override val statErrors = "Erros"
+    override val statUnforcedErrors = "Erros não forçados"
+    override val statForcedErrors = "Erros forçados"
+    override val detailAskOutcome = "Como terminou o ponto?"
+    override val detailAskErrorType = "Erro não forçado ou forçado?"
+    override val detailUnforced = "Não forçado"
+    override val detailForced = "Forçado"
+    override val detailWinnerOf: (String) -> String = { x -> "Winner $x" }
+    override val detailErrorOf: (String) -> String = { x -> "Erro $x" }
+    override val trendTitle = "Evolução"
+    override val trendHint = "Pontos ganhos partida a partida (últimas 12; cheia = partida vencida, linha = 50%)."
+    override val trendPointsAvg: (Int) -> String = { n -> "Pontos ganhos em média: $n%" }
+    override val trendDetailTitle: (Int) -> String = { n -> "Médias por partida ($n com estatísticas detalhadas)" }
     override val detailedStats = "Estatísticas detalhadas"
     override val detailedStatsHint = "Para quem marca da beira da quadra: no lugar dos dois botões grandes há ace, falta e, para cada jogador, winner, erro e ponto. Servem para aces, duplas faltas, primeiros saques, winners e erros."
     override val btnAce = "Ace"
@@ -14686,6 +16126,9 @@ object PtStrings : Strings {
     override val setsHeader = "SETS"
     override val gamesHeader = "JOGOS"
     override val undoPoint = "Anular ponto"
+    override val lockScreen = "Bloquear tela"
+    override val lockedTitle = "Tela bloqueada"
+    override val unlockHint = "Segure o cadeado para desbloquear. As pulseiras e os controles continuam funcionando."
     override val suspend = "Suspender"
     override val resume = "Retomar"
     override val audioOn = "Audio On"
@@ -14803,6 +16246,16 @@ object PtStrings : Strings {
     override val photoRemove = "Remover foto"
     override val photoNeedsName = "Escreva primeiro o nome do jogador: a foto é encontrada pelo nome."
     override val photoError = "Não foi possível ler esta foto."
+    override val matchPhotosTitle = "Fotos da partida"
+    override val matchPhotosHint = "Até 10 fotos de recordação: ficam neste telefone, vão para o PDF e passam para o outro telefone com a transferência."
+    override val addPhotos = "Adicionar fotos"
+    override val takePhoto = "Tirar foto"
+    override val matchPhotosFull = "Esta partida já tem 10 fotos."
+    override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
+    override val shareChoose = "O que você compartilha?"
+    override val shareChooseHint = "A imagem com texto serve para WhatsApp e redes sociais; o PDF tem também estatísticas, histórico e fotos da partida."
+    override val shareImage = "Imagem"
+    override val sharePdf = "PDF completo"
     override val tournamentButton = "Torneio Americano ou Mexicano"
     override val tournamentTitle = "Torneio"
     override val tournamentSubtitle = "Americano e Mexicano: duplas que mudam a cada rodada"
@@ -15222,6 +16675,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15398,6 +16852,8 @@ private fun PlayerDetail(c: MatchController, played: List<PlayerStats.Played>, m
             }
         }
     }
+    val lines = remember(played, key) { PlayerStats.lines(played, key) }
+    if (lines.size >= 2) TrendCard(lines)
     if (rivals.isNotEmpty()) {
         Text(s.historyHeadToHead, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         rivals.forEach { r -> PlayerRow(c, r.name, s.historyRecord(r.won, r.lost), chevron = false) {} }
@@ -15461,6 +16917,50 @@ private fun PlayerRow(c: MatchController, name: String, record: String, chevron:
         if (chevron) Icon(Icons.Filled.ChevronRight, null, tint = TsmColors.TextDim)
     }
 }
+
+/**
+ * Andamento del giocatore: una colonna per partita (ultime 12) con la percentuale di punti vinti, piena se vinta;
+ * la linea è il 50%. Sotto le medie, e quelle delle statistiche dettagliate se qualche partita le ha.
+ */
+@Composable
+private fun TrendCard(lines: List<PlayerStats.MatchLine>) {
+    val s = LocalStrings.current
+    val last = lines.takeLast(12)
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.trendTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        Box(Modifier.fillMaxWidth().height(90.dp)) {
+            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.Bottom) {
+                last.forEach { l ->
+                    Box(
+                        Modifier.weight(1f).fillMaxHeight(l.pointsWonPct / 100f).clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(if (l.won) TsmColors.Ball else TsmColors.Outline),
+                    )
+                }
+                repeat(12 - last.size) { Spacer(Modifier.weight(1f)) }
+            }
+            // Linea del 50%: sopra si sono vinti più punti di quanti se ne sono persi.
+            Box(Modifier.fillMaxWidth().height(1.dp).align(Alignment.Center).background(TsmColors.TextDim.copy(alpha = 0.6f)))
+        }
+        Text(s.trendHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Text(s.trendPointsAvg(Math.round(lines.map { it.pointsWonPct }.average()).toInt()), color = TsmColors.TextMain)
+        val det = lines.mapNotNull { it.detail }
+        if (det.isNotEmpty()) {
+            val n = det.size.toDouble()
+            fun avg(f: (com.tennis.scoremanager.data.MatchStats.SideTotals) -> Int) = String.format(java.util.Locale.ROOT, "%.1f", det.sumOf(f) / n)
+            val serves = det.sumOf { it.servePoints }
+            val firstIn = if (serves > 0) Math.round(det.sumOf { it.firstServesIn } * 100.0 / serves) else 0
+            Text(s.trendDetailTitle(det.size), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(
+                "${s.statAces} ${avg { it.aces }} · ${s.statDoubleFaults} ${avg { it.doubleFaults }} · ${s.statFirstServeIn} $firstIn% · " +
+                    "${s.statWinners} ${avg { it.winners }} · ${s.statErrors} ${avg { it.errors }}",
+                color = TsmColors.TextDim, fontSize = 13.sp,
+            )
+        }
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/MatchScreen.kt
@@ -15481,10 +16981,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15500,7 +16998,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -15512,6 +17013,7 @@ import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
@@ -15534,12 +17036,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -15551,6 +17055,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.tennis.scoremanager.CountdownKind
 import com.tennis.scoremanager.CountdownUi
+import com.tennis.scoremanager.DetailAsk
+import com.tennis.scoremanager.DetailPrompt
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
@@ -15566,9 +17072,9 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.TiebreakKind
 import com.tennis.scoremanager.ui.BandSettingsPanel
 import com.tennis.scoremanager.ui.ConfirmDialog
-import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Pill
+import com.tennis.scoremanager.ui.RemoteKeysInDialog
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
@@ -15598,59 +17104,67 @@ fun MatchScreen(c: MatchController) {
     var confirmNew by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var bandSheet by remember { mutableStateOf<Side?>(null) }
+    /** Schermo bloccato: i tocchi non fanno niente (braccialetti e telecomandi sì); si sblocca tenendo premuto. */
+    var locked by rememberSaveable { mutableStateOf(false) }
 
     BackHandler { Toast.makeText(context, s.backDisabled, Toast.LENGTH_SHORT).show() }
 
-    Column(
-        Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        TimersRow(clock, cd, s) { TvChip(c) }
-        if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
-        if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
-        if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
-        MessageBox(msg)
-        Scoreboard(state, names, s)
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            val playing = !suspended && !state.isFinished
-            if (lm.record.options.detailedStats) {
-                val fault by c.faultPending.collectAsState()
-                DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
-            } else {
-                PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
-            }
-            if (suspended) {
-                Box(
-                    Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
-                        Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TimersRow(clock, cd, s) { TvChip(c) }
+            if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
+            if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
+            if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
+            MessageBox(msg)
+            Scoreboard(state, names, s)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                val playing = !suspended && !state.isFinished
+                if (lm.record.options.detailedStats) {
+                    val fault by c.faultPending.collectAsState()
+                    DetailedPointButtons(state, names, s, playing, fault, onFault = { c.fault() }) { side, kind -> c.awardPoint(side, kind = kind) }
+                } else {
+                    PointButtons(state, names, s, enabled = playing) { c.awardPoint(it) }
+                }
+                val detail by c.detailPrompt.collectAsState()
+                detail?.let { DetailBar(it, names, s, Modifier.align(Alignment.BottomCenter)) { k -> c.setPointDetail(k) } }
+                if (suspended) {
+                    Box(
+                        Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(Color(0xCC0B1220)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(56.dp))
+                            Text(s.suspendedOverlay, color = TsmColors.Orange, fontSize = 26.sp, lineHeight = 30.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                        }
                     }
                 }
             }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
+                ControlButton(
+                    if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    if (suspended) s.resume else s.suspend,
+                    Modifier.weight(1f),
+                    highlight = suspended,
+                ) { c.toggleSuspend() }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
+                ControlButton(
+                    if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                    null,
+                    Modifier.width(64.dp),
+                    contentDescription = if (o.audio) s.audioOn else s.audioOff,
+                ) { c.toggleAudio() }
+                ControlButton(Icons.Filled.Lock, null, Modifier.width(64.dp), contentDescription = s.lockScreen) { locked = true }
+                ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
+                ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
+            }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ControlButton(Icons.AutoMirrored.Filled.Undo, s.undoPoint, Modifier.weight(1f)) { c.undo() }
-            ControlButton(
-                if (suspended) Icons.Filled.PlayArrow else Icons.Filled.Pause,
-                if (suspended) s.resume else s.suspend,
-                Modifier.weight(1f),
-                highlight = suspended,
-            ) { c.toggleSuspend() }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Audio solo icona (barrata quando è spento): lascia spazio a "Nuova partita" ed "Esci".
-            ControlButton(
-                if (o.audio) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                null,
-                Modifier.width(64.dp),
-                contentDescription = if (o.audio) s.audioOn else s.audioOff,
-            ) { c.toggleAudio() }
-            ControlButton(Icons.Filled.AddCircle, s.newMatch, Modifier.weight(1.3f)) { confirmNew = true }
-            ControlButton(Icons.AutoMirrored.Filled.ExitToApp, s.exit, Modifier.weight(1f)) { confirmExit = true }
-        }
+        if (locked) LockOverlay(s) { locked = false }
     }
 
     if (confirmExit) {
@@ -16070,6 +17584,72 @@ private fun DetailedPointButtons(
     }
 }
 
+/**
+ * Velo sopra la schermata bloccata: il punteggio resta visibile, i tocchi si fermano qui. Si sblocca tenendo
+ * premuto il lucchetto (un tocco solo non basta, così non si sblocca per sbaglio in tasca).
+ */
+@Composable
+private fun LockOverlay(s: Strings, onUnlock: () -> Unit) {
+    var hint by remember { mutableStateOf(false) }
+    Box(
+        Modifier.fillMaxSize().background(Color(0x660B1220)).pointerInput(Unit) { detectTapGestures { hint = true } },
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Column(
+            Modifier.systemBarsPadding().padding(bottom = 24.dp).clip(RoundedCornerShape(24.dp)).background(TsmColors.Surface)
+                .border(2.dp, if (hint) TsmColors.Orange else TsmColors.Outline, RoundedCornerShape(24.dp)).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                Modifier.size(72.dp).clip(CircleShape).background(TsmColors.Ball)
+                    .pointerInput(Unit) { detectTapGestures(onTap = { hint = true }, onLongPress = { onUnlock() }) },
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Filled.Lock, s.lockScreen, tint = TsmColors.OnBall, modifier = Modifier.size(36.dp)) }
+            Text(s.lockedTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(s.unlockHint, color = if (hint) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+/**
+ * Domanda facoltativa sul punto appena segnato, sopra i tasti: dal braccialetto o dal telecomando "come è finito?"
+ * (ace solo se l'ha vinto chi serviva), dopo un errore "gratuito o forzato?". Sparisce da sola.
+ */
+@Composable
+private fun DetailBar(p: DetailPrompt, names: Names, s: Strings, modifier: Modifier, onPick: (PointKind?) -> Unit) {
+    val loser = p.winner.other
+    val options: List<Triple<String, PointKind, Color>> = when (p.ask) {
+        DetailAsk.OUTCOME -> listOfNotNull(
+            Triple(s.btnAce, PointKind.ACE, TsmColors.player(p.winner)).takeIf { p.winner == p.server },
+            Triple(s.detailWinnerOf(names.short(p.winner)), PointKind.WINNER, TsmColors.player(p.winner)),
+            Triple(s.detailErrorOf(names.short(loser)), PointKind.ERROR, TsmColors.player(loser)),
+        )
+        DetailAsk.ERROR_TYPE -> listOf(
+            Triple(s.detailUnforced, PointKind.UNFORCED_ERROR, TsmColors.Orange),
+            Triple(s.detailForced, PointKind.FORCED_ERROR, TsmColors.SurfaceHigh),
+        )
+    }
+    Column(
+        modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface)
+            .border(2.dp, TsmColors.Ball, RoundedCornerShape(18.dp)).padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(if (p.ask == DetailAsk.OUTCOME) s.detailAskOutcome else s.detailAskErrorType, color = TsmColors.TextMain,
+                fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("✕", color = TsmColors.TextDim, fontSize = 20.sp, modifier = Modifier.clickable { onPick(null) }.padding(horizontal = 8.dp))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { (label, kind, color) ->
+                val fg = if (color == TsmColors.SurfaceHigh) TsmColors.TextMain else if (color == TsmColors.Orange) TsmColors.OnOrange
+                    else TsmColors.onPlayer(if (color == TsmColors.player(Side.P1)) Side.P1 else Side.P2)
+                PadButton(label, null, color, fg, true, Modifier.weight(1f).height(56.dp)) { onPick(kind) }
+            }
+        }
+    }
+}
+
 @Composable
 private fun PadButton(
     text: String,
@@ -16169,6 +17749,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
 import com.tennis.scoremanager.data.Names
@@ -16242,21 +17823,47 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ) + (if (detail) listOf(
             Stat(s.statWinners, a.winners, b.winners),
             Stat(s.statErrors, a.errors, b.errors),
-        ) else emptyList()) + listOf(
+        ) + (if (a.unforcedErrors + b.unforcedErrors + a.forcedErrors + b.forcedErrors > 0) listOf(
+            Stat(s.statUnforcedErrors, a.unforcedErrors, b.unforcedErrors),
+            Stat(s.statForcedErrors, a.forcedErrors, b.forcedErrors),
+        ) else emptyList()) else emptyList()) + listOf(
             Stat(s.statStreak, a.maxStreak, b.maxStreak),
             Stat(s.statLast10, a.last10, b.last10),
             Stat(s.statMatchPointsSaved, a.matchPointsSaved, b.matchPointsSaved),
+            Stat(s.statGamePointsWon, a.gamePointsWon, a.gamePoints, b.gamePointsWon, b.gamePoints, StatKind.RATIO),
+            Stat(s.statSetPointsWon, a.setPointsWon, a.setPoints, b.setPointsWon, b.setPoints, StatKind.RATIO),
+            Stat(s.statMatchPointsWon, a.matchPointsWon, a.matchPoints, b.matchPointsWon, b.matchPoints, StatKind.RATIO),
         ))
         StatSection(s.statGames, listOf(
             Stat(s.statTotalGames, a.gamesWon, a.games, b.gamesWon, b.games, StatKind.PERCENT),
+            Stat(s.statLoveGames, a.loveGames, b.loveGames),
+            Stat(s.statBestGameRun, a.bestGameRun, b.bestGameRun),
+            Stat(s.statSetsFromBreakDown, a.setsFromBreakDown, b.setsFromBreakDown),
         ))
+        // Tempi: durata dei set e game più lungo, dalle ore dei punti (solo sulla partita intera).
+        if (period == null) {
+            val durations = remember(rec) { MatchStats.setDurations(pts) }
+            val longest = remember(rec) { MatchStats.longestGame(pts) }
+            if (durations.any { it != null } || longest != null) {
+                StatCard(s.statTimes) {
+                    if (durations.any { it != null }) {
+                        Text("${s.statSetDurations}: " + durations.joinToString(" · ") { d -> d?.let { minutes(it) } ?: "–" },
+                            color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                    longest?.let { (ms, n) ->
+                        Text("${s.statLongestGame}: ${s.longestGameValue(minutes(ms), n)}", color = TsmColors.TextMain, fontSize = 13.sp,
+                            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        }
         // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
         if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
         // Battito delle fasce cardio: sulla partita intera, con il grafico nel tempo.
         if (period == null) heartStats(rec, s)?.let { rows ->
             StatSection(s.heartStat, rows)
-            StatCard(s.heartChart) { HeartChart(rec) }
-            StatCard(s.heartZones) { HeartZones(rec, names) }
+            StatCard(s.heartChart) { HeartChart(rec.heart) }
+            StatCard(s.heartZones) { HeartZones(rec.heart) { names.short(it) } }
         }
         MatchStats.rally(pts, period)?.let { r ->
             StatCard(s.strokesPerPoint) {
@@ -16266,6 +17873,12 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         }
         Text(if (detail) s.statsHintDetailed else s.statsHint, color = TsmColors.TextDim, fontSize = 12.sp)
     }
+}
+
+/** "38'" oppure "1 h 05'". */
+private fun minutes(ms: Long): String {
+    val m = Math.round(ms / 60_000.0).toInt()
+    return if (m >= 60) "${m / 60} h ${"%02d".format(m % 60)}'" else "$m'"
 }
 
 private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
@@ -16295,8 +17908,8 @@ private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
 
 /** Battito nel tempo, una linea per lato nel suo colore; i buchi (pause, fascia staccata) interrompono la linea. */
 @Composable
-private fun HeartChart(rec: MatchRecord) {
-    val tracks = Side.entries.mapNotNull { side -> rec.heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
+internal fun HeartChart(heart: Map<Side, HeartTrack>) {
+    val tracks = Side.entries.mapNotNull { side -> heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
     if (tracks.isEmpty()) return
     val all = tracks.flatMap { (_, t) -> t.bpm.take(t.size) }
     val lo = (all.min() - 5).coerceAtLeast(30)
@@ -16329,10 +17942,10 @@ private val ZoneColors = listOf(Color(0xFF9AA8BD), Color(0xFF4CAF50), Color(0xFF
 
 /** Una torta per lato con il tempo in ciascuna zona, e sotto la legenda con le percentuali dei due lati. */
 @Composable
-private fun HeartZones(rec: MatchRecord, names: Names) {
+internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
     val s = LocalStrings.current
     val zones = Side.entries.associateWith { side ->
-        val t = rec.heart[side]
+        val t = heart[side]
         t?.profile?.let { HeartStats.zoneSeconds(t, it.age) }?.takeIf { it.sum() > 0 }
     }
     if (zones.values.all { it == null }) {
@@ -16358,7 +17971,7 @@ private fun HeartZones(rec: MatchRecord, names: Names) {
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                Text(label(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             }
         }
@@ -16389,7 +18002,7 @@ private fun NamesHeader(names: Names) {
 }
 
 @Composable
-private fun StatCard(title: String, content: @Composable () -> Unit) {
+internal fun StatCard(title: String, content: @Composable () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -17491,6 +19104,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -17573,10 +19187,19 @@ fun SetupScreen(c: MatchController) {
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
         action = {
-            Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
-                    Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Allenamento con la fascia, senza partita: schermata a parte.
+                Surface(onClick = { c.openWorkouts() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.MonitorHeart, null, tint = TsmColors.Danger)
+                        Text(s.workoutTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
+                        Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         },
@@ -17968,12 +19591,18 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SummaryScreen.
 
 package com.tennis.scoremanager.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17994,6 +19623,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Rule
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.BatteryStd
 import androidx.compose.material.icons.filled.Business
@@ -18002,6 +19632,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
@@ -18029,18 +19660,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.BigButton
@@ -18070,6 +19705,8 @@ fun SummaryScreen(c: MatchController) {
     var tab by remember(rec.id) { mutableStateOf(0) }
     val fromHistory by c.summaryFromHistory.collectAsState()
     var confirmDelete by remember { mutableStateOf(false) }
+    /** "Condividi": immagine e testo per i social, oppure il PDF completo. */
+    var shareChoice by remember { mutableStateOf(false) }
     // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
     BackHandler { if (fromHistory) c.backToHistory() }
 
@@ -18151,7 +19788,10 @@ fun SummaryScreen(c: MatchController) {
             when (tab) {
                 1 -> MatchStatsTab(rec, names)
                 2 -> MatchChronologyTab(rec, names)
-                else -> SummaryInfo(rec, state, names)
+                else -> {
+                    SummaryInfo(rec, state, names)
+                    MatchPhotosCard(c, rec.id)
+                }
             }
         }
         Column(
@@ -18160,9 +19800,7 @@ fun SummaryScreen(c: MatchController) {
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BigButton(s.saveHistory, Icons.Filled.Save, { showSave = true }, Modifier.weight(1f))
-                BigButton(s.share, Icons.Filled.Share, {
-                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
-                }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
+                BigButton(s.share, Icons.Filled.Share, { shareChoice = true }, Modifier.weight(1f), color = TsmColors.Orange, onColor = TsmColors.OnOrange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 // La partita finita è già nello storico: uscire non fa perdere niente.
@@ -18178,6 +19816,26 @@ fun SummaryScreen(c: MatchController) {
     }
 
     if (showSave) SaveDialog(c) { showSave = false }
+    if (shareChoice) {
+        AlertDialog(
+            onDismissRequest = { shareChoice = false },
+            icon = { Icon(Icons.Filled.Share, null, tint = TsmColors.Orange) },
+            title = { Text(s.shareChoose) },
+            text = { Text(s.shareChooseHint) },
+            confirmButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent(pdf = true)?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.sharePdf) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    shareChoice = false
+                    c.shareIntent()?.let { runCatching { context.startActivity(it) } }
+                }) { Text(s.shareImage) }
+            },
+        )
+    }
     if (confirmDelete) {
         ConfirmDialog(
             icon = Icons.Filled.Delete,
@@ -18247,6 +19905,7 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
     var txt by remember { mutableStateOf(true) }
     var json by remember { mutableStateOf(true) }
     var png by remember { mutableStateOf(true) }
+    var pdf by remember { mutableStateOf(true) }
     val treeLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) {
             c.setHistoryFolder(uri)
@@ -18280,11 +19939,12 @@ private fun SaveDialog(c: MatchController, onDismiss: () -> Unit) {
                 CheckRow(s.formatReport, txt) { txt = it }
                 CheckRow(s.formatData, json) { json = it }
                 CheckRow(s.formatImage, png) { png = it }
+                CheckRow(s.formatPdf, pdf) { pdf = it }
             }
         },
         confirmButton = {
-            Button(enabled = txt || json || png, onClick = {
-                c.saveHistory(name, txt, json, png)
+            Button(enabled = txt || json || png || pdf, onClick = {
+                c.saveHistory(name, txt, json, png, pdf)
                 onDismiss()
             }) { Text(s.save) }
         },
@@ -18298,6 +19958,77 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
         Checkbox(checked, onChange, colors = CheckboxDefaults.colors(checkedColor = TsmColors.Ball, checkmarkColor = TsmColors.OnBall))
         Text(label, color = TsmColors.TextMain)
     }
+}
+
+/**
+ * Foto ricordo della partita (fino a 10): dalla galleria o dalla fotocamera. Restano sul telefono con la partita,
+ * vanno nel PDF e passano all'altro telefono col trasferimento; non vanno nell'immagine per i social.
+ */
+@Composable
+private fun MatchPhotosCard(c: MatchController, id: String) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val version by c.matchPhotosVersion.collectAsState()
+    val photos = remember(id, version) { c.matchPhotos(id) }
+    val left = Storage.MAX_MATCH_PHOTOS - photos.size
+    var open by remember { mutableStateOf<java.io.File?>(null) }
+    var cameraUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val pickMany = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Storage.MAX_MATCH_PHOTOS)) { c.addMatchPhotos(it) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        cameraUri?.let { if (ok) c.addMatchPhotos(listOf(it)) }
+    }
+    fun shoot() {
+        val u = c.cameraUri()
+        cameraUri = u
+        camera.launch(u)
+    }
+    val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) shoot() }
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text("${s.matchPhotosTitle} (${photos.size}/${Storage.MAX_MATCH_PHOTOS})", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        if (photos.isEmpty()) Text(s.matchPhotosHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (photos.isNotEmpty()) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                photos.forEach { f ->
+                    val bmp = remember(f) { runCatching { thumb(f) }.getOrNull() }
+                    if (bmp != null) {
+                        Image(bmp, null, contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(86.dp).clip(RoundedCornerShape(12.dp)).clickable { open = f })
+                    }
+                }
+            }
+        }
+        if (left > 0) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GhostButton(s.addPhotos, Icons.Filled.AddPhotoAlternate, {
+                    pickMany.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }, Modifier.weight(1f))
+                GhostButton(s.takePhoto, Icons.Filled.PhotoCamera, {
+                    val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    if (granted) shoot() else askCamera.launch(Manifest.permission.CAMERA)
+                }, Modifier.weight(1f))
+            }
+        }
+    }
+    open?.let { f ->
+        val big = remember(f) { runCatching { BitmapFactory.decodeFile(f.absolutePath).asImageBitmap() }.getOrNull() }
+        AlertDialog(
+            onDismissRequest = { open = null },
+            text = { if (big != null) Image(big, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxWidth()) },
+            confirmButton = { TextButton(onClick = { open = null }) { Text(s.ok) } },
+            dismissButton = { TextButton(onClick = { c.removeMatchPhoto(f); open = null }) { Text(s.photoRemove) } },
+        )
+    }
+}
+
+/** Miniatura leggera della foto (lato di circa 256 pixel). */
+private fun thumb(f: java.io.File): androidx.compose.ui.graphics.ImageBitmap {
+    val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(f.absolutePath, o)
+    val sample = (maxOf(o.outWidth, o.outHeight) / 256).coerceAtLeast(1)
+    return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample }).asImageBitmap()
 }
 TSM_EOF
 
@@ -18782,6 +20513,213 @@ private fun StandingsTable(c: MatchController, t: Tournament) {
         }
     }
     Text(s.tournamentStandingsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/WorkoutScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/WorkoutScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.WorkoutReport
+import com.tennis.scoremanager.data.WorkoutStats
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.WorkoutStrapCard
+import com.tennis.scoremanager.workout.WorkoutPhase
+
+/**
+ * Allenamento con la fascia cardio, senza partita: Avvia / Pausa / Giro / Fine, poi un minuto di recupero e il
+ * riepilogo. Sotto, gli allenamenti salvati (a parte dalle partite).
+ */
+@Composable
+fun WorkoutScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val detail by c.workoutDetail.collectAsState()
+    BackHandler { c.back() }
+    val shown = detail
+    if (shown != null) {
+        WorkoutDetail(c, shown)
+        return
+    }
+    val ui by c.workout.ui.collectAsState()
+    val straps by c.straps.collectAsState()
+    val list by c.workouts.collectAsState()
+    val o by c.options.collectAsState()
+    ScreenScaffold(
+        title = s.workoutTitle,
+        subtitle = s.workoutHint,
+        icon = Icons.Filled.MonitorHeart,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        SectionCard(s.workoutTitle, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
+            val strap = Side.entries.firstNotNullOfOrNull { straps[it] }
+            if (ui.phase == WorkoutPhase.IDLE && strap == null) {
+                Text(s.workoutPickStrap, color = TsmColors.Orange)
+                return@SectionCard
+            }
+            Text(
+                (ui.bpm ?: strap?.bpm)?.let { "$it" } ?: "--",
+                color = TsmColors.TextMain, fontSize = 64.sp, fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+            )
+            Text("bpm", color = TsmColors.TextDim, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            strap?.let { Text(it.name, color = TsmColors.TextDim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) }
+            when (ui.phase) {
+                WorkoutPhase.IDLE -> BigButton(s.workoutStart, Icons.Filled.PlayArrow, { c.startWorkout() }, Modifier.fillMaxWidth())
+                WorkoutPhase.RUNNING, WorkoutPhase.PAUSED -> {
+                    Text(
+                        Reports.duration(ui.elapsedS * 1000L),
+                        color = if (ui.phase == WorkoutPhase.PAUSED) TsmColors.Orange else TsmColors.TextMain,
+                        fontSize = 32.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(
+                        "${s.workoutLap} ${ui.lap} · ${Reports.duration(ui.lapS * 1000L)}",
+                        color = TsmColors.TextDim, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (ui.phase == WorkoutPhase.RUNNING) {
+                            GhostButton(s.workoutPause, Icons.Filled.Pause, { c.workout.pause() }, Modifier.weight(1f))
+                            BigButton(s.workoutLap, Icons.Filled.Flag, { c.workout.lap() }, Modifier.weight(1f))
+                        } else {
+                            BigButton(s.workoutResume, Icons.Filled.PlayArrow, { c.workout.resume() }, Modifier.weight(1f))
+                        }
+                    }
+                    BigButton(s.workoutEnd, Icons.Filled.Stop, { c.workout.end() }, Modifier.fillMaxWidth(),
+                        color = TsmColors.Danger, onColor = TsmColors.TextMain)
+                }
+                WorkoutPhase.COOLDOWN -> {
+                    Text(s.workoutRecovering(ui.cooldownLeft), color = TsmColors.Ball, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Text(s.workoutRecoveringHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    GhostButton(s.workoutSaveNow, Icons.Filled.Save, { c.workout.finish() }, Modifier.fillMaxWidth())
+                }
+            }
+        }
+        // La fascia si sceglie qui, senza passare dalla pagina 2.
+        if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
+        if (ui.phase == WorkoutPhase.IDLE) {
+            SectionCard(s.workoutHistory, Icons.Filled.TableChart) {
+                if (list.isEmpty()) Text(s.workoutNone, color = TsmColors.TextDim)
+                for (w in list) {
+                    val sum = com.tennis.scoremanager.data.HeartStats.summary(w.heart)
+                    Surface(onClick = { c.workoutDetail.value = w }, shape = RoundedCornerShape(12.dp), color = TsmColors.SurfaceHigh,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                            Text("${Reports.date(w.startedAt, o.lang)} ${Reports.time(w.startedAt, o.lang)}", color = TsmColors.TextMain,
+                                fontWeight = FontWeight.SemiBold)
+                            Text(
+                                listOfNotNull(
+                                    Reports.duration(w.durationS * 1000L),
+                                    sum?.let { "${s.workoutAvgShort} ${it.avg} bpm" },
+                                    sum?.let { "${s.workoutMaxShort} ${it.max}" },
+                                ).joinToString(" · "),
+                                color = TsmColors.TextDim, fontSize = 12.sp,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Riepilogo di un allenamento: numeri, grafico, zone, giri; condivisione CSV/PDF ed eliminazione. */
+@Composable
+private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val o by c.options.collectAsState()
+    var confirmDelete by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = s.workoutTitle,
+        subtitle = "${Reports.date(w.startedAt, o.lang)} ${Reports.time(w.startedAt, o.lang)}",
+        icon = Icons.Filled.MonitorHeart,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        StatCard(s.heartStat) {
+            for ((k, v) in WorkoutReport.summaryLines(w, s)) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(k, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    Text(v, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                }
+            }
+            if (WorkoutStats.rmssd(w.rr) != null) Text(s.workoutHrvHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(s.workoutRecoveryHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        if (w.heart.size > 1) StatCard(s.heartChart) { HeartChart(mapOf(Side.P1 to w.heart)) }
+        StatCard(s.heartZones) { HeartZones(mapOf(Side.P1 to w.heart)) { w.strapName ?: s.workoutTitle } }
+        val laps = WorkoutStats.laps(w)
+        if (laps.size > 1) {
+            StatCard(s.workoutLaps) {
+                for (l in laps) Text(WorkoutReport.lapLine(l, s), color = TsmColors.TextMain, fontSize = 13.sp)
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GhostButton(s.workoutShareCsv, Icons.Filled.TableChart, {
+                c.workoutShareIntent(w, pdf = false)?.let { context.startActivity(it) }
+            }, Modifier.weight(1f))
+            GhostButton(s.workoutSharePdf, Icons.Filled.PictureAsPdf, {
+                c.workoutShareIntent(w, pdf = true)?.let { context.startActivity(it) }
+            }, Modifier.weight(1f))
+        }
+        GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.fillMaxWidth())
+    }
+    if (confirmDelete) {
+        ConfirmDialog(
+            Icons.Filled.Delete, s.workoutDeleteTitle, s.workoutDeleteText, s.delete,
+            onConfirm = {
+                confirmDelete = false
+                c.deleteWorkout(w.id)
+            },
+            onDismiss = { confirmDelete = false },
+            danger = true,
+        )
+    }
 }
 TSM_EOF
 
@@ -20003,6 +21941,167 @@ internal object VoiceZip {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/workout/WorkoutSession.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/workout/WorkoutSession.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.workout
+
+import android.os.SystemClock
+import com.tennis.scoremanager.ble.HeartMeasurement
+import com.tennis.scoremanager.data.HeartTrack
+import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.WorkoutStats
+import com.tennis.scoremanager.model.Side
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import java.security.SecureRandom
+
+enum class WorkoutPhase { IDLE, RUNNING, PAUSED, COOLDOWN }
+
+/** Quello che si vede durante l'allenamento. */
+data class WorkoutUi(
+    val phase: WorkoutPhase = WorkoutPhase.IDLE,
+    val elapsedS: Int = 0,
+    val lap: Int = 1,
+    val lapS: Int = 0,
+    val bpm: Int? = null,
+    /** Secondi di recupero che mancano dopo "Fine". */
+    val cooldownLeft: Int = 0,
+)
+
+/**
+ * Allenamento con una fascia, senza partita: un valore di battito al secondo (l'ultima misura arrivata negli ultimi
+ * 3 secondi), gli intervalli RR per l'HRV, i giri. Dopo "Fine" registra ancora un minuto per il recupero, poi
+ * consegna l'allenamento a [onFinished]. Le misure arrivano da qualunque telefono (anche dal satellite).
+ */
+class WorkoutSession(
+    private val scope: CoroutineScope,
+    private val onFinished: (WorkoutRecord) -> Unit,
+) {
+    private val _ui = MutableStateFlow(WorkoutUi())
+    val ui: StateFlow<WorkoutUi> = _ui
+
+    val active: Boolean get() = _ui.value.phase != WorkoutPhase.IDLE
+
+    private var side: Side = Side.P1
+    private var strapName: String? = null
+    private var id = ""
+    private var startedAt = 0L
+    private var elapsed = 0
+    private var t = ArrayList<Int>()
+    private var bpm = ArrayList<Int>()
+    private var rr = ArrayList<Int>()
+    private var laps = ArrayList<Int>()
+    private var cooldown = ArrayList<Int>()
+    private var last: Int? = null
+    private var lastAt = 0L
+    private var ticker: Job? = null
+
+    /** Misura di una fascia: conta solo quella del lato scelto all'avvio. */
+    fun onReading(from: Side, m: HeartMeasurement) {
+        if (from != side || !m.valid) return
+        last = m.bpm
+        lastAt = SystemClock.elapsedRealtime()
+        if (_ui.value.phase == WorkoutPhase.RUNNING) rr.addAll(m.rrMs)
+        _ui.value = _ui.value.copy(bpm = m.bpm)
+    }
+
+    fun start(side: Side, strapName: String?) {
+        if (active) return
+        this.side = side
+        this.strapName = strapName
+        id = "w" + System.currentTimeMillis() + "-" + ByteArray(3).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+        startedAt = System.currentTimeMillis()
+        elapsed = 0
+        t = ArrayList(); bpm = ArrayList(); rr = ArrayList(); laps = ArrayList(); cooldown = ArrayList()
+        _ui.value = WorkoutUi(WorkoutPhase.RUNNING, bpm = fresh())
+        ticker?.cancel()
+        ticker = scope.launch {
+            var next = SystemClock.elapsedRealtime()
+            while (true) {
+                next += 1_000
+                delay((next - SystemClock.elapsedRealtime()).coerceAtLeast(0))
+                tick()
+            }
+        }
+    }
+
+    private fun fresh(): Int? = last?.takeIf { SystemClock.elapsedRealtime() - lastAt <= 3_000 }
+
+    private fun tick() {
+        val now = fresh()
+        when (_ui.value.phase) {
+            WorkoutPhase.RUNNING -> {
+                now?.let { t.add(elapsed); bpm.add(it) }
+                elapsed++
+            }
+            WorkoutPhase.COOLDOWN -> {
+                // Senza misura si ripete l'ultima: il recupero si legge al sessantesimo secondo.
+                (now ?: cooldown.lastOrNull())?.let { cooldown.add(it) }
+                if (_ui.value.cooldownLeft <= 1) {
+                    finish()
+                    return
+                }
+            }
+            else -> Unit
+        }
+        val lapStart = laps.lastOrNull() ?: 0
+        _ui.value = _ui.value.copy(
+            elapsedS = elapsed, lap = laps.size + 1, lapS = elapsed - lapStart, bpm = now,
+            cooldownLeft = if (_ui.value.phase == WorkoutPhase.COOLDOWN) _ui.value.cooldownLeft - 1 else 0,
+        )
+    }
+
+    fun pause() {
+        if (_ui.value.phase == WorkoutPhase.RUNNING) _ui.value = _ui.value.copy(phase = WorkoutPhase.PAUSED)
+    }
+
+    fun resume() {
+        if (_ui.value.phase == WorkoutPhase.PAUSED) _ui.value = _ui.value.copy(phase = WorkoutPhase.RUNNING)
+    }
+
+    fun lap() {
+        if (_ui.value.phase != WorkoutPhase.RUNNING || elapsed == (laps.lastOrNull() ?: 0)) return
+        laps.add(elapsed)
+        _ui.value = _ui.value.copy(lap = laps.size + 1, lapS = 0)
+    }
+
+    /** "Fine": ancora un minuto per il recupero (si può saltare con [finish]). */
+    fun end() {
+        val p = _ui.value.phase
+        if (p != WorkoutPhase.RUNNING && p != WorkoutPhase.PAUSED) return
+        _ui.value = _ui.value.copy(phase = WorkoutPhase.COOLDOWN, cooldownLeft = WorkoutStats.RECOVERY_S)
+    }
+
+    /** Salva subito (anche senza aspettare il minuto di recupero). */
+    fun finish() {
+        if (!active) return
+        ticker?.cancel()
+        ticker = null
+        val rec = WorkoutRecord(
+            id = id, startedAt = startedAt, endedAt = System.currentTimeMillis(), durationS = elapsed,
+            heart = HeartTrack(t = t.toList(), bpm = bpm.toList()), laps = laps.toList(),
+            cooldown = cooldown.toList(), rr = rr.toList(), strapName = strapName,
+        )
+        _ui.value = WorkoutUi()
+        onFinished(rec)
+    }
+
+    /** Annulla senza salvare. */
+    fun discard() {
+        ticker?.cancel()
+        ticker = null
+        _ui.value = WorkoutUi()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/res/drawable/ic_launcher_background.xml
 cat > "$DEST/app/src/main/res/drawable/ic_launcher_background.xml" << 'TSM_EOF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -20844,6 +22943,58 @@ class MatchStatsTest {
     }
 
     @Test
+    fun unforcedAndForcedErrorsAreAlsoErrors() {
+        fun pt(w: Side, k: PointKind) = MatchEvent.Point(w, kind = k)
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(detailedStats = true), rules = RulesConfig(firstServer = p1),
+            events = listOf(pt(p1, PointKind.UNFORCED_ERROR), pt(p1, PointKind.FORCED_ERROR), pt(p1, PointKind.ERROR), pt(p2, PointKind.UNFORCED_ERROR)),
+        )
+        val t = MatchStats.totals(MatchStats.points(r))
+        val b = t.getValue(p2)
+        assertEquals(3, b.errors)
+        assertEquals(1, b.unforcedErrors)
+        assertEquals(1, b.forcedErrors)
+        assertEquals(1, t.getValue(p1).unforcedErrors)
+    }
+
+    @Test
+    fun loveGamesGamePointsAndRuns() {
+        val a = MatchStats.totals(MatchStats.points(rec(*holdBreakHold))).getValue(p1)
+        // Tiene a zero, strappa il servizio a zero, poi tiene da 0-30.
+        assertEquals(2, a.loveGames)
+        assertEquals(3, a.gamePoints)
+        assertEquals(3, a.gamePointsWon)
+        assertEquals(3, a.bestGameRun)
+        assertEquals(0, a.setPoints)
+    }
+
+    @Test
+    fun setWonFromABreakDownAndSetPoints() {
+        // G2 va 3-0, poi G1 vince sei game di fila: 6-3 da sotto di tre game.
+        val winners = Array(3) { game(p2) }.flatten() + Array(6) { game(p1) }.flatten()
+        val a = MatchStats.totals(MatchStats.points(rec(*winners.toTypedArray()))).getValue(p1)
+        assertEquals(1, a.setsFromBreakDown)
+        assertEquals(1, a.setPoints)
+        assertEquals(1, a.setPointsWon)
+        assertEquals(6, a.bestGameRun)
+    }
+
+    @Test
+    fun setDurationAndLongestGameFromPointTimes() {
+        val r = MatchRecord(
+            id = "m", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(firstServer = p1),
+            events = holdBreakHold.mapIndexed { i, w -> MatchEvent.Point(w, at = 1_000_000L + i * 10_000L) },
+        )
+        val pts = MatchStats.points(r)
+        // 14 punti a 10 secondi l'uno: dal primo all'ultimo 130 secondi.
+        assertEquals(listOf<Long?>(130_000L), MatchStats.setDurations(pts))
+        // Il terzo game ha 6 punti: 50 secondi dal primo all'ultimo.
+        assertEquals(50_000L to 6, MatchStats.longestGame(pts))
+        // Senza ore (partite vecchie) non si sa.
+        assertEquals(listOf<Long?>(null), MatchStats.setDurations(MatchStats.points(rec(*holdBreakHold))))
+    }
+
+    @Test
     fun noDetailForPlainMatches() {
         val r = rec(*holdBreakHold)
         assertFalse(MatchStats.hasDetail(r, MatchStats.points(r)))
@@ -20999,6 +23150,16 @@ class PlayerStatsTest {
         assertEquals(1, p.first { it.key == "bianchi" }.won)
         assertEquals(1, p.first { it.key == "neri" }.lost)
         assertEquals(listOf("neri", "verdi"), PlayerStats.rivals(d, "bianchi").map { it.key })
+    }
+
+    @Test
+    fun linesFollowTheMatchesInOrder() {
+        val r = PlayerStats.lines(all, "rossi")
+        assertEquals(listOf(1L, 2L, 3L, 4L), r.map { it.rec.endedAt })
+        assertEquals(listOf(true, false, false, true), r.map { it.won })
+        // Partite senza punti: 0%, e niente statistiche dettagliate.
+        assertEquals(0, r.first().pointsWonPct)
+        assertNull(r.first().detail)
     }
 }
 TSM_EOF
@@ -21161,6 +23322,77 @@ class TournamentTest {
         val t = start(Tournament(id = "t5", players = names(9), courts = 4))
         assertEquals(2, t.current!!.matches.size)
         assertEquals(1, t.current!!.resting.size)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/WorkoutStatsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/WorkoutStatsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class WorkoutStatsTest {
+
+    /** Un valore al secondo da 0 a [n]-1 con il battito dato. */
+    private fun track(n: Int, bpm: (Int) -> Int) = HeartTrack(t = (0 until n).toList(), bpm = (0 until n).map(bpm))
+
+    @Test
+    fun lapsWithRecovery() {
+        // Due giri: 0-120 a 160 bpm, poi si cala a 120 entro il minuto dopo; secondo giro fino a 300 a 150.
+        val w = WorkoutRecord(
+            id = "w1", startedAt = 0, durationS = 300, laps = listOf(120),
+            heart = track(301) { s -> if (s <= 120) 160 else if (s <= 180) 160 - (s - 120) * 40 / 60 else 150 },
+            cooldown = List(60) { 150 - it / 2 },
+        )
+        val laps = WorkoutStats.laps(w)
+        assertEquals(2, laps.size)
+        assertEquals(120, laps[0].durationS)
+        assertEquals(160, laps[0].avg)
+        assertEquals(160, laps[0].max)
+        assertEquals(40, laps[0].recovery)          // 160 a 120 s, 120 a 180 s
+        assertEquals(180, laps[1].durationS)
+        assertEquals(29, laps[1].recovery)          // dopo "Fine": 150 → 121
+        assertEquals(29, WorkoutStats.finalRecovery(w))
+    }
+
+    @Test
+    fun noRecoveryWithoutData() {
+        val w = WorkoutRecord(id = "w", startedAt = 0, durationS = 100, heart = track(101) { 140 })
+        assertNull(WorkoutStats.finalRecovery(w))
+        assertNull(WorkoutStats.laps(w).single().recovery)
+    }
+
+    @Test
+    fun bpmAtToleratesSmallHoles() {
+        val t = HeartTrack(t = listOf(0, 1, 2, 10), bpm = listOf(100, 101, 102, 110))
+        assertEquals(102, WorkoutStats.bpmAt(t, 4))
+        assertNull(WorkoutStats.bpmAt(t, 6))
+    }
+
+    @Test
+    fun rmssdSkipsArtifacts() {
+        // Alterna 800 e 820 ms: differenze di 20 ms → RMSSD 20. Un battito perso (1600) e uno doppio (400) si scartano.
+        val rr = List(60) { if (it % 2 == 0) 800 else 820 } + listOf(1600, 800, 400, 820)
+        assertEquals(20.0, WorkoutStats.rmssd(rr)!!, 0.001)
+        assertNull(WorkoutStats.rmssd(List(10) { 800 }))
+    }
+
+    @Test
+    fun csvSecondBySecond() {
+        val w = WorkoutRecord(
+            id = "w", startedAt = 0, durationS = 4, laps = listOf(2),
+            heart = track(5) { 100 + it }, cooldown = listOf(99, 98),
+        )
+        assertEquals(
+            "second,bpm,lap\n0,100,1\n1,101,1\n2,102,2\n3,103,2\n4,104,2\n5,99,recovery\n6,98,recovery\n",
+            WorkoutStats.csv(w),
+        )
     }
 }
 TSM_EOF
@@ -22269,8 +24501,9 @@ class StringsTest {
             // Le sigle (BP, SP, OK, SET...) restano uguali in ogni lingua: non contano come copie.
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
-            // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese).
-            assertTrue("$lang copia l'inglese in: $same", same.size < 35)
+            // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
+            // con l'allenamento anche "Pause", uguale in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 40)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -27062,6 +29295,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 101 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 107 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -89,7 +89,16 @@ data class RulesConfig(
  * ace e doppio fallo sono di chi serve, il vincente di chi vince il punto, l'errore di chi lo perde.
  */
 @Serializable
-enum class PointKind { ACE, DOUBLE_FAULT, WINNER, ERROR }
+enum class PointKind {
+    ACE, DOUBLE_FAULT, WINNER,
+
+    /** Errore senza dire se gratuito o forzato (anche le partite salvate prima della distinzione). */
+    ERROR,
+    UNFORCED_ERROR,
+    FORCED_ERROR;
+
+    val isError: Boolean get() = this == ERROR || this == UNFORCED_ERROR || this == FORCED_ERROR
+}
 
 /** Eventi della partita: lo stato si ricalcola sempre rigiocandoli (undo sicuro a ogni livello). */
 @Serializable

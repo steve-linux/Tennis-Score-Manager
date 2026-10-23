@@ -9,7 +9,7 @@ Tennis Score Manager keeps the score of a tennis match by the ITF rules and call
 * Optional M5StickS3 wristbands over Bluetooth LE: each player presses KEY1 to win the point and KEY2 to undo it. Their Arduino firmware is in the same repository. From firmware 2.4 they also recognize forehand, backhand, serve and volley after a short calibration.
 * No wristbands? Two Bluetooth selfie remotes (€1–3 each), paired like a keyboard, do the job: one click = point, double click, long press or the other button = undo.
 * LED-style scoreboard on a TV or monitor: a second phone with an HDMI cable, a Chromecast (screen cast), or any browser on the phone's hotspot.
-* Match summary with the score set by set, duration, club, court and place; save it as text, JSON or image, or share it.
+* Match summary with the score set by set, duration, club, court and place; save it as text, JSON, image or full PDF (statistics, log and up to 10 match photos), or share it.
 * End-of-match statistics, for the match or per set (serve, return, break points, points in a row…), and a point-by-point log with break points, set points and match points.
 * Detailed stats, for someone scoring from the side of the court: aces, double faults, first serves, winners and errors.
 * History on the phone: finished matches to reopen, players with wins, losses and head to head; matches saved (JSON) on another phone can be imported, also with a QR code on the same Wi-Fi. Player photos, on the TV scoreboard too.
