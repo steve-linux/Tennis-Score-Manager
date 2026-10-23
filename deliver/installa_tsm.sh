@@ -18264,7 +18264,8 @@ private fun pct(v: Int, of: Int) = if (of > 0) Math.round(v * 100.0 / of).toInt(
 private fun shown(st: Stat, v: Int, of: Int, other: Int): Pair<String, Float> = when (st.kind) {
     StatKind.PERCENT -> "${pct(v, of)}% ($v/$of)" to (if (of > 0) v.toFloat() / of else 0f)
     StatKind.RATIO -> "$v/$of" to (if (of > 0) v.toFloat() / of else 0f)
-    StatKind.COUNT -> "$v" to (if (maxOf(v, other) > 0) v.toFloat() / maxOf(v, other) else 0f)
+    // Negativo = non misurato (per esempio il giocatore senza fascia cardio): un trattino, non uno zero.
+    StatKind.COUNT -> if (v < 0) "–" to 0f else "$v" to (if (maxOf(v, other) > 0) v.toFloat() / maxOf(v, other) else 0f)
 }
 
 /**
@@ -18389,9 +18390,9 @@ private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
     val b = HeartStats.summary(rec.heart[Side.P2])
     if (a == null && b == null) return null
     return listOfNotNull(
-        Stat("${s.heartAvg} (bpm)", a?.avg ?: 0, b?.avg ?: 0),
-        Stat("${s.heartMax} (bpm)", a?.max ?: 0, b?.max ?: 0),
-        Stat("${s.heartCalories} (kcal)", a?.kcal ?: 0, b?.kcal ?: 0).takeIf { it.a > 0 || it.b > 0 },
+        Stat("${s.heartAvg} (bpm)", a?.avg ?: -1, b?.avg ?: -1),
+        Stat("${s.heartMax} (bpm)", a?.max ?: -1, b?.max ?: -1),
+        Stat("${s.heartCalories} (kcal)", a?.kcal ?: -1, b?.kcal ?: -1).takeIf { it.a > 0 || it.b > 0 },
     )
 }
 

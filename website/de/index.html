@@ -246,6 +246,8 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
 
 <header class="nav">
@@ -282,7 +284,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Frei und kostenlos · Lizenz GPL-3.0</div>
       <h1>Dein Spielstand im Tennis, <em>wie bei den Profis.</em></h1>
-      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken, den Verlauf Punkt für Punkt und mit den Armbändern auch deine Schläge, und das Ergebnis kann live auf einem Fernseher erscheinen.</p>
+      <p class="lead">Die Android-App, die den Spielstand im Tennis und Padel nach den ITF-Regeln zählt und ihn laut ansagt wie ein Stuhlschiedsrichter. Gezählt wird am Telefon, mit zwei Armbändern oder mit zwei Bluetooth-Fernbedienungen; am Ende gibt es Statistiken, den Verlauf Punkt für Punkt und mit den Armbändern auch deine Schläge, und das Ergebnis kann live auf einem Fernseher erscheinen. Mit einem Bluetooth-Brustgurt misst du auch Herzfrequenz und Kalorien, im Spiel und im Training.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> App holen</a>
         <a class="btn btn-ghost" href="#features">Funktionen entdecken <svg class="icon"><use href="#i-down"/></svg></a>
@@ -356,6 +358,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Statt Armbändern zwei Bluetooth-Selfie-Fernbedienungen (1–3 €): Ein Klick gibt den Punkt, ein Doppelklick nimmt ihn zurück. Keine Firmware nötig.</p>
         <button class="more" data-open="d-remote">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div>
+        <h3>Herzfrequenz und Kalorien</h3>
+        <p>Mit einem Bluetooth-Brustgurt (Coospo, Magene, Polar, Garmin…) siehst du die Herzfrequenz jedes Spielers live und nach dem Spiel Durchschnitt, Maximum, Kalorien, Diagramm und Pulszonen.</p>
+        <button class="more" data-open="d-heart">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Training und Fortschritte</h3>
+        <p>Trainiere mit dem Gurt auch ohne Spiel: Runden, Pausen, Erholungsminute, HRV, CSV und PDF. Fortschritte vergleicht Trainings und Spiele über die Zeit und zeigt dir, ob du besser wirst.</p>
+        <button class="more" data-open="d-train">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div>
+        <h3>Zweites Telefon an der Grundlinie</h3>
+        <p>Gurte und Armbänder reichen ein paar Meter weniger weit als der Platz lang ist: Ein zweites Telefon am anderen Ende dient als Brücke, mit eigenem Netz und ohne Datenverlust.</p>
+        <button class="more" data-open="d-second">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Erkennt deine Schläge</h3>
@@ -379,8 +399,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <li><svg class="icon"><use href="#i-check"/></svg><div>Punkt für Punkt<small>Spiel für Spiel: wer aufschlägt, verlorene Aufschläge und der Stand nach jedem Punkt, mit hervorgehobenen Break-, Satz- und Matchbällen.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Verlauf und Spieler<small>Jedes beendete Match bleibt auf dem Telefon: Öffne es mit seiner Zusammenfassung wieder und sieh Siege, Niederlagen und direkten Vergleich jedes Spielers. Auf einem anderen Telefon gespeicherte Matches lassen sich importieren. Verlauf und unterbrochene Matches lassen sich auch per QR-Code im selben WLAN auf ein anderes Telefon übertragen. Jeder Spieler kann ein Foto haben, auch auf der TV-Anzeigetafel.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Mit Armbändern auch die Schläge<small>Vorhände, Rückhände, Aufschläge und Volleys jedes Spielers, Handgelenk-Tempo und wie viele Schläge jeder Ballwechsel dauert.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>PDF, Fotos und Fortschritte<small>Der vollständige Spielbericht wird zum PDF mit Statistiken, Verlauf und bis zu 10 Fotos vom Spiel. Im Verlauf siehst du die Entwicklung jedes Spielers, unter Fortschritte, ob du besser wirst.</small></div></li>
         </ul>
-        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Asse, Doppelfehler und Fehler sind nicht bekannt: Die App weiß nur, wer jeden Punkt gewinnt.</p>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Asse, Doppelfehler, erste Aufschläge, Winner sowie unerzwungene und erzwungene Fehler gibt es, wenn du die detaillierten Statistiken einschaltest; mit Armbändern oder Fernbedienungen fragt die App auf Wunsch, wie der Punkt geendet hat.</p>
       </div>
       <div class="media">
         <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
@@ -472,6 +493,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modus Fernbedienungen: Jeder Spieler holt sich den Punkt mit einer Bluetooth-Selfie-Fernbedienung"><span>Fernbedienungen</span></button></li>
       <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiken zum Matchende: Aufschlag, Return und Breakbälle beider Spieler im Vergleich"><span>Statistiken</span></button></li>
       <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Schlagerkennung: Kalibrierung von Vorhand, Rückhand, Aufschlag und Volley am Armband"><span>Schlagerkennung</span></button></li>
+      <li><button class="shot"><img src="../img/fasce.jpg" width="540" height="1152" loading="lazy" alt="Seite 2: verbundener Brustgurt mit Puls, Signal und Akku sowie Alter und Gewicht für die Kalorien"><span>Brustgurte</span></button></li>
+      <li><button class="shot"><img src="../img/battito.jpg" width="540" height="1152" loading="lazy" alt="Statistiken nach dem Spiel: Durchschnitts- und Maximalpuls, Kalorien, Pulsdiagramm und Zeit in den Pulszonen"><span>Puls im Spiel</span></button></li>
+      <li><button class="shot"><img src="../img/allenamento.jpg" width="540" height="1152" loading="lazy" alt="Zusammenfassung eines Trainings mit dem Gurt: Dauer, Puls, Kalorien, HRV, Erholung und Diagramm"><span>Training</span></button></li>
     </ul>
   </div>
 </section>
@@ -497,7 +521,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <dt>Lizenz</dt><dd>GNU GPL v3 oder neuer</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Für die Armbänder. Fernbedienungen werden in den Bluetooth-Einstellungen des Telefons gekoppelt.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Für Armbänder und Brustgurte und zum Verbinden des zweiten Telefons. Fernbedienungen werden in den Bluetooth-Einstellungen des Telefons gekoppelt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Standort<small>Optional: der Ort des Platzes im Spielbericht. Bis Android 11 wird er auch für die Bluetooth-Suche benötigt.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Netzwerk<small>Nur für die Anzeigetafel im lokalen Netz.</small></div></li>
         </ul>
@@ -620,6 +644,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li>Während des Matches bleibt die App bei eingeschaltetem Bildschirm geöffnet: Die Tasten einer Bluetooth-Tastatur erreichen nur die sichtbare App.</li>
     </ul>
     <div class="note">Keine Firmware und keine Berechtigungen: Android sieht sie als Tastatur.</div>
+  </div>
+</dialog>
+
+<dialog id="d-heart" aria-labelledby="t-heart" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div><h3 id="t-heart">Bluetooth-Brustgurte</h3></div>
+    <p>Herzfrequenz und Kalorien von Brustgurten mit dem Standard-Herzfrequenzdienst von Bluetooth: Coospo (getestet mit dem H6), Magene, Polar, Garmin, Wahoo… Einer pro Spieler, in jedem Modus, auch ohne Armbänder.</p>
+    <ul>
+      <li><strong>Sofort bereit:</strong> Elektroden befeuchten und anlegen, er schaltet sich selbst ein; in der App wählst du ihn nur einmal aus.</li>
+      <li><strong>Live:</strong> Im Spiel zeigt eine Zeile die Herzfrequenz jedes Spielers.</li>
+      <li><strong>Nach dem Spiel:</strong> Durchschnitts- und Maximalpuls, Kalorien, Verlauf als Diagramm und Zeit in den Pulszonen; Pausen zählen nicht.</li>
+      <li><strong>Kalorien und Zonen:</strong> mit Alter, Gewicht und Geschlecht der Person mit dem Gurt (Keytel-Formel, typischer Fehler ±20 %; Maximalpuls geschätzt als 208 − 0,7 × Alter).</li>
+      <li><strong>Signal im Blick:</strong> Die App zeigt die Signalstärke und wie oft die Herzfrequenz nicht angekommen ist.</li>
+    </ul>
+    <div class="note"><strong>Reichweite:</strong> Ein Gurt reicht etwa 20 Meter weit, weniger, wenn du dem Telefon den Rücken zudrehst. Im Einzel steht der ferne Spieler 24-30 Meter entfernt: Mit einem zweiten Telefon an der Grundlinie geht nichts verloren.</div>
+  </div>
+</dialog>
+
+<dialog id="d-train" aria-labelledby="t-train" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-train">Training und Fortschritte</h3></div>
+    <p>Auf der ersten Seite zeichnet <strong>Training</strong> eine Einheit mit dem Gurt auf, auch ohne Spiel.</p>
+    <ul>
+      <li><strong>Runden und Pausen:</strong> „Runde“ schließt einen Abschnitt (einen Sprint, eine Übung, eine Bahnrunde) und beginnt den nächsten; Pausen zählen nicht.</li>
+      <li><strong>Erholung:</strong> Am Ende zeichnet die App noch eine Minute auf, um zu messen, wie weit der Puls sinkt.</li>
+      <li><strong>Zusammenfassung:</strong> Dauer, Durchschnitts- und Maximalpuls, Kalorien, HRV (RMSSD), Erholung, Diagramm, Pulszonen und die Werte jeder Runde; CSV Sekunde für Sekunde und PDF zum Teilen.</li>
+      <li><strong>Fortschritte:</strong> Für Trainings und für die Spiele eines Spielers aus dem Verlauf vergleicht es die erste und die zweite Hälfte des Zeitraums: ▲, wenn du besser wirst, ▼, wenn schlechter. Als PDF teilen oder drucken.</li>
+    </ul>
+    <div class="note">Vergleiche HRV und Erholung mit deinen eigenen ähnlichen Einheiten, nicht mit denen anderer.</div>
+  </div>
+</dialog>
+
+<dialog id="d-second" aria-labelledby="t-second" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div><h3 id="t-second">Zweites Telefon an der Grundlinie</h3></div>
+    <p>Gurte und Armbänder verbinden sich mit jeweils einem Telefon und reichen ein paar Meter weniger weit als der Platz lang ist. Mit einem zweiten Telefon am anderen Ende hat jeder Spieler immer eines in der Nähe.</p>
+    <ul>
+      <li><strong>Verbindung per QR-Code:</strong> Das Haupttelefon erstellt ein eigenes, nur lokales Netz: keine SIM, keine mobilen Daten, kein WLAN des Clubs.</li>
+      <li><strong>Nichts auszuwählen:</strong> Das zweite Telefon übernimmt von selbst die Gurte und Armbänder, die auf dem Haupttelefon gewählt sind.</li>
+      <li><strong>Seitenwechsel automatisch:</strong> Jeder Gurt und jedes Armband wechselt von selbst zum nächsten Telefon.</li>
+      <li><strong>Keine Daten verloren:</strong> Puls und Schläge vom zweiten Telefon warten auf die Bestätigung des Haupttelefons und füllen nach einem Netzausfall die Lücken, sobald es wieder da ist.</li>
+      <li><strong>Auch als Anzeigetafel:</strong> Das zweite Telefon kann die Anzeigetafel des Spiels im Vollbild zeigen.</li>
+    </ul>
+    <div class="note">Das Haupttelefon führt das Spiel: Spielstand, Stimme und Spielbericht bleiben dort.</div>
   </div>
 </dialog>
 

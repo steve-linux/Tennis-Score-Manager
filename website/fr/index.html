@@ -246,6 +246,8 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
 
 <header class="nav">
@@ -282,7 +284,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Libre et gratuite · licence GPL-3.0</div>
       <h1>Votre score de tennis, <em>comme un vrai Pro.</em></h1>
-      <p class="lead">L'application Android qui compte les points au tennis et au padel selon les règles de l'ITF et les annonce à voix haute comme un arbitre de chaise. On marque depuis le téléphone, avec deux bracelets ou deux télécommandes Bluetooth ; en fin de match, statistiques, déroulé point par point et, avec les bracelets, vos coups, et le score peut s'afficher en direct sur une TV.</p>
+      <p class="lead">L'application Android qui compte les points au tennis et au padel selon les règles de l'ITF et les annonce à voix haute comme un arbitre de chaise. On marque depuis le téléphone, avec deux bracelets ou deux télécommandes Bluetooth ; en fin de match, statistiques, déroulé point par point et, avec les bracelets, vos coups, et le score peut s'afficher en direct sur une TV. Avec une ceinture cardio Bluetooth, vous suivez aussi la fréquence cardiaque et les calories, en match et à l'entraînement.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Obtenir l'application</a>
         <a class="btn btn-ghost" href="#features">Découvrir les fonctions <svg class="icon"><use href="#i-down"/></svg></a>
@@ -356,6 +358,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>À la place des bracelets, deux télécommandes Bluetooth pour selfie (1 à 3 €) : un clic donne le point, un double clic l'annule. Aucun firmware à charger.</p>
         <button class="more" data-open="d-remote">Détails <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div>
+        <h3>Fréquence cardiaque et calories</h3>
+        <p>Avec une ceinture thoracique Bluetooth (Coospo, Magene, Polar, Garmin…), vous voyez en direct la fréquence cardiaque de chaque joueur et, en fin de match, moyenne, maximum, calories, graphique et zones cardio.</p>
+        <button class="more" data-open="d-heart">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Entraînement et progrès</h3>
+        <p>Entraînez-vous avec la ceinture même sans match : tours, pauses, minute de récupération, VFC, CSV et PDF. Progrès compare entraînements et matchs dans le temps et vous dit si vous progressez.</p>
+        <button class="more" data-open="d-train">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div>
+        <h3>Deuxième téléphone au fond du court</h3>
+        <p>Ceintures et bracelets portent à quelques mètres de moins que la longueur du court : un deuxième téléphone à l'autre bout sert de relais, avec son propre réseau et sans perte de données.</p>
+        <button class="more" data-open="d-second">Détails <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Reconnaît vos coups</h3>
@@ -379,8 +399,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <li><svg class="icon"><use href="#i-check"/></svg><div>Point par point<small>Jeu par jeu : qui sert, les services perdus et le score après chaque point, avec balles de break, de set et de match mises en évidence.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Historique et joueurs<small>Chaque match terminé reste sur le téléphone : rouvrez-le avec son récapitulatif et voyez victoires, défaites et face-à-face de chaque joueur. Les matchs enregistrés sur un autre téléphone s'importent. L'historique et les matchs suspendus passent aussi sur un autre téléphone avec un code QR, sur le même réseau Wi-Fi. Chaque joueur peut avoir sa photo, aussi sur le tableau TV.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Avec les bracelets, aussi les coups<small>Coups droits, revers, services et volées de chaque joueur, vitesse du poignet et nombre de coups de chaque échange.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>PDF, photos et progrès<small>Le résumé complet devient un PDF avec statistiques, déroulé et jusqu'à 10 photos du match. Dans l'historique, vous voyez l'évolution de chaque joueur, et dans Progrès si vous vous améliorez.</small></div></li>
         </ul>
-        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, doubles fautes et fautes ne peuvent pas être connus : l'application sait seulement qui gagne chaque point.</p>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, doubles fautes, premières balles, coups gagnants et fautes directes ou provoquées sont là si vous activez les statistiques détaillées ; avec bracelets ou télécommandes, l'application peut demander comment le point s'est terminé.</p>
       </div>
       <div class="media">
         <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
@@ -472,6 +493,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Mode Télécommandes : chaque joueur marque le point avec une télécommande Bluetooth pour selfie"><span>Télécommandes</span></button></li>
       <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Statistiques de fin de match : service, retour et balles de break des deux joueurs comparés"><span>Statistiques</span></button></li>
       <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Reconnaissance des coups : calibrage du coup droit, du revers, du service et de la volée sur le bracelet"><span>Reconnaissance des coups</span></button></li>
+      <li><button class="shot"><img src="../img/fasce.jpg" width="540" height="1152" loading="lazy" alt="Page 2 : ceinture cardio connectée avec fréquence cardiaque, signal et batterie, et âge et poids pour les calories"><span>Ceintures cardio</span></button></li>
+      <li><button class="shot"><img src="../img/battito.jpg" width="540" height="1152" loading="lazy" alt="Statistiques de fin de match : fréquence moyenne et maximale, calories, graphique et temps dans les zones cardio"><span>Cœur en match</span></button></li>
+      <li><button class="shot"><img src="../img/allenamento.jpg" width="540" height="1152" loading="lazy" alt="Résumé d'un entraînement avec la ceinture : durée, fréquence cardiaque, calories, VFC, récupération et graphique"><span>Entraînement</span></button></li>
     </ul>
   </div>
 </section>
@@ -497,7 +521,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <dt>Licence</dt><dd>GNU GPL v3 ou ultérieure</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Pour les bracelets. Les télécommandes s'appairent depuis les réglages Bluetooth du téléphone.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Pour les bracelets et les ceintures cardio, et pour relier le deuxième téléphone. Les télécommandes s'appairent depuis les réglages Bluetooth du téléphone.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Localisation<small>Facultative : le lieu du court dans le résumé. Jusqu'à Android 11, elle sert aussi à la recherche Bluetooth.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Réseau<small>Uniquement pour le tableau sur le réseau local.</small></div></li>
         </ul>
@@ -620,6 +644,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li>Pendant le match, l'application reste ouverte, écran allumé : les touches d'un clavier Bluetooth n'arrivent qu'à l'application visible.</li>
     </ul>
     <div class="note">Aucun firmware et aucune autorisation : Android les voit comme un clavier.</div>
+  </div>
+</dialog>
+
+<dialog id="d-heart" aria-labelledby="t-heart" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div><h3 id="t-heart">Ceintures cardio Bluetooth</h3></div>
+    <p>Fréquence cardiaque et calories avec des ceintures thoraciques qui utilisent le service cardio standard du Bluetooth : Coospo (testée avec la H6), Magene, Polar, Garmin, Wahoo… Une par joueur, dans tous les modes, même sans bracelets.</p>
+    <ul>
+      <li><strong>Prête en un instant :</strong> mouillez les électrodes et mettez-la, elle s'allume toute seule ; on la choisit une seule fois dans l'application.</li>
+      <li><strong>En direct :</strong> pendant le match, une ligne affiche la fréquence cardiaque de chaque joueur.</li>
+      <li><strong>En fin de match :</strong> fréquence moyenne et maximale, calories, graphique dans le temps et temps passé dans les zones cardio ; les pauses ne comptent pas.</li>
+      <li><strong>Calories et zones :</strong> avec l'âge, le poids et le sexe de la personne qui la porte (formule de Keytel, erreur typique ±20 % ; fréquence maximale estimée à 208 − 0,7 × âge).</li>
+      <li><strong>Signal sous contrôle :</strong> l'application affiche la force du signal et le nombre de fois où la fréquence n'est pas arrivée.</li>
+    </ul>
+    <div class="note"><strong>Portée :</strong> une ceinture porte à environ 20 mètres du téléphone, moins si vous lui tournez le dos. En simple, le joueur éloigné est à 24-30 mètres : avec un deuxième téléphone au fond du court, rien n'est perdu.</div>
+  </div>
+</dialog>
+
+<dialog id="d-train" aria-labelledby="t-train" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-train">Entraînement et progrès</h3></div>
+    <p>Depuis la première page, <strong>Entraînement</strong> enregistre une séance avec la ceinture, même sans match.</p>
+    <ul>
+      <li><strong>Tours et pauses :</strong> « Tour » termine une partie (un sprint, un exercice, un tour de piste) et en commence une autre ; les pauses ne comptent pas.</li>
+      <li><strong>Récupération :</strong> à la fin, l'application enregistre encore une minute pour mesurer de combien la fréquence descend.</li>
+      <li><strong>Résumé :</strong> durée, fréquence moyenne et maximale, calories, VFC (RMSSD), récupération, graphique, zones cardio et données de chaque tour ; CSV seconde par seconde et PDF à partager.</li>
+      <li><strong>Progrès :</strong> pour les entraînements et pour les matchs d'un joueur de l'historique, compare la première et la deuxième moitié de la période : ▲ si vous progressez, ▼ si vous reculez. À partager en PDF ou à imprimer.</li>
+    </ul>
+    <div class="note">Comparez la VFC et la récupération avec vos propres séances similaires, pas avec celles des autres.</div>
+  </div>
+</dialog>
+
+<dialog id="d-second" aria-labelledby="t-second" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fermer"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div><h3 id="t-second">Deuxième téléphone au fond du court</h3></div>
+    <p>Ceintures et bracelets se connectent à un seul téléphone à la fois et portent à quelques mètres de moins que la longueur du court. Avec un deuxième téléphone à l'autre bout, chaque joueur en a toujours un à proximité.</p>
+    <ul>
+      <li><strong>Se relie avec un QR code :</strong> le téléphone principal crée son propre réseau, uniquement local : ni carte SIM, ni données, ni Wi-Fi du club.</li>
+      <li><strong>Rien à choisir :</strong> le deuxième téléphone suit tout seul les ceintures et les bracelets choisis sur le principal.</li>
+      <li><strong>Changement de côté automatique :</strong> chaque ceinture et chaque bracelet passe tout seul au téléphone le plus proche.</li>
+      <li><strong>Aucune donnée perdue :</strong> la fréquence et les coups relayés par le deuxième téléphone attendent la confirmation du principal et, si le réseau tombe, comblent les trous dès son retour.</li>
+      <li><strong>Tableau aussi :</strong> le deuxième téléphone peut afficher le tableau du match en plein écran.</li>
+    </ul>
+    <div class="note">Le téléphone principal garde le match : score, voix et résumé restent sur lui.</div>
   </div>
 </dialog>
 

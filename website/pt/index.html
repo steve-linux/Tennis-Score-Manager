@@ -246,6 +246,8 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
 
 <header class="nav">
@@ -282,7 +284,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
     <div>
       <div class="badge"><span class="dot"></span> Livre e gratuito · licença GPL-3.0</div>
       <h1>Seu placar de tênis, <em>como um verdadeiro Pro.</em></h1>
-      <p class="lead">O app Android que marca o placar do tênis e do padel segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone, com duas pulseiras ou com dois controles Bluetooth; no fim você tem estatísticas, histórico ponto a ponto e, com as pulseiras, também seus golpes, e o resultado pode aparecer ao vivo numa TV.</p>
+      <p class="lead">O app Android que marca o placar do tênis e do padel segundo as regras da ITF e o anuncia em voz alta como um árbitro de cadeira. Os pontos são marcados no telefone, com duas pulseiras ou com dois controles Bluetooth; no fim você tem estatísticas, histórico ponto a ponto e, com as pulseiras, também seus golpes, e o resultado pode aparecer ao vivo numa TV. Com uma cinta cardíaca Bluetooth você também mede batimentos e calorias, na partida e no treino.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#download"><svg class="icon"><use href="#i-download"/></svg> Baixar o app</a>
         <a class="btn btn-ghost" href="#features">Conheça os recursos <svg class="icon"><use href="#i-down"/></svg></a>
@@ -356,6 +358,24 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>No lugar das pulseiras, dois controles Bluetooth de selfie bem baratos: um clique marca o ponto, o clique duplo desfaz. Sem firmware para carregar.</p>
         <button class="more" data-open="d-remote">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div>
+        <h3>Batimentos e calorias</h3>
+        <p>Com uma cinta peitoral Bluetooth (Coospo, Magene, Polar, Garmin…) você vê os batimentos de cada jogador ao vivo e, no fim da partida, média, máximo, calorias, gráfico e zonas cardíacas.</p>
+        <button class="more" data-open="d-heart">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div>
+        <h3>Treino e progresso</h3>
+        <p>Treine com a cinta mesmo sem partida: voltas, pausas, minuto de recuperação, VFC, CSV e PDF. Progressos compara treinos e partidas ao longo do tempo e diz se você está melhorando.</p>
+        <button class="more" data-open="d-train">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
+      <article class="card" style="--accent:var(--violet)">
+        <div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div>
+        <h3>Segundo telefone no fundo da quadra</h3>
+        <p>Cintas e pulseiras alcançam alguns metros a menos que o comprimento da quadra: um segundo telefone no outro fundo faz a ponte, com rede própria e sem perder dados.</p>
+        <button class="more" data-open="d-second">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
       <article class="card wide" style="--accent:var(--blue)">
         <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
         <h3>Reconhece seus golpes</h3>
@@ -379,8 +399,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <li><svg class="icon"><use href="#i-check"/></svg><div>Ponto a ponto<small>Jogo a jogo: quem saca, os saques perdidos e o placar depois de cada ponto, com break points, set points e match points em destaque.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Histórico e jogadores<small>Cada partida terminada fica no telefone: reabra com o resumo e veja vitórias, derrotas e confronto direto de cada jogador. As partidas salvas em outro telefone podem ser importadas. O histórico e as partidas suspensas também passam para outro telefone com um código QR, na mesma rede Wi-Fi. Cada jogador pode ter sua foto, também no placar da TV.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Com as pulseiras, também os golpes<small>Forehands, backhands, saques e voleios de cada jogador, velocidade do pulso e quantos golpes dura cada troca de bola.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>PDF, fotos e progresso<small>O resumo completo vira um PDF com estatísticas, histórico e até 10 fotos da partida. No histórico você vê a evolução de cada jogador, e em Progressos se está melhorando.</small></div></li>
         </ul>
-        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, duplas faltas e erros não podem ser conhecidos: o app só sabe quem ganha cada ponto.</p>
+        <p style="margin-top:20px;color:var(--muted);font-size:.92rem">Aces, duplas faltas, primeiros saques, winners e erros não forçados ou forçados aparecem se você ativar as estatísticas detalhadas; com pulseiras ou controles o app pode perguntar como o ponto terminou.</p>
       </div>
       <div class="media">
         <ul class="gallery" style="grid-template-columns:repeat(2,1fr)">
@@ -472,6 +493,9 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><button class="shot"><img src="../img/telecomandi.jpg" width="540" height="1152" loading="lazy" alt="Modo Controles: cada jogador marca o ponto com um controle Bluetooth de selfie"><span>Controles</span></button></li>
       <li><button class="shot"><img src="../img/statistiche.jpg" width="540" height="1152" loading="lazy" alt="Estatísticas de fim de partida: saque, devolução e break points dos dois jogadores comparados"><span>Estatísticas</span></button></li>
       <li><button class="shot"><img src="../img/colpi.jpg" width="540" height="1152" loading="lazy" alt="Reconhecimento de golpes: calibração de forehand, backhand, saque e voleio na pulseira"><span>Reconhecimento de golpes</span></button></li>
+      <li><button class="shot"><img src="../img/fasce.jpg" width="540" height="1152" loading="lazy" alt="Página 2: cinta cardíaca conectada com batimentos, sinal e bateria, e idade e peso para as calorias"><span>Cintas cardíacas</span></button></li>
+      <li><button class="shot"><img src="../img/battito.jpg" width="540" height="1152" loading="lazy" alt="Estatísticas de fim de partida: média e máximo de batimentos, calorias, gráfico e tempo nas zonas cardíacas"><span>Batimentos na partida</span></button></li>
+      <li><button class="shot"><img src="../img/allenamento.jpg" width="540" height="1152" loading="lazy" alt="Resumo de um treino com a cinta: duração, batimentos, calorias, VFC, recuperação e gráfico"><span>Treino</span></button></li>
     </ul>
   </div>
 </section>
@@ -497,7 +521,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
           <dt>Licença</dt><dd>GNU GPL v3 ou posterior</dd>
         </dl>
         <ul class="checks" style="margin-top:18px">
-          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Para as pulseiras. Os controles são pareados nos ajustes Bluetooth do telefone.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Bluetooth<small>Para as pulseiras e as cintas cardíacas, e para conectar o segundo telefone. Os controles são pareados nos ajustes Bluetooth do telefone.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Localização<small>Opcional: o local da quadra no resumo. Até o Android 11 também é necessária para a busca Bluetooth.</small></div></li>
           <li><svg class="icon"><use href="#i-check"/></svg><div>Rede<small>Só para o placar na rede local.</small></div></li>
         </ul>
@@ -620,6 +644,53 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li>Durante a partida o app fica aberto com a tela acesa: as teclas de um teclado Bluetooth só chegam ao app visível.</li>
     </ul>
     <div class="note">Sem firmware e sem permissões: o Android os vê como um teclado.</div>
+  </div>
+</dialog>
+
+<dialog id="d-heart" aria-labelledby="t-heart" style="--accent:var(--blue)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-heart"/></svg></div><h3 id="t-heart">Cintas cardíacas Bluetooth</h3></div>
+    <p>Batimentos e calorias de cintas peitorais que usam o serviço cardíaco padrão do Bluetooth: Coospo (testada a H6), Magene, Polar, Garmin, Wahoo… Uma por jogador, em qualquer modo, mesmo sem pulseiras.</p>
+    <ul>
+      <li><strong>Pronta num instante:</strong> molhe os eletrodos e coloque, ela liga sozinha; no app você a escolhe uma vez só.</li>
+      <li><strong>Ao vivo:</strong> durante a partida uma linha mostra os batimentos de cada jogador.</li>
+      <li><strong>No fim da partida:</strong> média e máximo de batimentos, calorias, gráfico no tempo e tempo nas zonas cardíacas; as pausas não contam.</li>
+      <li><strong>Calorias e zonas:</strong> com idade, peso e sexo de quem usa a cinta (fórmula de Keytel, erro típico ±20%; batimento máximo estimado em 208 − 0,7 × idade).</li>
+      <li><strong>Sinal sob controle:</strong> o app mostra a força do sinal e quantas vezes os batimentos não chegaram.</li>
+    </ul>
+    <div class="note"><strong>Alcance:</strong> uma cinta chega a uns 20 metros do telefone, menos se você estiver de costas para ele. Nas simples o jogador distante fica a 24-30 metros: com um segundo telefone no fundo da quadra nada se perde.</div>
+  </div>
+</dialog>
+
+<dialog id="d-train" aria-labelledby="t-train" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-trend"/></svg></div><h3 id="t-train">Treino e progresso</h3></div>
+    <p>Na primeira página, <strong>Treino</strong> registra uma sessão com a cinta, mesmo sem partida.</p>
+    <ul>
+      <li><strong>Voltas e pausas:</strong> “Volta” fecha uma parte (um tiro, um exercício, uma volta na pista) e abre outra; as pausas não contam.</li>
+      <li><strong>Recuperação:</strong> no fim o app registra mais um minuto para medir quanto os batimentos descem.</li>
+      <li><strong>Resumo:</strong> duração, média e máximo de batimentos, calorias, VFC (RMSSD), recuperação, gráfico, zonas cardíacas e dados de cada volta; CSV segundo a segundo e PDF para compartilhar.</li>
+      <li><strong>Progressos:</strong> para os treinos e para as partidas de um jogador do histórico compara a primeira e a segunda metade do período: ▲ se você melhora, ▼ se piora. Compartilhe em PDF ou imprima.</li>
+    </ul>
+    <div class="note">Compare a VFC e a recuperação com seus próprios treinos parecidos, não com os dos outros.</div>
+  </div>
+</dialog>
+
+<dialog id="d-second" aria-labelledby="t-second" style="--accent:var(--violet)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-phone"/></svg></div><h3 id="t-second">Segundo telefone no fundo da quadra</h3></div>
+    <p>Cintas e pulseiras se conectam a um telefone por vez e alcançam alguns metros a menos que o comprimento da quadra. Com um segundo telefone no outro fundo, cada jogador sempre tem um por perto.</p>
+    <ul>
+      <li><strong>Conecta com um QR:</strong> o telefone principal cria uma rede própria, só local: sem chip, sem dados e sem o Wi-Fi do clube.</li>
+      <li><strong>Nada para escolher:</strong> o segundo telefone segue sozinho as cintas e pulseiras escolhidas no principal.</li>
+      <li><strong>Troca de lado automática:</strong> cada cinta e cada pulseira passa sozinha para o telefone mais próximo.</li>
+      <li><strong>Nenhum dado perdido:</strong> batimentos e golpes que passam pelo segundo telefone esperam a confirmação do principal e, se a rede cair, preenchem as lacunas assim que ela volta.</li>
+      <li><strong>Placar também:</strong> o segundo telefone pode mostrar o placar da partida em tela cheia.</li>
+    </ul>
+    <div class="note">O telefone principal cuida da partida: placar, voz e resumo ficam nele.</div>
   </div>
 </dialog>
 
