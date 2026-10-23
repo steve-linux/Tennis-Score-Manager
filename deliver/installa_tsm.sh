@@ -821,6 +821,7 @@ import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapGaps
 import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
@@ -1018,6 +1019,14 @@ class MatchController(
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
     private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    /**
+     * Stacchi di ciascuna fascia (per indirizzo), con le misure di questo telefono e del satellite insieme: conta
+     * quando il battito non è arrivato da nessuno dei due. Ripartono a ogni partita.
+     */
+    private val strapGaps = mutableMapOf<String, StrapGaps>()
+    /** Batte ogni 2 secondi: uno stacco in corso si vede crescere anche senza misure nuove. */
+    private val gapTick = MutableStateFlow(0L)
+
     /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
     private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
 
@@ -1037,15 +1046,17 @@ class MatchController(
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
      */
-    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote) { local, remote ->
+    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
+        val now = SystemClock.elapsedRealtime()
         local.mapValues { (_, st) ->
             val r = remote[st.address]?.status
             val localOk = st.state == StrapState.READY && st.bpm != null
-            if (!localOk && r != null && r.ready && r.bpm != null) {
-                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, received = r.received, relayed = true)
+            val shown = if (!localOk && r != null && r.ready && r.bpm != null) {
+                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, relayed = true)
             } else {
                 st
             }
+            shown.copy(gaps = strapGaps[st.address]?.stats(now))
         }
     }.stateIn(scope, SharingStarted.Eagerly, emptyMap())
     private var locationJob: Job? = null
@@ -1079,6 +1090,7 @@ class MatchController(
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
         scope.launch {
             heart.readings.collect { (side, m) ->
+                heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
                 onHeartReading(side, m)
                 relay.onLocalReading(side, m)
             }
@@ -1087,6 +1099,19 @@ class MatchController(
             while (true) {
                 delay(HeartStats.STEP_S * 1000L)
                 flushHeart()
+            }
+        }
+        scope.launch {
+            heart.straps.collect { map ->
+                // Una fascia tolta non conta più: se torna, si riparte da zero.
+                val inUse = map.values.map { it.address }.toSet()
+                strapGaps.keys.retainAll(inUse)
+            }
+        }
+        scope.launch {
+            while (true) {
+                delay(2_000)
+                if (strapGaps.isNotEmpty()) gapTick.value = SystemClock.elapsedRealtime()
             }
         }
         scope.launch { watchBands() }
@@ -1646,6 +1671,9 @@ class MatchController(
      */
     private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
         val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val age = System.currentTimeMillis() - at
+        // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
+        if (age <= HeartRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= HeartRelay.LIVE_MS) {
@@ -1654,6 +1682,10 @@ class MatchController(
             val start = lm.record.startedAt ?: return
             if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
         }
+    }
+
+    private fun strapGap(addr: String, at: Long) {
+        strapGaps.getOrPut(addr) { StrapGaps() }.onReading(at)
     }
 
     /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
@@ -1756,6 +1788,8 @@ class MatchController(
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
         setRecord(lm.record.copy(startedAt = System.currentTimeMillis(), batteryStart = startBattery))
+        // Gli stacchi contano dal "gioco": quelli del riscaldamento non dicono niente della partita.
+        strapGaps.values.forEach { it.reset() }
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }
@@ -3987,8 +4021,7 @@ data class FoundStrap(val address: String, val name: String, val rssi: Int, val 
 
 /**
  * [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata).
- * [rssi] segnale in dBm (più vicino a 0 = più forte), [received] secondi con almeno una misura nell'ultimo minuto (%):
- * dicono fin dove arriva la fascia.
+ * [rssi] segnale in dBm (più vicino a 0 = più forte) e [gaps] stacchi: dicono fin dove arriva la fascia.
  */
 data class StrapInfo(
     val address: String,
@@ -3998,7 +4031,8 @@ data class StrapInfo(
     val contact: Boolean? = null,
     val battery: Int? = null,
     val rssi: Int? = null,
-    val received: Int? = null,
+    /** Riempiti da MatchController, che vede anche le misure arrivate dal telefono satellite. */
+    val gaps: GapStats? = null,
     /** Il battito arriva dal telefono satellite (questo telefono non sente la fascia). */
     val relayed: Boolean = false,
 )
@@ -4186,7 +4220,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                 contact = l.last?.contact?.takeIf { fresh },
                 battery = l.battery,
                 rssi = l.rssi.takeIf { ready },
-                received = l.receivedPercent().takeIf { ready },
             )
         }
     }
@@ -4200,9 +4233,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         var last: HeartMeasurement? = null
         private var lastAt = 0L
         var rssi: Int? = null
-        private var readySince = 0L
-        /** Secondi (dall'avvio del telefono) in cui è arrivata almeno una misura, solo l'ultimo minuto. */
-        private val seconds = ArrayDeque<Long>()
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -4217,16 +4247,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
 
         fun readRssi() {
             if (state == StrapState.READY) runCatching { gatt?.readRemoteRssi() }
-        }
-
-        /** Secondi con almeno una misura nell'ultimo minuto (o da quando è collegata, se è meno di un minuto). */
-        fun receivedPercent(): Int? {
-            val nowS = SystemClock.elapsedRealtime() / 1000
-            while (seconds.isNotEmpty() && seconds.first() <= nowS - RECEIVED_WINDOW_S) seconds.removeFirst()
-            // Il secondo in corso non conta: la misura può ancora arrivare.
-            val span = minOf(RECEIVED_WINDOW_S, nowS - readySince / 1000)
-            if (span < 5) return null
-            return (seconds.count { it < nowS } * 100 / span).toInt().coerceAtMost(100)
         }
 
         private fun changeState(s: StrapState) {
@@ -4372,8 +4392,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                     HeartRateProtocol.MEASUREMENT -> HeartRateProtocol.parse(copy)?.let { m ->
                         last = m
                         lastAt = SystemClock.elapsedRealtime()
-                        val s = lastAt / 1000
-                        if (seconds.lastOrNull() != s) seconds.addLast(s)
                         publish()
                         _readings.tryEmit(side to m)
                     }
@@ -4400,8 +4418,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
             if (g !== gatt) return
             watchdog?.cancel()
             failures = 0
-            readySince = SystemClock.elapsedRealtime()
-            seconds.clear()
             changeState(StrapState.READY)
         }
 
@@ -4438,7 +4454,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         private const val DIRECT_TRIES = 3
         /** Le fasce mandano una misura al secondo: dopo 6 secondi senza, il battito non è più quello di adesso. */
         private const val STALE_MS = 6_000L
-        private const val RECEIVED_WINDOW_S = 60L
     }
 }
 TSM_EOF
@@ -4497,6 +4512,64 @@ object HeartRateProtocol {
             }
         }
         return HeartMeasurement(bpm, contact, rr)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ble/StrapGaps.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ble/StrapGaps.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ble
+
+/** Stacchi di una fascia: quante volte il battito non è arrivato per più di [StrapGaps.GAP_MS] e quanti secondi in tutto. */
+data class GapStats(val drops: Int, val lostS: Int)
+
+/**
+ * Conta i buchi tra una misura e l'altra di una fascia, da qualunque telefono arrivino. Il Bluetooth LE ritrasmette
+ * i pacchetti persi: una misura o arriva o la fascia si è staccata, quindi i buchi sono il dato che dice se la
+ * fascia è troppo lontana. Le fasce mandano circa una misura al secondo: un buco di 2 secondi capita anche
+ * da vicino, da 3 in su è uno stacco.
+ */
+class StrapGaps {
+    private var last = 0L
+    private var drops = 0
+    private var lostMs = 0L
+
+    /** Misura arrivata all'ora [atMs] (anche fuori ordine: una più vecchia dell'ultima non conta). */
+    fun onReading(atMs: Long) {
+        if (last != 0L && atMs > last) {
+            val gap = atMs - last
+            if (gap > GAP_MS) {
+                drops++
+                lostMs += gap - EXPECTED_MS
+            }
+        }
+        if (atMs > last) last = atMs
+    }
+
+    /** null prima della prima misura. Uno stacco ancora in corso conta già, coi secondi fino a [nowMs]. */
+    fun stats(nowMs: Long): GapStats? {
+        if (last == 0L) return null
+        val open = nowMs - last
+        return if (open > GAP_MS) {
+            GapStats(drops + 1, ((lostMs + open - EXPECTED_MS) / 1000).toInt())
+        } else {
+            GapStats(drops, (lostMs / 1000).toInt())
+        }
+    }
+
+    fun reset() {
+        last = 0L
+        drops = 0
+        lostMs = 0L
+    }
+
+    companion object {
+        const val GAP_MS = 3_000L
+        /** Il secondo che ci si aspetta comunque tra una misura e l'altra non è perso. */
+        private const val EXPECTED_MS = 1_000L
     }
 }
 TSM_EOF
@@ -6719,7 +6792,7 @@ class HeartRelay(
         flush()
     }
 
-    private fun StrapInfo.toStatus() = RelayStrapStatus(address, state == StrapState.READY, bpm, rssi, received)
+    private fun StrapInfo.toStatus() = RelayStrapStatus(address, state == StrapState.READY, bpm, rssi)
 
     private fun deviceName(): String = listOf(Build.MANUFACTURER, Build.MODEL).filter { it.isNotBlank() }.distinct().joinToString(" ")
 
@@ -7135,14 +7208,13 @@ data class RelayMsg(
 @Serializable
 data class RelayStrap(val addr: String, val name: String, val side: Int)
 
-/** Come il satellite vede una fascia: segnale (dBm) e misure arrivate nell'ultimo minuto (%). */
+/** Come il satellite vede una fascia: collegata, battito e segnale (dBm). */
 @Serializable
 data class RelayStrapStatus(
     val addr: String,
     val ready: Boolean,
     val bpm: Int? = null,
     val rssi: Int? = null,
-    val received: Int? = null,
 )
 
 object RelayCodec {
@@ -10174,8 +10246,8 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
 }
 
 /**
- * "Collegata · 72 bpm · −68 dBm · 100% ricevute · Batteria 90%", oppure perché il battito non arriva. Segnale e
- * misure ricevute nell'ultimo minuto servono a capire fin dove arriva la fascia.
+ * "Collegata · 72 bpm · −68 dBm · 2 stacchi (14 s) · Batteria 90%", oppure perché il battito non arriva. Segnale e
+ * stacchi (dall'inizio della partita, o da quando la fascia è stata scelta) dicono fin dove arriva la fascia.
  */
 private fun strapStatus(st: StrapInfo, s: Strings): String {
     val state = when {
@@ -10186,7 +10258,7 @@ private fun strapStatus(st: StrapInfo, s: Strings): String {
     }
     return state +
         (st.rssi?.let { " · $it dBm" } ?: "") +
-        (st.received?.let { " · ${s.strapReceived(it)}" } ?: "") +
+        (st.gaps?.let { g -> " · " + if (g.drops == 0) s.strapNoDrops else s.strapDrops(g.drops, g.lostS) } ?: "") +
         (st.battery?.let { " · ${s.battery} $it%" } ?: "")
 }
 
@@ -10482,7 +10554,8 @@ interface Strings {
     val strapWaiting: String
     val strapNoContact: String
     val strapRelayed: String
-    val strapReceived: (Int) -> String
+    val strapNoDrops: String
+    val strapDrops: (Int, Int) -> String
     val relayTitle: String
     val relayHint: String
     val relayMain: String
@@ -11077,7 +11150,8 @@ object ItStrings : Strings {
     override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
     override val strapNoContact = "Non tocca la pelle"
     override val strapRelayed = "Dal secondo telefono"
-    override val strapReceived: (Int) -> String = { "$it% ricevute" }
+    override val strapNoDrops = "nessuno stacco"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "stacco" else "stacchi"} ($s s)" }
     override val relayTitle = "Secondo telefono"
     override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
     override val relayMain = "Usa un secondo telefono"
@@ -11645,7 +11719,8 @@ object EnStrings : Strings {
     override val strapWaiting = "Waiting: put it on and wet the electrodes"
     override val strapNoContact = "Not touching the skin"
     override val strapRelayed = "Via second phone"
-    override val strapReceived: (Int) -> String = { "$it% received" }
+    override val strapNoDrops = "no dropouts"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "dropout" else "dropouts"} ($s s)" }
     override val relayTitle = "Second phone"
     override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
     override val relayMain = "Use a second phone"
@@ -12236,7 +12311,8 @@ object DeStrings : Strings {
     override val strapWaiting = "Warte: Gurt anlegen und Elektroden befeuchten"
     override val strapNoContact = "Kein Hautkontakt"
     override val strapRelayed = "Über zweites Telefon"
-    override val strapReceived: (Int) -> String = { "$it % empfangen" }
+    override val strapNoDrops = "keine Aussetzer"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n Aussetzer ($s s)" }
     override val relayTitle = "Zweites Telefon"
     override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
     override val relayMain = "Zweites Telefon verwenden"
@@ -12819,7 +12895,8 @@ object EsStrings : Strings {
     override val strapWaiting = "En espera: póntela y moja los electrodos"
     override val strapNoContact = "No toca la piel"
     override val strapRelayed = "Desde el segundo teléfono"
-    override val strapReceived: (Int) -> String = { "$it % recibidas" }
+    override val strapNoDrops = "ningún corte"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "corte" else "cortes"} ($s s)" }
     override val relayTitle = "Segundo teléfono"
     override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Este teléfono crea su propia red, sin SIM ni datos, y el otro se conecta solo escaneando el código."
     override val relayMain = "Usar un segundo teléfono"
@@ -13406,7 +13483,8 @@ object FrStrings : Strings {
     override val strapWaiting = "En attente : mettez-la et mouillez les électrodes"
     override val strapNoContact = "Pas de contact avec la peau"
     override val strapRelayed = "Via le second téléphone"
-    override val strapReceived: (Int) -> String = { "$it % reçues" }
+    override val strapNoDrops = "aucune coupure"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "coupure" else "coupures"} ($s s)" }
     override val relayTitle = "Second téléphone"
     override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Ce téléphone crée son propre réseau, sans SIM ni données, et l'autre s'y connecte tout seul en scannant le code."
     override val relayMain = "Utiliser un second téléphone"
@@ -13992,7 +14070,8 @@ object PtStrings : Strings {
     override val strapWaiting = "Aguardando: coloque-a e molhe os eletrodos"
     override val strapNoContact = "Sem contato com a pele"
     override val strapRelayed = "Pelo segundo telefone"
-    override val strapReceived: (Int) -> String = { "$it% recebidas" }
+    override val strapNoDrops = "nenhuma queda"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "queda" else "quedas"} ($s s)" }
     override val relayTitle = "Segundo telefone"
     override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Este telefone cria a sua própria rede, sem SIM nem dados, e o outro se conecta sozinho escaneando o código."
     override val relayMain = "Usar um segundo telefone"
@@ -19966,6 +20045,78 @@ class BatteryModelTest {
         assertEquals("~40 min", BatteryModel.formatHours(40 / 60.0))
         assertEquals("~7 h", BatteryModel.formatHours(7.0))
         assertEquals("~6 h 30 min", BatteryModel.formatHours(6.5))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/ble/StrapGapsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/ble/StrapGapsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ble
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class StrapGapsTest {
+
+    @Test
+    fun nothingBeforeFirstReading() {
+        assertNull(StrapGaps().stats(10_000))
+    }
+
+    @Test
+    fun smallHolesAreNotDrops() {
+        val g = StrapGaps()
+        // Una al secondo, con un secondo saltato ogni tanto: succede anche da vicino.
+        listOf(1_000L, 2_000, 3_000, 5_000, 6_000, 8_900).forEach { g.onReading(it) }
+        assertEquals(GapStats(0, 0), g.stats(9_500))
+    }
+
+    @Test
+    fun dropsAndLostSeconds() {
+        val g = StrapGaps()
+        g.onReading(1_000)
+        g.onReading(9_000)   // 8 s di buco: 7 persi
+        g.onReading(10_000)
+        g.onReading(16_000)  // 6 s: 5 persi
+        assertEquals(GapStats(2, 12), g.stats(16_500))
+    }
+
+    @Test
+    fun ongoingDropCountsAlready() {
+        val g = StrapGaps()
+        g.onReading(1_000)
+        assertEquals(GapStats(0, 0), g.stats(3_500))
+        assertEquals(GapStats(1, 9), g.stats(11_000))
+        // Torna: lo stacco resta uno solo.
+        g.onReading(12_000)
+        assertEquals(GapStats(1, 10), g.stats(12_500))
+    }
+
+    @Test
+    fun twoPhonesSameStrap() {
+        // Le misure dei due telefoni si mescolano: una vecchia (o doppia) non apre né chiude buchi.
+        val g = StrapGaps()
+        g.onReading(1_000)
+        g.onReading(2_000)
+        g.onReading(1_900)
+        g.onReading(2_000)
+        g.onReading(3_000)
+        assertEquals(GapStats(0, 0), g.stats(3_200))
+    }
+
+    @Test
+    fun resetStartsAgain() {
+        val g = StrapGaps()
+        g.onReading(1_000)
+        g.onReading(20_000)
+        g.reset()
+        assertNull(g.stats(21_000))
+        g.onReading(22_000)
+        assertEquals(GapStats(0, 0), g.stats(22_500))
     }
 }
 TSM_EOF
@@ -26549,6 +26700,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 98 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 100 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

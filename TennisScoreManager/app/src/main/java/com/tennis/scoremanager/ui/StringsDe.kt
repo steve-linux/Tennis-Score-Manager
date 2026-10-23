@@ -68,7 +68,8 @@ object DeStrings : Strings {
     override val strapWaiting = "Warte: Gurt anlegen und Elektroden befeuchten"
     override val strapNoContact = "Kein Hautkontakt"
     override val strapRelayed = "Über zweites Telefon"
-    override val strapReceived: (Int) -> String = { "$it % empfangen" }
+    override val strapNoDrops = "keine Aussetzer"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n Aussetzer ($s s)" }
     override val relayTitle = "Zweites Telefon"
     override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
     override val relayMain = "Zweites Telefon verwenden"

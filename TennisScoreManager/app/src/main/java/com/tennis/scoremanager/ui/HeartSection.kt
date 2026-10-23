@@ -291,8 +291,8 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
 }
 
 /**
- * "Collegata · 72 bpm · −68 dBm · 100% ricevute · Batteria 90%", oppure perché il battito non arriva. Segnale e
- * misure ricevute nell'ultimo minuto servono a capire fin dove arriva la fascia.
+ * "Collegata · 72 bpm · −68 dBm · 2 stacchi (14 s) · Batteria 90%", oppure perché il battito non arriva. Segnale e
+ * stacchi (dall'inizio della partita, o da quando la fascia è stata scelta) dicono fin dove arriva la fascia.
  */
 private fun strapStatus(st: StrapInfo, s: Strings): String {
     val state = when {
@@ -303,7 +303,7 @@ private fun strapStatus(st: StrapInfo, s: Strings): String {
     }
     return state +
         (st.rssi?.let { " · $it dBm" } ?: "") +
-        (st.received?.let { " · ${s.strapReceived(it)}" } ?: "") +
+        (st.gaps?.let { g -> " · " + if (g.drops == 0) s.strapNoDrops else s.strapDrops(g.drops, g.lostS) } ?: "") +
         (st.battery?.let { " · ${s.battery} $it%" } ?: "")
 }
 

@@ -68,7 +68,8 @@ object EsStrings : Strings {
     override val strapWaiting = "En espera: póntela y moja los electrodos"
     override val strapNoContact = "No toca la piel"
     override val strapRelayed = "Desde el segundo teléfono"
-    override val strapReceived: (Int) -> String = { "$it % recibidas" }
+    override val strapNoDrops = "ningún corte"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "corte" else "cortes"} ($s s)" }
     override val relayTitle = "Segundo teléfono"
     override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Este teléfono crea su propia red, sin SIM ni datos, y el otro se conecta solo escaneando el código."
     override val relayMain = "Usar un segundo teléfono"

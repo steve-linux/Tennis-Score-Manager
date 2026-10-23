@@ -80,7 +80,8 @@ interface Strings {
     val strapWaiting: String
     val strapNoContact: String
     val strapRelayed: String
-    val strapReceived: (Int) -> String
+    val strapNoDrops: String
+    val strapDrops: (Int, Int) -> String
     val relayTitle: String
     val relayHint: String
     val relayMain: String
@@ -675,7 +676,8 @@ object ItStrings : Strings {
     override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
     override val strapNoContact = "Non tocca la pelle"
     override val strapRelayed = "Dal secondo telefono"
-    override val strapReceived: (Int) -> String = { "$it% ricevute" }
+    override val strapNoDrops = "nessuno stacco"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "stacco" else "stacchi"} ($s s)" }
     override val relayTitle = "Secondo telefono"
     override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
     override val relayMain = "Usa un secondo telefono"
@@ -1243,7 +1245,8 @@ object EnStrings : Strings {
     override val strapWaiting = "Waiting: put it on and wet the electrodes"
     override val strapNoContact = "Not touching the skin"
     override val strapRelayed = "Via second phone"
-    override val strapReceived: (Int) -> String = { "$it% received" }
+    override val strapNoDrops = "no dropouts"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "dropout" else "dropouts"} ($s s)" }
     override val relayTitle = "Second phone"
     override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
     override val relayMain = "Use a second phone"

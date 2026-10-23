@@ -53,14 +53,13 @@ data class RelayMsg(
 @Serializable
 data class RelayStrap(val addr: String, val name: String, val side: Int)
 
-/** Come il satellite vede una fascia: segnale (dBm) e misure arrivate nell'ultimo minuto (%). */
+/** Come il satellite vede una fascia: collegata, battito e segnale (dBm). */
 @Serializable
 data class RelayStrapStatus(
     val addr: String,
     val ready: Boolean,
     val bpm: Int? = null,
     val rssi: Int? = null,
-    val received: Int? = null,
 )
 
 object RelayCodec {

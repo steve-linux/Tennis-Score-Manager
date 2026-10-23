@@ -71,7 +71,8 @@ object PtStrings : Strings {
     override val strapWaiting = "Aguardando: coloque-a e molhe os eletrodos"
     override val strapNoContact = "Sem contato com a pele"
     override val strapRelayed = "Pelo segundo telefone"
-    override val strapReceived: (Int) -> String = { "$it% recebidas" }
+    override val strapNoDrops = "nenhuma queda"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "queda" else "quedas"} ($s s)" }
     override val relayTitle = "Segundo telefone"
     override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Este telefone cria a sua própria rede, sem SIM nem dados, e o outro se conecta sozinho escaneando o código."
     override val relayMain = "Usar um segundo telefone"

@@ -29,6 +29,7 @@ import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapGaps
 import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
@@ -226,6 +227,14 @@ class MatchController(
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
     private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    /**
+     * Stacchi di ciascuna fascia (per indirizzo), con le misure di questo telefono e del satellite insieme: conta
+     * quando il battito non è arrivato da nessuno dei due. Ripartono a ogni partita.
+     */
+    private val strapGaps = mutableMapOf<String, StrapGaps>()
+    /** Batte ogni 2 secondi: uno stacco in corso si vede crescere anche senza misure nuove. */
+    private val gapTick = MutableStateFlow(0L)
+
     /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
     private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
 
@@ -245,15 +254,17 @@ class MatchController(
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
      */
-    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote) { local, remote ->
+    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote, gapTick) { local, remote, _ ->
+        val now = SystemClock.elapsedRealtime()
         local.mapValues { (_, st) ->
             val r = remote[st.address]?.status
             val localOk = st.state == StrapState.READY && st.bpm != null
-            if (!localOk && r != null && r.ready && r.bpm != null) {
-                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, received = r.received, relayed = true)
+            val shown = if (!localOk && r != null && r.ready && r.bpm != null) {
+                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, relayed = true)
             } else {
                 st
             }
+            shown.copy(gaps = strapGaps[st.address]?.stats(now))
         }
     }.stateIn(scope, SharingStarted.Eagerly, emptyMap())
     private var locationJob: Job? = null
@@ -287,6 +298,7 @@ class MatchController(
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
         scope.launch {
             heart.readings.collect { (side, m) ->
+                heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
                 onHeartReading(side, m)
                 relay.onLocalReading(side, m)
             }
@@ -295,6 +307,19 @@ class MatchController(
             while (true) {
                 delay(HeartStats.STEP_S * 1000L)
                 flushHeart()
+            }
+        }
+        scope.launch {
+            heart.straps.collect { map ->
+                // Una fascia tolta non conta più: se torna, si riparte da zero.
+                val inUse = map.values.map { it.address }.toSet()
+                strapGaps.keys.retainAll(inUse)
+            }
+        }
+        scope.launch {
+            while (true) {
+                delay(2_000)
+                if (strapGaps.isNotEmpty()) gapTick.value = SystemClock.elapsedRealtime()
             }
         }
         scope.launch { watchBands() }
@@ -854,6 +879,9 @@ class MatchController(
      */
     private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
         val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val age = System.currentTimeMillis() - at
+        // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
+        if (age <= HeartRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= HeartRelay.LIVE_MS) {
@@ -862,6 +890,10 @@ class MatchController(
             val start = lm.record.startedAt ?: return
             if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
         }
+    }
+
+    private fun strapGap(addr: String, at: Long) {
+        strapGaps.getOrPut(addr) { StrapGaps() }.onReading(at)
     }
 
     /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
@@ -964,6 +996,8 @@ class MatchController(
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
         setRecord(lm.record.copy(startedAt = System.currentTimeMillis(), batteryStart = startBattery))
+        // Gli stacchi contano dal "gioco": quelli del riscaldamento non dicono niente della partita.
+        strapGaps.values.forEach { it.reset() }
         startCountdown(CountdownKind.SHOT_CLOCK, SHOT_CLOCK_S)
         bandMessage(strings.bandPlay, "0 - 0", 3)
     }

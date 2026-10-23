@@ -71,7 +71,8 @@ object FrStrings : Strings {
     override val strapWaiting = "En attente : mettez-la et mouillez les électrodes"
     override val strapNoContact = "Pas de contact avec la peau"
     override val strapRelayed = "Via le second téléphone"
-    override val strapReceived: (Int) -> String = { "$it % reçues" }
+    override val strapNoDrops = "aucune coupure"
+    override val strapDrops: (Int, Int) -> String = { n, s -> "$n ${if (n == 1) "coupure" else "coupures"} ($s s)" }
     override val relayTitle = "Second téléphone"
     override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Ce téléphone crée son propre réseau, sans SIM ni données, et l'autre s'y connecte tout seul en scannant le code."
     override val relayMain = "Utiliser un second téléphone"

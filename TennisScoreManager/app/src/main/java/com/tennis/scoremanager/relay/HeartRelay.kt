@@ -378,7 +378,7 @@ class HeartRelay(
         flush()
     }
 
-    private fun StrapInfo.toStatus() = RelayStrapStatus(address, state == StrapState.READY, bpm, rssi, received)
+    private fun StrapInfo.toStatus() = RelayStrapStatus(address, state == StrapState.READY, bpm, rssi)
 
     private fun deviceName(): String = listOf(Build.MANUFACTURER, Build.MODEL).filter { it.isNotBlank() }.distinct().joinToString(" ")
 
