@@ -77,6 +77,33 @@ class Storage(context: Context) {
         File(tournamentsDir, "$id.json").delete()
     }
 
+    /** Allenamenti con la fascia: a parte dalle partite, uno per file. */
+    private val workoutsDir: File get() = File(app.filesDir, "workouts").apply { mkdirs() }
+
+    @Synchronized
+    fun saveWorkout(w: WorkoutRecord) {
+        runCatching {
+            val f = File(workoutsDir, "${w.id}.json")
+            val tmp = File(workoutsDir, "${w.id}.tmp")
+            tmp.writeText(json.encodeToString(WorkoutRecord.serializer(), w))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allenamento fallito", it) }
+    }
+
+    /** Allenamenti, dal più recente. */
+    fun loadWorkouts(): List<WorkoutRecord> =
+        workoutsDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(WorkoutRecord.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.startedAt }
+
+    @Synchronized
+    fun deleteWorkout(id: String) {
+        File(workoutsDir, "$id.json").delete()
+    }
+
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
 

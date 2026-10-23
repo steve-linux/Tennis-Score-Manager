@@ -63,6 +63,10 @@ import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
+import com.tennis.scoremanager.workout.WorkoutSession
+import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.WorkoutReport
+import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
@@ -104,7 +108,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT }
 
 enum class CountdownKind { SHOT_CLOCK, CHANGEOVER, SET_BREAK, TIEBREAK_BREAK }
 
@@ -253,6 +257,14 @@ class MatchController(
         },
     )
 
+    /** Allenamento con la fascia, senza partita (schermata a parte, pulsante in pagina 1). */
+    val workout = WorkoutSession(scope) { rec -> onWorkoutFinished(rec) }
+    /** Allenamenti salvati, dal più recente. */
+    val workouts = MutableStateFlow<List<WorkoutRecord>>(emptyList())
+    /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
+    val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
+    private var workoutSide = Side.P1
+
     /**
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
      * arriva dal satellite.
@@ -303,6 +315,7 @@ class MatchController(
         scope.launch {
             heart.readings.collect { (side, m) ->
                 heart.straps.value[side]?.address?.let { strapGap(it, SystemClock.elapsedRealtime()) }
+                workout.onReading(side, m)
                 onHeartReading(side, m)
                 relay.onLocalReading(side, m)
             }
@@ -381,7 +394,7 @@ class MatchController(
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
     private fun needsService(): Boolean =
         options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
-            relay.ui.value.role != RelayRole.OFF
+            relay.ui.value.role != RelayRole.OFF || workout.active
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -502,6 +515,13 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
+            // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
+            Screen.WORKOUT -> if (workoutDetail.value != null) {
+                workoutDetail.value = null
+                Screen.WORKOUT
+            } else {
+                Screen.SETUP
+            }
             Screen.START -> {
                 if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
                 Screen.OPTIONS
@@ -894,7 +914,10 @@ class MatchController(
         val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
         val age = System.currentTimeMillis() - at
         // Per gli stacchi conta l'ora della misura, riportata sull'orologio di questo telefono.
-        if (age <= PhoneRelay.LIVE_MS) strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
+        if (age <= PhoneRelay.LIVE_MS) {
+            strapGap(addr, SystemClock.elapsedRealtime() - age.coerceAtLeast(0))
+            workout.onReading(side, m)
+        }
         val lm = live.value ?: return
         if (match != lm.record.id || !m.valid) return
         if (System.currentTimeMillis() - at <= PhoneRelay.LIVE_MS) {
@@ -1291,6 +1314,68 @@ class MatchController(
     fun openHistory() {
         refreshHistory()
         screen.value = Screen.HISTORY
+    }
+
+    // ---------------------------------------------------------------- allenamento
+
+    fun openWorkouts() {
+        workoutDetail.value = null
+        refreshWorkouts()
+        screen.value = Screen.WORKOUT
+    }
+
+    private fun refreshWorkouts() {
+        scope.launch { workouts.value = withContext(io) { storage.loadWorkouts() } }
+    }
+
+    /** La fascia dell'allenamento: quella del Giocatore 1 o l'unica scelta. false se non ce n'è nessuna. */
+    fun startWorkout(): Boolean {
+        val straps = heart.straps.value
+        val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
+        workoutSide = side
+        workout.start(side, straps[side]?.name)
+        MatchService.start(app)
+        return true
+    }
+
+    private fun onWorkoutFinished(rec: WorkoutRecord) {
+        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]))
+        scope.launch {
+            withContext(io) { storage.saveWorkout(w) }
+            refreshWorkouts()
+        }
+        workoutDetail.value = w
+        if (!needsService()) MatchService.stop(app)
+    }
+
+    fun deleteWorkout(id: String) {
+        scope.launch {
+            withContext(io) { storage.deleteWorkout(id) }
+            workoutDetail.value = null
+            refreshWorkouts()
+        }
+    }
+
+    /** Condivide l'allenamento come CSV (secondo per secondo) o PDF di riepilogo. */
+    fun workoutShareIntent(w: WorkoutRecord, pdf: Boolean): Intent? {
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm", java.util.Locale.ROOT).format(java.util.Date(w.startedAt))
+        val file = File(dir, "${s.workoutTitle}_$stamp.${if (pdf) "pdf" else "csv"}")
+        runCatching {
+            file.outputStream().use { o ->
+                if (pdf) WorkoutReport.pdf(w, s, options.value.lang, o) else o.write(WorkoutStats.csv(w).toByteArray())
+            }
+        }.onFailure { return null }
+        val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = if (pdf) "application/pdf" else "text/csv"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "${s.workoutTitle} ${Reports.date(w.startedAt, options.value.lang)}")
+            clipData = ClipData.newRawUri("", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        return Intent.createChooser(send, s.share)
     }
 
     fun refreshHistory() {

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
 import com.tennis.scoremanager.data.Names
@@ -126,8 +127,8 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         // Battito delle fasce cardio: sulla partita intera, con il grafico nel tempo.
         if (period == null) heartStats(rec, s)?.let { rows ->
             StatSection(s.heartStat, rows)
-            StatCard(s.heartChart) { HeartChart(rec) }
-            StatCard(s.heartZones) { HeartZones(rec, names) }
+            StatCard(s.heartChart) { HeartChart(rec.heart) }
+            StatCard(s.heartZones) { HeartZones(rec.heart) { names.short(it) } }
         }
         MatchStats.rally(pts, period)?.let { r ->
             StatCard(s.strokesPerPoint) {
@@ -166,8 +167,8 @@ private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
 
 /** Battito nel tempo, una linea per lato nel suo colore; i buchi (pause, fascia staccata) interrompono la linea. */
 @Composable
-private fun HeartChart(rec: MatchRecord) {
-    val tracks = Side.entries.mapNotNull { side -> rec.heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
+internal fun HeartChart(heart: Map<Side, HeartTrack>) {
+    val tracks = Side.entries.mapNotNull { side -> heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
     if (tracks.isEmpty()) return
     val all = tracks.flatMap { (_, t) -> t.bpm.take(t.size) }
     val lo = (all.min() - 5).coerceAtLeast(30)
@@ -200,10 +201,10 @@ private val ZoneColors = listOf(Color(0xFF9AA8BD), Color(0xFF4CAF50), Color(0xFF
 
 /** Una torta per lato con il tempo in ciascuna zona, e sotto la legenda con le percentuali dei due lati. */
 @Composable
-private fun HeartZones(rec: MatchRecord, names: Names) {
+internal fun HeartZones(heart: Map<Side, HeartTrack>, label: (Side) -> String) {
     val s = LocalStrings.current
     val zones = Side.entries.associateWith { side ->
-        val t = rec.heart[side]
+        val t = heart[side]
         t?.profile?.let { HeartStats.zoneSeconds(t, it.age) }?.takeIf { it.sum() > 0 }
     }
     if (zones.values.all { it == null }) {
@@ -229,7 +230,7 @@ private fun HeartZones(rec: MatchRecord, names: Names) {
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                Text(label(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             }
         }
@@ -260,7 +261,7 @@ private fun NamesHeader(names: Names) {
 }
 
 @Composable
-private fun StatCard(title: String, content: @Composable () -> Unit) {
+internal fun StatCard(title: String, content: @Composable () -> Unit) {
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.Surface).padding(horizontal = 12.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),

@@ -98,6 +98,32 @@ interface Strings {
     val relayPending: (Int) -> String
     val relayPreparing: String
     val relayShowBoard: String
+    val workoutTitle: String
+    val workoutHint: String
+    val workoutPickStrap: String
+    val workoutStart: String
+    val workoutPause: String
+    val workoutResume: String
+    val workoutLap: String
+    val workoutEnd: String
+    val workoutRecovering: (Int) -> String
+    val workoutRecoveringHint: String
+    val workoutSaveNow: String
+    val workoutHistory: String
+    val workoutNone: String
+    val workoutDuration: String
+    val workoutHrv: String
+    val workoutHrvHint: String
+    val workoutRecovery: String
+    val workoutRecoveryHint: String
+    val workoutLaps: String
+    val workoutAvgShort: String
+    val workoutMaxShort: String
+    val workoutRecShort: String
+    val workoutShareCsv: String
+    val workoutSharePdf: String
+    val workoutDeleteTitle: String
+    val workoutDeleteText: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -695,6 +721,32 @@ object ItStrings : Strings {
     override val relayPending: (Int) -> String = { "$it misure da inviare" }
     override val relayPreparing = "Preparazione della rete…"
     override val relayShowBoard = "Mostra il tabellone"
+    override val workoutTitle = "Allenamento"
+    override val workoutHint = "Battito con la fascia cardio, senza partita: giri, HRV e recupero."
+    override val workoutPickStrap = "Scegli la fascia qui sotto: bagna gli elettrodi e indossala."
+    override val workoutStart = "Avvia"
+    override val workoutPause = "Pausa"
+    override val workoutResume = "Riprendi"
+    override val workoutLap = "Giro"
+    override val workoutEnd = "Fine"
+    override val workoutRecovering: (Int) -> String = { "Recupero: ancora $it s" }
+    override val workoutRecoveringHint = "Resta fermo: si misura quanto scende il battito nel primo minuto."
+    override val workoutSaveNow = "Salva subito"
+    override val workoutHistory = "Allenamenti salvati"
+    override val workoutNone = "Nessun allenamento salvato."
+    override val workoutDuration = "Durata"
+    override val workoutHrv = "HRV (RMSSD)"
+    override val workoutHrvHint = "Variabilità tra un battito e l'altro, misurata durante l'allenamento: confrontala con i tuoi allenamenti simili, non con quelli degli altri."
+    override val workoutRecovery = "Recupero in 1 minuto"
+    override val workoutRecoveryHint = "Recupero: quanto scende il battito nel minuto dopo la fine (più scende, meglio è)."
+    override val workoutLaps = "Giri"
+    override val workoutAvgShort = "media"
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "recupero"
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Eliminare l'allenamento?"
+    override val workoutDeleteText = "Verrà tolto da questo telefono."
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1265,6 +1317,32 @@ object EnStrings : Strings {
     override val relayPending: (Int) -> String = { "$it readings to send" }
     override val relayPreparing = "Setting up the network…"
     override val relayShowBoard = "Show the scoreboard"
+    override val workoutTitle = "Workout"
+    override val workoutHint = "Heart rate with the chest strap, no match: laps, HRV and recovery."
+    override val workoutPickStrap = "Pick the strap below: wet the electrodes and put it on."
+    override val workoutStart = "Start"
+    override val workoutPause = "Pause"
+    override val workoutResume = "Resume"
+    override val workoutLap = "Lap"
+    override val workoutEnd = "Finish"
+    override val workoutRecovering: (Int) -> String = { "Recovery: $it s left" }
+    override val workoutRecoveringHint = "Stay still: it measures how much your heart rate drops in the first minute."
+    override val workoutSaveNow = "Save now"
+    override val workoutHistory = "Saved workouts"
+    override val workoutNone = "No saved workouts."
+    override val workoutDuration = "Duration"
+    override val workoutHrv = "HRV (RMSSD)"
+    override val workoutHrvHint = "Variability between one beat and the next, measured during the workout: compare it with your own similar workouts, not with other people's."
+    override val workoutRecovery = "Recovery in 1 minute"
+    override val workoutRecoveryHint = "Recovery: how much the heart rate drops in the minute after the end (the more, the better)."
+    override val workoutLaps = "Laps"
+    override val workoutAvgShort = "avg"
+    override val workoutMaxShort = "max"
+    override val workoutRecShort = "recovery"
+    override val workoutShareCsv = "CSV"
+    override val workoutSharePdf = "PDF"
+    override val workoutDeleteTitle = "Delete the workout?"
+    override val workoutDeleteText = "It will be removed from this phone."
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

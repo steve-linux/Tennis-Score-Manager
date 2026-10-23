@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -85,10 +86,19 @@ fun SetupScreen(c: MatchController) {
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
         action = {
-            Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
-                Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
-                    Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Allenamento con la fascia, senza partita: schermata a parte.
+                Surface(onClick = { c.openWorkouts() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.MonitorHeart, null, tint = TsmColors.Danger)
+                        Text(s.workoutTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                Surface(onClick = { c.openHistory() }, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh) {
+                    Column(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.History, null, tint = TsmColors.Ball)
+                        Text(s.historyTitle, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         },

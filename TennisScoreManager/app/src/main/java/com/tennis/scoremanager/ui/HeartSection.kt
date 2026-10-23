@@ -242,3 +242,46 @@ private fun NumberField(value: String, label: String, modifier: Modifier, onChan
         modifier = modifier,
     )
 }
+
+/**
+ * Schermata Allenamento: la fascia (una sola, quella del Giocatore 1) si sceglie lì, senza passare dalla pagina 2.
+ * Accende le fasce cardio se erano spente, chiede Bluetooth e permessi, cerca le fasce mentre è aperta.
+ */
+@Composable
+fun WorkoutStrapCard(c: MatchController) {
+    val s = LocalStrings.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val o by c.options.collectAsState()
+    val btOn by c.ble.adapterOn.collectAsState()
+    var permTick by remember { mutableStateOf(0) }
+    val permsOk = remember(permTick) {
+        c.ble.hasPermissions() && (android.os.Build.VERSION.SDK_INT >= 31 || com.tennis.scoremanager.data.LocationHelper.hasPermission(context))
+    }
+    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        permTick++
+        c.heart.reconnectAll()
+    }
+    val btLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { permTick++ }
+    val found by c.heart.found.collectAsState()
+    val straps by c.straps.collectAsState()
+    val profiles by c.heartProfiles.collectAsState()
+    val ready = btOn && permsOk && o.heartRate
+    LifecycleResumeEffect(ready) {
+        c.setStrapScan(ready)
+        onPauseOrDispose { c.setStrapScan(false) }
+    }
+    SectionCard(s.heartSection, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
+        if (!o.heartRate) {
+            SwitchRow(Icons.Filled.Favorite, s.heartRate, s.heartRateHint, false) { v -> c.updateOptions { it.copy(heartRate = v) } }
+            return@SectionCard
+        }
+        if (!permsOk) RequirementRow(Icons.Filled.LocationOn, s.location, false, s.allow) { permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions()) }
+        if (!btOn) RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, false, s.enable) {
+            if (!permsOk) permLauncher.launch(com.tennis.scoremanager.ble.BleManager.requiredPermissions())
+            else runCatching { btLauncher.launch(android.content.Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
+        }
+        StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
+        straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
+        Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
