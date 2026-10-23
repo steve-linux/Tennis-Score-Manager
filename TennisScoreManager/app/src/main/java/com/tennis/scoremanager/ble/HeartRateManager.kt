@@ -49,7 +49,11 @@ enum class StrapState { IDLE, CONNECTING, READY }
 
 data class FoundStrap(val address: String, val name: String, val rssi: Int, val lastSeen: Long = 0L)
 
-/** [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata). */
+/**
+ * [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata).
+ * [rssi] segnale in dBm (più vicino a 0 = più forte), [received] secondi con almeno una misura nell'ultimo minuto (%):
+ * dicono fin dove arriva la fascia.
+ */
 data class StrapInfo(
     val address: String,
     val name: String,
@@ -57,6 +61,10 @@ data class StrapInfo(
     val bpm: Int? = null,
     val contact: Boolean? = null,
     val battery: Int? = null,
+    val rssi: Int? = null,
+    val received: Int? = null,
+    /** Il battito arriva dal telefono satellite (questo telefono non sente la fascia). */
+    val relayed: Boolean = false,
 )
 
 /**
@@ -104,11 +112,13 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                 }
             }
         }, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED)
-        // Un battito vecchio non si mostra: dopo [STALE_MS] senza misure la fascia è "in attesa".
+        // Un battito vecchio non si mostra: dopo [STALE_MS] senza misure la fascia è "in attesa". Intanto si
+        // aggiornano segnale e misure ricevute.
         scope.launch {
             while (true) {
                 delay(2_000)
-                if (links.values.any { it.fresh() != it.shownFresh }) publish()
+                links.values.forEach { it.readRssi() }
+                if (links.isNotEmpty()) publish()
             }
         }
     }
@@ -231,7 +241,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
     private fun publish() {
         _straps.value = links.mapValues { (_, l) ->
             val fresh = l.fresh()
-            l.shownFresh = fresh
+            val ready = l.state == StrapState.READY
             StrapInfo(
                 address = l.address,
                 name = l.name,
@@ -239,6 +249,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                 bpm = l.last?.bpm?.takeIf { fresh && l.last?.valid == true },
                 contact = l.last?.contact?.takeIf { fresh },
                 battery = l.battery,
+                rssi = l.rssi.takeIf { ready },
+                received = l.receivedPercent().takeIf { ready },
             )
         }
     }
@@ -251,8 +263,10 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         var battery: Int? = null
         var last: HeartMeasurement? = null
         private var lastAt = 0L
-        /** Com'era l'ultima misura quando si è pubblicato: se cambia, va ripubblicato. */
-        var shownFresh = false
+        var rssi: Int? = null
+        private var readySince = 0L
+        /** Secondi (dall'avvio del telefono) in cui è arrivata almeno una misura, solo l'ultimo minuto. */
+        private val seconds = ArrayDeque<Long>()
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -264,6 +278,20 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         @Volatile private var pendingKind: OpKind? = null
 
         fun fresh(): Boolean = last != null && SystemClock.elapsedRealtime() - lastAt <= STALE_MS
+
+        fun readRssi() {
+            if (state == StrapState.READY) runCatching { gatt?.readRemoteRssi() }
+        }
+
+        /** Secondi con almeno una misura nell'ultimo minuto (o da quando è collegata, se è meno di un minuto). */
+        fun receivedPercent(): Int? {
+            val nowS = SystemClock.elapsedRealtime() / 1000
+            while (seconds.isNotEmpty() && seconds.first() <= nowS - RECEIVED_WINDOW_S) seconds.removeFirst()
+            // Il secondo in corso non conta: la misura può ancora arrivare.
+            val span = minOf(RECEIVED_WINDOW_S, nowS - readySince / 1000)
+            if (span < 5) return null
+            return (seconds.count { it < nowS } * 100 / span).toInt().coerceAtMost(100)
+        }
 
         private fun changeState(s: StrapState) {
             state = s
@@ -357,6 +385,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                         gatt = null
                         val wasReady = state == StrapState.READY
                         if (wasReady) failures = 0 else failures++
+                        rssi = null
                         changeState(StrapState.IDLE)
                         scheduleReconnect(afterLoss = wasReady)
                     }
@@ -365,6 +394,10 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
 
             override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
                 scope.launch { if (g === gatt) setup(g) }
+            }
+
+            override fun onReadRemoteRssi(g: BluetoothGatt, rssi: Int, status: Int) {
+                if (status == BluetoothGatt.GATT_SUCCESS) scope.launch { if (g === gatt) this@StrapLink.rssi = rssi }
             }
 
             override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
@@ -403,6 +436,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                     HeartRateProtocol.MEASUREMENT -> HeartRateProtocol.parse(copy)?.let { m ->
                         last = m
                         lastAt = SystemClock.elapsedRealtime()
+                        val s = lastAt / 1000
+                        if (seconds.lastOrNull() != s) seconds.addLast(s)
                         publish()
                         _readings.tryEmit(side to m)
                     }
@@ -429,6 +464,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
             if (g !== gatt) return
             watchdog?.cancel()
             failures = 0
+            readySince = SystemClock.elapsedRealtime()
+            seconds.clear()
             changeState(StrapState.READY)
         }
 
@@ -465,5 +502,6 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         private const val DIRECT_TRIES = 3
         /** Le fasce mandano una misura al secondo: dopo 6 secondi senza, il battito non è più quello di adesso. */
         private const val STALE_MS = 6_000L
+        private const val RECEIVED_WINDOW_S = 60L
     }
 }

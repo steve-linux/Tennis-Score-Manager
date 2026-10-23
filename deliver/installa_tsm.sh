@@ -30,6 +30,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/model"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/relay"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/service"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/transfer"
@@ -44,6 +45,7 @@ mkdir -p "$DEST/app/src/main/res/xml"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/data"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/model"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/relay"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/transfer"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
@@ -813,6 +815,8 @@ import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
@@ -843,6 +847,8 @@ import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.relay.HeartRelay
+import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
@@ -871,10 +877,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -1003,6 +1012,36 @@ class MatchController(
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
     private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
+    private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
+
+    /** Due telefoni per le fasce cardio: principale o satellite (vedi [HeartRelay]). */
+    val relay: HeartRelay = HeartRelay(
+        scope, heart,
+        matchIds = live.map { it?.record?.id.orEmpty() },
+        onRemoteReading = { addr, m, at, match -> onRemoteHeart(addr, m, at, match) },
+        onSatelliteStopped = {
+            heart.disconnectAll()
+            if (options.value.heartRate) restoreStraps()
+            if (!needsService()) MatchService.stop(app)
+        },
+    )
+
+    /**
+     * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
+     * arriva dal satellite.
+     */
+    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote) { local, remote ->
+        local.mapValues { (_, st) ->
+            val r = remote[st.address]?.status
+            val localOk = st.state == StrapState.READY && st.bpm != null
+            if (!localOk && r != null && r.ready && r.bpm != null) {
+                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, received = r.received, relayed = true)
+            } else {
+                st
+            }
+        }
+    }.stateIn(scope, SharingStarted.Eagerly, emptyMap())
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -1032,7 +1071,12 @@ class MatchController(
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
-        scope.launch { heart.readings.collect { (side, m) -> onHeartReading(side, m) } }
+        scope.launch {
+            heart.readings.collect { (side, m) ->
+                onHeartReading(side, m)
+                relay.onLocalReading(side, m)
+            }
+        }
         scope.launch {
             while (true) {
                 delay(HeartStats.STEP_S * 1000L)
@@ -1084,8 +1128,9 @@ class MatchController(
     }
 
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
-    private fun needsService() =
-        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty()
+    private fun needsService(): Boolean =
+        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
+            relay.ui.value.role != RelayRole.OFF
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -1184,7 +1229,12 @@ class MatchController(
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
         if (old.heartRate != v.heartRate) {
-            if (v.heartRate) restoreStraps() else heart.disconnectAll()
+            if (v.heartRate) {
+                restoreStraps()
+            } else {
+                relay.stop()
+                heart.disconnectAll()
+            }
         }
     }
 
@@ -1584,19 +1634,66 @@ class MatchController(
         if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
     }
 
-    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita. */
+    /**
+     * Misura girata dal telefono satellite. Se è appena presa vale come quelle di questo telefono; se arriva in
+     * ritardo (il Wi-Fi tra i telefoni era caduto) va a riempire i buchi della partita a cui appartiene.
+     */
+    private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
+        val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val lm = live.value ?: return
+        if (match != lm.record.id || !m.valid) return
+        if (System.currentTimeMillis() - at <= HeartRelay.LIVE_MS) {
+            onHeartReading(side, m)
+        } else {
+            val start = lm.record.startedAt ?: return
+            if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
+        }
+    }
+
+    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
     private fun flushHeart() {
         val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
+        val late = lateHeart.groupBy({ it.first }, { it.second to it.third })
+        lateHeart.clear()
         val lm = live.value ?: return
         val start = lm.record.startedAt ?: return
-        if (values.isEmpty() || !recordingHeart(lm)) return
+        val now = values.takeIf { recordingHeart(lm) }.orEmpty()
+        if (now.isEmpty() && late.isEmpty()) return
         val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
         var heartMap = lm.record.heart
-        for ((side, bpm) in values) {
-            val track = heartMap[side] ?: HeartTrack()
-            heartMap = heartMap + (side to track.add(sec, bpm!!).copy(profile = track.profile ?: heartProfiles.value[side]))
+        for (side in Side.entries) {
+            val bpm = now[side]
+            val points = late[side].orEmpty()
+            if (bpm == null && points.isEmpty()) continue
+            var track = heartMap[side] ?: HeartTrack()
+            if (bpm != null) track = track.add(sec, bpm)
+            track = track.fill(points, HeartStats.STEP_S)
+            heartMap = heartMap + (side to track.copy(profile = track.profile ?: heartProfiles.value[side]))
         }
         setRecord(lm.record.copy(heart = heartMap))
+    }
+
+    // ---------------------------------------------------------------- due telefoni
+
+    /** Questo telefono diventa il principale: false se non è su una rete locale (Wi-Fi o hotspot). */
+    fun startRelayMain(): Boolean {
+        if (!relay.startMain()) return false
+        MatchService.start(app)
+        return true
+    }
+
+    /** Testo del QR del principale: questo telefono diventa satellite. */
+    fun joinRelay(text: String) {
+        if (!relay.startSatellite(text)) {
+            _toasts.tryEmit(strings.transferBadCode)
+            return
+        }
+        MatchService.start(app)
+    }
+
+    fun stopRelay() {
+        relay.stop()
+        if (!needsService()) MatchService.stop(app)
     }
 
     // ---------------------------------------------------------------- partita
@@ -1618,7 +1715,9 @@ class MatchController(
             firstServerP2 = if (su.doubles) o.firstServerP2 else 0,
         )
         val now = System.currentTimeMillis()
-        val rec = MatchRecord(id = "m$now", setup = su, options = o, rules = rules, updatedAt = now)
+        // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
+        val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -2523,6 +2622,7 @@ class MatchController(
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
             ble.disconnectAll()
+            relay.stop()
             heart.disconnectAll()
             MatchService.stop(app)
             finish()
@@ -3876,7 +3976,11 @@ enum class StrapState { IDLE, CONNECTING, READY }
 
 data class FoundStrap(val address: String, val name: String, val rssi: Int, val lastSeen: Long = 0L)
 
-/** [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata). */
+/**
+ * [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata).
+ * [rssi] segnale in dBm (più vicino a 0 = più forte), [received] secondi con almeno una misura nell'ultimo minuto (%):
+ * dicono fin dove arriva la fascia.
+ */
 data class StrapInfo(
     val address: String,
     val name: String,
@@ -3884,6 +3988,10 @@ data class StrapInfo(
     val bpm: Int? = null,
     val contact: Boolean? = null,
     val battery: Int? = null,
+    val rssi: Int? = null,
+    val received: Int? = null,
+    /** Il battito arriva dal telefono satellite (questo telefono non sente la fascia). */
+    val relayed: Boolean = false,
 )
 
 /**
@@ -3931,11 +4039,13 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                 }
             }
         }, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED)
-        // Un battito vecchio non si mostra: dopo [STALE_MS] senza misure la fascia è "in attesa".
+        // Un battito vecchio non si mostra: dopo [STALE_MS] senza misure la fascia è "in attesa". Intanto si
+        // aggiornano segnale e misure ricevute.
         scope.launch {
             while (true) {
                 delay(2_000)
-                if (links.values.any { it.fresh() != it.shownFresh }) publish()
+                links.values.forEach { it.readRssi() }
+                if (links.isNotEmpty()) publish()
             }
         }
     }
@@ -4058,7 +4168,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
     private fun publish() {
         _straps.value = links.mapValues { (_, l) ->
             val fresh = l.fresh()
-            l.shownFresh = fresh
+            val ready = l.state == StrapState.READY
             StrapInfo(
                 address = l.address,
                 name = l.name,
@@ -4066,6 +4176,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                 bpm = l.last?.bpm?.takeIf { fresh && l.last?.valid == true },
                 contact = l.last?.contact?.takeIf { fresh },
                 battery = l.battery,
+                rssi = l.rssi.takeIf { ready },
+                received = l.receivedPercent().takeIf { ready },
             )
         }
     }
@@ -4078,8 +4190,10 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         var battery: Int? = null
         var last: HeartMeasurement? = null
         private var lastAt = 0L
-        /** Com'era l'ultima misura quando si è pubblicato: se cambia, va ripubblicato. */
-        var shownFresh = false
+        var rssi: Int? = null
+        private var readySince = 0L
+        /** Secondi (dall'avvio del telefono) in cui è arrivata almeno una misura, solo l'ultimo minuto. */
+        private val seconds = ArrayDeque<Long>()
         private var gatt: BluetoothGatt? = null
         private var closed = false
         private var retryJob: Job? = null
@@ -4091,6 +4205,20 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         @Volatile private var pendingKind: OpKind? = null
 
         fun fresh(): Boolean = last != null && SystemClock.elapsedRealtime() - lastAt <= STALE_MS
+
+        fun readRssi() {
+            if (state == StrapState.READY) runCatching { gatt?.readRemoteRssi() }
+        }
+
+        /** Secondi con almeno una misura nell'ultimo minuto (o da quando è collegata, se è meno di un minuto). */
+        fun receivedPercent(): Int? {
+            val nowS = SystemClock.elapsedRealtime() / 1000
+            while (seconds.isNotEmpty() && seconds.first() <= nowS - RECEIVED_WINDOW_S) seconds.removeFirst()
+            // Il secondo in corso non conta: la misura può ancora arrivare.
+            val span = minOf(RECEIVED_WINDOW_S, nowS - readySince / 1000)
+            if (span < 5) return null
+            return (seconds.count { it < nowS } * 100 / span).toInt().coerceAtMost(100)
+        }
 
         private fun changeState(s: StrapState) {
             state = s
@@ -4184,6 +4312,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                         gatt = null
                         val wasReady = state == StrapState.READY
                         if (wasReady) failures = 0 else failures++
+                        rssi = null
                         changeState(StrapState.IDLE)
                         scheduleReconnect(afterLoss = wasReady)
                     }
@@ -4192,6 +4321,10 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
 
             override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
                 scope.launch { if (g === gatt) setup(g) }
+            }
+
+            override fun onReadRemoteRssi(g: BluetoothGatt, rssi: Int, status: Int) {
+                if (status == BluetoothGatt.GATT_SUCCESS) scope.launch { if (g === gatt) this@StrapLink.rssi = rssi }
             }
 
             override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
@@ -4230,6 +4363,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
                     HeartRateProtocol.MEASUREMENT -> HeartRateProtocol.parse(copy)?.let { m ->
                         last = m
                         lastAt = SystemClock.elapsedRealtime()
+                        val s = lastAt / 1000
+                        if (seconds.lastOrNull() != s) seconds.addLast(s)
                         publish()
                         _readings.tryEmit(side to m)
                     }
@@ -4256,6 +4391,8 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
             if (g !== gatt) return
             watchdog?.cancel()
             failures = 0
+            readySince = SystemClock.elapsedRealtime()
+            seconds.clear()
             changeState(StrapState.READY)
         }
 
@@ -4292,6 +4429,7 @@ class HeartRateManager(context: Context, private val ble: BleManager) {
         private const val DIRECT_TRIES = 3
         /** Le fasce mandano una misura al secondo: dopo 6 secondi senza, il battito non è più quello di adesso. */
         private const val STALE_MS = 6_000L
+        private const val RECEIVED_WINDOW_S = 60L
     }
 }
 TSM_EOF
@@ -4915,6 +5053,26 @@ data class HeartTrack(
     val size: Int get() = minOf(t.size, bpm.size)
 
     fun add(sec: Int, value: Int): HeartTrack = copy(t = t + sec, bpm = bpm + value)
+
+    /**
+     * Misure arrivate in ritardo (dal telefono satellite, dopo un'interruzione del Wi-Fi): (secondo, battito).
+     * Si raggruppano a [step] secondi come quelle dal vivo e vanno solo dove la traccia ha un buco (nessun valore
+     * a mezzo passo o meno), al loro posto in ordine di tempo.
+     */
+    fun fill(points: List<Pair<Int, Int>>, step: Int): HeartTrack {
+        val n = size
+        val pairs = (0 until n).map { t[it] to bpm[it] }.toMutableList()
+        val groups = points.filter { it.first >= 0 }.groupBy { it.first / step }.toSortedMap()
+        for ((slot, values) in groups) {
+            val sec = slot * step + step - 1
+            if (pairs.any { kotlin.math.abs(it.first - sec) <= step / 2 }) continue
+            val avg = Math.round(values.map { it.second }.average()).toInt()
+            val at = pairs.indexOfFirst { it.first > sec }.let { if (it < 0) pairs.size else it }
+            pairs.add(at, sec to avg)
+        }
+        if (pairs.size == n) return this
+        return copy(t = pairs.map { it.first }, bpm = pairs.map { it.second })
+    }
 }
 
 /**
@@ -6167,6 +6325,676 @@ object ScoreEngine {
         if (s.isFinished || s.inTiebreak) return false
         return lookahead(s, s.receiver)?.gameWinner == s.receiver
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/relay/HeartRelay.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/HeartRelay.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import android.os.Build
+import com.tennis.scoremanager.ble.HeartMeasurement
+import com.tennis.scoremanager.ble.HeartRateManager
+import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.ble.StrapState
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.TvServer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import java.security.SecureRandom
+
+enum class RelayRole { OFF, MAIN, SATELLITE }
+
+/**
+ * Stato del collegamento tra i telefoni, per le schermate. Principale: [url] da mostrare nel QR e [satellites]
+ * collegati. Satellite: [connected] al principale e [pending] misure in attesa di conferma.
+ */
+data class RelayUi(
+    val role: RelayRole = RelayRole.OFF,
+    val url: String? = null,
+    val satellites: List<String> = emptyList(),
+    val connected: Boolean = false,
+    val pending: Int = 0,
+)
+
+/** Come un satellite vede una fascia, con l'ora (del principale) in cui l'ha detto. */
+data class RemoteStrap(val status: RelayStrapStatus, val satellite: String, val at: Long)
+
+/**
+ * Due telefoni per le fasce cardio, uno per fondo campo. Il principale tiene la partita e le fasce come sempre;
+ * il satellite si collega alle stesse fasce e gli gira le misure. Al cambio campo non serve fare niente: ogni fascia
+ * resta collegata a chi la sente finché il segnale regge, poi la prende il telefono più vicino (le fasce che
+ * accettano più collegamenti restano su tutti e due, e il principale usa le misure di entrambi).
+ *
+ * Ogni misura del satellite porta l'ID della partita del principale e un numero progressivo: il satellite la
+ * tiene finché il principale non conferma, così un'interruzione del Wi-Fi non perde niente (le misure arrivano
+ * dopo, con la loro ora, e riempiono i buchi del grafico).
+ */
+class HeartRelay(
+    private val scope: CoroutineScope,
+    private val heart: HeartRateManager,
+    /** ID della partita in corso sul principale ("" = nessuna). */
+    matchIds: Flow<String>,
+    /** Misura arrivata da un satellite: indirizzo della fascia, misura, ora (orologio di questo telefono), partita. */
+    private val onRemoteReading: (addr: String, m: HeartMeasurement, at: Long, match: String) -> Unit,
+    /** Il satellite smette: rimette le fasce di questo telefono. */
+    private val onSatelliteStopped: () -> Unit,
+) {
+    private val net = Dispatchers.IO.limitedParallelism(1)
+
+    private val _ui = MutableStateFlow(RelayUi())
+    val ui: StateFlow<RelayUi> = _ui
+    private val _remote = MutableStateFlow<Map<String, RemoteStrap>>(emptyMap())
+    /** Principale: come i satelliti vedono le fasce, per indirizzo (il migliore se sono più d'uno). */
+    val remote: StateFlow<Map<String, RemoteStrap>> = _remote
+
+    private var currentMatch = ""
+
+    // ---------------------------------------------------------------- principale
+
+    private var hub: RelayHub? = null
+    private val inbox = RelayInbox()
+    /** Satelliti collegati: id della connessione -> (id del satellite, nome del telefono). */
+    private val sats = mutableMapOf<Int, Pair<String, String>>()
+    private var lastStraps: List<RelayStrap> = emptyList()
+
+    init {
+        scope.launch {
+            matchIds.distinctUntilChanged().collect { id ->
+                currentMatch = id
+                if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.MATCH, match = id))
+            }
+        }
+        scope.launch {
+            heart.straps.map { m -> m.map { (side, st) -> RelayStrap(st.address, st.name, side.ordinal) }.sortedBy { it.side } }
+                .distinctUntilChanged()
+                .collect { list ->
+                    lastStraps = list
+                    if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.STRAPS, straps = list))
+                }
+        }
+        scope.launch {
+            while (true) {
+                delay(2_000)
+                when (_ui.value.role) {
+                    RelayRole.MAIN -> dropStaleRemote()
+                    RelayRole.SATELLITE -> satelliteTick()
+                    RelayRole.OFF -> Unit
+                }
+            }
+        }
+    }
+
+    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui il satellite possa collegarsi. */
+    fun startMain(): Boolean {
+        if (_ui.value.role == RelayRole.MAIN && hub != null) return true
+        stopSatellite()
+        val host = TvServer.localAddresses().firstOrNull() ?: return false
+        val h = RelayHub(
+            onMessage = { id, conn, m -> onHubMessage(id, conn, m) },
+            onClosed = { id -> scope.launch { satelliteGone(id) } },
+        )
+        val port = runCatching { h.start() }.getOrNull() ?: return false
+        hub = h
+        _ui.value = RelayUi(RelayRole.MAIN, url = RelayCodec.url(host, port, h.token))
+        return true
+    }
+
+    fun stopMain() {
+        hub?.let { h -> scope.launch(net) { h.stop() } }
+        hub = null
+        sats.clear()
+        _remote.value = emptyMap()
+        if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
+    }
+
+    /** Dal thread di rete: il ping si risponde subito (l'ora conta), il resto passa al thread principale. */
+    private fun onHubMessage(id: Int, conn: RelayConnection, m: RelayMsg) {
+        if (m.t == RelayMsg.PING) {
+            conn.send(RelayMsg(RelayMsg.PONG, c = m.c, m = System.currentTimeMillis()))
+            return
+        }
+        scope.launch {
+            when (m.t) {
+                RelayMsg.HELLO -> {
+                    sats[id] = m.sat!! to (m.name ?: "")
+                    publishSatellites()
+                    send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps))
+                }
+                RelayMsg.HR -> {
+                    val sat = sats[id]?.first ?: return@launch
+                    val seq = m.seq ?: return@launch
+                    val addr = m.addr
+                    val bpm = m.bpm
+                    if (inbox.accept(sat, seq) && addr != null && bpm != null && m.at != null) {
+                        onRemoteReading(addr, HeartMeasurement(bpm, m.contact), m.at, m.match.orEmpty())
+                    }
+                    send(id, RelayMsg(RelayMsg.ACK, seq = inbox.last(sat)))
+                }
+                RelayMsg.STATUS -> {
+                    val name = sats[id]?.second ?: return@launch
+                    val now = System.currentTimeMillis()
+                    var map = _remote.value
+                    for (st in m.status.orEmpty()) {
+                        val old = map[st.addr]
+                        // Con due satelliti sulla stessa fascia vince chi la sente meglio.
+                        val better = old == null || old.satellite == name || now - old.at > STALE_MS ||
+                            st.ready && (!old.status.ready || (st.rssi ?: -127) > (old.status.rssi ?: -127))
+                        if (better) map = map + (st.addr to RemoteStrap(st, name, now))
+                    }
+                    _remote.value = map
+                }
+            }
+        }
+    }
+
+    private fun satelliteGone(id: Int) {
+        val name = sats.remove(id)?.second ?: return
+        _remote.value = _remote.value.filterValues { it.satellite != name }
+        publishSatellites()
+    }
+
+    private fun publishSatellites() {
+        if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second })
+    }
+
+    private fun dropStaleRemote() {
+        val now = System.currentTimeMillis()
+        val fresh = _remote.value.filterValues { now - it.at <= STALE_MS }
+        if (fresh.size != _remote.value.size) _remote.value = fresh
+    }
+
+    private fun send(id: Int, m: RelayMsg) {
+        val h = hub ?: return
+        scope.launch(net) { h.send(id, m) }
+    }
+
+    private fun broadcast(m: RelayMsg) {
+        val h = hub ?: return
+        scope.launch(net) { h.broadcast(m) }
+    }
+
+    // ---------------------------------------------------------------- satellite
+
+    private class Reading(val addr: String, val m: HeartMeasurement, val localAt: Long, val match: String)
+
+    private var client: RelayClient? = null
+    private val outbox = RelayOutbox<Reading>()
+    private val clock = ClockSync()
+    /** Ultimo numero già spedito su questa connessione: dopo una riconnessione si riparte da quelli non confermati. */
+    private var sentUpTo = 0L
+    private var satId = ""
+    private var pingJob: Job? = null
+
+    /** Testo del QR del principale: questo telefono diventa satellite. false se il QR non è quello giusto. */
+    fun startSatellite(text: String): Boolean {
+        val (host, port, token) = RelayCodec.parseUrl(text) ?: return false
+        stopMain()
+        stopSatellite()
+        satId = ByteArray(8).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+        heart.disconnectAll()
+        val hello = RelayMsg(RelayMsg.HELLO, token = token, sat = satId, name = deviceName())
+        val c = RelayClient(
+            host, port, hello = { hello },
+            onConnected = { scope.launch { onSatConnected() } },
+            onMessage = { m -> onSatMessage(m) },
+            onDisconnected = { scope.launch { _ui.value = _ui.value.copy(connected = false) } },
+        )
+        client = c
+        _ui.value = RelayUi(RelayRole.SATELLITE)
+        c.start()
+        return true
+    }
+
+    fun stopSatellite() {
+        if (_ui.value.role != RelayRole.SATELLITE) return
+        val c = client
+        scope.launch(net) { c?.stop() }
+        client = null
+        pingJob?.cancel()
+        clock.clear()
+        _ui.value = RelayUi()
+        onSatelliteStopped()
+    }
+
+    private fun onSatConnected() {
+        sentUpTo = outbox.pending().firstOrNull()?.first?.minus(1) ?: sentUpTo
+        _ui.value = _ui.value.copy(connected = true)
+        pingJob?.cancel()
+        pingJob = scope.launch {
+            while (true) {
+                val now = System.currentTimeMillis()
+                scope.launch(net) { client?.send(RelayMsg(RelayMsg.PING, c = now)) }
+                delay(if (clock.offset == null) 1_000 else 5_000)
+            }
+        }
+    }
+
+    private fun onSatMessage(m: RelayMsg) {
+        // L'ora d'arrivo del pong si prende qui, sul thread di rete, prima di qualunque attesa.
+        val receivedAt = System.currentTimeMillis()
+        scope.launch {
+            when (m.t) {
+                RelayMsg.WELCOME -> {
+                    currentMatch = m.match.orEmpty()
+                    follow(m.straps.orEmpty())
+                }
+                RelayMsg.STRAPS -> follow(m.straps.orEmpty())
+                RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
+                RelayMsg.PONG -> if (m.c != null && m.m != null) {
+                    clock.add(m.c, m.m, receivedAt)
+                    flush()
+                }
+                RelayMsg.ACK -> m.seq?.let {
+                    outbox.ack(it)
+                    _ui.value = _ui.value.copy(pending = outbox.size)
+                }
+            }
+        }
+    }
+
+    /** Il satellite segue le fasce del principale, sugli stessi lati. */
+    private fun follow(list: List<RelayStrap>) {
+        val want = list.mapNotNull { r -> Side.entries.getOrNull(r.side)?.let { it to r } }.toMap()
+        val have = heart.straps.value
+        for (side in Side.entries) {
+            val r = want[side]
+            if (r == null) {
+                if (have[side] != null) heart.assign(side, null, null)
+            } else if (have[side]?.address != r.addr) {
+                heart.assign(side, r.addr, r.name)
+            }
+        }
+    }
+
+    /** Satellite: ogni misura delle fasce seguite va nella coda per il principale. */
+    fun onLocalReading(side: Side, m: HeartMeasurement) {
+        if (_ui.value.role != RelayRole.SATELLITE) return
+        val addr = heart.straps.value[side]?.address ?: return
+        outbox.add(Reading(addr, m, System.currentTimeMillis(), currentMatch))
+        _ui.value = _ui.value.copy(pending = outbox.size)
+        flush()
+    }
+
+    /** Spedisce le misure non ancora spedite su questa connessione (serve l'orologio allineato). */
+    private fun flush() {
+        val c = client ?: return
+        val offset = clock.offset ?: return
+        if (!_ui.value.connected) return
+        val todo = outbox.pending().filter { it.first > sentUpTo }
+        if (todo.isEmpty()) return
+        sentUpTo = todo.last().first
+        scope.launch(net) {
+            for ((seq, r) in todo) {
+                val msg = RelayMsg(
+                    RelayMsg.HR, seq = seq, match = r.match, addr = r.addr, bpm = r.m.bpm, contact = r.m.contact,
+                    at = r.localAt + offset,
+                )
+                if (!c.send(msg)) break  // caduta: alla riconnessione si rimanda da quelle non confermate
+            }
+        }
+    }
+
+    private fun satelliteTick() {
+        val c = client ?: return
+        val status = heart.straps.value.values.map { it.toStatus() }
+        if (_ui.value.connected) scope.launch(net) { c.send(RelayMsg(RelayMsg.STATUS, status = status)) }
+        flush()
+    }
+
+    private fun StrapInfo.toStatus() = RelayStrapStatus(address, state == StrapState.READY, bpm, rssi, received)
+
+    private fun deviceName(): String = listOf(Build.MANUFACTURER, Build.MODEL).filter { it.isNotBlank() }.distinct().joinToString(" ")
+
+    fun stop() {
+        stopMain()
+        stopSatellite()
+    }
+
+    companion object {
+        /** Stato di una fascia vista dal satellite: dopo 6 s senza notizie non vale più. */
+        const val STALE_MS = 6_000L
+        /** Misure del satellite più vecchie di così non sono "dal vivo": vanno a riempire i buchi. */
+        const val LIVE_MS = 8_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/relay/RelayLink.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/RelayLink.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.Socket
+import java.security.SecureRandom
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.thread
+
+/** Una connessione TCP a righe: ogni riga un [RelayMsg]. Scrive da qualunque thread. */
+class RelayConnection(private val socket: Socket) {
+    private val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8))
+    private val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
+
+    val closed: Boolean get() = socket.isClosed
+
+    /** false se la connessione è caduta. */
+    fun send(m: RelayMsg): Boolean = synchronized(writer) {
+        runCatching {
+            writer.write(RelayCodec.encode(m))
+            writer.write("\n")
+            writer.flush()
+        }.isSuccess
+    }
+
+    /** Blocca fino al prossimo messaggio; null = connessione chiusa o muta da troppo tempo. */
+    fun read(): RelayMsg? {
+        while (true) {
+            val line = runCatching { reader.readLine() }.getOrNull() ?: return null
+            RelayCodec.decode(line)?.let { return it }
+        }
+    }
+
+    fun close() {
+        runCatching { socket.close() }
+    }
+
+    companion object {
+        /** Senza niente per 20 s (i ping sono ogni 5 s) la connessione si considera persa. */
+        const val SILENCE_MS = 20_000
+    }
+}
+
+/**
+ * Telefono principale: server che accetta i satelliti col codice giusto. [onMessage] e [onClosed] arrivano dai
+ * thread di rete: chi li riceve li riporta sul thread principale.
+ */
+class RelayHub(
+    private val onMessage: (id: Int, conn: RelayConnection, m: RelayMsg) -> Unit,
+    private val onClosed: (id: Int) -> Unit,
+) {
+    private var server: ServerSocket? = null
+    private val ids = AtomicInteger(0)
+    private val conns = ConcurrentHashMap<Int, RelayConnection>()
+    val token: String = ByteArray(16).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+
+    /** Avvia il server su una porta libera e la restituisce. */
+    fun start(): Int {
+        val ss = ServerSocket().apply {
+            reuseAddress = true
+            bind(InetSocketAddress(0))
+        }
+        server = ss
+        thread(name = "tsm-relay-hub", isDaemon = true) {
+            while (!ss.isClosed) {
+                val socket = runCatching { ss.accept() }.getOrNull() ?: break
+                thread(name = "tsm-relay-in", isDaemon = true) { serve(socket) }
+            }
+        }
+        return ss.localPort
+    }
+
+    private fun serve(socket: Socket) {
+        socket.soTimeout = RelayConnection.SILENCE_MS
+        socket.tcpNoDelay = true
+        val conn = runCatching { RelayConnection(socket) }.getOrNull() ?: return
+        val hello = conn.read()
+        if (hello?.t != RelayMsg.HELLO || hello.token != token || hello.sat.isNullOrEmpty()) {
+            conn.close()
+            return
+        }
+        val id = ids.incrementAndGet()
+        conns[id] = conn
+        onMessage(id, conn, hello)
+        while (true) {
+            val m = conn.read() ?: break
+            onMessage(id, conn, m)
+        }
+        conn.close()
+        conns.remove(id)
+        onClosed(id)
+    }
+
+    fun send(id: Int, m: RelayMsg) {
+        conns[id]?.send(m)
+    }
+
+    fun broadcast(m: RelayMsg) = conns.values.forEach { it.send(m) }
+
+    fun stop() {
+        runCatching { server?.close() }
+        server = null
+        conns.values.forEach { it.close() }
+        conns.clear()
+    }
+}
+
+/**
+ * Telefono satellite: si collega al principale e, se la connessione cade (fuori portata del Wi-Fi, principale
+ * spento), riprova ogni pochi secondi finché non si chiama [stop].
+ */
+class RelayClient(
+    private val host: String,
+    private val port: Int,
+    private val hello: () -> RelayMsg,
+    private val onConnected: (RelayConnection) -> Unit,
+    private val onMessage: (RelayMsg) -> Unit,
+    private val onDisconnected: () -> Unit,
+) {
+    @Volatile private var running = false
+    @Volatile private var conn: RelayConnection? = null
+
+    fun start() {
+        if (running) return
+        running = true
+        thread(name = "tsm-relay-client", isDaemon = true) {
+            while (running) {
+                val c = runCatching {
+                    val s = Socket()
+                    s.connect(InetSocketAddress(host, port), 5_000)
+                    s.soTimeout = RelayConnection.SILENCE_MS
+                    s.tcpNoDelay = true
+                    RelayConnection(s)
+                }.getOrNull()
+                if (c != null && c.send(hello())) {
+                    conn = c
+                    onConnected(c)
+                    while (running) onMessage(c.read() ?: break)
+                    conn = null
+                    c.close()
+                    onDisconnected()
+                } else {
+                    c?.close()
+                }
+                if (running) Thread.sleep(RETRY_MS)
+            }
+        }
+    }
+
+    /** false se in questo momento non c'è collegamento (il messaggio resta da rimandare a chi lo chiama). */
+    fun send(m: RelayMsg): Boolean = conn?.send(m) ?: false
+
+    fun stop() {
+        running = false
+        conn?.close()
+        conn = null
+    }
+
+    companion object {
+        private const val RETRY_MS = 3_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/relay/RelayProtocol.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/RelayProtocol.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+/**
+ * Due telefoni, uno per fondo campo: il principale tiene la partita, il satellite si collega alle fasce dei
+ * giocatori vicini a lui e gli gira le misure. Una riga JSON per messaggio, su una connessione TCP nella rete locale
+ * (Wi-Fi del circolo o hotspot del principale).
+ *
+ * Principale → satellite: [WELCOME] (fasce da seguire e partita in corso), [STRAPS], [MATCH], [PONG], [ACK].
+ * Satellite → principale: [HELLO], [HR] (una misura), [STATUS] (come vede le fasce), [PING].
+ */
+@Serializable
+data class RelayMsg(
+    val t: String,
+    /** Codice del QR: senza, il principale chiude la connessione. */
+    val token: String? = null,
+    /** Satellite che parla: cambia a ogni avvio, così i numeri [seq] di prima non si confondono. */
+    val sat: String? = null,
+    /** ID della partita del principale ("" = nessuna partita in corso). */
+    val match: String? = null,
+    val seq: Long? = null,
+    /** Orologio del satellite all'invio del ping ([c]) e del principale alla risposta ([m]). */
+    val c: Long? = null,
+    val m: Long? = null,
+    val addr: String? = null,
+    val bpm: Int? = null,
+    val contact: Boolean? = null,
+    /** Ora della misura, già sull'orologio del principale. */
+    val at: Long? = null,
+    val straps: List<RelayStrap>? = null,
+    val status: List<RelayStrapStatus>? = null,
+    val name: String? = null,
+) {
+    companion object {
+        const val HELLO = "hello"
+        const val WELCOME = "welcome"
+        const val STRAPS = "straps"
+        const val MATCH = "match"
+        const val PING = "ping"
+        const val PONG = "pong"
+        const val HR = "hr"
+        const val ACK = "ack"
+        const val STATUS = "status"
+    }
+}
+
+/** Fascia che il satellite deve seguire: [side] 0 = giocatore 1, 1 = giocatore 2. */
+@Serializable
+data class RelayStrap(val addr: String, val name: String, val side: Int)
+
+/** Come il satellite vede una fascia: segnale (dBm) e misure arrivate nell'ultimo minuto (%). */
+@Serializable
+data class RelayStrapStatus(
+    val addr: String,
+    val ready: Boolean,
+    val bpm: Int? = null,
+    val rssi: Int? = null,
+    val received: Int? = null,
+)
+
+object RelayCodec {
+    private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
+
+    fun encode(m: RelayMsg): String = json.encodeToString(RelayMsg.serializer(), m)
+
+    /** null se la riga non è un messaggio valido (si ignora, non si chiude la connessione). */
+    fun decode(line: String): RelayMsg? = runCatching { json.decodeFromString(RelayMsg.serializer(), line) }.getOrNull()
+
+    const val SCHEME = "tsm-relay://"
+
+    fun url(host: String, port: Int, token: String) = "$SCHEME$host:$port/$token"
+
+    /** (host, porta, codice) dal testo del QR, o null se non è un QR del telefono principale. */
+    fun parseUrl(text: String): Triple<String, Int, String>? {
+        val m = Regex("""^${Regex.escape(SCHEME)}([0-9.]+):(\d{1,5})/([0-9a-f]{32})$""").matchEntire(text.trim()) ?: return null
+        val port = m.groupValues[2].toInt().takeIf { it in 1..65535 } ?: return null
+        return Triple(m.groupValues[1], port, m.groupValues[3])
+    }
+}
+
+/**
+ * Scarto tra l'orologio del principale e quello del satellite, dai ping: per ogni ping si stima
+ * `principale − (invio + arrivo) / 2`, e si tiene la stima del ping più veloce tra gli ultimi (meno attesa in rete,
+ * meno errore).
+ */
+class ClockSync(private val keep: Int = 8) {
+    private val samples = ArrayDeque<Pair<Long, Long>>()  // (andata e ritorno, scarto)
+
+    fun add(sentAt: Long, masterAt: Long, receivedAt: Long) {
+        val rtt = receivedAt - sentAt
+        if (rtt < 0) return
+        samples.addLast(rtt to masterAt - (sentAt + receivedAt) / 2)
+        while (samples.size > keep) samples.removeFirst()
+    }
+
+    /** Da sommare all'ora del satellite per avere quella del principale; null finché non è arrivato nessun ping. */
+    val offset: Long? get() = samples.minByOrNull { it.first }?.second
+
+    fun clear() = samples.clear()
+}
+
+/**
+ * Misure del satellite non ancora confermate dal principale: si numerano, si tengono finché il principale non
+ * conferma (conferma cumulativa: "ho tutto fino a N") e dopo un'interruzione si rimandano tutte.
+ * Il principale scarta i numeri già visti, quindi rimandare è sempre sicuro.
+ */
+class RelayOutbox<T>(private val max: Int = 20_000) {
+    private val items = ArrayDeque<Pair<Long, T>>()
+    private var next = 1L
+
+    fun add(item: T): Long {
+        val seq = next++
+        items.addLast(seq to item)
+        // Ore di misure senza principale: si perdono le più vecchie, non si riempie la memoria.
+        while (items.size > max) items.removeFirst()
+        return seq
+    }
+
+    fun ack(upTo: Long) {
+        while (items.isNotEmpty() && items.first().first <= upTo) items.removeFirst()
+    }
+
+    fun pending(): List<Pair<Long, T>> = items.toList()
+
+    val size: Int get() = items.size
+}
+
+/**
+ * Lato principale: per ogni satellite l'ultimo numero ricevuto. Le misure arrivano in ordine (TCP); dopo una
+ * riconnessione il satellite rimanda anche quelle già arrivate, che qui si riconoscono e si saltano.
+ */
+class RelayInbox {
+    private val lastSeq = mutableMapOf<String, Long>()
+
+    /** true se la misura è nuova (da usare), false se è un doppione. */
+    fun accept(sat: String, seq: Long): Boolean {
+        val last = lastSeq[sat] ?: 0L
+        if (seq <= last) return false
+        lastSeq[sat] = seq
+        return true
+    }
+
+    fun last(sat: String): Long = lastSeq[sat] ?: 0L
 }
 TSM_EOF
 
@@ -8807,6 +9635,8 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt" << 'T
 
 package com.tennis.scoremanager.ui
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8827,6 +9657,11 @@ import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.PhonelinkRing
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -8836,6 +9671,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8845,6 +9681,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -8860,6 +9697,10 @@ import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.relay.RelayRole
+import com.tennis.scoremanager.relay.RelayUi
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 
 /**
  * Pagina 2, "Battito cardiaco": interruttore, fasce di ciascun lato (ricerca automatica mentre la sezione è aperta)
@@ -8884,11 +9725,24 @@ fun HeartSection(
         val ready = btOn && permsOk
         val found by c.heart.found.collectAsState()
         val scanning by c.heart.scanning.collectAsState()
-        val straps by c.heart.straps.collectAsState()
+        val straps by c.straps.collectAsState()
         val profiles by c.heartProfiles.collectAsState()
         LifecycleResumeEffect(ready) {
             c.setStrapScan(ready)
             onPauseOrDispose { c.setStrapScan(false) }
+        }
+        val relay by c.relay.ui.collectAsState()
+        if (relay.role == RelayRole.SATELLITE) {
+            // Il satellite segue le fasce scelte sul principale: qui solo come le sente.
+            for (side in Side.entries) {
+                val st = straps[side] ?: continue
+                Column {
+                    Text(st.name, color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    Text(strapStatus(st, s), color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+            }
+            RelayPanel(c, relay)
+            return@SectionCard
         }
         Text(s.heartHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -8907,6 +9761,73 @@ fun HeartSection(
         }
         if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        RelayPanel(c, relay)
+    }
+}
+
+/**
+ * Secondo telefono a fondo campo: da qui questo telefono diventa il principale (mostra il QR) oppure il satellite
+ * (inquadra il QR del principale).
+ */
+@Composable
+private fun RelayPanel(c: MatchController, relay: RelayUi) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    var showQr by remember { mutableStateOf(false) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    Spacer(Modifier.height(4.dp))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Filled.PhonelinkRing, null, tint = TsmColors.Ball)
+        Spacer(Modifier.width(10.dp))
+        Text(s.relayTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+    }
+    when (relay.role) {
+        RelayRole.OFF -> {
+            Text(s.relayHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.relayMain, Icons.Filled.QrCode2, {
+                if (c.startRelayMain()) showQr = true else Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+            }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
+                scanner.launch(
+                    ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
+                        .setBeepEnabled(false).setOrientationLocked(true),
+                )
+            }, Modifier.fillMaxWidth())
+        }
+        RelayRole.MAIN -> {
+            Text(
+                if (relay.satellites.isEmpty()) s.relayNoSatellite else s.relaySatellites(relay.satellites.joinToString(", ")),
+                color = if (relay.satellites.isEmpty()) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp,
+            )
+            GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
+            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
+        }
+        RelayRole.SATELLITE -> {
+            Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            Text(
+                (if (relay.connected) s.relayConnected else s.relayDisconnected) +
+                    (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
+                color = if (relay.connected) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp,
+            )
+            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
+        }
+    }
+    val url = relay.url
+    if (showQr && url != null) {
+        AlertDialog(
+            onDismissRequest = { showQr = false },
+            title = { Text(s.relayTitle) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    QrCode(url, 240.dp)
+                    Text(
+                        if (relay.satellites.isEmpty()) s.relayShowQr else s.relaySatellites(relay.satellites.joinToString(", ")),
+                        color = if (relay.satellites.isEmpty()) TsmColors.TextMain else TsmColors.Ok,
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showQr = false }) { Text(s.ok) } },
+        )
     }
 }
 
@@ -8955,15 +9876,21 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
     }
 }
 
-/** "Collegata · 72 bpm · Batteria 90%", oppure perché il battito non arriva. */
+/**
+ * "Collegata · 72 bpm · −68 dBm · 100% ricevute · Batteria 90%", oppure perché il battito non arriva. Segnale e
+ * misure ricevute nell'ultimo minuto servono a capire fin dove arriva la fascia.
+ */
 private fun strapStatus(st: StrapInfo, s: Strings): String {
     val state = when {
         st.state != StrapState.READY -> if (st.state == StrapState.CONNECTING) s.strapConnecting else s.strapWaiting
         st.contact == false -> s.strapNoContact
-        st.bpm != null -> "${s.strapConnected} · ${st.bpm} bpm"
+        st.bpm != null -> "${if (st.relayed) s.strapRelayed else s.strapConnected} · ${st.bpm} bpm"
         else -> s.strapWaiting
     }
-    return state + (st.battery?.let { " · ${s.battery} $it%" } ?: "")
+    return state +
+        (st.rssi?.let { " · $it dBm" } ?: "") +
+        (st.received?.let { " · ${s.strapReceived(it)}" } ?: "") +
+        (st.battery?.let { " · ${s.battery} $it%" } ?: "")
 }
 
 /** Età, peso e sesso: si salvano appena età e peso sono plausibili; svuotarli toglie il profilo. */
@@ -9257,6 +10184,22 @@ interface Strings {
     val strapConnecting: String
     val strapWaiting: String
     val strapNoContact: String
+    val strapRelayed: String
+    val strapReceived: (Int) -> String
+    val relayTitle: String
+    val relayHint: String
+    val relayMain: String
+    val relayJoin: String
+    val relayShowCode: String
+    val relayShowQr: String
+    val relayScanPrompt: String
+    val relayNoSatellite: String
+    val relaySatellites: (String) -> String
+    val relayStop: String
+    val relaySatelliteOn: String
+    val relayConnected: String
+    val relayDisconnected: String
+    val relayPending: (Int) -> String
     val heartAge: String
     val heartWeight: String
     val heartMale: String
@@ -9830,6 +10773,22 @@ object ItStrings : Strings {
     override val strapConnecting = "Collegamento…"
     override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
     override val strapNoContact = "Non tocca la pelle"
+    override val strapRelayed = "Dal secondo telefono"
+    override val strapReceived: (Int) -> String = { "$it% ricevute" }
+    override val relayTitle = "Secondo telefono"
+    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. I due telefoni devono stare sulla stessa rete Wi-Fi (o sull'hotspot di questo)."
+    override val relayMain = "Usa un secondo telefono"
+    override val relayJoin = "Fai da secondo telefono"
+    override val relayShowCode = "Mostra il codice"
+    override val relayShowQr = "Sull'altro telefono attiva Fasce cardio (pagina 2), tocca Fai da secondo telefono e inquadra questo codice."
+    override val relayScanPrompt = "Inquadra il codice del telefono principale"
+    override val relayNoSatellite = "Nessun secondo telefono collegato"
+    override val relaySatellites: (String) -> String = { "Secondo telefono collegato: $it" }
+    override val relayStop = "Smetti"
+    override val relaySatelliteOn = "Questo telefono fa da secondo telefono: segue le fasce scelte sul principale e gli gira il battito. Lascialo a fondo campo con l'app aperta."
+    override val relayConnected = "Collegato al telefono principale"
+    override val relayDisconnected = "Telefono principale non raggiungibile: riprovo…"
+    override val relayPending: (Int) -> String = { "$it misure da inviare" }
     override val heartAge = "Età"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Uomo"
@@ -10376,6 +11335,22 @@ object EnStrings : Strings {
     override val strapConnecting = "Connecting…"
     override val strapWaiting = "Waiting: put it on and wet the electrodes"
     override val strapNoContact = "Not touching the skin"
+    override val strapRelayed = "Via second phone"
+    override val strapReceived: (Int) -> String = { "$it% received" }
+    override val relayTitle = "Second phone"
+    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. Both phones must be on the same Wi-Fi network (or on this phone's hotspot)."
+    override val relayMain = "Use a second phone"
+    override val relayJoin = "Act as second phone"
+    override val relayShowCode = "Show the code"
+    override val relayShowQr = "On the other phone turn on Heart rate straps (page 2), tap Act as second phone and scan this code."
+    override val relayScanPrompt = "Scan the main phone's code"
+    override val relayNoSatellite = "No second phone connected"
+    override val relaySatellites: (String) -> String = { "Second phone connected: $it" }
+    override val relayStop = "Stop"
+    override val relaySatelliteOn = "This phone is acting as second phone: it follows the straps picked on the main phone and passes the heart rate on. Leave it behind the baseline with the app open."
+    override val relayConnected = "Connected to the main phone"
+    override val relayDisconnected = "Main phone not reachable: retrying…"
+    override val relayPending: (Int) -> String = { "$it readings to send" }
     override val heartAge = "Age"
     override val heartWeight = "Weight (kg)"
     override val heartMale = "Man"
@@ -10945,6 +11920,22 @@ object DeStrings : Strings {
     override val strapConnecting = "Verbinde…"
     override val strapWaiting = "Warte: Gurt anlegen und Elektroden befeuchten"
     override val strapNoContact = "Kein Hautkontakt"
+    override val strapRelayed = "Über zweites Telefon"
+    override val strapReceived: (Int) -> String = { "$it % empfangen" }
+    override val relayTitle = "Zweites Telefon"
+    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Beide Telefone müssen im selben WLAN sein (oder im Hotspot dieses Telefons)."
+    override val relayMain = "Zweites Telefon verwenden"
+    override val relayJoin = "Als zweites Telefon dienen"
+    override val relayShowCode = "Code anzeigen"
+    override val relayShowQr = "Schalte auf dem anderen Telefon Brustgurte ein (Seite 2), tippe auf Als zweites Telefon dienen und scanne diesen Code."
+    override val relayScanPrompt = "Scanne den Code des Haupttelefons"
+    override val relayNoSatellite = "Kein zweites Telefon verbunden"
+    override val relaySatellites: (String) -> String = { "Zweites Telefon verbunden: $it" }
+    override val relayStop = "Beenden"
+    override val relaySatelliteOn = "Dieses Telefon dient als zweites Telefon: Es folgt den auf dem Haupttelefon gewählten Gurten und gibt die Herzfrequenz weiter. Lass es mit geöffneter App hinter der Grundlinie liegen."
+    override val relayConnected = "Mit dem Haupttelefon verbunden"
+    override val relayDisconnected = "Haupttelefon nicht erreichbar: neuer Versuch…"
+    override val relayPending: (Int) -> String = { "$it Messwerte zu senden" }
     override val heartAge = "Alter"
     override val heartWeight = "Gewicht (kg)"
     override val heartMale = "Mann"
@@ -11506,6 +12497,22 @@ object EsStrings : Strings {
     override val strapConnecting = "Conectando…"
     override val strapWaiting = "En espera: póntela y moja los electrodos"
     override val strapNoContact = "No toca la piel"
+    override val strapRelayed = "Desde el segundo teléfono"
+    override val strapReceived: (Int) -> String = { "$it % recibidas" }
+    override val relayTitle = "Segundo teléfono"
+    override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Los dos teléfonos deben estar en la misma red Wi-Fi (o en el punto de acceso de este)."
+    override val relayMain = "Usar un segundo teléfono"
+    override val relayJoin = "Hacer de segundo teléfono"
+    override val relayShowCode = "Mostrar el código"
+    override val relayShowQr = "En el otro teléfono activa Bandas de pecho (página 2), toca Hacer de segundo teléfono y escanea este código."
+    override val relayScanPrompt = "Escanea el código del teléfono principal"
+    override val relayNoSatellite = "Ningún segundo teléfono conectado"
+    override val relaySatellites: (String) -> String = { "Segundo teléfono conectado: $it" }
+    override val relayStop = "Detener"
+    override val relaySatelliteOn = "Este teléfono hace de segundo teléfono: sigue las bandas elegidas en el principal y le pasa la frecuencia cardíaca. Déjalo detrás de la línea de fondo con la app abierta."
+    override val relayConnected = "Conectado al teléfono principal"
+    override val relayDisconnected = "Teléfono principal no disponible: reintentando…"
+    override val relayPending: (Int) -> String = { "$it medidas por enviar" }
     override val heartAge = "Edad"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Hombre"
@@ -12071,6 +13078,22 @@ object FrStrings : Strings {
     override val strapConnecting = "Connexion…"
     override val strapWaiting = "En attente : mettez-la et mouillez les électrodes"
     override val strapNoContact = "Pas de contact avec la peau"
+    override val strapRelayed = "Via le second téléphone"
+    override val strapReceived: (Int) -> String = { "$it % reçues" }
+    override val relayTitle = "Second téléphone"
+    override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Les deux téléphones doivent être sur le même réseau Wi-Fi (ou sur le point d'accès de celui-ci)."
+    override val relayMain = "Utiliser un second téléphone"
+    override val relayJoin = "Servir de second téléphone"
+    override val relayShowCode = "Afficher le code"
+    override val relayShowQr = "Sur l'autre téléphone, activez Ceintures cardio (page 2), touchez Servir de second téléphone et scannez ce code."
+    override val relayScanPrompt = "Scannez le code du téléphone principal"
+    override val relayNoSatellite = "Aucun second téléphone connecté"
+    override val relaySatellites: (String) -> String = { "Second téléphone connecté : $it" }
+    override val relayStop = "Arrêter"
+    override val relaySatelliteOn = "Ce téléphone sert de second téléphone : il suit les ceintures choisies sur le principal et lui transmet la fréquence cardiaque. Laissez-le derrière la ligne de fond avec l'app ouverte."
+    override val relayConnected = "Connecté au téléphone principal"
+    override val relayDisconnected = "Téléphone principal injoignable : nouvel essai…"
+    override val relayPending: (Int) -> String = { "$it mesures à envoyer" }
     override val heartAge = "Âge"
     override val heartWeight = "Poids (kg)"
     override val heartMale = "Homme"
@@ -12635,6 +13658,22 @@ object PtStrings : Strings {
     override val strapConnecting = "Conectando…"
     override val strapWaiting = "Aguardando: coloque-a e molhe os eletrodos"
     override val strapNoContact = "Sem contato com a pele"
+    override val strapRelayed = "Pelo segundo telefone"
+    override val strapReceived: (Int) -> String = { "$it% recebidas" }
+    override val relayTitle = "Segundo telefone"
+    override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Os dois telefones devem estar na mesma rede Wi-Fi (ou no hotspot deste)."
+    override val relayMain = "Usar um segundo telefone"
+    override val relayJoin = "Servir de segundo telefone"
+    override val relayShowCode = "Mostrar o código"
+    override val relayShowQr = "No outro telefone ative Cintas cardíacas (página 2), toque em Servir de segundo telefone e escaneie este código."
+    override val relayScanPrompt = "Escaneie o código do telefone principal"
+    override val relayNoSatellite = "Nenhum segundo telefone conectado"
+    override val relaySatellites: (String) -> String = { "Segundo telefone conectado: $it" }
+    override val relayStop = "Parar"
+    override val relaySatelliteOn = "Este telefone serve de segundo telefone: segue as cintas escolhidas no principal e passa a frequência cardíaca para ele. Deixe-o atrás da linha de fundo com o app aberto."
+    override val relayConnected = "Conectado ao telefone principal"
+    override val relayDisconnected = "Telefone principal fora de alcance: tentando de novo…"
+    override val relayPending: (Int) -> String = { "$it medidas a enviar" }
     override val heartAge = "Idade"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Homem"
@@ -13793,7 +14832,7 @@ fun MatchScreen(c: MatchController) {
     val serveOrder by c.serveOrderPrompt.collectAsState()
     val o by c.options.collectAsState()
     val bands by c.ble.bands.collectAsState()
-    val straps by c.heart.straps.collectAsState()
+    val straps by c.straps.collectAsState()
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
@@ -19680,6 +20719,191 @@ class ScoreEngineTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/relay/RelayLinkTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/relay/RelayLinkTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+
+/** Principale e satellite veri, su questo computer: saluto col codice, ping e misure con conferma. */
+class RelayLinkTest {
+
+    @Test
+    fun satelliteTalksToMain() {
+        val atMain = LinkedBlockingQueue<RelayMsg>()
+        lateinit var hub: RelayHub
+        hub = RelayHub(
+            onMessage = { id, conn, m ->
+                atMain.add(m)
+                when (m.t) {
+                    RelayMsg.HELLO -> conn.send(RelayMsg(RelayMsg.WELCOME, match = "m1-abc"))
+                    RelayMsg.PING -> conn.send(RelayMsg(RelayMsg.PONG, c = m.c, m = 42L))
+                    RelayMsg.HR -> hub.send(id, RelayMsg(RelayMsg.ACK, seq = m.seq))
+                }
+            },
+            onClosed = {},
+        )
+        val port = hub.start()
+        val atSat = LinkedBlockingQueue<RelayMsg>()
+        val connected = LinkedBlockingQueue<Boolean>()
+        val client = RelayClient(
+            "127.0.0.1", port,
+            hello = { RelayMsg(RelayMsg.HELLO, token = hub.token, sat = "s1", name = "prova") },
+            onConnected = { connected.add(true) },
+            onMessage = { atSat.add(it) },
+            onDisconnected = {},
+        )
+        try {
+            client.start()
+            assertNotNull(connected.poll(5, TimeUnit.SECONDS))
+            assertEquals(RelayMsg.HELLO, atMain.poll(5, TimeUnit.SECONDS)?.t)
+            assertEquals("m1-abc", atSat.poll(5, TimeUnit.SECONDS)?.match)
+            assertTrue(client.send(RelayMsg(RelayMsg.PING, c = 7L)))
+            assertEquals(RelayMsg(RelayMsg.PONG, c = 7L, m = 42L), atSat.poll(5, TimeUnit.SECONDS))
+            assertEquals(RelayMsg.PING, atMain.poll(5, TimeUnit.SECONDS)?.t)
+            assertTrue(client.send(RelayMsg(RelayMsg.HR, seq = 1, addr = "AA", bpm = 150, at = 1L, match = "m1-abc")))
+            assertEquals(150, atMain.poll(5, TimeUnit.SECONDS)?.bpm)
+            assertEquals(1L, atSat.poll(5, TimeUnit.SECONDS)?.seq)
+        } finally {
+            client.stop()
+            hub.stop()
+        }
+    }
+
+    @Test
+    fun wrongCodeIsRefused() {
+        val atMain = LinkedBlockingQueue<RelayMsg>()
+        val hub = RelayHub(onMessage = { _, _, m -> atMain.add(m) }, onClosed = {})
+        val port = hub.start()
+        val client = RelayClient(
+            "127.0.0.1", port,
+            hello = { RelayMsg(RelayMsg.HELLO, token = "ffffffffffffffffffffffffffffffff", sat = "s1") },
+            onConnected = {}, onMessage = {}, onDisconnected = {},
+        )
+        try {
+            client.start()
+            Thread.sleep(500)
+            assertEquals(0, atMain.size)
+        } finally {
+            client.stop()
+            hub.stop()
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/relay/RelayProtocolTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/relay/RelayProtocolTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import com.tennis.scoremanager.data.HeartTrack
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class RelayProtocolTest {
+    private val token = "0123456789abcdef0123456789abcdef"
+
+    @Test
+    fun urlRoundTrip() {
+        val url = RelayCodec.url("192.168.43.1", 40123, token)
+        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl(url))
+        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl("  $url\n"))
+    }
+
+    @Test
+    fun otherQrCodesAreRejected() {
+        assertNull(RelayCodec.parseUrl("http://192.168.1.5:8080/tsm-transfer/$token"))
+        assertNull(RelayCodec.parseUrl("tsm-relay://192.168.1.5:99999/$token"))
+        assertNull(RelayCodec.parseUrl("tsm-relay://192.168.1.5:8080/abc"))
+    }
+
+    @Test
+    fun messageRoundTripAndGarbage() {
+        val m = RelayMsg(RelayMsg.HR, sat = "s1", match = "m1-ab", seq = 7, addr = "AA:BB", bpm = 151, contact = true, at = 1_000L)
+        val line = RelayCodec.encode(m)
+        assertFalse(line.contains("\n"))
+        assertFalse("i campi nulli non viaggiano", line.contains("null"))
+        assertEquals(m, RelayCodec.decode(line))
+        assertNull(RelayCodec.decode("non json"))
+        // Un campo sconosciuto (versione più nuova dell'altro telefono) non rompe niente.
+        assertEquals(RelayMsg.PING, RelayCodec.decode("""{"t":"ping","c":5,"nuovo":1}""")?.t)
+    }
+
+    @Test
+    fun clockSyncKeepsFastestPing() {
+        val c = ClockSync()
+        assertNull(c.offset)
+        // Satellite 10 s indietro: ping lento (asimmetrico) e ping veloce.
+        c.add(sentAt = 1_000, masterAt = 11_400, receivedAt = 1_600)  // rtt 600, stima 10 100
+        c.add(sentAt = 2_000, masterAt = 12_010, receivedAt = 2_020)  // rtt 20, stima 10 000
+        assertEquals(10_000L, c.offset)
+        c.add(sentAt = 3_000, masterAt = 0, receivedAt = 2_000)  // tempo all'indietro: scartato
+        assertEquals(10_000L, c.offset)
+    }
+
+    @Test
+    fun outboxResendsUntilAcked() {
+        val o = RelayOutbox<String>(max = 3)
+        assertEquals(1L, o.add("a"))
+        assertEquals(2L, o.add("b"))
+        o.add("c")
+        o.add("d")  // oltre il massimo: si perde la più vecchia
+        assertEquals(listOf(2L, 3L, 4L), o.pending().map { it.first })
+        o.ack(3)
+        assertEquals(listOf(4L to "d"), o.pending())
+        o.ack(10)
+        assertEquals(0, o.size)
+        assertEquals(5L, o.add("e"))
+    }
+
+    @Test
+    fun inboxSkipsResentReadings() {
+        val i = RelayInbox()
+        assertTrue(i.accept("s1", 1))
+        assertTrue(i.accept("s1", 2))
+        // Riconnessione: il satellite rimanda 2 (non confermata in tempo) e poi 3.
+        assertFalse(i.accept("s1", 2))
+        assertTrue(i.accept("s1", 3))
+        assertEquals(3L, i.last("s1"))
+        // Satellite riavviato: nuovo id, i numeri ripartono.
+        assertTrue(i.accept("s2", 1))
+    }
+
+    @Test
+    fun lateReadingsFillOnlyGaps() {
+        // Dal vivo fino a 20 s, poi il Wi-Fi cade fino a 40 s.
+        val track = HeartTrack(t = listOf(5, 10, 15, 20, 40), bpm = listOf(100, 110, 120, 130, 150))
+        val late = (12..39).map { it to 140 }
+        val filled = track.fill(late, 5)
+        assertEquals(listOf(5, 10, 15, 20, 24, 29, 34, 40), filled.t)
+        assertEquals(listOf(100, 110, 120, 130, 140, 140, 140, 150), filled.bpm)
+        assertSame(filled, filled.fill(late, 5))
+    }
+
+    @Test
+    fun lateReadingsAverageBySlot() {
+        val filled = HeartTrack().fill(listOf(0 to 100, 2 to 110, 4 to 120, 7 to 90), 5)
+        assertEquals(listOf(4, 9), filled.t)
+        assertEquals(listOf(110, 90), filled.bpm)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/remote/PressDetectorTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/remote/PressDetectorTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -24975,6 +26199,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 92 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 97 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

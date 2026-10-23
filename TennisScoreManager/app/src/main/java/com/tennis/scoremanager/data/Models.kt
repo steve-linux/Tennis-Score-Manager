@@ -114,6 +114,26 @@ data class HeartTrack(
     val size: Int get() = minOf(t.size, bpm.size)
 
     fun add(sec: Int, value: Int): HeartTrack = copy(t = t + sec, bpm = bpm + value)
+
+    /**
+     * Misure arrivate in ritardo (dal telefono satellite, dopo un'interruzione del Wi-Fi): (secondo, battito).
+     * Si raggruppano a [step] secondi come quelle dal vivo e vanno solo dove la traccia ha un buco (nessun valore
+     * a mezzo passo o meno), al loro posto in ordine di tempo.
+     */
+    fun fill(points: List<Pair<Int, Int>>, step: Int): HeartTrack {
+        val n = size
+        val pairs = (0 until n).map { t[it] to bpm[it] }.toMutableList()
+        val groups = points.filter { it.first >= 0 }.groupBy { it.first / step }.toSortedMap()
+        for ((slot, values) in groups) {
+            val sec = slot * step + step - 1
+            if (pairs.any { kotlin.math.abs(it.first - sec) <= step / 2 }) continue
+            val avg = Math.round(values.map { it.second }.average()).toInt()
+            val at = pairs.indexOfFirst { it.first > sec }.let { if (it < 0) pairs.size else it }
+            pairs.add(at, sec to avg)
+        }
+        if (pairs.size == n) return this
+        return copy(t = pairs.map { it.first }, bpm = pairs.map { it.second })
+    }
 }
 
 /**

@@ -79,6 +79,22 @@ interface Strings {
     val strapConnecting: String
     val strapWaiting: String
     val strapNoContact: String
+    val strapRelayed: String
+    val strapReceived: (Int) -> String
+    val relayTitle: String
+    val relayHint: String
+    val relayMain: String
+    val relayJoin: String
+    val relayShowCode: String
+    val relayShowQr: String
+    val relayScanPrompt: String
+    val relayNoSatellite: String
+    val relaySatellites: (String) -> String
+    val relayStop: String
+    val relaySatelliteOn: String
+    val relayConnected: String
+    val relayDisconnected: String
+    val relayPending: (Int) -> String
     val heartAge: String
     val heartWeight: String
     val heartMale: String
@@ -652,6 +668,22 @@ object ItStrings : Strings {
     override val strapConnecting = "Collegamento…"
     override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
     override val strapNoContact = "Non tocca la pelle"
+    override val strapRelayed = "Dal secondo telefono"
+    override val strapReceived: (Int) -> String = { "$it% ricevute" }
+    override val relayTitle = "Secondo telefono"
+    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. I due telefoni devono stare sulla stessa rete Wi-Fi (o sull'hotspot di questo)."
+    override val relayMain = "Usa un secondo telefono"
+    override val relayJoin = "Fai da secondo telefono"
+    override val relayShowCode = "Mostra il codice"
+    override val relayShowQr = "Sull'altro telefono attiva Fasce cardio (pagina 2), tocca Fai da secondo telefono e inquadra questo codice."
+    override val relayScanPrompt = "Inquadra il codice del telefono principale"
+    override val relayNoSatellite = "Nessun secondo telefono collegato"
+    override val relaySatellites: (String) -> String = { "Secondo telefono collegato: $it" }
+    override val relayStop = "Smetti"
+    override val relaySatelliteOn = "Questo telefono fa da secondo telefono: segue le fasce scelte sul principale e gli gira il battito. Lascialo a fondo campo con l'app aperta."
+    override val relayConnected = "Collegato al telefono principale"
+    override val relayDisconnected = "Telefono principale non raggiungibile: riprovo…"
+    override val relayPending: (Int) -> String = { "$it misure da inviare" }
     override val heartAge = "Età"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Uomo"
@@ -1198,6 +1230,22 @@ object EnStrings : Strings {
     override val strapConnecting = "Connecting…"
     override val strapWaiting = "Waiting: put it on and wet the electrodes"
     override val strapNoContact = "Not touching the skin"
+    override val strapRelayed = "Via second phone"
+    override val strapReceived: (Int) -> String = { "$it% received" }
+    override val relayTitle = "Second phone"
+    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. Both phones must be on the same Wi-Fi network (or on this phone's hotspot)."
+    override val relayMain = "Use a second phone"
+    override val relayJoin = "Act as second phone"
+    override val relayShowCode = "Show the code"
+    override val relayShowQr = "On the other phone turn on Heart rate straps (page 2), tap Act as second phone and scan this code."
+    override val relayScanPrompt = "Scan the main phone's code"
+    override val relayNoSatellite = "No second phone connected"
+    override val relaySatellites: (String) -> String = { "Second phone connected: $it" }
+    override val relayStop = "Stop"
+    override val relaySatelliteOn = "This phone is acting as second phone: it follows the straps picked on the main phone and passes the heart rate on. Leave it behind the baseline with the app open."
+    override val relayConnected = "Connected to the main phone"
+    override val relayDisconnected = "Main phone not reachable: retrying…"
+    override val relayPending: (Int) -> String = { "$it readings to send" }
     override val heartAge = "Age"
     override val heartWeight = "Weight (kg)"
     override val heartMale = "Man"

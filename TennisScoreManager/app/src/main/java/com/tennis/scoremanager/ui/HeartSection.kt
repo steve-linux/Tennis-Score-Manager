@@ -3,6 +3,8 @@
 
 package com.tennis.scoremanager.ui
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,11 @@ import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.PhonelinkRing
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -32,6 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,6 +65,10 @@ import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.relay.RelayRole
+import com.tennis.scoremanager.relay.RelayUi
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 
 /**
  * Pagina 2, "Battito cardiaco": interruttore, fasce di ciascun lato (ricerca automatica mentre la sezione è aperta)
@@ -80,11 +93,24 @@ fun HeartSection(
         val ready = btOn && permsOk
         val found by c.heart.found.collectAsState()
         val scanning by c.heart.scanning.collectAsState()
-        val straps by c.heart.straps.collectAsState()
+        val straps by c.straps.collectAsState()
         val profiles by c.heartProfiles.collectAsState()
         LifecycleResumeEffect(ready) {
             c.setStrapScan(ready)
             onPauseOrDispose { c.setStrapScan(false) }
+        }
+        val relay by c.relay.ui.collectAsState()
+        if (relay.role == RelayRole.SATELLITE) {
+            // Il satellite segue le fasce scelte sul principale: qui solo come le sente.
+            for (side in Side.entries) {
+                val st = straps[side] ?: continue
+                Column {
+                    Text(st.name, color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+                    Text(strapStatus(st, s), color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+            }
+            RelayPanel(c, relay)
+            return@SectionCard
         }
         Text(s.heartHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -103,6 +129,73 @@ fun HeartSection(
         }
         if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        RelayPanel(c, relay)
+    }
+}
+
+/**
+ * Secondo telefono a fondo campo: da qui questo telefono diventa il principale (mostra il QR) oppure il satellite
+ * (inquadra il QR del principale).
+ */
+@Composable
+private fun RelayPanel(c: MatchController, relay: RelayUi) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    var showQr by remember { mutableStateOf(false) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    Spacer(Modifier.height(4.dp))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Filled.PhonelinkRing, null, tint = TsmColors.Ball)
+        Spacer(Modifier.width(10.dp))
+        Text(s.relayTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+    }
+    when (relay.role) {
+        RelayRole.OFF -> {
+            Text(s.relayHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.relayMain, Icons.Filled.QrCode2, {
+                if (c.startRelayMain()) showQr = true else Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+            }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
+                scanner.launch(
+                    ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
+                        .setBeepEnabled(false).setOrientationLocked(true),
+                )
+            }, Modifier.fillMaxWidth())
+        }
+        RelayRole.MAIN -> {
+            Text(
+                if (relay.satellites.isEmpty()) s.relayNoSatellite else s.relaySatellites(relay.satellites.joinToString(", ")),
+                color = if (relay.satellites.isEmpty()) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp,
+            )
+            GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
+            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
+        }
+        RelayRole.SATELLITE -> {
+            Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            Text(
+                (if (relay.connected) s.relayConnected else s.relayDisconnected) +
+                    (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
+                color = if (relay.connected) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp,
+            )
+            GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
+        }
+    }
+    val url = relay.url
+    if (showQr && url != null) {
+        AlertDialog(
+            onDismissRequest = { showQr = false },
+            title = { Text(s.relayTitle) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    QrCode(url, 240.dp)
+                    Text(
+                        if (relay.satellites.isEmpty()) s.relayShowQr else s.relaySatellites(relay.satellites.joinToString(", ")),
+                        color = if (relay.satellites.isEmpty()) TsmColors.TextMain else TsmColors.Ok,
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showQr = false }) { Text(s.ok) } },
+        )
     }
 }
 
@@ -151,15 +244,21 @@ private fun StrapPicker(c: MatchController, side: Side, playerName: String, curr
     }
 }
 
-/** "Collegata · 72 bpm · Batteria 90%", oppure perché il battito non arriva. */
+/**
+ * "Collegata · 72 bpm · −68 dBm · 100% ricevute · Batteria 90%", oppure perché il battito non arriva. Segnale e
+ * misure ricevute nell'ultimo minuto servono a capire fin dove arriva la fascia.
+ */
 private fun strapStatus(st: StrapInfo, s: Strings): String {
     val state = when {
         st.state != StrapState.READY -> if (st.state == StrapState.CONNECTING) s.strapConnecting else s.strapWaiting
         st.contact == false -> s.strapNoContact
-        st.bpm != null -> "${s.strapConnected} · ${st.bpm} bpm"
+        st.bpm != null -> "${if (st.relayed) s.strapRelayed else s.strapConnected} · ${st.bpm} bpm"
         else -> s.strapWaiting
     }
-    return state + (st.battery?.let { " · ${s.battery} $it%" } ?: "")
+    return state +
+        (st.rssi?.let { " · $it dBm" } ?: "") +
+        (st.received?.let { " · ${s.strapReceived(it)}" } ?: "") +
+        (st.battery?.let { " · ${s.battery} $it%" } ?: "")
 }
 
 /** Età, peso e sesso: si salvano appena età e peso sono plausibili; svuotarli toglie il profilo. */

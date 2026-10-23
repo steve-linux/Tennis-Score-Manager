@@ -29,6 +29,8 @@ import com.tennis.scoremanager.ble.FoundBand
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.data.HeartBucket
 import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
@@ -59,6 +61,8 @@ import com.tennis.scoremanager.model.Transition
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
+import com.tennis.scoremanager.relay.HeartRelay
+import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
@@ -87,10 +91,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -219,6 +226,36 @@ class MatchController(
     private var rallyStrokes = 0
     /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
     private val heartBuckets = Side.entries.associateWith { HeartBucket() }
+    /** Misure arrivate in ritardo dal telefono satellite: (lato, secondo della partita, battito). */
+    private val lateHeart = mutableListOf<Triple<Side, Int, Int>>()
+
+    /** Due telefoni per le fasce cardio: principale o satellite (vedi [HeartRelay]). */
+    val relay: HeartRelay = HeartRelay(
+        scope, heart,
+        matchIds = live.map { it?.record?.id.orEmpty() },
+        onRemoteReading = { addr, m, at, match -> onRemoteHeart(addr, m, at, match) },
+        onSatelliteStopped = {
+            heart.disconnectAll()
+            if (options.value.heartRate) restoreStraps()
+            if (!needsService()) MatchService.stop(app)
+        },
+    )
+
+    /**
+     * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
+     * arriva dal satellite.
+     */
+    val straps: StateFlow<Map<Side, StrapInfo>> = combine(heart.straps, relay.remote) { local, remote ->
+        local.mapValues { (_, st) ->
+            val r = remote[st.address]?.status
+            val localOk = st.state == StrapState.READY && st.bpm != null
+            if (!localOk && r != null && r.ready && r.bpm != null) {
+                st.copy(state = StrapState.READY, bpm = r.bpm, contact = null, rssi = r.rssi, received = r.received, relayed = true)
+            } else {
+                st
+            }
+        }
+    }.stateIn(scope, SharingStarted.Eagerly, emptyMap())
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -248,7 +285,12 @@ class MatchController(
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
-        scope.launch { heart.readings.collect { (side, m) -> onHeartReading(side, m) } }
+        scope.launch {
+            heart.readings.collect { (side, m) ->
+                onHeartReading(side, m)
+                relay.onLocalReading(side, m)
+            }
+        }
         scope.launch {
             while (true) {
                 delay(HeartStats.STEP_S * 1000L)
@@ -300,8 +342,9 @@ class MatchController(
     }
 
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
-    private fun needsService() =
-        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty()
+    private fun needsService(): Boolean =
+        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
+            relay.ui.value.role != RelayRole.OFF
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -400,7 +443,12 @@ class MatchController(
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
         if (old.heartRate != v.heartRate) {
-            if (v.heartRate) restoreStraps() else heart.disconnectAll()
+            if (v.heartRate) {
+                restoreStraps()
+            } else {
+                relay.stop()
+                heart.disconnectAll()
+            }
         }
     }
 
@@ -800,19 +848,66 @@ class MatchController(
         if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
     }
 
-    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita. */
+    /**
+     * Misura girata dal telefono satellite. Se è appena presa vale come quelle di questo telefono; se arriva in
+     * ritardo (il Wi-Fi tra i telefoni era caduto) va a riempire i buchi della partita a cui appartiene.
+     */
+    private fun onRemoteHeart(addr: String, m: HeartMeasurement, at: Long, match: String) {
+        val side = heart.straps.value.entries.firstOrNull { it.value.address == addr }?.key ?: return
+        val lm = live.value ?: return
+        if (match != lm.record.id || !m.valid) return
+        if (System.currentTimeMillis() - at <= HeartRelay.LIVE_MS) {
+            onHeartReading(side, m)
+        } else {
+            val start = lm.record.startedAt ?: return
+            if (at >= start && !lm.state.isFinished) lateHeart += Triple(side, ((at - start) / 1000).toInt(), m.bpm)
+        }
+    }
+
+    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
     private fun flushHeart() {
         val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
+        val late = lateHeart.groupBy({ it.first }, { it.second to it.third })
+        lateHeart.clear()
         val lm = live.value ?: return
         val start = lm.record.startedAt ?: return
-        if (values.isEmpty() || !recordingHeart(lm)) return
+        val now = values.takeIf { recordingHeart(lm) }.orEmpty()
+        if (now.isEmpty() && late.isEmpty()) return
         val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
         var heartMap = lm.record.heart
-        for ((side, bpm) in values) {
-            val track = heartMap[side] ?: HeartTrack()
-            heartMap = heartMap + (side to track.add(sec, bpm!!).copy(profile = track.profile ?: heartProfiles.value[side]))
+        for (side in Side.entries) {
+            val bpm = now[side]
+            val points = late[side].orEmpty()
+            if (bpm == null && points.isEmpty()) continue
+            var track = heartMap[side] ?: HeartTrack()
+            if (bpm != null) track = track.add(sec, bpm)
+            track = track.fill(points, HeartStats.STEP_S)
+            heartMap = heartMap + (side to track.copy(profile = track.profile ?: heartProfiles.value[side]))
         }
         setRecord(lm.record.copy(heart = heartMap))
+    }
+
+    // ---------------------------------------------------------------- due telefoni
+
+    /** Questo telefono diventa il principale: false se non è su una rete locale (Wi-Fi o hotspot). */
+    fun startRelayMain(): Boolean {
+        if (!relay.startMain()) return false
+        MatchService.start(app)
+        return true
+    }
+
+    /** Testo del QR del principale: questo telefono diventa satellite. */
+    fun joinRelay(text: String) {
+        if (!relay.startSatellite(text)) {
+            _toasts.tryEmit(strings.transferBadCode)
+            return
+        }
+        MatchService.start(app)
+    }
+
+    fun stopRelay() {
+        relay.stop()
+        if (!needsService()) MatchService.stop(app)
     }
 
     // ---------------------------------------------------------------- partita
@@ -834,7 +929,9 @@ class MatchController(
             firstServerP2 = if (su.doubles) o.firstServerP2 else 0,
         )
         val now = System.currentTimeMillis()
-        val rec = MatchRecord(id = "m$now", setup = su, options = o, rules = rules, updatedAt = now)
+        // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
+        val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
+        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -1739,6 +1836,7 @@ class MatchController(
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
             ble.disconnectAll()
+            relay.stop()
             heart.disconnectAll()
             MatchService.stop(app)
             finish()

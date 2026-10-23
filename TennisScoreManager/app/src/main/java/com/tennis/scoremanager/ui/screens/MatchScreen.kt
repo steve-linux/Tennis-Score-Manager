@@ -124,7 +124,7 @@ fun MatchScreen(c: MatchController) {
     val serveOrder by c.serveOrderPrompt.collectAsState()
     val o by c.options.collectAsState()
     val bands by c.ble.bands.collectAsState()
-    val straps by c.heart.straps.collectAsState()
+    val straps by c.straps.collectAsState()
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
