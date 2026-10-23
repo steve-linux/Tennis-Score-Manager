@@ -186,6 +186,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Secondo telefono per le fasce: il principale crea una rete solo locale, il satellite ci entra da solo.
+         Da Android 13 basta "Dispositivi nelle vicinanze", che non serve a localizzare -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="tiramisu" />
 
     <!-- Android 11+: senza questa dichiarazione la sintesi vocale non trova i motori TTS -->
     <queries>
@@ -1017,7 +1023,7 @@ class MatchController(
 
     /** Due telefoni per le fasce cardio: principale o satellite (vedi [HeartRelay]). */
     val relay: HeartRelay = HeartRelay(
-        scope, heart,
+        app, scope, heart,
         matchIds = live.map { it?.record?.id.orEmpty() },
         onRemoteReading = { addr, m, at, match -> onRemoteHeart(addr, m, at, match) },
         onSatelliteStopped = {
@@ -1675,11 +1681,14 @@ class MatchController(
 
     // ---------------------------------------------------------------- due telefoni
 
-    /** Questo telefono diventa il principale: false se non è su una rete locale (Wi-Fi o hotspot). */
-    fun startRelayMain(): Boolean {
-        if (!relay.startMain()) return false
-        MatchService.start(app)
-        return true
+    /**
+     * Questo telefono diventa il principale: con [useHotspot] (permesso concesso) crea una rete sua, altrimenti usa
+     * il Wi-Fi in cui si trova. Se non c'è nessuna rete lo dice.
+     */
+    fun startRelayMain(useHotspot: Boolean) {
+        scope.launch {
+            if (relay.startMain(useHotspot)) MatchService.start(app) else _toasts.tryEmit(strings.transferNoNetwork)
+        }
     }
 
     /** Testo del QR del principale: questo telefono diventa satellite. */
@@ -6335,7 +6344,9 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/HeartRelay.kt" << '
 
 package com.tennis.scoremanager.relay
 
+import android.content.Context
 import android.os.Build
+import android.util.Log
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.StrapInfo
@@ -6352,6 +6363,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.net.Socket
 import java.security.SecureRandom
 
 enum class RelayRole { OFF, MAIN, SATELLITE }
@@ -6366,6 +6378,12 @@ data class RelayUi(
     val satellites: List<String> = emptyList(),
     val connected: Boolean = false,
     val pending: Int = 0,
+    /** Principale: rete creata da questo telefono (null = si usa il Wi-Fi in cui si trova). Satellite: rete del principale. */
+    val hotspot: HotspotInfo? = null,
+    /** Satellite: a che punto è il collegamento alla rete del principale (null = non serve). */
+    val join: JoinState? = null,
+    /** Satellite con Android 9 o prima: la rete del principale va scelta a mano nelle impostazioni Wi-Fi. */
+    val joinByHand: Boolean = false,
 )
 
 /** Come un satellite vede una fascia, con l'ora (del principale) in cui l'ha detto. */
@@ -6382,6 +6400,7 @@ data class RemoteStrap(val status: RelayStrapStatus, val satellite: String, val 
  * dopo, con la loro ora, e riempiono i buchi del grafico).
  */
 class HeartRelay(
+    context: Context,
     private val scope: CoroutineScope,
     private val heart: HeartRateManager,
     /** ID della partita in corso sul principale ("" = nessuna). */
@@ -6404,6 +6423,8 @@ class HeartRelay(
     // ---------------------------------------------------------------- principale
 
     private var hub: RelayHub? = null
+    private val hotspot = LocalHotspot(context) { scope.launch { onHotspotStopped() } }
+    private val joiner = HotspotJoiner(context) { st -> scope.launch { onJoinState(st) } }
     private val inbox = RelayInbox()
     /** Satelliti collegati: id della connessione -> (id del satellite, nome del telefono). */
     private val sats = mutableMapOf<Int, Pair<String, String>>()
@@ -6436,24 +6457,60 @@ class HeartRelay(
         }
     }
 
-    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui il satellite possa collegarsi. */
-    fun startMain(): Boolean {
+    /**
+     * Apre il server e prepara il QR. Con [useHotspot] prima prova a creare una rete sua (nei circoli il Wi-Fi spesso
+     * non c'è o non arriva ai campi); se il telefono non può, usa la rete in cui si trova. false = nessuna rete.
+     */
+    suspend fun startMain(useHotspot: Boolean): Boolean {
         if (_ui.value.role == RelayRole.MAIN && hub != null) return true
         stopSatellite()
-        val host = TvServer.localAddresses().firstOrNull() ?: return false
+        _ui.value = RelayUi(RelayRole.MAIN)
+        val before = TvServer.localAddresses().toSet()
+        val info = if (useHotspot) hotspot.start() else null
+        // L'indirizzo dell'hotspot compare qualche istante dopo l'avvio: è quello che prima non c'era.
+        var host: String? = null
+        if (info != null) {
+            for (i in 0 until 20) {
+                host = (TvServer.localAddresses() - before).firstOrNull()
+                if (host != null) break
+                delay(250)
+            }
+        }
+        val hotspotOn = info != null && host != null
+        if (!hotspotOn) {
+            hotspot.stop()
+            host = TvServer.localAddresses().firstOrNull()
+        }
         val h = RelayHub(
             onMessage = { id, conn, m -> onHubMessage(id, conn, m) },
             onClosed = { id -> scope.launch { satelliteGone(id) } },
         )
-        val port = runCatching { h.start() }.getOrNull() ?: return false
+        val port = host?.let { runCatching { h.start() }.getOrNull() }
+        if (_ui.value.role != RelayRole.MAIN || host == null || port == null) {
+            // Annullato nel frattempo, o nessuna rete.
+            hotspot.stop()
+            h.stop()
+            if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
+            return false
+        }
         hub = h
-        _ui.value = RelayUi(RelayRole.MAIN, url = RelayCodec.url(host, port, h.token))
+        val own = info.takeIf { hotspotOn }
+        _ui.value = RelayUi(RelayRole.MAIN, url = RelayCodec.url(host!!, port, h.token, own), hotspot = own)
         return true
+    }
+
+    /** Il sistema ha spento la rete del principale: i satelliti non la raggiungono più, si riparte da capo. */
+    private fun onHotspotStopped() {
+        if (_ui.value.role == RelayRole.MAIN && _ui.value.hotspot != null) {
+            Log.w(TAG, "hotspot spento dal sistema")
+            stopMain()
+        }
     }
 
     fun stopMain() {
         hub?.let { h -> scope.launch(net) { h.stop() } }
         hub = null
+        hotspot.stop()
         sats.clear()
         _remote.value = emptyMap()
         if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
@@ -6539,7 +6596,8 @@ class HeartRelay(
 
     /** Testo del QR del principale: questo telefono diventa satellite. false se il QR non è quello giusto. */
     fun startSatellite(text: String): Boolean {
-        val (host, port, token) = RelayCodec.parseUrl(text) ?: return false
+        val target = RelayCodec.parseUrl(text) ?: return false
+        val (host, port, token) = target
         stopMain()
         stopSatellite()
         satId = ByteArray(8).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
@@ -6550,11 +6608,18 @@ class HeartRelay(
             onConnected = { scope.launch { onSatConnected() } },
             onMessage = { m -> onSatMessage(m) },
             onDisconnected = { scope.launch { _ui.value = _ui.value.copy(connected = false) } },
+            newSocket = { joiner.network?.socketFactory?.createSocket() ?: Socket() },
         )
         client = c
-        _ui.value = RelayUi(RelayRole.SATELLITE)
+        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot)
+        // La rete del principale: ci si entra da soli (Android 10+, con una conferma), altrimenti a mano.
+        target.hotspot?.let { if (!joiner.join(it)) _ui.value = _ui.value.copy(joinByHand = true) }
         c.start()
         return true
+    }
+
+    private fun onJoinState(st: JoinState) {
+        if (_ui.value.role == RelayRole.SATELLITE) _ui.value = _ui.value.copy(join = st)
     }
 
     fun stopSatellite() {
@@ -6562,6 +6627,7 @@ class HeartRelay(
         val c = client
         scope.launch(net) { c?.stop() }
         client = null
+        joiner.release()
         pingJob?.cancel()
         clock.clear()
         _ui.value = RelayUi()
@@ -6663,10 +6729,175 @@ class HeartRelay(
     }
 
     companion object {
+        private const val TAG = "HeartRelay"
         /** Stato di una fascia vista dal satellite: dopo 6 s senza notizie non vale più. */
         const val STALE_MS = 6_000L
         /** Misure del satellite più vecchie di così non sono "dal vivo": vanno a riempire i buchi. */
         const val LIVE_MS = 8_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/relay/Hotspot.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/Hotspot.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.relay
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.wifi.WifiManager
+import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.coroutines.resume
+
+/** Rete del principale vista dal satellite: in attesa della conferma, collegata, persa, rifiutata dall'utente. */
+enum class JoinState { WAITING, CONNECTED, LOST, REFUSED }
+
+/** Nome e password della rete creata dal telefono principale. */
+data class HotspotInfo(val ssid: String, val pass: String?)
+
+/**
+ * Permessi per creare la rete (principale) e per collegarsi da soli (satellite): da Android 13 "Dispositivi nelle
+ * vicinanze" (senza posizione), prima la posizione.
+ */
+object HotspotPermissions {
+    fun required(): Array<String> =
+        if (Build.VERSION.SDK_INT >= 33) arrayOf(Manifest.permission.NEARBY_WIFI_DEVICES) else arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+    fun granted(context: Context): Boolean =
+        required().all { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
+}
+
+/**
+ * Telefono principale: hotspot "solo locale" di Android. Niente SIM né dati, nome e password casuali scelti dal
+ * sistema; resta acceso finché non si chiama [stop] (o il sistema lo spegne: [onStopped]).
+ */
+class LocalHotspot(context: Context, private val onStopped: () -> Unit) {
+    private val app = context.applicationContext
+    private val wifi = app.getSystemService(WifiManager::class.java)
+    private var reservation: WifiManager.LocalOnlyHotspotReservation? = null
+
+    /** null se il telefono non può (hotspot normale già acceso, Wi-Fi che non regge le due cose, permesso negato). */
+    @SuppressLint("MissingPermission")
+    suspend fun start(): HotspotInfo? {
+        if (wifi == null || !HotspotPermissions.granted(app)) return null
+        stop()
+        return withTimeoutOrNull(15_000) {
+            suspendCancellableCoroutine { cont ->
+                val cb = object : WifiManager.LocalOnlyHotspotCallback() {
+                    override fun onStarted(r: WifiManager.LocalOnlyHotspotReservation) {
+                        reservation = r
+                        val info = info(r)
+                        if (cont.isActive) cont.resume(info) else r.close()
+                    }
+
+                    override fun onStopped() {
+                        reservation = null
+                        onStopped()
+                    }
+
+                    override fun onFailed(reason: Int) {
+                        Log.w(TAG, "hotspot non avviato: $reason")
+                        if (cont.isActive) cont.resume(null)
+                    }
+                }
+                runCatching { wifi.startLocalOnlyHotspot(cb, Handler(Looper.getMainLooper())) }
+                    .onFailure {
+                        Log.w(TAG, "hotspot non avviato", it)
+                        if (cont.isActive) cont.resume(null)
+                    }
+            }
+        }
+    }
+
+    fun stop() {
+        runCatching { reservation?.close() }
+        reservation = null
+    }
+
+    @Suppress("DEPRECATION")
+    private fun info(r: WifiManager.LocalOnlyHotspotReservation): HotspotInfo? {
+        if (Build.VERSION.SDK_INT >= 30) {
+            val c = r.softApConfiguration
+            val ssid = c.ssid ?: return null
+            return HotspotInfo(ssid.removeSurrounding("\""), c.passphrase)
+        }
+        val c = r.wifiConfiguration ?: return null
+        val ssid = c.SSID ?: return null
+        return HotspotInfo(ssid.removeSurrounding("\""), c.preSharedKey?.removeSurrounding("\""))
+    }
+
+    companion object {
+        private const val TAG = "LocalHotspot"
+    }
+}
+
+/**
+ * Satellite, da Android 10: chiede al sistema la rete del principale (compare una conferma una volta). La rete
+ * resta solo per questa app: i dati mobili continuano a funzionare, e i collegamenti al principale vanno creati
+ * con [network] (con un socket normale finirebbero sui dati mobili).
+ */
+class HotspotJoiner(context: Context, private val onChange: (JoinState) -> Unit) {
+    private val cm = context.applicationContext.getSystemService(ConnectivityManager::class.java)
+    private var callback: ConnectivityManager.NetworkCallback? = null
+
+    @Volatile var network: Network? = null
+        private set
+
+    /** false se questo Android non lo permette (prima del 10): ci si collega a mano dalle impostazioni. */
+    fun join(info: HotspotInfo): Boolean {
+        if (Build.VERSION.SDK_INT < 29 || cm == null) return false
+        release()
+        val spec = WifiNetworkSpecifier.Builder().setSsid(info.ssid).apply { info.pass?.let { setWpa2Passphrase(it) } }.build()
+        val request = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .setNetworkSpecifier(spec)
+            .build()
+        val cb = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(n: Network) {
+                network = n
+                onChange(JoinState.CONNECTED)
+            }
+
+            override fun onLost(n: Network) {
+                if (network == n) network = null
+                onChange(JoinState.LOST)
+            }
+
+            override fun onUnavailable() {
+                network = null
+                onChange(JoinState.REFUSED)
+            }
+        }
+        callback = cb
+        onChange(JoinState.WAITING)
+        return runCatching { cm.requestNetwork(request, cb) }.onFailure { Log.w(TAG, "rete non chiesta", it) }.isSuccess
+    }
+
+    /** Lascia la rete del principale (il telefono torna alla sua rete di prima). */
+    fun release() {
+        callback?.let { runCatching { cm?.unregisterNetworkCallback(it) } }
+        callback = null
+        network = null
+    }
+
+    companion object {
+        private const val TAG = "HotspotJoiner"
     }
 }
 TSM_EOF
@@ -6799,6 +7030,8 @@ class RelayClient(
     private val onConnected: (RelayConnection) -> Unit,
     private val onMessage: (RelayMsg) -> Unit,
     private val onDisconnected: () -> Unit,
+    /** Socket ancora da collegare: sulla rete del principale, se il satellite ci è entrato da solo. */
+    private val newSocket: () -> Socket = { Socket() },
 ) {
     @Volatile private var running = false
     @Volatile private var conn: RelayConnection? = null
@@ -6809,7 +7042,7 @@ class RelayClient(
         thread(name = "tsm-relay-client", isDaemon = true) {
             while (running) {
                 val c = runCatching {
-                    val s = Socket()
+                    val s = newSocket()
                     s.connect(InetSocketAddress(host, port), 5_000)
                     s.soTimeout = RelayConnection.SILENCE_MS
                     s.tcpNoDelay = true
@@ -6922,15 +7155,33 @@ object RelayCodec {
 
     const val SCHEME = "tsm-relay://"
 
-    fun url(host: String, port: Int, token: String) = "$SCHEME$host:$port/$token"
-
-    /** (host, porta, codice) dal testo del QR, o null se non è un QR del telefono principale. */
-    fun parseUrl(text: String): Triple<String, Int, String>? {
-        val m = Regex("""^${Regex.escape(SCHEME)}([0-9.]+):(\d{1,5})/([0-9a-f]{32})$""").matchEntire(text.trim()) ?: return null
-        val port = m.groupValues[2].toInt().takeIf { it in 1..65535 } ?: return null
-        return Triple(m.groupValues[1], port, m.groupValues[3])
+    /**
+     * Indirizzo del principale per il QR; con [hotspot] anche nome e password della sua rete, così il satellite ci
+     * si collega da solo.
+     */
+    fun url(host: String, port: Int, token: String, hotspot: HotspotInfo? = null): String {
+        val base = "$SCHEME$host:$port/$token"
+        if (hotspot == null) return base
+        return base + "?s=" + enc(hotspot.ssid) + (hotspot.pass?.let { "&p=" + enc(it) } ?: "")
     }
+
+    /** Il testo del QR, o null se non è un QR del telefono principale. */
+    fun parseUrl(text: String): RelayTarget? {
+        val m = Regex("""^${Regex.escape(SCHEME)}([0-9.]+):(\d{1,5})/([0-9a-f]{32})(?:\?(.*))?$""").matchEntire(text.trim()) ?: return null
+        val port = m.groupValues[2].toInt().takeIf { it in 1..65535 } ?: return null
+        val query = m.groupValues[4].split("&").filter { "=" in it }
+            .associate { it.substringBefore("=") to runCatching { dec(it.substringAfter("=")) }.getOrNull() }
+        val hotspot = query["s"]?.takeIf { it.isNotEmpty() }?.let { HotspotInfo(it, query["p"]?.takeIf { p -> p.isNotEmpty() }) }
+        return RelayTarget(m.groupValues[1], port, m.groupValues[3], hotspot)
+    }
+
+    private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
+
+    private fun dec(v: String) = java.net.URLDecoder.decode(v, "UTF-8")
 }
+
+/** Dove sta il principale: indirizzo, porta, codice e (se l'ha creata lui) la sua rete. */
+data class RelayTarget(val host: String, val port: Int, val token: String, val hotspot: HotspotInfo? = null)
 
 /**
  * Scarto tra l'orologio del principale e quello del satellite, dai ping: per ogni ping si stima
@@ -9635,8 +9886,8 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt" << 'T
 
 package com.tennis.scoremanager.ui
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9697,6 +9948,8 @@ import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.relay.HotspotPermissions
+import com.tennis.scoremanager.relay.JoinState
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.relay.RelayUi
 import com.journeyapps.barcodescanner.ScanContract
@@ -9775,6 +10028,31 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    fun scan() = scanner.launch(
+        ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
+            .setBeepEnabled(false).setOrientationLocked(true),
+    )
+    // Il permesso serve al principale per creare la rete e al satellite per entrarci da solo. Se lo si nega, si
+    // usa il Wi-Fi in cui i telefoni si trovano già.
+    var afterPerms by remember { mutableStateOf<String?>(null) }
+    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        when (afterPerms) {
+            "main" -> {
+                c.startRelayMain(HotspotPermissions.granted(context))
+                showQr = true
+            }
+            "join" -> scan()
+        }
+        afterPerms = null
+    }
+    fun withPerms(then: String, run: () -> Unit) {
+        if (HotspotPermissions.granted(context)) {
+            run()
+        } else {
+            afterPerms = then
+            permLauncher.launch(HotspotPermissions.required())
+        }
+    }
     Spacer(Modifier.height(4.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.PhonelinkRing, null, tint = TsmColors.Ball)
@@ -9785,25 +10063,38 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
         RelayRole.OFF -> {
             Text(s.relayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             GhostButton(s.relayMain, Icons.Filled.QrCode2, {
-                if (c.startRelayMain()) showQr = true else Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+                withPerms("main") {
+                    c.startRelayMain(useHotspot = true)
+                    showQr = true
+                }
             }, Modifier.fillMaxWidth())
-            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
-                scanner.launch(
-                    ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
-                        .setBeepEnabled(false).setOrientationLocked(true),
-                )
-            }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, { withPerms("join") { scan() } }, Modifier.fillMaxWidth())
         }
         RelayRole.MAIN -> {
             Text(
-                if (relay.satellites.isEmpty()) s.relayNoSatellite else s.relaySatellites(relay.satellites.joinToString(", ")),
+                when {
+                    relay.url == null -> s.relayPreparing
+                    relay.satellites.isEmpty() -> s.relayNoSatellite
+                    else -> s.relaySatellites(relay.satellites.joinToString(", "))
+                },
                 color = if (relay.satellites.isEmpty()) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp,
             )
+            relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
             GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
             Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            val net = relay.hotspot
+            val joinText = when {
+                net == null || relay.connected -> null
+                relay.joinByHand -> s.relayJoinByHand(net.ssid, net.pass.orEmpty())
+                relay.join == JoinState.WAITING -> s.relayJoinWaiting
+                relay.join == JoinState.REFUSED -> s.relayJoinRefused
+                relay.join == JoinState.LOST -> s.relayJoinLost
+                else -> null
+            }
+            joinText?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
             Text(
                 (if (relay.connected) s.relayConnected else s.relayDisconnected) +
                     (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
@@ -9813,13 +10104,19 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
         }
     }
     val url = relay.url
-    if (showQr && url != null) {
+    if (showQr && relay.role == RelayRole.MAIN) {
         AlertDialog(
             onDismissRequest = { showQr = false },
             title = { Text(s.relayTitle) },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (url == null) {
+                        CircularProgressIndicator(Modifier.size(48.dp), color = TsmColors.Ball)
+                        Text(s.relayPreparing, color = TsmColors.TextMain)
+                        return@Column
+                    }
                     QrCode(url, 240.dp)
+                    relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
                     Text(
                         if (relay.satellites.isEmpty()) s.relayShowQr else s.relaySatellites(relay.satellites.joinToString(", ")),
                         color = if (relay.satellites.isEmpty()) TsmColors.TextMain else TsmColors.Ok,
@@ -10200,6 +10497,12 @@ interface Strings {
     val relayConnected: String
     val relayDisconnected: String
     val relayPending: (Int) -> String
+    val relayPreparing: String
+    val relayOwnNetwork: (String) -> String
+    val relayJoinWaiting: String
+    val relayJoinRefused: String
+    val relayJoinLost: String
+    val relayJoinByHand: (String, String) -> String
     val heartAge: String
     val heartWeight: String
     val heartMale: String
@@ -10776,7 +11079,7 @@ object ItStrings : Strings {
     override val strapRelayed = "Dal secondo telefono"
     override val strapReceived: (Int) -> String = { "$it% ricevute" }
     override val relayTitle = "Secondo telefono"
-    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. I due telefoni devono stare sulla stessa rete Wi-Fi (o sull'hotspot di questo)."
+    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
     override val relayMain = "Usa un secondo telefono"
     override val relayJoin = "Fai da secondo telefono"
     override val relayShowCode = "Mostra il codice"
@@ -10789,6 +11092,12 @@ object ItStrings : Strings {
     override val relayConnected = "Collegato al telefono principale"
     override val relayDisconnected = "Telefono principale non raggiungibile: riprovo…"
     override val relayPending: (Int) -> String = { "$it misure da inviare" }
+    override val relayPreparing = "Preparazione della rete…"
+    override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
+    override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
+    override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
+    override val relayJoinLost = "Rete del telefono principale persa: riprovo…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Dalle impostazioni Wi-Fi collegati alla rete $n (password $p)." }
     override val heartAge = "Età"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Uomo"
@@ -11338,7 +11647,7 @@ object EnStrings : Strings {
     override val strapRelayed = "Via second phone"
     override val strapReceived: (Int) -> String = { "$it% received" }
     override val relayTitle = "Second phone"
-    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. Both phones must be on the same Wi-Fi network (or on this phone's hotspot)."
+    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
     override val relayMain = "Use a second phone"
     override val relayJoin = "Act as second phone"
     override val relayShowCode = "Show the code"
@@ -11351,6 +11660,12 @@ object EnStrings : Strings {
     override val relayConnected = "Connected to the main phone"
     override val relayDisconnected = "Main phone not reachable: retrying…"
     override val relayPending: (Int) -> String = { "$it readings to send" }
+    override val relayPreparing = "Setting up the network…"
+    override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
+    override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
+    override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
+    override val relayJoinLost = "Main phone's network lost: retrying…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "In the Wi-Fi settings, connect to the network $n (password $p)." }
     override val heartAge = "Age"
     override val heartWeight = "Weight (kg)"
     override val heartMale = "Man"
@@ -11923,7 +12238,7 @@ object DeStrings : Strings {
     override val strapRelayed = "Über zweites Telefon"
     override val strapReceived: (Int) -> String = { "$it % empfangen" }
     override val relayTitle = "Zweites Telefon"
-    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Beide Telefone müssen im selben WLAN sein (oder im Hotspot dieses Telefons)."
+    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
     override val relayMain = "Zweites Telefon verwenden"
     override val relayJoin = "Als zweites Telefon dienen"
     override val relayShowCode = "Code anzeigen"
@@ -11936,6 +12251,12 @@ object DeStrings : Strings {
     override val relayConnected = "Mit dem Haupttelefon verbunden"
     override val relayDisconnected = "Haupttelefon nicht erreichbar: neuer Versuch…"
     override val relayPending: (Int) -> String = { "$it Messwerte zu senden" }
+    override val relayPreparing = "Netz wird eingerichtet…"
+    override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
+    override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
+    override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
+    override val relayJoinLost = "Netz des Haupttelefons verloren: neuer Versuch…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Verbinde dich in den WLAN-Einstellungen mit dem Netz $n (Passwort $p)." }
     override val heartAge = "Alter"
     override val heartWeight = "Gewicht (kg)"
     override val heartMale = "Mann"
@@ -12500,7 +12821,7 @@ object EsStrings : Strings {
     override val strapRelayed = "Desde el segundo teléfono"
     override val strapReceived: (Int) -> String = { "$it % recibidas" }
     override val relayTitle = "Segundo teléfono"
-    override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Los dos teléfonos deben estar en la misma red Wi-Fi (o en el punto de acceso de este)."
+    override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Este teléfono crea su propia red, sin SIM ni datos, y el otro se conecta solo escaneando el código."
     override val relayMain = "Usar un segundo teléfono"
     override val relayJoin = "Hacer de segundo teléfono"
     override val relayShowCode = "Mostrar el código"
@@ -12513,6 +12834,12 @@ object EsStrings : Strings {
     override val relayConnected = "Conectado al teléfono principal"
     override val relayDisconnected = "Teléfono principal no disponible: reintentando…"
     override val relayPending: (Int) -> String = { "$it medidas por enviar" }
+    override val relayPreparing = "Preparando la red…"
+    override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
+    override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
+    override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
+    override val relayJoinLost = "Red del teléfono principal perdida: reintentando…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "En los ajustes de Wi-Fi conéctate a la red $n (contraseña $p)." }
     override val heartAge = "Edad"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Hombre"
@@ -13081,7 +13408,7 @@ object FrStrings : Strings {
     override val strapRelayed = "Via le second téléphone"
     override val strapReceived: (Int) -> String = { "$it % reçues" }
     override val relayTitle = "Second téléphone"
-    override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Les deux téléphones doivent être sur le même réseau Wi-Fi (ou sur le point d'accès de celui-ci)."
+    override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Ce téléphone crée son propre réseau, sans SIM ni données, et l'autre s'y connecte tout seul en scannant le code."
     override val relayMain = "Utiliser un second téléphone"
     override val relayJoin = "Servir de second téléphone"
     override val relayShowCode = "Afficher le code"
@@ -13094,6 +13421,12 @@ object FrStrings : Strings {
     override val relayConnected = "Connecté au téléphone principal"
     override val relayDisconnected = "Téléphone principal injoignable : nouvel essai…"
     override val relayPending: (Int) -> String = { "$it mesures à envoyer" }
+    override val relayPreparing = "Préparation du réseau…"
+    override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
+    override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
+    override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
+    override val relayJoinLost = "Réseau du téléphone principal perdu : nouvel essai…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Dans les paramètres Wi-Fi, connectez-vous au réseau $n (mot de passe $p)." }
     override val heartAge = "Âge"
     override val heartWeight = "Poids (kg)"
     override val heartMale = "Homme"
@@ -13661,7 +13994,7 @@ object PtStrings : Strings {
     override val strapRelayed = "Pelo segundo telefone"
     override val strapReceived: (Int) -> String = { "$it% recebidas" }
     override val relayTitle = "Segundo telefone"
-    override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Os dois telefones devem estar na mesma rede Wi-Fi (ou no hotspot deste)."
+    override val relayHint = "Com um telefone atrás de cada linha de fundo, cada cinta tem sempre um telefone por perto: o segundo a capta e passa a frequência cardíaca para este. Este telefone cria a sua própria rede, sem SIM nem dados, e o outro se conecta sozinho escaneando o código."
     override val relayMain = "Usar um segundo telefone"
     override val relayJoin = "Servir de segundo telefone"
     override val relayShowCode = "Mostrar o código"
@@ -13674,6 +14007,12 @@ object PtStrings : Strings {
     override val relayConnected = "Conectado ao telefone principal"
     override val relayDisconnected = "Telefone principal fora de alcance: tentando de novo…"
     override val relayPending: (Int) -> String = { "$it medidas a enviar" }
+    override val relayPreparing = "Preparando a rede…"
+    override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
+    override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
+    override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
+    override val relayJoinLost = "Rede do telefone principal perdida: tentando de novo…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Nas configurações de Wi-Fi, conecte-se à rede $n (senha $p)." }
     override val heartAge = "Idade"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Homem"
@@ -20821,8 +21160,19 @@ class RelayProtocolTest {
     @Test
     fun urlRoundTrip() {
         val url = RelayCodec.url("192.168.43.1", 40123, token)
-        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl(url))
-        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl("  $url\n"))
+        assertEquals(RelayTarget("192.168.43.1", 40123, token), RelayCodec.parseUrl(url))
+        assertEquals(RelayTarget("192.168.43.1", 40123, token), RelayCodec.parseUrl("  $url\n"))
+    }
+
+    @Test
+    fun urlCarriesHotspot() {
+        // Nome con spazi e password con caratteri che nell'indirizzo hanno un significato.
+        val net = HotspotInfo("AndroidShare_1234 campo", "a&b=c?d+e%f")
+        val url = RelayCodec.url("192.168.49.1", 40123, token, net)
+        assertEquals(RelayTarget("192.168.49.1", 40123, token, net), RelayCodec.parseUrl(url))
+        // Rete aperta: niente password.
+        val open = HotspotInfo("Aperta", null)
+        assertEquals(open, RelayCodec.parseUrl(RelayCodec.url("10.0.0.1", 9, token, open))?.hotspot)
     }
 
     @Test
@@ -26199,6 +26549,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 97 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 98 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

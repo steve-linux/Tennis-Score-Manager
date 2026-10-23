@@ -73,7 +73,7 @@ object FrStrings : Strings {
     override val strapRelayed = "Via le second téléphone"
     override val strapReceived: (Int) -> String = { "$it % reçues" }
     override val relayTitle = "Second téléphone"
-    override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Les deux téléphones doivent être sur le même réseau Wi-Fi (ou sur le point d'accès de celui-ci)."
+    override val relayHint = "Avec un téléphone derrière chaque ligne de fond, chaque ceinture a toujours un téléphone proche : le second la capte et transmet la fréquence cardiaque à celui-ci. Ce téléphone crée son propre réseau, sans SIM ni données, et l'autre s'y connecte tout seul en scannant le code."
     override val relayMain = "Utiliser un second téléphone"
     override val relayJoin = "Servir de second téléphone"
     override val relayShowCode = "Afficher le code"
@@ -86,6 +86,12 @@ object FrStrings : Strings {
     override val relayConnected = "Connecté au téléphone principal"
     override val relayDisconnected = "Téléphone principal injoignable : nouvel essai…"
     override val relayPending: (Int) -> String = { "$it mesures à envoyer" }
+    override val relayPreparing = "Préparation du réseau…"
+    override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
+    override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
+    override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
+    override val relayJoinLost = "Réseau du téléphone principal perdu : nouvel essai…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Dans les paramètres Wi-Fi, connectez-vous au réseau $n (mot de passe $p)." }
     override val heartAge = "Âge"
     override val heartWeight = "Poids (kg)"
     override val heartMale = "Homme"

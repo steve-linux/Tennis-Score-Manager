@@ -3,8 +3,8 @@
 
 package com.tennis.scoremanager.ui
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +65,8 @@ import com.tennis.scoremanager.data.HeartProfile
 import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.relay.HotspotPermissions
+import com.tennis.scoremanager.relay.JoinState
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.relay.RelayUi
 import com.journeyapps.barcodescanner.ScanContract
@@ -143,6 +145,31 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    fun scan() = scanner.launch(
+        ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
+            .setBeepEnabled(false).setOrientationLocked(true),
+    )
+    // Il permesso serve al principale per creare la rete e al satellite per entrarci da solo. Se lo si nega, si
+    // usa il Wi-Fi in cui i telefoni si trovano già.
+    var afterPerms by remember { mutableStateOf<String?>(null) }
+    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        when (afterPerms) {
+            "main" -> {
+                c.startRelayMain(HotspotPermissions.granted(context))
+                showQr = true
+            }
+            "join" -> scan()
+        }
+        afterPerms = null
+    }
+    fun withPerms(then: String, run: () -> Unit) {
+        if (HotspotPermissions.granted(context)) {
+            run()
+        } else {
+            afterPerms = then
+            permLauncher.launch(HotspotPermissions.required())
+        }
+    }
     Spacer(Modifier.height(4.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.PhonelinkRing, null, tint = TsmColors.Ball)
@@ -153,25 +180,38 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
         RelayRole.OFF -> {
             Text(s.relayHint, color = TsmColors.TextDim, fontSize = 13.sp)
             GhostButton(s.relayMain, Icons.Filled.QrCode2, {
-                if (c.startRelayMain()) showQr = true else Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+                withPerms("main") {
+                    c.startRelayMain(useHotspot = true)
+                    showQr = true
+                }
             }, Modifier.fillMaxWidth())
-            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
-                scanner.launch(
-                    ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
-                        .setBeepEnabled(false).setOrientationLocked(true),
-                )
-            }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, { withPerms("join") { scan() } }, Modifier.fillMaxWidth())
         }
         RelayRole.MAIN -> {
             Text(
-                if (relay.satellites.isEmpty()) s.relayNoSatellite else s.relaySatellites(relay.satellites.joinToString(", ")),
+                when {
+                    relay.url == null -> s.relayPreparing
+                    relay.satellites.isEmpty() -> s.relayNoSatellite
+                    else -> s.relaySatellites(relay.satellites.joinToString(", "))
+                },
                 color = if (relay.satellites.isEmpty()) TsmColors.Orange else TsmColors.Ok, fontSize = 13.sp,
             )
+            relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
             GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
             Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            val net = relay.hotspot
+            val joinText = when {
+                net == null || relay.connected -> null
+                relay.joinByHand -> s.relayJoinByHand(net.ssid, net.pass.orEmpty())
+                relay.join == JoinState.WAITING -> s.relayJoinWaiting
+                relay.join == JoinState.REFUSED -> s.relayJoinRefused
+                relay.join == JoinState.LOST -> s.relayJoinLost
+                else -> null
+            }
+            joinText?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
             Text(
                 (if (relay.connected) s.relayConnected else s.relayDisconnected) +
                     (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
@@ -181,13 +221,19 @@ private fun RelayPanel(c: MatchController, relay: RelayUi) {
         }
     }
     val url = relay.url
-    if (showQr && url != null) {
+    if (showQr && relay.role == RelayRole.MAIN) {
         AlertDialog(
             onDismissRequest = { showQr = false },
             title = { Text(s.relayTitle) },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (url == null) {
+                        CircularProgressIndicator(Modifier.size(48.dp), color = TsmColors.Ball)
+                        Text(s.relayPreparing, color = TsmColors.TextMain)
+                        return@Column
+                    }
                     QrCode(url, 240.dp)
+                    relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
                     Text(
                         if (relay.satellites.isEmpty()) s.relayShowQr else s.relaySatellites(relay.satellites.joinToString(", ")),
                         color = if (relay.satellites.isEmpty()) TsmColors.TextMain else TsmColors.Ok,

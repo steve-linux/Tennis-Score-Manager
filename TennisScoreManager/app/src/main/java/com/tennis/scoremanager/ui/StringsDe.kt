@@ -70,7 +70,7 @@ object DeStrings : Strings {
     override val strapRelayed = "Über zweites Telefon"
     override val strapReceived: (Int) -> String = { "$it % empfangen" }
     override val relayTitle = "Zweites Telefon"
-    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Beide Telefone müssen im selben WLAN sein (oder im Hotspot dieses Telefons)."
+    override val relayHint = "Mit je einem Telefon hinter jeder Grundlinie hat jeder Gurt immer ein Telefon in der Nähe: Das zweite empfängt ihn und gibt die Herzfrequenz an dieses weiter. Dieses Telefon erstellt ein eigenes Netz, ohne SIM und ohne Daten, und das andere verbindet sich selbst, indem es den Code scannt."
     override val relayMain = "Zweites Telefon verwenden"
     override val relayJoin = "Als zweites Telefon dienen"
     override val relayShowCode = "Code anzeigen"
@@ -83,6 +83,12 @@ object DeStrings : Strings {
     override val relayConnected = "Mit dem Haupttelefon verbunden"
     override val relayDisconnected = "Haupttelefon nicht erreichbar: neuer Versuch…"
     override val relayPending: (Int) -> String = { "$it Messwerte zu senden" }
+    override val relayPreparing = "Netz wird eingerichtet…"
+    override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
+    override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
+    override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
+    override val relayJoinLost = "Netz des Haupttelefons verloren: neuer Versuch…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Verbinde dich in den WLAN-Einstellungen mit dem Netz $n (Passwort $p)." }
     override val heartAge = "Alter"
     override val heartWeight = "Gewicht (kg)"
     override val heartMale = "Mann"

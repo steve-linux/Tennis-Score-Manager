@@ -73,15 +73,33 @@ object RelayCodec {
 
     const val SCHEME = "tsm-relay://"
 
-    fun url(host: String, port: Int, token: String) = "$SCHEME$host:$port/$token"
-
-    /** (host, porta, codice) dal testo del QR, o null se non è un QR del telefono principale. */
-    fun parseUrl(text: String): Triple<String, Int, String>? {
-        val m = Regex("""^${Regex.escape(SCHEME)}([0-9.]+):(\d{1,5})/([0-9a-f]{32})$""").matchEntire(text.trim()) ?: return null
-        val port = m.groupValues[2].toInt().takeIf { it in 1..65535 } ?: return null
-        return Triple(m.groupValues[1], port, m.groupValues[3])
+    /**
+     * Indirizzo del principale per il QR; con [hotspot] anche nome e password della sua rete, così il satellite ci
+     * si collega da solo.
+     */
+    fun url(host: String, port: Int, token: String, hotspot: HotspotInfo? = null): String {
+        val base = "$SCHEME$host:$port/$token"
+        if (hotspot == null) return base
+        return base + "?s=" + enc(hotspot.ssid) + (hotspot.pass?.let { "&p=" + enc(it) } ?: "")
     }
+
+    /** Il testo del QR, o null se non è un QR del telefono principale. */
+    fun parseUrl(text: String): RelayTarget? {
+        val m = Regex("""^${Regex.escape(SCHEME)}([0-9.]+):(\d{1,5})/([0-9a-f]{32})(?:\?(.*))?$""").matchEntire(text.trim()) ?: return null
+        val port = m.groupValues[2].toInt().takeIf { it in 1..65535 } ?: return null
+        val query = m.groupValues[4].split("&").filter { "=" in it }
+            .associate { it.substringBefore("=") to runCatching { dec(it.substringAfter("=")) }.getOrNull() }
+        val hotspot = query["s"]?.takeIf { it.isNotEmpty() }?.let { HotspotInfo(it, query["p"]?.takeIf { p -> p.isNotEmpty() }) }
+        return RelayTarget(m.groupValues[1], port, m.groupValues[3], hotspot)
+    }
+
+    private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
+
+    private fun dec(v: String) = java.net.URLDecoder.decode(v, "UTF-8")
 }
+
+/** Dove sta il principale: indirizzo, porta, codice e (se l'ha creata lui) la sua rete. */
+data class RelayTarget(val host: String, val port: Int, val token: String, val hotspot: HotspotInfo? = null)
 
 /**
  * Scarto tra l'orologio del principale e quello del satellite, dai ping: per ogni ping si stima

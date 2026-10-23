@@ -95,6 +95,12 @@ interface Strings {
     val relayConnected: String
     val relayDisconnected: String
     val relayPending: (Int) -> String
+    val relayPreparing: String
+    val relayOwnNetwork: (String) -> String
+    val relayJoinWaiting: String
+    val relayJoinRefused: String
+    val relayJoinLost: String
+    val relayJoinByHand: (String, String) -> String
     val heartAge: String
     val heartWeight: String
     val heartMale: String
@@ -671,7 +677,7 @@ object ItStrings : Strings {
     override val strapRelayed = "Dal secondo telefono"
     override val strapReceived: (Int) -> String = { "$it% ricevute" }
     override val relayTitle = "Secondo telefono"
-    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. I due telefoni devono stare sulla stessa rete Wi-Fi (o sull'hotspot di questo)."
+    override val relayHint = "Con un telefono per fondo campo ogni fascia ha sempre un telefono vicino: il secondo la sente e gira il battito a questo. Questo telefono crea una rete sua, senza SIM né dati, e l'altro ci entra da solo inquadrando il codice."
     override val relayMain = "Usa un secondo telefono"
     override val relayJoin = "Fai da secondo telefono"
     override val relayShowCode = "Mostra il codice"
@@ -684,6 +690,12 @@ object ItStrings : Strings {
     override val relayConnected = "Collegato al telefono principale"
     override val relayDisconnected = "Telefono principale non raggiungibile: riprovo…"
     override val relayPending: (Int) -> String = { "$it misure da inviare" }
+    override val relayPreparing = "Preparazione della rete…"
+    override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
+    override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
+    override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
+    override val relayJoinLost = "Rete del telefono principale persa: riprovo…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "Dalle impostazioni Wi-Fi collegati alla rete $n (password $p)." }
     override val heartAge = "Età"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Uomo"
@@ -1233,7 +1245,7 @@ object EnStrings : Strings {
     override val strapRelayed = "Via second phone"
     override val strapReceived: (Int) -> String = { "$it% received" }
     override val relayTitle = "Second phone"
-    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. Both phones must be on the same Wi-Fi network (or on this phone's hotspot)."
+    override val relayHint = "With one phone behind each baseline every strap always has a phone nearby: the second one hears it and passes the heart rate on to this one. This phone creates its own network, with no SIM or data needed, and the other one joins it by itself by scanning the code."
     override val relayMain = "Use a second phone"
     override val relayJoin = "Act as second phone"
     override val relayShowCode = "Show the code"
@@ -1246,6 +1258,12 @@ object EnStrings : Strings {
     override val relayConnected = "Connected to the main phone"
     override val relayDisconnected = "Main phone not reachable: retrying…"
     override val relayPending: (Int) -> String = { "$it readings to send" }
+    override val relayPreparing = "Setting up the network…"
+    override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
+    override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
+    override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
+    override val relayJoinLost = "Main phone's network lost: retrying…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "In the Wi-Fi settings, connect to the network $n (password $p)." }
     override val heartAge = "Age"
     override val heartWeight = "Weight (kg)"
     override val heartMale = "Man"

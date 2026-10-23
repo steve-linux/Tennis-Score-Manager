@@ -231,7 +231,7 @@ class MatchController(
 
     /** Due telefoni per le fasce cardio: principale o satellite (vedi [HeartRelay]). */
     val relay: HeartRelay = HeartRelay(
-        scope, heart,
+        app, scope, heart,
         matchIds = live.map { it?.record?.id.orEmpty() },
         onRemoteReading = { addr, m, at, match -> onRemoteHeart(addr, m, at, match) },
         onSatelliteStopped = {
@@ -889,11 +889,14 @@ class MatchController(
 
     // ---------------------------------------------------------------- due telefoni
 
-    /** Questo telefono diventa il principale: false se non è su una rete locale (Wi-Fi o hotspot). */
-    fun startRelayMain(): Boolean {
-        if (!relay.startMain()) return false
-        MatchService.start(app)
-        return true
+    /**
+     * Questo telefono diventa il principale: con [useHotspot] (permesso concesso) crea una rete sua, altrimenti usa
+     * il Wi-Fi in cui si trova. Se non c'è nessuna rete lo dice.
+     */
+    fun startRelayMain(useHotspot: Boolean) {
+        scope.launch {
+            if (relay.startMain(useHotspot)) MatchService.start(app) else _toasts.tryEmit(strings.transferNoNetwork)
+        }
     }
 
     /** Testo del QR del principale: questo telefono diventa satellite. */

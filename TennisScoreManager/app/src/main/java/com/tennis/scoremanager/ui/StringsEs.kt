@@ -70,7 +70,7 @@ object EsStrings : Strings {
     override val strapRelayed = "Desde el segundo teléfono"
     override val strapReceived: (Int) -> String = { "$it % recibidas" }
     override val relayTitle = "Segundo teléfono"
-    override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Los dos teléfonos deben estar en la misma red Wi-Fi (o en el punto de acceso de este)."
+    override val relayHint = "Con un teléfono detrás de cada línea de fondo, cada banda tiene siempre un teléfono cerca: el segundo la capta y pasa la frecuencia cardíaca a este. Este teléfono crea su propia red, sin SIM ni datos, y el otro se conecta solo escaneando el código."
     override val relayMain = "Usar un segundo teléfono"
     override val relayJoin = "Hacer de segundo teléfono"
     override val relayShowCode = "Mostrar el código"
@@ -83,6 +83,12 @@ object EsStrings : Strings {
     override val relayConnected = "Conectado al teléfono principal"
     override val relayDisconnected = "Teléfono principal no disponible: reintentando…"
     override val relayPending: (Int) -> String = { "$it medidas por enviar" }
+    override val relayPreparing = "Preparando la red…"
+    override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
+    override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
+    override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
+    override val relayJoinLost = "Red del teléfono principal perdida: reintentando…"
+    override val relayJoinByHand: (String, String) -> String = { n, p -> "En los ajustes de Wi-Fi conéctate a la red $n (contraseña $p)." }
     override val heartAge = "Edad"
     override val heartWeight = "Peso (kg)"
     override val heartMale = "Hombre"

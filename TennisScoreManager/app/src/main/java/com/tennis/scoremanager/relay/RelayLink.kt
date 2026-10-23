@@ -124,6 +124,8 @@ class RelayClient(
     private val onConnected: (RelayConnection) -> Unit,
     private val onMessage: (RelayMsg) -> Unit,
     private val onDisconnected: () -> Unit,
+    /** Socket ancora da collegare: sulla rete del principale, se il satellite ci è entrato da solo. */
+    private val newSocket: () -> Socket = { Socket() },
 ) {
     @Volatile private var running = false
     @Volatile private var conn: RelayConnection? = null
@@ -134,7 +136,7 @@ class RelayClient(
         thread(name = "tsm-relay-client", isDaemon = true) {
             while (running) {
                 val c = runCatching {
-                    val s = Socket()
+                    val s = newSocket()
                     s.connect(InetSocketAddress(host, port), 5_000)
                     s.soTimeout = RelayConnection.SILENCE_MS
                     s.tcpNoDelay = true

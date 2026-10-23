@@ -3,7 +3,9 @@
 
 package com.tennis.scoremanager.relay
 
+import android.content.Context
 import android.os.Build
+import android.util.Log
 import com.tennis.scoremanager.ble.HeartMeasurement
 import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.StrapInfo
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.net.Socket
 import java.security.SecureRandom
 
 enum class RelayRole { OFF, MAIN, SATELLITE }
@@ -34,6 +37,12 @@ data class RelayUi(
     val satellites: List<String> = emptyList(),
     val connected: Boolean = false,
     val pending: Int = 0,
+    /** Principale: rete creata da questo telefono (null = si usa il Wi-Fi in cui si trova). Satellite: rete del principale. */
+    val hotspot: HotspotInfo? = null,
+    /** Satellite: a che punto è il collegamento alla rete del principale (null = non serve). */
+    val join: JoinState? = null,
+    /** Satellite con Android 9 o prima: la rete del principale va scelta a mano nelle impostazioni Wi-Fi. */
+    val joinByHand: Boolean = false,
 )
 
 /** Come un satellite vede una fascia, con l'ora (del principale) in cui l'ha detto. */
@@ -50,6 +59,7 @@ data class RemoteStrap(val status: RelayStrapStatus, val satellite: String, val 
  * dopo, con la loro ora, e riempiono i buchi del grafico).
  */
 class HeartRelay(
+    context: Context,
     private val scope: CoroutineScope,
     private val heart: HeartRateManager,
     /** ID della partita in corso sul principale ("" = nessuna). */
@@ -72,6 +82,8 @@ class HeartRelay(
     // ---------------------------------------------------------------- principale
 
     private var hub: RelayHub? = null
+    private val hotspot = LocalHotspot(context) { scope.launch { onHotspotStopped() } }
+    private val joiner = HotspotJoiner(context) { st -> scope.launch { onJoinState(st) } }
     private val inbox = RelayInbox()
     /** Satelliti collegati: id della connessione -> (id del satellite, nome del telefono). */
     private val sats = mutableMapOf<Int, Pair<String, String>>()
@@ -104,24 +116,60 @@ class HeartRelay(
         }
     }
 
-    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui il satellite possa collegarsi. */
-    fun startMain(): Boolean {
+    /**
+     * Apre il server e prepara il QR. Con [useHotspot] prima prova a creare una rete sua (nei circoli il Wi-Fi spesso
+     * non c'è o non arriva ai campi); se il telefono non può, usa la rete in cui si trova. false = nessuna rete.
+     */
+    suspend fun startMain(useHotspot: Boolean): Boolean {
         if (_ui.value.role == RelayRole.MAIN && hub != null) return true
         stopSatellite()
-        val host = TvServer.localAddresses().firstOrNull() ?: return false
+        _ui.value = RelayUi(RelayRole.MAIN)
+        val before = TvServer.localAddresses().toSet()
+        val info = if (useHotspot) hotspot.start() else null
+        // L'indirizzo dell'hotspot compare qualche istante dopo l'avvio: è quello che prima non c'era.
+        var host: String? = null
+        if (info != null) {
+            for (i in 0 until 20) {
+                host = (TvServer.localAddresses() - before).firstOrNull()
+                if (host != null) break
+                delay(250)
+            }
+        }
+        val hotspotOn = info != null && host != null
+        if (!hotspotOn) {
+            hotspot.stop()
+            host = TvServer.localAddresses().firstOrNull()
+        }
         val h = RelayHub(
             onMessage = { id, conn, m -> onHubMessage(id, conn, m) },
             onClosed = { id -> scope.launch { satelliteGone(id) } },
         )
-        val port = runCatching { h.start() }.getOrNull() ?: return false
+        val port = host?.let { runCatching { h.start() }.getOrNull() }
+        if (_ui.value.role != RelayRole.MAIN || host == null || port == null) {
+            // Annullato nel frattempo, o nessuna rete.
+            hotspot.stop()
+            h.stop()
+            if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
+            return false
+        }
         hub = h
-        _ui.value = RelayUi(RelayRole.MAIN, url = RelayCodec.url(host, port, h.token))
+        val own = info.takeIf { hotspotOn }
+        _ui.value = RelayUi(RelayRole.MAIN, url = RelayCodec.url(host!!, port, h.token, own), hotspot = own)
         return true
+    }
+
+    /** Il sistema ha spento la rete del principale: i satelliti non la raggiungono più, si riparte da capo. */
+    private fun onHotspotStopped() {
+        if (_ui.value.role == RelayRole.MAIN && _ui.value.hotspot != null) {
+            Log.w(TAG, "hotspot spento dal sistema")
+            stopMain()
+        }
     }
 
     fun stopMain() {
         hub?.let { h -> scope.launch(net) { h.stop() } }
         hub = null
+        hotspot.stop()
         sats.clear()
         _remote.value = emptyMap()
         if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
@@ -207,7 +255,8 @@ class HeartRelay(
 
     /** Testo del QR del principale: questo telefono diventa satellite. false se il QR non è quello giusto. */
     fun startSatellite(text: String): Boolean {
-        val (host, port, token) = RelayCodec.parseUrl(text) ?: return false
+        val target = RelayCodec.parseUrl(text) ?: return false
+        val (host, port, token) = target
         stopMain()
         stopSatellite()
         satId = ByteArray(8).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
@@ -218,11 +267,18 @@ class HeartRelay(
             onConnected = { scope.launch { onSatConnected() } },
             onMessage = { m -> onSatMessage(m) },
             onDisconnected = { scope.launch { _ui.value = _ui.value.copy(connected = false) } },
+            newSocket = { joiner.network?.socketFactory?.createSocket() ?: Socket() },
         )
         client = c
-        _ui.value = RelayUi(RelayRole.SATELLITE)
+        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot)
+        // La rete del principale: ci si entra da soli (Android 10+, con una conferma), altrimenti a mano.
+        target.hotspot?.let { if (!joiner.join(it)) _ui.value = _ui.value.copy(joinByHand = true) }
         c.start()
         return true
+    }
+
+    private fun onJoinState(st: JoinState) {
+        if (_ui.value.role == RelayRole.SATELLITE) _ui.value = _ui.value.copy(join = st)
     }
 
     fun stopSatellite() {
@@ -230,6 +286,7 @@ class HeartRelay(
         val c = client
         scope.launch(net) { c?.stop() }
         client = null
+        joiner.release()
         pingJob?.cancel()
         clock.clear()
         _ui.value = RelayUi()
@@ -331,6 +388,7 @@ class HeartRelay(
     }
 
     companion object {
+        private const val TAG = "HeartRelay"
         /** Stato di una fascia vista dal satellite: dopo 6 s senza notizie non vale più. */
         const val STALE_MS = 6_000L
         /** Misure del satellite più vecchie di così non sono "dal vivo": vanno a riempire i buchi. */

@@ -17,8 +17,19 @@ class RelayProtocolTest {
     @Test
     fun urlRoundTrip() {
         val url = RelayCodec.url("192.168.43.1", 40123, token)
-        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl(url))
-        assertEquals(Triple("192.168.43.1", 40123, token), RelayCodec.parseUrl("  $url\n"))
+        assertEquals(RelayTarget("192.168.43.1", 40123, token), RelayCodec.parseUrl(url))
+        assertEquals(RelayTarget("192.168.43.1", 40123, token), RelayCodec.parseUrl("  $url\n"))
+    }
+
+    @Test
+    fun urlCarriesHotspot() {
+        // Nome con spazi e password con caratteri che nell'indirizzo hanno un significato.
+        val net = HotspotInfo("AndroidShare_1234 campo", "a&b=c?d+e%f")
+        val url = RelayCodec.url("192.168.49.1", 40123, token, net)
+        assertEquals(RelayTarget("192.168.49.1", 40123, token, net), RelayCodec.parseUrl(url))
+        // Rete aperta: niente password.
+        val open = HotspotInfo("Aperta", null)
+        assertEquals(open, RelayCodec.parseUrl(RelayCodec.url("10.0.0.1", 9, token, open))?.hotspot)
     }
 
     @Test
