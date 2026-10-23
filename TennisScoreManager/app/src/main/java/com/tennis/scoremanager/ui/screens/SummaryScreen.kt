@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
@@ -256,6 +257,9 @@ private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
             Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
         }
         Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
+        for (side in Side.entries) {
+            Reports.heartLine(rec, side, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${names.short(side)}", it) }
+        }
     }
 }
 

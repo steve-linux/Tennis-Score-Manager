@@ -63,6 +63,8 @@ data class MatchOptions(
     val bandsOffAtEnd: Boolean = true,
     /** Cerca l'indirizzo del campo dalle coordinate (Geocoder: con i servizi Google le coordinate vanno a Google). Spento di default. */
     val addressLookup: Boolean = false,
+    /** Fasce cardio Bluetooth: battito e calorie, in qualsiasi modalità. */
+    val heartRate: Boolean = false,
 )
 
 @Serializable
@@ -91,7 +93,28 @@ data class MatchRecord(
     val batteryEnd: Map<Side, Int> = emptyMap(),
     /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
     val strokes: Map<Side, StrokeStats> = emptyMap(),
+    /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
+    val heart: Map<Side, HeartTrack> = emptyMap(),
 )
+
+/** Chi indossa la fascia: serve solo a stimare le calorie. */
+@Serializable
+data class HeartProfile(val age: Int, val weightKg: Int, val female: Boolean = false)
+
+/**
+ * Battito durante la partita: un valore ogni [HeartStats.STEP_S] secondi (media delle misure della fascia), [t] in
+ * secondi dall'inizio della partita. Le pause (sospensione, fascia staccata) restano buchi tra un tempo e l'altro.
+ */
+@Serializable
+data class HeartTrack(
+    val t: List<Int> = emptyList(),
+    val bpm: List<Int> = emptyList(),
+    val profile: HeartProfile? = null,
+) {
+    val size: Int get() = minOf(t.size, bpm.size)
+
+    fun add(sec: Int, value: Int): HeartTrack = copy(t = t + sec, bpm = bpm + value)
+}
 
 /**
  * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.

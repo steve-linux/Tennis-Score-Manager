@@ -97,7 +97,7 @@ class CallBuilder(private val lang: Lang) {
         const val TAG_PLAY = "play"
         private const val SHORT = 300L
         private const val MEDIUM = 500L
-        private const val START_GAP = 2000L
+        private const val START_GAP = 1000L
     }
 
     private fun num(n: Int): Seg = if (n in 0..Phrases.MAX_NUMBER) Seg.Clip("num_$n") else Seg.Say(n.toString())
@@ -105,7 +105,7 @@ class CallBuilder(private val lang: Lang) {
     private fun serverName(s: MatchState, names: CallNames): String =
         if (s.rules.doubles) names.player(s.server, s.serverPlayer) else names.side(s.server)
 
-    /** "Primo set" · "[nome] al servizio" · "gioco" con due secondi tra una frase e l'altra. */
+    /** "Primo set" · "[nome] al servizio" · "gioco" con un secondo tra una frase e l'altra. */
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
         // Partita di solo super tie-break: niente "primo set".
         Seg.Clip(if (s.tiebreak == TiebreakKind.MATCH) "match_tiebreak" else "first_set"),

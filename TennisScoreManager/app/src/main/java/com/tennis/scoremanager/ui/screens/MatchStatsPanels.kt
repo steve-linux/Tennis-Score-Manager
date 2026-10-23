@@ -3,12 +3,14 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
 import com.tennis.scoremanager.data.Names
@@ -118,6 +123,12 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ))
         // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
         if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
+        // Battito delle fasce cardio: sulla partita intera, con il grafico nel tempo.
+        if (period == null) heartStats(rec, s)?.let { rows ->
+            StatSection(s.heartStat, rows)
+            StatCard(s.heartChart) { HeartChart(rec) }
+            StatCard(s.heartZones) { HeartZones(rec, names) }
+        }
         MatchStats.rally(pts, period)?.let { r ->
             StatCard(s.strokesPerPoint) {
                 Text(Reports.rallyLine(r, s, rec.options.lang), color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center,
@@ -140,6 +151,101 @@ private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
     return listOf(Stat(s.statStrokesTotal, a?.total ?: 0, b?.total ?: 0)) +
         (0 until BandProtocol.STROKE_COUNT).map { Stat(s.strokeName(it), a?.count(it) ?: 0, b?.count(it) ?: 0) } +
         listOfNotNull(Stat("${s.statAvgWristSpeed} (°/s)", avg(a), avg(b)).takeIf { it.a > 0 || it.b > 0 })
+}
+
+private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
+    val a = HeartStats.summary(rec.heart[Side.P1])
+    val b = HeartStats.summary(rec.heart[Side.P2])
+    if (a == null && b == null) return null
+    return listOfNotNull(
+        Stat("${s.heartAvg} (bpm)", a?.avg ?: 0, b?.avg ?: 0),
+        Stat("${s.heartMax} (bpm)", a?.max ?: 0, b?.max ?: 0),
+        Stat("${s.heartCalories} (kcal)", a?.kcal ?: 0, b?.kcal ?: 0).takeIf { it.a > 0 || it.b > 0 },
+    )
+}
+
+/** Battito nel tempo, una linea per lato nel suo colore; i buchi (pause, fascia staccata) interrompono la linea. */
+@Composable
+private fun HeartChart(rec: MatchRecord) {
+    val tracks = Side.entries.mapNotNull { side -> rec.heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
+    if (tracks.isEmpty()) return
+    val all = tracks.flatMap { (_, t) -> t.bpm.take(t.size) }
+    val lo = (all.min() - 5).coerceAtLeast(30)
+    val hi = all.max() + 5
+    val end = tracks.maxOf { (_, t) -> t.t[t.size - 1] }.coerceAtLeast(1)
+    Row(Modifier.fillMaxWidth().height(140.dp)) {
+        Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
+            Text("$hi", color = TsmColors.TextDim, fontSize = 10.sp)
+            Text("$lo", color = TsmColors.TextDim, fontSize = 10.sp)
+        }
+        Spacer(Modifier.width(6.dp))
+        Canvas(Modifier.weight(1f).fillMaxHeight()) {
+            fun x(sec: Int) = sec.toFloat() / end * size.width
+            fun y(bpm: Int) = size.height - (bpm - lo).toFloat() / (hi - lo) * size.height
+            for ((side, t) in tracks) {
+                val path = Path()
+                for (i in 0 until t.size) {
+                    val gap = i == 0 || t.t[i] - t.t[i - 1] > 2 * HeartStats.STEP_S
+                    if (gap) path.moveTo(x(t.t[i]), y(t.bpm[i])) else path.lineTo(x(t.t[i]), y(t.bpm[i]))
+                }
+                drawPath(path, TsmColors.player(side), style = Stroke(width = 2.dp.toPx()))
+            }
+        }
+    }
+    Text(Reports.duration(end * 1000L), color = TsmColors.TextDim, fontSize = 10.sp, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+}
+
+/** Dalla zona 1 alla 5: dal grigio al rosso. */
+private val ZoneColors = listOf(Color(0xFF9AA8BD), Color(0xFF4CAF50), Color(0xFFC6F432), Color(0xFFFF9800), Color(0xFFFF3B30))
+
+/** Una torta per lato con il tempo in ciascuna zona, e sotto la legenda con le percentuali dei due lati. */
+@Composable
+private fun HeartZones(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val zones = Side.entries.associateWith { side ->
+        val t = rec.heart[side]
+        t?.profile?.let { HeartStats.zoneSeconds(t, it.age) }?.takeIf { it.sum() > 0 }
+    }
+    if (zones.values.all { it == null }) {
+        Text(s.heartZonesHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        return
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        for (side in Side.entries) {
+            val z = zones[side] ?: continue
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Canvas(Modifier.size(110.dp)) {
+                    val total = z.sum().toFloat()
+                    var start = -90f
+                    val w = 22.dp.toPx()
+                    for (i in z.indices) {
+                        val sweep = z[i] / total * 360f
+                        if (sweep > 0f) {
+                            drawArc(ZoneColors[i], start, sweep, useCenter = false, style = Stroke(width = w),
+                                topLeft = androidx.compose.ui.geometry.Offset(w / 2, w / 2),
+                                size = androidx.compose.ui.geometry.Size(size.width - w, size.height - w))
+                        }
+                        start += sweep
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+    for (i in 0 until HeartStats.ZONES) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(ZoneColors[i]))
+            Spacer(Modifier.width(8.dp))
+            Text(s.zoneName(i), color = TsmColors.TextMain, fontSize = 12.sp, modifier = Modifier.weight(1f))
+            Text(
+                Side.entries.mapNotNull { side -> zones[side]?.let { z -> "${s.playerTag(side.ordinal + 1)} ${pct(z[i], z.sum())}%" } }
+                    .joinToString(" · "),
+                color = TsmColors.TextDim, fontSize = 12.sp,
+            )
+        }
+    }
 }
 
 @Composable

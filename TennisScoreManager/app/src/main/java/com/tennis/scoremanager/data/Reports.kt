@@ -89,6 +89,12 @@ object Reports {
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
 
+    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di quel lato non ha mandato niente. */
+    fun heartLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val h = HeartStats.summary(rec.heart[side]) ?: return null
+        return s.heartLine(h.avg, h.max) + (h.kcal?.let { " · ${s.caloriesLine(it)}" } ?: "")
+    }
+
     /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
     data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
 
@@ -169,6 +175,7 @@ object Reports {
         for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
+        for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))

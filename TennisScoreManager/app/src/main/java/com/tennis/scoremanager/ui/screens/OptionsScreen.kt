@@ -125,6 +125,7 @@ import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.remote.RemoteInfo
 import com.tennis.scoremanager.ui.BandSettingsPanel
+import com.tennis.scoremanager.ui.HeartSection
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -164,6 +165,7 @@ fun OptionsScreen(c: MatchController) {
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permTick++
         c.ble.reconnectAll()
+        c.heart.reconnectAll()
     }
     val btLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { permTick++ }
 
@@ -267,6 +269,14 @@ fun OptionsScreen(c: MatchController) {
             }
             if (o.mode == PlayMode.REMOTES) RemotesSection(c, names)
         }
+
+        // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
+        HeartSection(
+            c, names, btOn = btOn,
+            permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
+            onEnableBluetooth = { enableBluetooth() },
+            onRequestPermissions = { if (blePerms && !locOn) openLocationSettings() else requestBandPermissions() },
+        )
 
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {

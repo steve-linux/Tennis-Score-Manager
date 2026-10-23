@@ -128,6 +128,23 @@ class Storage(context: Context) {
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
+    fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
+    fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
+    fun setStrap(p1: Boolean, address: String?, name: String?) {
+        prefs.edit()
+            .putString(if (p1) "strap_p1" else "strap_p2", address)
+            .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+            .apply()
+    }
+
+    /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
+    fun heartProfile(p1: Boolean): HeartProfile? =
+        prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
+
+    fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
+        prefs.edit().putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }).apply()
+    }
+
     fun bandBaseMa(address: String): Double? =
         prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
 

@@ -810,7 +810,13 @@ import com.tennis.scoremanager.ble.BandStroke
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
 import com.tennis.scoremanager.ble.FoundBand
+import com.tennis.scoremanager.ble.HeartMeasurement
+import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.data.HeartBucket
+import com.tennis.scoremanager.data.HeartProfile
+import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchLocation
 import com.tennis.scoremanager.data.MatchOptions
@@ -899,6 +905,7 @@ class MatchController(
     private val app: Application,
     val storage: Storage,
     val ble: BleManager,
+    val heart: HeartRateManager,
     val voice: VoicePack,
     val announcer: Announcer,
 ) {
@@ -953,6 +960,8 @@ class MatchController(
     val voiceCount = MutableStateFlow(0)
     val customVoiceCount = MutableStateFlow(0)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
+    /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
+    val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
     /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
     private val statusStart = mutableMapOf<Side, BandStatus>()
@@ -992,6 +1001,8 @@ class MatchController(
     private var lastUndoAt = 0L
     /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
     private var rallyStrokes = 0
+    /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
+    private val heartBuckets = Side.entries.associateWith { HeartBucket() }
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -1012,6 +1023,7 @@ class MatchController(
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
+        if (options.value.heartRate) restoreStraps()
         remotes.enabled = options.value.mode == PlayMode.REMOTES
         remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
         refreshSaved()
@@ -1020,6 +1032,13 @@ class MatchController(
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
+        scope.launch { heart.readings.collect { (side, m) -> onHeartReading(side, m) } }
+        scope.launch {
+            while (true) {
+                delay(HeartStats.STEP_S * 1000L)
+                flushHeart()
+            }
+        }
         scope.launch { watchBands() }
         scope.launch { watchRemotes() }
         scope.launch {
@@ -1065,7 +1084,8 @@ class MatchController(
     }
 
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
-    private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
+    private fun needsService() =
+        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty()
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -1163,11 +1183,15 @@ class MatchController(
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
+        if (old.heartRate != v.heartRate) {
+            if (v.heartRate) restoreStraps() else heart.disconnectAll()
+        }
     }
 
     fun go(to: Screen) {
         if (to == Screen.START) refreshSaved()
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
+        if (to == Screen.OPTIONS && options.value.heartRate) heart.reconnectAll()
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
         if (to == Screen.START && needsService()) MatchService.start(app)
@@ -1519,6 +1543,62 @@ class MatchController(
         Side.entries.forEach { ble.send(it, BandProtocol.message(line1, line2, seconds)) }
     }
 
+    // ---------------------------------------------------------------- fasce cardio
+
+    private fun restoreStraps() {
+        storage.strapAddress(true)?.let { heart.assign(Side.P1, it, storage.strapName(true)) }
+        storage.strapAddress(false)?.let { heart.assign(Side.P2, it, storage.strapName(false)) }
+    }
+
+    fun assignStrap(side: Side, address: String?, name: String?) {
+        if (address != null && storage.strapAddress(side == Side.P2) == address) storage.setStrap(side == Side.P2, null, null)
+        storage.setStrap(side == Side.P1, address, name)
+        heart.assign(side, address, name)
+    }
+
+    /** Ricerca delle fasce mentre la loro sezione è aperta (e l'app in primo piano). */
+    fun setStrapScan(on: Boolean) = heart.setAutoScan(on && options.value.heartRate)
+
+    fun swapStraps() {
+        val p1 = storage.strapAddress(true) to storage.strapName(true)
+        val p2 = storage.strapAddress(false) to storage.strapName(false)
+        storage.setStrap(true, p2.first, p2.second)
+        storage.setStrap(false, p1.first, p1.second)
+        heart.swapSides()
+        val prof = heartProfiles.value
+        setHeartProfile(Side.P1, prof[Side.P2])
+        setHeartProfile(Side.P2, prof[Side.P1])
+    }
+
+    fun setHeartProfile(side: Side, p: HeartProfile?) {
+        storage.setHeartProfile(side == Side.P1, p)
+        heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
+    }
+
+    /** Il battito conta come i colpi: a partita avviata e in corso, non nelle pause. */
+    private fun recordingHeart(lm: LiveMatch): Boolean =
+        screen.value == Screen.MATCH && lm.record.startedAt != null && !lm.record.suspended && !lm.state.isFinished
+
+    private fun onHeartReading(side: Side, m: HeartMeasurement) {
+        val lm = live.value ?: return
+        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
+    }
+
+    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita. */
+    private fun flushHeart() {
+        val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
+        val lm = live.value ?: return
+        val start = lm.record.startedAt ?: return
+        if (values.isEmpty() || !recordingHeart(lm)) return
+        val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
+        var heartMap = lm.record.heart
+        for ((side, bpm) in values) {
+            val track = heartMap[side] ?: HeartTrack()
+            heartMap = heartMap + (side to track.add(sec, bpm!!).copy(profile = track.profile ?: heartProfiles.value[side]))
+        }
+        setRecord(lm.record.copy(heart = heartMap))
+    }
+
     // ---------------------------------------------------------------- partita
 
     fun startMatch() {
@@ -1732,6 +1812,7 @@ class MatchController(
             val total = currentClock()
             runningSince = null
             setRecord(lm.record.copy(suspended = true, clockMs = total))
+            heartBuckets.values.forEach { it.clear() }
             stopCountdown()
             announcer.stop()
             showMessage(s.msgSuspended)
@@ -1749,9 +1830,11 @@ class MatchController(
         val endBattery = if (lm.record.options.mode == PlayMode.BANDS) {
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
+        // Età e peso detti a partita iniziata valgono lo stesso per le calorie.
+        val heartMap = lm.record.heart.mapValues { (side, t) -> t.copy(profile = t.profile ?: heartProfiles.value[side]) }
         val rec = lm.record.copy(
             finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
-            batteryEnd = endBattery,
+            batteryEnd = endBattery, heart = heartMap,
         )
         runningSince = null
         scope.launch(io) {
@@ -2440,6 +2523,7 @@ class MatchController(
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
             ble.disconnectAll()
+            heart.disconnectAll()
             MatchService.stop(app)
             finish()
             delay(400)
@@ -2494,6 +2578,7 @@ package com.tennis.scoremanager
 
 import android.app.Application
 import com.tennis.scoremanager.ble.BleManager
+import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.VoicePack
@@ -2506,7 +2591,8 @@ class TsmApp : Application() {
     override fun onCreate() {
         super.onCreate()
         val voice = VoicePack(this)
-        controller = MatchController(this, Storage(this), BleManager(this), voice, Announcer(this, voice))
+        val ble = BleManager(this)
+        controller = MatchController(this, Storage(this), ble, HeartRateManager(this, ble), voice, Announcer(this, voice))
     }
 }
 TSM_EOF
@@ -3737,6 +3823,644 @@ internal class ScanThrottle(private val maxStarts: Int = 4, private val windowMs
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ble/HeartRateManager.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ble/HeartRateManager.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ble
+
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothStatusCodes
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.ParcelUuid
+import android.os.SystemClock
+import android.util.Log
+import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.model.Side
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
+import java.util.UUID
+
+enum class StrapState { IDLE, CONNECTING, READY }
+
+data class FoundStrap(val address: String, val name: String, val rssi: Int, val lastSeen: Long = 0L)
+
+/** [bpm] null se la fascia non manda niente da qualche secondo; [contact] false = non tocca la pelle (asciutta, allentata). */
+data class StrapInfo(
+    val address: String,
+    val name: String,
+    val state: StrapState = StrapState.IDLE,
+    val bpm: Int? = null,
+    val contact: Boolean? = null,
+    val battery: Int? = null,
+)
+
+/**
+ * Fasce cardio Bluetooth (servizio standard 0x180D), una per lato. Stesso schema dei braccialetti ([BleManager]),
+ * ma la fascia manda solo: nessun messaggio da scriverle, nessuna conferma.
+ */
+@SuppressLint("MissingPermission")
+class HeartRateManager(context: Context, private val ble: BleManager) {
+
+    private val app = context.applicationContext
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val adapter: BluetoothAdapter? = app.getSystemService(BluetoothManager::class.java)?.adapter
+
+    private val _found = MutableStateFlow<List<FoundStrap>>(emptyList())
+    val found: StateFlow<List<FoundStrap>> = _found
+    private val _scanning = MutableStateFlow(false)
+    val scanning: StateFlow<Boolean> = _scanning
+    private val _straps = MutableStateFlow<Map<Side, StrapInfo>>(emptyMap())
+    val straps: StateFlow<Map<Side, StrapInfo>> = _straps
+    private val _readings = MutableSharedFlow<Pair<Side, HeartMeasurement>>(extraBufferCapacity = 32)
+    /** Ogni misura arrivata (circa una al secondo per fascia). */
+    val readings: SharedFlow<Pair<Side, HeartMeasurement>> = _readings
+
+    private val links = mutableMapOf<Side, StrapLink>()
+    private var autoScan = false
+    private var scanRunning = false
+    private var scanStartJob: Job? = null
+    private var scanStopJob: Job? = null
+    private var scanJob: Job? = null
+    // Android permette 5 avvii di ricerca ogni 30 s per tutta l'app: 4 li tengono i braccialetti, 1 le fasce.
+    private val scanThrottle = ScanThrottle(maxStarts = 1)
+
+    init {
+        ContextCompat.registerReceiver(app, object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, i: Intent?) {
+                when (i?.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
+                    BluetoothAdapter.STATE_ON -> {
+                        links.values.forEach { it.connect() }
+                        if (autoScan) ensureScan()
+                    }
+                    BluetoothAdapter.STATE_OFF -> {
+                        stopScanNow()
+                        links.values.forEach { it.onAdapterOff() }
+                    }
+                }
+            }
+        }, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED)
+        // Un battito vecchio non si mostra: dopo [STALE_MS] senza misure la fascia è "in attesa".
+        scope.launch {
+            while (true) {
+                delay(2_000)
+                if (links.values.any { it.fresh() != it.shownFresh }) publish()
+            }
+        }
+    }
+
+    private val isEnabled: Boolean get() = adapter?.isEnabled == true
+
+    private fun granted(p: String) = ContextCompat.checkSelfPermission(app, p) == PackageManager.PERMISSION_GRANTED
+
+    /** Ricerca continua finché [on] (la sezione delle fasce è aperta). */
+    fun setAutoScan(on: Boolean) {
+        autoScan = on
+        scanStopJob?.cancel()
+        if (on) {
+            ensureScan()
+        } else {
+            scanStopJob = scope.launch {
+                delay(1_500)
+                stopScanNow()
+            }
+        }
+    }
+
+    private fun ensureScan(retryInMs: Long = 0) {
+        if (!autoScan || scanRunning || scanStartJob?.isActive == true) return
+        if (!ble.canScan() || !isEnabled || adapter?.bluetoothLeScanner == null) {
+            _scanning.value = false
+            return
+        }
+        _scanning.value = true
+        scanStartJob = scope.launch {
+            delay(maxOf(retryInMs, scanThrottle.delayBeforeStart(SystemClock.elapsedRealtime())))
+            startScanNow()
+        }
+    }
+
+    private fun startScanNow() {
+        val scanner = adapter?.bluetoothLeScanner
+        if (!autoScan || scanner == null || !ble.canScan() || !isEnabled) {
+            _scanning.value = false
+            return
+        }
+        val filters = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(HeartRateProtocol.SERVICE)).build())
+        val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+        val ok = runCatching { scanner.startScan(filters, settings, scanCallback) }.isSuccess
+        scanThrottle.recordStart(SystemClock.elapsedRealtime())
+        if (!ok) {
+            _scanning.value = false
+            ensureScan(retryInMs = 5_000)
+            return
+        }
+        scanRunning = true
+        _scanning.value = true
+        scanJob?.cancel()
+        scanJob = scope.launch {
+            while (true) {
+                delay(2_000)
+                val now = SystemClock.elapsedRealtime()
+                _found.update { list -> list.filter { now - it.lastSeen < 10_000 } }
+            }
+        }
+    }
+
+    private fun stopScanNow() {
+        scanStartJob?.cancel()
+        scanJob?.cancel()
+        if (scanRunning) runCatching { adapter?.bluetoothLeScanner?.stopScan(scanCallback) }
+        scanRunning = false
+        _scanning.value = false
+        _found.value = emptyList()
+    }
+
+    private val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val addr = result.device.address
+            val name = result.scanRecord?.deviceName ?: runCatching { result.device.name }.getOrNull() ?: addr
+            val strap = FoundStrap(addr, name, result.rssi, SystemClock.elapsedRealtime())
+            _found.update { list -> (list.filterNot { it.address == addr } + strap).sortedBy { it.name } }
+            scope.launch { links.values.firstOrNull { it.address == addr }?.onSeen() }
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            scope.launch {
+                Log.w(TAG, "ricerca fallita: $errorCode")
+                if (errorCode == 1) return@launch  // già avviata
+                scanJob?.cancel()
+                scanRunning = false
+                _scanning.value = false
+                ensureScan(retryInMs = 30_000)
+            }
+        }
+    }
+
+    /** Associa (o toglie, con address null) la fascia a un lato. Una fascia non può stare su due lati. */
+    fun assign(side: Side, address: String?, name: String?) {
+        links.remove(side)?.close()
+        if (address != null) {
+            links.entries.firstOrNull { it.value.address == address }?.let { links.remove(it.key)?.close() }
+            links[side] = StrapLink(side, address, name ?: address).also { it.connect() }
+        }
+        publish()
+    }
+
+    fun swapSides() {
+        val a = links.remove(Side.P1)
+        val b = links.remove(Side.P2)
+        a?.let { it.side = Side.P2; links[Side.P2] = it }
+        b?.let { it.side = Side.P1; links[Side.P1] = it }
+        publish()
+    }
+
+    fun reconnectAll() = links.values.forEach { it.retryNow() }
+
+    fun disconnectAll() {
+        setAutoScan(false)
+        links.values.forEach { it.close() }
+        links.clear()
+        publish()
+    }
+
+    private fun publish() {
+        _straps.value = links.mapValues { (_, l) ->
+            val fresh = l.fresh()
+            l.shownFresh = fresh
+            StrapInfo(
+                address = l.address,
+                name = l.name,
+                state = l.state,
+                bpm = l.last?.bpm?.takeIf { fresh && l.last?.valid == true },
+                contact = l.last?.contact?.takeIf { fresh },
+                battery = l.battery,
+            )
+        }
+    }
+
+    private enum class OpKind { DESCRIPTOR, READ }
+
+    private inner class StrapLink(var side: Side, val address: String, val name: String) {
+        var state = StrapState.IDLE
+            private set
+        var battery: Int? = null
+        var last: HeartMeasurement? = null
+        private var lastAt = 0L
+        /** Com'era l'ultima misura quando si è pubblicato: se cambia, va ripubblicato. */
+        var shownFresh = false
+        private var gatt: BluetoothGatt? = null
+        private var closed = false
+        private var retryJob: Job? = null
+        private var watchdog: Job? = null
+        private var background = false
+        private var failures = 0
+        private val opLock = Mutex()
+        @Volatile private var pendingOp: CompletableDeferred<Int>? = null
+        @Volatile private var pendingKind: OpKind? = null
+
+        fun fresh(): Boolean = last != null && SystemClock.elapsedRealtime() - lastAt <= STALE_MS
+
+        private fun changeState(s: StrapState) {
+            state = s
+            publish()
+        }
+
+        /**
+         * Prima tentativi diretti; dopo [DIRECT_TRIES] a vuoto si aspetta in background (Android collega la fascia
+         * da solo quando torna a trasmettere: indossata e con gli elettrodi bagnati).
+         */
+        fun connect(direct: Boolean = false) {
+            if (closed || !ble.canConnect() || !isEnabled) return
+            if (gatt != null) {
+                if (!direct || !background || state == StrapState.READY) return
+                runCatching { gatt?.close() }
+                gatt = null
+            }
+            val dev = runCatching { adapter?.getRemoteDevice(address) }.getOrNull() ?: return
+            retryJob?.cancel()
+            background = !direct && failures >= DIRECT_TRIES
+            changeState(if (background) StrapState.IDLE else StrapState.CONNECTING)
+            gatt = runCatching { dev.connectGatt(app, background, callback, BluetoothDevice.TRANSPORT_LE) }.getOrNull()
+            if (gatt == null) scheduleReconnect(afterLoss = false)
+        }
+
+        fun retryNow() {
+            failures = 0
+            connect(direct = true)
+        }
+
+        fun onSeen() {
+            if (!background || state == StrapState.READY) return
+            failures = 0
+            connect(direct = true)
+        }
+
+        fun onAdapterOff() {
+            pendingOp?.complete(-1)
+            runCatching { gatt?.close() }
+            gatt = null
+            changeState(StrapState.IDLE)
+        }
+
+        fun close() {
+            closed = true
+            retryJob?.cancel()
+            watchdog?.cancel()
+            pendingOp?.complete(-1)
+            runCatching { gatt?.disconnect() }
+            runCatching { gatt?.close() }
+            gatt = null
+        }
+
+        private fun scheduleReconnect(afterLoss: Boolean) {
+            if (closed) return
+            val wasBackground = background
+            retryJob?.cancel()
+            retryJob = scope.launch {
+                delay(
+                    when {
+                        wasBackground -> 30_000
+                        afterLoss -> 500
+                        else -> 2_500
+                    },
+                )
+                connect()
+            }
+        }
+
+        private fun completeOp(kind: OpKind, status: Int) {
+            if (pendingKind == kind) pendingOp?.complete(status)
+        }
+
+        private val callback = object : BluetoothGattCallback() {
+            override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
+                scope.launch {
+                    if (g !== gatt) return@launch
+                    if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+                        background = false
+                        watchdog?.cancel()
+                        watchdog = scope.launch {
+                            delay(15_000)
+                            if (gatt === g && state != StrapState.READY) runCatching { g.disconnect() }
+                        }
+                        delay(400)
+                        runCatching { g.discoverServices() }
+                    } else {
+                        watchdog?.cancel()
+                        pendingOp?.complete(-1)
+                        runCatching { g.close() }
+                        gatt = null
+                        val wasReady = state == StrapState.READY
+                        if (wasReady) failures = 0 else failures++
+                        changeState(StrapState.IDLE)
+                        scheduleReconnect(afterLoss = wasReady)
+                    }
+                }
+            }
+
+            override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
+                scope.launch { if (g === gatt) setup(g) }
+            }
+
+            override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int) {
+                completeOp(OpKind.DESCRIPTOR, status)
+            }
+
+            override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray, status: Int) {
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, value)
+                completeOp(OpKind.READ, status)
+            }
+
+            @Suppress("OVERRIDE_DEPRECATION")
+            override fun onCharacteristicRead(g: BluetoothGatt, c: BluetoothGattCharacteristic, status: Int) {
+                if (Build.VERSION.SDK_INT >= 33) return
+                @Suppress("DEPRECATION")
+                if (status == BluetoothGatt.GATT_SUCCESS) handle(c.uuid, c.value ?: byteArrayOf())
+                completeOp(OpKind.READ, status)
+            }
+
+            override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic, value: ByteArray) {
+                handle(c.uuid, value)
+            }
+
+            @Suppress("OVERRIDE_DEPRECATION")
+            override fun onCharacteristicChanged(g: BluetoothGatt, c: BluetoothGattCharacteristic) {
+                if (Build.VERSION.SDK_INT >= 33) return
+                @Suppress("DEPRECATION")
+                handle(c.uuid, c.value ?: byteArrayOf())
+            }
+        }
+
+        private fun handle(uuid: UUID, value: ByteArray) {
+            val copy = value.copyOf()
+            scope.launch {
+                when (uuid) {
+                    HeartRateProtocol.MEASUREMENT -> HeartRateProtocol.parse(copy)?.let { m ->
+                        last = m
+                        lastAt = SystemClock.elapsedRealtime()
+                        publish()
+                        _readings.tryEmit(side to m)
+                    }
+                    HeartRateProtocol.BATTERY_LEVEL -> if (copy.isNotEmpty()) {
+                        battery = (copy[0].toInt() and 0xFF).coerceIn(0, 100)
+                        publish()
+                    }
+                }
+            }
+        }
+
+        private suspend fun setup(g: BluetoothGatt) {
+            val hr = g.getService(HeartRateProtocol.SERVICE)?.getCharacteristic(HeartRateProtocol.MEASUREMENT)
+            if (hr == null || !enableNotify(g, hr)) {
+                runCatching { g.disconnect() }
+                return
+            }
+            g.getService(HeartRateProtocol.BATTERY_SERVICE)?.getCharacteristic(HeartRateProtocol.BATTERY_LEVEL)?.let {
+                op(OpKind.READ) { g.readCharacteristic(it) }
+                if (it.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0) enableNotify(g, it)
+            }
+            // Una misura al secondo non chiede una connessione veloce: meno consumo, per la fascia e per il telefono.
+            runCatching { g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER) }
+            if (g !== gatt) return
+            watchdog?.cancel()
+            failures = 0
+            changeState(StrapState.READY)
+        }
+
+        private suspend fun op(kind: OpKind, start: () -> Boolean): Boolean = opLock.withLock {
+            val d = CompletableDeferred<Int>()
+            pendingKind = kind
+            pendingOp = d
+            val started = runCatching(start).getOrDefault(false)
+            val result = if (started) withTimeoutOrNull(5_000) { d.await() } else null
+            pendingOp = null
+            pendingKind = null
+            result == BluetoothGatt.GATT_SUCCESS
+        }
+
+        private suspend fun enableNotify(g: BluetoothGatt, c: BluetoothGattCharacteristic): Boolean {
+            runCatching { g.setCharacteristicNotification(c, true) }
+            val d = c.getDescriptor(HeartRateProtocol.CCCD) ?: return false
+            val value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            return op(OpKind.DESCRIPTOR) {
+                if (Build.VERSION.SDK_INT >= 33) {
+                    g.writeDescriptor(d, value) == BluetoothStatusCodes.SUCCESS
+                } else {
+                    @Suppress("DEPRECATION")
+                    d.value = value
+                    @Suppress("DEPRECATION")
+                    g.writeDescriptor(d)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "HeartRateManager"
+        private const val DIRECT_TRIES = 3
+        /** Le fasce mandano una misura al secondo: dopo 6 secondi senza, il battito non è più quello di adesso. */
+        private const val STALE_MS = 6_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ble/HeartRateProtocol.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ble/HeartRateProtocol.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ble
+
+import java.util.UUID
+
+/** Una misura della fascia: [contact] null se la fascia non sa dire se tocca la pelle, [rrMs] gli intervalli tra i battiti. */
+data class HeartMeasurement(val bpm: Int, val contact: Boolean?, val rrMs: List<Int> = emptyList()) {
+    /** Da tenere: un battito plausibile e la fascia sulla pelle (o una fascia che non lo dice). */
+    val valid: Boolean get() = bpm in 30..240 && contact != false
+}
+
+/**
+ * Servizio cardio standard del Bluetooth (Heart Rate Service 0x180D): lo usano tutte le fasce toraciche
+ * (Coospo, Magene, Polar, Garmin, Wahoo...), quindi niente codice per una marca sola.
+ */
+object HeartRateProtocol {
+    private fun uuid16(v: Int): UUID = UUID.fromString(String.format("%08x-0000-1000-8000-00805f9b34fb", v))
+
+    val SERVICE: UUID = uuid16(0x180D)
+    val MEASUREMENT: UUID = uuid16(0x2A37)
+    val BATTERY_SERVICE: UUID = uuid16(0x180F)
+    val BATTERY_LEVEL: UUID = uuid16(0x2A19)
+    val CCCD: UUID = uuid16(0x2902)
+
+    /**
+     * Heart Rate Measurement: un byte di flag, poi il battito (8 o 16 bit), l'energia (16 bit, se c'è) e gli
+     * intervalli RR (16 bit ciascuno, in 1/1024 di secondo). null se il pacchetto è troppo corto.
+     */
+    fun parse(b: ByteArray): HeartMeasurement? {
+        if (b.size < 2) return null
+        val flags = b[0].toInt() and 0xFF
+        fun u16(i: Int) = (b[i].toInt() and 0xFF) or ((b[i + 1].toInt() and 0xFF) shl 8)
+        var i = 1
+        val bpm = if (flags and 0x01 != 0) {
+            if (b.size < 3) return null
+            u16(1).also { i = 3 }
+        } else {
+            (b[1].toInt() and 0xFF).also { i = 2 }
+        }
+        // Bit 2 = la fascia sa dire se tocca la pelle, bit 1 = la tocca.
+        val contact = if (flags and 0x04 != 0) flags and 0x02 != 0 else null
+        if (flags and 0x08 != 0) i += 2  // energia spesa: non serve
+        val rr = mutableListOf<Int>()
+        if (flags and 0x10 != 0) {
+            while (i + 1 < b.size) {
+                rr += Math.round(u16(i) * 1000.0 / 1024).toInt()
+                i += 2
+            }
+        }
+        return HeartMeasurement(bpm, contact, rr)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/HeartStats.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/HeartStats.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+/** Battito medio e massimo, calorie stimate. */
+object HeartStats {
+    /** Un valore ogni 5 secondi: 2 ore di partita sono ~1.400 valori per fascia, il salvataggio resta leggero. */
+    const val STEP_S = 5
+
+    data class Summary(val avg: Int, val max: Int, val min: Int, val minutes: Int, val kcal: Int?)
+
+    /** null se la fascia non ha mandato niente. */
+    fun summary(track: HeartTrack?): Summary? {
+        val n = track?.size ?: 0
+        if (track == null || n == 0) return null
+        val v = track.bpm.take(n)
+        val seconds = (0 until n).sumOf { span(track, it) }
+        return Summary(
+            avg = Math.round(v.average()).toInt(),
+            max = v.max(),
+            min = v.min(),
+            minutes = Math.round(seconds / 60.0).toInt(),
+            kcal = track.profile?.let { kcal(track, it) },
+        )
+    }
+
+    /** Secondi coperti dal valore [i]: fino al successivo, ma un buco (pausa, fascia staccata) non conta. */
+    private fun span(track: HeartTrack, i: Int): Int {
+        val next = track.t.getOrNull(i + 1)?.takeIf { i + 1 < track.size } ?: return STEP_S
+        val gap = next - track.t[i]
+        return if (gap in 1..2 * STEP_S) gap else STEP_S
+    }
+
+    /**
+     * Calorie dal battito con la formula di Keytel et al. (2005, J Sports Sci 23:289), senza VO2max: kJ/min da
+     * battito, peso ed età, diversa per uomini e donne. Errore tipico ±20%: è una stima.
+     */
+    fun kcal(track: HeartTrack, p: HeartProfile): Int {
+        var total = 0.0
+        for (i in 0 until track.size) total += kcalPerMinute(track.bpm[i], p) * span(track, i) / 60.0
+        return Math.round(total).toInt()
+    }
+
+    fun kcalPerMinute(bpm: Int, p: HeartProfile): Double {
+        val kj = if (p.female) {
+            -20.4022 + 0.4472 * bpm - 0.1263 * p.weightKg + 0.074 * p.age
+        } else {
+            -55.0969 + 0.6309 * bpm + 0.1988 * p.weightKg + 0.2017 * p.age
+        }
+        // A riposo la formula scende sotto zero: lì non si conta niente.
+        return (kj / 4.184).coerceAtLeast(0.0)
+    }
+
+    const val ZONES = 5
+
+    /** Battito massimo stimato dall'età (Tanaka et al. 2001): più fedele di "220 − età", soprattutto dopo i 40 anni. */
+    fun maxBpm(age: Int): Int = Math.round(208 - 0.7 * age).toInt()
+
+    /**
+     * Secondi passati in ciascuna delle 5 zone (50-60, 60-70, 70-80, 80-90, oltre 90% del battito massimo); sotto il
+     * 50% conta come zona 1. Vuoto senza dati.
+     */
+    fun zoneSeconds(track: HeartTrack?, age: Int): List<Int> {
+        if (track == null || track.size == 0) return emptyList()
+        val max = maxBpm(age).toDouble()
+        val out = IntArray(ZONES)
+        for (i in 0 until track.size) {
+            val zone = ((track.bpm[i] / max - 0.5) * 10).toInt().coerceIn(0, ZONES - 1)
+            out[zone] += span(track, i)
+        }
+        return out.toList()
+    }
+
+    /** Età e peso plausibili, altrimenti niente profilo (e niente calorie). */
+    fun profile(age: Int?, weightKg: Int?, female: Boolean): HeartProfile? =
+        if (age != null && age in 8..99 && weightKg != null && weightKg in 25..200) HeartProfile(age, weightKg, female) else null
+}
+
+/** Media delle misure arrivate in un intervallo di [HeartStats.STEP_S] secondi. */
+class HeartBucket {
+    private var sum = 0
+    private var count = 0
+
+    fun add(bpm: Int) {
+        sum += bpm
+        count++
+    }
+
+    /** La media (e si riparte da zero); null se non è arrivato niente. */
+    fun take(): Int? {
+        if (count == 0) return null
+        val avg = Math.round(sum.toDouble() / count).toInt()
+        sum = 0
+        count = 0
+        return avg
+    }
+
+    fun clear() {
+        sum = 0
+        count = 0
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/LocationHelper.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/LocationHelper.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -4140,6 +4864,8 @@ data class MatchOptions(
     val bandsOffAtEnd: Boolean = true,
     /** Cerca l'indirizzo del campo dalle coordinate (Geocoder: con i servizi Google le coordinate vanno a Google). Spento di default. */
     val addressLookup: Boolean = false,
+    /** Fasce cardio Bluetooth: battito e calorie, in qualsiasi modalità. */
+    val heartRate: Boolean = false,
 )
 
 @Serializable
@@ -4168,7 +4894,28 @@ data class MatchRecord(
     val batteryEnd: Map<Side, Int> = emptyMap(),
     /** Colpi riconosciuti dai braccialetti (firmware 2.4) per giocatore o squadra. */
     val strokes: Map<Side, StrokeStats> = emptyMap(),
+    /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
+    val heart: Map<Side, HeartTrack> = emptyMap(),
 )
+
+/** Chi indossa la fascia: serve solo a stimare le calorie. */
+@Serializable
+data class HeartProfile(val age: Int, val weightKg: Int, val female: Boolean = false)
+
+/**
+ * Battito durante la partita: un valore ogni [HeartStats.STEP_S] secondi (media delle misure della fascia), [t] in
+ * secondi dall'inizio della partita. Le pause (sospensione, fascia staccata) restano buchi tra un tempo e l'altro.
+ */
+@Serializable
+data class HeartTrack(
+    val t: List<Int> = emptyList(),
+    val bpm: List<Int> = emptyList(),
+    val profile: HeartProfile? = null,
+) {
+    val size: Int get() = minOf(t.size, bpm.size)
+
+    fun add(sec: Int, value: Int): HeartTrack = copy(t = t + sec, bpm = bpm + value)
+}
 
 /**
  * Colpi di un giocatore: [counts] nell'ordine di BandProtocol.STROKE_*, [unknown] quelli non riconosciuti.
@@ -4405,6 +5152,12 @@ object Reports {
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
 
+    /** "medio 138 · max 176 bpm · ~620 kcal (stima)"; null se la fascia di quel lato non ha mandato niente. */
+    fun heartLine(rec: MatchRecord, side: Side, s: Strings): String? {
+        val h = HeartStats.summary(rec.heart[side]) ?: return null
+        return s.heartLine(h.avg, h.max) + (h.kcal?.let { " · ${s.caloriesLine(it)}" } ?: "")
+    }
+
     /** Colpi per punto (entrambi i braccialetti): [shortPct] 1-3 colpi, [mediumPct] 4-8, [longPct] 9 o più. */
     data class RallyStats(val points: Int, val average: Double, val longest: Int, val shortPct: Int, val mediumPct: Int, val longPct: Int)
 
@@ -4485,6 +5238,7 @@ object Reports {
         for (side in Side.entries) strokesLine(rec, side, s)?.let { sb.appendLine("🎾 ${s.strokes} ${names.short(side)}: $it") }
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
+        for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))
@@ -4729,6 +5483,23 @@ class Storage(context: Context) {
     }
 
     /** Consumo di base misurato sul campo per ogni braccialetto (mA), per stimare l'autonomia. */
+    fun strapAddress(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1" else "strap_p2", null)
+    fun strapName(p1: Boolean): String? = prefs.getString(if (p1) "strap_p1_name" else "strap_p2_name", null)
+    fun setStrap(p1: Boolean, address: String?, name: String?) {
+        prefs.edit()
+            .putString(if (p1) "strap_p1" else "strap_p2", address)
+            .putString(if (p1) "strap_p1_name" else "strap_p2_name", name)
+            .apply()
+    }
+
+    /** Chi indossa la fascia del lato (per le calorie); null = non detto. */
+    fun heartProfile(p1: Boolean): HeartProfile? =
+        prefs.getString(if (p1) "heart_p1" else "heart_p2", null)?.let { runCatching { json.decodeFromString(HeartProfile.serializer(), it) }.getOrNull() }
+
+    fun setHeartProfile(p1: Boolean, p: HeartProfile?) {
+        prefs.edit().putString(if (p1) "heart_p1" else "heart_p2", p?.let { json.encodeToString(HeartProfile.serializer(), it) }).apply()
+    }
+
     fun bandBaseMa(address: String): Double? =
         prefs.getFloat("base_ma_$address", -1f).takeIf { it > 0f }?.toDouble()
 
@@ -8029,6 +8800,221 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.BluetoothConnected
+import androidx.compose.material.icons.filled.BluetoothDisabled
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.ble.FoundStrap
+import com.tennis.scoremanager.ble.StrapInfo
+import com.tennis.scoremanager.ble.StrapState
+import com.tennis.scoremanager.data.HeartProfile
+import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.model.Side
+
+/**
+ * Pagina 2, "Battito cardiaco": interruttore, fasce di ciascun lato (ricerca automatica mentre la sezione è aperta)
+ * ed età, peso e sesso di chi le indossa per le calorie. Vale in tutte le modalità, anche arbitro e telecomandi.
+ */
+@Composable
+fun HeartSection(
+    c: MatchController,
+    names: Names,
+    btOn: Boolean,
+    permsOk: Boolean,
+    onEnableBluetooth: () -> Unit,
+    onRequestPermissions: () -> Unit,
+) {
+    val s = LocalStrings.current
+    val o by c.options.collectAsState()
+    SectionCard(s.heartSection, Icons.Filled.MonitorHeart, accent = TsmColors.Danger) {
+        SwitchRow(Icons.Filled.Favorite, s.heartRate, s.heartRateHint, o.heartRate) { v -> c.updateOptions { it.copy(heartRate = v) } }
+        if (!o.heartRate) return@SectionCard
+        if (!btOn) RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, false, s.enable) { onEnableBluetooth() }
+        if (!permsOk) RequirementRow(Icons.Filled.LocationOn, s.location, false, s.allow) { onRequestPermissions() }
+        val ready = btOn && permsOk
+        val found by c.heart.found.collectAsState()
+        val scanning by c.heart.scanning.collectAsState()
+        val straps by c.heart.straps.collectAsState()
+        val profiles by c.heartProfiles.collectAsState()
+        LifecycleResumeEffect(ready) {
+            c.setStrapScan(ready)
+            onPauseOrDispose { c.setStrapScan(false) }
+        }
+        Text(s.heartHowTo, color = TsmColors.TextMain, fontSize = 14.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (scanning) {
+                CircularProgressIndicator(Modifier.size(22.dp), color = TsmColors.Ball, strokeWidth = 3.dp)
+            } else {
+                Icon(Icons.AutoMirrored.Filled.BluetoothSearching, null, tint = TsmColors.TextDim)
+            }
+            Spacer(Modifier.width(10.dp))
+            Text(if (scanning) s.strapSearching else s.autoSearchOff, color = if (scanning) TsmColors.TextMain else TsmColors.Orange, fontSize = 13.sp)
+        }
+        for (side in Side.entries) {
+            StrapPicker(c, side, names.short(side), straps[side], found, straps)
+            // Scambiando le fasce i campi ripartono dal profilo che segue la fascia.
+            straps[side]?.let { key(it.address) { ProfileRow(profiles[side]) { p -> c.setHeartProfile(side, p) } } }
+        }
+        if (straps.size == 2) GhostButton(s.swapBands, Icons.Filled.SwapHoriz, { c.swapStraps() }, Modifier.fillMaxWidth())
+        Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
+
+@Composable
+private fun StrapPicker(c: MatchController, side: Side, playerName: String, current: StrapInfo?, found: List<FoundStrap>, all: Map<Side, StrapInfo>) {
+    val s = LocalStrings.current
+    var open by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth()) {
+        Text(s.strapFor(playerName), color = TsmColors.player(side), fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Box {
+            OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+                val (icon, tint) = when {
+                    current == null -> Icons.Filled.BluetoothDisabled to TsmColors.TextDim
+                    current.state == StrapState.READY -> Icons.Filled.BluetoothConnected to TsmColors.Ok
+                    else -> Icons.Filled.Bluetooth to TsmColors.Orange
+                }
+                Icon(icon, null, tint = tint)
+                Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(current?.name ?: s.noStrap, color = TsmColors.TextMain, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (current != null) Text(strapStatus(current, s), color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+                Icon(Icons.Filled.ArrowDropDown, null, tint = TsmColors.TextDim)
+            }
+            DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+                DropdownMenuItem(text = { Text(s.noStrap) }, onClick = {
+                    open = false
+                    c.assignStrap(side, null, null)
+                })
+                val options = (found.map { it.address to "${it.name}  (${it.rssi} dBm)" } + all.values.map { it.address to it.name })
+                    .distinctBy { it.first }
+                for ((address, label) in options) {
+                    val usedBy = all.entries.firstOrNull { it.value.address == address && it.key != side }?.key
+                    DropdownMenuItem(
+                        text = { Text(label + (usedBy?.let { " → ${s.playerTag(it.ordinal + 1)}" } ?: "")) },
+                        leadingIcon = { Icon(Icons.Filled.Favorite, null) },
+                        onClick = {
+                            open = false
+                            c.assignStrap(side, address, label.substringBefore("  ("))
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** "Collegata · 72 bpm · Batteria 90%", oppure perché il battito non arriva. */
+private fun strapStatus(st: StrapInfo, s: Strings): String {
+    val state = when {
+        st.state != StrapState.READY -> if (st.state == StrapState.CONNECTING) s.strapConnecting else s.strapWaiting
+        st.contact == false -> s.strapNoContact
+        st.bpm != null -> "${s.strapConnected} · ${st.bpm} bpm"
+        else -> s.strapWaiting
+    }
+    return state + (st.battery?.let { " · ${s.battery} $it%" } ?: "")
+}
+
+/** Età, peso e sesso: si salvano appena età e peso sono plausibili; svuotarli toglie il profilo. */
+@Composable
+private fun ProfileRow(profile: HeartProfile?, onChange: (HeartProfile?) -> Unit) {
+    val s = LocalStrings.current
+    var age by remember { mutableStateOf(profile?.age?.toString() ?: "") }
+    var weight by remember { mutableStateOf(profile?.weightKg?.toString() ?: "") }
+    var female by remember { mutableStateOf(profile?.female ?: false) }
+    fun save() {
+        val p = HeartStats.profile(age.toIntOrNull(), weight.toIntOrNull(), female)
+        if (p != null || age.isBlank() || weight.isBlank()) onChange(p)
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        NumberField(age, s.heartAge, Modifier.weight(1f)) {
+            age = it
+            save()
+        }
+        NumberField(weight, s.heartWeight, Modifier.weight(1.4f)) {
+            weight = it
+            save()
+        }
+    }
+    Segmented(
+        listOf(SegOption(s.heartMale), SegOption(s.heartFemale)),
+        selected = if (female) 1 else 0,
+        onSelect = {
+            female = it == 1
+            save()
+        },
+    )
+}
+
+@Composable
+private fun NumberField(value: String, label: String, modifier: Modifier, onChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { v -> onChange(v.filter { it.isDigit() }.take(3)) },
+        label = { Text(label, maxLines = 1) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = TsmColors.Ball,
+            focusedLabelColor = TsmColors.Ball,
+            cursorColor = TsmColors.Ball,
+        ),
+        modifier = modifier,
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/PlayerPhoto.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/PlayerPhoto.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -8259,6 +9245,37 @@ interface Strings {
     val enable: String
     val allow: String
     val ok: String
+    // Fasce cardio
+    val heartSection: String
+    val heartRate: String
+    val heartRateHint: String
+    val heartHowTo: String
+    val strapFor: (String) -> String
+    val noStrap: String
+    val strapSearching: String
+    val strapConnected: String
+    val strapConnecting: String
+    val strapWaiting: String
+    val strapNoContact: String
+    val heartAge: String
+    val heartWeight: String
+    val heartMale: String
+    val heartFemale: String
+    val heartProfileHint: String
+    val heartStat: String
+    val heartAvg: String
+    val heartMax: String
+    val heartCalories: String
+    val heartChart: String
+    /** "medio 138 · max 176 bpm" */
+    val heartLine: (Int, Int) -> String
+    /** "~620 kcal (stima)" */
+    val caloriesLine: (Int) -> String
+    val heartStatsHint: String
+    val heartZones: String
+    /** "Z3 Moderata": zone da 0 a 4. */
+    val zoneName: (Int) -> String
+    val heartZonesHint: String
     val bandFor: (String) -> String
     val noBand: String
     val bandConnected: String
@@ -8801,6 +9818,34 @@ object ItStrings : Strings {
     override val enable = "Attiva"
     override val allow = "Consenti"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Battito cardiaco"
+    override val heartRate = "Fasce cardio"
+    override val heartRateHint = "Battito e calorie da fasce toraciche Bluetooth (Coospo, Magene, Polar, Garmin…), con qualsiasi modalità."
+    override val heartHowTo = "Bagna gli elettrodi, indossa la fascia e sceglila qui sotto: la fascia di ogni giocatore va scelta una volta sola."
+    override val strapFor: (String) -> String = { "Fascia di $it" }
+    override val noStrap = "Nessuna"
+    override val strapSearching = "Ricerca delle fasce…"
+    override val strapConnected = "Collegata"
+    override val strapConnecting = "Collegamento…"
+    override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
+    override val strapNoContact = "Non tocca la pelle"
+    override val heartAge = "Età"
+    override val heartWeight = "Peso (kg)"
+    override val heartMale = "Uomo"
+    override val heartFemale = "Donna"
+    override val heartProfileHint = "Età, peso e sesso servono solo a stimare le calorie."
+    override val heartStat = "Battito"
+    override val heartAvg = "Battito medio"
+    override val heartMax = "Battito massimo"
+    override val heartCalories = "Calorie (stima)"
+    override val heartChart = "Battito durante la partita"
+    override val heartLine: (Int, Int) -> String = { a, m -> "medio $a · max $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (stima)" }
+    override val heartStatsHint = "Calorie stimate dal battito con la formula di Keytel: l'errore tipico è del 20%."
+    override val heartZones = "Tempo nelle zone cardio"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Molto leggera", "Leggera", "Moderata", "Intensa", "Massima").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zone in percentuale del battito massimo stimato dall'età (208 − 0,7 × età): serve l'età di chi indossa la fascia."
     override val bandFor: (String) -> String = { "Braccialetto di $it" }
     override val noBand = "Nessuno"
     override val bandConnected = "Connesso"
@@ -9319,6 +10364,34 @@ object EnStrings : Strings {
     override val enable = "Turn on"
     override val allow = "Allow"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Heart rate"
+    override val heartRate = "Heart rate straps"
+    override val heartRateHint = "Heart rate and calories from Bluetooth chest straps (Coospo, Magene, Polar, Garmin…), in any mode."
+    override val heartHowTo = "Wet the electrodes, put the strap on and pick it below: each player's strap only needs picking once."
+    override val strapFor: (String) -> String = { "$it's strap" }
+    override val noStrap = "None"
+    override val strapSearching = "Searching for straps…"
+    override val strapConnected = "Connected"
+    override val strapConnecting = "Connecting…"
+    override val strapWaiting = "Waiting: put it on and wet the electrodes"
+    override val strapNoContact = "Not touching the skin"
+    override val heartAge = "Age"
+    override val heartWeight = "Weight (kg)"
+    override val heartMale = "Man"
+    override val heartFemale = "Woman"
+    override val heartProfileHint = "Age, weight and sex are only used to estimate calories."
+    override val heartStat = "Heart rate"
+    override val heartAvg = "Average heart rate"
+    override val heartMax = "Maximum heart rate"
+    override val heartCalories = "Calories (estimate)"
+    override val heartChart = "Heart rate during the match"
+    override val heartLine: (Int, Int) -> String = { a, m -> "average $a · max $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (estimate)" }
+    override val heartStatsHint = "Calories estimated from heart rate with the Keytel formula: the typical error is 20%."
+    override val heartZones = "Time in heart rate zones"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Very light", "Light", "Moderate", "Hard", "Maximum").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zones as a percentage of the maximum heart rate estimated from age (208 − 0.7 × age): the wearer's age is needed."
     override val bandFor: (String) -> String = { "$it's wristband" }
     override val noBand = "None"
     override val bandConnected = "Connected"
@@ -9860,6 +10933,34 @@ object DeStrings : Strings {
     override val enable = "Einschalten"
     override val allow = "Erlauben"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Herzfrequenz"
+    override val heartRate = "Brustgurte"
+    override val heartRateHint = "Herzfrequenz und Kalorien von Bluetooth-Brustgurten (Coospo, Magene, Polar, Garmin…), in jedem Modus."
+    override val heartHowTo = "Befeuchte die Elektroden, lege den Gurt an und wähle ihn unten aus: Der Gurt jedes Spielers wird nur einmal gewählt."
+    override val strapFor: (String) -> String = { "Gurt von $it" }
+    override val noStrap = "Keiner"
+    override val strapSearching = "Suche nach Gurten…"
+    override val strapConnected = "Verbunden"
+    override val strapConnecting = "Verbinde…"
+    override val strapWaiting = "Warte: Gurt anlegen und Elektroden befeuchten"
+    override val strapNoContact = "Kein Hautkontakt"
+    override val heartAge = "Alter"
+    override val heartWeight = "Gewicht (kg)"
+    override val heartMale = "Mann"
+    override val heartFemale = "Frau"
+    override val heartProfileHint = "Alter, Gewicht und Geschlecht dienen nur zur Schätzung der Kalorien."
+    override val heartStat = "Puls"
+    override val heartAvg = "Durchschnittspuls"
+    override val heartMax = "Maximalpuls"
+    override val heartCalories = "Kalorien (Schätzung)"
+    override val heartChart = "Herzfrequenz während des Spiels"
+    override val heartLine: (Int, Int) -> String = { a, m -> "Schnitt $a · max. $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (Schätzung)" }
+    override val heartStatsHint = "Kalorien aus der Herzfrequenz mit der Keytel-Formel geschätzt: Der typische Fehler liegt bei 20 %."
+    override val heartZones = "Zeit in den Pulszonen"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Sehr leicht", "Leicht", "Moderat", "Intensiv", "Maximal").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zonen in Prozent des aus dem Alter geschätzten Maximalpulses (208 − 0,7 × Alter): Das Alter der Person mit dem Gurt wird benötigt."
     override val bandFor: (String) -> String = { "Armband von $it" }
     override val noBand = "Keins"
     override val bandConnected = "Verbunden"
@@ -10393,6 +11494,34 @@ object EsStrings : Strings {
     override val enable = "Activar"
     override val allow = "Permitir"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Frecuencia cardíaca"
+    override val heartRate = "Bandas de pecho"
+    override val heartRateHint = "Pulso y calorías desde bandas de pecho Bluetooth (Coospo, Magene, Polar, Garmin…), en cualquier modo."
+    override val heartHowTo = "Moja los electrodos, ponte la banda y elígela abajo: la banda de cada jugador se elige una sola vez."
+    override val strapFor: (String) -> String = { "Banda de $it" }
+    override val noStrap = "Ninguna"
+    override val strapSearching = "Buscando bandas…"
+    override val strapConnected = "Conectada"
+    override val strapConnecting = "Conectando…"
+    override val strapWaiting = "En espera: póntela y moja los electrodos"
+    override val strapNoContact = "No toca la piel"
+    override val heartAge = "Edad"
+    override val heartWeight = "Peso (kg)"
+    override val heartMale = "Hombre"
+    override val heartFemale = "Mujer"
+    override val heartProfileHint = "La edad, el peso y el sexo solo sirven para estimar las calorías."
+    override val heartStat = "Pulso"
+    override val heartAvg = "Pulso medio"
+    override val heartMax = "Pulso máximo"
+    override val heartCalories = "Calorías (estimación)"
+    override val heartChart = "Pulso durante el partido"
+    override val heartLine: (Int, Int) -> String = { a, m -> "medio $a · máx. $m lpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (estimación)" }
+    override val heartStatsHint = "Calorías estimadas a partir del pulso con la fórmula de Keytel: el error típico es del 20 %."
+    override val heartZones = "Tiempo en zonas de pulso"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Muy suave", "Suave", "Moderada", "Intensa", "Máxima").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zonas en porcentaje del pulso máximo estimado por la edad (208 − 0,7 × edad): hace falta la edad de quien lleva la banda."
     override val bandFor: (String) -> String = { "Pulsera de $it" }
     override val noBand = "Ninguna"
     override val bandConnected = "Conectada"
@@ -10930,6 +12059,34 @@ object FrStrings : Strings {
     override val enable = "Activer"
     override val allow = "Autoriser"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Fréquence cardiaque"
+    override val heartRate = "Ceintures cardio"
+    override val heartRateHint = "Fréquence cardiaque et calories avec des ceintures thoraciques Bluetooth (Coospo, Magene, Polar, Garmin…), dans tous les modes."
+    override val heartHowTo = "Mouillez les électrodes, mettez la ceinture et choisissez-la ci-dessous : la ceinture de chaque joueur se choisit une seule fois."
+    override val strapFor: (String) -> String = { "Ceinture ${de(it)}" }
+    override val noStrap = "Aucune"
+    override val strapSearching = "Recherche des ceintures…"
+    override val strapConnected = "Connectée"
+    override val strapConnecting = "Connexion…"
+    override val strapWaiting = "En attente : mettez-la et mouillez les électrodes"
+    override val strapNoContact = "Pas de contact avec la peau"
+    override val heartAge = "Âge"
+    override val heartWeight = "Poids (kg)"
+    override val heartMale = "Homme"
+    override val heartFemale = "Femme"
+    override val heartProfileHint = "L'âge, le poids et le sexe servent seulement à estimer les calories."
+    override val heartStat = "Cœur"
+    override val heartAvg = "Fréquence moyenne"
+    override val heartMax = "Fréquence maximale"
+    override val heartCalories = "Calories (estimation)"
+    override val heartChart = "Fréquence cardiaque pendant le match"
+    override val heartLine: (Int, Int) -> String = { a, m -> "moyenne $a · max $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (estimation)" }
+    override val heartStatsHint = "Calories estimées à partir de la fréquence cardiaque avec la formule de Keytel : l'erreur typique est de 20 %."
+    override val heartZones = "Temps dans les zones cardio"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Très légère", "Légère", "Modérée", "Intense", "Maximale").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zones en pourcentage de la fréquence maximale estimée d'après l'âge (208 − 0,7 × âge) : il faut l'âge de la personne qui porte la ceinture."
     override val bandFor: (String) -> String = { "Bracelet ${de(it)}" }
     override val noBand = "Aucun"
     override val bandConnected = "Connecté"
@@ -11466,6 +12623,34 @@ object PtStrings : Strings {
     override val enable = "Ativar"
     override val allow = "Permitir"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Frequência cardíaca"
+    override val heartRate = "Cintas cardíacas"
+    override val heartRateHint = "Batimentos e calorias de cintas peitorais Bluetooth (Coospo, Magene, Polar, Garmin…), em qualquer modo."
+    override val heartHowTo = "Molhe os eletrodos, coloque a cinta e escolha-a abaixo: a cinta de cada jogador é escolhida uma vez só."
+    override val strapFor: (String) -> String = { "Cinta de $it" }
+    override val noStrap = "Nenhuma"
+    override val strapSearching = "Procurando cintas…"
+    override val strapConnected = "Conectada"
+    override val strapConnecting = "Conectando…"
+    override val strapWaiting = "Aguardando: coloque-a e molhe os eletrodos"
+    override val strapNoContact = "Sem contato com a pele"
+    override val heartAge = "Idade"
+    override val heartWeight = "Peso (kg)"
+    override val heartMale = "Homem"
+    override val heartFemale = "Mulher"
+    override val heartProfileHint = "Idade, peso e sexo servem apenas para estimar as calorias."
+    override val heartStat = "Batimentos"
+    override val heartAvg = "Média de batimentos"
+    override val heartMax = "Batimento máximo"
+    override val heartCalories = "Calorias (estimativa)"
+    override val heartChart = "Batimentos durante a partida"
+    override val heartLine: (Int, Int) -> String = { a, m -> "média $a · máx. $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (estimativa)" }
+    override val heartStatsHint = "Calorias estimadas a partir dos batimentos com a fórmula de Keytel: o erro típico é de 20%."
+    override val heartZones = "Tempo nas zonas cardíacas"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Muito leve", "Leve", "Moderada", "Intensa", "Máxima").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zonas em porcentagem do batimento máximo estimado pela idade (208 − 0,7 × idade): é preciso a idade de quem usa a cinta."
     override val bandFor: (String) -> String = { "Pulseira de $it" }
     override val noBand = "Nenhuma"
     override val bandConnected = "Conectada"
@@ -12523,6 +13708,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -12571,6 +13757,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
@@ -12606,6 +13793,7 @@ fun MatchScreen(c: MatchController) {
     val serveOrder by c.serveOrderPrompt.collectAsState()
     val o by c.options.collectAsState()
     val bands by c.ble.bands.collectAsState()
+    val straps by c.heart.straps.collectAsState()
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
@@ -12622,6 +13810,7 @@ fun MatchScreen(c: MatchController) {
         TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
+        if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -12838,6 +14027,24 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             Icons.Filled.Tune, null, tint = TsmColors.TextDim,
             modifier = Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).clickable { onOpen(Side.P1) },
         )
+    }
+}
+
+/** Battito dal vivo delle fasce: "♥ G1 142"; "--" se la fascia non manda (staccata, asciutta, lontana). */
+@Composable
+private fun HeartRow(straps: Map<Side, StrapInfo>) {
+    val s = LocalStrings.current
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (side in Side.entries) {
+            val st = straps[side] ?: continue
+            val bpm = st.bpm
+            Pill(
+                "${s.playerTag(side.ordinal + 1)} · ${bpm ?: "--"} bpm",
+                if (bpm != null) TsmColors.player(side) else TsmColors.SurfaceHigh,
+                if (bpm != null) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                Icons.Filled.Favorite,
+            )
+        }
     }
 }
 
@@ -13127,12 +14334,14 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MatchStatsPane
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13150,6 +14359,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -13159,6 +14370,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.HeartStats
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.MatchStats
 import com.tennis.scoremanager.data.Names
@@ -13242,6 +14454,12 @@ fun MatchStatsTab(rec: MatchRecord, names: Names) {
         ))
         // Colpi per tipo e velocità: i braccialetti li contano sulla partita intera, non per set.
         if (period == null) strokeStats(rec, s)?.let { StatSection(s.strokes, it) }
+        // Battito delle fasce cardio: sulla partita intera, con il grafico nel tempo.
+        if (period == null) heartStats(rec, s)?.let { rows ->
+            StatSection(s.heartStat, rows)
+            StatCard(s.heartChart) { HeartChart(rec) }
+            StatCard(s.heartZones) { HeartZones(rec, names) }
+        }
         MatchStats.rally(pts, period)?.let { r ->
             StatCard(s.strokesPerPoint) {
                 Text(Reports.rallyLine(r, s, rec.options.lang), color = TsmColors.TextMain, fontSize = 13.sp, textAlign = TextAlign.Center,
@@ -13264,6 +14482,101 @@ private fun strokeStats(rec: MatchRecord, s: Strings): List<Stat>? {
     return listOf(Stat(s.statStrokesTotal, a?.total ?: 0, b?.total ?: 0)) +
         (0 until BandProtocol.STROKE_COUNT).map { Stat(s.strokeName(it), a?.count(it) ?: 0, b?.count(it) ?: 0) } +
         listOfNotNull(Stat("${s.statAvgWristSpeed} (°/s)", avg(a), avg(b)).takeIf { it.a > 0 || it.b > 0 })
+}
+
+private fun heartStats(rec: MatchRecord, s: Strings): List<Stat>? {
+    val a = HeartStats.summary(rec.heart[Side.P1])
+    val b = HeartStats.summary(rec.heart[Side.P2])
+    if (a == null && b == null) return null
+    return listOfNotNull(
+        Stat("${s.heartAvg} (bpm)", a?.avg ?: 0, b?.avg ?: 0),
+        Stat("${s.heartMax} (bpm)", a?.max ?: 0, b?.max ?: 0),
+        Stat("${s.heartCalories} (kcal)", a?.kcal ?: 0, b?.kcal ?: 0).takeIf { it.a > 0 || it.b > 0 },
+    )
+}
+
+/** Battito nel tempo, una linea per lato nel suo colore; i buchi (pause, fascia staccata) interrompono la linea. */
+@Composable
+private fun HeartChart(rec: MatchRecord) {
+    val tracks = Side.entries.mapNotNull { side -> rec.heart[side]?.takeIf { it.size > 1 }?.let { side to it } }
+    if (tracks.isEmpty()) return
+    val all = tracks.flatMap { (_, t) -> t.bpm.take(t.size) }
+    val lo = (all.min() - 5).coerceAtLeast(30)
+    val hi = all.max() + 5
+    val end = tracks.maxOf { (_, t) -> t.t[t.size - 1] }.coerceAtLeast(1)
+    Row(Modifier.fillMaxWidth().height(140.dp)) {
+        Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
+            Text("$hi", color = TsmColors.TextDim, fontSize = 10.sp)
+            Text("$lo", color = TsmColors.TextDim, fontSize = 10.sp)
+        }
+        Spacer(Modifier.width(6.dp))
+        Canvas(Modifier.weight(1f).fillMaxHeight()) {
+            fun x(sec: Int) = sec.toFloat() / end * size.width
+            fun y(bpm: Int) = size.height - (bpm - lo).toFloat() / (hi - lo) * size.height
+            for ((side, t) in tracks) {
+                val path = Path()
+                for (i in 0 until t.size) {
+                    val gap = i == 0 || t.t[i] - t.t[i - 1] > 2 * HeartStats.STEP_S
+                    if (gap) path.moveTo(x(t.t[i]), y(t.bpm[i])) else path.lineTo(x(t.t[i]), y(t.bpm[i]))
+                }
+                drawPath(path, TsmColors.player(side), style = Stroke(width = 2.dp.toPx()))
+            }
+        }
+    }
+    Text(Reports.duration(end * 1000L), color = TsmColors.TextDim, fontSize = 10.sp, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+}
+
+/** Dalla zona 1 alla 5: dal grigio al rosso. */
+private val ZoneColors = listOf(Color(0xFF9AA8BD), Color(0xFF4CAF50), Color(0xFFC6F432), Color(0xFFFF9800), Color(0xFFFF3B30))
+
+/** Una torta per lato con il tempo in ciascuna zona, e sotto la legenda con le percentuali dei due lati. */
+@Composable
+private fun HeartZones(rec: MatchRecord, names: Names) {
+    val s = LocalStrings.current
+    val zones = Side.entries.associateWith { side ->
+        val t = rec.heart[side]
+        t?.profile?.let { HeartStats.zoneSeconds(t, it.age) }?.takeIf { it.sum() > 0 }
+    }
+    if (zones.values.all { it == null }) {
+        Text(s.heartZonesHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        return
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        for (side in Side.entries) {
+            val z = zones[side] ?: continue
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Canvas(Modifier.size(110.dp)) {
+                    val total = z.sum().toFloat()
+                    var start = -90f
+                    val w = 22.dp.toPx()
+                    for (i in z.indices) {
+                        val sweep = z[i] / total * 360f
+                        if (sweep > 0f) {
+                            drawArc(ZoneColors[i], start, sweep, useCenter = false, style = Stroke(width = w),
+                                topLeft = androidx.compose.ui.geometry.Offset(w / 2, w / 2),
+                                size = androidx.compose.ui.geometry.Size(size.width - w, size.height - w))
+                        }
+                        start += sweep
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(names.short(side), color = TsmColors.player(side), fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+    for (i in 0 until HeartStats.ZONES) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(10.dp).clip(RoundedCornerShape(2.dp)).background(ZoneColors[i]))
+            Spacer(Modifier.width(8.dp))
+            Text(s.zoneName(i), color = TsmColors.TextMain, fontSize = 12.sp, modifier = Modifier.weight(1f))
+            Text(
+                Side.entries.mapNotNull { side -> zones[side]?.let { z -> "${s.playerTag(side.ordinal + 1)} ${pct(z[i], z.sum())}%" } }
+                    .joinToString(" · "),
+                color = TsmColors.TextDim, fontSize = 12.sp,
+            )
+        }
+    }
 }
 
 @Composable
@@ -13554,6 +14867,7 @@ import com.tennis.scoremanager.model.MatchFormat
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.remote.RemoteInfo
 import com.tennis.scoremanager.ui.BandSettingsPanel
+import com.tennis.scoremanager.ui.HeartSection
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -13593,6 +14907,7 @@ fun OptionsScreen(c: MatchController) {
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permTick++
         c.ble.reconnectAll()
+        c.heart.reconnectAll()
     }
     val btLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { permTick++ }
 
@@ -13696,6 +15011,14 @@ fun OptionsScreen(c: MatchController) {
             }
             if (o.mode == PlayMode.REMOTES) RemotesSection(c, names)
         }
+
+        // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
+        HeartSection(
+            c, names, btOn = btOn,
+            permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
+            onEnableBluetooth = { enableBluetooth() },
+            onRequestPermissions = { if (blePerms && !locOn) openLocationSettings() else requestBandPermissions() },
+        )
 
         // Lingua
         SectionCard(s.languageSection, Icons.Filled.Language) {
@@ -14875,6 +16198,7 @@ import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Replay
@@ -15096,6 +16420,9 @@ private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
             Reports.wristSpeedLine(rec, side, s)?.let { InfoRow(Icons.Filled.Speed, "${s.wristSpeed} ${names.short(side)}", it) }
         }
         Reports.rallyStats(rec)?.let { InfoRow(Icons.Filled.SwapHoriz, s.strokesPerPoint, Reports.rallyLine(it, s, lang)) }
+        for (side in Side.entries) {
+            Reports.heartLine(rec, side, s)?.let { InfoRow(Icons.Filled.Favorite, "${s.heartStat} ${names.short(side)}", it) }
+        }
     }
 }
 
@@ -16462,7 +17789,7 @@ class CallBuilder(private val lang: Lang) {
         const val TAG_PLAY = "play"
         private const val SHORT = 300L
         private const val MEDIUM = 500L
-        private const val START_GAP = 2000L
+        private const val START_GAP = 1000L
     }
 
     private fun num(n: Int): Seg = if (n in 0..Phrases.MAX_NUMBER) Seg.Clip("num_$n") else Seg.Say(n.toString())
@@ -16470,7 +17797,7 @@ class CallBuilder(private val lang: Lang) {
     private fun serverName(s: MatchState, names: CallNames): String =
         if (s.rules.doubles) names.player(s.server, s.serverPlayer) else names.side(s.server)
 
-    /** "Primo set" · "[nome] al servizio" · "gioco" con due secondi tra una frase e l'altra. */
+    /** "Primo set" · "[nome] al servizio" · "gioco" con un secondo tra una frase e l'altra. */
     fun start(s: MatchState, names: CallNames): List<Seg> = listOf(
         // Partita di solo super tie-break: niente "primo set".
         Seg.Clip(if (s.tiebreak == TiebreakKind.MATCH) "match_tiebreak" else "first_set"),
@@ -17459,6 +18786,120 @@ class DataTest {
         assertEquals("Pádel · 3 sets · tie-break a 7 · Punto de oro · Dobles", Reports.formatLabel(rec, stringsFor(Lang.ES)))
         // Senza golden point (ai vantaggi) resta solo il nome dello sport.
         assertEquals("Padel · 3 sets · tie-break to 7 · Doubles", Reports.formatLabel(rec.copy(rules = rec.rules.copy(noAd = false)), EnStrings))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/HeartStatsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/HeartStatsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ble.HeartRateProtocol
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class HeartStatsTest {
+
+    private fun bytes(vararg v: Int) = ByteArray(v.size) { v[it].toByte() }
+
+    @Test
+    fun parsesEightBitHeartRate() {
+        val m = HeartRateProtocol.parse(bytes(0x00, 72))!!
+        assertEquals(72, m.bpm)
+        assertNull(m.contact)
+        assertTrue(m.rrMs.isEmpty())
+        assertTrue(m.valid)
+    }
+
+    @Test
+    fun parsesSixteenBitHeartRateWithContactAndRr() {
+        // 16 bit, contatto supportato e presente, RR: 1024 -> 1000 ms, 512 -> 500 ms
+        val m = HeartRateProtocol.parse(bytes(0x01 or 0x02 or 0x04 or 0x10, 0x2C, 0x01, 0x00, 0x04, 0x00, 0x02))!!
+        assertEquals(300, m.bpm)
+        assertEquals(true, m.contact)
+        assertEquals(listOf(1000, 500), m.rrMs)
+        assertFalse(m.valid)  // 300 bpm non è un battito vero
+    }
+
+    @Test
+    fun skipsEnergyBeforeRr() {
+        val m = HeartRateProtocol.parse(bytes(0x08 or 0x10, 150, 0x10, 0x00, 0x00, 0x03))!!
+        assertEquals(150, m.bpm)
+        assertEquals(listOf(750), m.rrMs)
+    }
+
+    @Test
+    fun noSkinContactIsNotValid() {
+        val m = HeartRateProtocol.parse(bytes(0x04, 0))!!
+        assertEquals(false, m.contact)
+        assertFalse(m.valid)
+        assertNull(HeartRateProtocol.parse(bytes(0x01, 0x10)))
+    }
+
+    @Test
+    fun keytelMatchesThePaper() {
+        // Uomo di 30 anni, 75 kg, 140 bpm: (-55.0969 + 0.6309*140 + 0.1988*75 + 0.2017*30) / 4.184 ≈ 12.95 kcal/min
+        assertEquals(12.95, HeartStats.kcalPerMinute(140, HeartProfile(30, 75)), 0.01)
+        // Donna di 30 anni, 60 kg, 140 bpm: (-20.4022 + 0.4472*140 - 0.1263*60 + 0.074*30) / 4.184 ≈ 8.81
+        assertEquals(8.81, HeartStats.kcalPerMinute(140, HeartProfile(30, 60, female = true)), 0.01)
+        assertEquals(0.0, HeartStats.kcalPerMinute(50, HeartProfile(30, 75)), 0.0)
+    }
+
+    @Test
+    fun summaryOfAnHour() {
+        val n = 3600 / HeartStats.STEP_S
+        val track = HeartTrack(t = List(n) { it * HeartStats.STEP_S }, bpm = List(n) { if (it % 2 == 0) 130 else 150 }, profile = HeartProfile(30, 75))
+        val s = HeartStats.summary(track)!!
+        assertEquals(140, s.avg)
+        assertEquals(150, s.max)
+        assertEquals(130, s.min)
+        assertEquals(60, s.minutes)
+        assertEquals(777.0, s.kcal!!.toDouble(), 2.0)
+    }
+
+    @Test
+    fun gapsDoNotCount() {
+        // 10 minuti, un'ora di sospensione, altri 10 minuti: contano 20 minuti, non 80.
+        val first = List(120) { it * 5 }
+        val second = List(120) { 4200 + it * 5 }
+        val track = HeartTrack(t = first + second, bpm = List(240) { 140 }, profile = HeartProfile(30, 75))
+        val s = HeartStats.summary(track)!!
+        assertEquals(20, s.minutes)
+        assertEquals(259.0, s.kcal!!.toDouble(), 2.0)
+    }
+
+    @Test
+    fun noProfileNoCalories() {
+        assertNull(HeartStats.summary(HeartTrack(listOf(0), listOf(120)))!!.kcal)
+        assertNull(HeartStats.summary(HeartTrack()))
+        assertNull(HeartStats.profile(30, null, false))
+        assertNull(HeartStats.profile(150, 70, false))
+        assertEquals(HeartProfile(45, 82, false), HeartStats.profile(45, 82, false))
+    }
+
+    @Test
+    fun zones() {
+        // 30 anni: massimo 187. 100 bpm (53%) zona 1, 140 (75%) zona 3, 180 (96%) zona 5; 60 bpm (32%) va in zona 1.
+        assertEquals(187, HeartStats.maxBpm(30))
+        val track = HeartTrack(t = listOf(0, 5, 10, 15), bpm = listOf(100, 140, 180, 60))
+        assertEquals(listOf(10, 0, 5, 0, 5), HeartStats.zoneSeconds(track, 30))
+        assertTrue(HeartStats.zoneSeconds(HeartTrack(), 30).isEmpty())
+    }
+
+    @Test
+    fun bucketAverages() {
+        val b = HeartBucket()
+        assertNull(b.take())
+        b.add(120)
+        b.add(125)
+        assertEquals(123, b.take())
+        assertNull(b.take())
     }
 }
 TSM_EOF
@@ -23534,6 +24975,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 87 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 92 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

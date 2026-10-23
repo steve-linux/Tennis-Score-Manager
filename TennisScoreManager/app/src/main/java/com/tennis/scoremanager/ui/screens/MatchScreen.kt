@@ -39,6 +39,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
@@ -87,6 +88,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.Reports
@@ -122,6 +124,7 @@ fun MatchScreen(c: MatchController) {
     val serveOrder by c.serveOrderPrompt.collectAsState()
     val o by c.options.collectAsState()
     val bands by c.ble.bands.collectAsState()
+    val straps by c.heart.straps.collectAsState()
     val names = remember(lm.record.setup, s) { Names(lm.record.setup, s) }
     val state = lm.state
     val suspended = lm.record.suspended
@@ -138,6 +141,7 @@ fun MatchScreen(c: MatchController) {
         TimersRow(clock, cd, s) { TvChip(c) }
         if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
         if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
+        if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
         MessageBox(msg)
         Scoreboard(state, names, s)
         Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -354,6 +358,24 @@ private fun BandStatusRow(bands: Map<Side, BandInfo>, battery: Map<Side, com.ten
             Icons.Filled.Tune, null, tint = TsmColors.TextDim,
             modifier = Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).clickable { onOpen(Side.P1) },
         )
+    }
+}
+
+/** Battito dal vivo delle fasce: "♥ G1 142"; "--" se la fascia non manda (staccata, asciutta, lontana). */
+@Composable
+private fun HeartRow(straps: Map<Side, StrapInfo>) {
+    val s = LocalStrings.current
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (side in Side.entries) {
+            val st = straps[side] ?: continue
+            val bpm = st.bpm
+            Pill(
+                "${s.playerTag(side.ordinal + 1)} · ${bpm ?: "--"} bpm",
+                if (bpm != null) TsmColors.player(side) else TsmColors.SurfaceHigh,
+                if (bpm != null) TsmColors.onPlayer(side) else TsmColors.TextDim,
+                Icons.Filled.Favorite,
+            )
+        }
     }
 }
 

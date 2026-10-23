@@ -67,6 +67,37 @@ interface Strings {
     val enable: String
     val allow: String
     val ok: String
+    // Fasce cardio
+    val heartSection: String
+    val heartRate: String
+    val heartRateHint: String
+    val heartHowTo: String
+    val strapFor: (String) -> String
+    val noStrap: String
+    val strapSearching: String
+    val strapConnected: String
+    val strapConnecting: String
+    val strapWaiting: String
+    val strapNoContact: String
+    val heartAge: String
+    val heartWeight: String
+    val heartMale: String
+    val heartFemale: String
+    val heartProfileHint: String
+    val heartStat: String
+    val heartAvg: String
+    val heartMax: String
+    val heartCalories: String
+    val heartChart: String
+    /** "medio 138 · max 176 bpm" */
+    val heartLine: (Int, Int) -> String
+    /** "~620 kcal (stima)" */
+    val caloriesLine: (Int) -> String
+    val heartStatsHint: String
+    val heartZones: String
+    /** "Z3 Moderata": zone da 0 a 4. */
+    val zoneName: (Int) -> String
+    val heartZonesHint: String
     val bandFor: (String) -> String
     val noBand: String
     val bandConnected: String
@@ -609,6 +640,34 @@ object ItStrings : Strings {
     override val enable = "Attiva"
     override val allow = "Consenti"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Battito cardiaco"
+    override val heartRate = "Fasce cardio"
+    override val heartRateHint = "Battito e calorie da fasce toraciche Bluetooth (Coospo, Magene, Polar, Garmin…), con qualsiasi modalità."
+    override val heartHowTo = "Bagna gli elettrodi, indossa la fascia e sceglila qui sotto: la fascia di ogni giocatore va scelta una volta sola."
+    override val strapFor: (String) -> String = { "Fascia di $it" }
+    override val noStrap = "Nessuna"
+    override val strapSearching = "Ricerca delle fasce…"
+    override val strapConnected = "Collegata"
+    override val strapConnecting = "Collegamento…"
+    override val strapWaiting = "In attesa: indossala e bagna gli elettrodi"
+    override val strapNoContact = "Non tocca la pelle"
+    override val heartAge = "Età"
+    override val heartWeight = "Peso (kg)"
+    override val heartMale = "Uomo"
+    override val heartFemale = "Donna"
+    override val heartProfileHint = "Età, peso e sesso servono solo a stimare le calorie."
+    override val heartStat = "Battito"
+    override val heartAvg = "Battito medio"
+    override val heartMax = "Battito massimo"
+    override val heartCalories = "Calorie (stima)"
+    override val heartChart = "Battito durante la partita"
+    override val heartLine: (Int, Int) -> String = { a, m -> "medio $a · max $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (stima)" }
+    override val heartStatsHint = "Calorie stimate dal battito con la formula di Keytel: l'errore tipico è del 20%."
+    override val heartZones = "Tempo nelle zone cardio"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Molto leggera", "Leggera", "Moderata", "Intensa", "Massima").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zone in percentuale del battito massimo stimato dall'età (208 − 0,7 × età): serve l'età di chi indossa la fascia."
     override val bandFor: (String) -> String = { "Braccialetto di $it" }
     override val noBand = "Nessuno"
     override val bandConnected = "Connesso"
@@ -1127,6 +1186,34 @@ object EnStrings : Strings {
     override val enable = "Turn on"
     override val allow = "Allow"
     override val ok = "OK"
+    // Fasce cardio
+    override val heartSection = "Heart rate"
+    override val heartRate = "Heart rate straps"
+    override val heartRateHint = "Heart rate and calories from Bluetooth chest straps (Coospo, Magene, Polar, Garmin…), in any mode."
+    override val heartHowTo = "Wet the electrodes, put the strap on and pick it below: each player's strap only needs picking once."
+    override val strapFor: (String) -> String = { "$it's strap" }
+    override val noStrap = "None"
+    override val strapSearching = "Searching for straps…"
+    override val strapConnected = "Connected"
+    override val strapConnecting = "Connecting…"
+    override val strapWaiting = "Waiting: put it on and wet the electrodes"
+    override val strapNoContact = "Not touching the skin"
+    override val heartAge = "Age"
+    override val heartWeight = "Weight (kg)"
+    override val heartMale = "Man"
+    override val heartFemale = "Woman"
+    override val heartProfileHint = "Age, weight and sex are only used to estimate calories."
+    override val heartStat = "Heart rate"
+    override val heartAvg = "Average heart rate"
+    override val heartMax = "Maximum heart rate"
+    override val heartCalories = "Calories (estimate)"
+    override val heartChart = "Heart rate during the match"
+    override val heartLine: (Int, Int) -> String = { a, m -> "average $a · max $m bpm" }
+    override val caloriesLine: (Int) -> String = { "~$it kcal (estimate)" }
+    override val heartStatsHint = "Calories estimated from heart rate with the Keytel formula: the typical error is 20%."
+    override val heartZones = "Time in heart rate zones"
+    override val zoneName: (Int) -> String = { "Z${it + 1} " + listOf("Very light", "Light", "Moderate", "Hard", "Maximum").getOrElse(it) { "" } }
+    override val heartZonesHint = "Zones as a percentage of the maximum heart rate estimated from age (208 − 0.7 × age): the wearer's age is needed."
     override val bandFor: (String) -> String = { "$it's wristband" }
     override val noBand = "None"
     override val bandConnected = "Connected"

@@ -26,7 +26,13 @@ import com.tennis.scoremanager.ble.BandStroke
 import com.tennis.scoremanager.ble.BatteryModel
 import com.tennis.scoremanager.ble.BleManager
 import com.tennis.scoremanager.ble.FoundBand
+import com.tennis.scoremanager.ble.HeartMeasurement
+import com.tennis.scoremanager.ble.HeartRateManager
 import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.data.HeartBucket
+import com.tennis.scoremanager.data.HeartProfile
+import com.tennis.scoremanager.data.HeartStats
+import com.tennis.scoremanager.data.HeartTrack
 import com.tennis.scoremanager.data.LocationHelper
 import com.tennis.scoremanager.data.MatchLocation
 import com.tennis.scoremanager.data.MatchOptions
@@ -115,6 +121,7 @@ class MatchController(
     private val app: Application,
     val storage: Storage,
     val ble: BleManager,
+    val heart: HeartRateManager,
     val voice: VoicePack,
     val announcer: Announcer,
 ) {
@@ -169,6 +176,8 @@ class MatchController(
     val voiceCount = MutableStateFlow(0)
     val customVoiceCount = MutableStateFlow(0)
     val bandBattery = MutableStateFlow<Map<Side, BandBattery>>(emptyMap())
+    /** Chi indossa la fascia cardio di ciascun lato (per le calorie). */
+    val heartProfiles = MutableStateFlow(Side.entries.mapNotNull { side -> storage.heartProfile(side == Side.P1)?.let { side to it } }.toMap())
     private val batterySamples = mutableMapOf<Side, MutableList<Pair<Long, Int>>>()
     /** Primo stato della finestra di campioni: serve per sapere quanto è rimasto acceso il display nel frattempo. */
     private val statusStart = mutableMapOf<Side, BandStatus>()
@@ -208,6 +217,8 @@ class MatchController(
     private var lastUndoAt = 0L
     /** Colpi dei braccialetti dall'ultimo punto: diventano la lunghezza dello scambio del prossimo punto. */
     private var rallyStrokes = 0
+    /** Misure delle fasce arrivate negli ultimi [HeartStats.STEP_S] secondi, per lato. */
+    private val heartBuckets = Side.entries.associateWith { HeartBucket() }
     private var locationJob: Job? = null
     private var locationFor: String? = null
     /** Il riepilogo perso con il processo si riapre una volta sola, alla prima Activity. */
@@ -228,6 +239,7 @@ class MatchController(
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
         if (options.value.mode == PlayMode.BANDS) restoreBands()
+        if (options.value.heartRate) restoreStraps()
         remotes.enabled = options.value.mode == PlayMode.REMOTES
         remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
         refreshSaved()
@@ -236,6 +248,13 @@ class MatchController(
         scope.launch { ble.found.collect { autoFill(it) } }
         scope.launch { ble.status.collect { (side, st) -> onBandStatus(side, st) } }
         scope.launch { ble.strokes.collect { onBandStroke(it) } }
+        scope.launch { heart.readings.collect { (side, m) -> onHeartReading(side, m) } }
+        scope.launch {
+            while (true) {
+                delay(HeartStats.STEP_S * 1000L)
+                flushHeart()
+            }
+        }
         scope.launch { watchBands() }
         scope.launch { watchRemotes() }
         scope.launch {
@@ -281,7 +300,8 @@ class MatchController(
     }
 
     /** Serve il servizio in primo piano: braccialetti, oppure tabellone TV da tenere acceso. */
-    private fun needsService() = options.value.mode == PlayMode.BANDS || tv.value.enabled
+    private fun needsService() =
+        options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty()
 
     /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
@@ -379,11 +399,15 @@ class MatchController(
             if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
+        if (old.heartRate != v.heartRate) {
+            if (v.heartRate) restoreStraps() else heart.disconnectAll()
+        }
     }
 
     fun go(to: Screen) {
         if (to == Screen.START) refreshSaved()
         if (to == Screen.OPTIONS && options.value.mode == PlayMode.BANDS) ble.reconnectAll()
+        if (to == Screen.OPTIONS && options.value.heartRate) heart.reconnectAll()
         // Il servizio in primo piano parte ora che l'app è visibile: avviarlo dopo, da un KEY1 a schermo
         // bloccato, Android lo vieterebbe e la partita resterebbe senza protezione in background.
         if (to == Screen.START && needsService()) MatchService.start(app)
@@ -735,6 +759,62 @@ class MatchController(
         Side.entries.forEach { ble.send(it, BandProtocol.message(line1, line2, seconds)) }
     }
 
+    // ---------------------------------------------------------------- fasce cardio
+
+    private fun restoreStraps() {
+        storage.strapAddress(true)?.let { heart.assign(Side.P1, it, storage.strapName(true)) }
+        storage.strapAddress(false)?.let { heart.assign(Side.P2, it, storage.strapName(false)) }
+    }
+
+    fun assignStrap(side: Side, address: String?, name: String?) {
+        if (address != null && storage.strapAddress(side == Side.P2) == address) storage.setStrap(side == Side.P2, null, null)
+        storage.setStrap(side == Side.P1, address, name)
+        heart.assign(side, address, name)
+    }
+
+    /** Ricerca delle fasce mentre la loro sezione è aperta (e l'app in primo piano). */
+    fun setStrapScan(on: Boolean) = heart.setAutoScan(on && options.value.heartRate)
+
+    fun swapStraps() {
+        val p1 = storage.strapAddress(true) to storage.strapName(true)
+        val p2 = storage.strapAddress(false) to storage.strapName(false)
+        storage.setStrap(true, p2.first, p2.second)
+        storage.setStrap(false, p1.first, p1.second)
+        heart.swapSides()
+        val prof = heartProfiles.value
+        setHeartProfile(Side.P1, prof[Side.P2])
+        setHeartProfile(Side.P2, prof[Side.P1])
+    }
+
+    fun setHeartProfile(side: Side, p: HeartProfile?) {
+        storage.setHeartProfile(side == Side.P1, p)
+        heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
+    }
+
+    /** Il battito conta come i colpi: a partita avviata e in corso, non nelle pause. */
+    private fun recordingHeart(lm: LiveMatch): Boolean =
+        screen.value == Screen.MATCH && lm.record.startedAt != null && !lm.record.suspended && !lm.state.isFinished
+
+    private fun onHeartReading(side: Side, m: HeartMeasurement) {
+        val lm = live.value ?: return
+        if (m.valid && recordingHeart(lm)) heartBuckets.getValue(side).add(m.bpm)
+    }
+
+    /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita. */
+    private fun flushHeart() {
+        val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
+        val lm = live.value ?: return
+        val start = lm.record.startedAt ?: return
+        if (values.isEmpty() || !recordingHeart(lm)) return
+        val sec = ((System.currentTimeMillis() - start) / 1000).toInt()
+        var heartMap = lm.record.heart
+        for ((side, bpm) in values) {
+            val track = heartMap[side] ?: HeartTrack()
+            heartMap = heartMap + (side to track.add(sec, bpm!!).copy(profile = track.profile ?: heartProfiles.value[side]))
+        }
+        setRecord(lm.record.copy(heart = heartMap))
+    }
+
     // ---------------------------------------------------------------- partita
 
     fun startMatch() {
@@ -948,6 +1028,7 @@ class MatchController(
             val total = currentClock()
             runningSince = null
             setRecord(lm.record.copy(suspended = true, clockMs = total))
+            heartBuckets.values.forEach { it.clear() }
             stopCountdown()
             announcer.stop()
             showMessage(s.msgSuspended)
@@ -965,9 +1046,11 @@ class MatchController(
         val endBattery = if (lm.record.options.mode == PlayMode.BANDS) {
             bandBattery.value.filterValues { !it.charging }.mapValues { it.value.percent }
         } else emptyMap()
+        // Età e peso detti a partita iniziata valgono lo stesso per le calorie.
+        val heartMap = lm.record.heart.mapValues { (side, t) -> t.copy(profile = t.profile ?: heartProfiles.value[side]) }
         val rec = lm.record.copy(
             finished = true, suspended = false, clockMs = currentClock(), updatedAt = System.currentTimeMillis(),
-            batteryEnd = endBattery,
+            batteryEnd = endBattery, heart = heartMap,
         )
         runningSince = null
         scope.launch(io) {
@@ -1656,6 +1739,7 @@ class MatchController(
             }
             if (options.value.mode == PlayMode.BANDS && options.value.bandsOffAtEnd) powerOffBands(s.bandAppClosed) { "" }
             ble.disconnectAll()
+            heart.disconnectAll()
             MatchService.stop(app)
             finish()
             delay(400)
