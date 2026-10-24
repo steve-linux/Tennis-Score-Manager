@@ -378,7 +378,9 @@ class MatchController(
                 if (lastPoints in 0 until played && lm.record.startedAt != null) {
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
                     val (set, game) = PointMarks.place(lm.state)
-                    relay.publishPoint(PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
+                    relay.publishPoint(
+                        PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game, p?.secondServe == true),
+                    )
                 }
                 lastPoints = played
             }

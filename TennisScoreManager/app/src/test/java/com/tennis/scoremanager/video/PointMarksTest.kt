@@ -35,6 +35,17 @@ class PointMarksTest {
     }
 
     @Test
+    fun secondServeAndDoubleFault() {
+        // Punto sulla seconda vinto da chi serve, poi doppio fallo: 15-15.
+        val first = PointMarks.stateAfter(rules, listOf(PointMark(1_000, "", 0, secondServe = true)), 1)
+        val p1 = PointMarks.mark(1_000, first, Side.P1, null, secondServe = true)
+        val df = PointMark(2_000, "", 1, kind = "DOUBLE_FAULT", secondServe = true)
+        val after = PointMarks.stateAfter(rules, listOf(p1, df), 2)
+        assertEquals(true, p1.secondServe)
+        assertEquals("0-0 15-15", PointMarks.score(after))
+    }
+
+    @Test
     fun setEnds() {
         // 6-0: 24 punti di G1; il punto che chiude il set appartiene ancora al set 0.
         val pts = tag(*IntArray(25) { if (it < 24) 0 else 1 })

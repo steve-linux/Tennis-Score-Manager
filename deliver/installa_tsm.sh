@@ -1194,7 +1194,9 @@ class MatchController(
                 if (lastPoints in 0 until played && lm.record.startedAt != null) {
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
                     val (set, game) = PointMarks.place(lm.state)
-                    relay.publishPoint(PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
+                    relay.publishPoint(
+                        PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game, p?.secondServe == true),
+                    )
                 }
                 lastPoints = played
             }
@@ -22669,9 +22671,9 @@ object PointMarks {
     }
 
     /** Il segno del punto appena giocato, con lo stato dopo il punto. */
-    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?): PointMark {
+    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game)
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe)
     }
 
     /** I punti segnati rigiocati con le regole: lo stato dopo i primi [n]. */
@@ -22680,6 +22682,7 @@ object PointMarks {
             MatchEvent.Point(
                 winner = if (p.winner == 1) Side.P2 else Side.P1,
                 kind = p.kind?.let { k -> runCatching { PointKind.valueOf(k) }.getOrNull() },
+                secondServe = p.secondServe,
             )
         })
 }
@@ -22750,6 +22753,8 @@ data class PointMark(
     /** Set (da 0) e game della partita (da 0, contati su tutti i set) in cui si è giocato il punto. */
     val set: Int = 0,
     val game: Int = 0,
+    /** Punto giocato sulla seconda di servizio (la prima era fuori). */
+    val secondServe: Boolean = false,
 )
 TSM_EOF
 
@@ -22814,9 +22819,14 @@ object VideoLibrary {
         return e.copy(chapters = ch)
     }
 
-    /** Un video scelto dal telefono: si tiene il permesso di leggerlo e si creano i capitoli, ancora senza punti. */
+    /**
+     * Un video scelto dal telefono: si tiene il permesso di leggerlo e si creano i capitoli, ancora senza punti.
+     * Se lo stesso video è già stato importato si riapre quello (con i punti già segnati), senza doppioni.
+     */
     fun import(context: Context, uri: Uri): Entry? = runCatching {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }
+            .maxByOrNull { it.chapters.points.size }?.let { return@runCatching it }
         val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: "video"
@@ -23060,46 +23070,81 @@ class VideoPlayerActivity : ComponentActivity() {
         val rules = ch.rules ?: return
         val points = ch.points
         val state = remember(ch) { PointMarks.stateAfter(rules, points, points.size) }
-        Text(str.videoTagHowTo, color = TsmColors.TextDim, fontSize = 11.sp)
-        Text(if (points.isEmpty()) "0-0" else PointMarks.score(state), color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        // Prima di servizio fuori: il prossimo punto si gioca sulla seconda; un altro fallo è doppio fallo.
+        var fault by remember(points.size) { mutableStateOf(false) }
+        // "Com'è finito?" compare dopo ogni punto segnato e sparisce appena si risponde (o si annulla).
+        var askKind by remember { mutableStateOf(false) }
+        fun add(winner: Side, kind: PointKind?) {
+            val last = points.lastOrNull()?.at ?: -1L
+            if (pos <= last) {
+                Toast.makeText(this, str.videoTagTooEarly, Toast.LENGTH_SHORT).show()
+                return
+            }
+            val probe = PointMark(pos, "", winner.ordinal, kind?.name, secondServe = fault)
+            val after = PointMarks.stateAfter(rules, points + probe, points.size + 1)
+            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault)))
+            askKind = kind == null
+        }
+        // Il pannello è basso (telefono in orizzontale): pulsanti a due a due, istruzioni solo prima del primo punto.
+        if (points.isEmpty()) Text(str.videoTagHowTo, color = TsmColors.TextDim, fontSize = 11.sp, lineHeight = 13.sp)
+        Text(
+            (if (points.isEmpty()) "0-0" else PointMarks.score(state)) + if (fault) " · ${str.secondServe}" else "",
+            color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+        )
         if (state.isFinished) return
-        for (side in Side.entries) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
-                onClick = {
-                    val last = points.lastOrNull()?.at ?: -1L
-                    if (pos <= last) {
-                        Toast.makeText(this, str.videoTagTooEarly, Toast.LENGTH_SHORT).show()
-                    } else {
-                        val after = PointMarks.stateAfter(rules, points + PointMark(pos, "", side.ordinal), points.size + 1)
-                        onChange(ch.copy(points = points + PointMarks.mark(pos, after, side, null)))
-                    }
-                },
-                shape = RoundedCornerShape(12.dp), color = TsmColors.player(side), modifier = Modifier.fillMaxWidth(),
+                onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
+                shape = RoundedCornerShape(10.dp), color = if (fault) TsmColors.Orange else TsmColors.SurfaceHigh, modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    str.videoPointFor(ch.names.getOrElse(side.ordinal) { str.playerTag(side.ordinal + 1) }),
-                    color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 10.dp),
+                    if (fault) str.btnDoubleFault else str.btnFault, color = if (fault) TsmColors.OnBall else TsmColors.TextMain,
+                    fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1,
+                    modifier = Modifier.padding(vertical = 7.dp),
                 )
             }
+            if (points.isNotEmpty()) {
+                NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.weight(1f)) {
+                    p.seekTo(Chapters.start(points, points.lastIndex))
+                    onChange(ch.copy(points = points.dropLast(1)))
+                    askKind = false
+                }
+            }
         }
-        if (points.isNotEmpty()) {
-            // Com'è finito l'ultimo punto (facoltativo): toccando di nuovo lo stesso si toglie.
-            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (side in Side.entries) {
+                Surface(
+                    onClick = { add(side, null) },
+                    shape = RoundedCornerShape(10.dp), color = TsmColors.player(side), modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        str.videoPointFor(ch.names.getOrElse(side.ordinal) { str.playerTag(side.ordinal + 1) }),
+                        color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center,
+                        maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+                    )
+                }
+            }
+        }
+        if (points.isNotEmpty() && askKind) {
+            // Com'è finito l'ultimo punto (facoltativo): un tocco e il pannello torna pronto per il punto dopo.
+            @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+            androidx.compose.foundation.layout.FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 for (k in listOf(PointKind.ACE, PointKind.DOUBLE_FAULT, PointKind.WINNER, PointKind.UNFORCED_ERROR, PointKind.FORCED_ERROR)) {
                     val on = points.last().kind == k.name
                     Surface(
-                        onClick = { onChange(ch.copy(points = points.dropLast(1) + points.last().copy(kind = if (on) null else k.name))) },
+                        onClick = {
+                            onChange(ch.copy(points = points.dropLast(1) + points.last().copy(kind = if (on) null else k.name)))
+                            askKind = false
+                        },
                         shape = RoundedCornerShape(16.dp), color = if (on) TsmColors.Ball else TsmColors.SurfaceHigh,
                     ) {
                         Text(str.videoKind(k.name), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 11.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp))
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
                     }
                 }
-            }
-            NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.fillMaxWidth()) {
-                p.seekTo(Chapters.start(points, points.lastIndex))
-                onChange(ch.copy(points = points.dropLast(1)))
             }
         }
     }
@@ -23149,8 +23194,9 @@ class VideoPlayerActivity : ComponentActivity() {
                 Text(pt.score, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (current) FontWeight.Bold else FontWeight.Normal)
                 val who = names.getOrNull(pt.winner)
                 val kind = pt.kind?.let { str.videoKind(it) }
-                if (who != null || kind != null) {
-                    Text(listOfNotNull(who, kind).joinToString(" · "), color = TsmColors.TextDim, fontSize = 11.sp)
+                val second = str.secondServe.takeIf { pt.secondServe && pt.kind != PointKind.DOUBLE_FAULT.name }
+                if (who != null || kind != null || second != null) {
+                    Text(listOfNotNull(who, kind, second).joinToString(" · "), color = TsmColors.TextDim, fontSize = 11.sp)
                 }
             }
             Text("${i + 1} · ${Chapters.time(startMs)}", color = TsmColors.TextDim, fontSize = 11.sp)
@@ -27158,6 +27204,17 @@ class PointMarksTest {
         // I primi quattro punti sono del game 0 (anche quello che lo chiude), il quinto del game 1.
         assertEquals(listOf(0, 0, 0, 0, 1), pts.map { it.game })
         assertEquals(listOf(0, 0, 0, 0, 0), pts.map { it.set })
+    }
+
+    @Test
+    fun secondServeAndDoubleFault() {
+        // Punto sulla seconda vinto da chi serve, poi doppio fallo: 15-15.
+        val first = PointMarks.stateAfter(rules, listOf(PointMark(1_000, "", 0, secondServe = true)), 1)
+        val p1 = PointMarks.mark(1_000, first, Side.P1, null, secondServe = true)
+        val df = PointMark(2_000, "", 1, kind = "DOUBLE_FAULT", secondServe = true)
+        val after = PointMarks.stateAfter(rules, listOf(p1, df), 2)
+        assertEquals(true, p1.secondServe)
+        assertEquals("0-0 15-15", PointMarks.score(after))
     }
 
     @Test

@@ -57,9 +57,14 @@ object VideoLibrary {
         return e.copy(chapters = ch)
     }
 
-    /** Un video scelto dal telefono: si tiene il permesso di leggerlo e si creano i capitoli, ancora senza punti. */
+    /**
+     * Un video scelto dal telefono: si tiene il permesso di leggerlo e si creano i capitoli, ancora senza punti.
+     * Se lo stesso video è già stato importato si riapre quello (con i punti già segnati), senza doppioni.
+     */
     fun import(context: Context, uri: Uri): Entry? = runCatching {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        list(context).filter { it.chapters.imported && it.chapters.uri == uri.toString() }
+            .maxByOrNull { it.chapters.points.size }?.let { return@runCatching it }
         val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: "video"

@@ -228,46 +228,81 @@ class VideoPlayerActivity : ComponentActivity() {
         val rules = ch.rules ?: return
         val points = ch.points
         val state = remember(ch) { PointMarks.stateAfter(rules, points, points.size) }
-        Text(str.videoTagHowTo, color = TsmColors.TextDim, fontSize = 11.sp)
-        Text(if (points.isEmpty()) "0-0" else PointMarks.score(state), color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        // Prima di servizio fuori: il prossimo punto si gioca sulla seconda; un altro fallo è doppio fallo.
+        var fault by remember(points.size) { mutableStateOf(false) }
+        // "Com'è finito?" compare dopo ogni punto segnato e sparisce appena si risponde (o si annulla).
+        var askKind by remember { mutableStateOf(false) }
+        fun add(winner: Side, kind: PointKind?) {
+            val last = points.lastOrNull()?.at ?: -1L
+            if (pos <= last) {
+                Toast.makeText(this, str.videoTagTooEarly, Toast.LENGTH_SHORT).show()
+                return
+            }
+            val probe = PointMark(pos, "", winner.ordinal, kind?.name, secondServe = fault)
+            val after = PointMarks.stateAfter(rules, points + probe, points.size + 1)
+            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault)))
+            askKind = kind == null
+        }
+        // Il pannello è basso (telefono in orizzontale): pulsanti a due a due, istruzioni solo prima del primo punto.
+        if (points.isEmpty()) Text(str.videoTagHowTo, color = TsmColors.TextDim, fontSize = 11.sp, lineHeight = 13.sp)
+        Text(
+            (if (points.isEmpty()) "0-0" else PointMarks.score(state)) + if (fault) " · ${str.secondServe}" else "",
+            color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+        )
         if (state.isFinished) return
-        for (side in Side.entries) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Surface(
-                onClick = {
-                    val last = points.lastOrNull()?.at ?: -1L
-                    if (pos <= last) {
-                        Toast.makeText(this, str.videoTagTooEarly, Toast.LENGTH_SHORT).show()
-                    } else {
-                        val after = PointMarks.stateAfter(rules, points + PointMark(pos, "", side.ordinal), points.size + 1)
-                        onChange(ch.copy(points = points + PointMarks.mark(pos, after, side, null)))
-                    }
-                },
-                shape = RoundedCornerShape(12.dp), color = TsmColors.player(side), modifier = Modifier.fillMaxWidth(),
+                onClick = { if (fault) add(state.receiver, PointKind.DOUBLE_FAULT) else fault = true },
+                shape = RoundedCornerShape(10.dp), color = if (fault) TsmColors.Orange else TsmColors.SurfaceHigh, modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    str.videoPointFor(ch.names.getOrElse(side.ordinal) { str.playerTag(side.ordinal + 1) }),
-                    color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 10.dp),
+                    if (fault) str.btnDoubleFault else str.btnFault, color = if (fault) TsmColors.OnBall else TsmColors.TextMain,
+                    fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 1,
+                    modifier = Modifier.padding(vertical = 7.dp),
                 )
             }
+            if (points.isNotEmpty()) {
+                NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.weight(1f)) {
+                    p.seekTo(Chapters.start(points, points.lastIndex))
+                    onChange(ch.copy(points = points.dropLast(1)))
+                    askKind = false
+                }
+            }
         }
-        if (points.isNotEmpty()) {
-            // Com'è finito l'ultimo punto (facoltativo): toccando di nuovo lo stesso si toglie.
-            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (side in Side.entries) {
+                Surface(
+                    onClick = { add(side, null) },
+                    shape = RoundedCornerShape(10.dp), color = TsmColors.player(side), modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        str.videoPointFor(ch.names.getOrElse(side.ordinal) { str.playerTag(side.ordinal + 1) }),
+                        color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center,
+                        maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+                    )
+                }
+            }
+        }
+        if (points.isNotEmpty() && askKind) {
+            // Com'è finito l'ultimo punto (facoltativo): un tocco e il pannello torna pronto per il punto dopo.
+            @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+            androidx.compose.foundation.layout.FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 for (k in listOf(PointKind.ACE, PointKind.DOUBLE_FAULT, PointKind.WINNER, PointKind.UNFORCED_ERROR, PointKind.FORCED_ERROR)) {
                     val on = points.last().kind == k.name
                     Surface(
-                        onClick = { onChange(ch.copy(points = points.dropLast(1) + points.last().copy(kind = if (on) null else k.name))) },
+                        onClick = {
+                            onChange(ch.copy(points = points.dropLast(1) + points.last().copy(kind = if (on) null else k.name)))
+                            askKind = false
+                        },
                         shape = RoundedCornerShape(16.dp), color = if (on) TsmColors.Ball else TsmColors.SurfaceHigh,
                     ) {
                         Text(str.videoKind(k.name), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 11.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp))
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
                     }
                 }
-            }
-            NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.fillMaxWidth()) {
-                p.seekTo(Chapters.start(points, points.lastIndex))
-                onChange(ch.copy(points = points.dropLast(1)))
             }
         }
     }
@@ -317,8 +352,9 @@ class VideoPlayerActivity : ComponentActivity() {
                 Text(pt.score, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (current) FontWeight.Bold else FontWeight.Normal)
                 val who = names.getOrNull(pt.winner)
                 val kind = pt.kind?.let { str.videoKind(it) }
-                if (who != null || kind != null) {
-                    Text(listOfNotNull(who, kind).joinToString(" · "), color = TsmColors.TextDim, fontSize = 11.sp)
+                val second = str.secondServe.takeIf { pt.secondServe && pt.kind != PointKind.DOUBLE_FAULT.name }
+                if (who != null || kind != null || second != null) {
+                    Text(listOfNotNull(who, kind, second).joinToString(" · "), color = TsmColors.TextDim, fontSize = 11.sp)
                 }
             }
             Text("${i + 1} · ${Chapters.time(startMs)}", color = TsmColors.TextDim, fontSize = 11.sp)

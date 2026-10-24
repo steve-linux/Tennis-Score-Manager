@@ -31,9 +31,9 @@ object PointMarks {
     }
 
     /** Il segno del punto appena giocato, con lo stato dopo il punto. */
-    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?): PointMark {
+    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game)
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe)
     }
 
     /** I punti segnati rigiocati con le regole: lo stato dopo i primi [n]. */
@@ -42,6 +42,7 @@ object PointMarks {
             MatchEvent.Point(
                 winner = if (p.winner == 1) Side.P2 else Side.P1,
                 kind = p.kind?.let { k -> runCatching { PointKind.valueOf(k) }.getOrNull() },
+                secondServe = p.secondServe,
             )
         })
 }

@@ -61,4 +61,6 @@ data class PointMark(
     /** Set (da 0) e game della partita (da 0, contati su tutti i set) in cui si è giocato il punto. */
     val set: Int = 0,
     val game: Int = 0,
+    /** Punto giocato sulla seconda di servizio (la prima era fuori). */
+    val secondServe: Boolean = false,
 )
