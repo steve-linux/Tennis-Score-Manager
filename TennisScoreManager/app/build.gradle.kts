@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
     implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
+    implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

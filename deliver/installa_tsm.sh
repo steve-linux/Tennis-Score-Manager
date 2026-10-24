@@ -37,6 +37,7 @@ mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/transfer"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens"
+mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/video"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/workout"
 mkdir -p "$DEST/app/src/main/res/drawable"
@@ -130,6 +131,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
     implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
+    implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
@@ -190,6 +192,9 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <!-- Secondo telefono per le fasce: il principale crea una rete solo locale, il satellite ci entra da solo.
          Da Android 13 basta "Dispositivi nelle vicinanze", che non serve a localizzare -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- Telefono-telecamera: video e audio della partita (registrazione e diretta) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="tiramisu" />
@@ -239,6 +244,14 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
 
         <activity
             android:name=".tv.DisplayActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
+            android:launchMode="singleTask" />
+
+        <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
+        <activity
+            android:name=".video.CameraActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
@@ -861,6 +874,8 @@ import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.workout.WorkoutSession
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressPdf
@@ -1154,6 +1169,24 @@ class MatchController(
             }
         }
         scope.launch { watchBands() }
+        scope.launch {
+            // Telefono-telecamera: punteggio per la grafica a ogni cambiamento e un segno a ogni punto (capitoli).
+            var lastPoints = -1
+            live.collect { lm ->
+                if (lm == null) {
+                    relay.publishScore(null)
+                    lastPoints = -1
+                    return@collect
+                }
+                relay.publishScore(scoreOverlay(lm))
+                val played = lm.state.pointsPlayed
+                if (lastPoints in 0 until played && lm.record.startedAt != null) {
+                    val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
+                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name))
+                }
+                lastPoints = played
+            }
+        }
         scope.launch { watchRemotes() }
         scope.launch {
             while (true) {
@@ -1747,6 +1780,19 @@ class MatchController(
         strapGaps.getOrPut(addr) { StrapGaps() }.onReading(at)
     }
 
+    /** La grafica del punteggio per la telecamera, con la scritta di pressione (palla break, set point...). */
+    private fun scoreOverlay(lm: LiveMatch): ScoreOverlay {
+        val n = names(lm.record.setup)
+        val title = listOf(lm.record.setup.club, lm.record.setup.court).filter { it.isNotBlank() }.joinToString(" · ")
+        val banner = if (lm.state.isFinished) null else pressureMessage(lm.state)
+        return ScoreOverlay.from(lm.state, Side.entries.map { n.short(it) }, banner, title)
+    }
+
+    /** "6-4 3-2 30-15": il punteggio dopo un punto, per i capitoli del video. */
+    private fun scoreText(state: MatchState): String =
+        (state.sets.map { "${it.g1}-${it.g2}" } + if (state.isFinished) emptyList() else listOf("${state.g1}-${state.g2}", "${state.pointLabel(Side.P1)}-${state.pointLabel(Side.P2)}"))
+            .joinToString(" ")
+
     /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
     private fun flushHeart() {
         val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
@@ -1782,9 +1828,9 @@ class MatchController(
         }
     }
 
-    /** Testo del QR del principale: questo telefono diventa satellite. */
-    fun joinRelay(text: String) {
-        if (!relay.startSatellite(text)) {
+    /** Testo del QR del principale: questo telefono diventa satellite (con [camera], telefono-telecamera). */
+    fun joinRelay(text: String, camera: Boolean = false) {
+        if (!relay.startSatellite(text, camera)) {
             _toasts.tryEmit(strings.transferBadCode)
             return
         }
@@ -6788,6 +6834,17 @@ class Storage(context: Context) {
         get() = prefs.getString("display_host", null)
         set(v) = prefs.edit().putString("display_host", v).apply()
 
+    /** Telefono-telecamera: server RTMP della diretta (di serie YouTube) e chiave di trasmissione. */
+    var streamUrl: String
+        get() = prefs.getString("stream_url", null) ?: "rtmp://a.rtmp.youtube.com/live2"
+        set(v) = prefs.edit().putString("stream_url", v.trim()).apply()
+    var streamKey: String
+        get() = prefs.getString("stream_key", null) ?: ""
+        set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+    var cameraOverlay: Boolean
+        get() = prefs.getBoolean("camera_overlay", true)
+        set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
 
@@ -7946,12 +8003,16 @@ import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvServer
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -7979,6 +8040,10 @@ data class RelayUi(
     val joinByHand: Boolean = false,
     /** Satellite: indirizzo del tabellone del principale (host:porta), da mostrare a schermo intero. */
     val tv: String? = null,
+    /** Satellite che fa da telecamera (riceve il punteggio, non segue fasce e braccialetti). */
+    val camera: Boolean = false,
+    /** Satellite col Wi-Fi spento: non può entrare nella rete del principale (Android non chiede nemmeno). */
+    val wifiOff: Boolean = false,
 )
 
 /** Come un satellite vede una fascia, con l'ora (del principale) in cui l'ha detto. */
@@ -8012,6 +8077,7 @@ class PhoneRelay(
     private val onSatelliteStopped: () -> Unit,
 ) {
     private val net = Dispatchers.IO.limitedParallelism(1)
+    private val wifi = context.applicationContext.getSystemService(android.net.wifi.WifiManager::class.java)
 
     private val _ui = MutableStateFlow(RelayUi())
     val ui: StateFlow<RelayUi> = _ui
@@ -8020,6 +8086,14 @@ class PhoneRelay(
     val remote: StateFlow<Map<String, RemoteStrap>> = _remote
 
     val isSatellite: Boolean get() = _ui.value.role == RelayRole.SATELLITE
+
+    private val _score = MutableStateFlow<ScoreOverlay?>(null)
+    /** Telecamera: il punteggio da disegnare (null finché il principale non l'ha mandato). */
+    val score: StateFlow<ScoreOverlay?> = _score
+    private val _points = MutableSharedFlow<PointMark>(extraBufferCapacity = 64)
+    /** Telecamera: ogni punto giocato, con l'ora già sull'orologio di questo telefono. */
+    val points: SharedFlow<PointMark> = _points
+    private var lastScore: ScoreOverlay? = null
 
     private var currentMatch = ""
 
@@ -8181,7 +8255,7 @@ class PhoneRelay(
                 RelayMsg.HELLO -> {
                     sats[id] = m.sat!! to (m.name ?: "")
                     publishSatellites()
-                    send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress()))
+                    send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress(), score = lastScore))
                 }
                 RelayMsg.HR, RelayMsg.BAND_EVT, RelayMsg.STROKE -> {
                     val sat = sats[id]?.first ?: return@launch
@@ -8244,6 +8318,18 @@ class PhoneRelay(
         ble.setRemote(map.mapValues { (_, e) -> RemoteBand(e.status.ready, e.battery, e.status.battery) })
     }
 
+    /** Principale: il punteggio per la grafica delle telecamere (e per quelle che si collegano dopo). */
+    fun publishScore(o: ScoreOverlay?) {
+        if (o == lastScore) return
+        lastScore = o
+        if (_ui.value.role == RelayRole.MAIN && o != null) broadcast(RelayMsg(RelayMsg.SCORE, score = o))
+    }
+
+    /** Principale: un punto appena giocato, per i capitoli del video ([PointMark.at] sull'orologio di questo telefono). */
+    fun publishPoint(p: PointMark) {
+        if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
+    }
+
     /** Principale: punteggio, comando o impostazioni per un braccialetto che sente solo un satellite. */
     private fun toBand(addr: String, payload: String, kind: String): Boolean {
         val e = remoteBands[addr]?.takeIf { it.status.ready } ?: return false
@@ -8292,8 +8378,11 @@ class PhoneRelay(
     private var satId = ""
     private var pingJob: Job? = null
 
-    /** Testo del QR del principale: questo telefono diventa satellite. false se il QR non è quello giusto. */
-    fun startSatellite(text: String): Boolean {
+    /**
+     * Testo del QR del principale: questo telefono diventa satellite. Con [camera] fa da telefono-telecamera:
+     * riceve punteggio e punti ma non prende fasce e braccialetti. false se il QR non è quello giusto.
+     */
+    fun startSatellite(text: String, camera: Boolean = false): Boolean {
         val target = RelayCodec.parseUrl(text) ?: return false
         val (host, port, token) = target
         stopMain()
@@ -8301,7 +8390,7 @@ class PhoneRelay(
         satId = ByteArray(8).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
         heart.disconnectAll()
         ble.disconnectAll()
-        val hello = RelayMsg(RelayMsg.HELLO, token = token, sat = satId, name = deviceName())
+        val hello = RelayMsg(RelayMsg.HELLO, token = token, sat = satId, name = deviceName(), role = RelayMsg.ROLE_CAMERA.takeIf { camera })
         val c = RelayClient(
             host, port, hello = { hello },
             onConnected = { scope.launch { onSatConnected() } },
@@ -8310,7 +8399,8 @@ class PhoneRelay(
             newSocket = { joiner.network?.socketFactory?.createSocket() ?: Socket() },
         )
         client = c
-        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot)
+        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot, camera = camera)
+        _score.value = null
         // La rete del principale: ci si entra da soli (Android 10+, con una conferma), altrimenti a mano.
         target.hotspot?.let { if (!joiner.join(it)) _ui.value = _ui.value.copy(joinByHand = true) }
         c.start()
@@ -8353,12 +8443,18 @@ class PhoneRelay(
             when (m.t) {
                 RelayMsg.WELCOME -> {
                     currentMatch = m.match.orEmpty()
-                    follow(m.straps.orEmpty())
-                    followBands(m.bands.orEmpty())
+                    if (!_ui.value.camera) {
+                        follow(m.straps.orEmpty())
+                        followBands(m.bands.orEmpty())
+                    }
+                    m.score?.let { _score.value = it }
                     _ui.value = _ui.value.copy(tv = m.tv)
                 }
-                RelayMsg.STRAPS -> follow(m.straps.orEmpty())
-                RelayMsg.BANDS -> followBands(m.bands.orEmpty())
+                RelayMsg.STRAPS -> if (!_ui.value.camera) follow(m.straps.orEmpty())
+                RelayMsg.BANDS -> if (!_ui.value.camera) followBands(m.bands.orEmpty())
+                RelayMsg.SCORE -> m.score?.let { _score.value = it }
+                // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
+                RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
                 RelayMsg.TV -> _ui.value = _ui.value.copy(tv = m.tv)
                 RelayMsg.BAND_OUT -> {
@@ -8436,7 +8532,12 @@ class PhoneRelay(
     }
 
     private fun satelliteTick() {
+        // Rete del principale da raggiungere col Wi-Fi spento: lo si dice (si accende dal pannello del Wi-Fi).
+        val off = _ui.value.hotspot != null && wifi?.isWifiEnabled == false
+        if (off != _ui.value.wifiOff) _ui.value = _ui.value.copy(wifiOff = off)
         val c = client ?: return
+        // La telecamera non sente fasce e braccialetti: niente da dire al principale.
+        if (_ui.value.camera) return
         val straps = heart.straps.value.values.map { it.toStatus() }
         // "Pronto" solo se collegato davvero a questo telefono.
         val bands = ble.bands.value.values.map { RelayBandStatus(it.address, it.state == LinkState.READY && !it.relayed, it.battery) }
@@ -8650,6 +8751,8 @@ package com.tennis.scoremanager.relay
 
 import com.tennis.scoremanager.ble.BandStatus
 import com.tennis.scoremanager.ble.RawStroke
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -8700,6 +8803,11 @@ data class RelayMsg(
     val kind: String? = null,
     /** Indirizzo (host:porta) del tabellone del principale, da mostrare sul satellite. */
     val tv: String? = null,
+    /** "camera" = telefono-telecamera: riceve il punteggio, non segue fasce e braccialetti. */
+    val role: String? = null,
+    /** Punteggio per la grafica della telecamera e punto appena giocato (con l'ora del principale). */
+    val score: ScoreOverlay? = null,
+    val point: PointMark? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -8717,6 +8825,9 @@ data class RelayMsg(
         const val BAND_STATUS = "bstat"
         const val BAND_OUT = "bout"
         const val TV = "tv"
+        const val SCORE = "score"
+        const val POINT = "point"
+        const val ROLE_CAMERA = "camera"
     }
 }
 
@@ -11917,6 +12028,8 @@ import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -11943,6 +12056,7 @@ import com.tennis.scoremanager.relay.HotspotPermissions
 import com.tennis.scoremanager.relay.JoinState
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.tv.DisplayActivity
+import com.tennis.scoremanager.video.CameraActivity
 
 /**
  * Pagina 2, "Secondo telefono": un telefono per fondo campo. Da qui questo telefono diventa il principale (mostra il
@@ -11955,7 +12069,14 @@ fun RelaySection(c: MatchController, names: Names) {
     val relay by c.relay.ui.collectAsState()
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    // Il QR serve sia al satellite sia alla telecamera: [asCamera] dice quale dei due si è scelto.
+    var asCamera by remember { mutableStateOf(false) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r ->
+        r.contents?.let {
+            c.joinRelay(it, asCamera)
+            if (asCamera && c.relay.ui.value.camera) context.startActivity(Intent(context, CameraActivity::class.java))
+        }
+    }
     fun scan() = scanner.launch(
         ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
             .setBeepEnabled(false).setOrientationLocked(true),
@@ -11991,7 +12112,15 @@ fun RelaySection(c: MatchController, names: Names) {
                     showQr = true
                 }
             }, Modifier.fillMaxWidth())
-            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, { withPerms("join") { scan() } }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
+                asCamera = false
+                withPerms("join") { scan() }
+            }, Modifier.fillMaxWidth())
+            // Telefono dietro il campo, al centro: registra e trasmette la partita con la grafica del punteggio.
+            GhostButton(s.relayJoinCamera, Icons.Filled.Videocam, {
+                asCamera = true
+                withPerms("join") { scan() }
+            }, Modifier.fillMaxWidth())
         }
         RelayRole.MAIN -> {
             Text(
@@ -12007,9 +12136,14 @@ fun RelaySection(c: MatchController, names: Names) {
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
-            Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            if (!relay.camera) Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
             val net = relay.hotspot
+            if (relay.wifiOff && !relay.connected) {
+                Text(s.relayWifiOff, color = TsmColors.Orange, fontSize = 13.sp)
+                GhostButton(s.relayWifiOn, Icons.Filled.Wifi, { openWifiPanel(context) }, Modifier.fillMaxWidth())
+            }
             val joinText = when {
+                relay.wifiOff -> null
                 net == null || relay.connected -> null
                 relay.joinByHand -> s.relayJoinByHand(net.ssid, net.pass.orEmpty())
                 relay.join == JoinState.WAITING -> s.relayJoinWaiting
@@ -12023,7 +12157,14 @@ fun RelaySection(c: MatchController, names: Names) {
                     (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
                 color = if (relay.connected) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp,
             )
-            SatelliteDevices(c, names)
+            if (relay.camera) {
+                Text(s.cameraRoleOn, color = TsmColors.TextMain, fontSize = 13.sp)
+                GhostButton(s.cameraOpen, Icons.Filled.Videocam, {
+                    context.startActivity(Intent(context, CameraActivity::class.java))
+                }, Modifier.fillMaxWidth())
+            } else {
+                SatelliteDevices(c, names)
+            }
             relay.tv?.let { tv ->
                 GhostButton(s.relayShowBoard, Icons.Filled.Tv, {
                     context.startActivity(Intent(context, DisplayActivity::class.java).putExtra(DisplayActivity.EXTRA_ADDRESS, tv))
@@ -12082,6 +12223,12 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
             st?.let { Text("${it.name} · ${strapStatus(it, s)}", color = TsmColors.TextDim, fontSize = 12.sp) }
         }
     }
+}
+
+/** Pannello del Wi-Fi (da Android 10 l'app non può accenderlo da sola); prima, le impostazioni del Wi-Fi. */
+fun openWifiPanel(context: android.content.Context) {
+    val action = if (android.os.Build.VERSION.SDK_INT >= 29) android.provider.Settings.Panel.ACTION_WIFI else android.provider.Settings.ACTION_WIFI_SETTINGS
+    runCatching { context.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
 }
 TSM_EOF
 
@@ -12278,6 +12425,31 @@ interface Strings {
     val progressPointsWon: String
     val progressPdf: String
     val progressPrint: String
+    val relayWifiOff: String
+    val relayWifiOn: String
+    val relayJoinCamera: String
+    val cameraRoleOn: String
+    val cameraOpen: String
+    val cameraLiveFailed: (String) -> String
+    val cameraNotSupported: String
+    val cameraSaved: (Int) -> String
+    val cameraSaveFailed: (String) -> String
+    val cameraPermissions: String
+    val cameraConnecting: String
+    val cameraNoReferee: String
+    val cameraWaitingScore: String
+    val cameraScoreOk: String
+    val cameraRec: String
+    val cameraStopRec: String
+    val cameraGoLive: String
+    val cameraStopLive: String
+    val cameraOverlay: String
+    val cameraStreamSettings: String
+    val cameraClose: String
+    val cameraStopFirst: String
+    val cameraStreamHint: String
+    val cameraStreamUrl: String
+    val cameraStreamKey: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -12965,6 +13137,31 @@ object ItStrings : Strings {
     override val progressPointsWon = "Punti vinti"
     override val progressPdf = "PDF"
     override val progressPrint = "Stampa"
+    override val relayWifiOff = "Il Wi-Fi di questo telefono è spento: accendilo (senza collegarti a nessuna rete) per entrare nella rete del principale."
+    override val relayWifiOn = "Attiva il Wi-Fi"
+    override val relayJoinCamera = "Fai da telecamera"
+    override val cameraRoleOn = "Questo telefono fa da telecamera: riceve il punteggio dall'arbitro e lo mette sul video."
+    override val cameraOpen = "Apri la telecamera"
+    override val cameraLiveFailed: (String) -> String = { "Diretta non riuscita: $it" }
+    override val cameraNotSupported = "Questo telefono non riesce a registrare in 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Video salvato in Film/Tennis Score Manager, con $n punti segnati." }
+    override val cameraSaveFailed: (String) -> String = { "Video salvato solo in $it" }
+    override val cameraPermissions = "Servono i permessi di fotocamera e microfono."
+    override val cameraConnecting = "Collegamento…"
+    override val cameraNoReferee = "Senza arbitro: solo video"
+    override val cameraWaitingScore = "In attesa del punteggio"
+    override val cameraScoreOk = "Punteggio collegato"
+    override val cameraRec = "Registra"
+    override val cameraStopRec = "Ferma"
+    override val cameraGoLive = "Diretta"
+    override val cameraStopLive = "Ferma diretta"
+    override val cameraOverlay = "Grafica"
+    override val cameraStreamSettings = "Diretta: server"
+    override val cameraClose = "Chiudi"
+    override val cameraStopFirst = "Prima ferma registrazione e diretta."
+    override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
+    override val cameraStreamUrl = "Server RTMP"
+    override val cameraStreamKey = "Chiave dello stream"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -13624,6 +13821,31 @@ object EnStrings : Strings {
     override val progressPointsWon = "Points won"
     override val progressPdf = "PDF"
     override val progressPrint = "Print"
+    override val relayWifiOff = "This phone's Wi-Fi is off: turn it on (no need to join any network) to get onto the main phone's network."
+    override val relayWifiOn = "Turn on Wi-Fi"
+    override val relayJoinCamera = "Act as camera"
+    override val cameraRoleOn = "This phone acts as a camera: it gets the score from the umpire and puts it on the video."
+    override val cameraOpen = "Open the camera"
+    override val cameraLiveFailed: (String) -> String = { "Live stream failed: $it" }
+    override val cameraNotSupported = "This phone cannot record in 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Video saved in Movies/Tennis Score Manager, with $n points marked." }
+    override val cameraSaveFailed: (String) -> String = { "Video saved only in $it" }
+    override val cameraPermissions = "Camera and microphone permissions are needed."
+    override val cameraConnecting = "Connecting…"
+    override val cameraNoReferee = "No umpire: video only"
+    override val cameraWaitingScore = "Waiting for the score"
+    override val cameraScoreOk = "Score connected"
+    override val cameraRec = "Record"
+    override val cameraStopRec = "Stop"
+    override val cameraGoLive = "Go live"
+    override val cameraStopLive = "Stop live"
+    override val cameraOverlay = "Overlay"
+    override val cameraStreamSettings = "Live: server"
+    override val cameraClose = "Close"
+    override val cameraStopFirst = "Stop recording and live stream first."
+    override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
+    override val cameraStreamUrl = "RTMP server"
+    override val cameraStreamKey = "Stream key"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -14306,6 +14528,31 @@ object DeStrings : Strings {
     override val progressPointsWon = "Gewonnene Punkte"
     override val progressPdf = "PDF"
     override val progressPrint = "Drucken"
+    override val relayWifiOff = "Das WLAN dieses Telefons ist aus: Schalte es ein (ohne dich mit einem Netz zu verbinden), um ins Netz des Haupttelefons zu kommen."
+    override val relayWifiOn = "WLAN einschalten"
+    override val relayJoinCamera = "Als Kamera dienen"
+    override val cameraRoleOn = "Dieses Telefon dient als Kamera: Es bekommt den Spielstand vom Schiedsrichter und blendet ihn ins Video ein."
+    override val cameraOpen = "Kamera öffnen"
+    override val cameraLiveFailed: (String) -> String = { "Livestream fehlgeschlagen: $it" }
+    override val cameraNotSupported = "Dieses Telefon kann nicht in 1080p aufnehmen."
+    override val cameraSaved: (Int) -> String = { n -> "Video in Filme/Tennis Score Manager gespeichert, mit $n markierten Punkten." }
+    override val cameraSaveFailed: (String) -> String = { "Video nur in $it gespeichert" }
+    override val cameraPermissions = "Kamera- und Mikrofonberechtigung sind nötig."
+    override val cameraConnecting = "Verbinde…"
+    override val cameraNoReferee = "Ohne Schiedsrichter: nur Video"
+    override val cameraWaitingScore = "Warte auf den Spielstand"
+    override val cameraScoreOk = "Spielstand verbunden"
+    override val cameraRec = "Aufnehmen"
+    override val cameraStopRec = "Stopp"
+    override val cameraGoLive = "Live"
+    override val cameraStopLive = "Live beenden"
+    override val cameraOverlay = "Einblendung"
+    override val cameraStreamSettings = "Live: Server"
+    override val cameraClose = "Schließen"
+    override val cameraStopFirst = "Beende zuerst Aufnahme und Livestream."
+    override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
+    override val cameraStreamUrl = "RTMP-Server"
+    override val cameraStreamKey = "Streamschlüssel"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -14980,6 +15227,31 @@ object EsStrings : Strings {
     override val progressPointsWon = "Puntos ganados"
     override val progressPdf = "PDF"
     override val progressPrint = "Imprimir"
+    override val relayWifiOff = "El Wi-Fi de este teléfono está apagado: actívalo (sin conectarte a ninguna red) para entrar en la red del principal."
+    override val relayWifiOn = "Activar el Wi-Fi"
+    override val relayJoinCamera = "Hacer de cámara"
+    override val cameraRoleOn = "Este teléfono hace de cámara: recibe el marcador del árbitro y lo pone en el vídeo."
+    override val cameraOpen = "Abrir la cámara"
+    override val cameraLiveFailed: (String) -> String = { "Directo fallido: $it" }
+    override val cameraNotSupported = "Este teléfono no puede grabar en 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Vídeo guardado en Películas/Tennis Score Manager, con $n puntos marcados." }
+    override val cameraSaveFailed: (String) -> String = { "Vídeo guardado solo en $it" }
+    override val cameraPermissions = "Hacen falta los permisos de cámara y micrófono."
+    override val cameraConnecting = "Conectando…"
+    override val cameraNoReferee = "Sin árbitro: solo vídeo"
+    override val cameraWaitingScore = "Esperando el marcador"
+    override val cameraScoreOk = "Marcador conectado"
+    override val cameraRec = "Grabar"
+    override val cameraStopRec = "Parar"
+    override val cameraGoLive = "Directo"
+    override val cameraStopLive = "Parar directo"
+    override val cameraOverlay = "Gráfico"
+    override val cameraStreamSettings = "Directo: servidor"
+    override val cameraClose = "Cerrar"
+    override val cameraStopFirst = "Primero para la grabación y el directo."
+    override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
+    override val cameraStreamUrl = "Servidor RTMP"
+    override val cameraStreamKey = "Clave de emisión"
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -15658,6 +15930,31 @@ object FrStrings : Strings {
     override val progressPointsWon = "Points gagnés"
     override val progressPdf = "PDF"
     override val progressPrint = "Imprimer"
+    override val relayWifiOff = "Le Wi-Fi de ce téléphone est éteint : activez-le (sans vous connecter à un réseau) pour rejoindre le réseau du principal."
+    override val relayWifiOn = "Activer le Wi-Fi"
+    override val relayJoinCamera = "Servir de caméra"
+    override val cameraRoleOn = "Ce téléphone sert de caméra : il reçoit le score de l'arbitre et l'affiche sur la vidéo."
+    override val cameraOpen = "Ouvrir la caméra"
+    override val cameraLiveFailed: (String) -> String = { "Direct impossible : $it" }
+    override val cameraNotSupported = "Ce téléphone ne peut pas filmer en 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Vidéo enregistrée dans Films/Tennis Score Manager, avec $n points marqués." }
+    override val cameraSaveFailed: (String) -> String = { "Vidéo enregistrée seulement dans $it" }
+    override val cameraPermissions = "Les autorisations caméra et micro sont nécessaires."
+    override val cameraConnecting = "Connexion…"
+    override val cameraNoReferee = "Sans arbitre : vidéo seule"
+    override val cameraWaitingScore = "En attente du score"
+    override val cameraScoreOk = "Score connecté"
+    override val cameraRec = "Filmer"
+    override val cameraStopRec = "Arrêter"
+    override val cameraGoLive = "Direct"
+    override val cameraStopLive = "Arrêter le direct"
+    override val cameraOverlay = "Habillage"
+    override val cameraStreamSettings = "Direct : serveur"
+    override val cameraClose = "Fermer"
+    override val cameraStopFirst = "Arrêtez d'abord l'enregistrement et le direct."
+    override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
+    override val cameraStreamUrl = "Serveur RTMP"
+    override val cameraStreamKey = "Clé de flux"
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -16335,6 +16632,31 @@ object PtStrings : Strings {
     override val progressPointsWon = "Pontos ganhos"
     override val progressPdf = "PDF"
     override val progressPrint = "Imprimir"
+    override val relayWifiOff = "O Wi-Fi deste telefone está desligado: ligue-o (sem se conectar a nenhuma rede) para entrar na rede do principal."
+    override val relayWifiOn = "Ligar o Wi-Fi"
+    override val relayJoinCamera = "Servir de câmera"
+    override val cameraRoleOn = "Este telefone serve de câmera: recebe o placar do árbitro e o coloca no vídeo."
+    override val cameraOpen = "Abrir a câmera"
+    override val cameraLiveFailed: (String) -> String = { "Transmissão falhou: $it" }
+    override val cameraNotSupported = "Este telefone não consegue gravar em 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Vídeo salvo em Filmes/Tennis Score Manager, com $n pontos marcados." }
+    override val cameraSaveFailed: (String) -> String = { "Vídeo salvo só em $it" }
+    override val cameraPermissions = "São necessárias as permissões de câmera e microfone."
+    override val cameraConnecting = "Conectando…"
+    override val cameraNoReferee = "Sem árbitro: só vídeo"
+    override val cameraWaitingScore = "Aguardando o placar"
+    override val cameraScoreOk = "Placar conectado"
+    override val cameraRec = "Gravar"
+    override val cameraStopRec = "Parar"
+    override val cameraGoLive = "Ao vivo"
+    override val cameraStopLive = "Parar ao vivo"
+    override val cameraOverlay = "Gráfico"
+    override val cameraStreamSettings = "Ao vivo: servidor"
+    override val cameraClose = "Fechar"
+    override val cameraStopFirst = "Pare antes a gravação e a transmissão."
+    override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
+    override val cameraStreamUrl = "Servidor RTMP"
+    override val cameraStreamKey = "Chave da transmissão"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -21364,6 +21686,604 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/CameraActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/CameraActivity.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.Manifest
+import android.content.ContentValues
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.SystemClock
+import android.provider.MediaStore
+import android.util.Log
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import android.view.WindowManager
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.FiberManualRecord
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
+import com.pedro.common.ConnectChecker
+import com.pedro.encoder.input.gl.render.filters.`object`.ImageFilterRender
+import com.pedro.encoder.input.video.CameraHelper
+import com.pedro.library.base.recording.RecordController
+import com.pedro.library.generic.GenericStream
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+/**
+ * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
+ * (RTMP: YouTube, Twitch, un server proprio), con la grafica del punteggio che arriva dal telefono dell'arbitro
+ * (vedi PhoneRelay, ruolo "camera"). Ogni punto ricevuto durante la registrazione diventa un capitolo, salvato
+ * accanto al video (file .json con lo stesso nome).
+ */
+class CameraActivity : ComponentActivity() {
+
+    private val controller get() = (application as TsmApp).controller
+    private val s: Strings get() = stringsFor(controller.options.value.lang)
+
+    private val live = MutableStateFlow(LiveState.OFF)
+    private val recording = MutableStateFlow(false)
+    private val recordSince = MutableStateFlow(0L)
+    private val message = MutableStateFlow<String?>(null)
+    private val permsOk = MutableStateFlow(false)
+
+    private enum class LiveState { OFF, CONNECTING, ON }
+
+    private var stream: GenericStream? = null
+    private var prepared = false
+    private val overlay = ImageFilterRender()
+    private var overlayAttached = false
+    private var recordFile: File? = null
+    private var recordStartWall = 0L
+    private val chapters = mutableListOf<PointMark>()
+
+    private val checker = object : ConnectChecker {
+        override fun onConnectionStarted(url: String) = runOnUiThread { live.value = LiveState.CONNECTING }
+        override fun onConnectionSuccess() = runOnUiThread { live.value = LiveState.ON }
+        override fun onConnectionFailed(reason: String) = runOnUiThread {
+            Log.w(TAG, "diretta non riuscita: $reason")
+            stream?.stopStream()
+            live.value = LiveState.OFF
+            message.value = s.cameraLiveFailed(reason)
+        }
+        override fun onDisconnect() = runOnUiThread { if (live.value != LiveState.OFF) live.value = LiveState.OFF }
+        override fun onAuthError() = runOnUiThread { message.value = s.cameraLiveFailed("auth") }
+        override fun onAuthSuccess() {}
+    }
+
+    private val perms = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { refreshPerms() }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.decorView.setBackgroundColor(Color.BLACK)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+        refreshPerms()
+        if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+        setContent { TsmTheme { Content() } }
+        // Grafica: si ridisegna a ogni punteggio nuovo dal telefono dell'arbitro.
+        lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
+        // Capitoli: i punti arrivati mentre si registra.
+        lifecycleScope.launch {
+            controller.relay.points.collect { p -> if (recording.value) chapters += p.copy(at = p.at - recordStartWall) }
+        }
+    }
+
+    private fun refreshPerms() {
+        permsOk.value = listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+            .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+    }
+
+    private fun stream(): GenericStream = stream ?: GenericStream(this, checker).also {
+        it.getGlInterface().autoHandleOrientation = true
+        stream = it
+    }
+
+    private fun prepare(): Boolean {
+        if (prepared) return true
+        val st = stream()
+        val rotation = CameraHelper.getCameraOrientation(this)
+        prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
+        if (!prepared) message.value = s.cameraNotSupported
+        return prepared
+    }
+
+    // ---------------------------------------------------------------- grafica
+
+    private fun updateOverlay() {
+        val st = stream ?: return
+        val o = controller.relay.score.value
+        if (!controller.storage.cameraOverlay || o == null) {
+            if (overlayAttached) {
+                st.getGlInterface().clearFilters()
+                overlayAttached = false
+            }
+            return
+        }
+        if (!overlayAttached) {
+            st.getGlInterface().setFilter(overlay)
+            overlayAttached = true
+        }
+        // 1,2: da lontano (telefono dietro il campo, video guardato sul telefono) le misure "da TV" sono piccole.
+        val bmp = OverlayRenderer.render(o, scale = 1.2f)
+        overlay.setImage(bmp)
+        // In percentuale del fotogramma: in basso a sinistra, con un margine da "zona sicura" televisiva.
+        val w = bmp.width * 100f / WIDTH
+        val h = bmp.height * 100f / HEIGHT
+        overlay.setScale(w, h)
+        overlay.setPosition(3f, 100f - h - 5f)
+    }
+
+    // ---------------------------------------------------------------- registrazione e diretta
+
+    private fun toggleRecord() {
+        val st = stream ?: return
+        if (recording.value) {
+            st.stopRecord()
+            recording.value = false
+            finishRecording()
+            return
+        }
+        if (!prepare()) return
+        val dir = getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir
+        val file = File(dir, "TSM_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(Date())}.mp4")
+        recordFile = file
+        chapters.clear()
+        recordStartWall = System.currentTimeMillis()
+        st.startRecord(file.absolutePath) { status ->
+            if (status == RecordController.Status.RECORDING) runOnUiThread { recordSince.value = SystemClock.elapsedRealtime() }
+        }
+        recording.value = true
+        recordSince.value = SystemClock.elapsedRealtime()
+    }
+
+    /** Capitoli accanto al video e copia del video nella galleria (Film/Tennis Score Manager). */
+    private fun finishRecording() {
+        val file = recordFile ?: return
+        val marks = chapters.toList()
+        lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                runCatching {
+                    File(file.parentFile, file.nameWithoutExtension + ".json")
+                        .writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks)))
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        val values = ContentValues().apply {
+                            put(MediaStore.Video.Media.DISPLAY_NAME, file.name)
+                            put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+                            put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/Tennis Score Manager")
+                        }
+                        val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
+                        contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: error("open")
+                    }
+                }.onFailure { Log.w(TAG, "copia del video non riuscita", it) }.isSuccess
+            }
+            message.value = if (ok) s.cameraSaved(marks.size) else s.cameraSaveFailed(file.absolutePath)
+        }
+    }
+
+    private fun toggleLive(openSettings: () -> Unit) {
+        val st = stream ?: return
+        if (live.value != LiveState.OFF) {
+            st.stopStream()
+            live.value = LiveState.OFF
+            return
+        }
+        val key = controller.storage.streamKey
+        if (key.isEmpty()) {
+            openSettings()
+            return
+        }
+        if (!prepare()) return
+        st.startStream(controller.storage.streamUrl.trimEnd('/') + "/" + key)
+    }
+
+    override fun onDestroy() {
+        stream?.let { st ->
+            if (st.isRecording) {
+                st.stopRecord()
+                finishRecording()
+            }
+            if (st.isStreaming) st.stopStream()
+            if (st.isOnPreview) st.stopPreview()
+            st.release()
+        }
+        stream = null
+        super.onDestroy()
+    }
+
+    // ---------------------------------------------------------------- interfaccia
+
+    @Composable
+    private fun Content() {
+        val ok by permsOk.collectAsState()
+        val str = s
+        if (!ok) {
+            Box(Modifier.fillMaxSize().background(TsmColors.Background), contentAlignment = Alignment.Center) {
+                Text(str.cameraPermissions, color = TsmColors.TextMain, modifier = Modifier.padding(32.dp))
+            }
+            return
+        }
+        var settings by remember { mutableStateOf(false) }
+        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            AndroidView(factory = { ctx ->
+                SurfaceView(ctx).apply {
+                    holder.addCallback(object : SurfaceHolder.Callback {
+                        override fun surfaceCreated(h: SurfaceHolder) {
+                            if (!prepare()) return
+                            val st = stream()
+                            if (!st.isOnPreview) st.startPreview(this@apply)
+                            updateOverlay()
+                        }
+
+                        override fun surfaceChanged(h: SurfaceHolder, format: Int, w: Int, hh: Int) {
+                            stream?.getGlInterface()?.setPreviewResolution(w, hh)
+                        }
+
+                        override fun surfaceDestroyed(h: SurfaceHolder) {
+                            stream?.let { if (it.isOnPreview) it.stopPreview() }
+                        }
+                    })
+                }
+            }, modifier = Modifier.fillMaxSize())
+            Controls(onSettings = { settings = true })
+        }
+        if (settings) StreamSettings { settings = false }
+    }
+
+    @Composable
+    private fun Controls(onSettings: () -> Unit) {
+        val str = s
+        val rec by recording.collectAsState()
+        val since by recordSince.collectAsState()
+        val lv by live.collectAsState()
+        val msg by message.collectAsState()
+        val relay by controller.relay.ui.collectAsState()
+        val score by controller.relay.score.collectAsState()
+        var now by remember { mutableStateOf(SystemClock.elapsedRealtime()) }
+        LaunchedEffect(rec) {
+            while (rec) {
+                now = SystemClock.elapsedRealtime()
+                delay(500)
+            }
+        }
+        LaunchedEffect(msg) {
+            if (msg != null) {
+                delay(6_000)
+                message.value = null
+            }
+        }
+        Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (rec) Pill("● REC ${Reports.duration(now - since)}", TsmColors.Danger)
+                if (lv == LiveState.ON) Pill("LIVE", TsmColors.Danger) else if (lv == LiveState.CONNECTING) Pill(str.cameraConnecting, TsmColors.Orange)
+                if (relay.wifiOff && !relay.connected) {
+                    Surface(onClick = { com.tennis.scoremanager.ui.openWifiPanel(this@CameraActivity) }, shape = RoundedCornerShape(10.dp), color = TsmColors.Orange) {
+                        Text(str.relayWifiOn, color = TsmColors.OnBall, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+                    }
+                }
+                Pill(
+                    when {
+                        !relay.camera -> str.cameraNoReferee
+                        relay.wifiOff && !relay.connected -> str.relayWifiOff
+                        !relay.connected -> str.relayDisconnected
+                        score == null -> str.cameraWaitingScore
+                        else -> str.cameraScoreOk
+                    },
+                    if (relay.camera && relay.connected && score != null) TsmColors.Ok else TsmColors.Orange,
+                )
+            }
+            msg?.let { Pill(it, TsmColors.SurfaceHigh) }
+            Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Btn(if (rec) Icons.Filled.Stop else Icons.Filled.FiberManualRecord, if (rec) str.cameraStopRec else str.cameraRec, TsmColors.Danger) { toggleRecord() }
+                Btn(Icons.Filled.LiveTv, if (lv == LiveState.OFF) str.cameraGoLive else str.cameraStopLive, if (lv == LiveState.OFF) TsmColors.SurfaceHigh else TsmColors.Danger) {
+                    toggleLive(onSettings)
+                }
+                Btn(Icons.Filled.Layers, str.cameraOverlay, if (controller.storage.cameraOverlay) TsmColors.Ok else TsmColors.SurfaceHigh) {
+                    controller.storage.cameraOverlay = !controller.storage.cameraOverlay
+                    updateOverlay()
+                }
+                Btn(Icons.Filled.Settings, str.cameraStreamUrl, TsmColors.SurfaceHigh) { onSettings() }
+                Btn(Icons.AutoMirrored.Filled.ExitToApp, str.cameraClose, TsmColors.SurfaceHigh) {
+                    if (rec || lv != LiveState.OFF) Toast.makeText(this@CameraActivity, str.cameraStopFirst, Toast.LENGTH_SHORT).show() else finish()
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Pill(text: String, color: androidx.compose.ui.graphics.Color) {
+        Text(
+            text, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+            modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(color).padding(horizontal = 10.dp, vertical = 6.dp),
+        )
+    }
+
+    @Composable
+    private fun Btn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, color: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+        Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = color) {
+            Column(Modifier.width(92.dp).padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(icon, null, tint = TsmColors.TextMain)
+                Text(label, color = TsmColors.TextMain, fontSize = 11.sp, maxLines = 1)
+            }
+        }
+    }
+
+    /** Server e chiave della diretta: di serie YouTube (la chiave è in YouTube Studio › Trasmetti dal vivo). */
+    @Composable
+    private fun StreamSettings(onDone: () -> Unit) {
+        val str = s
+        var url by remember { mutableStateOf(controller.storage.streamUrl) }
+        var key by remember { mutableStateOf(controller.storage.streamKey) }
+        AlertDialog(
+            onDismissRequest = onDone,
+            title = { Text(str.cameraStreamSettings) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(str.cameraStreamHint, fontSize = 13.sp)
+                    OutlinedTextField(url, { url = it }, label = { Text(str.cameraStreamUrl) }, singleLine = true)
+                    OutlinedTextField(key, { key = it }, label = { Text(str.cameraStreamKey) }, singleLine = true)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    controller.storage.streamUrl = url
+                    controller.storage.streamKey = key
+                    onDone()
+                }) { Text(str.ok) }
+            },
+        )
+    }
+
+    companion object {
+        private const val TAG = "Telecamera"
+        private const val WIDTH = 1920
+        private const val HEIGHT = 1080
+        /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
+        private const val VIDEO_BITRATE = 6_000_000
+    }
+}
+
+/** Capitoli di un video: un segno per punto, [PointMark.at] in ms dall'inizio della registrazione. */
+@kotlinx.serialization.Serializable
+data class VideoChapters(val video: String, val points: List<PointMark>)
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/OverlayRenderer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/OverlayRenderer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
+
+/**
+ * Disegna la grafica del punteggio come nelle dirette dei tornei: due righe scure con nome, set finiti, game del
+ * set in corso e, nel riquadro colorato, i punti del game; la pallina gialla accanto a chi serve; sotto, quando c'è,
+ * la scritta di pressione (BREAK POINT...). Stile nostro, senza loghi né caratteri di altri.
+ * Le misure sono pensate per un video 1920×1080: [scale] le adatta ad altre risoluzioni.
+ */
+object OverlayRenderer {
+    private val BG = Color.argb(235, 12, 20, 36)
+    private val BG_ALT = Color.argb(235, 22, 32, 52)
+    private val SET_TXT = Color.rgb(170, 182, 200)
+    private val ACCENT = Color.rgb(0xC6, 0xF4, 0x32)
+    private val ON_ACCENT = Color.rgb(12, 20, 36)
+    private val BALL = Color.rgb(0xE8, 0xF5, 0x4A)
+    private val WIN = Color.rgb(0xC6, 0xF4, 0x32)
+
+    fun render(o: ScoreOverlay, scale: Float = 1f): Bitmap {
+        val rowH = 56f * scale
+        val pad = 18f * scale
+        val cellW = 46f * scale
+        val pointW = 74f * scale
+        val ballW = 28f * scale
+        val name = Paint().apply { isAntiAlias = true; color = Color.WHITE; textSize = 30f * scale; typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD) }
+        val num = Paint(name).apply { textAlign = Paint.Align.CENTER }
+        val small = Paint(num).apply { textSize = 17f * scale }
+        val titleP = Paint(name).apply { textSize = 22f * scale; color = SET_TXT; typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL) }
+        val bannerP = Paint(name).apply { textSize = 24f * scale; color = ON_ACCENT; letterSpacing = 0.08f }
+
+        val nameW = (o.names.maxOfOrNull { name.measureText(it) } ?: 0f).coerceIn(160f * scale, 460f * scale)
+        val setCols = o.sets.size + if (o.games.isNotEmpty()) 1 else 0
+        val hasPoints = o.points.isNotEmpty()
+        val width = ballW + nameW + pad + setCols * cellW + (if (hasPoints) pointW else 0f) + pad / 2
+        val titleH = if (o.title.isNotEmpty()) 34f * scale else 0f
+        val bannerText = o.banner?.uppercase()
+        val bannerH = if (bannerText != null) 40f * scale else 0f
+        val height = titleH + 2 * rowH + bannerH
+        val bmp = Bitmap.createBitmap(width.toInt().coerceAtLeast(1), height.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        val fill = Paint().apply { isAntiAlias = true }
+
+        if (titleH > 0f) {
+            fill.color = BG
+            c.drawRoundRect(RectF(0f, 0f, width, titleH + 8f * scale), 8f * scale, 8f * scale, fill)
+            c.drawText(o.title, pad, titleH - 10f * scale, titleP)
+        }
+        for (row in 0..1) {
+            val top = titleH + row * rowH
+            fill.color = if (row == 0) BG else BG_ALT
+            c.drawRect(0f, top, width, top + rowH, fill)
+            val base = top + rowH / 2 - (name.descent() + name.ascent()) / 2
+            // Pallina di chi serve (o spunta del vincitore a fine partita).
+            if (o.server == row) {
+                fill.color = BALL
+                c.drawCircle(ballW / 2 + 4f * scale, top + rowH / 2, 8f * scale, fill)
+            }
+            val winner = o.winner == row
+            name.color = if (o.winner >= 0 && !winner) SET_TXT else Color.WHITE
+            c.drawText(o.names.getOrElse(row) { "" }, ballW + 4f * scale, base, name)
+            var x = ballW + nameW + pad
+            o.sets.forEachIndexed { i, s ->
+                val mine = s[row]
+                val won = mine > s[1 - row]
+                num.color = if (won) Color.WHITE else SET_TXT
+                c.drawText("$mine", x + cellW / 2, base, num)
+                // Tie-break: i punti del perdente in piccolo, accanto ai game di chi l'ha perso.
+                val tb = o.setTiebreaks.getOrNull(i)
+                if (tb != null && !won) c.drawText("$tb", x + cellW - 6f * scale, top + 20f * scale, small.apply { color = SET_TXT })
+                x += cellW
+            }
+            if (o.games.isNotEmpty()) {
+                num.color = Color.WHITE
+                c.drawText("${o.games[row]}", x + cellW / 2, base, num)
+                x += cellW
+            }
+            if (hasPoints) {
+                fill.color = ACCENT
+                c.drawRect(x, top, x + pointW, top + rowH, fill)
+                num.color = ON_ACCENT
+                c.drawText(o.points[row], x + pointW / 2, base, num)
+            }
+            if (winner) {
+                fill.color = WIN
+                c.drawRect(0f, top, 6f * scale, top + rowH, fill)
+            }
+        }
+        if (bannerText != null) {
+            val top = titleH + 2 * rowH
+            fill.color = ACCENT
+            c.drawRect(0f, top, width, top + bannerH, fill)
+            c.drawText(bannerText, pad, top + bannerH / 2 - (bannerP.descent() + bannerP.ascent()) / 2, bannerP)
+        }
+        return bmp
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.model.MatchState
+import com.tennis.scoremanager.model.Side
+import kotlinx.serialization.Serializable
+
+/**
+ * Il punteggio come lo disegna la grafica della telecamera: lo prepara il telefono dell'arbitro e lo manda al
+ * telefono-telecamera a ogni punto. Una riga per giocatore (o squadra): [sets] finiti, [games] del set in corso,
+ * [points] del game (o del tie-break), [server] 0/1 (-1 a partita finita).
+ */
+@Serializable
+data class ScoreOverlay(
+    val names: List<String>,
+    val sets: List<List<Int>> = emptyList(),
+    /** Punti del perdente nel tie-break di ciascun set finito (null = set senza tie-break). */
+    val setTiebreaks: List<Int?> = emptyList(),
+    val games: List<Int> = listOf(0, 0),
+    val points: List<String> = listOf("0", "0"),
+    val server: Int = 0,
+    val tiebreak: Boolean = false,
+    /** BREAK POINT, SET POINT, MATCH POINT...: la scritta sotto il punteggio. */
+    val banner: String? = null,
+    val winner: Int = -1,
+    /** Circolo · campo, sopra il punteggio (vuoto = niente). */
+    val title: String = "",
+) {
+    companion object {
+        fun from(state: MatchState, names: List<String>, banner: String?, title: String): ScoreOverlay {
+            val finished = state.isFinished
+            return ScoreOverlay(
+                names = names,
+                sets = state.sets.map { listOf(it.g1, it.g2) },
+                setTiebreaks = state.sets.map { s -> if (s.hasTiebreak) minOf(s.tb1!!, s.tb2!!) else null },
+                games = if (finished) emptyList() else listOf(state.g1, state.g2),
+                points = if (finished) emptyList() else Side.entries.map { state.pointLabel(it) },
+                server = if (finished) -1 else state.server.ordinal,
+                tiebreak = state.inTiebreak,
+                banner = banner,
+                winner = state.winner?.ordinal ?: -1,
+                title = title,
+            )
+        }
+    }
+}
+
+/**
+ * Un punto giocato, per i capitoli del video: [at] ora del punto sull'orologio del telefono-telecamera, [score]
+ * il punteggio dopo il punto ("6-4 3-2 30-15"), [winner] 0/1, [kind] ACE, DOUBLE_FAULT... se segnato.
+ */
+@Serializable
+data class PointMark(val at: Long, val score: String, val winner: Int, val kind: String? = null)
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/Announcer.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/voice/Announcer.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -24554,6 +25474,8 @@ package com.tennis.scoremanager.relay
 import com.tennis.scoremanager.ble.BandStatus
 import com.tennis.scoremanager.ble.RawStroke
 import com.tennis.scoremanager.data.HeartTrack
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -24612,6 +25534,15 @@ class RelayProtocolTest {
             RelayMsg(RelayMsg.BAND_OUT, addr = "AA", payload = "P|15|30|1|", kind = "show"),
             RelayMsg(RelayMsg.STATUS, bandStatus = listOf(RelayBandStatus("AA", true, 81)), status = emptyList()),
             RelayMsg(RelayMsg.WELCOME, match = "m1", bands = listOf(RelayStrap("AA", "TSM 1", 0)), tv = "10.0.0.1:8080"),
+            RelayMsg(RelayMsg.HELLO, token = "t", sat = "s", role = RelayMsg.ROLE_CAMERA),
+            RelayMsg(
+                RelayMsg.SCORE,
+                score = ScoreOverlay(
+                    names = listOf("Rossi", "Bianchi"), sets = listOf(listOf(7, 6)), setTiebreaks = listOf(5),
+                    games = listOf(3, 2), points = listOf("AD", "40"), server = 1, banner = "BREAK POINT", title = "Circolo · 3",
+                ),
+            ),
+            RelayMsg(RelayMsg.POINT, point = PointMark(at = 123_456L, score = "7-6 3-2 AD-40", winner = 0, kind = "ACE")),
         )
         for (m in msgs) assertEquals(m, RelayCodec.decode(RelayCodec.encode(m)))
     }
@@ -25927,6 +26858,7 @@ serialization = "1.9.0"
 junit = "4.13.2"
 zxing = "3.5.3"
 zxingEmbedded = "4.3.0"
+rootEncoder = "2.8.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25944,6 +26876,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
+rootencoder = { group = "com.github.pedroSG94.RootEncoder", name = "library", version.ref = "rootEncoder" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -27111,6 +28044,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Solo per RootEncoder (telecamera e diretta RTMP, Apache 2.0), che si pubblica su JitPack: compilato dai
+        // sorgenti, nient'altro arriva da qui.
+        maven("https://jitpack.io") {
+            content { includeGroupByRegex("com\\.github\\.pedroSG94.*") }
+        }
     }
 }
 
@@ -29972,6 +30910,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 111 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 114 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

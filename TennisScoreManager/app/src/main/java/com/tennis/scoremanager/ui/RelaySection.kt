@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -42,6 +44,7 @@ import com.tennis.scoremanager.relay.HotspotPermissions
 import com.tennis.scoremanager.relay.JoinState
 import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.tv.DisplayActivity
+import com.tennis.scoremanager.video.CameraActivity
 
 /**
  * Pagina 2, "Secondo telefono": un telefono per fondo campo. Da qui questo telefono diventa il principale (mostra il
@@ -54,7 +57,14 @@ fun RelaySection(c: MatchController, names: Names) {
     val relay by c.relay.ui.collectAsState()
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.joinRelay(it) } }
+    // Il QR serve sia al satellite sia alla telecamera: [asCamera] dice quale dei due si è scelto.
+    var asCamera by remember { mutableStateOf(false) }
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { r ->
+        r.contents?.let {
+            c.joinRelay(it, asCamera)
+            if (asCamera && c.relay.ui.value.camera) context.startActivity(Intent(context, CameraActivity::class.java))
+        }
+    }
     fun scan() = scanner.launch(
         ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(s.relayScanPrompt)
             .setBeepEnabled(false).setOrientationLocked(true),
@@ -90,7 +100,15 @@ fun RelaySection(c: MatchController, names: Names) {
                     showQr = true
                 }
             }, Modifier.fillMaxWidth())
-            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, { withPerms("join") { scan() } }, Modifier.fillMaxWidth())
+            GhostButton(s.relayJoin, Icons.Filled.QrCodeScanner, {
+                asCamera = false
+                withPerms("join") { scan() }
+            }, Modifier.fillMaxWidth())
+            // Telefono dietro il campo, al centro: registra e trasmette la partita con la grafica del punteggio.
+            GhostButton(s.relayJoinCamera, Icons.Filled.Videocam, {
+                asCamera = true
+                withPerms("join") { scan() }
+            }, Modifier.fillMaxWidth())
         }
         RelayRole.MAIN -> {
             Text(
@@ -106,9 +124,14 @@ fun RelaySection(c: MatchController, names: Names) {
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
-            Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
+            if (!relay.camera) Text(s.relaySatelliteOn, color = TsmColors.TextMain, fontSize = 13.sp)
             val net = relay.hotspot
+            if (relay.wifiOff && !relay.connected) {
+                Text(s.relayWifiOff, color = TsmColors.Orange, fontSize = 13.sp)
+                GhostButton(s.relayWifiOn, Icons.Filled.Wifi, { openWifiPanel(context) }, Modifier.fillMaxWidth())
+            }
             val joinText = when {
+                relay.wifiOff -> null
                 net == null || relay.connected -> null
                 relay.joinByHand -> s.relayJoinByHand(net.ssid, net.pass.orEmpty())
                 relay.join == JoinState.WAITING -> s.relayJoinWaiting
@@ -122,7 +145,14 @@ fun RelaySection(c: MatchController, names: Names) {
                     (if (relay.pending > 0) " · ${s.relayPending(relay.pending)}" else ""),
                 color = if (relay.connected) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp,
             )
-            SatelliteDevices(c, names)
+            if (relay.camera) {
+                Text(s.cameraRoleOn, color = TsmColors.TextMain, fontSize = 13.sp)
+                GhostButton(s.cameraOpen, Icons.Filled.Videocam, {
+                    context.startActivity(Intent(context, CameraActivity::class.java))
+                }, Modifier.fillMaxWidth())
+            } else {
+                SatelliteDevices(c, names)
+            }
             relay.tv?.let { tv ->
                 GhostButton(s.relayShowBoard, Icons.Filled.Tv, {
                     context.startActivity(Intent(context, DisplayActivity::class.java).putExtra(DisplayActivity.EXTRA_ADDRESS, tv))
@@ -181,4 +211,10 @@ private fun SatelliteDevices(c: MatchController, names: Names) {
             st?.let { Text("${it.name} · ${strapStatus(it, s)}", color = TsmColors.TextDim, fontSize = 12.sp) }
         }
     }
+}
+
+/** Pannello del Wi-Fi (da Android 10 l'app non può accenderlo da sola); prima, le impostazioni del Wi-Fi. */
+fun openWifiPanel(context: android.content.Context) {
+    val action = if (android.os.Build.VERSION.SDK_INT >= 29) android.provider.Settings.Panel.ACTION_WIFI else android.provider.Settings.ACTION_WIFI_SETTINGS
+    runCatching { context.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
 }

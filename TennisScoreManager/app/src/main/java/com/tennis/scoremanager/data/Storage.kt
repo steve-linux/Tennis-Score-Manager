@@ -152,6 +152,17 @@ class Storage(context: Context) {
         get() = prefs.getString("display_host", null)
         set(v) = prefs.edit().putString("display_host", v).apply()
 
+    /** Telefono-telecamera: server RTMP della diretta (di serie YouTube) e chiave di trasmissione. */
+    var streamUrl: String
+        get() = prefs.getString("stream_url", null) ?: "rtmp://a.rtmp.youtube.com/live2"
+        set(v) = prefs.edit().putString("stream_url", v.trim()).apply()
+    var streamKey: String
+        get() = prefs.getString("stream_key", null) ?: ""
+        set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+    var cameraOverlay: Boolean
+        get() = prefs.getBoolean("camera_overlay", true)
+        set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
 

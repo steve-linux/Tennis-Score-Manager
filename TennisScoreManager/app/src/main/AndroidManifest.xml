@@ -31,6 +31,9 @@
     <!-- Secondo telefono per le fasce: il principale crea una rete solo locale, il satellite ci entra da solo.
          Da Android 13 basta "Dispositivi nelle vicinanze", che non serve a localizzare -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- Telefono-telecamera: video e audio della partita (registrazione e diretta) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="tiramisu" />
@@ -80,6 +83,14 @@
 
         <activity
             android:name=".tv.DisplayActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
+            android:launchMode="singleTask" />
+
+        <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
+        <activity
+            android:name=".video.CameraActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"

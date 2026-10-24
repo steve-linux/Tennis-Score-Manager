@@ -6,6 +6,8 @@ package com.tennis.scoremanager.relay
 import com.tennis.scoremanager.ble.BandStatus
 import com.tennis.scoremanager.ble.RawStroke
 import com.tennis.scoremanager.data.HeartTrack
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -64,6 +66,15 @@ class RelayProtocolTest {
             RelayMsg(RelayMsg.BAND_OUT, addr = "AA", payload = "P|15|30|1|", kind = "show"),
             RelayMsg(RelayMsg.STATUS, bandStatus = listOf(RelayBandStatus("AA", true, 81)), status = emptyList()),
             RelayMsg(RelayMsg.WELCOME, match = "m1", bands = listOf(RelayStrap("AA", "TSM 1", 0)), tv = "10.0.0.1:8080"),
+            RelayMsg(RelayMsg.HELLO, token = "t", sat = "s", role = RelayMsg.ROLE_CAMERA),
+            RelayMsg(
+                RelayMsg.SCORE,
+                score = ScoreOverlay(
+                    names = listOf("Rossi", "Bianchi"), sets = listOf(listOf(7, 6)), setTiebreaks = listOf(5),
+                    games = listOf(3, 2), points = listOf("AD", "40"), server = 1, banner = "BREAK POINT", title = "Circolo · 3",
+                ),
+            ),
+            RelayMsg(RelayMsg.POINT, point = PointMark(at = 123_456L, score = "7-6 3-2 AD-40", winner = 0, kind = "ACE")),
         )
         for (m in msgs) assertEquals(m, RelayCodec.decode(RelayCodec.encode(m)))
     }

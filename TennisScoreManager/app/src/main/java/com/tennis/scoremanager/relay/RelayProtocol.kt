@@ -5,6 +5,8 @@ package com.tennis.scoremanager.relay
 
 import com.tennis.scoremanager.ble.BandStatus
 import com.tennis.scoremanager.ble.RawStroke
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -55,6 +57,11 @@ data class RelayMsg(
     val kind: String? = null,
     /** Indirizzo (host:porta) del tabellone del principale, da mostrare sul satellite. */
     val tv: String? = null,
+    /** "camera" = telefono-telecamera: riceve il punteggio, non segue fasce e braccialetti. */
+    val role: String? = null,
+    /** Punteggio per la grafica della telecamera e punto appena giocato (con l'ora del principale). */
+    val score: ScoreOverlay? = null,
+    val point: PointMark? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -72,6 +79,9 @@ data class RelayMsg(
         const val BAND_STATUS = "bstat"
         const val BAND_OUT = "bout"
         const val TV = "tv"
+        const val SCORE = "score"
+        const val POINT = "point"
+        const val ROLE_CAMERA = "camera"
     }
 }
 

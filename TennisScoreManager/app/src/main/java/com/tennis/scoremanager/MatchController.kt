@@ -68,6 +68,8 @@ import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.workout.WorkoutSession
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressPdf
@@ -361,6 +363,24 @@ class MatchController(
             }
         }
         scope.launch { watchBands() }
+        scope.launch {
+            // Telefono-telecamera: punteggio per la grafica a ogni cambiamento e un segno a ogni punto (capitoli).
+            var lastPoints = -1
+            live.collect { lm ->
+                if (lm == null) {
+                    relay.publishScore(null)
+                    lastPoints = -1
+                    return@collect
+                }
+                relay.publishScore(scoreOverlay(lm))
+                val played = lm.state.pointsPlayed
+                if (lastPoints in 0 until played && lm.record.startedAt != null) {
+                    val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
+                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name))
+                }
+                lastPoints = played
+            }
+        }
         scope.launch { watchRemotes() }
         scope.launch {
             while (true) {
@@ -954,6 +974,19 @@ class MatchController(
         strapGaps.getOrPut(addr) { StrapGaps() }.onReading(at)
     }
 
+    /** La grafica del punteggio per la telecamera, con la scritta di pressione (palla break, set point...). */
+    private fun scoreOverlay(lm: LiveMatch): ScoreOverlay {
+        val n = names(lm.record.setup)
+        val title = listOf(lm.record.setup.club, lm.record.setup.court).filter { it.isNotBlank() }.joinToString(" · ")
+        val banner = if (lm.state.isFinished) null else pressureMessage(lm.state)
+        return ScoreOverlay.from(lm.state, Side.entries.map { n.short(it) }, banner, title)
+    }
+
+    /** "6-4 3-2 30-15": il punteggio dopo un punto, per i capitoli del video. */
+    private fun scoreText(state: MatchState): String =
+        (state.sets.map { "${it.g1}-${it.g2}" } + if (state.isFinished) emptyList() else listOf("${state.g1}-${state.g2}", "${state.pointLabel(Side.P1)}-${state.pointLabel(Side.P2)}"))
+            .joinToString(" ")
+
     /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
     private fun flushHeart() {
         val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
@@ -989,9 +1022,9 @@ class MatchController(
         }
     }
 
-    /** Testo del QR del principale: questo telefono diventa satellite. */
-    fun joinRelay(text: String) {
-        if (!relay.startSatellite(text)) {
+    /** Testo del QR del principale: questo telefono diventa satellite (con [camera], telefono-telecamera). */
+    fun joinRelay(text: String, camera: Boolean = false) {
+        if (!relay.startSatellite(text, camera)) {
             _toasts.tryEmit(strings.transferBadCode)
             return
         }

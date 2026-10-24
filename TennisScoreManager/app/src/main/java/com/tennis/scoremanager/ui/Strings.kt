@@ -152,6 +152,31 @@ interface Strings {
     val progressPointsWon: String
     val progressPdf: String
     val progressPrint: String
+    val relayWifiOff: String
+    val relayWifiOn: String
+    val relayJoinCamera: String
+    val cameraRoleOn: String
+    val cameraOpen: String
+    val cameraLiveFailed: (String) -> String
+    val cameraNotSupported: String
+    val cameraSaved: (Int) -> String
+    val cameraSaveFailed: (String) -> String
+    val cameraPermissions: String
+    val cameraConnecting: String
+    val cameraNoReferee: String
+    val cameraWaitingScore: String
+    val cameraScoreOk: String
+    val cameraRec: String
+    val cameraStopRec: String
+    val cameraGoLive: String
+    val cameraStopLive: String
+    val cameraOverlay: String
+    val cameraStreamSettings: String
+    val cameraClose: String
+    val cameraStopFirst: String
+    val cameraStreamHint: String
+    val cameraStreamUrl: String
+    val cameraStreamKey: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -839,6 +864,31 @@ object ItStrings : Strings {
     override val progressPointsWon = "Punti vinti"
     override val progressPdf = "PDF"
     override val progressPrint = "Stampa"
+    override val relayWifiOff = "Il Wi-Fi di questo telefono è spento: accendilo (senza collegarti a nessuna rete) per entrare nella rete del principale."
+    override val relayWifiOn = "Attiva il Wi-Fi"
+    override val relayJoinCamera = "Fai da telecamera"
+    override val cameraRoleOn = "Questo telefono fa da telecamera: riceve il punteggio dall'arbitro e lo mette sul video."
+    override val cameraOpen = "Apri la telecamera"
+    override val cameraLiveFailed: (String) -> String = { "Diretta non riuscita: $it" }
+    override val cameraNotSupported = "Questo telefono non riesce a registrare in 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Video salvato in Film/Tennis Score Manager, con $n punti segnati." }
+    override val cameraSaveFailed: (String) -> String = { "Video salvato solo in $it" }
+    override val cameraPermissions = "Servono i permessi di fotocamera e microfono."
+    override val cameraConnecting = "Collegamento…"
+    override val cameraNoReferee = "Senza arbitro: solo video"
+    override val cameraWaitingScore = "In attesa del punteggio"
+    override val cameraScoreOk = "Punteggio collegato"
+    override val cameraRec = "Registra"
+    override val cameraStopRec = "Ferma"
+    override val cameraGoLive = "Diretta"
+    override val cameraStopLive = "Ferma diretta"
+    override val cameraOverlay = "Grafica"
+    override val cameraStreamSettings = "Diretta: server"
+    override val cameraClose = "Chiudi"
+    override val cameraStopFirst = "Prima ferma registrazione e diretta."
+    override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
+    override val cameraStreamUrl = "Server RTMP"
+    override val cameraStreamKey = "Chiave dello stream"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1498,6 +1548,31 @@ object EnStrings : Strings {
     override val progressPointsWon = "Points won"
     override val progressPdf = "PDF"
     override val progressPrint = "Print"
+    override val relayWifiOff = "This phone's Wi-Fi is off: turn it on (no need to join any network) to get onto the main phone's network."
+    override val relayWifiOn = "Turn on Wi-Fi"
+    override val relayJoinCamera = "Act as camera"
+    override val cameraRoleOn = "This phone acts as a camera: it gets the score from the umpire and puts it on the video."
+    override val cameraOpen = "Open the camera"
+    override val cameraLiveFailed: (String) -> String = { "Live stream failed: $it" }
+    override val cameraNotSupported = "This phone cannot record in 1080p."
+    override val cameraSaved: (Int) -> String = { n -> "Video saved in Movies/Tennis Score Manager, with $n points marked." }
+    override val cameraSaveFailed: (String) -> String = { "Video saved only in $it" }
+    override val cameraPermissions = "Camera and microphone permissions are needed."
+    override val cameraConnecting = "Connecting…"
+    override val cameraNoReferee = "No umpire: video only"
+    override val cameraWaitingScore = "Waiting for the score"
+    override val cameraScoreOk = "Score connected"
+    override val cameraRec = "Record"
+    override val cameraStopRec = "Stop"
+    override val cameraGoLive = "Go live"
+    override val cameraStopLive = "Stop live"
+    override val cameraOverlay = "Overlay"
+    override val cameraStreamSettings = "Live: server"
+    override val cameraClose = "Close"
+    override val cameraStopFirst = "Stop recording and live stream first."
+    override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
+    override val cameraStreamUrl = "RTMP server"
+    override val cameraStreamKey = "Stream key"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

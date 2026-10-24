@@ -16,12 +16,16 @@ import com.tennis.scoremanager.ble.StrapInfo
 import com.tennis.scoremanager.ble.StrapState
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.tv.TvServer
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.ScoreOverlay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -49,6 +53,10 @@ data class RelayUi(
     val joinByHand: Boolean = false,
     /** Satellite: indirizzo del tabellone del principale (host:porta), da mostrare a schermo intero. */
     val tv: String? = null,
+    /** Satellite che fa da telecamera (riceve il punteggio, non segue fasce e braccialetti). */
+    val camera: Boolean = false,
+    /** Satellite col Wi-Fi spento: non può entrare nella rete del principale (Android non chiede nemmeno). */
+    val wifiOff: Boolean = false,
 )
 
 /** Come un satellite vede una fascia, con l'ora (del principale) in cui l'ha detto. */
@@ -82,6 +90,7 @@ class PhoneRelay(
     private val onSatelliteStopped: () -> Unit,
 ) {
     private val net = Dispatchers.IO.limitedParallelism(1)
+    private val wifi = context.applicationContext.getSystemService(android.net.wifi.WifiManager::class.java)
 
     private val _ui = MutableStateFlow(RelayUi())
     val ui: StateFlow<RelayUi> = _ui
@@ -90,6 +99,14 @@ class PhoneRelay(
     val remote: StateFlow<Map<String, RemoteStrap>> = _remote
 
     val isSatellite: Boolean get() = _ui.value.role == RelayRole.SATELLITE
+
+    private val _score = MutableStateFlow<ScoreOverlay?>(null)
+    /** Telecamera: il punteggio da disegnare (null finché il principale non l'ha mandato). */
+    val score: StateFlow<ScoreOverlay?> = _score
+    private val _points = MutableSharedFlow<PointMark>(extraBufferCapacity = 64)
+    /** Telecamera: ogni punto giocato, con l'ora già sull'orologio di questo telefono. */
+    val points: SharedFlow<PointMark> = _points
+    private var lastScore: ScoreOverlay? = null
 
     private var currentMatch = ""
 
@@ -251,7 +268,7 @@ class PhoneRelay(
                 RelayMsg.HELLO -> {
                     sats[id] = m.sat!! to (m.name ?: "")
                     publishSatellites()
-                    send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress()))
+                    send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress(), score = lastScore))
                 }
                 RelayMsg.HR, RelayMsg.BAND_EVT, RelayMsg.STROKE -> {
                     val sat = sats[id]?.first ?: return@launch
@@ -314,6 +331,18 @@ class PhoneRelay(
         ble.setRemote(map.mapValues { (_, e) -> RemoteBand(e.status.ready, e.battery, e.status.battery) })
     }
 
+    /** Principale: il punteggio per la grafica delle telecamere (e per quelle che si collegano dopo). */
+    fun publishScore(o: ScoreOverlay?) {
+        if (o == lastScore) return
+        lastScore = o
+        if (_ui.value.role == RelayRole.MAIN && o != null) broadcast(RelayMsg(RelayMsg.SCORE, score = o))
+    }
+
+    /** Principale: un punto appena giocato, per i capitoli del video ([PointMark.at] sull'orologio di questo telefono). */
+    fun publishPoint(p: PointMark) {
+        if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
+    }
+
     /** Principale: punteggio, comando o impostazioni per un braccialetto che sente solo un satellite. */
     private fun toBand(addr: String, payload: String, kind: String): Boolean {
         val e = remoteBands[addr]?.takeIf { it.status.ready } ?: return false
@@ -362,8 +391,11 @@ class PhoneRelay(
     private var satId = ""
     private var pingJob: Job? = null
 
-    /** Testo del QR del principale: questo telefono diventa satellite. false se il QR non è quello giusto. */
-    fun startSatellite(text: String): Boolean {
+    /**
+     * Testo del QR del principale: questo telefono diventa satellite. Con [camera] fa da telefono-telecamera:
+     * riceve punteggio e punti ma non prende fasce e braccialetti. false se il QR non è quello giusto.
+     */
+    fun startSatellite(text: String, camera: Boolean = false): Boolean {
         val target = RelayCodec.parseUrl(text) ?: return false
         val (host, port, token) = target
         stopMain()
@@ -371,7 +403,7 @@ class PhoneRelay(
         satId = ByteArray(8).also { SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
         heart.disconnectAll()
         ble.disconnectAll()
-        val hello = RelayMsg(RelayMsg.HELLO, token = token, sat = satId, name = deviceName())
+        val hello = RelayMsg(RelayMsg.HELLO, token = token, sat = satId, name = deviceName(), role = RelayMsg.ROLE_CAMERA.takeIf { camera })
         val c = RelayClient(
             host, port, hello = { hello },
             onConnected = { scope.launch { onSatConnected() } },
@@ -380,7 +412,8 @@ class PhoneRelay(
             newSocket = { joiner.network?.socketFactory?.createSocket() ?: Socket() },
         )
         client = c
-        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot)
+        _ui.value = RelayUi(RelayRole.SATELLITE, hotspot = target.hotspot, camera = camera)
+        _score.value = null
         // La rete del principale: ci si entra da soli (Android 10+, con una conferma), altrimenti a mano.
         target.hotspot?.let { if (!joiner.join(it)) _ui.value = _ui.value.copy(joinByHand = true) }
         c.start()
@@ -423,12 +456,18 @@ class PhoneRelay(
             when (m.t) {
                 RelayMsg.WELCOME -> {
                     currentMatch = m.match.orEmpty()
-                    follow(m.straps.orEmpty())
-                    followBands(m.bands.orEmpty())
+                    if (!_ui.value.camera) {
+                        follow(m.straps.orEmpty())
+                        followBands(m.bands.orEmpty())
+                    }
+                    m.score?.let { _score.value = it }
                     _ui.value = _ui.value.copy(tv = m.tv)
                 }
-                RelayMsg.STRAPS -> follow(m.straps.orEmpty())
-                RelayMsg.BANDS -> followBands(m.bands.orEmpty())
+                RelayMsg.STRAPS -> if (!_ui.value.camera) follow(m.straps.orEmpty())
+                RelayMsg.BANDS -> if (!_ui.value.camera) followBands(m.bands.orEmpty())
+                RelayMsg.SCORE -> m.score?.let { _score.value = it }
+                // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
+                RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
                 RelayMsg.TV -> _ui.value = _ui.value.copy(tv = m.tv)
                 RelayMsg.BAND_OUT -> {
@@ -506,7 +545,12 @@ class PhoneRelay(
     }
 
     private fun satelliteTick() {
+        // Rete del principale da raggiungere col Wi-Fi spento: lo si dice (si accende dal pannello del Wi-Fi).
+        val off = _ui.value.hotspot != null && wifi?.isWifiEnabled == false
+        if (off != _ui.value.wifiOff) _ui.value = _ui.value.copy(wifiOff = off)
         val c = client ?: return
+        // La telecamera non sente fasce e braccialetti: niente da dire al principale.
+        if (_ui.value.camera) return
         val straps = heart.straps.value.values.map { it.toStatus() }
         // "Pronto" solo se collegato davvero a questo telefono.
         val bands = ble.bands.value.values.map { RelayBandStatus(it.address, it.state == LinkState.READY && !it.relayed, it.battery) }

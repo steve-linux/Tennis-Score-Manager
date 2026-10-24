@@ -19,6 +19,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Solo per RootEncoder (telecamera e diretta RTMP, Apache 2.0), che si pubblica su JitPack: compilato dai
+        // sorgenti, nient'altro arriva da qui.
+        maven("https://jitpack.io") {
+            content { includeGroupByRegex("com\\.github\\.pedroSG94.*") }
+        }
     }
 }
 
