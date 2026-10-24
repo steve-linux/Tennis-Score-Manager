@@ -195,7 +195,6 @@ object EsStrings : Strings {
     override val hlNone = "Ningún punto adecuado: marca aces, ganadores o juega con las pulseras."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n puntos · $t" }
     override val hlHint = "Si es demasiado largo, primero se acortan los fragmentos y luego quedan fuera los puntos menos importantes. El vídeo va a la galería."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Bola de partido"; "SET_POINT" -> "Bola de set"; "BREAK_POINT" -> "Bola de break"; "LONG_RALLY" -> "Peloteo largo"; "ACE" -> "Ace"; else -> "Ganador" } }
     override val hlCreate = "Crear"
     override val hlMaking: (Int) -> String = { "Montando… $it %" }
     override val hlDone = "Mejores jugadas listas, guardadas en Películas/Tennis Score Manager."

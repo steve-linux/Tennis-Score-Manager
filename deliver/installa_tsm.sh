@@ -12510,7 +12510,6 @@ interface Strings {
     val hlNone: String
     val hlPreview: (Int, String) -> String
     val hlHint: String
-    val hlReason: (String) -> String
     val hlCreate: String
     val hlMaking: (Int) -> String
     val hlDone: String
@@ -13257,7 +13256,6 @@ object ItStrings : Strings {
     override val hlNone = "Nessun punto adatto: segna ace, vincenti o gioca con i braccialetti."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n punti · $t" }
     override val hlHint = "Se supera la durata, prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il video va in galleria."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Palla break"; "LONG_RALLY" -> "Scambio lungo"; "ACE" -> "Ace"; else -> "Vincente" } }
     override val hlCreate = "Crea"
     override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
     override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
@@ -13976,7 +13974,6 @@ object EnStrings : Strings {
     override val hlNone = "No suitable points: mark aces, winners or play with the wristbands."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n points · $t" }
     override val hlHint = "If it is too long, clips are shortened first, then the least important points are left out. The video goes to the gallery."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Long rally"; "ACE" -> "Ace"; else -> "Winner" } }
     override val hlCreate = "Create"
     override val hlMaking: (Int) -> String = { "Editing… $it%" }
     override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."
@@ -14718,7 +14715,6 @@ object DeStrings : Strings {
     override val hlNone = "Keine passenden Punkte: Markiere Asse, Winner oder spiele mit den Armbändern."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n Punkte · $t" }
     override val hlHint = "Wird es zu lang, werden zuerst die Ausschnitte gekürzt, dann bleiben die unwichtigsten Punkte draußen. Das Video kommt in die Galerie."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Matchball"; "SET_POINT" -> "Satzball"; "BREAK_POINT" -> "Breakball"; "LONG_RALLY" -> "Langer Ballwechsel"; "ACE" -> "Ass"; else -> "Winner" } }
     override val hlCreate = "Erstellen"
     override val hlMaking: (Int) -> String = { "Schnitt… $it %" }
     override val hlDone = "Highlights fertig, gespeichert in Filme/Tennis Score Manager."
@@ -15452,7 +15448,6 @@ object EsStrings : Strings {
     override val hlNone = "Ningún punto adecuado: marca aces, ganadores o juega con las pulseras."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n puntos · $t" }
     override val hlHint = "Si es demasiado largo, primero se acortan los fragmentos y luego quedan fuera los puntos menos importantes. El vídeo va a la galería."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Bola de partido"; "SET_POINT" -> "Bola de set"; "BREAK_POINT" -> "Bola de break"; "LONG_RALLY" -> "Peloteo largo"; "ACE" -> "Ace"; else -> "Ganador" } }
     override val hlCreate = "Crear"
     override val hlMaking: (Int) -> String = { "Montando… $it %" }
     override val hlDone = "Mejores jugadas listas, guardadas en Películas/Tennis Score Manager."
@@ -16190,7 +16185,6 @@ object FrStrings : Strings {
     override val hlNone = "Aucun point adapté : marquez aces, coups gagnants ou jouez avec les bracelets."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n points · durée $t" }
     override val hlHint = "Si c'est trop long, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. La vidéo va dans la galerie."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Balle de match"; "SET_POINT" -> "Balle de set"; "BREAK_POINT" -> "Balle de break"; "LONG_RALLY" -> "Long échange"; "ACE" -> "Ace"; else -> "Coup gagnant" } }
     override val hlCreate = "Créer"
     override val hlMaking: (Int) -> String = { "Montage… $it %" }
     override val hlDone = "Temps forts prêts, enregistrés dans Films/Tennis Score Manager."
@@ -16927,7 +16921,6 @@ object PtStrings : Strings {
     override val hlNone = "Nenhum ponto adequado: marque aces, winners ou jogue com as pulseiras."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n pontos · $t" }
     override val hlHint = "Se ficar longo demais, primeiro os trechos são encurtados, depois os pontos menos importantes ficam de fora. O vídeo vai para a galeria."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Rali longo"; "ACE" -> "Ace"; else -> "Winner" } }
     override val hlCreate = "Criar"
     override val hlMaking: (Int) -> String = { "Montando… $it%" }
     override val hlDone = "Melhores momentos prontos, salvos em Filmes/Tennis Score Manager."
@@ -22628,12 +22621,6 @@ package com.tennis.scoremanager.video
 
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.Typeface
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
@@ -22659,7 +22646,7 @@ import java.io.File
 
 /**
  * Monta gli highlights sul telefono (Media3 Transformer): i pezzi scelti da [Highlights.select], uno dopo l'altro,
- * con una scritta sul perché (ACE, PALLA BREAK...) e, nei video importati, la grafica del punteggio. Il risultato va
+ * senza scritte; nei video importati con la grafica del punteggio (in quelli registrati c'è già). Il risultato va
  * in galleria (Film/Tennis Score Manager) con i suoi capitoli, così si rivede punto per punto come gli altri video.
  */
 @UnstableApi
@@ -22672,7 +22659,6 @@ class HighlightMaker(context: Context) {
     fun make(
         e: VideoLibrary.Entry,
         clips: List<Highlights.Clip>,
-        label: (Highlights.Reason) -> String,
         onProgress: (Int) -> Unit,
         onDone: (File?) -> Unit,
     ) {
@@ -22684,16 +22670,13 @@ class HighlightMaker(context: Context) {
             val item = MediaItem.Builder().setUri(e.video).setClippingConfiguration(
                 MediaItem.ClippingConfiguration.Builder().setStartPositionMs(c.startMs).setEndPositionMs(c.endMs).build(),
             ).build()
-            val overlays = mutableListOf<androidx.media3.effect.TextureOverlay>(
-                BitmapOverlay.createStaticBitmapOverlay(tag(label(c.reason), scale), at(-0.92f, 0.85f, -1f, 1f)),
-            )
             // Nei video importati il punteggio non è nel video: lo si disegna, com'era prima del punto.
-            ch.rules?.let { rules ->
+            val effects = ch.rules?.let { rules ->
                 val before = PointMarks.stateAfter(rules, ch.points, c.index)
                 val bmp = OverlayRenderer.render(ScoreOverlay.from(before, ch.names, null, ""), scale)
-                overlays += BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))
-            }
-            EditedMediaItem.Builder(item).setEffects(Effects(listOf(), listOf(OverlayEffect(overlays)))).build()
+                Effects(listOf(), listOf(OverlayEffect(listOf(BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))))))
+            } ?: Effects.EMPTY
+            EditedMediaItem.Builder(item).setEffects(effects).build()
         }
         val dir = app.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: app.filesDir
         val out = File(dir, "TSM_highlights_${System.currentTimeMillis()}.mp4")
@@ -22745,22 +22728,6 @@ class HighlightMaker(context: Context) {
             r.release()
         }
     }.getOrNull()
-
-    /** La scritta del perché, in alto a sinistra: riquadro verde lime come la grafica del punteggio. */
-    private fun tag(text: String, scale: Float): Bitmap {
-        val p = Paint().apply {
-            isAntiAlias = true; color = Color.rgb(12, 20, 36); textSize = 30f * scale; letterSpacing = 0.08f
-            typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        }
-        val padX = 18f * scale
-        val h = 50f * scale
-        val w = p.measureText(text.uppercase()) + 2 * padX
-        val bmp = Bitmap.createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
-        val c = Canvas(bmp)
-        c.drawRoundRect(RectF(0f, 0f, w, h), 8f * scale, 8f * scale, Paint().apply { isAntiAlias = true; color = Color.rgb(0xC6, 0xF4, 0x32) })
-        c.drawText(text.uppercase(), padX, h / 2 - (p.descent() + p.ascent()) / 2, p)
-        return bmp
-    }
 
     /** Copia in galleria e capitoli del montaggio: ogni pezzo è un punto, con l'ora nel nuovo video. */
     private fun finish(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, out: File): File? = runCatching {
@@ -23577,7 +23544,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     hlProgress = 0
                     val m = HighlightMaker(this)
                     maker = m
-                    m.make(e, clips, { r -> str.hlReason(r.name) }, { hlProgress = it }) { file ->
+                    m.make(e, clips, { hlProgress = it }) { file ->
                         hlProgress = null
                         maker = null
                         if (file == null) {

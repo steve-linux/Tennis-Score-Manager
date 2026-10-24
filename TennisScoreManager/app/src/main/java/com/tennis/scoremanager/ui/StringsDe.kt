@@ -195,7 +195,6 @@ object DeStrings : Strings {
     override val hlNone = "Keine passenden Punkte: Markiere Asse, Winner oder spiele mit den Armbändern."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n Punkte · $t" }
     override val hlHint = "Wird es zu lang, werden zuerst die Ausschnitte gekürzt, dann bleiben die unwichtigsten Punkte draußen. Das Video kommt in die Galerie."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Matchball"; "SET_POINT" -> "Satzball"; "BREAK_POINT" -> "Breakball"; "LONG_RALLY" -> "Langer Ballwechsel"; "ACE" -> "Ass"; else -> "Winner" } }
     override val hlCreate = "Erstellen"
     override val hlMaking: (Int) -> String = { "Schnitt… $it %" }
     override val hlDone = "Highlights fertig, gespeichert in Filme/Tennis Score Manager."

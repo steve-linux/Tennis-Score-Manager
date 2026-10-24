@@ -198,7 +198,6 @@ object PtStrings : Strings {
     override val hlNone = "Nenhum ponto adequado: marque aces, winners ou jogue com as pulseiras."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n pontos · $t" }
     override val hlHint = "Se ficar longo demais, primeiro os trechos são encurtados, depois os pontos menos importantes ficam de fora. O vídeo vai para a galeria."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Rali longo"; "ACE" -> "Ace"; else -> "Winner" } }
     override val hlCreate = "Criar"
     override val hlMaking: (Int) -> String = { "Montando… $it%" }
     override val hlDone = "Melhores momentos prontos, salvos em Filmes/Tennis Score Manager."

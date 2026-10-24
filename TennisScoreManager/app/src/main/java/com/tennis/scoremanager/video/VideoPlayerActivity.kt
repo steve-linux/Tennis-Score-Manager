@@ -354,7 +354,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     hlProgress = 0
                     val m = HighlightMaker(this)
                     maker = m
-                    m.make(e, clips, { r -> str.hlReason(r.name) }, { hlProgress = it }) { file ->
+                    m.make(e, clips, { hlProgress = it }) { file ->
                         hlProgress = null
                         maker = null
                         if (file == null) {

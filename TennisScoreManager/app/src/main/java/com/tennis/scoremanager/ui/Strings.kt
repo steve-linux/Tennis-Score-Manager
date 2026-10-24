@@ -207,7 +207,6 @@ interface Strings {
     val hlNone: String
     val hlPreview: (Int, String) -> String
     val hlHint: String
-    val hlReason: (String) -> String
     val hlCreate: String
     val hlMaking: (Int) -> String
     val hlDone: String
@@ -954,7 +953,6 @@ object ItStrings : Strings {
     override val hlNone = "Nessun punto adatto: segna ace, vincenti o gioca con i braccialetti."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n punti · $t" }
     override val hlHint = "Se supera la durata, prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il video va in galleria."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Palla break"; "LONG_RALLY" -> "Scambio lungo"; "ACE" -> "Ace"; else -> "Vincente" } }
     override val hlCreate = "Crea"
     override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
     override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
@@ -1673,7 +1671,6 @@ object EnStrings : Strings {
     override val hlNone = "No suitable points: mark aces, winners or play with the wristbands."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n points · $t" }
     override val hlHint = "If it is too long, clips are shortened first, then the least important points are left out. The video goes to the gallery."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Long rally"; "ACE" -> "Ace"; else -> "Winner" } }
     override val hlCreate = "Create"
     override val hlMaking: (Int) -> String = { "Editing… $it%" }
     override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."

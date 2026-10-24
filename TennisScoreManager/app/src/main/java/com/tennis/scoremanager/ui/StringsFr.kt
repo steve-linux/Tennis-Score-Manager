@@ -198,7 +198,6 @@ object FrStrings : Strings {
     override val hlNone = "Aucun point adapté : marquez aces, coups gagnants ou jouez avec les bracelets."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n points · durée $t" }
     override val hlHint = "Si c'est trop long, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. La vidéo va dans la galerie."
-    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Balle de match"; "SET_POINT" -> "Balle de set"; "BREAK_POINT" -> "Balle de break"; "LONG_RALLY" -> "Long échange"; "ACE" -> "Ace"; else -> "Coup gagnant" } }
     override val hlCreate = "Créer"
     override val hlMaking: (Int) -> String = { "Montage… $it %" }
     override val hlDone = "Temps forts prêts, enregistrés dans Films/Tennis Score Manager."

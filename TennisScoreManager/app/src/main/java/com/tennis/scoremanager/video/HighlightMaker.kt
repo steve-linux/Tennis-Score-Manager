@@ -5,12 +5,6 @@ package com.tennis.scoremanager.video
 
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.Typeface
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
@@ -36,7 +30,7 @@ import java.io.File
 
 /**
  * Monta gli highlights sul telefono (Media3 Transformer): i pezzi scelti da [Highlights.select], uno dopo l'altro,
- * con una scritta sul perché (ACE, PALLA BREAK...) e, nei video importati, la grafica del punteggio. Il risultato va
+ * senza scritte; nei video importati con la grafica del punteggio (in quelli registrati c'è già). Il risultato va
  * in galleria (Film/Tennis Score Manager) con i suoi capitoli, così si rivede punto per punto come gli altri video.
  */
 @UnstableApi
@@ -49,7 +43,6 @@ class HighlightMaker(context: Context) {
     fun make(
         e: VideoLibrary.Entry,
         clips: List<Highlights.Clip>,
-        label: (Highlights.Reason) -> String,
         onProgress: (Int) -> Unit,
         onDone: (File?) -> Unit,
     ) {
@@ -61,16 +54,13 @@ class HighlightMaker(context: Context) {
             val item = MediaItem.Builder().setUri(e.video).setClippingConfiguration(
                 MediaItem.ClippingConfiguration.Builder().setStartPositionMs(c.startMs).setEndPositionMs(c.endMs).build(),
             ).build()
-            val overlays = mutableListOf<androidx.media3.effect.TextureOverlay>(
-                BitmapOverlay.createStaticBitmapOverlay(tag(label(c.reason), scale), at(-0.92f, 0.85f, -1f, 1f)),
-            )
             // Nei video importati il punteggio non è nel video: lo si disegna, com'era prima del punto.
-            ch.rules?.let { rules ->
+            val effects = ch.rules?.let { rules ->
                 val before = PointMarks.stateAfter(rules, ch.points, c.index)
                 val bmp = OverlayRenderer.render(ScoreOverlay.from(before, ch.names, null, ""), scale)
-                overlays += BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))
-            }
-            EditedMediaItem.Builder(item).setEffects(Effects(listOf(), listOf(OverlayEffect(overlays)))).build()
+                Effects(listOf(), listOf(OverlayEffect(listOf(BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))))))
+            } ?: Effects.EMPTY
+            EditedMediaItem.Builder(item).setEffects(effects).build()
         }
         val dir = app.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: app.filesDir
         val out = File(dir, "TSM_highlights_${System.currentTimeMillis()}.mp4")
@@ -122,22 +112,6 @@ class HighlightMaker(context: Context) {
             r.release()
         }
     }.getOrNull()
-
-    /** La scritta del perché, in alto a sinistra: riquadro verde lime come la grafica del punteggio. */
-    private fun tag(text: String, scale: Float): Bitmap {
-        val p = Paint().apply {
-            isAntiAlias = true; color = Color.rgb(12, 20, 36); textSize = 30f * scale; letterSpacing = 0.08f
-            typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        }
-        val padX = 18f * scale
-        val h = 50f * scale
-        val w = p.measureText(text.uppercase()) + 2 * padX
-        val bmp = Bitmap.createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
-        val c = Canvas(bmp)
-        c.drawRoundRect(RectF(0f, 0f, w, h), 8f * scale, 8f * scale, Paint().apply { isAntiAlias = true; color = Color.rgb(0xC6, 0xF4, 0x32) })
-        c.drawText(text.uppercase(), padX, h / 2 - (p.descent() + p.ascent()) / 2, p)
-        return bmp
-    }
 
     /** Copia in galleria e capitoli del montaggio: ogni pezzo è un punto, con l'ora nel nuovo video. */
     private fun finish(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, out: File): File? = runCatching {
