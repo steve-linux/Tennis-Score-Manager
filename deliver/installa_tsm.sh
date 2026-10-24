@@ -135,6 +135,8 @@ dependencies {
     implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
     implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
     implementation(libs.media3.ui)
+    implementation(libs.media3.transformer)  // montaggio degli highlights sul telefono
+    implementation(libs.media3.effect)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
@@ -1183,10 +1185,12 @@ class MatchController(
         scope.launch {
             // Telefono-telecamera: punteggio per la grafica a ogni cambiamento e un segno a ogni punto (capitoli).
             var lastPoints = -1
+            var before: MatchState? = null
             live.collect { lm ->
                 if (lm == null) {
                     relay.publishScore(null)
                     lastPoints = -1
+                    before = null
                     return@collect
                 }
                 relay.publishScore(scoreOverlay(lm))
@@ -1195,10 +1199,14 @@ class MatchController(
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
                     val (set, game) = PointMarks.place(lm.state)
                     relay.publishPoint(
-                        PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game, p?.secondServe == true),
+                        PointMark(
+                            System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game,
+                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes,
+                        ),
                     )
                 }
                 lastPoints = played
+                before = lm.state
             }
         }
         scope.launch { watchRemotes() }
@@ -12495,6 +12503,18 @@ interface Strings {
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
+    val hlTitle: String
+    val hlBig: String
+    val hlRallies: String
+    val hlMax: String
+    val hlNone: String
+    val hlPreview: (Int, String) -> String
+    val hlHint: String
+    val hlReason: (String) -> String
+    val hlCreate: String
+    val hlMaking: (Int) -> String
+    val hlDone: String
+    val hlFailed: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -13230,6 +13250,18 @@ object ItStrings : Strings {
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
+    override val hlTitle = "Highlights"
+    override val hlBig = "Palle break, set e match point"
+    override val hlRallies = "Scambi lunghi (dai braccialetti)"
+    override val hlMax = "Durata massima"
+    override val hlNone = "Nessun punto adatto: segna ace, vincenti o gioca con i braccialetti."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n punti · $t" }
+    override val hlHint = "Se supera la durata, prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il video va in galleria."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Palla break"; "LONG_RALLY" -> "Scambio lungo"; "ACE" -> "Ace"; else -> "Vincente" } }
+    override val hlCreate = "Crea"
+    override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
+    override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
+    override val hlFailed = "Montaggio non riuscito."
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -13937,6 +13969,18 @@ object EnStrings : Strings {
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."
+    override val hlTitle = "Highlights"
+    override val hlBig = "Break, set and match points"
+    override val hlRallies = "Long rallies (from the wristbands)"
+    override val hlMax = "Maximum length"
+    override val hlNone = "No suitable points: mark aces, winners or play with the wristbands."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n points · $t" }
+    override val hlHint = "If it is too long, clips are shortened first, then the least important points are left out. The video goes to the gallery."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Long rally"; "ACE" -> "Ace"; else -> "Winner" } }
+    override val hlCreate = "Create"
+    override val hlMaking: (Int) -> String = { "Editing… $it%" }
+    override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."
+    override val hlFailed = "Editing failed."
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -14667,6 +14711,18 @@ object DeStrings : Strings {
     override val videoTagSetupTitle = "Wer spielt?"
     override val videoFirstServer = "Wer schlägt zuerst auf"
     override val videoTagSetupHint = "Format und Regeln sind die von Seite 2."
+    override val hlTitle = "Highlights"
+    override val hlBig = "Break-, Satz- und Matchbälle"
+    override val hlRallies = "Lange Ballwechsel (von den Armbändern)"
+    override val hlMax = "Maximale Länge"
+    override val hlNone = "Keine passenden Punkte: Markiere Asse, Winner oder spiele mit den Armbändern."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n Punkte · $t" }
+    override val hlHint = "Wird es zu lang, werden zuerst die Ausschnitte gekürzt, dann bleiben die unwichtigsten Punkte draußen. Das Video kommt in die Galerie."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Matchball"; "SET_POINT" -> "Satzball"; "BREAK_POINT" -> "Breakball"; "LONG_RALLY" -> "Langer Ballwechsel"; "ACE" -> "Ass"; else -> "Winner" } }
+    override val hlCreate = "Erstellen"
+    override val hlMaking: (Int) -> String = { "Schnitt… $it %" }
+    override val hlDone = "Highlights fertig, gespeichert in Filme/Tennis Score Manager."
+    override val hlFailed = "Schnitt fehlgeschlagen."
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -15389,6 +15445,18 @@ object EsStrings : Strings {
     override val videoTagSetupTitle = "¿Quién juega?"
     override val videoFirstServer = "Quién saca primero"
     override val videoTagSetupHint = "Formato y reglas son los de la página 2."
+    override val hlTitle = "Mejores jugadas"
+    override val hlBig = "Bolas de break, de set y de partido"
+    override val hlRallies = "Peloteos largos (de las pulseras)"
+    override val hlMax = "Duración máxima"
+    override val hlNone = "Ningún punto adecuado: marca aces, ganadores o juega con las pulseras."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n puntos · $t" }
+    override val hlHint = "Si es demasiado largo, primero se acortan los fragmentos y luego quedan fuera los puntos menos importantes. El vídeo va a la galería."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Bola de partido"; "SET_POINT" -> "Bola de set"; "BREAK_POINT" -> "Bola de break"; "LONG_RALLY" -> "Peloteo largo"; "ACE" -> "Ace"; else -> "Ganador" } }
+    override val hlCreate = "Crear"
+    override val hlMaking: (Int) -> String = { "Montando… $it %" }
+    override val hlDone = "Mejores jugadas listas, guardadas en Películas/Tennis Score Manager."
+    override val hlFailed = "No se pudo montar."
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -16115,6 +16183,18 @@ object FrStrings : Strings {
     override val videoTagSetupTitle = "Qui joue ?"
     override val videoFirstServer = "Qui sert en premier"
     override val videoTagSetupHint = "Format et règles sont ceux de la page 2."
+    override val hlTitle = "Temps forts"
+    override val hlBig = "Balles de break, de set et de match"
+    override val hlRallies = "Longs échanges (des bracelets)"
+    override val hlMax = "Durée maximale"
+    override val hlNone = "Aucun point adapté : marquez aces, coups gagnants ou jouez avec les bracelets."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n points · durée $t" }
+    override val hlHint = "Si c'est trop long, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. La vidéo va dans la galerie."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Balle de match"; "SET_POINT" -> "Balle de set"; "BREAK_POINT" -> "Balle de break"; "LONG_RALLY" -> "Long échange"; "ACE" -> "Ace"; else -> "Coup gagnant" } }
+    override val hlCreate = "Créer"
+    override val hlMaking: (Int) -> String = { "Montage… $it %" }
+    override val hlDone = "Temps forts prêts, enregistrés dans Films/Tennis Score Manager."
+    override val hlFailed = "Montage échoué."
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -16840,6 +16920,18 @@ object PtStrings : Strings {
     override val videoTagSetupTitle = "Quem joga?"
     override val videoFirstServer = "Quem saca primeiro"
     override val videoTagSetupHint = "Formato e regras são os da página 2."
+    override val hlTitle = "Melhores momentos"
+    override val hlBig = "Break points, set points e match points"
+    override val hlRallies = "Ralis longos (das pulseiras)"
+    override val hlMax = "Duração máxima"
+    override val hlNone = "Nenhum ponto adequado: marque aces, winners ou jogue com as pulseiras."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n pontos · $t" }
+    override val hlHint = "Se ficar longo demais, primeiro os trechos são encurtados, depois os pontos menos importantes ficam de fora. O vídeo vai para a galeria."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Rali longo"; "ACE" -> "Ace"; else -> "Winner" } }
+    override val hlCreate = "Criar"
+    override val hlMaking: (Int) -> String = { "Montando… $it%" }
+    override val hlDone = "Melhores momentos prontos, salvos em Filmes/Tennis Score Manager."
+    override val hlFailed = "Não foi possível montar."
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -22527,6 +22619,278 @@ object Chapters {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.media.MediaMetadataRetriever
+import android.os.Build
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.provider.MediaStore
+import android.util.Log
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.effect.BitmapOverlay
+import androidx.media3.effect.OverlayEffect
+import androidx.media3.effect.StaticOverlaySettings
+import androidx.media3.transformer.Composition
+import androidx.media3.transformer.EditedMediaItem
+import androidx.media3.transformer.EditedMediaItemSequence
+import androidx.media3.transformer.Effects
+import androidx.media3.transformer.ExportException
+import androidx.media3.transformer.ExportResult
+import androidx.media3.transformer.ProgressHolder
+import androidx.media3.transformer.Transformer
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/**
+ * Monta gli highlights sul telefono (Media3 Transformer): i pezzi scelti da [Highlights.select], uno dopo l'altro,
+ * con una scritta sul perché (ACE, PALLA BREAK...) e, nei video importati, la grafica del punteggio. Il risultato va
+ * in galleria (Film/Tennis Score Manager) con i suoi capitoli, così si rivede punto per punto come gli altri video.
+ */
+@UnstableApi
+class HighlightMaker(context: Context) {
+    private val app = context.applicationContext
+    private var transformer: Transformer? = null
+    private val main = Handler(Looper.getMainLooper())
+
+    /** Da chiamare sul thread principale. [onProgress] in percento; [onDone] col file dei capitoli, o null se fallisce. */
+    fun make(
+        e: VideoLibrary.Entry,
+        clips: List<Highlights.Clip>,
+        label: (Highlights.Reason) -> String,
+        onProgress: (Int) -> Unit,
+        onDone: (File?) -> Unit,
+    ) {
+        val ch = e.chapters
+        val width = frameWidth(e) ?: 1920
+        // Le misure della grafica sono pensate per 1920 di larghezza: si adattano al video.
+        val scale = width / 1920f * 1.2f
+        val items = clips.map { c ->
+            val item = MediaItem.Builder().setUri(e.video).setClippingConfiguration(
+                MediaItem.ClippingConfiguration.Builder().setStartPositionMs(c.startMs).setEndPositionMs(c.endMs).build(),
+            ).build()
+            val overlays = mutableListOf<androidx.media3.effect.TextureOverlay>(
+                BitmapOverlay.createStaticBitmapOverlay(tag(label(c.reason), scale), at(-0.92f, 0.85f, -1f, 1f)),
+            )
+            // Nei video importati il punteggio non è nel video: lo si disegna, com'era prima del punto.
+            ch.rules?.let { rules ->
+                val before = PointMarks.stateAfter(rules, ch.points, c.index)
+                val bmp = OverlayRenderer.render(ScoreOverlay.from(before, ch.names, null, ""), scale)
+                overlays += BitmapOverlay.createStaticBitmapOverlay(bmp, at(-0.94f, -0.88f, -1f, -1f))
+            }
+            EditedMediaItem.Builder(item).setEffects(Effects(listOf(), listOf(OverlayEffect(overlays)))).build()
+        }
+        val dir = app.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: app.filesDir
+        val out = File(dir, "TSM_highlights_${System.currentTimeMillis()}.mp4")
+        val t = Transformer.Builder(app).addListener(object : Transformer.Listener {
+            override fun onCompleted(composition: Composition, exportResult: ExportResult) {
+                transformer = null
+                Thread { val f = finish(e, clips, out); main.post { onDone(f) } }.start()
+            }
+
+            override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                Log.w(TAG, "montaggio non riuscito", exportException)
+                transformer = null
+                out.delete()
+                onDone(null)
+            }
+        }).build()
+        transformer = t
+        t.start(Composition.Builder(EditedMediaItemSequence.Builder(items).build()).build(), out.absolutePath)
+        // Avanzamento: Transformer lo dice solo se glielo si chiede.
+        val holder = ProgressHolder()
+        val poll = object : Runnable {
+            override fun run() {
+                val tr = transformer ?: return
+                if (tr.getProgress(holder) == Transformer.PROGRESS_STATE_AVAILABLE) onProgress(holder.progress)
+                main.postDelayed(this, 500)
+            }
+        }
+        main.post(poll)
+    }
+
+    fun cancel() {
+        transformer?.cancel()
+        transformer = null
+    }
+
+    /** Ancoraggi: (x, y) del punto del video e del punto della scritta da far coincidere, da -1 a 1. */
+    private fun at(bx: Float, by: Float, ox: Float, oy: Float) =
+        StaticOverlaySettings.Builder().setBackgroundFrameAnchor(bx, by).setOverlayFrameAnchor(ox, oy).build()
+
+    private fun frameWidth(e: VideoLibrary.Entry): Int? = runCatching {
+        val r = MediaMetadataRetriever()
+        try {
+            r.setDataSource(app, e.video)
+            val w = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt()
+            val h = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toInt()
+            val rot = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt() ?: 0
+            if (rot == 90 || rot == 270) h else w
+        } finally {
+            r.release()
+        }
+    }.getOrNull()
+
+    /** La scritta del perché, in alto a sinistra: riquadro verde lime come la grafica del punteggio. */
+    private fun tag(text: String, scale: Float): Bitmap {
+        val p = Paint().apply {
+            isAntiAlias = true; color = Color.rgb(12, 20, 36); textSize = 30f * scale; letterSpacing = 0.08f
+            typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
+        }
+        val padX = 18f * scale
+        val h = 50f * scale
+        val w = p.measureText(text.uppercase()) + 2 * padX
+        val bmp = Bitmap.createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        c.drawRoundRect(RectF(0f, 0f, w, h), 8f * scale, 8f * scale, Paint().apply { isAntiAlias = true; color = Color.rgb(0xC6, 0xF4, 0x32) })
+        c.drawText(text.uppercase(), padX, h / 2 - (p.descent() + p.ascent()) / 2, p)
+        return bmp
+    }
+
+    /** Copia in galleria e capitoli del montaggio: ogni pezzo è un punto, con l'ora nel nuovo video. */
+    private fun finish(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, out: File): File? = runCatching {
+        var offset = 0L
+        val marks = clips.map { c ->
+            val p = e.chapters.points[c.index]
+            val end = offset + (p.at - c.startMs)
+            offset += c.durationMs
+            p.copy(at = end)
+        }
+        var uri: String? = null
+        if (Build.VERSION.SDK_INT >= 29) {
+            val values = ContentValues().apply {
+                put(MediaStore.Video.Media.DISPLAY_NAME, out.name)
+                put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+                put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/Tennis Score Manager")
+            }
+            val u = app.contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
+            app.contentResolver.openOutputStream(u)?.use { o -> out.inputStream().use { it.copyTo(o) } } ?: error("open")
+            uri = u.toString()
+            out.delete()
+        }
+        val json = File(out.parentFile, out.nameWithoutExtension + ".json")
+        json.writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(out.name, marks, uri, System.currentTimeMillis(), e.chapters.names)))
+        json
+    }.onFailure { Log.w(TAG, "highlights non salvati", it) }.getOrNull()
+
+    companion object {
+        private const val TAG = "Highlights"
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/Highlights.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/Highlights.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.model.RulesConfig
+
+/**
+ * Highlights: quali punti finiscono nel montaggio e da dove a dove. Ogni punto prende un valore (match point 5,
+ * set point 4, palla break o scambio lungo 3, ace e vincente 2). Se tutti insieme superano la durata scelta, prima
+ * si accorciano i pezzi (meno secondi prima della fine del punto, fino a [MIN_BEFORE_MS]), poi, se non basta, si
+ * lasciano fuori i meno importanti; alla fine si rimettono in ordine di tempo.
+ */
+object Highlights {
+    /** Prima della fine del punto: abbastanza per vedere servizio e scambio di un punto normale. */
+    const val BEFORE_MS = 12_000L
+    /** Il minimo a cui si accorcia un pezzo quando il montaggio supera la durata scelta. */
+    const val MIN_BEFORE_MS = 5_000L
+    /** Dopo la fine: la reazione, il punteggio che cambia. */
+    const val AFTER_MS = 2_000L
+    /** Dagli 8 colpi in su lo scambio è lungo. */
+    const val LONG_RALLY = 8
+
+    enum class Reason { MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
+
+    /** Cosa includere (tutto acceso di serie). */
+    data class Options(
+        val aces: Boolean = true,
+        val winners: Boolean = true,
+        val bigPoints: Boolean = true,
+        val longRallies: Boolean = true,
+        /** Durata massima del montaggio: 5 minuti vanno bene per i social, un circolo può volerne 15. */
+        val maxMs: Long = 5 * 60_000L,
+    )
+
+    /** Un pezzo del montaggio: il punto [index], da [startMs] a [endMs] del video, e perché c'è. */
+    data class Clip(val index: Int, val startMs: Long, val endMs: Long, val reason: Reason) {
+        val durationMs: Long get() = endMs - startMs
+    }
+
+    /** Il motivo più forte per tenere il punto (null = non va negli highlights). */
+    fun reason(p: PointMark, pressure: String?, o: Options): Reason? = when {
+        o.bigPoints && pressure == "MATCH_POINT" -> Reason.MATCH_POINT
+        o.bigPoints && pressure == "SET_POINT" -> Reason.SET_POINT
+        o.bigPoints && pressure == "BREAK_POINT" -> Reason.BREAK_POINT
+        o.longRallies && (p.strokes ?: 0) >= LONG_RALLY -> Reason.LONG_RALLY
+        o.aces && p.kind == "ACE" -> Reason.ACE
+        o.winners && p.kind == "WINNER" -> Reason.WINNER
+        else -> null
+    }
+
+    fun value(r: Reason): Int = when (r) {
+        Reason.MATCH_POINT -> 5
+        Reason.SET_POINT -> 4
+        Reason.BREAK_POINT, Reason.LONG_RALLY -> 3
+        Reason.ACE, Reason.WINNER -> 2
+    }
+
+    /**
+     * I pezzi del montaggio, in ordine di tempo. [rules] serve per i video segnati prima che i punti portassero
+     * cosa c'era in palio: lo si ricalcola. [videoMs] è la durata del video (i pezzi non vanno oltre).
+     */
+    fun select(points: List<PointMark>, rules: RulesConfig?, videoMs: Long, o: Options = Options()): List<Clip> {
+        val chosen = points.mapIndexedNotNull { i, p ->
+            val pressure = p.pressure ?: rules?.let { PointMarks.pressure(PointMarks.stateAfter(it, points, i)) }
+            reason(p, pressure, o)?.let { i to it }
+        }
+        fun clips(before: Long) = chosen.mapNotNull { (i, r) ->
+            val p = points[i]
+            // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto.
+            val prevEnd = points.getOrNull(i - 1)?.at?.plus(1_000) ?: 0L
+            val start = maxOf(p.at - before, prevEnd, 0L)
+            val end = (p.at + AFTER_MS).let { if (videoMs > 0) minOf(it, videoMs) else it }
+            if (end <= start) null else Clip(i, start, end, r)
+        }
+        // Troppo lungo: prima si accorciano tutti i pezzi, un secondo alla volta.
+        var before = BEFORE_MS
+        var candidates = clips(before)
+        while (candidates.sumOf { it.durationMs } > o.maxMs && before > MIN_BEFORE_MS) {
+            before -= 1_000
+            candidates = clips(before)
+        }
+        // Ancora troppo lungo: restano i più importanti (a parità, i più recenti: il finale conta).
+        val kept = mutableListOf<Clip>()
+        var total = 0L
+        for (c in candidates.sortedWith(compareByDescending<Clip> { value(it.reason) }.thenByDescending { it.index })) {
+            if (total + c.durationMs > o.maxMs) continue
+            kept += c
+            total += c.durationMs
+        }
+        return kept.sortedBy { it.index }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/OverlayRenderer.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/OverlayRenderer.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -22670,10 +23034,23 @@ object PointMarks {
         return set.coerceAtLeast(0) to game.coerceAtLeast(0)
     }
 
-    /** Il segno del punto appena giocato, con lo stato dopo il punto. */
-    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false): PointMark {
+    /** Il segno del punto appena giocato, con lo stato dopo il punto e (se si sa) quello prima. */
+    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false, before: MatchState? = null): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe)
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure))
+    }
+
+    /** Cosa c'è in palio nel prossimo punto (come le scritte del riquadro arancione e della grafica). */
+    fun pressure(state: MatchState): String? {
+        if (state.isFinished) return null
+        val next = Side.entries.mapNotNull { ScoreEngine.lookahead(state, it) }
+        return when {
+            next.any { it.matchWinner != null } -> "MATCH_POINT"
+            next.any { it.setWinner != null } -> "SET_POINT"
+            state.isDecidingPoint -> "DECIDING"
+            ScoreEngine.isBreakPoint(state) -> "BREAK_POINT"
+            else -> null
+        }
     }
 
     /** I punti segnati rigiocati con le regole: lo stato dopo i primi [n]. */
@@ -22755,6 +23132,10 @@ data class PointMark(
     val game: Int = 0,
     /** Punto giocato sulla seconda di servizio (la prima era fuori). */
     val secondServe: Boolean = false,
+    /** Cosa c'era in palio prima del punto: MATCH_POINT, SET_POINT, BREAK_POINT, DECIDING (null = niente). */
+    val pressure: String? = null,
+    /** Colpi dello scambio (dai braccialetti), se si sanno. */
+    val strokes: Int? = null,
 )
 TSM_EOF
 
@@ -22871,11 +23252,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Replay
@@ -22927,11 +23310,15 @@ import java.io.File
  * Nei video importati i punti si segnano qui, guardando: a fine punto si tocca chi l'ha vinto (e, se si vuole, com'è
  * finito), e il punteggio si calcola con le regole della partita; la grafica del punteggio si disegna sopra il video.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class VideoPlayerActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
     private val s: Strings get() = stringsFor(controller.options.value.lang)
     private var player: ExoPlayer? = null
+    private var maker: HighlightMaker? = null
+    /** Montaggio in corso: percentuale (null = nessuno). */
+    private var hlProgress by mutableStateOf<Int?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22964,6 +23351,7 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        maker?.cancel()
         player?.release()
         player = null
         super.onDestroy()
@@ -22984,6 +23372,7 @@ class VideoPlayerActivity : ComponentActivity() {
         }
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
+        var hlOpen by remember { mutableStateOf(false) }
         val cur = Chapters.indexAt(points, pos)
         val list = rememberLazyListState()
         LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
@@ -23035,6 +23424,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
                     NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
                     NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
+                    NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
                 }
                 LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     itemsIndexed(points) { i, pt ->
@@ -23051,6 +23441,8 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+        if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
+        hlProgress?.let { HighlightProgress(it) }
         if (setup) {
             TagSetup(onDone = { names, server ->
                 update(ch.copy(names = names, rules = controller.rulesFromOptions(server)))
@@ -23082,7 +23474,7 @@ class VideoPlayerActivity : ComponentActivity() {
             }
             val probe = PointMark(pos, "", winner.ordinal, kind?.name, secondServe = fault)
             val after = PointMarks.stateAfter(rules, points + probe, points.size + 1)
-            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault)))
+            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault, before = state)))
             askKind = kind == null
         }
         // Il pannello è basso (telefono in orizzontale): pulsanti a due a due, istruzioni solo prima del primo punto.
@@ -23147,6 +23539,88 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Highlights: cosa includere e quanto può durare al massimo; sotto, quanti punti e quanto verrebbe. */
+    @Composable
+    private fun HighlightDialog(e: VideoLibrary.Entry, videoMs: Long, onClose: () -> Unit) {
+        val str = s
+        var o by remember { mutableStateOf(Highlights.Options()) }
+        // Dai social (1-5 minuti) al video del circolo (10-15).
+        val minutes = listOf(1, 3, 5, 10, 15)
+        val clips = remember(o, e) { Highlights.select(e.chapters.points, e.chapters.rules, videoMs, o) }
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = { Text(str.hlTitle) },
+            text = {
+                // In orizzontale il dialogo è basso: si scorre.
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Check(str.hlBig, o.bigPoints) { o = o.copy(bigPoints = it) }
+                    Check(str.videoKind("ACE"), o.aces) { o = o.copy(aces = it) }
+                    Check(str.videoKind("WINNER"), o.winners) { o = o.copy(winners = it) }
+                    Check(str.hlRallies, o.longRallies) { o = o.copy(longRallies = it) }
+                    Text(str.hlMax, fontSize = 13.sp)
+                    Segmented(minutes.map { SegOption("$it′") }, minutes.indexOf((o.maxMs / 60_000).toInt()).coerceAtLeast(0), { i ->
+                        o = o.copy(maxMs = minutes[i] * 60_000L)
+                    }, columns = minutes.size)
+                    Text(
+                        if (clips.isEmpty()) str.hlNone else str.hlPreview(clips.size, Chapters.time(clips.sumOf { it.durationMs })),
+                        fontSize = 13.sp, color = if (clips.isEmpty()) TsmColors.Orange else TsmColors.TextMain,
+                    )
+                    Text(str.hlHint, fontSize = 11.sp, color = TsmColors.TextDim)
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = clips.isNotEmpty(), onClick = {
+                    onClose()
+                    player?.pause()
+                    hlProgress = 0
+                    val m = HighlightMaker(this)
+                    maker = m
+                    m.make(e, clips, { r -> str.hlReason(r.name) }, { hlProgress = it }) { file ->
+                        hlProgress = null
+                        maker = null
+                        if (file == null) {
+                            Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
+                        }
+                    }
+                }) { Text(str.hlCreate) }
+            },
+            dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
+        )
+    }
+
+    @Composable
+    private fun Check(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
+        Row(Modifier.fillMaxWidth().clickable { onChange(!on) }, verticalAlignment = Alignment.CenterVertically) {
+            androidx.compose.material3.Checkbox(on, onChange)
+            Text(label, fontSize = 14.sp)
+        }
+    }
+
+    @Composable
+    private fun HighlightProgress(pct: Int) {
+        val str = s
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(str.hlTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(str.hlMaking(pct))
+                    androidx.compose.material3.LinearProgressIndicator(progress = { pct / 100f }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    maker?.cancel()
+                    maker = null
+                    hlProgress = null
+                }) { Text(str.back) }
+            },
+        )
     }
 
     /** Prima di segnare: chi gioca e chi serve per primo (le regole sono quelle di pagina 2). */
@@ -27023,7 +27497,7 @@ class StringsTest {
                     is Function1<*, *> -> call({ (v as Function1<Any?, Any?>)(it[0]) }, listOf(listOf(2), listOf("Rossi"), listOf(listOf("Rossi"))))
                     is Function2<*, *, *> -> call(
                         { (v as Function2<Any?, Any?, Any?>)(it[0], it[1]) },
-                        listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(true, false)),
+                        listOf(listOf("Rossi", "6-4"), listOf("Rossi", 2), listOf(2, 3), listOf(2, "1:23"), listOf(true, false)),
                     )
                     is Function3<*, *, *, *> -> call(
                         { (v as Function3<Any?, Any?, Any?, Any?>)(it[0], it[1], it[2]) },
@@ -27164,6 +27638,77 @@ class ChaptersTest {
         val text = Chapters.youtube(pts, "Inizio") { set, game -> "Set $set · Game $game" }
         assertEquals("0:00 Inizio\n1:00 Set 1 · Game 2\n1:40 Set 2 · Game 1", text)
         assertEquals("1:02:03", Chapters.time(3_723_000))
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/HighlightsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/HighlightsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class HighlightsTest {
+
+    private fun p(at: Long, kind: String? = null, pressure: String? = null, strokes: Int? = null) =
+        PointMark(at, "", 0, kind, pressure = pressure, strokes = strokes)
+
+    @Test
+    fun picksByReasonAndKeepsTimeOrder() {
+        val pts = listOf(
+            p(20_000),                              // niente
+            p(40_000, kind = "ACE"),                // ace
+            p(60_000, pressure = "BREAK_POINT"),    // palla break
+            p(65_000, kind = "WINNER"),             // vincente, 5 s dopo il punto prima
+            p(90_000, strokes = 12),                // scambio lungo
+        )
+        val clips = Highlights.select(pts, null, 0)
+        assertEquals(listOf(1, 2, 3, 4), clips.map { it.index })
+        assertEquals(Highlights.Reason.BREAK_POINT, clips[1].reason)
+        // Il vincente parte dopo la fine del punto prima (+1 s), non 12 s prima.
+        assertEquals(61_000L, clips[2].startMs)
+        assertEquals(67_000L, clips[2].endMs)
+        assertEquals(28_000L, clips[0].startMs)
+    }
+
+    @Test
+    fun overLimitClipsGetShorterFirst() {
+        val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
+        // 14 s l'uno fanno 42 s: con 30 s di limite si accorciano a 10 s (8 prima della fine + 2 dopo) e restano tutti.
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 30_000))
+        assertEquals(listOf(0, 1, 2), clips.map { it.index })
+        assertEquals(listOf(10_000L, 10_000L, 10_000L), clips.map { it.durationMs })
+    }
+
+    @Test
+    fun stillOverLimitDropsLeastImportant() {
+        val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
+        // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori uno da 2, il meno recente (l'ace).
+        val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 20_000))
+        assertEquals(listOf(1, 2), clips.map { it.index })
+        assertEquals(7_000L, clips[0].durationMs)
+    }
+
+    @Test
+    fun optionsFilterAndPressureFromRules() {
+        // Video segnato senza "pressure": la si ricalcola con le regole. G1 vince il suo game di servizio (punti 0-3),
+        // poi in risposta va 0-40 (punti 4-6): il punto 7 si gioca su palla break.
+        val rules = RulesConfig()
+        val raw = mutableListOf<PointMark>()
+        val winners = List(8) { 0 }
+        for ((i, w) in winners.withIndex()) {
+            val after = PointMarks.stateAfter(rules, raw + PointMark(0, "", w), raw.size + 1)
+            raw += PointMarks.mark((i + 1) * 20_000L, after, if (w == 0) Side.P1 else Side.P2, null)
+        }
+        val clips = Highlights.select(raw, rules, 0, Highlights.Options(aces = false, winners = false, longRallies = false))
+        assertEquals(listOf(7), clips.map { it.index })
+        assertEquals(Highlights.Reason.BREAK_POINT, clips.single().reason)
     }
 }
 TSM_EOF
@@ -27957,6 +28502,8 @@ zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", v
 rootencoder = { group = "com.github.pedroSG94.RootEncoder", name = "library", version.ref = "rootEncoder" }
 media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
+media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3" }
+media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref = "media3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -31990,6 +32537,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 121 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 124 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

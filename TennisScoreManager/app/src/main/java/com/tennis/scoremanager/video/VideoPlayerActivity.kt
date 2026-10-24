@@ -29,11 +29,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Replay
@@ -85,11 +87,15 @@ import java.io.File
  * Nei video importati i punti si segnano qui, guardando: a fine punto si tocca chi l'ha vinto (e, se si vuole, com'è
  * finito), e il punteggio si calcola con le regole della partita; la grafica del punteggio si disegna sopra il video.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class VideoPlayerActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
     private val s: Strings get() = stringsFor(controller.options.value.lang)
     private var player: ExoPlayer? = null
+    private var maker: HighlightMaker? = null
+    /** Montaggio in corso: percentuale (null = nessuno). */
+    private var hlProgress by mutableStateOf<Int?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +128,7 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        maker?.cancel()
         player?.release()
         player = null
         super.onDestroy()
@@ -142,6 +149,7 @@ class VideoPlayerActivity : ComponentActivity() {
         }
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
+        var hlOpen by remember { mutableStateOf(false) }
         val cur = Chapters.indexAt(points, pos)
         val list = rememberLazyListState()
         LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
@@ -193,6 +201,7 @@ class VideoPlayerActivity : ComponentActivity() {
                     NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
                     NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
                     NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
+                    NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
                 }
                 LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     itemsIndexed(points) { i, pt ->
@@ -209,6 +218,8 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+        if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
+        hlProgress?.let { HighlightProgress(it) }
         if (setup) {
             TagSetup(onDone = { names, server ->
                 update(ch.copy(names = names, rules = controller.rulesFromOptions(server)))
@@ -240,7 +251,7 @@ class VideoPlayerActivity : ComponentActivity() {
             }
             val probe = PointMark(pos, "", winner.ordinal, kind?.name, secondServe = fault)
             val after = PointMarks.stateAfter(rules, points + probe, points.size + 1)
-            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault)))
+            onChange(ch.copy(points = points + PointMarks.mark(pos, after, winner, kind, fault, before = state)))
             askKind = kind == null
         }
         // Il pannello è basso (telefono in orizzontale): pulsanti a due a due, istruzioni solo prima del primo punto.
@@ -305,6 +316,88 @@ class VideoPlayerActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Highlights: cosa includere e quanto può durare al massimo; sotto, quanti punti e quanto verrebbe. */
+    @Composable
+    private fun HighlightDialog(e: VideoLibrary.Entry, videoMs: Long, onClose: () -> Unit) {
+        val str = s
+        var o by remember { mutableStateOf(Highlights.Options()) }
+        // Dai social (1-5 minuti) al video del circolo (10-15).
+        val minutes = listOf(1, 3, 5, 10, 15)
+        val clips = remember(o, e) { Highlights.select(e.chapters.points, e.chapters.rules, videoMs, o) }
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = { Text(str.hlTitle) },
+            text = {
+                // In orizzontale il dialogo è basso: si scorre.
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Check(str.hlBig, o.bigPoints) { o = o.copy(bigPoints = it) }
+                    Check(str.videoKind("ACE"), o.aces) { o = o.copy(aces = it) }
+                    Check(str.videoKind("WINNER"), o.winners) { o = o.copy(winners = it) }
+                    Check(str.hlRallies, o.longRallies) { o = o.copy(longRallies = it) }
+                    Text(str.hlMax, fontSize = 13.sp)
+                    Segmented(minutes.map { SegOption("$it′") }, minutes.indexOf((o.maxMs / 60_000).toInt()).coerceAtLeast(0), { i ->
+                        o = o.copy(maxMs = minutes[i] * 60_000L)
+                    }, columns = minutes.size)
+                    Text(
+                        if (clips.isEmpty()) str.hlNone else str.hlPreview(clips.size, Chapters.time(clips.sumOf { it.durationMs })),
+                        fontSize = 13.sp, color = if (clips.isEmpty()) TsmColors.Orange else TsmColors.TextMain,
+                    )
+                    Text(str.hlHint, fontSize = 11.sp, color = TsmColors.TextDim)
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = clips.isNotEmpty(), onClick = {
+                    onClose()
+                    player?.pause()
+                    hlProgress = 0
+                    val m = HighlightMaker(this)
+                    maker = m
+                    m.make(e, clips, { r -> str.hlReason(r.name) }, { hlProgress = it }) { file ->
+                        hlProgress = null
+                        maker = null
+                        if (file == null) {
+                            Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
+                            startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
+                        }
+                    }
+                }) { Text(str.hlCreate) }
+            },
+            dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
+        )
+    }
+
+    @Composable
+    private fun Check(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
+        Row(Modifier.fillMaxWidth().clickable { onChange(!on) }, verticalAlignment = Alignment.CenterVertically) {
+            androidx.compose.material3.Checkbox(on, onChange)
+            Text(label, fontSize = 14.sp)
+        }
+    }
+
+    @Composable
+    private fun HighlightProgress(pct: Int) {
+        val str = s
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(str.hlTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(str.hlMaking(pct))
+                    androidx.compose.material3.LinearProgressIndicator(progress = { pct / 100f }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    maker?.cancel()
+                    maker = null
+                    hlProgress = null
+                }) { Text(str.back) }
+            },
+        )
     }
 
     /** Prima di segnare: chi gioca e chi serve per primo (le regole sono quelle di pagina 2). */

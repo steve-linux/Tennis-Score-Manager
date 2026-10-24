@@ -30,10 +30,23 @@ object PointMarks {
         return set.coerceAtLeast(0) to game.coerceAtLeast(0)
     }
 
-    /** Il segno del punto appena giocato, con lo stato dopo il punto. */
-    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false): PointMark {
+    /** Il segno del punto appena giocato, con lo stato dopo il punto e (se si sa) quello prima. */
+    fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false, before: MatchState? = null): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe)
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure))
+    }
+
+    /** Cosa c'è in palio nel prossimo punto (come le scritte del riquadro arancione e della grafica). */
+    fun pressure(state: MatchState): String? {
+        if (state.isFinished) return null
+        val next = Side.entries.mapNotNull { ScoreEngine.lookahead(state, it) }
+        return when {
+            next.any { it.matchWinner != null } -> "MATCH_POINT"
+            next.any { it.setWinner != null } -> "SET_POINT"
+            state.isDecidingPoint -> "DECIDING"
+            ScoreEngine.isBreakPoint(state) -> "BREAK_POINT"
+            else -> null
+        }
     }
 
     /** I punti segnati rigiocati con le regole: lo stato dopo i primi [n]. */

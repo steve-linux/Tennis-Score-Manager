@@ -367,10 +367,12 @@ class MatchController(
         scope.launch {
             // Telefono-telecamera: punteggio per la grafica a ogni cambiamento e un segno a ogni punto (capitoli).
             var lastPoints = -1
+            var before: MatchState? = null
             live.collect { lm ->
                 if (lm == null) {
                     relay.publishScore(null)
                     lastPoints = -1
+                    before = null
                     return@collect
                 }
                 relay.publishScore(scoreOverlay(lm))
@@ -379,10 +381,14 @@ class MatchController(
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
                     val (set, game) = PointMarks.place(lm.state)
                     relay.publishPoint(
-                        PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game, p?.secondServe == true),
+                        PointMark(
+                            System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game,
+                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes,
+                        ),
                     )
                 }
                 lastPoints = played
+                before = lm.state
             }
         }
         scope.launch { watchRemotes() }

@@ -200,6 +200,18 @@ interface Strings {
     val videoTagSetupTitle: String
     val videoFirstServer: String
     val videoTagSetupHint: String
+    val hlTitle: String
+    val hlBig: String
+    val hlRallies: String
+    val hlMax: String
+    val hlNone: String
+    val hlPreview: (Int, String) -> String
+    val hlHint: String
+    val hlReason: (String) -> String
+    val hlCreate: String
+    val hlMaking: (Int) -> String
+    val hlDone: String
+    val hlFailed: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -935,6 +947,18 @@ object ItStrings : Strings {
     override val videoTagSetupTitle = "Chi gioca?"
     override val videoFirstServer = "Chi serve per primo"
     override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
+    override val hlTitle = "Highlights"
+    override val hlBig = "Palle break, set e match point"
+    override val hlRallies = "Scambi lunghi (dai braccialetti)"
+    override val hlMax = "Durata massima"
+    override val hlNone = "Nessun punto adatto: segna ace, vincenti o gioca con i braccialetti."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n punti · $t" }
+    override val hlHint = "Se supera la durata, prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il video va in galleria."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Palla break"; "LONG_RALLY" -> "Scambio lungo"; "ACE" -> "Ace"; else -> "Vincente" } }
+    override val hlCreate = "Crea"
+    override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
+    override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
+    override val hlFailed = "Montaggio non riuscito."
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1642,6 +1666,18 @@ object EnStrings : Strings {
     override val videoTagSetupTitle = "Who is playing?"
     override val videoFirstServer = "Who serves first"
     override val videoTagSetupHint = "Format and rules are the ones on page 2."
+    override val hlTitle = "Highlights"
+    override val hlBig = "Break, set and match points"
+    override val hlRallies = "Long rallies (from the wristbands)"
+    override val hlMax = "Maximum length"
+    override val hlNone = "No suitable points: mark aces, winners or play with the wristbands."
+    override val hlPreview: (Int, String) -> String = { n, t -> "$n points · $t" }
+    override val hlHint = "If it is too long, clips are shortened first, then the least important points are left out. The video goes to the gallery."
+    override val hlReason: (String) -> String = { r -> when (r) { "MATCH_POINT" -> "Match point"; "SET_POINT" -> "Set point"; "BREAK_POINT" -> "Break point"; "LONG_RALLY" -> "Long rally"; "ACE" -> "Ace"; else -> "Winner" } }
+    override val hlCreate = "Create"
+    override val hlMaking: (Int) -> String = { "Editing… $it%" }
+    override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."
+    override val hlFailed = "Editing failed."
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

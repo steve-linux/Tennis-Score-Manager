@@ -63,4 +63,8 @@ data class PointMark(
     val game: Int = 0,
     /** Punto giocato sulla seconda di servizio (la prima era fuori). */
     val secondServe: Boolean = false,
+    /** Cosa c'era in palio prima del punto: MATCH_POINT, SET_POINT, BREAK_POINT, DECIDING (null = niente). */
+    val pressure: String? = null,
+    /** Colpi dello scambio (dai braccialetti), se si sanno. */
+    val strokes: Int? = null,
 )
