@@ -33,7 +33,7 @@ object PointMarks {
     /** Il segno del punto appena giocato, con lo stato dopo il punto e (se si sa) quello prima. */
     fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false, before: MatchState? = null): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure))
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure), server = before?.server?.ordinal ?: -1)
     }
 
     /** Cosa c'è in palio nel prossimo punto (come le scritte del riquadro arancione e della grafica). */

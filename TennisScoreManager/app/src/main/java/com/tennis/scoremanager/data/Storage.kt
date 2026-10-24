@@ -159,6 +159,13 @@ class Storage(context: Context) {
     var streamKey: String
         get() = prefs.getString("stream_key", null) ?: ""
         set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+    /** Highlights: ordine delle voci (dalla più importante) e quelle accese, come l'ultima volta. */
+    var highlightOrder: List<String>
+        get() = prefs.getString("hl_order", null)?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
+        set(v) = prefs.edit().putString("hl_order", v.joinToString(",")).apply()
+    var highlightEnabled: Set<String>?
+        get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
+        set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()

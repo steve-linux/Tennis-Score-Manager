@@ -1201,7 +1201,7 @@ class MatchController(
                     relay.publishPoint(
                         PointMark(
                             System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game,
-                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes,
+                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes, before?.server?.ordinal ?: -1,
                         ),
                     )
                 }
@@ -6869,6 +6869,13 @@ class Storage(context: Context) {
     var streamKey: String
         get() = prefs.getString("stream_key", null) ?: ""
         set(v) = prefs.edit().putString("stream_key", v.trim()).apply()
+    /** Highlights: ordine delle voci (dalla più importante) e quelle accese, come l'ultima volta. */
+    var highlightOrder: List<String>
+        get() = prefs.getString("hl_order", null)?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
+        set(v) = prefs.edit().putString("hl_order", v.joinToString(",")).apply()
+    var highlightEnabled: Set<String>?
+        get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
+        set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
@@ -12514,6 +12521,31 @@ interface Strings {
     val hlMaking: (Int) -> String
     val hlDone: String
     val hlFailed: String
+    val hlOrderHint: String
+    val hlUp: String
+    val hlDown: String
+    val coachTitle: String
+    val coachPlayer: String
+    val coachAll: String
+    val coachPoint: String
+    val coachWon: String
+    val coachLost: String
+    val coachServe: String
+    val coachServing: String
+    val coachReturning: String
+    val coachServeKind: String
+    val coachFirst: String
+    val coachSecond: String
+    val coachEnd: String
+    val coachSituation: String
+    val coachBreak: String
+    val coachSetMatch: String
+    val coachApply: String
+    val coachClear: String
+    val coachCount: (Int) -> String
+    val coachSummary: (Int, Int) -> String
+    val coachPlay: String
+    val coachNone: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -13260,6 +13292,31 @@ object ItStrings : Strings {
     override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
     override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
     override val hlFailed = "Montaggio non riuscito."
+    override val hlOrderHint = "In alto le voci con la precedenza: se il video supera la durata, restano fuori prima quelle in fondo."
+    override val hlUp = "Sposta su"
+    override val hlDown = "Sposta giù"
+    override val coachTitle = "Filtri allenatore"
+    override val coachPlayer = "Giocatore"
+    override val coachAll = "Tutti"
+    override val coachPoint = "Punti"
+    override val coachWon = "Vinti"
+    override val coachLost = "Persi"
+    override val coachServe = "Servizio"
+    override val coachServing = "Al servizio"
+    override val coachReturning = "In risposta"
+    override val coachServeKind = "Battuta"
+    override val coachFirst = "Prima"
+    override val coachSecond = "Seconda"
+    override val coachEnd = "Com'è finito"
+    override val coachSituation = "Situazione"
+    override val coachBreak = "Palle break"
+    override val coachSetMatch = "Set e match point"
+    override val coachApply = "Applica"
+    override val coachClear = "Togli il filtro"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n punti" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n punti · $w vinti (${if (n > 0) w * 100 / n else 0}%)" }
+    override val coachPlay = "Riproduci"
+    override val coachNone = "Nessun punto con questo filtro"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -13978,6 +14035,31 @@ object EnStrings : Strings {
     override val hlMaking: (Int) -> String = { "Editing… $it%" }
     override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."
     override val hlFailed = "Editing failed."
+    override val hlOrderHint = "Items at the top take precedence: if the video is too long, those at the bottom are left out first."
+    override val hlUp = "Move up"
+    override val hlDown = "Move down"
+    override val coachTitle = "Coach filters"
+    override val coachPlayer = "Player"
+    override val coachAll = "All"
+    override val coachPoint = "Points"
+    override val coachWon = "Won"
+    override val coachLost = "Lost"
+    override val coachServe = "Serve"
+    override val coachServing = "Serving"
+    override val coachReturning = "Returning"
+    override val coachServeKind = "Serve"
+    override val coachFirst = "First"
+    override val coachSecond = "Second"
+    override val coachEnd = "How it ended"
+    override val coachSituation = "Situation"
+    override val coachBreak = "Break points"
+    override val coachSetMatch = "Set and match points"
+    override val coachApply = "Apply"
+    override val coachClear = "Remove filter"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 point" else "$n points" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w won (${if (n > 0) w * 100 / n else 0}%)" }
+    override val coachPlay = "Play"
+    override val coachNone = "No points with this filter"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -14719,6 +14801,31 @@ object DeStrings : Strings {
     override val hlMaking: (Int) -> String = { "Schnitt… $it %" }
     override val hlDone = "Highlights fertig, gespeichert in Filme/Tennis Score Manager."
     override val hlFailed = "Schnitt fehlgeschlagen."
+    override val hlOrderHint = "Oben stehende Punkte haben Vorrang: Ist das Video zu lang, fallen zuerst die unteren weg."
+    override val hlUp = "Nach oben"
+    override val hlDown = "Nach unten"
+    override val coachTitle = "Trainerfilter"
+    override val coachPlayer = "Spieler"
+    override val coachAll = "Alle"
+    override val coachPoint = "Punkte"
+    override val coachWon = "Gewonnen"
+    override val coachLost = "Verloren"
+    override val coachServe = "Aufschlag"
+    override val coachServing = "Bei Aufschlag"
+    override val coachReturning = "Bei Rückschlag"
+    override val coachServeKind = "Aufschlagart"
+    override val coachFirst = "Erster"
+    override val coachSecond = "Zweiter"
+    override val coachEnd = "Wie er endete"
+    override val coachSituation = "Situation"
+    override val coachBreak = "Breakbälle"
+    override val coachSetMatch = "Satz- und Matchbälle"
+    override val coachApply = "Anwenden"
+    override val coachClear = "Filter entfernen"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 Punkt" else "$n Punkte" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n Punkte · $w gewonnen (${if (n > 0) w * 100 / n else 0} %)" }
+    override val coachPlay = "Abspielen"
+    override val coachNone = "Keine Punkte mit diesem Filter"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -15452,6 +15559,31 @@ object EsStrings : Strings {
     override val hlMaking: (Int) -> String = { "Montando… $it %" }
     override val hlDone = "Mejores jugadas listas, guardadas en Películas/Tennis Score Manager."
     override val hlFailed = "No se pudo montar."
+    override val hlOrderHint = "Los de arriba tienen prioridad: si el vídeo es demasiado largo, primero quedan fuera los de abajo."
+    override val hlUp = "Subir"
+    override val hlDown = "Bajar"
+    override val coachTitle = "Filtros de entrenador"
+    override val coachPlayer = "Jugador"
+    override val coachAll = "Todos"
+    override val coachPoint = "Puntos"
+    override val coachWon = "Ganados"
+    override val coachLost = "Perdidos"
+    override val coachServe = "Saque"
+    override val coachServing = "Al saque"
+    override val coachReturning = "Al resto"
+    override val coachServeKind = "Servicio"
+    override val coachFirst = "Primero"
+    override val coachSecond = "Segundo"
+    override val coachEnd = "Cómo terminó"
+    override val coachSituation = "Situación"
+    override val coachBreak = "Bolas de break"
+    override val coachSetMatch = "Bolas de set y de partido"
+    override val coachApply = "Aplicar"
+    override val coachClear = "Quitar el filtro"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n puntos" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n puntos · $w ganados (${if (n > 0) w * 100 / n else 0} %)" }
+    override val coachPlay = "Reproducir"
+    override val coachNone = "Ningún punto con este filtro"
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -16189,6 +16321,31 @@ object FrStrings : Strings {
     override val hlMaking: (Int) -> String = { "Montage… $it %" }
     override val hlDone = "Temps forts prêts, enregistrés dans Films/Tennis Score Manager."
     override val hlFailed = "Montage échoué."
+    override val hlOrderHint = "Les éléments en haut ont la priorité : si la vidéo est trop longue, ceux du bas restent dehors en premier."
+    override val hlUp = "Monter"
+    override val hlDown = "Descendre"
+    override val coachTitle = "Filtres entraîneur"
+    override val coachPlayer = "Joueur"
+    override val coachAll = "Tous"
+    override val coachPoint = "Points"
+    override val coachWon = "Gagnés"
+    override val coachLost = "Perdus"
+    override val coachServe = "Service"
+    override val coachServing = "Au service"
+    override val coachReturning = "En retour"
+    override val coachServeKind = "Balle"
+    override val coachFirst = "Première"
+    override val coachSecond = "Seconde"
+    override val coachEnd = "Fin du point"
+    override val coachSituation = "Situation"
+    override val coachBreak = "Balles de break"
+    override val coachSetMatch = "Balles de set et de match"
+    override val coachApply = "Appliquer"
+    override val coachClear = "Retirer le filtre"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 point" else "$n points" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w gagnés (${if (n > 0) w * 100 / n else 0} %)" }
+    override val coachPlay = "Lire"
+    override val coachNone = "Aucun point avec ce filtre"
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -16925,6 +17082,31 @@ object PtStrings : Strings {
     override val hlMaking: (Int) -> String = { "Montando… $it%" }
     override val hlDone = "Melhores momentos prontos, salvos em Filmes/Tennis Score Manager."
     override val hlFailed = "Não foi possível montar."
+    override val hlOrderHint = "Os itens de cima têm prioridade: se o vídeo ficar longo demais, os de baixo ficam de fora primeiro."
+    override val hlUp = "Mover para cima"
+    override val hlDown = "Mover para baixo"
+    override val coachTitle = "Filtros do treinador"
+    override val coachPlayer = "Jogador"
+    override val coachAll = "Todos"
+    override val coachPoint = "Pontos"
+    override val coachWon = "Ganhos"
+    override val coachLost = "Perdidos"
+    override val coachServe = "Saque"
+    override val coachServing = "No saque"
+    override val coachReturning = "Na devolução"
+    override val coachServeKind = "Serviço"
+    override val coachFirst = "Primeiro"
+    override val coachSecond = "Segundo"
+    override val coachEnd = "Como terminou"
+    override val coachSituation = "Situação"
+    override val coachBreak = "Break points"
+    override val coachSetMatch = "Set points e match points"
+    override val coachApply = "Aplicar"
+    override val coachClear = "Remover o filtro"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 ponto" else "$n pontos" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n pontos · $w ganhos (${if (n > 0) w * 100 / n else 0}%)" }
+    override val coachPlay = "Reproduzir"
+    override val coachNone = "Nenhum ponto com este filtro"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -22612,6 +22794,59 @@ object Chapters {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/CoachFilter.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/CoachFilter.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.model.RulesConfig
+
+/**
+ * Filtri da allenatore: quali punti rivedere. [player] 0/1 (null = tutti) a cui si riferiscono vinti/persi e
+ * servizio/risposta; i campi null non filtrano niente.
+ */
+data class CoachFilter(
+    val player: Int? = null,
+    /** true = vinti da [player], false = persi. */
+    val won: Boolean? = null,
+    /** true = [player] al servizio, false = in risposta. */
+    val serving: Boolean? = null,
+    /** true = giocati sulla seconda, false = sulla prima. */
+    val secondServe: Boolean? = null,
+    /** Com'è finito (ACE, DOUBLE_FAULT, WINNER, UNFORCED_ERROR, FORCED_ERROR): vuoto = qualsiasi. */
+    val kinds: Set<String> = emptySet(),
+    /** "BREAK" = palle break, "SET_MATCH" = set e match point. */
+    val situation: String? = null,
+) {
+    val active: Boolean get() = this != CoachFilter()
+
+    companion object {
+        /**
+         * I punti che passano il filtro, in ordine. Chi serviva e cosa c'era in palio, se mancano nei segni (video
+         * segnati prima che li portassero), si ricalcolano con le regole.
+         */
+        fun matching(points: List<PointMark>, rules: RulesConfig?, f: CoachFilter): List<Int> = points.indices.filter { i ->
+            val p = points[i]
+            val before = if ((p.server < 0 || p.pressure == null) && rules != null) PointMarks.stateAfter(rules, points, i) else null
+            val server = p.server.takeIf { it >= 0 } ?: before?.server?.ordinal ?: -1
+            val pressure = p.pressure ?: before?.let { PointMarks.pressure(it) }
+            val me = f.player
+            (f.won == null || me == null || (p.winner == me) == f.won) &&
+                (f.serving == null || me == null || (server >= 0 && (server == me) == f.serving)) &&
+                (f.secondServe == null || p.secondServe == f.secondServe) &&
+                (f.kinds.isEmpty() || p.kind in f.kinds) &&
+                when (f.situation) {
+                    "BREAK" -> pressure == "BREAK_POINT"
+                    "SET_MATCH" -> pressure == "SET_POINT" || pressure == "MATCH_POINT"
+                    else -> true
+                }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/HighlightMaker.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -22771,8 +23006,8 @@ package com.tennis.scoremanager.video
 import com.tennis.scoremanager.model.RulesConfig
 
 /**
- * Highlights: quali punti finiscono nel montaggio e da dove a dove. Ogni punto prende un valore (match point 5,
- * set point 4, palla break o scambio lungo 3, ace e vincente 2). Se tutti insieme superano la durata scelta, prima
+ * Highlights: quali punti finiscono nel montaggio e da dove a dove. Le voci (palle break/set/match point, ace,
+ * vincenti, scambi lunghi) hanno la precedenza nell'ordine scelto dall'utente. Se tutti insieme superano la durata scelta, prima
  * si accorciano i pezzi (meno secondi prima della fine del punto, fino a [MIN_BEFORE_MS]), poi, se non basta, si
  * lasciano fuori i meno importanti; alla fine si rimettono in ordine di tempo.
  */
@@ -22788,37 +23023,72 @@ object Highlights {
 
     enum class Reason { MATCH_POINT, SET_POINT, BREAK_POINT, LONG_RALLY, ACE, WINNER }
 
-    /** Cosa includere (tutto acceso di serie). */
+    /** Le voci che si possono mettere negli highlights, ordinabili: quelle più in alto hanno la precedenza. */
+    enum class Category { BIG_POINTS, ACES, WINNERS, LONG_RALLIES }
+
+    /**
+     * Cosa includere e con che precedenza: [order] dalla più importante, [enabled] quelle accese. Quando non ci
+     * sta tutto, restano fuori prima le voci in fondo.
+     */
     data class Options(
-        val aces: Boolean = true,
-        val winners: Boolean = true,
-        val bigPoints: Boolean = true,
-        val longRallies: Boolean = true,
+        val order: List<Category> = Category.entries,
+        val enabled: Set<Category> = Category.entries.toSet(),
         /** Durata massima del montaggio: 5 minuti vanno bene per i social, un circolo può volerne 15. */
         val maxMs: Long = 5 * 60_000L,
     )
 
     /** Un pezzo del montaggio: il punto [index], da [startMs] a [endMs] del video, e perché c'è. */
-    data class Clip(val index: Int, val startMs: Long, val endMs: Long, val reason: Reason) {
+    data class Clip(val index: Int, val startMs: Long, val endMs: Long, val reason: Reason? = null, val priority: Int = 0) {
         val durationMs: Long get() = endMs - startMs
     }
 
-    /** Il motivo più forte per tenere il punto (null = non va negli highlights). */
-    fun reason(p: PointMark, pressure: String?, o: Options): Reason? = when {
-        o.bigPoints && pressure == "MATCH_POINT" -> Reason.MATCH_POINT
-        o.bigPoints && pressure == "SET_POINT" -> Reason.SET_POINT
-        o.bigPoints && pressure == "BREAK_POINT" -> Reason.BREAK_POINT
-        o.longRallies && (p.strokes ?: 0) >= LONG_RALLY -> Reason.LONG_RALLY
-        o.aces && p.kind == "ACE" -> Reason.ACE
-        o.winners && p.kind == "WINNER" -> Reason.WINNER
-        else -> null
+    private fun category(r: Reason): Category = when (r) {
+        Reason.MATCH_POINT, Reason.SET_POINT, Reason.BREAK_POINT -> Category.BIG_POINTS
+        Reason.LONG_RALLY -> Category.LONG_RALLIES
+        Reason.ACE -> Category.ACES
+        Reason.WINNER -> Category.WINNERS
     }
 
-    fun value(r: Reason): Int = when (r) {
-        Reason.MATCH_POINT -> 5
-        Reason.SET_POINT -> 4
-        Reason.BREAK_POINT, Reason.LONG_RALLY -> 3
-        Reason.ACE, Reason.WINNER -> 2
+    /** Tutti i motivi per cui il punto potrebbe entrare (un ace su palla break ne ha due). */
+    private fun reasons(p: PointMark, pressure: String?): List<Reason> = listOfNotNull(
+        when (pressure) {
+            "MATCH_POINT" -> Reason.MATCH_POINT
+            "SET_POINT" -> Reason.SET_POINT
+            "BREAK_POINT" -> Reason.BREAK_POINT
+            else -> null
+        },
+        Reason.LONG_RALLY.takeIf { (p.strokes ?: 0) >= LONG_RALLY },
+        Reason.ACE.takeIf { p.kind == "ACE" },
+        Reason.WINNER.takeIf { p.kind == "WINNER" },
+    )
+
+    /**
+     * Precedenza di un motivo: prima conta la posizione della sua voce (più in alto, più conta), poi, dentro "palle
+     * break, set e match point", match point > set point > palla break.
+     */
+    fun priority(r: Reason, o: Options): Int {
+        val rank = o.order.size - o.order.indexOf(category(r))
+        val sub = when (r) {
+            Reason.MATCH_POINT -> 3
+            Reason.SET_POINT -> 2
+            Reason.BREAK_POINT -> 1
+            else -> 0
+        }
+        return rank * 10 + sub
+    }
+
+    /** Il motivo più forte per tenere il punto tra le voci accese (null = non va negli highlights). */
+    fun reason(p: PointMark, pressure: String?, o: Options): Reason? =
+        reasons(p, pressure).filter { category(it) in o.enabled }.maxByOrNull { priority(it, o) }
+
+    /** Il pezzo di video del punto [i]: da [before] prima della fine (non prima del punto precedente) a 2 s dopo. */
+    fun clip(points: List<PointMark>, i: Int, videoMs: Long, before: Long = BEFORE_MS): Clip? {
+        val p = points[i]
+        // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto.
+        val prevEnd = points.getOrNull(i - 1)?.at?.plus(1_000) ?: 0L
+        val start = maxOf(p.at - before, prevEnd, 0L)
+        val end = (p.at + AFTER_MS).let { if (videoMs > 0) minOf(it, videoMs) else it }
+        return if (end <= start) null else Clip(i, start, end)
     }
 
     /**
@@ -22830,14 +23100,7 @@ object Highlights {
             val pressure = p.pressure ?: rules?.let { PointMarks.pressure(PointMarks.stateAfter(it, points, i)) }
             reason(p, pressure, o)?.let { i to it }
         }
-        fun clips(before: Long) = chosen.mapNotNull { (i, r) ->
-            val p = points[i]
-            // Non prima della fine del punto precedente: si vedrebbe la fine di un altro punto.
-            val prevEnd = points.getOrNull(i - 1)?.at?.plus(1_000) ?: 0L
-            val start = maxOf(p.at - before, prevEnd, 0L)
-            val end = (p.at + AFTER_MS).let { if (videoMs > 0) minOf(it, videoMs) else it }
-            if (end <= start) null else Clip(i, start, end, r)
-        }
+        fun clips(before: Long) = chosen.mapNotNull { (i, r) -> clip(points, i, videoMs, before)?.copy(reason = r, priority = priority(r, o)) }
         // Troppo lungo: prima si accorciano tutti i pezzi, un secondo alla volta.
         var before = BEFORE_MS
         var candidates = clips(before)
@@ -22848,7 +23111,7 @@ object Highlights {
         // Ancora troppo lungo: restano i più importanti (a parità, i più recenti: il finale conta).
         val kept = mutableListOf<Clip>()
         var total = 0L
-        for (c in candidates.sortedWith(compareByDescending<Clip> { value(it.reason) }.thenByDescending { it.index })) {
+        for (c in candidates.sortedWith(compareByDescending<Clip> { it.priority }.thenByDescending { it.index })) {
             if (total + c.durationMs > o.maxMs) continue
             kept += c
             total += c.durationMs
@@ -23004,7 +23267,7 @@ object PointMarks {
     /** Il segno del punto appena giocato, con lo stato dopo il punto e (se si sa) quello prima. */
     fun mark(at: Long, state: MatchState, winner: Side, kind: PointKind?, secondServe: Boolean = false, before: MatchState? = null): PointMark {
         val (set, game) = place(state)
-        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure))
+        return PointMark(at, score(state), winner.ordinal, kind?.name, set, game, secondServe, before?.let(::pressure), server = before?.server?.ordinal ?: -1)
     }
 
     /** Cosa c'è in palio nel prossimo punto (come le scritte del riquadro arancione e della grafica). */
@@ -23103,6 +23366,8 @@ data class PointMark(
     val pressure: String? = null,
     /** Colpi dello scambio (dai braccialetti), se si sanno. */
     val strokes: Int? = null,
+    /** Chi serviva il punto: 0/1, -1 = non si sa (si ricalcola dalle regole se ci sono). */
+    val server: Int = -1,
 )
 TSM_EOF
 
@@ -23227,7 +23492,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -23340,9 +23611,32 @@ class VideoPlayerActivity : ComponentActivity() {
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         var hlOpen by remember { mutableStateOf(false) }
+        var filter by remember { mutableStateOf(CoachFilter()) }
+        var filterOpen by remember { mutableStateOf(false) }
+        val shown = remember(ch, filter) { if (filter.active) CoachFilter.matching(points, ch.rules, filter) else points.indices.toList() }
         val cur = Chapters.indexAt(points, pos)
         val list = rememberLazyListState()
-        LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
+        // L'elenco segue il video (con un filtro, la posizione del punto tra quelli mostrati).
+        LaunchedEffect(cur, shown) {
+            val k = shown.indexOf(cur)
+            if (k >= 0) list.animateScrollToItem((k - 2).coerceAtLeast(0))
+        }
+        // Riproduzione dei soli punti filtrati: a fine pezzo si salta al prossimo, dopo l'ultimo ci si ferma.
+        var queue by remember { mutableStateOf<List<Highlights.Clip>?>(null) }
+        LaunchedEffect(queue) {
+            val q = queue ?: return@LaunchedEffect
+            var k = 0
+            p.seekTo(q[0].startMs)
+            p.play()
+            while (k < q.size) {
+                delay(150)
+                if (p.currentPosition >= q[k].endMs) {
+                    k++
+                    if (k < q.size) p.seekTo(q[k].startMs) else p.pause()
+                }
+            }
+            queue = null
+        }
         fun go(i: Int?) {
             if (i == null || i < 0 || points.isEmpty()) return
             p.seekTo(Chapters.start(points, i.coerceIn(0, points.lastIndex)))
@@ -23376,6 +23670,7 @@ class VideoPlayerActivity : ComponentActivity() {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
                     NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
+                    if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
                     if (ch.imported || ch.rules != null) {
                         NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
                             if (ch.rules == null) setup = true else tagging = !tagging
@@ -23391,11 +23686,30 @@ class VideoPlayerActivity : ComponentActivity() {
                     NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
                     NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
                     NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
-                    NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
+                    if (filter.active) {
+                        // Filtro acceso: quanti punti e, con un giocatore scelto, quanti vinti; poi riproduci o esporta.
+                        val won = filter.player?.let { me -> shown.count { points[it].winner == me } }
+                        Text(
+                            if (shown.isEmpty()) str.coachNone else if (won != null) str.coachSummary(shown.size, won) else str.coachCount(shown.size),
+                            color = TsmColors.Ball, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            val clips = shown.mapNotNull { Highlights.clip(points, it, p.duration.coerceAtLeast(0)) }
+                            NavBtn(Icons.Filled.PlayArrow, str.coachPlay, Modifier.weight(1f)) { if (clips.isNotEmpty()) queue = clips }
+                            NavBtn(Icons.Filled.Movie, null, Modifier.weight(0.5f)) { if (clips.isNotEmpty()) montage(entry, clips) }
+                            NavBtn(Icons.Filled.Close, null, Modifier.weight(0.5f)) {
+                                filter = CoachFilter()
+                                queue = null
+                            }
+                        }
+                    } else {
+                        NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
+                    }
                 }
                 LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    itemsIndexed(points) { i, pt ->
-                        val newGame = i == 0 || points[i - 1].game != pt.game
+                    itemsIndexed(shown) { k, i ->
+                        val pt = points[i]
+                        val newGame = k == 0 || points[shown[k - 1]].game != pt.game
                         if (newGame) {
                             Text(
                                 "${str.videoSet} ${pt.set + 1} · ${str.videoGame} ${pt.game + 1}",
@@ -23409,6 +23723,7 @@ class VideoPlayerActivity : ComponentActivity() {
             }
         }
         if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
+        if (filterOpen) FilterDialog(ch, filter, { filter = it; queue = null }) { filterOpen = false }
         hlProgress?.let { HighlightProgress(it) }
         if (setup) {
             TagSetup(onDone = { names, server ->
@@ -23512,20 +23827,58 @@ class VideoPlayerActivity : ComponentActivity() {
     @Composable
     private fun HighlightDialog(e: VideoLibrary.Entry, videoMs: Long, onClose: () -> Unit) {
         val str = s
-        var o by remember { mutableStateOf(Highlights.Options()) }
+        // Ordine e voci accese dell'ultima volta.
+        var o by remember {
+            val st = controller.storage
+            val order = st.highlightOrder.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }
+            val full = order + Highlights.Category.entries.filter { it !in order }
+            val enabled = st.highlightEnabled?.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }?.toSet()
+            mutableStateOf(Highlights.Options(order = full, enabled = enabled ?: Highlights.Category.entries.toSet()))
+        }
         // Dai social (1-5 minuti) al video del circolo (10-15).
         val minutes = listOf(1, 3, 5, 10, 15)
         val clips = remember(o, e) { Highlights.select(e.chapters.points, e.chapters.rules, videoMs, o) }
+        // Ordine e voci accese si ricordano subito, anche senza creare il video.
+        LaunchedEffect(o.order, o.enabled) {
+            controller.storage.highlightOrder = o.order.map { it.name }
+            controller.storage.highlightEnabled = o.enabled.map { it.name }.toSet()
+        }
         AlertDialog(
             onDismissRequest = onClose,
             title = { Text(str.hlTitle) },
             text = {
                 // In orizzontale il dialogo è basso: si scorre.
                 Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Check(str.hlBig, o.bigPoints) { o = o.copy(bigPoints = it) }
-                    Check(str.videoKind("ACE"), o.aces) { o = o.copy(aces = it) }
-                    Check(str.videoKind("WINNER"), o.winners) { o = o.copy(winners = it) }
-                    Check(str.hlRallies, o.longRallies) { o = o.copy(longRallies = it) }
+                    Text(str.hlOrderHint, fontSize = 12.sp, color = TsmColors.TextDim)
+                    // In alto le voci che contano di più: se non ci sta tutto, restano fuori prima quelle in fondo.
+                    o.order.forEachIndexed { i, cat ->
+                        val label = when (cat) {
+                            Highlights.Category.BIG_POINTS -> str.hlBig
+                            Highlights.Category.ACES -> str.videoKind("ACE")
+                            Highlights.Category.WINNERS -> str.videoKind("WINNER")
+                            Highlights.Category.LONG_RALLIES -> str.hlRallies
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("${i + 1}", color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.width(16.dp))
+                            androidx.compose.material3.Checkbox(cat in o.enabled, { on ->
+                                o = o.copy(enabled = if (on) o.enabled + cat else o.enabled - cat)
+                            })
+                            Text(label, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                            fun move(d: Int) {
+                                val l = o.order.toMutableList()
+                                val j = i + d
+                                if (j !in l.indices) return
+                                l[i] = l[j].also { l[j] = l[i] }
+                                o = o.copy(order = l)
+                            }
+                            androidx.compose.material3.IconButton(onClick = { move(-1) }, enabled = i > 0) {
+                                Icon(Icons.Filled.KeyboardArrowUp, str.hlUp, tint = if (i > 0) TsmColors.TextMain else TsmColors.TextDim)
+                            }
+                            androidx.compose.material3.IconButton(onClick = { move(1) }, enabled = i < o.order.lastIndex) {
+                                Icon(Icons.Filled.KeyboardArrowDown, str.hlDown, tint = if (i < o.order.lastIndex) TsmColors.TextMain else TsmColors.TextDim)
+                            }
+                        }
+                    }
                     Text(str.hlMax, fontSize = 13.sp)
                     Segmented(minutes.map { SegOption("$it′") }, minutes.indexOf((o.maxMs / 60_000).toInt()).coerceAtLeast(0), { i ->
                         o = o.copy(maxMs = minutes[i] * 60_000L)
@@ -23540,25 +23893,90 @@ class VideoPlayerActivity : ComponentActivity() {
             confirmButton = {
                 TextButton(enabled = clips.isNotEmpty(), onClick = {
                     onClose()
-                    player?.pause()
-                    hlProgress = 0
-                    val m = HighlightMaker(this)
-                    maker = m
-                    m.make(e, clips, { hlProgress = it }) { file ->
-                        hlProgress = null
-                        maker = null
-                        if (file == null) {
-                            Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
-                            startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
-                        }
-                    }
+                    montage(e, clips)
                 }) { Text(str.hlCreate) }
             },
             dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
         )
     }
+
+    /** Monta [clips] (highlights o punti filtrati) e apre il risultato. */
+    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>) {
+        val str = s
+        player?.pause()
+        hlProgress = 0
+        val m = HighlightMaker(this)
+        maker = m
+        m.make(e, clips, { hlProgress = it }) { file ->
+            hlProgress = null
+            maker = null
+            if (file == null) {
+                Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
+            }
+        }
+    }
+
+    /** Filtri da allenatore: chi, vinti o persi, servizio, prima o seconda, com'è finito, situazione. */
+    @Composable
+    private fun FilterDialog(ch: VideoChapters, current: CoachFilter, onApply: (CoachFilter) -> Unit, onClose: () -> Unit) {
+        val str = s
+        var f by remember { mutableStateOf(current) }
+        val names = List(2) { ch.names.getOrElse(it) { str.playerTag(it + 1) } }
+        val count = remember(f, ch) { CoachFilter.matching(ch.points, ch.rules, f).size }
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = { Text(str.coachTitle) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Label(str.coachPlayer)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(names[0]), SegOption(names[1])), (f.player ?: -1) + 1, { i ->
+                        f = if (i == 0) f.copy(player = null, won = null, serving = null) else f.copy(player = i - 1)
+                    })
+                    // Vinti/persi e servizio/risposta si riferiscono al giocatore scelto.
+                    if (f.player != null) {
+                        Label(str.coachPoint)
+                        Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachWon), SegOption(str.coachLost)), when (f.won) { null -> 0; true -> 1; false -> 2 }, { i ->
+                            f = f.copy(won = if (i == 0) null else i == 1)
+                        })
+                        Label(str.coachServe)
+                        Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachServing), SegOption(str.coachReturning)), when (f.serving) { null -> 0; true -> 1; false -> 2 }, { i ->
+                            f = f.copy(serving = if (i == 0) null else i == 1)
+                        })
+                    }
+                    Label(str.coachServeKind)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachFirst), SegOption(str.coachSecond)), when (f.secondServe) { null -> 0; false -> 1; true -> 2 }, { i ->
+                        f = f.copy(secondServe = if (i == 0) null else i == 2)
+                    })
+                    Label(str.coachEnd)
+                    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        for (k in listOf("ACE", "DOUBLE_FAULT", "WINNER", "UNFORCED_ERROR", "FORCED_ERROR")) {
+                            val on = k in f.kinds
+                            // Nel dialogo lo sfondo è già chiaro: le etichette spente vanno più scure, se no non si vedono.
+                            Surface(onClick = { f = f.copy(kinds = if (on) f.kinds - k else f.kinds + k) }, shape = RoundedCornerShape(16.dp),
+                                color = if (on) TsmColors.Ball else TsmColors.Background) {
+                                Text(str.videoKind(k), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 12.sp,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                            }
+                        }
+                    }
+                    Label(str.coachSituation)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachBreak), SegOption(str.coachSetMatch)), when (f.situation) { "BREAK" -> 1; "SET_MATCH" -> 2; else -> 0 }, { i ->
+                        f = f.copy(situation = when (i) { 1 -> "BREAK"; 2 -> "SET_MATCH"; else -> null })
+                    })
+                    Text(if (count == 0) str.coachNone else str.coachCount(count), color = if (count == 0) TsmColors.Orange else TsmColors.TextMain, fontSize = 13.sp)
+                }
+            },
+            confirmButton = { TextButton(onClick = { onApply(f); onClose() }) { Text(str.coachApply) } },
+            dismissButton = { TextButton(onClick = { onApply(CoachFilter()); onClose() }) { Text(str.coachClear) } },
+        )
+    }
+
+    @Composable
+    private fun Label(text: String) = Text(text, fontSize = 12.sp, color = TsmColors.TextDim, fontWeight = FontWeight.Bold)
 
     @Composable
     private fun Check(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
@@ -27609,6 +28027,59 @@ class ChaptersTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/CoachFilterTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/CoachFilterTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class CoachFilterTest {
+    private fun p(winner: Int, server: Int, kind: String? = null, second: Boolean = false, pressure: String? = null) =
+        PointMark(0, "", winner, kind, secondServe = second, pressure = pressure, server = server)
+
+    private val pts = listOf(
+        p(0, 0, "ACE"),                              // 0: G1 serve, ace
+        p(1, 0, "DOUBLE_FAULT", second = true),      // 1: G1 doppio fallo
+        p(0, 0, second = true),                      // 2: G1 vince sulla seconda
+        p(1, 1, "WINNER", pressure = "BREAK_POINT"), // 3: G2 serve, salva... vince la palla break
+        p(0, 1, "UNFORCED_ERROR"),                   // 4: G1 vince in risposta su errore di G2
+    )
+
+    @Test
+    fun byPlayerServeAndOutcome() {
+        assertEquals(listOf(0, 1, 2), CoachFilter.matching(pts, null, CoachFilter(player = 0, serving = true)))
+        assertEquals(listOf(1, 2), CoachFilter.matching(pts, null, CoachFilter(player = 0, serving = true, secondServe = true)))
+        assertEquals(listOf(2), CoachFilter.matching(pts, null, CoachFilter(player = 0, serving = true, secondServe = true, won = true)))
+        assertEquals(listOf(4), CoachFilter.matching(pts, null, CoachFilter(player = 0, serving = false, won = true)))
+    }
+
+    @Test
+    fun byKindAndSituation() {
+        assertEquals(listOf(0, 3), CoachFilter.matching(pts, null, CoachFilter(kinds = setOf("ACE", "WINNER"))))
+        assertEquals(listOf(3), CoachFilter.matching(pts, null, CoachFilter(situation = "BREAK")))
+        assertEquals(pts.indices.toList(), CoachFilter.matching(pts, null, CoachFilter()))
+    }
+
+    @Test
+    fun serverFromRulesWhenMissing() {
+        // Segni senza "server": si ricalcola. Primo game servito da G1, il secondo da G2.
+        val rules = RulesConfig(firstServer = Side.P1)
+        val raw = mutableListOf<PointMark>()
+        repeat(5) {
+            val after = PointMarks.stateAfter(rules, raw + PointMark(0, "", 0), raw.size + 1)
+            raw += PointMarks.mark(it * 1_000L, after, Side.P1, null).copy(server = -1)
+        }
+        assertEquals(listOf(4), CoachFilter.matching(raw, rules, CoachFilter(player = 1, serving = true)))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/HighlightsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/HighlightsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -27645,6 +28116,25 @@ class HighlightsTest {
     }
 
     @Test
+    fun orderDecidesWhoStays() {
+        val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "BREAK_POINT"), p(60_000, kind = "WINNER"))
+        // Al minimo 7 s l'uno: con 14 s ne stanno due. Di serie vincono palla break e (tra ace e vincente) l'ace.
+        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 14_000)).map { it.index })
+        // Vincenti in cima, poi ace: la palla break resta fuori.
+        val order = listOf(Highlights.Category.WINNERS, Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.LONG_RALLIES)
+        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, maxMs = 14_000)).map { it.index })
+    }
+
+    @Test
+    fun pointWithTwoReasonsCountsWithTheHigher() {
+        // Ace su palla break: con gli ace in cima conta come ace.
+        val pt = p(20_000, kind = "ACE", pressure = "BREAK_POINT")
+        val aceFirst = Highlights.Options(order = listOf(Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.WINNERS, Highlights.Category.LONG_RALLIES))
+        assertEquals(Highlights.Reason.ACE, Highlights.reason(pt, "BREAK_POINT", aceFirst))
+        assertEquals(Highlights.Reason.BREAK_POINT, Highlights.reason(pt, "BREAK_POINT", Highlights.Options()))
+    }
+
+    @Test
     fun overLimitClipsGetShorterFirst() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
         // 14 s l'uno fanno 42 s: con 30 s di limite si accorciano a 10 s (8 prima della fine + 2 dopo) e restano tutti.
@@ -27656,9 +28146,9 @@ class HighlightsTest {
     @Test
     fun stillOverLimitDropsLeastImportant() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
-        // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori uno da 2, il meno recente (l'ace).
+        // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori la voce più in basso (di serie i vincenti).
         val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 20_000))
-        assertEquals(listOf(1, 2), clips.map { it.index })
+        assertEquals(listOf(0, 1), clips.map { it.index })
         assertEquals(7_000L, clips[0].durationMs)
     }
 
@@ -27673,7 +28163,7 @@ class HighlightsTest {
             val after = PointMarks.stateAfter(rules, raw + PointMark(0, "", w), raw.size + 1)
             raw += PointMarks.mark((i + 1) * 20_000L, after, if (w == 0) Side.P1 else Side.P2, null)
         }
-        val clips = Highlights.select(raw, rules, 0, Highlights.Options(aces = false, winners = false, longRallies = false))
+        val clips = Highlights.select(raw, rules, 0, Highlights.Options(enabled = setOf(Highlights.Category.BIG_POINTS)))
         assertEquals(listOf(7), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips.single().reason)
     }
@@ -32504,6 +32994,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 124 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 126 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

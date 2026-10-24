@@ -67,4 +67,6 @@ data class PointMark(
     val pressure: String? = null,
     /** Colpi dello scambio (dai braccialetti), se si sanno. */
     val strokes: Int? = null,
+    /** Chi serviva il punto: 0/1, -1 = non si sa (si ricalcola dalle regole se ci sono). */
+    val server: Int = -1,
 )

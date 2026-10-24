@@ -211,6 +211,31 @@ interface Strings {
     val hlMaking: (Int) -> String
     val hlDone: String
     val hlFailed: String
+    val hlOrderHint: String
+    val hlUp: String
+    val hlDown: String
+    val coachTitle: String
+    val coachPlayer: String
+    val coachAll: String
+    val coachPoint: String
+    val coachWon: String
+    val coachLost: String
+    val coachServe: String
+    val coachServing: String
+    val coachReturning: String
+    val coachServeKind: String
+    val coachFirst: String
+    val coachSecond: String
+    val coachEnd: String
+    val coachSituation: String
+    val coachBreak: String
+    val coachSetMatch: String
+    val coachApply: String
+    val coachClear: String
+    val coachCount: (Int) -> String
+    val coachSummary: (Int, Int) -> String
+    val coachPlay: String
+    val coachNone: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -957,6 +982,31 @@ object ItStrings : Strings {
     override val hlMaking: (Int) -> String = { "Montaggio… $it%" }
     override val hlDone = "Highlights pronti, salvati in Film/Tennis Score Manager."
     override val hlFailed = "Montaggio non riuscito."
+    override val hlOrderHint = "In alto le voci con la precedenza: se il video supera la durata, restano fuori prima quelle in fondo."
+    override val hlUp = "Sposta su"
+    override val hlDown = "Sposta giù"
+    override val coachTitle = "Filtri allenatore"
+    override val coachPlayer = "Giocatore"
+    override val coachAll = "Tutti"
+    override val coachPoint = "Punti"
+    override val coachWon = "Vinti"
+    override val coachLost = "Persi"
+    override val coachServe = "Servizio"
+    override val coachServing = "Al servizio"
+    override val coachReturning = "In risposta"
+    override val coachServeKind = "Battuta"
+    override val coachFirst = "Prima"
+    override val coachSecond = "Seconda"
+    override val coachEnd = "Com'è finito"
+    override val coachSituation = "Situazione"
+    override val coachBreak = "Palle break"
+    override val coachSetMatch = "Set e match point"
+    override val coachApply = "Applica"
+    override val coachClear = "Togli il filtro"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n punti" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n punti · $w vinti (${if (n > 0) w * 100 / n else 0}%)" }
+    override val coachPlay = "Riproduci"
+    override val coachNone = "Nessun punto con questo filtro"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1675,6 +1725,31 @@ object EnStrings : Strings {
     override val hlMaking: (Int) -> String = { "Editing… $it%" }
     override val hlDone = "Highlights ready, saved in Movies/Tennis Score Manager."
     override val hlFailed = "Editing failed."
+    override val hlOrderHint = "Items at the top take precedence: if the video is too long, those at the bottom are left out first."
+    override val hlUp = "Move up"
+    override val hlDown = "Move down"
+    override val coachTitle = "Coach filters"
+    override val coachPlayer = "Player"
+    override val coachAll = "All"
+    override val coachPoint = "Points"
+    override val coachWon = "Won"
+    override val coachLost = "Lost"
+    override val coachServe = "Serve"
+    override val coachServing = "Serving"
+    override val coachReturning = "Returning"
+    override val coachServeKind = "Serve"
+    override val coachFirst = "First"
+    override val coachSecond = "Second"
+    override val coachEnd = "How it ended"
+    override val coachSituation = "Situation"
+    override val coachBreak = "Break points"
+    override val coachSetMatch = "Set and match points"
+    override val coachApply = "Apply"
+    override val coachClear = "Remove filter"
+    override val coachCount: (Int) -> String = { n -> if (n == 1) "1 point" else "$n points" }
+    override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w won (${if (n > 0) w * 100 / n else 0}%)" }
+    override val coachPlay = "Play"
+    override val coachNone = "No points with this filter"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

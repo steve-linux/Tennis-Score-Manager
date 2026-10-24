@@ -383,7 +383,7 @@ class MatchController(
                     relay.publishPoint(
                         PointMark(
                             System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game,
-                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes,
+                            p?.secondServe == true, before?.let(PointMarks::pressure), p?.strokes, before?.server?.ordinal ?: -1,
                         ),
                     )
                 }

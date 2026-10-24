@@ -32,6 +32,25 @@ class HighlightsTest {
     }
 
     @Test
+    fun orderDecidesWhoStays() {
+        val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "BREAK_POINT"), p(60_000, kind = "WINNER"))
+        // Al minimo 7 s l'uno: con 14 s ne stanno due. Di serie vincono palla break e (tra ace e vincente) l'ace.
+        assertEquals(listOf(0, 1), Highlights.select(pts, null, 0, Highlights.Options(maxMs = 14_000)).map { it.index })
+        // Vincenti in cima, poi ace: la palla break resta fuori.
+        val order = listOf(Highlights.Category.WINNERS, Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.LONG_RALLIES)
+        assertEquals(listOf(0, 2), Highlights.select(pts, null, 0, Highlights.Options(order = order, maxMs = 14_000)).map { it.index })
+    }
+
+    @Test
+    fun pointWithTwoReasonsCountsWithTheHigher() {
+        // Ace su palla break: con gli ace in cima conta come ace.
+        val pt = p(20_000, kind = "ACE", pressure = "BREAK_POINT")
+        val aceFirst = Highlights.Options(order = listOf(Highlights.Category.ACES, Highlights.Category.BIG_POINTS, Highlights.Category.WINNERS, Highlights.Category.LONG_RALLIES))
+        assertEquals(Highlights.Reason.ACE, Highlights.reason(pt, "BREAK_POINT", aceFirst))
+        assertEquals(Highlights.Reason.BREAK_POINT, Highlights.reason(pt, "BREAK_POINT", Highlights.Options()))
+    }
+
+    @Test
     fun overLimitClipsGetShorterFirst() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
         // 14 s l'uno fanno 42 s: con 30 s di limite si accorciano a 10 s (8 prima della fine + 2 dopo) e restano tutti.
@@ -43,9 +62,9 @@ class HighlightsTest {
     @Test
     fun stillOverLimitDropsLeastImportant() {
         val pts = listOf(p(20_000, kind = "ACE"), p(40_000, pressure = "SET_POINT"), p(60_000, kind = "WINNER"))
-        // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori uno da 2, il meno recente (l'ace).
+        // Anche corti al minimo (5 + 2 = 7 s) fanno 21 s: con 20 s resta fuori la voce più in basso (di serie i vincenti).
         val clips = Highlights.select(pts, null, 0, Highlights.Options(maxMs = 20_000))
-        assertEquals(listOf(1, 2), clips.map { it.index })
+        assertEquals(listOf(0, 1), clips.map { it.index })
         assertEquals(7_000L, clips[0].durationMs)
     }
 
@@ -60,7 +79,7 @@ class HighlightsTest {
             val after = PointMarks.stateAfter(rules, raw + PointMark(0, "", w), raw.size + 1)
             raw += PointMarks.mark((i + 1) * 20_000L, after, if (w == 0) Side.P1 else Side.P2, null)
         }
-        val clips = Highlights.select(raw, rules, 0, Highlights.Options(aces = false, winners = false, longRallies = false))
+        val clips = Highlights.select(raw, rules, 0, Highlights.Options(enabled = setOf(Highlights.Category.BIG_POINTS)))
         assertEquals(listOf(7), clips.map { it.index })
         assertEquals(Highlights.Reason.BREAK_POINT, clips.single().reason)
     }

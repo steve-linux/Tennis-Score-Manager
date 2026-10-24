@@ -37,7 +37,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -150,9 +156,32 @@ class VideoPlayerActivity : ComponentActivity() {
         var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
         var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         var hlOpen by remember { mutableStateOf(false) }
+        var filter by remember { mutableStateOf(CoachFilter()) }
+        var filterOpen by remember { mutableStateOf(false) }
+        val shown = remember(ch, filter) { if (filter.active) CoachFilter.matching(points, ch.rules, filter) else points.indices.toList() }
         val cur = Chapters.indexAt(points, pos)
         val list = rememberLazyListState()
-        LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
+        // L'elenco segue il video (con un filtro, la posizione del punto tra quelli mostrati).
+        LaunchedEffect(cur, shown) {
+            val k = shown.indexOf(cur)
+            if (k >= 0) list.animateScrollToItem((k - 2).coerceAtLeast(0))
+        }
+        // Riproduzione dei soli punti filtrati: a fine pezzo si salta al prossimo, dopo l'ultimo ci si ferma.
+        var queue by remember { mutableStateOf<List<Highlights.Clip>?>(null) }
+        LaunchedEffect(queue) {
+            val q = queue ?: return@LaunchedEffect
+            var k = 0
+            p.seekTo(q[0].startMs)
+            p.play()
+            while (k < q.size) {
+                delay(150)
+                if (p.currentPosition >= q[k].endMs) {
+                    k++
+                    if (k < q.size) p.seekTo(q[k].startMs) else p.pause()
+                }
+            }
+            queue = null
+        }
         fun go(i: Int?) {
             if (i == null || i < 0 || points.isEmpty()) return
             p.seekTo(Chapters.start(points, i.coerceIn(0, points.lastIndex)))
@@ -186,6 +215,7 @@ class VideoPlayerActivity : ComponentActivity() {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
                     NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
+                    if (points.isNotEmpty() && !tagging) NavBtn(Icons.Filled.FilterList, null, Modifier.weight(0.6f)) { filterOpen = true }
                     if (ch.imported || ch.rules != null) {
                         NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
                             if (ch.rules == null) setup = true else tagging = !tagging
@@ -201,11 +231,30 @@ class VideoPlayerActivity : ComponentActivity() {
                     NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
                     NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
                     NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
-                    NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
+                    if (filter.active) {
+                        // Filtro acceso: quanti punti e, con un giocatore scelto, quanti vinti; poi riproduci o esporta.
+                        val won = filter.player?.let { me -> shown.count { points[it].winner == me } }
+                        Text(
+                            if (shown.isEmpty()) str.coachNone else if (won != null) str.coachSummary(shown.size, won) else str.coachCount(shown.size),
+                            color = TsmColors.Ball, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            val clips = shown.mapNotNull { Highlights.clip(points, it, p.duration.coerceAtLeast(0)) }
+                            NavBtn(Icons.Filled.PlayArrow, str.coachPlay, Modifier.weight(1f)) { if (clips.isNotEmpty()) queue = clips }
+                            NavBtn(Icons.Filled.Movie, null, Modifier.weight(0.5f)) { if (clips.isNotEmpty()) montage(entry, clips) }
+                            NavBtn(Icons.Filled.Close, null, Modifier.weight(0.5f)) {
+                                filter = CoachFilter()
+                                queue = null
+                            }
+                        }
+                    } else {
+                        NavBtn(Icons.Filled.AutoAwesome, str.hlTitle, Modifier.fillMaxWidth()) { hlOpen = true }
+                    }
                 }
                 LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    itemsIndexed(points) { i, pt ->
-                        val newGame = i == 0 || points[i - 1].game != pt.game
+                    itemsIndexed(shown) { k, i ->
+                        val pt = points[i]
+                        val newGame = k == 0 || points[shown[k - 1]].game != pt.game
                         if (newGame) {
                             Text(
                                 "${str.videoSet} ${pt.set + 1} · ${str.videoGame} ${pt.game + 1}",
@@ -219,6 +268,7 @@ class VideoPlayerActivity : ComponentActivity() {
             }
         }
         if (hlOpen) HighlightDialog(entry, p.duration.coerceAtLeast(0)) { hlOpen = false }
+        if (filterOpen) FilterDialog(ch, filter, { filter = it; queue = null }) { filterOpen = false }
         hlProgress?.let { HighlightProgress(it) }
         if (setup) {
             TagSetup(onDone = { names, server ->
@@ -322,20 +372,58 @@ class VideoPlayerActivity : ComponentActivity() {
     @Composable
     private fun HighlightDialog(e: VideoLibrary.Entry, videoMs: Long, onClose: () -> Unit) {
         val str = s
-        var o by remember { mutableStateOf(Highlights.Options()) }
+        // Ordine e voci accese dell'ultima volta.
+        var o by remember {
+            val st = controller.storage
+            val order = st.highlightOrder.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }
+            val full = order + Highlights.Category.entries.filter { it !in order }
+            val enabled = st.highlightEnabled?.mapNotNull { n -> Highlights.Category.entries.firstOrNull { it.name == n } }?.toSet()
+            mutableStateOf(Highlights.Options(order = full, enabled = enabled ?: Highlights.Category.entries.toSet()))
+        }
         // Dai social (1-5 minuti) al video del circolo (10-15).
         val minutes = listOf(1, 3, 5, 10, 15)
         val clips = remember(o, e) { Highlights.select(e.chapters.points, e.chapters.rules, videoMs, o) }
+        // Ordine e voci accese si ricordano subito, anche senza creare il video.
+        LaunchedEffect(o.order, o.enabled) {
+            controller.storage.highlightOrder = o.order.map { it.name }
+            controller.storage.highlightEnabled = o.enabled.map { it.name }.toSet()
+        }
         AlertDialog(
             onDismissRequest = onClose,
             title = { Text(str.hlTitle) },
             text = {
                 // In orizzontale il dialogo è basso: si scorre.
                 Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Check(str.hlBig, o.bigPoints) { o = o.copy(bigPoints = it) }
-                    Check(str.videoKind("ACE"), o.aces) { o = o.copy(aces = it) }
-                    Check(str.videoKind("WINNER"), o.winners) { o = o.copy(winners = it) }
-                    Check(str.hlRallies, o.longRallies) { o = o.copy(longRallies = it) }
+                    Text(str.hlOrderHint, fontSize = 12.sp, color = TsmColors.TextDim)
+                    // In alto le voci che contano di più: se non ci sta tutto, restano fuori prima quelle in fondo.
+                    o.order.forEachIndexed { i, cat ->
+                        val label = when (cat) {
+                            Highlights.Category.BIG_POINTS -> str.hlBig
+                            Highlights.Category.ACES -> str.videoKind("ACE")
+                            Highlights.Category.WINNERS -> str.videoKind("WINNER")
+                            Highlights.Category.LONG_RALLIES -> str.hlRallies
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("${i + 1}", color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.width(16.dp))
+                            androidx.compose.material3.Checkbox(cat in o.enabled, { on ->
+                                o = o.copy(enabled = if (on) o.enabled + cat else o.enabled - cat)
+                            })
+                            Text(label, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                            fun move(d: Int) {
+                                val l = o.order.toMutableList()
+                                val j = i + d
+                                if (j !in l.indices) return
+                                l[i] = l[j].also { l[j] = l[i] }
+                                o = o.copy(order = l)
+                            }
+                            androidx.compose.material3.IconButton(onClick = { move(-1) }, enabled = i > 0) {
+                                Icon(Icons.Filled.KeyboardArrowUp, str.hlUp, tint = if (i > 0) TsmColors.TextMain else TsmColors.TextDim)
+                            }
+                            androidx.compose.material3.IconButton(onClick = { move(1) }, enabled = i < o.order.lastIndex) {
+                                Icon(Icons.Filled.KeyboardArrowDown, str.hlDown, tint = if (i < o.order.lastIndex) TsmColors.TextMain else TsmColors.TextDim)
+                            }
+                        }
+                    }
                     Text(str.hlMax, fontSize = 13.sp)
                     Segmented(minutes.map { SegOption("$it′") }, minutes.indexOf((o.maxMs / 60_000).toInt()).coerceAtLeast(0), { i ->
                         o = o.copy(maxMs = minutes[i] * 60_000L)
@@ -350,25 +438,90 @@ class VideoPlayerActivity : ComponentActivity() {
             confirmButton = {
                 TextButton(enabled = clips.isNotEmpty(), onClick = {
                     onClose()
-                    player?.pause()
-                    hlProgress = 0
-                    val m = HighlightMaker(this)
-                    maker = m
-                    m.make(e, clips, { hlProgress = it }) { file ->
-                        hlProgress = null
-                        maker = null
-                        if (file == null) {
-                            Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
-                            startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
-                        }
-                    }
+                    montage(e, clips)
                 }) { Text(str.hlCreate) }
             },
             dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
         )
     }
+
+    /** Monta [clips] (highlights o punti filtrati) e apre il risultato. */
+    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>) {
+        val str = s
+        player?.pause()
+        hlProgress = 0
+        val m = HighlightMaker(this)
+        maker = m
+        m.make(e, clips, { hlProgress = it }) { file ->
+            hlProgress = null
+            maker = null
+            if (file == null) {
+                Toast.makeText(this, str.hlFailed, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, str.hlDone, Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_CHAPTERS, file.absolutePath))
+            }
+        }
+    }
+
+    /** Filtri da allenatore: chi, vinti o persi, servizio, prima o seconda, com'è finito, situazione. */
+    @Composable
+    private fun FilterDialog(ch: VideoChapters, current: CoachFilter, onApply: (CoachFilter) -> Unit, onClose: () -> Unit) {
+        val str = s
+        var f by remember { mutableStateOf(current) }
+        val names = List(2) { ch.names.getOrElse(it) { str.playerTag(it + 1) } }
+        val count = remember(f, ch) { CoachFilter.matching(ch.points, ch.rules, f).size }
+        AlertDialog(
+            onDismissRequest = onClose,
+            title = { Text(str.coachTitle) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Label(str.coachPlayer)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(names[0]), SegOption(names[1])), (f.player ?: -1) + 1, { i ->
+                        f = if (i == 0) f.copy(player = null, won = null, serving = null) else f.copy(player = i - 1)
+                    })
+                    // Vinti/persi e servizio/risposta si riferiscono al giocatore scelto.
+                    if (f.player != null) {
+                        Label(str.coachPoint)
+                        Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachWon), SegOption(str.coachLost)), when (f.won) { null -> 0; true -> 1; false -> 2 }, { i ->
+                            f = f.copy(won = if (i == 0) null else i == 1)
+                        })
+                        Label(str.coachServe)
+                        Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachServing), SegOption(str.coachReturning)), when (f.serving) { null -> 0; true -> 1; false -> 2 }, { i ->
+                            f = f.copy(serving = if (i == 0) null else i == 1)
+                        })
+                    }
+                    Label(str.coachServeKind)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachFirst), SegOption(str.coachSecond)), when (f.secondServe) { null -> 0; false -> 1; true -> 2 }, { i ->
+                        f = f.copy(secondServe = if (i == 0) null else i == 2)
+                    })
+                    Label(str.coachEnd)
+                    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+                    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        for (k in listOf("ACE", "DOUBLE_FAULT", "WINNER", "UNFORCED_ERROR", "FORCED_ERROR")) {
+                            val on = k in f.kinds
+                            // Nel dialogo lo sfondo è già chiaro: le etichette spente vanno più scure, se no non si vedono.
+                            Surface(onClick = { f = f.copy(kinds = if (on) f.kinds - k else f.kinds + k) }, shape = RoundedCornerShape(16.dp),
+                                color = if (on) TsmColors.Ball else TsmColors.Background) {
+                                Text(str.videoKind(k), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 12.sp,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
+                            }
+                        }
+                    }
+                    Label(str.coachSituation)
+                    Segmented(listOf(SegOption(str.coachAll), SegOption(str.coachBreak), SegOption(str.coachSetMatch)), when (f.situation) { "BREAK" -> 1; "SET_MATCH" -> 2; else -> 0 }, { i ->
+                        f = f.copy(situation = when (i) { 1 -> "BREAK"; 2 -> "SET_MATCH"; else -> null })
+                    })
+                    Text(if (count == 0) str.coachNone else str.coachCount(count), color = if (count == 0) TsmColors.Orange else TsmColors.TextMain, fontSize = 13.sp)
+                }
+            },
+            confirmButton = { TextButton(onClick = { onApply(f); onClose() }) { Text(str.coachApply) } },
+            dismissButton = { TextButton(onClick = { onApply(CoachFilter()); onClose() }) { Text(str.coachClear) } },
+        )
+    }
+
+    @Composable
+    private fun Label(text: String) = Text(text, fontSize = 12.sp, color = TsmColors.TextDim, fontWeight = FontWeight.Bold)
 
     @Composable
     private fun Check(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
