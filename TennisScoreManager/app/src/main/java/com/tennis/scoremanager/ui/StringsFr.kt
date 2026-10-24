@@ -182,6 +182,15 @@ object FrStrings : Strings {
     override val videoReplay = "Revoir le point"
     override val videoStart = "Début"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double faute"; "WINNER" -> "Coup gagnant"; "UNFORCED_ERROR" -> "Faute directe"; "FORCED_ERROR" -> "Faute provoquée"; "ERROR" -> "Faute"; else -> k } }
+    override val videoImport = "Importer une vidéo"
+    override val videoImportHint = "Une vidéo du téléphone (même filmée avec une autre caméra) : les points se marquent en la regardant. Le fichier reste où il est."
+    override val videoTagHowTo = "Regardez la vidéo et, à la fin de chaque point, touchez qui l'a gagné ; puis, si vous voulez, comment il s'est terminé. Le score se calcule tout seul."
+    override val videoTagTooEarly = "Placez la vidéo après le dernier point marqué."
+    override val videoPointFor: (String) -> String = { "Point $it" }
+    override val videoUndoLast = "Annuler le dernier"
+    override val videoTagSetupTitle = "Qui joue ?"
+    override val videoFirstServer = "Qui sert en premier"
+    override val videoTagSetupHint = "Format et règles sont ceux de la page 2."
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."

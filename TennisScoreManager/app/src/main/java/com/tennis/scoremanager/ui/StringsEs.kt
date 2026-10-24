@@ -179,6 +179,15 @@ object EsStrings : Strings {
     override val videoReplay = "Ver el punto otra vez"
     override val videoStart = "Inicio"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doble falta"; "WINNER" -> "Ganador"; "UNFORCED_ERROR" -> "Error no forzado"; "FORCED_ERROR" -> "Error forzado"; "ERROR" -> "Error"; else -> k } }
+    override val videoImport = "Importar vídeo"
+    override val videoImportHint = "Un vídeo del teléfono (aunque sea de otra cámara): los puntos se marcan mirándolo. El archivo se queda donde está."
+    override val videoTagHowTo = "Mira el vídeo y, al final de cada punto, toca quién lo ganó; luego, si quieres, cómo terminó. El marcador se calcula solo."
+    override val videoTagTooEarly = "Lleva el vídeo después del último punto marcado."
+    override val videoPointFor: (String) -> String = { "Punto $it" }
+    override val videoUndoLast = "Deshacer el último"
+    override val videoTagSetupTitle = "¿Quién juega?"
+    override val videoFirstServer = "Quién saca primero"
+    override val videoTagSetupHint = "Formato y reglas son los de la página 2."
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."

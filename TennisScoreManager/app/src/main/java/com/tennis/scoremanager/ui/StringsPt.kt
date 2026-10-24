@@ -182,6 +182,15 @@ object PtStrings : Strings {
     override val videoReplay = "Rever o ponto"
     override val videoStart = "Início"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Dupla falta"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Erro não forçado"; "FORCED_ERROR" -> "Erro forçado"; "ERROR" -> "Erro"; else -> k } }
+    override val videoImport = "Importar vídeo"
+    override val videoImportHint = "Um vídeo do telefone (mesmo feito com outra câmera): os pontos são marcados assistindo. O arquivo fica onde está."
+    override val videoTagHowTo = "Assista ao vídeo e, no fim de cada ponto, toque em quem o ganhou; depois, se quiser, como terminou. O placar é calculado sozinho."
+    override val videoTagTooEarly = "Leve o vídeo para depois do último ponto marcado."
+    override val videoPointFor: (String) -> String = { "Ponto $it" }
+    override val videoUndoLast = "Desfazer o último"
+    override val videoTagSetupTitle = "Quem joga?"
+    override val videoFirstServer = "Quem saca primeiro"
+    override val videoTagSetupHint = "Formato e regras são os da página 2."
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."

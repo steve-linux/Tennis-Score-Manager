@@ -4,6 +4,8 @@
 package com.tennis.scoremanager.video
 
 import android.content.Context
+import android.content.Intent
+import android.provider.OpenableColumns
 import android.net.Uri
 import android.os.Environment
 import kotlinx.serialization.json.Json
@@ -34,10 +36,36 @@ object VideoLibrary {
         return Entry(f, ch, uri)
     }
 
-    /** Elimina video (anche dalla galleria) e capitoli. */
+    /**
+     * Elimina video (anche dalla galleria) e capitoli. Un video importato resta dov'era: si tolgono solo i capitoli
+     * e il permesso di leggerlo.
+     */
     fun delete(context: Context, e: Entry) {
-        e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(Uri.parse(u), null, null) } }
-        File(e.chaptersFile.parentFile, e.chapters.video).delete()
+        if (e.chapters.imported) {
+            e.chapters.uri?.let { u ->
+                runCatching { context.contentResolver.releasePersistableUriPermission(Uri.parse(u), Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            }
+        } else {
+            e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(Uri.parse(u), null, null) } }
+            File(e.chaptersFile.parentFile, e.chapters.video).delete()
+        }
         e.chaptersFile.delete()
     }
+
+    fun save(e: Entry, ch: VideoChapters): Entry {
+        e.chaptersFile.writeText(json.encodeToString(VideoChapters.serializer(), ch))
+        return e.copy(chapters = ch)
+    }
+
+    /** Un video scelto dal telefono: si tiene il permesso di leggerlo e si creano i capitoli, ancora senza punti. */
+    fun import(context: Context, uri: Uri): Entry? = runCatching {
+        context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null
+        } ?: "video"
+        val f = File(dir(context), "IMP_${System.currentTimeMillis()}.json")
+        val ch = VideoChapters(name, emptyList(), uri.toString(), System.currentTimeMillis(), imported = true)
+        f.writeText(json.encodeToString(VideoChapters.serializer(), ch))
+        Entry(f, ch, uri)
+    }.getOrNull()
 }

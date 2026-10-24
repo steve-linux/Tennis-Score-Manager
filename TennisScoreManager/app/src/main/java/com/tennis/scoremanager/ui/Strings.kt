@@ -191,6 +191,15 @@ interface Strings {
     val videoReplay: String
     val videoStart: String
     val videoKind: (String) -> String
+    val videoImport: String
+    val videoImportHint: String
+    val videoTagHowTo: String
+    val videoTagTooEarly: String
+    val videoPointFor: (String) -> String
+    val videoUndoLast: String
+    val videoTagSetupTitle: String
+    val videoFirstServer: String
+    val videoTagSetupHint: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -917,6 +926,15 @@ object ItStrings : Strings {
     override val videoReplay = "Rivedi il punto"
     override val videoStart = "Inizio"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doppio fallo"; "WINNER" -> "Vincente"; "UNFORCED_ERROR" -> "Errore gratuito"; "FORCED_ERROR" -> "Errore forzato"; "ERROR" -> "Errore"; else -> k } }
+    override val videoImport = "Importa video"
+    override val videoImportHint = "Un video dal telefono (anche fatto con un'altra fotocamera): i punti si segnano guardandolo. Il file resta dov'è."
+    override val videoTagHowTo = "Guarda il video e, a fine punto, tocca chi l'ha vinto; poi, se vuoi, com'è finito. Il punteggio si calcola da solo."
+    override val videoTagTooEarly = "Porta il video dopo l'ultimo punto segnato."
+    override val videoPointFor: (String) -> String = { "Punto $it" }
+    override val videoUndoLast = "Annulla ultimo"
+    override val videoTagSetupTitle = "Chi gioca?"
+    override val videoFirstServer = "Chi serve per primo"
+    override val videoTagSetupHint = "Formato e regole sono quelli di pagina 2."
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1615,6 +1633,15 @@ object EnStrings : Strings {
     override val videoReplay = "Replay the point"
     override val videoStart = "Start"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double fault"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unforced error"; "FORCED_ERROR" -> "Forced error"; "ERROR" -> "Error"; else -> k } }
+    override val videoImport = "Import video"
+    override val videoImportHint = "A video from the phone (even shot with another camera): the points are marked while watching it. The file stays where it is."
+    override val videoTagHowTo = "Watch the video and, at the end of each point, tap who won it; then, if you like, how it ended. The score is worked out by itself."
+    override val videoTagTooEarly = "Move the video past the last marked point."
+    override val videoPointFor: (String) -> String = { "Point $it" }
+    override val videoUndoLast = "Undo last"
+    override val videoTagSetupTitle = "Who is playing?"
+    override val videoFirstServer = "Who serves first"
+    override val videoTagSetupHint = "Format and rules are the ones on page 2."
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

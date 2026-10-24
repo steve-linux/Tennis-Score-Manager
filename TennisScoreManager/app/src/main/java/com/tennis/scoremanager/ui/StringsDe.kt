@@ -179,6 +179,15 @@ object DeStrings : Strings {
     override val videoReplay = "Punkt wiederholen"
     override val videoStart = "Start"
     override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ass"; "DOUBLE_FAULT" -> "Doppelfehler"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unerzwungener Fehler"; "FORCED_ERROR" -> "Erzwungener Fehler"; "ERROR" -> "Fehler"; else -> k } }
+    override val videoImport = "Video importieren"
+    override val videoImportHint = "Ein Video vom Telefon (auch mit einer anderen Kamera gefilmt): Die Punkte werden beim Anschauen markiert. Die Datei bleibt, wo sie ist."
+    override val videoTagHowTo = "Schau das Video an und tippe am Ende jedes Punkts, wer ihn gewonnen hat; dann, wenn du willst, wie er endete. Der Spielstand rechnet sich selbst."
+    override val videoTagTooEarly = "Spule das Video hinter den zuletzt markierten Punkt."
+    override val videoPointFor: (String) -> String = { "Punkt $it" }
+    override val videoUndoLast = "Letzten rückgängig"
+    override val videoTagSetupTitle = "Wer spielt?"
+    override val videoFirstServer = "Wer schlägt zuerst auf"
+    override val videoTagSetupHint = "Format und Regeln sind die von Seite 2."
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."

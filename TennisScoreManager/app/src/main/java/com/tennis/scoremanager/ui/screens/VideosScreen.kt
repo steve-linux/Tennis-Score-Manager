@@ -5,6 +5,8 @@ package com.tennis.scoremanager.ui.screens
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +63,12 @@ fun VideosScreen(c: MatchController) {
     }
     val list by produceState(emptyList<VideoLibrary.Entry>(), tick) { value = withContext(Dispatchers.IO) { VideoLibrary.list(context) } }
     var toDelete by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
+    // Video presi dal telefono: si apre subito il lettore per segnare i punti.
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        val e = uri?.let { VideoLibrary.import(context, it) } ?: return@rememberLauncherForActivityResult
+        tick++
+        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+    }
     ScreenScaffold(
         title = s.videoTitle,
         subtitle = s.videoHint,
@@ -67,6 +76,8 @@ fun VideosScreen(c: MatchController) {
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
         SectionCard(s.videoTitle, Icons.Filled.VideoLibrary) {
+            GhostButton(s.videoImport, Icons.Filled.FileOpen, { picker.launch(arrayOf("video/*")) }, Modifier.fillMaxWidth())
+            Text(s.videoImportHint, color = TsmColors.TextDim, fontSize = 12.sp)
             if (list.isEmpty()) Text(s.videoNone, color = TsmColors.TextDim)
             for (e in list) {
                 val ch = e.chapters
@@ -82,6 +93,7 @@ fun VideosScreen(c: MatchController) {
                             Text("${Reports.date(at, o.lang)} ${Reports.time(at, o.lang)}", color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
                             Text(
                                 listOfNotNull(
+                                    ch.video.takeIf { ch.imported },
                                     ch.names.takeIf { it.size == 2 }?.joinToString(" – "),
                                     s.videoPoints(ch.points.size),
                                     ch.points.lastOrNull()?.score,

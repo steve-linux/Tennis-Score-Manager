@@ -7,10 +7,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,27 +28,38 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.Subtitles
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -53,6 +67,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.model.PointKind
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
@@ -63,6 +82,8 @@ import java.io.File
 /**
  * Lettore del video di una partita con i capitoli: a destra l'elenco dei punti (tocchi e il video va lì) e i
  * pulsanti per saltare di punto, di game e di set, rivedere il punto e copiare i capitoli per YouTube.
+ * Nei video importati i punti si segnano qui, guardando: a fine punto si tocca chi l'ha vinto (e, se si vuole, com'è
+ * finito), e il punteggio si calcola con le regole della partita; la grafica del punteggio si disegna sopra il video.
  */
 class VideoPlayerActivity : ComponentActivity() {
 
@@ -88,7 +109,8 @@ class VideoPlayerActivity : ComponentActivity() {
         val p = ExoPlayer.Builder(this).build().apply {
             setMediaItem(MediaItem.fromUri(entry.video))
             prepare()
-            playWhenReady = true
+            // Un video importato senza punti si apre fermo: prima si sceglie chi gioca.
+            playWhenReady = !(entry.chapters.imported && entry.chapters.points.isEmpty())
         }
         player = p
         setContent { TsmTheme { Content(entry, p) } }
@@ -106,16 +128,20 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Content(e: VideoLibrary.Entry, p: ExoPlayer) {
+    private fun Content(start: VideoLibrary.Entry, p: ExoPlayer) {
         val str = s
-        val points = e.chapters.points
+        var entry by remember { mutableStateOf(start) }
+        val ch = entry.chapters
+        val points = ch.points
         var pos by remember { mutableLongStateOf(0L) }
         LaunchedEffect(p) {
             while (true) {
                 pos = p.currentPosition
-                delay(250)
+                delay(200)
             }
         }
+        var tagging by remember { mutableStateOf(ch.imported && points.isEmpty()) }
+        var setup by remember { mutableStateOf(ch.imported && ch.rules == null) }
         val cur = Chapters.indexAt(points, pos)
         val list = rememberLazyListState()
         LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
@@ -124,29 +150,50 @@ class VideoPlayerActivity : ComponentActivity() {
             p.seekTo(Chapters.start(points, i.coerceIn(0, points.lastIndex)))
             p.play()
         }
+        fun update(new: VideoChapters) {
+            entry = VideoLibrary.save(entry, new)
+        }
         // "All'inizio del punto": nei primi 2 secondi indietro va al punto prima, dopo riparte da questo.
         val atStart = cur >= 0 && pos - Chapters.start(points, cur) < 2_000
         Row(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
-            AndroidView(
-                factory = { ctx -> PlayerView(ctx).apply { player = p } },
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-            )
+            Box(Modifier.weight(1f).fillMaxHeight()) {
+                AndroidView(factory = { ctx -> PlayerView(ctx).apply { player = p } }, modifier = Modifier.fillMaxSize())
+                // Video importati: la grafica del punteggio sopra il video, dal punteggio ricalcolato.
+                ch.rules?.let { rules ->
+                    val done = points.count { it.at <= pos }
+                    val bmp = remember(ch, done) {
+                        val state = PointMarks.stateAfter(rules, points, done)
+                        OverlayRenderer.render(ScoreOverlay.from(state, ch.names, null, ""))
+                    }
+                    Image(
+                        bmp.asImageBitmap(), null,
+                        modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 56.dp).width((bmp.width / 4).dp),
+                    )
+                }
+            }
             Column(
                 Modifier.width(300.dp).fillMaxHeight().background(TsmColors.Background).padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    NavBtn(Icons.AutoMirrored.Filled.ArrowBack, str.back, Modifier.weight(1f)) { finish() }
-                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1f)) { shareYoutube(e) }
+                    NavBtn(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.weight(0.6f)) { finish() }
+                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1.4f)) { shareYoutube(ch) }
+                    if (ch.imported || ch.rules != null) {
+                        NavBtn(if (tagging) Icons.Filled.Check else Icons.Filled.EditNote, null, Modifier.weight(0.6f)) {
+                            if (ch.rules == null) setup = true else tagging = !tagging
+                        }
+                    }
                 }
-                if (points.isEmpty()) {
-                    Text(str.videoNoPoints, color = TsmColors.TextDim, fontSize = 13.sp)
-                    return@Column
+                if (tagging && ch.rules != null) {
+                    TagPanel(ch, pos, p, onChange = ::update)
+                } else if (points.isEmpty()) {
+                    Text(if (ch.imported) str.videoTagHowTo else str.videoNoPoints, color = TsmColors.TextDim, fontSize = 13.sp)
+                } else {
+                    // Toccando "Punto" si rivede il punto in corso dall'inizio.
+                    NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
+                    NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
+                    NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
                 }
-                // Toccando "Punto" si rivede il punto in corso dall'inizio.
-                NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
-                NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
-                NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
                 LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     itemsIndexed(points) { i, pt ->
                         val newGame = i == 0 || points[i - 1].game != pt.game
@@ -157,11 +204,101 @@ class VideoPlayerActivity : ComponentActivity() {
                                 modifier = Modifier.padding(top = 6.dp),
                             )
                         }
-                        PointRow(i, pt, e.chapters.names, i == cur, Chapters.start(points, i)) { go(i) }
+                        PointRow(i, pt, ch.names, i == cur, Chapters.start(points, i)) { go(i) }
                     }
                 }
             }
         }
+        if (setup) {
+            TagSetup(onDone = { names, server ->
+                update(ch.copy(names = names, rules = controller.rulesFromOptions(server)))
+                setup = false
+                tagging = true
+            }, onCancel = { setup = false })
+        }
+    }
+
+    /**
+     * Segnare i punti: a fine punto si tocca chi l'ha vinto; poi, se si vuole, com'è finito (vale per l'ultimo
+     * punto segnato). Il punto finisce dove si trova il video in quel momento.
+     */
+    @Composable
+    private fun TagPanel(ch: VideoChapters, pos: Long, p: ExoPlayer, onChange: (VideoChapters) -> Unit) {
+        val str = s
+        val rules = ch.rules ?: return
+        val points = ch.points
+        val state = remember(ch) { PointMarks.stateAfter(rules, points, points.size) }
+        Text(str.videoTagHowTo, color = TsmColors.TextDim, fontSize = 11.sp)
+        Text(if (points.isEmpty()) "0-0" else PointMarks.score(state), color = TsmColors.TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        if (state.isFinished) return
+        for (side in Side.entries) {
+            Surface(
+                onClick = {
+                    val last = points.lastOrNull()?.at ?: -1L
+                    if (pos <= last) {
+                        Toast.makeText(this, str.videoTagTooEarly, Toast.LENGTH_SHORT).show()
+                    } else {
+                        val after = PointMarks.stateAfter(rules, points + PointMark(pos, "", side.ordinal), points.size + 1)
+                        onChange(ch.copy(points = points + PointMarks.mark(pos, after, side, null)))
+                    }
+                },
+                shape = RoundedCornerShape(12.dp), color = TsmColors.player(side), modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    str.videoPointFor(ch.names.getOrElse(side.ordinal) { str.playerTag(side.ordinal + 1) }),
+                    color = TsmColors.onPlayer(side), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 10.dp),
+                )
+            }
+        }
+        if (points.isNotEmpty()) {
+            // Com'è finito l'ultimo punto (facoltativo): toccando di nuovo lo stesso si toglie.
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                for (k in listOf(PointKind.ACE, PointKind.DOUBLE_FAULT, PointKind.WINNER, PointKind.UNFORCED_ERROR, PointKind.FORCED_ERROR)) {
+                    val on = points.last().kind == k.name
+                    Surface(
+                        onClick = { onChange(ch.copy(points = points.dropLast(1) + points.last().copy(kind = if (on) null else k.name))) },
+                        shape = RoundedCornerShape(16.dp), color = if (on) TsmColors.Ball else TsmColors.SurfaceHigh,
+                    ) {
+                        Text(str.videoKind(k.name), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp))
+                    }
+                }
+            }
+            NavBtn(Icons.AutoMirrored.Filled.Undo, str.videoUndoLast, Modifier.fillMaxWidth()) {
+                p.seekTo(Chapters.start(points, points.lastIndex))
+                onChange(ch.copy(points = points.dropLast(1)))
+            }
+        }
+    }
+
+    /** Prima di segnare: chi gioca e chi serve per primo (le regole sono quelle di pagina 2). */
+    @Composable
+    private fun TagSetup(onDone: (List<String>, Side) -> Unit, onCancel: () -> Unit) {
+        val str = s
+        val names = remember { Names(controller.setup.value, str) }
+        var n1 by remember { mutableStateOf(names.short(Side.P1)) }
+        var n2 by remember { mutableStateOf(names.short(Side.P2)) }
+        var server by remember { mutableIntStateOf(0) }
+        AlertDialog(
+            onDismissRequest = onCancel,
+            title = { Text(str.videoTagSetupTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(n1, { n1 = it }, label = { Text(str.playerTag(1)) }, singleLine = true)
+                    OutlinedTextField(n2, { n2 = it }, label = { Text(str.playerTag(2)) }, singleLine = true)
+                    Text(str.videoFirstServer, fontSize = 13.sp)
+                    Segmented(listOf(SegOption(n1.ifBlank { str.playerTag(1) }), SegOption(n2.ifBlank { str.playerTag(2) })), server, { server = it })
+                    Text(str.videoTagSetupHint, fontSize = 12.sp, color = TsmColors.TextDim)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDone(listOf(n1.trim().ifEmpty { str.playerTag(1) }, n2.trim().ifEmpty { str.playerTag(2) }), Side.entries[server])
+                }) { Text(str.ok) }
+            },
+            dismissButton = { TextButton(onClick = onCancel) { Text(str.back) } },
+        )
     }
 
     @Composable
@@ -173,7 +310,7 @@ class VideoPlayerActivity : ComponentActivity() {
                 .clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val side = if (pt.winner == 1) com.tennis.scoremanager.model.Side.P2 else com.tennis.scoremanager.model.Side.P1
+            val side = if (pt.winner == 1) Side.P2 else Side.P1
             Box(Modifier.size(10.dp).clip(CircleShape).background(if (pt.winner in 0..1) TsmColors.player(side) else TsmColors.TextDim))
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
@@ -196,7 +333,7 @@ class VideoPlayerActivity : ComponentActivity() {
                 NavBtn(Icons.Filled.Replay, label, Modifier.width(104.dp), onLabel)
             } else {
                 Text(label, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(104.dp),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    textAlign = TextAlign.Center)
             }
             NavBtn(Icons.Filled.SkipNext, null, Modifier.weight(1f), next)
         }
@@ -216,9 +353,9 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Capitoli per game da incollare nella descrizione del video su YouTube. */
-    private fun shareYoutube(e: VideoLibrary.Entry) {
+    private fun shareYoutube(ch: VideoChapters) {
         val str = s
-        val text = Chapters.youtube(e.chapters.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
+        val text = Chapters.youtube(ch.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

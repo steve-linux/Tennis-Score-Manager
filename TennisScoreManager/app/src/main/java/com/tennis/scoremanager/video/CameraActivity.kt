@@ -439,4 +439,8 @@ data class VideoChapters(
     val recordedAt: Long = 0L,
     /** Nomi dei due lati, dall'ultimo punteggio ricevuto. */
     val names: List<String> = emptyList(),
+    /** Video preso dal telefono (non registrato da TSM): non si cancella mai, i punti si segnano guardandolo. */
+    val imported: Boolean = false,
+    /** Regole per ricalcolare il punteggio dai punti segnati dopo (null = punti arrivati dal vivo dall'arbitro). */
+    val rules: com.tennis.scoremanager.model.RulesConfig? = null,
 )

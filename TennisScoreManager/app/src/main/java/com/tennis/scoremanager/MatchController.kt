@@ -69,6 +69,7 @@ import com.tennis.scoremanager.service.MatchService
 import com.tennis.scoremanager.relay.PhoneRelay
 import com.tennis.scoremanager.workout.WorkoutSession
 import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.PointMarks
 import com.tennis.scoremanager.video.ScoreOverlay
 import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.Progress
@@ -376,8 +377,8 @@ class MatchController(
                 val played = lm.state.pointsPlayed
                 if (lastPoints in 0 until played && lm.record.startedAt != null) {
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
-                    val (set, game) = pointPlace(lm.state)
-                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
+                    val (set, game) = PointMarks.place(lm.state)
+                    relay.publishPoint(PointMark(System.currentTimeMillis(), PointMarks.score(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
                 }
                 lastPoints = played
             }
@@ -984,24 +985,6 @@ class MatchController(
         return ScoreOverlay.from(lm.state, Side.entries.map { n.short(it) }, banner, title)
     }
 
-    /**
-     * Set e game (contati su tutta la partita) in cui si è giocato l'ultimo punto, dallo stato dopo il punto: se il
-     * punto ha chiuso il game (punti tornati a zero) apparteneva al game prima, e se ha chiuso il set al set prima.
-     */
-    private fun pointPlace(state: MatchState): Pair<Int, Int> {
-        val total = state.sets.sumOf { it.g1 + it.g2 } + state.g1 + state.g2
-        val gameEnded = state.isFinished || (state.pt1 == 0 && state.pt2 == 0)
-        val setEnded = state.isFinished || (gameEnded && state.g1 == 0 && state.g2 == 0 && state.sets.isNotEmpty())
-        val set = if (setEnded) state.sets.size - 1 else state.sets.size
-        val game = if (gameEnded) total - 1 else total
-        return set.coerceAtLeast(0) to game.coerceAtLeast(0)
-    }
-
-    /** "6-4 3-2 30-15": il punteggio dopo un punto, per i capitoli del video. */
-    private fun scoreText(state: MatchState): String =
-        (state.sets.map { "${it.g1}-${it.g2}" } + if (state.isFinished) emptyList() else listOf("${state.g1}-${state.g2}", "${state.pointLabel(Side.P1)}-${state.pointLabel(Side.P2)}"))
-            .joinToString(" ")
-
     /** Ogni [HeartStats.STEP_S] secondi la media delle misure entra nella partita, con quelle arrivate in ritardo. */
     private fun flushHeart() {
         val values = heartBuckets.mapValues { it.value.take() }.filterValues { it != null }
@@ -1052,6 +1035,16 @@ class MatchController(
     }
 
     // ---------------------------------------------------------------- partita
+
+    /** Regole di pagina 2 (formato, set, tie-break, No-Ad...) con chi serve per primo: anche per i video importati. */
+    fun rulesFromOptions(firstServer: Side): RulesConfig {
+        val o = options.value
+        val su = setup.value
+        return RulesConfig(
+            format = o.format, gamesPerSet = o.gamesPerSet, setTiebreak = o.setTiebreak, noAd = o.noAd,
+            starPoint = su.sport == Sport.PADEL && o.starPoint && !o.noAd, doubles = su.doubles, firstServer = firstServer,
+        )
+    }
 
     fun startMatch() {
         if (screen.value != Screen.START) return
