@@ -81,6 +81,7 @@ import com.tennis.scoremanager.ui.screens.SummaryScreen
 import com.tennis.scoremanager.ui.screens.TournamentScreen
 import com.tennis.scoremanager.ui.screens.WorkoutScreen
 import com.tennis.scoremanager.ui.screens.ProgressScreen
+import com.tennis.scoremanager.ui.screens.VideosScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -124,6 +125,7 @@ fun AppRoot(c: MatchController) {
                 Screen.TOURNAMENT -> TournamentScreen(c)
                 Screen.WORKOUT -> WorkoutScreen(c)
                 Screen.PROGRESS -> ProgressScreen(c)
+                Screen.VIDEOS -> VideosScreen(c)
             }
         }
     }

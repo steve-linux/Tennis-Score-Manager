@@ -48,8 +48,17 @@ data class ScoreOverlay(
 }
 
 /**
- * Un punto giocato, per i capitoli del video: [at] ora del punto sull'orologio del telefono-telecamera, [score]
- * il punteggio dopo il punto ("6-4 3-2 30-15"), [winner] 0/1, [kind] ACE, DOUBLE_FAULT... se segnato.
+ * Un punto giocato, per i capitoli del video: [at] ora della fine del punto (sull'orologio del telefono-telecamera,
+ * poi in ms dall'inizio del video), [score] il punteggio dopo il punto ("6-4 3-2 30-15"), [winner] 0/1, [kind] ACE,
+ * DOUBLE_FAULT... se segnato.
  */
 @Serializable
-data class PointMark(val at: Long, val score: String, val winner: Int, val kind: String? = null)
+data class PointMark(
+    val at: Long,
+    val score: String,
+    val winner: Int,
+    val kind: String? = null,
+    /** Set (da 0) e game della partita (da 0, contati su tutti i set) in cui si è giocato il punto. */
+    val set: Int = 0,
+    val game: Int = 0,
+)

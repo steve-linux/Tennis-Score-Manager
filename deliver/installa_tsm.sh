@@ -52,6 +52,7 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/remote"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/transfer"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/tv"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
+mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/video"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/gradle"
 mkdir -p "$DEST/gradle/wrapper"
@@ -132,6 +133,8 @@ dependencies {
     implementation(libs.zxing.core)  // QR del tabellone TV
     implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
     implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
+    implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
+    implementation(libs.media3.ui)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
@@ -248,6 +251,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
+
+        <!-- Lettore dei video delle partite, con i capitoli punto per punto -->
+        <activity
+            android:name=".video.VideoPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
         <activity
@@ -922,7 +932,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -1182,7 +1192,8 @@ class MatchController(
                 val played = lm.state.pointsPlayed
                 if (lastPoints in 0 until played && lm.record.startedAt != null) {
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
-                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name))
+                    val (set, game) = pointPlace(lm.state)
+                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
                 }
                 lastPoints = played
             }
@@ -1363,6 +1374,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.PROGRESS -> Screen.SETUP
+            Screen.VIDEOS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1786,6 +1798,19 @@ class MatchController(
         val title = listOf(lm.record.setup.club, lm.record.setup.court).filter { it.isNotBlank() }.joinToString(" · ")
         val banner = if (lm.state.isFinished) null else pressureMessage(lm.state)
         return ScoreOverlay.from(lm.state, Side.entries.map { n.short(it) }, banner, title)
+    }
+
+    /**
+     * Set e game (contati su tutta la partita) in cui si è giocato l'ultimo punto, dallo stato dopo il punto: se il
+     * punto ha chiuso il game (punti tornati a zero) apparteneva al game prima, e se ha chiuso il set al set prima.
+     */
+    private fun pointPlace(state: MatchState): Pair<Int, Int> {
+        val total = state.sets.sumOf { it.g1 + it.g2 } + state.g1 + state.g2
+        val gameEnded = state.isFinished || (state.pt1 == 0 && state.pt2 == 0)
+        val setEnded = state.isFinished || (gameEnded && state.g1 == 0 && state.g2 == 0 && state.sets.isNotEmpty())
+        val set = if (setEnded) state.sets.size - 1 else state.sets.size
+        val game = if (gameEnded) total - 1 else total
+        return set.coerceAtLeast(0) to game.coerceAtLeast(0)
     }
 
     /** "6-4 3-2 30-15": il punteggio dopo un punto, per i capitoli del video. */
@@ -11256,6 +11281,7 @@ import com.tennis.scoremanager.ui.screens.SummaryScreen
 import com.tennis.scoremanager.ui.screens.TournamentScreen
 import com.tennis.scoremanager.ui.screens.WorkoutScreen
 import com.tennis.scoremanager.ui.screens.ProgressScreen
+import com.tennis.scoremanager.ui.screens.VideosScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -11299,6 +11325,7 @@ fun AppRoot(c: MatchController) {
                 Screen.TOURNAMENT -> TournamentScreen(c)
                 Screen.WORKOUT -> WorkoutScreen(c)
                 Screen.PROGRESS -> ProgressScreen(c)
+                Screen.VIDEOS -> VideosScreen(c)
             }
         }
     }
@@ -12450,6 +12477,20 @@ interface Strings {
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
+    val videoTitle: String
+    val videoHint: String
+    val videoNone: String
+    val videoPoints: (Int) -> String
+    val videoDeleteTitle: String
+    val videoDeleteText: String
+    val videoYoutubeChapters: String
+    val videoNoPoints: String
+    val videoPoint: String
+    val videoGame: String
+    val videoSet: String
+    val videoReplay: String
+    val videoStart: String
+    val videoKind: (String) -> String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -13162,6 +13203,20 @@ object ItStrings : Strings {
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
+    override val videoTitle = "Video"
+    override val videoHint = "Le partite registrate dal telefono-telecamera, da rivedere punto per punto."
+    override val videoNone = "Nessun video: registra una partita col telefono-telecamera (pagina 2 › Secondo telefono › Fai da telecamera)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n punti" }
+    override val videoDeleteTitle = "Eliminare il video?"
+    override val videoDeleteText = "Il video viene tolto anche dalla galleria, insieme ai suoi capitoli."
+    override val videoYoutubeChapters = "Capitoli YouTube"
+    override val videoNoPoints = "Questo video non ha punti segnati: era registrato senza il punteggio dell'arbitro."
+    override val videoPoint = "Punto"
+    override val videoGame = "Game"
+    override val videoSet = "Set"
+    override val videoReplay = "Rivedi il punto"
+    override val videoStart = "Inizio"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doppio fallo"; "WINNER" -> "Vincente"; "UNFORCED_ERROR" -> "Errore gratuito"; "FORCED_ERROR" -> "Errore forzato"; "ERROR" -> "Errore"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -13846,6 +13901,20 @@ object EnStrings : Strings {
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"
+    override val videoTitle = "Videos"
+    override val videoHint = "Matches recorded by the camera phone, to watch point by point."
+    override val videoNone = "No videos: record a match with the camera phone (page 2 › Second phone › Act as camera)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 point" else "$n points" }
+    override val videoDeleteTitle = "Delete the video?"
+    override val videoDeleteText = "The video is also removed from the gallery, together with its chapters."
+    override val videoYoutubeChapters = "YouTube chapters"
+    override val videoNoPoints = "This video has no points marked: it was recorded without the umpire's score."
+    override val videoPoint = "Point"
+    override val videoGame = "Game"
+    override val videoSet = "Set"
+    override val videoReplay = "Replay the point"
+    override val videoStart = "Start"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double fault"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unforced error"; "FORCED_ERROR" -> "Forced error"; "ERROR" -> "Error"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -14553,6 +14622,20 @@ object DeStrings : Strings {
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
+    override val videoTitle = "Videos"
+    override val videoHint = "Von der Telefon-Kamera aufgenommene Matches, Punkt für Punkt anzusehen."
+    override val videoNone = "Keine Videos: Nimm ein Match mit der Telefon-Kamera auf (Seite 2 › Zweites Telefon › Als Kamera dienen)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 Punkt" else "$n Punkte" }
+    override val videoDeleteTitle = "Video löschen?"
+    override val videoDeleteText = "Das Video wird auch aus der Galerie entfernt, zusammen mit seinen Kapiteln."
+    override val videoYoutubeChapters = "YouTube-Kapitel"
+    override val videoNoPoints = "Dieses Video hat keine markierten Punkte: Es wurde ohne den Spielstand des Schiedsrichters aufgenommen."
+    override val videoPoint = "Punkt"
+    override val videoGame = "Spiel"
+    override val videoSet = "Satz"
+    override val videoReplay = "Punkt wiederholen"
+    override val videoStart = "Start"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ass"; "DOUBLE_FAULT" -> "Doppelfehler"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unerzwungener Fehler"; "FORCED_ERROR" -> "Erzwungener Fehler"; "ERROR" -> "Fehler"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -15252,6 +15335,20 @@ object EsStrings : Strings {
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"
+    override val videoTitle = "Vídeos"
+    override val videoHint = "Los partidos grabados por el teléfono-cámara, para ver punto por punto."
+    override val videoNone = "Ningún vídeo: graba un partido con el teléfono-cámara (página 2 › Segundo teléfono › Hacer de cámara)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n puntos" }
+    override val videoDeleteTitle = "¿Eliminar el vídeo?"
+    override val videoDeleteText = "El vídeo también se quita de la galería, junto con sus capítulos."
+    override val videoYoutubeChapters = "Capítulos de YouTube"
+    override val videoNoPoints = "Este vídeo no tiene puntos marcados: se grabó sin el marcador del árbitro."
+    override val videoPoint = "Punto"
+    override val videoGame = "Juego"
+    override val videoSet = "Set"
+    override val videoReplay = "Ver el punto otra vez"
+    override val videoStart = "Inicio"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doble falta"; "WINNER" -> "Ganador"; "UNFORCED_ERROR" -> "Error no forzado"; "FORCED_ERROR" -> "Error forzado"; "ERROR" -> "Error"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -15955,6 +16052,20 @@ object FrStrings : Strings {
     override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Serveur RTMP"
     override val cameraStreamKey = "Clé de flux"
+    override val videoTitle = "Vidéos"
+    override val videoHint = "Les matchs filmés par le téléphone-caméra, à revoir point par point."
+    override val videoNone = "Aucune vidéo : filmez un match avec le téléphone-caméra (page 2 › Second téléphone › Servir de caméra)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 point" else "$n points" }
+    override val videoDeleteTitle = "Supprimer la vidéo ?"
+    override val videoDeleteText = "La vidéo est aussi retirée de la galerie, avec ses chapitres."
+    override val videoYoutubeChapters = "Chapitres YouTube"
+    override val videoNoPoints = "Cette vidéo n'a pas de points marqués : elle a été filmée sans le score de l'arbitre."
+    override val videoPoint = "Point"
+    override val videoGame = "Jeu"
+    override val videoSet = "Set"
+    override val videoReplay = "Revoir le point"
+    override val videoStart = "Début"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Double faute"; "WINNER" -> "Coup gagnant"; "UNFORCED_ERROR" -> "Faute directe"; "FORCED_ERROR" -> "Faute provoquée"; "ERROR" -> "Faute"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -16657,6 +16768,20 @@ object PtStrings : Strings {
     override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Chave da transmissão"
+    override val videoTitle = "Vídeos"
+    override val videoHint = "As partidas gravadas pelo telefone-câmera, para rever ponto a ponto."
+    override val videoNone = "Nenhum vídeo: grave uma partida com o telefone-câmera (página 2 › Segundo telefone › Servir de câmera)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 ponto" else "$n pontos" }
+    override val videoDeleteTitle = "Excluir o vídeo?"
+    override val videoDeleteText = "O vídeo também é removido da galeria, junto com os capítulos."
+    override val videoYoutubeChapters = "Capítulos do YouTube"
+    override val videoNoPoints = "Este vídeo não tem pontos marcados: foi gravado sem o placar do árbitro."
+    override val videoPoint = "Ponto"
+    override val videoGame = "Game"
+    override val videoSet = "Set"
+    override val videoReplay = "Rever o ponto"
+    override val videoStart = "Início"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Dupla falta"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Erro não forçado"; "FORCED_ERROR" -> "Erro forçado"; "ERROR" -> "Erro"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -20060,6 +20185,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
@@ -20144,11 +20270,12 @@ fun SetupScreen(c: MatchController) {
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
     ) {
-        // Tre scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite.
+        // Scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite, video registrati.
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
             HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
             HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
+            HomeShortcut(Icons.Filled.VideoLibrary, TsmColors.Ball, s.videoTitle, Modifier.weight(1f)) { c.screen.value = Screen.VIDEOS }
         }
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
         SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
@@ -20282,9 +20409,10 @@ private fun HomeShortcut(
     onClick: () -> Unit,
 ) {
     Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.padding(horizontal = 2.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, tint = tint)
-            Text(label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+            // Quattro scorciatoie in una riga: "Allenamento" deve starci anche sui telefoni stretti.
+            Text(label, color = TsmColors.TextMain, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, letterSpacing = 0.sp,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
@@ -21479,6 +21607,120 @@ private fun StandingsTable(c: MatchController, t: Tournament) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/VideosScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/VideosScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.video.VideoLibrary
+import com.tennis.scoremanager.video.VideoPlayerActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/** Pagina 1 › Video: le partite registrate dal telefono-telecamera, da rivedere punto per punto. */
+@Composable
+fun VideosScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val o by c.options.collectAsState()
+    BackHandler { c.back() }
+    var tick by remember { mutableIntStateOf(0) }
+    LifecycleResumeEffect(Unit) {
+        tick++
+        onPauseOrDispose { }
+    }
+    val list by produceState(emptyList<VideoLibrary.Entry>(), tick) { value = withContext(Dispatchers.IO) { VideoLibrary.list(context) } }
+    var toDelete by remember { mutableStateOf<VideoLibrary.Entry?>(null) }
+    ScreenScaffold(
+        title = s.videoTitle,
+        subtitle = s.videoHint,
+        icon = Icons.Filled.VideoLibrary,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        SectionCard(s.videoTitle, Icons.Filled.VideoLibrary) {
+            if (list.isEmpty()) Text(s.videoNone, color = TsmColors.TextDim)
+            for (e in list) {
+                val ch = e.chapters
+                val at = ch.recordedAt.takeIf { it > 0 } ?: e.chaptersFile.lastModified()
+                Surface(
+                    onClick = {
+                        context.startActivity(Intent(context, VideoPlayerActivity::class.java).putExtra(VideoPlayerActivity.EXTRA_CHAPTERS, e.chaptersFile.absolutePath))
+                    },
+                    shape = RoundedCornerShape(12.dp), color = TsmColors.SurfaceHigh, modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(Modifier.padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                            Text("${Reports.date(at, o.lang)} ${Reports.time(at, o.lang)}", color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                listOfNotNull(
+                                    ch.names.takeIf { it.size == 2 }?.joinToString(" – "),
+                                    s.videoPoints(ch.points.size),
+                                    ch.points.lastOrNull()?.score,
+                                ).joinToString(" · "),
+                                color = TsmColors.TextDim, fontSize = 12.sp,
+                            )
+                        }
+                        IconButton(onClick = { toDelete = e }) { Icon(Icons.Filled.Delete, null, tint = TsmColors.TextDim) }
+                    }
+                }
+            }
+        }
+    }
+    toDelete?.let { e ->
+        ConfirmDialog(
+            Icons.Filled.Delete, s.videoDeleteTitle, s.videoDeleteText, s.delete,
+            onConfirm = {
+                VideoLibrary.delete(context, e)
+                toDelete = null
+                tick++
+            },
+            onDismiss = { toDelete = null },
+            danger = true,
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/WorkoutScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/WorkoutScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -21909,10 +22151,13 @@ class CameraActivity : ComponentActivity() {
         val file = recordFile ?: return
         val marks = chapters.toList()
         lifecycleScope.launch {
+            val started = recordStartWall
+            val names = controller.relay.score.value?.names.orEmpty()
             val ok = withContext(Dispatchers.IO) {
+                val json = File(file.parentFile, file.nameWithoutExtension + ".json")
+                fun save(uri: String?) = json.writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks, uri, started, names)))
                 runCatching {
-                    File(file.parentFile, file.nameWithoutExtension + ".json")
-                        .writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks)))
+                    save(null)
                     if (Build.VERSION.SDK_INT >= 29) {
                         val values = ContentValues().apply {
                             put(MediaStore.Video.Media.DISPLAY_NAME, file.name)
@@ -21921,6 +22166,9 @@ class CameraActivity : ComponentActivity() {
                         }
                         val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
                         contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: error("open")
+                        // Una copia sola: un'ora di partita sono 3-4 GB. I capitoli restano qui e puntano alla galleria.
+                        save(uri.toString())
+                        file.delete()
                     }
                 }.onFailure { Log.w(TAG, "copia del video non riuscita", it) }.isSuccess
             }
@@ -22111,9 +22359,98 @@ class CameraActivity : ComponentActivity() {
     }
 }
 
-/** Capitoli di un video: un segno per punto, [PointMark.at] in ms dall'inizio della registrazione. */
+/**
+ * Capitoli di un video: un segno per punto, [PointMark.at] in ms dall'inizio della registrazione. [uri] è la copia
+ * nella galleria (content://); senza, il video è ancora nella cartella dell'app col nome [video].
+ */
 @kotlinx.serialization.Serializable
-data class VideoChapters(val video: String, val points: List<PointMark>)
+data class VideoChapters(
+    val video: String,
+    val points: List<PointMark>,
+    val uri: String? = null,
+    val recordedAt: Long = 0L,
+    /** Nomi dei due lati, dall'ultimo punteggio ricevuto. */
+    val names: List<String> = emptyList(),
+)
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/Chapters.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/Chapters.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import java.util.Locale
+
+/**
+ * Capitoli di un video: il punto i va dalla fine del punto precedente (o dall'inizio del video) al suo segno
+ * [PointMark.at]. Da qui la navigazione per punto, game e set e i capitoli per YouTube.
+ */
+object Chapters {
+    /** Quanto prima della fine del punto precedente si riparte: il servizio comincia un attimo dopo. */
+    const val LEAD_MS = 0L
+
+    fun start(points: List<PointMark>, i: Int): Long = if (i <= 0) 0L else points[i - 1].at + LEAD_MS
+
+    /** Il punto in corso alla posizione [posMs] (l'ultimo se si è oltre la fine); -1 senza punti. */
+    fun indexAt(points: List<PointMark>, posMs: Long): Int {
+        if (points.isEmpty()) return -1
+        val i = points.indexOfFirst { posMs < it.at }
+        return if (i < 0) points.lastIndex else i
+    }
+
+    /** Primo punto del game (o del set) successivo; null se è già l'ultimo. */
+    fun nextGame(points: List<PointMark>, i: Int): Int? = points.indices.firstOrNull { it > i && points[it].game > points[i].game }
+
+    fun nextSet(points: List<PointMark>, i: Int): Int? = points.indices.firstOrNull { it > i && points[it].set > points[i].set }
+
+    /** Primo punto del game in corso; se ci si è già, quello del game prima. */
+    fun prevGame(points: List<PointMark>, i: Int, atStart: Boolean): Int {
+        if (i < 0) return 0
+        val first = points.indexOfFirst { it.game == points[i].game }
+        if (!atStart || first < i) return first
+        val prev = points.getOrNull(first - 1) ?: return 0
+        return points.indexOfFirst { it.game == prev.game }
+    }
+
+    fun prevSet(points: List<PointMark>, i: Int, atStart: Boolean): Int {
+        if (i < 0) return 0
+        val first = points.indexOfFirst { it.set == points[i].set }
+        if (!atStart || first < i) return first
+        val prev = points.getOrNull(first - 1) ?: return 0
+        return points.indexOfFirst { it.set == prev.set }
+    }
+
+    /**
+     * Capitoli per la descrizione di YouTube, uno per game (YouTube vuole almeno tre capitoli, il primo a 0:00, e
+     * ognuno di almeno 10 secondi: i singoli punti sono spesso più corti). [label] dà il nome del game dal set
+     * (da 1) e dal numero del game nel set (da 1).
+     */
+    fun youtube(points: List<PointMark>, start: String, label: (set: Int, game: Int) -> String): String {
+        val lines = mutableListOf("0:00 $start")
+        var lastAt = 0L
+        var gameInSet = 0
+        for (i in points.indices) {
+            val p = points[i]
+            val prev = points.getOrNull(i - 1)
+            if (prev != null && prev.game == p.game) continue
+            gameInSet = if (prev == null || prev.set != p.set) 1 else gameInSet + 1
+            val at = start(points, i)
+            if (at - lastAt < 10_000 && i > 0) continue
+            if (at < 10_000) continue  // il primo game parte con "0:00"
+            lines += "${time(at)} ${label(p.set + 1, gameInSet)}"
+            lastAt = at
+        }
+        return lines.joinToString("\n")
+    }
+
+    fun time(ms: Long): String {
+        val s = ms / 1000
+        return if (s >= 3600) String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
+        else String.format(Locale.ROOT, "%d:%02d", s / 60, s % 60)
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/OverlayRenderer.kt
@@ -22277,11 +22614,304 @@ data class ScoreOverlay(
 }
 
 /**
- * Un punto giocato, per i capitoli del video: [at] ora del punto sull'orologio del telefono-telecamera, [score]
- * il punteggio dopo il punto ("6-4 3-2 30-15"), [winner] 0/1, [kind] ACE, DOUBLE_FAULT... se segnato.
+ * Un punto giocato, per i capitoli del video: [at] ora della fine del punto (sull'orologio del telefono-telecamera,
+ * poi in ms dall'inizio del video), [score] il punteggio dopo il punto ("6-4 3-2 30-15"), [winner] 0/1, [kind] ACE,
+ * DOUBLE_FAULT... se segnato.
  */
 @Serializable
-data class PointMark(val at: Long, val score: String, val winner: Int, val kind: String? = null)
+data class PointMark(
+    val at: Long,
+    val score: String,
+    val winner: Int,
+    val kind: String? = null,
+    /** Set (da 0) e game della partita (da 0, contati su tutti i set) in cui si è giocato il punto. */
+    val set: Int = 0,
+    val game: Int = 0,
+)
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/VideoLibrary.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/VideoLibrary.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/**
+ * I video registrati dal telefono-telecamera: per ciascuno il file dei capitoli (.json, nella cartella dell'app) e
+ * il video, nella galleria ([VideoChapters.uri]) o ancora nella cartella dell'app (registrazioni vecchie o Android 9).
+ */
+object VideoLibrary {
+    private val json = Json { ignoreUnknownKeys = true }
+
+    data class Entry(val chaptersFile: File, val chapters: VideoChapters, val video: Uri)
+
+    private fun dir(context: Context): File = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: context.filesDir
+
+    /** Dal più recente; solo quelli il cui video c'è ancora. */
+    fun list(context: Context): List<Entry> =
+        dir(context).listFiles { f -> f.extension == "json" }.orEmpty().mapNotNull { f -> load(context, f) }
+            .sortedByDescending { it.chapters.recordedAt.takeIf { t -> t > 0 } ?: it.chaptersFile.lastModified() }
+
+    fun load(context: Context, f: File): Entry? {
+        val ch = runCatching { json.decodeFromString(VideoChapters.serializer(), f.readText()) }.getOrNull() ?: return null
+        val local = File(f.parentFile, ch.video)
+        val uri = ch.uri?.let(Uri::parse)?.takeIf { u -> runCatching { context.contentResolver.openFileDescriptor(u, "r")?.close() }.isSuccess }
+            ?: local.takeIf { it.exists() }?.let(Uri::fromFile)
+            ?: return null
+        return Entry(f, ch, uri)
+    }
+
+    /** Elimina video (anche dalla galleria) e capitoli. */
+    fun delete(context: Context, e: Entry) {
+        e.chapters.uri?.let { u -> runCatching { context.contentResolver.delete(Uri.parse(u), null, null) } }
+        File(e.chaptersFile.parentFile, e.chapters.video).delete()
+        e.chaptersFile.delete()
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/VideoPlayerActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/VideoPlayerActivity.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Subtitles
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import kotlinx.coroutines.delay
+import java.io.File
+
+/**
+ * Lettore del video di una partita con i capitoli: a destra l'elenco dei punti (tocchi e il video va lì) e i
+ * pulsanti per saltare di punto, di game e di set, rivedere il punto e copiare i capitoli per YouTube.
+ */
+class VideoPlayerActivity : ComponentActivity() {
+
+    private val controller get() = (application as TsmApp).controller
+    private val s: Strings get() = stringsFor(controller.options.value.lang)
+    private var player: ExoPlayer? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.decorView.setBackgroundColor(Color.BLACK)
+        // A schermo intero: in orizzontale ogni riga conta per l'elenco dei punti.
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+        val entry = intent.getStringExtra(EXTRA_CHAPTERS)?.let { VideoLibrary.load(this, File(it)) }
+        if (entry == null) {
+            finish()
+            return
+        }
+        val p = ExoPlayer.Builder(this).build().apply {
+            setMediaItem(MediaItem.fromUri(entry.video))
+            prepare()
+            playWhenReady = true
+        }
+        player = p
+        setContent { TsmTheme { Content(entry, p) } }
+    }
+
+    override fun onStop() {
+        player?.pause()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        player?.release()
+        player = null
+        super.onDestroy()
+    }
+
+    @Composable
+    private fun Content(e: VideoLibrary.Entry, p: ExoPlayer) {
+        val str = s
+        val points = e.chapters.points
+        var pos by remember { mutableLongStateOf(0L) }
+        LaunchedEffect(p) {
+            while (true) {
+                pos = p.currentPosition
+                delay(250)
+            }
+        }
+        val cur = Chapters.indexAt(points, pos)
+        val list = rememberLazyListState()
+        LaunchedEffect(cur) { if (cur >= 0) list.animateScrollToItem((cur - 2).coerceAtLeast(0)) }
+        fun go(i: Int?) {
+            if (i == null || i < 0 || points.isEmpty()) return
+            p.seekTo(Chapters.start(points, i.coerceIn(0, points.lastIndex)))
+            p.play()
+        }
+        // "All'inizio del punto": nei primi 2 secondi indietro va al punto prima, dopo riparte da questo.
+        val atStart = cur >= 0 && pos - Chapters.start(points, cur) < 2_000
+        Row(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            AndroidView(
+                factory = { ctx -> PlayerView(ctx).apply { player = p } },
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+            )
+            Column(
+                Modifier.width(300.dp).fillMaxHeight().background(TsmColors.Background).padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    NavBtn(Icons.AutoMirrored.Filled.ArrowBack, str.back, Modifier.weight(1f)) { finish() }
+                    NavBtn(Icons.Filled.Subtitles, str.videoYoutubeChapters, Modifier.weight(1f)) { shareYoutube(e) }
+                }
+                if (points.isEmpty()) {
+                    Text(str.videoNoPoints, color = TsmColors.TextDim, fontSize = 13.sp)
+                    return@Column
+                }
+                // Toccando "Punto" si rivede il punto in corso dall'inizio.
+                NavRow(str.videoPoint, { go(if (atStart) cur - 1 else cur) }, { go(cur + 1) }, onLabel = { go(cur) })
+                NavRow(str.videoGame, { go(Chapters.prevGame(points, cur, atStart)) }, { go(Chapters.nextGame(points, cur)) })
+                NavRow(str.videoSet, { go(Chapters.prevSet(points, cur, atStart)) }, { go(Chapters.nextSet(points, cur)) })
+                LazyColumn(state = list, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    itemsIndexed(points) { i, pt ->
+                        val newGame = i == 0 || points[i - 1].game != pt.game
+                        if (newGame) {
+                            Text(
+                                "${str.videoSet} ${pt.set + 1} · ${str.videoGame} ${pt.game + 1}",
+                                color = TsmColors.TextDim, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 6.dp),
+                            )
+                        }
+                        PointRow(i, pt, e.chapters.names, i == cur, Chapters.start(points, i)) { go(i) }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun PointRow(i: Int, pt: PointMark, names: List<String>, current: Boolean, startMs: Long, onClick: () -> Unit) {
+        val str = s
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+                .background(if (current) TsmColors.SurfaceHigh else TsmColors.Surface)
+                .clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val side = if (pt.winner == 1) com.tennis.scoremanager.model.Side.P2 else com.tennis.scoremanager.model.Side.P1
+            Box(Modifier.size(10.dp).clip(CircleShape).background(if (pt.winner in 0..1) TsmColors.player(side) else TsmColors.TextDim))
+            Spacer(Modifier.width(8.dp))
+            Column(Modifier.weight(1f)) {
+                Text(pt.score, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (current) FontWeight.Bold else FontWeight.Normal)
+                val who = names.getOrNull(pt.winner)
+                val kind = pt.kind?.let { str.videoKind(it) }
+                if (who != null || kind != null) {
+                    Text(listOfNotNull(who, kind).joinToString(" · "), color = TsmColors.TextDim, fontSize = 11.sp)
+                }
+            }
+            Text("${i + 1} · ${Chapters.time(startMs)}", color = TsmColors.TextDim, fontSize = 11.sp)
+        }
+    }
+
+    @Composable
+    private fun NavRow(label: String, prev: () -> Unit, next: () -> Unit, onLabel: (() -> Unit)? = null) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            NavBtn(Icons.Filled.SkipPrevious, null, Modifier.weight(1f), prev)
+            if (onLabel != null) {
+                NavBtn(Icons.Filled.Replay, label, Modifier.width(104.dp), onLabel)
+            } else {
+                Text(label, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(104.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            }
+            NavBtn(Icons.Filled.SkipNext, null, Modifier.weight(1f), next)
+        }
+    }
+
+    @Composable
+    private fun NavBtn(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String?, modifier: Modifier, onClick: () -> Unit) {
+        Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
+            Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, null, tint = TsmColors.TextMain)
+                label?.let {
+                    Spacer(Modifier.width(6.dp))
+                    Text(it, color = TsmColors.TextMain, fontSize = 12.sp, maxLines = 1)
+                }
+            }
+        }
+    }
+
+    /** Capitoli per game da incollare nella descrizione del video su YouTube. */
+    private fun shareYoutube(e: VideoLibrary.Entry) {
+        val str = s
+        val text = Chapters.youtube(e.chapters.points, str.videoStart) { set, game -> "${str.videoSet} $set · ${str.videoGame} $game" }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(Intent.createChooser(send, str.videoYoutubeChapters))
+    }
+
+    companion object {
+        /** Percorso del file dei capitoli (.json) del video da aprire. */
+        const val EXTRA_CHAPTERS = "chapters"
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/voice/Announcer.kt
@@ -26110,8 +26740,8 @@ class StringsTest {
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
-            // con l'allenamento anche "Pause", uguale in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 40)
+            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", uguali in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 45)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -26149,6 +26779,57 @@ class StringsTest {
         assertEquals("lang=de", BandSettings.languageConfig("de"))
         // Le impostazioni scritte dal pannello non toccano la lingua (quella la manda l'app da sola).
         assertTrue("lang" !in s.encode())
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/ChaptersTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/ChaptersTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class ChaptersTest {
+    // Set 0: game 0 (3 punti), game 1 (2 punti); set 1: game 2 (2 punti). Un punto ogni 20 s.
+    private val pts = listOf(
+        0 to 0, 0 to 0, 0 to 0, 0 to 1, 0 to 1, 1 to 2, 1 to 2,
+    ).mapIndexed { i, (set, game) -> PointMark(at = (i + 1) * 20_000L, score = "s$i", winner = i % 2, set = set, game = game) }
+
+    @Test
+    fun pointAtPosition() {
+        assertEquals(0, Chapters.indexAt(pts, 0))
+        assertEquals(0, Chapters.indexAt(pts, 19_999))
+        assertEquals(1, Chapters.indexAt(pts, 20_000))
+        assertEquals(6, Chapters.indexAt(pts, 999_999))
+        assertEquals(-1, Chapters.indexAt(emptyList(), 5))
+        assertEquals(0L, Chapters.start(pts, 0))
+        assertEquals(40_000L, Chapters.start(pts, 2))
+    }
+
+    @Test
+    fun gamesAndSets() {
+        assertEquals(3, Chapters.nextGame(pts, 1))
+        assertEquals(5, Chapters.nextGame(pts, 3))
+        assertNull(Chapters.nextGame(pts, 6))
+        assertEquals(5, Chapters.nextSet(pts, 0))
+        assertNull(Chapters.nextSet(pts, 5))
+        // Indietro: a metà game torna al suo inizio, all'inizio del game va a quello prima.
+        assertEquals(3, Chapters.prevGame(pts, 4, atStart = false))
+        assertEquals(0, Chapters.prevGame(pts, 3, atStart = true))
+        assertEquals(0, Chapters.prevSet(pts, 5, atStart = true))
+        assertEquals(5, Chapters.prevSet(pts, 6, atStart = false))
+    }
+
+    @Test
+    fun youtubeChaptersPerGame() {
+        val text = Chapters.youtube(pts, "Inizio") { set, game -> "Set $set · Game $game" }
+        assertEquals("0:00 Inizio\n1:00 Set 1 · Game 2\n1:40 Set 2 · Game 1", text)
+        assertEquals("1:02:03", Chapters.time(3_723_000))
     }
 }
 TSM_EOF
@@ -26859,6 +27540,7 @@ junit = "4.13.2"
 zxing = "3.5.3"
 zxingEmbedded = "4.3.0"
 rootEncoder = "2.8.1"
+media3 = "1.11.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26877,6 +27559,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 rootencoder = { group = "com.github.pedroSG94.RootEncoder", name = "library", version.ref = "rootEncoder" }
+media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -30910,6 +31594,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 114 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 119 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

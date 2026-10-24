@@ -72,6 +72,8 @@ dependencies {
     implementation(libs.zxing.core)  // QR del tabellone TV
     implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
     implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
+    implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
+    implementation(libs.media3.ui)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

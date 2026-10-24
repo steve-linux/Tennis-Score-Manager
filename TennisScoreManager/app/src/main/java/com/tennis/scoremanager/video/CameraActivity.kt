@@ -219,10 +219,13 @@ class CameraActivity : ComponentActivity() {
         val file = recordFile ?: return
         val marks = chapters.toList()
         lifecycleScope.launch {
+            val started = recordStartWall
+            val names = controller.relay.score.value?.names.orEmpty()
             val ok = withContext(Dispatchers.IO) {
+                val json = File(file.parentFile, file.nameWithoutExtension + ".json")
+                fun save(uri: String?) = json.writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks, uri, started, names)))
                 runCatching {
-                    File(file.parentFile, file.nameWithoutExtension + ".json")
-                        .writeText(Json.encodeToString(VideoChapters.serializer(), VideoChapters(file.name, marks)))
+                    save(null)
                     if (Build.VERSION.SDK_INT >= 29) {
                         val values = ContentValues().apply {
                             put(MediaStore.Video.Media.DISPLAY_NAME, file.name)
@@ -231,6 +234,9 @@ class CameraActivity : ComponentActivity() {
                         }
                         val uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values) ?: error("insert")
                         contentResolver.openOutputStream(uri)?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: error("open")
+                        // Una copia sola: un'ora di partita sono 3-4 GB. I capitoli restano qui e puntano alla galleria.
+                        save(uri.toString())
+                        file.delete()
                     }
                 }.onFailure { Log.w(TAG, "copia del video non riuscita", it) }.isSuccess
             }
@@ -421,6 +427,16 @@ class CameraActivity : ComponentActivity() {
     }
 }
 
-/** Capitoli di un video: un segno per punto, [PointMark.at] in ms dall'inizio della registrazione. */
+/**
+ * Capitoli di un video: un segno per punto, [PointMark.at] in ms dall'inizio della registrazione. [uri] è la copia
+ * nella galleria (content://); senza, il video è ancora nella cartella dell'app col nome [video].
+ */
 @kotlinx.serialization.Serializable
-data class VideoChapters(val video: String, val points: List<PointMark>)
+data class VideoChapters(
+    val video: String,
+    val points: List<PointMark>,
+    val uri: String? = null,
+    val recordedAt: Long = 0L,
+    /** Nomi dei due lati, dall'ultimo punteggio ricevuto. */
+    val names: List<String> = emptyList(),
+)

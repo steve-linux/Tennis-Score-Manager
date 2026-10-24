@@ -165,6 +165,20 @@ object DeStrings : Strings {
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
+    override val videoTitle = "Videos"
+    override val videoHint = "Von der Telefon-Kamera aufgenommene Matches, Punkt für Punkt anzusehen."
+    override val videoNone = "Keine Videos: Nimm ein Match mit der Telefon-Kamera auf (Seite 2 › Zweites Telefon › Als Kamera dienen)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 Punkt" else "$n Punkte" }
+    override val videoDeleteTitle = "Video löschen?"
+    override val videoDeleteText = "Das Video wird auch aus der Galerie entfernt, zusammen mit seinen Kapiteln."
+    override val videoYoutubeChapters = "YouTube-Kapitel"
+    override val videoNoPoints = "Dieses Video hat keine markierten Punkte: Es wurde ohne den Spielstand des Schiedsrichters aufgenommen."
+    override val videoPoint = "Punkt"
+    override val videoGame = "Spiel"
+    override val videoSet = "Satz"
+    override val videoReplay = "Punkt wiederholen"
+    override val videoStart = "Start"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ass"; "DOUBLE_FAULT" -> "Doppelfehler"; "WINNER" -> "Winner"; "UNFORCED_ERROR" -> "Unerzwungener Fehler"; "FORCED_ERROR" -> "Erzwungener Fehler"; "ERROR" -> "Fehler"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."

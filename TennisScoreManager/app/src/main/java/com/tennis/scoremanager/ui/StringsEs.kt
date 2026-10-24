@@ -165,6 +165,20 @@ object EsStrings : Strings {
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"
+    override val videoTitle = "Vídeos"
+    override val videoHint = "Los partidos grabados por el teléfono-cámara, para ver punto por punto."
+    override val videoNone = "Ningún vídeo: graba un partido con el teléfono-cámara (página 2 › Segundo teléfono › Hacer de cámara)."
+    override val videoPoints: (Int) -> String = { n -> if (n == 1) "1 punto" else "$n puntos" }
+    override val videoDeleteTitle = "¿Eliminar el vídeo?"
+    override val videoDeleteText = "El vídeo también se quita de la galería, junto con sus capítulos."
+    override val videoYoutubeChapters = "Capítulos de YouTube"
+    override val videoNoPoints = "Este vídeo no tiene puntos marcados: se grabó sin el marcador del árbitro."
+    override val videoPoint = "Punto"
+    override val videoGame = "Juego"
+    override val videoSet = "Set"
+    override val videoReplay = "Ver el punto otra vez"
+    override val videoStart = "Inicio"
+    override val videoKind: (String) -> String = { k -> when (k) { "ACE" -> "Ace"; "DOUBLE_FAULT" -> "Doble falta"; "WINNER" -> "Ganador"; "UNFORCED_ERROR" -> "Error no forzado"; "FORCED_ERROR" -> "Error forzado"; "ERROR" -> "Error"; else -> k } }
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."

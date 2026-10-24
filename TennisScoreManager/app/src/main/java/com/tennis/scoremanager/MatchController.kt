@@ -116,7 +116,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -376,7 +376,8 @@ class MatchController(
                 val played = lm.state.pointsPlayed
                 if (lastPoints in 0 until played && lm.record.startedAt != null) {
                     val p = lm.record.events.lastOrNull { it is MatchEvent.Point } as? MatchEvent.Point
-                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name))
+                    val (set, game) = pointPlace(lm.state)
+                    relay.publishPoint(PointMark(System.currentTimeMillis(), scoreText(lm.state), p?.winner?.ordinal ?: -1, p?.kind?.name, set, game))
                 }
                 lastPoints = played
             }
@@ -557,6 +558,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.PROGRESS -> Screen.SETUP
+            Screen.VIDEOS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -980,6 +982,19 @@ class MatchController(
         val title = listOf(lm.record.setup.club, lm.record.setup.court).filter { it.isNotBlank() }.joinToString(" · ")
         val banner = if (lm.state.isFinished) null else pressureMessage(lm.state)
         return ScoreOverlay.from(lm.state, Side.entries.map { n.short(it) }, banner, title)
+    }
+
+    /**
+     * Set e game (contati su tutta la partita) in cui si è giocato l'ultimo punto, dallo stato dopo il punto: se il
+     * punto ha chiuso il game (punti tornati a zero) apparteneva al game prima, e se ha chiuso il set al set prima.
+     */
+    private fun pointPlace(state: MatchState): Pair<Int, Int> {
+        val total = state.sets.sumOf { it.g1 + it.g2 } + state.g1 + state.g2
+        val gameEnded = state.isFinished || (state.pt1 == 0 && state.pt2 == 0)
+        val setEnded = state.isFinished || (gameEnded && state.g1 == 0 && state.g2 == 0 && state.sets.isNotEmpty())
+        val set = if (setEnded) state.sets.size - 1 else state.sets.size
+        val game = if (gameEnded) total - 1 else total
+        return set.coerceAtLeast(0) to game.coerceAtLeast(0)
     }
 
     /** "6-4 3-2 30-15": il punteggio dopo un punto, per i capitoli del video. */

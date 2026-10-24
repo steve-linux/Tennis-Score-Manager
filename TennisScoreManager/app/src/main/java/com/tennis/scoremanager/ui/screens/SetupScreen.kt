@@ -3,6 +3,7 @@
 
 package com.tennis.scoremanager.ui.screens
 
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
@@ -87,11 +88,12 @@ fun SetupScreen(c: MatchController) {
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
     ) {
-        // Tre scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite.
+        // Scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite, video registrati.
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
             HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
             HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
+            HomeShortcut(Icons.Filled.VideoLibrary, TsmColors.Ball, s.videoTitle, Modifier.weight(1f)) { c.screen.value = Screen.VIDEOS }
         }
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
         SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
@@ -225,9 +227,10 @@ private fun HomeShortcut(
     onClick: () -> Unit,
 ) {
     Surface(onClick = onClick, shape = RoundedCornerShape(14.dp), color = TsmColors.SurfaceHigh, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.padding(horizontal = 2.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, tint = tint)
-            Text(label, color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+            // Quattro scorciatoie in una riga: "Allenamento" deve starci anche sui telefoni stretti.
+            Text(label, color = TsmColors.TextMain, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, letterSpacing = 0.sp,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
