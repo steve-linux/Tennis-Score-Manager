@@ -62,6 +62,10 @@ object Reports {
     fun pointsWon(rec: MatchRecord, side: Side): Int = rec.events.count { it is MatchEvent.Point && it.winner == side }
     fun gamesWon(state: MatchState, side: Side): Int = state.sets.sumOf { it.games(side) } + state.games(side)
 
+    /** "Open di Primavera · Lim. 4.1 · Semifinale"; null senza torneo. */
+    fun eventLine(su: SetupData): String? =
+        listOf(su.event, su.category, su.round).map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" · ").ifEmpty { null }
+
     /** "G1 92% → 71% · G2 88% → 70%" */
     fun batteryLine(rec: MatchRecord, s: Strings): String =
         Side.entries.mapNotNull { side ->
@@ -161,6 +165,7 @@ object Reports {
                 rec.setup.court.ifBlank { null }?.let { "${s.court} $it" },
             ).joinToString(" · "))
         }
+        eventLine(rec.setup)?.let { sb.appendLine("🏆 $it") }
         sb.appendLine(date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
         sb.appendLine()
         sb.appendLine("🏆 ${s.winner}: ${names.side(w)}")

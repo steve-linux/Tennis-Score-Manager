@@ -28,6 +28,20 @@ data class SetupData(
     val p2a: String = "",
     val p2b: String = "",
     val sport: Sport = Sport.TENNIS,
+    /** Torneo (facoltativo, per i circuiti amatoriali): nome, categoria o tabellone ("Lim. 4.1", "Over 45"), turno. */
+    val event: String = "",
+    val category: String = "",
+    val round: String = "",
+    /** Classifica di ciascun giocatore ("4.1", "NC"...), facoltativa. */
+    val p1aRank: String = "",
+    val p1bRank: String = "",
+    val p2aRank: String = "",
+    val p2bRank: String = "",
+    /** Sesso di ciascun giocatore ("M", "F" o "" = non detto): serve solo all'avatar stilizzato degli highlights. */
+    val p1aSex: String = "",
+    val p1bSex: String = "",
+    val p2aSex: String = "",
+    val p2bSex: String = "",
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */

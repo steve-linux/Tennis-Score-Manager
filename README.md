@@ -59,6 +59,8 @@ Versioni: Gradle 8.14.3 · Android Gradle Plugin 8.13.2 · Kotlin 2.2.21 · comp
 | Statistiche e cronologia punto per punto del riepilogo | `app/.../data/MatchStats.kt` (+ test), `ui/screens/MatchStatsPanels.kt` |
 | Storico, giocatori e importazione dei JSON | `app/.../data/PlayerStats.kt` (+ test), `data/Storage.kt` (`saveFinished`), `ui/screens/HistoryScreen.kt`, `MatchController.kt` (`importMatches`) |
 | Trasferimento tra telefoni col QR (storico e partite sospese) | `app/.../transfer/Transfer.kt` (server e `TransferBundle`), `MatchController.kt` (`startSending`, `receiveFrom`), `ui/screens/HistoryScreen.kt` (`SendDialog`) |
+| Statistiche in coda agli highlights (schermate, avatar, musica) | `app/.../video/HighlightStats.kt` (partita del video, righe + test), `video/StatsCardRenderer.kt` (disegno), `video/HighlightMaker.kt` (immagini e musica nel montaggio), `video/MusicClip.kt` (brano scelto), `video/StatsMusic.kt` (musica generata + test), `video/VideoPlayerActivity.kt` (`HighlightDialog`) |
+| Torneo, categoria, turno, classifica e sesso dei giocatori | `app/.../data/Models.kt` (`SetupData`), `ui/screens/SetupScreen.kt`, `data/Reports.kt` (`eventLine`) |
 | Note della partita nel riepilogo (PDF, testo, .json) | `app/.../data/Models.kt` (`MatchRecord.notes`), `MatchController.kt` (`setNotes`), `ui/screens/SummaryScreen.kt` (`MatchNotesCard`), `data/PdfReport.kt`, `data/Reports.kt` (`text`) |
 | Foto dei giocatori | `app/.../ui/PlayerPhoto.kt` (`PlayerAvatar`, `EditablePlayerAvatar`), `data/Storage.kt` (`savePhoto`), `MatchController.kt` (`setPhoto`), `/photo/` in `tv/TvServer.kt` e `assets/scoreboard.html` |
 | Fasce cardio Bluetooth (battito, calorie, zone, grafici) | `app/.../ble/HeartRateProtocol.kt` (+ test), `ble/HeartRateManager.kt`, `data/HeartStats.kt` (Keytel, zone, + test), `ui/HeartSection.kt`, `MatchController.kt` (`flushHeart`), `ui/screens/MatchStatsPanels.kt` (`HeartChart`, `HeartZones`) |
@@ -82,5 +84,12 @@ Sono tutti compatibili con la GPL 3:
 | M5Unified, M5GFX | firmware | MIT (i font FreeSans arrivano da Adafruit GFX: BSD) |
 | NimBLE-Arduino | firmware | Apache 2.0 |
 | Core Arduino per ESP32, ESP-IDF | firmware | LGPL 2.1 o successiva, Apache 2.0 |
+
+Materiale non di codice:
+
+| Materiale | File | Autore e licenza |
+|---|---|---|
+| Musica delle statistiche negli highlights (primi 31 secondi) | `app/src/main/res/raw/stats_music.m4a` | "Nowhere Land" di Kevin MacLeod ([incompetech.com](https://incompetech.com)), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): chi pubblica un video con questa musica ne cita l'autore (l'app lo ricorda nella finestra degli highlights) |
+| Ritratti stilizzati di uomo e donna | `app/src/main/res/drawable-nodpi/avatar_*.webp` | Stefano Spagnolo, GPL 3.0 o successiva come il resto dell'app |
 
 Il codice Apache 2.0 si può unire a un programma GPL 3, non a uno "solo GPL 2": per questo la licenza è la 3 o successiva. Il firmware compilato contiene anche le librerie radio e Bluetooth di Espressif, fornite solo in binario: conta solo se un giorno si distribuisce il file `.bin` già compilato (oltre al sorgente), ed è la stessa situazione di firmware GPL per ESP32 come Tasmota e Meshtastic.

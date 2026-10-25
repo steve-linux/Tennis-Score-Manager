@@ -166,6 +166,19 @@ class Storage(context: Context) {
     var highlightEnabled: Set<String>?
         get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
         set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
+    /** Brano scelto per le statistiche degli highlights: una copia sul telefono, col nome da mostrare. */
+    val highlightMusicFile: File get() = File(app.filesDir, "hl_music")
+    var highlightMusicName: String?
+        get() = prefs.getString("hl_music_name", null)?.takeIf { highlightMusicFile.exists() }
+        set(v) {
+            if (v == null) highlightMusicFile.delete()
+            prefs.edit().putString("hl_music_name", v).apply()
+        }
+
+    /** Highlights: schermate delle statistiche in coda al montaggio. */
+    var highlightStats: Boolean
+        get() = prefs.getBoolean("hl_stats", true)
+        set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()

@@ -3,9 +3,6 @@
 
 package com.tennis.scoremanager.ui.screens
 
-import androidx.compose.material.icons.filled.VideoLibrary
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.MonitorHeart
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -22,16 +19,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -116,6 +119,13 @@ fun SetupScreen(c: MatchController) {
                 c.updateOptions { it.copy(addressLookup = v) }
             }
         }
+        // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
+        SectionCard(s.eventSection, Icons.Filled.EmojiEvents) {
+            Field(su.event, s.eventName, Icons.Filled.EmojiEvents) { v -> c.updateSetup { it.copy(event = v) } }
+            Field(su.category, s.eventCategory, Icons.Filled.Category) { v -> c.updateSetup { it.copy(category = v) } }
+            Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
+            Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        }
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(
                 listOf(SegOption(s.singles, Icons.Filled.Person), SegOption(s.doubles, Icons.Filled.Groups)),
@@ -174,6 +184,12 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                 }
             }
         }
+        Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
+            c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
+        }
+        SexChoice(if (side == Side.P1) su.p1aSex else su.p2aSex, accent) { v ->
+            c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
+        }
         if (su.doubles) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 EditablePlayerAvatar(c, b, accent, 52.dp)
@@ -183,8 +199,25 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                     }
                 }
             }
+            Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
+            }
+            SexChoice(if (side == Side.P1) su.p1bSex else su.p2bSex, accent) { v ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1bSex = v) else it.copy(p2bSex = v) }
+            }
         }
     }
+}
+
+/** Uomo o donna (facoltativo): solo per la sagoma degli highlights quando manca la foto. Ritoccandolo si toglie. */
+@Composable
+private fun SexChoice(value: String, accent: Color, onChange: (String) -> Unit) {
+    val s = LocalStrings.current
+    Segmented(
+        listOf(SegOption(s.heartMale, color = accent, onColor = TsmColors.Background), SegOption(s.heartFemale, color = accent, onColor = TsmColors.Background)),
+        selected = when (value) { "M" -> 0; "F" -> 1; else -> -1 },
+        onSelect = { i -> val v = if (i == 0) "M" else "F"; onChange(if (v == value) "" else v) },
+    )
 }
 
 @Composable

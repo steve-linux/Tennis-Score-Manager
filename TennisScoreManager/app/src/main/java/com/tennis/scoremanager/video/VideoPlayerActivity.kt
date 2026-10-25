@@ -4,12 +4,16 @@
 package com.tennis.scoremanager.video
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +33,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -60,6 +65,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,6 +73,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,7 +81,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.tennis.scoremanager.R
 import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
@@ -84,8 +93,10 @@ import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
-import kotlinx.coroutines.delay
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 /**
  * Lettore del video di una partita con i capitoli: a destra l'elenco dei punti (tocchi e il video va lì) e i
@@ -382,7 +393,31 @@ class VideoPlayerActivity : ComponentActivity() {
         }
         // Dai social (1-5 minuti) al video del circolo (10-15).
         val minutes = listOf(1, 3, 5, 10, 15)
+        // Durata a piacere in minuti: vale solo se è tra 1 e [MAX_HL_MINUTES], altrimenti resta l'ultima valida.
+        var custom by remember { mutableStateOf("") }
         val clips = remember(o, e) { Highlights.select(e.chapters.points, e.chapters.rules, videoMs, o) }
+        // Statistiche in coda: dalla partita dello storico che corrisponde al video (o dai punti segnati).
+        var withStats by remember { mutableStateOf(controller.storage.highlightStats) }
+        val statsRec by produceState<MatchRecord?>(null, e) {
+            value = withContext(Dispatchers.IO) {
+                val all = controller.storage.loadFinished() + listOfNotNull(controller.live.value?.record)
+                HighlightStats.record(all, e.chapters, videoMs, controller.setup.value)
+            }
+        }
+        val statsPages = remember(statsRec) { statsRec?.let { HighlightStats.card(it, str).pages.size } ?: 0 }
+        // Musica delle statistiche: un brano dal telefono (copiato nell'app) o quella generata dall'app.
+        var musicName by remember { mutableStateOf(controller.storage.highlightMusicName) }
+        val pickMusic = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri ?: return@rememberLauncherForActivityResult
+            val name = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                if (c.moveToFirst()) c.getString(0) else null
+            } ?: uri.lastPathSegment ?: "?"
+            val ok = runCatching {
+                contentResolver.openInputStream(uri)!!.use { i -> controller.storage.highlightMusicFile.outputStream().use { i.copyTo(it) } }
+            }.isSuccess
+            controller.storage.highlightMusicName = if (ok) name else null
+            musicName = controller.storage.highlightMusicName
+        }
         // Ordine e voci accese si ricordano subito, anche senza creare il video.
         LaunchedEffect(o.order, o.enabled) {
             controller.storage.highlightOrder = o.order.map { it.name }
@@ -425,9 +460,47 @@ class VideoPlayerActivity : ComponentActivity() {
                         }
                     }
                     Text(str.hlMax, fontSize = 13.sp)
-                    Segmented(minutes.map { SegOption("$it′") }, minutes.indexOf((o.maxMs / 60_000).toInt()).coerceAtLeast(0), { i ->
+                    // Con una durata scritta a mano nessun tempo pronto resta acceso (indice -1).
+                    Segmented(minutes.map { SegOption("$it′") }, if (custom.isEmpty()) minutes.indexOf((o.maxMs / 60_000).toInt()) else -1, { i ->
+                        custom = ""
                         o = o.copy(maxMs = minutes[i] * 60_000L)
                     }, columns = minutes.size)
+                    OutlinedTextField(
+                        value = custom,
+                        onValueChange = { v ->
+                            custom = v.filter { it.isDigit() }.take(2)
+                            custom.toIntOrNull()?.takeIf { it in 1..MAX_HL_MINUTES }?.let { o = o.copy(maxMs = it * 60_000L) }
+                        },
+                        label = { Text(str.hlCustom) },
+                        singleLine = true,
+                        isError = custom.isNotEmpty() && custom.toIntOrNull()?.let { it in 1..MAX_HL_MINUTES } != true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(withStats && statsPages > 0, { on ->
+                            withStats = on
+                            controller.storage.highlightStats = on
+                        }, enabled = statsPages > 0)
+                        Text(str.hlStats, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    }
+                    if (withStats && statsPages > 0) {
+                        Text("${str.hlMusic}: ${musicName ?: STATS_MUSIC_CREDIT}", fontSize = 13.sp, maxLines = 3)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TextButton(onClick = { pickMusic.launch("audio/*") }) { Text(str.hlMusicPick) }
+                            if (musicName != null) TextButton(onClick = {
+                                controller.storage.highlightMusicName = null
+                                musicName = null
+                            }) { Text(str.hlMusicReset) }
+                        }
+                        Text(str.hlMusicHint, fontSize = 11.sp, color = TsmColors.TextDim)
+                        // Licenza CC BY: chi pubblica il video deve citare l'autore della musica dell'app.
+                        if (musicName == null) Text(str.hlMusicCredit(STATS_MUSIC_CREDIT), fontSize = 11.sp, color = TsmColors.TextDim)
+                    }
+                    Text(
+                        if (statsPages > 0) str.hlStatsHint(statsPages, (statsPages * HighlightStats.PAGE_MS / 1000).toInt()) else str.hlStatsNone,
+                        fontSize = 11.sp, color = TsmColors.TextDim,
+                    )
                     Text(
                         if (clips.isEmpty()) str.hlNone else str.hlPreview(clips.size, Chapters.time(clips.sumOf { it.durationMs })),
                         fontSize = 13.sp, color = if (clips.isEmpty()) TsmColors.Orange else TsmColors.TextMain,
@@ -438,7 +511,7 @@ class VideoPlayerActivity : ComponentActivity() {
             confirmButton = {
                 TextButton(enabled = clips.isNotEmpty(), onClick = {
                     onClose()
-                    montage(e, clips)
+                    montage(e, clips, statsRec?.takeIf { withStats && statsPages > 0 })
                 }) { Text(str.hlCreate) }
             },
             dismissButton = { TextButton(onClick = onClose) { Text(str.back) } },
@@ -446,13 +519,35 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     /** Monta [clips] (highlights o punti filtrati) e apre il risultato. */
-    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>) {
+    private fun montage(e: VideoLibrary.Entry, clips: List<Highlights.Clip>, statsRec: MatchRecord? = null) {
         val str = s
         player?.pause()
         hlProgress = 0
         val m = HighlightMaker(this)
         maker = m
-        m.make(e, clips, { hlProgress = it }) { file ->
+        val stats = statsRec?.let { rec ->
+            val card = HighlightStats.card(rec, str)
+            // Foto di chi ha il nome scritto; agli altri l'avatar con le iniziali.
+            val photos = Side.entries.associateWith { side ->
+                val real = HighlightStats.photoNames(rec, side)
+                card.players[side]?.names.orEmpty().map { n -> if (n in real) controller.loadPhoto(n) else null }
+            }
+            val avatars = runCatching {
+                StatsCardRenderer.Avatars(
+                    BitmapFactory.decodeResource(resources, R.drawable.avatar_man),
+                    BitmapFactory.decodeResource(resources, R.drawable.avatar_woman),
+                )
+            }.getOrNull()
+            // Il brano dell'app sta nelle risorse: per leggerlo come file lo si copia una volta nella cache.
+            val bundled = File(cacheDir, "stats_music.m4a")
+            if (!bundled.exists()) runCatching { resources.openRawResource(R.raw.stats_music).use { i -> bundled.outputStream().use { i.copyTo(it) } } }
+            HighlightMaker.Stats(
+                card, photos, str.pointsWon,
+                controller.storage.highlightMusicFile.takeIf { controller.storage.highlightMusicName != null }, avatars,
+                bundled.takeIf { it.exists() },
+            )
+        }
+        m.make(e, clips, { hlProgress = it }, stats = stats) { file ->
             hlProgress = null
             maker = null
             if (file == null) {
@@ -646,6 +741,10 @@ class VideoPlayerActivity : ComponentActivity() {
     }
 
     companion object {
+        /** Musica dell'app per le statistiche (res/raw/stats_music.m4a, i primi 31 secondi del brano). */
+        const val STATS_MUSIC_CREDIT = "\"Nowhere Land\" Kevin MacLeod (incompetech.com), CC BY 4.0"
+        /** Durata massima a piacere degli highlights (minuti). */
+        const val MAX_HL_MINUTES = 90
         /** Percorso del file dei capitoli (.json) del video da aprire. */
         const val EXTRA_CHAPTERS = "chapters"
     }

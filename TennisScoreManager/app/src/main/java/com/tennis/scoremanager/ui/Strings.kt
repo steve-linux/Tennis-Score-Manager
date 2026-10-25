@@ -204,6 +204,28 @@ interface Strings {
     val hlBig: String
     val hlRallies: String
     val hlMax: String
+    val hlCustom: String
+    val hlMusic: String
+    val hlMusicPick: String
+    val hlMusicReset: String
+    val hlMusicHint: String
+    val hlMusicCredit: (String) -> String
+    val eventSection: String
+    val eventName: String
+    val eventCategory: String
+    val eventRound: String
+    val eventHint: String
+    val playerRank: String
+    val hlStats: String
+    val hlStatsHint: (Int, Int) -> String
+    val hlStatsNone: String
+    val cardTitle: (String) -> String
+    val cardFinal: String
+    val cardPartial: String
+    val cardBreakPoints: String
+    val cardRallies: String
+    val cardShortRallies: String
+    val cardLongRallies: String
     val hlNone: String
     val hlPreview: (Int, String) -> String
     val hlHint: String
@@ -988,6 +1010,28 @@ object ItStrings : Strings {
     override val hlBig = "Palle break, set e match point"
     override val hlRallies = "Scambi lunghi (dai braccialetti)"
     override val hlMax = "Durata massima"
+    override val hlCustom = "Altra durata (minuti)"
+    override val hlMusic = "Musica delle statistiche"
+    override val hlMusicPick = "Scegli un brano"
+    override val hlMusicReset = "Usa quella dell'app"
+    override val hlMusicHint = "Un brano dal telefono: se ne usa l'inizio, con dissolvenza. Usa solo musica che hai il diritto di mettere nei tuoi video."
+    override val hlMusicCredit: (String) -> String = { "Se pubblichi il video, nei crediti scrivi: $it" }
+    override val eventSection = "Torneo"
+    override val eventName = "Nome del torneo"
+    override val eventCategory = "Categoria o tabellone (es. Open, Lim. 4.1, Over 45)"
+    override val eventRound = "Turno (es. Quarti, Finale)"
+    override val eventHint = "Facoltativi: compaiono nel riepilogo, nel PDF e nelle statistiche degli highlights."
+    override val playerRank = "Classifica (es. 4.1, NC)"
+    override val hlStats = "Statistiche a fine video"
+    override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n schermate con le statistiche della partita ($sec s) dopo i punti." }
+    override val hlStatsNone = "Statistiche non disponibili: la partita del video non è nello storico."
+    override val cardTitle: (String) -> String = { "Statistiche ${it.lowercase()}" }
+    override val cardFinal = "Risultato finale"
+    override val cardPartial = "Parziale"
+    override val cardBreakPoints = "Palle break"
+    override val cardRallies = "Scambi"
+    override val cardShortRallies = "Punti vinti fino a 8 colpi"
+    override val cardLongRallies = "Punti vinti da 9 colpi in su"
     override val hlNone = "Nessun punto adatto: segna ace, vincenti o gioca con i braccialetti."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n punti · $t" }
     override val hlHint = "Se supera la durata, prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il video va in galleria."
@@ -1744,6 +1788,28 @@ object EnStrings : Strings {
     override val hlBig = "Break, set and match points"
     override val hlRallies = "Long rallies (from the wristbands)"
     override val hlMax = "Maximum length"
+    override val hlCustom = "Other length (minutes)"
+    override val hlMusic = "Statistics music"
+    override val hlMusicPick = "Choose a track"
+    override val hlMusicReset = "Use the app's own"
+    override val hlMusicHint = "A track from the phone: its beginning is used, with fades. Only use music you have the right to put in your videos."
+    override val hlMusicCredit: (String) -> String = { "If you publish the video, credit: $it" }
+    override val eventSection = "Tournament"
+    override val eventName = "Tournament name"
+    override val eventCategory = "Category or draw (e.g. Open, 4.1 limit, Over 45)"
+    override val eventRound = "Round (e.g. Quarterfinal, Final)"
+    override val eventHint = "Optional: they appear in the summary, the PDF and the highlights statistics."
+    override val playerRank = "Ranking (e.g. 4.1, NR)"
+    override val hlStats = "Statistics at the end of the video"
+    override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n screens with the match statistics ($sec s) after the points." }
+    override val hlStatsNone = "Statistics not available: the video's match is not in the history."
+    override val cardTitle: (String) -> String = { "$it statistics" }
+    override val cardFinal = "Final"
+    override val cardPartial = "Partial"
+    override val cardBreakPoints = "Break points"
+    override val cardRallies = "Rallies"
+    override val cardShortRallies = "Points won up to 8 shots"
+    override val cardLongRallies = "Points won with 9+ shots"
     override val hlNone = "No suitable points: mark aces, winners or play with the wristbands."
     override val hlPreview: (Int, String) -> String = { n, t -> "$n points · $t" }
     override val hlHint = "If it is too long, clips are shortened first, then the least important points are left out. The video goes to the gallery."

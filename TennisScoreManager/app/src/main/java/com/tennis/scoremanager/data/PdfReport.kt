@@ -137,6 +137,7 @@ object PdfReport {
             "${s.result}: ${names.short(state.winner ?: Side.P1)} ${Reports.scoreLine(state, state.winner ?: Side.P1)}",
             "${s.duration}: ${Reports.duration(rec.clockMs)}",
             "${Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() }} · ${s.startTime} ${Reports.time(rec.startedAt, lang)} · ${s.endTime} ${Reports.time(rec.endedAt, lang)}",
+            Reports.eventLine(rec.setup)?.let { "${s.eventSection}: $it" } ?: "",
             listOfNotNull(rec.setup.club.ifBlank { null }, rec.setup.court.ifBlank { null }?.let { "${s.court} $it" }).joinToString(" · "),
             "${s.place}: ${Reports.place(rec, s)}",
             "${s.format}: ${Reports.formatLabel(rec, s)}",

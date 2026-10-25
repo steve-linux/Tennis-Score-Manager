@@ -293,6 +293,7 @@ private fun SummaryInfo(rec: MatchRecord, state: MatchState, names: Names) {
         InfoRow(Icons.Filled.Event, s.date, Reports.date(rec.startedAt, lang).replaceFirstChar { it.uppercase() })
         InfoRow(Icons.Filled.Schedule, s.startTime, Reports.time(rec.startedAt, lang))
         InfoRow(Icons.Filled.Schedule, s.endTime, Reports.time(rec.endedAt, lang))
+        Reports.eventLine(rec.setup)?.let { InfoRow(Icons.Filled.EmojiEvents, s.eventSection, it) }
         if (rec.setup.club.isNotBlank()) InfoRow(Icons.Filled.Business, s.club, rec.setup.club)
         if (rec.setup.court.isNotBlank()) InfoRow(Icons.Filled.Tag, s.court, rec.setup.court)
         InfoRow(Icons.Filled.Place, s.place, Reports.place(rec, s))
