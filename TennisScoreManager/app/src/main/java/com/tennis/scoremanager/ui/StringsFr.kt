@@ -227,6 +227,17 @@ object FrStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w gagnés (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Lire"
     override val coachNone = "Aucun point avec ce filtre"
+    override val replayTitle = "Ralenti"
+    override val replayHint = "Depuis le téléphone-caméra : le point contesté depuis le début, même si un peu de temps a passé."
+    override val replayLastPoint = "Dernier point"
+    override val replayPrevPoint = "Point précédent"
+    override val replaySinceLast = "Depuis le dernier point marqué"
+    override val replayWaiting = "Arrive de la caméra…"
+    override val replayFailed = "Ralenti non reçu : vérifiez que la caméra est ouverte et connectée."
+    override val replayClose = "Fermer"
+    override val replayNoCamera = "Aucune caméra connectée."
+    override val cameraReplaySent = "Ralenti envoyé à l'arbitre"
+    override val cameraReplayNone = "Ralenti indisponible : aucune vidéo en mémoire"
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."

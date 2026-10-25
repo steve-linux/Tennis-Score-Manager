@@ -62,6 +62,16 @@ data class RelayMsg(
     /** Punteggio per la grafica della telecamera e punto appena giocato (con l'ora del principale). */
     val score: ScoreOverlay? = null,
     val point: PointMark? = null,
+    /** Moviola: richiesta [rid] di [rlen] secondi; pezzi del video in base64 ([data]), file [file] di [files], parte [part] di [parts]. */
+    val rid: String? = null,
+    val rlen: Int? = null,
+    val data: String? = null,
+    val file: Int? = null,
+    val files: Int? = null,
+    val part: Int? = null,
+    val parts: Int? = null,
+    /** Moviola: -1 = dall'ultimo punto segnato a adesso, 0 = l'ultimo segnato, 1 = quello prima (null = ultimi [rlen] s). */
+    val back: Int? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -82,6 +92,9 @@ data class RelayMsg(
         const val SCORE = "score"
         const val POINT = "point"
         const val ROLE_CAMERA = "camera"
+        const val CHALLENGE = "challenge"
+        const val REPLAY = "replay"
+        const val REPLAY_FAIL = "replayfail"
     }
 }
 

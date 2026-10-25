@@ -224,6 +224,17 @@ object EsStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n puntos · $w ganados (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Reproducir"
     override val coachNone = "Ningún punto con este filtro"
+    override val replayTitle = "Repetición"
+    override val replayHint = "Desde el teléfono-cámara: el punto reclamado desde el principio, aunque haya pasado un rato."
+    override val replayLastPoint = "Último punto"
+    override val replayPrevPoint = "Punto anterior"
+    override val replaySinceLast = "Desde el último punto marcado"
+    override val replayWaiting = "Llegando desde la cámara…"
+    override val replayFailed = "La repetición no llegó: comprueba que la cámara esté abierta y conectada."
+    override val replayClose = "Cerrar"
+    override val replayNoCamera = "Ninguna cámara conectada."
+    override val cameraReplaySent = "Repetición enviada al árbitro"
+    override val cameraReplayNone = "Repetición no disponible: no hay vídeo en memoria"
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."

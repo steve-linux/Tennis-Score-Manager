@@ -227,6 +227,17 @@ object PtStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n pontos · $w ganhos (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Reproduzir"
     override val coachNone = "Nenhum ponto com este filtro"
+    override val replayTitle = "Replay"
+    override val replayHint = "Do telefone-câmera: o ponto contestado desde o início, mesmo que já tenha passado um tempo."
+    override val replayLastPoint = "Último ponto"
+    override val replayPrevPoint = "Ponto anterior"
+    override val replaySinceLast = "Desde o último ponto marcado"
+    override val replayWaiting = "Chegando da câmera…"
+    override val replayFailed = "O replay não chegou: verifique se a câmera está aberta e conectada."
+    override val replayClose = "Fechar"
+    override val replayNoCamera = "Nenhuma câmera conectada."
+    override val cameraReplaySent = "Replay enviado ao árbitro"
+    override val cameraReplayNone = "Replay indisponível: nenhum vídeo na memória"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."

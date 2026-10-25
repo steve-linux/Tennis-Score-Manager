@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.tennis.scoremanager.video.ReplayRecorder
+import java.io.File
 import java.net.Socket
 import java.security.SecureRandom
 
@@ -55,6 +57,8 @@ data class RelayUi(
     val tv: String? = null,
     /** Satellite che fa da telecamera (riceve il punteggio, non segue fasce e braccialetti). */
     val camera: Boolean = false,
+    /** Principale: telecamere collegate (per la moviola). */
+    val cameras: Int = 0,
     /** Satellite col Wi-Fi spento: non può entrare nella rete del principale (Android non chiede nemmeno). */
     val wifiOff: Boolean = false,
 )
@@ -120,6 +124,8 @@ class PhoneRelay(
     private val inbox = RelayInbox()
     /** Satelliti collegati: id della connessione -> (id del satellite, nome del telefono). */
     private val sats = mutableMapOf<Int, Pair<String, String>>()
+    /** Connessioni dei telefoni-telecamera. */
+    private val cameraConns = mutableSetOf<Int>()
     private var lastStraps: List<RelayStrap> = emptyList()
     private var lastBands: List<RelayStrap> = emptyList()
     private var remoteBands = mapOf<String, RemoteBandEntry>()
@@ -267,6 +273,7 @@ class PhoneRelay(
             when (m.t) {
                 RelayMsg.HELLO -> {
                     sats[id] = m.sat!! to (m.name ?: "")
+                    if (m.role == RelayMsg.ROLE_CAMERA) cameraConns += id
                     publishSatellites()
                     send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress(), score = lastScore))
                 }
@@ -277,6 +284,8 @@ class PhoneRelay(
                     send(id, RelayMsg(RelayMsg.ACK, seq = inbox.last(sat)))
                 }
                 RelayMsg.STATUS -> onStatus(id, m)
+                RelayMsg.REPLAY -> onReplayPart(m)
+                RelayMsg.REPLAY_FAIL -> m.rid?.let { if (it == replayId) _replay.value = Replay.Failed }
                 RelayMsg.BAND_STATUS -> {
                     val addr = m.addr ?: return@launch
                     val st = m.battery ?: return@launch
@@ -343,6 +352,89 @@ class PhoneRelay(
         if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
     }
 
+    // ---------------------------------------------------------------- moviola
+
+    /** Moviola sul telefono dell'arbitro: in attesa, pronta (i pezzi da vedere in fila) o non riuscita. */
+    sealed class Replay {
+        /** [back] punto chiesto (0 = ultimo), oppure null e gli ultimi [seconds] secondi. */
+        data class Waiting(val back: Int?, val seconds: Int) : Replay()
+        data class Ready(val files: List<File>) : Replay()
+        data object Failed : Replay()
+    }
+
+    private val _replay = MutableStateFlow<Replay?>(null)
+    val replay: StateFlow<Replay?> = _replay
+    private var replayId: String? = null
+    private var replayDir: File? = null
+    private var replayTimeout: Job? = null
+
+    /**
+     * Principale: chiede alla telecamera la moviola del punto [back] (0 = l'ultimo segnato, 1 = quello prima),
+     * oppure, con [back] null, gli ultimi [seconds] secondi. false se non c'è nessuna telecamera.
+     */
+    fun requestReplay(back: Int?, seconds: Int, cacheDir: File): Boolean {
+        val conns = cameraConns.filter { it in sats }
+        if (conns.isEmpty()) return false
+        val rid = System.currentTimeMillis().toString(36)
+        replayId = rid
+        replayDir = File(cacheDir, "replays/$rid").apply { deleteRecursively(); mkdirs() }
+        _replay.value = Replay.Waiting(back, seconds)
+        // Una telecamera basta: la prima.
+        send(conns.first(), RelayMsg(RelayMsg.CHALLENGE, rid = rid, rlen = seconds, back = back, at = System.currentTimeMillis()))
+        replayTimeout?.cancel()
+        replayTimeout = scope.launch {
+            delay(REPLAY_TIMEOUT_MS)
+            if (_replay.value is Replay.Waiting && replayId == rid) _replay.value = Replay.Failed
+        }
+        return true
+    }
+
+    fun closeReplay() {
+        replayTimeout?.cancel()
+        replayId = null
+        _replay.value = null
+    }
+
+    /** I pezzi arrivano in ordine (TCP): si aggiungono al file; all'ultima parte dell'ultimo file la moviola è pronta. */
+    private fun onReplayPart(m: RelayMsg) {
+        if (m.rid == null || m.rid != replayId) return
+        val dir = replayDir ?: return
+        val idx = m.file ?: return
+        val f = File(dir, "part_$idx.mp4")
+        runCatching { m.data?.let { f.appendBytes(android.util.Base64.decode(it, android.util.Base64.NO_WRAP)) } }
+            .onFailure { _replay.value = Replay.Failed; return }
+        if (idx == (m.files ?: 1) - 1 && m.part == (m.parts ?: 1) - 1) {
+            replayTimeout?.cancel()
+            _replay.value = Replay.Ready((0 until (m.files ?: 1)).map { File(dir, "part_$it.mp4") }.filter { it.exists() })
+        }
+    }
+
+    /** Telecamera: una richiesta di moviola, con l'ora già sull'orologio del telefono-telecamera. */
+    data class Challenge(val rid: String, val at: Long, val seconds: Int, val back: Int?)
+
+    private val _challenges = MutableSharedFlow<Challenge>(extraBufferCapacity = 4)
+    val challenges: SharedFlow<Challenge> = _challenges
+
+    /** Telecamera: manda i pezzi della moviola al principale, a fette da 256 kB. */
+    fun sendReplay(rid: String, parts: List<File>) {
+        val c = client ?: return
+        scope.launch(net) {
+            if (parts.isEmpty()) {
+                c.send(RelayMsg(RelayMsg.REPLAY_FAIL, rid = rid))
+                return@launch
+            }
+            for ((i, f) in parts.withIndex()) {
+                val bytes = runCatching { f.readBytes() }.getOrNull() ?: ByteArray(0)
+                val n = maxOf(1, (bytes.size + REPLAY_CHUNK - 1) / REPLAY_CHUNK)
+                for (k in 0 until n) {
+                    val slice = bytes.copyOfRange(k * REPLAY_CHUNK, minOf(bytes.size, (k + 1) * REPLAY_CHUNK))
+                    val data = android.util.Base64.encodeToString(slice, android.util.Base64.NO_WRAP)
+                    if (!c.send(RelayMsg(RelayMsg.REPLAY, rid = rid, data = data, file = i, files = parts.size, part = k, parts = n))) return@launch
+                }
+            }
+        }
+    }
+
     /** Principale: punteggio, comando o impostazioni per un braccialetto che sente solo un satellite. */
     private fun toBand(addr: String, payload: String, kind: String): Boolean {
         val e = remoteBands[addr]?.takeIf { it.status.ready } ?: return false
@@ -359,7 +451,8 @@ class PhoneRelay(
     }
 
     private fun publishSatellites() {
-        if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second })
+        cameraConns.retainAll(sats.keys)
+        if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second }, cameras = cameraConns.size)
     }
 
     private fun dropStaleRemote() {
@@ -466,6 +559,10 @@ class PhoneRelay(
                 RelayMsg.STRAPS -> if (!_ui.value.camera) follow(m.straps.orEmpty())
                 RelayMsg.BANDS -> if (!_ui.value.camera) followBands(m.bands.orEmpty())
                 RelayMsg.SCORE -> m.score?.let { _score.value = it }
+                // L'ora della richiesta arriva sull'orologio del principale.
+                RelayMsg.CHALLENGE -> if (m.rid != null && m.at != null) {
+                    _challenges.tryEmit(Challenge(m.rid, m.at - (clock.offset ?: 0L), m.rlen ?: ReplayRecorder.DEFAULT_S, m.back))
+                }
                 // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
                 RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
@@ -573,6 +670,9 @@ class PhoneRelay(
         const val STALE_MS = 6_000L
         /** Misure del satellite più vecchie di così non sono "dal vivo": vanno a riempire i buchi. */
         const val LIVE_MS = 8_000L
+        /** Moviola non arrivata entro questo tempo: non riuscita. */
+        private const val REPLAY_TIMEOUT_MS = 45_000L
+        private const val REPLAY_CHUNK = 256 * 1024
         /** Un tasto arrivato dal satellite più tardi di così non dà (o toglie) il punto. */
         const val EVENT_MAX_AGE_MS = 5_000L
     }

@@ -236,6 +236,17 @@ interface Strings {
     val coachSummary: (Int, Int) -> String
     val coachPlay: String
     val coachNone: String
+    val replayTitle: String
+    val replayHint: String
+    val replayLastPoint: String
+    val replayPrevPoint: String
+    val replaySinceLast: String
+    val replayWaiting: String
+    val replayFailed: String
+    val replayClose: String
+    val replayNoCamera: String
+    val cameraReplaySent: String
+    val cameraReplayNone: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -1007,6 +1018,17 @@ object ItStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n punti · $w vinti (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Riproduci"
     override val coachNone = "Nessun punto con questo filtro"
+    override val replayTitle = "Moviola"
+    override val replayHint = "Dal telefono-telecamera: il punto contestato dall'inizio, anche se è passato un po' di tempo."
+    override val replayLastPoint = "Ultimo punto"
+    override val replayPrevPoint = "Punto prima"
+    override val replaySinceLast = "Dall'ultimo punto segnato"
+    override val replayWaiting = "In arrivo dalla telecamera…"
+    override val replayFailed = "Moviola non arrivata: controlla che la telecamera sia aperta e collegata."
+    override val replayClose = "Chiudi"
+    override val replayNoCamera = "Nessuna telecamera collegata."
+    override val cameraReplaySent = "Moviola mandata all'arbitro"
+    override val cameraReplayNone = "Moviola non disponibile: niente video in memoria"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -1750,6 +1772,17 @@ object EnStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w won (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Play"
     override val coachNone = "No points with this filter"
+    override val replayTitle = "Replay"
+    override val replayHint = "From the camera phone: the challenged point from the start, even if some time has passed."
+    override val replayLastPoint = "Last point"
+    override val replayPrevPoint = "Previous point"
+    override val replaySinceLast = "Since the last scored point"
+    override val replayWaiting = "Coming from the camera…"
+    override val replayFailed = "Replay did not arrive: check that the camera is open and connected."
+    override val replayClose = "Close"
+    override val replayNoCamera = "No camera connected."
+    override val cameraReplaySent = "Replay sent to the umpire"
+    override val cameraReplayNone = "Replay not available: no video in memory"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."

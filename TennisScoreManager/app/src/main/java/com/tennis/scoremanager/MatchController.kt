@@ -1037,6 +1037,11 @@ class MatchController(
         MatchService.start(app)
     }
 
+    /** Moviola: il punto [back] (0 = l'ultimo, 1 = quello prima) o, con null, gli ultimi secondi. */
+    fun requestReplay(back: Int?) {
+        if (!relay.requestReplay(back, com.tennis.scoremanager.video.ReplayRecorder.DEFAULT_S, app.cacheDir)) _toasts.tryEmit(strings.replayNoCamera)
+    }
+
     fun stopRelay() {
         relay.stop()
         if (!needsService()) MatchService.stop(app)

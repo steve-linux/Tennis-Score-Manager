@@ -64,7 +64,6 @@ import androidx.lifecycle.lifecycleScope
 import com.pedro.common.ConnectChecker
 import com.pedro.encoder.input.gl.render.filters.`object`.ImageFilterRender
 import com.pedro.encoder.input.video.CameraHelper
-import com.pedro.library.base.recording.RecordController
 import com.pedro.library.generic.GenericStream
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.Reports
@@ -142,7 +141,37 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
         // Capitoli: i punti arrivati mentre si registra.
         lifecycleScope.launch {
-            controller.relay.points.collect { p -> if (recording.value) chapters += p.copy(at = p.at - recordStartWall) }
+            controller.relay.points.collect { p ->
+                if (recording.value) chapters += p.copy(at = p.at - recordStartWall)
+                // Per la moviola: gli ultimi punti con la loro ora (anche senza registrare la partita).
+                recentPoints.addLast(p)
+                while (recentPoints.size > 30) recentPoints.removeFirst()
+            }
+        }
+        // Moviola chiesta dall'arbitro: gli ultimi secondi, subito, al suo telefono.
+        lifecycleScope.launch {
+            controller.relay.challenges.collect { ch ->
+                val out = File(cacheDir, "replay_out/${ch.rid}")
+                // Un punto preciso: dalla fine di quello prima a 3 s dopo la sua fine, anche se la richiesta arriva tardi.
+                // back = -1: il punto contestato non è ancora segnato, dall'ultimo segnato a adesso.
+                val pts = recentPoints.toList()
+                val target = ch.back?.takeIf { it >= 0 }?.let { pts.getOrNull(pts.lastIndex - it) }
+                val parts = withContext(Dispatchers.IO) {
+                    runCatching {
+                        if (ch.back == -1) {
+                            val from = pts.lastOrNull()?.at?.minus(1_000) ?: (ch.at - 60_000)
+                            recorder.cutRange(maxOf(from, ch.at - 110_000), ch.at, out)
+                        } else if (target != null) {
+                            val prevEnd = pts.getOrNull(pts.indexOf(target) - 1)?.at ?: (target.at - 20_000)
+                            recorder.cutRange(maxOf(prevEnd, target.at - 40_000), target.at + 3_000, out)
+                        } else {
+                            recorder.cut(ch.at, ch.seconds * 1000L, out)
+                        }
+                    }.getOrDefault(emptyList())
+                }
+                controller.relay.sendReplay(ch.rid, parts)
+                message.value = if (parts.isEmpty()) s.cameraReplayNone else s.cameraReplaySent
+            }
         }
     }
 
@@ -151,8 +180,13 @@ class CameraActivity : ComponentActivity() {
             .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
     }
 
+    /** Registrazione nostra: video della partita a comando, e sempre gli ultimi secondi per la moviola. */
+    private val recorder by lazy { ReplayRecorder(File(cacheDir, "replay_buffer")) }
+    private val recentPoints = ArrayDeque<PointMark>()
+
     private fun stream(): GenericStream = stream ?: GenericStream(this, checker).also {
         it.getGlInterface().autoHandleOrientation = true
+        it.setRecordController(recorder)
         stream = it
     }
 
@@ -193,23 +227,28 @@ class CameraActivity : ComponentActivity() {
 
     // ---------------------------------------------------------------- registrazione e diretta
 
-    private fun toggleRecord() {
+    /** Il codificatore gira sempre (per la memoria della moviola): "Registra" apre e chiude solo il file della partita. */
+    private fun startBuffer() {
         val st = stream ?: return
+        if (!st.isRecording) st.startRecord(File(cacheDir, "replay_buffer").absolutePath) { }
+    }
+
+    private fun toggleRecord() {
+        if (stream == null) return
         if (recording.value) {
-            st.stopRecord()
+            recorder.stopFile()
             recording.value = false
             finishRecording()
             return
         }
         if (!prepare()) return
+        startBuffer()
         val dir = getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir
         val file = File(dir, "TSM_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(Date())}.mp4")
         recordFile = file
         chapters.clear()
         recordStartWall = System.currentTimeMillis()
-        st.startRecord(file.absolutePath) { status ->
-            if (status == RecordController.Status.RECORDING) runOnUiThread { recordSince.value = SystemClock.elapsedRealtime() }
-        }
+        recorder.startFile(file)
         recording.value = true
         recordSince.value = SystemClock.elapsedRealtime()
     }
@@ -262,10 +301,11 @@ class CameraActivity : ComponentActivity() {
 
     override fun onDestroy() {
         stream?.let { st ->
-            if (st.isRecording) {
-                st.stopRecord()
+            if (recorder.fileActive) {
+                recorder.stopFile()
                 finishRecording()
             }
+            if (st.isRecording) st.stopRecord()
             if (st.isStreaming) st.stopStream()
             if (st.isOnPreview) st.stopPreview()
             st.release()
@@ -295,6 +335,7 @@ class CameraActivity : ComponentActivity() {
                             if (!prepare()) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            startBuffer()
                             updateOverlay()
                         }
 

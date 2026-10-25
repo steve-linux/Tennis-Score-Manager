@@ -224,6 +224,17 @@ object DeStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n Punkte · $w gewonnen (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Abspielen"
     override val coachNone = "Keine Punkte mit diesem Filter"
+    override val replayTitle = "Zeitlupe"
+    override val replayHint = "Von der Telefon-Kamera: der beanstandete Punkt von Anfang an, auch wenn schon etwas Zeit vergangen ist."
+    override val replayLastPoint = "Letzter Punkt"
+    override val replayPrevPoint = "Punkt davor"
+    override val replaySinceLast = "Seit dem letzten gezählten Punkt"
+    override val replayWaiting = "Kommt von der Kamera…"
+    override val replayFailed = "Zeitlupe nicht angekommen: Prüfe, ob die Kamera offen und verbunden ist."
+    override val replayClose = "Schließen"
+    override val replayNoCamera = "Keine Kamera verbunden."
+    override val cameraReplaySent = "Zeitlupe an den Schiedsrichter gesendet"
+    override val cameraReplayNone = "Zeitlupe nicht verfügbar: kein Video im Speicher"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."

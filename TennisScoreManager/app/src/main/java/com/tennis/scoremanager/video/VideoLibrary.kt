@@ -22,10 +22,17 @@ object VideoLibrary {
 
     private fun dir(context: Context): File = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: context.filesDir
 
-    /** Dal più recente; solo quelli il cui video c'è ancora. */
+    /**
+     * Dal più recente; solo quelli il cui video c'è ancora. I capitoli di un video tolto dalla galleria (o da dove
+     * era stato importato) non servono più: si cancellano.
+     */
     fun list(context: Context): List<Entry> =
-        dir(context).listFiles { f -> f.extension == "json" }.orEmpty().mapNotNull { f -> load(context, f) }
-            .sortedByDescending { it.chapters.recordedAt.takeIf { t -> t > 0 } ?: it.chaptersFile.lastModified() }
+        dir(context).listFiles { f -> f.extension == "json" }.orEmpty().mapNotNull { f ->
+            load(context, f) ?: run {
+                if (runCatching { json.decodeFromString(VideoChapters.serializer(), f.readText()) }.isSuccess) f.delete()
+                null
+            }
+        }.sortedByDescending { it.chapters.recordedAt.takeIf { t -> t > 0 } ?: it.chaptersFile.lastModified() }
 
     fun load(context: Context, f: File): Entry? {
         val ch = runCatching { json.decodeFromString(VideoChapters.serializer(), f.readText()) }.getOrNull() ?: return null

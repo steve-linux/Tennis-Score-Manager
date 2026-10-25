@@ -88,6 +88,13 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 
+        <!-- Moviola sul telefono dell'arbitro: gira con il telefono (la partita resta in verticale) -->
+        <activity
+            android:name=".video.ReplayActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
+
         <!-- Lettore dei video delle partite, con i capitoli punto per punto -->
         <activity
             android:name=".video.VideoPlayerActivity"

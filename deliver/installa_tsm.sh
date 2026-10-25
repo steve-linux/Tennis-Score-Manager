@@ -254,6 +254,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
 
+        <!-- Moviola sul telefono dell'arbitro: gira con il telefono (la partita resta in verticale) -->
+        <activity
+            android:name=".video.ReplayActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
+
         <!-- Lettore dei video delle partite, con i capitoli punto per punto -->
         <activity
             android:name=".video.VideoPlayerActivity"
@@ -1853,6 +1860,11 @@ class MatchController(
             return
         }
         MatchService.start(app)
+    }
+
+    /** Moviola: il punto [back] (0 = l'ultimo, 1 = quello prima) o, con null, gli ultimi secondi. */
+    fun requestReplay(back: Int?) {
+        if (!relay.requestReplay(back, com.tennis.scoremanager.video.ReplayRecorder.DEFAULT_S, app.cacheDir)) _toasts.tryEmit(strings.replayNoCamera)
     }
 
     fun stopRelay() {
@@ -8052,6 +8064,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.tennis.scoremanager.video.ReplayRecorder
+import java.io.File
 import java.net.Socket
 import java.security.SecureRandom
 
@@ -8077,6 +8091,8 @@ data class RelayUi(
     val tv: String? = null,
     /** Satellite che fa da telecamera (riceve il punteggio, non segue fasce e braccialetti). */
     val camera: Boolean = false,
+    /** Principale: telecamere collegate (per la moviola). */
+    val cameras: Int = 0,
     /** Satellite col Wi-Fi spento: non può entrare nella rete del principale (Android non chiede nemmeno). */
     val wifiOff: Boolean = false,
 )
@@ -8142,6 +8158,8 @@ class PhoneRelay(
     private val inbox = RelayInbox()
     /** Satelliti collegati: id della connessione -> (id del satellite, nome del telefono). */
     private val sats = mutableMapOf<Int, Pair<String, String>>()
+    /** Connessioni dei telefoni-telecamera. */
+    private val cameraConns = mutableSetOf<Int>()
     private var lastStraps: List<RelayStrap> = emptyList()
     private var lastBands: List<RelayStrap> = emptyList()
     private var remoteBands = mapOf<String, RemoteBandEntry>()
@@ -8289,6 +8307,7 @@ class PhoneRelay(
             when (m.t) {
                 RelayMsg.HELLO -> {
                     sats[id] = m.sat!! to (m.name ?: "")
+                    if (m.role == RelayMsg.ROLE_CAMERA) cameraConns += id
                     publishSatellites()
                     send(id, RelayMsg(RelayMsg.WELCOME, match = currentMatch, straps = lastStraps, bands = lastBands, tv = tvAddress(), score = lastScore))
                 }
@@ -8299,6 +8318,8 @@ class PhoneRelay(
                     send(id, RelayMsg(RelayMsg.ACK, seq = inbox.last(sat)))
                 }
                 RelayMsg.STATUS -> onStatus(id, m)
+                RelayMsg.REPLAY -> onReplayPart(m)
+                RelayMsg.REPLAY_FAIL -> m.rid?.let { if (it == replayId) _replay.value = Replay.Failed }
                 RelayMsg.BAND_STATUS -> {
                     val addr = m.addr ?: return@launch
                     val st = m.battery ?: return@launch
@@ -8365,6 +8386,89 @@ class PhoneRelay(
         if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
     }
 
+    // ---------------------------------------------------------------- moviola
+
+    /** Moviola sul telefono dell'arbitro: in attesa, pronta (i pezzi da vedere in fila) o non riuscita. */
+    sealed class Replay {
+        /** [back] punto chiesto (0 = ultimo), oppure null e gli ultimi [seconds] secondi. */
+        data class Waiting(val back: Int?, val seconds: Int) : Replay()
+        data class Ready(val files: List<File>) : Replay()
+        data object Failed : Replay()
+    }
+
+    private val _replay = MutableStateFlow<Replay?>(null)
+    val replay: StateFlow<Replay?> = _replay
+    private var replayId: String? = null
+    private var replayDir: File? = null
+    private var replayTimeout: Job? = null
+
+    /**
+     * Principale: chiede alla telecamera la moviola del punto [back] (0 = l'ultimo segnato, 1 = quello prima),
+     * oppure, con [back] null, gli ultimi [seconds] secondi. false se non c'è nessuna telecamera.
+     */
+    fun requestReplay(back: Int?, seconds: Int, cacheDir: File): Boolean {
+        val conns = cameraConns.filter { it in sats }
+        if (conns.isEmpty()) return false
+        val rid = System.currentTimeMillis().toString(36)
+        replayId = rid
+        replayDir = File(cacheDir, "replays/$rid").apply { deleteRecursively(); mkdirs() }
+        _replay.value = Replay.Waiting(back, seconds)
+        // Una telecamera basta: la prima.
+        send(conns.first(), RelayMsg(RelayMsg.CHALLENGE, rid = rid, rlen = seconds, back = back, at = System.currentTimeMillis()))
+        replayTimeout?.cancel()
+        replayTimeout = scope.launch {
+            delay(REPLAY_TIMEOUT_MS)
+            if (_replay.value is Replay.Waiting && replayId == rid) _replay.value = Replay.Failed
+        }
+        return true
+    }
+
+    fun closeReplay() {
+        replayTimeout?.cancel()
+        replayId = null
+        _replay.value = null
+    }
+
+    /** I pezzi arrivano in ordine (TCP): si aggiungono al file; all'ultima parte dell'ultimo file la moviola è pronta. */
+    private fun onReplayPart(m: RelayMsg) {
+        if (m.rid == null || m.rid != replayId) return
+        val dir = replayDir ?: return
+        val idx = m.file ?: return
+        val f = File(dir, "part_$idx.mp4")
+        runCatching { m.data?.let { f.appendBytes(android.util.Base64.decode(it, android.util.Base64.NO_WRAP)) } }
+            .onFailure { _replay.value = Replay.Failed; return }
+        if (idx == (m.files ?: 1) - 1 && m.part == (m.parts ?: 1) - 1) {
+            replayTimeout?.cancel()
+            _replay.value = Replay.Ready((0 until (m.files ?: 1)).map { File(dir, "part_$it.mp4") }.filter { it.exists() })
+        }
+    }
+
+    /** Telecamera: una richiesta di moviola, con l'ora già sull'orologio del telefono-telecamera. */
+    data class Challenge(val rid: String, val at: Long, val seconds: Int, val back: Int?)
+
+    private val _challenges = MutableSharedFlow<Challenge>(extraBufferCapacity = 4)
+    val challenges: SharedFlow<Challenge> = _challenges
+
+    /** Telecamera: manda i pezzi della moviola al principale, a fette da 256 kB. */
+    fun sendReplay(rid: String, parts: List<File>) {
+        val c = client ?: return
+        scope.launch(net) {
+            if (parts.isEmpty()) {
+                c.send(RelayMsg(RelayMsg.REPLAY_FAIL, rid = rid))
+                return@launch
+            }
+            for ((i, f) in parts.withIndex()) {
+                val bytes = runCatching { f.readBytes() }.getOrNull() ?: ByteArray(0)
+                val n = maxOf(1, (bytes.size + REPLAY_CHUNK - 1) / REPLAY_CHUNK)
+                for (k in 0 until n) {
+                    val slice = bytes.copyOfRange(k * REPLAY_CHUNK, minOf(bytes.size, (k + 1) * REPLAY_CHUNK))
+                    val data = android.util.Base64.encodeToString(slice, android.util.Base64.NO_WRAP)
+                    if (!c.send(RelayMsg(RelayMsg.REPLAY, rid = rid, data = data, file = i, files = parts.size, part = k, parts = n))) return@launch
+                }
+            }
+        }
+    }
+
     /** Principale: punteggio, comando o impostazioni per un braccialetto che sente solo un satellite. */
     private fun toBand(addr: String, payload: String, kind: String): Boolean {
         val e = remoteBands[addr]?.takeIf { it.status.ready } ?: return false
@@ -8381,7 +8485,8 @@ class PhoneRelay(
     }
 
     private fun publishSatellites() {
-        if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second })
+        cameraConns.retainAll(sats.keys)
+        if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second }, cameras = cameraConns.size)
     }
 
     private fun dropStaleRemote() {
@@ -8488,6 +8593,10 @@ class PhoneRelay(
                 RelayMsg.STRAPS -> if (!_ui.value.camera) follow(m.straps.orEmpty())
                 RelayMsg.BANDS -> if (!_ui.value.camera) followBands(m.bands.orEmpty())
                 RelayMsg.SCORE -> m.score?.let { _score.value = it }
+                // L'ora della richiesta arriva sull'orologio del principale.
+                RelayMsg.CHALLENGE -> if (m.rid != null && m.at != null) {
+                    _challenges.tryEmit(Challenge(m.rid, m.at - (clock.offset ?: 0L), m.rlen ?: ReplayRecorder.DEFAULT_S, m.back))
+                }
                 // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
                 RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
@@ -8595,6 +8704,9 @@ class PhoneRelay(
         const val STALE_MS = 6_000L
         /** Misure del satellite più vecchie di così non sono "dal vivo": vanno a riempire i buchi. */
         const val LIVE_MS = 8_000L
+        /** Moviola non arrivata entro questo tempo: non riuscita. */
+        private const val REPLAY_TIMEOUT_MS = 45_000L
+        private const val REPLAY_CHUNK = 256 * 1024
         /** Un tasto arrivato dal satellite più tardi di così non dà (o toglie) il punto. */
         const val EVENT_MAX_AGE_MS = 5_000L
     }
@@ -8843,6 +8955,16 @@ data class RelayMsg(
     /** Punteggio per la grafica della telecamera e punto appena giocato (con l'ora del principale). */
     val score: ScoreOverlay? = null,
     val point: PointMark? = null,
+    /** Moviola: richiesta [rid] di [rlen] secondi; pezzi del video in base64 ([data]), file [file] di [files], parte [part] di [parts]. */
+    val rid: String? = null,
+    val rlen: Int? = null,
+    val data: String? = null,
+    val file: Int? = null,
+    val files: Int? = null,
+    val part: Int? = null,
+    val parts: Int? = null,
+    /** Moviola: -1 = dall'ultimo punto segnato a adesso, 0 = l'ultimo segnato, 1 = quello prima (null = ultimi [rlen] s). */
+    val back: Int? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -8863,6 +8985,9 @@ data class RelayMsg(
         const val SCORE = "score"
         const val POINT = "point"
         const val ROLE_CAMERA = "camera"
+        const val CHALLENGE = "challenge"
+        const val REPLAY = "replay"
+        const val REPLAY_FAIL = "replayfail"
     }
 }
 
@@ -12306,6 +12431,138 @@ fun RemoteKeysInDialog(c: MatchController) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ReplayUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ReplayUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Intent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.SlowMotionVideo
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.relay.PhoneRelay
+import com.tennis.scoremanager.video.ReplayActivity
+import java.io.File
+
+/**
+ * Moviola sul telefono dell'arbitro: il chip "Moviola" (solo con una telecamera collegata) chiede il punto in corso
+ * (dall'ultimo segnato), l'ultimo punto o quello prima; la moviola si guarda in [ReplayActivity].
+ */
+@Composable
+fun ReplayChip(c: MatchController) {
+    val s = LocalStrings.current
+    val relay by c.relay.ui.collectAsState()
+    val replay by c.relay.replay.collectAsState()
+    val context = LocalContext.current
+    var menu by remember { mutableStateOf(false) }
+    if (relay.cameras > 0) {
+        Pill(s.replayTitle, TsmColors.Orange, TsmColors.OnOrange, Icons.Filled.SlowMotionVideo) { menu = true }
+    }
+    if (menu) {
+        AlertDialog(
+            onDismissRequest = { menu = false },
+            icon = { Icon(Icons.Filled.SlowMotionVideo, null, tint = TsmColors.Orange) },
+            title = { Text(s.replayTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(s.replayHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                    // Di solito il punto contestato non è ancora stato dato: per primo "dall'ultimo punto segnato".
+                    for ((label, back) in listOf(s.replaySinceLast to -1, s.replayLastPoint to 0, s.replayPrevPoint to 1)) {
+                        GhostButton(label, Icons.Filled.SlowMotionVideo, {
+                            menu = false
+                            c.requestReplay(back)
+                        }, Modifier.fillMaxWidth())
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { menu = false }) { Text(s.back) } },
+        )
+    }
+    when (val r = replay) {
+        is PhoneRelay.Replay.Waiting -> AlertDialog(
+            onDismissRequest = {},
+            title = { Text(s.replayTitle) },
+            text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(color = TsmColors.Orange)
+                    Text("  " + s.replayWaiting, fontSize = 14.sp)
+                }
+            },
+            confirmButton = { TextButton(onClick = { c.relay.closeReplay() }) { Text(s.back) } },
+        )
+        is PhoneRelay.Replay.Failed -> AlertDialog(
+            onDismissRequest = { c.relay.closeReplay() },
+            title = { Text(s.replayTitle) },
+            text = { Text(s.replayFailed) },
+            confirmButton = { TextButton(onClick = { c.relay.closeReplay() }) { Text(s.ok) } },
+        )
+        // Pronta: si apre a schermo intero in una pagina sua, che gira anche in orizzontale.
+        is PhoneRelay.Replay.Ready -> LaunchedEffect(r) {
+            context.startActivity(
+                Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, r.files.map { it.absolutePath }.toTypedArray()),
+            )
+        }
+        null -> Unit
+    }
+}
+
+@Composable
+private fun Btn(icon: ImageVector?, label: String?, on: Boolean, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = if (on) TsmColors.Orange else TsmColors.SurfaceHigh) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            icon?.let { Icon(it, null, tint = if (on) TsmColors.OnOrange else TsmColors.TextMain) }
+            label?.let { Text(it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Strings.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Strings.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -12546,6 +12803,17 @@ interface Strings {
     val coachSummary: (Int, Int) -> String
     val coachPlay: String
     val coachNone: String
+    val replayTitle: String
+    val replayHint: String
+    val replayLastPoint: String
+    val replayPrevPoint: String
+    val replaySinceLast: String
+    val replayWaiting: String
+    val replayFailed: String
+    val replayClose: String
+    val replayNoCamera: String
+    val cameraReplaySent: String
+    val cameraReplayNone: String
     val relayOwnNetwork: (String) -> String
     val relayJoinWaiting: String
     val relayJoinRefused: String
@@ -13317,6 +13585,17 @@ object ItStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n punti · $w vinti (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Riproduci"
     override val coachNone = "Nessun punto con questo filtro"
+    override val replayTitle = "Moviola"
+    override val replayHint = "Dal telefono-telecamera: il punto contestato dall'inizio, anche se è passato un po' di tempo."
+    override val replayLastPoint = "Ultimo punto"
+    override val replayPrevPoint = "Punto prima"
+    override val replaySinceLast = "Dall'ultimo punto segnato"
+    override val replayWaiting = "In arrivo dalla telecamera…"
+    override val replayFailed = "Moviola non arrivata: controlla che la telecamera sia aperta e collegata."
+    override val replayClose = "Chiudi"
+    override val replayNoCamera = "Nessuna telecamera collegata."
+    override val cameraReplaySent = "Moviola mandata all'arbitro"
+    override val cameraReplayNone = "Moviola non disponibile: niente video in memoria"
     override val relayOwnNetwork: (String) -> String = { "Rete creata da questo telefono: $it" }
     override val relayJoinWaiting = "Conferma sullo schermo il collegamento alla rete del telefono principale."
     override val relayJoinRefused = "Collegamento alla rete rifiutato: tocca Smetti e inquadra di nuovo il codice."
@@ -14060,6 +14339,17 @@ object EnStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w won (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Play"
     override val coachNone = "No points with this filter"
+    override val replayTitle = "Replay"
+    override val replayHint = "From the camera phone: the challenged point from the start, even if some time has passed."
+    override val replayLastPoint = "Last point"
+    override val replayPrevPoint = "Previous point"
+    override val replaySinceLast = "Since the last scored point"
+    override val replayWaiting = "Coming from the camera…"
+    override val replayFailed = "Replay did not arrive: check that the camera is open and connected."
+    override val replayClose = "Close"
+    override val replayNoCamera = "No camera connected."
+    override val cameraReplaySent = "Replay sent to the umpire"
+    override val cameraReplayNone = "Replay not available: no video in memory"
     override val relayOwnNetwork: (String) -> String = { "Network created by this phone: $it" }
     override val relayJoinWaiting = "Confirm on screen the connection to the main phone's network."
     override val relayJoinRefused = "Network connection declined: tap Stop and scan the code again."
@@ -14826,6 +15116,17 @@ object DeStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n Punkte · $w gewonnen (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Abspielen"
     override val coachNone = "Keine Punkte mit diesem Filter"
+    override val replayTitle = "Zeitlupe"
+    override val replayHint = "Von der Telefon-Kamera: der beanstandete Punkt von Anfang an, auch wenn schon etwas Zeit vergangen ist."
+    override val replayLastPoint = "Letzter Punkt"
+    override val replayPrevPoint = "Punkt davor"
+    override val replaySinceLast = "Seit dem letzten gezählten Punkt"
+    override val replayWaiting = "Kommt von der Kamera…"
+    override val replayFailed = "Zeitlupe nicht angekommen: Prüfe, ob die Kamera offen und verbunden ist."
+    override val replayClose = "Schließen"
+    override val replayNoCamera = "Keine Kamera verbunden."
+    override val cameraReplaySent = "Zeitlupe an den Schiedsrichter gesendet"
+    override val cameraReplayNone = "Zeitlupe nicht verfügbar: kein Video im Speicher"
     override val relayOwnNetwork: (String) -> String = { "Von diesem Telefon erstelltes Netz: $it" }
     override val relayJoinWaiting = "Bestätige auf dem Bildschirm die Verbindung mit dem Netz des Haupttelefons."
     override val relayJoinRefused = "Netzverbindung abgelehnt: Tippe auf Beenden und scanne den Code erneut."
@@ -15584,6 +15885,17 @@ object EsStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n puntos · $w ganados (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Reproducir"
     override val coachNone = "Ningún punto con este filtro"
+    override val replayTitle = "Repetición"
+    override val replayHint = "Desde el teléfono-cámara: el punto reclamado desde el principio, aunque haya pasado un rato."
+    override val replayLastPoint = "Último punto"
+    override val replayPrevPoint = "Punto anterior"
+    override val replaySinceLast = "Desde el último punto marcado"
+    override val replayWaiting = "Llegando desde la cámara…"
+    override val replayFailed = "La repetición no llegó: comprueba que la cámara esté abierta y conectada."
+    override val replayClose = "Cerrar"
+    override val replayNoCamera = "Ninguna cámara conectada."
+    override val cameraReplaySent = "Repetición enviada al árbitro"
+    override val cameraReplayNone = "Repetición no disponible: no hay vídeo en memoria"
     override val relayOwnNetwork: (String) -> String = { "Red creada por este teléfono: $it" }
     override val relayJoinWaiting = "Confirma en la pantalla la conexión a la red del teléfono principal."
     override val relayJoinRefused = "Conexión a la red rechazada: toca Detener y vuelve a escanear el código."
@@ -16346,6 +16658,17 @@ object FrStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n points · $w gagnés (${if (n > 0) w * 100 / n else 0} %)" }
     override val coachPlay = "Lire"
     override val coachNone = "Aucun point avec ce filtre"
+    override val replayTitle = "Ralenti"
+    override val replayHint = "Depuis le téléphone-caméra : le point contesté depuis le début, même si un peu de temps a passé."
+    override val replayLastPoint = "Dernier point"
+    override val replayPrevPoint = "Point précédent"
+    override val replaySinceLast = "Depuis le dernier point marqué"
+    override val replayWaiting = "Arrive de la caméra…"
+    override val replayFailed = "Ralenti non reçu : vérifiez que la caméra est ouverte et connectée."
+    override val replayClose = "Fermer"
+    override val replayNoCamera = "Aucune caméra connectée."
+    override val cameraReplaySent = "Ralenti envoyé à l'arbitre"
+    override val cameraReplayNone = "Ralenti indisponible : aucune vidéo en mémoire"
     override val relayOwnNetwork: (String) -> String = { "Réseau créé par ce téléphone : $it" }
     override val relayJoinWaiting = "Confirmez à l'écran la connexion au réseau du téléphone principal."
     override val relayJoinRefused = "Connexion au réseau refusée : touchez Arrêter et scannez à nouveau le code."
@@ -17107,6 +17430,17 @@ object PtStrings : Strings {
     override val coachSummary: (Int, Int) -> String = { n, w -> "$n pontos · $w ganhos (${if (n > 0) w * 100 / n else 0}%)" }
     override val coachPlay = "Reproduzir"
     override val coachNone = "Nenhum ponto com este filtro"
+    override val replayTitle = "Replay"
+    override val replayHint = "Do telefone-câmera: o ponto contestado desde o início, mesmo que já tenha passado um tempo."
+    override val replayLastPoint = "Último ponto"
+    override val replayPrevPoint = "Ponto anterior"
+    override val replaySinceLast = "Desde o último ponto marcado"
+    override val replayWaiting = "Chegando da câmera…"
+    override val replayFailed = "O replay não chegou: verifique se a câmera está aberta e conectada."
+    override val replayClose = "Fechar"
+    override val replayNoCamera = "Nenhuma câmera conectada."
+    override val cameraReplaySent = "Replay enviado ao árbitro"
+    override val cameraReplayNone = "Replay indisponível: nenhum vídeo na memória"
     override val relayOwnNetwork: (String) -> String = { "Rede criada por este telefone: $it" }
     override val relayJoinWaiting = "Confirme na tela a conexão com a rede do telefone principal."
     override val relayJoinRefused = "Conexão com a rede recusada: toque em Parar e escaneie o código de novo."
@@ -18340,6 +18674,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.ReplayChip
 import com.tennis.scoremanager.ui.TvChip
 import com.tennis.scoremanager.ui.rememberArmed
 
@@ -18375,7 +18710,12 @@ fun MatchScreen(c: MatchController) {
             Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TimersRow(clock, cd, s) { TvChip(c) }
+            TimersRow(clock, cd, s) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    TvChip(c)
+                    ReplayChip(c)
+                }
+            }
             if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
             if (lm.record.strokes.isNotEmpty()) StrokesRow(lm.record.strokes)
             if (o.heartRate && straps.isNotEmpty()) HeartRow(straps)
@@ -22333,7 +22673,6 @@ import androidx.lifecycle.lifecycleScope
 import com.pedro.common.ConnectChecker
 import com.pedro.encoder.input.gl.render.filters.`object`.ImageFilterRender
 import com.pedro.encoder.input.video.CameraHelper
-import com.pedro.library.base.recording.RecordController
 import com.pedro.library.generic.GenericStream
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.Reports
@@ -22411,7 +22750,37 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
         // Capitoli: i punti arrivati mentre si registra.
         lifecycleScope.launch {
-            controller.relay.points.collect { p -> if (recording.value) chapters += p.copy(at = p.at - recordStartWall) }
+            controller.relay.points.collect { p ->
+                if (recording.value) chapters += p.copy(at = p.at - recordStartWall)
+                // Per la moviola: gli ultimi punti con la loro ora (anche senza registrare la partita).
+                recentPoints.addLast(p)
+                while (recentPoints.size > 30) recentPoints.removeFirst()
+            }
+        }
+        // Moviola chiesta dall'arbitro: gli ultimi secondi, subito, al suo telefono.
+        lifecycleScope.launch {
+            controller.relay.challenges.collect { ch ->
+                val out = File(cacheDir, "replay_out/${ch.rid}")
+                // Un punto preciso: dalla fine di quello prima a 3 s dopo la sua fine, anche se la richiesta arriva tardi.
+                // back = -1: il punto contestato non è ancora segnato, dall'ultimo segnato a adesso.
+                val pts = recentPoints.toList()
+                val target = ch.back?.takeIf { it >= 0 }?.let { pts.getOrNull(pts.lastIndex - it) }
+                val parts = withContext(Dispatchers.IO) {
+                    runCatching {
+                        if (ch.back == -1) {
+                            val from = pts.lastOrNull()?.at?.minus(1_000) ?: (ch.at - 60_000)
+                            recorder.cutRange(maxOf(from, ch.at - 110_000), ch.at, out)
+                        } else if (target != null) {
+                            val prevEnd = pts.getOrNull(pts.indexOf(target) - 1)?.at ?: (target.at - 20_000)
+                            recorder.cutRange(maxOf(prevEnd, target.at - 40_000), target.at + 3_000, out)
+                        } else {
+                            recorder.cut(ch.at, ch.seconds * 1000L, out)
+                        }
+                    }.getOrDefault(emptyList())
+                }
+                controller.relay.sendReplay(ch.rid, parts)
+                message.value = if (parts.isEmpty()) s.cameraReplayNone else s.cameraReplaySent
+            }
         }
     }
 
@@ -22420,8 +22789,13 @@ class CameraActivity : ComponentActivity() {
             .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
     }
 
+    /** Registrazione nostra: video della partita a comando, e sempre gli ultimi secondi per la moviola. */
+    private val recorder by lazy { ReplayRecorder(File(cacheDir, "replay_buffer")) }
+    private val recentPoints = ArrayDeque<PointMark>()
+
     private fun stream(): GenericStream = stream ?: GenericStream(this, checker).also {
         it.getGlInterface().autoHandleOrientation = true
+        it.setRecordController(recorder)
         stream = it
     }
 
@@ -22462,23 +22836,28 @@ class CameraActivity : ComponentActivity() {
 
     // ---------------------------------------------------------------- registrazione e diretta
 
-    private fun toggleRecord() {
+    /** Il codificatore gira sempre (per la memoria della moviola): "Registra" apre e chiude solo il file della partita. */
+    private fun startBuffer() {
         val st = stream ?: return
+        if (!st.isRecording) st.startRecord(File(cacheDir, "replay_buffer").absolutePath) { }
+    }
+
+    private fun toggleRecord() {
+        if (stream == null) return
         if (recording.value) {
-            st.stopRecord()
+            recorder.stopFile()
             recording.value = false
             finishRecording()
             return
         }
         if (!prepare()) return
+        startBuffer()
         val dir = getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir
         val file = File(dir, "TSM_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(Date())}.mp4")
         recordFile = file
         chapters.clear()
         recordStartWall = System.currentTimeMillis()
-        st.startRecord(file.absolutePath) { status ->
-            if (status == RecordController.Status.RECORDING) runOnUiThread { recordSince.value = SystemClock.elapsedRealtime() }
-        }
+        recorder.startFile(file)
         recording.value = true
         recordSince.value = SystemClock.elapsedRealtime()
     }
@@ -22531,10 +22910,11 @@ class CameraActivity : ComponentActivity() {
 
     override fun onDestroy() {
         stream?.let { st ->
-            if (st.isRecording) {
-                st.stopRecord()
+            if (recorder.fileActive) {
+                recorder.stopFile()
                 finishRecording()
             }
+            if (st.isRecording) st.stopRecord()
             if (st.isStreaming) st.stopStream()
             if (st.isOnPreview) st.stopPreview()
             st.release()
@@ -22564,6 +22944,7 @@ class CameraActivity : ComponentActivity() {
                             if (!prepare()) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            startBuffer()
                             updateOverlay()
                         }
 
@@ -23295,6 +23676,432 @@ object PointMarks {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ReplayActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ReplayActivity.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.graphics.Color
+import android.net.Uri
+import android.os.Bundle
+import android.view.TextureView
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.exoplayer.ExoPlayer
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import java.io.File
+
+/**
+ * Moviola a schermo intero sul telefono dell'arbitro: gira in orizzontale e in verticale, in loop, a 1×, ½× e ¼×,
+ * un fotogramma alla volta. Due dita ingrandiscono (fino a 6×) e spostano l'immagine, un doppio tocco torna normale.
+ * Il video si disegna su una TextureView: a differenza della SurfaceView si può ingrandire e spostare.
+ */
+class ReplayActivity : ComponentActivity() {
+
+    private val controller get() = (application as TsmApp).controller
+    private var player: ExoPlayer? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.decorView.setBackgroundColor(Color.BLACK)
+        val files = intent.getStringArrayExtra(EXTRA_FILES)?.map(::File)?.filter { it.exists() }.orEmpty()
+        if (files.isEmpty()) {
+            finish()
+            return
+        }
+        val p = ExoPlayer.Builder(this).build().apply {
+            setMediaItems(files.map { MediaItem.fromUri(Uri.fromFile(it)) })
+            repeatMode = Player.REPEAT_MODE_ALL
+            prepare()
+            play()
+        }
+        player = p
+        setContent { TsmTheme { Content(p) } }
+    }
+
+    override fun onDestroy() {
+        player?.release()
+        player = null
+        // Chiusa la moviola, il telefono dell'arbitro torna alla partita (e può chiederne un'altra).
+        if (isFinishing) controller.relay.closeReplay()
+        super.onDestroy()
+    }
+
+    @Composable
+    private fun Content(p: ExoPlayer) {
+        val s = stringsFor(controller.options.value.lang)
+        var ratio by remember { mutableFloatStateOf(16f / 9f) }
+        var speed by remember { mutableFloatStateOf(1f) }
+        var playing by remember { mutableStateOf(true) }
+        var zoom by remember { mutableFloatStateOf(1f) }
+        var pan by remember { mutableStateOf(Offset.Zero) }
+        remember(p) {
+            p.addListener(object : Player.Listener {
+                override fun onVideoSizeChanged(v: VideoSize) {
+                    if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
+                }
+            })
+        }
+        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            // L'immagine: proporzioni del video, al centro; due dita per ingrandire e spostare.
+            Box(
+                Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, move, scale, _ ->
+                            zoom = (zoom * scale).coerceIn(1f, MAX_ZOOM)
+                            // Spostamento limitato a quanto l'immagine ingrandita sborda dallo schermo.
+                            val maxX = size.width * (zoom - 1) / 2
+                            val maxY = size.height * (zoom - 1) / 2
+                            pan = Offset((pan.x + move.x).coerceIn(-maxX, maxX), (pan.y + move.y).coerceIn(-maxY, maxY))
+                        }
+                    }
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = {
+                            zoom = 1f
+                            pan = Offset.Zero
+                        })
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                AndroidView(
+                    factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } },
+                    // La più grande che sta nello schermo con le proporzioni del video, in verticale come in orizzontale.
+                    modifier = Modifier.aspectRatio(ratio)
+                        .graphicsLayer {
+                            scaleX = zoom
+                            scaleY = zoom
+                            translationX = pan.x
+                            translationY = pan.y
+                        },
+                )
+            }
+            Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            Row(
+                Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding()
+                    .background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
+            ) {
+                for (v in listOf(1f, 0.5f, 0.25f)) {
+                    Btn(null, if (v == 1f) "1×" else if (v == 0.5f) "½×" else "¼×", speed == v) {
+                        speed = v
+                        p.playbackParameters = PlaybackParameters(v)
+                    }
+                }
+                // Un fotogramma a 30 fps sono ~33 ms: il video si ferma e si avanza a scatti.
+                Btn(Icons.Filled.SkipPrevious, null, false) {
+                    p.pause()
+                    playing = false
+                    p.seekTo(maxOf(0, p.currentPosition - 33))
+                }
+                Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
+                    if (playing) p.pause() else p.play()
+                    playing = !playing
+                }
+                Btn(Icons.Filled.SkipNext, null, false) {
+                    p.pause()
+                    playing = false
+                    p.seekTo(p.currentPosition + 33)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Btn(icon: ImageVector?, label: String?, on: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+        Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = if (on) TsmColors.Orange else TsmColors.SurfaceHigh, modifier = modifier) {
+            Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                icon?.let { Icon(it, null, tint = if (on) TsmColors.OnOrange else TsmColors.TextMain) }
+                label?.let {
+                    Text(
+                        if (icon != null) " $it" else it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain,
+                        fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+
+    companion object {
+        /** Percorsi dei pezzi della moviola, da vedere in fila. */
+        const val EXTRA_FILES = "files"
+        private const val MAX_ZOOM = 6f
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ReplayRecorder.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ReplayRecorder.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.media.MediaCodec
+import android.media.MediaFormat
+import android.media.MediaMuxer
+import android.util.Log
+import com.pedro.library.base.recording.BaseRecordController
+import com.pedro.library.base.recording.RecordController
+import java.io.File
+import java.io.FileDescriptor
+import java.nio.ByteBuffer
+
+/**
+ * Registrazione del telefono-telecamera, al posto di quella di RootEncoder. Due uscite dagli stessi fotogrammi
+ * codificati (niente doppia codifica):
+ *  - il video della partita, solo tra [startFile] e [stopFile];
+ *  - una memoria degli ultimi 2 minuti circa in pezzi da [SEGMENT_US] (sempre, finché la telecamera è aperta), da cui si
+ *    prende la moviola con [cut]. Un MP4 si legge solo quando è chiuso: per questo i pezzi sono corti.
+ * Ogni pezzo e il video cominciano da un fotogramma chiave. I fotogrammi arrivano dai thread del codificatore.
+ */
+class ReplayRecorder(private val dir: File) : BaseRecordController() {
+
+    /** Un pezzo chiuso della memoria: [startMs]/[endMs] sull'orologio del telefono. */
+    data class Segment(val file: File, val startMs: Long, val endMs: Long)
+
+    /** Un MP4 in scrittura: tracce, primo istante (per far partire il file da zero) e se ha già visto la chiave. */
+    private class Out(val file: File, video: MediaFormat, audio: MediaFormat?) {
+        val muxer = MediaMuxer(file.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        val videoTrack = muxer.addTrack(video)
+        val audioTrack = audio?.let { muxer.addTrack(it) } ?: -1
+        var baseUs = -1L
+        var startMs = 0L
+        var lastVideoUs = -1L
+        var lastAudioUs = -1L
+
+        init {
+            muxer.start()
+        }
+
+        fun close() {
+            runCatching { muxer.stop() }
+            runCatching { muxer.release() }
+        }
+    }
+
+    private val lock = Any()
+    private var videoFormat: MediaFormat? = null
+    private var audioFormat: MediaFormat? = null
+    private var segment: Out? = null
+    private val segments = ArrayDeque<Segment>()
+    private var main: Out? = null
+    /** Video della partita chiesto ma non ancora partito (aspetta il prossimo fotogramma chiave). */
+    private var mainPending: File? = null
+    private var counter = 0
+
+    init {
+        dir.mkdirs()
+        dir.listFiles()?.forEach { it.delete() }
+    }
+
+    // ---------------------------------------------------------------- RecordController
+
+    /** Da StreamBase.startRecord: accende la memoria dei pezzi (il percorso non serve). */
+    override fun startRecord(path: String, listener: RecordController.Listener?, tracks: RecordController.RecordTracks) {
+        this.listener = listener
+        this.tracks = tracks
+        status = RecordController.Status.RECORDING
+        listener?.onStatusChange(status)
+        requestKeyFrame?.onRequestKeyFrame()
+    }
+
+    override fun startRecord(fd: FileDescriptor, listener: RecordController.Listener?, tracks: RecordController.RecordTracks) =
+        startRecord("", listener, tracks)
+
+    override fun stopRecord() {
+        synchronized(lock) {
+            closeSegment()
+            main?.close()
+            main = null
+            mainPending = null
+        }
+        status = RecordController.Status.STOPPED
+        listener?.onStatusChange(status)
+    }
+
+    override fun setVideoFormat(format: MediaFormat) {
+        videoFormat = format
+    }
+
+    override fun setAudioFormat(format: MediaFormat) {
+        audioFormat = format
+    }
+
+    override fun resetFormats() {
+        videoFormat = null
+        audioFormat = null
+    }
+
+    override fun recordVideo(buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
+        if (status != RecordController.Status.RECORDING) return
+        val video = videoFormat ?: return
+        val key = info.flags and MediaCodec.BUFFER_FLAG_KEY_FRAME != 0
+        synchronized(lock) {
+            try {
+                // Memoria: un pezzo nuovo a ogni fotogramma chiave dopo SEGMENT_US.
+                val seg = segment
+                if (key && (seg == null || info.presentationTimeUs - seg.baseUs >= SEGMENT_US)) {
+                    closeSegment()
+                    segment = Out(File(dir, "seg_${counter++}.mp4"), video, audioFormat).also { it.startMs = System.currentTimeMillis() }
+                }
+                segment?.let { write(it, it.videoTrack, buffer, info, video = true) }
+                // Video della partita: parte dal primo fotogramma chiave dopo "Registra".
+                val pending = mainPending
+                if (pending != null && key) {
+                    main = Out(pending, video, audioFormat)
+                    mainPending = null
+                }
+                main?.let { write(it, it.videoTrack, buffer, info, video = true) }
+            } catch (e: Exception) {
+                Log.w(TAG, "fotogramma non scritto", e)
+            }
+        }
+    }
+
+    override fun recordAudio(buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
+        if (status != RecordController.Status.RECORDING) return
+        synchronized(lock) {
+            try {
+                segment?.let { if (it.audioTrack >= 0) write(it, it.audioTrack, buffer, info, video = false) }
+                main?.let { if (it.audioTrack >= 0) write(it, it.audioTrack, buffer, info, video = false) }
+            } catch (e: Exception) {
+                Log.w(TAG, "audio non scritto", e)
+            }
+        }
+    }
+
+    /** Tempi dal primo fotogramma del file; l'audio prima del primo fotogramma video si salta. */
+    private fun write(o: Out, track: Int, buffer: ByteBuffer, info: MediaCodec.BufferInfo, video: Boolean) {
+        if (video && o.baseUs < 0) o.baseUs = info.presentationTimeUs
+        if (o.baseUs < 0 || info.size <= 0) return
+        val t = info.presentationTimeUs - o.baseUs
+        if (t < 0) return
+        // Il muxer vuole tempi che crescono, traccia per traccia.
+        if (video) {
+            if (t <= o.lastVideoUs) return
+            o.lastVideoUs = t
+        } else {
+            if (t <= o.lastAudioUs) return
+            o.lastAudioUs = t
+        }
+        val copy = MediaCodec.BufferInfo().apply { set(info.offset, info.size, t, info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG.inv()) }
+        val b = buffer.duplicate()
+        b.position(info.offset)
+        b.limit(info.offset + info.size)
+        o.muxer.writeSampleData(track, b, copy)
+    }
+
+    private fun closeSegment() {
+        val s = segment ?: return
+        segment = null
+        s.close()
+        if (s.lastVideoUs > 0) {
+            segments.addLast(Segment(s.file, s.startMs, System.currentTimeMillis()))
+        } else {
+            s.file.delete()
+        }
+        while (segments.size > KEEP) segments.removeFirst().file.delete()
+    }
+
+    // ---------------------------------------------------------------- per la telecamera
+
+    /** Comincia a scrivere il video della partita (dal prossimo fotogramma chiave, chiesto subito). */
+    fun startFile(file: File) {
+        synchronized(lock) { mainPending = file }
+        requestKeyFrame?.onRequestKeyFrame()
+    }
+
+    fun stopFile() {
+        synchronized(lock) {
+            main?.close()
+            main = null
+            mainPending = null
+        }
+    }
+
+    val fileActive: Boolean get() = synchronized(lock) { main != null || mainPending != null }
+
+    /**
+     * Moviola: chiude il pezzo in corso (così si legge) e restituisce, copiati in [out], i pezzi che coprono
+     * gli ultimi [beforeMs] fino a [atMs] (ora del telefono). Il pezzo successivo parte al prossimo fotogramma chiave.
+     */
+    fun cut(atMs: Long, beforeMs: Long, out: File): List<File> = cutRange(atMs - beforeMs, atMs, out)
+
+    /** I pezzi che coprono da [fromMs] a [toMs] (ora del telefono), come [cut]. */
+    fun cutRange(fromMs: Long, toMs: Long, out: File): List<File> {
+        val chosen = synchronized(lock) {
+            closeSegment()
+            segments.filter { it.endMs >= fromMs && it.startMs <= toMs }
+        }
+        requestKeyFrame?.onRequestKeyFrame()
+        out.mkdirs()
+        return chosen.mapIndexed { i, s -> File(out, "part_$i.mp4").also { s.file.copyTo(it, overwrite = true) } }
+    }
+
+    companion object {
+        private const val TAG = "Moviola"
+        /** Pezzi da 4 secondi: la moviola arriva entro un attimo e copre un punto intero. */
+        const val SEGMENT_US = 4_000_000L
+        /**
+         * 30 pezzi, circa 2 minuti (~90 MB a 6 Mbit/s, cancellati man mano): anche una contestazione chiamata tardi
+         * trova ancora il suo punto.
+         */
+        private const val KEEP = 30
+        /** "Ultimi secondi" quando il punto non è stato segnato. */
+        const val DEFAULT_S = 30
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ScoreOverlay.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -23397,10 +24204,17 @@ object VideoLibrary {
 
     private fun dir(context: Context): File = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: context.filesDir
 
-    /** Dal più recente; solo quelli il cui video c'è ancora. */
+    /**
+     * Dal più recente; solo quelli il cui video c'è ancora. I capitoli di un video tolto dalla galleria (o da dove
+     * era stato importato) non servono più: si cancellano.
+     */
     fun list(context: Context): List<Entry> =
-        dir(context).listFiles { f -> f.extension == "json" }.orEmpty().mapNotNull { f -> load(context, f) }
-            .sortedByDescending { it.chapters.recordedAt.takeIf { t -> t > 0 } ?: it.chaptersFile.lastModified() }
+        dir(context).listFiles { f -> f.extension == "json" }.orEmpty().mapNotNull { f ->
+            load(context, f) ?: run {
+                if (runCatching { json.decodeFromString(VideoChapters.serializer(), f.readText()) }.isSuccess) f.delete()
+                null
+            }
+        }.sortedByDescending { it.chapters.recordedAt.takeIf { t -> t > 0 } ?: it.chaptersFile.lastModified() }
 
     fun load(context: Context, f: File): Entry? {
         val ch = runCatching { json.decodeFromString(VideoChapters.serializer(), f.readText()) }.getOrNull() ?: return null
@@ -32994,6 +33808,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 126 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 129 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
