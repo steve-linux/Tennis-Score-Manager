@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -68,12 +69,15 @@ class ReplayActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
     private var player: ExoPlayer? = null
+    private var files: List<File> = emptyList()
+    /** Moviola mandata anche al tabellone: la si toglie chiudendo. */
+    private var onTv by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.decorView.setBackgroundColor(Color.BLACK)
-        val files = intent.getStringArrayExtra(EXTRA_FILES)?.map(::File)?.filter { it.exists() }.orEmpty()
+        files = intent.getStringArrayExtra(EXTRA_FILES)?.map(::File)?.filter { it.exists() }.orEmpty()
         if (files.isEmpty()) {
             finish()
             return
@@ -85,12 +89,18 @@ class ReplayActivity : ComponentActivity() {
             play()
         }
         player = p
+        // Scelto nella finestra della moviola: subito anche sul tabellone.
+        if (savedInstanceState == null && intent.getBooleanExtra(EXTRA_BOARD, false) && controller.canShowReplayOnTv) {
+            controller.showReplayOnTv(files, 1f)
+            onTv = true
+        }
         setContent { TsmTheme { Content(p) } }
     }
 
     override fun onDestroy() {
         player?.release()
         player = null
+        if (onTv) controller.hideReplayOnTv()
         // Chiusa la moviola, il telefono dell'arbitro torna alla partita (e può chiederne un'altra).
         if (isFinishing) controller.relay.closeReplay()
         super.onDestroy()
@@ -145,6 +155,18 @@ class ReplayActivity : ComponentActivity() {
                 )
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
+            if (controller.canShowReplayOnTv) {
+                Btn(Icons.Filled.Tv, s.replayOnBoard, onTv, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
+                    if (onTv) {
+                        controller.hideReplayOnTv()
+                    } else {
+                        controller.showReplayOnTv(files, speed)
+                        syncBoard(p, !playing)
+                    }
+                    onTv = !onTv
+                }
+            }
             Row(
                 Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding()
                     .background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp),
@@ -154,6 +176,7 @@ class ReplayActivity : ComponentActivity() {
                     Btn(null, if (v == 1f) "1×" else if (v == 0.5f) "½×" else "¼×", speed == v) {
                         speed = v
                         p.playbackParameters = PlaybackParameters(v)
+                        if (onTv) controller.setTvReplaySpeed(v)
                     }
                 }
                 // Un fotogramma a 30 fps sono ~33 ms: il video si ferma e si avanza a scatti.
@@ -161,18 +184,26 @@ class ReplayActivity : ComponentActivity() {
                     p.pause()
                     playing = false
                     p.seekTo(maxOf(0, p.currentPosition - 33))
+                    syncBoard(p, true)
                 }
                 Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
                     if (playing) p.pause() else p.play()
                     playing = !playing
+                    syncBoard(p, !playing)
                 }
                 Btn(Icons.Filled.SkipNext, null, false) {
                     p.pause()
                     playing = false
                     p.seekTo(p.currentPosition + 33)
+                    syncBoard(p, true)
                 }
             }
         }
+    }
+
+    /** Il tabellone fa quello che fa la moviola dell'arbitro: stesso pezzo, stesso istante, fermo o in movimento. */
+    private fun syncBoard(p: ExoPlayer, paused: Boolean) {
+        if (onTv) controller.syncTvReplay(paused, p.currentMediaItemIndex, p.currentPosition)
     }
 
     @Composable
@@ -193,6 +224,8 @@ class ReplayActivity : ComponentActivity() {
     companion object {
         /** Percorsi dei pezzi della moviola, da vedere in fila. */
         const val EXTRA_FILES = "files"
+        /** true = mandarla subito anche al tabellone. */
+        const val EXTRA_BOARD = "board"
         private const val MAX_ZOOM = 6f
     }
 }

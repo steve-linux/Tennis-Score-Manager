@@ -257,6 +257,8 @@ object PtStrings : Strings {
     override val replayWaiting = "Chegando da câmera…"
     override val replayFailed = "O replay não chegou: verifique se a câmera está aberta e conectada."
     override val replayClose = "Fechar"
+    override val replayOnBoard = "Placar"
+    override val replayAlsoOnBoard = "Também no placar"
     override val replayNoCamera = "Nenhuma câmera conectada."
     override val cameraReplaySent = "Replay enviado ao árbitro"
     override val cameraReplayNone = "Replay indisponível: nenhum vídeo na memória"

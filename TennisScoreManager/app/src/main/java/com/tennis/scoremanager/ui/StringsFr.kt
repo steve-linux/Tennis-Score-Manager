@@ -257,6 +257,8 @@ object FrStrings : Strings {
     override val replayWaiting = "Arrive de la caméra…"
     override val replayFailed = "Ralenti non reçu : vérifiez que la caméra est ouverte et connectée."
     override val replayClose = "Fermer"
+    override val replayOnBoard = "Tableau"
+    override val replayAlsoOnBoard = "Aussi sur le tableau"
     override val replayNoCamera = "Aucune caméra connectée."
     override val cameraReplaySent = "Ralenti envoyé à l'arbitre"
     override val cameraReplayNone = "Ralenti indisponible : aucune vidéo en mémoire"

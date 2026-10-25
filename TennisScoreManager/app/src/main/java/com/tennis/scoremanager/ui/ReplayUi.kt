@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.SlowMotionVideo
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -77,6 +78,14 @@ fun ReplayChip(c: MatchController) {
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(s.replayHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                    // Sul tabellone appena arriva (si toglie e si rimette anche dalla moviola).
+                    if (c.canShowReplayOnTv) {
+                        var board by remember { mutableStateOf(c.storage.replayOnBoard) }
+                        SwitchRow(Icons.Filled.Tv, s.replayAlsoOnBoard, null, board) {
+                            board = it
+                            c.storage.replayOnBoard = it
+                        }
+                    }
                     // Di solito il punto contestato non è ancora stato dato: per primo "dall'ultimo punto segnato".
                     for ((label, back) in listOf(s.replaySinceLast to -1, s.replayLastPoint to 0, s.replayPrevPoint to 1)) {
                         GhostButton(label, Icons.Filled.SlowMotionVideo, {
@@ -110,7 +119,8 @@ fun ReplayChip(c: MatchController) {
         // Pronta: si apre a schermo intero in una pagina sua, che gira anche in orizzontale.
         is PhoneRelay.Replay.Ready -> LaunchedEffect(r) {
             context.startActivity(
-                Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, r.files.map { it.absolutePath }.toTypedArray()),
+                Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, r.files.map { it.absolutePath }.toTypedArray())
+                    .putExtra(ReplayActivity.EXTRA_BOARD, c.canShowReplayOnTv && c.storage.replayOnBoard),
             )
         }
         null -> Unit

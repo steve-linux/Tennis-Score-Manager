@@ -179,6 +179,11 @@ class Storage(context: Context) {
     var highlightStats: Boolean
         get() = prefs.getBoolean("hl_stats", true)
         set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
+
+    /** Moviola mandata subito anche al tabellone. */
+    var replayOnBoard: Boolean
+        get() = prefs.getBoolean("replay_on_board", false)
+        set(v) = prefs.edit().putBoolean("replay_on_board", v).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()

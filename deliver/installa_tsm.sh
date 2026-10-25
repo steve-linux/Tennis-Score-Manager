@@ -395,6 +395,11 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
     font: 700 min(calc(3 * var(--vh)), calc(1.8 * var(--vw))) monospace; color: #DDD; background: #111; cursor: pointer;
   }
   body.pointer #fs.can { display: block; }
+  /* Moviola: a tutto schermo sopra il punteggio, con la scritta in alto a sinistra. */
+  #replay { display: none; position: fixed; inset: 0; z-index: 50; background: #000; align-items: center; justify-content: center; }
+  #replay video { width: 100%; height: 100%; object-fit: contain; }
+  #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
+        background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
 </style>
 </head>
 <body>
@@ -424,6 +429,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   </div>
 </div>
 <div id="banner"></div>
+<div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
 <!-- Testi di ogni lingua per prima del primo stato (titolo, "connessione persa", "schermo intero") e per l'anteprima.
@@ -641,7 +647,58 @@ function onState(json) {
   S = json;
   recvAt = lastMsg = performance.now();
   render();
+  replayUpdate(S.replay);
 }
+// ------------------------------------------------------------------ moviola
+// L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il
+// punteggio. Senza audio (il tabellone parte senza un tocco solo se il video è muto).
+let rpId = "", rpPart = 0, rpSync = -1, rpParts = 1;
+function replayUpdate(r) {
+  const box = $("replay"), v = $("rv");
+  if (!r) {
+    if (rpId) { v.pause(); v.removeAttribute("src"); v.load(); }
+    rpId = "";
+    box.style.display = "none";
+    return;
+  }
+  $("rl").textContent = r.label + (r.speed < 1 ? "  " + (r.speed === 0.5 ? "½×" : "¼×") : "");
+  box.style.display = "flex";
+  rpParts = r.parts;
+  if (r.id !== rpId) {
+    rpId = r.id;
+    rpPart = 0;
+    rpSync = -1;
+    v.onended = () => { if (!(S && S.replay && S.replay.paused)) { rpPart = (rpPart + 1) % rpParts; playPart(0, false); } };
+    playPart(0, false);
+  }
+  v.playbackRate = r.speed || 1;
+  // Comando dell'arbitro (pausa, ripresa, fotogramma): stesso pezzo e stesso istante, fermo o in movimento.
+  if ((r.sync || 0) !== rpSync && r.sync) {
+    rpSync = r.sync;
+    if (r.part !== rpPart) {
+      rpPart = r.part;
+      playPart(r.posMs, r.paused);
+    } else {
+      v.currentTime = r.posMs / 1000;
+      if (r.paused) v.pause(); else { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+    }
+  } else if (r.paused && !v.paused) {
+    // Ferma dall'arbitro ma qui va (un comando perso, un pezzo appena caricato): si ferma anche qui.
+    v.pause();
+  }
+}
+function playPart(posMs, paused) {
+  const v = $("rv");
+  v.src = "replay/" + rpId + "/" + rpPart + ".mp4";
+  v.playbackRate = (S && S.replay && S.replay.speed) || 1;
+  v.onloadedmetadata = () => {
+    if (posMs) v.currentTime = posMs / 1000;
+    v.playbackRate = (S && S.replay && S.replay.speed) || 1;
+    // Conta lo stato di adesso, non quello di quando si è chiesto il pezzo: nel frattempo l'arbitro può aver fermato.
+    if (paused || (S && S.replay && S.replay.paused)) v.pause(); else { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+  };
+}
+
 
 // ------------------------------------------------------------------ collegamento
 let es = null, retryMs = 2000, retryTimer = 0, reopenAt = 0;
@@ -907,6 +964,7 @@ import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
+import com.tennis.scoremanager.tv.TvReplay
 import com.tennis.scoremanager.tv.TvServer
 import com.tennis.scoremanager.tv.TvSettings
 import com.tennis.scoremanager.tv.TvSnapshot
@@ -1032,6 +1090,11 @@ class MatchController(
      * col tabellone acceso, all'avvio publishTv la legge subito.
      */
     val photosVersion = MutableStateFlow(0)
+    /**
+     * Moviola sul tabellone (null = niente): la manda l'arbitro dalla sua moviola. Anche questa va dichiarata prima
+     * del blocco init, che la ascolta per aggiornare il tabellone.
+     */
+    val tvReplay = MutableStateFlow<TvReplay?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -1251,7 +1314,7 @@ class MatchController(
         scope.launch {
             // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd,
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -1305,9 +1368,35 @@ class MatchController(
                 strings = strings,
                 seq = ++tvSeq,
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
+                replay = tvReplay.value,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
+    }
+
+    /** Il tabellone può mostrare la moviola: il suo server è acceso (tabellone TV o secondo telefono). */
+    val canShowReplayOnTv: Boolean get() = tvServer.running.value
+
+    fun showReplayOnTv(files: List<File>, speed: Float) {
+        val id = System.currentTimeMillis().toString(36)
+        tvServer.replayFiles = files
+        tvServer.replayId = id
+        tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    fun setTvReplaySpeed(speed: Float) {
+        tvReplay.value = tvReplay.value?.copy(speed = speed)
+    }
+
+    /** Pausa, ripresa o fotogramma dell'arbitro: il tabellone va allo stesso punto e fa lo stesso. */
+    fun syncTvReplay(paused: Boolean, part: Int, posMs: Long) {
+        tvReplay.value = tvReplay.value?.let { it.copy(paused = paused, part = part, posMs = posMs, sync = it.sync + 1) }
+    }
+
+    fun hideReplayOnTv() {
+        tvReplay.value = null
+        tvServer.replayId = ""
+        tvServer.replayFiles = emptyList()
     }
 
     /** Messaggio di gioco per il tabellone (set point, cambio campo...): 5 secondi come sul telefono. */
@@ -6958,6 +7047,11 @@ class Storage(context: Context) {
     var highlightStats: Boolean
         get() = prefs.getBoolean("hl_stats", true)
         set(v) = prefs.edit().putBoolean("hl_stats", v).apply()
+
+    /** Moviola mandata subito anche al tabellone. */
+    var replayOnBoard: Boolean
+        get() = prefs.getBoolean("replay_on_board", false)
+        set(v) = prefs.edit().putBoolean("replay_on_board", v).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
@@ -10477,6 +10571,25 @@ data class TvSnapshot(
     val message: String? = null,
     val show: TvShow,
     val labels: TvLabels,
+    /** Moviola mandata al tabellone dall'arbitro (null = niente): copre il punteggio finché non la si toglie. */
+    val replay: TvReplay? = null,
+)
+
+/**
+ * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
+ * [label]. Segue i comandi dell'arbitro: a ogni [sync] nuovo il tabellone va al pezzo [part], a [posMs], e si ferma
+ * ([paused]) o riparte.
+ */
+@Serializable
+data class TvReplay(
+    val id: String,
+    val parts: Int,
+    val speed: Float,
+    val label: String,
+    val paused: Boolean = false,
+    val part: Int = 0,
+    val posMs: Long = 0,
+    val sync: Int = 0,
 )
 
 @Serializable
@@ -10533,6 +10646,7 @@ data class TvInput(
     val seq: Long,
     /** Indirizzi delle foto dei giocatori di ogni lato. */
     val photos: Map<Side, List<String>> = emptyMap(),
+    val replay: TvReplay? = null,
 )
 
 object TvSnapshots {
@@ -10605,6 +10719,7 @@ object TvSnapshots {
             message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
             labels = labels(s),
+            replay = i.replay,
         )
     }
 
@@ -10696,6 +10811,8 @@ class TvServer(context: Context) {
         private const val STOP = "\u0000stop"
         private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
+        private val REPLAY_PATH = Regex("^/replay/([0-9a-z]+)/(\\d+)\\.mp4$")
+        private val RANGE = Regex("bytes=(\\d*)-(\\d*)")
 
         /**
          * Chi può collegarsi: solo la rete locale (Wi-Fi, hotspot, USB). Il server ascolta su tutte le interfacce
@@ -10878,9 +10995,12 @@ class TvServer(context: Context) {
             s.tcpNoDelay = true
             val input = s.getInputStream()
             val requestLine = readLine(input) ?: return
+            var range: String? = null
             while (true) {
                 val header = readLine(input) ?: return
                 if (header.isEmpty()) break
+                // Il video della moviola si legge a pezzi (Range): il browser salta all'indice in fondo all'MP4.
+                if (header.startsWith("Range:", ignoreCase = true)) range = header.substringAfter(':').trim()
             }
             val parts = requestLine.split(' ')
             if (parts.size < 2) return
@@ -10897,7 +11017,9 @@ class TvServer(context: Context) {
                 "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
-                else -> {
+                else -> if (path.startsWith("/replay/")) {
+                    serveReplay(out, path, range, head)
+                } else {
                     // Foto dei giocatori: solo nomi di file come li scrive Storage (sha1 del nome + .jpg).
                     val photo = path.removePrefix("/photo/").takeIf { path.startsWith("/photo/") && PHOTO_NAME.matches(it) }
                         ?.let { File(photoDir, it) }?.takeIf { it.isFile }
@@ -10905,6 +11027,48 @@ class TvServer(context: Context) {
                     else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
                 }
             }
+        }
+    }
+
+    /** Moviola mandata al tabellone: [replayId] e i suoi pezzi (vuoto = nessuna). */
+    @Volatile var replayId: String = ""
+    @Volatile var replayFiles: List<File> = emptyList()
+
+    /** /replay/<id>/<n>.mp4, anche a pezzi ("Range: bytes=a-b"), solo per la moviola in corso. */
+    private fun serveReplay(out: OutputStream, path: String, range: String?, head: Boolean) {
+        val m = REPLAY_PATH.matchEntire(path)
+        val f = m?.takeIf { it.groupValues[1] == replayId }?.groupValues?.get(2)?.toIntOrNull()
+            ?.let { replayFiles.getOrNull(it) }?.takeIf { it.isFile }
+        if (f == null) {
+            respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+            return
+        }
+        val size = f.length()
+        val r = range?.let { RANGE.find(it) }
+        var from = 0L
+        var to = size - 1
+        if (r != null) {
+            val (a, b) = r.destructured
+            if (a.isNotEmpty()) from = a.toLong()
+            if (b.isNotEmpty()) to = minOf(b.toLong(), size - 1)
+            // "bytes=-500": gli ultimi 500 byte.
+            if (a.isEmpty() && b.isNotEmpty()) {
+                from = maxOf(0L, size - b.toLong())
+                to = size - 1
+            }
+        }
+        if (from > to || from >= size) {
+            respond(out, "416 Range Not Satisfiable", "text/plain", ByteArray(0), head, "Content-Range: bytes */$size\r\n")
+            return
+        }
+        val body = java.io.RandomAccessFile(f, "r").use { raf ->
+            raf.seek(from)
+            ByteArray((to - from + 1).toInt()).also { raf.readFully(it) }
+        }
+        if (r != null) {
+            respond(out, "206 Partial Content", "video/mp4", body, head, "Accept-Ranges: bytes\r\nContent-Range: bytes $from-$to/$size\r\n")
+        } else {
+            respond(out, "200 OK", "video/mp4", body, head, "Accept-Ranges: bytes\r\n")
         }
     }
 
@@ -12525,6 +12689,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.SlowMotionVideo
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -12582,6 +12747,14 @@ fun ReplayChip(c: MatchController) {
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(s.replayHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                    // Sul tabellone appena arriva (si toglie e si rimette anche dalla moviola).
+                    if (c.canShowReplayOnTv) {
+                        var board by remember { mutableStateOf(c.storage.replayOnBoard) }
+                        SwitchRow(Icons.Filled.Tv, s.replayAlsoOnBoard, null, board) {
+                            board = it
+                            c.storage.replayOnBoard = it
+                        }
+                    }
                     // Di solito il punto contestato non è ancora stato dato: per primo "dall'ultimo punto segnato".
                     for ((label, back) in listOf(s.replaySinceLast to -1, s.replayLastPoint to 0, s.replayPrevPoint to 1)) {
                         GhostButton(label, Icons.Filled.SlowMotionVideo, {
@@ -12615,7 +12788,8 @@ fun ReplayChip(c: MatchController) {
         // Pronta: si apre a schermo intero in una pagina sua, che gira anche in orizzontale.
         is PhoneRelay.Replay.Ready -> LaunchedEffect(r) {
             context.startActivity(
-                Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, r.files.map { it.absolutePath }.toTypedArray()),
+                Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, r.files.map { it.absolutePath }.toTypedArray())
+                    .putExtra(ReplayActivity.EXTRA_BOARD, c.canShowReplayOnTv && c.storage.replayOnBoard),
             )
         }
         null -> Unit
@@ -12903,6 +13077,8 @@ interface Strings {
     val replayWaiting: String
     val replayFailed: String
     val replayClose: String
+    val replayOnBoard: String
+    val replayAlsoOnBoard: String
     val replayNoCamera: String
     val cameraReplaySent: String
     val cameraReplayNone: String
@@ -13709,6 +13885,8 @@ object ItStrings : Strings {
     override val replayWaiting = "In arrivo dalla telecamera…"
     override val replayFailed = "Moviola non arrivata: controlla che la telecamera sia aperta e collegata."
     override val replayClose = "Chiudi"
+    override val replayOnBoard = "Tabellone"
+    override val replayAlsoOnBoard = "Anche sul tabellone"
     override val replayNoCamera = "Nessuna telecamera collegata."
     override val cameraReplaySent = "Moviola mandata all'arbitro"
     override val cameraReplayNone = "Moviola non disponibile: niente video in memoria"
@@ -14487,6 +14665,8 @@ object EnStrings : Strings {
     override val replayWaiting = "Coming from the camera…"
     override val replayFailed = "Replay did not arrive: check that the camera is open and connected."
     override val replayClose = "Close"
+    override val replayOnBoard = "Scoreboard"
+    override val replayAlsoOnBoard = "Also on the scoreboard"
     override val replayNoCamera = "No camera connected."
     override val cameraReplaySent = "Replay sent to the umpire"
     override val cameraReplayNone = "Replay not available: no video in memory"
@@ -15288,6 +15468,8 @@ object DeStrings : Strings {
     override val replayWaiting = "Kommt von der Kamera…"
     override val replayFailed = "Zeitlupe nicht angekommen: Prüfe, ob die Kamera offen und verbunden ist."
     override val replayClose = "Schließen"
+    override val replayOnBoard = "Anzeigetafel"
+    override val replayAlsoOnBoard = "Auch auf der Anzeigetafel"
     override val replayNoCamera = "Keine Kamera verbunden."
     override val cameraReplaySent = "Zeitlupe an den Schiedsrichter gesendet"
     override val cameraReplayNone = "Zeitlupe nicht verfügbar: kein Video im Speicher"
@@ -16081,6 +16263,8 @@ object EsStrings : Strings {
     override val replayWaiting = "Llegando desde la cámara…"
     override val replayFailed = "La repetición no llegó: comprueba que la cámara esté abierta y conectada."
     override val replayClose = "Cerrar"
+    override val replayOnBoard = "Marcador"
+    override val replayAlsoOnBoard = "También en el marcador"
     override val replayNoCamera = "Ninguna cámara conectada."
     override val cameraReplaySent = "Repetición enviada al árbitro"
     override val cameraReplayNone = "Repetición no disponible: no hay vídeo en memoria"
@@ -16878,6 +17062,8 @@ object FrStrings : Strings {
     override val replayWaiting = "Arrive de la caméra…"
     override val replayFailed = "Ralenti non reçu : vérifiez que la caméra est ouverte et connectée."
     override val replayClose = "Fermer"
+    override val replayOnBoard = "Tableau"
+    override val replayAlsoOnBoard = "Aussi sur le tableau"
     override val replayNoCamera = "Aucune caméra connectée."
     override val cameraReplaySent = "Ralenti envoyé à l'arbitre"
     override val cameraReplayNone = "Ralenti indisponible : aucune vidéo en mémoire"
@@ -17674,6 +17860,8 @@ object PtStrings : Strings {
     override val replayWaiting = "Chegando da câmera…"
     override val replayFailed = "O replay não chegou: verifique se a câmera está aberta e conectada."
     override val replayClose = "Fechar"
+    override val replayOnBoard = "Placar"
+    override val replayAlsoOnBoard = "Também no placar"
     override val replayNoCamera = "Nenhuma câmera conectada."
     override val cameraReplaySent = "Replay enviado ao árbitro"
     override val cameraReplayNone = "Replay indisponível: nenhum vídeo na memória"
@@ -24400,6 +24588,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24439,12 +24628,15 @@ class ReplayActivity : ComponentActivity() {
 
     private val controller get() = (application as TsmApp).controller
     private var player: ExoPlayer? = null
+    private var files: List<File> = emptyList()
+    /** Moviola mandata anche al tabellone: la si toglie chiudendo. */
+    private var onTv by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.decorView.setBackgroundColor(Color.BLACK)
-        val files = intent.getStringArrayExtra(EXTRA_FILES)?.map(::File)?.filter { it.exists() }.orEmpty()
+        files = intent.getStringArrayExtra(EXTRA_FILES)?.map(::File)?.filter { it.exists() }.orEmpty()
         if (files.isEmpty()) {
             finish()
             return
@@ -24456,12 +24648,18 @@ class ReplayActivity : ComponentActivity() {
             play()
         }
         player = p
+        // Scelto nella finestra della moviola: subito anche sul tabellone.
+        if (savedInstanceState == null && intent.getBooleanExtra(EXTRA_BOARD, false) && controller.canShowReplayOnTv) {
+            controller.showReplayOnTv(files, 1f)
+            onTv = true
+        }
         setContent { TsmTheme { Content(p) } }
     }
 
     override fun onDestroy() {
         player?.release()
         player = null
+        if (onTv) controller.hideReplayOnTv()
         // Chiusa la moviola, il telefono dell'arbitro torna alla partita (e può chiederne un'altra).
         if (isFinishing) controller.relay.closeReplay()
         super.onDestroy()
@@ -24516,6 +24714,18 @@ class ReplayActivity : ComponentActivity() {
                 )
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
+            if (controller.canShowReplayOnTv) {
+                Btn(Icons.Filled.Tv, s.replayOnBoard, onTv, Modifier.align(Alignment.TopStart).statusBarsPadding().padding(12.dp)) {
+                    if (onTv) {
+                        controller.hideReplayOnTv()
+                    } else {
+                        controller.showReplayOnTv(files, speed)
+                        syncBoard(p, !playing)
+                    }
+                    onTv = !onTv
+                }
+            }
             Row(
                 Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding()
                     .background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp),
@@ -24525,6 +24735,7 @@ class ReplayActivity : ComponentActivity() {
                     Btn(null, if (v == 1f) "1×" else if (v == 0.5f) "½×" else "¼×", speed == v) {
                         speed = v
                         p.playbackParameters = PlaybackParameters(v)
+                        if (onTv) controller.setTvReplaySpeed(v)
                     }
                 }
                 // Un fotogramma a 30 fps sono ~33 ms: il video si ferma e si avanza a scatti.
@@ -24532,18 +24743,26 @@ class ReplayActivity : ComponentActivity() {
                     p.pause()
                     playing = false
                     p.seekTo(maxOf(0, p.currentPosition - 33))
+                    syncBoard(p, true)
                 }
                 Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
                     if (playing) p.pause() else p.play()
                     playing = !playing
+                    syncBoard(p, !playing)
                 }
                 Btn(Icons.Filled.SkipNext, null, false) {
                     p.pause()
                     playing = false
                     p.seekTo(p.currentPosition + 33)
+                    syncBoard(p, true)
                 }
             }
         }
+    }
+
+    /** Il tabellone fa quello che fa la moviola dell'arbitro: stesso pezzo, stesso istante, fermo o in movimento. */
+    private fun syncBoard(p: ExoPlayer, paused: Boolean) {
+        if (onTv) controller.syncTvReplay(paused, p.currentMediaItemIndex, p.currentPosition)
     }
 
     @Composable
@@ -24564,6 +24783,8 @@ class ReplayActivity : ComponentActivity() {
     companion object {
         /** Percorsi dei pezzi della moviola, da vedere in fila. */
         const val EXTRA_FILES = "files"
+        /** true = mandarla subito anche al tabellone. */
+        const val EXTRA_BOARD = "board"
         private const val MAX_ZOOM = 6f
     }
 }
