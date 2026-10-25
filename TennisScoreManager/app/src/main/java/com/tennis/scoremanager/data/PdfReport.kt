@@ -142,6 +142,11 @@ object PdfReport {
             "${s.format}: ${Reports.formatLabel(rec, s)}",
         ).filter { it.isNotBlank() }
         info.forEach { wr.paragraph(it, body) }
+        // Note del riepilogo: riga per riga, come le ha scritte chi segna (una riga vuota resta uno stacco).
+        if (rec.notes.isNotBlank()) {
+            wr.title(s.matchNotesTitle)
+            rec.notes.trim().lines().forEach { line -> if (line.isBlank()) wr.y += 6 else wr.paragraph(line, body) }
+        }
 
         // ---- Statistiche: partita intera e poi ogni set
         val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1

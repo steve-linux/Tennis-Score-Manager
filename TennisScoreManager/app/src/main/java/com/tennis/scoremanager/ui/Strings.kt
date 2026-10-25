@@ -666,6 +666,8 @@ interface Strings {
     val addPhotos: String
     val takePhoto: String
     val matchPhotosFull: String
+    val matchNotesTitle: String
+    val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
     val shareChooseHint: String
@@ -1433,6 +1435,8 @@ object ItStrings : Strings {
     override val addPhotos = "Aggiungi foto"
     override val takePhoto = "Scatta"
     override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val matchNotesTitle = "Note"
+    override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
     override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
@@ -2187,6 +2191,8 @@ object EnStrings : Strings {
     override val addPhotos = "Add photos"
     override val takePhoto = "Take photo"
     override val matchPhotosFull = "This match already has 10 photos."
+    override val matchNotesTitle = "Notes"
+    override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
     override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."

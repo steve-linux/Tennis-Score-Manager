@@ -176,6 +176,11 @@ object Reports {
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
         for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
+        if (rec.notes.isNotBlank()) {
+            sb.appendLine()
+            sb.appendLine("📝 ${s.matchNotesTitle}")
+            sb.appendLine(rec.notes.trim())
+        }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))

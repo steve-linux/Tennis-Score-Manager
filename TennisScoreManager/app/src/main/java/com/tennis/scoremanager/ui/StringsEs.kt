@@ -640,6 +640,8 @@ object EsStrings : Strings {
     override val addPhotos = "Añadir fotos"
     override val takePhoto = "Hacer foto"
     override val matchPhotosFull = "Este partido ya tiene 10 fotos."
+    override val matchNotesTitle = "Notas"
+    override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
     override val shareChooseHint = "La imagen con texto va bien para WhatsApp y las redes; el PDF tiene también estadísticas, historial y fotos del partido."

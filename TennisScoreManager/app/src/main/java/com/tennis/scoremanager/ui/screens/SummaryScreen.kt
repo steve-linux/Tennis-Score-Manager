@@ -18,18 +18,25 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -61,9 +68,11 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,11 +81,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -98,8 +109,10 @@ import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.delay
 
 /** Ultima schermata: tutti i dati della partita, salvataggio, condivisione, nuova partita, uscita. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SummaryScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -122,7 +135,10 @@ fun SummaryScreen(c: MatchController) {
     // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
     BackHandler { if (fromHistory) c.backToHistory() }
 
-    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+    // Con l'app a tutto schermo la tastiera non restringe la pagina da sola: ci pensa imePadding. Mentre si
+    // scrivono le note i pulsanti in basso spariscono, così resta spazio per vedere il testo.
+    val keyboard = WindowInsets.isImeVisible
+    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -203,10 +219,11 @@ fun SummaryScreen(c: MatchController) {
                 else -> {
                     SummaryInfo(rec, state, names)
                     MatchPhotosCard(c, rec.id)
+                    MatchNotesCard(c, rec.id, rec.notes)
                 }
             }
         }
-        Column(
+        if (!keyboard) Column(
             Modifier.fillMaxWidth().background(TsmColors.Surface).padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -376,6 +393,49 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
  * Foto ricordo della partita (fino a 10): dalla galleria o dalla fotocamera. Restano sul telefono con la partita,
  * vanno nel PDF e passano all'altro telefono col trasferimento; non vanno nell'immagine per i social.
  */
+/** Note libere della partita: si salvano da sole e finiscono nel PDF, nel testo condiviso e nei file salvati. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MatchNotesCard(c: MatchController, id: String, saved: String) {
+    val s = LocalStrings.current
+    // Il testo vive qui mentre si scrive: dal controller torna lo stesso, ma solo cambiando partita si riparte da [saved].
+    var text by remember(id) { mutableStateOf(saved) }
+    // Il campo resta in vista sopra la tastiera, anche quando cresce andando a capo.
+    val inView = remember { BringIntoViewRequester() }
+    var focused by remember { mutableStateOf(false) }
+    val keyboard = WindowInsets.isImeVisible
+    LaunchedEffect(focused, keyboard, text.count { it == '\n' }, text.length / 40) {
+        if (focused && keyboard) {
+            delay(150)
+            inView.bringIntoView()
+        }
+    }
+    Column(
+        Modifier.fillMaxWidth().bringIntoViewRequester(inView).clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(s.matchNotesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                text = it.take(MatchController.MAX_NOTES)
+                c.setNotes(text)
+            },
+            placeholder = { Text(s.matchNotesHint, color = TsmColors.TextDim) },
+            minLines = 3,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            supportingText = if (text.length > MatchController.MAX_NOTES - 200) {
+                { Text("${text.length}/${MatchController.MAX_NOTES}", color = TsmColors.TextDim) }
+            } else null,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TsmColors.Ball,
+                cursorColor = TsmColors.Ball,
+            ),
+            modifier = Modifier.fillMaxWidth().onFocusChanged { focused = it.isFocused },
+        )
+    }
+}
+
 @Composable
 private fun MatchPhotosCard(c: MatchController, id: String) {
     val s = LocalStrings.current

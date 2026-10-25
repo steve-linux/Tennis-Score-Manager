@@ -639,6 +639,8 @@ object DeStrings : Strings {
     override val addPhotos = "Fotos hinzufügen"
     override val takePhoto = "Foto aufnehmen"
     override val matchPhotosFull = "Dieses Match hat schon 10 Fotos."
+    override val matchNotesTitle = "Notizen"
+    override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
     override val shareChooseHint = "Das Bild mit Text passt für WhatsApp und soziale Netze; das PDF enthält auch Statistik, Verlauf und Fotos vom Match."

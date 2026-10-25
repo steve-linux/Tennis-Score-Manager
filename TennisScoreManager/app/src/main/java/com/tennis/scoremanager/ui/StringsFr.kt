@@ -642,6 +642,8 @@ object FrStrings : Strings {
     override val addPhotos = "Ajouter des photos"
     override val takePhoto = "Prendre une photo"
     override val matchPhotosFull = "Ce match a déjà 10 photos."
+    override val matchNotesTitle = "Notes du match"
+    override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
     override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."

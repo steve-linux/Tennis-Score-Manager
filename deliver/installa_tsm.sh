@@ -984,6 +984,8 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Lunghezza massima delle note di una partita (caratteri). */
+        const val MAX_NOTES = 2000
         /** Cartella predefinita di "Salva file" da Android 10 (memoria condivisa, visibile a tutte le app). */
         val DOCUMENTS_DIR = "${Environment.DIRECTORY_DOCUMENTS}/Tennis Score Manager"
         /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
@@ -2604,6 +2606,27 @@ class MatchController(
             withContext(io) { storage.deletePhoto(key) }
             photosVersion.value++
             publishTv()
+        }
+    }
+
+    // ---------------------------------------------------------------- note della partita
+
+    private var notesJob: Job? = null
+
+    /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    fun setNotes(text: String) {
+        val sm = summary.value ?: return
+        val rec = sm.record.copy(notes = text.take(MAX_NOTES))
+        summary.value = sm.copy(record = rec)
+        val fromHistory = summaryFromHistory.value
+        notesJob?.cancel()
+        notesJob = scope.launch {
+            delay(800)
+            withContext(io) {
+                storage.saveFinished(rec)
+                // Il riepilogo da riaprire è quello appena finito, non una partita riaperta dallo storico.
+                if (!fromHistory) storage.saveLastFinished(rec)
+            }
         }
     }
 
@@ -5691,6 +5714,8 @@ data class MatchRecord(
     val strokes: Map<Side, StrokeStats> = emptyMap(),
     /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
     val heart: Map<Side, HeartTrack> = emptyMap(),
+    /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
+    val notes: String = "",
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */
@@ -5949,6 +5974,11 @@ object PdfReport {
             "${s.format}: ${Reports.formatLabel(rec, s)}",
         ).filter { it.isNotBlank() }
         info.forEach { wr.paragraph(it, body) }
+        // Note del riepilogo: riga per riga, come le ha scritte chi segna (una riga vuota resta uno stacco).
+        if (rec.notes.isNotBlank()) {
+            wr.title(s.matchNotesTitle)
+            rec.notes.trim().lines().forEach { line -> if (line.isBlank()) wr.y += 6 else wr.paragraph(line, body) }
+        }
 
         // ---- Statistiche: partita intera e poi ogni set
         val sets = (pts.maxOfOrNull { it.set } ?: -1) + 1
@@ -6606,6 +6636,11 @@ object Reports {
         for (side in Side.entries) wristSpeedLine(rec, side, s)?.let { sb.appendLine("⚡ ${s.wristSpeed} ${names.short(side)}: $it") }
         rallyStats(rec)?.let { sb.appendLine("🔁 ${s.strokesPerPoint}: ${rallyLine(it, s, lang)}") }
         for (side in Side.entries) heartLine(rec, side, s)?.let { sb.appendLine("❤️ ${s.heartStat} ${names.short(side)}: $it") }
+        if (rec.notes.isNotBlank()) {
+            sb.appendLine()
+            sb.appendLine("📝 ${s.matchNotesTitle}")
+            sb.appendLine(rec.notes.trim())
+        }
         sb.appendLine()
         sb.appendLine("#tennis · ${s.generatedWith}")
         sb.append(siteUrl(lang))
@@ -13233,6 +13268,8 @@ interface Strings {
     val addPhotos: String
     val takePhoto: String
     val matchPhotosFull: String
+    val matchNotesTitle: String
+    val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
     val shareChooseHint: String
@@ -14000,6 +14037,8 @@ object ItStrings : Strings {
     override val addPhotos = "Aggiungi foto"
     override val takePhoto = "Scatta"
     override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
+    override val matchNotesTitle = "Note"
+    override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
     override val shareChooseHint = "L'immagine col testo va bene per WhatsApp e i social; il PDF ha anche statistiche, cronologia e foto della partita."
@@ -14754,6 +14793,8 @@ object EnStrings : Strings {
     override val addPhotos = "Add photos"
     override val takePhoto = "Take photo"
     override val matchPhotosFull = "This match already has 10 photos."
+    override val matchNotesTitle = "Notes"
+    override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
     override val shareChooseHint = "The image with text is right for WhatsApp and social media; the PDF also has statistics, the log and the match photos."
@@ -15531,6 +15572,8 @@ object DeStrings : Strings {
     override val addPhotos = "Fotos hinzufügen"
     override val takePhoto = "Foto aufnehmen"
     override val matchPhotosFull = "Dieses Match hat schon 10 Fotos."
+    override val matchNotesTitle = "Notizen"
+    override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
     override val shareChooseHint = "Das Bild mit Text passt für WhatsApp und soziale Netze; das PDF enthält auch Statistik, Verlauf und Fotos vom Match."
@@ -16301,6 +16344,8 @@ object EsStrings : Strings {
     override val addPhotos = "Añadir fotos"
     override val takePhoto = "Hacer foto"
     override val matchPhotosFull = "Este partido ya tiene 10 fotos."
+    override val matchNotesTitle = "Notas"
+    override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
     override val shareChooseHint = "La imagen con texto va bien para WhatsApp y las redes; el PDF tiene también estadísticas, historial y fotos del partido."
@@ -17073,6 +17118,8 @@ object FrStrings : Strings {
     override val addPhotos = "Ajouter des photos"
     override val takePhoto = "Prendre une photo"
     override val matchPhotosFull = "Ce match a déjà 10 photos."
+    override val matchNotesTitle = "Notes du match"
+    override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
     override val shareChooseHint = "L'image avec le texte convient à WhatsApp et aux réseaux sociaux ; le PDF contient aussi statistiques, déroulé et photos du match."
@@ -17846,6 +17893,8 @@ object PtStrings : Strings {
     override val addPhotos = "Adicionar fotos"
     override val takePhoto = "Tirar foto"
     override val matchPhotosFull = "Esta partida já tem 10 fotos."
+    override val matchNotesTitle = "Notas"
+    override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
     override val shareChooseHint = "A imagem com texto serve para WhatsApp e redes sociais; o PDF tem também estatísticas, histórico e fotos da partida."
@@ -21362,18 +21411,25 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21405,9 +21461,11 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21416,11 +21474,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21442,8 +21502,10 @@ import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.delay
 
 /** Ultima schermata: tutti i dati della partita, salvataggio, condivisione, nuova partita, uscita. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SummaryScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -21466,7 +21528,10 @@ fun SummaryScreen(c: MatchController) {
     // Dalla fine partita "Indietro" non fa niente (si torna solo con "Nuova partita" o "Esci"); dallo storico ci torna.
     BackHandler { if (fromHistory) c.backToHistory() }
 
-    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+    // Con l'app a tutto schermo la tastiera non restringe la pagina da sola: ci pensa imePadding. Mentre si
+    // scrivono le note i pulsanti in basso spariscono, così resta spazio per vedere il testo.
+    val keyboard = WindowInsets.isImeVisible
+    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -21547,10 +21612,11 @@ fun SummaryScreen(c: MatchController) {
                 else -> {
                     SummaryInfo(rec, state, names)
                     MatchPhotosCard(c, rec.id)
+                    MatchNotesCard(c, rec.id, rec.notes)
                 }
             }
         }
-        Column(
+        if (!keyboard) Column(
             Modifier.fillMaxWidth().background(TsmColors.Surface).padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -21720,6 +21786,49 @@ private fun CheckRow(label: String, checked: Boolean, onChange: (Boolean) -> Uni
  * Foto ricordo della partita (fino a 10): dalla galleria o dalla fotocamera. Restano sul telefono con la partita,
  * vanno nel PDF e passano all'altro telefono col trasferimento; non vanno nell'immagine per i social.
  */
+/** Note libere della partita: si salvano da sole e finiscono nel PDF, nel testo condiviso e nei file salvati. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MatchNotesCard(c: MatchController, id: String, saved: String) {
+    val s = LocalStrings.current
+    // Il testo vive qui mentre si scrive: dal controller torna lo stesso, ma solo cambiando partita si riparte da [saved].
+    var text by remember(id) { mutableStateOf(saved) }
+    // Il campo resta in vista sopra la tastiera, anche quando cresce andando a capo.
+    val inView = remember { BringIntoViewRequester() }
+    var focused by remember { mutableStateOf(false) }
+    val keyboard = WindowInsets.isImeVisible
+    LaunchedEffect(focused, keyboard, text.count { it == '\n' }, text.length / 40) {
+        if (focused && keyboard) {
+            delay(150)
+            inView.bringIntoView()
+        }
+    }
+    Column(
+        Modifier.fillMaxWidth().bringIntoViewRequester(inView).clip(RoundedCornerShape(20.dp)).background(TsmColors.Surface).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(s.matchNotesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                text = it.take(MatchController.MAX_NOTES)
+                c.setNotes(text)
+            },
+            placeholder = { Text(s.matchNotesHint, color = TsmColors.TextDim) },
+            minLines = 3,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            supportingText = if (text.length > MatchController.MAX_NOTES - 200) {
+                { Text("${text.length}/${MatchController.MAX_NOTES}", color = TsmColors.TextDim) }
+            } else null,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TsmColors.Ball,
+                cursorColor = TsmColors.Ball,
+            ),
+            modifier = Modifier.fillMaxWidth().onFocusChanged { focused = it.isFocused },
+        )
+    }
+}
+
 @Composable
 private fun MatchPhotosCard(c: MatchController, id: String) {
     val s = LocalStrings.current
@@ -27413,7 +27522,9 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** Colpi nel riepilogo: velocità del polso per tipo di colpo e colpi per punto. */
@@ -27421,6 +27532,25 @@ class StrokeReportTest {
 
     private fun record(events: List<MatchEvent> = emptyList(), strokes: Map<Side, StrokeStats> = emptyMap()) =
         MatchRecord(id = "m1", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(), events = events, strokes = strokes)
+
+    @Test
+    fun notesGoIntoTheSharedText() {
+        val rec = record(listOf(MatchEvent.Point(Side.P1))).copy(notes = "Vento forte\nRiprendere il rovescio")
+        val state = com.tennis.scoremanager.model.ScoreEngine.replay(rec.rules, rec.events)
+        val text = Reports.text(rec, state, ItStrings, Names(rec.setup, ItStrings))
+        assertTrue(text, "📝 Note\nVento forte\nRiprendere il rovescio" in text)
+        assertFalse("📝" in Reports.text(rec.copy(notes = "  "), state, ItStrings, Names(rec.setup, ItStrings)))
+    }
+
+    @Test
+    fun oldSavesWithoutNotesStillLoad() {
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; encodeDefaults = true }
+        val old = json.encodeToString(MatchRecord.serializer(), record()).replace(",\"notes\":\"\"", "")
+        assertFalse("notes" in old)
+        assertEquals("", json.decodeFromString(MatchRecord.serializer(), old).notes)
+        val withNotes = record().copy(notes = "ciao")
+        assertEquals("ciao", json.decodeFromString(MatchRecord.serializer(), json.encodeToString(MatchRecord.serializer(), withNotes)).notes)
+    }
 
     @Test
     fun wristSpeedPerStroke() {

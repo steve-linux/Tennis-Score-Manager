@@ -95,6 +95,8 @@ data class MatchRecord(
     val strokes: Map<Side, StrokeStats> = emptyMap(),
     /** Battito dalle fasce cardio, per lato (nel doppio: chi indossa la fascia). */
     val heart: Map<Side, HeartTrack> = emptyMap(),
+    /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
+    val notes: String = "",
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */

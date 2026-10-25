@@ -11,7 +11,9 @@ import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.ItStrings
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** Colpi nel riepilogo: velocità del polso per tipo di colpo e colpi per punto. */
@@ -19,6 +21,25 @@ class StrokeReportTest {
 
     private fun record(events: List<MatchEvent> = emptyList(), strokes: Map<Side, StrokeStats> = emptyMap()) =
         MatchRecord(id = "m1", setup = SetupData(), options = MatchOptions(), rules = RulesConfig(), events = events, strokes = strokes)
+
+    @Test
+    fun notesGoIntoTheSharedText() {
+        val rec = record(listOf(MatchEvent.Point(Side.P1))).copy(notes = "Vento forte\nRiprendere il rovescio")
+        val state = com.tennis.scoremanager.model.ScoreEngine.replay(rec.rules, rec.events)
+        val text = Reports.text(rec, state, ItStrings, Names(rec.setup, ItStrings))
+        assertTrue(text, "📝 Note\nVento forte\nRiprendere il rovescio" in text)
+        assertFalse("📝" in Reports.text(rec.copy(notes = "  "), state, ItStrings, Names(rec.setup, ItStrings)))
+    }
+
+    @Test
+    fun oldSavesWithoutNotesStillLoad() {
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; encodeDefaults = true }
+        val old = json.encodeToString(MatchRecord.serializer(), record()).replace(",\"notes\":\"\"", "")
+        assertFalse("notes" in old)
+        assertEquals("", json.decodeFromString(MatchRecord.serializer(), old).notes)
+        val withNotes = record().copy(notes = "ciao")
+        assertEquals("ciao", json.decodeFromString(MatchRecord.serializer(), json.encodeToString(MatchRecord.serializer(), withNotes)).notes)
+    }
 
     @Test
     fun wristSpeedPerStroke() {

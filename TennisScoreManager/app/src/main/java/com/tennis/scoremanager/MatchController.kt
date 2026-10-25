@@ -159,6 +159,8 @@ class MatchController(
         const val WALK_S = 30                // pausa per spostarsi (dopo il 1° game, nel tie-break, sul 6-6)
         /** Lato delle foto dei giocatori salvate (pixel). */
         const val PHOTO_PX = 320
+        /** Lunghezza massima delle note di una partita (caratteri). */
+        const val MAX_NOTES = 2000
         /** Cartella predefinita di "Salva file" da Android 10 (memoria condivisa, visibile a tutte le app). */
         val DOCUMENTS_DIR = "${Environment.DIRECTORY_DOCUMENTS}/Tennis Score Manager"
         /** Lato lungo delle foto ricordo di una partita (pixel): basta per il PDF, circa 200-400 kB l'una. */
@@ -1779,6 +1781,27 @@ class MatchController(
             withContext(io) { storage.deletePhoto(key) }
             photosVersion.value++
             publishTv()
+        }
+    }
+
+    // ---------------------------------------------------------------- note della partita
+
+    private var notesJob: Job? = null
+
+    /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    fun setNotes(text: String) {
+        val sm = summary.value ?: return
+        val rec = sm.record.copy(notes = text.take(MAX_NOTES))
+        summary.value = sm.copy(record = rec)
+        val fromHistory = summaryFromHistory.value
+        notesJob?.cancel()
+        notesJob = scope.launch {
+            delay(800)
+            withContext(io) {
+                storage.saveFinished(rec)
+                // Il riepilogo da riaprire è quello appena finito, non una partita riaperta dallo storico.
+                if (!fromHistory) storage.saveLastFinished(rec)
+            }
         }
     }
 
