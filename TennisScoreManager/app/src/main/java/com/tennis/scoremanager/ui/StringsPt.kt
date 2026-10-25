@@ -205,7 +205,7 @@ object PtStrings : Strings {
     override val eventName = "Nome do torneio"
     override val eventCategory = "Categoria ou chave (ex. Open, 4ª classe, 45+)"
     override val eventRound = "Fase (ex. quartas, final)"
-    override val eventHint = "Opcionais: aparecem no resumo, no PDF e nas estatísticas dos highlights."
+    override val eventHint = "Opcionais: aparecem no resumo, no PDF e nas estatísticas dos melhores momentos."
     override val playerRank = "Ranking (ex. 4.1, NC)"
     override val hlStats = "Estatísticas no fim do vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n telas com as estatísticas da partida ($sec s) depois dos pontos." }

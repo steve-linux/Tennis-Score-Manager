@@ -16211,7 +16211,7 @@ object EsStrings : Strings {
     override val eventName = "Nombre del torneo"
     override val eventCategory = "Categoría o cuadro (p. ej. Open, 3.ª, +45)"
     override val eventRound = "Ronda (p. ej. cuartos, final)"
-    override val eventHint = "Opcionales: aparecen en el resumen, el PDF y las estadísticas de los highlights."
+    override val eventHint = "Opcionales: aparecen en el resumen, el PDF y las estadísticas de las mejores jugadas."
     override val playerRank = "Clasificación (p. ej. 4.1, NC)"
     override val hlStats = "Estadísticas al final del vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n pantallas con las estadísticas del partido ($sec s) después de los puntos." }
@@ -17010,7 +17010,7 @@ object FrStrings : Strings {
     override val eventName = "Nom du tournoi"
     override val eventCategory = "Catégorie ou tableau (ex. Open, 4e série, +45 ans)"
     override val eventRound = "Tour (ex. quarts, finale)"
-    override val eventHint = "Facultatifs : ils apparaissent dans le résumé, le PDF et les statistiques des highlights."
+    override val eventHint = "Facultatifs : ils apparaissent dans le résumé, le PDF et les statistiques des temps forts."
     override val playerRank = "Classement (ex. 15/2, NC)"
     override val hlStats = "Statistiques en fin de vidéo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n écrans avec les statistiques du match ($sec s) après les points." }
@@ -17808,7 +17808,7 @@ object PtStrings : Strings {
     override val eventName = "Nome do torneio"
     override val eventCategory = "Categoria ou chave (ex. Open, 4ª classe, 45+)"
     override val eventRound = "Fase (ex. quartas, final)"
-    override val eventHint = "Opcionais: aparecem no resumo, no PDF e nas estatísticas dos highlights."
+    override val eventHint = "Opcionais: aparecem no resumo, no PDF e nas estatísticas dos melhores momentos."
     override val playerRank = "Ranking (ex. 4.1, NC)"
     override val hlStats = "Estatísticas no fim do vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n telas com as estatísticas da partida ($sec s) depois dos pontos." }

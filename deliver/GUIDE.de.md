@@ -328,6 +328,22 @@ Seite 1 › **Fortschritte**: ein Dokument, um zu sehen, ob du besser wirst, **g
 - Für jeden Punkt der Durchschnitt der **ersten Hälfte** des Zeitraums und der **zweiten**: grünes ▲, wenn es besser wird, rotes ▼, wenn es schlechter wird (weniger Doppelfehler oder Fehler ist eine Verbesserung), =, wenn es gleich bleibt (unter 5 % Unterschied) oder nicht beurteilt werden kann (Herzfrequenz). Es braucht mindestens 2 Trainings oder Matches.
 - **PDF** (mit dem Verlauf jedes Punkts und der vollständigen Liste, bei Bedarf auf mehreren Seiten) zum Teilen, oder **Drucken** mit dem Android-Druckdienst (auch *Als PDF speichern*).
 
+### 7.3 Videos: Kamera-Telefon, Highlights und Zeitlupe (App 2.5)
+
+Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
+
+1. **Schiedsrichter**: Seite 2 › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
+2. **Kamera**: Seite 2 › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
+   - **Aufnehmen / Stopp**: Das Video kommt in die Galerie (*Filme/Tennis Score Manager*) mit Kapiteln, eines pro Punkt.
+   - **Live**: RTMP-Übertragung zu YouTube, Twitch, Facebook oder einem eigenen Server; Server und Stream-Schlüssel unter *Live: Server*.
+
+- **Videos** (Seite 1): die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von Seite 2.
+- **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
+- **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
+  - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** auf Seite 1) oder eine neutrale Silhouette; darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (Karte **Turnier** auf Seite 1) oder Club und Platz.
+  - **Musik** unter den Statistiken, mit Ein- und Ausblendung: *Nowhere Land* von Kevin MacLeod (incompetech.com, Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn), oder ein eigener Titel mit **Titel wählen** (es wird der Anfang verwendet; nur Musik verwenden, die du in deinen Videos nutzen darfst).
+- **Zeitlupe**: Auf dem Telefon des Schiedsrichters fragt **Zeitlupe** bei verbundener Kamera den strittigen Punkt ab (*Letzter Punkt*, *Punkt davor* oder *Seit dem letzten gezählten Punkt*) und zeigt ihn, mit Pause und Bild für Bild. **Auch auf der Anzeigetafel** zeigt ihn zusätzlich auf der TV-Anzeigetafel.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

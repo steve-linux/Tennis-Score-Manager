@@ -328,6 +328,22 @@ Pagina 1 › **Progressi**: un documento per vedere se migliori, **separato** pe
 - Per ogni voce la media della **prima metà** del periodo e quella della **seconda**: ▲ verde se migliora, ▼ rossa se peggiora (meno doppi falli o errori è un miglioramento), = se resta uguale (meno del 5% di differenza) o se non si può dire (battito). Servono almeno 2 allenamenti o partite.
 - **PDF** (con l'andamento di ogni voce e l'elenco completo, su più pagine se serve) da condividere, o **Stampa** con il servizio di stampa di Android (anche *Salva come PDF*).
 
+### 7.3 Video: telefono-telecamera, highlights e moviola (app 2.5)
+
+Un secondo telefono su un treppiede riprende la partita e mette sul video il punteggio dell'arbitro.
+
+1. **Arbitro**: pagina 2 › **Secondo telefono** › **Usa un secondo telefono** (QR, come in 6.6).
+2. **Telecamera**: pagina 2 › **Secondo telefono** › **Fai da telecamera**, inquadra il QR, poi **Apri la telecamera** (permessi di fotocamera e microfono; serve un telefono che registri in 1080p). Con *Punteggio collegato* la grafica del punteggio è sul video (**Grafica** la accende o la spegne); senza arbitro registra solo il video.
+   - **Registra / Ferma**: il video va in galleria (*Film/Tennis Score Manager*) con i capitoli, uno per punto.
+   - **Diretta**: trasmissione RTMP su YouTube, Twitch, Facebook o un server tuo; server e chiave dello stream in *Diretta: server*.
+
+- **Video** (pagina 1): i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di pagina 2.
+- **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
+- **Highlights**: montaggio automatico dei punti più belli (ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
+  - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia. La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in pagina 1) o una sagoma neutra; sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (scheda **Torneo** in pagina 1), oppure circolo e campo.
+  - **Musica** sotto le statistiche, con dissolvenza in entrata e in uscita: *Nowhere Land* di Kevin MacLeod (incompetech.com, licenza CC BY 4.0: se pubblichi il video, citalo nei crediti), oppure un brano tuo con **Scegli un brano** (se ne usa l'inizio; usa solo musica che hai il diritto di mettere nei tuoi video).
+- **Moviola**: sul telefono dell'arbitro, con la telecamera collegata, **Moviola** chiede alla telecamera il punto contestato (*Ultimo punto*, *Punto prima* o *Dall'ultimo punto segnato*) e lo mostra, con pausa e fotogramma per fotogramma. **Anche sul tabellone** lo fa vedere anche sul tabellone TV.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

@@ -328,6 +328,22 @@ Página 1 › **Progresos**: un documento para ver si mejoras, **separado** para
 - Para cada dato la media de la **primera mitad** del periodo y la de la **segunda**: ▲ verde si mejora, ▼ rojo si empeora (menos dobles faltas o errores es una mejora), = si se mantiene (menos del 5 % de diferencia) o si no se puede decir (pulso). Hacen falta al menos 2 entrenamientos o partidos.
 - **PDF** (con la evolución de cada dato y la lista completa, en varias páginas si hace falta) para compartir, o **Imprimir** con el servicio de impresión de Android (también *Guardar como PDF*).
 
+### 7.3 Vídeos: teléfono-cámara, mejores jugadas y repetición (app 2.5)
+
+Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
+
+1. **Árbitro**: página 2 › **Segundo teléfono** › **Usar un segundo teléfono** (QR, como en 6.6).
+2. **Cámara**: página 2 › **Segundo teléfono** › **Hacer de cámara**, escanea el QR y luego **Abrir la cámara** (permisos de cámara y micrófono; el teléfono debe grabar en 1080p). Con *Marcador conectado* el gráfico del marcador está en el vídeo (**Gráfico** lo enciende o lo apaga); sin árbitro graba solo el vídeo.
+   - **Grabar / Parar**: el vídeo va a la galería (*Películas/Tennis Score Manager*) con capítulos, uno por punto.
+   - **Directo**: emisión RTMP en YouTube, Twitch, Facebook o un servidor tuyo; servidor y clave de la emisión en *Directo: servidor*.
+
+- **Vídeos** (página 1): los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de la página 2.
+- **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
+- **Mejores jugadas**: montaje automático de los mejores puntos (aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
+  - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda. El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en la página 1) o una silueta neutra; debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (tarjeta **Torneo** en la página 1), o club y pista.
+  - **Música** bajo las estadísticas, con fundido de entrada y de salida: *Nowhere Land* de Kevin MacLeod (incompetech.com, licencia CC BY 4.0: si publicas el vídeo, cítalo), o una pista tuya con **Elegir una pista** (se usa el principio; usa solo música que tengas derecho a poner en tus vídeos).
+- **Repetición**: en el teléfono del árbitro, con la cámara conectada, **Repetición** pide a la cámara el punto dudoso (*Último punto*, *Punto anterior* o *Desde el último punto marcado*) y lo muestra, con pausa y fotograma a fotograma. **También en el marcador** lo enseña también en el marcador de la TV.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

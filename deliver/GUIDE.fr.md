@@ -328,6 +328,22 @@ Page 1 › **Progrès** : un document pour voir si vous progressez, **séparé**
 - Pour chaque élément la moyenne de la **première moitié** de la période et celle de la **seconde** : ▲ vert si ça progresse, ▼ rouge si ça baisse (moins de doubles fautes ou d'erreurs est un progrès), = si c'est stable (moins de 5 % d'écart) ou si on ne peut pas dire (fréquence). Il faut au moins 2 entraînements ou matchs.
 - **PDF** (avec l'évolution de chaque élément et la liste complète, sur plusieurs pages si besoin) à partager, ou **Imprimer** avec le service d'impression d'Android (aussi *Enregistrer en PDF*).
 
+### 7.3 Vidéos : téléphone-caméra, temps forts et ralenti (app 2.5)
+
+Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
+
+1. **Arbitre** : page 2 › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
+2. **Caméra** : page 2 › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
+   - **Filmer / Arrêter** : la vidéo va dans la galerie (*Films/Tennis Score Manager*) avec ses chapitres, un par point.
+   - **Direct** : diffusion RTMP sur YouTube, Twitch, Facebook ou votre serveur ; serveur et clé du flux dans *Direct : serveur*.
+
+- **Vidéos** (page 1) : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de la page 2.
+- **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
+- **Temps forts** : montage automatique des plus beaux points (aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
+  - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** en page 1) ou une silhouette neutre ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (carte **Tournoi** en page 1), ou club et court.
+  - **Musique** sous les statistiques, avec fondu en entrée et en sortie : *Nowhere Land* de Kevin MacLeod (incompetech.com, licence CC BY 4.0 : si vous publiez la vidéo, citez-le), ou un morceau à vous avec **Choisir un morceau** (on en utilise le début ; n'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos).
+- **Ralenti** : sur le téléphone de l'arbitre, avec la caméra connectée, **Ralenti** demande à la caméra le point contesté (*Dernier point*, *Point précédent* ou *Depuis le dernier point marqué*) et l'affiche, avec pause et image par image. **Aussi sur le tableau** le montre aussi sur le tableau TV.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

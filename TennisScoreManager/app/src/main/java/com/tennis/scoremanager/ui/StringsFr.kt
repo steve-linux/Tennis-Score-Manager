@@ -205,7 +205,7 @@ object FrStrings : Strings {
     override val eventName = "Nom du tournoi"
     override val eventCategory = "Catégorie ou tableau (ex. Open, 4e série, +45 ans)"
     override val eventRound = "Tour (ex. quarts, finale)"
-    override val eventHint = "Facultatifs : ils apparaissent dans le résumé, le PDF et les statistiques des highlights."
+    override val eventHint = "Facultatifs : ils apparaissent dans le résumé, le PDF et les statistiques des temps forts."
     override val playerRank = "Classement (ex. 15/2, NC)"
     override val hlStats = "Statistiques en fin de vidéo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n écrans avec les statistiques du match ($sec s) après les points." }

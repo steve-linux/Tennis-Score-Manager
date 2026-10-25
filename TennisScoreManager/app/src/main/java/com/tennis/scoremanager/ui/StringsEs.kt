@@ -202,7 +202,7 @@ object EsStrings : Strings {
     override val eventName = "Nombre del torneo"
     override val eventCategory = "Categoría o cuadro (p. ej. Open, 3.ª, +45)"
     override val eventRound = "Ronda (p. ej. cuartos, final)"
-    override val eventHint = "Opcionales: aparecen en el resumen, el PDF y las estadísticas de los highlights."
+    override val eventHint = "Opcionales: aparecen en el resumen, el PDF y las estadísticas de las mejores jugadas."
     override val playerRank = "Clasificación (p. ej. 4.1, NC)"
     override val hlStats = "Estadísticas al final del vídeo"
     override val hlStatsHint: (Int, Int) -> String = { n, sec -> "$n pantallas con las estadísticas del partido ($sec s) después de los puntos." }

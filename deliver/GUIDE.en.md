@@ -328,6 +328,22 @@ Page 1 › **Progress**: a document to see whether you are improving, **separate
 - For each item the average of the **first half** of the period and of the **second**: green ▲ if it improves, red ▼ if it gets worse (fewer double faults or errors is an improvement), = if it stays the same (less than 5% difference) or can't be judged (heart rate). At least 2 workouts or matches are needed.
 - **PDF** (with the trend of each item and the full list, on several pages if needed) to share, or **Print** with the Android print service (also *Save as PDF*).
 
+### 7.3 Videos: camera phone, highlights and replay (app 2.5)
+
+A second phone on a tripod films the match and puts the umpire's score on the video.
+
+1. **Umpire**: page 2 › **Second phone** › **Use a second phone** (QR, as in 6.6).
+2. **Camera**: page 2 › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
+   - **Record / Stop**: the video goes to the gallery (*Movies/Tennis Score Manager*) with chapters, one per point.
+   - **Go live**: RTMP broadcast to YouTube, Twitch, Facebook or your own server; server and stream key in *Live: server*.
+
+- **Videos** (page 1): the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of page 2.
+- **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
+- **Highlights**: automatic edit of the best points (aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
+  - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice on page 1) or a neutral silhouette; below, the percentage of points won. At the top, tournament, category and round (**Tournament** card on page 1), or club and court.
+  - **Music** under the statistics, with fade in and out: *Nowhere Land* by Kevin MacLeod (incompetech.com, CC BY 4.0 licence: if you publish the video, credit it), or a track of yours with **Choose a track** (its beginning is used; only use music you have the right to put in your videos).
+- **Replay**: on the umpire's phone, with the camera connected, **Replay** asks the camera for the disputed point (*Last point*, *Previous point* or *Since the last scored point*) and shows it, with pause and frame by frame. **Also on the scoreboard** shows it on the TV scoreboard too.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
