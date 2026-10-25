@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Stefano Spagnolo
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (il jar del wrapper in base64)."""
+"""Genera installa_tsm.sh: ogni file del progetto come blocco `cat << 'TSM_EOF'` (i file binari in base64)."""
 import base64
 import pathlib
 import subprocess
@@ -59,7 +59,13 @@ for f in files:
     path = ROOT / f
     data = path.read_bytes()
     lines.append(f"# ---------------------------------------------------------------- {rel}")
-    if rel.endswith(".jar"):
+    # I file binari (il jar del wrapper, immagini, musica) vanno in base64; il resto com'è.
+    try:
+        data.decode("utf-8")
+        binary = rel.endswith(".jar")
+    except UnicodeDecodeError:
+        binary = True
+    if binary:
         b64 = base64.encodebytes(data).decode().rstrip("\n")
         lines.append(f"base64 -d > \"$DEST/{rel}\" << '{DELIM}'")
         lines.append(b64)
