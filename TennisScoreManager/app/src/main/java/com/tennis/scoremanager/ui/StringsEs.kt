@@ -232,6 +232,8 @@ object EsStrings : Strings {
     override val replayWaiting = "Llegando desde la cámara…"
     override val replayFailed = "La repetición no llegó: comprueba que la cámara esté abierta y conectada."
     override val replayClose = "Cerrar"
+    override val replayOnBoard = "Marcador"
+    override val replayAlsoOnBoard = "También en el marcador"
     override val replayNoCamera = "Ninguna cámara conectada."
     override val cameraReplaySent = "Repetición enviada al árbitro"
     override val cameraReplayNone = "Repetición no disponible: no hay vídeo en memoria"

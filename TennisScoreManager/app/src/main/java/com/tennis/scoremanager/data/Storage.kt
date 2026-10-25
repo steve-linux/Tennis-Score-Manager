@@ -166,6 +166,10 @@ class Storage(context: Context) {
     var highlightEnabled: Set<String>?
         get() = prefs.getString("hl_enabled", null)?.split(',')?.filter { it.isNotBlank() }?.toSet()
         set(v) = prefs.edit().putString("hl_enabled", v?.joinToString(",")).apply()
+    /** Moviola mandata subito anche al tabellone. */
+    var replayOnBoard: Boolean
+        get() = prefs.getBoolean("replay_on_board", false)
+        set(v) = prefs.edit().putBoolean("replay_on_board", v).apply()
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()

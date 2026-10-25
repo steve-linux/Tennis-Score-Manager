@@ -80,6 +80,7 @@ import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
+import com.tennis.scoremanager.tv.TvReplay
 import com.tennis.scoremanager.tv.TvServer
 import com.tennis.scoremanager.tv.TvSettings
 import com.tennis.scoremanager.tv.TvSnapshot
@@ -203,6 +204,11 @@ class MatchController(
      * col tabellone acceso, all'avvio publishTv la legge subito.
      */
     val photosVersion = MutableStateFlow(0)
+    /**
+     * Moviola sul tabellone (null = niente): la manda l'arbitro dalla sua moviola. Anche questa va dichiarata prima
+     * del blocco init, che la ascolta per aggiornare il tabellone.
+     */
+    val tvReplay = MutableStateFlow<TvReplay?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -422,7 +428,7 @@ class MatchController(
         scope.launch {
             // A ogni cambiamento che si vede sul tabellone (i cronometri li fa scorrere la pagina da sé: basta l'inizio)...
             merge(
-                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd,
+                screen, setup, options, live, summary, tvMessage, tv, tvServer.clients, tvCountdownEnd, tvReplay,
             ).collect { publishTv() }
         }
         scope.launch {
@@ -476,9 +482,35 @@ class MatchController(
                 strings = strings,
                 seq = ++tvSeq,
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
+                replay = tvReplay.value,
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
+    }
+
+    /** Il tabellone può mostrare la moviola: il suo server è acceso (tabellone TV o secondo telefono). */
+    val canShowReplayOnTv: Boolean get() = tvServer.running.value
+
+    fun showReplayOnTv(files: List<File>, speed: Float) {
+        val id = System.currentTimeMillis().toString(36)
+        tvServer.replayFiles = files
+        tvServer.replayId = id
+        tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    fun setTvReplaySpeed(speed: Float) {
+        tvReplay.value = tvReplay.value?.copy(speed = speed)
+    }
+
+    /** Pausa, ripresa o fotogramma dell'arbitro: il tabellone va allo stesso punto e fa lo stesso. */
+    fun syncTvReplay(paused: Boolean, part: Int, posMs: Long) {
+        tvReplay.value = tvReplay.value?.let { it.copy(paused = paused, part = part, posMs = posMs, sync = it.sync + 1) }
+    }
+
+    fun hideReplayOnTv() {
+        tvReplay.value = null
+        tvServer.replayId = ""
+        tvServer.replayFiles = emptyList()
     }
 
     /** Messaggio di gioco per il tabellone (set point, cambio campo...): 5 secondi come sul telefono. */

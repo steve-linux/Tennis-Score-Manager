@@ -73,6 +73,25 @@ data class TvSnapshot(
     val message: String? = null,
     val show: TvShow,
     val labels: TvLabels,
+    /** Moviola mandata al tabellone dall'arbitro (null = niente): copre il punteggio finché non la si toglie. */
+    val replay: TvReplay? = null,
+)
+
+/**
+ * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
+ * [label]. Segue i comandi dell'arbitro: a ogni [sync] nuovo il tabellone va al pezzo [part], a [posMs], e si ferma
+ * ([paused]) o riparte.
+ */
+@Serializable
+data class TvReplay(
+    val id: String,
+    val parts: Int,
+    val speed: Float,
+    val label: String,
+    val paused: Boolean = false,
+    val part: Int = 0,
+    val posMs: Long = 0,
+    val sync: Int = 0,
 )
 
 @Serializable
@@ -129,6 +148,7 @@ data class TvInput(
     val seq: Long,
     /** Indirizzi delle foto dei giocatori di ogni lato. */
     val photos: Map<Side, List<String>> = emptyMap(),
+    val replay: TvReplay? = null,
 )
 
 object TvSnapshots {
@@ -201,6 +221,7 @@ object TvSnapshots {
             message = i.message?.takeIf { phase == "play" && i.tv.showMessages },
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
             labels = labels(s),
+            replay = i.replay,
         )
     }
 

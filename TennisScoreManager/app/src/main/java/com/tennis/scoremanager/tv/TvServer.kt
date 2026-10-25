@@ -68,6 +68,8 @@ class TvServer(context: Context) {
         private const val STOP = "\u0000stop"
         private val PHOTO_NAME = Regex("[0-9a-f]{40}\\.jpg")
         private const val TAG = "TvServer"
+        private val REPLAY_PATH = Regex("^/replay/([0-9a-z]+)/(\\d+)\\.mp4$")
+        private val RANGE = Regex("bytes=(\\d*)-(\\d*)")
 
         /**
          * Chi può collegarsi: solo la rete locale (Wi-Fi, hotspot, USB). Il server ascolta su tutte le interfacce
@@ -250,9 +252,12 @@ class TvServer(context: Context) {
             s.tcpNoDelay = true
             val input = s.getInputStream()
             val requestLine = readLine(input) ?: return
+            var range: String? = null
             while (true) {
                 val header = readLine(input) ?: return
                 if (header.isEmpty()) break
+                // Il video della moviola si legge a pezzi (Range): il browser salta all'indice in fondo all'MP4.
+                if (header.startsWith("Range:", ignoreCase = true)) range = header.substringAfter(':').trim()
             }
             val parts = requestLine.split(' ')
             if (parts.size < 2) return
@@ -269,7 +274,9 @@ class TvServer(context: Context) {
                 "/state", "/state.json" -> respond(out, "200 OK", "application/json; charset=utf-8", latest.toByteArray(), head, "$ID_HEADER: $serverId\r\n")
                 "/events" -> if (head) respond(out, "200 OK", "text/event-stream", ByteArray(0), true) else stream(s, out)
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
-                else -> {
+                else -> if (path.startsWith("/replay/")) {
+                    serveReplay(out, path, range, head)
+                } else {
                     // Foto dei giocatori: solo nomi di file come li scrive Storage (sha1 del nome + .jpg).
                     val photo = path.removePrefix("/photo/").takeIf { path.startsWith("/photo/") && PHOTO_NAME.matches(it) }
                         ?.let { File(photoDir, it) }?.takeIf { it.isFile }
@@ -277,6 +284,48 @@ class TvServer(context: Context) {
                     else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
                 }
             }
+        }
+    }
+
+    /** Moviola mandata al tabellone: [replayId] e i suoi pezzi (vuoto = nessuna). */
+    @Volatile var replayId: String = ""
+    @Volatile var replayFiles: List<File> = emptyList()
+
+    /** /replay/<id>/<n>.mp4, anche a pezzi ("Range: bytes=a-b"), solo per la moviola in corso. */
+    private fun serveReplay(out: OutputStream, path: String, range: String?, head: Boolean) {
+        val m = REPLAY_PATH.matchEntire(path)
+        val f = m?.takeIf { it.groupValues[1] == replayId }?.groupValues?.get(2)?.toIntOrNull()
+            ?.let { replayFiles.getOrNull(it) }?.takeIf { it.isFile }
+        if (f == null) {
+            respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
+            return
+        }
+        val size = f.length()
+        val r = range?.let { RANGE.find(it) }
+        var from = 0L
+        var to = size - 1
+        if (r != null) {
+            val (a, b) = r.destructured
+            if (a.isNotEmpty()) from = a.toLong()
+            if (b.isNotEmpty()) to = minOf(b.toLong(), size - 1)
+            // "bytes=-500": gli ultimi 500 byte.
+            if (a.isEmpty() && b.isNotEmpty()) {
+                from = maxOf(0L, size - b.toLong())
+                to = size - 1
+            }
+        }
+        if (from > to || from >= size) {
+            respond(out, "416 Range Not Satisfiable", "text/plain", ByteArray(0), head, "Content-Range: bytes */$size\r\n")
+            return
+        }
+        val body = java.io.RandomAccessFile(f, "r").use { raf ->
+            raf.seek(from)
+            ByteArray((to - from + 1).toInt()).also { raf.readFully(it) }
+        }
+        if (r != null) {
+            respond(out, "206 Partial Content", "video/mp4", body, head, "Accept-Ranges: bytes\r\nContent-Range: bytes $from-$to/$size\r\n")
+        } else {
+            respond(out, "200 OK", "video/mp4", body, head, "Accept-Ranges: bytes\r\n")
         }
     }
 

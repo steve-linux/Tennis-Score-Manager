@@ -244,6 +244,8 @@ interface Strings {
     val replayWaiting: String
     val replayFailed: String
     val replayClose: String
+    val replayOnBoard: String
+    val replayAlsoOnBoard: String
     val replayNoCamera: String
     val cameraReplaySent: String
     val cameraReplayNone: String
@@ -1026,6 +1028,8 @@ object ItStrings : Strings {
     override val replayWaiting = "In arrivo dalla telecamera…"
     override val replayFailed = "Moviola non arrivata: controlla che la telecamera sia aperta e collegata."
     override val replayClose = "Chiudi"
+    override val replayOnBoard = "Tabellone"
+    override val replayAlsoOnBoard = "Anche sul tabellone"
     override val replayNoCamera = "Nessuna telecamera collegata."
     override val cameraReplaySent = "Moviola mandata all'arbitro"
     override val cameraReplayNone = "Moviola non disponibile: niente video in memoria"
@@ -1780,6 +1784,8 @@ object EnStrings : Strings {
     override val replayWaiting = "Coming from the camera…"
     override val replayFailed = "Replay did not arrive: check that the camera is open and connected."
     override val replayClose = "Close"
+    override val replayOnBoard = "Scoreboard"
+    override val replayAlsoOnBoard = "Also on the scoreboard"
     override val replayNoCamera = "No camera connected."
     override val cameraReplaySent = "Replay sent to the umpire"
     override val cameraReplayNone = "Replay not available: no video in memory"

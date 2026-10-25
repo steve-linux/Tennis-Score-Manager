@@ -232,6 +232,8 @@ object DeStrings : Strings {
     override val replayWaiting = "Kommt von der Kamera…"
     override val replayFailed = "Zeitlupe nicht angekommen: Prüfe, ob die Kamera offen und verbunden ist."
     override val replayClose = "Schließen"
+    override val replayOnBoard = "Anzeigetafel"
+    override val replayAlsoOnBoard = "Auch auf der Anzeigetafel"
     override val replayNoCamera = "Keine Kamera verbunden."
     override val cameraReplaySent = "Zeitlupe an den Schiedsrichter gesendet"
     override val cameraReplayNone = "Zeitlupe nicht verfügbar: kein Video im Speicher"
