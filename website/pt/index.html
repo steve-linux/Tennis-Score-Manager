@@ -246,6 +246,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
   <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
@@ -258,6 +259,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><a href="#features">Recursos</a></li>
       <li><a href="#stats">Estatísticas</a></li>
       <li><a href="#scoreboard">Placar na TV</a></li>
+      <li><a href="#video">Vídeos</a></li>
       <li><a href="#wristbands">Pulseiras</a></li>
       <li><a href="#gallery">Galeria</a></li>
       <li><a href="#download">Baixar</a></li>
@@ -382,6 +384,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Com o firmware 2.4 a pulseira distingue forehand, backhand, saque e voleio de quem a usa, depois de uma breve calibração. No fim você vê os golpes de cada jogador, a velocidade do pulso e quantos golpes dura cada troca de bola.</p>
         <button class="more" data-open="d-ble">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-video"/></svg></div>
+        <h3>Vídeos, melhores momentos e replay</h3>
+        <p>Um segundo telefone num tripé filma a partida com o placar por cima, também ao vivo. Reveja cada ponto, deixe o app montar os melhores momentos com as estatísticas finais e, num ponto contestado, peça o replay.</p>
+        <button class="more" data-open="d-video">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -439,7 +447,27 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands" class="alt">
+<section id="video" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Vídeos</div>
+        <h2>A partida como na TV</h2>
+        <p>O telefone-câmera recebe o placar do árbitro e o coloca no vídeo. No fim, o app tira o melhor dela.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Gravação e ao vivo<small>Vídeo na galeria com um capítulo por ponto, ou ao vivo no YouTube, Twitch ou Facebook.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Ponto a ponto<small>Reveja qualquer ponto, game ou set; com os filtros do treinador, só os pontos que você precisa. Também vídeos feitos com outra câmera, marcando os pontos assistindo.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Melhores momentos automáticos<small>Os melhores pontos, na duração que você escolher, fechados pelas estatísticas da partida como nas transmissões: foto ou retrato dos jogadores e música de fundo.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Replay<small>O ponto contestado desde o início, também em câmera lenta, no telefone do árbitro e no placar.</small></div></li>
+        </ul>
+        <button class="more" data-open="d-video" style="margin-top:20px">Detalhes <svg class="icon"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="media"><div class="tv"><img src="../img/highlights-statistiche.jpg" width="1280" height="720" loading="lazy" alt="Tela de estatísticas no fim dos melhores momentos: Rossi e Bianchi nas laterais, saque e break points no centro"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="wristbands">
   <div class="wrap">
     <div class="split">
       <div>
@@ -473,7 +501,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery">
+<section id="gallery" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galeria</div>
@@ -500,7 +528,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="download" class="alt">
+<section id="download">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Baixar</div>
@@ -691,6 +719,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Placar também:</strong> o segundo telefone pode mostrar o placar da partida em tela cheia.</li>
     </ul>
     <div class="note">O telefone principal cuida da partida: placar, voz e resumo ficam nele.</div>
+  </div>
+</dialog>
+
+<dialog id="d-video" aria-labelledby="t-video" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-video"/></svg></div><h3 id="t-video">Vídeos, melhores momentos e replay</h3></div>
+    <p>Com um segundo telefone servindo de câmera, ligado ao do árbitro por um QR, a partida vira um vídeo com o placar por cima.</p>
+    <ul>
+      <li><strong>Telefone-câmera:</strong> grava em 1080p com o gráfico do placar, ou transmite ao vivo por RTMP no YouTube, Twitch, Facebook ou num servidor seu.</li>
+      <li><strong>Vídeo ponto a ponto:</strong> um capítulo por ponto, para rever por ponto, game ou set; os capítulos também podem ser copiados para o YouTube.</li>
+      <li><strong>Vídeos importados:</strong> até um vídeo feito com outra câmera: os pontos são marcados assistindo e o placar se calcula sozinho.</li>
+      <li><strong>Filtros do treinador:</strong> só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points.</li>
+      <li><strong>Melhores momentos:</strong> aces, winners, break points, set e match points e trocas de bola longas na ordem que você escolher, de 1 a 15 minutos ou a duração que quiser. No fim, as estatísticas da partida com foto ou retrato dos jogadores, torneio e rankings, e música com fade.</li>
+      <li><strong>Replay:</strong> num ponto contestado o árbitro pede à câmera e o vê também em câmera lenta, quadro a quadro; se quiser, também no placar da TV.</li>
+    </ul>
+    <div class="note">A música das estatísticas é <em>Nowhere Land</em> de Kevin MacLeod (incompetech.com), licença CC BY 4.0: se publicar o vídeo, dê o crédito. Você também pode escolher uma faixa sua.</div>
   </div>
 </dialog>
 

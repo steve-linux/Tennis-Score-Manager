@@ -246,6 +246,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
   <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
@@ -258,6 +259,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><a href="#features">Features</a></li>
       <li><a href="#stats">Statistics</a></li>
       <li><a href="#scoreboard">TV scoreboard</a></li>
+      <li><a href="#video">Videos</a></li>
       <li><a href="#wristbands">Wristbands</a></li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#download">Download</a></li>
@@ -382,6 +384,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>With firmware 2.4 the wristband tells the wearer's forehand, backhand, serve and volley apart after a short calibration. At the end you get each player's strokes, wrist speed and how many strokes each rally lasts.</p>
         <button class="more" data-open="d-ble">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-video"/></svg></div>
+        <h3>Videos, highlights and replay</h3>
+        <p>A second phone on a tripod films the match with the score on top, live too. Watch every point again, let the app edit the highlights with the final statistics and, on a disputed point, ask for the replay.</p>
+        <button class="more" data-open="d-video">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -439,7 +447,27 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands" class="alt">
+<section id="video" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Videos</div>
+        <h2>The match like on TV</h2>
+        <p>The camera phone receives the score from the umpire and puts it on the video. After the match the app pulls out the best of it.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Recording and live<small>Video in the gallery with one chapter per point, or live on YouTube, Twitch or Facebook.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Point by point<small>Watch any point, game or set again; with the coach filters, only the points you need. Videos shot with another camera too, scoring the points while watching.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Automatic highlights<small>The best points, in the length you choose, closed by the match statistics like in broadcasts: player photo or portrait and background music.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Replay<small>The disputed point from the start, in slow motion too, on the umpire's phone and on the scoreboard.</small></div></li>
+        </ul>
+        <button class="more" data-open="d-video" style="margin-top:20px">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="media"><div class="tv"><img src="../img/highlights-statistiche.jpg" width="1280" height="720" loading="lazy" alt="Statistics screen at the end of the highlights: Rossi and Bianchi at the sides, serve and break points in the middle"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="wristbands">
   <div class="wrap">
     <div class="split">
       <div>
@@ -473,7 +501,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery">
+<section id="gallery" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Gallery</div>
@@ -500,7 +528,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="download" class="alt">
+<section id="download">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Download</div>
@@ -691,6 +719,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Scoreboard too:</strong> the second phone can show the match scoreboard full screen.</li>
     </ul>
     <div class="note">The main phone keeps the match: score, voice and summary stay there.</div>
+  </div>
+</dialog>
+
+<dialog id="d-video" aria-labelledby="t-video" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-video"/></svg></div><h3 id="t-video">Videos, highlights and replay</h3></div>
+    <p>With a second phone acting as a camera, linked to the umpire's phone with a QR code, the match becomes a video with the score on top.</p>
+    <ul>
+      <li><strong>Camera phone:</strong> records in 1080p with the score graphics, or goes live over RTMP to YouTube, Twitch, Facebook or your own server.</li>
+      <li><strong>Point-by-point video:</strong> one chapter per point, to watch again by point, game or set; the chapters can also be copied for YouTube.</li>
+      <li><strong>Imported videos:</strong> even a video shot with another camera: you score the points while watching and the score works itself out.</li>
+      <li><strong>Coach filters:</strong> only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points.</li>
+      <li><strong>Highlights:</strong> aces, winners, break points, set and match points and long rallies in the order you choose, for 1-15 minutes or any length you like. At the end, the match statistics with player photo or portrait, tournament and rankings, and music with a fade.</li>
+      <li><strong>Replay:</strong> on a disputed point the umpire asks the camera for it and watches it in slow motion too, frame by frame; on the TV scoreboard as well, if you like.</li>
+    </ul>
+    <div class="note">The statistics music is <em>Nowhere Land</em> by Kevin MacLeod (incompetech.com), CC BY 4.0 licence: if you publish the video, credit it. You can also pick a track of your own.</div>
   </div>
 </dialog>
 

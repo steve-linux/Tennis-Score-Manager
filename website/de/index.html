@@ -246,6 +246,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   <symbol id="i-padel" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.3 2.2 5.9 5 6.7V21a2 2 0 0 0 4 0v-5.3c2.8-.8 5-3.4 5-6.7a7 7 0 0 0-7-7z"/><path d="M9.5 7.5h.01M12 6h.01M14.5 7.5h.01M10.5 10.5h.01M13.5 10.5h.01"/></symbol>
   <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
   <symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="8" r="2.5"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
   <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
 </svg>
@@ -258,6 +259,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><a href="#features">Funktionen</a></li>
       <li><a href="#stats">Statistiken</a></li>
       <li><a href="#scoreboard">Anzeigetafel</a></li>
+      <li><a href="#video">Videos</a></li>
       <li><a href="#wristbands">Armbänder</a></li>
       <li><a href="#gallery">Galerie</a></li>
       <li><a href="#download">Download</a></li>
@@ -382,6 +384,12 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
         <p>Mit Firmware 2.4 unterscheidet das Armband nach einer kurzen Kalibrierung Vorhand, Rückhand, Aufschlag und Volley der Person, die es trägt. Am Ende siehst du die Schläge jedes Spielers, das Handgelenk-Tempo und wie viele Schläge jeder Ballwechsel dauert.</p>
         <button class="more" data-open="d-ble">Details <svg class="icon"><use href="#i-right"/></svg></button>
       </article>
+      <article class="card wide" style="--accent:var(--orange)">
+        <div class="ico"><svg class="icon"><use href="#i-video"/></svg></div>
+        <h3>Videos, Highlights und Zeitlupe</h3>
+        <p>Ein zweites Telefon auf einem Stativ filmt das Match mit eingeblendetem Spielstand, auch live. Sieh dir jeden Punkt noch einmal an, lass die App die Highlights mit den Schlussstatistiken schneiden und hol dir beim strittigen Punkt die Zeitlupe.</p>
+        <button class="more" data-open="d-video">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </article>
     </div>
   </div>
 </section>
@@ -439,7 +447,27 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="wristbands" class="alt">
+<section id="video" class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Videos</div>
+        <h2>Das Match wie im Fernsehen</h2>
+        <p>Das Kamera-Telefon bekommt den Spielstand vom Schiedsrichter und blendet ihn ins Video ein. Nach dem Match holt die App das Beste heraus.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Aufnahme und Livestream<small>Video in der Galerie mit einem Kapitel pro Punkt, oder live auf YouTube, Twitch oder Facebook.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Punkt für Punkt<small>Jeden Punkt, jedes Spiel oder jeden Satz noch einmal ansehen; mit den Trainerfiltern nur die Punkte, die du brauchst. Auch Videos anderer Kameras, die Punkte zählst du beim Ansehen.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Automatische Highlights<small>Die schönsten Punkte in der gewählten Länge, zum Schluss die Matchstatistik wie in den Übertragungen: Foto oder Porträt der Spieler und Musik im Hintergrund.</small></div></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><div>Zeitlupe<small>Der strittige Punkt von Anfang an, auch verlangsamt, auf dem Telefon des Schiedsrichters und auf der Anzeigetafel.</small></div></li>
+        </ul>
+        <button class="more" data-open="d-video" style="margin-top:20px">Details <svg class="icon"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="media"><div class="tv"><img src="../img/highlights-statistiche.jpg" width="1280" height="720" loading="lazy" alt="Statistikbildschirm am Ende der Highlights: Rossi und Bianchi an den Seiten, Aufschlag und Breakbälle in der Mitte"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="wristbands">
   <div class="wrap">
     <div class="split">
       <div>
@@ -473,7 +501,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="gallery">
+<section id="gallery" class="alt">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Galerie</div>
@@ -500,7 +528,7 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
   </div>
 </section>
 
-<section id="download" class="alt">
+<section id="download">
   <div class="wrap">
     <div class="head">
       <div class="eyebrow">Download</div>
@@ -691,6 +719,23 @@ dialog::backdrop{background:rgba(3,6,14,.78);backdrop-filter:blur(4px)}
       <li><strong>Auch als Anzeigetafel:</strong> Das zweite Telefon kann die Anzeigetafel des Spiels im Vollbild zeigen.</li>
     </ul>
     <div class="note">Das Haupttelefon führt das Spiel: Spielstand, Stimme und Spielbericht bleiben dort.</div>
+  </div>
+</dialog>
+
+<dialog id="d-video" aria-labelledby="t-video" style="--accent:var(--orange)">
+  <button class="close" data-close aria-label="Schließen"><svg class="icon"><use href="#i-x"/></svg></button>
+  <div class="dlg">
+    <div class="dlg-head"><div class="ico"><svg class="icon"><use href="#i-video"/></svg></div><h3 id="t-video">Videos, Highlights und Zeitlupe</h3></div>
+    <p>Mit einem zweiten Telefon als Kamera, per QR-Code mit dem des Schiedsrichters verbunden, wird das Match zu einem Video mit eingeblendetem Spielstand.</p>
+    <ul>
+      <li><strong>Kamera-Telefon:</strong> nimmt in 1080p mit Spielstand-Einblendung auf oder sendet per RTMP live zu YouTube, Twitch, Facebook oder einem eigenen Server.</li>
+      <li><strong>Video Punkt für Punkt:</strong> ein Kapitel pro Punkt, nach Punkt, Spiel oder Satz anzusehen; die Kapitel lassen sich auch für YouTube kopieren.</li>
+      <li><strong>Importierte Videos:</strong> auch ein Video einer anderen Kamera: Die Punkte zählst du beim Ansehen, der Spielstand ergibt sich von selbst.</li>
+      <li><strong>Trainerfilter:</strong> nur die Punkte eines Spielers, gewonnen oder verloren, bei Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen.</li>
+      <li><strong>Highlights:</strong> Asse, Winner, Break-, Satz- und Matchbälle und lange Ballwechsel in der gewählten Reihenfolge, für 1-15 Minuten oder jede gewünschte Länge. Am Ende die Matchstatistik mit Foto oder Porträt der Spieler, Turnier und Ranglisten, und Musik mit Ausblendung.</li>
+      <li><strong>Zeitlupe:</strong> Beim strittigen Punkt fordert der Schiedsrichter ihn bei der Kamera an und sieht ihn auch verlangsamt, Bild für Bild; auf Wunsch auch auf der TV-Anzeigetafel.</li>
+    </ul>
+    <div class="note">Die Musik der Statistiken ist <em>Nowhere Land</em> von Kevin MacLeod (incompetech.com), Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn. Du kannst auch einen eigenen Titel wählen.</div>
   </div>
 </dialog>
 
