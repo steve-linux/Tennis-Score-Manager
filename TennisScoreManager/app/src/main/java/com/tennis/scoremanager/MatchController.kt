@@ -48,10 +48,15 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Feel
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressItem
 import com.tennis.scoremanager.data.ProgressItems
 import com.tennis.scoremanager.data.ProgressPdf
+import com.tennis.scoremanager.data.Racket
+import com.tennis.scoremanager.data.RacketStats
+import com.tennis.scoremanager.data.RacketUse
+import com.tennis.scoremanager.data.Stringing
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
@@ -121,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -299,6 +304,8 @@ class MatchController(
     /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
     val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
     private var workoutSide = Side.P1
+    /** Racchetta dell'allenamento in corso, presa all'avvio. */
+    private var workoutUse: RacketUse? = null
 
     /**
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
@@ -608,6 +615,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.PROGRESS -> Screen.SETUP
+            Screen.RACKETS -> Screen.SETUP
             Screen.VIDEOS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
@@ -1123,7 +1131,7 @@ class MatchController(
         val now = System.currentTimeMillis()
         // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
-        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now)
+        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -1476,6 +1484,119 @@ class MatchController(
         screen.value = Screen.HISTORY
     }
 
+    // ---------------------------------------------------------------- racchetta virtuale
+
+    /** Racchette con le incordature, in ordine di creazione. */
+    val rackets = MutableStateFlow(storage.loadRackets())
+    /** Racchetta proposta per gli allenamenti ("" = nessuna). */
+    val workoutRacket = MutableStateFlow(storage.workoutRacket)
+
+    fun racketById(id: String): Racket? = id.takeIf { it.isNotEmpty() }?.let { k -> rackets.value.firstOrNull { it.id == k } }
+
+    /** Le racchette scelte in pagina 1, com'erano all'inizio della partita. */
+    private fun racketsFor(su: SetupData): Map<Side, RacketUse> = buildMap {
+        racketById(su.p1Racket)?.let { put(Side.P1, it.use()) }
+        racketById(su.p2Racket)?.let { put(Side.P2, it.use()) }
+    }
+
+    fun openRackets() {
+        refreshHistory()
+        refreshWorkouts()
+        screen.value = Screen.RACKETS
+    }
+
+    private fun storeRackets(list: List<Racket>) {
+        rackets.value = list
+        scope.launch(io) { storage.saveRackets(list) }
+    }
+
+    fun newRacketId(): String = "r${System.currentTimeMillis()}"
+
+    fun newStringingId(): String = "s${System.currentTimeMillis()}"
+
+    /** Aggiunge o aggiorna una racchetta (stesso id). */
+    fun saveRacket(r: Racket) {
+        val list = rackets.value
+        storeRackets(if (list.any { it.id == r.id }) list.map { if (it.id == r.id) r else it } else list + r)
+    }
+
+    /** Toglie la racchetta dall'elenco; le partite giocate la conservano (ne hanno una copia). */
+    fun deleteRacket(id: String) {
+        storeRackets(rackets.value.filter { it.id != id })
+        updateSetup { it.copy(p1Racket = if (it.p1Racket == id) "" else it.p1Racket, p2Racket = if (it.p2Racket == id) "" else it.p2Racket) }
+        if (workoutRacket.value == id) setWorkoutRacket("")
+    }
+
+    fun saveStringing(racketId: String, st: Stringing) {
+        val r = racketById(racketId) ?: return
+        val list = if (r.stringings.any { it.id == st.id }) r.stringings.map { if (it.id == st.id) st else it } else r.stringings + st
+        saveRacket(r.copy(stringings = list.sortedBy { it.date }))
+    }
+
+    fun deleteStringing(racketId: String, stringingId: String) {
+        val r = racketById(racketId) ?: return
+        saveRacket(r.copy(stringings = r.stringings.filter { it.id != stringingId }))
+    }
+
+    fun setWorkoutRacket(id: String) {
+        workoutRacket.value = id
+        storage.workoutRacket = id
+    }
+
+    /** Partite dello storico e allenamenti, come sessioni con una racchetta. */
+    fun racketSessions(): List<RacketStats.Session> = RacketStats.sessions(played(), workouts.value)
+
+    /** Sensazioni dette nel riepilogo per la racchetta di un lato. */
+    fun setMatchFeel(side: Side, feel: Feel) {
+        val sm = summary.value ?: return
+        val use = sm.record.rackets[side] ?: return
+        saveSummary(sm.copy(record = sm.record.copy(rackets = sm.record.rackets + (side to use.copy(feel = feel)))))
+    }
+
+    /**
+     * Associa (o toglie, con "") una racchetta a un lato della partita nel riepilogo, anche a partita già
+     * giocata: si prende l'incordatura montata quel giorno.
+     */
+    fun setMatchRacket(side: Side, racketId: String) {
+        val sm = summary.value ?: return
+        val old = sm.record.rackets
+        val r = racketById(racketId)
+        val at = sm.record.startedAt ?: sm.record.updatedAt
+        val rackets = if (r == null) old - side else old + (side to r.useAt(at).copy(feel = old[side]?.feel))
+        saveSummary(sm.copy(record = sm.record.copy(rackets = rackets)))
+    }
+
+    /** Come [setMatchRacket] per l'allenamento aperto. */
+    fun setWorkoutRacketOf(racketId: String) {
+        val w = workoutDetail.value ?: return
+        val use = racketById(racketId)?.useAt(w.startedAt)?.copy(feel = w.racket?.feel)
+        saveWorkout(w.copy(racket = use))
+    }
+
+    private fun saveSummary(sm: LiveMatch) {
+        val rec = sm.record
+        summary.value = sm
+        val fromHistory = summaryFromHistory.value
+        scope.launch(io) {
+            storage.saveFinished(rec)
+            if (!fromHistory) storage.saveLastFinished(rec)
+        }
+        history.value = history.value.map { if (it.record.id == rec.id) it.copy(record = rec) else it }
+    }
+
+    private fun saveWorkout(rec: WorkoutRecord) {
+        workoutDetail.value = rec
+        workouts.value = workouts.value.map { if (it.id == rec.id) rec else it }
+        scope.launch(io) { storage.saveWorkout(rec) }
+    }
+
+    /** Sensazioni dell'allenamento aperto nel riepilogo. */
+    fun setWorkoutFeel(feel: Feel) {
+        val w = workoutDetail.value ?: return
+        val use = w.racket ?: return
+        saveWorkout(w.copy(racket = use.copy(feel = feel)))
+    }
+
     // ---------------------------------------------------------------- progressi
 
     /** Pagina 1 › Progressi: documenti stampabili, uno per gli allenamenti e uno per le partite di un giocatore. */
@@ -1560,13 +1681,14 @@ class MatchController(
         val straps = heart.straps.value
         val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
+        workoutUse = racketById(workoutRacket.value)?.use()
         workout.start(side, straps[side]?.name)
         MatchService.start(app)
         return true
     }
 
     private fun onWorkoutFinished(rec: WorkoutRecord) {
-        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]))
+        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]), racket = workoutUse)
         scope.launch {
             withContext(io) { storage.saveWorkout(w) }
             refreshWorkouts()

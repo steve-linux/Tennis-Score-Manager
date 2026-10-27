@@ -347,6 +347,16 @@ Un secondo telefono su un treppiede riprende la partita e mette sul video il pun
   - In fondo a ogni schermata delle statistiche c'è la scritta **Creato con Tennis Score Manager** con l'indirizzo del sito.
 - **Moviola**: sul telefono dell'arbitro, con la telecamera collegata, **Moviola** chiede alla telecamera il punto contestato (*Ultimo punto*, *Punto prima* o *Dall'ultimo punto segnato*) e lo mostra, con pausa e fotogramma per fotogramma. **Anche sul tabellone** lo fa vedere anche sul tabellone TV.
 
+### 7.4 Racchette: racchetta virtuale (app 2.5)
+
+Pagina 1 › **Racchette** › **Le mie racchette**: ogni racchetta fisica ha la sua scheda (due racchette dello stesso modello sono due schede: corde, peso e ore cambiano).
+
+- **Scheda**: soprannome (A, B…), marca, modello, peso, bilanciamento, piatto corde e schema; si possono scrivere a mano o prendere **dal catalogo** (dati del produttore, da correggere se hai misurato la tua). *Messa da parte*: non si propone più, ma resta nei confronti.
+- **Incordature**: tipo (monofilamento, multifilamento, sintetico, budello, ibrido), marca e modello (anche dalle corde comuni), calibro, tensione delle verticali e delle orizzontali, data e note. *Nuova incordatura* parte da quella montata. Per ognuna l'app somma le **ore di gioco** delle partite e degli allenamenti associati e avvisa quando si supera la **soglia di controllo** scelta (20 ore di serie): dal solo tempo non può sapere quanta tensione è rimasta.
+- **Prima di giocare**: in pagina 1, sotto la classifica di ogni giocatore, si sceglie la sua racchetta; nell'allenamento la si sceglie sopra la fascia. La partita (punti, colpi dei braccialetti, battito) e l'allenamento si salvano con una **copia** della racchetta com'era quel giorno, corde e tensione comprese: reincordarla dopo non cambia le sessioni passate.
+- **Nel riepilogo** della partita (scheda *Riassunto*) e dell'allenamento si vede la racchetta usata, la si può associare anche dopo (si prende l'incordatura montata quel giorno) e si danno le **sensazioni** da 1 a 5: controllo, comfort, potenza e fatica.
+- **Confronto**: *per racchetta* o *per incordatura* (stessa racchetta con tensioni o corde diverse), si scelgono le configurazioni A e B. Barre affiancate per sessioni, ore, partite vinte, punti vinti, prime in campo, punti vinti con la prima e con la seconda, ace, doppi falli, vincenti ed errori gratuiti a partita, velocità media del polso e colpi dei braccialetti, battito medio, e le sensazioni medie. Il valore migliore è in grassetto, ma l'app non sceglie una vincitrice: contano anche avversario, superficie, condizioni e forma.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

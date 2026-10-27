@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.Surface
@@ -70,6 +71,8 @@ fun WorkoutScreen(c: MatchController) {
     val straps by c.straps.collectAsState()
     val list by c.workouts.collectAsState()
     val o by c.options.collectAsState()
+    val rackets by c.rackets.collectAsState()
+    val workoutRacket by c.workoutRacket.collectAsState()
     ScreenScaffold(
         title = s.workoutTitle,
         subtitle = s.workoutHint,
@@ -122,6 +125,12 @@ fun WorkoutScreen(c: MatchController) {
         }
         // La fascia si sceglie qui, senza passare dalla pagina 2.
         if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
+        // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
+        if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
+            SectionCard(s.racketField, Icons.Filled.SportsTennis) {
+                RacketPicker(c, workoutRacket) { c.setWorkoutRacket(it) }
+            }
+        }
         if (ui.phase == WorkoutPhase.IDLE) {
             SectionCard(s.workoutHistory, Icons.Filled.TableChart) {
                 if (list.isEmpty()) Text(s.workoutNone, color = TsmColors.TextDim)
@@ -179,6 +188,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
                 for (l in laps) Text(WorkoutReport.lapLine(l, s), color = TsmColors.TextMain, fontSize = 13.sp)
             }
         }
+        RacketSessionCard(c, s.racketUsed, w.racket, o.lang, onRacket = { c.setWorkoutRacketOf(it) }, onFeel = { c.setWorkoutFeel(it) })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.workoutShareCsv, Icons.Filled.TableChart, {
                 c.workoutShareIntent(w, pdf = false)?.let { context.startActivity(it) }

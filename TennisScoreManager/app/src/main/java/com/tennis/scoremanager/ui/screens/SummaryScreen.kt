@@ -218,6 +218,11 @@ fun SummaryScreen(c: MatchController) {
                 2 -> MatchChronologyTab(rec, names)
                 else -> {
                     SummaryInfo(rec, state, names)
+                    // Racchetta di ciascun lato e sensazioni: alimentano il confronto delle racchette.
+                    for (side in Side.entries) {
+                        RacketSessionCard(c, "${s.racketUsed} · ${names.side(side)}", rec.rackets[side], lang, TsmColors.player(side),
+                            onRacket = { c.setMatchRacket(side, it) }, onFeel = { c.setMatchFeel(side, it) })
+                    }
                     MatchPhotosCard(c, rec.id)
                     MatchNotesCard(c, rec.id, rec.notes)
                 }

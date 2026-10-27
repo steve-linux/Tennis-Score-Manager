@@ -347,6 +347,16 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
   - At the bottom of every statistics screen there is the line **Made with Tennis Score Manager** with the website address.
 - **Replay**: on the umpire's phone, with the camera connected, **Replay** asks the camera for the disputed point (*Last point*, *Previous point* or *Since the last scored point*) and shows it, with pause and frame by frame. **Also on the scoreboard** shows it on the TV scoreboard too.
 
+### 7.4 Rackets: virtual racket (app 2.5)
+
+Page 1 › **Rackets** › **My rackets**: each physical racket has its own card (two rackets of the same model are two cards: strings, weight and hours differ).
+
+- **Card**: nickname (A, B…), brand, model, weight, balance, head size and string pattern, typed in or taken **from the catalogue** (manufacturer specs, to be corrected if you measured yours). *Retired*: no longer offered, but kept in comparisons.
+- **Stringings**: type (polyester, multifilament, synthetic gut, natural gut, hybrid), brand and model (also from the common strings), gauge, mains and crosses tension, date and notes. *New stringing* starts from the current one. For each one the app adds up the **hours played** in linked matches and workouts and warns when the chosen **check threshold** is passed (20 hours by default): from time alone it cannot tell how much tension is left.
+- **Before playing**: on page 1, under each player's ranking, pick their racket; in the workout pick it above the strap. The match (points, wristband strokes, heart rate) and the workout are saved with a **copy** of the racket as it was that day, strings and tension included: restringing it later does not change past sessions.
+- **In the summary** of the match (*Summary* tab) and of the workout you see the racket used, can link it afterwards too (the stringing mounted that day is used) and rate the **feel** from 1 to 5: control, comfort, power and fatigue.
+- **Comparison**: *by racket* or *by stringing* (same racket with different tensions or strings), pick setups A and B. Side-by-side bars for sessions, hours, matches won, points won, first serves in, points won on first and second serve, aces, double faults, winners and unforced errors per match, average wrist speed and wristband strokes, average heart rate, and average feel. The better value is in bold, but the app does not pick a winner: opponent, surface, conditions and form matter too.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

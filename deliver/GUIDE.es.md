@@ -347,6 +347,16 @@ Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marc
   - Al pie de cada pantalla de estadísticas aparece **Creado con Tennis Score Manager** con la dirección del sitio.
 - **Repetición**: en el teléfono del árbitro, con la cámara conectada, **Repetición** pide a la cámara el punto dudoso (*Último punto*, *Punto anterior* o *Desde el último punto marcado*) y lo muestra, con pausa y fotograma a fotograma. **También en el marcador** lo enseña también en el marcador de la TV.
 
+### 7.4 Raquetas: raqueta virtual (app 2.5)
+
+Página 1 › **Raquetas** › **Mis raquetas**: cada raqueta física tiene su ficha (dos raquetas del mismo modelo son dos fichas: cuerdas, peso y horas cambian).
+
+- **Ficha**: apodo (A, B…), marca, modelo, peso, balance, cabeza y patrón de cordaje, escritos a mano o tomados **del catálogo** (datos del fabricante, para corregir si has medido la tuya). *Retirada*: ya no se propone, pero sigue en las comparaciones.
+- **Encordados**: tipo (monofilamento, multifilamento, sintética, tripa natural, híbrido), marca y modelo (también de las cuerdas comunes), calibre, tensión de verticales y horizontales, fecha y notas. *Nuevo encordado* parte del montado. Para cada uno la app suma las **horas de juego** de los partidos y entrenamientos asociados y avisa al pasar el **umbral de revisión** elegido (20 horas por defecto): solo con el tiempo no puede saber cuánta tensión queda.
+- **Antes de jugar**: en la página 1, bajo la clasificación de cada jugador, se elige su raqueta; en el entrenamiento, encima de la banda. El partido (puntos, golpes de las pulseras, pulso) y el entrenamiento se guardan con una **copia** de la raqueta tal como estaba ese día, cuerdas y tensión incluidas: volver a encordarla después no cambia las sesiones pasadas.
+- **En el resumen** del partido (pestaña *Resumen*) y del entrenamiento se ve la raqueta usada, se puede asociar también después (se toma el encordado montado ese día) y se valoran las **sensaciones** de 1 a 5: control, confort, potencia y cansancio.
+- **Comparación**: *por raqueta* o *por encordado* (misma raqueta con tensiones o cuerdas distintas), se eligen las configuraciones A y B. Barras lado a lado para sesiones, horas, partidos ganados, puntos ganados, primeros saques dentro, puntos ganados con el primero y el segundo, aces, dobles faltas, golpes ganadores y errores no forzados por partido, velocidad media de la muñeca y golpes de las pulseras, pulso medio y sensaciones medias. El mejor valor va en negrita, pero la app no elige ganadora: también cuentan rival, superficie, condiciones y forma.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

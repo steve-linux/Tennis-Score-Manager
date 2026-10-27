@@ -24,6 +24,8 @@ data class WorkoutRecord(
     val cooldown: List<Int> = emptyList(),
     val rr: List<Int> = emptyList(),
     val strapName: String? = null,
+    /** Racchetta dell'allenamento, com'era quel giorno (con le sensazioni). */
+    val racket: RacketUse? = null,
 )
 
 /** Calcoli sugli allenamenti: giri, HRV e recupero. */

@@ -347,6 +347,16 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
   - Unten auf jeder Statistikseite steht **Erstellt mit Tennis Score Manager** mit der Adresse der Website.
 - **Zeitlupe**: Auf dem Telefon des Schiedsrichters fragt **Zeitlupe** bei verbundener Kamera den strittigen Punkt ab (*Letzter Punkt*, *Punkt davor* oder *Seit dem letzten gezählten Punkt*) und zeigt ihn, mit Pause und Bild für Bild. **Auch auf der Anzeigetafel** zeigt ihn zusätzlich auf der TV-Anzeigetafel.
 
+### 7.4 Schläger: virtueller Schläger (App 2.5)
+
+Seite 1 › **Schläger** › **Meine Schläger**: jeder echte Schläger hat seine eigene Karte (zwei Schläger desselben Modells sind zwei Karten: Saiten, Gewicht und Stunden unterscheiden sich).
+
+- **Karte**: Spitzname (A, B…), Marke, Modell, Gewicht, Balance, Kopfgröße und Besaitungsbild, von Hand eingegeben oder **aus dem Katalog** übernommen (Herstellerangaben, zu korrigieren, wenn du deinen gemessen hast). *Ausgemustert*: wird nicht mehr angeboten, bleibt aber im Vergleich.
+- **Besaitungen**: Typ (Monofil, Multifil, Synthetik, Naturdarm, Hybrid), Marke und Modell (auch aus den gängigen Saiten), Stärke, Spannung der Längs- und Quersaiten, Datum und Notizen. *Neue Besaitung* startet von der aktuellen. Für jede zählt die App die **Spielstunden** der zugeordneten Matches und Trainings und warnt beim Überschreiten der gewählten **Prüfgrenze** (standardmäßig 20 Stunden): aus der Zeit allein kennt sie die verbleibende Spannung nicht.
+- **Vor dem Spiel**: auf Seite 1 unter der Rangliste jedes Spielers seinen Schläger wählen; im Training über dem Brustgurt. Match (Punkte, Schläge der Armbänder, Puls) und Training werden mit einer **Kopie** des Schlägers gespeichert, wie er an dem Tag war, samt Saite und Spannung: späteres Neubesaiten ändert vergangene Einheiten nicht.
+- **In der Zusammenfassung** des Matches (Reiter *Übersicht*) und des Trainings sieht man den benutzten Schläger, kann ihn auch nachträglich zuordnen (es gilt die an dem Tag aufgezogene Besaitung) und das **Spielgefühl** von 1 bis 5 bewerten: Kontrolle, Komfort, Power und Ermüdung.
+- **Vergleich**: *nach Schläger* oder *nach Besaitung* (gleicher Schläger mit anderen Spannungen oder Saiten), Konfigurationen A und B wählen. Balken nebeneinander für Einheiten, Stunden, gewonnene Matches, gewonnene Punkte, erste Aufschläge im Feld, Punkte nach erstem und zweitem Aufschlag, Asse, Doppelfehler, Winner und unerzwungene Fehler pro Match, mittlere Handgelenkgeschwindigkeit und Schläge der Armbänder, mittlerer Puls und mittleres Spielgefühl. Der bessere Wert ist fett, aber die App kürt keinen Sieger: Gegner, Belag, Bedingungen und Form zählen auch.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
