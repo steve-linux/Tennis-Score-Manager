@@ -57,6 +57,7 @@ fun RelaySection(c: MatchController, names: Names) {
     val relay by c.relay.ui.collectAsState()
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
+    var camRemote by remember { mutableStateOf(false) }
     // Il QR serve sia al satellite sia alla telecamera: [asCamera] dice quale dei due si è scelto.
     var asCamera by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r ->
@@ -121,6 +122,8 @@ fun RelaySection(c: MatchController, names: Names) {
             )
             relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
             GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
+            // Telefono-telecamera collegato: l'inquadratura e i comandi anche prima della partita, per sistemarlo.
+            if (relay.cameras > 0) GhostButton(s.camRemoteOpen, Icons.Filled.Videocam, { camRemote = true }, Modifier.fillMaxWidth())
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
@@ -162,6 +165,7 @@ fun RelaySection(c: MatchController, names: Names) {
         }
     }
     }
+    if (camRemote) CameraRemoteDialog(c) { camRemote = false }
     val url = relay.url
     if (showQr && relay.role == RelayRole.MAIN) {
         AlertDialog(

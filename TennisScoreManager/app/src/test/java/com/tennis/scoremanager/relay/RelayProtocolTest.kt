@@ -136,4 +136,16 @@ class RelayProtocolTest {
         assertEquals(listOf(4, 9), filled.t)
         assertEquals(listOf(110, 90), filled.bpm)
     }
+
+    @Test
+    fun cameraRemoteMessagesRoundTrip() {
+        val st = CamState(recording = true, recMs = 65_000, live = 2, liveReady = true, overlay = true, zoom = 2.5f, zoomMin = 1f, zoomMax = 8f, battery = 41, freeMb = 12_000)
+        assertEquals(st, RelayCodec.decode(RelayCodec.encode(RelayMsg(RelayMsg.CAM_STATE, cam = st)))?.cam)
+        val cmd = RelayCodec.decode(RelayCodec.encode(RelayMsg(RelayMsg.CAM_CMD, cmd = CamCmd.ZOOM, zoom = 3f)))
+        assertEquals(CamCmd.ZOOM, cmd?.cmd)
+        assertEquals(3f, cmd?.zoom)
+        // Una versione vecchia dell'app ignora i campi nuovi; uno stato senza campi vale "tutto spento".
+        assertEquals(CamState(), RelayCodec.decode("""{"t":"camstate","cam":{}}""")?.cam)
+        assertEquals(RelayMsg.PING, RelayCodec.decode("""{"t":"ping","cmd":"x","cam":{"recording":true}}""")?.t)
+    }
 }

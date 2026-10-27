@@ -112,6 +112,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.CameraChip
 import com.tennis.scoremanager.ui.ReplayChip
 import com.tennis.scoremanager.ui.TvChip
 import com.tennis.scoremanager.ui.rememberArmed
@@ -152,6 +153,7 @@ fun MatchScreen(c: MatchController) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     TvChip(c)
                     ReplayChip(c)
+                    CameraChip(c)
                 }
             }
             if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }

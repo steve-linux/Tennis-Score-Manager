@@ -8359,6 +8359,8 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/relay/PhoneRelay.kt" << '
 package com.tennis.scoremanager.relay
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import com.tennis.scoremanager.ble.BandStatus
@@ -8385,10 +8387,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.tennis.scoremanager.video.ReplayRecorder
 import java.io.File
 import java.net.Socket
 import java.security.SecureRandom
+import java.util.concurrent.atomic.AtomicBoolean
 
 enum class RelayRole { OFF, MAIN, SATELLITE }
 
@@ -8607,6 +8611,9 @@ class PhoneRelay(
         mainHost = null
         hotspot.stop()
         sats.clear()
+        cameraConns.clear()
+        _camState.value = null
+        _camFrame.value = null
         _remote.value = emptyMap()
         setRemoteBands(emptyMap())
         if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
@@ -8641,6 +8648,14 @@ class PhoneRelay(
                 RelayMsg.STATUS -> onStatus(id, m)
                 RelayMsg.REPLAY -> onReplayPart(m)
                 RelayMsg.REPLAY_FAIL -> m.rid?.let { if (it == replayId) _replay.value = Replay.Failed }
+                // Telecamera comandata da qui: vale la prima collegata, come per la moviola.
+                RelayMsg.CAM_STATE -> if (id == firstCamera()) _camState.value = m.cam
+                RelayMsg.CAM_FRAME -> if (id == firstCamera()) m.data?.let { b64 ->
+                    val bmp = withContext(Dispatchers.Default) {
+                        runCatching { android.util.Base64.decode(b64, android.util.Base64.NO_WRAP).let { BitmapFactory.decodeByteArray(it, 0, it.size) } }.getOrNull()
+                    }
+                    if (bmp != null && id == firstCamera()) _camFrame.value = bmp
+                }
                 RelayMsg.BAND_STATUS -> {
                     val addr = m.addr ?: return@launch
                     val st = m.battery ?: return@launch
@@ -8705,6 +8720,58 @@ class PhoneRelay(
     /** Principale: un punto appena giocato, per i capitoli del video ([PointMark.at] sull'orologio di questo telefono). */
     fun publishPoint(p: PointMark) {
         if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
+    }
+
+    // ---------------------------------------------------------------- telecamera comandata dall'arbitro
+
+    private val _camState = MutableStateFlow<CamState?>(null)
+    /** Principale: come sta la telecamera (null finché non ha mandato niente, o se non c'è). */
+    val camState: StateFlow<CamState?> = _camState
+    private val _camFrame = MutableStateFlow<Bitmap?>(null)
+    /** Principale: l'ultimo fotogramma dell'inquadratura (solo mentre la si guarda). */
+    val camFrame: StateFlow<Bitmap?> = _camFrame
+
+    private fun firstCamera(): Int? = cameraConns.firstOrNull { it in sats }
+
+    /** Principale: un comando alla telecamera ([CamCmd]). false se non c'è nessuna telecamera. */
+    fun camCommand(cmd: String, zoom: Float? = null): Boolean {
+        val id = firstCamera() ?: return false
+        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom))
+        return true
+    }
+
+    /** Principale: chiude l'anteprima e lascia andare l'ultimo fotogramma. */
+    fun stopCamPreview() {
+        camCommand(CamCmd.PREVIEW_OFF)
+        _camFrame.value = null
+    }
+
+    private val _camCommands = MutableSharedFlow<RelayMsg>(extraBufferCapacity = 16)
+    /** Telecamera: i comandi arrivati dall'arbitro. */
+    val camCommands: SharedFlow<RelayMsg> = _camCommands
+    private val frameInFlight = AtomicBoolean(false)
+
+    /** Telecamera: lo stato, all'arbitro. */
+    fun sendCamState(st: CamState) {
+        val c = client ?: return
+        scope.launch(net) { c.send(RelayMsg(RelayMsg.CAM_STATE, cam = st)) }
+    }
+
+    /**
+     * Telecamera: un fotogramma JPEG. false (e non si manda) se il precedente non è ancora partito: con il Wi-Fi lento
+     * si saltano fotogrammi invece di accumularli.
+     */
+    fun sendCamFrame(jpeg: ByteArray): Boolean {
+        val c = client ?: return false
+        if (!frameInFlight.compareAndSet(false, true)) return false
+        scope.launch(net) {
+            try {
+                c.send(RelayMsg(RelayMsg.CAM_FRAME, data = android.util.Base64.encodeToString(jpeg, android.util.Base64.NO_WRAP)))
+            } finally {
+                frameInFlight.set(false)
+            }
+        }
+        return true
     }
 
     // ---------------------------------------------------------------- moviola
@@ -8807,6 +8874,10 @@ class PhoneRelay(
 
     private fun publishSatellites() {
         cameraConns.retainAll(sats.keys)
+        if (firstCamera() == null) {
+            _camState.value = null
+            _camFrame.value = null
+        }
         if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second }, cameras = cameraConns.size)
     }
 
@@ -8921,6 +8992,7 @@ class PhoneRelay(
                 // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
                 RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
+                RelayMsg.CAM_CMD -> if (_ui.value.camera) _camCommands.tryEmit(m)
                 RelayMsg.TV -> _ui.value = _ui.value.copy(tv = m.tv)
                 RelayMsg.BAND_OUT -> {
                     val side = ble.bands.value.entries.firstOrNull { it.value.address == m.addr }?.key ?: return@launch
@@ -9286,6 +9358,11 @@ data class RelayMsg(
     val parts: Int? = null,
     /** Moviola: -1 = dall'ultimo punto segnato a adesso, 0 = l'ultimo segnato, 1 = quello prima (null = ultimi [rlen] s). */
     val back: Int? = null,
+    /** Telecamera comandata dall'arbitro: comando ([CamCmd]) e livello di zoom per [CamCmd.ZOOM]. */
+    val cmd: String? = null,
+    val zoom: Float? = null,
+    /** Telecamera → principale: come sta (registrazione, diretta, zoom, batteria, spazio). */
+    val cam: CamState? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -9309,6 +9386,12 @@ data class RelayMsg(
         const val CHALLENGE = "challenge"
         const val REPLAY = "replay"
         const val REPLAY_FAIL = "replayfail"
+        /** Principale → telecamera: un comando ([cmd]). */
+        const val CAM_CMD = "camcmd"
+        /** Telecamera → principale: lo stato ([cam]), a ogni cambio e ogni pochi secondi. */
+        const val CAM_STATE = "camstate"
+        /** Telecamera → principale: un fotogramma dell'inquadratura, JPEG in base64 ([data]), solo se chiesto. */
+        const val CAM_FRAME = "camframe"
     }
 }
 
@@ -9328,6 +9411,44 @@ data class RelayStrapStatus(
 /** Come il satellite vede un braccialetto: collegato a lui e la carica. */
 @Serializable
 data class RelayBandStatus(val addr: String, val ready: Boolean, val battery: Int? = null)
+
+/**
+ * Comandi della telecamera dal telefono dell'arbitro. [PREVIEW] va ripetuto finché si guarda l'inquadratura: se non
+ * arriva più per [PREVIEW_TTL_MS] la telecamera smette di mandare fotogrammi (anche se il principale sparisce).
+ */
+object CamCmd {
+    const val PREVIEW = "preview"
+    const val PREVIEW_OFF = "preview_off"
+    const val REC_START = "rec_start"
+    const val REC_STOP = "rec_stop"
+    const val LIVE_START = "live_start"
+    const val LIVE_STOP = "live_stop"
+    const val OVERLAY_ON = "overlay_on"
+    const val OVERLAY_OFF = "overlay_off"
+    const val ZOOM = "zoom"
+    const val PREVIEW_TTL_MS = 8_000L
+}
+
+/**
+ * Stato della telecamera per il telefono dell'arbitro. [recMs]: da quanto registra; [live] 0 spenta, 1 in
+ * collegamento, 2 in onda; [liveReady] se la chiave della diretta c'è; zoom attuale e limiti; batteria in % e spazio
+ * libero in MB (null se non si sanno).
+ */
+@Serializable
+data class CamState(
+    val recording: Boolean = false,
+    val recMs: Long = 0L,
+    val live: Int = 0,
+    val liveReady: Boolean = false,
+    val overlay: Boolean = false,
+    val zoom: Float = 1f,
+    val zoomMin: Float = 1f,
+    val zoomMax: Float = 1f,
+    val battery: Int? = null,
+    val freeMb: Long? = null,
+    /** Ultimo messaggio della telecamera (salvato, diretta non riuscita…), da mostrare anche all'arbitro. */
+    val message: String? = null,
+)
 
 object RelayCodec {
     private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
@@ -11731,6 +11852,214 @@ private fun PanelButton(text: String, icon: ImageVector, modifier: Modifier, ena
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/CameraRemoteUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/CameraRemoteUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.os.SystemClock
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FiberManualRecord
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.relay.CamCmd
+import kotlinx.coroutines.delay
+
+/** Chip "Telecamera" in partita, accanto a "Moviola": c'è solo con un telefono-telecamera collegato. */
+@Composable
+fun CameraChip(c: MatchController) {
+    val s = LocalStrings.current
+    val relay by c.relay.ui.collectAsState()
+    val st by c.relay.camState.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    if (relay.cameras > 0) {
+        val rec = st?.recording == true
+        Pill(if (rec) "● " + s.camRemoteTitle else s.camRemoteTitle, if (rec) TsmColors.Danger else TsmColors.SurfaceHigh, TsmColors.TextMain, Icons.Filled.Videocam) { open = true }
+    }
+    if (open) CameraRemoteDialog(c) { open = false }
+}
+
+/**
+ * Telefono dell'arbitro: l'inquadratura del telefono-telecamera (spesso in alto, irraggiungibile) e i suoi comandi.
+ * Finché è aperta chiede i fotogrammi ogni 3 s; chiusa, la telecamera smette di mandarli.
+ */
+@Composable
+fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val relay by c.relay.ui.collectAsState()
+    val st by c.relay.camState.collectAsState()
+    val frame by c.relay.camFrame.collectAsState()
+    LaunchedEffect(Unit) {
+        while (true) {
+            c.relay.camCommand(CamCmd.PREVIEW)
+            delay(3_000)
+        }
+    }
+    DisposableEffect(Unit) { onDispose { c.relay.stopCamPreview() } }
+    // La durata della registrazione arriva ogni 3 s: in mezzo la si conta qui.
+    var stateAt by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
+    LaunchedEffect(st) { stateAt = SystemClock.elapsedRealtime() }
+    var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
+    LaunchedEffect(st?.recording) {
+        while (st?.recording == true) {
+            now = SystemClock.elapsedRealtime()
+            delay(500)
+        }
+    }
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(Modifier.fillMaxWidth().padding(10.dp), shape = RoundedCornerShape(18.dp), color = TsmColors.Surface) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Videocam, null, tint = TsmColors.Ball)
+                    Text("  " + s.camRemoteTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                    IconButton(onClick = onClose) { Icon(Icons.Filled.Close, s.back, tint = TsmColors.TextMain) }
+                }
+                Box(
+                    Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(10.dp)).background(Color.Black),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val f = frame
+                    when {
+                        relay.cameras == 0 -> Text(s.camRemoteGone, color = TsmColors.Orange)
+                        f != null -> Image(f.asImageBitmap(), null, Modifier.fillMaxWidth(), contentScale = ContentScale.Fit)
+                        else -> Row(verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(color = TsmColors.Ball)
+                            Text("  " + s.camRemoteWaiting, color = TsmColors.TextDim, fontSize = 13.sp)
+                        }
+                    }
+                    // Sopra l'immagine, come sul telefono-telecamera.
+                    val cam = st
+                    Row(Modifier.align(Alignment.TopStart).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (cam?.recording == true) Tag("● REC ${Reports.duration(cam.recMs + (now - stateAt).coerceAtLeast(0))}", TsmColors.Danger)
+                        when (cam?.live) {
+                            2 -> Tag("LIVE", TsmColors.Danger)
+                            1 -> Tag(s.cameraConnecting, TsmColors.Orange)
+                        }
+                    }
+                }
+                st?.let { cam ->
+                    val info = listOfNotNull(
+                        cam.battery?.let { s.camRemoteBattery(it) },
+                        cam.freeMb?.let { s.camRemoteFree(if (it >= 1024) "%.1f GB".format(it / 1024f) else "$it MB") },
+                    ).joinToString(" · ")
+                    if (info.isNotEmpty()) Text(info, color = if ((cam.battery ?: 100) < 20 || (cam.freeMb ?: Long.MAX_VALUE) < 2048) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+                    cam.message?.let { Text(it, color = TsmColors.TextMain, fontSize = 13.sp) }
+                }
+                val cam = st
+                val enabled = relay.cameras > 0 && cam != null
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val rec = cam?.recording == true
+                    Cmd(if (rec) Icons.Filled.Stop else Icons.Filled.FiberManualRecord, if (rec) s.cameraStopRec else s.cameraRec, TsmColors.Danger, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (rec) CamCmd.REC_STOP else CamCmd.REC_START)
+                    }
+                    val live = (cam?.live ?: 0) != 0
+                    Cmd(Icons.Filled.LiveTv, if (live) s.cameraStopLive else s.cameraGoLive, if (live) TsmColors.Danger else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (live) CamCmd.LIVE_STOP else CamCmd.LIVE_START)
+                    }
+                    val ov = cam?.overlay == true
+                    Cmd(Icons.Filled.Layers, s.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (ov) CamCmd.OVERLAY_OFF else CamCmd.OVERLAY_ON)
+                    }
+                }
+                if (cam != null && cam.zoomMax > cam.zoomMin) ZoomRow(c, cam.zoom, cam.zoomMin, cam.zoomMax)
+                Text(s.camRemoteHint, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+/** Zoom: cursore (il comando parte quando lo si lascia, per non intasare il Wi-Fi) e tasti − / +. */
+@Composable
+private fun ZoomRow(c: MatchController, zoom: Float, min: Float, max: Float) {
+    val s = LocalStrings.current
+    var drag by remember { mutableStateOf<Float?>(null) }
+    var local by remember { mutableFloatStateOf(zoom) }
+    LaunchedEffect(zoom) { if (drag == null) local = zoom }
+    val step = (max - min) / 10f
+    fun send(v: Float) {
+        local = v.coerceIn(min, max)
+        c.relay.camCommand(CamCmd.ZOOM, local)
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { send(local - step) }) { Icon(Icons.Filled.ZoomOut, s.camRemoteZoom, tint = TsmColors.TextMain) }
+        Slider(
+            value = drag ?: local, onValueChange = { drag = it }, valueRange = min..max,
+            onValueChangeFinished = { drag?.let { send(it) }; drag = null },
+            colors = SliderDefaults.colors(thumbColor = TsmColors.Ball, activeTrackColor = TsmColors.Ball),
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = { send(local + step) }) { Icon(Icons.Filled.ZoomIn, s.camRemoteZoom, tint = TsmColors.TextMain) }
+        Text("%.1f×".format(drag ?: local), color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
+
+@Composable
+private fun Tag(text: String, color: Color) {
+    Text(
+        text, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 12.sp,
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(color).padding(horizontal = 8.dp, vertical = 4.dp),
+    )
+}
+
+@Composable
+private fun Cmd(icon: ImageVector, label: String, color: Color, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(14.dp), color = if (enabled) color else TsmColors.SurfaceHigh, modifier = modifier) {
+        Column(Modifier.padding(vertical = 10.dp, horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, null, tint = if (enabled) TsmColors.TextMain else TsmColors.TextDim)
+            Text(label, color = if (enabled) TsmColors.TextMain else TsmColors.TextDim, fontSize = 12.sp, maxLines = 1)
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Components.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Components.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -12626,6 +12955,7 @@ fun RelaySection(c: MatchController, names: Names) {
     val relay by c.relay.ui.collectAsState()
     val context = LocalContext.current
     var showQr by remember { mutableStateOf(false) }
+    var camRemote by remember { mutableStateOf(false) }
     // Il QR serve sia al satellite sia alla telecamera: [asCamera] dice quale dei due si è scelto.
     var asCamera by remember { mutableStateOf(false) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r ->
@@ -12690,6 +13020,8 @@ fun RelaySection(c: MatchController, names: Names) {
             )
             relay.hotspot?.let { Text(s.relayOwnNetwork(it.ssid), color = TsmColors.TextDim, fontSize = 13.sp) }
             GhostButton(s.relayShowCode, Icons.Filled.QrCode2, { showQr = true }, Modifier.fillMaxWidth())
+            // Telefono-telecamera collegato: l'inquadratura e i comandi anche prima della partita, per sistemarlo.
+            if (relay.cameras > 0) GhostButton(s.camRemoteOpen, Icons.Filled.Videocam, { camRemote = true }, Modifier.fillMaxWidth())
             GhostButton(s.relayStop, Icons.Filled.Stop, { c.stopRelay() }, Modifier.fillMaxWidth())
         }
         RelayRole.SATELLITE -> {
@@ -12731,6 +13063,7 @@ fun RelaySection(c: MatchController, names: Names) {
         }
     }
     }
+    if (camRemote) CameraRemoteDialog(c) { camRemote = false }
     val url = relay.url
     if (showQr && relay.role == RelayRole.MAIN) {
         AlertDialog(
@@ -13160,6 +13493,16 @@ interface Strings {
     val cameraStreamSettings: String
     val cameraClose: String
     val cameraStopFirst: String
+    /** Telecamera comandata dal telefono dell'arbitro: inquadratura e comandi. */
+    val camRemoteTitle: String
+    val camRemoteOpen: String
+    val camRemoteHint: String
+    val camRemoteWaiting: String
+    val camRemoteGone: String
+    val camRemoteZoom: String
+    val camRemoteBattery: (Int) -> String
+    val camRemoteFree: (String) -> String
+    val cameraNoStreamKey: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -13982,6 +14325,15 @@ object ItStrings : Strings {
     override val cameraStreamSettings = "Diretta: server"
     override val cameraClose = "Chiudi"
     override val cameraStopFirst = "Prima ferma registrazione e diretta."
+    override val camRemoteTitle = "Telecamera"
+    override val camRemoteOpen = "Inquadratura e comandi della telecamera"
+    override val camRemoteHint = "Quello che vede il telefono-telecamera, come finisce nel video. I comandi valgono come sul suo schermo."
+    override val camRemoteWaiting = "In attesa dell'inquadratura…"
+    override val camRemoteGone = "Telecamera non collegata"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batteria $it%" }
+    override val camRemoteFree: (String) -> String = { "Libero $it" }
+    override val cameraNoStreamKey = "Manca la chiave della diretta: mettila sul telefono-telecamera (Impostazioni)."
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -14776,6 +15128,15 @@ object EnStrings : Strings {
     override val cameraStreamSettings = "Live: server"
     override val cameraClose = "Close"
     override val cameraStopFirst = "Stop recording and live stream first."
+    override val camRemoteTitle = "Camera"
+    override val camRemoteOpen = "Camera view and controls"
+    override val camRemoteHint = "What the camera phone sees, as it ends up in the video. The controls work as on its own screen."
+    override val camRemoteWaiting = "Waiting for the picture…"
+    override val camRemoteGone = "Camera not connected"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Battery $it%" }
+    override val camRemoteFree: (String) -> String = { "Free $it" }
+    override val cameraNoStreamKey = "No live stream key: set it on the camera phone (Settings)."
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"
@@ -15593,6 +15954,15 @@ object DeStrings : Strings {
     override val cameraStreamSettings = "Live: Server"
     override val cameraClose = "Schließen"
     override val cameraStopFirst = "Beende zuerst Aufnahme und Livestream."
+    override val camRemoteTitle = "Kamera"
+    override val camRemoteOpen = "Kamerabild und Steuerung"
+    override val camRemoteHint = "Was das Kamera-Telefon sieht, so wie es im Video landet. Die Tasten wirken wie auf seinem Bildschirm."
+    override val camRemoteWaiting = "Warten auf das Bild…"
+    override val camRemoteGone = "Kamera nicht verbunden"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Akku $it %" }
+    override val camRemoteFree: (String) -> String = { "Frei $it" }
+    override val cameraNoStreamKey = "Kein Stream-Schlüssel: auf dem Kamera-Telefon eintragen (Einstellungen)."
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
@@ -16402,6 +16772,15 @@ object EsStrings : Strings {
     override val cameraStreamSettings = "Directo: servidor"
     override val cameraClose = "Cerrar"
     override val cameraStopFirst = "Primero para la grabación y el directo."
+    override val camRemoteTitle = "Cámara"
+    override val camRemoteOpen = "Encuadre y mandos de la cámara"
+    override val camRemoteHint = "Lo que ve el teléfono-cámara, tal como queda en el vídeo. Los mandos funcionan como en su pantalla."
+    override val camRemoteWaiting = "Esperando la imagen…"
+    override val camRemoteGone = "Cámara no conectada"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batería $it %" }
+    override val camRemoteFree: (String) -> String = { "Libre $it" }
+    override val cameraNoStreamKey = "Falta la clave del directo: ponla en el teléfono-cámara (Ajustes)."
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"
@@ -17215,6 +17594,15 @@ object FrStrings : Strings {
     override val cameraStreamSettings = "Direct : serveur"
     override val cameraClose = "Fermer"
     override val cameraStopFirst = "Arrêtez d'abord l'enregistrement et le direct."
+    override val camRemoteTitle = "Caméra"
+    override val camRemoteOpen = "Cadrage et commandes de la caméra"
+    override val camRemoteHint = "Ce que voit le téléphone-caméra, tel qu'il finit dans la vidéo. Les commandes fonctionnent comme sur son écran."
+    override val camRemoteWaiting = "En attente de l'image…"
+    override val camRemoteGone = "Caméra non connectée"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batterie $it %" }
+    override val camRemoteFree: (String) -> String = { "Libre $it" }
+    override val cameraNoStreamKey = "Clé du direct manquante : saisissez-la sur le téléphone-caméra (Réglages)."
     override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Serveur RTMP"
     override val cameraStreamKey = "Clé de flux"
@@ -18027,6 +18415,15 @@ object PtStrings : Strings {
     override val cameraStreamSettings = "Ao vivo: servidor"
     override val cameraClose = "Fechar"
     override val cameraStopFirst = "Pare antes a gravação e a transmissão."
+    override val camRemoteTitle = "Câmera"
+    override val camRemoteOpen = "Enquadramento e comandos da câmera"
+    override val camRemoteHint = "O que o telefone-câmera vê, como fica no vídeo. Os comandos funcionam como na tela dele."
+    override val camRemoteWaiting = "Aguardando a imagem…"
+    override val camRemoteGone = "Câmera não conectada"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Bateria $it%" }
+    override val camRemoteFree: (String) -> String = { "Livre $it" }
+    override val cameraNoStreamKey = "Falta a chave da transmissão: coloque-a no telefone-câmera (Ajustes)."
     override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Chave da transmissão"
@@ -19359,6 +19756,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.CameraChip
 import com.tennis.scoremanager.ui.ReplayChip
 import com.tennis.scoremanager.ui.TvChip
 import com.tennis.scoremanager.ui.rememberArmed
@@ -19399,6 +19797,7 @@ fun MatchScreen(c: MatchController) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     TvChip(c)
                     ReplayChip(c)
+                    CameraChip(c)
                 }
             }
             if (o.mode == PlayMode.BANDS) BandStatusRow(bands, c.bandBattery.collectAsState().value) { bandSheet = it }
@@ -23566,10 +23965,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.pedro.common.ConnectChecker
 import com.pedro.encoder.input.gl.render.filters.`object`.ImageFilterRender
+import com.pedro.encoder.input.sources.video.Camera2Source
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.library.generic.GenericStream
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.relay.CamCmd
+import com.tennis.scoremanager.relay.CamState
+import com.tennis.scoremanager.relay.RelayMsg
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
@@ -23580,6 +23983,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23589,7 +23993,8 @@ import java.util.Locale
  * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
  * (RTMP: YouTube, Twitch, un server proprio), con la grafica del punteggio che arriva dal telefono dell'arbitro
  * (vedi PhoneRelay, ruolo "camera"). Ogni punto ricevuto durante la registrazione diventa un capitolo, salvato
- * accanto al video (file .json con lo stesso nome).
+ * accanto al video (file .json con lo stesso nome). Spesso sta in alto, lontano: l'arbitro ne vede l'inquadratura e la
+ * comanda dal suo telefono (registra, diretta, grafica, zoom; vedi CameraRemoteActivity).
  */
 class CameraActivity : ComponentActivity() {
 
@@ -23601,6 +24006,11 @@ class CameraActivity : ComponentActivity() {
     private val recordSince = MutableStateFlow(0L)
     private val message = MutableStateFlow<String?>(null)
     private val permsOk = MutableStateFlow(false)
+    private val overlayOn = MutableStateFlow(false)
+    private val zoom = MutableStateFlow(1f)
+    /** Fino a quando mandare l'inquadratura all'arbitro (si allunga a ogni sua richiesta). */
+    @Volatile private var previewUntil = 0L
+    private var previewJob: kotlinx.coroutines.Job? = null
 
     private enum class LiveState { OFF, CONNECTING, ON }
 
@@ -23637,6 +24047,7 @@ class CameraActivity : ComponentActivity() {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+        overlayOn.value = controller.storage.cameraOverlay
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { Content() } }
@@ -23649,6 +24060,17 @@ class CameraActivity : ComponentActivity() {
                 // Per la moviola: gli ultimi punti con la loro ora (anche senza registrare la partita).
                 recentPoints.addLast(p)
                 while (recentPoints.size > 30) recentPoints.removeFirst()
+            }
+        }
+        // Comandi dall'arbitro, e lo stato che gli torna: a ogni cambio e ogni 3 s (durata, batteria, spazio).
+        lifecycleScope.launch { controller.relay.camCommands.collect { onRemote(it) } }
+        lifecycleScope.launch {
+            kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
+        }
+        lifecycleScope.launch {
+            while (true) {
+                delay(3_000)
+                sendState()
             }
         }
         // Moviola chiesta dall'arbitro: gli ultimi secondi, subito, al suo telefono.
@@ -23700,6 +24122,91 @@ class CameraActivity : ComponentActivity() {
         prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
+    }
+
+    // ---------------------------------------------------------------- comandi dall'arbitro
+
+    private fun onRemote(m: RelayMsg) {
+        when (m.cmd) {
+            CamCmd.PREVIEW -> {
+                previewUntil = SystemClock.elapsedRealtime() + CamCmd.PREVIEW_TTL_MS
+                if (previewJob?.isActive != true) previewJob = lifecycleScope.launch { sendPreview() }
+            }
+            CamCmd.PREVIEW_OFF -> previewUntil = 0L
+            CamCmd.REC_START -> if (!recording.value) toggleRecord()
+            CamCmd.REC_STOP -> if (recording.value) toggleRecord()
+            CamCmd.LIVE_START -> if (live.value == LiveState.OFF) toggleLive { message.value = s.cameraNoStreamKey }
+            CamCmd.LIVE_STOP -> if (live.value != LiveState.OFF) toggleLive {}
+            CamCmd.OVERLAY_ON -> setOverlay(true)
+            CamCmd.OVERLAY_OFF -> setOverlay(false)
+            CamCmd.ZOOM -> m.zoom?.let { setZoom(it) }
+        }
+    }
+
+    private fun camera(): Camera2Source? = stream?.videoSource as? Camera2Source
+
+    private fun setZoom(z: Float) {
+        val cam = camera() ?: return
+        val r = runCatching { cam.getZoomRange() }.getOrNull() ?: return
+        val v = z.coerceIn(r.lower, r.upper)
+        runCatching { cam.setZoom(v) }
+        zoom.value = v
+    }
+
+    private fun sendState() {
+        val cam = camera()
+        val range = cam?.let { runCatching { it.getZoomRange() }.getOrNull() }
+        val battery = runCatching {
+            getSystemService(android.os.BatteryManager::class.java).getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        }.getOrNull()?.takeIf { it in 0..100 }
+        val free = runCatching { (getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir).usableSpace / (1024 * 1024) }.getOrNull()
+        controller.relay.sendCamState(
+            CamState(
+                recording = recording.value,
+                recMs = if (recording.value) SystemClock.elapsedRealtime() - recordSince.value else 0L,
+                live = when (live.value) { LiveState.OFF -> 0; LiveState.CONNECTING -> 1; LiveState.ON -> 2 },
+                liveReady = controller.storage.streamKey.isNotEmpty(),
+                overlay = overlayOn.value,
+                zoom = zoom.value,
+                zoomMin = range?.lower ?: 1f,
+                zoomMax = range?.upper ?: 1f,
+                battery = battery,
+                freeMb = free,
+                message = message.value,
+            ),
+        )
+    }
+
+    /**
+     * Inquadratura all'arbitro finché la chiede: un fotogramma piccolo (640×360, JPEG) circa tre volte al secondo,
+     * preso dopo la grafica, cioè come finisce nel video.
+     */
+    private suspend fun sendPreview() {
+        while (SystemClock.elapsedRealtime() < previewUntil) {
+            val st = stream
+            if (st != null && st.isOnPreview) {
+                val bmp = kotlinx.coroutines.withTimeoutOrNull(1_500) {
+                    kotlinx.coroutines.suspendCancellableCoroutine<android.graphics.Bitmap?> { cont ->
+                        runCatching { st.getGlInterface().takePhoto { b -> if (cont.isActive) cont.resumeWith(Result.success(b)) } }
+                            .onFailure { if (cont.isActive) cont.resumeWith(Result.success(null)) }
+                    }
+                }
+                if (bmp != null) {
+                    val jpeg = withContext(Dispatchers.Default) {
+                        val small = android.graphics.Bitmap.createScaledBitmap(bmp, PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1), true)
+                        ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, it) }.toByteArray()
+                    }
+                    controller.relay.sendCamFrame(jpeg)
+                }
+            }
+            delay(PREVIEW_EVERY_MS)
+        }
+    }
+
+    private fun setOverlay(on: Boolean) {
+        controller.storage.cameraOverlay = on
+        overlayOn.value = on
+        updateOverlay()
     }
 
     // ---------------------------------------------------------------- grafica
@@ -23906,10 +24413,8 @@ class CameraActivity : ComponentActivity() {
                 Btn(Icons.Filled.LiveTv, if (lv == LiveState.OFF) str.cameraGoLive else str.cameraStopLive, if (lv == LiveState.OFF) TsmColors.SurfaceHigh else TsmColors.Danger) {
                     toggleLive(onSettings)
                 }
-                Btn(Icons.Filled.Layers, str.cameraOverlay, if (controller.storage.cameraOverlay) TsmColors.Ok else TsmColors.SurfaceHigh) {
-                    controller.storage.cameraOverlay = !controller.storage.cameraOverlay
-                    updateOverlay()
-                }
+                val ov by overlayOn.collectAsState()
+                Btn(Icons.Filled.Layers, str.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh) { setOverlay(!ov) }
                 Btn(Icons.Filled.Settings, str.cameraStreamUrl, TsmColors.SurfaceHigh) { onSettings() }
                 Btn(Icons.AutoMirrored.Filled.ExitToApp, str.cameraClose, TsmColors.SurfaceHigh) {
                     if (rec || lv != LiveState.OFF) Toast.makeText(this@CameraActivity, str.cameraStopFirst, Toast.LENGTH_SHORT).show() else finish()
@@ -23968,6 +24473,9 @@ class CameraActivity : ComponentActivity() {
         private const val HEIGHT = 1080
         /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
         private const val VIDEO_BITRATE = 6_000_000
+        /** Inquadratura per l'arbitro: larghezza dei fotogrammi e ogni quanto. */
+        private const val PREVIEW_W = 640
+        private const val PREVIEW_EVERY_MS = 330L
     }
 }
 
@@ -40000,6 +40508,18 @@ class RelayProtocolTest {
         assertEquals(listOf(4, 9), filled.t)
         assertEquals(listOf(110, 90), filled.bpm)
     }
+
+    @Test
+    fun cameraRemoteMessagesRoundTrip() {
+        val st = CamState(recording = true, recMs = 65_000, live = 2, liveReady = true, overlay = true, zoom = 2.5f, zoomMin = 1f, zoomMax = 8f, battery = 41, freeMb = 12_000)
+        assertEquals(st, RelayCodec.decode(RelayCodec.encode(RelayMsg(RelayMsg.CAM_STATE, cam = st)))?.cam)
+        val cmd = RelayCodec.decode(RelayCodec.encode(RelayMsg(RelayMsg.CAM_CMD, cmd = CamCmd.ZOOM, zoom = 3f)))
+        assertEquals(CamCmd.ZOOM, cmd?.cmd)
+        assertEquals(3f, cmd?.zoom)
+        // Una versione vecchia dell'app ignora i campi nuovi; uno stato senza campi vale "tutto spento".
+        assertEquals(CamState(), RelayCodec.decode("""{"t":"camstate","cam":{}}""")?.cam)
+        assertEquals(RelayMsg.PING, RelayCodec.decode("""{"t":"ping","cmd":"x","cam":{"recording":true}}""")?.t)
+    }
 }
 TSM_EOF
 
@@ -40506,8 +41026,8 @@ class StringsTest {
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
-            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", uguali in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 45)
+            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", uguali in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 48)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -45721,6 +46241,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 140 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 141 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

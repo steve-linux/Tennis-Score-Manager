@@ -4,6 +4,8 @@
 package com.tennis.scoremanager.relay
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import com.tennis.scoremanager.ble.BandStatus
@@ -30,10 +32,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.tennis.scoremanager.video.ReplayRecorder
 import java.io.File
 import java.net.Socket
 import java.security.SecureRandom
+import java.util.concurrent.atomic.AtomicBoolean
 
 enum class RelayRole { OFF, MAIN, SATELLITE }
 
@@ -252,6 +256,9 @@ class PhoneRelay(
         mainHost = null
         hotspot.stop()
         sats.clear()
+        cameraConns.clear()
+        _camState.value = null
+        _camFrame.value = null
         _remote.value = emptyMap()
         setRemoteBands(emptyMap())
         if (_ui.value.role == RelayRole.MAIN) _ui.value = RelayUi()
@@ -286,6 +293,14 @@ class PhoneRelay(
                 RelayMsg.STATUS -> onStatus(id, m)
                 RelayMsg.REPLAY -> onReplayPart(m)
                 RelayMsg.REPLAY_FAIL -> m.rid?.let { if (it == replayId) _replay.value = Replay.Failed }
+                // Telecamera comandata da qui: vale la prima collegata, come per la moviola.
+                RelayMsg.CAM_STATE -> if (id == firstCamera()) _camState.value = m.cam
+                RelayMsg.CAM_FRAME -> if (id == firstCamera()) m.data?.let { b64 ->
+                    val bmp = withContext(Dispatchers.Default) {
+                        runCatching { android.util.Base64.decode(b64, android.util.Base64.NO_WRAP).let { BitmapFactory.decodeByteArray(it, 0, it.size) } }.getOrNull()
+                    }
+                    if (bmp != null && id == firstCamera()) _camFrame.value = bmp
+                }
                 RelayMsg.BAND_STATUS -> {
                     val addr = m.addr ?: return@launch
                     val st = m.battery ?: return@launch
@@ -350,6 +365,58 @@ class PhoneRelay(
     /** Principale: un punto appena giocato, per i capitoli del video ([PointMark.at] sull'orologio di questo telefono). */
     fun publishPoint(p: PointMark) {
         if (_ui.value.role == RelayRole.MAIN) broadcast(RelayMsg(RelayMsg.POINT, point = p))
+    }
+
+    // ---------------------------------------------------------------- telecamera comandata dall'arbitro
+
+    private val _camState = MutableStateFlow<CamState?>(null)
+    /** Principale: come sta la telecamera (null finché non ha mandato niente, o se non c'è). */
+    val camState: StateFlow<CamState?> = _camState
+    private val _camFrame = MutableStateFlow<Bitmap?>(null)
+    /** Principale: l'ultimo fotogramma dell'inquadratura (solo mentre la si guarda). */
+    val camFrame: StateFlow<Bitmap?> = _camFrame
+
+    private fun firstCamera(): Int? = cameraConns.firstOrNull { it in sats }
+
+    /** Principale: un comando alla telecamera ([CamCmd]). false se non c'è nessuna telecamera. */
+    fun camCommand(cmd: String, zoom: Float? = null): Boolean {
+        val id = firstCamera() ?: return false
+        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom))
+        return true
+    }
+
+    /** Principale: chiude l'anteprima e lascia andare l'ultimo fotogramma. */
+    fun stopCamPreview() {
+        camCommand(CamCmd.PREVIEW_OFF)
+        _camFrame.value = null
+    }
+
+    private val _camCommands = MutableSharedFlow<RelayMsg>(extraBufferCapacity = 16)
+    /** Telecamera: i comandi arrivati dall'arbitro. */
+    val camCommands: SharedFlow<RelayMsg> = _camCommands
+    private val frameInFlight = AtomicBoolean(false)
+
+    /** Telecamera: lo stato, all'arbitro. */
+    fun sendCamState(st: CamState) {
+        val c = client ?: return
+        scope.launch(net) { c.send(RelayMsg(RelayMsg.CAM_STATE, cam = st)) }
+    }
+
+    /**
+     * Telecamera: un fotogramma JPEG. false (e non si manda) se il precedente non è ancora partito: con il Wi-Fi lento
+     * si saltano fotogrammi invece di accumularli.
+     */
+    fun sendCamFrame(jpeg: ByteArray): Boolean {
+        val c = client ?: return false
+        if (!frameInFlight.compareAndSet(false, true)) return false
+        scope.launch(net) {
+            try {
+                c.send(RelayMsg(RelayMsg.CAM_FRAME, data = android.util.Base64.encodeToString(jpeg, android.util.Base64.NO_WRAP)))
+            } finally {
+                frameInFlight.set(false)
+            }
+        }
+        return true
     }
 
     // ---------------------------------------------------------------- moviola
@@ -452,6 +519,10 @@ class PhoneRelay(
 
     private fun publishSatellites() {
         cameraConns.retainAll(sats.keys)
+        if (firstCamera() == null) {
+            _camState.value = null
+            _camFrame.value = null
+        }
         if (_ui.value.role == RelayRole.MAIN) _ui.value = _ui.value.copy(satellites = sats.values.map { it.second }, cameras = cameraConns.size)
     }
 
@@ -566,6 +637,7 @@ class PhoneRelay(
                 // L'ora del punto arriva sull'orologio del principale: la si riporta su quello di questo telefono.
                 RelayMsg.POINT -> m.point?.let { p -> _points.tryEmit(p.copy(at = p.at - (clock.offset ?: 0L))) }
                 RelayMsg.MATCH -> currentMatch = m.match.orEmpty()
+                RelayMsg.CAM_CMD -> if (_ui.value.camera) _camCommands.tryEmit(m)
                 RelayMsg.TV -> _ui.value = _ui.value.copy(tv = m.tv)
                 RelayMsg.BAND_OUT -> {
                     val side = ble.bands.value.entries.firstOrNull { it.value.address == m.addr }?.key ?: return@launch

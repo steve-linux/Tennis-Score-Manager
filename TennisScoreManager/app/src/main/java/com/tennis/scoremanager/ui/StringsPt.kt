@@ -179,6 +179,15 @@ object PtStrings : Strings {
     override val cameraStreamSettings = "Ao vivo: servidor"
     override val cameraClose = "Fechar"
     override val cameraStopFirst = "Pare antes a gravação e a transmissão."
+    override val camRemoteTitle = "Câmera"
+    override val camRemoteOpen = "Enquadramento e comandos da câmera"
+    override val camRemoteHint = "O que o telefone-câmera vê, como fica no vídeo. Os comandos funcionam como na tela dele."
+    override val camRemoteWaiting = "Aguardando a imagem…"
+    override val camRemoteGone = "Câmera não conectada"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Bateria $it%" }
+    override val camRemoteFree: (String) -> String = { "Livre $it" }
+    override val cameraNoStreamKey = "Falta a chave da transmissão: coloque-a no telefone-câmera (Ajustes)."
     override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Chave da transmissão"

@@ -179,6 +179,15 @@ object FrStrings : Strings {
     override val cameraStreamSettings = "Direct : serveur"
     override val cameraClose = "Fermer"
     override val cameraStopFirst = "Arrêtez d'abord l'enregistrement et le direct."
+    override val camRemoteTitle = "Caméra"
+    override val camRemoteOpen = "Cadrage et commandes de la caméra"
+    override val camRemoteHint = "Ce que voit le téléphone-caméra, tel qu'il finit dans la vidéo. Les commandes fonctionnent comme sur son écran."
+    override val camRemoteWaiting = "En attente de l'image…"
+    override val camRemoteGone = "Caméra non connectée"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batterie $it %" }
+    override val camRemoteFree: (String) -> String = { "Libre $it" }
+    override val cameraNoStreamKey = "Clé du direct manquante : saisissez-la sur le téléphone-caméra (Réglages)."
     override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Serveur RTMP"
     override val cameraStreamKey = "Clé de flux"

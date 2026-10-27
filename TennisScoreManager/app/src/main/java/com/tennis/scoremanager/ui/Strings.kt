@@ -188,6 +188,16 @@ interface Strings {
     val cameraStreamSettings: String
     val cameraClose: String
     val cameraStopFirst: String
+    /** Telecamera comandata dal telefono dell'arbitro: inquadratura e comandi. */
+    val camRemoteTitle: String
+    val camRemoteOpen: String
+    val camRemoteHint: String
+    val camRemoteWaiting: String
+    val camRemoteGone: String
+    val camRemoteZoom: String
+    val camRemoteBattery: (Int) -> String
+    val camRemoteFree: (String) -> String
+    val cameraNoStreamKey: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -1010,6 +1020,15 @@ object ItStrings : Strings {
     override val cameraStreamSettings = "Diretta: server"
     override val cameraClose = "Chiudi"
     override val cameraStopFirst = "Prima ferma registrazione e diretta."
+    override val camRemoteTitle = "Telecamera"
+    override val camRemoteOpen = "Inquadratura e comandi della telecamera"
+    override val camRemoteHint = "Quello che vede il telefono-telecamera, come finisce nel video. I comandi valgono come sul suo schermo."
+    override val camRemoteWaiting = "In attesa dell'inquadratura…"
+    override val camRemoteGone = "Telecamera non collegata"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batteria $it%" }
+    override val camRemoteFree: (String) -> String = { "Libero $it" }
+    override val cameraNoStreamKey = "Manca la chiave della diretta: mettila sul telefono-telecamera (Impostazioni)."
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -1804,6 +1823,15 @@ object EnStrings : Strings {
     override val cameraStreamSettings = "Live: server"
     override val cameraClose = "Close"
     override val cameraStopFirst = "Stop recording and live stream first."
+    override val camRemoteTitle = "Camera"
+    override val camRemoteOpen = "Camera view and controls"
+    override val camRemoteHint = "What the camera phone sees, as it ends up in the video. The controls work as on its own screen."
+    override val camRemoteWaiting = "Waiting for the picture…"
+    override val camRemoteGone = "Camera not connected"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Battery $it%" }
+    override val camRemoteFree: (String) -> String = { "Free $it" }
+    override val cameraNoStreamKey = "No live stream key: set it on the camera phone (Settings)."
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"

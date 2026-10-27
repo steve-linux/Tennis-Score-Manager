@@ -63,10 +63,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.pedro.common.ConnectChecker
 import com.pedro.encoder.input.gl.render.filters.`object`.ImageFilterRender
+import com.pedro.encoder.input.sources.video.Camera2Source
 import com.pedro.encoder.input.video.CameraHelper
 import com.pedro.library.generic.GenericStream
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.relay.CamCmd
+import com.tennis.scoremanager.relay.CamState
+import com.tennis.scoremanager.relay.RelayMsg
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
@@ -77,6 +81,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -86,7 +91,8 @@ import java.util.Locale
  * Telefono-telecamera: dietro il campo, al centro. Registra la partita in MP4 1080p e può trasmetterla in diretta
  * (RTMP: YouTube, Twitch, un server proprio), con la grafica del punteggio che arriva dal telefono dell'arbitro
  * (vedi PhoneRelay, ruolo "camera"). Ogni punto ricevuto durante la registrazione diventa un capitolo, salvato
- * accanto al video (file .json con lo stesso nome).
+ * accanto al video (file .json con lo stesso nome). Spesso sta in alto, lontano: l'arbitro ne vede l'inquadratura e la
+ * comanda dal suo telefono (registra, diretta, grafica, zoom; vedi CameraRemoteActivity).
  */
 class CameraActivity : ComponentActivity() {
 
@@ -98,6 +104,11 @@ class CameraActivity : ComponentActivity() {
     private val recordSince = MutableStateFlow(0L)
     private val message = MutableStateFlow<String?>(null)
     private val permsOk = MutableStateFlow(false)
+    private val overlayOn = MutableStateFlow(false)
+    private val zoom = MutableStateFlow(1f)
+    /** Fino a quando mandare l'inquadratura all'arbitro (si allunga a ogni sua richiesta). */
+    @Volatile private var previewUntil = 0L
+    private var previewJob: kotlinx.coroutines.Job? = null
 
     private enum class LiveState { OFF, CONNECTING, ON }
 
@@ -134,6 +145,7 @@ class CameraActivity : ComponentActivity() {
             hide(WindowInsetsCompat.Type.systemBars())
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+        overlayOn.value = controller.storage.cameraOverlay
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { Content() } }
@@ -146,6 +158,17 @@ class CameraActivity : ComponentActivity() {
                 // Per la moviola: gli ultimi punti con la loro ora (anche senza registrare la partita).
                 recentPoints.addLast(p)
                 while (recentPoints.size > 30) recentPoints.removeFirst()
+            }
+        }
+        // Comandi dall'arbitro, e lo stato che gli torna: a ogni cambio e ogni 3 s (durata, batteria, spazio).
+        lifecycleScope.launch { controller.relay.camCommands.collect { onRemote(it) } }
+        lifecycleScope.launch {
+            kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
+        }
+        lifecycleScope.launch {
+            while (true) {
+                delay(3_000)
+                sendState()
             }
         }
         // Moviola chiesta dall'arbitro: gli ultimi secondi, subito, al suo telefono.
@@ -197,6 +220,91 @@ class CameraActivity : ComponentActivity() {
         prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
+    }
+
+    // ---------------------------------------------------------------- comandi dall'arbitro
+
+    private fun onRemote(m: RelayMsg) {
+        when (m.cmd) {
+            CamCmd.PREVIEW -> {
+                previewUntil = SystemClock.elapsedRealtime() + CamCmd.PREVIEW_TTL_MS
+                if (previewJob?.isActive != true) previewJob = lifecycleScope.launch { sendPreview() }
+            }
+            CamCmd.PREVIEW_OFF -> previewUntil = 0L
+            CamCmd.REC_START -> if (!recording.value) toggleRecord()
+            CamCmd.REC_STOP -> if (recording.value) toggleRecord()
+            CamCmd.LIVE_START -> if (live.value == LiveState.OFF) toggleLive { message.value = s.cameraNoStreamKey }
+            CamCmd.LIVE_STOP -> if (live.value != LiveState.OFF) toggleLive {}
+            CamCmd.OVERLAY_ON -> setOverlay(true)
+            CamCmd.OVERLAY_OFF -> setOverlay(false)
+            CamCmd.ZOOM -> m.zoom?.let { setZoom(it) }
+        }
+    }
+
+    private fun camera(): Camera2Source? = stream?.videoSource as? Camera2Source
+
+    private fun setZoom(z: Float) {
+        val cam = camera() ?: return
+        val r = runCatching { cam.getZoomRange() }.getOrNull() ?: return
+        val v = z.coerceIn(r.lower, r.upper)
+        runCatching { cam.setZoom(v) }
+        zoom.value = v
+    }
+
+    private fun sendState() {
+        val cam = camera()
+        val range = cam?.let { runCatching { it.getZoomRange() }.getOrNull() }
+        val battery = runCatching {
+            getSystemService(android.os.BatteryManager::class.java).getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        }.getOrNull()?.takeIf { it in 0..100 }
+        val free = runCatching { (getExternalFilesDir(Environment.DIRECTORY_MOVIES) ?: filesDir).usableSpace / (1024 * 1024) }.getOrNull()
+        controller.relay.sendCamState(
+            CamState(
+                recording = recording.value,
+                recMs = if (recording.value) SystemClock.elapsedRealtime() - recordSince.value else 0L,
+                live = when (live.value) { LiveState.OFF -> 0; LiveState.CONNECTING -> 1; LiveState.ON -> 2 },
+                liveReady = controller.storage.streamKey.isNotEmpty(),
+                overlay = overlayOn.value,
+                zoom = zoom.value,
+                zoomMin = range?.lower ?: 1f,
+                zoomMax = range?.upper ?: 1f,
+                battery = battery,
+                freeMb = free,
+                message = message.value,
+            ),
+        )
+    }
+
+    /**
+     * Inquadratura all'arbitro finché la chiede: un fotogramma piccolo (640×360, JPEG) circa tre volte al secondo,
+     * preso dopo la grafica, cioè come finisce nel video.
+     */
+    private suspend fun sendPreview() {
+        while (SystemClock.elapsedRealtime() < previewUntil) {
+            val st = stream
+            if (st != null && st.isOnPreview) {
+                val bmp = kotlinx.coroutines.withTimeoutOrNull(1_500) {
+                    kotlinx.coroutines.suspendCancellableCoroutine<android.graphics.Bitmap?> { cont ->
+                        runCatching { st.getGlInterface().takePhoto { b -> if (cont.isActive) cont.resumeWith(Result.success(b)) } }
+                            .onFailure { if (cont.isActive) cont.resumeWith(Result.success(null)) }
+                    }
+                }
+                if (bmp != null) {
+                    val jpeg = withContext(Dispatchers.Default) {
+                        val small = android.graphics.Bitmap.createScaledBitmap(bmp, PREVIEW_W, PREVIEW_W * bmp.height / bmp.width.coerceAtLeast(1), true)
+                        ByteArrayOutputStream().also { small.compress(android.graphics.Bitmap.CompressFormat.JPEG, 55, it) }.toByteArray()
+                    }
+                    controller.relay.sendCamFrame(jpeg)
+                }
+            }
+            delay(PREVIEW_EVERY_MS)
+        }
+    }
+
+    private fun setOverlay(on: Boolean) {
+        controller.storage.cameraOverlay = on
+        overlayOn.value = on
+        updateOverlay()
     }
 
     // ---------------------------------------------------------------- grafica
@@ -403,10 +511,8 @@ class CameraActivity : ComponentActivity() {
                 Btn(Icons.Filled.LiveTv, if (lv == LiveState.OFF) str.cameraGoLive else str.cameraStopLive, if (lv == LiveState.OFF) TsmColors.SurfaceHigh else TsmColors.Danger) {
                     toggleLive(onSettings)
                 }
-                Btn(Icons.Filled.Layers, str.cameraOverlay, if (controller.storage.cameraOverlay) TsmColors.Ok else TsmColors.SurfaceHigh) {
-                    controller.storage.cameraOverlay = !controller.storage.cameraOverlay
-                    updateOverlay()
-                }
+                val ov by overlayOn.collectAsState()
+                Btn(Icons.Filled.Layers, str.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh) { setOverlay(!ov) }
                 Btn(Icons.Filled.Settings, str.cameraStreamUrl, TsmColors.SurfaceHigh) { onSettings() }
                 Btn(Icons.AutoMirrored.Filled.ExitToApp, str.cameraClose, TsmColors.SurfaceHigh) {
                     if (rec || lv != LiveState.OFF) Toast.makeText(this@CameraActivity, str.cameraStopFirst, Toast.LENGTH_SHORT).show() else finish()
@@ -465,6 +571,9 @@ class CameraActivity : ComponentActivity() {
         private const val HEIGHT = 1080
         /** 6 Mbit/s: quanto chiede YouTube per il 1080p a 30 fotogrammi. */
         private const val VIDEO_BITRATE = 6_000_000
+        /** Inquadratura per l'arbitro: larghezza dei fotogrammi e ogni quanto. */
+        private const val PREVIEW_W = 640
+        private const val PREVIEW_EVERY_MS = 330L
     }
 }
 

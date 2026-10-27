@@ -72,6 +72,11 @@ data class RelayMsg(
     val parts: Int? = null,
     /** Moviola: -1 = dall'ultimo punto segnato a adesso, 0 = l'ultimo segnato, 1 = quello prima (null = ultimi [rlen] s). */
     val back: Int? = null,
+    /** Telecamera comandata dall'arbitro: comando ([CamCmd]) e livello di zoom per [CamCmd.ZOOM]. */
+    val cmd: String? = null,
+    val zoom: Float? = null,
+    /** Telecamera → principale: come sta (registrazione, diretta, zoom, batteria, spazio). */
+    val cam: CamState? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -95,6 +100,12 @@ data class RelayMsg(
         const val CHALLENGE = "challenge"
         const val REPLAY = "replay"
         const val REPLAY_FAIL = "replayfail"
+        /** Principale → telecamera: un comando ([cmd]). */
+        const val CAM_CMD = "camcmd"
+        /** Telecamera → principale: lo stato ([cam]), a ogni cambio e ogni pochi secondi. */
+        const val CAM_STATE = "camstate"
+        /** Telecamera → principale: un fotogramma dell'inquadratura, JPEG in base64 ([data]), solo se chiesto. */
+        const val CAM_FRAME = "camframe"
     }
 }
 
@@ -114,6 +125,44 @@ data class RelayStrapStatus(
 /** Come il satellite vede un braccialetto: collegato a lui e la carica. */
 @Serializable
 data class RelayBandStatus(val addr: String, val ready: Boolean, val battery: Int? = null)
+
+/**
+ * Comandi della telecamera dal telefono dell'arbitro. [PREVIEW] va ripetuto finché si guarda l'inquadratura: se non
+ * arriva più per [PREVIEW_TTL_MS] la telecamera smette di mandare fotogrammi (anche se il principale sparisce).
+ */
+object CamCmd {
+    const val PREVIEW = "preview"
+    const val PREVIEW_OFF = "preview_off"
+    const val REC_START = "rec_start"
+    const val REC_STOP = "rec_stop"
+    const val LIVE_START = "live_start"
+    const val LIVE_STOP = "live_stop"
+    const val OVERLAY_ON = "overlay_on"
+    const val OVERLAY_OFF = "overlay_off"
+    const val ZOOM = "zoom"
+    const val PREVIEW_TTL_MS = 8_000L
+}
+
+/**
+ * Stato della telecamera per il telefono dell'arbitro. [recMs]: da quanto registra; [live] 0 spenta, 1 in
+ * collegamento, 2 in onda; [liveReady] se la chiave della diretta c'è; zoom attuale e limiti; batteria in % e spazio
+ * libero in MB (null se non si sanno).
+ */
+@Serializable
+data class CamState(
+    val recording: Boolean = false,
+    val recMs: Long = 0L,
+    val live: Int = 0,
+    val liveReady: Boolean = false,
+    val overlay: Boolean = false,
+    val zoom: Float = 1f,
+    val zoomMin: Float = 1f,
+    val zoomMax: Float = 1f,
+    val battery: Int? = null,
+    val freeMb: Long? = null,
+    /** Ultimo messaggio della telecamera (salvato, diretta non riuscita…), da mostrare anche all'arbitro. */
+    val message: String? = null,
+)
 
 object RelayCodec {
     private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }

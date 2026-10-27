@@ -176,6 +176,15 @@ object EsStrings : Strings {
     override val cameraStreamSettings = "Directo: servidor"
     override val cameraClose = "Cerrar"
     override val cameraStopFirst = "Primero para la grabación y el directo."
+    override val camRemoteTitle = "Cámara"
+    override val camRemoteOpen = "Encuadre y mandos de la cámara"
+    override val camRemoteHint = "Lo que ve el teléfono-cámara, tal como queda en el vídeo. Los mandos funcionan como en su pantalla."
+    override val camRemoteWaiting = "Esperando la imagen…"
+    override val camRemoteGone = "Cámara no conectada"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Batería $it %" }
+    override val camRemoteFree: (String) -> String = { "Libre $it" }
+    override val cameraNoStreamKey = "Falta la clave del directo: ponla en el teléfono-cámara (Ajustes)."
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"

@@ -176,6 +176,15 @@ object DeStrings : Strings {
     override val cameraStreamSettings = "Live: Server"
     override val cameraClose = "Schließen"
     override val cameraStopFirst = "Beende zuerst Aufnahme und Livestream."
+    override val camRemoteTitle = "Kamera"
+    override val camRemoteOpen = "Kamerabild und Steuerung"
+    override val camRemoteHint = "Was das Kamera-Telefon sieht, so wie es im Video landet. Die Tasten wirken wie auf seinem Bildschirm."
+    override val camRemoteWaiting = "Warten auf das Bild…"
+    override val camRemoteGone = "Kamera nicht verbunden"
+    override val camRemoteZoom = "Zoom"
+    override val camRemoteBattery: (Int) -> String = { "Akku $it %" }
+    override val camRemoteFree: (String) -> String = { "Frei $it" }
+    override val cameraNoStreamKey = "Kein Stream-Schlüssel: auf dem Kamera-Telefon eintragen (Einstellungen)."
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
