@@ -931,6 +931,11 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Feel
+import com.tennis.scoremanager.data.Racket
+import com.tennis.scoremanager.data.RacketStats
+import com.tennis.scoremanager.data.RacketUse
+import com.tennis.scoremanager.data.Stringing
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
@@ -1002,7 +1007,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS }
+enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -1180,6 +1185,8 @@ class MatchController(
     /** Allenamento aperto nel riepilogo (null = schermata dell'allenamento in corso e dell'elenco). */
     val workoutDetail = MutableStateFlow<WorkoutRecord?>(null)
     private var workoutSide = Side.P1
+    /** Racchetta dell'allenamento in corso, presa all'avvio. */
+    private var workoutUse: RacketUse? = null
 
     /**
      * Fasce come le mostrano le schermate: quelle di questo telefono e, se questo non le sente, il battito che
@@ -1485,6 +1492,7 @@ class MatchController(
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
             Screen.PROGRESS -> Screen.SETUP
+            Screen.RACKETS -> Screen.SETUP
             Screen.VIDEOS -> Screen.SETUP
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
@@ -1996,7 +2004,7 @@ class MatchController(
         val now = System.currentTimeMillis()
         // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
-        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now)
+        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -2349,6 +2357,119 @@ class MatchController(
         screen.value = Screen.HISTORY
     }
 
+    // ---------------------------------------------------------------- racchetta virtuale
+
+    /** Racchette con le incordature, in ordine di creazione. */
+    val rackets = MutableStateFlow(storage.loadRackets())
+    /** Racchetta proposta per gli allenamenti ("" = nessuna). */
+    val workoutRacket = MutableStateFlow(storage.workoutRacket)
+
+    fun racketById(id: String): Racket? = id.takeIf { it.isNotEmpty() }?.let { k -> rackets.value.firstOrNull { it.id == k } }
+
+    /** Le racchette scelte in pagina 1, com'erano all'inizio della partita. */
+    private fun racketsFor(su: SetupData): Map<Side, RacketUse> = buildMap {
+        racketById(su.p1Racket)?.let { put(Side.P1, it.use()) }
+        racketById(su.p2Racket)?.let { put(Side.P2, it.use()) }
+    }
+
+    fun openRackets() {
+        refreshHistory()
+        refreshWorkouts()
+        screen.value = Screen.RACKETS
+    }
+
+    private fun storeRackets(list: List<Racket>) {
+        rackets.value = list
+        scope.launch(io) { storage.saveRackets(list) }
+    }
+
+    fun newRacketId(): String = "r${System.currentTimeMillis()}"
+
+    fun newStringingId(): String = "s${System.currentTimeMillis()}"
+
+    /** Aggiunge o aggiorna una racchetta (stesso id). */
+    fun saveRacket(r: Racket) {
+        val list = rackets.value
+        storeRackets(if (list.any { it.id == r.id }) list.map { if (it.id == r.id) r else it } else list + r)
+    }
+
+    /** Toglie la racchetta dall'elenco; le partite giocate la conservano (ne hanno una copia). */
+    fun deleteRacket(id: String) {
+        storeRackets(rackets.value.filter { it.id != id })
+        updateSetup { it.copy(p1Racket = if (it.p1Racket == id) "" else it.p1Racket, p2Racket = if (it.p2Racket == id) "" else it.p2Racket) }
+        if (workoutRacket.value == id) setWorkoutRacket("")
+    }
+
+    fun saveStringing(racketId: String, st: Stringing) {
+        val r = racketById(racketId) ?: return
+        val list = if (r.stringings.any { it.id == st.id }) r.stringings.map { if (it.id == st.id) st else it } else r.stringings + st
+        saveRacket(r.copy(stringings = list.sortedBy { it.date }))
+    }
+
+    fun deleteStringing(racketId: String, stringingId: String) {
+        val r = racketById(racketId) ?: return
+        saveRacket(r.copy(stringings = r.stringings.filter { it.id != stringingId }))
+    }
+
+    fun setWorkoutRacket(id: String) {
+        workoutRacket.value = id
+        storage.workoutRacket = id
+    }
+
+    /** Partite dello storico e allenamenti, come sessioni con una racchetta. */
+    fun racketSessions(): List<RacketStats.Session> = RacketStats.sessions(played(), workouts.value)
+
+    /** Sensazioni dette nel riepilogo per la racchetta di un lato. */
+    fun setMatchFeel(side: Side, feel: Feel) {
+        val sm = summary.value ?: return
+        val use = sm.record.rackets[side] ?: return
+        saveSummary(sm.copy(record = sm.record.copy(rackets = sm.record.rackets + (side to use.copy(feel = feel)))))
+    }
+
+    /**
+     * Associa (o toglie, con "") una racchetta a un lato della partita nel riepilogo, anche a partita già
+     * giocata: si prende l'incordatura montata quel giorno.
+     */
+    fun setMatchRacket(side: Side, racketId: String) {
+        val sm = summary.value ?: return
+        val old = sm.record.rackets
+        val r = racketById(racketId)
+        val at = sm.record.startedAt ?: sm.record.updatedAt
+        val rackets = if (r == null) old - side else old + (side to r.useAt(at).copy(feel = old[side]?.feel))
+        saveSummary(sm.copy(record = sm.record.copy(rackets = rackets)))
+    }
+
+    /** Come [setMatchRacket] per l'allenamento aperto. */
+    fun setWorkoutRacketOf(racketId: String) {
+        val w = workoutDetail.value ?: return
+        val use = racketById(racketId)?.useAt(w.startedAt)?.copy(feel = w.racket?.feel)
+        saveWorkout(w.copy(racket = use))
+    }
+
+    private fun saveSummary(sm: LiveMatch) {
+        val rec = sm.record
+        summary.value = sm
+        val fromHistory = summaryFromHistory.value
+        scope.launch(io) {
+            storage.saveFinished(rec)
+            if (!fromHistory) storage.saveLastFinished(rec)
+        }
+        history.value = history.value.map { if (it.record.id == rec.id) it.copy(record = rec) else it }
+    }
+
+    private fun saveWorkout(rec: WorkoutRecord) {
+        workoutDetail.value = rec
+        workouts.value = workouts.value.map { if (it.id == rec.id) rec else it }
+        scope.launch(io) { storage.saveWorkout(rec) }
+    }
+
+    /** Sensazioni dell'allenamento aperto nel riepilogo. */
+    fun setWorkoutFeel(feel: Feel) {
+        val w = workoutDetail.value ?: return
+        val use = w.racket ?: return
+        saveWorkout(w.copy(racket = use.copy(feel = feel)))
+    }
+
     // ---------------------------------------------------------------- progressi
 
     /** Pagina 1 › Progressi: documenti stampabili, uno per gli allenamenti e uno per le partite di un giocatore. */
@@ -2421,13 +2542,14 @@ class MatchController(
         val straps = heart.straps.value
         val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
+        workoutUse = racketById(workoutRacket.value)?.use()
         workout.start(side, straps[side]?.name)
         MatchService.start(app)
         return true
     }
 
     private fun onWorkoutFinished(rec: WorkoutRecord) {
-        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]))
+        val w = rec.copy(heart = rec.heart.copy(profile = heartProfiles.value[workoutSide]), racket = workoutUse)
         scope.launch {
             withContext(io) { storage.saveWorkout(w) }
             refreshWorkouts()
@@ -5752,6 +5874,9 @@ data class SetupData(
     val p1bSex: String = "",
     val p2aSex: String = "",
     val p2bSex: String = "",
+    /** Racchetta virtuale: id della racchetta scelta per ciascun lato ("" = nessuna). */
+    val p1Racket: String = "",
+    val p2Racket: String = "",
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
@@ -5821,6 +5946,8 @@ data class MatchRecord(
     val heart: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
+    /** Racchetta usata da ciascun lato, com'era quando si è iniziato (con le sensazioni dette nel riepilogo). */
+    val rackets: Map<Side, RacketUse> = emptyMap(),
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */
@@ -6562,6 +6689,313 @@ object ProgressPdf {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Racket.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Racket.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Side
+import kotlinx.serialization.Serializable
+import java.util.Locale
+
+/** Tipo di corda: decide le sensazioni più del marchio. */
+@Serializable
+enum class StringType { MONO, MULTI, SYNTHETIC, GUT, HYBRID }
+
+/**
+ * Un'incordatura della racchetta. Tensioni in kg (verticali e orizzontali), calibro in mm; null = non detto.
+ * Nell'ibrido [crossModel] è la corda delle orizzontali.
+ */
+@Serializable
+data class Stringing(
+    val id: String,
+    /** Giorno dell'incordatura (ms). */
+    val date: Long,
+    val type: StringType = StringType.MONO,
+    val brand: String = "",
+    val model: String = "",
+    val gaugeMm: Double? = null,
+    val mainsKg: Double? = null,
+    val crossesKg: Double? = null,
+    val crossModel: String = "",
+    val notes: String = "",
+)
+
+/**
+ * Una racchetta fisica (non il modello: due racchette uguali hanno incordature, pesi e ore diverse). [name] è il
+ * soprannome per distinguerle ("A", "Quella nuova"). Peso e bilanciamento come li dichiara il produttore o come
+ * li ha misurati il giocatore; [headCm2] la superficie del piatto, [pattern] lo schema ("16x19").
+ * [stringings]: tutte le incordature, l'ultima è quella montata. [checkHours]: dopo quante ore di gioco
+ * ricordare di controllare le corde (scelta del giocatore: il tempo da solo non dice la tensione rimasta).
+ */
+@Serializable
+data class Racket(
+    val id: String,
+    val name: String = "",
+    val brand: String = "",
+    val model: String = "",
+    val weightG: Int? = null,
+    val balanceMm: Int? = null,
+    val headCm2: Int? = null,
+    val pattern: String = "",
+    /** Di chi è (nome della pagina 1): la si propone a lui. Vuoto = di nessuno in particolare. */
+    val owner: String = "",
+    val stringings: List<Stringing> = emptyList(),
+    val checkHours: Int = DEFAULT_CHECK_HOURS,
+    val notes: String = "",
+    /** Racchetta messa da parte: non si propone più, ma le sue partite restano nel confronto. */
+    val retired: Boolean = false,
+    val createdAt: Long = 0L,
+) {
+    /** L'incordatura montata adesso (la più recente). */
+    val current: Stringing? get() = stringings.maxByOrNull { it.date }
+
+    /** "A · Babolat Pure Drive", oppure solo il modello se non ha soprannome. */
+    val label: String
+        get() {
+            val m = listOf(brand, model).filter { it.isNotBlank() }.joinToString(" ")
+            return when {
+                name.isBlank() -> m
+                m.isBlank() -> name
+                else -> "$name · $m"
+            }
+        }
+
+    /** La configurazione di adesso, da salvare con la partita o l'allenamento. */
+    fun use(): RacketUse = useAt(Long.MAX_VALUE)
+
+    /**
+     * La configurazione com'era il giorno [at]: l'incordatura montata allora (l'ultima fatta entro quel giorno;
+     * se sono tutte dopo, la prima). Serve ad associare la racchetta a una partita già giocata.
+     */
+    fun useAt(at: Long): RacketUse = RacketUse(
+        racketId = id, name = name, brand = brand, model = model, weightG = weightG, balanceMm = balanceMm,
+        headCm2 = headCm2, pattern = pattern,
+        stringing = stringings.filter { it.date <= at }.maxByOrNull { it.date } ?: stringings.minByOrNull { it.date },
+    )
+
+    companion object {
+        const val DEFAULT_CHECK_HOURS = 20
+    }
+}
+
+/**
+ * Sensazioni dopo la sessione, da 1 a 5 (0 = non detto). [fatigue]: 5 = molto stanco, quindi più basso è meglio.
+ */
+@Serializable
+data class Feel(
+    val control: Int = 0,
+    val comfort: Int = 0,
+    val power: Int = 0,
+    val fatigue: Int = 0,
+) {
+    val isEmpty: Boolean get() = control == 0 && comfort == 0 && power == 0 && fatigue == 0
+}
+
+/**
+ * La racchetta come era quando si è giocato: una copia, non un riferimento, così la partita resta giusta anche se
+ * poi si cambia la racchetta o la si reincorda. [feel]: le sensazioni di chi l'ha usata in quella sessione.
+ */
+@Serializable
+data class RacketUse(
+    val racketId: String,
+    val name: String = "",
+    val brand: String = "",
+    val model: String = "",
+    val weightG: Int? = null,
+    val balanceMm: Int? = null,
+    val headCm2: Int? = null,
+    val pattern: String = "",
+    val stringing: Stringing? = null,
+    val feel: Feel? = null,
+) {
+    val label: String
+        get() = Racket(racketId, name, brand, model).label
+}
+
+/** Modelli noti, per riempire la scheda senza cercare i dati: valori del produttore (versione recente, a racchetta non incordata). */
+object RacketCatalog {
+    data class Model(val brand: String, val model: String, val weightG: Int, val balanceMm: Int, val headCm2: Int, val pattern: String) {
+        val label: String get() = "$brand $model"
+    }
+
+    val models = listOf(
+        Model("Babolat", "Pure Drive", 300, 320, 645, "16x19"),
+        Model("Babolat", "Pure Aero", 300, 320, 645, "16x19"),
+        Model("Babolat", "Pure Strike 98 16x19", 305, 320, 632, "16x19"),
+        Model("Babolat", "Pure Drive Team", 285, 330, 645, "16x19"),
+        Model("Dunlop", "CX 200", 305, 320, 632, "16x19"),
+        Model("Head", "Speed MP", 300, 320, 645, "16x19"),
+        Model("Head", "Radical MP", 300, 320, 632, "16x19"),
+        Model("Head", "Extreme MP", 300, 320, 645, "16x19"),
+        Model("Head", "Boom MP", 295, 325, 645, "16x19"),
+        Model("Wilson", "Pro Staff 97", 315, 310, 626, "16x19"),
+        Model("Wilson", "Blade 98 16x19", 305, 320, 632, "16x19"),
+        Model("Wilson", "Clash 100", 295, 325, 645, "16x19"),
+        Model("Wilson", "Ultra 100", 300, 320, 645, "16x19"),
+        Model("Yonex", "EZONE 100", 300, 320, 645, "16x19"),
+        Model("Yonex", "VCORE 100", 300, 320, 645, "16x19"),
+        Model("Yonex", "Percept 97", 310, 315, 626, "16x19"),
+    )
+
+    /** Corde molto diffuse: marca, modello, tipo e calibro più venduto. */
+    data class StringModel(val brand: String, val model: String, val type: StringType, val gaugeMm: Double) {
+        val label: String get() = "$brand $model"
+    }
+
+    val strings = listOf(
+        StringModel("Babolat", "RPM Blast", StringType.MONO, 1.25),
+        StringModel("Babolat", "VS Touch", StringType.GUT, 1.30),
+        StringModel("Babolat", "Xcel", StringType.MULTI, 1.30),
+        StringModel("Head", "Lynx Tour", StringType.MONO, 1.25),
+        StringModel("Luxilon", "ALU Power", StringType.MONO, 1.25),
+        StringModel("Solinco", "Hyperion", StringType.MONO, 1.25),
+        StringModel("Solinco", "Tour Bite", StringType.MONO, 1.25),
+        StringModel("Tecnifibre", "X-One Biphase", StringType.MULTI, 1.30),
+        StringModel("Wilson", "NXT", StringType.MULTI, 1.30),
+        StringModel("Wilson", "Synthetic Gut", StringType.SYNTHETIC, 1.30),
+        StringModel("Yonex", "Poly Tour Pro", StringType.MONO, 1.25),
+    )
+}
+
+/**
+ * Racchetta virtuale: ore di gioco delle incordature e confronto tra configurazioni (racchetta, oppure racchetta
+ * con una certa incordatura). Le sessioni sono le partite finite (una per lato che aveva una racchetta) e gli
+ * allenamenti. I numeri dicono com'è andata con ciascuna, non quale sia la migliore: contano anche avversario,
+ * superficie e forma del giorno.
+ */
+object RacketStats {
+
+    /** Una sessione con una racchetta: [side] e [winner] solo per le partite. */
+    data class Session(
+        val at: Long,
+        val use: RacketUse,
+        val durationMs: Long,
+        val match: MatchRecord? = null,
+        val side: Side? = null,
+        val winner: Side? = null,
+        val workout: WorkoutRecord? = null,
+    )
+
+    fun sessions(matches: List<PlayerStats.Played>, workouts: List<WorkoutRecord>): List<Session> {
+        val out = mutableListOf<Session>()
+        for (m in matches) {
+            for ((side, use) in m.rec.rackets) {
+                out += Session(m.rec.startedAt ?: m.rec.updatedAt, use, m.rec.clockMs, m.rec, side, m.winner)
+            }
+        }
+        for (w in workouts) {
+            val use = w.racket ?: continue
+            out += Session(w.startedAt, use, w.durationS * 1000L, workout = w)
+        }
+        return out.sortedBy { it.at }
+    }
+
+    /**
+     * Ore giocate con un'incordatura: partite e allenamenti in cui era montata. Una partita conta una volta
+     * sola anche se la stessa racchetta era segnata per tutti e due i lati.
+     */
+    fun hours(stringingId: String, sessions: List<Session>): Double =
+        sessions.filter { it.use.stringing?.id == stringingId }
+            .distinctBy { it.match?.id ?: it.workout?.id }
+            .sumOf { it.durationMs } / 3_600_000.0
+
+    /** Ore della racchetta, tutte le incordature insieme. */
+    fun racketHours(racketId: String, sessions: List<Session>): Double =
+        sessions.filter { it.use.racketId == racketId }
+            .distinctBy { it.match?.id ?: it.workout?.id }
+            .sumOf { it.durationMs } / 3_600_000.0
+
+    /** Chiave della configurazione: la racchetta, e con [byStringing] anche l'incordatura. */
+    fun key(use: RacketUse, byStringing: Boolean): String =
+        if (byStringing) "${use.racketId}/${use.stringing?.id.orEmpty()}" else use.racketId
+
+    /** Numeri di una configurazione. Le percentuali sono sul totale dei punti, non medie di percentuali. */
+    data class ConfigStats(
+        val key: String,
+        /** La configurazione dell'ultima sessione: per nome e incordatura da mostrare. */
+        val use: RacketUse,
+        val sessions: Int,
+        val matches: Int,
+        val workouts: Int,
+        val hours: Double,
+        val winPct: Double?,
+        val pointsWonPct: Double?,
+        val firstServeInPct: Double?,
+        val firstServeWonPct: Double?,
+        val secondServeWonPct: Double?,
+        val acesPerMatch: Double?,
+        val doubleFaultsPerMatch: Double?,
+        val winnersPerMatch: Double?,
+        val unforcedPerMatch: Double?,
+        /** Velocità media del polso al colpo (°/s) dai braccialetti. */
+        val wristDps: Double?,
+        val strokesPerMatch: Double?,
+        val heartAvg: Double?,
+        val control: Double?,
+        val comfort: Double?,
+        val power: Double?,
+        val fatigue: Double?,
+        /** Sessioni con le sensazioni dette. */
+        val rated: Int,
+    )
+
+    private fun pct(a: Int, b: Int): Double? = if (b > 0) a * 100.0 / b else null
+
+    private fun avgOf(values: List<Int>): Double? = values.filter { it > 0 }.takeIf { it.isNotEmpty() }?.average()
+
+    fun configs(sessions: List<Session>, byStringing: Boolean): List<ConfigStats> =
+        sessions.groupBy { key(it.use, byStringing) }.map { (k, list) -> stats(k, list) }
+            .sortedWith(compareBy<ConfigStats> { it.use.label.lowercase(Locale.ROOT) }.thenBy { it.use.stringing?.date ?: 0L })
+
+    fun stats(key: String, list: List<Session>): ConfigStats {
+        val matches = list.filter { it.match != null && it.side != null && it.winner != null }
+        val totals = matches.map { s ->
+            val pts = MatchStats.points(s.match!!)
+            Triple(s, MatchStats.totals(pts).getValue(s.side!!), MatchStats.hasDetail(s.match, pts))
+        }
+        val detail = totals.filter { it.third }.map { it.second }
+        fun perMatch(f: (MatchStats.SideTotals) -> Int): Double? = detail.takeIf { it.isNotEmpty() }?.map(f)?.average()
+        val all = totals.map { it.second }
+        val strokes = matches.mapNotNull { s -> s.match!!.strokes[s.side!!]?.takeIf { it.total > 0 } }
+        val gyroN = strokes.sumOf { st -> st.counts.indices.sumOf { i -> if (st.gyroSum.getOrElse(i) { 0L } > 0) st.count(i) else 0 } }
+        val gyroSum = strokes.sumOf { it.gyroSum.sum() }
+        val hearts = list.mapNotNull { s ->
+            val track = s.workout?.heart ?: s.side?.let { s.match?.heart?.get(it) }
+            track?.let { HeartStats.summary(it)?.avg }
+        }
+        val feels = list.mapNotNull { it.use.feel?.takeIf { f -> !f.isEmpty } }
+        return ConfigStats(
+            key = key,
+            use = list.maxBy { it.at }.use,
+            sessions = list.size,
+            matches = matches.size,
+            workouts = list.count { it.workout != null },
+            hours = list.distinctBy { it.match?.id ?: it.workout?.id }.sumOf { it.durationMs } / 3_600_000.0,
+            winPct = pct(matches.count { it.winner == it.side }, matches.size),
+            pointsWonPct = pct(all.sumOf { it.pointsWon }, all.sumOf { it.points }),
+            firstServeInPct = pct(detail.sumOf { it.firstServesIn }, detail.sumOf { it.servePoints }),
+            firstServeWonPct = pct(detail.sumOf { it.firstServePointsWon }, detail.sumOf { it.firstServesIn }),
+            secondServeWonPct = pct(detail.sumOf { it.secondServePointsWon }, detail.sumOf { it.secondServes }),
+            acesPerMatch = perMatch { it.aces },
+            doubleFaultsPerMatch = perMatch { it.doubleFaults },
+            winnersPerMatch = perMatch { it.winners },
+            unforcedPerMatch = perMatch { it.unforcedErrors },
+            wristDps = if (gyroN > 0) gyroSum.toDouble() / gyroN else null,
+            strokesPerMatch = strokes.takeIf { it.isNotEmpty() }?.map { it.total }?.average(),
+            heartAvg = hearts.takeIf { it.isNotEmpty() }?.average(),
+            control = avgOf(feels.map { it.control }),
+            comfort = avgOf(feels.map { it.comfort }),
+            power = avgOf(feels.map { it.power }),
+            fatigue = avgOf(feels.map { it.fatigue }),
+            rated = feels.size,
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Reports.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Reports.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -6874,6 +7308,7 @@ package com.tennis.scoremanager.data
 import android.content.Context
 import android.util.Log
 import com.tennis.scoremanager.tv.TvSettings
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -6994,6 +7429,29 @@ class Storage(context: Context) {
     fun deleteWorkout(id: String) {
         File(workoutsDir, "$id.json").delete()
     }
+
+    /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
+    private val racketsFile: File get() = File(app.filesDir, "rackets.json")
+
+    fun loadRackets(): List<Racket> =
+        runCatching { json.decodeFromString(ListSerializer(Racket.serializer()), racketsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveRackets(list: List<Racket>) {
+        runCatching {
+            val tmp = File(app.filesDir, "rackets.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Racket.serializer()), list))
+            if (!tmp.renameTo(racketsFile)) {
+                racketsFile.delete()
+                tmp.renameTo(racketsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
+    }
+
+    /** Racchetta scelta per gli allenamenti ("" = nessuna). */
+    var workoutRacket: String
+        get() = prefs.getString("workout_racket", null) ?: ""
+        set(v) = prefs.edit().putString("workout_racket", v).apply()
 
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }
@@ -7393,6 +7851,8 @@ data class WorkoutRecord(
     val cooldown: List<Int> = emptyList(),
     val rr: List<Int> = emptyList(),
     val strapName: String? = null,
+    /** Racchetta dell'allenamento, com'era quel giorno (con le sensazioni). */
+    val racket: RacketUse? = null,
 )
 
 /** Calcoli sugli allenamenti: giri, HRV e recupero. */
@@ -11651,6 +12111,7 @@ import com.tennis.scoremanager.ui.screens.TournamentScreen
 import com.tennis.scoremanager.ui.screens.WorkoutScreen
 import com.tennis.scoremanager.ui.screens.ProgressScreen
 import com.tennis.scoremanager.ui.screens.VideosScreen
+import com.tennis.scoremanager.ui.screens.RacketsScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -11695,6 +12156,7 @@ fun AppRoot(c: MatchController) {
                 Screen.WORKOUT -> WorkoutScreen(c)
                 Screen.PROGRESS -> ProgressScreen(c)
                 Screen.VIDEOS -> VideosScreen(c)
+                Screen.RACKETS -> RacketsScreen(c)
             }
         }
     }
@@ -13633,6 +14095,71 @@ interface Strings {
     val displayRetry: String
 
     // In fondo alla pagina 1: versione, licenza (GPL) e link al codice sorgente
+
+    // Racchetta virtuale
+    val racketTitle: String
+    val racketHint: String
+    val racketMine: String
+    val racketCompare: String
+    val racketAdd: String
+    val racketNew: String
+    val racketEdit: String
+    val racketNone: String
+    val racketEmpty: String
+    val racketField: String
+    val racketSetupHint: String
+    val racketCatalog: String
+    val racketCatalogHint: String
+    val racketName: String
+    val racketBrand: String
+    val racketModel: String
+    val racketWeight: String
+    val racketBalance: String
+    val racketHead: String
+    val racketPattern: String
+    val racketOwner: String
+    val racketCheckHours: String
+    val racketRetired: String
+    val racketRetiredHint: String
+    val racketDeleteTitle: String
+    val racketDeleteText: String
+    val stringTitle: String
+    val stringNew: String
+    val stringHistory: String
+    val stringNone: String
+    val stringType: String
+    val stringTypeName: (Int) -> String
+    val stringCatalog: String
+    val stringCross: String
+    val stringGauge: String
+    val stringMains: String
+    val stringCrosses: String
+    val stringDate: String
+    val stringNotes: String
+    val stringHours: (String, Int) -> String
+    val stringCheck: String
+    val stringCheckNote: String
+    val stringDeleteTitle: String
+    val racketHours: String
+    val racketSessions: (Int) -> String
+    val compareByRacket: String
+    val compareByString: String
+    val compareA: String
+    val compareB: String
+    val compareTooFew: String
+    val compareNote: String
+    val compareSessions: String
+    val comparePerMatch: (String) -> String
+    val compareStrokes: String
+    val compareRated: (Int) -> String
+    val feelTitle: String
+    val feelHint: String
+    val feelControl: String
+    val feelComfort: String
+    val feelPower: String
+    val feelFatigue: String
+    val racketUsed: String
+
     val aboutLicense: (String) -> String
     val aboutSource: String
 }
@@ -14412,6 +14939,70 @@ object ItStrings : Strings {
     override val displayShowHere = "Mostra anche qui"
     override val displayBackAgain = "Premi di nuovo indietro per uscire"
     override val displayRetry = "Cerca di nuovo"
+
+    // Racchetta virtuale
+    override val racketTitle = "Racchette"
+    override val racketHint = "Confronta statistiche e sensazioni con racchette, corde o tensioni diverse."
+    override val racketMine = "Le mie racchette"
+    override val racketCompare = "Confronto"
+    override val racketAdd = "Aggiungi racchetta"
+    override val racketNew = "Nuova racchetta"
+    override val racketEdit = "Modifica"
+    override val racketNone = "Nessuna"
+    override val racketEmpty = "Nessuna racchetta. Aggiungi le tue racchette con corde e tensione: poi scegli quella usata prima di ogni partita o allenamento."
+    override val racketField = "Racchetta"
+    override val racketSetupHint = "Scegli la racchetta di ciascun giocatore: la partita ricorderà racchetta, corde e tensione di oggi."
+    override val racketCatalog = "Dal catalogo"
+    override val racketCatalogHint = "Dati del produttore, indicativi: se hai misurato la tua racchetta correggili."
+    override val racketName = "Soprannome (A, B…)"
+    override val racketBrand = "Marca"
+    override val racketModel = "Modello"
+    override val racketWeight = "Peso (g)"
+    override val racketBalance = "Bilanciamento (mm)"
+    override val racketHead = "Piatto corde (cm²)"
+    override val racketPattern = "Schema corde"
+    override val racketOwner = "Di chi è (nome della pagina 1)"
+    override val racketCheckHours = "Controllo corde dopo (ore)"
+    override val racketRetired = "Messa da parte"
+    override val racketRetiredHint = "Non si propone più prima di giocare, ma resta nei confronti."
+    override val racketDeleteTitle = "Eliminare la racchetta?"
+    override val racketDeleteText = "Le partite e gli allenamenti già giocati ne conservano una copia e restano nel confronto."
+    override val stringTitle = "Incordatura"
+    override val stringNew = "Nuova incordatura"
+    override val stringHistory = "Storico incordature"
+    override val stringNone = "Nessuna incordatura registrata."
+    override val stringType = "Tipo di corda"
+    override val stringTypeName: (Int) -> String = { listOf("Monofilamento", "Multifilamento", "Sintetico", "Budello", "Ibrido").getOrElse(it) { "" } }
+    override val stringCatalog = "Corde comuni"
+    override val stringCross = "Corda delle orizzontali"
+    override val stringGauge = "Calibro (mm)"
+    override val stringMains = "Verticali (kg)"
+    override val stringCrosses = "Orizzontali (kg)"
+    override val stringDate = "Data dell'incordatura"
+    override val stringNotes = "Note"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h di gioco dall'ultima incordatura · controllo a $max h" }
+    override val stringCheck = "Ore di controllo raggiunte: dai un'occhiata alle corde."
+    override val stringCheckNote = "Le ore sono quelle delle partite e degli allenamenti associati alla racchetta. Dal solo tempo l'app non può sapere quanta tensione è rimasta."
+    override val stringDeleteTitle = "Eliminare l'incordatura?"
+    override val racketHours = "Ore di gioco"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 sessione" else "$n sessioni" }
+    override val compareByRacket = "Per racchetta"
+    override val compareByString = "Per incordatura"
+    override val compareA = "Configurazione A"
+    override val compareB = "Configurazione B"
+    override val compareTooFew = "Per confrontare servono partite o allenamenti con almeno due configurazioni diverse. Scegli la racchetta in pagina 1 o nell'allenamento, oppure associala dal riepilogo."
+    override val compareNote = "I numeri dicono com'è andata con ciascuna configurazione, non quale sia la migliore: contano anche avversario, superficie, condizioni e forma del giorno."
+    override val compareSessions = "Sessioni"
+    override val comparePerMatch: (String) -> String = { "$it a partita" }
+    override val compareStrokes = "Colpi dei braccialetti"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "sensazioni da 1 sessione" else "sensazioni da $n sessioni" }
+    override val feelTitle = "Sensazioni"
+    override val feelHint = "Come ti sei trovato? Da 1 (poco) a 5 (molto); ritocca per togliere."
+    override val feelControl = "Controllo"
+    override val feelComfort = "Comfort"
+    override val feelPower = "Potenza"
+    override val feelFatigue = "Fatica"
+    override val racketUsed = "Racchetta usata"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libero con licenza GNU GPL versione 3 o successiva, senza alcuna garanzia." }
     override val aboutSource = "Codice sorgente"
@@ -15193,6 +15784,70 @@ object EnStrings : Strings {
     override val displayShowHere = "Show here too"
     override val displayBackAgain = "Press back again to exit"
     override val displayRetry = "Search again"
+
+    // Racchetta virtuale
+    override val racketTitle = "Rackets"
+    override val racketHint = "Compare stats and feel across different rackets, strings or tensions."
+    override val racketMine = "My rackets"
+    override val racketCompare = "Comparison"
+    override val racketAdd = "Add racket"
+    override val racketNew = "New racket"
+    override val racketEdit = "Edit"
+    override val racketNone = "None"
+    override val racketEmpty = "No rackets yet. Add your rackets with strings and tension, then pick the one you use before each match or workout."
+    override val racketField = "Racket"
+    override val racketSetupHint = "Pick each player's racket: the match will remember today's racket, strings and tension."
+    override val racketCatalog = "From catalogue"
+    override val racketCatalogHint = "Manufacturer specs, approximate: correct them if you measured your racket."
+    override val racketName = "Nickname (A, B…)"
+    override val racketBrand = "Brand"
+    override val racketModel = "Model"
+    override val racketWeight = "Weight (g)"
+    override val racketBalance = "Balance (mm)"
+    override val racketHead = "Head size (cm²)"
+    override val racketPattern = "String pattern"
+    override val racketOwner = "Owner (name as on page 1)"
+    override val racketCheckHours = "Check strings after (hours)"
+    override val racketRetired = "Retired"
+    override val racketRetiredHint = "No longer offered before playing, but kept in comparisons."
+    override val racketDeleteTitle = "Delete the racket?"
+    override val racketDeleteText = "Matches and workouts already played keep a copy of it and stay in the comparison."
+    override val stringTitle = "Stringing"
+    override val stringNew = "New stringing"
+    override val stringHistory = "Stringing history"
+    override val stringNone = "No stringing recorded."
+    override val stringType = "String type"
+    override val stringTypeName: (Int) -> String = { listOf("Polyester", "Multifilament", "Synthetic gut", "Natural gut", "Hybrid").getOrElse(it) { "" } }
+    override val stringCatalog = "Common strings"
+    override val stringCross = "Cross string"
+    override val stringGauge = "Gauge (mm)"
+    override val stringMains = "Mains (kg)"
+    override val stringCrosses = "Crosses (kg)"
+    override val stringDate = "Stringing date"
+    override val stringNotes = "Notes"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h played since the last stringing · check at $max h" }
+    override val stringCheck = "Check hours reached: have a look at the strings."
+    override val stringCheckNote = "Hours come from the matches and workouts linked to the racket. From time alone the app cannot tell how much tension is left."
+    override val stringDeleteTitle = "Delete the stringing?"
+    override val racketHours = "Hours played"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 session" else "$n sessions" }
+    override val compareByRacket = "By racket"
+    override val compareByString = "By stringing"
+    override val compareA = "Setup A"
+    override val compareB = "Setup B"
+    override val compareTooFew = "To compare you need matches or workouts with at least two different setups. Pick the racket on page 1 or in the workout, or link it from the summary."
+    override val compareNote = "The numbers show how each setup went, not which one is best: opponent, surface, conditions and form matter too."
+    override val compareSessions = "Sessions"
+    override val comparePerMatch: (String) -> String = { "$it per match" }
+    override val compareStrokes = "Wristband strokes"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "feel from 1 session" else "feel from $n sessions" }
+    override val feelTitle = "Feel"
+    override val feelHint = "How did it feel? From 1 (low) to 5 (high); tap again to clear."
+    override val feelControl = "Control"
+    override val feelComfort = "Comfort"
+    override val feelPower = "Power"
+    override val feelFatigue = "Fatigue"
+    override val racketUsed = "Racket used"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · free software under the GNU GPL version 3 or later, with absolutely no warranty." }
     override val aboutSource = "Source code"
@@ -16000,6 +16655,70 @@ object DeStrings : Strings {
     override val displayBackAgain = "Zum Beenden noch einmal Zurück drücken"
     override val displayRetry = "Erneut suchen"
 
+    // Racchetta virtuale
+    override val racketTitle = "Schläger"
+    override val racketHint = "Vergleiche Statistiken und Spielgefühl mit verschiedenen Schlägern, Saiten oder Spannungen."
+    override val racketMine = "Meine Schläger"
+    override val racketCompare = "Vergleich"
+    override val racketAdd = "Schläger hinzufügen"
+    override val racketNew = "Neuer Schläger"
+    override val racketEdit = "Bearbeiten"
+    override val racketNone = "Keiner"
+    override val racketEmpty = "Noch keine Schläger. Füge deine Schläger mit Saite und Spannung hinzu und wähle vor jedem Match oder Training den benutzten aus."
+    override val racketField = "Schläger"
+    override val racketSetupHint = "Wähle den Schläger jedes Spielers: das Match merkt sich Schläger, Saite und Spannung von heute."
+    override val racketCatalog = "Aus dem Katalog"
+    override val racketCatalogHint = "Herstellerangaben, ungefähr: korrigiere sie, wenn du deinen Schläger gemessen hast."
+    override val racketName = "Spitzname (A, B…)"
+    override val racketBrand = "Marke"
+    override val racketModel = "Modell"
+    override val racketWeight = "Gewicht (g)"
+    override val racketBalance = "Balance (mm)"
+    override val racketHead = "Kopfgröße (cm²)"
+    override val racketPattern = "Besaitungsbild"
+    override val racketOwner = "Besitzer (Name wie auf Seite 1)"
+    override val racketCheckHours = "Saiten prüfen nach (Stunden)"
+    override val racketRetired = "Ausgemustert"
+    override val racketRetiredHint = "Wird vor dem Spiel nicht mehr angeboten, bleibt aber im Vergleich."
+    override val racketDeleteTitle = "Schläger löschen?"
+    override val racketDeleteText = "Bereits gespielte Matches und Trainings behalten eine Kopie und bleiben im Vergleich."
+    override val stringTitle = "Besaitung"
+    override val stringNew = "Neue Besaitung"
+    override val stringHistory = "Besaitungsverlauf"
+    override val stringNone = "Keine Besaitung erfasst."
+    override val stringType = "Saitentyp"
+    override val stringTypeName: (Int) -> String = { listOf("Monofil", "Multifil", "Synthetik", "Naturdarm", "Hybrid").getOrElse(it) { "" } }
+    override val stringCatalog = "Gängige Saiten"
+    override val stringCross = "Quersaite"
+    override val stringGauge = "Stärke (mm)"
+    override val stringMains = "Längssaiten (kg)"
+    override val stringCrosses = "Quersaiten (kg)"
+    override val stringDate = "Besaitet am"
+    override val stringNotes = "Notizen"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h gespielt seit der letzten Besaitung · Prüfung bei $max h" }
+    override val stringCheck = "Prüfstunden erreicht: schau dir die Saiten an."
+    override val stringCheckNote = "Die Stunden stammen aus den Matches und Trainings mit diesem Schläger. Aus der Zeit allein kann die App die verbleibende Spannung nicht kennen."
+    override val stringDeleteTitle = "Besaitung löschen?"
+    override val racketHours = "Spielstunden"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 Einheit" else "$n Einheiten" }
+    override val compareByRacket = "Nach Schläger"
+    override val compareByString = "Nach Besaitung"
+    override val compareA = "Konfiguration A"
+    override val compareB = "Konfiguration B"
+    override val compareTooFew = "Zum Vergleichen braucht es Matches oder Trainings mit mindestens zwei verschiedenen Konfigurationen. Wähle den Schläger auf Seite 1 oder im Training oder ordne ihn in der Zusammenfassung zu."
+    override val compareNote = "Die Zahlen zeigen, wie es mit jeder Konfiguration lief, nicht welche die beste ist: Gegner, Belag, Bedingungen und Tagesform zählen auch."
+    override val compareSessions = "Einheiten"
+    override val comparePerMatch: (String) -> String = { "$it pro Match" }
+    override val compareStrokes = "Schläge der Armbänder"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "Gefühl aus 1 Einheit" else "Gefühl aus $n Einheiten" }
+    override val feelTitle = "Spielgefühl"
+    override val feelHint = "Wie hat es sich angefühlt? Von 1 (wenig) bis 5 (sehr); nochmals tippen zum Löschen."
+    override val feelControl = "Kontrolle"
+    override val feelComfort = "Komfort"
+    override val feelPower = "Power"
+    override val feelFatigue = "Ermüdung"
+    override val racketUsed = "Benutzter Schläger"
+
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · freie Software unter der GNU GPL Version 3 oder später, ohne jegliche Gewährleistung." }
     override val aboutSource = "Quellcode"
 }
@@ -16795,6 +17514,70 @@ object EsStrings : Strings {
     override val displayShowHere = "Mostrar también aquí"
     override val displayBackAgain = "Pulsa atrás otra vez para salir"
     override val displayRetry = "Buscar de nuevo"
+
+    // Racchetta virtuale
+    override val racketTitle = "Raquetas"
+    override val racketHint = "Compara estadísticas y sensaciones con raquetas, cuerdas o tensiones distintas."
+    override val racketMine = "Mis raquetas"
+    override val racketCompare = "Comparación"
+    override val racketAdd = "Añadir raqueta"
+    override val racketNew = "Nueva raqueta"
+    override val racketEdit = "Editar"
+    override val racketNone = "Ninguna"
+    override val racketEmpty = "Ninguna raqueta. Añade tus raquetas con cuerdas y tensión y elige la que usas antes de cada partido o entrenamiento."
+    override val racketField = "Raqueta"
+    override val racketSetupHint = "Elige la raqueta de cada jugador: el partido recordará la raqueta, las cuerdas y la tensión de hoy."
+    override val racketCatalog = "Del catálogo"
+    override val racketCatalogHint = "Datos del fabricante, orientativos: corrígelos si has medido tu raqueta."
+    override val racketName = "Apodo (A, B…)"
+    override val racketBrand = "Marca"
+    override val racketModel = "Modelo"
+    override val racketWeight = "Peso (g)"
+    override val racketBalance = "Balance (mm)"
+    override val racketHead = "Cabeza (cm²)"
+    override val racketPattern = "Patrón de cordaje"
+    override val racketOwner = "Dueño (nombre de la página 1)"
+    override val racketCheckHours = "Revisar cuerdas tras (horas)"
+    override val racketRetired = "Retirada"
+    override val racketRetiredHint = "Ya no se propone antes de jugar, pero sigue en las comparaciones."
+    override val racketDeleteTitle = "¿Eliminar la raqueta?"
+    override val racketDeleteText = "Los partidos y entrenamientos ya jugados conservan una copia y siguen en la comparación."
+    override val stringTitle = "Encordado"
+    override val stringNew = "Nuevo encordado"
+    override val stringHistory = "Historial de encordados"
+    override val stringNone = "Ningún encordado registrado."
+    override val stringType = "Tipo de cuerda"
+    override val stringTypeName: (Int) -> String = { listOf("Monofilamento", "Multifilamento", "Sintética", "Tripa natural", "Híbrido").getOrElse(it) { "" } }
+    override val stringCatalog = "Cuerdas comunes"
+    override val stringCross = "Cuerda de las cruzadas"
+    override val stringGauge = "Calibre (mm)"
+    override val stringMains = "Verticales (kg)"
+    override val stringCrosses = "Horizontales (kg)"
+    override val stringDate = "Fecha del encordado"
+    override val stringNotes = "Notas"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h de juego desde el último encordado · revisión a las $max h" }
+    override val stringCheck = "Horas de revisión alcanzadas: echa un vistazo a las cuerdas."
+    override val stringCheckNote = "Las horas salen de los partidos y entrenamientos asociados a la raqueta. Solo con el tiempo la app no puede saber cuánta tensión queda."
+    override val stringDeleteTitle = "¿Eliminar el encordado?"
+    override val racketHours = "Horas de juego"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 sesión" else "$n sesiones" }
+    override val compareByRacket = "Por raqueta"
+    override val compareByString = "Por encordado"
+    override val compareA = "Configuración A"
+    override val compareB = "Configuración B"
+    override val compareTooFew = "Para comparar hacen falta partidos o entrenamientos con al menos dos configuraciones distintas. Elige la raqueta en la página 1 o en el entrenamiento, o asóciala desde el resumen."
+    override val compareNote = "Los números dicen cómo fue con cada configuración, no cuál es la mejor: también cuentan rival, superficie, condiciones y forma del día."
+    override val compareSessions = "Sesiones"
+    override val comparePerMatch: (String) -> String = { "$it por partido" }
+    override val compareStrokes = "Golpes de las pulseras"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "sensaciones de 1 sesión" else "sensaciones de $n sesiones" }
+    override val feelTitle = "Sensaciones"
+    override val feelHint = "¿Cómo te has sentido? De 1 (poco) a 5 (mucho); vuelve a tocar para borrar."
+    override val feelControl = "Control"
+    override val feelComfort = "Confort"
+    override val feelPower = "Potencia"
+    override val feelFatigue = "Cansancio"
+    override val racketUsed = "Raqueta usada"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libre bajo la GNU GPL versión 3 o posterior, sin ninguna garantía." }
     override val aboutSource = "Código fuente"
@@ -17594,6 +18377,70 @@ object FrStrings : Strings {
     override val displayBackAgain = "Appuyez encore sur retour pour quitter"
     override val displayRetry = "Chercher à nouveau"
 
+    // Racchetta virtuale
+    override val racketTitle = "Raquettes"
+    override val racketHint = "Comparez statistiques et sensations avec des raquettes, cordages ou tensions différents."
+    override val racketMine = "Mes raquettes"
+    override val racketCompare = "Comparaison"
+    override val racketAdd = "Ajouter une raquette"
+    override val racketNew = "Nouvelle raquette"
+    override val racketEdit = "Modifier"
+    override val racketNone = "Aucune"
+    override val racketEmpty = "Aucune raquette. Ajoutez vos raquettes avec cordage et tension, puis choisissez celle utilisée avant chaque match ou entraînement."
+    override val racketField = "Raquette"
+    override val racketSetupHint = "Choisissez la raquette de chaque joueur : le match retiendra la raquette, le cordage et la tension du jour."
+    override val racketCatalog = "Depuis le catalogue"
+    override val racketCatalogHint = "Données du fabricant, indicatives : corrigez-les si vous avez mesuré votre raquette."
+    override val racketName = "Surnom (A, B…)"
+    override val racketBrand = "Marque"
+    override val racketModel = "Modèle"
+    override val racketWeight = "Poids (g)"
+    override val racketBalance = "Équilibre (mm)"
+    override val racketHead = "Tamis (cm²)"
+    override val racketPattern = "Plan de cordage"
+    override val racketOwner = "Propriétaire (nom de la page 1)"
+    override val racketCheckHours = "Contrôle du cordage après (heures)"
+    override val racketRetired = "Mise de côté"
+    override val racketRetiredHint = "N'est plus proposée avant de jouer, mais reste dans les comparaisons."
+    override val racketDeleteTitle = "Supprimer la raquette ?"
+    override val racketDeleteText = "Les matchs et entraînements déjà joués en gardent une copie et restent dans la comparaison."
+    override val stringTitle = "Cordage"
+    override val stringNew = "Nouveau cordage"
+    override val stringHistory = "Historique des cordages"
+    override val stringNone = "Aucun cordage enregistré."
+    override val stringType = "Type de cordage"
+    override val stringTypeName: (Int) -> String = { listOf("Monofilament", "Multifilament", "Boyau synthétique", "Boyau naturel", "Hybride").getOrElse(it) { "" } }
+    override val stringCatalog = "Cordages courants"
+    override val stringCross = "Cordage des travers"
+    override val stringGauge = "Calibre (mm)"
+    override val stringMains = "Montants (kg)"
+    override val stringCrosses = "Travers (kg)"
+    override val stringDate = "Date du cordage"
+    override val stringNotes = "Remarques"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h de jeu depuis le dernier cordage · contrôle à $max h" }
+    override val stringCheck = "Heures de contrôle atteintes : jetez un œil au cordage."
+    override val stringCheckNote = "Les heures viennent des matchs et entraînements associés à la raquette. Le temps seul ne permet pas de connaître la tension restante."
+    override val stringDeleteTitle = "Supprimer le cordage ?"
+    override val racketHours = "Heures de jeu"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 séance" else "$n séances" }
+    override val compareByRacket = "Par raquette"
+    override val compareByString = "Par cordage"
+    override val compareA = "Configuration A"
+    override val compareB = "Configuration B"
+    override val compareTooFew = "Pour comparer, il faut des matchs ou entraînements avec au moins deux configurations différentes. Choisissez la raquette en page 1 ou dans l'entraînement, ou associez-la depuis le récapitulatif."
+    override val compareNote = "Les chiffres montrent comment s'est passée chaque configuration, pas laquelle est la meilleure : adversaire, surface, conditions et forme comptent aussi."
+    override val compareSessions = "Séances"
+    override val comparePerMatch: (String) -> String = { "$it par match" }
+    override val compareStrokes = "Coups des bracelets"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "sensations sur 1 séance" else "sensations sur $n séances" }
+    override val feelTitle = "Sensations"
+    override val feelHint = "Comment vous êtes-vous senti ? De 1 (peu) à 5 (beaucoup) ; touchez à nouveau pour effacer."
+    override val feelControl = "Contrôle"
+    override val feelComfort = "Confort"
+    override val feelPower = "Puissance"
+    override val feelFatigue = "Fatigue ressentie"
+    override val racketUsed = "Raquette utilisée"
+
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · logiciel libre sous licence GNU GPL version 3 ou ultérieure, sans aucune garantie." }
     override val aboutSource = "Code source"
 }
@@ -18392,6 +19239,70 @@ object PtStrings : Strings {
     override val displayShowHere = "Mostrar aqui também"
     override val displayBackAgain = "Toque em voltar de novo para sair"
     override val displayRetry = "Procurar de novo"
+
+    // Racchetta virtuale
+    override val racketTitle = "Raquetes"
+    override val racketHint = "Compare estatísticas e sensações com raquetes, cordas ou tensões diferentes."
+    override val racketMine = "As minhas raquetes"
+    override val racketCompare = "Comparação"
+    override val racketAdd = "Adicionar raquete"
+    override val racketNew = "Nova raquete"
+    override val racketEdit = "Editar"
+    override val racketNone = "Nenhuma"
+    override val racketEmpty = "Nenhuma raquete. Adicione as suas raquetes com cordas e tensão e escolha a usada antes de cada jogo ou treino."
+    override val racketField = "Raquete"
+    override val racketSetupHint = "Escolha a raquete de cada jogador: o jogo guardará a raquete, as cordas e a tensão de hoje."
+    override val racketCatalog = "Do catálogo"
+    override val racketCatalogHint = "Dados do fabricante, indicativos: corrija-os se mediu a sua raquete."
+    override val racketName = "Alcunha (A, B…)"
+    override val racketBrand = "Marca"
+    override val racketModel = "Modelo"
+    override val racketWeight = "Peso (g)"
+    override val racketBalance = "Equilíbrio (mm)"
+    override val racketHead = "Cabeça (cm²)"
+    override val racketPattern = "Padrão de cordas"
+    override val racketOwner = "Dono (nome da página 1)"
+    override val racketCheckHours = "Verificar cordas após (horas)"
+    override val racketRetired = "Posta de lado"
+    override val racketRetiredHint = "Deixa de ser proposta antes de jogar, mas fica nas comparações."
+    override val racketDeleteTitle = "Eliminar a raquete?"
+    override val racketDeleteText = "Os jogos e treinos já jogados guardam uma cópia e continuam na comparação."
+    override val stringTitle = "Encordoamento"
+    override val stringNew = "Novo encordoamento"
+    override val stringHistory = "Histórico de encordoamentos"
+    override val stringNone = "Nenhum encordoamento registado."
+    override val stringType = "Tipo de corda"
+    override val stringTypeName: (Int) -> String = { listOf("Monofilamento", "Multifilamento", "Sintética", "Tripa natural", "Híbrido").getOrElse(it) { "" } }
+    override val stringCatalog = "Cordas comuns"
+    override val stringCross = "Corda das horizontais"
+    override val stringGauge = "Calibre (mm)"
+    override val stringMains = "Verticais (kg)"
+    override val stringCrosses = "Horizontais (kg)"
+    override val stringDate = "Data do encordoamento"
+    override val stringNotes = "Notas"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h de jogo desde o último encordoamento · verificação às $max h" }
+    override val stringCheck = "Horas de verificação atingidas: dê uma olhada nas cordas."
+    override val stringCheckNote = "As horas vêm dos jogos e treinos associados à raquete. Só pelo tempo a app não consegue saber quanta tensão resta."
+    override val stringDeleteTitle = "Eliminar o encordoamento?"
+    override val racketHours = "Horas de jogo"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 sessão" else "$n sessões" }
+    override val compareByRacket = "Por raquete"
+    override val compareByString = "Por encordoamento"
+    override val compareA = "Configuração A"
+    override val compareB = "Configuração B"
+    override val compareTooFew = "Para comparar são precisos jogos ou treinos com pelo menos duas configurações diferentes. Escolha a raquete na página 1 ou no treino, ou associe-a a partir do resumo."
+    override val compareNote = "Os números mostram como correu cada configuração, não qual é a melhor: adversário, piso, condições e forma do dia também contam."
+    override val compareSessions = "Sessões"
+    override val comparePerMatch: (String) -> String = { "$it por jogo" }
+    override val compareStrokes = "Pancadas das pulseiras"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "sensações de 1 sessão" else "sensações de $n sessões" }
+    override val feelTitle = "Sensações"
+    override val feelHint = "Como se sentiu? De 1 (pouco) a 5 (muito); toque de novo para apagar."
+    override val feelControl = "Controlo"
+    override val feelComfort = "Conforto"
+    override val feelPower = "Potência"
+    override val feelFatigue = "Cansaço"
+    override val racketUsed = "Raquete usada"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software livre sob a GNU GPL versão 3 ou posterior, sem nenhuma garantia." }
     override val aboutSource = "Código-fonte"
@@ -21269,6 +22180,617 @@ private fun printPdf(context: Context, file: File) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/RacketsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/RacketsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.DatePickerDialog
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Mood
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Feel
+import com.tennis.scoremanager.data.Racket
+import com.tennis.scoremanager.data.RacketCatalog
+import com.tennis.scoremanager.data.RacketStats
+import com.tennis.scoremanager.data.RacketUse
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.StringType
+import com.tennis.scoremanager.data.Stringing
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.ConfirmDialog
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.Picker
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import java.util.Calendar
+import java.util.Locale
+
+/**
+ * Pagina 1 › Racchette: le racchette del giocatore con le incordature (ore di gioco e soglia di controllo) e il
+ * confronto tra due configurazioni. Le schede di modifica sono pagine a sé, così la tastiera non copre i campi.
+ */
+@Composable
+fun RacketsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val rackets by c.rackets.collectAsState()
+    val history by c.history.collectAsState()
+    val workouts by c.workouts.collectAsState()
+    val o by c.options.collectAsState()
+    var tab by rememberSaveable { mutableStateOf(0) }
+    var editing by remember { mutableStateOf<Racket?>(null) }
+    /** Incordatura in modifica, con la sua racchetta. */
+    var stringing by remember { mutableStateOf<Pair<String, Stringing>?>(null) }
+    val sessions = remember(history, workouts) { c.racketSessions() }
+
+    val e = editing
+    val st = stringing
+    if (e != null) {
+        BackHandler { editing = null }
+        RacketEditor(c, e, isNew = rackets.none { it.id == e.id }) { editing = null }
+        return
+    }
+    if (st != null) {
+        BackHandler { stringing = null }
+        StringingEditor(c, st.first, st.second, o.lang) { stringing = null }
+        return
+    }
+    BackHandler { c.back() }
+    ScreenScaffold(
+        title = s.racketTitle,
+        subtitle = s.racketHint,
+        icon = Icons.Filled.SportsTennis,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        Segmented(listOf(SegOption(s.racketMine), SegOption(s.racketCompare)), selected = tab, onSelect = { tab = it })
+        if (tab == 0) {
+            if (rackets.isEmpty()) Text(s.racketEmpty, color = TsmColors.TextDim)
+            for (r in rackets.sortedBy { it.retired }) {
+                RacketCard(r, sessions, o.lang,
+                    onEdit = { editing = r },
+                    onNewStringing = { stringing = r.id to newStringing(c, r) },
+                    onStringing = { stringing = r.id to it },
+                )
+            }
+            BigButton(s.racketAdd, Icons.Filled.Add, {
+                editing = Racket(id = c.newRacketId(), pattern = "16x19", createdAt = System.currentTimeMillis())
+            }, Modifier.fillMaxWidth())
+            Text(s.stringCheckNote, color = TsmColors.TextDim, fontSize = 12.sp)
+        } else {
+            CompareTab(sessions, o.lang)
+        }
+    }
+}
+
+/** Nuova incordatura: si parte da quella montata (spesso si cambia solo la tensione), con la data di oggi. */
+private fun newStringing(c: MatchController, r: Racket): Stringing =
+    r.current?.copy(id = c.newStringingId(), date = System.currentTimeMillis(), notes = "")
+        ?: Stringing(id = c.newStringingId(), date = System.currentTimeMillis())
+
+// ---------------------------------------------------------------- testi
+
+/** 23 → "23", 23.5 → "23,5", 1.25 → "1,25" (fino a due decimali, con la virgola delle lingue che la usano). */
+internal fun num(v: Double, lang: Lang): String =
+    String.format(lang.locale, "%.2f", v).trimEnd('0').trimEnd(',', '.')
+
+/** "300 g · 320 mm · 645 cm² · 16x19". */
+internal fun specsLine(weightG: Int?, balanceMm: Int?, headCm2: Int?, pattern: String): String =
+    listOfNotNull(weightG?.let { "$it g" }, balanceMm?.let { "$it mm" }, headCm2?.let { "$it cm²" }, pattern.takeIf { it.isNotBlank() })
+        .joinToString(" · ")
+
+/** "Monofilamento · Babolat RPM Blast 1,25 mm · 23/22 kg". */
+internal fun stringLine(st: Stringing, s: Strings, lang: Lang): String {
+    val name = listOf(st.brand, st.model).filter { it.isNotBlank() }.joinToString(" ")
+    val cross = st.crossModel.takeIf { st.type == StringType.HYBRID && it.isNotBlank() }?.let { " / $it" }.orEmpty()
+    val tension = when {
+        st.mainsKg != null && st.crossesKg != null && st.mainsKg != st.crossesKg -> "${num(st.mainsKg, lang)}/${num(st.crossesKg, lang)} kg"
+        st.mainsKg != null -> "${num(st.mainsKg, lang)} kg"
+        st.crossesKg != null -> "${num(st.crossesKg, lang)} kg"
+        else -> null
+    }
+    return listOfNotNull(
+        s.stringTypeName(st.type.ordinal),
+        (name + cross).takeIf { it.isNotBlank() }?.let { n -> st.gaugeMm?.let { "$n ${num(it, lang)} mm" } ?: n }
+            ?: st.gaugeMm?.let { "${num(it, lang)} mm" },
+        tension,
+    ).joinToString(" · ")
+}
+
+/** Ore con una cifra decimale sotto le 10 ("2,5"), intere sopra. */
+private fun hoursText(h: Double, lang: Lang): String =
+    if (h < 0.05) "0" else if (h < 10) String.format(lang.locale, "%.1f", h) else "${Math.round(h)}"
+
+// ---------------------------------------------------------------- elenco
+
+@Composable
+private fun RacketCard(
+    r: Racket,
+    sessions: List<RacketStats.Session>,
+    lang: Lang,
+    onEdit: () -> Unit,
+    onNewStringing: () -> Unit,
+    onStringing: (Stringing) -> Unit,
+) {
+    val s = LocalStrings.current
+    SectionCard(r.label.ifBlank { s.racketNew }, Icons.Filled.SportsTennis, accent = if (r.retired) TsmColors.TextDim else TsmColors.Ball) {
+        val specs = specsLine(r.weightG, r.balanceMm, r.headCm2, r.pattern)
+        if (specs.isNotEmpty()) Text(specs, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (r.owner.isNotBlank()) Text(r.owner, color = TsmColors.TextDim, fontSize = 13.sp)
+        if (r.retired) Text(s.racketRetired, color = TsmColors.Orange, fontSize = 13.sp)
+        val cur = r.current
+        if (cur == null) {
+            Text(s.stringNone, color = TsmColors.TextDim)
+        } else {
+            Text(stringLine(cur, s, lang), color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+            Text("${s.stringDate}: ${Reports.date(cur.date, lang)}", color = TsmColors.TextDim, fontSize = 12.sp)
+            // Ore dall'ultima incordatura, con la barra fino alla soglia scelta dal giocatore.
+            val h = RacketStats.hours(cur.id, sessions)
+            val max = r.checkHours.coerceAtLeast(1)
+            val over = h >= max
+            Text(s.stringHours(hoursText(h, lang), max), color = if (over) TsmColors.Orange else TsmColors.TextMain, fontSize = 13.sp)
+            Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(TsmColors.SurfaceHigh)) {
+                Box(Modifier.fillMaxWidth((h / max).toFloat().coerceIn(0f, 1f)).height(8.dp).clip(RoundedCornerShape(4.dp))
+                    .background(if (over) TsmColors.Orange else TsmColors.Ball))
+            }
+            if (over) Text(s.stringCheck, color = TsmColors.Orange, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GhostButton(s.racketEdit, Icons.Filled.Edit, onEdit, Modifier.weight(1f))
+            GhostButton(s.stringNew, Icons.Filled.Add, onNewStringing, Modifier.weight(1f))
+        }
+        if (r.stringings.isNotEmpty()) {
+            Text(s.stringHistory, color = TsmColors.TextDim, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            for (st in r.stringings.sortedByDescending { it.date }) {
+                Surface(onClick = { onStringing(st) }, shape = RoundedCornerShape(12.dp), color = TsmColors.SurfaceHigh, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                        Text(stringLine(st, s, lang), color = TsmColors.TextMain, fontSize = 13.sp)
+                        Text("${Reports.date(st.date, lang)} · ${hoursText(RacketStats.hours(st.id, sessions), lang)} h",
+                            color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- schede
+
+@Composable
+private fun TextInput(
+    value: String,
+    label: String,
+    keyboard: KeyboardType = KeyboardType.Text,
+    max: Int = 40,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    onChange: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onChange(it.take(max)) },
+        label = { Text(label) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = if (keyboard == KeyboardType.Text) KeyboardCapitalization.Words else KeyboardCapitalization.None,
+            keyboardType = keyboard,
+        ),
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TsmColors.Ball, focusedLabelColor = TsmColors.Ball, cursorColor = TsmColors.Ball),
+        modifier = modifier,
+    )
+}
+
+private fun String.toIntOrNullTrim(): Int? = trim().toIntOrNull()
+
+/** Accetta sia "1,25" sia "1.25". */
+private fun String.toDoubleOrNullComma(): Double? = trim().replace(',', '.').toDoubleOrNull()
+
+private fun Double?.field(lang: Lang): String = this?.let { num(it, lang) } ?: ""
+
+@Composable
+private fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.collectAsState().value.lang
+    var name by remember { mutableStateOf(start.name) }
+    var brand by remember { mutableStateOf(start.brand) }
+    var model by remember { mutableStateOf(start.model) }
+    var weight by remember { mutableStateOf(start.weightG?.toString().orEmpty()) }
+    var balance by remember { mutableStateOf(start.balanceMm?.toString().orEmpty()) }
+    var head by remember { mutableStateOf(start.headCm2?.toString().orEmpty()) }
+    var pattern by remember { mutableStateOf(start.pattern) }
+    var owner by remember { mutableStateOf(start.owner) }
+    var check by remember { mutableStateOf(start.checkHours.toString()) }
+    var retired by remember { mutableStateOf(start.retired) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    fun build() = start.copy(
+        name = name.trim(), brand = brand.trim(), model = model.trim(),
+        weightG = weight.toIntOrNullTrim(), balanceMm = balance.toIntOrNullTrim(), headCm2 = head.toIntOrNullTrim(),
+        pattern = pattern.trim(), owner = owner.trim(),
+        checkHours = check.toIntOrNullTrim()?.coerceIn(1, 999) ?: Racket.DEFAULT_CHECK_HOURS, retired = retired,
+    )
+    ScreenScaffold(
+        title = if (isNew) s.racketNew else s.racketEdit,
+        subtitle = start.label.takeIf { !isNew && it.isNotBlank() },
+        icon = Icons.Filled.SportsTennis,
+        bottomBar = {
+            GhostButton(s.cancel, Icons.AutoMirrored.Filled.ArrowBack, onClose, Modifier.weight(1f))
+            BigButton(s.save, Icons.Filled.Save, {
+                c.saveRacket(build())
+                onClose()
+            }, Modifier.weight(1f))
+        },
+    ) {
+        SectionCard(s.racketCatalog, Icons.Filled.Inventory2) {
+            Picker(s.racketCatalog, listOf(brand, model).filter { it.isNotBlank() }.joinToString(" ").ifBlank { "–" },
+                RacketCatalog.models.map { it to it.label }) { m ->
+                brand = m.brand
+                model = m.model
+                weight = m.weightG.toString()
+                balance = m.balanceMm.toString()
+                head = m.headCm2.toString()
+                pattern = m.pattern
+            }
+            Text(s.racketCatalogHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        SectionCard(s.racketField, Icons.Filled.SportsTennis) {
+            TextInput(name, s.racketName) { name = it }
+            TextInput(brand, s.racketBrand) { brand = it }
+            TextInput(model, s.racketModel) { model = it }
+            // Uno per riga: "Bilanciamento (mm)" a metà larghezza andrebbe a capo.
+            TextInput(weight, s.racketWeight, KeyboardType.Number, 4) { weight = it }
+            TextInput(balance, s.racketBalance, KeyboardType.Number, 3) { balance = it }
+            TextInput(head, s.racketHead, KeyboardType.Number, 3) { head = it }
+            Text(s.racketPattern, color = TsmColors.TextDim, fontSize = 13.sp)
+            val patterns = listOf("16x19", "18x20", "16x18", "18x16")
+            Segmented(patterns.map { SegOption(it) }, selected = patterns.indexOf(pattern), onSelect = { pattern = patterns[it] })
+            TextInput(pattern, s.racketPattern, max = 10) { pattern = it }
+            TextInput(owner, s.racketOwner) { owner = it }
+        }
+        SectionCard(s.stringTitle, Icons.Filled.Timer) {
+            TextInput(check, s.racketCheckHours, KeyboardType.Number, 3) { check = it }
+            Text(s.stringCheckNote, color = TsmColors.TextDim, fontSize = 12.sp)
+            SwitchRow(Icons.Filled.Inventory2, s.racketRetired, s.racketRetiredHint, retired) { retired = it }
+        }
+        if (!isNew) GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.fillMaxWidth())
+    }
+    if (confirmDelete) {
+        ConfirmDialog(
+            Icons.Filled.Delete, s.racketDeleteTitle, s.racketDeleteText, s.delete,
+            onConfirm = {
+                confirmDelete = false
+                c.deleteRacket(start.id)
+                onClose()
+            },
+            onDismiss = { confirmDelete = false },
+            danger = true,
+        )
+    }
+}
+
+@Composable
+private fun StringingEditor(c: MatchController, racketId: String, start: Stringing, lang: Lang, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val racket = c.racketById(racketId)
+    val isNew = racket?.stringings?.none { it.id == start.id } ?: true
+    var type by remember { mutableStateOf(start.type) }
+    var brand by remember { mutableStateOf(start.brand) }
+    var model by remember { mutableStateOf(start.model) }
+    var cross by remember { mutableStateOf(start.crossModel) }
+    var gauge by remember { mutableStateOf(start.gaugeMm.field(lang)) }
+    var mains by remember { mutableStateOf(start.mainsKg.field(lang)) }
+    var crosses by remember { mutableStateOf(start.crossesKg.field(lang)) }
+    var date by remember { mutableStateOf(start.date) }
+    var notes by remember { mutableStateOf(start.notes) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = if (isNew) s.stringNew else s.stringTitle,
+        subtitle = racket?.label,
+        icon = Icons.Filled.SportsTennis,
+        bottomBar = {
+            GhostButton(s.cancel, Icons.AutoMirrored.Filled.ArrowBack, onClose, Modifier.weight(1f))
+            BigButton(s.save, Icons.Filled.Save, {
+                val m = mains.toDoubleOrNullComma()
+                c.saveStringing(racketId, start.copy(
+                    type = type, brand = brand.trim(), model = model.trim(), crossModel = if (type == StringType.HYBRID) cross.trim() else "",
+                    gaugeMm = gauge.toDoubleOrNullComma(), mainsKg = m,
+                    // Una tensione sola vale per verticali e orizzontali.
+                    crossesKg = crosses.toDoubleOrNullComma() ?: m,
+                    date = date, notes = notes.trim(),
+                ))
+                onClose()
+            }, Modifier.weight(1f))
+        },
+    ) {
+        SectionCard(s.stringTitle, Icons.Filled.SportsTennis) {
+            Picker(s.stringCatalog, listOf(brand, model).filter { it.isNotBlank() }.joinToString(" ").ifBlank { "–" },
+                RacketCatalog.strings.map { it to it.label }) { m ->
+                brand = m.brand
+                model = m.model
+                type = m.type
+                gauge = num(m.gaugeMm, lang)
+            }
+            Text(s.stringType, color = TsmColors.TextDim, fontSize = 13.sp)
+            Segmented(StringType.entries.map { SegOption(s.stringTypeName(it.ordinal)) }, selected = type.ordinal,
+                onSelect = { type = StringType.entries[it] }, columns = 2)
+            TextInput(brand, s.racketBrand) { brand = it }
+            TextInput(model, s.racketModel) { model = it }
+            if (type == StringType.HYBRID) TextInput(cross, s.stringCross) { cross = it }
+            TextInput(gauge, s.stringGauge, KeyboardType.Decimal, 5) { gauge = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextInput(mains, s.stringMains, KeyboardType.Decimal, 5, Modifier.weight(1f)) { mains = it }
+                TextInput(crosses, s.stringCrosses, KeyboardType.Decimal, 5, Modifier.weight(1f)) { crosses = it }
+            }
+            GhostButton("${s.stringDate}: ${Reports.date(date, lang)}", Icons.Filled.CalendarMonth, {
+                val cal = Calendar.getInstance().apply { timeInMillis = date }
+                DatePickerDialog(context, { _, y, m, d ->
+                    // Mezzogiorno: la data resta la stessa anche cambiando fuso orario.
+                    date = Calendar.getInstance().apply { set(y, m, d, 12, 0, 0) }.timeInMillis
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+            }, Modifier.fillMaxWidth())
+            OutlinedTextField(
+                value = notes, onValueChange = { notes = it.take(300) }, label = { Text(s.stringNotes) }, minLines = 2,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TsmColors.Ball, focusedLabelColor = TsmColors.Ball, cursorColor = TsmColors.Ball),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (!isNew) GhostButton(s.delete, Icons.Filled.Delete, { confirmDelete = true }, Modifier.fillMaxWidth())
+    }
+    if (confirmDelete) {
+        ConfirmDialog(
+            Icons.Filled.Delete, s.stringDeleteTitle, s.racketDeleteText, s.delete,
+            onConfirm = {
+                confirmDelete = false
+                c.deleteStringing(racketId, start.id)
+                onClose()
+            },
+            onDismiss = { confirmDelete = false },
+            danger = true,
+        )
+    }
+}
+
+// ---------------------------------------------------------------- confronto
+
+/** Una riga del confronto: [better] true = più alto è meglio, false = più basso, null = non si dice. */
+private class Row2(
+    val label: String, val unit: String, val a: Double?, val b: Double?, val better: Boolean?, val decimals: Int = 0, val max: Double? = null,
+    /** Testo del valore al posto di numero e unità. */
+    val text: ((Double) -> String)? = null,
+)
+
+/** Tempo di gioco da ore: "25 min", "3 h 05". */
+private fun playTime(h: Double): String {
+    val min = Math.round(h * 60)
+    return if (min < 60) "$min min" else String.format(Locale.ROOT, "%d h %02d", min / 60, min % 60)
+}
+
+@Composable
+private fun CompareTab(sessions: List<RacketStats.Session>, lang: Lang) {
+    val s = LocalStrings.current
+    var byStringing by rememberSaveable { mutableStateOf(false) }
+    Segmented(listOf(SegOption(s.compareByRacket), SegOption(s.compareByString)), selected = if (byStringing) 1 else 0,
+        onSelect = { byStringing = it == 1 })
+    val configs = remember(sessions, byStringing) { RacketStats.configs(sessions, byStringing) }
+    if (configs.size < 2) {
+        Text(s.compareTooFew, color = TsmColors.TextDim)
+        return
+    }
+    fun label(cs: RacketStats.ConfigStats): String {
+        val st = cs.use.stringing
+        return if (byStringing && st != null) "${cs.use.label} · ${stringLine(st, s, lang)} · ${Reports.date(st.date, lang)}" else cs.use.label
+    }
+    var keyA by rememberSaveable(byStringing) { mutableStateOf(configs[0].key) }
+    var keyB by rememberSaveable(byStringing) { mutableStateOf(configs[1].key) }
+    val a = configs.firstOrNull { it.key == keyA } ?: configs[0]
+    val b = configs.firstOrNull { it.key == keyB } ?: configs[1]
+    val options = configs.map { it.key to label(it) }
+    Picker(s.compareA, label(a), options) { keyA = it }
+    Picker(s.compareB, label(b), options) { keyB = it }
+
+    val rows = listOf(
+        Row2(s.compareSessions, "", a.sessions.toDouble(), b.sessions.toDouble(), null),
+        Row2(s.racketHours, "", a.hours, b.hours, null, text = ::playTime),
+        Row2(s.progressWins, "%", a.winPct, b.winPct, true, max = 100.0),
+        Row2(s.progressPointsWon, "%", a.pointsWonPct, b.pointsWonPct, true, max = 100.0),
+        Row2(s.statFirstServeIn, "%", a.firstServeInPct, b.firstServeInPct, true, max = 100.0),
+        Row2(s.statFirstServeWon, "%", a.firstServeWonPct, b.firstServeWonPct, true, max = 100.0),
+        Row2(s.statSecondServeWon, "%", a.secondServeWonPct, b.secondServeWonPct, true, max = 100.0),
+        Row2(s.comparePerMatch(s.statAces), "", a.acesPerMatch, b.acesPerMatch, true, 1),
+        Row2(s.comparePerMatch(s.statDoubleFaults), "", a.doubleFaultsPerMatch, b.doubleFaultsPerMatch, false, 1),
+        Row2(s.comparePerMatch(s.statWinners), "", a.winnersPerMatch, b.winnersPerMatch, true, 1),
+        Row2(s.comparePerMatch(s.statUnforcedErrors), "", a.unforcedPerMatch, b.unforcedPerMatch, false, 1),
+        Row2(s.statAvgWristSpeed, "°/s", a.wristDps, b.wristDps, null),
+        Row2(s.comparePerMatch(s.compareStrokes), "", a.strokesPerMatch, b.strokesPerMatch, null),
+        Row2(s.heartAvg, "bpm", a.heartAvg, b.heartAvg, null),
+    ).filter { it.a != null || it.b != null }
+    val feel = listOf(
+        Row2(s.feelControl, "", a.control, b.control, true, 1, 5.0),
+        Row2(s.feelComfort, "", a.comfort, b.comfort, true, 1, 5.0),
+        Row2(s.feelPower, "", a.power, b.power, true, 1, 5.0),
+        Row2(s.feelFatigue, "", a.fatigue, b.fatigue, false, 1, 5.0),
+    ).filter { it.a != null || it.b != null }
+
+    SectionCard(s.racketCompare, Icons.AutoMirrored.Filled.CompareArrows) {
+        Legend(TsmColors.Player1, "A", label(a))
+        Legend(TsmColors.Player2, "B", label(b))
+        rows.forEach { CompareRow(it, lang) }
+    }
+    if (feel.isNotEmpty()) {
+        SectionCard(s.feelTitle, Icons.Filled.Mood) {
+            Text("A: ${s.compareRated(a.rated)} · B: ${s.compareRated(b.rated)}", color = TsmColors.TextDim, fontSize = 12.sp)
+            feel.forEach { CompareRow(it, lang) }
+        }
+    }
+    Text(s.compareNote, color = TsmColors.TextDim, fontSize = 12.sp)
+}
+
+@Composable
+private fun Legend(color: Color, tag: String, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(18.dp).clip(RoundedCornerShape(5.dp)).background(color), contentAlignment = Alignment.Center) {
+            Text(tag, color = TsmColors.Background, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer8()
+        Text(text, color = TsmColors.TextMain, fontSize = 13.sp)
+    }
+}
+
+@Composable
+private fun Spacer8() = Box(Modifier.width(8.dp))
+
+/** Etichetta, poi una barra per configurazione col valore; il valore migliore (se si può dire) in grassetto. */
+@Composable
+private fun CompareRow(r: Row2, lang: Lang) {
+    val top = r.max ?: maxOf(r.a ?: 0.0, r.b ?: 0.0).takeIf { it > 0 } ?: 1.0
+    val best = if (r.a != null && r.b != null && r.better != null && r.a != r.b) {
+        if ((r.a > r.b) == r.better) 0 else 1
+    } else -1
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Text(r.label, color = TsmColors.TextDim, fontSize = 12.sp)
+        for ((i, v) in listOf(r.a, r.b).withIndex()) {
+            val color = if (i == 0) TsmColors.Player1 else TsmColors.Player2
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(5.dp)).background(TsmColors.SurfaceHigh)) {
+                    if (v != null) Box(Modifier.fillMaxWidth((v / top).toFloat().coerceIn(0.02f, 1f)).height(10.dp).clip(RoundedCornerShape(5.dp)).background(color))
+                }
+                Text(
+                    v?.let { r.text?.invoke(it) } ?: v?.let { (if (r.decimals == 0) "${Math.round(it)}" else String.format(lang.locale, "%.${r.decimals}f", it)) + if (r.unit.isNotEmpty()) " ${r.unit}" else "" } ?: "–",
+                    color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = if (best == i) FontWeight.Bold else FontWeight.Normal,
+                    textAlign = TextAlign.End, modifier = Modifier.width(76.dp),
+                )
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- usati da altre schermate
+
+/** Scelta della racchetta: "Nessuna" e le racchette non messe da parte (quelle di [owner] per prime). */
+@Composable
+internal fun RacketPicker(c: MatchController, selected: String, owner: String = "", onSelect: (String) -> Unit) {
+    val s = LocalStrings.current
+    val rackets by c.rackets.collectAsState()
+    val k = owner.trim().lowercase(Locale.ROOT)
+    val shown = rackets.filter { !it.retired || it.id == selected }
+        .sortedByDescending { k.isNotEmpty() && it.owner.trim().lowercase(Locale.ROOT) == k }
+    val current = rackets.firstOrNull { it.id == selected }
+    Picker(s.racketField, current?.label?.ifBlank { s.racketField } ?: s.racketNone,
+        listOf("" to s.racketNone) + shown.map { it.id to it.label.ifBlank { s.racketField } }) { onSelect(it) }
+}
+
+/**
+ * Racchetta di una sessione già giocata (riepilogo della partita o dell'allenamento): quale era, con che corde,
+ * e le sensazioni da 1 a 5. Senza racchette registrate non compare.
+ */
+@Composable
+internal fun RacketSessionCard(
+    c: MatchController,
+    title: String,
+    use: RacketUse?,
+    lang: Lang,
+    accent: Color = TsmColors.Ball,
+    onRacket: (String) -> Unit,
+    onFeel: (Feel) -> Unit,
+) {
+    val s = LocalStrings.current
+    val rackets by c.rackets.collectAsState()
+    if (rackets.isEmpty() && use == null) return
+    SectionCard(title, Icons.Filled.SportsTennis, accent = accent) {
+        // Una racchetta tolta dall'elenco resta nella partita: la si mostra col suo nome.
+        if (use != null && rackets.none { it.id == use.racketId }) {
+            Text(use.label, color = TsmColors.TextMain, fontWeight = FontWeight.SemiBold)
+        } else {
+            RacketPicker(c, use?.racketId.orEmpty()) { onRacket(it) }
+        }
+        if (use == null) return@SectionCard
+        val specs = specsLine(use.weightG, use.balanceMm, use.headCm2, use.pattern)
+        if (specs.isNotEmpty()) Text(specs, color = TsmColors.TextDim, fontSize = 12.sp)
+        use.stringing?.let { Text(stringLine(it, s, lang), color = TsmColors.TextDim, fontSize = 12.sp) }
+        Text(s.feelHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        val f = use.feel ?: Feel()
+        FeelRow(s.feelControl, f.control, accent) { onFeel(f.copy(control = it)) }
+        FeelRow(s.feelComfort, f.comfort, accent) { onFeel(f.copy(comfort = it)) }
+        FeelRow(s.feelPower, f.power, accent) { onFeel(f.copy(power = it)) }
+        FeelRow(s.feelFatigue, f.fatigue, accent) { onFeel(f.copy(fatigue = it)) }
+    }
+}
+
+/** Da 1 a 5; ritoccando il valore scelto lo si toglie. */
+@Composable
+private fun FeelRow(label: String, value: Int, accent: Color, onChange: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        for (v in 1..5) {
+            val on = v <= value
+            Surface(
+                onClick = { onChange(if (v == value) 0 else v) },
+                shape = RoundedCornerShape(10.dp),
+                color = if (on) accent else TsmColors.SurfaceHigh,
+                modifier = Modifier.padding(start = 4.dp).size(34.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text("$v", color = if (on) TsmColors.Background else TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -21354,6 +22876,7 @@ fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
     val o by c.options.collectAsState()
+    val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
@@ -21409,6 +22932,11 @@ fun SetupScreen(c: MatchController) {
         }
         PlayerCard(c, su, Side.P1)
         PlayerCard(c, su, Side.P2)
+        // Racchetta virtuale: le racchette con corde e tensioni, da confrontare nel tempo.
+        SectionCard(s.racketTitle, Icons.Filled.SportsTennis) {
+            Text(if (rackets.isEmpty()) s.racketHint else s.racketSetupHint, color = TsmColors.TextDim)
+            GhostButton(s.racketMine, Icons.Filled.SportsTennis, { c.openRackets() }, Modifier.fillMaxWidth())
+        }
         // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
         SectionCard(s.displayMode, Icons.Filled.Tv) {
             Text(s.displayModeHint, color = TsmColors.TextDim)
@@ -21462,6 +22990,12 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
         }
         SexChoice(if (side == Side.P1) su.p1aSex else su.p2aSex, accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
+        }
+        // La racchetta di oggi: la partita ne tiene una copia con corde e tensione.
+        if (c.rackets.collectAsState().value.isNotEmpty()) {
+            RacketPicker(c, if (side == Side.P1) su.p1Racket else su.p2Racket, a) { id ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1Racket = id) else it.copy(p2Racket = id) }
+            }
         }
         if (su.doubles) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -22021,6 +23555,11 @@ fun SummaryScreen(c: MatchController) {
                 2 -> MatchChronologyTab(rec, names)
                 else -> {
                     SummaryInfo(rec, state, names)
+                    // Racchetta di ciascun lato e sensazioni: alimentano il confronto delle racchette.
+                    for (side in Side.entries) {
+                        RacketSessionCard(c, "${s.racketUsed} · ${names.side(side)}", rec.rackets[side], lang, TsmColors.player(side),
+                            onRacket = { c.setMatchRacket(side, it) }, onFeel = { c.setMatchFeel(side, it) })
+                    }
                     MatchPhotosCard(c, rec.id)
                     MatchNotesCard(c, rec.id, rec.notes)
                 }
@@ -22941,6 +24480,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.Surface
@@ -22992,6 +24532,8 @@ fun WorkoutScreen(c: MatchController) {
     val straps by c.straps.collectAsState()
     val list by c.workouts.collectAsState()
     val o by c.options.collectAsState()
+    val rackets by c.rackets.collectAsState()
+    val workoutRacket by c.workoutRacket.collectAsState()
     ScreenScaffold(
         title = s.workoutTitle,
         subtitle = s.workoutHint,
@@ -23044,6 +24586,12 @@ fun WorkoutScreen(c: MatchController) {
         }
         // La fascia si sceglie qui, senza passare dalla pagina 2.
         if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
+        // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
+        if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
+            SectionCard(s.racketField, Icons.Filled.SportsTennis) {
+                RacketPicker(c, workoutRacket) { c.setWorkoutRacket(it) }
+            }
+        }
         if (ui.phase == WorkoutPhase.IDLE) {
             SectionCard(s.workoutHistory, Icons.Filled.TableChart) {
                 if (list.isEmpty()) Text(s.workoutNone, color = TsmColors.TextDim)
@@ -23101,6 +24649,7 @@ private fun WorkoutDetail(c: MatchController, w: WorkoutRecord) {
                 for (l in laps) Text(WorkoutReport.lapLine(l, s), color = TsmColors.TextMain, fontSize = 13.sp)
             }
         }
+        RacketSessionCard(c, s.racketUsed, w.racket, o.lang, onRacket = { c.setWorkoutRacketOf(it) }, onFeel = { c.setWorkoutFeel(it) })
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GhostButton(s.workoutShareCsv, Icons.Filled.TableChart, {
                 c.workoutShareIntent(w, pdf = false)?.let { context.startActivity(it) }
@@ -38886,6 +40435,159 @@ class ProgressTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/RacketTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/RacketTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.MatchEvent
+import com.tennis.scoremanager.model.PointKind
+import com.tennis.scoremanager.model.RulesConfig
+import com.tennis.scoremanager.model.Side
+import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class RacketTest {
+
+    private val hour = 3_600_000L
+    private val day = 86_400_000L
+
+    private val mono23 = Stringing("s1", date = 10 * day, brand = "Babolat", model = "RPM Blast", gaugeMm = 1.25, mainsKg = 23.0, crossesKg = 22.0)
+    private val mono21 = mono23.copy(id = "s2", date = 20 * day, mainsKg = 21.0, crossesKg = 21.0)
+    private val a = Racket("rA", name = "A", brand = "Babolat", model = "Pure Drive", stringings = listOf(mono23, mono21))
+    private val b = Racket("rB", name = "B", brand = "Head", model = "Speed MP", stringings = listOf(Stringing("s3", 5 * day, StringType.MULTI)))
+
+    /** Partita finita in cui P1 vince [p1] punti su [p1 + p2], con la racchetta [use] per P1. */
+    private fun match(id: String, at: Long, use: RacketUse?, p1: Int, p2: Int, minutes: Int = 60, events: List<MatchEvent>? = null): PlayerStats.Played {
+        val ev = events ?: (List(p1) { MatchEvent.Point(Side.P1) } + List(p2) { MatchEvent.Point(Side.P2) })
+        val rec = MatchRecord(
+            id = id, setup = SetupData(p1a = "Rossi", p2a = "Bianchi"), options = MatchOptions(), rules = RulesConfig(),
+            events = ev, clockMs = minutes * 60_000L, startedAt = at, finished = true,
+            rackets = use?.let { mapOf(Side.P1 to it) } ?: emptyMap(),
+        )
+        return PlayerStats.Played(rec, if (p1 >= p2) Side.P1 else Side.P2)
+    }
+
+    @Test
+    fun currentStringingIsTheMostRecent() {
+        assertEquals("s2", a.current?.id)
+        assertEquals("A · Babolat Pure Drive", a.label)
+        assertEquals("Babolat Pure Drive", a.copy(name = "").label)
+    }
+
+    @Test
+    fun useAtPicksTheStringingMountedThatDay() {
+        assertEquals("s1", a.useAt(15 * day).stringing?.id)
+        assertEquals("s2", a.useAt(25 * day).stringing?.id)
+        // Partita prima di ogni incordatura registrata: la più vecchia.
+        assertEquals("s1", a.useAt(1 * day).stringing?.id)
+        assertNull(Racket("x").use().stringing)
+    }
+
+    @Test
+    fun sessionKeepsItsCopyWhenTheRacketChanges() {
+        val use = a.use()
+        val restrung = a.copy(stringings = a.stringings + mono23.copy(id = "s9", date = 30 * day, mainsKg = 25.0))
+        assertEquals("s9", restrung.use().stringing?.id)
+        assertEquals(21.0, use.stringing?.mainsKg)
+    }
+
+    @Test
+    fun hoursCountSessionsOfThatStringingOnce() {
+        val both = match("m1", 21 * day, a.useAt(21 * day), 4, 0, minutes = 90).let { p ->
+            // Stessa racchetta segnata per tutti e due i lati: la partita conta una volta.
+            p.copy(rec = p.rec.copy(rackets = mapOf(Side.P1 to a.useAt(21 * day), Side.P2 to a.useAt(21 * day))))
+        }
+        val older = match("m2", 12 * day, a.useAt(12 * day), 4, 0, minutes = 60)
+        val w = WorkoutRecord("w1", startedAt = 22 * day, durationS = 1800, racket = a.useAt(22 * day))
+        val sessions = RacketStats.sessions(listOf(both, older), listOf(w))
+        assertEquals(2.0, RacketStats.hours("s2", sessions), 1e-9)
+        assertEquals(1.0, RacketStats.hours("s1", sessions), 1e-9)
+        assertEquals(3.0, RacketStats.racketHours("rA", sessions), 1e-9)
+        assertEquals(4, sessions.size)
+    }
+
+    @Test
+    fun configsGroupByRacketOrByStringing() {
+        val sessions = RacketStats.sessions(
+            listOf(
+                match("m1", 12 * day, a.useAt(12 * day), 4, 0),
+                match("m2", 22 * day, a.useAt(22 * day), 0, 4),
+                match("m3", 22 * day, b.use(), 4, 4),
+                match("m4", 23 * day, null, 4, 0),
+            ),
+            emptyList(),
+        )
+        val byRacket = RacketStats.configs(sessions, byStringing = false)
+        assertEquals(listOf("rA", "rB"), byRacket.map { it.key })
+        val ra = byRacket.first { it.key == "rA" }
+        assertEquals(2, ra.matches)
+        assertEquals(50.0, ra.winPct!!, 1e-9)
+        assertEquals(50.0, ra.pointsWonPct!!, 1e-9)
+        val byString = RacketStats.configs(sessions, byStringing = true)
+        assertEquals(3, byString.size)
+        assertEquals(100.0, byString.first { it.key == "rA/s1" }.winPct!!, 1e-9)
+        assertEquals(0.0, byString.first { it.key == "rA/s2" }.pointsWonPct!!, 1e-9)
+    }
+
+    @Test
+    fun serveStatsOnlyFromDetailedMatches() {
+        // P1 serve il primo game: ace, doppio fallo (seconda), punto vinto sulla prima, punto vinto sulla seconda.
+        val ev = listOf(
+            MatchEvent.Point(Side.P1, kind = PointKind.ACE),
+            MatchEvent.Point(Side.P2, kind = PointKind.DOUBLE_FAULT, secondServe = true),
+            MatchEvent.Point(Side.P1),
+            MatchEvent.Point(Side.P1, secondServe = true),
+        )
+        val detailed = match("m1", 12 * day, a.useAt(12 * day), 0, 0, events = ev)
+        val plain = match("m2", 13 * day, a.useAt(13 * day), 4, 0)
+        val cs = RacketStats.configs(RacketStats.sessions(listOf(detailed, plain), emptyList()), false).single()
+        assertEquals(2, cs.matches)
+        // Solo la partita dettagliata: 2 prime dentro su 4 punti al servizio, entrambe vinte.
+        assertEquals(50.0, cs.firstServeInPct!!, 1e-9)
+        assertEquals(100.0, cs.firstServeWonPct!!, 1e-9)
+        assertEquals(1.0, cs.acesPerMatch!!, 1e-9)
+        assertEquals(1.0, cs.doubleFaultsPerMatch!!, 1e-9)
+    }
+
+    @Test
+    fun feelAveragesIgnoreMissingValues() {
+        val s = RacketStats.sessions(
+            emptyList(),
+            listOf(
+                WorkoutRecord("w1", startedAt = 1, durationS = 600, racket = b.use().copy(feel = Feel(control = 4, comfort = 2))),
+                WorkoutRecord("w2", startedAt = 2, durationS = 600, racket = b.use().copy(feel = Feel(control = 2, fatigue = 5))),
+                WorkoutRecord("w3", startedAt = 3, durationS = 600, racket = b.use()),
+            ),
+        )
+        val cs = RacketStats.configs(s, false).single()
+        assertEquals(3, cs.workouts)
+        assertEquals(2, cs.rated)
+        assertEquals(3.0, cs.control!!, 1e-9)
+        assertEquals(2.0, cs.comfort!!, 1e-9)
+        assertNull(cs.power)
+        assertEquals(5.0, cs.fatigue!!, 1e-9)
+        assertEquals(0.5, cs.hours, 1e-9)
+    }
+
+    @Test
+    fun oldSavesWithoutRacketsStillLoad() {
+        val json = Json { ignoreUnknownKeys = true }
+        val rec = json.decodeFromString(MatchRecord.serializer(), """{"id":"m1","setup":{},"options":{},"rules":{}}""")
+        assertEquals(emptyMap<Side, RacketUse>(), rec.rackets)
+        val w = json.decodeFromString(WorkoutRecord.serializer(), """{"id":"w1","startedAt":1}""")
+        assertNull(w.racket)
+        // E le nuove si rileggono uguali.
+        val withRacket = rec.copy(rackets = mapOf(Side.P2 to a.use().copy(feel = Feel(power = 3))))
+        assertEquals(withRacket, json.decodeFromString(MatchRecord.serializer(), json.encodeToString(MatchRecord.serializer(), withRacket)))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -45471,6 +47173,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 138 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 141 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

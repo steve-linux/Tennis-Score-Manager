@@ -822,6 +822,71 @@ interface Strings {
     val displayRetry: String
 
     // In fondo alla pagina 1: versione, licenza (GPL) e link al codice sorgente
+
+    // Racchetta virtuale
+    val racketTitle: String
+    val racketHint: String
+    val racketMine: String
+    val racketCompare: String
+    val racketAdd: String
+    val racketNew: String
+    val racketEdit: String
+    val racketNone: String
+    val racketEmpty: String
+    val racketField: String
+    val racketSetupHint: String
+    val racketCatalog: String
+    val racketCatalogHint: String
+    val racketName: String
+    val racketBrand: String
+    val racketModel: String
+    val racketWeight: String
+    val racketBalance: String
+    val racketHead: String
+    val racketPattern: String
+    val racketOwner: String
+    val racketCheckHours: String
+    val racketRetired: String
+    val racketRetiredHint: String
+    val racketDeleteTitle: String
+    val racketDeleteText: String
+    val stringTitle: String
+    val stringNew: String
+    val stringHistory: String
+    val stringNone: String
+    val stringType: String
+    val stringTypeName: (Int) -> String
+    val stringCatalog: String
+    val stringCross: String
+    val stringGauge: String
+    val stringMains: String
+    val stringCrosses: String
+    val stringDate: String
+    val stringNotes: String
+    val stringHours: (String, Int) -> String
+    val stringCheck: String
+    val stringCheckNote: String
+    val stringDeleteTitle: String
+    val racketHours: String
+    val racketSessions: (Int) -> String
+    val compareByRacket: String
+    val compareByString: String
+    val compareA: String
+    val compareB: String
+    val compareTooFew: String
+    val compareNote: String
+    val compareSessions: String
+    val comparePerMatch: (String) -> String
+    val compareStrokes: String
+    val compareRated: (Int) -> String
+    val feelTitle: String
+    val feelHint: String
+    val feelControl: String
+    val feelComfort: String
+    val feelPower: String
+    val feelFatigue: String
+    val racketUsed: String
+
     val aboutLicense: (String) -> String
     val aboutSource: String
 }
@@ -1601,6 +1666,70 @@ object ItStrings : Strings {
     override val displayShowHere = "Mostra anche qui"
     override val displayBackAgain = "Premi di nuovo indietro per uscire"
     override val displayRetry = "Cerca di nuovo"
+
+    // Racchetta virtuale
+    override val racketTitle = "Racchette"
+    override val racketHint = "Confronta statistiche e sensazioni con racchette, corde o tensioni diverse."
+    override val racketMine = "Le mie racchette"
+    override val racketCompare = "Confronto"
+    override val racketAdd = "Aggiungi racchetta"
+    override val racketNew = "Nuova racchetta"
+    override val racketEdit = "Modifica"
+    override val racketNone = "Nessuna"
+    override val racketEmpty = "Nessuna racchetta. Aggiungi le tue racchette con corde e tensione: poi scegli quella usata prima di ogni partita o allenamento."
+    override val racketField = "Racchetta"
+    override val racketSetupHint = "Scegli la racchetta di ciascun giocatore: la partita ricorderà racchetta, corde e tensione di oggi."
+    override val racketCatalog = "Dal catalogo"
+    override val racketCatalogHint = "Dati del produttore, indicativi: se hai misurato la tua racchetta correggili."
+    override val racketName = "Soprannome (A, B…)"
+    override val racketBrand = "Marca"
+    override val racketModel = "Modello"
+    override val racketWeight = "Peso (g)"
+    override val racketBalance = "Bilanciamento (mm)"
+    override val racketHead = "Piatto corde (cm²)"
+    override val racketPattern = "Schema corde"
+    override val racketOwner = "Di chi è (nome della pagina 1)"
+    override val racketCheckHours = "Controllo corde dopo (ore)"
+    override val racketRetired = "Messa da parte"
+    override val racketRetiredHint = "Non si propone più prima di giocare, ma resta nei confronti."
+    override val racketDeleteTitle = "Eliminare la racchetta?"
+    override val racketDeleteText = "Le partite e gli allenamenti già giocati ne conservano una copia e restano nel confronto."
+    override val stringTitle = "Incordatura"
+    override val stringNew = "Nuova incordatura"
+    override val stringHistory = "Storico incordature"
+    override val stringNone = "Nessuna incordatura registrata."
+    override val stringType = "Tipo di corda"
+    override val stringTypeName: (Int) -> String = { listOf("Monofilamento", "Multifilamento", "Sintetico", "Budello", "Ibrido").getOrElse(it) { "" } }
+    override val stringCatalog = "Corde comuni"
+    override val stringCross = "Corda delle orizzontali"
+    override val stringGauge = "Calibro (mm)"
+    override val stringMains = "Verticali (kg)"
+    override val stringCrosses = "Orizzontali (kg)"
+    override val stringDate = "Data dell'incordatura"
+    override val stringNotes = "Note"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h di gioco dall'ultima incordatura · controllo a $max h" }
+    override val stringCheck = "Ore di controllo raggiunte: dai un'occhiata alle corde."
+    override val stringCheckNote = "Le ore sono quelle delle partite e degli allenamenti associati alla racchetta. Dal solo tempo l'app non può sapere quanta tensione è rimasta."
+    override val stringDeleteTitle = "Eliminare l'incordatura?"
+    override val racketHours = "Ore di gioco"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 sessione" else "$n sessioni" }
+    override val compareByRacket = "Per racchetta"
+    override val compareByString = "Per incordatura"
+    override val compareA = "Configurazione A"
+    override val compareB = "Configurazione B"
+    override val compareTooFew = "Per confrontare servono partite o allenamenti con almeno due configurazioni diverse. Scegli la racchetta in pagina 1 o nell'allenamento, oppure associala dal riepilogo."
+    override val compareNote = "I numeri dicono com'è andata con ciascuna configurazione, non quale sia la migliore: contano anche avversario, superficie, condizioni e forma del giorno."
+    override val compareSessions = "Sessioni"
+    override val comparePerMatch: (String) -> String = { "$it a partita" }
+    override val compareStrokes = "Colpi dei braccialetti"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "sensazioni da 1 sessione" else "sensazioni da $n sessioni" }
+    override val feelTitle = "Sensazioni"
+    override val feelHint = "Come ti sei trovato? Da 1 (poco) a 5 (molto); ritocca per togliere."
+    override val feelControl = "Controllo"
+    override val feelComfort = "Comfort"
+    override val feelPower = "Potenza"
+    override val feelFatigue = "Fatica"
+    override val racketUsed = "Racchetta usata"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · software libero con licenza GNU GPL versione 3 o successiva, senza alcuna garanzia." }
     override val aboutSource = "Codice sorgente"
@@ -2382,6 +2511,70 @@ object EnStrings : Strings {
     override val displayShowHere = "Show here too"
     override val displayBackAgain = "Press back again to exit"
     override val displayRetry = "Search again"
+
+    // Racchetta virtuale
+    override val racketTitle = "Rackets"
+    override val racketHint = "Compare stats and feel across different rackets, strings or tensions."
+    override val racketMine = "My rackets"
+    override val racketCompare = "Comparison"
+    override val racketAdd = "Add racket"
+    override val racketNew = "New racket"
+    override val racketEdit = "Edit"
+    override val racketNone = "None"
+    override val racketEmpty = "No rackets yet. Add your rackets with strings and tension, then pick the one you use before each match or workout."
+    override val racketField = "Racket"
+    override val racketSetupHint = "Pick each player's racket: the match will remember today's racket, strings and tension."
+    override val racketCatalog = "From catalogue"
+    override val racketCatalogHint = "Manufacturer specs, approximate: correct them if you measured your racket."
+    override val racketName = "Nickname (A, B…)"
+    override val racketBrand = "Brand"
+    override val racketModel = "Model"
+    override val racketWeight = "Weight (g)"
+    override val racketBalance = "Balance (mm)"
+    override val racketHead = "Head size (cm²)"
+    override val racketPattern = "String pattern"
+    override val racketOwner = "Owner (name as on page 1)"
+    override val racketCheckHours = "Check strings after (hours)"
+    override val racketRetired = "Retired"
+    override val racketRetiredHint = "No longer offered before playing, but kept in comparisons."
+    override val racketDeleteTitle = "Delete the racket?"
+    override val racketDeleteText = "Matches and workouts already played keep a copy of it and stay in the comparison."
+    override val stringTitle = "Stringing"
+    override val stringNew = "New stringing"
+    override val stringHistory = "Stringing history"
+    override val stringNone = "No stringing recorded."
+    override val stringType = "String type"
+    override val stringTypeName: (Int) -> String = { listOf("Polyester", "Multifilament", "Synthetic gut", "Natural gut", "Hybrid").getOrElse(it) { "" } }
+    override val stringCatalog = "Common strings"
+    override val stringCross = "Cross string"
+    override val stringGauge = "Gauge (mm)"
+    override val stringMains = "Mains (kg)"
+    override val stringCrosses = "Crosses (kg)"
+    override val stringDate = "Stringing date"
+    override val stringNotes = "Notes"
+    override val stringHours: (String, Int) -> String = { h, max -> "$h h played since the last stringing · check at $max h" }
+    override val stringCheck = "Check hours reached: have a look at the strings."
+    override val stringCheckNote = "Hours come from the matches and workouts linked to the racket. From time alone the app cannot tell how much tension is left."
+    override val stringDeleteTitle = "Delete the stringing?"
+    override val racketHours = "Hours played"
+    override val racketSessions: (Int) -> String = { n -> if (n == 1) "1 session" else "$n sessions" }
+    override val compareByRacket = "By racket"
+    override val compareByString = "By stringing"
+    override val compareA = "Setup A"
+    override val compareB = "Setup B"
+    override val compareTooFew = "To compare you need matches or workouts with at least two different setups. Pick the racket on page 1 or in the workout, or link it from the summary."
+    override val compareNote = "The numbers show how each setup went, not which one is best: opponent, surface, conditions and form matter too."
+    override val compareSessions = "Sessions"
+    override val comparePerMatch: (String) -> String = { "$it per match" }
+    override val compareStrokes = "Wristband strokes"
+    override val compareRated: (Int) -> String = { n -> if (n == 1) "feel from 1 session" else "feel from $n sessions" }
+    override val feelTitle = "Feel"
+    override val feelHint = "How did it feel? From 1 (low) to 5 (high); tap again to clear."
+    override val feelControl = "Control"
+    override val feelComfort = "Comfort"
+    override val feelPower = "Power"
+    override val feelFatigue = "Fatigue"
+    override val racketUsed = "Racket used"
 
     override val aboutLicense: (String) -> String = { "Tennis Score Manager $it · free software under the GNU GPL version 3 or later, with absolutely no warranty." }
     override val aboutSource = "Source code"

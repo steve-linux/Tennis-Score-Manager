@@ -344,6 +344,16 @@ Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do á
   - **Música** sob as estatísticas, com fade de entrada e de saída: *Nowhere Land* de Kevin MacLeod (incompetech.com, licença CC BY 4.0: se publicar o vídeo, dê o crédito), ou uma faixa sua com **Escolher uma faixa** (usa-se o começo; use só músicas que você tem o direito de colocar nos seus vídeos).
 - **Replay**: no telefone do árbitro, com a câmera conectada, **Replay** pede à câmera o ponto contestado (*Último ponto*, *Ponto anterior* ou *Desde o último ponto marcado*) e o mostra, com pausa e quadro a quadro. **Também no placar** mostra também no placar da TV.
 
+### 7.4 Raquetes: raquete virtual (app 2.5)
+
+Página 1 › **Raquetes** › **As minhas raquetes**: cada raquete física tem a sua ficha (duas raquetes do mesmo modelo são duas fichas: cordas, peso e horas mudam).
+
+- **Ficha**: alcunha (A, B…), marca, modelo, peso, equilíbrio, cabeça e padrão de cordas, escritos à mão ou tirados **do catálogo** (dados do fabricante, a corrigir se mediu a sua). *Posta de lado*: deixa de ser proposta, mas fica nas comparações.
+- **Encordoamentos**: tipo (monofilamento, multifilamento, sintética, tripa natural, híbrido), marca e modelo (também das cordas comuns), calibre, tensão das verticais e das horizontais, data e notas. *Novo encordoamento* parte do montado. Para cada um a app soma as **horas de jogo** dos jogos e treinos associados e avisa ao passar o **limite de verificação** escolhido (20 horas por omissão): só pelo tempo não consegue saber quanta tensão resta.
+- **Antes de jogar**: na página 1, por baixo da classificação de cada jogador, escolhe-se a sua raquete; no treino, acima da cinta. O jogo (pontos, pancadas das pulseiras, batimento) e o treino são guardados com uma **cópia** da raquete como estava nesse dia, cordas e tensão incluídas: voltar a encordoá-la depois não muda as sessões passadas.
+- **No resumo** do jogo (separador *Resumo*) e do treino vê-se a raquete usada, pode associá-la também depois (usa-se o encordoamento montado nesse dia) e avaliar as **sensações** de 1 a 5: controlo, conforto, potência e cansaço.
+- **Comparação**: *por raquete* ou *por encordoamento* (mesma raquete com tensões ou cordas diferentes), escolhem-se as configurações A e B. Barras lado a lado para sessões, horas, jogos ganhos, pontos ganhos, primeiros serviços dentro, pontos ganhos com o primeiro e o segundo, ases, duplas faltas, winners e erros não forçados por jogo, velocidade média do pulso e pancadas das pulseiras, batimento médio e sensações médias. O melhor valor fica a negrito, mas a app não escolhe uma vencedora: adversário, piso, condições e forma também contam.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

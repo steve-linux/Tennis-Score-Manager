@@ -6,6 +6,7 @@ package com.tennis.scoremanager.data
 import android.content.Context
 import android.util.Log
 import com.tennis.scoremanager.tv.TvSettings
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -126,6 +127,29 @@ class Storage(context: Context) {
     fun deleteWorkout(id: String) {
         File(workoutsDir, "$id.json").delete()
     }
+
+    /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
+    private val racketsFile: File get() = File(app.filesDir, "rackets.json")
+
+    fun loadRackets(): List<Racket> =
+        runCatching { json.decodeFromString(ListSerializer(Racket.serializer()), racketsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveRackets(list: List<Racket>) {
+        runCatching {
+            val tmp = File(app.filesDir, "rackets.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Racket.serializer()), list))
+            if (!tmp.renameTo(racketsFile)) {
+                racketsFile.delete()
+                tmp.renameTo(racketsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio racchette fallito", it) }
+    }
+
+    /** Racchetta scelta per gli allenamenti ("" = nessuna). */
+    var workoutRacket: String
+        get() = prefs.getString("workout_racket", null) ?: ""
+        set(v) = prefs.edit().putString("workout_racket", v).apply()
 
     /** Storico: le partite finite, una per file, restano sul telefono finché non le si elimina. */
     private val finishedDir: File get() = File(app.filesDir, "finished").apply { mkdirs() }

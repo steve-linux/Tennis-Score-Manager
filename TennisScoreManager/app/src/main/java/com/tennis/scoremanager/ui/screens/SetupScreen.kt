@@ -81,6 +81,7 @@ fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
     val su by c.setup.collectAsState()
     val o by c.options.collectAsState()
+    val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
     ScreenScaffold(
         title = s.setupTitle,
@@ -136,6 +137,11 @@ fun SetupScreen(c: MatchController) {
         }
         PlayerCard(c, su, Side.P1)
         PlayerCard(c, su, Side.P2)
+        // Racchetta virtuale: le racchette con corde e tensioni, da confrontare nel tempo.
+        SectionCard(s.racketTitle, Icons.Filled.SportsTennis) {
+            Text(if (rackets.isEmpty()) s.racketHint else s.racketSetupHint, color = TsmColors.TextDim)
+            GhostButton(s.racketMine, Icons.Filled.SportsTennis, { c.openRackets() }, Modifier.fillMaxWidth())
+        }
         // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
         SectionCard(s.displayMode, Icons.Filled.Tv) {
             Text(s.displayModeHint, color = TsmColors.TextDim)
@@ -189,6 +195,12 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
         }
         SexChoice(if (side == Side.P1) su.p1aSex else su.p2aSex, accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
+        }
+        // La racchetta di oggi: la partita ne tiene una copia con corde e tensione.
+        if (c.rackets.collectAsState().value.isNotEmpty()) {
+            RacketPicker(c, if (side == Side.P1) su.p1Racket else su.p2Racket, a) { id ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1Racket = id) else it.copy(p2Racket = id) }
+            }
         }
         if (su.doubles) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {

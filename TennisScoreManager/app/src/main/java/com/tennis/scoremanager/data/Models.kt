@@ -42,6 +42,9 @@ data class SetupData(
     val p1bSex: String = "",
     val p2aSex: String = "",
     val p2bSex: String = "",
+    /** Racchetta virtuale: id della racchetta scelta per ciascun lato ("" = nessuna). */
+    val p1Racket: String = "",
+    val p2Racket: String = "",
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
@@ -111,6 +114,8 @@ data class MatchRecord(
     val heart: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
+    /** Racchetta usata da ciascun lato, com'era quando si è iniziato (con le sensazioni dette nel riepilogo). */
+    val rackets: Map<Side, RacketUse> = emptyMap(),
 )
 
 /** Chi indossa la fascia: serve solo a stimare le calorie. */
