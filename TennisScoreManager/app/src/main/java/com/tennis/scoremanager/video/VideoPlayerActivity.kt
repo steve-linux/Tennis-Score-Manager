@@ -526,7 +526,12 @@ class VideoPlayerActivity : ComponentActivity() {
         val m = HighlightMaker(this)
         maker = m
         val stats = statsRec?.let { rec ->
-            val card = HighlightStats.card(rec, str)
+            val base = HighlightStats.card(rec, str)
+            // Il sesso detto in pagina 1 per quel nome vale anche se la partita non lo ricorda.
+            val card = base.copy(players = base.players.mapValues { (side, p) ->
+                val real = HighlightStats.photoNames(rec, side)
+                p.copy(female = p.names.mapIndexed { i, n -> p.female.getOrNull(i) ?: if (n in real && controller.isFemale(n)) true else null })
+            })
             // Foto di chi ha il nome scritto; agli altri l'avatar con le iniziali.
             val photos = Side.entries.associateWith { side ->
                 val real = HighlightStats.photoNames(rec, side)

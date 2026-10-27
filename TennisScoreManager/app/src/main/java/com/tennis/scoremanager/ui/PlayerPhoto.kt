@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -34,17 +33,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Foto del giocatore in un cerchio col bordo del suo colore; senza foto le iniziali. Le foto stanno solo su
- * questo telefono (passano a un altro col trasferimento) e si ritrovano dal nome.
+ * Foto del giocatore in un cerchio col bordo del suo colore; senza foto il ritratto di donna (se lo si è detto in
+ * pagina 1) o di uomo. Le foto stanno solo su questo telefono (passano a un altro col trasferimento) e si ritrovano
+ * dal nome, come il sesso.
  */
 @Composable
 fun PlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modifier: Modifier = Modifier) {
@@ -52,21 +52,16 @@ fun PlayerAvatar(c: MatchController, name: String, color: Color, size: Dp, modif
     val photo by produceState<ImageBitmap?>(null, name, version) {
         value = withContext(Dispatchers.IO) { c.loadPhoto(name)?.asImageBitmap() }
     }
+    val female = remember(name, version) { c.isFemale(name) }
     Box(
         modifier.size(size).clip(CircleShape).background(color.copy(alpha = 0.22f)).border(if (size < 40.dp) 1.5.dp else 2.dp, color, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         val p = photo
-        when {
-            p != null -> Image(p, null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
-            name.isNotBlank() -> Text(initials(name), color = color, fontWeight = FontWeight.Black, fontSize = (size.value * 0.38f).sp)
-            else -> Icon(Icons.Filled.Person, null, tint = color, modifier = Modifier.size(size * 0.55f))
-        }
+        if (p != null) Image(p, null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
+        else Image(painterResource(if (female) R.drawable.avatar_woman else R.drawable.avatar_man), null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
     }
 }
-
-private fun initials(name: String): String =
-    name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.take(2).joinToString("") { it.take(1).uppercase() }
 
 /**
  * Avatar da toccare per mettere la foto: senza foto apre subito il selettore di foto di Android (niente permessi),

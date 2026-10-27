@@ -15,15 +15,7 @@ import android.os.SystemClock
 import android.system.Os
 import android.system.OsConstants
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import com.tennis.scoremanager.R
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.IOException
@@ -40,6 +32,15 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * Piccolo server web sul telefono dell'arbitro, attivo solo con il tabellone TV acceso.
@@ -54,6 +55,10 @@ class TvServer(context: Context) {
 
     /** Cartella delle foto dei giocatori (la stessa di Storage). */
     private val photoDir = File(context.filesDir, "players")
+    /** Ritratti di uomo e di donna per chi non ha la foto, dalle risorse dell'app. */
+    private val avatars: Map<String, ByteArray> = mapOf("man" to R.drawable.avatar_man, "woman" to R.drawable.avatar_woman).mapValues { (_, id) ->
+        runCatching { context.resources.openRawResource(id).use { it.readBytes() } }.getOrDefault(ByteArray(0))
+    }
 
     companion object {
         const val PORT = 8080
@@ -276,6 +281,10 @@ class TvServer(context: Context) {
                 "/favicon.ico" -> respond(out, "204 No Content", "text/plain", ByteArray(0), head)
                 else -> if (path.startsWith("/replay/")) {
                     serveReplay(out, path, range, head)
+                } else if (path.startsWith("/avatar/")) {
+                    val img = avatars[path.removePrefix("/avatar/").removeSuffix(".webp")]?.takeIf { it.isNotEmpty() }
+                    if (img != null) respond(out, "200 OK", "image/webp", img, head)
+                    else respond(out, "404 Not Found", "text/plain", "Not found".toByteArray(), head)
                 } else {
                     // Foto dei giocatori: solo nomi di file come li scrive Storage (sha1 del nome + .jpg).
                     val photo = path.removePrefix("/photo/").takeIf { path.startsWith("/photo/") && PHOTO_NAME.matches(it) }

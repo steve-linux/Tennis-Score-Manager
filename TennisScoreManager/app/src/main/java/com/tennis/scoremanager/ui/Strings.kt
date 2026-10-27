@@ -126,6 +126,20 @@ interface Strings {
     val workoutDeleteText: String
     val workoutChart: String
     val progressTitle: String
+    val progressFilters: String
+    val progressPeriod: String
+    val progressPeriodAll: String
+    val progress30: String
+    val progress90: String
+    val progress365: String
+    val progressWeekdays: String
+    val progressOpponent: String
+    val progressAnyOption: String
+    val progressChoose: String
+    val progressSelected: (Int, Int) -> String
+    val progressSelectAll: String
+    val progressSelectNone: String
+    val progressNoneMatch: String
     val progressHint: String
     val progressWorkouts: String
     val progressMatches: String
@@ -934,6 +948,20 @@ object ItStrings : Strings {
     override val workoutDeleteText = "Verrà tolto da questo telefono."
     override val workoutChart = "Battito durante l'allenamento"
     override val progressTitle = "Progressi"
+    override val progressFilters = "Filtri"
+    override val progressPeriod = "Periodo"
+    override val progressPeriodAll = "Tutto"
+    override val progress30 = "30 giorni"
+    override val progress90 = "3 mesi"
+    override val progress365 = "1 anno"
+    override val progressWeekdays = "Giorni della settimana"
+    override val progressOpponent = "Avversario"
+    override val progressAnyOption = "Tutti"
+    override val progressChoose = "Da confrontare"
+    override val progressSelected: (Int, Int) -> String = { a, b -> "$a scelti su $b" }
+    override val progressSelectAll = "Tutti"
+    override val progressSelectNone = "Nessuno"
+    override val progressNoneMatch = "Niente con questi filtri."
     override val progressHint = "Confronta allenamenti e partite nel tempo per vedere se migliori: documento da condividere o stampare."
     override val progressWorkouts = "Allenamenti"
     override val progressMatches = "Partite"
@@ -1714,6 +1742,20 @@ object EnStrings : Strings {
     override val workoutDeleteText = "It will be removed from this phone."
     override val workoutChart = "Heart rate during the workout"
     override val progressTitle = "Progress"
+    override val progressFilters = "Filters"
+    override val progressPeriod = "Period"
+    override val progressPeriodAll = "All time"
+    override val progress30 = "30 days"
+    override val progress90 = "3 months"
+    override val progress365 = "1 year"
+    override val progressWeekdays = "Days of the week"
+    override val progressOpponent = "Opponent"
+    override val progressAnyOption = "All"
+    override val progressChoose = "To compare"
+    override val progressSelected: (Int, Int) -> String = { a, b -> "$a of $b selected" }
+    override val progressSelectAll = "All"
+    override val progressSelectNone = "None"
+    override val progressNoneMatch = "Nothing matches these filters."
     override val progressHint = "Compare workouts and matches over time to see whether you are improving: a document to share or print."
     override val progressWorkouts = "Workouts"
     override val progressMatches = "Matches"

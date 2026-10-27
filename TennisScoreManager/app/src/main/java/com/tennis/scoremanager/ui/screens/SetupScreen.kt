@@ -44,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.BuildConfig
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
 import com.tennis.scoremanager.model.Side
@@ -187,7 +189,7 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
-        SexChoice(if (side == Side.P1) su.p1aSex else su.p2aSex, accent) { v ->
+        SexChoice(c, a, if (side == Side.P1) su.p1aSex else su.p2aSex, accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aSex = v) else it.copy(p2aSex = v) }
         }
         if (su.doubles) {
@@ -202,21 +204,31 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
-            SexChoice(if (side == Side.P1) su.p1bSex else su.p2bSex, accent) { v ->
+            SexChoice(c, b, if (side == Side.P1) su.p1bSex else su.p2bSex, accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bSex = v) else it.copy(p2bSex = v) }
             }
         }
     }
 }
 
-/** Uomo o donna (facoltativo): solo per la sagoma degli highlights quando manca la foto. Ritoccandolo si toglie. */
+/**
+ * Uomo o donna (facoltativo): sceglie il ritratto del giocatore quando manca la foto, in tutta l'app. Vale per il
+ * nome, come la foto: lo si ritrova nelle partite dopo. Ritoccandolo si toglie.
+ */
 @Composable
-private fun SexChoice(value: String, accent: Color, onChange: (String) -> Unit) {
+private fun SexChoice(c: MatchController, name: String, field: String, accent: Color, onChange: (String) -> Unit) {
     val s = LocalStrings.current
+    val version by c.photosVersion.collectAsState()
+    val value = remember(name, field, version) { field.ifEmpty { if (name.isBlank()) "" else c.storage.playerSex(PlayerStats.key(name)) } }
     Segmented(
         listOf(SegOption(s.heartMale, color = accent, onColor = TsmColors.Background), SegOption(s.heartFemale, color = accent, onColor = TsmColors.Background)),
         selected = when (value) { "M" -> 0; "F" -> 1; else -> -1 },
-        onSelect = { i -> val v = if (i == 0) "M" else "F"; onChange(if (v == value) "" else v) },
+        onSelect = { i ->
+            val v = if (i == 0) "M" else "F"
+            val next = if (v == value) "" else v
+            onChange(next)
+            c.setPlayerSex(name, next)
+        },
     )
 }
 

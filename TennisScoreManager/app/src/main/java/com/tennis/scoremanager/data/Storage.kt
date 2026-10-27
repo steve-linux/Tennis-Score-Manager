@@ -51,6 +51,13 @@ class Storage(context: Context) {
     }
 
     @Synchronized
+    /** Sesso di un giocatore, dal nome come la foto: "M", "F" o "" (non detto). Serve all'avatar senza foto. */
+    fun playerSex(key: String): String = prefs.getString("sex_$key", "") ?: ""
+
+    fun setPlayerSex(key: String, sex: String) {
+        prefs.edit().apply { if (sex.isEmpty()) remove("sex_$key") else putString("sex_$key", sex) }.apply()
+    }
+
     fun deletePhoto(key: String) {
         photoFile(key).delete()
     }

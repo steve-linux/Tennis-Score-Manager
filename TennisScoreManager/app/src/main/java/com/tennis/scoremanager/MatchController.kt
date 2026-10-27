@@ -20,6 +20,7 @@ import android.provider.MediaStore
 import android.util.Base64
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
+import com.tennis.scoremanager.R
 import com.tennis.scoremanager.ble.BandEvent
 import com.tennis.scoremanager.ble.BandInfo
 import com.tennis.scoremanager.ble.BandProtocol
@@ -47,6 +48,10 @@ import com.tennis.scoremanager.data.Names
 import com.tennis.scoremanager.data.PdfReport
 import com.tennis.scoremanager.data.PlayMode
 import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Progress
+import com.tennis.scoremanager.data.ProgressItem
+import com.tennis.scoremanager.data.ProgressItems
+import com.tennis.scoremanager.data.ProgressPdf
 import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.SetupData
 import com.tennis.scoremanager.data.Sport
@@ -56,6 +61,9 @@ import com.tennis.scoremanager.data.Tournament
 import com.tennis.scoremanager.data.TournamentKind
 import com.tennis.scoremanager.data.TournamentScoring
 import com.tennis.scoremanager.data.Tournaments
+import com.tennis.scoremanager.data.WorkoutRecord
+import com.tennis.scoremanager.data.WorkoutReport
+import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.model.MatchEvent
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.PointKind
@@ -63,20 +71,11 @@ import com.tennis.scoremanager.model.RulesConfig
 import com.tennis.scoremanager.model.ScoreEngine
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.model.Transition
+import com.tennis.scoremanager.relay.PhoneRelay
+import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.remote.Gesture
 import com.tennis.scoremanager.remote.RemoteInput
 import com.tennis.scoremanager.service.MatchService
-import com.tennis.scoremanager.relay.PhoneRelay
-import com.tennis.scoremanager.workout.WorkoutSession
-import com.tennis.scoremanager.video.PointMark
-import com.tennis.scoremanager.video.PointMarks
-import com.tennis.scoremanager.video.ScoreOverlay
-import com.tennis.scoremanager.data.WorkoutRecord
-import com.tennis.scoremanager.data.Progress
-import com.tennis.scoremanager.data.ProgressPdf
-import com.tennis.scoremanager.data.WorkoutReport
-import com.tennis.scoremanager.data.WorkoutStats
-import com.tennis.scoremanager.relay.RelayRole
 import com.tennis.scoremanager.transfer.TransferBundle
 import com.tennis.scoremanager.transfer.TransferServer
 import com.tennis.scoremanager.tv.TvInput
@@ -88,10 +87,14 @@ import com.tennis.scoremanager.tv.TvSnapshots
 import com.tennis.scoremanager.ui.Strings
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.stringsFor
+import com.tennis.scoremanager.video.PointMark
+import com.tennis.scoremanager.video.PointMarks
+import com.tennis.scoremanager.video.ScoreOverlay
 import com.tennis.scoremanager.voice.Announcer
 import com.tennis.scoremanager.voice.CallBuilder
 import com.tennis.scoremanager.voice.Seg
 import com.tennis.scoremanager.voice.VoicePack
+import com.tennis.scoremanager.workout.WorkoutSession
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
@@ -455,10 +458,14 @@ class MatchController(
         options.value.mode == PlayMode.BANDS || tv.value.enabled || options.value.heartRate && heart.straps.value.isNotEmpty() ||
             relay.ui.value.role != RelayRole.OFF || workout.active
 
-    /** Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate. */
+    /**
+     * Foto dei giocatori per il tabellone: "/photo/<file>?v=<versione>", così il tabellone ricarica quelle cambiate;
+     * senza foto il ritratto di uomo o di donna ("/avatar/man.webp", "/avatar/woman.webp").
+     */
     private fun tvPhotos(su: SetupData): Map<Side, List<String>> = Side.entries.associateWith { side ->
-        PlayerStats.names(su, side).mapNotNull { n ->
+        PlayerStats.names(su, side).map { n ->
             storage.photoFile(PlayerStats.key(n)).takeIf { it.exists() }?.let { "/photo/${it.name}?v=${photosVersion.value}" }
+                ?: "/avatar/${if (isFemale(n)) "woman" else "man"}.webp"
         }
     }
 
@@ -1096,7 +1103,11 @@ class MatchController(
     fun startMatch() {
         if (screen.value != Screen.START) return
         val o = options.value
-        val su = setup.value
+        // Il sesso detto per quei nomi (anche in partite di prima) entra nella partita: lo usano highlights e storico.
+        val su = setup.value.let { s ->
+            fun sex(field: String, name: String) = field.ifEmpty { storage.playerSex(PlayerStats.key(name)) }
+            s.copy(p1aSex = sex(s.p1aSex, s.p1a), p1bSex = sex(s.p1bSex, s.p1b), p2aSex = sex(s.p2aSex, s.p2a), p2bSex = sex(s.p2bSex, s.p2b))
+        }
         val rules = RulesConfig(
             format = o.format,
             gamesPerSet = o.gamesPerSet,
@@ -1479,24 +1490,36 @@ class MatchController(
     /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
     fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
 
-    /** [playerKey] null = allenamenti. */
-    fun progressReport(playerKey: String?): Progress.Report {
+    /** Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta. */
+    private fun shortDate(): (Long) -> String {
+        val fmt = java.text.SimpleDateFormat("dd/MM/yy", options.value.lang.locale)
+        return { fmt.format(java.util.Date(it)) }
+    }
+
+    /** L'elenco da spuntare dei Progressi: allenamenti ([playerKey] null) o partite del giocatore, dal più recente. */
+    fun progressItems(playerKey: String?): List<ProgressItem> {
         val s = strings
-        val lang = options.value.lang
-        // Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta.
-        val fmt = java.text.SimpleDateFormat("dd/MM/yy", lang.locale)
-        val date: (Long) -> String = { fmt.format(java.util.Date(it)) }
+        val fmt = java.text.SimpleDateFormat("EEE dd/MM/yy HH:mm", options.value.lang.locale)
+        val date: (Long) -> String = { fmt.format(java.util.Date(it)).replaceFirstChar { c -> c.uppercase() } }
+        return if (playerKey == null) ProgressItems.workouts(workouts.value, date)
+        else ProgressItems.matches(PlayerStats.lines(played(), playerKey), playerKey, s.progressWon, s.progressLost, date)
+    }
+
+    /** [playerKey] null = allenamenti; [ids] = quelli spuntati (null = tutti). */
+    fun progressReport(playerKey: String?, ids: Set<String>? = null): Progress.Report {
+        val s = strings
+        val date = shortDate()
         return if (playerKey == null) {
-            Progress.workouts(workouts.value, s, date)
+            Progress.workouts(workouts.value.filter { ids == null || it.id in ids }, s, date)
         } else {
             val name = PlayerStats.players(played()).firstOrNull { it.key == playerKey }?.name ?: playerKey
-            Progress.matches(PlayerStats.lines(played(), playerKey), name, s, date)
+            Progress.matches(PlayerStats.lines(played(), playerKey).filter { ids == null || it.rec.id in ids }, name, s, date)
         }
     }
 
     /** Il PDF dei progressi nella cartella di condivisione; null se non si è potuto scrivere. */
-    fun progressPdf(playerKey: String?): File? {
-        val r = progressReport(playerKey)
+    fun progressPdf(playerKey: String?, ids: Set<String>? = null): File? {
+        val r = progressReport(playerKey, ids)
         val s = strings
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
         val name = (if (playerKey == null) s.progressWorkouts else "${s.progressMatches} ${r.title.substringAfter(": ")}")
@@ -1805,6 +1828,22 @@ class MatchController(
             publishTv()
         }
     }
+
+    /** Donna solo se lo si è detto per quel nome; altrimenti (uomo o non detto) il ritratto è quello dell'uomo. */
+    fun isFemale(name: String): Boolean = storage.playerSex(PlayerStats.key(name)) == "F"
+
+    /** "M", "F" o "" per il giocatore [name]: vale per tutti i suoi avatar, finché non ha una foto. */
+    fun setPlayerSex(name: String, sex: String) {
+        val key = PlayerStats.key(name)
+        if (key.isEmpty()) return
+        storage.setPlayerSex(key, sex)
+        photosVersion.value++
+        publishTv()
+    }
+
+    /** Il ritratto di uomo o di donna per chi non ha la foto (PDF e highlights). */
+    fun avatarBitmap(female: Boolean): Bitmap =
+        BitmapFactory.decodeResource(app.resources, if (female) R.drawable.avatar_woman else R.drawable.avatar_man)
 
     fun removePhoto(name: String) {
         val key = PlayerStats.key(name)
@@ -2238,7 +2277,7 @@ class MatchController(
         val n = summaryNames()
         PdfReport.write(
             out, sm.record, sm.state, s, n, Reports.renderCard(sm.record, sm.state, s, n),
-            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) },
+            storage.matchPhotos(sm.record.id), playerPhoto = { loadPhoto(it) ?: avatarBitmap(isFemale(it)) },
         )
     }
 

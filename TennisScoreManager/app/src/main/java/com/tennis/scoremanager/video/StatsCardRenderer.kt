@@ -129,14 +129,13 @@ object StatsCardRenderer {
 
     /**
      * Foto rotonda; senza foto il ritratto dell'uomo o della donna (immagini dell'autore, nelle risorse dell'app),
-     * o una sagoma neutra se il sesso non è detto.
+     * dell'uomo se il sesso non è detto (la sagoma neutra resta solo se mancano i ritratti).
      */
     private fun avatar(c: Canvas, photo: Bitmap?, female: Boolean?, accent: Int, x: Float, y: Float, size: Float, avatars: Avatars?) {
         val rect = RectF(x, y, x + size, y + size)
         val portrait = when (female) {
             true -> avatars?.woman
-            false -> avatars?.man
-            null -> null
+            false, null -> avatars?.man
         }
         if (photo == null && portrait != null) {
             c.drawBitmap(portrait, null, rect, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
