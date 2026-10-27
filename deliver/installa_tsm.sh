@@ -376,7 +376,11 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #fr { justify-items: start; }
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
-  #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #fc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
+  /* Prima della partita, sopra il circolo: nome dell'app e indirizzo del sito (durante il gioco non c'è). */
+  #brand { display: none; font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #8A8E95; white-space: nowrap; overflow: hidden; max-width: 100%; letter-spacing: .04em; padding-bottom: calc(1 * var(--vh)); }
+  #brand b { color: var(--ball); font-weight: 700; }
+  body.pre #brand { display: block; }
   #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
   #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
   #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
@@ -424,7 +428,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   </div>
   <div id="foot">
     <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
-    <div id="fc"><div id="title"></div></div>
+    <div id="fc"><div id="brand">Tennis Score Manager · <b>tennis-score-manager.netlify.app</b></div><div id="title"></div></div>
     <div id="fr"><div id="msg"></div><div id="timer"></div></div>
   </div>
 </div>
@@ -542,6 +546,22 @@ function fitText(el, maxPx) {
   }
 }
 
+// Il nome si rimpicciolisce finché sta nel posto lasciato da foto e pallina (in doppio le foto sono due).
+function fitName(n) {
+  const box = n.parentElement, gap = parseFloat(getComputedStyle(box).columnGap) || 0;
+  let taken = 0;
+  for (const c of box.children) if (c !== n && getComputedStyle(c).display !== "none") taken += c.offsetWidth + gap;
+  fitText(n, taken + 4);
+}
+
+// Tutti e due i nomi alla stessa grandezza: quella del più lungo.
+function fitNames() {
+  const ns = [$("n0"), $("n1")];
+  ns.forEach(fitName);
+  const px = Math.min(...ns.map(n => parseFloat(getComputedStyle(n).fontSize)));
+  ns.forEach(n => { n.style.fontSize = px + "px"; });
+}
+
 function hms(ms) {
   const t = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(t / 3600) % 100, m = Math.floor(t / 60) % 60, s = t % 60;
@@ -559,17 +579,19 @@ function render() {
   setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
+  let refit = false;
   for (let i = 0; i < 2; i++) {
     const n = $("n" + i);
     n.style.color = color(i);
-    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
-    // Foto dei giocatori accanto al nome (ci sono solo se messe nell'app); si rifanno solo se cambiano.
+    // Foto o ritratti dei giocatori accanto al nome; si rifanno solo se cambiano.
     const ph = $("ph" + i), urls = (S.players[i].photos || []).join(" ");
     if (ph.dataset.u !== urls) {
       ph.dataset.u = urls;
       ph.style.color = color(i);
       ph.replaceChildren(...(S.players[i].photos || []).map(u => { const im = new Image(); im.src = u; im.alt = ""; return im; }));
+      refit = true;
     }
+    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; refit = true; }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
     // Set senza tie-break o pro set: i game possono superare 9, allora le cifre diventano due (per tutti e due i lati).
@@ -578,6 +600,7 @@ function render() {
     setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 100), color(i));
     setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
   }
+  if (refit) fitNames();
   const vs = $("vs");
   const tb = S.phase === "play" || S.phase === "suspended" ? (S.tiebreak === "match" ? L.matchTiebreak : S.tiebreak === "set" ? L.tiebreak : "") : "";
   setText(vs, tb || L.vs);
@@ -593,6 +616,8 @@ function render() {
   setText($("done"), done);
   $("clock").classList.toggle("hide", !S.show.clock);
   setText($("title"), S.title || "");
+  const pre = S.phase === "idle" || S.phase === "ready";
+  if (document.body.classList.contains("pre") !== pre) { document.body.classList.toggle("pre", pre); if (pre) fitText($("brand")); }
 
   // messaggio: fasi speciali prima di tutto
   const msg = $("msg");
@@ -755,7 +780,7 @@ function viewportUnits() {
   }
 }
 viewportUnits();
-window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); fitText($("msg")); });
+window.addEventListener("resize", () => { viewportUnits(); fitNames(); fitText($("msg")); fitText($("brand")); });
 keepAwake();
 setInterval(tick, 200);
 
@@ -7709,11 +7734,15 @@ object WorkoutReport {
             c.drawText(s.workoutLaps, 40f, y, head)
             y += 18f
             for (l in laps) {
-                if (y > 810f) break
+                if (y > 795f) break
                 c.drawText(lapLine(l, s), 40f, y, text)
                 y += 15f
             }
         }
+        // In fondo, come negli altri PDF: nome dell'app e indirizzo del sito.
+        c.drawText("${s.appName} · ${Reports.siteUrl(lang)}", 595f / 2, 822f, Paint(text).apply {
+            textSize = 8f; color = Color.rgb(110, 120, 135); textAlign = Paint.Align.CENTER
+        })
         doc.finishPage(page)
         doc.writeTo(out)
         doc.close()
@@ -24146,6 +24175,8 @@ class HighlightMaker(context: Context) {
         val avatars: StatsCardRenderer.Avatars? = null,
         /** Il brano dell'app, copiato dalle risorse (la musica scelta dall'utente ha la precedenza). */
         val defaultMusic: File? = null,
+        /** In fondo alle schermate: "Creato con Tennis Score Manager" e l'indirizzo del sito. */
+        val credit: String = "", val site: String = "",
     )
 
     /**
@@ -24249,7 +24280,7 @@ class HighlightMaker(context: Context) {
         stats ?: return emptyList()
         val dir = File(app.cacheDir, "hl_stats").apply { deleteRecursively(); mkdirs() }
         return stats.card.pages.mapIndexed { i, page ->
-            val bmp = StatsCardRenderer.render(stats.card, page, width, height, stats.photos, stats.pointsWon, stats.avatars)
+            val bmp = StatsCardRenderer.render(stats.card, page, width, height, stats.photos, stats.pointsWon, stats.avatars, stats.credit, stats.site)
             val f = File(dir, "stats_$i.png")
             f.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bmp.recycle()
@@ -25486,10 +25517,11 @@ object StatsCardRenderer {
     /**
      * [photos]: le foto dei giocatori di ciascun lato, nello stesso ordine dei nomi (null = avatar con le iniziali).
      * [pointsWon]: la scritta sotto la percentuale nei pannelli ("PUNTI VINTI").
+     * [credit] e [site]: in fondo "Creato con Tennis Score Manager · indirizzo del sito", come nell'immagine social.
      */
     fun render(
         card: HighlightStats.Card, page: List<HighlightStats.Section>, width: Int, height: Int, photos: Map<Side, List<Bitmap?>>, pointsWon: String,
-        avatars: Avatars? = null,
+        avatars: Avatars? = null, credit: String = "", site: String = "",
     ): Bitmap {
         val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val c = Canvas(out)
@@ -25500,6 +25532,7 @@ object StatsCardRenderer {
         header(c, card)
         for (side in Side.entries) player(c, card, side, photos[side].orEmpty(), pointsWon, avatars)
         rows(c, page)
+        footer(c, credit, site)
         return out
     }
 
@@ -25645,6 +25678,16 @@ object StatsCardRenderer {
             }
             y += 6f
         }
+    }
+
+    private fun footer(c: Canvas, credit: String, site: String) {
+        if (credit.isEmpty() && site.isEmpty()) return
+        val lead = if (credit.isNotEmpty() && site.isNotEmpty()) "$credit · " else credit
+        val cp = paint(26f, DIM)
+        val sp = paint(26f, YELLOW, bold = true)
+        val x = (W - cp.measureText(lead) - sp.measureText(site)) / 2
+        c.drawText(lead, x, 1072f, cp)
+        c.drawText(site, x + cp.measureText(lead), 1072f, sp)
     }
 
     /** Accorcia [text] con "…" finché sta in [max] punti. */
@@ -25990,6 +26033,7 @@ import com.tennis.scoremanager.R
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.SegOption
@@ -26455,6 +26499,8 @@ class VideoPlayerActivity : ComponentActivity() {
                 card, photos, str.pointsWon,
                 controller.storage.highlightMusicFile.takeIf { controller.storage.highlightMusicName != null }, avatars,
                 bundled.takeIf { it.exists() },
+                credit = str.generatedWith,
+                site = Reports.siteUrl(controller.options.value.lang).removePrefix("https://").removeSuffix("/"),
             )
         }
         m.make(e, clips, { hlProgress = it }, stats = stats) { file ->

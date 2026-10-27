@@ -85,6 +85,7 @@ import com.tennis.scoremanager.R
 import com.tennis.scoremanager.TsmApp
 import com.tennis.scoremanager.data.MatchRecord
 import com.tennis.scoremanager.data.Names
+import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.model.PointKind
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.SegOption
@@ -550,6 +551,8 @@ class VideoPlayerActivity : ComponentActivity() {
                 card, photos, str.pointsWon,
                 controller.storage.highlightMusicFile.takeIf { controller.storage.highlightMusicName != null }, avatars,
                 bundled.takeIf { it.exists() },
+                credit = str.generatedWith,
+                site = Reports.siteUrl(controller.options.value.lang).removePrefix("https://").removeSuffix("/"),
             )
         }
         m.make(e, clips, { hlProgress = it }, stats = stats) { file ->

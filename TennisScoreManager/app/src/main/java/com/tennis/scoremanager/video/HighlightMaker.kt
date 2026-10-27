@@ -49,6 +49,8 @@ class HighlightMaker(context: Context) {
         val avatars: StatsCardRenderer.Avatars? = null,
         /** Il brano dell'app, copiato dalle risorse (la musica scelta dall'utente ha la precedenza). */
         val defaultMusic: File? = null,
+        /** In fondo alle schermate: "Creato con Tennis Score Manager" e l'indirizzo del sito. */
+        val credit: String = "", val site: String = "",
     )
 
     /**
@@ -152,7 +154,7 @@ class HighlightMaker(context: Context) {
         stats ?: return emptyList()
         val dir = File(app.cacheDir, "hl_stats").apply { deleteRecursively(); mkdirs() }
         return stats.card.pages.mapIndexed { i, page ->
-            val bmp = StatsCardRenderer.render(stats.card, page, width, height, stats.photos, stats.pointsWon, stats.avatars)
+            val bmp = StatsCardRenderer.render(stats.card, page, width, height, stats.photos, stats.pointsWon, stats.avatars, stats.credit, stats.site)
             val f = File(dir, "stats_$i.png")
             f.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bmp.recycle()

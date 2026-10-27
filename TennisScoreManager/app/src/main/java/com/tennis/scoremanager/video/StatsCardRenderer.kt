@@ -47,10 +47,11 @@ object StatsCardRenderer {
     /**
      * [photos]: le foto dei giocatori di ciascun lato, nello stesso ordine dei nomi (null = avatar con le iniziali).
      * [pointsWon]: la scritta sotto la percentuale nei pannelli ("PUNTI VINTI").
+     * [credit] e [site]: in fondo "Creato con Tennis Score Manager · indirizzo del sito", come nell'immagine social.
      */
     fun render(
         card: HighlightStats.Card, page: List<HighlightStats.Section>, width: Int, height: Int, photos: Map<Side, List<Bitmap?>>, pointsWon: String,
-        avatars: Avatars? = null,
+        avatars: Avatars? = null, credit: String = "", site: String = "",
     ): Bitmap {
         val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val c = Canvas(out)
@@ -61,6 +62,7 @@ object StatsCardRenderer {
         header(c, card)
         for (side in Side.entries) player(c, card, side, photos[side].orEmpty(), pointsWon, avatars)
         rows(c, page)
+        footer(c, credit, site)
         return out
     }
 
@@ -206,6 +208,16 @@ object StatsCardRenderer {
             }
             y += 6f
         }
+    }
+
+    private fun footer(c: Canvas, credit: String, site: String) {
+        if (credit.isEmpty() && site.isEmpty()) return
+        val lead = if (credit.isNotEmpty() && site.isNotEmpty()) "$credit · " else credit
+        val cp = paint(26f, DIM)
+        val sp = paint(26f, YELLOW, bold = true)
+        val x = (W - cp.measureText(lead) - sp.measureText(site)) / 2
+        c.drawText(lead, x, 1072f, cp)
+        c.drawText(site, x + cp.measureText(lead), 1072f, sp)
     }
 
     /** Accorcia [text] con "…" finché sta in [max] punti. */

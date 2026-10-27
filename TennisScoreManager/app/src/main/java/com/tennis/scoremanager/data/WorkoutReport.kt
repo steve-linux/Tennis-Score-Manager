@@ -95,11 +95,15 @@ object WorkoutReport {
             c.drawText(s.workoutLaps, 40f, y, head)
             y += 18f
             for (l in laps) {
-                if (y > 810f) break
+                if (y > 795f) break
                 c.drawText(lapLine(l, s), 40f, y, text)
                 y += 15f
             }
         }
+        // In fondo, come negli altri PDF: nome dell'app e indirizzo del sito.
+        c.drawText("${s.appName} · ${Reports.siteUrl(lang)}", 595f / 2, 822f, Paint(text).apply {
+            textSize = 8f; color = Color.rgb(110, 120, 135); textAlign = Paint.Align.CENTER
+        })
         doc.finishPage(page)
         doc.writeTo(out)
         doc.close()

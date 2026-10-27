@@ -76,7 +76,11 @@
   #fr { justify-items: start; }
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
-  #fc { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #fc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
+  /* Prima della partita, sopra il circolo: nome dell'app e indirizzo del sito (durante il gioco non c'è). */
+  #brand { display: none; font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #8A8E95; white-space: nowrap; overflow: hidden; max-width: 100%; letter-spacing: .04em; padding-bottom: calc(1 * var(--vh)); }
+  #brand b { color: var(--ball); font-weight: 700; }
+  body.pre #brand { display: block; }
   #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
   #msg { font-size: min(calc(4.6 * var(--vh)), calc(2.7 * var(--vw))); color: var(--orange); white-space: nowrap; align-self: center; letter-spacing: .03em; }
   #msg.blink { animation: blink 1.2s steps(2, start) infinite; }
@@ -124,7 +128,7 @@
   </div>
   <div id="foot">
     <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
-    <div id="fc"><div id="title"></div></div>
+    <div id="fc"><div id="brand">Tennis Score Manager · <b>tennis-score-manager.netlify.app</b></div><div id="title"></div></div>
     <div id="fr"><div id="msg"></div><div id="timer"></div></div>
   </div>
 </div>
@@ -242,6 +246,22 @@ function fitText(el, maxPx) {
   }
 }
 
+// Il nome si rimpicciolisce finché sta nel posto lasciato da foto e pallina (in doppio le foto sono due).
+function fitName(n) {
+  const box = n.parentElement, gap = parseFloat(getComputedStyle(box).columnGap) || 0;
+  let taken = 0;
+  for (const c of box.children) if (c !== n && getComputedStyle(c).display !== "none") taken += c.offsetWidth + gap;
+  fitText(n, taken + 4);
+}
+
+// Tutti e due i nomi alla stessa grandezza: quella del più lungo.
+function fitNames() {
+  const ns = [$("n0"), $("n1")];
+  ns.forEach(fitName);
+  const px = Math.min(...ns.map(n => parseFloat(getComputedStyle(n).fontSize)));
+  ns.forEach(n => { n.style.fontSize = px + "px"; });
+}
+
 function hms(ms) {
   const t = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(t / 3600) % 100, m = Math.floor(t / 60) % 60, s = t % 60;
@@ -259,17 +279,19 @@ function render() {
   setText(fs, "⛶ " + L.fullscreen);
   document.documentElement.style.setProperty("--p1", color(0));
   document.documentElement.style.setProperty("--p2", color(1));
+  let refit = false;
   for (let i = 0; i < 2; i++) {
     const n = $("n" + i);
     n.style.color = color(i);
-    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; fitText(n, 60); }
-    // Foto dei giocatori accanto al nome (ci sono solo se messe nell'app); si rifanno solo se cambiano.
+    // Foto o ritratti dei giocatori accanto al nome; si rifanno solo se cambiano.
     const ph = $("ph" + i), urls = (S.players[i].photos || []).join(" ");
     if (ph.dataset.u !== urls) {
       ph.dataset.u = urls;
       ph.style.color = color(i);
       ph.replaceChildren(...(S.players[i].photos || []).map(u => { const im = new Image(); im.src = u; im.alt = ""; return im; }));
+      refit = true;
     }
+    if (n.textContent !== S.players[i].name) { n.textContent = S.players[i].name; refit = true; }
     $("side" + i).classList.toggle("serving", S.show.serve && S.server === i);
     setSeg(pts[i], S.points[i], color(i));
     // Set senza tie-break o pro set: i game possono superare 9, allora le cifre diventano due (per tutti e due i lati).
@@ -278,6 +300,7 @@ function render() {
     setSeg(gms[i], S.phase === "idle" ? " " : String(S.games[i] % 100), color(i));
     setSeg(sts[i], S.phase === "idle" ? " " : String(S.sets[i] % 10), color(i));
   }
+  if (refit) fitNames();
   const vs = $("vs");
   const tb = S.phase === "play" || S.phase === "suspended" ? (S.tiebreak === "match" ? L.matchTiebreak : S.tiebreak === "set" ? L.tiebreak : "") : "";
   setText(vs, tb || L.vs);
@@ -293,6 +316,8 @@ function render() {
   setText($("done"), done);
   $("clock").classList.toggle("hide", !S.show.clock);
   setText($("title"), S.title || "");
+  const pre = S.phase === "idle" || S.phase === "ready";
+  if (document.body.classList.contains("pre") !== pre) { document.body.classList.toggle("pre", pre); if (pre) fitText($("brand")); }
 
   // messaggio: fasi speciali prima di tutto
   const msg = $("msg");
@@ -455,7 +480,7 @@ function viewportUnits() {
   }
 }
 viewportUnits();
-window.addEventListener("resize", () => { viewportUnits(); for (let i = 0; i < 2; i++) fitText($("n" + i), 60); fitText($("msg")); });
+window.addEventListener("resize", () => { viewportUnits(); fitNames(); fitText($("msg")); fitText($("brand")); });
 keepAwake();
 setInterval(tick, 200);
 
