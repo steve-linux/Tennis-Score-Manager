@@ -1611,6 +1611,25 @@ class MatchController(
     /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
     fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
 
+    /** Rating TSM di uno sport, dalle partite finite dello storico (le amichevoli non contano). */
+    fun ratingTable(sport: com.tennis.scoremanager.data.Sport): com.tennis.scoremanager.data.Rating.Table =
+        com.tennis.scoremanager.data.Rating.compute(
+            history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) }, sport,
+        )
+
+    /** Rating dello sport di [m], con [m] dentro anche se lo storico non l'ha ancora ricaricata (appena finita). */
+    fun ratingTableWith(m: LiveMatch): com.tennis.scoremanager.data.Rating.Table =
+        com.tennis.scoremanager.data.Rating.compute(
+            (history.value.filter { it.record.id != m.record.id } + m)
+                .mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) },
+            m.record.setup.sport,
+        )
+
+    /** Sport con almeno una partita che conta per il rating, il più giocato per primo. */
+    fun ratingSports(): List<com.tennis.scoremanager.data.Sport> =
+        history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner)?.sport }
+            .groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
+
     /** Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta. */
     private fun shortDate(): (Long) -> String {
         val fmt = java.text.SimpleDateFormat("dd/MM/yy", options.value.lang.locale)
@@ -1982,6 +2001,21 @@ class MatchController(
     private var notesJob: Job? = null
 
     /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    /** Partita del riepilogo amichevole o no: si salva subito e il rating si ricalcola con lo storico. */
+    fun setFriendly(on: Boolean) {
+        val sm = summary.value ?: return
+        val rec = sm.record.copy(friendly = on)
+        summary.value = sm.copy(record = rec)
+        val fromHistory = summaryFromHistory.value
+        scope.launch {
+            withContext(io) {
+                storage.saveFinished(rec)
+                if (!fromHistory) storage.saveLastFinished(rec)
+            }
+            refreshHistory()
+        }
+    }
+
     fun setNotes(text: String) {
         val sm = summary.value ?: return
         val rec = sm.record.copy(notes = text.take(MAX_NOTES))

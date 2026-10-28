@@ -2522,6 +2522,25 @@ class MatchController(
     /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
     fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
 
+    /** Rating TSM di uno sport, dalle partite finite dello storico (le amichevoli non contano). */
+    fun ratingTable(sport: com.tennis.scoremanager.data.Sport): com.tennis.scoremanager.data.Rating.Table =
+        com.tennis.scoremanager.data.Rating.compute(
+            history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) }, sport,
+        )
+
+    /** Rating dello sport di [m], con [m] dentro anche se lo storico non l'ha ancora ricaricata (appena finita). */
+    fun ratingTableWith(m: LiveMatch): com.tennis.scoremanager.data.Rating.Table =
+        com.tennis.scoremanager.data.Rating.compute(
+            (history.value.filter { it.record.id != m.record.id } + m)
+                .mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner) },
+            m.record.setup.sport,
+        )
+
+    /** Sport con almeno una partita che conta per il rating, il più giocato per primo. */
+    fun ratingSports(): List<com.tennis.scoremanager.data.Sport> =
+        history.value.mapNotNull { com.tennis.scoremanager.data.Rating.gameOf(it.record, it.state.sets, it.state.winner)?.sport }
+            .groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
+
     /** Data corta: nelle colonne del documento quella lunga ("martedì 20 ottobre 2026") non ci sta. */
     private fun shortDate(): (Long) -> String {
         val fmt = java.text.SimpleDateFormat("dd/MM/yy", options.value.lang.locale)
@@ -2893,6 +2912,21 @@ class MatchController(
     private var notesJob: Job? = null
 
     /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    /** Partita del riepilogo amichevole o no: si salva subito e il rating si ricalcola con lo storico. */
+    fun setFriendly(on: Boolean) {
+        val sm = summary.value ?: return
+        val rec = sm.record.copy(friendly = on)
+        summary.value = sm.copy(record = rec)
+        val fromHistory = summaryFromHistory.value
+        scope.launch {
+            withContext(io) {
+                storage.saveFinished(rec)
+                if (!fromHistory) storage.saveLastFinished(rec)
+            }
+            refreshHistory()
+        }
+    }
+
     fun setNotes(text: String) {
         val sm = summary.value ?: return
         val rec = sm.record.copy(notes = text.take(MAX_NOTES))
@@ -6012,6 +6046,8 @@ data class MatchRecord(
     val heart: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
+    /** Amichevole: resta nello storico ma non conta per il rating TSM. */
+    val friendly: Boolean = false,
     /** Racchetta usata da ciascun lato, com'era quando si è iniziato (con le sensazioni dette nel riepilogo). */
     val rackets: Map<Side, RacketUse> = emptyMap(),
 )
@@ -7139,6 +7175,134 @@ object RacketStats {
             power = avgOf(feels.map { it.power }),
             fatigue = avgOf(feels.map { it.fatigue }),
             rated = feels.size,
+        )
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Rating.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Rating.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Side
+import kotlin.math.pow
+import kotlin.math.roundToInt
+
+/**
+ * Rating TSM: un punteggio Elo calcolato sul telefono dalle partite finite dello storico, separato per sport (tennis e
+ * padel non si mescolano). Si parte da [START]; dopo ogni partita ciascun giocatore guadagna o perde secondo quanto il
+ * risultato è stato migliore o peggiore del previsto.
+ *
+ * - Previsto: dalla differenza di rating ([expected]); nel doppio vale la media della coppia.
+ * - Risultato: 75 % vittoria o sconfitta, 25 % quota di game vinti: 6-0 6-0 conta più di 7-6 7-6, ma vincere conta
+ *   sempre più che perdere bene.
+ * - Peso ([kFactor]): alto nelle prime partite, perché il rating trovi presto il suo posto, poi più stabile.
+ * - Non contano le partite non finite, quelle segnate come amichevoli e i lati senza nomi scritti.
+ *
+ * I giocatori sono riconosciuti dal nome, come nello storico ([PlayerStats.key]).
+ */
+object Rating {
+    const val START = 1500
+    /** Sotto queste partite il rating è ancora "provvisorio". */
+    const val PROVISIONAL = 5
+    private const val WIN_WEIGHT = 0.75
+
+    /** Una partita per il rating: nomi dei due lati, vincitore, game vinti da ciascuno. */
+    data class Game(
+        val id: String,
+        val at: Long,
+        val sport: Sport,
+        val sides: Map<Side, List<String>>,
+        val winner: Side,
+        val games: Map<Side, Int>,
+    )
+
+    /** Rating di un giocatore: valore, partite contate, e il valore dopo ciascuna (per l'andamento). */
+    data class Player(val key: String, val name: String, val rating: Int, val matches: Int, val wins: Int, val history: List<Pair<Long, Int>>) {
+        val provisional: Boolean get() = matches < PROVISIONAL
+    }
+
+    /** Risultato del calcolo: giocatori di uno sport, dal più alto, e la variazione di ciascuno in ogni partita. */
+    data class Table(val players: List<Player>, val deltas: Map<String, Map<String, Int>>) {
+        fun player(key: String): Player? = players.firstOrNull { it.key == key }
+        /** Variazione del giocatore [key] nella partita [id] (null se non contava). */
+        fun delta(id: String, key: String): Int? = deltas[id]?.get(key)
+    }
+
+    fun expected(mine: Double, theirs: Double): Double = 1.0 / (1.0 + 10.0.pow((theirs - mine) / 400.0))
+
+    fun kFactor(matchesBefore: Int): Double = when {
+        matchesBefore < 10 -> 40.0
+        matchesBefore < 30 -> 24.0
+        else -> 16.0
+    }
+
+    /** Risultato tra 0 e 1 per il lato [side]: vittoria e quota di game. */
+    fun score(g: Game, side: Side): Double {
+        val mine = g.games[side] ?: 0
+        val theirs = g.games[side.other] ?: 0
+        val share = if (mine + theirs > 0) mine.toDouble() / (mine + theirs) else if (g.winner == side) 1.0 else 0.0
+        return WIN_WEIGHT * (if (g.winner == side) 1.0 else 0.0) + (1 - WIN_WEIGHT) * share
+    }
+
+    /** Calcola i rating di [sport] dalle partite [games], in ordine di tempo. */
+    fun compute(games: List<Game>, sport: Sport): Table {
+        val rating = HashMap<String, Double>()
+        val count = HashMap<String, Int>()
+        val wins = HashMap<String, Int>()
+        val names = HashMap<String, String>()
+        val history = HashMap<String, MutableList<Pair<Long, Int>>>()
+        val deltas = LinkedHashMap<String, Map<String, Int>>()
+        for (g in games.filter { it.sport == sport }.sortedBy { it.at }) {
+            // Nome scritto e chiave di ciascun giocatore, lato per lato.
+            val named = Side.entries.associateWith { side ->
+                g.sides[side].orEmpty().map { it.trim() }.filter { it.isNotEmpty() }.distinctBy { PlayerStats.key(it) }
+            }
+            val keys = named.mapValues { (_, ns) -> ns.map { PlayerStats.key(it) } }
+            if (keys.values.any { it.isEmpty() }) continue
+            // Un nome su tutti e due i lati (errore di battitura): la partita non dice niente, si salta.
+            if (keys.getValue(Side.P1).any { it in keys.getValue(Side.P2) }) continue
+            val team = keys.mapValues { (_, ks) -> ks.map { rating[it] ?: START.toDouble() }.average() }
+            val d = HashMap<String, Int>()
+            for (side in Side.entries) {
+                val e = expected(team.getValue(side), team.getValue(side.other))
+                val s = score(g, side)
+                for ((i, k) in keys.getValue(side).withIndex()) {
+                    val before = rating[k] ?: START.toDouble()
+                    val change = kFactor(count[k] ?: 0) * (s - e)
+                    rating[k] = before + change
+                    count[k] = (count[k] ?: 0) + 1
+                    if (g.winner == side) wins[k] = (wins[k] ?: 0) + 1
+                    names[k] = named.getValue(side)[i]
+                    history.getOrPut(k) { mutableListOf() } += g.at to rating.getValue(k).roundToInt()
+                    d[k] = (rating.getValue(k).roundToInt() - before.roundToInt())
+                }
+            }
+            deltas[g.id] = d
+        }
+        val players = rating.keys.map { k ->
+            Player(k, names[k] ?: k, rating.getValue(k).roundToInt(), count[k] ?: 0, wins[k] ?: 0, history[k].orEmpty())
+        }.sortedWith(compareByDescending<Player> { it.rating }.thenBy { it.name.lowercase() })
+        return Table(players, deltas)
+    }
+
+    /** Una partita dello storico come [Game], o null se non conta (non finita, amichevole, senza vincitore). */
+    fun gameOf(rec: MatchRecord, sets: List<com.tennis.scoremanager.model.SetScore>, winner: Side?): Game? {
+        if (winner == null || !rec.finished || rec.friendly) return null
+        val games = Side.entries.associateWith { side ->
+            // Il super tie-break vale come un game: i suoi punti falserebbero la quota.
+            sets.sumOf { st -> if (st.matchTiebreak) (if (st.winner == side) 1 else 0) else st.games(side) }
+        }
+        return Game(
+            id = rec.id,
+            at = rec.endedAt ?: rec.startedAt ?: rec.updatedAt,
+            sport = rec.setup.sport,
+            sides = Side.entries.associateWith { PlayerStats.names(rec.setup, it) },
+            winner = winner,
+            games = games,
         )
     }
 }
@@ -13729,6 +13893,174 @@ fun EditablePlayerAvatar(c: MatchController, name: String, color: Color, size: D
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RatingUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RatingUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Handshake
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Rating
+import com.tennis.scoremanager.data.Sport
+import com.tennis.scoremanager.model.Side
+
+/** Variazione col segno: "+12", "−8", "0". */
+fun ratingDelta(d: Int): String = when {
+    d > 0 -> "+$d"
+    d < 0 -> "−${-d}"
+    else -> "0"
+}
+
+/**
+ * Progressi › Partite: rating TSM del giocatore scelto (con l'andamento) e la classifica di tutti. Con partite di
+ * tennis e di padel si sceglie lo sport: le due classifiche sono separate.
+ */
+@Composable
+fun RatingSection(c: MatchController, key: String?) {
+    val s = LocalStrings.current
+    val history by c.history.collectAsState()
+    val sports = remember(history) { c.ratingSports() }
+    var chosen by rememberSaveable { mutableStateOf<Sport?>(null) }
+    val sport = chosen?.takeIf { it in sports } ?: sports.firstOrNull()
+    SectionCard(s.ratingTitle, Icons.Filled.EmojiEvents) {
+        if (sport == null) {
+            Text(s.ratingNone, color = TsmColors.TextDim)
+            return@SectionCard
+        }
+        if (sports.size > 1) {
+            Segmented(sports.map { SegOption(if (it == Sport.PADEL) s.sportPadel else s.sportTennis) }, sports.indexOf(sport), { chosen = sports[it] })
+        }
+        val table = remember(history, sport) { c.ratingTable(sport) }
+        val me = key?.let { table.player(it) }
+        if (me != null) {
+            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("${me.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 40.sp)
+                Column {
+                    Text(s.ratingMatches(me.matches, me.wins), color = TsmColors.TextMain, fontSize = 14.sp)
+                    me.history.size.takeIf { it >= 2 }?.let {
+                        val last = me.history[it - 1].second - me.history[it - 2].second
+                        Text(s.ratingLast(ratingDelta(last)), color = if (last >= 0) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
+                    }
+                    if (me.provisional) Text(s.ratingProvisional(Rating.PROVISIONAL - me.matches), color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+            }
+            // Da 1500, il punto di partenza di tutti, a ogni partita.
+            RatingTrend(listOf(Rating.START) + me.history.map { it.second })
+        }
+        Text(s.ratingHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        Ranking(table, key)
+    }
+}
+
+/** Andamento del rating partita dopo partita, con la linea di partenza tratteggiata in chiaro. */
+@Composable
+private fun RatingTrend(values: List<Int>) {
+    val all = values + Rating.START
+    val lo = all.min() - 10
+    val hi = all.max() + 10
+    Canvas(Modifier.fillMaxWidth().height(64.dp)) {
+        fun y(v: Int) = size.height * (1f - (v - lo).toFloat() / (hi - lo))
+        drawLine(TsmColors.Outline, Offset(0f, y(Rating.START)), Offset(size.width, y(Rating.START)), strokeWidth = 1.5f)
+        val path = Path()
+        values.forEachIndexed { i, v ->
+            val x = if (values.size == 1) 0f else size.width * i / (values.size - 1)
+            if (i == 0) path.moveTo(x, y(v)) else path.lineTo(x, y(v))
+        }
+        drawPath(path, TsmColors.Ball, style = Stroke(width = 2.5f * density))
+    }
+}
+
+/** Classifica TSM: i primi dieci, tutti a richiesta; il giocatore scelto in evidenza. */
+@Composable
+private fun Ranking(table: Rating.Table, key: String?) {
+    val s = LocalStrings.current
+    var all by rememberSaveable { mutableStateOf(false) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.material3.Icon(Icons.Filled.Leaderboard, null, tint = TsmColors.TextMain)
+        Text("  " + s.ratingRanking, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+    }
+    val shown = if (all) table.players else table.players.take(10)
+    shown.forEachIndexed { i, p ->
+        val mine = p.key == key
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("${i + 1}.", color = TsmColors.TextDim, fontSize = 14.sp, modifier = Modifier.width(32.dp))
+            Text(
+                p.name + if (p.provisional) " *" else "", color = if (mine) TsmColors.Ball else TsmColors.TextMain,
+                fontWeight = if (mine) FontWeight.Bold else FontWeight.Normal, fontSize = 14.sp, modifier = Modifier.weight(1f),
+            )
+            Text("${p.rating}", color = if (mine) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
+    if (table.players.any { it.provisional }) Text("* " + s.ratingProvisional(Rating.PROVISIONAL).substringBefore(':'), color = TsmColors.TextDim, fontSize = 12.sp)
+    if (table.players.size > 10) TextButton(onClick = { all = !all }) { Text(if (all) s.ratingShowLess else s.ratingShowAll) }
+}
+
+/**
+ * Riepilogo: amichevole sì o no e, se conta, il rating di ciascun giocatore dopo la partita con la variazione.
+ */
+@Composable
+fun SummaryRatingCard(c: MatchController, m: LiveMatch) {
+    val s = LocalStrings.current
+    val rec = m.record
+    if (!rec.finished) return
+    val history by c.history.collectAsState()
+    SectionCard(s.ratingTitle, Icons.Filled.EmojiEvents) {
+        SwitchRow(Icons.Filled.Handshake, s.ratingFriendly, s.ratingFriendlyHint, rec.friendly) { c.setFriendly(it) }
+        val table = remember(history, rec) { c.ratingTableWith(m) }
+        val deltas = table.deltas[rec.id]
+        if (rec.friendly || deltas == null) {
+            Text(s.ratingNotCounted, color = TsmColors.TextDim, fontSize = 13.sp)
+            return@SectionCard
+        }
+        Text(s.ratingInMatch, color = TsmColors.TextDim, fontSize = 13.sp)
+        for (side in Side.entries) {
+            for (name in PlayerStats.names(rec.setup, side)) {
+                val k = PlayerStats.key(name)
+                val d = deltas[k] ?: continue
+                // Il rating subito dopo questa partita (quelle giocate dopo l'hanno già cambiato).
+                val after = table.player(k)?.history?.firstOrNull { it.first == (rec.endedAt ?: rec.startedAt ?: rec.updatedAt) }?.second
+                Row(Modifier.fillMaxWidth()) {
+                    Text(name, color = TsmColors.player(side), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    after?.let { Text("$it  ", color = TsmColors.TextMain, fontWeight = FontWeight.Bold) }
+                    Text(ratingDelta(d), color = if (d >= 0) TsmColors.Ok else TsmColors.Orange, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RelaySection.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RelaySection.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -14901,6 +15233,20 @@ interface Strings {
     val takePhoto: String
     val matchPhotosFull: String
     val matchNotesTitle: String
+    /** Rating TSM (Elo dalle partite dello storico) e classifica. */
+    val ratingTitle: String
+    val ratingHint: String
+    val ratingProvisional: (Int) -> String
+    val ratingMatches: (Int, Int) -> String
+    val ratingLast: (String) -> String
+    val ratingRanking: String
+    val ratingNone: String
+    val ratingFriendly: String
+    val ratingFriendlyHint: String
+    val ratingInMatch: String
+    val ratingNotCounted: String
+    val ratingShowAll: String
+    val ratingShowLess: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -15826,6 +16172,19 @@ object ItStrings : Strings {
     override val takePhoto = "Scatta"
     override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
     override val matchNotesTitle = "Note"
+    override val ratingTitle = "Rating TSM"
+    override val ratingHint = "Calcolato sul telefono dalle partite finite dello storico: sale quando vinci, di più contro chi ha un rating più alto e con un punteggio netto. Nel doppio conta la media della coppia. Le amichevoli non contano."
+    override val ratingProvisional: (Int) -> String = { "provvisorio: ancora $it partite" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a partite, $b vinte" }
+    override val ratingLast: (String) -> String = { "Ultima partita: $it" }
+    override val ratingRanking = "Classifica TSM"
+    override val ratingNone = "Ancora nessuna partita che conti per il rating."
+    override val ratingFriendly = "Amichevole"
+    override val ratingFriendlyHint = "Non conta per il rating TSM"
+    override val ratingInMatch = "Rating TSM dopo questa partita"
+    override val ratingNotCounted = "Questa partita non conta per il rating TSM."
+    override val ratingShowAll = "Mostra tutti"
+    override val ratingShowLess = "Mostra meno"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -16737,6 +17096,19 @@ object EnStrings : Strings {
     override val takePhoto = "Take photo"
     override val matchPhotosFull = "This match already has 10 photos."
     override val matchNotesTitle = "Notes"
+    override val ratingTitle = "TSM rating"
+    override val ratingHint = "Worked out on the phone from the finished matches in the history: it goes up when you win, more against higher-rated players and with a clear score. In doubles the pair's average counts. Friendlies don't count."
+    override val ratingProvisional: (Int) -> String = { "provisional: $it more matches" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a matches, $b won" }
+    override val ratingLast: (String) -> String = { "Last match: $it" }
+    override val ratingRanking = "TSM ranking"
+    override val ratingNone = "No match counts for the rating yet."
+    override val ratingFriendly = "Friendly"
+    override val ratingFriendlyHint = "Doesn't count for the TSM rating"
+    override val ratingInMatch = "TSM rating after this match"
+    override val ratingNotCounted = "This match doesn't count for the TSM rating."
+    override val ratingShowAll = "Show all"
+    override val ratingShowLess = "Show less"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -17671,6 +18043,19 @@ object DeStrings : Strings {
     override val takePhoto = "Foto aufnehmen"
     override val matchPhotosFull = "Dieses Match hat schon 10 Fotos."
     override val matchNotesTitle = "Notizen"
+    override val ratingTitle = "TSM-Wertung"
+    override val ratingHint = "Auf dem Telefon aus den beendeten Matches der Historie berechnet: Sie steigt, wenn du gewinnst, stärker gegen besser bewertete Spieler und bei klarem Ergebnis. Im Doppel zählt der Durchschnitt des Paares. Freundschaftsspiele zählen nicht."
+    override val ratingProvisional: (Int) -> String = { "vorläufig: noch $it Matches" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a Matches, $b gewonnen" }
+    override val ratingLast: (String) -> String = { "Letztes Match: $it" }
+    override val ratingRanking = "TSM-Rangliste"
+    override val ratingNone = "Noch kein Match zählt für die Wertung."
+    override val ratingFriendly = "Freundschaftsspiel"
+    override val ratingFriendlyHint = "Zählt nicht für die TSM-Wertung"
+    override val ratingInMatch = "TSM-Wertung nach diesem Match"
+    override val ratingNotCounted = "Dieses Match zählt nicht für die TSM-Wertung."
+    override val ratingShowAll = "Alle zeigen"
+    override val ratingShowLess = "Weniger zeigen"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -18598,6 +18983,19 @@ object EsStrings : Strings {
     override val takePhoto = "Hacer foto"
     override val matchPhotosFull = "Este partido ya tiene 10 fotos."
     override val matchNotesTitle = "Notas"
+    override val ratingTitle = "Rating TSM"
+    override val ratingHint = "Calculado en el teléfono a partir de los partidos terminados del historial: sube cuando ganas, más contra quien tiene un rating más alto y con un resultado claro. En dobles cuenta la media de la pareja. Los amistosos no cuentan."
+    override val ratingProvisional: (Int) -> String = { "provisional: faltan $it partidos" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a partidos, $b ganados" }
+    override val ratingLast: (String) -> String = { "Último partido: $it" }
+    override val ratingRanking = "Clasificación TSM"
+    override val ratingNone = "Todavía ningún partido cuenta para el rating."
+    override val ratingFriendly = "Amistoso"
+    override val ratingFriendlyHint = "No cuenta para el rating TSM"
+    override val ratingInMatch = "Rating TSM después de este partido"
+    override val ratingNotCounted = "Este partido no cuenta para el rating TSM."
+    override val ratingShowAll = "Mostrar todos"
+    override val ratingShowLess = "Mostrar menos"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -19527,6 +19925,19 @@ object FrStrings : Strings {
     override val takePhoto = "Prendre une photo"
     override val matchPhotosFull = "Ce match a déjà 10 photos."
     override val matchNotesTitle = "Notes du match"
+    override val ratingTitle = "Classement TSM"
+    override val ratingHint = "Calculé sur le téléphone à partir des matchs terminés de l'historique : il monte quand vous gagnez, davantage contre un joueur mieux classé et avec un score net. En double, c'est la moyenne de la paire qui compte. Les matchs amicaux ne comptent pas."
+    override val ratingProvisional: (Int) -> String = { "provisoire : encore $it matchs" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a matchs, $b gagnés" }
+    override val ratingLast: (String) -> String = { "Dernier match : $it" }
+    override val ratingRanking = "Classement TSM des joueurs"
+    override val ratingNone = "Aucun match ne compte encore pour le classement."
+    override val ratingFriendly = "Amical"
+    override val ratingFriendlyHint = "Ne compte pas pour le classement TSM"
+    override val ratingInMatch = "Classement TSM après ce match"
+    override val ratingNotCounted = "Ce match ne compte pas pour le classement TSM."
+    override val ratingShowAll = "Tout afficher"
+    override val ratingShowLess = "Afficher moins"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -20457,6 +20868,19 @@ object PtStrings : Strings {
     override val takePhoto = "Tirar foto"
     override val matchPhotosFull = "Esta partida já tem 10 fotos."
     override val matchNotesTitle = "Notas"
+    override val ratingTitle = "Rating TSM"
+    override val ratingHint = "Calculado no telefone a partir das partidas terminadas do histórico: sobe quando você vence, mais contra quem tem rating mais alto e com placar folgado. Nas duplas conta a média da dupla. Amistosos não contam."
+    override val ratingProvisional: (Int) -> String = { "provisório: faltam $it partidas" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a partidas, $b vencidas" }
+    override val ratingLast: (String) -> String = { "Última partida: $it" }
+    override val ratingRanking = "Classificação TSM"
+    override val ratingNone = "Ainda nenhuma partida conta para o rating."
+    override val ratingFriendly = "Amistoso"
+    override val ratingFriendlyHint = "Não conta para o rating TSM"
+    override val ratingInMatch = "Rating TSM depois desta partida"
+    override val ratingNotCounted = "Esta partida não conta para o rating TSM."
+    override val ratingShowAll = "Mostrar todos"
+    override val ratingShowLess = "Mostrar menos"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -23431,6 +23855,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressFilter
 import com.tennis.scoremanager.data.ProgressItem
+import com.tennis.scoremanager.ui.RatingSection
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Picker
@@ -23484,6 +23909,7 @@ fun ProgressScreen(c: MatchController) {
             } else {
                 Picker(s.progressPlayer, players.firstOrNull { it.first == key }?.second ?: "", players) { player = it }
             }
+            RatingSection(c, key)
         }
         if (items.isNotEmpty()) {
             FilterCard(filter, items, matches) { filter = it }
@@ -24894,6 +25320,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.SummaryRatingCard
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
@@ -25016,6 +25443,7 @@ fun SummaryScreen(c: MatchController) {
                         RacketSessionCard(c, "${s.racketUsed} · ${names.side(side)}", rec.rackets[side], lang, TsmColors.player(side),
                             onRacket = { c.setMatchRacket(side, it) }, onFeel = { c.setMatchFeel(side, it) })
                     }
+                    SummaryRatingCard(c, com.tennis.scoremanager.LiveMatch(rec, state))
                     MatchPhotosCard(c, rec.id)
                     MatchNotesCard(c, rec.id, rec.notes)
                 }
@@ -42591,6 +43019,85 @@ class RacketTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/RatingTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/RatingTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class RatingTest {
+    private var t = 0L
+
+    private fun game(p1: List<String>, p2: List<String>, winner: Side, g1: Int, g2: Int, sport: Sport = Sport.TENNIS, id: String = "m${++t}") =
+        Rating.Game(id, t, sport, mapOf(Side.P1 to p1, Side.P2 to p2), winner, mapOf(Side.P1 to g1, Side.P2 to g2))
+
+    @Test
+    fun equalPlayersMoveSymmetrically() {
+        val table = Rating.compute(listOf(game(listOf("Rossi"), listOf("Bianchi"), Side.P1, 12, 6)), Sport.TENNIS)
+        val rossi = table.player("rossi")!!
+        val bianchi = table.player("bianchi")!!
+        assertTrue(rossi.rating > Rating.START)
+        assertEquals(Rating.START * 2, rossi.rating + bianchi.rating)
+        assertEquals(rossi.rating - Rating.START, table.delta("m1", "rossi"))
+        assertTrue(rossi.provisional)
+        assertEquals("Rossi", rossi.name)
+    }
+
+    @Test
+    fun scoreCountsButWinningMatters() {
+        val clear = Rating.compute(listOf(game(listOf("A"), listOf("B"), Side.P1, 12, 0)), Sport.TENNIS).player("a")!!.rating
+        val tight = Rating.compute(listOf(game(listOf("A"), listOf("B"), Side.P1, 13, 12)), Sport.TENNIS).player("a")!!.rating
+        assertTrue(clear > tight)
+        // Perdere 6-7 6-7 non dà punti: il risultato resta sotto 0,5.
+        val loser = Rating.compute(listOf(game(listOf("A"), listOf("B"), Side.P1, 14, 12)), Sport.TENNIS).player("b")!!.rating
+        assertTrue(loser < Rating.START)
+    }
+
+    @Test
+    fun upsetGivesMoreThanExpectedWin() {
+        // Forte vince tre volte contro Debole, poi Debole lo batte: guadagna più di quanto Forte guadagnava.
+        val list = (1..3).map { game(listOf("Forte"), listOf("Debole"), Side.P1, 12, 4) } + game(listOf("Forte"), listOf("Debole"), Side.P2, 5, 12, id = "upset")
+        val table = Rating.compute(list, Sport.TENNIS)
+        val gain = table.delta("upset", "debole")!!
+        assertTrue("$gain", gain > table.delta("m1", "forte")!!)
+    }
+
+    @Test
+    fun doublesUseTeamAverageAndSkipBadMatches() {
+        val list = listOf(
+            game(listOf("Rossi", "Bianchi"), listOf("Verdi", "Neri"), Side.P1, 12, 9),
+            // Un lato senza nomi e lo stesso nome sui due lati non contano.
+            game(listOf("Rossi"), emptyList(), Side.P1, 12, 0),
+            game(listOf("Rossi"), listOf("rossi "), Side.P1, 12, 0),
+            game(listOf("Rossi"), listOf("Verdi"), Side.P1, 12, 0, sport = Sport.PADEL),
+        )
+        val tennis = Rating.compute(list, Sport.TENNIS)
+        assertEquals(4, tennis.players.size)
+        assertEquals(tennis.player("rossi")!!.rating, tennis.player("bianchi")!!.rating)
+        assertEquals(1, tennis.player("rossi")!!.matches)
+        assertNull(tennis.delta("m2", "rossi"))
+        // Il padel ha la sua classifica.
+        assertEquals(2, Rating.compute(list, Sport.PADEL).players.size)
+    }
+
+    @Test
+    fun weightDropsWithExperience() {
+        assertEquals(40.0, Rating.kFactor(0), 0.0)
+        assertEquals(24.0, Rating.kFactor(10), 0.0)
+        assertEquals(16.0, Rating.kFactor(30), 0.0)
+        assertEquals(0.5, Rating.expected(1500.0, 1500.0), 1e-9)
+        assertEquals(0.76, Rating.expected(1700.0, 1500.0), 0.01)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -49295,6 +49802,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 148 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 151 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

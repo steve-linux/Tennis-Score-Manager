@@ -101,6 +101,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.SummaryRatingCard
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
@@ -223,6 +224,7 @@ fun SummaryScreen(c: MatchController) {
                         RacketSessionCard(c, "${s.racketUsed} · ${names.side(side)}", rec.rackets[side], lang, TsmColors.player(side),
                             onRacket = { c.setMatchRacket(side, it) }, onFeel = { c.setMatchFeel(side, it) })
                     }
+                    SummaryRatingCard(c, com.tennis.scoremanager.LiveMatch(rec, state))
                     MatchPhotosCard(c, rec.id)
                     MatchNotesCard(c, rec.id, rec.notes)
                 }

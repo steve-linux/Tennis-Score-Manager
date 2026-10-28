@@ -114,6 +114,8 @@ data class MatchRecord(
     val heart: Map<Side, HeartTrack> = emptyMap(),
     /** Note libere scritte nel riepilogo: vanno nel PDF, nel testo condiviso e nei salvataggi. */
     val notes: String = "",
+    /** Amichevole: resta nello storico ma non conta per il rating TSM. */
+    val friendly: Boolean = false,
     /** Racchetta usata da ciascun lato, com'era quando si è iniziato (con le sensazioni dette nel riepilogo). */
     val rackets: Map<Side, RacketUse> = emptyMap(),
 )

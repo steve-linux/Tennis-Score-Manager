@@ -761,6 +761,20 @@ interface Strings {
     val takePhoto: String
     val matchPhotosFull: String
     val matchNotesTitle: String
+    /** Rating TSM (Elo dalle partite dello storico) e classifica. */
+    val ratingTitle: String
+    val ratingHint: String
+    val ratingProvisional: (Int) -> String
+    val ratingMatches: (Int, Int) -> String
+    val ratingLast: (String) -> String
+    val ratingRanking: String
+    val ratingNone: String
+    val ratingFriendly: String
+    val ratingFriendlyHint: String
+    val ratingInMatch: String
+    val ratingNotCounted: String
+    val ratingShowAll: String
+    val ratingShowLess: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1686,6 +1700,19 @@ object ItStrings : Strings {
     override val takePhoto = "Scatta"
     override val matchPhotosFull = "Ci sono già 10 foto per questa partita."
     override val matchNotesTitle = "Note"
+    override val ratingTitle = "Rating TSM"
+    override val ratingHint = "Calcolato sul telefono dalle partite finite dello storico: sale quando vinci, di più contro chi ha un rating più alto e con un punteggio netto. Nel doppio conta la media della coppia. Le amichevoli non contano."
+    override val ratingProvisional: (Int) -> String = { "provvisorio: ancora $it partite" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a partite, $b vinte" }
+    override val ratingLast: (String) -> String = { "Ultima partita: $it" }
+    override val ratingRanking = "Classifica TSM"
+    override val ratingNone = "Ancora nessuna partita che conti per il rating."
+    override val ratingFriendly = "Amichevole"
+    override val ratingFriendlyHint = "Non conta per il rating TSM"
+    override val ratingInMatch = "Rating TSM dopo questa partita"
+    override val ratingNotCounted = "Questa partita non conta per il rating TSM."
+    override val ratingShowAll = "Mostra tutti"
+    override val ratingShowLess = "Mostra meno"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2597,6 +2624,19 @@ object EnStrings : Strings {
     override val takePhoto = "Take photo"
     override val matchPhotosFull = "This match already has 10 photos."
     override val matchNotesTitle = "Notes"
+    override val ratingTitle = "TSM rating"
+    override val ratingHint = "Worked out on the phone from the finished matches in the history: it goes up when you win, more against higher-rated players and with a clear score. In doubles the pair's average counts. Friendlies don't count."
+    override val ratingProvisional: (Int) -> String = { "provisional: $it more matches" }
+    override val ratingMatches: (Int, Int) -> String = { a, b -> "$a matches, $b won" }
+    override val ratingLast: (String) -> String = { "Last match: $it" }
+    override val ratingRanking = "TSM ranking"
+    override val ratingNone = "No match counts for the rating yet."
+    override val ratingFriendly = "Friendly"
+    override val ratingFriendlyHint = "Doesn't count for the TSM rating"
+    override val ratingInMatch = "TSM rating after this match"
+    override val ratingNotCounted = "This match doesn't count for the TSM rating."
+    override val ratingShowAll = "Show all"
+    override val ratingShowLess = "Show less"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"

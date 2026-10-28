@@ -50,6 +50,7 @@ import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressFilter
 import com.tennis.scoremanager.data.ProgressItem
+import com.tennis.scoremanager.ui.RatingSection
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Picker
@@ -103,6 +104,7 @@ fun ProgressScreen(c: MatchController) {
             } else {
                 Picker(s.progressPlayer, players.firstOrNull { it.first == key }?.second ?: "", players) { player = it }
             }
+            RatingSection(c, key)
         }
         if (items.isNotEmpty()) {
             FilterCard(filter, items, matches) { filter = it }
