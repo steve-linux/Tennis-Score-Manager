@@ -2001,6 +2001,49 @@ class MatchController(
     private var notesJob: Job? = null
 
     /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    // ---------------------------------------------------------------- rivincita
+
+    /** Nomi di un lato per l'invito: "Rossi" o "Rossi / Bianchi". */
+    private fun rematchSide(rec: MatchRecord, side: Side): String = Names(rec.setup, strings).players(side).joinToString(" / ")
+
+    /** Luogo proposto: circolo e campo della partita, altrimenti l'indirizzo trovato. */
+    fun rematchPlace(rec: MatchRecord): String =
+        listOf(rec.setup.club.trim(), rec.setup.court.trim().takeIf { it.isNotEmpty() }?.let { strings.court + " " + it })
+            .filterNot { it.isNullOrEmpty() }.joinToString(" · ").ifEmpty { rec.location?.address.orEmpty() }
+
+    /** Il messaggio d'invito, nella lingua dell'app. */
+    fun rematchText(m: LiveMatch, at: Long, place: String, note: String): String {
+        val s = strings
+        val lang = options.value.lang
+        val rec = m.record
+        val last = m.state.winner?.let { w -> s.rematchLast(Reports.scoreLine(m.state, w), rematchSide(rec, w)) }
+        return com.tennis.scoremanager.data.Rematch.message(
+            s.rematchAsk, rematchSide(rec, Side.P1), rematchSide(rec, Side.P2), s.rematchVersus,
+            "${Reports.date(at, lang)}, ${Reports.time(at, lang)}", place, last, note,
+            "${s.generatedWith} · ${Reports.siteUrl(lang).removePrefix("https://").removeSuffix("/")}",
+        )
+    }
+
+    fun rematchShareIntent(text: String): Intent =
+        Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }, strings.share)
+
+    /** Evento nel calendario (lo crea l'app del calendario: niente permessi). */
+    fun rematchCalendarIntent(m: LiveMatch, at: Long, place: String, text: String): Intent =
+        Intent(Intent.ACTION_INSERT).setData(android.provider.CalendarContract.Events.CONTENT_URI)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, at)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_END_TIME, at + com.tennis.scoremanager.data.Rematch.durationMs(m.record.clockMs))
+            .putExtra(android.provider.CalendarContract.Events.TITLE, strings.rematchEvent("${rematchSide(m.record, Side.P1)} – ${rematchSide(m.record, Side.P2)}"))
+            .putExtra(android.provider.CalendarContract.Events.EVENT_LOCATION, place)
+            .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, text)
+
+    /** La stessa partita in pagina 1: giocatori, circolo, campo e regole; il torneo no. */
+    fun prepareRematch(rec: MatchRecord) {
+        updateSetup { com.tennis.scoremanager.data.Rematch.setup(rec.setup) }
+        updateOptions { com.tennis.scoremanager.data.Rematch.options(it, rec.options) }
+        summaryFromHistory.value = false
+        newMatch()
+    }
+
     /** Partita del riepilogo amichevole o no: si salva subito e il rating si ricalcola con lo storico. */
     fun setFriendly(on: Boolean) {
         val sm = summary.value ?: return

@@ -775,6 +775,22 @@ interface Strings {
     val ratingNotCounted: String
     val ratingShowAll: String
     val ratingShowLess: String
+    /** Rivincita: invito da condividere, calendario e stessa partita in pagina 1. */
+    val rematchTitle: String
+    val rematchHint: String
+    val rematchAsk: String
+    val rematchVersus: String
+    val rematchLast: (String, String) -> String
+    val rematchWhen: String
+    val rematchPlace: String
+    val rematchNote: String
+    val rematchNoteHint: String
+    val rematchSend: String
+    val rematchCalendar: String
+    val rematchPrepare: String
+    val rematchEvent: (String) -> String
+    val rematchNoCalendar: String
+    val rematchPreview: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1713,6 +1729,21 @@ object ItStrings : Strings {
     override val ratingNotCounted = "Questa partita non conta per il rating TSM."
     override val ratingShowAll = "Mostra tutti"
     override val ratingShowLess = "Mostra meno"
+    override val rematchTitle = "Rivincita"
+    override val rematchHint = "Proponi un'altra partita: l'invito pronto da mandare su WhatsApp o dove preferisci, la data in calendario e la stessa partita pronta in pagina 1."
+    override val rematchAsk = "Rivincita?"
+    override val rematchVersus = "contro"
+    override val rematchLast: (String, String) -> String = { a, b -> "Ultima volta: $a per $b" }
+    override val rematchWhen = "Quando"
+    override val rematchPlace = "Dove"
+    override val rematchNote = "Nota (facoltativa)"
+    override val rematchNoteHint = "es. campo già prenotato, porto io le palline"
+    override val rematchSend = "Manda l'invito"
+    override val rematchCalendar = "Metti in calendario"
+    override val rematchPrepare = "Prepara la partita"
+    override val rematchEvent: (String) -> String = { "Rivincita: $it" }
+    override val rematchNoCalendar = "Nessuna app di calendario su questo telefono."
+    override val rematchPreview = "Il messaggio"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2637,6 +2668,21 @@ object EnStrings : Strings {
     override val ratingNotCounted = "This match doesn't count for the TSM rating."
     override val ratingShowAll = "Show all"
     override val ratingShowLess = "Show less"
+    override val rematchTitle = "Rematch"
+    override val rematchHint = "Suggest another match: an invite ready to send on WhatsApp or wherever you like, the date in your calendar and the same match ready on page 1."
+    override val rematchAsk = "Rematch?"
+    override val rematchVersus = "vs"
+    override val rematchLast: (String, String) -> String = { a, b -> "Last time: $a to $b" }
+    override val rematchWhen = "When"
+    override val rematchPlace = "Where"
+    override val rematchNote = "Note (optional)"
+    override val rematchNoteHint = "e.g. court already booked, I'll bring the balls"
+    override val rematchSend = "Send the invite"
+    override val rematchCalendar = "Add to calendar"
+    override val rematchPrepare = "Set up the match"
+    override val rematchEvent: (String) -> String = { "Rematch: $it" }
+    override val rematchNoCalendar = "No calendar app on this phone."
+    override val rematchPreview = "The message"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"

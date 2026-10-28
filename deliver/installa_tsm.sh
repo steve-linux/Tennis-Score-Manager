@@ -2912,6 +2912,49 @@ class MatchController(
     private var notesJob: Job? = null
 
     /** Note del riepilogo: subito a schermo, sul file dopo un attimo di pausa (non a ogni lettera). */
+    // ---------------------------------------------------------------- rivincita
+
+    /** Nomi di un lato per l'invito: "Rossi" o "Rossi / Bianchi". */
+    private fun rematchSide(rec: MatchRecord, side: Side): String = Names(rec.setup, strings).players(side).joinToString(" / ")
+
+    /** Luogo proposto: circolo e campo della partita, altrimenti l'indirizzo trovato. */
+    fun rematchPlace(rec: MatchRecord): String =
+        listOf(rec.setup.club.trim(), rec.setup.court.trim().takeIf { it.isNotEmpty() }?.let { strings.court + " " + it })
+            .filterNot { it.isNullOrEmpty() }.joinToString(" · ").ifEmpty { rec.location?.address.orEmpty() }
+
+    /** Il messaggio d'invito, nella lingua dell'app. */
+    fun rematchText(m: LiveMatch, at: Long, place: String, note: String): String {
+        val s = strings
+        val lang = options.value.lang
+        val rec = m.record
+        val last = m.state.winner?.let { w -> s.rematchLast(Reports.scoreLine(m.state, w), rematchSide(rec, w)) }
+        return com.tennis.scoremanager.data.Rematch.message(
+            s.rematchAsk, rematchSide(rec, Side.P1), rematchSide(rec, Side.P2), s.rematchVersus,
+            "${Reports.date(at, lang)}, ${Reports.time(at, lang)}", place, last, note,
+            "${s.generatedWith} · ${Reports.siteUrl(lang).removePrefix("https://").removeSuffix("/")}",
+        )
+    }
+
+    fun rematchShareIntent(text: String): Intent =
+        Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }, strings.share)
+
+    /** Evento nel calendario (lo crea l'app del calendario: niente permessi). */
+    fun rematchCalendarIntent(m: LiveMatch, at: Long, place: String, text: String): Intent =
+        Intent(Intent.ACTION_INSERT).setData(android.provider.CalendarContract.Events.CONTENT_URI)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, at)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_END_TIME, at + com.tennis.scoremanager.data.Rematch.durationMs(m.record.clockMs))
+            .putExtra(android.provider.CalendarContract.Events.TITLE, strings.rematchEvent("${rematchSide(m.record, Side.P1)} – ${rematchSide(m.record, Side.P2)}"))
+            .putExtra(android.provider.CalendarContract.Events.EVENT_LOCATION, place)
+            .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, text)
+
+    /** La stessa partita in pagina 1: giocatori, circolo, campo e regole; il torneo no. */
+    fun prepareRematch(rec: MatchRecord) {
+        updateSetup { com.tennis.scoremanager.data.Rematch.setup(rec.setup) }
+        updateOptions { com.tennis.scoremanager.data.Rematch.options(it, rec.options) }
+        summaryFromHistory.value = false
+        newMatch()
+    }
+
     /** Partita del riepilogo amichevole o no: si salva subito e il rating si ricalcola con lo storico. */
     fun setFriendly(on: Boolean) {
         val sm = summary.value ?: return
@@ -7304,6 +7347,73 @@ object Rating {
             winner = winner,
             games = games,
         )
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Rematch.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Rematch.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.util.Calendar
+import java.util.TimeZone
+
+/**
+ * Rivincita: dopo una partita, un invito pronto da mandare con WhatsApp (o quello che si usa già) e da mettere in
+ * calendario, e la stessa partita pronta in pagina 1. Niente account e niente server: passa tutto dai canali di chi gioca.
+ */
+object Rematch {
+    /**
+     * Quando proporla: lo stesso giorno della settimana e la stessa ora della partita (arrotondata alla mezz'ora), la
+     * prima volta che cade almeno [minAheadMs] dopo [now]. Di solito la settimana dopo.
+     */
+    fun suggestedTime(lastStart: Long, now: Long, zone: TimeZone = TimeZone.getDefault(), minAheadMs: Long = 12 * 3600_000L): Long {
+        val c = Calendar.getInstance(zone).apply { timeInMillis = lastStart }
+        val minutes = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)
+        val rounded = (minutes + 15) / 30 * 30
+        c.set(Calendar.HOUR_OF_DAY, 0)
+        c.set(Calendar.MINUTE, 0)
+        c.set(Calendar.SECOND, 0)
+        c.set(Calendar.MILLISECOND, 0)
+        c.add(Calendar.MINUTE, rounded)
+        while (c.timeInMillis < now + minAheadMs) c.add(Calendar.DAY_OF_YEAR, 7)
+        return c.timeInMillis
+    }
+
+    /** Durata da mettere in calendario: quella della partita arrotondata alla mezz'ora sopra, tra 1 e 3 ore. */
+    fun durationMs(clockMs: Long): Long {
+        val half = 30 * 60_000L
+        return ((clockMs + half - 1) / half * half).coerceIn(2 * half, 6 * half)
+    }
+
+    /** La stessa partita per la pagina 1: giocatori, circolo e campo, sport; il torneo no (una rivincita è fuori torneo). */
+    fun setup(from: SetupData): SetupData = from.copy(event = "", category = "", round = "")
+
+    /** Le stesse regole: formato, game per set, tie-break, killer point, star point, statistiche dettagliate. */
+    fun options(current: MatchOptions, from: MatchOptions): MatchOptions = current.copy(
+        format = from.format, gamesPerSet = from.gamesPerSet, setTiebreak = from.setTiebreak, noAd = from.noAd,
+        starPoint = from.starPoint, detailedStats = from.detailedStats, tossWinner = null,
+    )
+
+    /**
+     * Il messaggio: chi contro chi, quando, dove, com'è finita l'ultima volta, la nota di chi invita e, in fondo, l'app.
+     * [whenText] e [result] arrivano già scritti nella lingua dell'app.
+     */
+    fun message(
+        title: String, sideA: String, sideB: String, versus: String, whenText: String, place: String,
+        lastLine: String?, note: String, credit: String,
+    ): String = buildString {
+        appendLine("🎾 $title")
+        appendLine("$sideA $versus $sideB")
+        appendLine("📅 $whenText")
+        if (place.isNotBlank()) appendLine("📍 ${place.trim()}")
+        lastLine?.takeIf { it.isNotBlank() }?.let { appendLine(it) }
+        if (note.isNotBlank()) appendLine(note.trim())
+        appendLine()
+        append(credit)
     }
 }
 TSM_EOF
@@ -14289,6 +14399,132 @@ fun openWifiPanel(context: android.content.Context) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RematchUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RematchUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.content.ActivityNotFoundException
+import android.text.format.DateFormat
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.LiveMatch
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.Rematch
+import java.util.Calendar
+
+/** Riepilogo di una partita finita: "Rivincita" apre l'invito da mandare, il calendario e la partita pronta. */
+@Composable
+fun RematchCard(c: MatchController, m: LiveMatch) {
+    val s = LocalStrings.current
+    if (!m.record.finished) return
+    var open by remember { mutableStateOf(false) }
+    SectionCard(s.rematchTitle, Icons.Filled.Replay) {
+        Text(s.rematchHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        GhostButton(s.rematchTitle, Icons.Filled.Replay, { open = true }, Modifier.fillMaxWidth())
+    }
+    if (open) RematchDialog(c, m) { open = false }
+}
+
+@Composable
+private fun RematchDialog(c: MatchController, m: LiveMatch, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val rec = m.record
+    var at by remember {
+        mutableLongStateOf(Rematch.suggestedTime(rec.startedAt ?: rec.updatedAt, System.currentTimeMillis()))
+    }
+    var place by remember { mutableStateOf(c.rematchPlace(rec)) }
+    var note by remember { mutableStateOf("") }
+    val text = c.rematchText(m, at, place, note)
+    fun pickDate() {
+        val cal = Calendar.getInstance().apply { timeInMillis = at }
+        DatePickerDialog(context, { _, y, mo, d ->
+            at = Calendar.getInstance().apply { timeInMillis = at; set(y, mo, d) }.timeInMillis
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+    }
+    fun pickTime() {
+        val cal = Calendar.getInstance().apply { timeInMillis = at }
+        TimePickerDialog(context, { _, h, min ->
+            at = Calendar.getInstance().apply { timeInMillis = at; set(Calendar.HOUR_OF_DAY, h); set(Calendar.MINUTE, min) }.timeInMillis
+        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), DateFormat.is24HourFormat(context)).show()
+    }
+    AlertDialog(
+        onDismissRequest = onClose,
+        icon = { androidx.compose.material3.Icon(Icons.Filled.Replay, null, tint = TsmColors.Ball) },
+        title = { Text(s.rematchTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.rematchWhen, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(Reports.date(at, lang), Icons.Filled.Event, { pickDate() }, Modifier.fillMaxWidth())
+                GhostButton(Reports.time(at, lang), Icons.Filled.Schedule, { pickTime() }, Modifier.fillMaxWidth())
+                OutlinedTextField(place, { place = it }, label = { Text(s.rematchPlace) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    note, { note = it.take(200) }, label = { Text(s.rematchNote) }, placeholder = { Text(s.rematchNoteHint, color = TsmColors.TextDim) },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences), modifier = Modifier.fillMaxWidth(),
+                )
+                // Anteprima: quello che arriva a chi lo riceve.
+                Text(s.rematchPreview, color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(
+                    text, color = TsmColors.TextMain, fontSize = 13.sp,
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).padding(10.dp),
+                )
+                GhostButton(s.rematchSend, Icons.AutoMirrored.Filled.Send, { context.startActivity(c.rematchShareIntent(text)) }, Modifier.fillMaxWidth())
+                GhostButton(s.rematchCalendar, Icons.Filled.CalendarMonth, {
+                    try {
+                        context.startActivity(c.rematchCalendarIntent(m, at, place, text))
+                    } catch (_: ActivityNotFoundException) {
+                        Toast.makeText(context, s.rematchNoCalendar, Toast.LENGTH_SHORT).show()
+                    }
+                }, Modifier.fillMaxWidth())
+                GhostButton(s.rematchPrepare, Icons.Filled.SportsTennis, {
+                    onClose()
+                    c.prepareRematch(rec)
+                }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(s.back) } },
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RemoteKeys.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -15247,6 +15483,22 @@ interface Strings {
     val ratingNotCounted: String
     val ratingShowAll: String
     val ratingShowLess: String
+    /** Rivincita: invito da condividere, calendario e stessa partita in pagina 1. */
+    val rematchTitle: String
+    val rematchHint: String
+    val rematchAsk: String
+    val rematchVersus: String
+    val rematchLast: (String, String) -> String
+    val rematchWhen: String
+    val rematchPlace: String
+    val rematchNote: String
+    val rematchNoteHint: String
+    val rematchSend: String
+    val rematchCalendar: String
+    val rematchPrepare: String
+    val rematchEvent: (String) -> String
+    val rematchNoCalendar: String
+    val rematchPreview: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -16185,6 +16437,21 @@ object ItStrings : Strings {
     override val ratingNotCounted = "Questa partita non conta per il rating TSM."
     override val ratingShowAll = "Mostra tutti"
     override val ratingShowLess = "Mostra meno"
+    override val rematchTitle = "Rivincita"
+    override val rematchHint = "Proponi un'altra partita: l'invito pronto da mandare su WhatsApp o dove preferisci, la data in calendario e la stessa partita pronta in pagina 1."
+    override val rematchAsk = "Rivincita?"
+    override val rematchVersus = "contro"
+    override val rematchLast: (String, String) -> String = { a, b -> "Ultima volta: $a per $b" }
+    override val rematchWhen = "Quando"
+    override val rematchPlace = "Dove"
+    override val rematchNote = "Nota (facoltativa)"
+    override val rematchNoteHint = "es. campo già prenotato, porto io le palline"
+    override val rematchSend = "Manda l'invito"
+    override val rematchCalendar = "Metti in calendario"
+    override val rematchPrepare = "Prepara la partita"
+    override val rematchEvent: (String) -> String = { "Rivincita: $it" }
+    override val rematchNoCalendar = "Nessuna app di calendario su questo telefono."
+    override val rematchPreview = "Il messaggio"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -17109,6 +17376,21 @@ object EnStrings : Strings {
     override val ratingNotCounted = "This match doesn't count for the TSM rating."
     override val ratingShowAll = "Show all"
     override val ratingShowLess = "Show less"
+    override val rematchTitle = "Rematch"
+    override val rematchHint = "Suggest another match: an invite ready to send on WhatsApp or wherever you like, the date in your calendar and the same match ready on page 1."
+    override val rematchAsk = "Rematch?"
+    override val rematchVersus = "vs"
+    override val rematchLast: (String, String) -> String = { a, b -> "Last time: $a to $b" }
+    override val rematchWhen = "When"
+    override val rematchPlace = "Where"
+    override val rematchNote = "Note (optional)"
+    override val rematchNoteHint = "e.g. court already booked, I'll bring the balls"
+    override val rematchSend = "Send the invite"
+    override val rematchCalendar = "Add to calendar"
+    override val rematchPrepare = "Set up the match"
+    override val rematchEvent: (String) -> String = { "Rematch: $it" }
+    override val rematchNoCalendar = "No calendar app on this phone."
+    override val rematchPreview = "The message"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -18056,6 +18338,21 @@ object DeStrings : Strings {
     override val ratingNotCounted = "Dieses Match zählt nicht für die TSM-Wertung."
     override val ratingShowAll = "Alle zeigen"
     override val ratingShowLess = "Weniger zeigen"
+    override val rematchTitle = "Revanche"
+    override val rematchHint = "Schlage ein weiteres Match vor: die Einladung fertig zum Senden über WhatsApp oder wo du willst, der Termin im Kalender und dasselbe Match fertig auf Seite 1."
+    override val rematchAsk = "Revanche?"
+    override val rematchVersus = "gegen"
+    override val rematchLast: (String, String) -> String = { a, b -> "Letztes Mal: $a für $b" }
+    override val rematchWhen = "Wann"
+    override val rematchPlace = "Wo"
+    override val rematchNote = "Notiz (optional)"
+    override val rematchNoteHint = "z. B. Platz schon gebucht, ich bringe die Bälle mit"
+    override val rematchSend = "Einladung senden"
+    override val rematchCalendar = "In den Kalender"
+    override val rematchPrepare = "Match vorbereiten"
+    override val rematchEvent: (String) -> String = { "Revanche: $it" }
+    override val rematchNoCalendar = "Keine Kalender-App auf diesem Telefon."
+    override val rematchPreview = "Die Nachricht"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -18996,6 +19293,21 @@ object EsStrings : Strings {
     override val ratingNotCounted = "Este partido no cuenta para el rating TSM."
     override val ratingShowAll = "Mostrar todos"
     override val ratingShowLess = "Mostrar menos"
+    override val rematchTitle = "Revancha"
+    override val rematchHint = "Propón otro partido: la invitación lista para mandar por WhatsApp o donde prefieras, la fecha en el calendario y el mismo partido listo en la página 1."
+    override val rematchAsk = "¿Revancha?"
+    override val rematchVersus = "contra"
+    override val rematchLast: (String, String) -> String = { a, b -> "La última vez: $a para $b" }
+    override val rematchWhen = "Cuándo"
+    override val rematchPlace = "Dónde"
+    override val rematchNote = "Nota (opcional)"
+    override val rematchNoteHint = "p. ej. pista ya reservada, llevo yo las pelotas"
+    override val rematchSend = "Mandar la invitación"
+    override val rematchCalendar = "Añadir al calendario"
+    override val rematchPrepare = "Preparar el partido"
+    override val rematchEvent: (String) -> String = { "Revancha: $it" }
+    override val rematchNoCalendar = "No hay ninguna app de calendario en este teléfono."
+    override val rematchPreview = "El mensaje"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -19938,6 +20250,21 @@ object FrStrings : Strings {
     override val ratingNotCounted = "Ce match ne compte pas pour le classement TSM."
     override val ratingShowAll = "Tout afficher"
     override val ratingShowLess = "Afficher moins"
+    override val rematchTitle = "Revanche"
+    override val rematchHint = "Proposez un autre match : l'invitation prête à envoyer sur WhatsApp ou ailleurs, la date dans l'agenda et le même match prêt en page 1."
+    override val rematchAsk = "Revanche ?"
+    override val rematchVersus = "contre"
+    override val rematchLast: (String, String) -> String = { a, b -> "La dernière fois : $a pour $b" }
+    override val rematchWhen = "Quand"
+    override val rematchPlace = "Où"
+    override val rematchNote = "Note (facultative)"
+    override val rematchNoteHint = "ex. court déjà réservé, j'apporte les balles"
+    override val rematchSend = "Envoyer l'invitation"
+    override val rematchCalendar = "Ajouter à l'agenda"
+    override val rematchPrepare = "Préparer le match"
+    override val rematchEvent: (String) -> String = { "Revanche : $it" }
+    override val rematchNoCalendar = "Aucune application d'agenda sur ce téléphone."
+    override val rematchPreview = "Le message"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -20881,6 +21208,21 @@ object PtStrings : Strings {
     override val ratingNotCounted = "Esta partida não conta para o rating TSM."
     override val ratingShowAll = "Mostrar todos"
     override val ratingShowLess = "Mostrar menos"
+    override val rematchTitle = "Revanche"
+    override val rematchHint = "Proponha outra partida: o convite pronto para mandar pelo WhatsApp ou onde preferir, a data na agenda e a mesma partida pronta na página 1."
+    override val rematchAsk = "Revanche?"
+    override val rematchVersus = "contra"
+    override val rematchLast: (String, String) -> String = { a, b -> "Da última vez: $a para $b" }
+    override val rematchWhen = "Quando"
+    override val rematchPlace = "Onde"
+    override val rematchNote = "Nota (opcional)"
+    override val rematchNoteHint = "ex. quadra já reservada, eu levo as bolas"
+    override val rematchSend = "Mandar o convite"
+    override val rematchCalendar = "Pôr na agenda"
+    override val rematchPrepare = "Preparar a partida"
+    override val rematchEvent: (String) -> String = { "Revanche: $it" }
+    override val rematchNoCalendar = "Nenhum app de agenda neste telefone."
+    override val rematchPreview = "A mensagem"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -25320,6 +25662,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.Storage
 import com.tennis.scoremanager.model.MatchState
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.RematchCard
 import com.tennis.scoremanager.ui.SummaryRatingCard
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
@@ -25444,6 +25787,7 @@ fun SummaryScreen(c: MatchController) {
                             onRacket = { c.setMatchRacket(side, it) }, onFeel = { c.setMatchFeel(side, it) })
                     }
                     SummaryRatingCard(c, com.tennis.scoremanager.LiveMatch(rec, state))
+                    RematchCard(c, com.tennis.scoremanager.LiveMatch(rec, state))
                     MatchPhotosCard(c, rec.id)
                     MatchNotesCard(c, rec.id, rec.notes)
                 }
@@ -43098,6 +43442,78 @@ class RatingTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/RematchTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/RematchTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.model.MatchFormat
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+import java.util.TimeZone
+
+class RematchTest {
+    private val rome = TimeZone.getTimeZone("Europe/Rome")
+
+    private fun at(y: Int, m: Int, d: Int, h: Int, min: Int = 0): Long =
+        Calendar.getInstance(rome).apply { clear(); set(y, m - 1, d, h, min) }.timeInMillis
+
+    @Test
+    fun sameWeekdayAndHourNextWeek() {
+        // Venerdì 23 ottobre 2026 alle 17:46: la rivincita venerdì 30 alle 18:00 (dopo il cambio dell'ora, sempre 18:00).
+        val last = at(2026, 10, 23, 17, 46)
+        assertEquals(at(2026, 10, 30, 18, 0), Rematch.suggestedTime(last, at(2026, 10, 23, 19, 30), rome))
+        // Se il riepilogo si apre giorni dopo, la prima data ancora utile.
+        assertEquals(at(2026, 11, 6, 18, 0), Rematch.suggestedTime(last, at(2026, 10, 30, 10, 0), rome))
+        // 9:10 diventa 9:00, 9:20 diventa 9:30.
+        assertEquals(at(2026, 10, 31, 9, 0), Rematch.suggestedTime(at(2026, 10, 24, 9, 10), at(2026, 10, 24, 12, 0), rome))
+        assertEquals(at(2026, 10, 31, 9, 30), Rematch.suggestedTime(at(2026, 10, 24, 9, 20), at(2026, 10, 24, 12, 0), rome))
+    }
+
+    @Test
+    fun calendarDuration() {
+        assertEquals(60 * 60_000L, Rematch.durationMs(25 * 60_000L))
+        assertEquals(90 * 60_000L, Rematch.durationMs(65 * 60_000L + 35_000))
+        assertEquals(180 * 60_000L, Rematch.durationMs(5 * 3600_000L))
+    }
+
+    @Test
+    fun setupAndRulesAreReused() {
+        val su = SetupData(club = "Circolo Tennis Esempio", court = "1", p1a = "Rossi", p2a = "Bianchi", event = "Open di Autunno", round = "Finale", p1aRank = "4.1")
+        val again = Rematch.setup(su)
+        assertEquals("Rossi", again.p1a)
+        assertEquals("4.1", again.p1aRank)
+        assertEquals("", again.event)
+        assertEquals("", again.round)
+        val from = MatchOptions(format = MatchFormat.BEST_OF_THREE, noAd = true, detailedStats = true, lang = Lang.EN)
+        val now = Rematch.options(MatchOptions(lang = Lang.IT, audio = false), from)
+        assertTrue(now.noAd && now.detailedStats)
+        // Lingua e audio restano quelli di chi usa l'app adesso.
+        assertEquals(Lang.IT, now.lang)
+        assertFalse(now.audio)
+    }
+
+    @Test
+    fun messageHasTheEssentials() {
+        val m = Rematch.message("Rivincita?", "Rossi", "Bianchi", "contro", "venerdì 30 ottobre, 18:00", "Circolo Tennis Esempio · Campo 1",
+            "Ultima volta: 6-4 6-3 per Rossi", "", "Creato con Tennis Score Manager · tennis-score-manager.netlify.app")
+        val lines = m.lines()
+        assertEquals("🎾 Rivincita?", lines[0])
+        assertEquals("Rossi contro Bianchi", lines[1])
+        assertTrue(m.contains("📍 Circolo Tennis Esempio · Campo 1"))
+        assertTrue(m.endsWith("netlify.app"))
+        // Senza luogo e senza nota non restano righe vuote in mezzo.
+        assertFalse(Rematch.message("R", "A", "B", "vs", "domani", " ", null, " ", "c").contains("📍"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -49802,6 +50218,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 151 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 154 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
