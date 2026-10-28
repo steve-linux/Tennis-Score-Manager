@@ -43,6 +43,7 @@ import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ServeTrainingCard
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
@@ -125,6 +126,8 @@ fun WorkoutScreen(c: MatchController) {
         }
         // La fascia si sceglie qui, senza passare dalla pagina 2.
         if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
+        // Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori.
+        if (ui.phase == WorkoutPhase.IDLE) ServeTrainingCard(c)
         // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
         if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
             SectionCard(s.racketField, Icons.Filled.SportsTennis) {

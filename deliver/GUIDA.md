@@ -362,6 +362,22 @@ Pagina 1 › **Racchette** › **Le mie racchette**: ogni racchetta fisica ha la
 - **Nel riepilogo** della partita (scheda *Riassunto*) e dell'allenamento si vede la racchetta usata, la si può associare anche dopo (si prende l'incordatura montata quel giorno) e si danno le **sensazioni** da 1 a 5: controllo, comfort, potenza e fatica.
 - **Confronto**: *per racchetta* o *per incordatura* (stessa racchetta con tensioni o corde diverse), si scelgono le configurazioni A e B. Barre affiancate per sessioni, ore, partite vinte, punti vinti, prime in campo, punti vinti con la prima e con la seconda, ace, doppi falli, vincenti ed errori gratuiti a partita, velocità media del polso e colpi dei braccialetti, battito medio, e le sensazioni medie. Il valore migliore è in grassetto, ma l'app non sceglie una vincitrice: contano anche avversario, superficie, condizioni e forma.
 
+### 7.5 Allenamento al servizio (app 2.5)
+
+Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosce il servizio e coi tasti si dice com'è andato. Basta un telefono, senza arbitro.
+
+1. Pagina 1 › **Allenamento** › **Allenamento al servizio** › **Inizia** (serve il braccialetto collegato come in 6.1; senza, si segna dai tasti sullo schermo).
+2. **Dove mettere il telefono** (la prima volta si apre da solo, poi dal tasto *Dove mettere il telefono?*):
+   - **a fianco di chi serve**, dal lato del braccio che colpisce (a destra per un destro), a **3-4 m**, all'altezza della linea di fondo o mezzo metro dietro;
+   - obiettivo a **1-1,2 m** da terra, telefono **in orizzontale** e dritto, puntato su chi serve;
+   - nell'inquadratura deve stare **tutta la persona, dai piedi alla racchetta in alto** (circa 2,7 m): se la testa della racchetta esce, allontana il telefono o passa al **grandangolo** (tasto *Obiettivo*);
+   - per vedere anche dove va la palla, in alternativa: 3-4 m **dietro** chi serve, un po' di lato, a 1,5-2 m d'altezza;
+   - mai davanti a chi serve né sulla traiettoria della palla.
+3. Scegli **lato** (destra/sinistra), **prima o seconda** e, se vuoi, il **bersaglio** (al T, al corpo, esterno): valgono per i servizi seguenti.
+4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto.
+5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma).
+6. Le sessioni restano nella scheda **Allenamento al servizio**: toccane una per il riepilogo e le clip, o per eliminarla (clip comprese).
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

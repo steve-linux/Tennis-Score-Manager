@@ -1771,7 +1771,33 @@ class MatchController(
         }
     }
 
+    /** Allenamento al servizio aperto: i tasti del braccialetto vanno a lui, non alla partita. */
+    @Volatile var serveTraining = false
+
+    /** Sessioni di allenamento al servizio salvate, dalla più recente. */
+    val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
+
+    fun refreshServeSessions() {
+        scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
+    }
+
+    fun deleteServeSession(id: String) {
+        scope.launch {
+            withContext(io) { storage.deleteServeSession(id) }
+            refreshServeSessions()
+        }
+    }
+
+    /** I pezzi di video dei servizi [serves] della sessione [id], in ordine, per la moviola. */
+    fun serveClipFiles(id: String, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
+        val dir = storage.serveClipsDir(id)
+        return serves.mapNotNull { it.clip }.flatMap { c ->
+            File(dir, c).listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+        }
+    }
+
     private fun onBandEvent(e: BandEvent) {
+        if (serveTraining) return
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
                 showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))
@@ -7720,6 +7746,105 @@ object Reports {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ServeTraining.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ServeTraining.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/** Lato da cui si serve: destra (parità) o sinistra (vantaggio). */
+@Serializable
+enum class ServeSide { DEUCE, AD }
+
+@Serializable
+enum class ServeKind { FIRST, SECOND }
+
+/** Dove si voleva mandare il servizio: al centro (T), al corpo o esterno. */
+@Serializable
+enum class ServeTarget { T, BODY, WIDE }
+
+/**
+ * Un servizio dell'allenamento: quando ([at], ora del telefono), se è entrato, con che impostazioni, se il braccialetto
+ * l'aveva riconosciuto ([detected]) e coi picchi del polso; [clip] è la cartella dei pezzi di video (null finché non
+ * è salvata, o se non c'è la telecamera).
+ */
+@Serializable
+data class ServeAttempt(
+    val at: Long,
+    val inPlay: Boolean,
+    val side: ServeSide,
+    val kind: ServeKind,
+    val target: ServeTarget? = null,
+    val detected: Boolean = false,
+    val gyroDps: Int? = null,
+    val accelG: Double? = null,
+    val clip: String? = null,
+)
+
+@Serializable
+data class ServeSession(
+    val id: String,
+    val startedAt: Long,
+    val endedAt: Long? = null,
+    val serves: List<ServeAttempt> = emptyList(),
+)
+
+/**
+ * Allenamento al servizio: un telefono sul cavalletto a fianco di chi serve, il braccialetto al polso. Il braccialetto
+ * riconosce il servizio; KEY1 dice "dentro", KEY2 "fuori", la pressione lunga di KEY1 annulla l'ultimo.
+ */
+object ServeTraining {
+    /** Un servizio riconosciuto vale per il tasto premuto entro questo tempo. */
+    const val MATCH_WINDOW_MS = 12_000L
+    /** Senza servizio riconosciuto: si suppone che sia partito poco prima del tasto. */
+    const val PRESS_DELAY_MS = 3_000L
+    /** Video tenuto prima e dopo l'istante del servizio. */
+    const val CLIP_BEFORE_MS = 3_000L
+    const val CLIP_AFTER_MS = 3_000L
+
+    /** Servizio riconosciuto dal braccialetto: ora e picchi del polso. */
+    data class Detected(val at: Long, val gyroDps: Int, val accelG: Double)
+
+    /**
+     * L'istante del servizio per un tasto premuto a [pressAt]: quello riconosciuto, se è arrivato nei
+     * [MATCH_WINDOW_MS] prima del tasto e non è già stato usato; altrimenti poco prima del tasto.
+     */
+    fun anchor(pressAt: Long, detected: Detected?, lastUsedAt: Long?): Pair<Long, Detected?> {
+        val d = detected?.takeIf { it.at in (pressAt - MATCH_WINDOW_MS)..pressAt && it.at != lastUsedAt }
+        return (d?.at ?: (pressAt - PRESS_DELAY_MS)) to d
+    }
+
+    /** Conteggio: servizi, quanti dentro, e la percentuale (null senza servizi). */
+    data class Count(val total: Int, val inPlay: Int) {
+        val pct: Int? get() = if (total == 0) null else Math.round(inPlay * 100.0 / total).toInt()
+    }
+
+    fun count(serves: List<ServeAttempt>): Count = Count(serves.size, serves.count { it.inPlay })
+
+    /** Righe del riepilogo: per lato, per prima e seconda, e per bersaglio (solo quelli usati). */
+    data class Breakdown(
+        val all: Count,
+        val bySide: Map<ServeSide, Count>,
+        val byKind: Map<ServeKind, Count>,
+        val byTarget: Map<ServeTarget, Count>,
+    )
+
+    fun breakdown(serves: List<ServeAttempt>): Breakdown = Breakdown(
+        count(serves),
+        ServeSide.entries.associateWith { s -> count(serves.filter { it.side == s }) }.filterValues { it.total > 0 },
+        ServeKind.entries.associateWith { k -> count(serves.filter { it.kind == k }) }.filterValues { it.total > 0 },
+        ServeTarget.entries.associateWith { t -> count(serves.filter { it.target == t }) }.filterValues { it.total > 0 },
+    )
+
+    /** Media dei picchi del polso dei servizi riconosciuti (null se nessuno): dentro e fuori, per confrontarli. */
+    fun meanGyro(serves: List<ServeAttempt>): Int? =
+        serves.mapNotNull { it.gyroDps }.takeIf { it.isNotEmpty() }?.average()?.let { Math.round(it).toInt() }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Storage.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Storage.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -7857,6 +7982,38 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteWorkout(id: String) {
         File(workoutsDir, "$id.json").delete()
+    }
+
+    /** Allenamenti al servizio: una sessione per file; le clip stanno nella cartella dei video dell'app. */
+    private val servesDir: File get() = File(app.filesDir, "serves").apply { mkdirs() }
+
+    /** Cartella delle clip della sessione [id] (una sottocartella per servizio). */
+    fun serveClipsDir(id: String): File =
+        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id").apply { mkdirs() }
+
+    @Synchronized
+    fun saveServeSession(sess: ServeSession) {
+        runCatching {
+            val f = File(servesDir, "${sess.id}.json")
+            val tmp = File(servesDir, "${sess.id}.tmp")
+            tmp.writeText(json.encodeToString(ServeSession.serializer(), sess))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
+    }
+
+    fun loadServeSessions(): List<ServeSession> =
+        servesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(ServeSession.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.startedAt }
+
+    /** Cancella la sessione e le sue clip. */
+    @Synchronized
+    fun deleteServeSession(id: String) {
+        File(servesDir, "$id.json").delete()
+        serveClipsDir(id).deleteRecursively()
     }
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
@@ -14704,6 +14861,234 @@ private fun Btn(icon: ImageVector?, label: String?, on: Boolean, onClick: () -> 
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ServeUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ServeUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Intent
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.ServeAttempt
+import com.tennis.scoremanager.data.ServeKind
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.ServeSide
+import com.tennis.scoremanager.data.ServeTarget
+import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.video.CameraActivity
+import com.tennis.scoremanager.video.ReplayActivity
+
+fun serveSideName(s: Strings, v: ServeSide) = if (v == ServeSide.DEUCE) s.serveSideDeuce else s.serveSideAd
+fun serveKindName(s: Strings, v: ServeKind) = if (v == ServeKind.FIRST) s.serveFirst else s.serveSecond
+fun serveTargetName(s: Strings, v: ServeTarget?) = when (v) {
+    ServeTarget.T -> s.serveTargetT
+    ServeTarget.BODY -> s.serveTargetBody
+    ServeTarget.WIDE -> s.serveTargetWide
+    null -> s.serveTargetNone
+}
+
+/** Pagina Allenamento: avvio dell'allenamento al servizio e le sessioni salvate. */
+@Composable
+fun ServeTrainingCard(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val sessions by c.serveSessions.collectAsState()
+    var help by remember { mutableStateOf(false) }
+    var open by remember { mutableStateOf<ServeSession?>(null) }
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    SectionCard(s.serveTitle, Icons.Filled.SportsTennis) {
+        Text(s.serveHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        BigButton(s.serveStart, Icons.Filled.Videocam, {
+            context.startActivity(Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true))
+        }, Modifier.fillMaxWidth())
+        GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
+        if (sessions.isNotEmpty()) {
+            Text(s.serveSessions, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            val lang = c.options.value.lang
+            for (sess in sessions.take(8)) {
+                val n = ServeTraining.count(sess.serves)
+                Row(Modifier.fillMaxWidth().clickable { open = sess }.padding(vertical = 6.dp)) {
+                    Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+                }
+            }
+        }
+    }
+    if (help) ServePlacementDialog { help = false }
+    open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/**
+ * Dove mettere il telefono: uno schema dall'alto (metà campo, chi serve, il telefono a fianco e l'alternativa
+ * dietro, tratteggiata) e le indicazioni.
+ */
+@Composable
+fun ServePlacementDialog(onClose: () -> Unit) {
+    val s = LocalStrings.current
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(s.servePlaceTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                PlacementDiagram()
+                Text("● " + s.servePlaceServer + "   ▮ " + s.servePlacePhone + "   ▯ " + s.servePlaceAlt, fontSize = 12.sp, color = TsmColors.TextDim)
+                Text(s.servePlaceText, fontSize = 13.sp, color = TsmColors.TextMain)
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },
+    )
+}
+
+/** Metà campo vista dall'alto, rete in alto: chi serve (giallo) a destra del segno centrale, il telefono (verde). */
+@Composable
+private fun PlacementDiagram() {
+    // 16 m di larghezza (campo da doppio con spazio ai lati) e 17,5 m di profondità: la metà campo e i 5 m dietro la linea.
+    Canvas(Modifier.fillMaxWidth().aspectRatio(16f / 17.5f)) {
+        val m = size.width / 16f
+        val left = 2.5f * m
+        val right = left + 10.97f * m
+        val net = 0.6f * m
+        val base = net + 11.885f * m
+        val single = 1.37f * m
+        val line = Color.White.copy(alpha = 0.8f)
+        val st = Stroke(width = 2f)
+        drawRect(TsmColors.Court, Offset(left, net), Size(right - left, base - net))
+        drawRect(line, Offset(left, net), Size(right - left, base - net), style = st)
+        drawLine(line, Offset(left + single, net), Offset(left + single, base), 2f)
+        drawLine(line, Offset(right - single, net), Offset(right - single, base), 2f)
+        val service = net + 6.40f * m
+        drawLine(line, Offset(left + single, service), Offset(right - single, service), 2f)
+        val mid = (left + right) / 2
+        drawLine(line, Offset(mid, net), Offset(mid, service), 2f)
+        drawLine(Color.White, Offset(left - 0.9f * m, net), Offset(right + 0.9f * m, net), 4f)
+        // Chi serve: dietro la linea di fondo, a destra del centro (servizio da destra).
+        val server = Offset(mid + 1f * m, base + 0.5f * m)
+        drawCircle(TsmColors.Player1, 0.45f * m, server)
+        // Il telefono: 3,5 m a destra di chi serve, puntato su di lui.
+        val phone = Offset(server.x + 3.5f * m, base + 0.2f * m)
+        drawRect(TsmColors.Ball, Offset(phone.x - 0.3f * m, phone.y - 0.5f * m), Size(0.6f * m, 1f * m))
+        drawLine(TsmColors.Ball, phone, server, 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f)))
+        // Alternativa: dietro chi serve, un po' di lato (per vedere dove va la palla).
+        val behind = Offset(server.x + 1.2f * m, base + 3.8f * m)
+        drawRect(TsmColors.Ball.copy(alpha = 0.45f), Offset(behind.x - 0.3f * m, behind.y - 0.5f * m), Size(0.6f * m, 1f * m), style = st)
+    }
+}
+
+/** Riepilogo di una sessione: totali, per lato, prima e seconda, bersaglio, polso; sotto, le clip da rivedere. */
+@Composable
+fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>) {
+    val b = ServeTraining.breakdown(serves)
+    Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+    @Composable
+    fun rows(title: String, map: Map<String, ServeTraining.Count>) {
+        if (map.isEmpty()) return
+        Text(title, color = TsmColors.TextDim, fontSize = 13.sp)
+        for ((name, n) in map) {
+            Row(Modifier.fillMaxWidth()) {
+                Text(name, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+            }
+        }
+    }
+    rows(s.serveBySide, b.bySide.mapKeys { serveSideName(s, it.key) })
+    rows(s.serveByKind, b.byKind.mapKeys { serveKindName(s, it.key) })
+    rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
+    val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
+    val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
+    if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
+}
+
+/** Sessione salvata: riepilogo, clip da rivedere (tutte, solo dentro, solo fuori) ed eliminazione. */
+@Composable
+fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    var ask by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(s.serveSummary) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                ServeSummaryContent(s, sess.serves)
+                ServeReplayButtons(c, sess)
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },
+        dismissButton = {
+            TextButton(onClick = { ask = true }) {
+                Icon(Icons.Filled.Delete, null, tint = TsmColors.Danger)
+                Text(" " + s.serveDelete, color = TsmColors.Danger)
+            }
+        },
+    )
+    if (ask) {
+        AlertDialog(
+            onDismissRequest = { ask = false },
+            text = { Text(s.serveDeleteAsk) },
+            confirmButton = { TextButton(onClick = { ask = false; c.deleteServeSession(sess.id); onClose() }) { Text(s.serveDelete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
+        )
+    }
+}
+
+/** Rivedi tutti / solo dentro / solo fuori, nella moviola (pausa, rallentatore, fotogramma per fotogramma). */
+@Composable
+fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    if (sess.serves.none { it.clip != null }) {
+        Text(s.serveNoClips, color = TsmColors.TextDim, fontSize = 13.sp)
+        return
+    }
+    fun play(list: List<ServeAttempt>) {
+        val files = c.serveClipFiles(sess.id, list)
+        if (files.isEmpty()) return
+        context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
+    }
+    GhostButton(s.servePlayAll, Icons.Filled.PlayArrow, { play(sess.serves) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { it.inPlay && it.clip != null }) GhostButton(s.servePlayIn, Icons.Filled.PlayArrow, { play(sess.serves.filter { it.inPlay }) }, Modifier.fillMaxWidth())
+    if (sess.serves.any { !it.inPlay && it.clip != null }) GhostButton(s.servePlayOut, Icons.Filled.PlayArrow, { play(sess.serves.filter { !it.inPlay }) }, Modifier.fillMaxWidth())
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Strings.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Strings.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -15499,6 +15884,48 @@ interface Strings {
     val rematchEvent: (String) -> String
     val rematchNoCalendar: String
     val rematchPreview: String
+    /** Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori. */
+    val serveTitle: String
+    val serveHint: String
+    val serveStart: String
+    val serveNoBand: String
+    val serveBandOk: (String) -> String
+    val serveSideDeuce: String
+    val serveSideAd: String
+    val serveFirst: String
+    val serveSecond: String
+    val serveTargetT: String
+    val serveTargetBody: String
+    val serveTargetWide: String
+    val serveTargetNone: String
+    val serveIn: String
+    val serveOut: String
+    val serveUndo: String
+    val serveSayIn: (Int, Int) -> String
+    val serveSayOut: (Int, Int) -> String
+    val serveSayUndo: String
+    val serveWaiting: String
+    val serveDetected: String
+    val serveEnd: String
+    val serveSummary: String
+    val serveCountLine: (Int, Int) -> String
+    val serveBySide: String
+    val serveByKind: String
+    val serveByTarget: String
+    val serveWrist: (Int, Int) -> String
+    val servePlayAll: String
+    val servePlayIn: String
+    val servePlayOut: String
+    val serveSessions: String
+    val serveDelete: String
+    val serveDeleteAsk: String
+    val servePlaceTitle: String
+    val servePlaceText: String
+    val servePlaceShow: String
+    val serveNoClips: String
+    val servePlaceServer: String
+    val servePlacePhone: String
+    val servePlaceAlt: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -16452,6 +16879,47 @@ object ItStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rivincita: $it" }
     override val rematchNoCalendar = "Nessuna app di calendario su questo telefono."
     override val rematchPreview = "Il messaggio"
+    override val serveTitle = "Allenamento al servizio"
+    override val serveHint = "Telefono sul cavalletto a fianco di chi serve, braccialetto al polso: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni servizio diventa una clip da rivedere."
+    override val serveStart = "Inizia"
+    override val serveNoBand = "Nessun braccialetto collegato: segna dentro e fuori coi tasti sullo schermo."
+    override val serveBandOk: (String) -> String = { "Braccialetto $it: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla" }
+    override val serveSideDeuce = "Destra"
+    override val serveSideAd = "Sinistra"
+    override val serveFirst = "Prima"
+    override val serveSecond = "Seconda"
+    override val serveTargetT = "Al T"
+    override val serveTargetBody = "Al corpo"
+    override val serveTargetWide = "Esterno"
+    override val serveTargetNone = "Nessuno"
+    override val serveIn = "Dentro"
+    override val serveOut = "Fuori"
+    override val serveUndo = "Annulla l'ultimo"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Dentro. $a su $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Fuori. $a su $b dentro" }
+    override val serveSayUndo = "Annullato"
+    override val serveWaiting = "Servi: il braccialetto riconosce il servizio"
+    override val serveDetected = "Servizio riconosciuto: dentro o fuori?"
+    override val serveEnd = "Fine"
+    override val serveSummary = "Riepilogo dell'allenamento"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a su $b dentro" }
+    override val serveBySide = "Per lato"
+    override val serveByKind = "Prima e seconda"
+    override val serveByTarget = "Per bersaglio"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Polso: in media $a °/s sui servizi dentro, $b °/s su quelli fuori" }
+    override val servePlayAll = "Rivedi tutti"
+    override val servePlayIn = "Rivedi solo i dentro"
+    override val servePlayOut = "Rivedi solo i fuori"
+    override val serveSessions = "Sessioni"
+    override val serveDelete = "Elimina"
+    override val serveDeleteAsk = "Eliminare la sessione e le sue clip?"
+    override val servePlaceTitle = "Dove mettere il telefono"
+    override val servePlaceText = "• A fianco di chi serve, dal lato del braccio che colpisce (a destra per un destro), a 3-4 m di distanza, all'altezza della linea di fondo o mezzo metro dietro.\n• Obiettivo a 1-1,2 m da terra, telefono in orizzontale e dritto, puntato su chi serve.\n• Nell'inquadratura ci deve stare tutta la persona, dai piedi alla racchetta in alto (circa 2,7 m): se la testa della racchetta esce, allontana il telefono o usa il grandangolo.\n• Per vedere anche dove va la palla: 3-4 m dietro chi serve, un po' di lato, a 1,5-2 m d'altezza.\n• Mai davanti a chi serve né sulla traiettoria della palla."
+    override val servePlaceShow = "Dove mettere il telefono?"
+    override val serveNoClips = "Nessuna clip: senza telecamera si contano solo dentro e fuori."
+    override val servePlaceServer = "chi serve"
+    override val servePlacePhone = "telefono"
+    override val servePlaceAlt = "in alternativa"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -17391,6 +17859,47 @@ object EnStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rematch: $it" }
     override val rematchNoCalendar = "No calendar app on this phone."
     override val rematchPreview = "The message"
+    override val serveTitle = "Serve practice"
+    override val serveHint = "Phone on the tripod beside the server, wristband on the wrist: KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every serve becomes a clip to watch again."
+    override val serveStart = "Start"
+    override val serveNoBand = "No wristband connected: mark in and out with the buttons on the screen."
+    override val serveBandOk: (String) -> String = { "Wristband $it: KEY1 in, KEY2 out, KEY1 held down undoes" }
+    override val serveSideDeuce = "Deuce side"
+    override val serveSideAd = "Ad side"
+    override val serveFirst = "First"
+    override val serveSecond = "Second"
+    override val serveTargetT = "Down the T"
+    override val serveTargetBody = "Body"
+    override val serveTargetWide = "Wide"
+    override val serveTargetNone = "None"
+    override val serveIn = "In"
+    override val serveOut = "Out"
+    override val serveUndo = "Undo the last one"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "In. $a of $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Out. $a of $b in" }
+    override val serveSayUndo = "Undone"
+    override val serveWaiting = "Serve: the wristband recognises the serve"
+    override val serveDetected = "Serve recognised: in or out?"
+    override val serveEnd = "Done"
+    override val serveSummary = "Practice summary"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a of $b in" }
+    override val serveBySide = "By side"
+    override val serveByKind = "First and second"
+    override val serveByTarget = "By target"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Wrist: on average $a °/s on serves in, $b °/s on serves out" }
+    override val servePlayAll = "Watch all"
+    override val servePlayIn = "Watch only the ins"
+    override val servePlayOut = "Watch only the outs"
+    override val serveSessions = "Sessions"
+    override val serveDelete = "Delete"
+    override val serveDeleteAsk = "Delete the session and its clips?"
+    override val servePlaceTitle = "Where to put the phone"
+    override val servePlaceText = "• Beside the server, on the hitting-arm side (right for a right-hander), 3-4 m away, level with the baseline or half a metre behind.\n• Lens 1-1.2 m above the ground, phone in landscape and level, pointed at the server.\n• The whole person must be in the frame, from the feet to the racket at the top (about 2.7 m): if the racket head goes out, move the phone back or use the wide lens.\n• To also see where the ball goes: 3-4 m behind the server, a little to the side, 1.5-2 m high.\n• Never in front of the server or in the ball's path."
+    override val servePlaceShow = "Where to put the phone?"
+    override val serveNoClips = "No clips: without the camera only ins and outs are counted."
+    override val servePlaceServer = "server"
+    override val servePlacePhone = "phone"
+    override val servePlaceAlt = "alternative"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -18353,6 +18862,47 @@ object DeStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche: $it" }
     override val rematchNoCalendar = "Keine Kalender-App auf diesem Telefon."
     override val rematchPreview = "Die Nachricht"
+    override val serveTitle = "Aufschlagtraining"
+    override val serveHint = "Telefon auf dem Stativ neben dem Aufschläger, Armband am Handgelenk: KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht den letzten rückgängig. Jeder Aufschlag wird ein Clip zum Anschauen."
+    override val serveStart = "Starten"
+    override val serveNoBand = "Kein Armband verbunden: drin und aus mit den Tasten auf dem Bildschirm markieren."
+    override val serveBandOk: (String) -> String = { "Armband $it: KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht rückgängig" }
+    override val serveSideDeuce = "Einstand-Seite"
+    override val serveSideAd = "Vorteil-Seite"
+    override val serveFirst = "Erster"
+    override val serveSecond = "Zweiter"
+    override val serveTargetT = "Durch die Mitte"
+    override val serveTargetBody = "Auf den Körper"
+    override val serveTargetWide = "Nach außen"
+    override val serveTargetNone = "Keins"
+    override val serveIn = "Drin"
+    override val serveOut = "Aus"
+    override val serveUndo = "Letzten rückgängig"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Drin. $a von $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Aus. $a von $b drin" }
+    override val serveSayUndo = "Rückgängig"
+    override val serveWaiting = "Aufschlagen: Das Armband erkennt den Aufschlag"
+    override val serveDetected = "Aufschlag erkannt: drin oder aus?"
+    override val serveEnd = "Fertig"
+    override val serveSummary = "Trainingsübersicht"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a von $b drin" }
+    override val serveBySide = "Nach Seite"
+    override val serveByKind = "Erster und zweiter"
+    override val serveByTarget = "Nach Ziel"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Handgelenk: im Schnitt $a °/s bei Aufschlägen drin, $b °/s bei Fehlern" }
+    override val servePlayAll = "Alle ansehen"
+    override val servePlayIn = "Nur die guten ansehen"
+    override val servePlayOut = "Nur die Fehler ansehen"
+    override val serveSessions = "Einheiten"
+    override val serveDelete = "Löschen"
+    override val serveDeleteAsk = "Einheit und ihre Clips löschen?"
+    override val servePlaceTitle = "Wo das Telefon hinkommt"
+    override val servePlaceText = "• Neben dem Aufschläger, auf der Seite des Schlagarms (rechts bei Rechtshändern), 3-4 m entfernt, auf Höhe der Grundlinie oder einen halben Meter dahinter.\n• Objektiv 1-1,2 m über dem Boden, Telefon quer und gerade, auf den Aufschläger gerichtet.\n• Die ganze Person muss im Bild sein, von den Füßen bis zum Schläger oben (etwa 2,7 m): Ragt der Schlägerkopf hinaus, Telefon weiter weg stellen oder das Weitwinkel nehmen.\n• Um auch zu sehen, wohin der Ball geht: 3-4 m hinter dem Aufschläger, etwas seitlich, 1,5-2 m hoch.\n• Nie vor den Aufschläger oder in die Flugbahn des Balls."
+    override val servePlaceShow = "Wo kommt das Telefon hin?"
+    override val serveNoClips = "Keine Clips: Ohne Kamera werden nur drin und aus gezählt."
+    override val servePlaceServer = "Aufschläger"
+    override val servePlacePhone = "Telefon"
+    override val servePlaceAlt = "alternativ"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -19308,6 +19858,47 @@ object EsStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revancha: $it" }
     override val rematchNoCalendar = "No hay ninguna app de calendario en este teléfono."
     override val rematchPreview = "El mensaje"
+    override val serveTitle = "Entrenamiento del saque"
+    override val serveHint = "Teléfono en el trípode al lado de quien saca, pulsera en la muñeca: KEY1 dentro, KEY2 fuera, KEY1 mantenido anula el último. Cada saque se convierte en un clip para volver a ver."
+    override val serveStart = "Empezar"
+    override val serveNoBand = "No hay ninguna pulsera conectada: marca dentro y fuera con los botones de la pantalla."
+    override val serveBandOk: (String) -> String = { "Pulsera $it: KEY1 dentro, KEY2 fuera, KEY1 mantenido anula" }
+    override val serveSideDeuce = "Lado derecho"
+    override val serveSideAd = "Lado izquierdo"
+    override val serveFirst = "Primero"
+    override val serveSecond = "Segundo"
+    override val serveTargetT = "A la T"
+    override val serveTargetBody = "Al cuerpo"
+    override val serveTargetWide = "Abierto"
+    override val serveTargetNone = "Ninguno"
+    override val serveIn = "Dentro"
+    override val serveOut = "Fuera"
+    override val serveUndo = "Anular el último"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Dentro. $a de $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Fuera. $a de $b dentro" }
+    override val serveSayUndo = "Anulado"
+    override val serveWaiting = "Saca: la pulsera reconoce el saque"
+    override val serveDetected = "Saque reconocido: ¿dentro o fuera?"
+    override val serveEnd = "Fin"
+    override val serveSummary = "Resumen del entrenamiento"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a de $b dentro" }
+    override val serveBySide = "Por lado"
+    override val serveByKind = "Primero y segundo"
+    override val serveByTarget = "Por objetivo"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Muñeca: de media $a °/s en los saques dentro, $b °/s en los de fuera" }
+    override val servePlayAll = "Ver todos"
+    override val servePlayIn = "Ver solo los buenos"
+    override val servePlayOut = "Ver solo los fuera"
+    override val serveSessions = "Sesiones"
+    override val serveDelete = "Eliminar"
+    override val serveDeleteAsk = "¿Eliminar la sesión y sus clips?"
+    override val servePlaceTitle = "Dónde poner el teléfono"
+    override val servePlaceText = "• Al lado de quien saca, en el lado del brazo que golpea (a la derecha para un diestro), a 3-4 m, a la altura de la línea de fondo o medio metro detrás.\n• Objetivo a 1-1,2 m del suelo, teléfono en horizontal y recto, apuntando a quien saca.\n• Tiene que entrar toda la persona en el encuadre, de los pies a la raqueta arriba (unos 2,7 m): si la cabeza de la raqueta se sale, aleja el teléfono o usa el gran angular.\n• Para ver también adónde va la pelota: 3-4 m detrás de quien saca, un poco de lado, a 1,5-2 m de altura.\n• Nunca delante de quien saca ni en la trayectoria de la pelota."
+    override val servePlaceShow = "¿Dónde pongo el teléfono?"
+    override val serveNoClips = "Sin clips: sin cámara solo se cuentan dentro y fuera."
+    override val servePlaceServer = "quien saca"
+    override val servePlacePhone = "teléfono"
+    override val servePlaceAlt = "alternativa"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -20265,6 +20856,47 @@ object FrStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche : $it" }
     override val rematchNoCalendar = "Aucune application d'agenda sur ce téléphone."
     override val rematchPreview = "Le message"
+    override val serveTitle = "Entraînement au service"
+    override val serveHint = "Téléphone sur le trépied à côté du serveur, bracelet au poignet : KEY1 bon, KEY2 faute, KEY1 maintenu annule le dernier. Chaque service devient un clip à revoir."
+    override val serveStart = "Commencer"
+    override val serveNoBand = "Aucun bracelet connecté : marquez bon et faute avec les boutons à l'écran."
+    override val serveBandOk: (String) -> String = { "Bracelet $it : KEY1 bon, KEY2 faute, KEY1 maintenu annule" }
+    override val serveSideDeuce = "Côté droit"
+    override val serveSideAd = "Côté gauche"
+    override val serveFirst = "Premier"
+    override val serveSecond = "Second"
+    override val serveTargetT = "Au T"
+    override val serveTargetBody = "Au corps"
+    override val serveTargetWide = "Extérieur"
+    override val serveTargetNone = "Aucune"
+    override val serveIn = "Bon"
+    override val serveOut = "Faute"
+    override val serveUndo = "Annuler le dernier"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Bon. $a sur $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Faute. $a bons sur $b" }
+    override val serveSayUndo = "Annulé"
+    override val serveWaiting = "Servez : le bracelet reconnaît le service"
+    override val serveDetected = "Service reconnu : bon ou faute ?"
+    override val serveEnd = "Terminé"
+    override val serveSummary = "Bilan de l'entraînement"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a bons sur $b" }
+    override val serveBySide = "Par côté"
+    override val serveByKind = "Premier et second"
+    override val serveByTarget = "Par cible"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Poignet : en moyenne $a °/s sur les services bons, $b °/s sur les fautes" }
+    override val servePlayAll = "Tout revoir"
+    override val servePlayIn = "Revoir les bons"
+    override val servePlayOut = "Revoir les fautes"
+    override val serveSessions = "Séances"
+    override val serveDelete = "Supprimer"
+    override val serveDeleteAsk = "Supprimer la séance et ses clips ?"
+    override val servePlaceTitle = "Où placer le téléphone"
+    override val servePlaceText = "• À côté du serveur, du côté du bras qui frappe (à droite pour un droitier), à 3-4 m, au niveau de la ligne de fond ou un demi-mètre derrière.\n• Objectif à 1-1,2 m du sol, téléphone à l'horizontale et droit, pointé sur le serveur.\n• Toute la personne doit être dans le cadre, des pieds à la raquette en haut (environ 2,7 m) : si la tête de raquette sort, éloignez le téléphone ou utilisez le grand-angle.\n• Pour voir aussi où va la balle : 3-4 m derrière le serveur, un peu sur le côté, à 1,5-2 m de haut.\n• Jamais devant le serveur ni sur la trajectoire de la balle."
+    override val servePlaceShow = "Où placer le téléphone ?"
+    override val serveNoClips = "Aucun clip : sans caméra, on compte seulement les bons et les fautes."
+    override val servePlaceServer = "serveur"
+    override val servePlacePhone = "téléphone"
+    override val servePlaceAlt = "autre position"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -21223,6 +21855,47 @@ object PtStrings : Strings {
     override val rematchEvent: (String) -> String = { "Revanche: $it" }
     override val rematchNoCalendar = "Nenhum app de agenda neste telefone."
     override val rematchPreview = "A mensagem"
+    override val serveTitle = "Treino de saque"
+    override val serveHint = "Telefone no tripé ao lado de quem saca, pulseira no pulso: KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz o último. Cada saque vira um clipe para rever."
+    override val serveStart = "Começar"
+    override val serveNoBand = "Nenhuma pulseira conectada: marque dentro e fora com os botões da tela."
+    override val serveBandOk: (String) -> String = { "Pulseira $it: KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz" }
+    override val serveSideDeuce = "Lado direito"
+    override val serveSideAd = "Lado esquerdo"
+    override val serveFirst = "Primeiro"
+    override val serveSecond = "Segundo"
+    override val serveTargetT = "No T"
+    override val serveTargetBody = "No corpo"
+    override val serveTargetWide = "Aberto"
+    override val serveTargetNone = "Nenhum"
+    override val serveIn = "Dentro"
+    override val serveOut = "Fora"
+    override val serveUndo = "Desfazer o último"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Dentro. $a de $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Fora. $a de $b dentro" }
+    override val serveSayUndo = "Desfeito"
+    override val serveWaiting = "Saque: a pulseira reconhece o saque"
+    override val serveDetected = "Saque reconhecido: dentro ou fora?"
+    override val serveEnd = "Fim"
+    override val serveSummary = "Resumo do treino"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a de $b dentro" }
+    override val serveBySide = "Por lado"
+    override val serveByKind = "Primeiro e segundo"
+    override val serveByTarget = "Por alvo"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Pulso: em média $a °/s nos saques dentro, $b °/s nos de fora" }
+    override val servePlayAll = "Rever todos"
+    override val servePlayIn = "Rever só os dentro"
+    override val servePlayOut = "Rever só os fora"
+    override val serveSessions = "Sessões"
+    override val serveDelete = "Excluir"
+    override val serveDeleteAsk = "Excluir a sessão e os seus clipes?"
+    override val servePlaceTitle = "Onde colocar o telefone"
+    override val servePlaceText = "• Ao lado de quem saca, do lado do braço que bate (à direita para um destro), a 3-4 m, na altura da linha de fundo ou meio metro atrás.\n• Lente a 1-1,2 m do chão, telefone na horizontal e reto, apontado para quem saca.\n• A pessoa inteira tem de caber no enquadramento, dos pés à raquete no alto (cerca de 2,7 m): se a cabeça da raquete sair, afaste o telefone ou use a grande-angular.\n• Para ver também para onde vai a bola: 3-4 m atrás de quem saca, um pouco de lado, a 1,5-2 m de altura.\n• Nunca na frente de quem saca nem na trajetória da bola."
+    override val servePlaceShow = "Onde coloco o telefone?"
+    override val serveNoClips = "Sem clipes: sem câmera só se contam dentro e fora."
+    override val servePlaceServer = "quem saca"
+    override val servePlacePhone = "telefone"
+    override val servePlaceAlt = "alternativa"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -26732,6 +27405,7 @@ import com.tennis.scoremanager.data.WorkoutRecord
 import com.tennis.scoremanager.data.WorkoutReport
 import com.tennis.scoremanager.data.WorkoutStats
 import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.ServeTrainingCard
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.ConfirmDialog
 import com.tennis.scoremanager.ui.GhostButton
@@ -26814,6 +27488,8 @@ fun WorkoutScreen(c: MatchController) {
         }
         // La fascia si sceglie qui, senza passare dalla pagina 2.
         if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
+        // Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori.
+        if (ui.phase == WorkoutPhase.IDLE) ServeTrainingCard(c)
         // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
         if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
             SectionCard(s.racketField, Icons.Filled.SportsTennis) {
@@ -26947,7 +27623,15 @@ import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.LooksOne
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
@@ -26986,7 +27670,21 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.ServeAttempt
+import com.tennis.scoremanager.data.ServeKind
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.ServeSide
+import com.tennis.scoremanager.data.ServeTarget
+import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.CalibrationPanel
+import com.tennis.scoremanager.ui.ServePlacementDialog
+import com.tennis.scoremanager.ui.ServeReplayButtons
+import com.tennis.scoremanager.ui.ServeSummaryContent
+import com.tennis.scoremanager.ui.serveKindName
+import com.tennis.scoremanager.ui.serveSideName
+import com.tennis.scoremanager.ui.serveTargetName
 import com.tennis.scoremanager.ui.CourtOutline
 import com.tennis.scoremanager.ui.FramingDialog
 import com.tennis.scoremanager.ui.HorizonOverlay
@@ -27042,6 +27740,20 @@ class CameraActivity : ComponentActivity() {
         }
     }
     private var lastTiltSent = 0L
+
+    // ---------------------------------------------------------------- allenamento al servizio (EXTRA_SERVE)
+
+    private val serveMode by lazy { intent.getBooleanExtra(EXTRA_SERVE, false) }
+    private val serveSession = MutableStateFlow(ServeSession("s${System.currentTimeMillis()}", System.currentTimeMillis()))
+    private val serveSide = MutableStateFlow(ServeSide.DEUCE)
+    private val serveKind = MutableStateFlow(ServeKind.FIRST)
+    private val serveTarget = MutableStateFlow<ServeTarget?>(null)
+    /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
+    private val servePending = MutableStateFlow(false)
+    private val serveSummary = MutableStateFlow(false)
+    private val placementHelp = MutableStateFlow(false)
+    private var lastDetected: ServeTraining.Detected? = null
+    private var lastUsedDetectedAt: Long? = null
     /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
     private val outlineOn = MutableStateFlow(false)
     private val calibrating = MutableStateFlow(false)
@@ -27088,6 +27800,7 @@ class CameraActivity : ComponentActivity() {
         overlayOn.value = controller.storage.cameraOverlay
         calib.value = controller.storage.framingCalib
         lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
+        if (serveMode) startServeTraining()
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
@@ -27183,6 +27896,96 @@ class CameraActivity : ComponentActivity() {
         prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
+    }
+
+    // ---------------------------------------------------------------- allenamento al servizio
+
+    private fun startServeTraining() {
+        controller.serveTraining = true
+        // La prima volta si mostra subito dove mettere il telefono.
+        if (controller.storage.loadServeSessions().isEmpty()) placementHelp.value = true
+        lifecycleScope.launch {
+            controller.ble.events.collect { e ->
+                when (e.type) {
+                    BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
+                    BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
+                    BandProtocol.EVT_BATTERY -> undoServe(e.side)
+                }
+            }
+        }
+        // In un allenamento al servizio ogni colpo riconosciuto è un servizio, anche se il firmware lo scambia per
+        // un dritto: conta l'istante, e i picchi del polso.
+        lifecycleScope.launch {
+            controller.ble.strokes.collect { st ->
+                lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
+                servePending.value = true
+            }
+        }
+    }
+
+    private fun endServeTraining() {
+        controller.serveTraining = false
+        val sess = serveSession.value
+        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess.id)
+        else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
+        controller.refreshServeSessions()
+    }
+
+    private fun saveServes(transform: (List<ServeAttempt>) -> List<ServeAttempt>) {
+        val sess = serveSession.value.let { it.copy(serves = transform(it.serves)) }
+        serveSession.value = sess
+        lifecycleScope.launch(Dispatchers.IO) { controller.storage.saveServeSession(sess) }
+    }
+
+    /**
+     * Dentro o fuori, dal braccialetto o dallo schermo. L'istante è quello del servizio riconosciuto (se c'è), e la
+     * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
+     */
+    private fun serveOutcome(inPlay: Boolean, band: Side? = null) {
+        val now = System.currentTimeMillis()
+        val (at, used) = ServeTraining.anchor(now, lastDetected, lastUsedDetectedAt)
+        used?.let { lastUsedDetectedAt = it.at }
+        servePending.value = false
+        val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$at"
+        saveServes { it + ServeAttempt(at, inPlay, serveSide.value, serveKind.value, serveTarget.value, used != null, used?.gyroDps, used?.accelG) }
+        val n = ServeTraining.count(serveSession.value.serves)
+        say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
+        bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        val st = stream ?: return
+        if (!st.isOnPreview) return
+        lifecycleScope.launch {
+            val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
+            if (wait > 0) delay(wait)
+            val dir = File(controller.storage.serveClipsDir(serveSession.value.id), clip)
+            val parts = withContext(Dispatchers.IO) {
+                runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, dir) }.getOrDefault(emptyList())
+            }
+            // Annullato nel frattempo: la clip non serve più.
+            if (serveSession.value.serves.none { it.at == at } || parts.isEmpty()) {
+                withContext(Dispatchers.IO) { dir.deleteRecursively() }
+                return@launch
+            }
+            saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
+        }
+    }
+
+    private fun undoServe(band: Side? = null) {
+        val last = serveSession.value.serves.lastOrNull() ?: return
+        saveServes { it.dropLast(1) }
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value.id), c).deleteRecursively() } }
+        say(s.serveSayUndo)
+        val n = ServeTraining.count(serveSession.value.serves)
+        bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")
+    }
+
+    private fun say(text: String) {
+        if (controller.options.value.audio) controller.announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)), force = true)
+    }
+
+    /** Sul display del braccialetto che ha premuto (o di quello collegato): esito e conteggio per 3 secondi. */
+    private fun bandShow(band: Side?, line1: String, line2: String) {
+        val side = band ?: Side.entries.firstOrNull { controller.ble.isReady(it) } ?: return
+        controller.ble.send(side, BandProtocol.message(line1.uppercase(), line2, 3))
     }
 
     // ---------------------------------------------------------------- comandi dall'arbitro
@@ -27474,6 +28277,7 @@ class CameraActivity : ComponentActivity() {
 
     override fun onDestroy() {
         tiltSensor.stop()
+        if (serveMode) endServeTraining()
         stream?.let { st ->
             if (recorder.fileActive) {
                 recorder.stopFile()
@@ -27531,8 +28335,10 @@ class CameraActivity : ComponentActivity() {
             Outline()
             }
             Level()
-            Controls(onSettings = { settings = true }, onFraming = { framing = true })
-            Calibration()
+            if (serveMode) ServeControls() else {
+                Controls(onSettings = { settings = true }, onFraming = { framing = true })
+                Calibration()
+            }
         }
         if (settings) StreamSettings { settings = false }
         if (framing) {
@@ -27589,6 +28395,71 @@ class CameraActivity : ComponentActivity() {
             Text(s.outlineTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             CalibrationPanel(c, { setCalib(it) })
             TextButton(onClick = { calibrating.value = false }) { Text(s.outlineDone) }
+        }
+    }
+
+    /**
+     * Allenamento al servizio: in alto braccialetto e conteggio, in basso dentro, fuori, annulla, lato, prima o
+     * seconda, bersaglio, obiettivo, dove mettere il telefono e fine.
+     */
+    @Composable
+    private fun ServeControls() {
+        val str = s
+        val sess by serveSession.collectAsState()
+        val pending by servePending.collectAsState()
+        val bands by controller.ble.bands.collectAsState()
+        val side by serveSide.collectAsState()
+        val kind by serveKind.collectAsState()
+        val target by serveTarget.collectAsState()
+        val li by lensIndex.collectAsState()
+        val msg by message.collectAsState()
+        val n = ServeTraining.count(sess.serves)
+        val band = bands.entries.firstOrNull { it.value.state == com.tennis.scoremanager.ble.LinkState.READY }?.value
+        Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
+                    sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                }
+                Pill(if (pending) str.serveDetected else str.serveWaiting, if (pending) TsmColors.Orange else TsmColors.SurfaceHigh)
+                msg?.let { Pill(it, TsmColors.SurfaceHigh) }
+            }
+            Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
+                Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
+                Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
+                    serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
+                }
+                Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
+                    serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
+                }
+                Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
+                    serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                }
+                if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
+                Btn(Icons.Filled.HelpOutline, str.servePlaceShow, TsmColors.SurfaceHigh) { placementHelp.value = true }
+                Btn(Icons.Filled.Flag, str.serveEnd, TsmColors.SurfaceHigh) {
+                    serveSession.value = serveSession.value.copy(endedAt = System.currentTimeMillis())
+                    serveSummary.value = true
+                }
+            }
+        }
+        if (placementHelp.collectAsState().value) ServePlacementDialog { placementHelp.value = false }
+        if (serveSummary.collectAsState().value) {
+            AlertDialog(
+                onDismissRequest = { serveSummary.value = false },
+                title = { Text(str.serveSummary) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ServeSummaryContent(str, sess.serves)
+                        ServeReplayButtons(controller, sess)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { serveSummary.value = false; finish() }) { Text(str.serveEnd) } },
+                dismissButton = { TextButton(onClick = { serveSummary.value = false }) { Text(str.back) } },
+            )
         }
     }
 
@@ -27704,6 +28575,8 @@ class CameraActivity : ComponentActivity() {
     }
 
     companion object {
+        /** true = allenamento al servizio: telecamera e braccialetto sullo stesso telefono, senza arbitro. */
+        const val EXTRA_SERVE = "serve"
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080
@@ -43514,6 +44387,54 @@ class RematchTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ServeTrainingTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ServeTrainingTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Test
+
+class ServeTrainingTest {
+    @Test
+    fun pressUsesTheRecognisedServe() {
+        val d = ServeTraining.Detected(at = 100_000, gyroDps = 1800, accelG = 9.5)
+        // Tasto 4 s dopo il servizio riconosciuto: vale quello.
+        val (at, used) = ServeTraining.anchor(104_000, d, null)
+        assertEquals(100_000, at)
+        assertSame(d, used)
+        // Troppo tardi, o già usato per il tasto prima: si suppone un servizio 3 s prima del tasto.
+        assertEquals(117_000L to null, ServeTraining.anchor(120_000, d, null))
+        assertEquals(101_000L to null, ServeTraining.anchor(104_000, d, 100_000))
+        // Nessun servizio riconosciuto.
+        assertEquals(47_000L to null, ServeTraining.anchor(50_000, null, null))
+    }
+
+    @Test
+    fun breakdownBySideKindAndTarget() {
+        fun s(inPlay: Boolean, side: ServeSide, kind: ServeKind = ServeKind.FIRST, target: ServeTarget? = null, gyro: Int? = null) =
+            ServeAttempt(0, inPlay, side, kind, target, gyroDps = gyro)
+        val list = listOf(
+            s(true, ServeSide.DEUCE, target = ServeTarget.T, gyro = 1600), s(false, ServeSide.DEUCE, target = ServeTarget.T, gyro = 2000),
+            s(true, ServeSide.AD, ServeKind.SECOND), s(true, ServeSide.AD, ServeKind.SECOND),
+        )
+        val b = ServeTraining.breakdown(list)
+        assertEquals(ServeTraining.Count(4, 3), b.all)
+        assertEquals(75, b.all.pct)
+        assertEquals(50, b.bySide.getValue(ServeSide.DEUCE).pct)
+        assertEquals(100, b.byKind.getValue(ServeKind.SECOND).pct)
+        // Solo i bersagli usati.
+        assertEquals(setOf(ServeTarget.T), b.byTarget.keys)
+        assertEquals(1800, ServeTraining.meanGyro(list))
+        assertNull(ServeTraining.count(emptyList()).pct)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StrokeReportTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -50218,6 +51139,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 154 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 157 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

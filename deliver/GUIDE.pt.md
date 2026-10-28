@@ -362,6 +362,22 @@ Página 1 › **Raquetes** › **As minhas raquetes**: cada raquete física tem 
 - **No resumo** do jogo (separador *Resumo*) e do treino vê-se a raquete usada, pode associá-la também depois (usa-se o encordoamento montado nesse dia) e avaliar as **sensações** de 1 a 5: controlo, conforto, potência e cansaço.
 - **Comparação**: *por raquete* ou *por encordoamento* (mesma raquete com tensões ou cordas diferentes), escolhem-se as configurações A e B. Barras lado a lado para sessões, horas, jogos ganhos, pontos ganhos, primeiros serviços dentro, pontos ganhos com o primeiro e o segundo, ases, duplas faltas, winners e erros não forçados por jogo, velocidade média do pulso e pancadas das pulseiras, batimento médio e sensações médias. O melhor valor fica a negrito, mas a app não escolhe uma vencedora: adversário, piso, condições e forma também contam.
 
+### 7.5 Treino de saque (app 2.5)
+
+Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e com os botões se diz como foi. Basta um telefone, sem árbitro.
+
+1. Página 1 › **Treino** › **Treino de saque** › **Começar** (a pulseira deve estar conectada como em 6.1; sem ela, marque pelos botões da tela).
+2. **Onde colocar o telefone** (abre sozinho na primeira vez, depois pelo botão *Onde coloco o telefone?*):
+   - **ao lado de quem saca**, do lado do braço que bate (à direita para um destro), a **3-4 m**, na altura da linha de fundo ou meio metro atrás;
+   - lente a **1-1,2 m** do chão, telefone **na horizontal** e reto, apontado para quem saca;
+   - no enquadramento tem de caber **a pessoa inteira, dos pés à raquete no alto** (cerca de 2,7 m): se a cabeça da raquete sair, afaste o telefone ou passe para a **grande-angular** (botão *Lente*);
+   - para ver também para onde vai a bola, como alternativa: 3-4 m **atrás** de quem saca, um pouco de lado, a 1,5-2 m de altura;
+   - nunca na frente de quem saca nem na trajetória da bola.
+3. Escolha o **lado** (direito/esquerdo), **primeiro ou segundo** e, se quiser, o **alvo** (no T, no corpo, aberto): valem para os saques seguintes.
+4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão.
+5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro).
+6. As sessões ficam no cartão **Treino de saque**: toque numa para o resumo e os clipes, ou para excluí-la (clipes incluídos).
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

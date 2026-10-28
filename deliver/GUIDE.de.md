@@ -362,6 +362,22 @@ Seite 1 › **Schläger** › **Meine Schläger**: jeder echte Schläger hat sei
 - **In der Zusammenfassung** des Matches (Reiter *Übersicht*) und des Trainings sieht man den benutzten Schläger, kann ihn auch nachträglich zuordnen (es gilt die an dem Tag aufgezogene Besaitung) und das **Spielgefühl** von 1 bis 5 bewerten: Kontrolle, Komfort, Power und Ermüdung.
 - **Vergleich**: *nach Schläger* oder *nach Besaitung* (gleicher Schläger mit anderen Spannungen oder Saiten), Konfigurationen A und B wählen. Balken nebeneinander für Einheiten, Stunden, gewonnene Matches, gewonnene Punkte, erste Aufschläge im Feld, Punkte nach erstem und zweitem Aufschlag, Asse, Doppelfehler, Winner und unerzwungene Fehler pro Match, mittlere Handgelenkgeschwindigkeit und Schläge der Armbänder, mittlerer Puls und mittleres Spielgefühl. Der bessere Wert ist fett, aber die App kürt keinen Sieger: Gegner, Belag, Bedingungen und Form zählen auch.
 
+### 7.5 Aufschlagtraining (App 2.5)
+
+Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erkennt den Aufschlag, und mit den Tasten sagt man, wie er war. Ein Telefon reicht, ohne Schiedsrichter.
+
+1. Seite 1 › **Training** › **Aufschlagtraining** › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
+2. **Wo das Telefon hinkommt** (öffnet sich beim ersten Mal von selbst, dann über *Wo kommt das Telefon hin?*):
+   - **neben dem Aufschläger**, auf der Seite des Schlagarms (rechts bei Rechtshändern), **3-4 m** entfernt, auf Höhe der Grundlinie oder einen halben Meter dahinter;
+   - Objektiv **1-1,2 m** über dem Boden, Telefon **quer** und gerade, auf den Aufschläger gerichtet;
+   - im Bild muss **die ganze Person sein, von den Füßen bis zum Schläger oben** (etwa 2,7 m): Ragt der Schlägerkopf hinaus, Telefon weiter weg stellen oder auf **Weitwinkel** wechseln (Taste *Objektiv*);
+   - um auch zu sehen, wohin der Ball geht, alternativ: 3-4 m **hinter** dem Aufschläger, etwas seitlich, 1,5-2 m hoch;
+   - nie vor den Aufschläger oder in die Flugbahn des Balls.
+3. **Seite** (Einstand/Vorteil), **erster oder zweiter** und bei Bedarf das **Ziel** (durch die Mitte, auf den Körper, nach außen) wählen: Sie gelten für die folgenden Aufschläge.
+4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck.
+5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild).
+6. Die Einheiten bleiben in der Karte **Aufschlagtraining**: eine antippen für Übersicht und Clips oder zum Löschen (mit Clips).
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

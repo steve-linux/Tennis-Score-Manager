@@ -362,6 +362,22 @@ Page 1 › **Rackets** › **My rackets**: each physical racket has its own card
 - **In the summary** of the match (*Summary* tab) and of the workout you see the racket used, can link it afterwards too (the stringing mounted that day is used) and rate the **feel** from 1 to 5: control, comfort, power and fatigue.
 - **Comparison**: *by racket* or *by stringing* (same racket with different tensions or strings), pick setups A and B. Side-by-side bars for sessions, hours, matches won, points won, first serves in, points won on first and second serve, aces, double faults, winners and unforced errors per match, average wrist speed and wristband strokes, average heart rate, and average feel. The better value is in bold, but the app does not pick a winner: opponent, surface, conditions and form matter too.
 
+### 7.5 Serve practice (app 2.5)
+
+A phone on a tripod films the server; the wristband on the wrist recognises the serve and the buttons say how it went. One phone is enough, no umpire.
+
+1. Page 1 › **Workout** › **Serve practice** › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
+2. **Where to put the phone** (it opens by itself the first time, then from the *Where to put the phone?* button):
+   - **beside the server**, on the hitting-arm side (right for a right-hander), **3-4 m** away, level with the baseline or half a metre behind;
+   - lens **1-1.2 m** above the ground, phone **in landscape** and level, pointed at the server;
+   - the frame must hold **the whole person, from the feet to the racket at the top** (about 2.7 m): if the racket head goes out, move the phone back or switch to the **wide** lens (*Lens* button);
+   - to also see where the ball goes, as an alternative: 3-4 m **behind** the server, a little to the side, 1.5-2 m high;
+   - never in front of the server or in the ball's path.
+3. Choose the **side** (deuce/ad), **first or second** and, if you like, the **target** (down the T, body, wide): they apply to the following serves.
+4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press.
+5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame).
+6. Sessions stay in the **Serve practice** card: tap one for its summary and clips, or to delete it (clips included).
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

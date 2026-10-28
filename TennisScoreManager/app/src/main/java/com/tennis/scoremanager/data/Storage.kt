@@ -135,6 +135,38 @@ class Storage(context: Context) {
         File(workoutsDir, "$id.json").delete()
     }
 
+    /** Allenamenti al servizio: una sessione per file; le clip stanno nella cartella dei video dell'app. */
+    private val servesDir: File get() = File(app.filesDir, "serves").apply { mkdirs() }
+
+    /** Cartella delle clip della sessione [id] (una sottocartella per servizio). */
+    fun serveClipsDir(id: String): File =
+        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id").apply { mkdirs() }
+
+    @Synchronized
+    fun saveServeSession(sess: ServeSession) {
+        runCatching {
+            val f = File(servesDir, "${sess.id}.json")
+            val tmp = File(servesDir, "${sess.id}.tmp")
+            tmp.writeText(json.encodeToString(ServeSession.serializer(), sess))
+            if (!tmp.renameTo(f)) {
+                f.delete()
+                tmp.renameTo(f)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allenamento al servizio fallito", it) }
+    }
+
+    fun loadServeSessions(): List<ServeSession> =
+        servesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(ServeSession.serializer(), f.readText()) }.getOrNull() }
+            .sortedByDescending { it.startedAt }
+
+    /** Cancella la sessione e le sue clip. */
+    @Synchronized
+    fun deleteServeSession(id: String) {
+        File(servesDir, "$id.json").delete()
+        serveClipsDir(id).deleteRecursively()
+    }
+
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
 

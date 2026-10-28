@@ -362,6 +362,22 @@ Page 1 › **Raquettes** › **Mes raquettes** : chaque raquette physique a sa f
 - **Dans le récapitulatif** du match (onglet *Résumé*) et de l'entraînement on voit la raquette utilisée, on peut l'associer après coup (le cordage en place ce jour-là est utilisé) et noter les **sensations** de 1 à 5 : contrôle, confort, puissance et fatigue.
 - **Comparaison** : *par raquette* ou *par cordage* (même raquette avec tensions ou cordages différents), on choisit les configurations A et B. Barres côte à côte pour séances, heures, matchs gagnés, points gagnés, premières balles, points gagnés sur première et seconde, aces, doubles fautes, coups gagnants et fautes directes par match, vitesse moyenne du poignet et coups des bracelets, fréquence cardiaque moyenne et sensations moyennes. La meilleure valeur est en gras, mais l'app ne désigne pas de gagnante : adversaire, surface, conditions et forme comptent aussi.
 
+### 7.5 Entraînement au service (app 2.5)
+
+Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît le service et les boutons disent comment il s'est passé. Un seul téléphone suffit, sans arbitre.
+
+1. Page 1 › **Entraînement** › **Entraînement au service** › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
+2. **Où placer le téléphone** (s'ouvre tout seul la première fois, puis avec le bouton *Où placer le téléphone ?*) :
+   - **à côté du serveur**, du côté du bras qui frappe (à droite pour un droitier), à **3-4 m**, au niveau de la ligne de fond ou un demi-mètre derrière ;
+   - objectif à **1-1,2 m** du sol, téléphone **à l'horizontale** et droit, pointé sur le serveur ;
+   - le cadre doit contenir **toute la personne, des pieds à la raquette en haut** (environ 2,7 m) : si la tête de raquette sort, éloignez le téléphone ou passez au **grand-angle** (bouton *Objectif*) ;
+   - pour voir aussi où va la balle, en alternative : 3-4 m **derrière** le serveur, un peu sur le côté, à 1,5-2 m de haut ;
+   - jamais devant le serveur ni sur la trajectoire de la balle.
+3. Choisissez le **côté** (droit/gauche), **premier ou second** et, si vous voulez, la **cible** (au T, au corps, extérieur) : ils valent pour les services suivants.
+4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui.
+5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image).
+6. Les séances restent dans la carte **Entraînement au service** : touchez-en une pour son bilan et ses clips, ou pour la supprimer (clips compris).
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

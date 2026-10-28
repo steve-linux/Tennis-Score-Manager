@@ -41,7 +41,15 @@ import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.LooksOne
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
@@ -80,7 +88,21 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ble.BandProtocol
+import com.tennis.scoremanager.data.ServeAttempt
+import com.tennis.scoremanager.data.ServeKind
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.ServeSide
+import com.tennis.scoremanager.data.ServeTarget
+import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.CalibrationPanel
+import com.tennis.scoremanager.ui.ServePlacementDialog
+import com.tennis.scoremanager.ui.ServeReplayButtons
+import com.tennis.scoremanager.ui.ServeSummaryContent
+import com.tennis.scoremanager.ui.serveKindName
+import com.tennis.scoremanager.ui.serveSideName
+import com.tennis.scoremanager.ui.serveTargetName
 import com.tennis.scoremanager.ui.CourtOutline
 import com.tennis.scoremanager.ui.FramingDialog
 import com.tennis.scoremanager.ui.HorizonOverlay
@@ -136,6 +158,20 @@ class CameraActivity : ComponentActivity() {
         }
     }
     private var lastTiltSent = 0L
+
+    // ---------------------------------------------------------------- allenamento al servizio (EXTRA_SERVE)
+
+    private val serveMode by lazy { intent.getBooleanExtra(EXTRA_SERVE, false) }
+    private val serveSession = MutableStateFlow(ServeSession("s${System.currentTimeMillis()}", System.currentTimeMillis()))
+    private val serveSide = MutableStateFlow(ServeSide.DEUCE)
+    private val serveKind = MutableStateFlow(ServeKind.FIRST)
+    private val serveTarget = MutableStateFlow<ServeTarget?>(null)
+    /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
+    private val servePending = MutableStateFlow(false)
+    private val serveSummary = MutableStateFlow(false)
+    private val placementHelp = MutableStateFlow(false)
+    private var lastDetected: ServeTraining.Detected? = null
+    private var lastUsedDetectedAt: Long? = null
     /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
     private val outlineOn = MutableStateFlow(false)
     private val calibrating = MutableStateFlow(false)
@@ -182,6 +218,7 @@ class CameraActivity : ComponentActivity() {
         overlayOn.value = controller.storage.cameraOverlay
         calib.value = controller.storage.framingCalib
         lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
+        if (serveMode) startServeTraining()
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
@@ -277,6 +314,96 @@ class CameraActivity : ComponentActivity() {
         prepared = st.prepareVideo(WIDTH, HEIGHT, VIDEO_BITRATE, rotation = rotation) && st.prepareAudio(44_100, true, 128_000)
         if (!prepared) message.value = s.cameraNotSupported
         return prepared
+    }
+
+    // ---------------------------------------------------------------- allenamento al servizio
+
+    private fun startServeTraining() {
+        controller.serveTraining = true
+        // La prima volta si mostra subito dove mettere il telefono.
+        if (controller.storage.loadServeSessions().isEmpty()) placementHelp.value = true
+        lifecycleScope.launch {
+            controller.ble.events.collect { e ->
+                when (e.type) {
+                    BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
+                    BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
+                    BandProtocol.EVT_BATTERY -> undoServe(e.side)
+                }
+            }
+        }
+        // In un allenamento al servizio ogni colpo riconosciuto è un servizio, anche se il firmware lo scambia per
+        // un dritto: conta l'istante, e i picchi del polso.
+        lifecycleScope.launch {
+            controller.ble.strokes.collect { st ->
+                lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
+                servePending.value = true
+            }
+        }
+    }
+
+    private fun endServeTraining() {
+        controller.serveTraining = false
+        val sess = serveSession.value
+        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess.id)
+        else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
+        controller.refreshServeSessions()
+    }
+
+    private fun saveServes(transform: (List<ServeAttempt>) -> List<ServeAttempt>) {
+        val sess = serveSession.value.let { it.copy(serves = transform(it.serves)) }
+        serveSession.value = sess
+        lifecycleScope.launch(Dispatchers.IO) { controller.storage.saveServeSession(sess) }
+    }
+
+    /**
+     * Dentro o fuori, dal braccialetto o dallo schermo. L'istante è quello del servizio riconosciuto (se c'è), e la
+     * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
+     */
+    private fun serveOutcome(inPlay: Boolean, band: Side? = null) {
+        val now = System.currentTimeMillis()
+        val (at, used) = ServeTraining.anchor(now, lastDetected, lastUsedDetectedAt)
+        used?.let { lastUsedDetectedAt = it.at }
+        servePending.value = false
+        val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$at"
+        saveServes { it + ServeAttempt(at, inPlay, serveSide.value, serveKind.value, serveTarget.value, used != null, used?.gyroDps, used?.accelG) }
+        val n = ServeTraining.count(serveSession.value.serves)
+        say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
+        bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        val st = stream ?: return
+        if (!st.isOnPreview) return
+        lifecycleScope.launch {
+            val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
+            if (wait > 0) delay(wait)
+            val dir = File(controller.storage.serveClipsDir(serveSession.value.id), clip)
+            val parts = withContext(Dispatchers.IO) {
+                runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, dir) }.getOrDefault(emptyList())
+            }
+            // Annullato nel frattempo: la clip non serve più.
+            if (serveSession.value.serves.none { it.at == at } || parts.isEmpty()) {
+                withContext(Dispatchers.IO) { dir.deleteRecursively() }
+                return@launch
+            }
+            saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
+        }
+    }
+
+    private fun undoServe(band: Side? = null) {
+        val last = serveSession.value.serves.lastOrNull() ?: return
+        saveServes { it.dropLast(1) }
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value.id), c).deleteRecursively() } }
+        say(s.serveSayUndo)
+        val n = ServeTraining.count(serveSession.value.serves)
+        bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")
+    }
+
+    private fun say(text: String) {
+        if (controller.options.value.audio) controller.announcer.announce(listOf(com.tennis.scoremanager.voice.Seg.Say(text)), force = true)
+    }
+
+    /** Sul display del braccialetto che ha premuto (o di quello collegato): esito e conteggio per 3 secondi. */
+    private fun bandShow(band: Side?, line1: String, line2: String) {
+        val side = band ?: Side.entries.firstOrNull { controller.ble.isReady(it) } ?: return
+        controller.ble.send(side, BandProtocol.message(line1.uppercase(), line2, 3))
     }
 
     // ---------------------------------------------------------------- comandi dall'arbitro
@@ -568,6 +695,7 @@ class CameraActivity : ComponentActivity() {
 
     override fun onDestroy() {
         tiltSensor.stop()
+        if (serveMode) endServeTraining()
         stream?.let { st ->
             if (recorder.fileActive) {
                 recorder.stopFile()
@@ -625,8 +753,10 @@ class CameraActivity : ComponentActivity() {
             Outline()
             }
             Level()
-            Controls(onSettings = { settings = true }, onFraming = { framing = true })
-            Calibration()
+            if (serveMode) ServeControls() else {
+                Controls(onSettings = { settings = true }, onFraming = { framing = true })
+                Calibration()
+            }
         }
         if (settings) StreamSettings { settings = false }
         if (framing) {
@@ -683,6 +813,71 @@ class CameraActivity : ComponentActivity() {
             Text(s.outlineTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             CalibrationPanel(c, { setCalib(it) })
             TextButton(onClick = { calibrating.value = false }) { Text(s.outlineDone) }
+        }
+    }
+
+    /**
+     * Allenamento al servizio: in alto braccialetto e conteggio, in basso dentro, fuori, annulla, lato, prima o
+     * seconda, bersaglio, obiettivo, dove mettere il telefono e fine.
+     */
+    @Composable
+    private fun ServeControls() {
+        val str = s
+        val sess by serveSession.collectAsState()
+        val pending by servePending.collectAsState()
+        val bands by controller.ble.bands.collectAsState()
+        val side by serveSide.collectAsState()
+        val kind by serveKind.collectAsState()
+        val target by serveTarget.collectAsState()
+        val li by lensIndex.collectAsState()
+        val msg by message.collectAsState()
+        val n = ServeTraining.count(sess.serves)
+        val band = bands.entries.firstOrNull { it.value.state == com.tennis.scoremanager.ble.LinkState.READY }?.value
+        Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
+                    sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                }
+                Pill(if (pending) str.serveDetected else str.serveWaiting, if (pending) TsmColors.Orange else TsmColors.SurfaceHigh)
+                msg?.let { Pill(it, TsmColors.SurfaceHigh) }
+            }
+            Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
+                Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
+                Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
+                    serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
+                }
+                Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
+                    serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
+                }
+                Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
+                    serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                }
+                if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
+                Btn(Icons.Filled.HelpOutline, str.servePlaceShow, TsmColors.SurfaceHigh) { placementHelp.value = true }
+                Btn(Icons.Filled.Flag, str.serveEnd, TsmColors.SurfaceHigh) {
+                    serveSession.value = serveSession.value.copy(endedAt = System.currentTimeMillis())
+                    serveSummary.value = true
+                }
+            }
+        }
+        if (placementHelp.collectAsState().value) ServePlacementDialog { placementHelp.value = false }
+        if (serveSummary.collectAsState().value) {
+            AlertDialog(
+                onDismissRequest = { serveSummary.value = false },
+                title = { Text(str.serveSummary) },
+                text = {
+                    Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ServeSummaryContent(str, sess.serves)
+                        ServeReplayButtons(controller, sess)
+                    }
+                },
+                confirmButton = { TextButton(onClick = { serveSummary.value = false; finish() }) { Text(str.serveEnd) } },
+                dismissButton = { TextButton(onClick = { serveSummary.value = false }) { Text(str.back) } },
+            )
         }
     }
 
@@ -798,6 +993,8 @@ class CameraActivity : ComponentActivity() {
     }
 
     companion object {
+        /** true = allenamento al servizio: telecamera e braccialetto sullo stesso telefono, senza arbitro. */
+        const val EXTRA_SERVE = "serve"
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080

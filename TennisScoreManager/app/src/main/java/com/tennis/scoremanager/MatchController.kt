@@ -860,7 +860,33 @@ class MatchController(
         }
     }
 
+    /** Allenamento al servizio aperto: i tasti del braccialetto vanno a lui, non alla partita. */
+    @Volatile var serveTraining = false
+
+    /** Sessioni di allenamento al servizio salvate, dalla più recente. */
+    val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
+
+    fun refreshServeSessions() {
+        scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
+    }
+
+    fun deleteServeSession(id: String) {
+        scope.launch {
+            withContext(io) { storage.deleteServeSession(id) }
+            refreshServeSessions()
+        }
+    }
+
+    /** I pezzi di video dei servizi [serves] della sessione [id], in ordine, per la moviola. */
+    fun serveClipFiles(id: String, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
+        val dir = storage.serveClipsDir(id)
+        return serves.mapNotNull { it.clip }.flatMap { c ->
+            File(dir, c).listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+        }
+    }
+
     private fun onBandEvent(e: BandEvent) {
+        if (serveTraining) return
         when (e.type) {
             BandProtocol.EVT_POWER_OFF -> if (screen.value == Screen.MATCH && options.value.mode == PlayMode.BANDS) {
                 showMessage(strings.msgBandOff(bandLabel(e.side), e.reason))

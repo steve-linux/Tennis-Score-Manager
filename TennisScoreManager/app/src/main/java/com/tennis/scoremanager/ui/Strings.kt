@@ -791,6 +791,48 @@ interface Strings {
     val rematchEvent: (String) -> String
     val rematchNoCalendar: String
     val rematchPreview: String
+    /** Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori. */
+    val serveTitle: String
+    val serveHint: String
+    val serveStart: String
+    val serveNoBand: String
+    val serveBandOk: (String) -> String
+    val serveSideDeuce: String
+    val serveSideAd: String
+    val serveFirst: String
+    val serveSecond: String
+    val serveTargetT: String
+    val serveTargetBody: String
+    val serveTargetWide: String
+    val serveTargetNone: String
+    val serveIn: String
+    val serveOut: String
+    val serveUndo: String
+    val serveSayIn: (Int, Int) -> String
+    val serveSayOut: (Int, Int) -> String
+    val serveSayUndo: String
+    val serveWaiting: String
+    val serveDetected: String
+    val serveEnd: String
+    val serveSummary: String
+    val serveCountLine: (Int, Int) -> String
+    val serveBySide: String
+    val serveByKind: String
+    val serveByTarget: String
+    val serveWrist: (Int, Int) -> String
+    val servePlayAll: String
+    val servePlayIn: String
+    val servePlayOut: String
+    val serveSessions: String
+    val serveDelete: String
+    val serveDeleteAsk: String
+    val servePlaceTitle: String
+    val servePlaceText: String
+    val servePlaceShow: String
+    val serveNoClips: String
+    val servePlaceServer: String
+    val servePlacePhone: String
+    val servePlaceAlt: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1744,6 +1786,47 @@ object ItStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rivincita: $it" }
     override val rematchNoCalendar = "Nessuna app di calendario su questo telefono."
     override val rematchPreview = "Il messaggio"
+    override val serveTitle = "Allenamento al servizio"
+    override val serveHint = "Telefono sul cavalletto a fianco di chi serve, braccialetto al polso: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni servizio diventa una clip da rivedere."
+    override val serveStart = "Inizia"
+    override val serveNoBand = "Nessun braccialetto collegato: segna dentro e fuori coi tasti sullo schermo."
+    override val serveBandOk: (String) -> String = { "Braccialetto $it: KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla" }
+    override val serveSideDeuce = "Destra"
+    override val serveSideAd = "Sinistra"
+    override val serveFirst = "Prima"
+    override val serveSecond = "Seconda"
+    override val serveTargetT = "Al T"
+    override val serveTargetBody = "Al corpo"
+    override val serveTargetWide = "Esterno"
+    override val serveTargetNone = "Nessuno"
+    override val serveIn = "Dentro"
+    override val serveOut = "Fuori"
+    override val serveUndo = "Annulla l'ultimo"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "Dentro. $a su $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Fuori. $a su $b dentro" }
+    override val serveSayUndo = "Annullato"
+    override val serveWaiting = "Servi: il braccialetto riconosce il servizio"
+    override val serveDetected = "Servizio riconosciuto: dentro o fuori?"
+    override val serveEnd = "Fine"
+    override val serveSummary = "Riepilogo dell'allenamento"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a su $b dentro" }
+    override val serveBySide = "Per lato"
+    override val serveByKind = "Prima e seconda"
+    override val serveByTarget = "Per bersaglio"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Polso: in media $a °/s sui servizi dentro, $b °/s su quelli fuori" }
+    override val servePlayAll = "Rivedi tutti"
+    override val servePlayIn = "Rivedi solo i dentro"
+    override val servePlayOut = "Rivedi solo i fuori"
+    override val serveSessions = "Sessioni"
+    override val serveDelete = "Elimina"
+    override val serveDeleteAsk = "Eliminare la sessione e le sue clip?"
+    override val servePlaceTitle = "Dove mettere il telefono"
+    override val servePlaceText = "• A fianco di chi serve, dal lato del braccio che colpisce (a destra per un destro), a 3-4 m di distanza, all'altezza della linea di fondo o mezzo metro dietro.\n• Obiettivo a 1-1,2 m da terra, telefono in orizzontale e dritto, puntato su chi serve.\n• Nell'inquadratura ci deve stare tutta la persona, dai piedi alla racchetta in alto (circa 2,7 m): se la testa della racchetta esce, allontana il telefono o usa il grandangolo.\n• Per vedere anche dove va la palla: 3-4 m dietro chi serve, un po' di lato, a 1,5-2 m d'altezza.\n• Mai davanti a chi serve né sulla traiettoria della palla."
+    override val servePlaceShow = "Dove mettere il telefono?"
+    override val serveNoClips = "Nessuna clip: senza telecamera si contano solo dentro e fuori."
+    override val servePlaceServer = "chi serve"
+    override val servePlacePhone = "telefono"
+    override val servePlaceAlt = "in alternativa"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2683,6 +2766,47 @@ object EnStrings : Strings {
     override val rematchEvent: (String) -> String = { "Rematch: $it" }
     override val rematchNoCalendar = "No calendar app on this phone."
     override val rematchPreview = "The message"
+    override val serveTitle = "Serve practice"
+    override val serveHint = "Phone on the tripod beside the server, wristband on the wrist: KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every serve becomes a clip to watch again."
+    override val serveStart = "Start"
+    override val serveNoBand = "No wristband connected: mark in and out with the buttons on the screen."
+    override val serveBandOk: (String) -> String = { "Wristband $it: KEY1 in, KEY2 out, KEY1 held down undoes" }
+    override val serveSideDeuce = "Deuce side"
+    override val serveSideAd = "Ad side"
+    override val serveFirst = "First"
+    override val serveSecond = "Second"
+    override val serveTargetT = "Down the T"
+    override val serveTargetBody = "Body"
+    override val serveTargetWide = "Wide"
+    override val serveTargetNone = "None"
+    override val serveIn = "In"
+    override val serveOut = "Out"
+    override val serveUndo = "Undo the last one"
+    override val serveSayIn: (Int, Int) -> String = { a, b -> "In. $a of $b" }
+    override val serveSayOut: (Int, Int) -> String = { a, b -> "Out. $a of $b in" }
+    override val serveSayUndo = "Undone"
+    override val serveWaiting = "Serve: the wristband recognises the serve"
+    override val serveDetected = "Serve recognised: in or out?"
+    override val serveEnd = "Done"
+    override val serveSummary = "Practice summary"
+    override val serveCountLine: (Int, Int) -> String = { a, b -> "$a of $b in" }
+    override val serveBySide = "By side"
+    override val serveByKind = "First and second"
+    override val serveByTarget = "By target"
+    override val serveWrist: (Int, Int) -> String = { a, b -> "Wrist: on average $a °/s on serves in, $b °/s on serves out" }
+    override val servePlayAll = "Watch all"
+    override val servePlayIn = "Watch only the ins"
+    override val servePlayOut = "Watch only the outs"
+    override val serveSessions = "Sessions"
+    override val serveDelete = "Delete"
+    override val serveDeleteAsk = "Delete the session and its clips?"
+    override val servePlaceTitle = "Where to put the phone"
+    override val servePlaceText = "• Beside the server, on the hitting-arm side (right for a right-hander), 3-4 m away, level with the baseline or half a metre behind.\n• Lens 1-1.2 m above the ground, phone in landscape and level, pointed at the server.\n• The whole person must be in the frame, from the feet to the racket at the top (about 2.7 m): if the racket head goes out, move the phone back or use the wide lens.\n• To also see where the ball goes: 3-4 m behind the server, a little to the side, 1.5-2 m high.\n• Never in front of the server or in the ball's path."
+    override val servePlaceShow = "Where to put the phone?"
+    override val serveNoClips = "No clips: without the camera only ins and outs are counted."
+    override val servePlaceServer = "server"
+    override val servePlacePhone = "phone"
+    override val servePlaceAlt = "alternative"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"

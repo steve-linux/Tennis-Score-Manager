@@ -362,6 +362,22 @@ Página 1 › **Raquetas** › **Mis raquetas**: cada raqueta física tiene su f
 - **En el resumen** del partido (pestaña *Resumen*) y del entrenamiento se ve la raqueta usada, se puede asociar también después (se toma el encordado montado ese día) y se valoran las **sensaciones** de 1 a 5: control, confort, potencia y cansancio.
 - **Comparación**: *por raqueta* o *por encordado* (misma raqueta con tensiones o cuerdas distintas), se eligen las configuraciones A y B. Barras lado a lado para sesiones, horas, partidos ganados, puntos ganados, primeros saques dentro, puntos ganados con el primero y el segundo, aces, dobles faltas, golpes ganadores y errores no forzados por partido, velocidad media de la muñeca y golpes de las pulseras, pulso medio y sensaciones medias. El mejor valor va en negrita, pero la app no elige ganadora: también cuentan rival, superficie, condiciones y forma.
 
+### 7.5 Entrenamiento del saque (app 2.5)
+
+Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoce el saque y con los botones se dice cómo ha ido. Basta un teléfono, sin árbitro.
+
+1. Página 1 › **Entrenamiento** › **Entrenamiento del saque** › **Empezar** (la pulsera debe estar conectada como en 6.1; sin ella, se marca con los botones de la pantalla).
+2. **Dónde poner el teléfono** (la primera vez se abre solo, luego con el botón *¿Dónde pongo el teléfono?*):
+   - **al lado de quien saca**, en el lado del brazo que golpea (a la derecha para un diestro), a **3-4 m**, a la altura de la línea de fondo o medio metro detrás;
+   - objetivo a **1-1,2 m** del suelo, teléfono **en horizontal** y recto, apuntando a quien saca;
+   - en el encuadre debe entrar **toda la persona, de los pies a la raqueta arriba** (unos 2,7 m): si la cabeza de la raqueta se sale, aleja el teléfono o cambia al **gran angular** (botón *Objetivo*);
+   - para ver también adónde va la pelota, como alternativa: 3-4 m **detrás** de quien saca, un poco de lado, a 1,5-2 m de altura;
+   - nunca delante de quien saca ni en la trayectoria de la pelota.
+3. Elige el **lado** (derecho/izquierdo), **primero o segundo** y, si quieres, el **objetivo** (a la T, al cuerpo, abierto): valen para los saques siguientes.
+4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar.
+5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma).
+6. Las sesiones quedan en la tarjeta **Entrenamiento del saque**: toca una para ver el resumen y los clips, o para eliminarla (con los clips).
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
