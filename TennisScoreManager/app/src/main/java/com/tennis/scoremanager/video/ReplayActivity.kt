@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -34,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +57,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
 import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.PoseFrame
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
@@ -64,6 +69,8 @@ import java.io.File
  * Moviola a schermo intero sul telefono dell'arbitro: gira in orizzontale e in verticale, in loop, a 1×, ½× e ¼×,
  * un fotogramma alla volta. Due dita ingrandiscono (fino a 6×) e spostano l'immagine, un doppio tocco torna normale.
  * Il video si disegna su una TextureView: a differenza della SurfaceView si può ingrandire e spostare.
+ * Con [EXTRA_POSE_DIR] (clip di un servizio analizzato) disegna sopra lo scheletro del giocatore, che segue il video
+ * anche ingrandito, e ha i tasti per saltare ai tre momenti chiave.
  */
 class ReplayActivity : ComponentActivity() {
 
@@ -72,6 +79,10 @@ class ReplayActivity : ComponentActivity() {
     private var files: List<File> = emptyList()
     /** Moviola mandata anche al tabellone: la si toglie chiudendo. */
     private var onTv by mutableStateOf(false)
+    /** Analisi del servizio: fotogrammi coi punti del corpo, ore d'inizio dei pezzi e istante del servizio. */
+    private var pose: ServePoseResult? = null
+    private var poseStarts: List<Long> = emptyList()
+    private var poseAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,10 +93,26 @@ class ReplayActivity : ComponentActivity() {
             finish()
             return
         }
+        intent.getStringExtra(EXTRA_POSE_DIR)?.let { path ->
+            val dir = File(path)
+            poseAt = intent.getLongExtra(EXTRA_POSE_AT, 0L)
+            poseStarts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
+            pose = runCatching {
+                kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                    .decodeFromString(ServePoseResult.serializer(), File(dir, ServeClipAnalysis.RESULT).readText())
+            }.getOrNull()?.takeIf { poseStarts.size == files.size }
+        }
         val p = ExoPlayer.Builder(this).build().apply {
             setMediaItems(files.map { MediaItem.fromUri(Uri.fromFile(it)) })
             repeatMode = Player.REPEAT_MODE_ALL
+            // Fermo il più vicino possibile all'istante chiesto: per l'avanti e indietro di un fotogramma.
+            setSeekParameters(androidx.media3.exoplayer.SeekParameters.EXACT)
             prepare()
+            // Con lo scheletro si parte poco prima del caricamento, al rallentatore.
+            pose?.metrics?.let { m ->
+                seekAbs(this, poseAt + m.trophyT - 1_200)
+                playbackParameters = PlaybackParameters(0.5f)
+            }
             play()
         }
         player = p
@@ -106,11 +133,53 @@ class ReplayActivity : ComponentActivity() {
         super.onDestroy()
     }
 
+    /** Va all'istante [abs] (ora del telefono) nel pezzo che lo contiene. */
+    private fun seekAbs(p: ExoPlayer, abs: Long) {
+        val i = poseStarts.indexOfLast { it <= abs }.coerceAtLeast(0)
+        p.seekTo(i, (abs - (poseStarts.getOrNull(i) ?: abs)).coerceAtLeast(0))
+    }
+
+    /** I punti del corpo all'istante [rel] (ms dal servizio), tra i due fotogrammi analizzati più vicini. */
+    private fun poseAt(rel: Long): PoseFrame? {
+        val frames = pose?.frames ?: return null
+        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
+        val j = frames.indexOfFirst { it.t >= rel }
+        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
+        val a = frames[j - 1]
+        val b = frames[j]
+        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
+        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
+    }
+
+    /** Lo scheletro sopra il video: x e y dei punti sono in frazioni dell'altezza dell'immagine. */
+    @Composable
+    private fun SkeletonOverlay(p: ExoPlayer) {
+        var frame by remember { mutableStateOf<PoseFrame?>(null) }
+        LaunchedEffect(p) {
+            while (true) {
+                androidx.compose.runtime.withFrameNanos { }
+                val abs = (poseStarts.getOrNull(p.currentMediaItemIndex) ?: continue) + p.currentPosition
+                frame = poseAt(abs - poseAt)
+            }
+        }
+        val f = frame ?: return
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+            val h = size.height
+            val bone = TsmColors.Ball
+            for ((a, b) in ServePose.BONES) {
+                if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
+                drawLine(bone, Offset(f.x[a] * h, f.y[a] * h), Offset(f.x[b] * h, f.y[b] * h), strokeWidth = h / 110, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            }
+            for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) drawCircle(androidx.compose.ui.graphics.Color.White, h / 120, Offset(f.x[i] * h, f.y[i] * h))
+        }
+    }
+
     @Composable
     private fun Content(p: ExoPlayer) {
         val s = stringsFor(controller.options.value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        var speed by remember { mutableFloatStateOf(1f) }
+        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null) 0.5f else 1f) }
+        var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
@@ -142,17 +211,20 @@ class ReplayActivity : ComponentActivity() {
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                AndroidView(
-                    factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } },
-                    // La più grande che sta nello schermo con le proporzioni del video, in verticale come in orizzontale.
-                    modifier = Modifier.aspectRatio(ratio)
+                // La più grande che sta nello schermo con le proporzioni del video, in verticale come in orizzontale;
+                // lo scheletro sta nello stesso riquadro, così si ingrandisce e si sposta insieme al video.
+                Box(
+                    Modifier.aspectRatio(ratio)
                         .graphicsLayer {
                             scaleX = zoom
                             scaleY = zoom
                             translationX = pan.x
                             translationY = pan.y
                         },
-                )
+                ) {
+                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+                    if (skeleton) SkeletonOverlay(p)
+                }
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
             // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
@@ -165,6 +237,25 @@ class ReplayActivity : ComponentActivity() {
                         syncBoard(p, !playing)
                     }
                     onTv = !onTv
+                }
+            }
+            // Analisi del servizio: scheletro sì o no e salto ai tre momenti chiave (fermo, per guardarli bene).
+            pose?.let { r ->
+                Row(
+                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(bottom = 64.dp)
+                        .background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Btn(Icons.Filled.AccessibilityNew, null, skeleton) { skeleton = !skeleton }
+                    r.metrics?.let { m ->
+                        for ((label, t) in listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT)) {
+                            Btn(null, label, false) {
+                                p.pause()
+                                playing = false
+                                seekAbs(p, poseAt + t)
+                            }
+                        }
+                    }
                 }
             }
             Row(
@@ -226,6 +317,9 @@ class ReplayActivity : ComponentActivity() {
         const val EXTRA_FILES = "files"
         /** true = mandarla subito anche al tabellone. */
         const val EXTRA_BOARD = "board"
+        /** Cartella della clip di un servizio analizzato (pose.json e starts.txt) e istante del servizio (ms). */
+        const val EXTRA_POSE_DIR = "pose_dir"
+        const val EXTRA_POSE_AT = "pose_at"
         private const val MAX_ZOOM = 6f
     }
 }

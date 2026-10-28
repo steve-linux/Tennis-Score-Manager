@@ -104,6 +104,11 @@
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
 
+        <!-- Allenamento al servizio: posizione del corpo nelle clip (MoveNet, sul telefono) -->
+        <activity
+            android:name=".video.ServeAnalysisActivity"
+            android:exported="false" />
+
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
         <activity
             android:name=".video.CameraActivity"

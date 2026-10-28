@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
@@ -184,6 +185,13 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ServeSummaryContent(s, sess.serves)
                 ServeReplayButtons(c, sess)
+                // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.
+                if (sess.serves.any { it.clip != null }) {
+                    GhostButton(s.poseTitle, Icons.Filled.AccessibilityNew, {
+                        context.startActivity(Intent(context, com.tennis.scoremanager.video.ServeAnalysisActivity::class.java)
+                            .putExtra(com.tennis.scoremanager.video.ServeAnalysisActivity.EXTRA_ID, sess.id))
+                    }, Modifier.fillMaxWidth())
+                }
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },

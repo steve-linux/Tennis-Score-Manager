@@ -202,11 +202,15 @@ class ReplayRecorder(private val dir: File) : BaseRecordController() {
         }
         requestKeyFrame?.onRequestKeyFrame()
         out.mkdirs()
+        // Accanto ai pezzi, l'ora d'inizio di ciascuno: serve a ritrovare un istante preciso (analisi del servizio).
+        runCatching { File(out, STARTS).writeText(chosen.joinToString("\n") { it.startMs.toString() }) }
         return chosen.mapIndexed { i, s -> File(out, "part_$i.mp4").also { s.file.copyTo(it, overwrite = true) } }
     }
 
     companion object {
         private const val TAG = "Moviola"
+        /** File con l'ora d'inizio (ms, orologio del telefono) di ciascun pezzo copiato da [cutRange], uno per riga. */
+        const val STARTS = "starts.txt"
         /** Pezzi da 4 secondi: la moviola arriva entro un attimo e copre un punto intero. */
         const val SEGMENT_US = 4_000_000L
         /**

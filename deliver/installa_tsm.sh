@@ -76,6 +76,11 @@ plugins {
 android {
     namespace = "com.tennis.scoremanager"
     compileSdk = 36
+    // LiteRT (analisi del servizio) solo per i processori ARM dei telefoni: le versioni x86 (emulatori, qualche
+    // Chromebook) pesano 7 MB. Su x86 l'app si installa lo stesso, manca solo l'analisi del movimento.
+    packaging {
+        jniLibs.excludes += setOf("lib/x86/libtensorflowlite_jni.so", "lib/x86_64/libtensorflowlite_jni.so")
+    }
 
     defaultConfig {
         applicationId = "io.github.steve_linux.tsm"
@@ -134,6 +139,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)  // QR del tabellone TV
     implementation(libs.zxing.embedded) { isTransitive = false }  // lettura del QR per trasferire lo storico
+    // Analisi del servizio: MoveNet (posizione del corpo) con LiteRT ricompilato dai sorgenti, senza Google Play Services.
+    implementation(libs.litert.fdroid)
+    implementation(libs.litert.api)  // le interfacce Java (InterpreterApi, Tensor, DataType), solo Java
     implementation(libs.rootencoder)  // telefono-telecamera: registrazione e diretta RTMP con la grafica del punteggio
     implementation(libs.media3.exoplayer)  // lettore dei video delle partite, con i capitoli punto per punto
     implementation(libs.media3.ui)
@@ -271,6 +279,11 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
+
+        <!-- Allenamento al servizio: posizione del corpo nelle clip (MoveNet, sul telefono) -->
+        <activity
+            android:name=".video.ServeAnalysisActivity"
+            android:exported="false" />
 
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
         <activity
@@ -7746,6 +7759,194 @@ object Reports {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ServePose.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ServePose.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.atan2
+import kotlin.math.sqrt
+
+/**
+ * I 17 punti del corpo di MoveNet in un fotogramma del servizio. [t] in ms rispetto all'istante del servizio (negativo
+ * prima); [x] e [y] in frazioni dell'altezza dell'immagine (y in giù), così le due misure hanno la stessa scala;
+ * [s] la sicurezza di ciascun punto (0-1).
+ */
+@Serializable
+data class PoseFrame(val t: Long, val x: List<Float>, val y: List<Float>, val s: List<Float>)
+
+/**
+ * Misure del servizio nei tre momenti chiave: il caricamento ("trofeo": braccio del lancio in alto), il ginocchio più
+ * piegato e l'impatto (polso del braccio che colpisce nel punto più alto).
+ */
+@Serializable
+data class ServeMetrics(
+    /** Angolo del ginocchio più piegato (anca-ginocchio-caviglia): 180° gamba tesa, più basso = più piegato. */
+    val kneeMinDeg: Float,
+    /** Angolo del gomito all'impatto (spalla-gomito-polso): vicino a 180° = braccio disteso. */
+    val elbowContactDeg: Float,
+    /** Altezza del polso all'impatto in rapporto alla statura (dai piedi). */
+    val contactHeight: Float,
+    /** Braccio del lancio al trofeo, gradi dalla verticale: 0 = dritto in su. */
+    val tossArmDeg: Float,
+    /** Inclinazione delle spalle al trofeo: positiva se la spalla del lancio è più alta. */
+    val shoulderTiltDeg: Float,
+    val trophyToContactMs: Long,
+    val kneeToContactMs: Long,
+    /** Sicurezza media dei punti usati (0-1): sotto 0,4 le misure valgono poco. */
+    val quality: Float,
+    val trophyT: Long,
+    val kneeT: Long,
+    val contactT: Long,
+    /** true = colpisce col braccio destro. */
+    val rightHanded: Boolean,
+) {
+    val reliable: Boolean get() = quality >= ServePose.MIN_QUALITY
+}
+
+/** Analisi di un servizio: fotogrammi e misure (null se il corpo non si vede abbastanza). */
+@Serializable
+data class ServePoseResult(
+    val frames: List<PoseFrame>,
+    val metrics: ServeMetrics?,
+    /** Persone diverse viste nell'inquadratura (si segue chi serve); 0 = nessuna. */
+    val people: Int = 1,
+)
+
+object ServePose {
+    const val NOSE = 0
+    const val L_SHOULDER = 5
+    const val R_SHOULDER = 6
+    const val L_ELBOW = 7
+    const val R_ELBOW = 8
+    const val L_WRIST = 9
+    const val R_WRIST = 10
+    const val L_HIP = 11
+    const val R_HIP = 12
+    const val L_KNEE = 13
+    const val R_KNEE = 14
+    const val L_ANKLE = 15
+    const val R_ANKLE = 16
+
+    /** Coppie di punti da unire per disegnare lo scheletro. */
+    val BONES = listOf(
+        L_SHOULDER to R_SHOULDER, L_SHOULDER to L_ELBOW, L_ELBOW to L_WRIST, R_SHOULDER to R_ELBOW, R_ELBOW to R_WRIST,
+        L_SHOULDER to L_HIP, R_SHOULDER to R_HIP, L_HIP to R_HIP, L_HIP to L_KNEE, L_KNEE to L_ANKLE, R_HIP to R_KNEE, R_KNEE to R_ANKLE,
+    )
+
+    const val MIN_SCORE = 0.3f
+    const val MIN_QUALITY = 0.4f
+    /** Dal naso alla caviglia c'è circa l'89 % della statura. */
+    private const val NOSE_TO_ANKLE = 0.89f
+
+    private fun ok(f: PoseFrame, vararg i: Int) = i.all { f.s[it] >= MIN_SCORE }
+
+    /** Angolo in [b] tra i segmenti b→a e b→c, in gradi. */
+    fun angle(f: PoseFrame, a: Int, b: Int, c: Int): Float {
+        val ux = f.x[a] - f.x[b]; val uy = f.y[a] - f.y[b]
+        val vx = f.x[c] - f.x[b]; val vy = f.y[c] - f.y[b]
+        val n = sqrt(ux * ux + uy * uy) * sqrt(vx * vx + vy * vy)
+        if (n < 1e-6f) return 180f
+        return Math.toDegrees(acos(((ux * vx + uy * vy) / n).coerceIn(-1f, 1f).toDouble())).toFloat()
+    }
+
+    private fun median(v: List<Float>): Float? = v.sorted().takeIf { it.isNotEmpty() }?.let { it[it.size / 2] }
+
+    /** Le misure dai fotogrammi in ordine di tempo; null se non si trovano i tre momenti. */
+    fun metrics(frames: List<PoseFrame>): ServeMetrics? {
+        if (frames.size < 5) return null
+        // Braccio che colpisce: il polso più veloce (lo swing); a pari dati, quello che arriva più in alto. L'altro è il
+        // braccio del lancio, che al trofeo può salire quasi altrettanto.
+        fun highest(w: Int) = frames.filter { ok(it, w) }.minOfOrNull { it.y[w] } ?: Float.MAX_VALUE
+        fun speeds(w: Int): List<Pair<Int, Float>> = (1 until frames.size).mapNotNull { i ->
+            val a = frames[i - 1]; val b = frames[i]
+            if (!ok(a, w) || !ok(b, w) || b.t <= a.t) return@mapNotNull null
+            val dx = b.x[w] - a.x[w]; val dy = b.y[w] - a.y[w]
+            i to sqrt(dx * dx + dy * dy) / (b.t - a.t)
+        }
+        val vr = speeds(R_WRIST).maxOfOrNull { it.second }
+        val vl = speeds(L_WRIST).maxOfOrNull { it.second }
+        val right = if (vr != null && vl != null && abs(vr - vl) > 0.1f * maxOf(vr, vl)) vr > vl else highest(R_WRIST) <= highest(L_WRIST)
+        val hitW = if (right) R_WRIST else L_WRIST
+        val hitE = if (right) R_ELBOW else L_ELBOW
+        val hitS = if (right) R_SHOULDER else L_SHOULDER
+        val tossW = if (right) L_WRIST else R_WRIST
+        val tossS = if (right) L_SHOULDER else R_SHOULDER
+
+        // Impatto: il punto più alto del polso che colpisce vicino al momento in cui va più veloce.
+        val fastest = speeds(hitW).maxByOrNull { it.second }?.first
+        val near = if (fastest != null) frames.indices.filter { abs(frames[it].t - frames[fastest].t) <= 250 } else frames.indices.toList()
+        val ci = near.filter { ok(frames[it], hitW) }.minByOrNull { frames[it].y[hitW] } ?: return null
+        val contact = frames[ci]
+        // Trofeo: il braccio del lancio più in alto, almeno 150 ms prima dell'impatto (e non più di 2 s).
+        val ti = (0 until ci).filter { frames[it].t in (contact.t - 2_000)..(contact.t - 150) && ok(frames[it], tossW, tossS) }
+            .minByOrNull { frames[it].y[tossW] } ?: return null
+        val trophy = frames[ti]
+        // Ginocchio: il più piegato tra le due gambe, dal trofeo (un po' prima) all'impatto.
+        fun knee(f: PoseFrame): Float? = listOfNotNull(
+            angle(f, L_HIP, L_KNEE, L_ANKLE).takeIf { ok(f, L_HIP, L_KNEE, L_ANKLE) },
+            angle(f, R_HIP, R_KNEE, R_ANKLE).takeIf { ok(f, R_HIP, R_KNEE, R_ANKLE) },
+        ).minOrNull()
+        val from = frames.indexOfFirst { it.t >= trophy.t - 800 }.coerceAtLeast(0)
+        val ki = (from..ci).filter { knee(frames[it]) != null }.minByOrNull { knee(frames[it])!! } ?: return null
+        val kneeFrame = frames[ki]
+
+        // Statura e terreno dai fotogrammi prima del trofeo (fermi, coi piedi a terra).
+        val before = frames.subList(0, ti + 1)
+        val ankle = { f: PoseFrame -> listOfNotNull(f.y[L_ANKLE].takeIf { ok(f, L_ANKLE) }, f.y[R_ANKLE].takeIf { ok(f, R_ANKLE) }).maxOrNull() }
+        val ground = median(before.mapNotNull(ankle)) ?: return null
+        val noseToAnkle = median(before.filter { ok(it, NOSE) }.mapNotNull { f -> ankle(f)?.let { it - f.y[NOSE] } }) ?: return null
+        val stature = noseToAnkle / NOSE_TO_ANKLE
+        if (stature <= 0.05f) return null
+
+        val elbow = if (ok(contact, hitS, hitE, hitW)) angle(contact, hitS, hitE, hitW) else return null
+        val dx = trophy.x[tossW] - trophy.x[tossS]
+        val dy = trophy.y[tossW] - trophy.y[tossS]
+        val tossArm = Math.toDegrees(atan2(abs(dx), -dy).toDouble()).toFloat()
+        val tilt = if (ok(trophy, hitS, tossS)) {
+            Math.toDegrees(atan2(trophy.y[hitS] - trophy.y[tossS], abs(trophy.x[hitS] - trophy.x[tossS]) + 1e-6f).toDouble()).toFloat()
+        } else 0f
+        val used = listOf(
+            contact.s[hitW], contact.s[hitE], contact.s[hitS], trophy.s[tossW], trophy.s[tossS],
+        ) + listOf(L_HIP, L_KNEE, L_ANKLE, R_HIP, R_KNEE, R_ANKLE).map { kneeFrame.s[it] }
+        return ServeMetrics(
+            kneeMinDeg = knee(kneeFrame)!!,
+            elbowContactDeg = elbow,
+            contactHeight = (ground - contact.y[hitW]) / stature,
+            tossArmDeg = tossArm,
+            shoulderTiltDeg = tilt,
+            trophyToContactMs = contact.t - trophy.t,
+            kneeToContactMs = contact.t - kneeFrame.t,
+            quality = used.average().toFloat(),
+            trophyT = trophy.t,
+            kneeT = kneeFrame.t,
+            contactT = contact.t,
+            rightHanded = right,
+        )
+    }
+
+    /** Media di ogni misura sui servizi affidabili (null se nessuno). */
+    data class Mean(
+        val n: Int, val kneeMinDeg: Float, val elbowContactDeg: Float, val contactHeight: Float,
+        val tossArmDeg: Float, val shoulderTiltDeg: Float, val trophyToContactMs: Long,
+    )
+
+    fun mean(list: List<ServeMetrics>): Mean? {
+        val r = list.filter { it.reliable }.takeIf { it.isNotEmpty() } ?: return null
+        return Mean(
+            r.size, r.map { it.kneeMinDeg }.average().toFloat(), r.map { it.elbowContactDeg }.average().toFloat(),
+            r.map { it.contactHeight }.average().toFloat(), r.map { it.tossArmDeg }.average().toFloat(),
+            r.map { it.shoulderTiltDeg }.average().toFloat(), r.map { it.trophyToContactMs }.average().toLong(),
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ServeTraining.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ServeTraining.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -14880,6 +15081,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
@@ -15049,6 +15251,13 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ServeSummaryContent(s, sess.serves)
                 ServeReplayButtons(c, sess)
+                // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.
+                if (sess.serves.any { it.clip != null }) {
+                    GhostButton(s.poseTitle, Icons.Filled.AccessibilityNew, {
+                        context.startActivity(Intent(context, com.tennis.scoremanager.video.ServeAnalysisActivity::class.java)
+                            .putExtra(com.tennis.scoremanager.video.ServeAnalysisActivity.EXTRA_ID, sess.id))
+                    }, Modifier.fillMaxWidth())
+                }
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },
@@ -15926,6 +16135,40 @@ interface Strings {
     val servePlaceServer: String
     val servePlacePhone: String
     val servePlaceAlt: String
+    /** Analisi del movimento del servizio (posizione del corpo dalle clip). */
+    val poseTitle: String
+    val poseHint: String
+    val poseAnalyzeAll: String
+    val poseAnalyzing: (Int, Int) -> String
+    val poseNoBody: String
+    val poseUnreliable: String
+    val poseTrophy: String
+    val poseKnee: String
+    val poseContact: String
+    val poseKneeMetric: String
+    val poseElbowMetric: String
+    val poseHeightMetric: String
+    val poseTossMetric: String
+    val poseTiltMetric: String
+    val poseTimingMetric: String
+    val poseHeightValue: (String) -> String
+    val poseInVsOut: String
+    val poseServe: (Int) -> String
+    val poseNoClip: String
+    val poseDone: String
+    /** Modello MoveNet scaricato a richiesta. */
+    val poseModelTitle: String
+    val poseModelHint: String
+    val poseModelDownload: String
+    val poseModelDownloading: (Int) -> String
+    val poseModelFailed: String
+    val poseModelBad: String
+    val poseModelDelete: String
+    val poseUnsupported: String
+    val poseWatch: String
+    val poseManyPeople: (Int) -> String
+    val poseZoomHint: String
+    val poseRedo: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -16920,6 +17163,38 @@ object ItStrings : Strings {
     override val servePlaceServer = "chi serve"
     override val servePlacePhone = "telefono"
     override val servePlaceAlt = "in alternativa"
+    override val poseTitle = "Analisi del movimento"
+    override val poseHint = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: caricamento, ginocchia più piegate e impatto. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi servizi dentro con quelli fuori."
+    override val poseAnalyzeAll = "Analizza i servizi"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analisi del servizio $a di $b…" }
+    override val poseNoBody = "Corpo non riconosciuto: inquadra tutta la persona, di lato, con buona luce."
+    override val poseUnreliable = "Misure poco sicure: il corpo si vede male"
+    override val poseTrophy = "Caricamento"
+    override val poseKnee = "Ginocchia"
+    override val poseContact = "Impatto"
+    override val poseKneeMetric = "Ginocchio più piegato"
+    override val poseElbowMetric = "Gomito all'impatto"
+    override val poseHeightMetric = "Altezza dell'impatto"
+    override val poseTossMetric = "Braccio del lancio (dalla verticale)"
+    override val poseTiltMetric = "Spalle al caricamento"
+    override val poseTimingMetric = "Dal caricamento all'impatto"
+    override val poseHeightValue: (String) -> String = { "$it × la statura" }
+    override val poseInVsOut = "Dentro e fuori a confronto"
+    override val poseServe: (Int) -> String = { "Servizio $it" }
+    override val poseNoClip = "Senza clip"
+    override val poseDone = "Analisi finita"
+    override val poseModelTitle = "Modello per riconoscere il corpo"
+    override val poseModelHint = "Per l'analisi serve il modello MoveNet di Google (7 MB, licenza Apache 2.0). Si scarica una volta sola dalla pagina del progetto su GitHub e resta sul telefono; le clip non lasciano mai il telefono."
+    override val poseModelDownload = "Scarica il modello (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Download del modello… $it%" }
+    override val poseModelFailed = "Download non riuscito: controlla la connessione e riprova."
+    override val poseModelBad = "Il file scaricato non è quello atteso e non è stato usato: riprova più tardi."
+    override val poseModelDelete = "Elimina il modello (7 MB)"
+    override val poseUnsupported = "L'analisi del movimento non è disponibile su questo dispositivo (processore x86)."
+    override val poseWatch = "Guarda il video con lo scheletro"
+    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi serve (controlla nelle immagini)." }
+    override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
+    override val poseRedo = "Rifai l'analisi"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -17900,6 +18175,38 @@ object EnStrings : Strings {
     override val servePlaceServer = "server"
     override val servePlacePhone = "phone"
     override val servePlaceAlt = "alternative"
+    override val poseTitle = "Movement analysis"
+    override val poseHint = "The app finds the body position in the clips, all on the phone, and measures three moments: loading, deepest knee bend and contact. They are estimates from a side view: they are most useful to compare your serves in with your serves out."
+    override val poseAnalyzeAll = "Analyse the serves"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analysing serve $a of $b…" }
+    override val poseNoBody = "Body not recognised: frame the whole person, from the side, in good light."
+    override val poseUnreliable = "Unreliable measurements: the body is hard to see"
+    override val poseTrophy = "Loading"
+    override val poseKnee = "Knees"
+    override val poseContact = "Contact"
+    override val poseKneeMetric = "Deepest knee bend"
+    override val poseElbowMetric = "Elbow at contact"
+    override val poseHeightMetric = "Contact height"
+    override val poseTossMetric = "Tossing arm (from vertical)"
+    override val poseTiltMetric = "Shoulders at loading"
+    override val poseTimingMetric = "From loading to contact"
+    override val poseHeightValue: (String) -> String = { "$it × body height" }
+    override val poseInVsOut = "Ins and outs compared"
+    override val poseServe: (Int) -> String = { "Serve $it" }
+    override val poseNoClip = "No clip"
+    override val poseDone = "Analysis done"
+    override val poseModelTitle = "Model to recognise the body"
+    override val poseModelHint = "The analysis needs Google's MoveNet model (7 MB, Apache 2.0 licence). It is downloaded once from the project's GitHub page and stays on the phone; the clips never leave the phone."
+    override val poseModelDownload = "Download the model (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Downloading the model… $it%" }
+    override val poseModelFailed = "Download failed: check the connection and try again."
+    override val poseModelBad = "The downloaded file is not the expected one and was not used: try again later."
+    override val poseModelDelete = "Delete the model (7 MB)"
+    override val poseUnsupported = "Movement analysis isn't available on this device (x86 processor)."
+    override val poseWatch = "Watch the video with the skeleton"
+    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the server was followed (check in the images)." }
+    override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
+    override val poseRedo = "Analyse again"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -18903,6 +19210,38 @@ object DeStrings : Strings {
     override val servePlaceServer = "Aufschläger"
     override val servePlacePhone = "Telefon"
     override val servePlaceAlt = "alternativ"
+    override val poseTitle = "Bewegungsanalyse"
+    override val poseHint = "Die App erkennt die Körperhaltung in den Clips, alles auf dem Telefon, und misst drei Momente: Ausholen, stärkste Kniebeuge und Treffpunkt. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner guten Aufschläge mit den Fehlern."
+    override val poseAnalyzeAll = "Aufschläge analysieren"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Aufschlag $a von $b wird analysiert…" }
+    override val poseNoBody = "Körper nicht erkannt: die ganze Person von der Seite und bei gutem Licht ins Bild nehmen."
+    override val poseUnreliable = "Unsichere Messwerte: Der Körper ist schlecht zu sehen"
+    override val poseTrophy = "Ausholen"
+    override val poseKnee = "Knie"
+    override val poseContact = "Treffpunkt"
+    override val poseKneeMetric = "Stärkste Kniebeuge"
+    override val poseElbowMetric = "Ellbogen im Treffpunkt"
+    override val poseHeightMetric = "Höhe des Treffpunkts"
+    override val poseTossMetric = "Wurfarm (zur Senkrechten)"
+    override val poseTiltMetric = "Schultern beim Ausholen"
+    override val poseTimingMetric = "Vom Ausholen zum Treffpunkt"
+    override val poseHeightValue: (String) -> String = { "$it × Körpergröße" }
+    override val poseInVsOut = "Gute und Fehler im Vergleich"
+    override val poseServe: (Int) -> String = { "Aufschlag $it" }
+    override val poseNoClip = "Ohne Clip"
+    override val poseDone = "Analyse fertig"
+    override val poseModelTitle = "Modell zur Körpererkennung"
+    override val poseModelHint = "Für die Analyse braucht es das MoveNet-Modell von Google (7 MB, Lizenz Apache 2.0). Es wird einmal von der Projektseite auf GitHub heruntergeladen und bleibt auf dem Telefon; die Clips verlassen das Telefon nie."
+    override val poseModelDownload = "Modell herunterladen (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Modell wird heruntergeladen… $it %" }
+    override val poseModelFailed = "Download fehlgeschlagen: Verbindung prüfen und erneut versuchen."
+    override val poseModelBad = "Die heruntergeladene Datei ist nicht die erwartete und wurde nicht verwendet: später erneut versuchen."
+    override val poseModelDelete = "Modell löschen (7 MB)"
+    override val poseUnsupported = "Die Bewegungsanalyse ist auf diesem Gerät nicht verfügbar (x86-Prozessor)."
+    override val poseWatch = "Video mit Skelett ansehen"
+    override val poseManyPeople: (Int) -> String = { "$it Personen im Bild: Der Aufschläger wurde verfolgt (in den Bildern prüfen)." }
+    override val poseZoomHint = "Bild antippen zum Vergrößern; zwei Finger zum Zoomen, doppelt tippen zum Zurücksetzen."
+    override val poseRedo = "Erneut analysieren"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -19899,6 +20238,38 @@ object EsStrings : Strings {
     override val servePlaceServer = "quien saca"
     override val servePlacePhone = "teléfono"
     override val servePlaceAlt = "alternativa"
+    override val poseTitle = "Análisis del movimiento"
+    override val poseHint = "La app encuentra la posición del cuerpo en los clips, todo en el teléfono, y mide tres momentos: armado, rodillas más flexionadas e impacto. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus saques dentro con los de fuera."
+    override val poseAnalyzeAll = "Analizar los saques"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analizando el saque $a de $b…" }
+    override val poseNoBody = "Cuerpo no reconocido: encuadra a toda la persona, de lado, con buena luz."
+    override val poseUnreliable = "Medidas poco seguras: el cuerpo se ve mal"
+    override val poseTrophy = "Armado"
+    override val poseKnee = "Rodillas"
+    override val poseContact = "Impacto"
+    override val poseKneeMetric = "Rodilla más flexionada"
+    override val poseElbowMetric = "Codo en el impacto"
+    override val poseHeightMetric = "Altura del impacto"
+    override val poseTossMetric = "Brazo del lanzamiento (desde la vertical)"
+    override val poseTiltMetric = "Hombros en el armado"
+    override val poseTimingMetric = "Del armado al impacto"
+    override val poseHeightValue: (String) -> String = { "$it × la estatura" }
+    override val poseInVsOut = "Dentro y fuera comparados"
+    override val poseServe: (Int) -> String = { "Saque $it" }
+    override val poseNoClip = "Sin clip"
+    override val poseDone = "Análisis terminado"
+    override val poseModelTitle = "Modelo para reconocer el cuerpo"
+    override val poseModelHint = "El análisis necesita el modelo MoveNet de Google (7 MB, licencia Apache 2.0). Se descarga una sola vez desde la página del proyecto en GitHub y se queda en el teléfono; los clips nunca salen del teléfono."
+    override val poseModelDownload = "Descargar el modelo (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Descargando el modelo… $it %" }
+    override val poseModelFailed = "La descarga ha fallado: comprueba la conexión y vuelve a intentarlo."
+    override val poseModelBad = "El archivo descargado no es el esperado y no se ha usado: vuelve a intentarlo más tarde."
+    override val poseModelDelete = "Eliminar el modelo (7 MB)"
+    override val poseUnsupported = "El análisis del movimiento no está disponible en este dispositivo (procesador x86)."
+    override val poseWatch = "Ver el vídeo con el esqueleto"
+    override val poseManyPeople: (Int) -> String = { "$it personas en el encuadre: se ha seguido a quien saca (compruébalo en las imágenes)." }
+    override val poseZoomHint = "Toca una imagen para ampliarla; dos dedos para el zoom, doble toque para volver."
+    override val poseRedo = "Repetir el análisis"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -20897,6 +21268,38 @@ object FrStrings : Strings {
     override val servePlaceServer = "serveur"
     override val servePlacePhone = "téléphone"
     override val servePlaceAlt = "autre position"
+    override val poseTitle = "Analyse du mouvement"
+    override val poseHint = "L'appli trouve la position du corps dans les clips, entièrement sur le téléphone, et mesure trois moments : armé, genoux le plus fléchis et impact. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos services bons et vos fautes."
+    override val poseAnalyzeAll = "Analyser les services"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analyse du service $a sur $b…" }
+    override val poseNoBody = "Corps non reconnu : cadrez toute la personne, de côté, avec une bonne lumière."
+    override val poseUnreliable = "Mesures peu fiables : le corps se voit mal"
+    override val poseTrophy = "Armé"
+    override val poseKnee = "Genoux"
+    override val poseContact = "Impact"
+    override val poseKneeMetric = "Genou le plus fléchi"
+    override val poseElbowMetric = "Coude à l'impact"
+    override val poseHeightMetric = "Hauteur de l'impact"
+    override val poseTossMetric = "Bras de lancer (depuis la verticale)"
+    override val poseTiltMetric = "Épaules à l'armé"
+    override val poseTimingMetric = "De l'armé à l'impact"
+    override val poseHeightValue: (String) -> String = { "$it × la taille" }
+    override val poseInVsOut = "Bons et fautes comparés"
+    override val poseServe: (Int) -> String = { "Service $it" }
+    override val poseNoClip = "Sans clip"
+    override val poseDone = "Analyse terminée"
+    override val poseModelTitle = "Modèle pour reconnaître le corps"
+    override val poseModelHint = "L'analyse a besoin du modèle MoveNet de Google (7 Mo, licence Apache 2.0). Il se télécharge une seule fois depuis la page du projet sur GitHub et reste sur le téléphone ; les clips ne quittent jamais le téléphone."
+    override val poseModelDownload = "Télécharger le modèle (7 Mo)"
+    override val poseModelDownloading: (Int) -> String = { "Téléchargement du modèle… $it %" }
+    override val poseModelFailed = "Échec du téléchargement : vérifiez la connexion et réessayez."
+    override val poseModelBad = "Le fichier téléchargé n'est pas celui attendu et n'a pas été utilisé : réessayez plus tard."
+    override val poseModelDelete = "Supprimer le modèle (7 Mo)"
+    override val poseUnsupported = "L'analyse du mouvement n'est pas disponible sur cet appareil (processeur x86)."
+    override val poseWatch = "Voir la vidéo avec le squelette"
+    override val poseManyPeople: (Int) -> String = { "$it personnes dans le cadre : le serveur a été suivi (vérifiez sur les images)." }
+    override val poseZoomHint = "Touchez une image pour l'agrandir ; deux doigts pour zoomer, double toucher pour revenir."
+    override val poseRedo = "Refaire l'analyse"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -21896,6 +22299,38 @@ object PtStrings : Strings {
     override val servePlaceServer = "quem saca"
     override val servePlacePhone = "telefone"
     override val servePlaceAlt = "alternativa"
+    override val poseTitle = "Análise do movimento"
+    override val poseHint = "O app encontra a posição do corpo nos clipes, tudo no telefone, e mede três momentos: preparação, joelhos mais flexionados e impacto. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus saques dentro com os de fora."
+    override val poseAnalyzeAll = "Analisar os saques"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analisando o saque $a de $b…" }
+    override val poseNoBody = "Corpo não reconhecido: enquadre a pessoa inteira, de lado, com boa luz."
+    override val poseUnreliable = "Medidas pouco seguras: o corpo aparece mal"
+    override val poseTrophy = "Preparação"
+    override val poseKnee = "Joelhos"
+    override val poseContact = "Impacto"
+    override val poseKneeMetric = "Joelho mais flexionado"
+    override val poseElbowMetric = "Cotovelo no impacto"
+    override val poseHeightMetric = "Altura do impacto"
+    override val poseTossMetric = "Braço do lançamento (da vertical)"
+    override val poseTiltMetric = "Ombros na preparação"
+    override val poseTimingMetric = "Da preparação ao impacto"
+    override val poseHeightValue: (String) -> String = { "$it × a altura" }
+    override val poseInVsOut = "Dentro e fora comparados"
+    override val poseServe: (Int) -> String = { "Saque $it" }
+    override val poseNoClip = "Sem clipe"
+    override val poseDone = "Análise concluída"
+    override val poseModelTitle = "Modelo para reconhecer o corpo"
+    override val poseModelHint = "A análise precisa do modelo MoveNet do Google (7 MB, licença Apache 2.0). Ele é baixado uma única vez da página do projeto no GitHub e fica no telefone; os clipes nunca saem do telefone."
+    override val poseModelDownload = "Baixar o modelo (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Baixando o modelo… $it%" }
+    override val poseModelFailed = "O download falhou: verifique a conexão e tente de novo."
+    override val poseModelBad = "O arquivo baixado não é o esperado e não foi usado: tente mais tarde."
+    override val poseModelDelete = "Excluir o modelo (7 MB)"
+    override val poseUnsupported = "A análise do movimento não está disponível neste aparelho (processador x86)."
+    override val poseWatch = "Ver o vídeo com o esqueleto"
+    override val poseManyPeople: (Int) -> String = { "$it pessoas no enquadramento: foi seguido quem saca (confira nas imagens)." }
+    override val poseZoomHint = "Toque numa imagem para ampliá-la; dois dedos para o zoom, toque duplo para voltar."
+    override val poseRedo = "Refazer a análise"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -29878,6 +30313,423 @@ object PointMarks {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/PoseAnalyzer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/PoseAnalyzer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.RectF
+import android.media.MediaMetadataRetriever
+import android.os.Build
+import com.tennis.scoremanager.data.PoseFrame
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.Interpreter
+import java.io.Closeable
+import java.io.File
+import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
+import kotlin.math.abs
+import kotlin.math.max
+
+/**
+ * Posizione del corpo con MoveNet SinglePose Thunder (17 punti), tutto sul telefono. Si usa dopo l'allenamento, clip
+ * per clip: niente in diretta, così non pesa su batteria e registrazione.
+ */
+class PoseAnalyzer(context: Context) : Closeable {
+    private val interpreter: Interpreter
+    private val size: Int
+    private val uint8: Boolean
+
+    init {
+        // Il modello scaricato a richiesta (PoseModel), mappato in memoria.
+        val f = PoseModel.file(context)
+        val model = FileInputStream(f).channel.use { it.map(FileChannel.MapMode.READ_ONLY, 0, it.size()) }
+        interpreter = Interpreter(model, Interpreter.Options().setNumThreads(4))
+        val input = interpreter.getInputTensor(0)
+        size = input.shape()[1]
+        uint8 = input.dataType() == DataType.UINT8
+    }
+
+    /**
+     * I 17 punti in [bmp]: x e y in pixel dell'immagine, poi la sicurezza. [crop] è il quadrato (in pixel) da guardare:
+     * il giocatore ingrandito si vede meglio; fuori dall'immagine è nero.
+     */
+    fun detect(bmp: Bitmap, crop: RectF, masks: List<RectF> = emptyList()): Array<FloatArray> {
+        val input = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        Canvas(input).apply {
+            drawColor(Color.BLACK)
+            val m = Matrix().apply { setRectToRect(crop, RectF(0f, 0f, size.toFloat(), size.toFloat()), Matrix.ScaleToFit.FILL) }
+            drawBitmap(bmp, m, Paint(Paint.FILTER_BITMAP_FLAG))
+            // Le altre persone (in pixel di [bmp]) si coprono: così il modello non le scambia per chi serve.
+            if (masks.isNotEmpty()) {
+                val black = Paint().apply { color = Color.BLACK }
+                for (r in masks) RectF(r).also { m.mapRect(it) }.let { drawRect(it, black) }
+            }
+        }
+        val px = IntArray(size * size)
+        input.getPixels(px, 0, size, 0, 0, size, size)
+        input.recycle()
+        val buf = ByteBuffer.allocateDirect(size * size * 3 * if (uint8) 1 else 4).order(ByteOrder.nativeOrder())
+        for (p in px) {
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            if (uint8) {
+                buf.put(r.toByte()); buf.put(g.toByte()); buf.put(b.toByte())
+            } else {
+                buf.putFloat(r.toFloat()); buf.putFloat(g.toFloat()); buf.putFloat(b.toFloat())
+            }
+        }
+        buf.rewind()
+        val out = Array(1) { Array(1) { Array(17) { FloatArray(3) } } }
+        interpreter.run(buf, out)
+        // MoveNet dà y, x, sicurezza nel quadrato d'ingresso (0-1).
+        return Array(17) { i ->
+            val (y, x, s) = out[0][0][i].let { Triple(it[0], it[1], it[2]) }
+            floatArrayOf(crop.left + x * crop.width(), crop.top + y * crop.height(), s)
+        }
+    }
+
+    override fun close() = interpreter.close()
+
+    companion object {
+        /** Quadrato intorno ai punti sicuri, largo 1,6 volte il corpo; null se non se ne vedono abbastanza. */
+        fun cropAround(kp: Array<FloatArray>, w: Int, h: Int): RectF? {
+            val good = kp.filter { it[2] >= ServePose.MIN_SCORE }
+            if (good.size < 6) return null
+            val x0 = good.minOf { it[0] }; val x1 = good.maxOf { it[0] }
+            val y0 = good.minOf { it[1] }; val y1 = good.maxOf { it[1] }
+            val side = max(x1 - x0, y1 - y0) * 1.6f
+            val cx = (x0 + x1) / 2; val cy = (y0 + y1) / 2
+            return RectF(cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2)
+        }
+
+        /** Centro orizzontale e larghezza dei punti sicuri (pixel), per riconoscere la stessa persona da un fotogramma all'altro. */
+        fun spread(kp: Array<FloatArray>): Pair<Float, Float>? {
+            val good = kp.filter { it[2] >= ServePose.MIN_SCORE }
+            if (good.size < 6) return null
+            val x0 = good.minOf { it[0] }; val x1 = good.maxOf { it[0] }
+            return (x0 + x1) / 2 to (x1 - x0)
+        }
+
+        /**
+         * Centro del busto (spalle e anche) e larghezza delle spalle, in pixel: non si sposta quando un braccio si alza,
+         * quindi distingue bene due persone vicine. null se il busto non si vede.
+         */
+        fun torso(kp: Array<FloatArray>): Pair<Float, Float>? {
+            val pts = listOf(ServePose.L_SHOULDER, ServePose.R_SHOULDER, ServePose.L_HIP, ServePose.R_HIP).filter { kp[it][2] >= ServePose.MIN_SCORE }
+            if (pts.size < 2) return null
+            val cx = pts.map { kp[it][0] }.average().toFloat()
+            val sw = if (kp[ServePose.L_SHOULDER][2] >= ServePose.MIN_SCORE && kp[ServePose.R_SHOULDER][2] >= ServePose.MIN_SCORE) {
+                abs(kp[ServePose.L_SHOULDER][0] - kp[ServePose.R_SHOULDER][0])
+            } else 0f
+            return cx to sw
+        }
+
+        /** Quanto un braccio è alzato sopra le spalle, in lunghezze del busto (chi serve arriva ben sopra 1). */
+        fun armRaise(kp: Array<FloatArray>): Float {
+            fun y(i: Int) = kp[i][1].takeIf { kp[i][2] >= ServePose.MIN_SCORE }
+            val sh = listOfNotNull(y(ServePose.L_SHOULDER), y(ServePose.R_SHOULDER)).minOrNull() ?: return 0f
+            val hip = listOfNotNull(y(ServePose.L_HIP), y(ServePose.R_HIP)).maxOrNull() ?: return 0f
+            val wrist = listOfNotNull(y(ServePose.L_WRIST), y(ServePose.R_WRIST)).minOrNull() ?: return 0f
+            val torso = (hip - sh).takeIf { it > 1f } ?: return 0f
+            return (sh - wrist) / torso
+        }
+
+        /** Tutta l'immagine in un quadrato, con bande nere sopra e sotto. */
+        fun full(w: Int, h: Int): RectF {
+            val side = max(w, h).toFloat()
+            return RectF((w - side) / 2, (h - side) / 2, (w + side) / 2, (h + side) / 2)
+        }
+    }
+}
+
+/**
+ * Analisi di un servizio salvato: fotogrammi tra poco prima e poco dopo l'istante [at] dalla clip [dir] (pezzi da 4 s
+ * con le loro ore d'inizio in [ReplayRecorder.STARTS]), punti del corpo, misure, e tre immagini con lo scheletro.
+ */
+object ServeClipAnalysis {
+    const val RESULT = "pose.json"
+    const val TROPHY = "key_trophy.jpg"
+    const val KNEE = "key_knee.jpg"
+    const val CONTACT = "key_contact.jpg"
+    /** Finestra intorno al servizio: col servizio riconosciuto si sa bene dov'è, senza si guarda più largo. */
+    private const val STEP_MS = 66L
+    /** Fotogrammi letti per volta: 8 in 1080p sono circa 33 MB. */
+    private const val CHUNK = 8
+
+    fun analyze(pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, onProgress: (Float) -> Unit = {}): ServePoseResult {
+        val parts = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+        val starts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
+        if (parts.isEmpty() || starts.size != parts.size) return ServePoseResult(emptyList(), null)
+        val (from, to) = if (detected) at - 2_000 to at + 700 else at - 2_500 to at + 2_500
+        val times = (from..to step STEP_MS).toList()
+        val frames = ArrayList<PoseFrame>()
+        var crop: RectF? = null
+        val retrievers = HashMap<File, MediaMetadataRetriever>()
+        // Il fotogramma all'ora [t] del telefono, dal pezzo che la contiene.
+        fun frameAt(t: Long): Bitmap? {
+            val i = starts.indexOfLast { it <= t }.takeIf { it >= 0 } ?: return null
+            val r = retrievers.getOrPut(parts[i]) { MediaMetadataRetriever().apply { setDataSource(parts[i].absolutePath) } }
+            val us = (t - starts[i]) * 1000
+            return if (Build.VERSION.SDK_INT >= 27) r.getScaledFrameAtTime(us, MediaMetadataRetriever.OPTION_CLOSEST, 960, 540)
+            else r.getFrameAtTime(us, MediaMetadataRetriever.OPTION_CLOSEST)
+        }
+        // Ricognizione: con più persone nell'inquadratura MoveNet ne segue una a caso. Si cercano le persone in tre
+        // quadrati (sinistra, centro, destra) su alcuni fotogrammi, e si sceglie chi alza di più il braccio: chi serve.
+        // Il ritaglio della ricognizione è in frazioni dell'altezza: i fotogrammi letti in fila sono più grandi.
+        val sc = scout(pose, times, ::frameAt)
+        val start = sc.crop
+        val people = sc.people
+        var center: Pair<Float, Float>? = null
+        var jumps = 0
+        var done = 0
+        fun process(bmp: Bitmap, t: Long) {
+            val w = bmp.width; val h = bmp.height
+            if (crop == null && center == null && start != null) {
+                crop = RectF(start.left * h, start.top * h, start.right * h, start.bottom * h)
+            }
+            val masks = sc.others.map { o -> RectF((o.cx - o.half) * h, 0f, (o.cx + o.half) * h, h.toFloat()) }
+            var kp = pose.detect(bmp, crop ?: PoseAnalyzer.full(w, h), masks)
+            var sp = PoseAnalyzer.spread(kp)
+            // Persa col ritaglio: si riprova un po' più largo intorno a dov'era, non su tutta l'immagine (dove
+            // potrebbe prendere un'altra persona).
+            if (sp == null && crop != null) {
+                val c = crop!!
+                val wider = RectF(c.centerX() - c.width() * 0.8f, c.centerY() - c.height() * 0.8f, c.centerX() + c.width() * 0.8f, c.centerY() + c.height() * 0.8f)
+                kp = pose.detect(bmp, wider, masks)
+                sp = PoseAnalyzer.spread(kp)
+            }
+            // Un salto del busto più largo delle spalle è un'altra persona: il fotogramma non vale, il ritaglio resta.
+            val tr = if (sp != null) PoseAnalyzer.torso(kp) else null
+            val prev = center
+            val far = tr != null && prev != null && abs(tr.first - prev.first) > maxOf(prev.second, h * 0.03f) * 1.2f
+            // Tre fotogrammi di fila nello stesso posto nuovo: si è spostato davvero (le altre persone sono coperte).
+            jumps = if (far) jumps + 1 else 0
+            val jumped = far && jumps < 3
+            if (sp != null && !jumped) {
+                crop = PoseAnalyzer.cropAround(kp, w, h)
+                if (tr != null) center = tr
+            }
+            val scores = if (jumped) List(17) { 0f } else kp.map { it[2] }
+            frames += PoseFrame(t - at, kp.map { it[0] / h }, kp.map { it[1] / h }, scores)
+            onProgress(++done / times.size.toFloat())
+        }
+        try {
+            // Pezzo per pezzo, coi fotogrammi letti in fila (Android 9+): chiederli uno per uno farebbe ripartire ogni
+            // volta la decodifica dall'inizio del pezzo, dieci volte più lento.
+            for ((pi, ts) in times.groupBy { t -> starts.indexOfLast { it <= t } }.filterKeys { it >= 0 }.toSortedMap()) {
+                val r = retrievers.getOrPut(parts[pi]) { MediaMetadataRetriever().apply { setDataSource(parts[pi].absolutePath) } }
+                val count = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0
+                val durMs = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+                if (Build.VERSION.SDK_INT < 28 || count <= 0 || durMs <= 0) {
+                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { process(it, t); it.recycle() }
+                    continue
+                }
+                val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
+                val lo = wanted.keys.min()
+                val hi = wanted.keys.max()
+                val params = MediaMetadataRetriever.BitmapParams().apply { preferredConfig = Bitmap.Config.RGB_565 }
+                var k = lo
+                while (k <= hi) {
+                    val n = minOf(CHUNK, hi - k + 1)
+                    val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
+                    list.forEachIndexed { j, bmp ->
+                        wanted[k + j]?.forEach { t -> process(bmp, t) }
+                        bmp.recycle()
+                    }
+                    if (list.isEmpty()) break
+                    k += n
+                }
+            }
+            frames.sortBy { it.t }
+            onProgress(1f)
+            val metrics = ServePose.metrics(frames)
+            // Le tre immagini dei momenti chiave, con lo scheletro: si riprendono dal video (non si tengono tutte in memoria).
+            if (metrics != null) {
+                for ((name, t) in listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)) {
+                    val bmp = runCatching { frameAt(t + at) }.getOrNull() ?: continue
+                    val f = frames.first { it.t == t }
+                    runCatching { File(dir, name).outputStream().use { skeleton(bmp, f).compress(Bitmap.CompressFormat.JPEG, 85, it) } }
+                    bmp.recycle()
+                }
+            }
+            return ServePoseResult(frames, metrics, people)
+        } finally {
+            retrievers.values.forEach { runCatching { it.release() } }
+        }
+    }
+
+    /**
+     * Ricognizione su 8 fotogrammi della finestra: ritaglio iniziale intorno a chi serve (null = tutta l'immagine) e
+     * quante persone diverse si sono viste.
+     */
+    /** Un'altra persona vista nella ricognizione: centro e mezza larghezza, in frazioni dell'altezza dell'immagine. */
+    data class Other(val cx: Float, val half: Float)
+
+    private data class Scout(val crop: RectF?, val people: Int, val others: List<Other>, val serverCx: Float?)
+
+    private fun scout(pose: PoseAnalyzer, times: List<Long>, frameAt: (Long) -> Bitmap?): Scout {
+        data class Seen(val cx: Float, val kp: Array<FloatArray>, val raise: Float, val width: Float)
+        val seen = ArrayList<Seen>()
+        var w = 0; var h = 0
+        for (k in 0 until 8) {
+            val t = times[(times.size - 1) * k / 7]
+            val bmp = runCatching { frameAt(t) }.getOrNull() ?: continue
+            w = bmp.width; h = bmp.height
+            val side = minOf(w, h).toFloat()
+            val xs = if (w > h) listOf(0f, (w - side) / 2, w - side) else listOf(0f)
+            for (x in xs) {
+                val kp = pose.detect(bmp, RectF(x, (h - side) / 2, x + side, (h + side) / 2))
+                if (kp.count { it[2] >= ServePose.MIN_SCORE } < 8) continue
+                val tr = PoseAnalyzer.torso(kp) ?: continue
+                // Lo stesso corpo visto da due quadrati vicini finisce nello stesso gruppo, qui sotto.
+                seen += Seen(tr.first, kp, PoseAnalyzer.armRaise(kp), maxOf(tr.second, h * 0.03f))
+            }
+            bmp.recycle()
+        }
+        if (seen.isEmpty() || w == 0) return Scout(null, 0, emptyList(), null)
+        // Persone: gruppi di avvistamenti col centro del busto vicino (meno di una larghezza di spalle e mezza).
+        val groups = ArrayList<MutableList<Seen>>()
+        for (s in seen.sortedBy { it.cx }) {
+            val g = groups.lastOrNull()
+            if (g != null && s.cx - g.last().cx < maxOf(g.last().width, s.width) * 1.5f) g += s else groups += mutableListOf(s)
+        }
+        val server = groups.maxBy { g -> g.maxOf { it.raise } }
+        val best = server.maxBy { it.raise }
+        val serverCx = server.map { it.cx }.average().toFloat()
+        // Le altre persone: dove stanno di solito (mediana) e quanto sono larghe, senza mai coprire chi serve.
+        val others = groups.filter { it !== server }.map { g ->
+            val cx = g.map { it.cx }.sorted()[g.size / 2]
+            val half = g.map { it.width }.sorted()[g.size / 2] * 1.2f
+            Other(cx / h, minOf(half, abs(cx - serverCx) * 0.6f) / h)
+        }
+        val c = PoseAnalyzer.cropAround(best.kp, w, h)
+        return Scout(c?.let { RectF(it.left / h, it.top / h, it.right / h, it.bottom / h) }, groups.size, others, serverCx / h)
+    }
+
+    /** Il fotogramma con lo scheletro disegnato sopra (punti sicuri e ossa fra punti sicuri). */
+    private fun skeleton(src: Bitmap, f: PoseFrame): Bitmap {
+        val out = src.copy(Bitmap.Config.ARGB_8888, true)
+        val c = Canvas(out)
+        val h = out.height.toFloat()
+        val bone = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(198, 244, 50); strokeWidth = h / 120; strokeCap = Paint.Cap.ROUND }
+        val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
+        for ((a, b) in ServePose.BONES) {
+            if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
+            c.drawLine(f.x[a] * h, f.y[a] * h, f.x[b] * h, f.y[b] * h, bone)
+        }
+        for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) c.drawCircle(f.x[i] * h, f.y[i] * h, h / 90, dot)
+        return out
+    }
+
+    fun keyImage(dir: File, name: String): Bitmap? = File(dir, name).takeIf { it.exists() }?.let { BitmapFactory.decodeFile(it.absolutePath) }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/PoseModel.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/PoseModel.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.os.Build
+import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.MessageDigest
+
+/**
+ * Il modello MoveNet (Google, Apache 2.0) non sta nell'app: si scarica una volta sola, se lo si vuole, dalla release
+ * del progetto su GitHub, e si usa solo se l'impronta sha256 è quella giusta. Le clip non lasciano mai il telefono.
+ */
+object PoseModel {
+    const val URL = "https://github.com/steve-linux/Tennis-Score-Manager/releases/download/pose-model-1/movenet_singlepose_thunder_int8_v1.tflite"
+    const val SHA256 = "b72fed22707cd6fb94b5a248b9bddb9c062b9f445471b4fa263407cf6d222011"
+    const val SIZE_BYTES = 7_126_768L
+
+    fun file(context: Context): File = File(context.filesDir, "pose/movenet_thunder_int8.tflite")
+
+    fun installed(context: Context): Boolean = file(context).let { it.exists() && it.length() == SIZE_BYTES }
+
+    /** LiteRT c'è solo per i processori ARM (le versioni x86 non sono nell'app). */
+    fun supported(): Boolean = Build.SUPPORTED_ABIS.any { it == "arm64-v8a" || it == "armeabi-v7a" }
+
+    fun delete(context: Context) {
+        file(context).delete()
+    }
+
+    sealed class Result {
+        data object Ok : Result()
+        data object Network : Result()
+        /** Scaricato ma non è il file atteso (cambiato o rovinato): non si usa. */
+        data object BadFile : Result()
+    }
+
+    /** Scarica in un file temporaneo, controlla dimensione e sha256, poi lo mette al suo posto. Bloccante: da IO. */
+    fun download(context: Context, onProgress: (Float) -> Unit): Result {
+        val dest = file(context)
+        dest.parentFile?.mkdirs()
+        val tmp = File(dest.parentFile, dest.name + ".part")
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            var conn = URL(URL).openConnection() as HttpURLConnection
+            // GitHub manda a un altro indirizzo per i file delle release: si segue a mano (anche da https a https).
+            var hops = 0
+            while (conn.responseCode in 300..399 && hops < 5) {
+                val next = conn.getHeaderField("Location") ?: break
+                conn.disconnect()
+                conn = URL(next).openConnection() as HttpURLConnection
+                hops++
+            }
+            if (conn.responseCode != 200) return Result.Network
+            var read = 0L
+            conn.inputStream.use { input ->
+                tmp.outputStream().use { out ->
+                    val buf = ByteArray(64 * 1024)
+                    while (true) {
+                        val n = input.read(buf)
+                        if (n < 0) break
+                        out.write(buf, 0, n)
+                        digest.update(buf, 0, n)
+                        read += n
+                        if (read > SIZE_BYTES) return Result.BadFile
+                        onProgress(read / SIZE_BYTES.toFloat())
+                    }
+                }
+            }
+            conn.disconnect()
+            val hash = digest.digest().joinToString("") { "%02x".format(it) }
+            if (read != SIZE_BYTES || hash != SHA256) return Result.BadFile
+            if (!tmp.renameTo(dest)) {
+                dest.delete()
+                if (!tmp.renameTo(dest)) return Result.Network
+            }
+            Result.Ok
+        } catch (e: Exception) {
+            Result.Network
+        } finally {
+            tmp.delete()
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ReplayActivity.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ReplayActivity.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -29906,6 +30758,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -29916,6 +30769,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29937,6 +30791,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
 import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.PoseFrame
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
@@ -29946,6 +30803,8 @@ import java.io.File
  * Moviola a schermo intero sul telefono dell'arbitro: gira in orizzontale e in verticale, in loop, a 1×, ½× e ¼×,
  * un fotogramma alla volta. Due dita ingrandiscono (fino a 6×) e spostano l'immagine, un doppio tocco torna normale.
  * Il video si disegna su una TextureView: a differenza della SurfaceView si può ingrandire e spostare.
+ * Con [EXTRA_POSE_DIR] (clip di un servizio analizzato) disegna sopra lo scheletro del giocatore, che segue il video
+ * anche ingrandito, e ha i tasti per saltare ai tre momenti chiave.
  */
 class ReplayActivity : ComponentActivity() {
 
@@ -29954,6 +30813,10 @@ class ReplayActivity : ComponentActivity() {
     private var files: List<File> = emptyList()
     /** Moviola mandata anche al tabellone: la si toglie chiudendo. */
     private var onTv by mutableStateOf(false)
+    /** Analisi del servizio: fotogrammi coi punti del corpo, ore d'inizio dei pezzi e istante del servizio. */
+    private var pose: ServePoseResult? = null
+    private var poseStarts: List<Long> = emptyList()
+    private var poseAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29964,10 +30827,26 @@ class ReplayActivity : ComponentActivity() {
             finish()
             return
         }
+        intent.getStringExtra(EXTRA_POSE_DIR)?.let { path ->
+            val dir = File(path)
+            poseAt = intent.getLongExtra(EXTRA_POSE_AT, 0L)
+            poseStarts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
+            pose = runCatching {
+                kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                    .decodeFromString(ServePoseResult.serializer(), File(dir, ServeClipAnalysis.RESULT).readText())
+            }.getOrNull()?.takeIf { poseStarts.size == files.size }
+        }
         val p = ExoPlayer.Builder(this).build().apply {
             setMediaItems(files.map { MediaItem.fromUri(Uri.fromFile(it)) })
             repeatMode = Player.REPEAT_MODE_ALL
+            // Fermo il più vicino possibile all'istante chiesto: per l'avanti e indietro di un fotogramma.
+            setSeekParameters(androidx.media3.exoplayer.SeekParameters.EXACT)
             prepare()
+            // Con lo scheletro si parte poco prima del caricamento, al rallentatore.
+            pose?.metrics?.let { m ->
+                seekAbs(this, poseAt + m.trophyT - 1_200)
+                playbackParameters = PlaybackParameters(0.5f)
+            }
             play()
         }
         player = p
@@ -29988,11 +30867,53 @@ class ReplayActivity : ComponentActivity() {
         super.onDestroy()
     }
 
+    /** Va all'istante [abs] (ora del telefono) nel pezzo che lo contiene. */
+    private fun seekAbs(p: ExoPlayer, abs: Long) {
+        val i = poseStarts.indexOfLast { it <= abs }.coerceAtLeast(0)
+        p.seekTo(i, (abs - (poseStarts.getOrNull(i) ?: abs)).coerceAtLeast(0))
+    }
+
+    /** I punti del corpo all'istante [rel] (ms dal servizio), tra i due fotogrammi analizzati più vicini. */
+    private fun poseAt(rel: Long): PoseFrame? {
+        val frames = pose?.frames ?: return null
+        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
+        val j = frames.indexOfFirst { it.t >= rel }
+        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
+        val a = frames[j - 1]
+        val b = frames[j]
+        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
+        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
+    }
+
+    /** Lo scheletro sopra il video: x e y dei punti sono in frazioni dell'altezza dell'immagine. */
+    @Composable
+    private fun SkeletonOverlay(p: ExoPlayer) {
+        var frame by remember { mutableStateOf<PoseFrame?>(null) }
+        LaunchedEffect(p) {
+            while (true) {
+                androidx.compose.runtime.withFrameNanos { }
+                val abs = (poseStarts.getOrNull(p.currentMediaItemIndex) ?: continue) + p.currentPosition
+                frame = poseAt(abs - poseAt)
+            }
+        }
+        val f = frame ?: return
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+            val h = size.height
+            val bone = TsmColors.Ball
+            for ((a, b) in ServePose.BONES) {
+                if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
+                drawLine(bone, Offset(f.x[a] * h, f.y[a] * h), Offset(f.x[b] * h, f.y[b] * h), strokeWidth = h / 110, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            }
+            for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) drawCircle(androidx.compose.ui.graphics.Color.White, h / 120, Offset(f.x[i] * h, f.y[i] * h))
+        }
+    }
+
     @Composable
     private fun Content(p: ExoPlayer) {
         val s = stringsFor(controller.options.value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        var speed by remember { mutableFloatStateOf(1f) }
+        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null) 0.5f else 1f) }
+        var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
@@ -30024,17 +30945,20 @@ class ReplayActivity : ComponentActivity() {
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                AndroidView(
-                    factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } },
-                    // La più grande che sta nello schermo con le proporzioni del video, in verticale come in orizzontale.
-                    modifier = Modifier.aspectRatio(ratio)
+                // La più grande che sta nello schermo con le proporzioni del video, in verticale come in orizzontale;
+                // lo scheletro sta nello stesso riquadro, così si ingrandisce e si sposta insieme al video.
+                Box(
+                    Modifier.aspectRatio(ratio)
                         .graphicsLayer {
                             scaleX = zoom
                             scaleY = zoom
                             translationX = pan.x
                             translationY = pan.y
                         },
-                )
+                ) {
+                    AndroidView(factory = { ctx -> TextureView(ctx).also { p.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+                    if (skeleton) SkeletonOverlay(p)
+                }
             }
             Btn(Icons.Filled.Close, s.replayClose, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
             // Sul tabellone (TV o telefono-tabellone), alla stessa velocità; di nuovo per toglierla.
@@ -30047,6 +30971,25 @@ class ReplayActivity : ComponentActivity() {
                         syncBoard(p, !playing)
                     }
                     onTv = !onTv
+                }
+            }
+            // Analisi del servizio: scheletro sì o no e salto ai tre momenti chiave (fermo, per guardarli bene).
+            pose?.let { r ->
+                Row(
+                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(bottom = 64.dp)
+                        .background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Btn(Icons.Filled.AccessibilityNew, null, skeleton) { skeleton = !skeleton }
+                    r.metrics?.let { m ->
+                        for ((label, t) in listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT)) {
+                            Btn(null, label, false) {
+                                p.pause()
+                                playing = false
+                                seekAbs(p, poseAt + t)
+                            }
+                        }
+                    }
                 }
             }
             Row(
@@ -30108,6 +31051,9 @@ class ReplayActivity : ComponentActivity() {
         const val EXTRA_FILES = "files"
         /** true = mandarla subito anche al tabellone. */
         const val EXTRA_BOARD = "board"
+        /** Cartella della clip di un servizio analizzato (pose.json e starts.txt) e istante del servizio (ms). */
+        const val EXTRA_POSE_DIR = "pose_dir"
+        const val EXTRA_POSE_AT = "pose_at"
         private const val MAX_ZOOM = 6f
     }
 }
@@ -30319,11 +31265,15 @@ class ReplayRecorder(private val dir: File) : BaseRecordController() {
         }
         requestKeyFrame?.onRequestKeyFrame()
         out.mkdirs()
+        // Accanto ai pezzi, l'ora d'inizio di ciascuno: serve a ritrovare un istante preciso (analisi del servizio).
+        runCatching { File(out, STARTS).writeText(chosen.joinToString("\n") { it.startMs.toString() }) }
         return chosen.mapIndexed { i, s -> File(out, "part_$i.mp4").also { s.file.copyTo(it, overwrite = true) } }
     }
 
     companion object {
         private const val TAG = "Moviola"
+        /** File con l'ora d'inizio (ms, orologio del telefono) di ciascun pezzo copiato da [cutRange], uno per riga. */
+        const val STARTS = "starts.txt"
         /** Pezzi da 4 secondi: la moviola arriva entro un attimo e copre un punto intero. */
         const val SEGMENT_US = 4_000_000L
         /**
@@ -30411,6 +31361,379 @@ data class PointMark(
     /** Chi serviva il punto: 0/1, -1 = non si sa (si ricalcola dalle regole se ci sono). */
     val server: Int = -1,
 )
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ServeAnalysisActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ServeAnalysisActivity.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.ServeAttempt
+import com.tennis.scoremanager.data.ServeMetrics
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/**
+ * Analisi del movimento di una sessione di allenamento al servizio: per ogni servizio con la clip, i punti del corpo
+ * (MoveNet, sul telefono), le misure dei tre momenti chiave con le immagini, e il confronto tra dentro e fuori.
+ */
+class ServeAnalysisActivity : ComponentActivity() {
+    private val controller get() = (application as TsmApp).controller
+    private val s: Strings get() = stringsFor(controller.options.value.lang)
+    private val json = Json { ignoreUnknownKeys = true }
+
+    private val session = MutableStateFlow<ServeSession?>(null)
+    /** Risultati per clip (cartella), letti dai file o appena calcolati. */
+    private val results = MutableStateFlow<Map<String, ServePoseResult>>(emptyMap())
+    /** Avanzamento: servizio in analisi (da 1), quanti in tutto e frazione del servizio. */
+    private val progress = MutableStateFlow<Triple<Int, Int, Float>?>(null)
+    private var job: Job? = null
+    /** Modello sul telefono, avanzamento del download (null = fermo) ed eventuale errore. */
+    private val modelReady = MutableStateFlow(false)
+    private val modelProgress = MutableStateFlow<Float?>(null)
+    private val modelError = MutableStateFlow<String?>(null)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val id = intent.getStringExtra(EXTRA_ID).orEmpty()
+        modelReady.value = PoseModel.installed(this)
+        lifecycleScope.launch {
+            val sess = withContext(Dispatchers.IO) { controller.storage.loadServeSessions().firstOrNull { it.id == id } }
+            session.value = sess
+            if (sess != null) results.value = withContext(Dispatchers.IO) { loadResults(sess) }
+        }
+        setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
+    }
+
+    private fun dir(sess: ServeSession, a: ServeAttempt): File? = a.clip?.let { File(controller.storage.serveClipsDir(sess.id), it) }
+
+    private fun loadResults(sess: ServeSession): Map<String, ServePoseResult> = sess.serves.mapNotNull { a ->
+        val f = dir(sess, a)?.let { File(it, ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
+        runCatching { a.clip!! to json.decodeFromString(ServePoseResult.serializer(), f.readText()) }.getOrNull()
+    }.toMap()
+
+    /** Scarica il modello (una volta sola) e lo controlla; poi si può analizzare. */
+    private fun downloadModel() {
+        if (modelProgress.value != null) return
+        modelError.value = null
+        modelProgress.value = 0f
+        lifecycleScope.launch {
+            val r = withContext(Dispatchers.IO) { PoseModel.download(this@ServeAnalysisActivity) { modelProgress.value = it } }
+            modelProgress.value = null
+            when (r) {
+                PoseModel.Result.Ok -> modelReady.value = true
+                PoseModel.Result.Network -> modelError.value = s.poseModelFailed
+                PoseModel.Result.BadFile -> modelError.value = s.poseModelBad
+            }
+        }
+    }
+
+    /** Cancella i risultati di questa sessione (le clip restano) e rianalizza tutto. */
+    private fun redoAll() {
+        val sess = session.value ?: return
+        if (job?.isActive == true) return
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                for (a in sess.serves) {
+                    val d = dir(sess, a) ?: continue
+                    for (name in listOf(ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT)) File(d, name).delete()
+                }
+            }
+            results.value = emptyMap()
+            analyzeAll()
+        }
+    }
+
+    /** Analizza i servizi con la clip che non hanno ancora il risultato, uno alla volta. */
+    private fun analyzeAll() {
+        val sess = session.value ?: return
+        if (job?.isActive == true) return
+        val todo = sess.serves.filter { it.clip != null && it.clip !in results.value.keys }
+        if (todo.isEmpty()) return
+        job = lifecycleScope.launch {
+            withContext(Dispatchers.Default) {
+                runCatching {
+                    PoseAnalyzer(this@ServeAnalysisActivity).use { pose ->
+                        for ((n, a) in todo.withIndex()) {
+                            val d = dir(sess, a) ?: continue
+                            progress.value = Triple(n + 1, todo.size, 0f)
+                            val r = ServeClipAnalysis.analyze(pose, d, a.at, a.detected) { f -> progress.value = Triple(n + 1, todo.size, f) }
+                            runCatching { File(d, ServeClipAnalysis.RESULT).writeText(json.encodeToString(ServePoseResult.serializer(), r)) }
+                            results.value = results.value + (a.clip!! to r)
+                        }
+                    }
+                }.onFailure { Log.w("Analisi servizio", "analisi non riuscita", it) }
+            }
+            progress.value = null
+        }
+    }
+
+    @Composable
+    private fun Content() {
+        val str = s
+        val sess by session.collectAsState()
+        val res by results.collectAsState()
+        val prog by progress.collectAsState()
+        var open by remember { mutableStateOf<String?>(null) }
+        Column(
+            Modifier.fillMaxSize().background(TsmColors.Background).systemBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(str.poseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            Text(str.poseHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            val current = sess ?: return@Column
+            val withClip = current.serves.filter { it.clip != null }
+            val p = prog
+            val ready by modelReady.collectAsState()
+            val dl by modelProgress.collectAsState()
+            val err by modelError.collectAsState()
+            if (!PoseModel.supported()) {
+                Text(str.poseUnsupported, color = TsmColors.Orange)
+            } else if (!ready) {
+                // Il modello non è nell'app: si scarica qui, una volta sola, solo se lo si vuole.
+                SectionCard(str.poseModelTitle, Icons.Filled.Download) {
+                    Text(str.poseModelHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    val d = dl
+                    if (d != null) {
+                        Text(str.poseModelDownloading((d * 100).toInt()), color = TsmColors.TextMain)
+                        LinearProgressIndicator(progress = { d }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
+                    } else {
+                        BigButton(str.poseModelDownload, Icons.Filled.Download, { downloadModel() }, Modifier.fillMaxWidth())
+                    }
+                    err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                }
+            } else if (p != null) {
+                Text(str.poseAnalyzing(p.first, p.second), color = TsmColors.TextMain)
+                LinearProgressIndicator(progress = { (p.first - 1 + p.third) / p.second }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
+            } else if (withClip.any { it.clip !in res.keys }) {
+                BigButton(str.poseAnalyzeAll, Icons.Filled.Insights, { analyzeAll() }, Modifier.fillMaxWidth())
+            } else if (withClip.isNotEmpty()) {
+                Text(str.poseDone, color = TsmColors.Ok)
+                // Dopo un aggiornamento dell'app l'analisi può venire meglio: si rifà da capo.
+                GhostButton(str.poseRedo, Icons.Filled.Insights, { redoAll() }, Modifier.fillMaxWidth())
+            }
+            Comparison(current, res)
+            current.serves.forEachIndexed { i, a ->
+                ServeRow(current, i, a, a.clip?.let { res[it] }, open == a.clip) { open = if (open == a.clip) null else a.clip }
+            }
+            GhostButton(str.back, Icons.AutoMirrored.Filled.ArrowBack, { finish() }, Modifier.fillMaxWidth())
+            if (ready && p == null) {
+                androidx.compose.material3.TextButton(onClick = { PoseModel.delete(this@ServeAnalysisActivity); modelReady.value = false }) {
+                    Text(str.poseModelDelete, color = TsmColors.TextDim)
+                }
+            }
+        }
+    }
+
+    /** Medie dei servizi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
+    @Composable
+    private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>) {
+        val str = s
+        fun metricsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it]?.metrics } }
+        val ins = ServePose.mean(metricsOf(true))
+        val outs = ServePose.mean(metricsOf(false))
+        if (ins == null || outs == null) return
+        SectionCard(str.poseInVsOut, Icons.Filled.AccessibilityNew) {
+            Row(Modifier.fillMaxWidth()) {
+                Text("", modifier = Modifier.weight(2f))
+                Text("${str.serveIn} (${ins.n})", color = TsmColors.Ok, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("${str.serveOut} (${outs.n})", color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            }
+            for ((label, a, b) in listOf(
+                Triple(str.poseKneeMetric, deg(ins.kneeMinDeg), deg(outs.kneeMinDeg)),
+                Triple(str.poseElbowMetric, deg(ins.elbowContactDeg), deg(outs.elbowContactDeg)),
+                Triple(str.poseHeightMetric, "%.2f".format(ins.contactHeight), "%.2f".format(outs.contactHeight)),
+                Triple(str.poseTossMetric, deg(ins.tossArmDeg), deg(outs.tossArmDeg)),
+                Triple(str.poseTiltMetric, deg(ins.shoulderTiltDeg), deg(outs.shoulderTiltDeg)),
+                Triple(str.poseTimingMetric, "${ins.trophyToContactMs} ms", "${outs.trophyToContactMs} ms"),
+            )) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(2f))
+                    Text(a, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(b, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+
+    /** Un servizio: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
+    @Composable
+    private fun ServeRow(sess: ServeSession, index: Int, a: ServeAttempt, r: ServePoseResult?, expanded: Boolean, onToggle: () -> Unit) {
+        val str = s
+        val m = r?.metrics
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).clickable(enabled = r != null) { onToggle() }.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Row(Modifier.fillMaxWidth()) {
+                Text(str.poseServe(index + 1), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
+            }
+            when {
+                a.clip == null -> Text(str.poseNoClip, color = TsmColors.TextDim, fontSize = 13.sp)
+                r == null -> Unit
+                m == null -> Text(str.poseNoBody, color = TsmColors.Orange, fontSize = 13.sp)
+                else -> {
+                    if (!m.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
+                    if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
+                    Text("${str.poseKneeMetric} ${deg(m.kneeMinDeg)} · ${str.poseElbowMetric} ${deg(m.elbowContactDeg)}", color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (expanded) Details(sess, a, m)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Details(sess: ServeSession, a: ServeAttempt, m: ServeMetrics) {
+        val str = s
+        val d = dir(sess, a) ?: return
+        val images = remember(d) {
+            listOf(str.poseTrophy to ServeClipAnalysis.TROPHY, str.poseKnee to ServeClipAnalysis.KNEE, str.poseContact to ServeClipAnalysis.CONTACT)
+                .map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) }
+        }
+        // Il video della clip con lo scheletro sopra, nella moviola (rallentatore, fotogramma per fotogramma, zoom).
+        GhostButton(str.poseWatch, Icons.Filled.PlayCircle, {
+            val parts = d.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+            startActivity(
+                android.content.Intent(this, ReplayActivity::class.java)
+                    .putExtra(ReplayActivity.EXTRA_FILES, parts.map { it.absolutePath }.toTypedArray())
+                    .putExtra(ReplayActivity.EXTRA_POSE_DIR, d.absolutePath)
+                    .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at),
+            )
+        }, Modifier.fillMaxWidth())
+        Text(str.poseZoomHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        var zoomed by remember { mutableStateOf<Bitmap?>(null) }
+        for ((label, bmp) in images) {
+            Text(label, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            bmp?.let { b -> KeyImage(b) { zoomed = b } }
+        }
+        zoomed?.let { ZoomDialog(it) { zoomed = null } }
+        for ((label, v) in listOf(
+            str.poseKneeMetric to deg(m.kneeMinDeg),
+            str.poseElbowMetric to deg(m.elbowContactDeg),
+            str.poseHeightMetric to str.poseHeightValue("%.2f".format(m.contactHeight)),
+            str.poseTossMetric to deg(m.tossArmDeg),
+            str.poseTiltMetric to deg(m.shoulderTiltDeg),
+            str.poseTimingMetric to "${m.trophyToContactMs} ms",
+        )) {
+            Row(Modifier.fillMaxWidth()) {
+                Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text(v, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            }
+        }
+    }
+
+    @Composable
+    private fun KeyImage(bmp: Bitmap, onClick: () -> Unit) {
+        Image(
+            bmp.asImageBitmap(), null, contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxWidth().aspectRatio(bmp.width / bmp.height.toFloat()).clip(RoundedCornerShape(10.dp)).clickable { onClick() },
+        )
+    }
+
+    /** Immagine a tutto schermo: due dita per ingrandire (fino a 6×) e spostare, doppio tocco per tornare normale. */
+    @Composable
+    private fun ZoomDialog(bmp: Bitmap, onClose: () -> Unit) {
+        var zoom by remember { mutableStateOf(1f) }
+        var pan by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+        androidx.compose.ui.window.Dialog(onDismissRequest = onClose, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+            androidx.compose.foundation.layout.Box(
+                Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, move, scale, _ ->
+                            zoom = (zoom * scale).coerceIn(1f, 6f)
+                            val maxX = size.width * (zoom - 1) / 2
+                            val maxY = size.height * (zoom - 1) / 2
+                            pan = androidx.compose.ui.geometry.Offset((pan.x + move.x).coerceIn(-maxX, maxX), (pan.y + move.y).coerceIn(-maxY, maxY))
+                        }
+                    }
+                    .pointerInput(Unit) { detectTapGestures(onDoubleTap = { zoom = 1f; pan = androidx.compose.ui.geometry.Offset.Zero }, onTap = { if (zoom == 1f) onClose() }) },
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) {
+                Image(
+                    bmp.asImageBitmap(), null, contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(bmp.width / bmp.height.toFloat())
+                        .graphicsLayer { scaleX = zoom; scaleY = zoom; translationX = pan.x; translationY = pan.y },
+                )
+            }
+        }
+    }
+
+    private fun deg(v: Float) = "%.0f°".format(v)
+
+    override fun onDestroy() {
+        job?.cancel()
+        super.onDestroy()
+    }
+
+    companion object {
+        const val EXTRA_ID = "session"
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/StatsCardRenderer.kt
@@ -44387,6 +45710,98 @@ class RematchTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ServePoseTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ServePoseTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.data.ServePose.L_ANKLE
+import com.tennis.scoremanager.data.ServePose.L_ELBOW
+import com.tennis.scoremanager.data.ServePose.L_HIP
+import com.tennis.scoremanager.data.ServePose.L_KNEE
+import com.tennis.scoremanager.data.ServePose.L_SHOULDER
+import com.tennis.scoremanager.data.ServePose.L_WRIST
+import com.tennis.scoremanager.data.ServePose.NOSE
+import com.tennis.scoremanager.data.ServePose.R_ANKLE
+import com.tennis.scoremanager.data.ServePose.R_ELBOW
+import com.tennis.scoremanager.data.ServePose.R_HIP
+import com.tennis.scoremanager.data.ServePose.R_KNEE
+import com.tennis.scoremanager.data.ServePose.R_SHOULDER
+import com.tennis.scoremanager.data.ServePose.R_WRIST
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import kotlin.math.abs
+import kotlin.math.max
+
+class ServePoseTest {
+    /**
+     * Un servizio finto di un destro: lancio col sinistro in alto a -700 ms, ginocchia più piegate a -400 ms, impatto
+     * col braccio destro teso sopra la testa a 0 ms.
+     */
+    private fun serve(score: Float = 0.9f): List<PoseFrame> = (-1500L..300L step 100).map { t ->
+        val x = MutableList(17) { 0.5f }
+        val y = MutableList(17) { 0.5f }
+        fun p(i: Int, px: Float, py: Float) { x[i] = px; y[i] = py }
+        p(NOSE, 0.5f, 0.15f)
+        p(L_SHOULDER, 0.45f, 0.25f); p(R_SHOULDER, 0.55f, 0.25f)
+        p(L_HIP, 0.47f, 0.5f); p(R_HIP, 0.53f, 0.5f)
+        // Ginocchia: si spostano in avanti fino a -400 ms (la gamba si piega), poi tornano.
+        val bend = max(0f, 1f - abs(t + 400) / 500f) * 0.08f
+        p(L_KNEE, 0.47f + bend, 0.7f); p(R_KNEE, 0.53f + bend, 0.7f)
+        p(L_ANKLE, 0.47f, 0.9f); p(R_ANKLE, 0.53f, 0.9f)
+        // Braccio del lancio: sale dritto fino a -700 ms.
+        val toss = max(0f, 1f - abs(t + 700) / 600f)
+        p(L_ELBOW, 0.45f, 0.35f - toss * 0.2f); p(L_WRIST, 0.45f, 0.45f - toss * 0.45f)
+        // Braccio che colpisce: basso, poi a 0 ms disteso sopra la spalla, col polso che scatta in avanti (lo swing,
+        // più veloce proprio all'impatto).
+        val hit = max(0f, 1f - abs(t) / 400f)
+        val swing = 0.15f * t / (abs(t) + 100f)
+        p(R_ELBOW, 0.55f + swing / 2, 0.35f - hit * 0.3f); p(R_WRIST, 0.55f + swing, 0.45f - hit * 0.6f)
+        PoseFrame(t, x, y, List(17) { score })
+    }
+
+    @Test
+    fun findsTheThreeMomentsAndMeasures() {
+        val m = ServePose.metrics(serve())!!
+        assertTrue(m.rightHanded)
+        assertEquals(0L, m.contactT)
+        assertEquals(-700L, m.trophyT)
+        assertEquals(-400L, m.kneeT)
+        assertEquals(700L, m.trophyToContactMs)
+        assertEquals(180f, m.elbowContactDeg, 1f)
+        assertEquals(0f, m.tossArmDeg, 1f)
+        // Impatto a 0,15 sopra il naso: (0,9 + 0,15) / statura (0,75 / 0,89).
+        assertEquals(1.246f, m.contactHeight, 0.01f)
+        assertTrue("${m.kneeMinDeg}", m.kneeMinDeg < 170f)
+        assertTrue(m.reliable)
+    }
+
+    @Test
+    fun lowConfidenceIsNotReliable() {
+        val m = ServePose.metrics(serve(score = 0.35f))!!
+        assertTrue(!m.reliable)
+        assertNull(ServePose.mean(listOf(m)))
+        // Corpo non visto: niente misure.
+        assertNull(ServePose.metrics(serve(score = 0.1f)))
+        assertNull(ServePose.metrics(serve().take(3)))
+    }
+
+    @Test
+    fun anglesAndMeans() {
+        val f = serve().first { it.t == 0L }
+        assertEquals(180f, ServePose.angle(f, R_SHOULDER, R_ELBOW, R_WRIST), 0.5f)
+        val a = ServePose.metrics(serve())!!
+        val mean = ServePose.mean(listOf(a, a.copy(kneeMinDeg = a.kneeMinDeg - 20)))!!
+        assertEquals(2, mean.n)
+        assertEquals(a.kneeMinDeg - 10, mean.kneeMinDeg, 0.01f)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ServeTrainingTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ServeTrainingTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -47083,6 +48498,8 @@ junit = "4.13.2"
 zxing = "3.5.3"
 zxingEmbedded = "4.3.0"
 rootEncoder = "2.8.1"
+litertFdroid = "1.4.1-fdroid"
+litertApi = "1.4.1"
 media3 = "1.11.1"
 
 [libraries]
@@ -47102,6 +48519,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 rootencoder = { group = "com.github.pedroSG94.RootEncoder", name = "library", version.ref = "rootEncoder" }
+litert-fdroid = { group = "de.schliweb", name = "tensorflow-lite-fdroid", version.ref = "litertFdroid" }
+litert-api = { group = "com.google.ai.edge.litert", name = "litert-api", version.ref = "litertApi" }
 media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
 media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3" }
@@ -51139,6 +52558,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 157 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 162 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

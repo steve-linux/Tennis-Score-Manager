@@ -833,6 +833,40 @@ interface Strings {
     val servePlaceServer: String
     val servePlacePhone: String
     val servePlaceAlt: String
+    /** Analisi del movimento del servizio (posizione del corpo dalle clip). */
+    val poseTitle: String
+    val poseHint: String
+    val poseAnalyzeAll: String
+    val poseAnalyzing: (Int, Int) -> String
+    val poseNoBody: String
+    val poseUnreliable: String
+    val poseTrophy: String
+    val poseKnee: String
+    val poseContact: String
+    val poseKneeMetric: String
+    val poseElbowMetric: String
+    val poseHeightMetric: String
+    val poseTossMetric: String
+    val poseTiltMetric: String
+    val poseTimingMetric: String
+    val poseHeightValue: (String) -> String
+    val poseInVsOut: String
+    val poseServe: (Int) -> String
+    val poseNoClip: String
+    val poseDone: String
+    /** Modello MoveNet scaricato a richiesta. */
+    val poseModelTitle: String
+    val poseModelHint: String
+    val poseModelDownload: String
+    val poseModelDownloading: (Int) -> String
+    val poseModelFailed: String
+    val poseModelBad: String
+    val poseModelDelete: String
+    val poseUnsupported: String
+    val poseWatch: String
+    val poseManyPeople: (Int) -> String
+    val poseZoomHint: String
+    val poseRedo: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1827,6 +1861,38 @@ object ItStrings : Strings {
     override val servePlaceServer = "chi serve"
     override val servePlacePhone = "telefono"
     override val servePlaceAlt = "in alternativa"
+    override val poseTitle = "Analisi del movimento"
+    override val poseHint = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: caricamento, ginocchia più piegate e impatto. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi servizi dentro con quelli fuori."
+    override val poseAnalyzeAll = "Analizza i servizi"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analisi del servizio $a di $b…" }
+    override val poseNoBody = "Corpo non riconosciuto: inquadra tutta la persona, di lato, con buona luce."
+    override val poseUnreliable = "Misure poco sicure: il corpo si vede male"
+    override val poseTrophy = "Caricamento"
+    override val poseKnee = "Ginocchia"
+    override val poseContact = "Impatto"
+    override val poseKneeMetric = "Ginocchio più piegato"
+    override val poseElbowMetric = "Gomito all'impatto"
+    override val poseHeightMetric = "Altezza dell'impatto"
+    override val poseTossMetric = "Braccio del lancio (dalla verticale)"
+    override val poseTiltMetric = "Spalle al caricamento"
+    override val poseTimingMetric = "Dal caricamento all'impatto"
+    override val poseHeightValue: (String) -> String = { "$it × la statura" }
+    override val poseInVsOut = "Dentro e fuori a confronto"
+    override val poseServe: (Int) -> String = { "Servizio $it" }
+    override val poseNoClip = "Senza clip"
+    override val poseDone = "Analisi finita"
+    override val poseModelTitle = "Modello per riconoscere il corpo"
+    override val poseModelHint = "Per l'analisi serve il modello MoveNet di Google (7 MB, licenza Apache 2.0). Si scarica una volta sola dalla pagina del progetto su GitHub e resta sul telefono; le clip non lasciano mai il telefono."
+    override val poseModelDownload = "Scarica il modello (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Download del modello… $it%" }
+    override val poseModelFailed = "Download non riuscito: controlla la connessione e riprova."
+    override val poseModelBad = "Il file scaricato non è quello atteso e non è stato usato: riprova più tardi."
+    override val poseModelDelete = "Elimina il modello (7 MB)"
+    override val poseUnsupported = "L'analisi del movimento non è disponibile su questo dispositivo (processore x86)."
+    override val poseWatch = "Guarda il video con lo scheletro"
+    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi serve (controlla nelle immagini)." }
+    override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
+    override val poseRedo = "Rifai l'analisi"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2807,6 +2873,38 @@ object EnStrings : Strings {
     override val servePlaceServer = "server"
     override val servePlacePhone = "phone"
     override val servePlaceAlt = "alternative"
+    override val poseTitle = "Movement analysis"
+    override val poseHint = "The app finds the body position in the clips, all on the phone, and measures three moments: loading, deepest knee bend and contact. They are estimates from a side view: they are most useful to compare your serves in with your serves out."
+    override val poseAnalyzeAll = "Analyse the serves"
+    override val poseAnalyzing: (Int, Int) -> String = { a, b -> "Analysing serve $a of $b…" }
+    override val poseNoBody = "Body not recognised: frame the whole person, from the side, in good light."
+    override val poseUnreliable = "Unreliable measurements: the body is hard to see"
+    override val poseTrophy = "Loading"
+    override val poseKnee = "Knees"
+    override val poseContact = "Contact"
+    override val poseKneeMetric = "Deepest knee bend"
+    override val poseElbowMetric = "Elbow at contact"
+    override val poseHeightMetric = "Contact height"
+    override val poseTossMetric = "Tossing arm (from vertical)"
+    override val poseTiltMetric = "Shoulders at loading"
+    override val poseTimingMetric = "From loading to contact"
+    override val poseHeightValue: (String) -> String = { "$it × body height" }
+    override val poseInVsOut = "Ins and outs compared"
+    override val poseServe: (Int) -> String = { "Serve $it" }
+    override val poseNoClip = "No clip"
+    override val poseDone = "Analysis done"
+    override val poseModelTitle = "Model to recognise the body"
+    override val poseModelHint = "The analysis needs Google's MoveNet model (7 MB, Apache 2.0 licence). It is downloaded once from the project's GitHub page and stays on the phone; the clips never leave the phone."
+    override val poseModelDownload = "Download the model (7 MB)"
+    override val poseModelDownloading: (Int) -> String = { "Downloading the model… $it%" }
+    override val poseModelFailed = "Download failed: check the connection and try again."
+    override val poseModelBad = "The downloaded file is not the expected one and was not used: try again later."
+    override val poseModelDelete = "Delete the model (7 MB)"
+    override val poseUnsupported = "Movement analysis isn't available on this device (x86 processor)."
+    override val poseWatch = "Watch the video with the skeleton"
+    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the server was followed (check in the images)." }
+    override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
+    override val poseRedo = "Analyse again"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
