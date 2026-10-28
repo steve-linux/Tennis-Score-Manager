@@ -23,13 +23,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -37,6 +41,7 @@ import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
@@ -75,6 +80,8 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ui.CalibrationPanel
+import com.tennis.scoremanager.ui.CourtOutline
 import com.tennis.scoremanager.ui.FramingDialog
 import com.tennis.scoremanager.ui.HorizonOverlay
 import com.tennis.scoremanager.ui.LevelReadout
@@ -129,6 +136,11 @@ class CameraActivity : ComponentActivity() {
         }
     }
     private var lastTiltSent = 0L
+    /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
+    private val outlineOn = MutableStateFlow(false)
+    private val calibrating = MutableStateFlow(false)
+    private val calib = MutableStateFlow(Framing.Calib())
+    private var calibPlace: String? = null
     private var wasLevel = false
     private var previewJob: kotlinx.coroutines.Job? = null
 
@@ -168,12 +180,18 @@ class CameraActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         overlayOn.value = controller.storage.cameraOverlay
+        calib.value = controller.storage.framingCalib
         lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
         // Grafica: si ridisegna a ogni punteggio nuovo dal telefono dell'arbitro.
-        lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
+        lifecycleScope.launch {
+            controller.relay.score.collect {
+                updateOverlay()
+                loadCalibFor(it?.title.orEmpty())
+            }
+        }
         // Capitoli: i punti arrivati mentre si registra.
         lifecycleScope.launch {
             controller.relay.points.collect { p ->
@@ -188,7 +206,7 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch {
             kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
         }
-        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn) { _, _ -> Unit }.collect { sendState() } }
+        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn, outlineOn, calib) { _, _, _, _ -> Unit }.collect { sendState() } }
         // Livella: all'arbitro due volte al secondo; una vibrazione quando inclinazione e livella diventano giuste.
         lifecycleScope.launch {
             tiltSensor.tilt.collect { t ->
@@ -199,7 +217,7 @@ class CameraActivity : ComponentActivity() {
                     sendState()
                 }
                 val target = framingTarget()
-                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down - target) == 0)
+                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down + calib.value.pitchOffset - target) == 0)
                 if (ok && !wasLevel) buzz()
                 wasLevel = ok
             }
@@ -280,16 +298,18 @@ class CameraActivity : ComponentActivity() {
             CamCmd.LENS_NEXT -> if (lenses.size > 1) useLens((lensIndex.value + 1) % lenses.size)
             CamCmd.ASSIST_ON -> setLevel(true)
             CamCmd.ASSIST_OFF -> setLevel(false)
+            CamCmd.OUTLINE_ON -> setOutline(true)
+            CamCmd.OUTLINE_OFF -> setOutline(false)
+            CamCmd.CALIB -> m.calib?.let { setCalib(it) }
         }
     }
 
     // ---------------------------------------------------------------- assistente inquadratura e obiettivo
 
-    /** Inclinazione consigliata con le misure salvate e l'obiettivo in uso. */
+    /** Inclinazione consigliata con le misure della taratura e l'obiettivo in uso. */
     private fun framingTarget(): Float? {
-        val st = controller.storage
-        val court = runCatching { Framing.Court.valueOf(st.framingCourt) }.getOrDefault(Framing.Court.TENNIS_DOUBLES)
-        return Framing.plan(st.framingDistance, st.framingHeight, court, lenses.getOrNull(lensIndex.value)).tilt
+        val c = calib.value
+        return Framing.plan(c.distance, c.height, c.courtType, lenses.getOrNull(lensIndex.value)).tilt
     }
 
     private fun setLevel(on: Boolean) {
@@ -299,7 +319,46 @@ class CameraActivity : ComponentActivity() {
         }
         levelOn.value = on
         wasLevel = false
-        if (on) tiltSensor.start() else tiltSensor.stop()
+        updateSensor()
+    }
+
+    /** La sagoma segue l'inclinazione del telefono: serve il sensore anche a livella spenta. */
+    private fun setOutline(on: Boolean) {
+        if (on && !tiltSensor.available) {
+            message.value = s.assistNoSensor
+            return
+        }
+        outlineOn.value = on
+        if (!on) calibrating.value = false
+        updateSensor()
+    }
+
+    private var sensorOn = false
+
+    private fun updateSensor() {
+        val want = levelOn.value || outlineOn.value
+        if (want == sensorOn) return
+        sensorOn = want
+        if (want) tiltSensor.start() else tiltSensor.stop()
+    }
+
+    /** Nuova taratura: la usa subito, la ricorda come attuale e per il campo della partita (se si sa). */
+    private fun setCalib(c: Framing.Calib) {
+        calib.value = c
+        controller.storage.framingCalib = c
+        calibPlace?.let { controller.storage.saveFramingCalibFor(it, c) }
+    }
+
+    /** Arrivato il campo della partita: se lì c'è già una taratura, si riprende quella. */
+    private fun loadCalibFor(place: String) {
+        if (place.isBlank() || place == calibPlace) return
+        calibPlace = place
+        val saved = controller.storage.framingCalibFor(place) ?: return
+        if (saved != calib.value) {
+            calib.value = saved
+            controller.storage.framingCalib = saved
+            message.value = s.outlineLoaded(place)
+        }
     }
 
     private fun canChangeLens(): Boolean = !recording.value && live.value == LiveState.OFF
@@ -364,9 +423,13 @@ class CameraActivity : ComponentActivity() {
                 message = message.value,
                 lens = lensIndex.value,
                 lenses = lenses.size.coerceAtLeast(1),
-                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value },
-                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value },
+                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value || outlineOn.value },
+                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value || outlineOn.value },
                 tiltTarget = framingTarget()?.takeIf { levelOn.value },
+                outline = outlineOn.value,
+                calib = calib.value,
+                hFov = lenses.getOrNull(lensIndex.value)?.hFov,
+                vFov = lenses.getOrNull(lensIndex.value)?.vFov,
             ),
         )
     }
@@ -534,6 +597,9 @@ class CameraActivity : ComponentActivity() {
         var settings by remember { mutableStateOf(false) }
         var framing by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            // L'anteprima ha le proporzioni del video (16:9): quello che si vede è quello che si registra, e la sagoma
+            // del campo cade esattamente sulle linee.
+            Box(Modifier.align(Alignment.Center).fillMaxSize().wrapContentSize().aspectRatio(16f / 9f, matchHeightConstraintsFirst = true)) {
             AndroidView(factory = { ctx ->
                 SurfaceView(ctx).apply {
                     holder.addCallback(object : SurfaceHolder.Callback {
@@ -556,16 +622,24 @@ class CameraActivity : ComponentActivity() {
                     })
                 }
             }, modifier = Modifier.fillMaxSize())
+            Outline()
+            }
             Level()
             Controls(onSettings = { settings = true }, onFraming = { framing = true })
+            Calibration()
         }
         if (settings) StreamSettings { settings = false }
         if (framing) {
             val lv by levelOn.collectAsState()
             val li by lensIndex.collectAsState()
-            FramingDialog(controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) }) {
+            val ol by outlineOn.collectAsState()
+            FramingDialog(
+                controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) },
+                outlineOn = ol, onOutline = { on -> setOutline(on); calibrating.value = on },
+            ) {
                 framing = false
-                sendState()
+                // Distanza, altezza e campo scritti nella finestra fanno parte della taratura.
+                setCalib(controller.storage.framingCalib)
             }
         }
     }
@@ -580,7 +654,35 @@ class CameraActivity : ComponentActivity() {
         if (!on) return
         Box(Modifier.fillMaxSize()) {
             HorizonOverlay(tilt.roll)
-            LevelReadout(tilt.down, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+            LevelReadout(tilt.down + calib.collectAsState().value.pitchOffset, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+        }
+    }
+
+    /** Sagoma del campo sopra l'anteprima (non finisce nel video). */
+    @Composable
+    private fun Outline() {
+        val on by outlineOn.collectAsState()
+        val t by tiltSensor.tilt.collectAsState()
+        val c by calib.collectAsState()
+        val li by lensIndex.collectAsState()
+        val lens = lenses.getOrNull(li) ?: return
+        val tilt = t ?: return
+        if (on) CourtOutline(c, lens.hFov, lens.vFov, tilt.down, tilt.roll)
+    }
+
+    /** Cursori della taratura a sinistra, sopra l'anteprima: si vedono le linee spostarsi mentre li si muove. */
+    @Composable
+    private fun Calibration() {
+        val on by calibrating.collectAsState()
+        val c by calib.collectAsState()
+        if (!on) return
+        Column(
+            Modifier.fillMaxHeight().width(320.dp).background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                .verticalScroll(rememberScrollState()).padding(12.dp),
+        ) {
+            Text(s.outlineTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            CalibrationPanel(c, { setCalib(it) })
+            TextButton(onClick = { calibrating.value = false }) { Text(s.outlineDone) }
         }
     }
 
@@ -635,6 +737,10 @@ class CameraActivity : ComponentActivity() {
                     toggleLive(onSettings)
                 }
                 Btn(Icons.Filled.Straighten, str.assistButton, if (levelOn.collectAsState().value) TsmColors.Ok else TsmColors.SurfaceHigh) { onFraming() }
+                val ol by outlineOn.collectAsState()
+                Btn(Icons.Filled.GridOn, str.outlineButton, if (ol) TsmColors.Ok else TsmColors.SurfaceHigh) {
+                    if (ol && !calibrating.value) calibrating.value = true else { setOutline(!ol); calibrating.value = !ol }
+                }
                 val li by lensIndex.collectAsState()
                 if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 val ov by overlayOn.collectAsState()

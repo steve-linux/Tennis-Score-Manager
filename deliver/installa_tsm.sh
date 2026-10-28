@@ -7682,6 +7682,29 @@ class Storage(context: Context) {
     var framingCourt: String
         get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
         set(v) = prefs.edit().putString("framing_court", v).apply()
+    /** Taratura completa della sagoma (distanza, altezza e campo sono quelli qui sopra). */
+    var framingCalib: com.tennis.scoremanager.video.Framing.Calib
+        get() = com.tennis.scoremanager.video.Framing.Calib(
+            framingDistance, framingHeight, framingCourt,
+            prefs.getFloat("framing_pan", 0f), prefs.getFloat("framing_lateral", 0f),
+            prefs.getFloat("framing_fov", 1f), prefs.getFloat("framing_pitch_off", 0f),
+        )
+        set(v) {
+            prefs.edit().putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
+                .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
+                .putFloat("framing_pitch_off", v.pitchOffset).apply()
+        }
+
+    /** Taratura salvata per un campo ("Circolo · Campo" dal punteggio dell'arbitro), null se non c'è. */
+    fun framingCalibFor(place: String): com.tennis.scoremanager.video.Framing.Calib? =
+        prefs.getString("framing_calib_" + place.trim().lowercase(), null)?.let {
+            runCatching { json.decodeFromString(com.tennis.scoremanager.video.Framing.Calib.serializer(), it) }.getOrNull()
+        }
+
+    fun saveFramingCalibFor(place: String, c: com.tennis.scoremanager.video.Framing.Calib) {
+        if (place.isBlank()) return
+        prefs.edit().putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)).apply()
+    }
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
@@ -9210,9 +9233,9 @@ class PhoneRelay(
     private fun firstCamera(): Int? = cameraConns.firstOrNull { it in sats }
 
     /** Principale: un comando alla telecamera ([CamCmd]). false se non c'è nessuna telecamera. */
-    fun camCommand(cmd: String, zoom: Float? = null): Boolean {
+    fun camCommand(cmd: String, zoom: Float? = null, calib: com.tennis.scoremanager.video.Framing.Calib? = null): Boolean {
         val id = firstCamera() ?: return false
-        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom))
+        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom, calib = calib))
         return true
     }
 
@@ -9839,6 +9862,8 @@ data class RelayMsg(
     val zoom: Float? = null,
     /** Telecamera → principale: come sta (registrazione, diretta, zoom, batteria, spazio). */
     val cam: CamState? = null,
+    /** Principale → telecamera: la taratura della sagoma del campo, con [CamCmd.CALIB]. */
+    val calib: com.tennis.scoremanager.video.Framing.Calib? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -9907,6 +9932,10 @@ object CamCmd {
     /** Livella dell'assistente inquadratura accesa o spenta. */
     const val ASSIST_ON = "assist_on"
     const val ASSIST_OFF = "assist_off"
+    /** Sagoma del campo sull'anteprima accesa o spenta, e nuova taratura ([RelayMsg.calib]). */
+    const val OUTLINE_ON = "outline_on"
+    const val OUTLINE_OFF = "outline_off"
+    const val CALIB = "calib"
     const val PREVIEW_TTL_MS = 8_000L
 }
 
@@ -9939,6 +9968,14 @@ data class CamState(
     val tilt: Float? = null,
     val roll: Float? = null,
     val tiltTarget: Float? = null,
+    /**
+     * Sagoma del campo accesa: la taratura e il campo visivo dell'obiettivo in uso, per disegnarla uguale anche sul
+     * telefono dell'arbitro (con [tilt] e [roll], che ci sono anche a livella spenta).
+     */
+    val outline: Boolean = false,
+    val calib: com.tennis.scoremanager.video.Framing.Calib? = null,
+    val hFov: Float? = null,
+    val vFov: Float? = null,
 )
 
 object RelayCodec {
@@ -12364,6 +12401,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
@@ -12468,6 +12506,13 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                             Text("  " + s.camRemoteWaiting, color = TsmColors.TextDim, fontSize = 13.sp)
                         }
                     }
+                    // La sagoma del campo come sul telefono-telecamera: il fotogramma è il video, quindi 16:9 esatto.
+                    st?.let { cam ->
+                        val cal = cam.calib
+                        if (cam.outline && cal != null && cam.hFov != null && cam.vFov != null && cam.tilt != null && cam.roll != null && frame != null) {
+                            CourtOutline(cal, cam.hFov, cam.vFov, cam.tilt, cam.roll)
+                        }
+                    }
                     // Sopra l'immagine, come sul telefono-telecamera.
                     val cam = st
                     Row(Modifier.align(Alignment.TopStart).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -12503,11 +12548,17 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                     }
                 }
                 // Assistente inquadratura: la livella del telefono-telecamera, da guardare mentre lo si sistema in alto.
-                if (cam?.tilt != null && cam.roll != null) LevelReadout(cam.tilt, cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                if (cam?.tilt != null && cam.roll != null && cam.tiltTarget != null) {
+                    LevelReadout(cam.tilt + (cam.calib?.pitchOffset ?: 0f), cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val level = cam?.tilt != null
+                    val level = cam?.tiltTarget != null
                     Cmd(Icons.Filled.Straighten, if (level) s.assistHideLevel else s.assistShowLevel, if (level) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
                         c.relay.camCommand(if (level) CamCmd.ASSIST_OFF else CamCmd.ASSIST_ON)
+                    }
+                    val outline = cam?.outline == true
+                    Cmd(Icons.Filled.GridOn, s.outlineButton, if (outline) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (outline) CamCmd.OUTLINE_OFF else CamCmd.OUTLINE_ON)
                     }
                     if ((cam?.lenses ?: 1) > 1) {
                         Cmd(Icons.Filled.Cameraswitch, "${s.cameraLens}: ${lensName(s, cam!!.lens, cam.lenses)}", TsmColors.SurfaceHigh, enabled && !cam.recording && cam.live == 0, Modifier.weight(1f)) {
@@ -12515,11 +12566,33 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                         }
                     }
                 }
+                if (cam != null && cam.outline) cam.calib?.let { RemoteCalibration(c, it) }
                 if (cam != null && cam.zoomMax > cam.zoomMin) ZoomRow(c, cam.zoom, cam.zoomMin, cam.zoomMax)
                 Text(s.camRemoteHint, color = TsmColors.TextDim, fontSize = 12.sp)
             }
         }
     }
+}
+
+/**
+ * Taratura della sagoma dal telefono dell'arbitro. I cursori seguono una copia locale: quella che torna dalla
+ * telecamera la sostituisce solo quando non li si tocca da un po', così non saltano mentre li si muove.
+ */
+@Composable
+private fun RemoteCalibration(c: MatchController, remote: com.tennis.scoremanager.video.Framing.Calib) {
+    var local by remember { mutableStateOf(remote) }
+    var editedAt by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(remote) { if (SystemClock.elapsedRealtime() - editedAt > 1_500) local = remote }
+    // Al massimo 8 invii al secondo mentre si trascina.
+    LaunchedEffect(local) {
+        if (editedAt == 0L || local == remote) return@LaunchedEffect
+        delay(120)
+        c.relay.camCommand(CamCmd.CALIB, calib = local)
+    }
+    CalibrationPanel(local, {
+        local = it
+        editedAt = SystemClock.elapsedRealtime()
+    })
 }
 
 /** Zoom: cursore (il comando parte quando lo si lascia, per non intasare il Wi-Fi) e tasti − / +. */
@@ -13015,8 +13088,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -13031,6 +13107,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -13119,6 +13197,8 @@ fun FramingDialog(
     canChangeLens: Boolean,
     onUseLens: (Int) -> Unit,
     onLevel: (Boolean) -> Unit,
+    outlineOn: Boolean = false,
+    onOutline: ((Boolean) -> Unit)? = null,
     onDone: () -> Unit,
 ) {
     val s = LocalStrings.current
@@ -13171,6 +13251,10 @@ fun FramingDialog(
                     }
                 }
                 Text(s.assistCenter, fontSize = 12.sp, color = TsmColors.TextDim)
+                // Fase 2: la sagoma del campo da far combaciare con le linee vere (centratura compresa).
+                onOutline?.let { set ->
+                    GhostButton(if (outlineOn) s.outlineHide else s.outlineShow, Icons.Filled.GridOn, { set(!outlineOn); onDone() }, Modifier.fillMaxWidth())
+                }
             }
         },
         confirmButton = {
@@ -13183,6 +13267,58 @@ fun FramingDialog(
 }
 
 private fun trimNum(v: Float): String = if (v % 1f == 0f) v.toInt().toString() else "%.1f".format(v)
+
+/**
+ * Sagoma del campo sopra l'immagine 16:9 (anteprima della telecamera o fotogramma sul telefono dell'arbitro): le linee
+ * come le vedrebbe l'obiettivo con questa taratura e l'inclinazione letta adesso dal sensore.
+ */
+@Composable
+fun CourtOutline(calib: Framing.Calib, hFov: Float, vFov: Float, pitchDown: Float, roll: Float, modifier: Modifier = Modifier) {
+    val lines = Framing.project(calib, Framing.Lens("", hFov, vFov), pitchDown, roll)
+    Canvas(modifier.fillMaxSize()) {
+        val stroke = Stroke(width = 2.5f * density)
+        for (line in lines) {
+            val path = Path()
+            line.forEachIndexed { i, (x, y) ->
+                if (i == 0) path.moveTo(x * size.width, y * size.height) else path.lineTo(x * size.width, y * size.height)
+            }
+            drawPath(path, TsmColors.Ball.copy(alpha = 0.85f), style = stroke)
+        }
+    }
+}
+
+/**
+ * Cursori della taratura: [onChange] a ogni spostamento (il chiamante decide quanto spesso mandarla). In alto le
+ * misure del posto, sotto le correzioni fini.
+ */
+@Composable
+fun CalibrationPanel(calib: Framing.Calib, onChange: (Framing.Calib) -> Unit, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(s.outlineHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        CalibSlider(s.calibDistance, "%.1f m".format(calib.distance), calib.distance, 0.5f..20f) { onChange(calib.copy(distance = it)) }
+        CalibSlider(s.calibHeight, "%.1f m".format(calib.height), calib.height, 0.3f..8f) { onChange(calib.copy(height = it)) }
+        CalibSlider(s.calibPan, deg(calib.pan), calib.pan, -25f..25f) { onChange(calib.copy(pan = it)) }
+        CalibSlider(s.calibLateral, "%.1f m".format(calib.lateral), calib.lateral, -4f..4f) { onChange(calib.copy(lateral = it)) }
+        CalibSlider(s.calibFov, "%d %%".format((calib.fovScale * 100).toInt()), calib.fovScale, 0.8f..1.25f) { onChange(calib.copy(fovScale = it)) }
+        CalibSlider(s.calibPitch, deg(calib.pitchOffset), calib.pitchOffset, -6f..6f) { onChange(calib.copy(pitchOffset = it)) }
+        TextButton(onClick = { onChange(calib.copy(pan = 0f, lateral = 0f, fovScale = 1f, pitchOffset = 0f)) }) { Text(s.outlineReset) }
+    }
+}
+
+@Composable
+private fun CalibSlider(label: String, value: String, v: Float, range: ClosedFloatingPointRange<Float>, onChange: (Float) -> Unit) {
+    Column {
+        Row {
+            Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            Text(value, color = TsmColors.Ball, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+        Slider(
+            value = v.coerceIn(range), onValueChange = onChange, valueRange = range,
+            colors = SliderDefaults.colors(thumbColor = TsmColors.Ball, activeTrackColor = TsmColors.Ball),
+        )
+    }
+}
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
@@ -14233,6 +14369,21 @@ interface Strings {
     val lensWide: String
     val cameraLens: String
     val cameraLensBusy: String
+    /** Sagoma del campo sull'anteprima della telecamera e sua taratura. */
+    val outlineButton: String
+    val outlineTitle: String
+    val outlineShow: String
+    val outlineHide: String
+    val outlineHint: String
+    val calibDistance: String
+    val calibHeight: String
+    val calibPan: String
+    val calibLateral: String
+    val calibFov: String
+    val calibPitch: String
+    val outlineLoaded: (String) -> String
+    val outlineReset: String
+    val outlineDone: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -15159,6 +15310,20 @@ object ItStrings : Strings {
     override val lensWide = "grandangolo"
     override val cameraLens = "Obiettivo"
     override val cameraLensBusy = "Ferma registrazione e diretta per cambiare obiettivo."
+    override val outlineButton = "Sagoma"
+    override val outlineTitle = "Sagoma del campo"
+    override val outlineShow = "Mostra la sagoma del campo"
+    override val outlineHide = "Nascondi la sagoma"
+    override val outlineHint = "Sposta i cursori finché le linee disegnate coincidono con quelle vere: allora distanza, altezza e direzione sono quelle giuste e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per questo campo."
+    override val calibDistance = "Distanza"
+    override val calibHeight = "Altezza"
+    override val calibPan = "Direzione"
+    override val calibLateral = "Spostamento laterale"
+    override val calibFov = "Campo visivo"
+    override val calibPitch = "Correzione inclinazione"
+    override val outlineLoaded: (String) -> String = { "Taratura di $it ripresa" }
+    override val outlineReset = "Azzera le correzioni"
+    override val outlineDone = "Fine"
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -16056,6 +16221,20 @@ object EnStrings : Strings {
     override val lensWide = "wide"
     override val cameraLens = "Lens"
     override val cameraLensBusy = "Stop recording and live stream to change lens."
+    override val outlineButton = "Outline"
+    override val outlineTitle = "Court outline"
+    override val outlineShow = "Show the court outline"
+    override val outlineHide = "Hide the outline"
+    override val outlineHint = "Move the sliders until the drawn lines match the real ones: then distance, height and direction are right and the suggested tilt becomes accurate. The calibration is remembered for this court."
+    override val calibDistance = "Distance"
+    override val calibHeight = "Height"
+    override val calibPan = "Direction"
+    override val calibLateral = "Sideways offset"
+    override val calibFov = "Field of view"
+    override val calibPitch = "Tilt correction"
+    override val outlineLoaded: (String) -> String = { "Calibration for $it restored" }
+    override val outlineReset = "Reset corrections"
+    override val outlineDone = "Done"
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"
@@ -16976,6 +17155,20 @@ object DeStrings : Strings {
     override val lensWide = "Weitwinkel"
     override val cameraLens = "Objektiv"
     override val cameraLensBusy = "Aufnahme und Livestream beenden, um das Objektiv zu wechseln."
+    override val outlineButton = "Umriss"
+    override val outlineTitle = "Platzumriss"
+    override val outlineShow = "Platzumriss zeigen"
+    override val outlineHide = "Umriss ausblenden"
+    override val outlineHint = "Schieberegler bewegen, bis die gezeichneten Linien auf den echten liegen: Dann stimmen Abstand, Höhe und Richtung, und die empfohlene Neigung wird genau. Die Einstellung wird für diesen Platz gespeichert."
+    override val calibDistance = "Abstand"
+    override val calibHeight = "Höhe"
+    override val calibPan = "Richtung"
+    override val calibLateral = "Seitlicher Versatz"
+    override val calibFov = "Bildwinkel"
+    override val calibPitch = "Neigungskorrektur"
+    override val outlineLoaded: (String) -> String = { "Einstellung für $it übernommen" }
+    override val outlineReset = "Korrekturen zurücksetzen"
+    override val outlineDone = "Fertig"
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
@@ -17888,6 +18081,20 @@ object EsStrings : Strings {
     override val lensWide = "gran angular"
     override val cameraLens = "Objetivo"
     override val cameraLensBusy = "Para la grabación y el directo para cambiar de objetivo."
+    override val outlineButton = "Silueta"
+    override val outlineTitle = "Silueta de la pista"
+    override val outlineShow = "Mostrar la silueta de la pista"
+    override val outlineHide = "Ocultar la silueta"
+    override val outlineHint = "Mueve los controles hasta que las líneas dibujadas coincidan con las reales: entonces distancia, altura y dirección son correctas y la inclinación aconsejada se vuelve precisa. El ajuste se recuerda para esta pista."
+    override val calibDistance = "Distancia"
+    override val calibHeight = "Altura"
+    override val calibPan = "Dirección"
+    override val calibLateral = "Desplazamiento lateral"
+    override val calibFov = "Campo de visión"
+    override val calibPitch = "Corrección de inclinación"
+    override val outlineLoaded: (String) -> String = { "Ajuste de $it recuperado" }
+    override val outlineReset = "Poner a cero las correcciones"
+    override val outlineDone = "Listo"
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"
@@ -18804,6 +19011,20 @@ object FrStrings : Strings {
     override val lensWide = "grand-angle"
     override val cameraLens = "Objectif"
     override val cameraLensBusy = "Arrêtez l'enregistrement et le direct pour changer d'objectif."
+    override val outlineButton = "Tracé"
+    override val outlineTitle = "Tracé du terrain"
+    override val outlineShow = "Afficher le tracé du terrain"
+    override val outlineHide = "Masquer le tracé"
+    override val outlineHint = "Déplacez les curseurs jusqu'à ce que les lignes dessinées coïncident avec les vraies : distance, hauteur et direction sont alors justes et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour ce terrain."
+    override val calibDistance = "Distance"
+    override val calibHeight = "Hauteur"
+    override val calibPan = "Direction"
+    override val calibLateral = "Décalage latéral"
+    override val calibFov = "Champ de vision"
+    override val calibPitch = "Correction d'inclinaison"
+    override val outlineLoaded: (String) -> String = { "Réglage de $it repris" }
+    override val outlineReset = "Remettre à zéro les corrections"
+    override val outlineDone = "Terminé"
     override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Serveur RTMP"
     override val cameraStreamKey = "Clé de flux"
@@ -19719,6 +19940,20 @@ object PtStrings : Strings {
     override val lensWide = "grande-angular"
     override val cameraLens = "Lente"
     override val cameraLensBusy = "Pare a gravação e a transmissão para trocar de lente."
+    override val outlineButton = "Contorno"
+    override val outlineTitle = "Contorno da quadra"
+    override val outlineShow = "Mostrar o contorno da quadra"
+    override val outlineHide = "Esconder o contorno"
+    override val outlineHint = "Mova os controles até as linhas desenhadas coincidirem com as reais: então distância, altura e direção estão certas e a inclinação sugerida fica precisa. O ajuste é lembrado para esta quadra."
+    override val calibDistance = "Distância"
+    override val calibHeight = "Altura"
+    override val calibPan = "Direção"
+    override val calibLateral = "Deslocamento lateral"
+    override val calibFov = "Campo de visão"
+    override val calibPitch = "Correção da inclinação"
+    override val outlineLoaded: (String) -> String = { "Ajuste de $it recuperado" }
+    override val outlineReset = "Zerar as correções"
+    override val outlineDone = "Pronto"
     override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Chave da transmissão"
@@ -25922,13 +26157,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -25936,6 +26175,7 @@ import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
@@ -25974,6 +26214,8 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ui.CalibrationPanel
+import com.tennis.scoremanager.ui.CourtOutline
 import com.tennis.scoremanager.ui.FramingDialog
 import com.tennis.scoremanager.ui.HorizonOverlay
 import com.tennis.scoremanager.ui.LevelReadout
@@ -26028,6 +26270,11 @@ class CameraActivity : ComponentActivity() {
         }
     }
     private var lastTiltSent = 0L
+    /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
+    private val outlineOn = MutableStateFlow(false)
+    private val calibrating = MutableStateFlow(false)
+    private val calib = MutableStateFlow(Framing.Calib())
+    private var calibPlace: String? = null
     private var wasLevel = false
     private var previewJob: kotlinx.coroutines.Job? = null
 
@@ -26067,12 +26314,18 @@ class CameraActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         overlayOn.value = controller.storage.cameraOverlay
+        calib.value = controller.storage.framingCalib
         lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
         // Grafica: si ridisegna a ogni punteggio nuovo dal telefono dell'arbitro.
-        lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
+        lifecycleScope.launch {
+            controller.relay.score.collect {
+                updateOverlay()
+                loadCalibFor(it?.title.orEmpty())
+            }
+        }
         // Capitoli: i punti arrivati mentre si registra.
         lifecycleScope.launch {
             controller.relay.points.collect { p ->
@@ -26087,7 +26340,7 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch {
             kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
         }
-        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn) { _, _ -> Unit }.collect { sendState() } }
+        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn, outlineOn, calib) { _, _, _, _ -> Unit }.collect { sendState() } }
         // Livella: all'arbitro due volte al secondo; una vibrazione quando inclinazione e livella diventano giuste.
         lifecycleScope.launch {
             tiltSensor.tilt.collect { t ->
@@ -26098,7 +26351,7 @@ class CameraActivity : ComponentActivity() {
                     sendState()
                 }
                 val target = framingTarget()
-                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down - target) == 0)
+                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down + calib.value.pitchOffset - target) == 0)
                 if (ok && !wasLevel) buzz()
                 wasLevel = ok
             }
@@ -26179,16 +26432,18 @@ class CameraActivity : ComponentActivity() {
             CamCmd.LENS_NEXT -> if (lenses.size > 1) useLens((lensIndex.value + 1) % lenses.size)
             CamCmd.ASSIST_ON -> setLevel(true)
             CamCmd.ASSIST_OFF -> setLevel(false)
+            CamCmd.OUTLINE_ON -> setOutline(true)
+            CamCmd.OUTLINE_OFF -> setOutline(false)
+            CamCmd.CALIB -> m.calib?.let { setCalib(it) }
         }
     }
 
     // ---------------------------------------------------------------- assistente inquadratura e obiettivo
 
-    /** Inclinazione consigliata con le misure salvate e l'obiettivo in uso. */
+    /** Inclinazione consigliata con le misure della taratura e l'obiettivo in uso. */
     private fun framingTarget(): Float? {
-        val st = controller.storage
-        val court = runCatching { Framing.Court.valueOf(st.framingCourt) }.getOrDefault(Framing.Court.TENNIS_DOUBLES)
-        return Framing.plan(st.framingDistance, st.framingHeight, court, lenses.getOrNull(lensIndex.value)).tilt
+        val c = calib.value
+        return Framing.plan(c.distance, c.height, c.courtType, lenses.getOrNull(lensIndex.value)).tilt
     }
 
     private fun setLevel(on: Boolean) {
@@ -26198,7 +26453,46 @@ class CameraActivity : ComponentActivity() {
         }
         levelOn.value = on
         wasLevel = false
-        if (on) tiltSensor.start() else tiltSensor.stop()
+        updateSensor()
+    }
+
+    /** La sagoma segue l'inclinazione del telefono: serve il sensore anche a livella spenta. */
+    private fun setOutline(on: Boolean) {
+        if (on && !tiltSensor.available) {
+            message.value = s.assistNoSensor
+            return
+        }
+        outlineOn.value = on
+        if (!on) calibrating.value = false
+        updateSensor()
+    }
+
+    private var sensorOn = false
+
+    private fun updateSensor() {
+        val want = levelOn.value || outlineOn.value
+        if (want == sensorOn) return
+        sensorOn = want
+        if (want) tiltSensor.start() else tiltSensor.stop()
+    }
+
+    /** Nuova taratura: la usa subito, la ricorda come attuale e per il campo della partita (se si sa). */
+    private fun setCalib(c: Framing.Calib) {
+        calib.value = c
+        controller.storage.framingCalib = c
+        calibPlace?.let { controller.storage.saveFramingCalibFor(it, c) }
+    }
+
+    /** Arrivato il campo della partita: se lì c'è già una taratura, si riprende quella. */
+    private fun loadCalibFor(place: String) {
+        if (place.isBlank() || place == calibPlace) return
+        calibPlace = place
+        val saved = controller.storage.framingCalibFor(place) ?: return
+        if (saved != calib.value) {
+            calib.value = saved
+            controller.storage.framingCalib = saved
+            message.value = s.outlineLoaded(place)
+        }
     }
 
     private fun canChangeLens(): Boolean = !recording.value && live.value == LiveState.OFF
@@ -26263,9 +26557,13 @@ class CameraActivity : ComponentActivity() {
                 message = message.value,
                 lens = lensIndex.value,
                 lenses = lenses.size.coerceAtLeast(1),
-                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value },
-                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value },
+                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value || outlineOn.value },
+                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value || outlineOn.value },
                 tiltTarget = framingTarget()?.takeIf { levelOn.value },
+                outline = outlineOn.value,
+                calib = calib.value,
+                hFov = lenses.getOrNull(lensIndex.value)?.hFov,
+                vFov = lenses.getOrNull(lensIndex.value)?.vFov,
             ),
         )
     }
@@ -26433,6 +26731,9 @@ class CameraActivity : ComponentActivity() {
         var settings by remember { mutableStateOf(false) }
         var framing by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            // L'anteprima ha le proporzioni del video (16:9): quello che si vede è quello che si registra, e la sagoma
+            // del campo cade esattamente sulle linee.
+            Box(Modifier.align(Alignment.Center).fillMaxSize().wrapContentSize().aspectRatio(16f / 9f, matchHeightConstraintsFirst = true)) {
             AndroidView(factory = { ctx ->
                 SurfaceView(ctx).apply {
                     holder.addCallback(object : SurfaceHolder.Callback {
@@ -26455,16 +26756,24 @@ class CameraActivity : ComponentActivity() {
                     })
                 }
             }, modifier = Modifier.fillMaxSize())
+            Outline()
+            }
             Level()
             Controls(onSettings = { settings = true }, onFraming = { framing = true })
+            Calibration()
         }
         if (settings) StreamSettings { settings = false }
         if (framing) {
             val lv by levelOn.collectAsState()
             val li by lensIndex.collectAsState()
-            FramingDialog(controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) }) {
+            val ol by outlineOn.collectAsState()
+            FramingDialog(
+                controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) },
+                outlineOn = ol, onOutline = { on -> setOutline(on); calibrating.value = on },
+            ) {
                 framing = false
-                sendState()
+                // Distanza, altezza e campo scritti nella finestra fanno parte della taratura.
+                setCalib(controller.storage.framingCalib)
             }
         }
     }
@@ -26479,7 +26788,35 @@ class CameraActivity : ComponentActivity() {
         if (!on) return
         Box(Modifier.fillMaxSize()) {
             HorizonOverlay(tilt.roll)
-            LevelReadout(tilt.down, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+            LevelReadout(tilt.down + calib.collectAsState().value.pitchOffset, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+        }
+    }
+
+    /** Sagoma del campo sopra l'anteprima (non finisce nel video). */
+    @Composable
+    private fun Outline() {
+        val on by outlineOn.collectAsState()
+        val t by tiltSensor.tilt.collectAsState()
+        val c by calib.collectAsState()
+        val li by lensIndex.collectAsState()
+        val lens = lenses.getOrNull(li) ?: return
+        val tilt = t ?: return
+        if (on) CourtOutline(c, lens.hFov, lens.vFov, tilt.down, tilt.roll)
+    }
+
+    /** Cursori della taratura a sinistra, sopra l'anteprima: si vedono le linee spostarsi mentre li si muove. */
+    @Composable
+    private fun Calibration() {
+        val on by calibrating.collectAsState()
+        val c by calib.collectAsState()
+        if (!on) return
+        Column(
+            Modifier.fillMaxHeight().width(320.dp).background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.6f))
+                .verticalScroll(rememberScrollState()).padding(12.dp),
+        ) {
+            Text(s.outlineTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            CalibrationPanel(c, { setCalib(it) })
+            TextButton(onClick = { calibrating.value = false }) { Text(s.outlineDone) }
         }
     }
 
@@ -26534,6 +26871,10 @@ class CameraActivity : ComponentActivity() {
                     toggleLive(onSettings)
                 }
                 Btn(Icons.Filled.Straighten, str.assistButton, if (levelOn.collectAsState().value) TsmColors.Ok else TsmColors.SurfaceHigh) { onFraming() }
+                val ol by outlineOn.collectAsState()
+                Btn(Icons.Filled.GridOn, str.outlineButton, if (ol) TsmColors.Ok else TsmColors.SurfaceHigh) {
+                    if (ol && !calibrating.value) calibrating.value = true else { setOutline(!ol); calibrating.value = !ol }
+                }
                 val li by lensIndex.collectAsState()
                 if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 val ov by overlayOn.collectAsState()
@@ -26886,6 +27227,115 @@ object Framing {
     }
 
     const val TOLERANCE = 1f
+
+    // ---------------------------------------------------------------- sagoma del campo (fase 2)
+
+    /**
+     * Taratura: dove sta il telefono rispetto al centro della linea di fondo vicina ([distance] metri dietro,
+     * [height] da terra, [lateral] metri a destra), quanto è girato a destra ([pan] gradi), correzione del campo
+     * visivo ([fovScale], per lo stabilizzatore) e dell'inclinazione letta dal sensore ([pitchOffset] gradi).
+     * Quando la sagoma combacia con le linee vere, questi numeri descrivono davvero la ripresa.
+     */
+    @kotlinx.serialization.Serializable
+    data class Calib(
+        val distance: Float = 6f,
+        val height: Float = 2.5f,
+        val court: String = Court.TENNIS_DOUBLES.name,
+        val pan: Float = 0f,
+        val lateral: Float = 0f,
+        val fovScale: Float = 1f,
+        val pitchOffset: Float = 0f,
+    ) {
+        val courtType: Court get() = runCatching { Court.valueOf(court) }.getOrDefault(Court.TENNIS_DOUBLES)
+    }
+
+    /** Un punto del campo: x a destra dal centro, y in avanti dalla linea di fondo vicina, z in su (metri). */
+    data class P3(val x: Float, val y: Float, val z: Float = 0f)
+
+    /** Linee del campo da disegnare, come spezzate; la rete in alto (nastro) per riconoscerla. */
+    fun lines(court: Court): List<List<P3>> {
+        val l = court.length
+        val half = court.width / 2f
+        val net = l / 2f
+        fun seg(x1: Float, y1: Float, x2: Float, y2: Float) = listOf(P3(x1, y1), P3(x2, y2))
+        val out = mutableListOf(
+            seg(-half, 0f, half, 0f), seg(-half, l, half, l),
+            seg(-half, 0f, -half, l), seg(half, 0f, half, l),
+        )
+        when (court) {
+            Court.PADEL -> {
+                val sv = 6.95f
+                out += seg(-half, net - sv, half, net - sv)
+                out += seg(-half, net + sv, half, net + sv)
+                out += seg(0f, net - sv, 0f, net + sv)
+                out += listOf(P3(-half, net, 0.92f), P3(0f, net, 0.88f), P3(half, net, 0.92f))
+            }
+            else -> {
+                val single = 8.23f / 2f
+                val sv = 6.40f
+                if (court == Court.TENNIS_DOUBLES) {
+                    out += seg(-single, 0f, -single, l)
+                    out += seg(single, 0f, single, l)
+                }
+                out += seg(-single, net - sv, single, net - sv)
+                out += seg(-single, net + sv, single, net + sv)
+                out += seg(0f, net - sv, 0f, net + sv)
+                // Segni centrali sulle linee di fondo.
+                out += seg(0f, 0f, 0f, 0.1f)
+                out += seg(0f, l, 0f, l - 0.1f)
+                // Nastro della rete: 1,07 m ai pali (0,914 m fuori dal doppio), 0,914 m al centro.
+                val post = 10.97f / 2f + 0.914f
+                out += listOf(P3(-post, net, 1.07f), P3(0f, net, 0.914f), P3(post, net, 1.07f))
+            }
+        }
+        return out
+    }
+
+    /**
+     * Le linee di [lines] viste dalla fotocamera: punti in frazioni dell'immagine 16:9 (0..1, y in giù), spezzate dove
+     * finiscono dietro l'obiettivo. [pitchDown] e [roll] sono quelli letti dal sensore (la taratura li corregge).
+     */
+    fun project(calib: Calib, lens: Lens, pitchDown: Float, roll: Float): List<List<Pair<Float, Float>>> {
+        val yaw = rad(calib.pan)
+        val p = rad(pitchDown + calib.pitchOffset)
+        val rl = rad(roll)
+        val f = floatArrayOf(sin(yaw) * cos(p), cos(yaw) * cos(p), -sin(p))
+        val r0 = floatArrayOf(cos(yaw), -sin(yaw), 0f)
+        val u0 = cross(r0, f)
+        // Telefono girato in senso orario: la destra dell'immagine scende.
+        val r = FloatArray(3) { r0[it] * cos(rl) - u0[it] * sin(rl) }
+        val u = FloatArray(3) { u0[it] * cos(rl) + r0[it] * sin(rl) }
+        val tx = kotlin.math.tan(rad(lens.hFov * calib.fovScale) / 2f)
+        val ty = kotlin.math.tan(rad(lens.vFov * calib.fovScale) / 2f)
+        val c = floatArrayOf(calib.lateral, -calib.distance, calib.height)
+        val out = mutableListOf<List<Pair<Float, Float>>>()
+        for (line in lines(calib.courtType)) {
+            var cur = mutableListOf<Pair<Float, Float>>()
+            for (k in 0 until line.size - 1) {
+                val a = line[k]
+                val b = line[k + 1]
+                // A pezzi: una linea vicina alla fotocamera può finire in parte dietro, e i pezzi davanti restano.
+                val steps = 24
+                for (i in 0..steps) {
+                    if (k > 0 && i == 0) continue
+                    val t = i / steps.toFloat()
+                    val v = floatArrayOf(a.x + (b.x - a.x) * t - c[0], a.y + (b.y - a.y) * t - c[1], a.z + (b.z - a.z) * t - c[2])
+                    val z = dot(v, f)
+                    if (z < 0.2f) {
+                        if (cur.size > 1) out += cur
+                        cur = mutableListOf()
+                        continue
+                    }
+                    cur += (0.5f + dot(v, r) / z / (2f * tx)) to (0.5f - dot(v, u) / z / (2f * ty))
+                }
+            }
+            if (cur.size > 1) out += cur
+        }
+        return out
+    }
+
+    private fun cross(a: FloatArray, b: FloatArray) = floatArrayOf(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+    private fun dot(a: FloatArray, b: FloatArray) = a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 
     private fun deg(r: Float) = Math.toDegrees(r.toDouble()).toFloat()
     private fun rad(d: Float) = Math.toRadians(d.toDouble()).toFloat()
@@ -43523,8 +43973,8 @@ class StringsTest {
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
-            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", uguali in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 48)
+            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 52)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -43738,6 +44188,41 @@ class FramingTest {
         assertEquals(0, Framing.grade(0.8f))
         assertEquals(1, Framing.grade(-2.5f))
         assertEquals(2, Framing.grade(4f))
+    }
+
+    private fun centerOfNet(calib: Framing.Calib): Float =
+        Math.toDegrees(kotlin.math.atan(calib.height / (calib.distance + 23.77f / 2f)).toDouble()).toFloat()
+
+    @Test
+    fun aimedPointIsInTheMiddle() {
+        val calib = Framing.Calib(distance = 6f, height = 3f, court = "TENNIS_DOUBLES")
+        val lines = Framing.project(calib, wide, centerOfNet(calib), 0f)
+        // La linea centrale del servizio passa per il centro dell'immagine (la rete a terra è lì).
+        val center = lines.flatten().minBy { (x, y) -> (x - 0.5f) * (x - 0.5f) + (y - 0.5f) * (y - 0.5f) }
+        assertEquals(0.5f, center.first, 0.01f)
+        assertEquals(0.5f, center.second, 0.02f)
+        // Linea di fondo vicina: simmetrica e più in basso del centro; quella lontana più in alto.
+        val near = lines.first()
+        assertEquals(1f, near.first().first + near.last().first, 0.01f)
+        assertTrue(near.first().second > 0.5f)
+        assertTrue(lines[1].first().second < 0.5f)
+    }
+
+    @Test
+    fun panAndRollMoveTheOutline() {
+        val calib = Framing.Calib(distance = 6f, height = 3f)
+        val pitch = centerOfNet(calib)
+        fun netCenter(c: Framing.Calib, roll: Float) = Framing.project(c, wide, pitch, roll).flatten()
+            .minBy { (x, y) -> (x - 0.5f) * (x - 0.5f) + (y - 0.5f) * (y - 0.5f) }
+        // Telefono girato a destra: il campo si sposta a sinistra nell'immagine.
+        val panned = Framing.project(calib.copy(pan = 5f), wide, pitch, 0f)
+        assertTrue(panned.first().let { it.first().first + it.last().first } < 1f)
+        // Telefono ruotato in senso orario: la linea di fondo vicina sale a destra (y più piccolo a destra).
+        val near = Framing.project(calib, wide, pitch, 3f).first()
+        assertTrue(near.last().second < near.first().second)
+        assertEquals(0.5f, netCenter(calib, 3f).first, 0.02f)
+        // La linea vicina con un telefono a 1 m: in parte dietro l'obiettivo, ma i pezzi davanti restano.
+        assertTrue(Framing.project(Framing.Calib(distance = 0.5f, height = 1f), wide, 60f, 0f).isNotEmpty())
     }
 }
 TSM_EOF

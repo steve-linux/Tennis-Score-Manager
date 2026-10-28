@@ -17,8 +17,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -33,6 +36,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -121,6 +126,8 @@ fun FramingDialog(
     canChangeLens: Boolean,
     onUseLens: (Int) -> Unit,
     onLevel: (Boolean) -> Unit,
+    outlineOn: Boolean = false,
+    onOutline: ((Boolean) -> Unit)? = null,
     onDone: () -> Unit,
 ) {
     val s = LocalStrings.current
@@ -173,6 +180,10 @@ fun FramingDialog(
                     }
                 }
                 Text(s.assistCenter, fontSize = 12.sp, color = TsmColors.TextDim)
+                // Fase 2: la sagoma del campo da far combaciare con le linee vere (centratura compresa).
+                onOutline?.let { set ->
+                    GhostButton(if (outlineOn) s.outlineHide else s.outlineShow, Icons.Filled.GridOn, { set(!outlineOn); onDone() }, Modifier.fillMaxWidth())
+                }
             }
         },
         confirmButton = {
@@ -185,3 +196,55 @@ fun FramingDialog(
 }
 
 private fun trimNum(v: Float): String = if (v % 1f == 0f) v.toInt().toString() else "%.1f".format(v)
+
+/**
+ * Sagoma del campo sopra l'immagine 16:9 (anteprima della telecamera o fotogramma sul telefono dell'arbitro): le linee
+ * come le vedrebbe l'obiettivo con questa taratura e l'inclinazione letta adesso dal sensore.
+ */
+@Composable
+fun CourtOutline(calib: Framing.Calib, hFov: Float, vFov: Float, pitchDown: Float, roll: Float, modifier: Modifier = Modifier) {
+    val lines = Framing.project(calib, Framing.Lens("", hFov, vFov), pitchDown, roll)
+    Canvas(modifier.fillMaxSize()) {
+        val stroke = Stroke(width = 2.5f * density)
+        for (line in lines) {
+            val path = Path()
+            line.forEachIndexed { i, (x, y) ->
+                if (i == 0) path.moveTo(x * size.width, y * size.height) else path.lineTo(x * size.width, y * size.height)
+            }
+            drawPath(path, TsmColors.Ball.copy(alpha = 0.85f), style = stroke)
+        }
+    }
+}
+
+/**
+ * Cursori della taratura: [onChange] a ogni spostamento (il chiamante decide quanto spesso mandarla). In alto le
+ * misure del posto, sotto le correzioni fini.
+ */
+@Composable
+fun CalibrationPanel(calib: Framing.Calib, onChange: (Framing.Calib) -> Unit, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(s.outlineHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        CalibSlider(s.calibDistance, "%.1f m".format(calib.distance), calib.distance, 0.5f..20f) { onChange(calib.copy(distance = it)) }
+        CalibSlider(s.calibHeight, "%.1f m".format(calib.height), calib.height, 0.3f..8f) { onChange(calib.copy(height = it)) }
+        CalibSlider(s.calibPan, deg(calib.pan), calib.pan, -25f..25f) { onChange(calib.copy(pan = it)) }
+        CalibSlider(s.calibLateral, "%.1f m".format(calib.lateral), calib.lateral, -4f..4f) { onChange(calib.copy(lateral = it)) }
+        CalibSlider(s.calibFov, "%d %%".format((calib.fovScale * 100).toInt()), calib.fovScale, 0.8f..1.25f) { onChange(calib.copy(fovScale = it)) }
+        CalibSlider(s.calibPitch, deg(calib.pitchOffset), calib.pitchOffset, -6f..6f) { onChange(calib.copy(pitchOffset = it)) }
+        TextButton(onClick = { onChange(calib.copy(pan = 0f, lateral = 0f, fovScale = 1f, pitchOffset = 0f)) }) { Text(s.outlineReset) }
+    }
+}
+
+@Composable
+private fun CalibSlider(label: String, value: String, v: Float, range: ClosedFloatingPointRange<Float>, onChange: (Float) -> Unit) {
+    Column {
+        Row {
+            Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            Text(value, color = TsmColors.Ball, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        }
+        Slider(
+            value = v.coerceIn(range), onValueChange = onChange, valueRange = range,
+            colors = SliderDefaults.colors(thumbColor = TsmColors.Ball, activeTrackColor = TsmColors.Ball),
+        )
+    }
+}

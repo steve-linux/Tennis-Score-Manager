@@ -82,8 +82,8 @@ class StringsTest {
             val same = t.filter { (k, v) -> v == en[k] && v.any { c -> c.isLetter() } && v.trim().length > 3 }.keys
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
-            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", uguali in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 48)
+            // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 52)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }

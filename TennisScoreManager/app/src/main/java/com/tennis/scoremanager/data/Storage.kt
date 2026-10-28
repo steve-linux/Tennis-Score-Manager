@@ -232,6 +232,29 @@ class Storage(context: Context) {
     var framingCourt: String
         get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
         set(v) = prefs.edit().putString("framing_court", v).apply()
+    /** Taratura completa della sagoma (distanza, altezza e campo sono quelli qui sopra). */
+    var framingCalib: com.tennis.scoremanager.video.Framing.Calib
+        get() = com.tennis.scoremanager.video.Framing.Calib(
+            framingDistance, framingHeight, framingCourt,
+            prefs.getFloat("framing_pan", 0f), prefs.getFloat("framing_lateral", 0f),
+            prefs.getFloat("framing_fov", 1f), prefs.getFloat("framing_pitch_off", 0f),
+        )
+        set(v) {
+            prefs.edit().putFloat("framing_distance", v.distance).putFloat("framing_height", v.height).putString("framing_court", v.court)
+                .putFloat("framing_pan", v.pan).putFloat("framing_lateral", v.lateral).putFloat("framing_fov", v.fovScale)
+                .putFloat("framing_pitch_off", v.pitchOffset).apply()
+        }
+
+    /** Taratura salvata per un campo ("Circolo · Campo" dal punteggio dell'arbitro), null se non c'è. */
+    fun framingCalibFor(place: String): com.tennis.scoremanager.video.Framing.Calib? =
+        prefs.getString("framing_calib_" + place.trim().lowercase(), null)?.let {
+            runCatching { json.decodeFromString(com.tennis.scoremanager.video.Framing.Calib.serializer(), it) }.getOrNull()
+        }
+
+    fun saveFramingCalibFor(place: String, c: com.tennis.scoremanager.video.Framing.Calib) {
+        if (place.isBlank()) return
+        prefs.edit().putString("framing_calib_" + place.trim().lowercase(), json.encodeToString(com.tennis.scoremanager.video.Framing.Calib.serializer(), c)).apply()
+    }
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }

@@ -379,9 +379,9 @@ class PhoneRelay(
     private fun firstCamera(): Int? = cameraConns.firstOrNull { it in sats }
 
     /** Principale: un comando alla telecamera ([CamCmd]). false se non c'è nessuna telecamera. */
-    fun camCommand(cmd: String, zoom: Float? = null): Boolean {
+    fun camCommand(cmd: String, zoom: Float? = null, calib: com.tennis.scoremanager.video.Framing.Calib? = null): Boolean {
         val id = firstCamera() ?: return false
-        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom))
+        send(id, RelayMsg(RelayMsg.CAM_CMD, cmd = cmd, zoom = zoom, calib = calib))
         return true
     }
 

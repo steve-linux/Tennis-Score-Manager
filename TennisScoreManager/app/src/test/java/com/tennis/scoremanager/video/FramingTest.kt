@@ -65,4 +65,39 @@ class FramingTest {
         assertEquals(1, Framing.grade(-2.5f))
         assertEquals(2, Framing.grade(4f))
     }
+
+    private fun centerOfNet(calib: Framing.Calib): Float =
+        Math.toDegrees(kotlin.math.atan(calib.height / (calib.distance + 23.77f / 2f)).toDouble()).toFloat()
+
+    @Test
+    fun aimedPointIsInTheMiddle() {
+        val calib = Framing.Calib(distance = 6f, height = 3f, court = "TENNIS_DOUBLES")
+        val lines = Framing.project(calib, wide, centerOfNet(calib), 0f)
+        // La linea centrale del servizio passa per il centro dell'immagine (la rete a terra è lì).
+        val center = lines.flatten().minBy { (x, y) -> (x - 0.5f) * (x - 0.5f) + (y - 0.5f) * (y - 0.5f) }
+        assertEquals(0.5f, center.first, 0.01f)
+        assertEquals(0.5f, center.second, 0.02f)
+        // Linea di fondo vicina: simmetrica e più in basso del centro; quella lontana più in alto.
+        val near = lines.first()
+        assertEquals(1f, near.first().first + near.last().first, 0.01f)
+        assertTrue(near.first().second > 0.5f)
+        assertTrue(lines[1].first().second < 0.5f)
+    }
+
+    @Test
+    fun panAndRollMoveTheOutline() {
+        val calib = Framing.Calib(distance = 6f, height = 3f)
+        val pitch = centerOfNet(calib)
+        fun netCenter(c: Framing.Calib, roll: Float) = Framing.project(c, wide, pitch, roll).flatten()
+            .minBy { (x, y) -> (x - 0.5f) * (x - 0.5f) + (y - 0.5f) * (y - 0.5f) }
+        // Telefono girato a destra: il campo si sposta a sinistra nell'immagine.
+        val panned = Framing.project(calib.copy(pan = 5f), wide, pitch, 0f)
+        assertTrue(panned.first().let { it.first().first + it.last().first } < 1f)
+        // Telefono ruotato in senso orario: la linea di fondo vicina sale a destra (y più piccolo a destra).
+        val near = Framing.project(calib, wide, pitch, 3f).first()
+        assertTrue(near.last().second < near.first().second)
+        assertEquals(0.5f, netCenter(calib, 3f).first, 0.02f)
+        // La linea vicina con un telefono a 1 m: in parte dietro l'obiettivo, ma i pezzi davanti restano.
+        assertTrue(Framing.project(Framing.Calib(distance = 0.5f, height = 1f), wide, 60f, 0f).isNotEmpty())
+    }
 }

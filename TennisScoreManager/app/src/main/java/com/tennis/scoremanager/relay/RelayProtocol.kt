@@ -77,6 +77,8 @@ data class RelayMsg(
     val zoom: Float? = null,
     /** Telecamera → principale: come sta (registrazione, diretta, zoom, batteria, spazio). */
     val cam: CamState? = null,
+    /** Principale → telecamera: la taratura della sagoma del campo, con [CamCmd.CALIB]. */
+    val calib: com.tennis.scoremanager.video.Framing.Calib? = null,
 ) {
     companion object {
         const val HELLO = "hello"
@@ -145,6 +147,10 @@ object CamCmd {
     /** Livella dell'assistente inquadratura accesa o spenta. */
     const val ASSIST_ON = "assist_on"
     const val ASSIST_OFF = "assist_off"
+    /** Sagoma del campo sull'anteprima accesa o spenta, e nuova taratura ([RelayMsg.calib]). */
+    const val OUTLINE_ON = "outline_on"
+    const val OUTLINE_OFF = "outline_off"
+    const val CALIB = "calib"
     const val PREVIEW_TTL_MS = 8_000L
 }
 
@@ -177,6 +183,14 @@ data class CamState(
     val tilt: Float? = null,
     val roll: Float? = null,
     val tiltTarget: Float? = null,
+    /**
+     * Sagoma del campo accesa: la taratura e il campo visivo dell'obiettivo in uso, per disegnarla uguale anche sul
+     * telefono dell'arbitro (con [tilt] e [roll], che ci sono anche a livella spenta).
+     */
+    val outline: Boolean = false,
+    val calib: com.tennis.scoremanager.video.Framing.Calib? = null,
+    val hFov: Float? = null,
+    val vFov: Float? = null,
 )
 
 object RelayCodec {

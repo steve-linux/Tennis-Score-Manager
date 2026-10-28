@@ -229,6 +229,21 @@ interface Strings {
     val lensWide: String
     val cameraLens: String
     val cameraLensBusy: String
+    /** Sagoma del campo sull'anteprima della telecamera e sua taratura. */
+    val outlineButton: String
+    val outlineTitle: String
+    val outlineShow: String
+    val outlineHide: String
+    val outlineHint: String
+    val calibDistance: String
+    val calibHeight: String
+    val calibPan: String
+    val calibLateral: String
+    val calibFov: String
+    val calibPitch: String
+    val outlineLoaded: (String) -> String
+    val outlineReset: String
+    val outlineDone: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -1155,6 +1170,20 @@ object ItStrings : Strings {
     override val lensWide = "grandangolo"
     override val cameraLens = "Obiettivo"
     override val cameraLensBusy = "Ferma registrazione e diretta per cambiare obiettivo."
+    override val outlineButton = "Sagoma"
+    override val outlineTitle = "Sagoma del campo"
+    override val outlineShow = "Mostra la sagoma del campo"
+    override val outlineHide = "Nascondi la sagoma"
+    override val outlineHint = "Sposta i cursori finché le linee disegnate coincidono con quelle vere: allora distanza, altezza e direzione sono quelle giuste e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per questo campo."
+    override val calibDistance = "Distanza"
+    override val calibHeight = "Altezza"
+    override val calibPan = "Direzione"
+    override val calibLateral = "Spostamento laterale"
+    override val calibFov = "Campo visivo"
+    override val calibPitch = "Correzione inclinazione"
+    override val outlineLoaded: (String) -> String = { "Taratura di $it ripresa" }
+    override val outlineReset = "Azzera le correzioni"
+    override val outlineDone = "Fine"
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -2052,6 +2081,20 @@ object EnStrings : Strings {
     override val lensWide = "wide"
     override val cameraLens = "Lens"
     override val cameraLensBusy = "Stop recording and live stream to change lens."
+    override val outlineButton = "Outline"
+    override val outlineTitle = "Court outline"
+    override val outlineShow = "Show the court outline"
+    override val outlineHide = "Hide the outline"
+    override val outlineHint = "Move the sliders until the drawn lines match the real ones: then distance, height and direction are right and the suggested tilt becomes accurate. The calibration is remembered for this court."
+    override val calibDistance = "Distance"
+    override val calibHeight = "Height"
+    override val calibPan = "Direction"
+    override val calibLateral = "Sideways offset"
+    override val calibFov = "Field of view"
+    override val calibPitch = "Tilt correction"
+    override val outlineLoaded: (String) -> String = { "Calibration for $it restored" }
+    override val outlineReset = "Reset corrections"
+    override val outlineDone = "Done"
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"

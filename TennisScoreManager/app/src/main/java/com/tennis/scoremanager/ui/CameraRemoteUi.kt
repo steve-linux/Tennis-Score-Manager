@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
@@ -121,6 +122,13 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                             Text("  " + s.camRemoteWaiting, color = TsmColors.TextDim, fontSize = 13.sp)
                         }
                     }
+                    // La sagoma del campo come sul telefono-telecamera: il fotogramma è il video, quindi 16:9 esatto.
+                    st?.let { cam ->
+                        val cal = cam.calib
+                        if (cam.outline && cal != null && cam.hFov != null && cam.vFov != null && cam.tilt != null && cam.roll != null && frame != null) {
+                            CourtOutline(cal, cam.hFov, cam.vFov, cam.tilt, cam.roll)
+                        }
+                    }
                     // Sopra l'immagine, come sul telefono-telecamera.
                     val cam = st
                     Row(Modifier.align(Alignment.TopStart).padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -156,11 +164,17 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                     }
                 }
                 // Assistente inquadratura: la livella del telefono-telecamera, da guardare mentre lo si sistema in alto.
-                if (cam?.tilt != null && cam.roll != null) LevelReadout(cam.tilt, cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                if (cam?.tilt != null && cam.roll != null && cam.tiltTarget != null) {
+                    LevelReadout(cam.tilt + (cam.calib?.pitchOffset ?: 0f), cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val level = cam?.tilt != null
+                    val level = cam?.tiltTarget != null
                     Cmd(Icons.Filled.Straighten, if (level) s.assistHideLevel else s.assistShowLevel, if (level) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
                         c.relay.camCommand(if (level) CamCmd.ASSIST_OFF else CamCmd.ASSIST_ON)
+                    }
+                    val outline = cam?.outline == true
+                    Cmd(Icons.Filled.GridOn, s.outlineButton, if (outline) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (outline) CamCmd.OUTLINE_OFF else CamCmd.OUTLINE_ON)
                     }
                     if ((cam?.lenses ?: 1) > 1) {
                         Cmd(Icons.Filled.Cameraswitch, "${s.cameraLens}: ${lensName(s, cam!!.lens, cam.lenses)}", TsmColors.SurfaceHigh, enabled && !cam.recording && cam.live == 0, Modifier.weight(1f)) {
@@ -168,11 +182,33 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                         }
                     }
                 }
+                if (cam != null && cam.outline) cam.calib?.let { RemoteCalibration(c, it) }
                 if (cam != null && cam.zoomMax > cam.zoomMin) ZoomRow(c, cam.zoom, cam.zoomMin, cam.zoomMax)
                 Text(s.camRemoteHint, color = TsmColors.TextDim, fontSize = 12.sp)
             }
         }
     }
+}
+
+/**
+ * Taratura della sagoma dal telefono dell'arbitro. I cursori seguono una copia locale: quella che torna dalla
+ * telecamera la sostituisce solo quando non li si tocca da un po', così non saltano mentre li si muove.
+ */
+@Composable
+private fun RemoteCalibration(c: MatchController, remote: com.tennis.scoremanager.video.Framing.Calib) {
+    var local by remember { mutableStateOf(remote) }
+    var editedAt by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(remote) { if (SystemClock.elapsedRealtime() - editedAt > 1_500) local = remote }
+    // Al massimo 8 invii al secondo mentre si trascina.
+    LaunchedEffect(local) {
+        if (editedAt == 0L || local == remote) return@LaunchedEffect
+        delay(120)
+        c.relay.camCommand(CamCmd.CALIB, calib = local)
+    }
+    CalibrationPanel(local, {
+        local = it
+        editedAt = SystemClock.elapsedRealtime()
+    })
 }
 
 /** Zoom: cursore (il comando parte quando lo si lascia, per non intasare il Wi-Fi) e tasti − / +. */
