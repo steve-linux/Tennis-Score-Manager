@@ -377,8 +377,8 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #done { font-size: min(calc(4.8 * var(--vh)), calc(2.8 * var(--vw))); color: var(--cyan); white-space: nowrap; overflow: hidden; align-self: center; letter-spacing: .02em; }
   #clock { height: 78%; width: auto; align-self: end; }
   #fc { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
-  /* Prima della partita, sopra il circolo: nome dell'app e indirizzo del sito (durante il gioco non c'è). */
-  #brand { display: none; font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #8A8E95; white-space: nowrap; overflow: hidden; max-width: 100%; letter-spacing: .04em; padding-bottom: calc(1 * var(--vh)); }
+  /* Prima della partita, sopra il circolo: l'indirizzo del sito, che ha già il nome dell'app (durante il gioco non c'è). */
+  #brand { display: none; font-size: min(calc(4.2 * var(--vh)), calc(2.4 * var(--vw))); color: #8A8E95; white-space: nowrap; overflow: hidden; max-width: 100%; letter-spacing: .04em; padding-bottom: calc(1 * var(--vh)); }
   #brand b { color: var(--ball); font-weight: 700; }
   body.pre #brand { display: block; }
   #title { font-size: min(calc(3.2 * var(--vh)), calc(1.9 * var(--vw))); color: #6B6F75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .04em; padding-bottom: calc(.6 * var(--vh)); }
@@ -428,7 +428,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   </div>
   <div id="foot">
     <div id="fl"><div id="done"></div><svg id="clock"></svg></div>
-    <div id="fc"><div id="brand">Tennis Score Manager · <b>tennis-score-manager.netlify.app</b></div><div id="title"></div></div>
+    <div id="fc"><div id="brand"><b>tennis-score-manager.netlify.app</b></div><div id="title"></div></div>
     <div id="fr"><div id="msg"></div><div id="timer"></div></div>
   </div>
 </div>
