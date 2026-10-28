@@ -198,6 +198,37 @@ interface Strings {
     val camRemoteBattery: (Int) -> String
     val camRemoteFree: (String) -> String
     val cameraNoStreamKey: String
+    /** Assistente inquadratura (telefono-telecamera) e scelta dell'obiettivo. */
+    val assistTitle: String
+    val assistButton: String
+    val assistHint: String
+    val assistDistance: String
+    val assistHeight: String
+    val assistCourt: String
+    val courtTennisSingles: String
+    val courtTennisDoubles: String
+    val courtPadel: String
+    val assistTiltIs: (String) -> String
+    val assistFitsWith: (String) -> String
+    val assistCornersOut: (String) -> String
+    val assistMinDistance: (String, String) -> String
+    val assistTooTall: String
+    val assistUseLens: (String) -> String
+    val assistShowLevel: String
+    val assistHideLevel: String
+    val assistPitch: String
+    val assistLevel: String
+    val assistAimLower: (String) -> String
+    val assistAimHigher: (String) -> String
+    val assistTurnCw: (String) -> String
+    val assistTurnCcw: (String) -> String
+    val assistOk: String
+    val assistNoSensor: String
+    val assistCenter: String
+    val lensMain: String
+    val lensWide: String
+    val cameraLens: String
+    val cameraLensBusy: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -1094,6 +1125,36 @@ object ItStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Batteria $it%" }
     override val camRemoteFree: (String) -> String = { "Libero $it" }
     override val cameraNoStreamKey = "Manca la chiave della diretta: mettila sul telefono-telecamera (Impostazioni)."
+    override val assistTitle = "Assistente inquadratura"
+    override val assistButton = "Inquadra"
+    override val assistHint = "Dove hai messo il telefono: l'app calcola l'inclinazione che tiene nel video tutte e due le linee di fondo e il giocatore lontano, e dice quale obiettivo usare."
+    override val assistDistance = "Distanza dietro la linea di fondo (m)"
+    override val assistHeight = "Altezza dell'obiettivo da terra (m)"
+    override val assistCourt = "Campo"
+    override val courtTennisSingles = "Tennis singolare"
+    override val courtTennisDoubles = "Tennis doppio"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Inclinazione consigliata: $it verso il basso" }
+    override val assistFitsWith: (String) -> String = { "Ci sta tutto il campo con l'obiettivo $it." }
+    override val assistCornersOut: (String) -> String = { "Gli angoli vicini del campo restano fuori anche con l'obiettivo $it: allontana il telefono dalla linea di fondo." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Con l'obiettivo $a servono almeno $b dietro la linea di fondo." }
+    override val assistTooTall = "In altezza non ci sta tutto: allontana il telefono o alzalo."
+    override val assistUseLens: (String) -> String = { "Usa l'obiettivo $it" }
+    override val assistShowLevel = "Mostra la livella"
+    override val assistHideLevel = "Nascondi la livella"
+    override val assistPitch = "Inclinazione"
+    override val assistLevel = "Livella"
+    override val assistAimLower: (String) -> String = { "punta più in basso di $it" }
+    override val assistAimHigher: (String) -> String = { "punta più in alto di $it" }
+    override val assistTurnCw: (String) -> String = { "gira in senso orario di $it" }
+    override val assistTurnCcw: (String) -> String = { "gira in senso antiorario di $it" }
+    override val assistOk = "a posto"
+    override val assistNoSensor = "Questo telefono non ha il sensore di gravità: la livella non c'è."
+    override val assistCenter = "Destra e sinistra i sensori non le sanno: guarda sull'anteprima che la rete sia al centro."
+    override val lensMain = "principale"
+    override val lensWide = "grandangolo"
+    override val cameraLens = "Obiettivo"
+    override val cameraLensBusy = "Ferma registrazione e diretta per cambiare obiettivo."
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -1961,6 +2022,36 @@ object EnStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Battery $it%" }
     override val camRemoteFree: (String) -> String = { "Free $it" }
     override val cameraNoStreamKey = "No live stream key: set it on the camera phone (Settings)."
+    override val assistTitle = "Framing assistant"
+    override val assistButton = "Framing"
+    override val assistHint = "Where you put the phone: the app works out the tilt that keeps both baselines and the far player in the video, and tells you which lens to use."
+    override val assistDistance = "Distance behind the baseline (m)"
+    override val assistHeight = "Lens height above the ground (m)"
+    override val assistCourt = "Court"
+    override val courtTennisSingles = "Tennis singles"
+    override val courtTennisDoubles = "Tennis doubles"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Suggested tilt: $it downwards" }
+    override val assistFitsWith: (String) -> String = { "The whole court fits with the $it lens." }
+    override val assistCornersOut: (String) -> String = { "The near corners of the court stay out even with the $it lens: move the phone further back from the baseline." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "With the $a lens you need at least $b behind the baseline." }
+    override val assistTooTall = "Not everything fits vertically: move the phone back or raise it."
+    override val assistUseLens: (String) -> String = { "Use the $it lens" }
+    override val assistShowLevel = "Show the level"
+    override val assistHideLevel = "Hide the level"
+    override val assistPitch = "Tilt"
+    override val assistLevel = "Level"
+    override val assistAimLower: (String) -> String = { "aim $it lower" }
+    override val assistAimHigher: (String) -> String = { "aim $it higher" }
+    override val assistTurnCw: (String) -> String = { "turn $it clockwise" }
+    override val assistTurnCcw: (String) -> String = { "turn $it anticlockwise" }
+    override val assistOk = "OK"
+    override val assistNoSensor = "This phone has no gravity sensor: no level."
+    override val assistCenter = "The sensors can't tell left from right: check on the preview that the net is in the middle."
+    override val lensMain = "main"
+    override val lensWide = "wide"
+    override val cameraLens = "Lens"
+    override val cameraLensBusy = "Stop recording and live stream to change lens."
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"

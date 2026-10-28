@@ -34,6 +34,8 @@
     <!-- Telefono-telecamera: video e audio della partita (registrazione e diretta) -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Assistente inquadratura: una vibrazione quando il telefono è in posizione. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="tiramisu" />

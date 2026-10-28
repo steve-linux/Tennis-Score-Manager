@@ -218,6 +218,20 @@ class Storage(context: Context) {
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+    /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
+    var cameraLensId: String?
+        get() = prefs.getString("camera_lens", null)
+        set(v) = prefs.edit().putString("camera_lens", v).apply()
+    /** Assistente inquadratura: metri dietro la linea di fondo, metri da terra, campo (Framing.Court). */
+    var framingDistance: Float
+        get() = prefs.getFloat("framing_distance", 6f)
+        set(v) = prefs.edit().putFloat("framing_distance", v).apply()
+    var framingHeight: Float
+        get() = prefs.getFloat("framing_height", 2.5f)
+        set(v) = prefs.edit().putFloat("framing_height", v).apply()
+    var framingCourt: String
+        get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
+        set(v) = prefs.edit().putString("framing_court", v).apply()
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }

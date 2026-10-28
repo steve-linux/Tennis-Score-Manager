@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
@@ -151,6 +153,19 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                     val ov = cam?.overlay == true
                     Cmd(Icons.Filled.Layers, s.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
                         c.relay.camCommand(if (ov) CamCmd.OVERLAY_OFF else CamCmd.OVERLAY_ON)
+                    }
+                }
+                // Assistente inquadratura: la livella del telefono-telecamera, da guardare mentre lo si sistema in alto.
+                if (cam?.tilt != null && cam.roll != null) LevelReadout(cam.tilt, cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val level = cam?.tilt != null
+                    Cmd(Icons.Filled.Straighten, if (level) s.assistHideLevel else s.assistShowLevel, if (level) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (level) CamCmd.ASSIST_OFF else CamCmd.ASSIST_ON)
+                    }
+                    if ((cam?.lenses ?: 1) > 1) {
+                        Cmd(Icons.Filled.Cameraswitch, "${s.cameraLens}: ${lensName(s, cam!!.lens, cam.lenses)}", TsmColors.SurfaceHigh, enabled && !cam.recording && cam.live == 0, Modifier.weight(1f)) {
+                            c.relay.camCommand(CamCmd.LENS_NEXT)
+                        }
                     }
                 }
                 if (cam != null && cam.zoomMax > cam.zoomMin) ZoomRow(c, cam.zoom, cam.zoomMin, cam.zoomMax)

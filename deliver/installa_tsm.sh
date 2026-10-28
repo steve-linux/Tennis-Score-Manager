@@ -202,6 +202,8 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <!-- Telefono-telecamera: video e audio della partita (registrazione e diretta) -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Assistente inquadratura: una vibrazione quando il telefono è in posizione. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="tiramisu" />
@@ -7666,6 +7668,20 @@ class Storage(context: Context) {
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+    /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
+    var cameraLensId: String?
+        get() = prefs.getString("camera_lens", null)
+        set(v) = prefs.edit().putString("camera_lens", v).apply()
+    /** Assistente inquadratura: metri dietro la linea di fondo, metri da terra, campo (Framing.Court). */
+    var framingDistance: Float
+        get() = prefs.getFloat("framing_distance", 6f)
+        set(v) = prefs.edit().putFloat("framing_distance", v).apply()
+    var framingHeight: Float
+        get() = prefs.getFloat("framing_height", 2.5f)
+        set(v) = prefs.edit().putFloat("framing_height", v).apply()
+    var framingCourt: String
+        get() = prefs.getString("framing_court", null) ?: "TENNIS_DOUBLES"
+        set(v) = prefs.edit().putString("framing_court", v).apply()
 
     private fun read(s: String?): SetupData? =
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
@@ -9886,6 +9902,11 @@ object CamCmd {
     const val OVERLAY_ON = "overlay_on"
     const val OVERLAY_OFF = "overlay_off"
     const val ZOOM = "zoom"
+    /** Obiettivo successivo (principale → grandangolo → …). */
+    const val LENS_NEXT = "lens_next"
+    /** Livella dell'assistente inquadratura accesa o spenta. */
+    const val ASSIST_ON = "assist_on"
+    const val ASSIST_OFF = "assist_off"
     const val PREVIEW_TTL_MS = 8_000L
 }
 
@@ -9908,6 +9929,16 @@ data class CamState(
     val freeMb: Long? = null,
     /** Ultimo messaggio della telecamera (salvato, diretta non riuscita…), da mostrare anche all'arbitro. */
     val message: String? = null,
+    /** Obiettivo in uso ([lens] da 0, 0 = principale) su [lenses]. */
+    val lens: Int = 0,
+    val lenses: Int = 1,
+    /**
+     * Assistente inquadratura acceso: gradi verso il basso ([tilt]) e di rotazione oraria ([roll]) del telefono, e
+     * inclinazione consigliata ([tiltTarget]). null = livella spenta.
+     */
+    val tilt: Float? = null,
+    val roll: Float? = null,
+    val tiltTarget: Float? = null,
 )
 
 object RelayCodec {
@@ -12331,11 +12362,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
@@ -12467,6 +12500,19 @@ fun CameraRemoteDialog(c: MatchController, onClose: () -> Unit) {
                     val ov = cam?.overlay == true
                     Cmd(Icons.Filled.Layers, s.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
                         c.relay.camCommand(if (ov) CamCmd.OVERLAY_OFF else CamCmd.OVERLAY_ON)
+                    }
+                }
+                // Assistente inquadratura: la livella del telefono-telecamera, da guardare mentre lo si sistema in alto.
+                if (cam?.tilt != null && cam.roll != null) LevelReadout(cam.tilt, cam.roll, cam.tiltTarget, Modifier.fillMaxWidth())
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val level = cam?.tilt != null
+                    Cmd(Icons.Filled.Straighten, if (level) s.assistHideLevel else s.assistShowLevel, if (level) TsmColors.Ok else TsmColors.SurfaceHigh, enabled, Modifier.weight(1f)) {
+                        c.relay.camCommand(if (level) CamCmd.ASSIST_OFF else CamCmd.ASSIST_ON)
+                    }
+                    if ((cam?.lenses ?: 1) > 1) {
+                        Cmd(Icons.Filled.Cameraswitch, "${s.cameraLens}: ${lensName(s, cam!!.lens, cam.lenses)}", TsmColors.SurfaceHigh, enabled && !cam.recording && cam.live == 0, Modifier.weight(1f)) {
+                            c.relay.camCommand(CamCmd.LENS_NEXT)
+                        }
                     }
                 }
                 if (cam != null && cam.zoomMax > cam.zoomMin) ZoomRow(c, cam.zoom, cam.zoomMin, cam.zoomMax)
@@ -12946,6 +12992,197 @@ fun <T> Picker(label: String, value: String, options: List<Pair<T, String>>, ena
         }
     }
 }
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/FramingUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/FramingUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.video.Framing
+
+/** Colore di quanto si è lontani dal giusto: verde a posto, arancione poco, rosso da correggere. */
+fun gradeColor(grade: Int): Color = when (grade) {
+    0 -> TsmColors.Ok
+    1 -> TsmColors.Orange
+    else -> TsmColors.Danger
+}
+
+private fun deg(v: Float) = "%.1f°".format(v)
+
+/** Nome dell'obiettivo [index] (0 = principale, poi i grandangoli dal meno al più largo). */
+fun lensName(s: Strings, index: Int, count: Int): String = when {
+    index == 0 -> s.lensMain
+    count > 2 -> "${s.lensWide} $index"
+    else -> s.lensWide
+}
+
+/**
+ * Livella: inclinazione rispetto a quella consigliata ([target], null se non calcolata) e rotazione laterale, coi
+ * consigli in parole. Si usa sull'anteprima del telefono-telecamera e nel riquadro Telecamera dell'arbitro.
+ */
+@Composable
+fun LevelReadout(tilt: Float, roll: Float, target: Float?, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+    val pitchErr = target?.let { tilt - it }
+    val pg = pitchErr?.let { Framing.grade(it) } ?: 0
+    val rg = Framing.grade(roll)
+    Column(
+        modifier.clip(RoundedCornerShape(12.dp)).background(Color.Black.copy(alpha = 0.55f)).padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        val pitchHint = when {
+            pitchErr == null -> null
+            pg == 0 -> s.assistOk
+            pitchErr < 0 -> s.assistAimLower(deg(-pitchErr))
+            else -> s.assistAimHigher(deg(pitchErr))
+        }
+        Text(
+            "${s.assistPitch} ${deg(tilt)}" + (target?.let { " → ${deg(it)}" } ?: "") + (pitchHint?.let { " · $it" } ?: ""),
+            color = if (target == null) TsmColors.TextMain else gradeColor(pg), fontWeight = FontWeight.Bold, fontSize = 14.sp,
+        )
+        val rollHint = when {
+            rg == 0 -> s.assistOk
+            roll > 0 -> s.assistTurnCcw(deg(roll))
+            else -> s.assistTurnCw(deg(-roll))
+        }
+        Text("${s.assistLevel} ${deg(roll)} · $rollHint", color = gradeColor(rg), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+    }
+}
+
+/**
+ * L'orizzonte vero sull'anteprima: una linea che resta orizzontale nel mondo mentre il telefono gira, con due tacche
+ * fisse ai lati dello schermo. Quando la linea passa sulle tacche il telefono è dritto.
+ */
+@Composable
+fun HorizonOverlay(roll: Float, modifier: Modifier = Modifier) {
+    val color = gradeColor(Framing.grade(roll))
+    Canvas(modifier.fillMaxSize()) {
+        val c = Offset(size.width / 2, size.height / 2)
+        val half = size.width * 0.35f
+        val tick = size.width * 0.06f
+        drawLine(Color.White.copy(alpha = 0.7f), Offset(0f, c.y), Offset(tick, c.y), strokeWidth = 4f)
+        drawLine(Color.White.copy(alpha = 0.7f), Offset(size.width - tick, c.y), Offset(size.width, c.y), strokeWidth = 4f)
+        rotate(-roll, c) {
+            drawLine(color, Offset(c.x - half, c.y), Offset(c.x + half, c.y), strokeWidth = 5f)
+        }
+    }
+}
+
+/**
+ * Impostazioni dell'assistente: dove sta il telefono e su che campo. Mostra subito inclinazione consigliata,
+ * se il campo ci sta con l'obiettivo in uso e quale conviene; [onUseLens] passa a quello consigliato.
+ */
+@Composable
+fun FramingDialog(
+    storage: com.tennis.scoremanager.data.Storage,
+    lenses: List<Framing.Lens>,
+    lensIndex: Int,
+    levelOn: Boolean,
+    canChangeLens: Boolean,
+    onUseLens: (Int) -> Unit,
+    onLevel: (Boolean) -> Unit,
+    onDone: () -> Unit,
+) {
+    val s = LocalStrings.current
+    var dText by remember { mutableStateOf(trimNum(storage.framingDistance)) }
+    var hText by remember { mutableStateOf(trimNum(storage.framingHeight)) }
+    var court by remember { mutableStateOf(runCatching { Framing.Court.valueOf(storage.framingCourt) }.getOrDefault(Framing.Court.TENNIS_DOUBLES)) }
+    fun dist(t: String) = t.replace(',', '.').toFloatOrNull()?.takeIf { it in 0.3f..60f }
+    fun high(t: String) = t.replace(',', '.').toFloatOrNull()?.takeIf { it in 0.3f..20f }
+    val d = dist(dText)
+    val h = high(hText)
+    AlertDialog(
+        onDismissRequest = onDone,
+        icon = { Icon(Icons.Filled.Straighten, null, tint = TsmColors.Ball) },
+        title = { Text(s.assistTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.assistHint, fontSize = 13.sp, color = TsmColors.TextDim)
+                val num = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                OutlinedTextField(dText, { dText = it; dist(it)?.let { v -> storage.framingDistance = v } }, label = { Text(s.assistDistance) }, singleLine = true, keyboardOptions = num, isError = d == null, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(hText, { hText = it; high(it)?.let { v -> storage.framingHeight = v } }, label = { Text(s.assistHeight) }, singleLine = true, keyboardOptions = num, isError = h == null, modifier = Modifier.fillMaxWidth())
+                Text(s.assistCourt, fontSize = 13.sp, color = TsmColors.TextDim)
+                val courts = Framing.Court.entries
+                Segmented(
+                    courts.map { SegOption(when (it) { Framing.Court.TENNIS_SINGLES -> s.courtTennisSingles; Framing.Court.TENNIS_DOUBLES -> s.courtTennisDoubles; Framing.Court.PADEL -> s.courtPadel }) },
+                    courts.indexOf(court),
+                    { court = courts[it]; storage.framingCourt = court.name },
+                    columns = 3,
+                )
+                if (d != null && h != null) {
+                    val lens = lenses.getOrNull(lensIndex)
+                    val p = Framing.plan(d, h, court, lens)
+                    Text(s.assistTiltIs(deg(p.tilt)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    val name = lensName(s, lensIndex, lenses.size)
+                    when {
+                        lens == null -> Unit
+                        p.fits -> Text(s.assistFitsWith(name), color = TsmColors.Ok, fontSize = 13.sp)
+                        !p.fitsV -> Text(s.assistTooTall, color = TsmColors.Orange, fontSize = 13.sp)
+                        else -> {
+                            Text(s.assistCornersOut(name), color = TsmColors.Orange, fontSize = 13.sp)
+                            Framing.minDistance(h, court, lens)?.let { m ->
+                                Text(s.assistMinDistance(name, "%.1f m".format(m)), color = TsmColors.TextDim, fontSize = 13.sp)
+                            }
+                        }
+                    }
+                    // Il consigliato: il più stretto in cui ci sta tutto; se non è quello in uso, un tasto per passarci.
+                    val best = Framing.bestLens(d, h, court, lenses)?.let { lenses.indexOf(it) } ?: -1
+                    if (best >= 0 && best != lensIndex) {
+                        GhostButton(s.assistUseLens(lensName(s, best, lenses.size)), Icons.Filled.CameraAlt, { onUseLens(best) }, Modifier.fillMaxWidth(), enabled = canChangeLens)
+                        if (!canChangeLens) Text(s.cameraLensBusy, color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                }
+                Text(s.assistCenter, fontSize = 12.sp, color = TsmColors.TextDim)
+            }
+        },
+        confirmButton = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = { onLevel(!levelOn); onDone() }) { Text(if (levelOn) s.assistHideLevel else s.assistShowLevel) }
+                TextButton(onClick = onDone) { Text(s.ok) }
+            }
+        },
+    )
+}
+
+private fun trimNum(v: Float): String = if (v % 1f == 0f) v.toInt().toString() else "%.1f".format(v)
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/HeartSection.kt
@@ -13965,6 +14202,37 @@ interface Strings {
     val camRemoteBattery: (Int) -> String
     val camRemoteFree: (String) -> String
     val cameraNoStreamKey: String
+    /** Assistente inquadratura (telefono-telecamera) e scelta dell'obiettivo. */
+    val assistTitle: String
+    val assistButton: String
+    val assistHint: String
+    val assistDistance: String
+    val assistHeight: String
+    val assistCourt: String
+    val courtTennisSingles: String
+    val courtTennisDoubles: String
+    val courtPadel: String
+    val assistTiltIs: (String) -> String
+    val assistFitsWith: (String) -> String
+    val assistCornersOut: (String) -> String
+    val assistMinDistance: (String, String) -> String
+    val assistTooTall: String
+    val assistUseLens: (String) -> String
+    val assistShowLevel: String
+    val assistHideLevel: String
+    val assistPitch: String
+    val assistLevel: String
+    val assistAimLower: (String) -> String
+    val assistAimHigher: (String) -> String
+    val assistTurnCw: (String) -> String
+    val assistTurnCcw: (String) -> String
+    val assistOk: String
+    val assistNoSensor: String
+    val assistCenter: String
+    val lensMain: String
+    val lensWide: String
+    val cameraLens: String
+    val cameraLensBusy: String
     val cameraStreamHint: String
     val cameraStreamUrl: String
     val cameraStreamKey: String
@@ -14861,6 +15129,36 @@ object ItStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Batteria $it%" }
     override val camRemoteFree: (String) -> String = { "Libero $it" }
     override val cameraNoStreamKey = "Manca la chiave della diretta: mettila sul telefono-telecamera (Impostazioni)."
+    override val assistTitle = "Assistente inquadratura"
+    override val assistButton = "Inquadra"
+    override val assistHint = "Dove hai messo il telefono: l'app calcola l'inclinazione che tiene nel video tutte e due le linee di fondo e il giocatore lontano, e dice quale obiettivo usare."
+    override val assistDistance = "Distanza dietro la linea di fondo (m)"
+    override val assistHeight = "Altezza dell'obiettivo da terra (m)"
+    override val assistCourt = "Campo"
+    override val courtTennisSingles = "Tennis singolare"
+    override val courtTennisDoubles = "Tennis doppio"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Inclinazione consigliata: $it verso il basso" }
+    override val assistFitsWith: (String) -> String = { "Ci sta tutto il campo con l'obiettivo $it." }
+    override val assistCornersOut: (String) -> String = { "Gli angoli vicini del campo restano fuori anche con l'obiettivo $it: allontana il telefono dalla linea di fondo." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Con l'obiettivo $a servono almeno $b dietro la linea di fondo." }
+    override val assistTooTall = "In altezza non ci sta tutto: allontana il telefono o alzalo."
+    override val assistUseLens: (String) -> String = { "Usa l'obiettivo $it" }
+    override val assistShowLevel = "Mostra la livella"
+    override val assistHideLevel = "Nascondi la livella"
+    override val assistPitch = "Inclinazione"
+    override val assistLevel = "Livella"
+    override val assistAimLower: (String) -> String = { "punta più in basso di $it" }
+    override val assistAimHigher: (String) -> String = { "punta più in alto di $it" }
+    override val assistTurnCw: (String) -> String = { "gira in senso orario di $it" }
+    override val assistTurnCcw: (String) -> String = { "gira in senso antiorario di $it" }
+    override val assistOk = "a posto"
+    override val assistNoSensor = "Questo telefono non ha il sensore di gravità: la livella non c'è."
+    override val assistCenter = "Destra e sinistra i sensori non le sanno: guarda sull'anteprima che la rete sia al centro."
+    override val lensMain = "principale"
+    override val lensWide = "grandangolo"
+    override val cameraLens = "Obiettivo"
+    override val cameraLensBusy = "Ferma registrazione e diretta per cambiare obiettivo."
     override val cameraStreamHint = "Per YouTube: YouTube Studio › Trasmetti dal vivo › copia la chiave dello stream. Per altri servizi (Twitch, Facebook, un server tuo) cambia anche il server (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Server RTMP"
     override val cameraStreamKey = "Chiave dello stream"
@@ -15728,6 +16026,36 @@ object EnStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Battery $it%" }
     override val camRemoteFree: (String) -> String = { "Free $it" }
     override val cameraNoStreamKey = "No live stream key: set it on the camera phone (Settings)."
+    override val assistTitle = "Framing assistant"
+    override val assistButton = "Framing"
+    override val assistHint = "Where you put the phone: the app works out the tilt that keeps both baselines and the far player in the video, and tells you which lens to use."
+    override val assistDistance = "Distance behind the baseline (m)"
+    override val assistHeight = "Lens height above the ground (m)"
+    override val assistCourt = "Court"
+    override val courtTennisSingles = "Tennis singles"
+    override val courtTennisDoubles = "Tennis doubles"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Suggested tilt: $it downwards" }
+    override val assistFitsWith: (String) -> String = { "The whole court fits with the $it lens." }
+    override val assistCornersOut: (String) -> String = { "The near corners of the court stay out even with the $it lens: move the phone further back from the baseline." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "With the $a lens you need at least $b behind the baseline." }
+    override val assistTooTall = "Not everything fits vertically: move the phone back or raise it."
+    override val assistUseLens: (String) -> String = { "Use the $it lens" }
+    override val assistShowLevel = "Show the level"
+    override val assistHideLevel = "Hide the level"
+    override val assistPitch = "Tilt"
+    override val assistLevel = "Level"
+    override val assistAimLower: (String) -> String = { "aim $it lower" }
+    override val assistAimHigher: (String) -> String = { "aim $it higher" }
+    override val assistTurnCw: (String) -> String = { "turn $it clockwise" }
+    override val assistTurnCcw: (String) -> String = { "turn $it anticlockwise" }
+    override val assistOk = "OK"
+    override val assistNoSensor = "This phone has no gravity sensor: no level."
+    override val assistCenter = "The sensors can't tell left from right: check on the preview that the net is in the middle."
+    override val lensMain = "main"
+    override val lensWide = "wide"
+    override val cameraLens = "Lens"
+    override val cameraLensBusy = "Stop recording and live stream to change lens."
     override val cameraStreamHint = "For YouTube: YouTube Studio › Go live › copy the stream key. For other services (Twitch, Facebook, your own server) also change the server (rtmp:// or rtmps://)."
     override val cameraStreamUrl = "RTMP server"
     override val cameraStreamKey = "Stream key"
@@ -16618,6 +16946,36 @@ object DeStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Akku $it %" }
     override val camRemoteFree: (String) -> String = { "Frei $it" }
     override val cameraNoStreamKey = "Kein Stream-Schlüssel: auf dem Kamera-Telefon eintragen (Einstellungen)."
+    override val assistTitle = "Bildausrichtung"
+    override val assistButton = "Ausrichten"
+    override val assistHint = "Wo das Telefon steht: Die App berechnet die Neigung, bei der beide Grundlinien und der entfernte Spieler im Video bleiben, und sagt, welches Objektiv passt."
+    override val assistDistance = "Abstand hinter der Grundlinie (m)"
+    override val assistHeight = "Höhe des Objektivs über dem Boden (m)"
+    override val assistCourt = "Platz"
+    override val courtTennisSingles = "Tennis Einzel"
+    override val courtTennisDoubles = "Tennis Doppel"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Empfohlene Neigung: $it nach unten" }
+    override val assistFitsWith: (String) -> String = { "Der ganze Platz passt mit dem Objektiv $it." }
+    override val assistCornersOut: (String) -> String = { "Die nahen Ecken des Platzes bleiben auch mit dem Objektiv $it draußen: Telefon weiter hinter die Grundlinie stellen." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Mit dem Objektiv $a braucht es mindestens $b hinter der Grundlinie." }
+    override val assistTooTall = "In der Höhe passt nicht alles: Telefon weiter weg oder höher stellen."
+    override val assistUseLens: (String) -> String = { "Objektiv $it verwenden" }
+    override val assistShowLevel = "Wasserwaage zeigen"
+    override val assistHideLevel = "Wasserwaage ausblenden"
+    override val assistPitch = "Neigung"
+    override val assistLevel = "Wasserwaage"
+    override val assistAimLower: (String) -> String = { "$it tiefer zielen" }
+    override val assistAimHigher: (String) -> String = { "$it höher zielen" }
+    override val assistTurnCw: (String) -> String = { "$it im Uhrzeigersinn drehen" }
+    override val assistTurnCcw: (String) -> String = { "$it gegen den Uhrzeigersinn drehen" }
+    override val assistOk = "passt"
+    override val assistNoSensor = "Dieses Telefon hat keinen Schwerkraftsensor: keine Wasserwaage."
+    override val assistCenter = "Links und rechts kennen die Sensoren nicht: in der Vorschau prüfen, dass das Netz in der Mitte ist."
+    override val lensMain = "Haupt"
+    override val lensWide = "Weitwinkel"
+    override val cameraLens = "Objektiv"
+    override val cameraLensBusy = "Aufnahme und Livestream beenden, um das Objektiv zu wechseln."
     override val cameraStreamHint = "Für YouTube: YouTube Studio › Livestream starten › Streamschlüssel kopieren. Für andere Dienste (Twitch, Facebook, eigener Server) auch den Server ändern (rtmp:// oder rtmps://)."
     override val cameraStreamUrl = "RTMP-Server"
     override val cameraStreamKey = "Streamschlüssel"
@@ -17500,6 +17858,36 @@ object EsStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Batería $it %" }
     override val camRemoteFree: (String) -> String = { "Libre $it" }
     override val cameraNoStreamKey = "Falta la clave del directo: ponla en el teléfono-cámara (Ajustes)."
+    override val assistTitle = "Asistente de encuadre"
+    override val assistButton = "Encuadrar"
+    override val assistHint = "Dónde has puesto el teléfono: la app calcula la inclinación que mantiene en el vídeo las dos líneas de fondo y al jugador lejano, y dice qué objetivo usar."
+    override val assistDistance = "Distancia detrás de la línea de fondo (m)"
+    override val assistHeight = "Altura del objetivo desde el suelo (m)"
+    override val assistCourt = "Pista"
+    override val courtTennisSingles = "Tenis individual"
+    override val courtTennisDoubles = "Tenis dobles"
+    override val courtPadel = "Pádel"
+    override val assistTiltIs: (String) -> String = { "Inclinación aconsejada: $it hacia abajo" }
+    override val assistFitsWith: (String) -> String = { "Cabe toda la pista con el objetivo $it." }
+    override val assistCornersOut: (String) -> String = { "Las esquinas cercanas de la pista quedan fuera incluso con el objetivo $it: aleja el teléfono de la línea de fondo." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Con el objetivo $a hacen falta al menos $b detrás de la línea de fondo." }
+    override val assistTooTall = "En altura no cabe todo: aleja el teléfono o súbelo."
+    override val assistUseLens: (String) -> String = { "Usar el objetivo $it" }
+    override val assistShowLevel = "Mostrar el nivel"
+    override val assistHideLevel = "Ocultar el nivel"
+    override val assistPitch = "Inclinación"
+    override val assistLevel = "Nivel"
+    override val assistAimLower: (String) -> String = { "apunta $it más abajo" }
+    override val assistAimHigher: (String) -> String = { "apunta $it más arriba" }
+    override val assistTurnCw: (String) -> String = { "gira $it en sentido horario" }
+    override val assistTurnCcw: (String) -> String = { "gira $it en sentido antihorario" }
+    override val assistOk = "bien"
+    override val assistNoSensor = "Este teléfono no tiene sensor de gravedad: no hay nivel."
+    override val assistCenter = "Los sensores no saben izquierda y derecha: comprueba en la vista previa que la red esté en el centro."
+    override val lensMain = "principal"
+    override val lensWide = "gran angular"
+    override val cameraLens = "Objetivo"
+    override val cameraLensBusy = "Para la grabación y el directo para cambiar de objetivo."
     override val cameraStreamHint = "Para YouTube: YouTube Studio › Emitir en directo › copia la clave de emisión. Para otros servicios (Twitch, Facebook, tu servidor) cambia también el servidor (rtmp:// o rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Clave de emisión"
@@ -18386,6 +18774,36 @@ object FrStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Batterie $it %" }
     override val camRemoteFree: (String) -> String = { "Libre $it" }
     override val cameraNoStreamKey = "Clé du direct manquante : saisissez-la sur le téléphone-caméra (Réglages)."
+    override val assistTitle = "Assistant de cadrage"
+    override val assistButton = "Cadrer"
+    override val assistHint = "Où vous avez mis le téléphone : l'appli calcule l'inclinaison qui garde dans la vidéo les deux lignes de fond et le joueur éloigné, et indique l'objectif à utiliser."
+    override val assistDistance = "Distance derrière la ligne de fond (m)"
+    override val assistHeight = "Hauteur de l'objectif (m)"
+    override val assistCourt = "Terrain"
+    override val courtTennisSingles = "Tennis simple"
+    override val courtTennisDoubles = "Tennis double"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Inclinaison conseillée : $it vers le bas" }
+    override val assistFitsWith: (String) -> String = { "Tout le terrain tient avec l'objectif $it." }
+    override val assistCornersOut: (String) -> String = { "Les coins proches du terrain restent hors champ même avec l'objectif $it : éloignez le téléphone de la ligne de fond." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Avec l'objectif $a il faut au moins $b derrière la ligne de fond." }
+    override val assistTooTall = "Tout ne tient pas en hauteur : éloignez le téléphone ou montez-le."
+    override val assistUseLens: (String) -> String = { "Utiliser l'objectif $it" }
+    override val assistShowLevel = "Afficher le niveau"
+    override val assistHideLevel = "Masquer le niveau"
+    override val assistPitch = "Inclinaison"
+    override val assistLevel = "Niveau"
+    override val assistAimLower: (String) -> String = { "visez $it plus bas" }
+    override val assistAimHigher: (String) -> String = { "visez $it plus haut" }
+    override val assistTurnCw: (String) -> String = { "tournez de $it dans le sens horaire" }
+    override val assistTurnCcw: (String) -> String = { "tournez de $it dans le sens antihoraire" }
+    override val assistOk = "bon"
+    override val assistNoSensor = "Ce téléphone n'a pas de capteur de gravité : pas de niveau."
+    override val assistCenter = "Les capteurs ne savent pas la gauche et la droite : vérifiez sur l'aperçu que le filet est au centre."
+    override val lensMain = "principal"
+    override val lensWide = "grand-angle"
+    override val cameraLens = "Objectif"
+    override val cameraLensBusy = "Arrêtez l'enregistrement et le direct pour changer d'objectif."
     override val cameraStreamHint = "Pour YouTube : YouTube Studio › Passer au direct › copiez la clé de flux. Pour d'autres services (Twitch, Facebook, votre serveur) changez aussi le serveur (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Serveur RTMP"
     override val cameraStreamKey = "Clé de flux"
@@ -19271,6 +19689,36 @@ object PtStrings : Strings {
     override val camRemoteBattery: (Int) -> String = { "Bateria $it%" }
     override val camRemoteFree: (String) -> String = { "Livre $it" }
     override val cameraNoStreamKey = "Falta a chave da transmissão: coloque-a no telefone-câmera (Ajustes)."
+    override val assistTitle = "Assistente de enquadramento"
+    override val assistButton = "Enquadrar"
+    override val assistHint = "Onde você colocou o telefone: o app calcula a inclinação que mantém no vídeo as duas linhas de fundo e o jogador distante, e diz qual lente usar."
+    override val assistDistance = "Distância atrás da linha de fundo (m)"
+    override val assistHeight = "Altura da lente em relação ao chão (m)"
+    override val assistCourt = "Quadra"
+    override val courtTennisSingles = "Tênis simples"
+    override val courtTennisDoubles = "Tênis duplas"
+    override val courtPadel = "Padel"
+    override val assistTiltIs: (String) -> String = { "Inclinação sugerida: $it para baixo" }
+    override val assistFitsWith: (String) -> String = { "A quadra inteira cabe com a lente $it." }
+    override val assistCornersOut: (String) -> String = { "Os cantos próximos da quadra ficam de fora mesmo com a lente $it: afaste o telefone da linha de fundo." }
+    override val assistMinDistance: (String, String) -> String = { a, b -> "Com a lente $a são precisos pelo menos $b atrás da linha de fundo." }
+    override val assistTooTall = "Na altura não cabe tudo: afaste o telefone ou suba-o."
+    override val assistUseLens: (String) -> String = { "Usar a lente $it" }
+    override val assistShowLevel = "Mostrar o nível"
+    override val assistHideLevel = "Esconder o nível"
+    override val assistPitch = "Inclinação"
+    override val assistLevel = "Nível"
+    override val assistAimLower: (String) -> String = { "aponte $it mais para baixo" }
+    override val assistAimHigher: (String) -> String = { "aponte $it mais para cima" }
+    override val assistTurnCw: (String) -> String = { "gire $it no sentido horário" }
+    override val assistTurnCcw: (String) -> String = { "gire $it no sentido anti-horário" }
+    override val assistOk = "ok"
+    override val assistNoSensor = "Este telefone não tem sensor de gravidade: sem nível."
+    override val assistCenter = "Os sensores não sabem esquerda e direita: confira na pré-visualização se a rede está no centro."
+    override val lensMain = "principal"
+    override val lensWide = "grande-angular"
+    override val cameraLens = "Lente"
+    override val cameraLensBusy = "Pare a gravação e a transmissão para trocar de lente."
     override val cameraStreamHint = "Para o YouTube: YouTube Studio › Transmitir ao vivo › copie a chave da transmissão. Para outros serviços (Twitch, Facebook, seu servidor) mude também o servidor (rtmp:// ou rtmps://)."
     override val cameraStreamUrl = "Servidor RTMP"
     override val cameraStreamKey = "Chave da transmissão"
@@ -25472,6 +25920,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25485,7 +25935,9 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -25522,7 +25974,12 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ui.FramingDialog
+import com.tennis.scoremanager.ui.HorizonOverlay
+import com.tennis.scoremanager.ui.LevelReadout
+import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.lensName
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
@@ -25559,6 +26016,19 @@ class CameraActivity : ComponentActivity() {
     private val zoom = MutableStateFlow(1f)
     /** Fino a quando mandare l'inquadratura all'arbitro (si allunga a ogni sua richiesta). */
     @Volatile private var previewUntil = 0L
+    /** Obiettivi posteriori utili (0 = principale) e quello in uso. */
+    private val lenses by lazy { CameraLenses.list(this) }
+    private val lensIndex = MutableStateFlow(0)
+    /** Assistente inquadratura: livella accesa e inclinazione del telefono. */
+    private val levelOn = MutableStateFlow(false)
+    private val tiltSensor by lazy {
+        TiltSensor(this) {
+            @Suppress("DEPRECATION")
+            when (windowManager.defaultDisplay.rotation) { android.view.Surface.ROTATION_90 -> 90; android.view.Surface.ROTATION_180 -> 180; android.view.Surface.ROTATION_270 -> 270; else -> 0 }
+        }
+    }
+    private var lastTiltSent = 0L
+    private var wasLevel = false
     private var previewJob: kotlinx.coroutines.Job? = null
 
     private enum class LiveState { OFF, CONNECTING, ON }
@@ -25597,9 +26067,10 @@ class CameraActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         overlayOn.value = controller.storage.cameraOverlay
+        lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
-        setContent { TsmTheme { Content() } }
+        setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
         // Grafica: si ridisegna a ogni punteggio nuovo dal telefono dell'arbitro.
         lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
         // Capitoli: i punti arrivati mentre si registra.
@@ -25615,6 +26086,22 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch { controller.relay.camCommands.collect { onRemote(it) } }
         lifecycleScope.launch {
             kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
+        }
+        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn) { _, _ -> Unit }.collect { sendState() } }
+        // Livella: all'arbitro due volte al secondo; una vibrazione quando inclinazione e livella diventano giuste.
+        lifecycleScope.launch {
+            tiltSensor.tilt.collect { t ->
+                if (t == null) return@collect
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastTiltSent >= 500) {
+                    lastTiltSent = now
+                    sendState()
+                }
+                val target = framingTarget()
+                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down - target) == 0)
+                if (ok && !wasLevel) buzz()
+                wasLevel = ok
+            }
         }
         lifecycleScope.launch {
             while (true) {
@@ -25689,6 +26176,58 @@ class CameraActivity : ComponentActivity() {
             CamCmd.OVERLAY_ON -> setOverlay(true)
             CamCmd.OVERLAY_OFF -> setOverlay(false)
             CamCmd.ZOOM -> m.zoom?.let { setZoom(it) }
+            CamCmd.LENS_NEXT -> if (lenses.size > 1) useLens((lensIndex.value + 1) % lenses.size)
+            CamCmd.ASSIST_ON -> setLevel(true)
+            CamCmd.ASSIST_OFF -> setLevel(false)
+        }
+    }
+
+    // ---------------------------------------------------------------- assistente inquadratura e obiettivo
+
+    /** Inclinazione consigliata con le misure salvate e l'obiettivo in uso. */
+    private fun framingTarget(): Float? {
+        val st = controller.storage
+        val court = runCatching { Framing.Court.valueOf(st.framingCourt) }.getOrDefault(Framing.Court.TENNIS_DOUBLES)
+        return Framing.plan(st.framingDistance, st.framingHeight, court, lenses.getOrNull(lensIndex.value)).tilt
+    }
+
+    private fun setLevel(on: Boolean) {
+        if (on && !tiltSensor.available) {
+            message.value = s.assistNoSensor
+            return
+        }
+        levelOn.value = on
+        wasLevel = false
+        if (on) tiltSensor.start() else tiltSensor.stop()
+    }
+
+    private fun canChangeLens(): Boolean = !recording.value && live.value == LiveState.OFF
+
+    /** Passa all'obiettivo [index]: solo a registrazione e diretta ferme (il cambio interrompe il video un attimo). */
+    private fun useLens(index: Int) {
+        val lens = lenses.getOrNull(index) ?: return
+        if (!canChangeLens()) {
+            message.value = s.cameraLensBusy
+            return
+        }
+        controller.storage.cameraLensId = lens.id
+        lensIndex.value = index
+        openLens()
+    }
+
+    private fun openLens() {
+        val cam = camera() ?: return
+        val id = lenses.getOrNull(lensIndex.value)?.id ?: return
+        if (runCatching { cam.getCurrentCameraId() }.getOrNull() == id) return
+        runCatching { cam.openCameraId(id) }.onFailure { Log.w(TAG, "obiettivo $id non aperto", it) }
+        zoom.value = 1f
+    }
+
+    private fun buzz() {
+        runCatching {
+            val v = if (Build.VERSION.SDK_INT >= 31) getSystemService(android.os.VibratorManager::class.java).defaultVibrator
+            else @Suppress("DEPRECATION") getSystemService(android.os.Vibrator::class.java)
+            v.vibrate(android.os.VibrationEffect.createOneShot(120, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
 
@@ -25722,6 +26261,11 @@ class CameraActivity : ComponentActivity() {
                 battery = battery,
                 freeMb = free,
                 message = message.value,
+                lens = lensIndex.value,
+                lenses = lenses.size.coerceAtLeast(1),
+                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value },
+                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value },
+                tiltTarget = framingTarget()?.takeIf { levelOn.value },
             ),
         )
     }
@@ -25859,6 +26403,7 @@ class CameraActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        tiltSensor.stop()
         stream?.let { st ->
             if (recorder.fileActive) {
                 recorder.stopFile()
@@ -25886,6 +26431,7 @@ class CameraActivity : ComponentActivity() {
             return
         }
         var settings by remember { mutableStateOf(false) }
+        var framing by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
             AndroidView(factory = { ctx ->
                 SurfaceView(ctx).apply {
@@ -25894,6 +26440,7 @@ class CameraActivity : ComponentActivity() {
                             if (!prepare()) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            openLens()
                             startBuffer()
                             updateOverlay()
                         }
@@ -25908,13 +26455,36 @@ class CameraActivity : ComponentActivity() {
                     })
                 }
             }, modifier = Modifier.fillMaxSize())
-            Controls(onSettings = { settings = true })
+            Level()
+            Controls(onSettings = { settings = true }, onFraming = { framing = true })
         }
         if (settings) StreamSettings { settings = false }
+        if (framing) {
+            val lv by levelOn.collectAsState()
+            val li by lensIndex.collectAsState()
+            FramingDialog(controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) }) {
+                framing = false
+                sendState()
+            }
+        }
+    }
+
+    /** Livella sull'anteprima (non finisce nel video): orizzonte e indicazioni, al centro. */
+    @Composable
+    private fun Level() {
+        val on by levelOn.collectAsState()
+        val t by tiltSensor.tilt.collectAsState()
+        val li by lensIndex.collectAsState()
+        val tilt = t ?: return
+        if (!on) return
+        Box(Modifier.fillMaxSize()) {
+            HorizonOverlay(tilt.roll)
+            LevelReadout(tilt.down, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+        }
     }
 
     @Composable
-    private fun Controls(onSettings: () -> Unit) {
+    private fun Controls(onSettings: () -> Unit, onFraming: () -> Unit) {
         val str = s
         val rec by recording.collectAsState()
         val since by recordSince.collectAsState()
@@ -25957,11 +26527,15 @@ class CameraActivity : ComponentActivity() {
                 )
             }
             msg?.let { Pill(it, TsmColors.SurfaceHigh) }
-            Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Sette tasti: sui telefoni stretti la fila scorre invece di uscire dallo schermo.
+            Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Btn(if (rec) Icons.Filled.Stop else Icons.Filled.FiberManualRecord, if (rec) str.cameraStopRec else str.cameraRec, TsmColors.Danger) { toggleRecord() }
                 Btn(Icons.Filled.LiveTv, if (lv == LiveState.OFF) str.cameraGoLive else str.cameraStopLive, if (lv == LiveState.OFF) TsmColors.SurfaceHigh else TsmColors.Danger) {
                     toggleLive(onSettings)
                 }
+                Btn(Icons.Filled.Straighten, str.assistButton, if (levelOn.collectAsState().value) TsmColors.Ok else TsmColors.SurfaceHigh) { onFraming() }
+                val li by lensIndex.collectAsState()
+                if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 val ov by overlayOn.collectAsState()
                 Btn(Icons.Filled.Layers, str.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh) { setOverlay(!ov) }
                 Btn(Icons.Filled.Settings, str.cameraStreamUrl, TsmColors.SurfaceHigh) { onSettings() }
@@ -26176,6 +26750,227 @@ data class CoachFilter(
                 }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/Framing.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/Framing.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.atan
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.sqrt
+
+/**
+ * Assistente inquadratura: telefono dietro una linea di fondo, al centro, in orizzontale. Con distanza e altezza
+ * calcola l'inclinazione che tiene nel video tutte e due le linee di fondo (e il giocatore lontano, testa compresa)
+ * e dice se la larghezza ci sta con l'obiettivo scelto. La centratura destra/sinistra non si calcola: i sensori non la
+ * sanno (la bussola sbaglia vicino a una recinzione di metallo), si guarda sull'anteprima.
+ */
+object Framing {
+    /** Campo: lunghezza e larghezza in metri. */
+    enum class Court(val length: Float, val width: Float) {
+        TENNIS_SINGLES(23.77f, 8.23f),
+        TENNIS_DOUBLES(23.77f, 10.97f),
+        PADEL(20f, 10f),
+    }
+
+    /** Un obiettivo posteriore: id della fotocamera e campo visivo del video 16:9, in gradi. */
+    data class Lens(val id: String, val hFov: Float, val vFov: Float) {
+        companion object {
+            /**
+             * Dal sensore (larghezza in mm) e dalla focale: il 16:9 usa tutta la larghezza di un sensore 4:3.
+             * [crop] toglie la parte che lo stabilizzatore tiene per sé (0,9 = 10 %).
+             */
+            fun of(id: String, focalMm: Float, sensorWidthMm: Float, crop: Float = STABILIZATION_CROP): Lens {
+                val half = sensorWidthMm / 2f * crop
+                return Lens(id, deg(2 * atan(half / focalMm)), deg(2 * atan(half * 9f / 16f / focalMm)))
+            }
+        }
+    }
+
+    /**
+     * Risultato: [tilt] gradi verso il basso consigliati; quanto campo visivo serve in altezza e in larghezza; se ci
+     * sta con l'obiettivo [lens].
+     */
+    data class Plan(val tilt: Float, val needV: Float, val needH: Float, val lens: Lens?, val fitsV: Boolean, val fitsH: Boolean) {
+        val fits: Boolean get() = fitsV && fitsH
+    }
+
+    /** Il giocatore lontano sta fino a 2 m dietro la sua linea ed è alto fino a 1,9 m; mezzo metro di margine ai lati. */
+    private const val FAR_BEHIND = 2f
+    private const val PLAYER_H = 1.9f
+    private const val SIDE_MARGIN = 0.5f
+    /** Parte dell'immagine che lo stabilizzatore del video tiene per sé (stima: si vede meglio con la sagoma). */
+    const val STABILIZATION_CROP = 0.9f
+
+    /** Inclinazione e campo visivo necessari, da [distance] metri dietro la linea di fondo e [height] metri da terra. */
+    fun plan(distance: Float, height: Float, court: Court, lens: Lens?): Plan {
+        val d = max(distance, 0.3f)
+        val h = max(height, 0.3f)
+        // Sotto: la linea di fondo vicina. Sopra: la testa del giocatore lontano, o il terreno dietro di lui se più in alto.
+        val bottom = deg(atan(h / d))
+        val farDist = d + court.length + FAR_BEHIND
+        val top = minOf(deg(atan(h / farDist)), deg(atan((h - PLAYER_H) / farDist)))
+        val tilt = (bottom + top) / 2f
+        val needV = bottom - top
+        val needH = needH(d, h, court, tilt)
+        return Plan(tilt, needV, needH, lens, lens != null && needV <= lens.vFov, lens != null && needH <= lens.hFov)
+    }
+
+    /** Larghezza: gli angoli vicini del campo, visti dalla fotocamera già inclinata di [tilt] gradi. */
+    private fun needH(d: Float, h: Float, court: Court, tilt: Float): Float {
+        val t = rad(tilt)
+        val depth = d * cos(t) + h * sin(t)
+        return deg(2 * atan((court.width / 2f + SIDE_MARGIN) / depth))
+    }
+
+    /** L'obiettivo da usare: il più stretto in cui ci sta tutto (più dettaglio), altrimenti il più largo. */
+    fun bestLens(distance: Float, height: Float, court: Court, lenses: List<Lens>): Lens? {
+        if (lenses.isEmpty()) return null
+        return lenses.sortedBy { it.hFov }.firstOrNull { plan(distance, height, court, it).fits } ?: lenses.maxBy { it.hFov }
+    }
+
+    /** Metri dietro la linea di fondo da cui la larghezza ci sta con [lens] (null se oltre 30 m). */
+    fun minDistance(height: Float, court: Court, lens: Lens): Float? {
+        var d = 0.5f
+        while (d <= 30f) {
+            if (plan(d, height, court, lens).fitsH) return d
+            d += 0.1f
+        }
+        return null
+    }
+
+    /**
+     * Inclinazione del telefono da un vettore "in su" nelle coordinate del telefono (quello del sensore di gravità):
+     * [Tilt.down] gradi verso il basso dell'obiettivo posteriore, [Tilt.roll] gradi di rotazione in senso orario
+     * dell'immagine. [rotation] è la rotazione dello schermo (0, 90, 180, 270).
+     */
+    data class Tilt(val down: Float, val roll: Float)
+
+    fun tilt(x: Float, y: Float, z: Float, rotation: Int): Tilt? {
+        val n = sqrt(x * x + y * y + z * z)
+        if (n < 1f) return null
+        val ux = x / n
+        val uy = y / n
+        val uz = z / n
+        // L'obiettivo posteriore guarda verso -z: verso il basso quando "su" esce dallo schermo.
+        val down = deg(asin(uz.coerceIn(-1f, 1f)))
+        // "Su" e "destra" dello schermo nelle coordinate del telefono.
+        val (upX, upY, rightX, rightY) = when (rotation) {
+            90 -> listOf(1f, 0f, 0f, -1f)
+            180 -> listOf(0f, -1f, -1f, 0f)
+            270 -> listOf(-1f, 0f, 0f, 1f)
+            else -> listOf(0f, 1f, 1f, 0f)
+        }
+        val alongUp = ux * upX + uy * upY
+        val alongRight = ux * rightX + uy * rightY
+        // Telefono girato in senso orario: il "su" vero appare spostato a sinistra.
+        val roll = deg(atan2(-alongRight, alongUp))
+        return Tilt(down, roll)
+    }
+
+    /** Quanto è lontano dal giusto: 0 a posto, 1 da correggere poco, 2 da correggere. */
+    fun grade(error: Float, tolerance: Float = TOLERANCE): Int = when {
+        abs(error) <= tolerance -> 0
+        abs(error) <= tolerance * 3 -> 1
+        else -> 2
+    }
+
+    const val TOLERANCE = 1f
+
+    private fun deg(r: Float) = Math.toDegrees(r.toDouble()).toFloat()
+    private fun rad(d: Float) = Math.toRadians(d.toDouble()).toFloat()
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/FramingSensors.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/FramingSensors.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.content.Context
+import android.graphics.SurfaceTexture
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
+import android.util.Size
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.abs
+
+/**
+ * Obiettivi posteriori che registrano in 1080p, dal più stretto al più largo, senza i tele (per un campo intero non
+ * servono) e senza doppioni con lo stesso campo visivo.
+ */
+object CameraLenses {
+    fun list(context: Context): List<Framing.Lens> {
+        val cm = context.getSystemService(CameraManager::class.java) ?: return emptyList()
+        val all = runCatching { cm.cameraIdList.toList() }.getOrDefault(emptyList()).mapNotNull { id ->
+            runCatching {
+                val ch = cm.getCameraCharacteristics(id)
+                if (ch.get(CameraCharacteristics.LENS_FACING) != CameraCharacteristics.LENS_FACING_BACK) return@runCatching null
+                val focal = ch.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: return@runCatching null
+                val sensor = ch.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE) ?: return@runCatching null
+                val sizes = ch.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)?.getOutputSizes(SurfaceTexture::class.java).orEmpty()
+                if (sizes.none { it == Size(1920, 1080) }) return@runCatching null
+                Framing.Lens.of(id, focal, sensor.width)
+            }.getOrNull()
+        }
+        if (all.isEmpty()) return emptyList()
+        // Il principale è il primo posteriore (di solito "0"): da lui in su, niente tele.
+        val main = all.first()
+        return all.filter { it.hFov >= main.hFov - 1f }
+            .sortedBy { it.hFov }
+            .fold(mutableListOf<Framing.Lens>()) { acc, l -> if (acc.none { abs(it.hFov - l.hFov) < 3f }) acc += l; acc }
+    }
+}
+
+/**
+ * Inclinazione del telefono dal sensore di gravità (o dall'accelerometro, filtrato), mediata: col telefono fermo sul
+ * cavalletto basta e sbaglia di pochi decimi di grado. [rotation] dà la rotazione dello schermo al momento.
+ */
+class TiltSensor(context: Context, private val rotation: () -> Int) : SensorEventListener {
+    private val sm = context.getSystemService(SensorManager::class.java)
+    private val sensor = sm?.getDefaultSensor(Sensor.TYPE_GRAVITY) ?: sm?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private val _tilt = MutableStateFlow<Framing.Tilt?>(null)
+    val tilt: StateFlow<Framing.Tilt?> = _tilt
+    val available: Boolean get() = sensor != null
+    private val g = FloatArray(3)
+    private var primed = false
+
+    fun start() {
+        primed = false
+        sensor?.let { sm?.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
+    }
+
+    fun stop() {
+        sm?.unregisterListener(this)
+        _tilt.value = null
+    }
+
+    override fun onSensorChanged(e: SensorEvent) {
+        // Media mobile: toglie il tremolio della mano e delle vibrazioni della recinzione.
+        val a = if (primed) 0.15f else 1f
+        for (i in 0..2) g[i] += a * (e.values[i] - g[i])
+        primed = true
+        _tilt.value = Framing.tilt(g[0], g[1], g[2], rotation())
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 }
 TSM_EOF
 
@@ -42875,6 +43670,78 @@ class CoachFilterTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/FramingTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/FramingTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import com.tennis.scoremanager.video.Framing.Court
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class FramingTest {
+    // Galaxy A52s: principale 5,23 mm su 7,4 mm, grandangolo 1,74 mm su 4,48 mm.
+    private val main = Framing.Lens.of("0", 5.23f, 7.3984f)
+    private val wide = Framing.Lens.of("2", 1.74f, 4.48f)
+
+    @Test
+    fun lensFieldOfView() {
+        assertEquals(65.0f, main.hFov, 0.5f)
+        assertEquals(39.4f, main.vFov, 0.5f)
+        assertEquals(98.0f, wide.hFov, 1f)
+        // Senza stabilizzatore il principale vede di più.
+        assertEquals(70.5f, Framing.Lens.of("0", 5.23f, 7.3984f, crop = 1f).hFov, 0.5f)
+    }
+
+    @Test
+    fun tiltKeepsBothBaselines() {
+        // 4 m dietro, 2,5 m d'altezza: mirare alla rete (8,9°) taglierebbe la linea vicina.
+        val p = Framing.plan(4f, 2.5f, Court.TENNIS_DOUBLES, wide)
+        assertTrue("${p.tilt}", p.tilt in 15f..19f)
+        assertTrue(p.fitsV)
+        // La linea vicina è 32° sotto l'orizzonte: sta dentro la metà inferiore dell'immagine.
+        assertTrue(p.tilt + wide.vFov / 2 >= 32f)
+    }
+
+    @Test
+    fun widthIsTheRealLimit() {
+        // Alla recinzione (6,4 m) il principale non vede gli angoli vicini del doppio, il grandangolo sì.
+        val fence = Framing.plan(6.4f, 2.5f, Court.TENNIS_DOUBLES, main)
+        assertTrue(fence.fitsV)
+        assertFalse(fence.fitsH)
+        assertTrue(Framing.plan(6.4f, 2.5f, Court.TENNIS_DOUBLES, wide).fits)
+        assertEquals("2", Framing.bestLens(6.4f, 2.5f, Court.TENNIS_DOUBLES, listOf(main, wide))?.id)
+        // Da lontano basta il principale, che ha più dettaglio: si sceglie lui.
+        assertEquals("0", Framing.bestLens(12f, 3f, Court.TENNIS_DOUBLES, listOf(main, wide))?.id)
+        val min = Framing.minDistance(3f, Court.TENNIS_DOUBLES, main)
+        assertNotNull(min)
+        assertTrue("$min", min!! in 8f..12f)
+    }
+
+    @Test
+    fun phoneTiltFromGravity() {
+        // In orizzontale (schermo ruotato di 90°), obiettivo orizzontale e dritto: "su" = +x.
+        val flat = Framing.tilt(9.81f, 0f, 0f, 90)!!
+        assertEquals(0f, flat.down, 0.01f)
+        assertEquals(0f, flat.roll, 0.01f)
+        // Inclinato di 20° verso il basso: "su" esce un po' dallo schermo.
+        val down = Framing.tilt(9.81f * 0.9397f, 0f, 9.81f * 0.342f, 90)!!
+        assertEquals(20f, down.down, 0.1f)
+        // Girato di 5° in senso orario: il "su" vero va verso la sinistra dello schermo (+y del telefono).
+        val cw = Framing.tilt(9.81f * 0.9962f, 9.81f * 0.0872f, 0f, 90)!!
+        assertEquals(5f, cw.roll, 0.1f)
+        assertEquals(0, Framing.grade(0.8f))
+        assertEquals(1, Framing.grade(-2.5f))
+        assertEquals(2, Framing.grade(4f))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/video/HighlightStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/video/HighlightStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -47943,6 +48810,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 144 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 148 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

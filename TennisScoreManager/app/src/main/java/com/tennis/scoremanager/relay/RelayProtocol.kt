@@ -140,6 +140,11 @@ object CamCmd {
     const val OVERLAY_ON = "overlay_on"
     const val OVERLAY_OFF = "overlay_off"
     const val ZOOM = "zoom"
+    /** Obiettivo successivo (principale → grandangolo → …). */
+    const val LENS_NEXT = "lens_next"
+    /** Livella dell'assistente inquadratura accesa o spenta. */
+    const val ASSIST_ON = "assist_on"
+    const val ASSIST_OFF = "assist_off"
     const val PREVIEW_TTL_MS = 8_000L
 }
 
@@ -162,6 +167,16 @@ data class CamState(
     val freeMb: Long? = null,
     /** Ultimo messaggio della telecamera (salvato, diretta non riuscita…), da mostrare anche all'arbitro. */
     val message: String? = null,
+    /** Obiettivo in uso ([lens] da 0, 0 = principale) su [lenses]. */
+    val lens: Int = 0,
+    val lenses: Int = 1,
+    /**
+     * Assistente inquadratura acceso: gradi verso il basso ([tilt]) e di rotazione oraria ([roll]) del telefono, e
+     * inclinazione consigliata ([tiltTarget]). null = livella spenta.
+     */
+    val tilt: Float? = null,
+    val roll: Float? = null,
+    val tiltTarget: Float? = null,
 )
 
 object RelayCodec {

@@ -21,6 +21,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +36,9 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -71,7 +75,12 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.relay.CamCmd
 import com.tennis.scoremanager.relay.CamState
 import com.tennis.scoremanager.relay.RelayMsg
+import com.tennis.scoremanager.ui.FramingDialog
+import com.tennis.scoremanager.ui.HorizonOverlay
+import com.tennis.scoremanager.ui.LevelReadout
+import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.lensName
 import com.tennis.scoremanager.ui.TsmColors
 import com.tennis.scoremanager.ui.TsmTheme
 import com.tennis.scoremanager.ui.stringsFor
@@ -108,6 +117,19 @@ class CameraActivity : ComponentActivity() {
     private val zoom = MutableStateFlow(1f)
     /** Fino a quando mandare l'inquadratura all'arbitro (si allunga a ogni sua richiesta). */
     @Volatile private var previewUntil = 0L
+    /** Obiettivi posteriori utili (0 = principale) e quello in uso. */
+    private val lenses by lazy { CameraLenses.list(this) }
+    private val lensIndex = MutableStateFlow(0)
+    /** Assistente inquadratura: livella accesa e inclinazione del telefono. */
+    private val levelOn = MutableStateFlow(false)
+    private val tiltSensor by lazy {
+        TiltSensor(this) {
+            @Suppress("DEPRECATION")
+            when (windowManager.defaultDisplay.rotation) { android.view.Surface.ROTATION_90 -> 90; android.view.Surface.ROTATION_180 -> 180; android.view.Surface.ROTATION_270 -> 270; else -> 0 }
+        }
+    }
+    private var lastTiltSent = 0L
+    private var wasLevel = false
     private var previewJob: kotlinx.coroutines.Job? = null
 
     private enum class LiveState { OFF, CONNECTING, ON }
@@ -146,9 +168,10 @@ class CameraActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         overlayOn.value = controller.storage.cameraOverlay
+        lensIndex.value = lenses.indexOfFirst { it.id == controller.storage.cameraLensId }.coerceAtLeast(0)
         refreshPerms()
         if (!permsOk.value) perms.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
-        setContent { TsmTheme { Content() } }
+        setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
         // Grafica: si ridisegna a ogni punteggio nuovo dal telefono dell'arbitro.
         lifecycleScope.launch { controller.relay.score.collect { updateOverlay() } }
         // Capitoli: i punti arrivati mentre si registra.
@@ -164,6 +187,22 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch { controller.relay.camCommands.collect { onRemote(it) } }
         lifecycleScope.launch {
             kotlinx.coroutines.flow.combine(recording, live, overlayOn, zoom, message) { _, _, _, _, _ -> Unit }.collect { sendState() }
+        }
+        lifecycleScope.launch { kotlinx.coroutines.flow.combine(lensIndex, levelOn) { _, _ -> Unit }.collect { sendState() } }
+        // Livella: all'arbitro due volte al secondo; una vibrazione quando inclinazione e livella diventano giuste.
+        lifecycleScope.launch {
+            tiltSensor.tilt.collect { t ->
+                if (t == null) return@collect
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastTiltSent >= 500) {
+                    lastTiltSent = now
+                    sendState()
+                }
+                val target = framingTarget()
+                val ok = Framing.grade(t.roll) == 0 && (target == null || Framing.grade(t.down - target) == 0)
+                if (ok && !wasLevel) buzz()
+                wasLevel = ok
+            }
         }
         lifecycleScope.launch {
             while (true) {
@@ -238,6 +277,58 @@ class CameraActivity : ComponentActivity() {
             CamCmd.OVERLAY_ON -> setOverlay(true)
             CamCmd.OVERLAY_OFF -> setOverlay(false)
             CamCmd.ZOOM -> m.zoom?.let { setZoom(it) }
+            CamCmd.LENS_NEXT -> if (lenses.size > 1) useLens((lensIndex.value + 1) % lenses.size)
+            CamCmd.ASSIST_ON -> setLevel(true)
+            CamCmd.ASSIST_OFF -> setLevel(false)
+        }
+    }
+
+    // ---------------------------------------------------------------- assistente inquadratura e obiettivo
+
+    /** Inclinazione consigliata con le misure salvate e l'obiettivo in uso. */
+    private fun framingTarget(): Float? {
+        val st = controller.storage
+        val court = runCatching { Framing.Court.valueOf(st.framingCourt) }.getOrDefault(Framing.Court.TENNIS_DOUBLES)
+        return Framing.plan(st.framingDistance, st.framingHeight, court, lenses.getOrNull(lensIndex.value)).tilt
+    }
+
+    private fun setLevel(on: Boolean) {
+        if (on && !tiltSensor.available) {
+            message.value = s.assistNoSensor
+            return
+        }
+        levelOn.value = on
+        wasLevel = false
+        if (on) tiltSensor.start() else tiltSensor.stop()
+    }
+
+    private fun canChangeLens(): Boolean = !recording.value && live.value == LiveState.OFF
+
+    /** Passa all'obiettivo [index]: solo a registrazione e diretta ferme (il cambio interrompe il video un attimo). */
+    private fun useLens(index: Int) {
+        val lens = lenses.getOrNull(index) ?: return
+        if (!canChangeLens()) {
+            message.value = s.cameraLensBusy
+            return
+        }
+        controller.storage.cameraLensId = lens.id
+        lensIndex.value = index
+        openLens()
+    }
+
+    private fun openLens() {
+        val cam = camera() ?: return
+        val id = lenses.getOrNull(lensIndex.value)?.id ?: return
+        if (runCatching { cam.getCurrentCameraId() }.getOrNull() == id) return
+        runCatching { cam.openCameraId(id) }.onFailure { Log.w(TAG, "obiettivo $id non aperto", it) }
+        zoom.value = 1f
+    }
+
+    private fun buzz() {
+        runCatching {
+            val v = if (Build.VERSION.SDK_INT >= 31) getSystemService(android.os.VibratorManager::class.java).defaultVibrator
+            else @Suppress("DEPRECATION") getSystemService(android.os.Vibrator::class.java)
+            v.vibrate(android.os.VibrationEffect.createOneShot(120, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
 
@@ -271,6 +362,11 @@ class CameraActivity : ComponentActivity() {
                 battery = battery,
                 freeMb = free,
                 message = message.value,
+                lens = lensIndex.value,
+                lenses = lenses.size.coerceAtLeast(1),
+                tilt = tiltSensor.tilt.value?.down?.takeIf { levelOn.value },
+                roll = tiltSensor.tilt.value?.roll?.takeIf { levelOn.value },
+                tiltTarget = framingTarget()?.takeIf { levelOn.value },
             ),
         )
     }
@@ -408,6 +504,7 @@ class CameraActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        tiltSensor.stop()
         stream?.let { st ->
             if (recorder.fileActive) {
                 recorder.stopFile()
@@ -435,6 +532,7 @@ class CameraActivity : ComponentActivity() {
             return
         }
         var settings by remember { mutableStateOf(false) }
+        var framing by remember { mutableStateOf(false) }
         Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
             AndroidView(factory = { ctx ->
                 SurfaceView(ctx).apply {
@@ -443,6 +541,7 @@ class CameraActivity : ComponentActivity() {
                             if (!prepare()) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
+                            openLens()
                             startBuffer()
                             updateOverlay()
                         }
@@ -457,13 +556,36 @@ class CameraActivity : ComponentActivity() {
                     })
                 }
             }, modifier = Modifier.fillMaxSize())
-            Controls(onSettings = { settings = true })
+            Level()
+            Controls(onSettings = { settings = true }, onFraming = { framing = true })
         }
         if (settings) StreamSettings { settings = false }
+        if (framing) {
+            val lv by levelOn.collectAsState()
+            val li by lensIndex.collectAsState()
+            FramingDialog(controller.storage, lenses, li, lv, canChangeLens(), onUseLens = { useLens(it) }, onLevel = { setLevel(it) }) {
+                framing = false
+                sendState()
+            }
+        }
+    }
+
+    /** Livella sull'anteprima (non finisce nel video): orizzonte e indicazioni, al centro. */
+    @Composable
+    private fun Level() {
+        val on by levelOn.collectAsState()
+        val t by tiltSensor.tilt.collectAsState()
+        val li by lensIndex.collectAsState()
+        val tilt = t ?: return
+        if (!on) return
+        Box(Modifier.fillMaxSize()) {
+            HorizonOverlay(tilt.roll)
+            LevelReadout(tilt.down, tilt.roll, framingTarget(), Modifier.align(Alignment.Center).padding(top = 80.dp))
+        }
     }
 
     @Composable
-    private fun Controls(onSettings: () -> Unit) {
+    private fun Controls(onSettings: () -> Unit, onFraming: () -> Unit) {
         val str = s
         val rec by recording.collectAsState()
         val since by recordSince.collectAsState()
@@ -506,11 +628,15 @@ class CameraActivity : ComponentActivity() {
                 )
             }
             msg?.let { Pill(it, TsmColors.SurfaceHigh) }
-            Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Sette tasti: sui telefoni stretti la fila scorre invece di uscire dallo schermo.
+            Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Btn(if (rec) Icons.Filled.Stop else Icons.Filled.FiberManualRecord, if (rec) str.cameraStopRec else str.cameraRec, TsmColors.Danger) { toggleRecord() }
                 Btn(Icons.Filled.LiveTv, if (lv == LiveState.OFF) str.cameraGoLive else str.cameraStopLive, if (lv == LiveState.OFF) TsmColors.SurfaceHigh else TsmColors.Danger) {
                     toggleLive(onSettings)
                 }
+                Btn(Icons.Filled.Straighten, str.assistButton, if (levelOn.collectAsState().value) TsmColors.Ok else TsmColors.SurfaceHigh) { onFraming() }
+                val li by lensIndex.collectAsState()
+                if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 val ov by overlayOn.collectAsState()
                 Btn(Icons.Filled.Layers, str.cameraOverlay, if (ov) TsmColors.Ok else TsmColors.SurfaceHigh) { setOverlay(!ov) }
                 Btn(Icons.Filled.Settings, str.cameraStreamUrl, TsmColors.SurfaceHigh) { onSettings() }
