@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressFilter
 import com.tennis.scoremanager.data.ProgressItem
@@ -78,7 +79,9 @@ fun ProgressScreen(c: MatchController) {
     var matches by rememberSaveable { mutableStateOf(false) }
     val players = remember(history) { c.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
-    val key = if (matches) (player ?: players.firstOrNull()?.first) else null
+    // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
+    val me = PlayerStats.key(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
+    val key = if (matches) (player ?: me ?: players.firstOrNull()?.first) else null
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }
     var excluded by remember(matches, key) { mutableStateOf(emptySet<String>()) }

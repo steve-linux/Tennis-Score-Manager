@@ -126,7 +126,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE }
+
+/** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -193,7 +196,15 @@ class MatchController(
     /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
     val remotes = RemoteInput(app, storage, scope)
 
-    val screen = MutableStateFlow(Screen.SETUP)
+    val screen = MutableStateFlow(Screen.HOME)
+    /** Scheda della prima schermata: resta quella da cui si è partiti, così "Indietro" ci torna. */
+    val homeTab = MutableStateFlow(HomeTab.PLAY)
+
+    /** Torna alla prima schermata ([tab] se dato, altrimenti la scheda di prima). */
+    fun home(tab: HomeTab? = null) {
+        tab?.let { homeTab.value = it }
+        screen.value = Screen.HOME
+    }
     val setup = MutableStateFlow(storage.setup)
     val options = MutableStateFlow(storage.options)
     val live = MutableStateFlow<LiveMatch?>(null)
@@ -614,15 +625,18 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
-            Screen.PROGRESS -> Screen.SETUP
-            Screen.RACKETS -> Screen.SETUP
-            Screen.VIDEOS -> Screen.SETUP
+            Screen.SETUP -> Screen.HOME
+            Screen.PROGRESS -> Screen.HOME
+            Screen.RACKETS -> Screen.HOME
+            Screen.VIDEOS -> Screen.HOME
+            Screen.DEVICES -> Screen.HOME
+            Screen.VOICE -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
                 Screen.WORKOUT
             } else {
-                Screen.SETUP
+                Screen.HOME
             }
             Screen.START -> {
                 if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
@@ -2580,7 +2594,7 @@ class MatchController(
     fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.HOME) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))

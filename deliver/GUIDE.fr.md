@@ -94,10 +94,22 @@ bash installa_tsm.sh
    - Si l'ordinateur ne voit pas le téléphone : sous Windows le pilote USB du fabricant, sous Linux le paquet avec les règles udev (1.1) ; puis rebranchez le câble. Autre solution, sans câble ni pilote : **Device Manager › Pair devices using Wi-Fi** (débogage sans fil, Android 11+, ordinateur et téléphone sur le même réseau).
 3. Autre possibilité : **Build › Build App Bundle(s) / APK(s) › Build APK(s)**, copiez l'APK sur le téléphone et installez-le (il faut autoriser l'installation d'applications de sources inconnues).
 
+### 3.1 Comment l'appli est organisée (app 2.5)
+
+Au **premier démarrage**, l'appli pose trois questions : la langue, comment vous l'utiliserez (compter les points, jouer avec les bracelets, vous entraîner, filmer les matchs) et votre nom ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas, il y a toujours **cinq onglets** :
+
+- **Jouer** : **Nouveau match**, le match suspendu à reprendre, la **revanche** du dernier, le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
+- **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
+- **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
+- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, raquettes, transfert des matchs, présentation, version et licence.
+
+**Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
+
 ## 4. La voix (fonctionne sans internet)
 
 - Chaque annonce est lue **d'une seule phrase** par la synthèse vocale du téléphone, avec une voix installée : pas d'internet et une prosodie naturelle. Les noms des joueurs font partie de la phrase.
-- Page 2 › **Audio et voix** :
+- Plus › **Langue et voix** › **Audio et voix** :
   - **Moteur de synthèse vocale** : *Par défaut du téléphone* (sur les Samsung, c'est Samsung TTS) ou un moteur au choix, par exemple *Services vocaux Google*. Lors des tests, faits en italien, Google sonnait plus naturel.
   - **Voix** : *Automatique (meilleure hors ligne)* ou une voix précise (Google désigne ses voix par un code, que l'application affiche sous la forme « Voix » + code ; celles marquées *en ligne* nécessitent internet).
   - **Tester la voix** : lit une séquence d'annonces d'exemple avec les noms saisis. Pendant la lecture, le bouton devient **Arrêter le test** : touchez-le à nouveau pour l'interrompre (la lecture s'arrête aussi d'elle-même quand vous quittez la page). La synthèse vocale ne peut pas être mise en pause au milieu d'une phrase, donc le bouton l'arrête ; si vous appuyez de nouveau, elle reprend depuis le début.
@@ -111,7 +123,7 @@ bash installa_tsm.sh
 
 ### 4.1 Langues (app 2.3, firmware 2.2)
 
-Page 2 › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+Plus › **Langue et voix** › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 Les annonces ne sont pas des traductions mot à mot : elles suivent les textes officiels pour les arbitres de chaise de chaque fédération, à savoir *L'arbitrage en 255 questions* de la FFT et l'ITF en français, les documents DTB/BTV et Swiss Tennis, *Deberes y procedimientos* de la RFET, *Deveres e Procedimentos* de la FPT (le seul script portugais publié). L'anglais suit l'ITF. En anglais, le zéro des manches en fin de match se dit *love* (« six love, six four »), comme pour les points.
 
@@ -275,8 +287,8 @@ Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** u
 
 Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelques mètres de moins que la longueur du court. Avec un second téléphone derrière l'autre ligne de fond, chaque joueur en a toujours un à proximité : le second (**satellite**) capte les ceintures et bracelets des joueurs de son côté et sert de relais vers le **principal**, qui tient le match.
 
-1. **Principal** : page 2 › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
-2. **Satellite** : page 2 › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
+1. **Principal** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
+2. **Satellite** : Plus › **Appareils** › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
 3. Le satellite suit tout seul les ceintures et bracelets choisis sur le principal, des mêmes côtés : rien à choisir. Laissez-le derrière la ligne de fond avec l'app ouverte.
 
 - **Changement de côté** : rien à faire. Chaque ceinture et chaque bracelet reste au téléphone auquel il est connecté tant que le signal tient, puis le téléphone le plus proche le prend (quelques secondes). Le principal affiche *Via le second téléphone* ; pendant le passage un bracelet peut apparaître déconnecté un instant.
@@ -311,7 +323,7 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 ### 7.1 Entraînement avec la ceinture (app 2.5)
 
-Pour s'entraîner avec la ceinture cardio sans match : page 1 › **Entraînement**. On utilise **une ceinture**, celle du Joueur 1, avec âge, poids et sexe pour les calories et les zones ; on la choisit directement là (avec l'interrupteur *Ceintures cardio*, le Bluetooth et les autorisations s'ils manquent).
+Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **Entraînement avec la ceinture**. On utilise **une ceinture**, celle du Joueur 1, avec âge, poids et sexe pour les calories et les zones ; on la choisit directement là (avec l'interrupteur *Ceintures cardio*, le Bluetooth et les autorisations s'ils manquent).
 
 1. **Démarrer** : en grand la fréquence en direct, dessous le temps et le tour en cours.
 2. **Tour** ferme une partie de l'entraînement et en ouvre une autre (comme le bouton tour d'un chronomètre) : un sprint, un exercice, un tour de piste. **Pause / Reprendre** arrête le temps ; les pauses ne comptent pas.
@@ -323,7 +335,7 @@ Pour s'entraîner avec la ceinture cardio sans match : page 1 › **Entraînemen
 
 ### 7.2 Progrès (app 2.5)
 
-Page 1 › **Progrès** : un document pour voir si vous progressez, **séparé** pour les entraînements et les matchs.
+**Progrès** › **Classement TSM · Progrès** : un document pour voir si vous progressez, **séparé** pour les entraînements et les matchs.
 
 - **Entraînements** : durée, fréquence moyenne et maximale, calories, VFC, récupération.
 - **Matchs** d'un joueur de l'historique (choisi dans la liste) : matchs gagnés, points gagnés, aces, doubles fautes, premières balles, coups gagnants, fautes directes. Les aces et les autres valeurs détaillées n'existent que pour les matchs joués avec les statistiques détaillées ; ce sont des totaux par match.
@@ -336,15 +348,15 @@ Page 1 › **Progrès** : un document pour voir si vous progressez, **séparé**
 
 Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
 
-1. **Arbitre** : page 2 › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
-2. **Caméra** : page 2 › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
+1. **Arbitre** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
+2. **Caméra** : Plus › **Appareils** › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
    - **Filmer / Arrêter** : la vidéo va dans la galerie (*Films/Tennis Score Manager*) avec ses chapitres, un par point.
    - **Direct** : diffusion RTMP sur YouTube, Twitch, Facebook ou votre serveur ; serveur et clé du flux dans *Direct : serveur*.
    - **Cadrer** (assistant de cadrage) : indiquez à combien de mètres derrière la ligne de fond et à quelle hauteur vous avez mis le téléphone, et sur quel terrain vous jouez ; l'appli donne l'inclinaison vers le bas qui garde dans la vidéo les deux lignes de fond et le joueur éloigné, et dit si le terrain tient en largeur. C'est souvent la largeur qui limite : depuis le grillage (environ 6 m) l'objectif principal coupe les coins proches, le **grand-angle** non (**Utiliser l'objectif…**, ou le bouton **Objectif**, enregistrement arrêté). Avec **Afficher le niveau**, l'aperçu montre l'horizon et des indications (*visez 2° plus bas*, *tournez dans le sens horaire*…), en vert quand c'est bon, avec une vibration quand le téléphone est en place. Le niveau s'affiche aussi dans la fenêtre **Caméra** du téléphone de l'arbitre. Les capteurs ne savent pas la gauche et la droite : vérifiez à l'œil que le filet est au centre.
    - **Tracé** (tracé du terrain) : l'aperçu montre les lignes du terrain telles que l'objectif les voit, et elles suivent le téléphone quand on l'incline. Déplacez les curseurs (**Distance**, **Hauteur**, **Direction**, **Décalage latéral** et, si besoin, **Champ de vision** et **Correction d'inclinaison**) jusqu'à ce qu'elles coïncident avec les vraies : cela règle aussi le centrage, et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour le terrain du match (*Club · Court* de l'arbitre) et repris la fois suivante. Tracé et curseurs sont aussi dans la fenêtre **Caméra** de l'arbitre. Plus le téléphone est haut, mieux on voit la moitié éloignée du terrain : à 2,5 m elle est écrasée juste au-dessus du filet.
-3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en page 2 › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
+3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
 
-- **Vidéos** (page 1) : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de la page 2.
+- **Vidéo** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de la page 2.
 - **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
 - **Temps forts** : montage automatique des plus beaux points (aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
   - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** en page 1) (sans choix, celui de l'homme ; valable dans toute l'application, aussi en page 1, dans l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (carte **Tournoi** en page 1), ou club et court.
@@ -354,7 +366,7 @@ Un deuxième téléphone sur un trépied filme le match et met le score de l'arb
 
 ### 7.4 Raquettes : raquette virtuelle (app 2.5)
 
-Page 1 › **Raquettes** › **Mes raquettes** : chaque raquette physique a sa fiche (deux raquettes du même modèle font deux fiches : cordage, poids et heures diffèrent).
+**Progrès** (ou **Plus**) › **Mes raquettes** : chaque raquette physique a sa fiche (deux raquettes du même modèle font deux fiches : cordage, poids et heures diffèrent).
 
 - **Fiche** : surnom (A, B…), marque, modèle, poids, équilibre, tamis et plan de cordage, saisis à la main ou pris **depuis le catalogue** (données du fabricant, à corriger si vous avez mesuré la vôtre). *Mise de côté* : n'est plus proposée, mais reste dans les comparaisons.
 - **Cordages** : type (monofilament, multifilament, boyau synthétique, boyau naturel, hybride), marque et modèle (aussi parmi les cordages courants), calibre, tension des montants et des travers, date et remarques. *Nouveau cordage* part de celui en place. Pour chacun l'app additionne les **heures de jeu** des matchs et entraînements associés et prévient au-delà du **seuil de contrôle** choisi (20 heures par défaut) : le temps seul ne dit pas la tension restante.
@@ -366,7 +378,7 @@ Page 1 › **Raquettes** › **Mes raquettes** : chaque raquette physique a sa f
 
 Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît le service et les boutons disent comment il s'est passé. Un seul téléphone suffit, sans arbitre.
 
-1. Page 1 › **Entraînement** › **Entraînement des coups**, choisissez le coup (**Service**, **Coup droit**, **Revers**, **Volée**) › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
+1. **S'entraîner** › **Entraînement des coups**, choisissez le coup (**Service**, **Coup droit**, **Revers**, **Volée**) › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
 2. **Où placer le téléphone** (s'ouvre tout seul la première fois, puis avec le bouton *Où placer le téléphone ?*) :
    - **à côté du serveur**, du côté du bras qui frappe (à droite pour un droitier), à **3-4 m**, au niveau de la ligne de fond ou un demi-mètre derrière ;
    - objectif à **1-1,2 m** du sol, téléphone **à l'horizontale** et droit, pointé sur le serveur ;
@@ -407,7 +419,7 @@ Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-F
 
 ### 8.2 Sur le téléphone de l'arbitre
 
-1. Page 2 › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
+1. Plus › **Appareils** › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
 2. L'**adresse** (ex. `192.168.43.1:8080`), le **QR code** et le nombre de tableaux connectés apparaissent. S'il est écrit *Aucun réseau*, activez le point d'accès ou connectez-vous à celui de l'autre téléphone.
 3. **Aperçu sur ce téléphone** ouvre le tableau dans le navigateur du téléphone lui-même.
 4. **Apparence du tableau** : couleur de chaque joueur (8 couleurs), durée du match, chrono du service et des pauses, manches terminées, messages (balle de break, balle de set, changement de côté…), balle à côté du serveur, segments éteints visibles, texte en bas (vide = club et court de la page 1). Les modifications arrivent aussitôt sur l'écran.
@@ -419,7 +431,7 @@ Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊ
 
 ### 8.3 Sur le téléphone-tableau
 
-1. Page 1 › tout en bas, **Utiliser comme tableau**.
+1. **Jouer** › **Utiliser comme tableau**.
 2. Le téléphone **cherche tout seul** le téléphone de l'arbitre (annonce sur le réseau et balayage du point d'accès, quelques secondes) et mémorise la dernière adresse. S'il ne le trouve pas : vérifiez le point d'accès et *Tableau d'affichage TV*, puis **Chercher à nouveau**, ou tapez l'adresse affichée par l'arbitre et **Connecter**. Il le trouve même si *Tableau d'affichage sur TV ou écran* est aussi activé sur ce téléphone ; si le Wi-Fi se connecte plus tard, il cherche de nouveau tout seul.
 3. Le tableau passe en plein écran, à l'horizontale, avec l'écran toujours allumé.
    - **Avec le câble HDMI** : le tableau s'affiche sur l'écran externe dans son format ; le téléphone affiche *Le tableau est sur l'écran externe* avec la luminosité au minimum (**Afficher aussi ici** pour le voir aussi sur le téléphone). Si on débranche le câble, il revient sur le téléphone.

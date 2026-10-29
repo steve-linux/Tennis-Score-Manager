@@ -94,10 +94,22 @@ bash installa_tsm.sh
    - Wenn der Computer das Telefon nicht sieht: unter Windows den USB-Treiber des Herstellers, unter Linux das Paket mit den udev-Regeln (1.1); dann das Kabel neu einstecken. Alternativ ohne Kabel und Treiber: **Device Manager › Pair devices using Wi-Fi** (Debugging über WLAN, Android 11+, Computer und Telefon im selben Netz).
 3. Alternativ **Build › Build App Bundle(s) / APK(s) › Build APK(s)**, die APK auf das Telefon kopieren und installieren (die Installation unbekannter Apps muss erlaubt sein).
 
+### 3.1 Wie die App aufgebaut ist (App 2.5)
+
+Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen wirst (Punkte zählen, mit Armbändern spielen, trainieren, Matches filmen) und deinen Namen; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten gibt es immer **fünf Reiter**:
+
+- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, die **Revanche** des letzten, das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
+- **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
+- **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
+- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, Schläger, Matches übertragen, Einführung, Version und Lizenz.
+
+**Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
+
 ## 4. Die Stimme (funktioniert ohne Internet)
 
 - Jede Ansage wird **in einem einzigen Satz** von der Sprachausgabe des Telefons mit einer installierten Stimme gesprochen: kein Internet und eine natürliche Satzmelodie. Die Namen der Spieler sind Teil des Satzes.
-- Seite 2 › **Audio und Stimme**:
+- Mehr › **Sprache und Stimme** › **Audio und Stimme**:
   - **Sprachausgabe-Engine**: *Standard des Telefons* (bei Samsung ist das Samsung TTS) oder eine Engine deiner Wahl, z. B. *Sprachdienste von Google*. In den Tests, auf Italienisch durchgeführt, klang Google natürlicher.
   - **Stimme**: *Automatisch (beste offline)* oder eine bestimmte Stimme (Google führt seine Stimmen mit einem Code auf, als *Stimme …*; die als *online* markierten brauchen Internet).
   - **Stimme testen**: spricht eine Folge von Beispielansagen mit den eingegebenen Namen. Während des Sprechens wird die Taste zu **Test beenden**: Tippe erneut darauf, um abzubrechen (der Test stoppt auch von selbst, wenn du die Seite verlässt). Die Sprachausgabe lässt sich nicht mitten im Satz anhalten, deshalb beendet die Taste sie; drückst du erneut, beginnt sie wieder von vorn.
@@ -111,7 +123,7 @@ bash installa_tsm.sh
 
 ### 4.1 Sprachen (App 2.3, Firmware 2.2)
 
-Seite 2 › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
+Mehr › **Sprache und Stimme** › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
 
 Die Ansagen sind keine Wort-für-Wort-Übersetzungen: Sie folgen den offiziellen Texten für Stuhlschiedsrichter des jeweiligen Verbands, also FFT *L'arbitrage en 255 questions* und ITF auf Französisch, den Unterlagen von DTB/BTV und Swiss Tennis, RFET *Deberes y procedimientos* und FPT *Deveres e Procedimentos* (dem einzigen veröffentlichten portugiesischen Ansagetext). Das Englische folgt der ITF. Im Englischen heißt die Null in den Satzergebnissen am Matchende *love* („six love, six four“), wie bei den Punkten.
 
@@ -275,8 +287,8 @@ Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfre
 
 Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar Meter weniger als die Platzlänge. Mit einem zweiten Telefon hinter der anderen Grundlinie hat jeder Spieler immer eines in der Nähe: Das zweite (**Satellit**) empfängt Gurte und Armbänder der Spieler auf seiner Seite und überbrückt zum **Haupttelefon**, das das Match führt.
 
-1. **Haupttelefon**: Seite 2 › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
-2. **Satellit**: Seite 2 › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
+1. **Haupttelefon**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
+2. **Satellit**: Mehr › **Geräte** › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
 3. Der Satellit folgt selbst den auf dem Haupttelefon gewählten Gurten und Armbändern, auf denselben Seiten: nichts zu wählen. Lass ihn mit geöffneter App hinter der Grundlinie liegen.
 
 - **Seitenwechsel**: nichts zu tun. Jeder Gurt und jedes Armband bleibt beim verbundenen Telefon, solange das Signal hält, dann übernimmt das nähere (ein paar Sekunden). Das Haupttelefon zeigt *Über zweites Telefon*; während der Übergabe kann ein Armband kurz als getrennt erscheinen.
@@ -311,7 +323,7 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 ### 7.1 Training mit dem Gurt (App 2.5)
 
-Zum Trainieren mit dem Brustgurt ohne Match: Seite 1 › **Training**. Es wird **ein Gurt** verwendet, der von Spieler 1, mit Alter, Gewicht und Geschlecht für Kalorien und Zonen; man wählt ihn direkt dort (mit dem Schalter *Brustgurte*, Bluetooth und Berechtigungen, falls sie fehlen).
+Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit dem Gurt**. Es wird **ein Gurt** verwendet, der von Spieler 1, mit Alter, Gewicht und Geschlecht für Kalorien und Zonen; man wählt ihn direkt dort (mit dem Schalter *Brustgurte*, Bluetooth und Berechtigungen, falls sie fehlen).
 
 1. **Starten**: groß die Live-Herzfrequenz, darunter die Zeit und die laufende Runde.
 2. **Runde** schließt einen Abschnitt des Trainings und beginnt den nächsten (wie die Rundentaste einer Stoppuhr): ein Sprint, eine Übung, eine Bahnrunde. **Pause / Weiter** hält die Zeit an; Pausen zählen nicht.
@@ -323,7 +335,7 @@ Zum Trainieren mit dem Brustgurt ohne Match: Seite 1 › **Training**. Es wird *
 
 ### 7.2 Fortschritte (App 2.5)
 
-Seite 1 › **Fortschritte**: ein Dokument, um zu sehen, ob du besser wirst, **getrennt** für Trainings und Matches.
+**Fortschritt** › **TSM-Wertung · Fortschritte**: ein Dokument, um zu sehen, ob du besser wirst, **getrennt** für Trainings und Matches.
 
 - **Trainings**: Dauer, durchschnittliche und maximale Herzfrequenz, Kalorien, HRV, Erholung.
 - **Matches** eines Spielers aus dem Verlauf (aus der Liste gewählt): gewonnene Matches, gewonnene Punkte, Asse, Doppelfehler, erste Aufschläge im Feld, Winner, unerzwungene Fehler. Asse und die anderen detaillierten Werte gibt es nur bei Matches mit detaillierter Statistik; es sind Summen pro Match.
@@ -336,15 +348,15 @@ Seite 1 › **Fortschritte**: ein Dokument, um zu sehen, ob du besser wirst, **g
 
 Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
 
-1. **Schiedsrichter**: Seite 2 › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
-2. **Kamera**: Seite 2 › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
+1. **Schiedsrichter**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
+2. **Kamera**: Mehr › **Geräte** › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
    - **Aufnehmen / Stopp**: Das Video kommt in die Galerie (*Filme/Tennis Score Manager*) mit Kapiteln, eines pro Punkt.
    - **Live**: RTMP-Übertragung zu YouTube, Twitch, Facebook oder einem eigenen Server; Server und Stream-Schlüssel unter *Live: Server*.
    - **Ausrichten** (Bildausrichtung): Gib ein, wie viele Meter hinter der Grundlinie und wie hoch das Telefon steht und auf welchem Platz gespielt wird; die App nennt die Neigung nach unten, bei der beide Grundlinien und der entfernte Spieler im Video bleiben, und ob der Platz in der Breite passt. Oft begrenzt die Breite: vom Zaun aus (etwa 6 m) schneidet das Hauptobjektiv die nahen Ecken ab, das **Weitwinkel** nicht (**Objektiv … verwenden** oder die Taste **Objektiv**, bei gestoppter Aufnahme). Mit **Wasserwaage zeigen** erscheinen in der Vorschau der Horizont und Hinweise (*2° tiefer zielen*, *im Uhrzeigersinn drehen*…), grün wenn es passt, mit einer Vibration, wenn das Telefon richtig steht. Die Wasserwaage erscheint auch im Fenster **Kamera** auf dem Telefon des Schiedsrichters. Links und rechts kennen die Sensoren nicht: mit dem Auge prüfen, dass das Netz in der Mitte ist.
    - **Umriss** (Platzumriss): In der Vorschau erscheinen die Platzlinien so, wie das Objektiv sie sieht, und sie folgen dem Telefon beim Neigen. Die Schieberegler (**Abstand**, **Höhe**, **Richtung**, **Seitlicher Versatz** und bei Bedarf **Bildwinkel** und **Neigungskorrektur**) bewegen, bis sie auf den echten Linien liegen: So stimmt auch die Mitte, und die empfohlene Neigung wird genau. Die Einstellung wird für den Platz des Matches (*Verein · Platz* des Schiedsrichters) gespeichert und beim nächsten Mal übernommen. Umriss und Regler gibt es auch im Fenster **Kamera** des Schiedsrichters. Je höher das Telefon, desto besser sieht man die entfernte Platzhälfte: aus 2,5 m ist sie knapp über dem Netz zusammengedrückt.
-3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Seite 2 › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
+3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
 
-- **Videos** (Seite 1): die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von Seite 2.
+- **Video** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von Seite 2.
 - **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
 - **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
   - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** auf Seite 1) (ohne Wahl der Mann; gilt in der ganzen App, auch auf Seite 1, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (Karte **Turnier** auf Seite 1) oder Club und Platz.
@@ -354,7 +366,7 @@ Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand 
 
 ### 7.4 Schläger: virtueller Schläger (App 2.5)
 
-Seite 1 › **Schläger** › **Meine Schläger**: jeder echte Schläger hat seine eigene Karte (zwei Schläger desselben Modells sind zwei Karten: Saiten, Gewicht und Stunden unterscheiden sich).
+**Fortschritt** (oder **Mehr**) › **Meine Schläger**: jeder echte Schläger hat seine eigene Karte (zwei Schläger desselben Modells sind zwei Karten: Saiten, Gewicht und Stunden unterscheiden sich).
 
 - **Karte**: Spitzname (A, B…), Marke, Modell, Gewicht, Balance, Kopfgröße und Besaitungsbild, von Hand eingegeben oder **aus dem Katalog** übernommen (Herstellerangaben, zu korrigieren, wenn du deinen gemessen hast). *Ausgemustert*: wird nicht mehr angeboten, bleibt aber im Vergleich.
 - **Besaitungen**: Typ (Monofil, Multifil, Synthetik, Naturdarm, Hybrid), Marke und Modell (auch aus den gängigen Saiten), Stärke, Spannung der Längs- und Quersaiten, Datum und Notizen. *Neue Besaitung* startet von der aktuellen. Für jede zählt die App die **Spielstunden** der zugeordneten Matches und Trainings und warnt beim Überschreiten der gewählten **Prüfgrenze** (standardmäßig 20 Stunden): aus der Zeit allein kennt sie die verbleibende Spannung nicht.
@@ -366,7 +378,7 @@ Seite 1 › **Schläger** › **Meine Schläger**: jeder echte Schläger hat sei
 
 Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erkennt den Aufschlag, und mit den Tasten sagt man, wie er war. Ein Telefon reicht, ohne Schiedsrichter.
 
-1. Seite 1 › **Training** › **Schlagtraining**, den Schlag wählen (**Aufschlag**, **Vorhand**, **Rückhand**, **Volley**) › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
+1. **Trainieren** › **Schlagtraining**, den Schlag wählen (**Aufschlag**, **Vorhand**, **Rückhand**, **Volley**) › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
 2. **Wo das Telefon hinkommt** (öffnet sich beim ersten Mal von selbst, dann über *Wo kommt das Telefon hin?*):
    - **neben dem Aufschläger**, auf der Seite des Schlagarms (rechts bei Rechtshändern), **3-4 m** entfernt, auf Höhe der Grundlinie oder einen halben Meter dahinter;
    - Objektiv **1-1,2 m** über dem Boden, Telefon **quer** und gerade, auf den Aufschläger gerichtet;
@@ -407,7 +419,7 @@ Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anz
 
 ### 8.2 Auf dem Telefon des Schiedsrichters
 
-1. Seite 2 › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
+1. Mehr › **Geräte** › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
 2. Es erscheinen die **Adresse** (z. B. `192.168.43.1:8080`), der **QR-Code** und wie viele Anzeigetafeln verbunden sind. Steht dort *Kein Netz*, schalte den Hotspot ein oder verbinde dich mit dem des anderen Telefons.
 3. **Vorschau auf diesem Telefon** öffnet die Anzeigetafel im Browser des Telefons selbst.
 4. **Aussehen der Anzeigetafel**: Farbe jedes Spielers (8 Farben), Matchdauer, Aufschlaguhr und Pausen, beendete Sätze, Meldungen (Breakball, Satzball, Seitenwechsel …), Ball beim Aufschläger, ausgeschaltete Segmente sichtbar, Text unten (leer = Verein und Platz von Seite 1). Änderungen erscheinen sofort auf dem Monitor.
@@ -419,7 +431,7 @@ Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT 
 
 ### 8.3 Auf dem Anzeigetafel-Telefon
 
-1. Seite 1 › ganz unten **Als Anzeigetafel verwenden**.
+1. **Spielen** › **Als Anzeigetafel verwenden**.
 2. Das Telefon **sucht selbst** nach dem Telefon des Schiedsrichters (Ankündigung im Netz und Scan des Hotspots, wenige Sekunden) und merkt sich die letzte Adresse. Findet es ihn nicht: Hotspot und *TV-Anzeigetafel* prüfen, dann **Erneut suchen**, oder die vom Schiedsrichter angezeigte Adresse eintippen und **Verbinden**. Es findet es auch, wenn auf diesem Telefon ebenfalls *Anzeigetafel auf TV oder Monitor* eingeschaltet ist; verbindet sich das WLAN erst später, sucht es von selbst erneut.
 3. Die Anzeigetafel läuft im Vollbild, im Querformat, mit dauerhaft eingeschaltetem Bildschirm.
    - **Mit HDMI-Kabel**: Die Anzeigetafel erscheint im Format des Monitors auf dem Monitor; das Telefon zeigt *Die Anzeigetafel ist auf dem externen Monitor* bei minimaler Helligkeit (**Auch hier zeigen**, um sie auch auf dem Telefon zu sehen). Nach dem Abziehen des Kabels kehrt sie auf das Telefon zurück.

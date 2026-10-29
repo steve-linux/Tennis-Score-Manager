@@ -117,6 +117,7 @@ fun AppRoot(c: MatchController) {
     ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
+                Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
                 Screen.OPTIONS -> OptionsScreen(c)
                 Screen.START -> StartScreen(c)
@@ -128,6 +129,8 @@ fun AppRoot(c: MatchController) {
                 Screen.PROGRESS -> ProgressScreen(c)
                 Screen.VIDEOS -> VideosScreen(c)
                 Screen.RACKETS -> RacketsScreen(c)
+                Screen.DEVICES -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.DEVICES)
+                Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
             }
         }
     }

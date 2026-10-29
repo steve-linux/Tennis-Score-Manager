@@ -1050,7 +1050,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE }
+
+/** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -1117,7 +1120,15 @@ class MatchController(
     /** Telecomandini Bluetooth da selfie (modalità Telecomandi): i tasti arrivano da MainActivity. */
     val remotes = RemoteInput(app, storage, scope)
 
-    val screen = MutableStateFlow(Screen.SETUP)
+    val screen = MutableStateFlow(Screen.HOME)
+    /** Scheda della prima schermata: resta quella da cui si è partiti, così "Indietro" ci torna. */
+    val homeTab = MutableStateFlow(HomeTab.PLAY)
+
+    /** Torna alla prima schermata ([tab] se dato, altrimenti la scheda di prima). */
+    fun home(tab: HomeTab? = null) {
+        tab?.let { homeTab.value = it }
+        screen.value = Screen.HOME
+    }
     val setup = MutableStateFlow(storage.setup)
     val options = MutableStateFlow(storage.options)
     val live = MutableStateFlow<LiveMatch?>(null)
@@ -1538,15 +1549,18 @@ class MatchController(
     fun back() {
         screen.value = when (screen.value) {
             Screen.OPTIONS -> Screen.SETUP
-            Screen.PROGRESS -> Screen.SETUP
-            Screen.RACKETS -> Screen.SETUP
-            Screen.VIDEOS -> Screen.SETUP
+            Screen.SETUP -> Screen.HOME
+            Screen.PROGRESS -> Screen.HOME
+            Screen.RACKETS -> Screen.HOME
+            Screen.VIDEOS -> Screen.HOME
+            Screen.DEVICES -> Screen.HOME
+            Screen.VOICE -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
                 Screen.WORKOUT
             } else {
-                Screen.SETUP
+                Screen.HOME
             }
             Screen.START -> {
                 if (tv.value.enabled) MatchService.start(app) else MatchService.stop(app)
@@ -3504,7 +3518,7 @@ class MatchController(
     fun onActivityCreated() {
         if (restoreChecked) return
         restoreChecked = true
-        if (live.value != null || summary.value != null || screen.value != Screen.SETUP) return
+        if (live.value != null || summary.value != null || screen.value != Screen.HOME) return
         val id = storage.summaryOpen ?: return
         val rec = storage.loadLastFinished()?.takeIf { it.id == id } ?: return
         summary.value = LiveMatch(rec, ScoreEngine.replay(rec.rules, rec.events))
@@ -8435,6 +8449,14 @@ class Storage(context: Context) {
     var cameraOverlay: Boolean
         get() = prefs.getBoolean("camera_overlay", true)
         set(v) = prefs.edit().putBoolean("camera_overlay", v).apply()
+    /** Prima accensione fatta (lingua, uso, nome) e il nome di chi usa l'app (per Progressi e rating; "" = non detto). */
+    var onboarded: Boolean
+        get() = prefs.getBoolean("onboarded", false)
+        set(v) = prefs.edit().putBoolean("onboarded", v).apply()
+    var myName: String
+        get() = prefs.getString("my_name", null) ?: ""
+        set(v) = prefs.edit().putString("my_name", v.trim()).apply()
+
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
         get() = prefs.getString("camera_lens", null)
@@ -13527,6 +13549,7 @@ fun AppRoot(c: MatchController) {
     ) {
         AnimatedContent(targetState = screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "screen") { s ->
             when (s) {
+                Screen.HOME -> com.tennis.scoremanager.ui.screens.HomeScreen(c)
                 Screen.SETUP -> SetupScreen(c)
                 Screen.OPTIONS -> OptionsScreen(c)
                 Screen.START -> StartScreen(c)
@@ -13538,6 +13561,8 @@ fun AppRoot(c: MatchController) {
                 Screen.PROGRESS -> ProgressScreen(c)
                 Screen.VIDEOS -> VideosScreen(c)
                 Screen.RACKETS -> RacketsScreen(c)
+                Screen.DEVICES -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.DEVICES)
+                Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
             }
         }
     }
@@ -14376,6 +14401,183 @@ fun WorkoutStrapCard(c: MatchController) {
         straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/OnboardingUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/OnboardingUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.data.PlayMode
+import com.tennis.scoremanager.model.Lang
+
+/** Come si userà l'app: decide la modalità di serie e la scheda da cui si parte. */
+private enum class Use { REFEREE, BANDS, TRAIN, VIDEO }
+
+/**
+ * Prima accensione: lingua, come si userà l'app e il proprio nome, a tutto schermo. Si può saltare; alla fine
+ * l'app parte dalla scheda giusta (coi braccialetti, dai dispositivi da collegare).
+ */
+@Composable
+fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val o by c.options.collectAsState()
+    var step by remember { mutableIntStateOf(0) }
+    var use by remember { mutableStateOf<Use?>(null) }
+    var name by remember { mutableStateOf(c.storage.myName) }
+    fun finish() {
+        c.storage.onboarded = true
+        val n = name.trim()
+        c.storage.myName = n
+        if (n.isNotEmpty() && c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = n) }
+        when (use) {
+            Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
+            Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
+            Use.TRAIN -> c.home(HomeTab.TRAIN)
+            Use.VIDEO -> c.home(HomeTab.VIDEO)
+            null -> c.home(HomeTab.PLAY)
+        }
+        onDone()
+    }
+    Dialog(onDismissRequest = {}, properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)) {
+        Column(
+            Modifier.fillMaxSize().background(TsmColors.Background).systemBarsPadding().padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(14.dp), color = TsmColors.Ball, modifier = Modifier.size(44.dp)) {
+                    Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.OnBall, modifier = Modifier.padding(10.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(s.onbWelcome, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text("${step + 1} / 3", color = TsmColors.TextDim, fontSize = 13.sp)
+                }
+            }
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                when (step) {
+                    0 -> {
+                        Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
+                        Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
+                    }
+                    1 -> {
+                        Text(s.onbUseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        for ((u, icon, title, hint) in listOf(
+                            Quad(Use.REFEREE, Icons.Filled.Gavel, s.onbUseReferee, s.onbUseRefereeHint),
+                            Quad(Use.BANDS, Icons.Filled.Watch, s.onbUseBands, s.onbUseBandsHint),
+                            Quad(Use.TRAIN, Icons.Filled.MonitorHeart, s.onbUseTrain, s.onbUseTrainHint),
+                            Quad(Use.VIDEO, Icons.Filled.Videocam, s.onbUseVideo, s.onbUseVideoHint),
+                        )) {
+                            Choice(icon, title, hint, use == u) { use = u }
+                        }
+                    }
+                    else -> {
+                        Text(s.onbNameTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        OutlinedTextField(
+                            name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text(s.onbNameHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                GhostButton(s.onbSkip, Icons.AutoMirrored.Filled.ArrowForward, { finish() }, Modifier.weight(1f))
+                BigButton(if (step < 2) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (step < 2) step++ else finish() }, Modifier.weight(1f))
+            }
+            Spacer(Modifier.height(4.dp))
+        }
+    }
+}
+
+private data class Quad(val use: Use, val icon: ImageVector, val title: String, val hint: String)
+
+@Composable
+private fun Choice(icon: ImageVector, title: String, hint: String, on: Boolean, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(16.dp), color = if (on) TsmColors.Ball else TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = if (on) TsmColors.OnBall else TsmColors.Ball, modifier = Modifier.size(26.dp))
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(title, color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(hint, color = if (on) TsmColors.OnBall else TsmColors.TextDim, fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+/** Altro › Tu: il proprio nome (Progressi parte da lì, la scheda Progressi mostra il proprio rating). */
+@Composable
+fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var name by remember { mutableStateOf(c.storage.myName) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.moreProfile) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
+                )
+                Text(s.moreProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.storage.myName = name; onDone() }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 TSM_EOF
 
@@ -15288,7 +15490,7 @@ fun ServeTrainingCard(c: MatchController) {
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
         val strokes = TrainedStroke.entries
-        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 4)
+        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 2)
         BigButton(s.serveStart, Icons.Filled.Videocam, {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
@@ -16376,6 +16578,68 @@ interface Strings {
     val poseHintGround: String
     val poseAnalyzeShots: String
     val poseAnalyzingShot: (Int, Int) -> String
+    /** Prima schermata a cinque schede (Gioca, Allenati, Video, Progressi, Altro). */
+    val tabPlay: String
+    val tabTrain: String
+    val tabVideo: String
+    val tabProgress: String
+    val tabMore: String
+    val playNewMatchHint: String
+    val playRematch: (String) -> String
+    val playResume: (String) -> String
+    val playTournamentHint: String
+    val playUseAs: String
+    val playAsBoardHint: String
+    val playAsCamera: String
+    val playAsCameraHint: String
+    val trainCardio: String
+    val trainCardioHint: String
+    val videoRecord: String
+    val videoRecordHint: String
+    val videoLibrary: String
+    val videoLibraryHint: String
+    val progressHistoryHint: String
+    val progressTrendHint: String
+    val progressRacketsHint: String
+    val moreDevices: String
+    val moreDevicesHint: String
+    val moreVoice: String
+    val moreVoiceHint: String
+    val moreRacketsHint: String
+    val moreTransfer: String
+    val moreTransferHint: String
+    val statusBands: (Int) -> String
+    val statusStraps: (Int) -> String
+    val statusCamera: String
+    val statusTv: String
+    val statusNone: String
+    val playTournament: String
+    val step1Hint: String
+    val step2Hint: String
+    val moreDetails: String
+    val moreDetailsHint: String
+    val recentPlayers: String
+    /** Prima accensione guidata e profilo Tu. */
+    val onbWelcome: String
+    val onbLang: String
+    val onbUseTitle: String
+    val onbUseReferee: String
+    val onbUseRefereeHint: String
+    val onbUseBands: String
+    val onbUseBandsHint: String
+    val onbUseTrain: String
+    val onbUseTrainHint: String
+    val onbUseVideo: String
+    val onbUseVideoHint: String
+    val onbNameTitle: String
+    val onbNameHint: String
+    val onbSkip: String
+    val onbStart: String
+    val moreProfile: String
+    val moreProfileHint: String
+    val moreTour: String
+    val moreTourHint: String
+    val profileName: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -17426,6 +17690,66 @@ object ItStrings : Strings {
     override val poseHintGround = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: preparazione (polso più indietro), impatto e finale. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi colpi dentro con quelli fuori."
     override val poseAnalyzeShots = "Analizza i colpi"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisi del colpo $a di $b…" }
+    override val tabPlay = "Gioca"
+    override val tabTrain = "Allenati"
+    override val tabVideo = "Video"
+    override val tabProgress = "Progressi"
+    override val tabMore = "Altro"
+    override val playNewMatchHint = "Chi gioca, regole e come segni il punteggio"
+    override val playRematch: (String) -> String = { "Rivincita: $it" }
+    override val playResume: (String) -> String = { "Riprendi: $it" }
+    override val playTournamentHint = "Americano o Mexicano, a coppie che girano"
+    override val playUseAs = "Usa questo telefono come"
+    override val playAsBoardHint = "Lo schermo diventa il tabellone di una partita"
+    override val playAsCamera = "Telefono-telecamera"
+    override val playAsCameraHint = "Riprende la partita col punteggio dell'arbitro"
+    override val trainCardio = "Allenamento con la fascia"
+    override val trainCardioHint = "Battito, giri, HRV e recupero"
+    override val videoRecord = "Riprendi con questo telefono"
+    override val videoRecordHint = "Registra un video, anche senza arbitro"
+    override val videoLibrary = "I tuoi video"
+    override val videoLibraryHint = "Capitoli punto per punto, highlights, filtri, importa"
+    override val progressHistoryHint = "Le partite finite: riepiloghi, PDF, giocatori"
+    override val progressTrendHint = "Rating TSM, classifica e confronto nel tempo"
+    override val progressRacketsHint = "Statistiche e sensazioni per racchetta"
+    override val moreDevices = "Dispositivi"
+    override val moreDevicesHint = "Braccialetti, fasce, telecomandi, secondo telefono, tabellone TV"
+    override val moreVoice = "Lingua e voce"
+    override val moreVoiceHint = "Lingua dell'app, voce che annuncia il punteggio"
+    override val moreRacketsHint = "Corde, tensioni e incordature"
+    override val moreTransfer = "Trasferisci le partite"
+    override val moreTransferHint = "Su un altro telefono, con un codice"
+    override val statusBands: (Int) -> String = { "Braccialetti $it/2" }
+    override val statusStraps: (Int) -> String = { "Fasce $it" }
+    override val statusCamera = "Telecamera collegata"
+    override val statusTv = "Tabellone TV"
+    override val statusNone = "Nessun dispositivo collegato"
+    override val playTournament = "Torneo tra amici"
+    override val step1Hint = "Passo 1 di 2 · Chi gioca. Tutto facoltativo: puoi andare avanti anche senza nomi."
+    override val step2Hint = "Passo 2 di 2 · Come segni il punteggio e le regole della partita."
+    override val moreDetails = "Altri dettagli"
+    override val moreDetailsHint = "Circolo, campo e torneo, se vuoi"
+    override val recentPlayers = "Giocatori recenti"
+    override val onbWelcome = "Benvenuto in Tennis Score Manager"
+    override val onbLang = "Scegli la lingua"
+    override val onbUseTitle = "Come userai TSM?"
+    override val onbUseReferee = "Segno il punteggio di una partita"
+    override val onbUseRefereeHint = "Dal telefono, da arbitro o mentre giochi"
+    override val onbUseBands = "Gioco coi braccialetti"
+    override val onbUseBandsHint = "Ogni giocatore segna i punti dal polso"
+    override val onbUseTrain = "Mi alleno"
+    override val onbUseTrainHint = "Fascia cardio, servizio, dritto, rovescio, volée"
+    override val onbUseVideo = "Riprendo le partite"
+    override val onbUseVideoHint = "Video, highlights e moviola"
+    override val onbNameTitle = "Come ti chiami?"
+    override val onbNameHint = "Serve per i tuoi progressi e il rating TSM. Puoi lasciarlo vuoto e scriverlo dopo in Altro › Tu."
+    override val onbSkip = "Salta"
+    override val onbStart = "Inizia"
+    override val moreProfile = "Tu"
+    override val moreProfileHint = "Il tuo nome, per progressi e rating"
+    override val moreTour = "Presentazione dell'app"
+    override val moreTourHint = "Le prime domande, di nuovo"
+    override val profileName = "Il tuo nome"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -18462,6 +18786,66 @@ object EnStrings : Strings {
     override val poseHintGround = "The app finds the body position in the clips, all on the phone, and measures three moments: preparation (wrist furthest back), contact and finish. They are estimates from a side view: most useful to compare your shots in with your shots out."
     override val poseAnalyzeShots = "Analyse the shots"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analysing shot $a of $b…" }
+    override val tabPlay = "Play"
+    override val tabTrain = "Train"
+    override val tabVideo = "Video"
+    override val tabProgress = "Progress"
+    override val tabMore = "More"
+    override val playNewMatchHint = "Who plays, rules and how you keep score"
+    override val playRematch: (String) -> String = { "Rematch: $it" }
+    override val playResume: (String) -> String = { "Resume: $it" }
+    override val playTournamentHint = "Americano or Mexicano, with rotating pairs"
+    override val playUseAs = "Use this phone as"
+    override val playAsBoardHint = "The screen becomes a match scoreboard"
+    override val playAsCamera = "Camera phone"
+    override val playAsCameraHint = "Films the match with the umpire's score"
+    override val trainCardio = "Workout with the strap"
+    override val trainCardioHint = "Heart rate, laps, HRV and recovery"
+    override val videoRecord = "Record with this phone"
+    override val videoRecordHint = "Record a video, even without an umpire"
+    override val videoLibrary = "Your videos"
+    override val videoLibraryHint = "Point-by-point chapters, highlights, filters, import"
+    override val progressHistoryHint = "Finished matches: summaries, PDF, players"
+    override val progressTrendHint = "TSM rating, ranking and comparison over time"
+    override val progressRacketsHint = "Statistics and feel per racket"
+    override val moreDevices = "Devices"
+    override val moreDevicesHint = "Wristbands, straps, remotes, second phone, TV scoreboard"
+    override val moreVoice = "Language and voice"
+    override val moreVoiceHint = "App language, voice that calls the score"
+    override val moreRacketsHint = "Strings, tensions and restringing"
+    override val moreTransfer = "Transfer matches"
+    override val moreTransferHint = "To another phone, with a code"
+    override val statusBands: (Int) -> String = { "Wristbands $it/2" }
+    override val statusStraps: (Int) -> String = { "Straps $it" }
+    override val statusCamera = "Camera connected"
+    override val statusTv = "TV scoreboard"
+    override val statusNone = "No device connected"
+    override val playTournament = "Friends tournament"
+    override val step1Hint = "Step 1 of 2 · Who plays. All optional: you can go on even without names."
+    override val step2Hint = "Step 2 of 2 · How you keep score and the match rules."
+    override val moreDetails = "More details"
+    override val moreDetailsHint = "Club, court and tournament, if you like"
+    override val recentPlayers = "Recent players"
+    override val onbWelcome = "Welcome to Tennis Score Manager"
+    override val onbLang = "Choose the language"
+    override val onbUseTitle = "How will you use TSM?"
+    override val onbUseReferee = "I keep score of a match"
+    override val onbUseRefereeHint = "On the phone, as umpire or while playing"
+    override val onbUseBands = "I play with the wristbands"
+    override val onbUseBandsHint = "Each player scores points from the wrist"
+    override val onbUseTrain = "I train"
+    override val onbUseTrainHint = "Heart-rate strap, serve, forehand, backhand, volley"
+    override val onbUseVideo = "I film matches"
+    override val onbUseVideoHint = "Videos, highlights and replay"
+    override val onbNameTitle = "What's your name?"
+    override val onbNameHint = "It's used for your progress and TSM rating. You can leave it empty and add it later in More › You."
+    override val onbSkip = "Skip"
+    override val onbStart = "Start"
+    override val moreProfile = "You"
+    override val moreProfileHint = "Your name, for progress and rating"
+    override val moreTour = "App introduction"
+    override val moreTourHint = "The first questions, again"
+    override val profileName = "Your name"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -19521,6 +19905,66 @@ object DeStrings : Strings {
     override val poseHintGround = "Die App erkennt die Körperhaltung in den Clips, alles auf dem Telefon, und misst drei Momente: Ausholen (Handgelenk am weitesten hinten), Treffpunkt und Ausschwung. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner guten Schläge mit den Fehlern."
     override val poseAnalyzeShots = "Schläge analysieren"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Schlag $a von $b wird analysiert…" }
+    override val tabPlay = "Spielen"
+    override val tabTrain = "Trainieren"
+    override val tabVideo = "Video"
+    override val tabProgress = "Fortschritt"
+    override val tabMore = "Mehr"
+    override val playNewMatchHint = "Wer spielt, Regeln und wie gezählt wird"
+    override val playRematch: (String) -> String = { "Revanche: $it" }
+    override val playResume: (String) -> String = { "Fortsetzen: $it" }
+    override val playTournamentHint = "Americano oder Mexicano, mit wechselnden Paaren"
+    override val playUseAs = "Dieses Telefon verwenden als"
+    override val playAsBoardHint = "Der Bildschirm wird zur Anzeigetafel eines Matches"
+    override val playAsCamera = "Kamera-Telefon"
+    override val playAsCameraHint = "Filmt das Match mit dem Stand des Schiedsrichters"
+    override val trainCardio = "Training mit dem Gurt"
+    override val trainCardioHint = "Herzfrequenz, Runden, HRV und Erholung"
+    override val videoRecord = "Mit diesem Telefon aufnehmen"
+    override val videoRecordHint = "Ein Video aufnehmen, auch ohne Schiedsrichter"
+    override val videoLibrary = "Deine Videos"
+    override val videoLibraryHint = "Kapitel Punkt für Punkt, Highlights, Filter, Import"
+    override val progressHistoryHint = "Beendete Matches: Übersichten, PDF, Spieler"
+    override val progressTrendHint = "TSM-Wertung, Rangliste und Verlauf"
+    override val progressRacketsHint = "Statistiken und Gefühl pro Schläger"
+    override val moreDevices = "Geräte"
+    override val moreDevicesHint = "Armbänder, Gurte, Fernbedienungen, zweites Telefon, TV-Anzeige"
+    override val moreVoice = "Sprache und Stimme"
+    override val moreVoiceHint = "App-Sprache, Stimme für den Spielstand"
+    override val moreRacketsHint = "Saiten, Spannungen und Besaitungen"
+    override val moreTransfer = "Matches übertragen"
+    override val moreTransferHint = "Auf ein anderes Telefon, mit einem Code"
+    override val statusBands: (Int) -> String = { "Armbänder $it/2" }
+    override val statusStraps: (Int) -> String = { "Gurte $it" }
+    override val statusCamera = "Kamera verbunden"
+    override val statusTv = "TV-Anzeige"
+    override val statusNone = "Kein Gerät verbunden"
+    override val playTournament = "Turnier unter Freunden"
+    override val step1Hint = "Schritt 1 von 2 · Wer spielt. Alles freiwillig: Es geht auch ohne Namen weiter."
+    override val step2Hint = "Schritt 2 von 2 · Wie gezählt wird und die Regeln des Matches."
+    override val moreDetails = "Weitere Angaben"
+    override val moreDetailsHint = "Verein, Platz und Turnier, wenn du willst"
+    override val recentPlayers = "Letzte Spieler"
+    override val onbWelcome = "Willkommen bei Tennis Score Manager"
+    override val onbLang = "Sprache wählen"
+    override val onbUseTitle = "Wie wirst du TSM nutzen?"
+    override val onbUseReferee = "Ich zähle die Punkte eines Matches"
+    override val onbUseRefereeHint = "Auf dem Telefon, als Schiedsrichter oder beim Spielen"
+    override val onbUseBands = "Ich spiele mit den Armbändern"
+    override val onbUseBandsHint = "Jeder Spieler zählt die Punkte am Handgelenk"
+    override val onbUseTrain = "Ich trainiere"
+    override val onbUseTrainHint = "Brustgurt, Aufschlag, Vorhand, Rückhand, Volley"
+    override val onbUseVideo = "Ich filme Matches"
+    override val onbUseVideoHint = "Videos, Highlights und Zeitlupe"
+    override val onbNameTitle = "Wie heißt du?"
+    override val onbNameHint = "Für deinen Fortschritt und die TSM-Wertung. Du kannst es leer lassen und später unter Mehr › Du eintragen."
+    override val onbSkip = "Überspringen"
+    override val onbStart = "Los geht's"
+    override val moreProfile = "Du"
+    override val moreProfileHint = "Dein Name, für Fortschritt und Wertung"
+    override val moreTour = "App-Einführung"
+    override val moreTourHint = "Die ersten Fragen noch einmal"
+    override val profileName = "Dein Name"
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -20573,6 +21017,66 @@ object EsStrings : Strings {
     override val poseHintGround = "La app encuentra la posición del cuerpo en los clips, todo en el teléfono, y mide tres momentos: preparación (muñeca más atrás), impacto y final. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus golpes dentro con los de fuera."
     override val poseAnalyzeShots = "Analizar los golpes"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analizando el golpe $a de $b…" }
+    override val tabPlay = "Jugar"
+    override val tabTrain = "Entrenar"
+    override val tabVideo = "Vídeo"
+    override val tabProgress = "Progresos"
+    override val tabMore = "Más"
+    override val playNewMatchHint = "Quién juega, reglas y cómo llevas el marcador"
+    override val playRematch: (String) -> String = { "Revancha: $it" }
+    override val playResume: (String) -> String = { "Reanudar: $it" }
+    override val playTournamentHint = "Americano o Mexicano, con parejas que rotan"
+    override val playUseAs = "Usar este teléfono como"
+    override val playAsBoardHint = "La pantalla se convierte en el marcador de un partido"
+    override val playAsCamera = "Teléfono-cámara"
+    override val playAsCameraHint = "Graba el partido con el marcador del árbitro"
+    override val trainCardio = "Entrenamiento con la banda"
+    override val trainCardioHint = "Pulso, vueltas, VFC y recuperación"
+    override val videoRecord = "Grabar con este teléfono"
+    override val videoRecordHint = "Graba un vídeo, también sin árbitro"
+    override val videoLibrary = "Tus vídeos"
+    override val videoLibraryHint = "Capítulos punto a punto, mejores jugadas, filtros, importar"
+    override val progressHistoryHint = "Partidos terminados: resúmenes, PDF, jugadores"
+    override val progressTrendHint = "Rating TSM, clasificación y evolución"
+    override val progressRacketsHint = "Estadísticas y sensaciones por raqueta"
+    override val moreDevices = "Dispositivos"
+    override val moreDevicesHint = "Pulseras, bandas, mandos, segundo teléfono, marcador en TV"
+    override val moreVoice = "Idioma y voz"
+    override val moreVoiceHint = "Idioma de la app, voz que canta el marcador"
+    override val moreRacketsHint = "Cuerdas, tensiones y encordados"
+    override val moreTransfer = "Transferir partidos"
+    override val moreTransferHint = "A otro teléfono, con un código"
+    override val statusBands: (Int) -> String = { "Pulseras $it/2" }
+    override val statusStraps: (Int) -> String = { "Bandas $it" }
+    override val statusCamera = "Cámara conectada"
+    override val statusTv = "Marcador en TV"
+    override val statusNone = "Ningún dispositivo conectado"
+    override val playTournament = "Torneo entre amigos"
+    override val step1Hint = "Paso 1 de 2 · Quién juega. Todo es opcional: puedes seguir sin nombres."
+    override val step2Hint = "Paso 2 de 2 · Cómo llevas el marcador y las reglas del partido."
+    override val moreDetails = "Más detalles"
+    override val moreDetailsHint = "Club, pista y torneo, si quieres"
+    override val recentPlayers = "Jugadores recientes"
+    override val onbWelcome = "Bienvenido a Tennis Score Manager"
+    override val onbLang = "Elige el idioma"
+    override val onbUseTitle = "¿Cómo vas a usar TSM?"
+    override val onbUseReferee = "Llevo el marcador de un partido"
+    override val onbUseRefereeHint = "En el teléfono, como árbitro o mientras juego"
+    override val onbUseBands = "Juego con las pulseras"
+    override val onbUseBandsHint = "Cada jugador marca los puntos desde la muñeca"
+    override val onbUseTrain = "Entreno"
+    override val onbUseTrainHint = "Banda de pulso, saque, derecha, revés, volea"
+    override val onbUseVideo = "Grabo partidos"
+    override val onbUseVideoHint = "Vídeos, mejores jugadas y repetición"
+    override val onbNameTitle = "¿Cómo te llamas?"
+    override val onbNameHint = "Sirve para tus progresos y el rating TSM. Puedes dejarlo vacío y escribirlo después en Más › Tú."
+    override val onbSkip = "Saltar"
+    override val onbStart = "Empezar"
+    override val moreProfile = "Tú"
+    override val moreProfileHint = "Tu nombre, para progresos y rating"
+    override val moreTour = "Presentación de la app"
+    override val moreTourHint = "Las primeras preguntas, otra vez"
+    override val profileName = "Tu nombre"
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -21627,6 +22131,66 @@ object FrStrings : Strings {
     override val poseHintGround = "L'appli trouve la position du corps dans les clips, entièrement sur le téléphone, et mesure trois moments : préparation (poignet le plus en arrière), impact et finish. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos coups bons et vos fautes."
     override val poseAnalyzeShots = "Analyser les coups"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analyse du coup $a sur $b…" }
+    override val tabPlay = "Jouer"
+    override val tabTrain = "S'entraîner"
+    override val tabVideo = "Vidéo"
+    override val tabProgress = "Progrès"
+    override val tabMore = "Plus"
+    override val playNewMatchHint = "Qui joue, règles et façon de compter"
+    override val playRematch: (String) -> String = { "Revanche : $it" }
+    override val playResume: (String) -> String = { "Reprendre : $it" }
+    override val playTournamentHint = "Americano ou Mexicano, avec des paires qui tournent"
+    override val playUseAs = "Utiliser ce téléphone comme"
+    override val playAsBoardHint = "L'écran devient le tableau d'un match"
+    override val playAsCamera = "Téléphone-caméra"
+    override val playAsCameraHint = "Filme le match avec le score de l'arbitre"
+    override val trainCardio = "Entraînement avec la ceinture"
+    override val trainCardioHint = "Fréquence cardiaque, tours, VFC et récupération"
+    override val videoRecord = "Filmer avec ce téléphone"
+    override val videoRecordHint = "Enregistrer une vidéo, même sans arbitre"
+    override val videoLibrary = "Vos vidéos"
+    override val videoLibraryHint = "Chapitres point par point, temps forts, filtres, import"
+    override val progressHistoryHint = "Matchs terminés : récapitulatifs, PDF, joueurs"
+    override val progressTrendHint = "Classement TSM, classement des joueurs et évolution"
+    override val progressRacketsHint = "Statistiques et sensations par raquette"
+    override val moreDevices = "Appareils"
+    override val moreDevicesHint = "Bracelets, ceintures, télécommandes, deuxième téléphone, tableau TV"
+    override val moreVoice = "Langue et voix"
+    override val moreVoiceHint = "Langue de l'appli, voix qui annonce le score"
+    override val moreRacketsHint = "Cordages, tensions et recordages"
+    override val moreTransfer = "Transférer les matchs"
+    override val moreTransferHint = "Vers un autre téléphone, avec un code"
+    override val statusBands: (Int) -> String = { "Bracelets $it/2" }
+    override val statusStraps: (Int) -> String = { "Ceintures $it" }
+    override val statusCamera = "Caméra connectée"
+    override val statusTv = "Tableau TV"
+    override val statusNone = "Aucun appareil connecté"
+    override val playTournament = "Tournoi entre amis"
+    override val step1Hint = "Étape 1 sur 2 · Qui joue. Tout est facultatif : vous pouvez continuer sans noms."
+    override val step2Hint = "Étape 2 sur 2 · Façon de compter et règles du match."
+    override val moreDetails = "Autres détails"
+    override val moreDetailsHint = "Club, court et tournoi, si vous voulez"
+    override val recentPlayers = "Joueurs récents"
+    override val onbWelcome = "Bienvenue dans Tennis Score Manager"
+    override val onbLang = "Choisissez la langue"
+    override val onbUseTitle = "Comment utiliserez-vous TSM ?"
+    override val onbUseReferee = "Je compte les points d'un match"
+    override val onbUseRefereeHint = "Sur le téléphone, comme arbitre ou en jouant"
+    override val onbUseBands = "Je joue avec les bracelets"
+    override val onbUseBandsHint = "Chaque joueur marque les points depuis le poignet"
+    override val onbUseTrain = "Je m'entraîne"
+    override val onbUseTrainHint = "Ceinture cardio, service, coup droit, revers, volée"
+    override val onbUseVideo = "Je filme les matchs"
+    override val onbUseVideoHint = "Vidéos, temps forts et ralenti"
+    override val onbNameTitle = "Comment vous appelez-vous ?"
+    override val onbNameHint = "Il sert pour vos progrès et le classement TSM. Vous pouvez le laisser vide et l'ajouter plus tard dans Plus › Vous."
+    override val onbSkip = "Passer"
+    override val onbStart = "Commencer"
+    override val moreProfile = "Vous"
+    override val moreProfileHint = "Votre nom, pour les progrès et le classement"
+    override val moreTour = "Présentation de l'appli"
+    override val moreTourHint = "Les premières questions, à nouveau"
+    override val profileName = "Votre nom"
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -22682,6 +23246,66 @@ object PtStrings : Strings {
     override val poseHintGround = "O app encontra a posição do corpo nos clipes, tudo no telefone, e mede três momentos: preparação (pulso mais atrás), impacto e final. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus golpes dentro com os de fora."
     override val poseAnalyzeShots = "Analisar os golpes"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisando o golpe $a de $b…" }
+    override val tabPlay = "Jogar"
+    override val tabTrain = "Treinar"
+    override val tabVideo = "Vídeo"
+    override val tabProgress = "Progresso"
+    override val tabMore = "Mais"
+    override val playNewMatchHint = "Quem joga, regras e como você marca o placar"
+    override val playRematch: (String) -> String = { "Revanche: $it" }
+    override val playResume: (String) -> String = { "Retomar: $it" }
+    override val playTournamentHint = "Americano ou Mexicano, com duplas que trocam"
+    override val playUseAs = "Usar este telefone como"
+    override val playAsBoardHint = "A tela vira o placar de uma partida"
+    override val playAsCamera = "Telefone-câmera"
+    override val playAsCameraHint = "Filma a partida com o placar do árbitro"
+    override val trainCardio = "Treino com a cinta"
+    override val trainCardioHint = "Batimentos, voltas, VFC e recuperação"
+    override val videoRecord = "Gravar com este telefone"
+    override val videoRecordHint = "Grave um vídeo, mesmo sem árbitro"
+    override val videoLibrary = "Seus vídeos"
+    override val videoLibraryHint = "Capítulos ponto a ponto, melhores momentos, filtros, importar"
+    override val progressHistoryHint = "Partidas terminadas: resumos, PDF, jogadores"
+    override val progressTrendHint = "Rating TSM, classificação e evolução"
+    override val progressRacketsHint = "Estatísticas e sensações por raquete"
+    override val moreDevices = "Dispositivos"
+    override val moreDevicesHint = "Pulseiras, cintas, controles, segundo telefone, placar na TV"
+    override val moreVoice = "Idioma e voz"
+    override val moreVoiceHint = "Idioma do app, voz que anuncia o placar"
+    override val moreRacketsHint = "Cordas, tensões e encordoamentos"
+    override val moreTransfer = "Transferir partidas"
+    override val moreTransferHint = "Para outro telefone, com um código"
+    override val statusBands: (Int) -> String = { "Pulseiras $it/2" }
+    override val statusStraps: (Int) -> String = { "Cintas $it" }
+    override val statusCamera = "Câmera conectada"
+    override val statusTv = "Placar na TV"
+    override val statusNone = "Nenhum dispositivo conectado"
+    override val playTournament = "Torneio entre amigos"
+    override val step1Hint = "Passo 1 de 2 · Quem joga. Tudo opcional: dá para seguir mesmo sem nomes."
+    override val step2Hint = "Passo 2 de 2 · Como você marca o placar e as regras da partida."
+    override val moreDetails = "Mais detalhes"
+    override val moreDetailsHint = "Clube, quadra e torneio, se quiser"
+    override val recentPlayers = "Jogadores recentes"
+    override val onbWelcome = "Bem-vindo ao Tennis Score Manager"
+    override val onbLang = "Escolha o idioma"
+    override val onbUseTitle = "Como você vai usar o TSM?"
+    override val onbUseReferee = "Marco o placar de uma partida"
+    override val onbUseRefereeHint = "No telefone, como árbitro ou enquanto jogo"
+    override val onbUseBands = "Jogo com as pulseiras"
+    override val onbUseBandsHint = "Cada jogador marca os pontos pelo pulso"
+    override val onbUseTrain = "Treino"
+    override val onbUseTrainHint = "Cinta cardíaca, saque, forehand, backhand, voleio"
+    override val onbUseVideo = "Filmo partidas"
+    override val onbUseVideoHint = "Vídeos, melhores momentos e replay"
+    override val onbNameTitle = "Como você se chama?"
+    override val onbNameHint = "Serve para o seu progresso e o rating TSM. Pode deixar vazio e escrever depois em Mais › Você."
+    override val onbSkip = "Pular"
+    override val onbStart = "Começar"
+    override val moreProfile = "Você"
+    override val moreProfileHint = "O seu nome, para progresso e rating"
+    override val moreTour = "Apresentação do app"
+    override val moreTourHint = "As primeiras perguntas, de novo"
+    override val profileName = "O seu nome"
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -23245,14 +23869,14 @@ fun HistoryScreen(c: MatchController) {
     val sendUrl by c.transferUrl.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
-    BackHandler { if (player != null) player = null else c.go(Screen.SETUP) }
+    BackHandler { if (player != null) player = null else c.home() }
 
     ScreenScaffold(
         title = s.historyTitle,
         subtitle = s.historySubtitle,
         icon = Icons.Filled.History,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.go(Screen.SETUP) },
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (player != null) player = null else c.home() },
                 Modifier.weight(1f))
             BigButton(s.historyImport, Icons.Filled.FileOpen, { importer.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                 Modifier.weight(1f))
@@ -23456,6 +24080,287 @@ private fun TrendCard(lines: List<PlayerStats.MatchLine>) {
             )
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HomeScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HomeScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Intent
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Screen
+import com.tennis.scoremanager.ble.LinkState
+import com.tennis.scoremanager.ble.StrapState
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.tv.DisplayActivity
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.ServeTrainingCard
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.video.CameraActivity
+
+/**
+ * Prima schermata: cinque schede in basso, per cosa si vuole fare (giocare, allenarsi, i video, i progressi, il resto).
+ * Ogni voce porta alla sua schermata; "Indietro" da lì torna alla scheda da cui si è partiti.
+ */
+@Composable
+fun HomeScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val tab by c.homeTab.collectAsState()
+    val history by c.history.collectAsState()
+    val saved by c.saved.collectAsState()
+    // Prima accensione: le tre domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
+    var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+    var asked by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        c.refreshHistory()
+        c.refreshSaved()
+        kotlinx.coroutines.delay(400)
+        if (!asked && !c.storage.onboarded && c.history.value.isEmpty() && c.saved.value.isEmpty()) tour = true
+        asked = true
+    }
+    if (tour) com.tennis.scoremanager.ui.OnboardingFlow(c) { tour = false }
+    // Da un'altra scheda "Indietro" torna a Gioca; da Gioca esce dall'app come sempre.
+    BackHandler(enabled = tab != HomeTab.PLAY) { c.homeTab.value = HomeTab.PLAY }
+    val (title, icon) = when (tab) {
+        HomeTab.PLAY -> s.tabPlay to Icons.Filled.SportsTennis
+        HomeTab.TRAIN -> s.tabTrain to Icons.Filled.FitnessCenter
+        HomeTab.VIDEO -> s.tabVideo to Icons.Filled.Videocam
+        HomeTab.PROGRESS -> s.tabProgress to Icons.AutoMirrored.Filled.TrendingUp
+        HomeTab.MORE -> s.tabMore to Icons.Filled.MoreHoriz
+    }
+    ScreenScaffold(title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tab) { c.homeTab.value = it } }) {
+        when (tab) {
+            HomeTab.PLAY -> PlayTab(c)
+            HomeTab.TRAIN -> TrainTab(c)
+            HomeTab.VIDEO -> VideoTab(c)
+            HomeTab.PROGRESS -> ProgressTab(c)
+            HomeTab.MORE -> MoreTab(c) { tour = true }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.TabBar(current: HomeTab, onSelect: (HomeTab) -> Unit) {
+    val s = LocalStrings.current
+    for ((t, label, icon) in listOf(
+        Triple(HomeTab.PLAY, s.tabPlay, Icons.Filled.SportsTennis),
+        Triple(HomeTab.TRAIN, s.tabTrain, Icons.Filled.FitnessCenter),
+        Triple(HomeTab.VIDEO, s.tabVideo, Icons.Filled.Videocam),
+        Triple(HomeTab.PROGRESS, s.tabProgress, Icons.AutoMirrored.Filled.TrendingUp),
+        Triple(HomeTab.MORE, s.tabMore, Icons.Filled.MoreHoriz),
+    )) {
+        val on = t == current
+        Column(
+            Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).clickable { onSelect(t) }
+                .background(if (on) TsmColors.SurfaceHigh else Color.Transparent).padding(vertical = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(icon, null, tint = if (on) TsmColors.Ball else TsmColors.TextDim)
+            // In tedesco o francese le parole sono lunghe: il testo si rimpicciolisce invece di essere tagliato.
+            androidx.compose.foundation.text.BasicText(
+                label, maxLines = 1,
+                style = androidx.compose.ui.text.TextStyle(color = if (on) TsmColors.Ball else TsmColors.TextDim, fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
+                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = 12.sp, stepSize = 0.5.sp),
+            )
+        }
+    }
+}
+
+/** Una voce della prima schermata: icona, titolo, una riga di spiegazione; [main] = l'azione principale della scheda. */
+@Composable
+private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = if (main) TsmColors.OnBall else TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, color = if (main) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = if (main) 19.sp else 16.sp)
+                hint?.let { Text(it, color = if (main) TsmColors.OnBall else TsmColors.TextDim, fontSize = 13.sp) }
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = if (main) TsmColors.OnBall else TsmColors.TextDim)
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(text, color = TsmColors.TextDim, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+}
+
+/** In cima a Gioca: cosa è collegato adesso (braccialetti, fasce, telecamera, TV); un tocco porta ai dispositivi. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun DeviceStatus(c: MatchController) {
+    val s = LocalStrings.current
+    val bands by c.ble.bands.collectAsState()
+    val straps by c.straps.collectAsState()
+    val relay by c.relay.ui.collectAsState()
+    val tv by c.tv.collectAsState()
+    val readyBands = Side.entries.count { bands[it]?.state == LinkState.READY }
+    val readyStraps = Side.entries.count { straps[it]?.state == StrapState.READY }
+    val chips = buildList {
+        if (bands.isNotEmpty()) add(s.statusBands(readyBands) to (readyBands == bands.size))
+        if (straps.isNotEmpty()) add(s.statusStraps(readyStraps) to (readyStraps == straps.size))
+        if (relay.cameras > 0) add(s.statusCamera to true)
+        if (tv.enabled) add(s.statusTv to true)
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (chips.isEmpty()) Chip(s.statusNone, null) { c.go(Screen.DEVICES) }
+        for ((label, ok) in chips) Chip(label, ok) { c.go(Screen.DEVICES) }
+    }
+}
+
+@Composable
+private fun Chip(label: String, ok: Boolean?, onClick: () -> Unit) {
+    Text(
+        label, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+        color = when (ok) { true -> TsmColors.Ok; false -> TsmColors.Orange; null -> TsmColors.TextDim },
+        modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { onClick() }.padding(horizontal = 10.dp, vertical = 6.dp),
+    )
+}
+
+@Composable
+private fun PlayTab(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val saved by c.saved.collectAsState()
+    val history by c.history.collectAsState()
+    LaunchedEffect(Unit) {
+        c.refreshSaved()
+        c.refreshHistory()
+    }
+    DeviceStatus(c)
+    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
+    // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
+    for (rec in saved.take(2)) {
+        val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+        val lang = c.options.value.lang
+        val at = rec.startedAt ?: rec.updatedAt
+        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}") { c.resumeSaved(rec) }
+    }
+    history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
+        val su = last.record.setup
+        if (Side.entries.all { PlayerStats.names(su, it).isNotEmpty() }) {
+            val names = Side.entries.joinToString(" – ") { PlayerStats.names(su, it).joinToString(" / ") }
+            Entry(Icons.Filled.Replay, s.playRematch(names), null) { c.prepareRematch(last.record) }
+        }
+    }
+    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
+    SectionLabel(s.playUseAs)
+    Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
+    Entry(Icons.Filled.Videocam, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+}
+
+@Composable
+private fun TrainTab(c: MatchController) {
+    val s = LocalStrings.current
+    Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
+    // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
+    ServeTrainingCard(c)
+}
+
+@Composable
+private fun VideoTab(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    Entry(Icons.Filled.Videocam, s.videoRecord, s.videoRecordHint, main = true) { context.startActivity(Intent(context, CameraActivity::class.java)) }
+    Entry(Icons.Filled.VideoLibrary, s.videoLibrary, s.videoLibraryHint) { c.screen.value = Screen.VIDEOS }
+    Entry(Icons.Filled.PlayCircle, s.playAsCamera, s.playAsCameraHint) { c.go(Screen.DEVICES) }
+}
+
+@Composable
+private fun ProgressTab(c: MatchController) {
+    val s = LocalStrings.current
+    // Col proprio nome (Altro › Tu) la voce mostra subito il proprio rating.
+    val history by c.history.collectAsState()
+    val me = c.storage.myName
+    val mine = remember(history, me) {
+        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(PlayerStats.key(me)) }
+    }
+    Entry(
+        Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
+        mine?.let { "$me: ${it.rating} · ${s.ratingMatches(it.matches, it.wins)}" } ?: s.progressTrendHint, main = true,
+    ) { c.openProgress() }
+    Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
+    Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+}
+
+@Composable
+private fun MoreTab(c: MatchController, onTour: () -> Unit) {
+    val s = LocalStrings.current
+    var profile by remember { mutableStateOf(false) }
+    val me = c.storage.myName
+    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) { profile = true }
+    if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
+    Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
+    Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
+    Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
+    Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
+    // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
+    AboutFooter()
 }
 TSM_EOF
 
@@ -24805,8 +25710,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Pagina 2: modalità, braccialetti, lingua, voce, formato e sorteggio. */
+/** Pagina 2 della partita, oppure (da Altro) i dispositivi o lingua e voce: stessi riquadri, permessi compresi. */
+enum class OptionsPage { MATCH, DEVICES, VOICE }
+
 @Composable
-fun OptionsScreen(c: MatchController) {
+fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val o by c.options.collectAsState()
@@ -24886,17 +25794,31 @@ fun OptionsScreen(c: MatchController) {
         c.go(Screen.START)
     }
 
+    val match = page == OptionsPage.MATCH
+    val devices = page == OptionsPage.DEVICES
+    if (!match) androidx.activity.compose.BackHandler { c.back() }
     ScreenScaffold(
-        title = s.optionsTitle,
-        subtitle = null,
-        icon = Icons.Filled.Tune,
+        title = when (page) { OptionsPage.MATCH -> s.optionsTitle; OptionsPage.DEVICES -> s.moreDevices; OptionsPage.VOICE -> s.moreVoice },
+        subtitle = when (page) { OptionsPage.MATCH -> s.step2Hint; OptionsPage.DEVICES -> s.moreDevicesHint; OptionsPage.VOICE -> s.moreVoiceHint },
+        icon = when (page) { OptionsPage.MATCH -> Icons.Filled.Tune; OptionsPage.DEVICES -> Icons.Filled.Bluetooth; OptionsPage.VOICE -> Icons.Filled.Language },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { onNext() }, Modifier.weight(1f))
+            if (match) BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { onNext() }, Modifier.weight(1f))
         },
     ) {
+        // Dispositivi (da Altro): braccialetti, telecomandi e fasce si collegano qui una volta, valgono per tutte le partite.
+        if (devices) {
+            SectionCard(s.modeBands, Icons.Filled.Watch) {
+                Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
+                RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
+                RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
+                RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
+                BandsSection(c, names, enabled = bandsReadyEnv)
+            }
+            SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+        }
         // Modalità
-        SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+        if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
             Segmented(
                 listOf(
@@ -24930,7 +25852,7 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        HeartSection(
+        if (match || devices) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -24938,10 +25860,10 @@ fun OptionsScreen(c: MatchController) {
         )
 
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
-        RelaySection(c, names)
+        if (devices) RelaySection(c, names)
 
         // Lingua
-        SectionCard(s.languageSection, Icons.Filled.Language) {
+        if (page == OptionsPage.VOICE) SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
             val generating = c.voiceProgress.collectAsState().value != null
@@ -24956,13 +25878,13 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Audio e voce
-        VoiceSection(c, o)
+        if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
-        TvSection(c)
+        if (devices) TvSection(c)
 
         // Formato
-        SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
+        if (match) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
             // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
             fun pick(f: MatchFormat) = c.updateOptions {
                 val pro = f == MatchFormat.PRO_SET
@@ -25010,7 +25932,7 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Sorteggio
-        CoinTossSection(c, o, names, su.doubles)
+        if (match) CoinTossSection(c, o, names, su.doubles)
     }
 
     if (locationDialog) {
@@ -25653,6 +26575,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.PlayerStats
 import com.tennis.scoremanager.data.Progress
 import com.tennis.scoremanager.data.ProgressFilter
 import com.tennis.scoremanager.data.ProgressItem
@@ -25684,7 +26607,9 @@ fun ProgressScreen(c: MatchController) {
     var matches by rememberSaveable { mutableStateOf(false) }
     val players = remember(history) { c.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
-    val key = if (matches) (player ?: players.firstOrNull()?.first) else null
+    // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
+    val me = PlayerStats.key(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
+    val key = if (matches) (player ?: me ?: players.firstOrNull()?.first) else null
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }
     var excluded by remember(matches, key) { mutableStateOf(emptySet<String>()) }
@@ -26472,6 +27397,7 @@ package com.tennis.scoremanager.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26484,6 +27410,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Business
@@ -26510,6 +27437,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26551,50 +27480,24 @@ fun SetupScreen(c: MatchController) {
     val o by c.options.collectAsState()
     val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
+    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
+    androidx.activity.compose.BackHandler { c.back() }
     ScreenScaffold(
         title = s.setupTitle,
-        subtitle = s.setupSubtitle,
+        subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
-            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
+        // Svuota i campi: in alto accanto al titolo, così in basso restano solo Indietro e Avanti.
+        action = {
+            androidx.compose.material3.IconButton(onClick = { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }) {
+                Icon(Icons.Filled.DeleteSweep, s.clearFields, tint = TsmColors.TextDim)
+            }
+        },
     ) {
-        // Scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite, video registrati.
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
-            HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
-            HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
-            HomeShortcut(Icons.Filled.VideoLibrary, TsmColors.Ball, s.videoTitle, Modifier.weight(1f)) { c.screen.value = Screen.VIDEOS }
-        }
-        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
-            Segmented(
-                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
-                selected = su.sport.ordinal,
-                onSelect = { i -> c.selectSport(Sport.entries[i]) },
-            )
-            if (su.sport == Sport.PADEL) {
-                Text(s.padelHint, color = TsmColors.TextDim)
-                // Tornei a coppie che cambiano: schermata a parte, senza toccare la partita normale.
-                GhostButton(s.tournamentButton, Icons.Filled.EmojiEvents, { c.openTournaments() }, Modifier.fillMaxWidth())
-            }
-        }
-        SectionCard(s.clubSection, Icons.Filled.Business) {
-            Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
-            Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
-            // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
-            SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
-                c.updateOptions { it.copy(addressLookup = v) }
-            }
-        }
-        // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
-        SectionCard(s.eventSection, Icons.Filled.EmojiEvents) {
-            Field(su.event, s.eventName, Icons.Filled.EmojiEvents) { v -> c.updateSetup { it.copy(event = v) } }
-            Field(su.category, s.eventCategory, Icons.Filled.Category) { v -> c.updateSetup { it.copy(category = v) } }
-            Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
-            Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        }
+        // Prima chi gioca (con i giocatori recenti da toccare), poi lo sport; circolo e torneo sotto, chiusi.
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(
                 listOf(SegOption(s.singles, Icons.Filled.Person), SegOption(s.doubles, Icons.Filled.Groups)),
@@ -26603,21 +27506,40 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        PlayerCard(c, su, Side.P1)
-        PlayerCard(c, su, Side.P2)
-        // Racchetta virtuale: le racchette con corde e tensioni, da confrontare nel tempo.
-        SectionCard(s.racketTitle, Icons.Filled.SportsTennis) {
-            Text(if (rackets.isEmpty()) s.racketHint else s.racketSetupHint, color = TsmColors.TextDim)
-            GhostButton(s.racketMine, Icons.Filled.SportsTennis, { c.openRackets() }, Modifier.fillMaxWidth())
+        val recent = remember(c.history.collectAsState().value) { c.progressPlayers().map { it.second }.take(8) }
+        PlayerCard(c, su, Side.P1, recent)
+        PlayerCard(c, su, Side.P2, recent)
+        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+            Segmented(
+                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
+                selected = su.sport.ordinal,
+                onSelect = { i -> c.selectSport(Sport.entries[i]) },
+            )
+            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
         }
-        // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
-        SectionCard(s.displayMode, Icons.Filled.Tv) {
-            Text(s.displayModeHint, color = TsmColors.TextDim)
-            GhostButton(s.displayMode, Icons.Filled.Tv, {
-                context.startActivity(Intent(context, DisplayActivity::class.java))
-            }, Modifier.fillMaxWidth())
+        // Circolo, campo e torneo: facoltativi, chiusi finché non servono (aperti se già scritti).
+        val filled = listOf(su.club, su.court, su.event, su.category, su.round).any { it.isNotBlank() }
+        var details by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(filled) }
+        SectionCard(s.moreDetails, Icons.Filled.Business) {
+            if (!details) {
+                Text(s.moreDetailsHint, color = TsmColors.TextDim)
+                GhostButton(s.moreDetails, Icons.Filled.Business, { details = true }, Modifier.fillMaxWidth())
+            } else {
+                Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
+                Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+                // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
+                SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                    c.updateOptions { it.copy(addressLookup = v) }
+                }
+                // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
+                Text(s.eventSection, color = TsmColors.TextMain, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Field(su.event, s.eventName, Icons.Filled.EmojiEvents) { v -> c.updateSetup { it.copy(event = v) } }
+                Field(su.category, s.eventCategory, Icons.Filled.Category) { v -> c.updateSetup { it.copy(category = v) } }
+                Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
+                Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
         }
-        AboutFooter()
     }
 }
 
@@ -26626,7 +27548,7 @@ private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Mana
 
 /** Versione, licenza e assenza di garanzia (la GPL chiede di mostrarle nei programmi con interfaccia), più il link al codice. */
 @Composable
-private fun AboutFooter() {
+internal fun AboutFooter() {
     val s = LocalStrings.current
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -26641,7 +27563,7 @@ private fun AboutFooter() {
 }
 
 @Composable
-private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
+private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<String> = emptyList()) {
     val s = LocalStrings.current
     val accent = TsmColors.player(side)
     val title = if (side == Side.P1) s.player1 else s.player2
@@ -26657,6 +27579,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                     c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
                 }
             }
+        }
+        // Giocatori recenti (dallo storico): un tocco e il nome è scritto. Solo quelli non già in campo.
+        val inUse = listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet()
+        RecentNames(recent.filter { PlayerStats.key(it) !in inUse }, accent) { n ->
+            c.updateSetup { if (side == Side.P1) it.copy(p1a = n) else it.copy(p2a = n) }
         }
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
@@ -26679,12 +27606,30 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                     }
                 }
             }
+            RecentNames(recent.filter { PlayerStats.key(it) !in listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet() }, accent) { n ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1b = n) else it.copy(p2b = n) }
+            }
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
             SexChoice(c, b, if (side == Side.P1) su.p1bSex else su.p2bSex, accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bSex = v) else it.copy(p2bSex = v) }
             }
+        }
+    }
+}
+
+/** Nomi dei giocatori recenti da toccare per scriverli nel campo (al massimo una riga che va a capo). */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun RecentNames(names: List<String>, accent: Color, onPick: (String) -> Unit) {
+    if (names.isEmpty()) return
+    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (n in names.take(6)) {
+            Text(
+                n, color = accent, fontSize = 13.sp,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { onPick(n) }.padding(horizontal = 10.dp, vertical = 6.dp),
+            )
         }
     }
 }
@@ -27646,9 +28591,9 @@ private fun TournamentList(c: MatchController) {
     val s = LocalStrings.current
     val all by c.tournaments.collectAsState()
     var creating by rememberSaveable { mutableStateOf(false) }
-    BackHandler { if (creating) creating = false else c.go(Screen.SETUP) }
+    BackHandler { if (creating) creating = false else c.home() }
     if (creating || all.isEmpty()) {
-        NewTournament(c) { if (all.isEmpty()) c.go(Screen.SETUP) else creating = false }
+        NewTournament(c) { if (all.isEmpty()) c.home() else creating = false }
         return
     }
     ScreenScaffold(
@@ -27656,7 +28601,7 @@ private fun TournamentList(c: MatchController) {
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.go(Screen.SETUP) }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.home() }, Modifier.weight(1f))
             BigButton(s.tournamentNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {
@@ -28274,8 +29219,6 @@ fun WorkoutScreen(c: MatchController) {
         }
         // La fascia si sceglie qui, senza passare dalla pagina 2.
         if (ui.phase == WorkoutPhase.IDLE) WorkoutStrapCard(c)
-        // Allenamento al servizio: telefono a fianco di chi serve, braccialetto per dentro e fuori.
-        if (ui.phase == WorkoutPhase.IDLE) ServeTrainingCard(c)
         // Racchetta dell'allenamento: l'allenamento ne tiene una copia con corde e tensione.
         if (ui.phase == WorkoutPhase.IDLE && rackets.isNotEmpty()) {
             SectionCard(s.racketField, Icons.Filled.SportsTennis) {
@@ -53087,6 +54030,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 162 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 164 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

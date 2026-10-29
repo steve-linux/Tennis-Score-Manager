@@ -94,10 +94,22 @@ bash installa_tsm.sh
    - If the computer doesn't see the phone: on Windows install the manufacturer's USB driver, on Linux the package with the udev rules (1.1); then plug the cable in again. Alternatively, with no cable or driver: **Device Manager › Pair devices using Wi-Fi** (wireless debugging, Android 11+, computer and phone on the same network).
 3. Alternatively, **Build › Build App Bundle(s) / APK(s) › Build APK(s)**, copy the APK to the phone and install it (installing apps from unknown sources must be allowed).
 
+### 3.1 How the app is organised (app 2.5)
+
+At the **first start** the app asks three questions: the language, how you'll use it (keep score, play with the wristbands, train, film matches) and your name; you can skip it and do it again from **More › App introduction**. At the bottom there are always **five tabs**:
+
+- **Play**: **New match**, the suspended match to resume, a **rematch** of the last one, the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
+- **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
+- **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
+- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, rackets, match transfer, introduction, version and licence.
+
+**New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
+
 ## 4. The voice (works without internet)
 
 - Each call is read **as a single sentence** by the phone's text-to-speech engine, using an installed voice: no internet and natural prosody. The players' names are part of the sentence.
-- Page 2 › **Audio and voice**:
+- More › **Language and voice** › **Audio and voice**:
   - **Speech engine**: *Phone default* (on Samsung phones this is Samsung TTS) or an engine of your choice, for example *Speech Services by Google*. In our tests, which were done in Italian, Google sounded more natural.
   - **Voice**: *Automatic (best offline)* or a specific voice (with Google the voices are listed by code, as *Voice* followed by a few letters; those marked *online* need internet).
   - **Test voice**: reads a sequence of sample calls with the names you entered. While it is reading, the button becomes **Stop the test**: tap it again to stop (it also stops by itself when you leave the page). Text-to-speech can't be paused mid-sentence, so the button stops it; pressing it again starts over from the beginning.
@@ -111,7 +123,7 @@ bash installa_tsm.sh
 
 ### 4.1 Languages (app 2.3, firmware 2.2)
 
-Page 2 › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+More › **Language and voice** › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
 
 The calls are not word-for-word translations: they follow each federation's official texts for chair umpires, namely the FFT *L'arbitrage en 255 questions* and the ITF in French, the DTB/BTV and Swiss Tennis materials, RFET *Deberes y procedimientos*, and FPT *Deveres e Procedimentos* (the only published Portuguese script). English follows the ITF. At the end of the match a zero in the set scores is read *love* ("six love, six four"), as in the points.
 
@@ -275,8 +287,8 @@ Heart rate and calories from **Bluetooth chest straps** using the standard heart
 
 Straps and bands accept **one phone at a time** and reach a few metres less than the length of the court. With a second phone behind the other baseline every player always has one nearby: the second one (**satellite**) hears the straps and bands of the players on its side and acts as a bridge to the **main** phone, which keeps the match.
 
-1. **Main**: page 2 › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
-2. **Satellite**: page 2 › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
+1. **Main**: More › **Devices** › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
+2. **Satellite**: More › **Devices** › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
 3. The satellite follows by itself the straps and bands picked on the main phone, on the same sides: nothing to pick. Leave it behind the baseline with the app open.
 
 - **Change of ends**: nothing to do. Each strap and band stays with the phone it is connected to while the signal holds, then the nearer phone takes it (a few seconds). The main phone shows *Via second phone*; during the handover a band may show as disconnected for a moment.
@@ -311,7 +323,7 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 ### 7.1 Workout with the strap (app 2.5)
 
-To train with the heart rate strap without a match: page 1 › **Workout**. It uses **one strap**, Player 1's, with age, weight and sex for calories and zones; you pick it right there (with the *Heart rate straps* switch, Bluetooth and permissions if missing).
+To train with the heart rate strap without a match: **Train** › **Workout with the strap**. It uses **one strap**, Player 1's, with age, weight and sex for calories and zones; you pick it right there (with the *Heart rate straps* switch, Bluetooth and permissions if missing).
 
 1. **Start**: the live heart rate in large type, below it the time and the current lap.
 2. **Lap** closes one piece of the workout and starts another (like the lap button of a stopwatch): a sprint, a drill, a lap of the track. **Pause / Resume** stops the time; pauses don't count.
@@ -323,7 +335,7 @@ To train with the heart rate strap without a match: page 1 › **Workout**. It u
 
 ### 7.2 Progress (app 2.5)
 
-Page 1 › **Progress**: a document to see whether you are improving, **separate** for workouts and matches.
+**Progress** › **TSM rating · Progress**: a document to see whether you are improving, **separate** for workouts and matches.
 
 - **Workouts**: duration, average and maximum heart rate, calories, HRV, recovery.
 - **Matches** of a player from the history (picked from the list): matches won, points won, aces, double faults, first serves in, winners, unforced errors. Aces and the other detailed values are only there for matches played with detailed statistics; they are totals per match.
@@ -336,15 +348,15 @@ Page 1 › **Progress**: a document to see whether you are improving, **separate
 
 A second phone on a tripod films the match and puts the umpire's score on the video.
 
-1. **Umpire**: page 2 › **Second phone** › **Use a second phone** (QR, as in 6.6).
-2. **Camera**: page 2 › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
+1. **Umpire**: More › **Devices** › **Second phone** › **Use a second phone** (QR, as in 6.6).
+2. **Camera**: More › **Devices** › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
    - **Record / Stop**: the video goes to the gallery (*Movies/Tennis Score Manager*) with chapters, one per point.
    - **Go live**: RTMP broadcast to YouTube, Twitch, Facebook or your own server; server and stream key in *Live: server*.
    - **Framing** (framing assistant): enter how many metres behind the baseline and how high you put the phone and which court you play on; the app gives the downward tilt that keeps both baselines and the far player in the video, and whether the court fits in width. Width is often the real limit: from the fence (about 6 m) the main lens cuts the near corners, the **wide** one doesn't (**Use the … lens**, or the **Lens** button, with recording stopped). With **Show the level** the preview shows the horizon and directions (*aim 2° lower*, *turn clockwise*…), green when right, with a vibration when the phone is in position. The level is also shown in the **Camera** window on the umpire's phone. The sensors can't tell left from right: check by eye that the net is in the middle.
    - **Outline** (court outline): the preview shows the court lines as the lens sees them, and they follow the phone as you tilt it. Move the sliders (**Distance**, **Height**, **Direction**, **Sideways offset** and, if needed, **Field of view** and **Tilt correction**) until they match the real lines: that also sets the centring, and the suggested tilt becomes accurate. The calibration is remembered for the match court (the umpire's *Club · Court*) and restored next time. Outline and sliders are also in the umpire's **Camera** window. The higher the phone, the better you see the far half of the court: from 2.5 m it is squeezed just above the net.
-3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in page 2 › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
+3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
 
-- **Videos** (page 1): the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of page 2.
+- **Video** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of page 2.
 - **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
 - **Highlights**: automatic edit of the best points (aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
   - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice on page 1) (without a choice, the man; this applies across the app, also on page 1, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (**Tournament** card on page 1), or club and court.
@@ -354,7 +366,7 @@ A second phone on a tripod films the match and puts the umpire's score on the vi
 
 ### 7.4 Rackets: virtual racket (app 2.5)
 
-Page 1 › **Rackets** › **My rackets**: each physical racket has its own card (two rackets of the same model are two cards: strings, weight and hours differ).
+**Progress** (or **More**) › **My rackets**: each physical racket has its own card (two rackets of the same model are two cards: strings, weight and hours differ).
 
 - **Card**: nickname (A, B…), brand, model, weight, balance, head size and string pattern, typed in or taken **from the catalogue** (manufacturer specs, to be corrected if you measured yours). *Retired*: no longer offered, but kept in comparisons.
 - **Stringings**: type (polyester, multifilament, synthetic gut, natural gut, hybrid), brand and model (also from the common strings), gauge, mains and crosses tension, date and notes. *New stringing* starts from the current one. For each one the app adds up the **hours played** in linked matches and workouts and warns when the chosen **check threshold** is passed (20 hours by default): from time alone it cannot tell how much tension is left.
@@ -366,7 +378,7 @@ Page 1 › **Rackets** › **My rackets**: each physical racket has its own card
 
 A phone on a tripod films the server; the wristband on the wrist recognises the serve and the buttons say how it went. One phone is enough, no umpire.
 
-1. Page 1 › **Workout** › **Stroke practice**, choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
+1. **Train** › **Stroke practice**, choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
 2. **Where to put the phone** (it opens by itself the first time, then from the *Where to put the phone?* button):
    - **beside the server**, on the hitting-arm side (right for a right-hander), **3-4 m** away, level with the baseline or half a metre behind;
    - lens **1-1.2 m** above the ground, phone **in landscape** and level, pointed at the server;
@@ -407,7 +419,7 @@ The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboa
 
 ### 8.2 On the umpire's phone
 
-1. Page 2 › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
+1. More › **Devices** › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
 2. The **address** (e.g. `192.168.43.1:8080`), the **QR code** and the number of connected scoreboards appear. If it says *No network*, turn on the hotspot or connect to the other phone's hotspot.
 3. **Preview on this phone** opens the scoreboard in the phone's own browser.
 4. **Scoreboard look**: each player's colour (8 colours), match time, serve clock and breaks, finished sets, messages (break point, set point, change ends…), ball next to the server, unlit segments visible, bottom line (empty = club and court from page 1). Changes reach the monitor straight away.
@@ -419,7 +431,7 @@ What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READ
 
 ### 8.3 On the scoreboard phone
 
-1. Page 1 › at the bottom, **Use as scoreboard**.
+1. **Play** › **Use as scoreboard**.
 2. The phone **finds the umpire's phone by itself** (network announcement and hotspot scan, a few seconds) and remembers the last address. If it can't find it: check the hotspot and *TV scoreboard*, then tap **Search again**, or type in the address shown on the umpire's phone and tap **Connect**. It finds it even if *Scoreboard on a TV or monitor* is on on this phone too; if Wi-Fi only connects later, it searches again by itself.
 3. The scoreboard goes full screen, in landscape, with the screen always on.
    - **With the HDMI cable**: the scoreboard goes to the monitor in the monitor's format; the phone shows *The scoreboard is on the external monitor* with brightness at minimum (**Show here too** to see it on the phone as well). Unplug the cable and it comes back to the phone.

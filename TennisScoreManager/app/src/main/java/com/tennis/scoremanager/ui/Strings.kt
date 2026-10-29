@@ -892,6 +892,68 @@ interface Strings {
     val poseHintGround: String
     val poseAnalyzeShots: String
     val poseAnalyzingShot: (Int, Int) -> String
+    /** Prima schermata a cinque schede (Gioca, Allenati, Video, Progressi, Altro). */
+    val tabPlay: String
+    val tabTrain: String
+    val tabVideo: String
+    val tabProgress: String
+    val tabMore: String
+    val playNewMatchHint: String
+    val playRematch: (String) -> String
+    val playResume: (String) -> String
+    val playTournamentHint: String
+    val playUseAs: String
+    val playAsBoardHint: String
+    val playAsCamera: String
+    val playAsCameraHint: String
+    val trainCardio: String
+    val trainCardioHint: String
+    val videoRecord: String
+    val videoRecordHint: String
+    val videoLibrary: String
+    val videoLibraryHint: String
+    val progressHistoryHint: String
+    val progressTrendHint: String
+    val progressRacketsHint: String
+    val moreDevices: String
+    val moreDevicesHint: String
+    val moreVoice: String
+    val moreVoiceHint: String
+    val moreRacketsHint: String
+    val moreTransfer: String
+    val moreTransferHint: String
+    val statusBands: (Int) -> String
+    val statusStraps: (Int) -> String
+    val statusCamera: String
+    val statusTv: String
+    val statusNone: String
+    val playTournament: String
+    val step1Hint: String
+    val step2Hint: String
+    val moreDetails: String
+    val moreDetailsHint: String
+    val recentPlayers: String
+    /** Prima accensione guidata e profilo Tu. */
+    val onbWelcome: String
+    val onbLang: String
+    val onbUseTitle: String
+    val onbUseReferee: String
+    val onbUseRefereeHint: String
+    val onbUseBands: String
+    val onbUseBandsHint: String
+    val onbUseTrain: String
+    val onbUseTrainHint: String
+    val onbUseVideo: String
+    val onbUseVideoHint: String
+    val onbNameTitle: String
+    val onbNameHint: String
+    val onbSkip: String
+    val onbStart: String
+    val moreProfile: String
+    val moreProfileHint: String
+    val moreTour: String
+    val moreTourHint: String
+    val profileName: String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1942,6 +2004,66 @@ object ItStrings : Strings {
     override val poseHintGround = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: preparazione (polso più indietro), impatto e finale. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi colpi dentro con quelli fuori."
     override val poseAnalyzeShots = "Analizza i colpi"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisi del colpo $a di $b…" }
+    override val tabPlay = "Gioca"
+    override val tabTrain = "Allenati"
+    override val tabVideo = "Video"
+    override val tabProgress = "Progressi"
+    override val tabMore = "Altro"
+    override val playNewMatchHint = "Chi gioca, regole e come segni il punteggio"
+    override val playRematch: (String) -> String = { "Rivincita: $it" }
+    override val playResume: (String) -> String = { "Riprendi: $it" }
+    override val playTournamentHint = "Americano o Mexicano, a coppie che girano"
+    override val playUseAs = "Usa questo telefono come"
+    override val playAsBoardHint = "Lo schermo diventa il tabellone di una partita"
+    override val playAsCamera = "Telefono-telecamera"
+    override val playAsCameraHint = "Riprende la partita col punteggio dell'arbitro"
+    override val trainCardio = "Allenamento con la fascia"
+    override val trainCardioHint = "Battito, giri, HRV e recupero"
+    override val videoRecord = "Riprendi con questo telefono"
+    override val videoRecordHint = "Registra un video, anche senza arbitro"
+    override val videoLibrary = "I tuoi video"
+    override val videoLibraryHint = "Capitoli punto per punto, highlights, filtri, importa"
+    override val progressHistoryHint = "Le partite finite: riepiloghi, PDF, giocatori"
+    override val progressTrendHint = "Rating TSM, classifica e confronto nel tempo"
+    override val progressRacketsHint = "Statistiche e sensazioni per racchetta"
+    override val moreDevices = "Dispositivi"
+    override val moreDevicesHint = "Braccialetti, fasce, telecomandi, secondo telefono, tabellone TV"
+    override val moreVoice = "Lingua e voce"
+    override val moreVoiceHint = "Lingua dell'app, voce che annuncia il punteggio"
+    override val moreRacketsHint = "Corde, tensioni e incordature"
+    override val moreTransfer = "Trasferisci le partite"
+    override val moreTransferHint = "Su un altro telefono, con un codice"
+    override val statusBands: (Int) -> String = { "Braccialetti $it/2" }
+    override val statusStraps: (Int) -> String = { "Fasce $it" }
+    override val statusCamera = "Telecamera collegata"
+    override val statusTv = "Tabellone TV"
+    override val statusNone = "Nessun dispositivo collegato"
+    override val playTournament = "Torneo tra amici"
+    override val step1Hint = "Passo 1 di 2 · Chi gioca. Tutto facoltativo: puoi andare avanti anche senza nomi."
+    override val step2Hint = "Passo 2 di 2 · Come segni il punteggio e le regole della partita."
+    override val moreDetails = "Altri dettagli"
+    override val moreDetailsHint = "Circolo, campo e torneo, se vuoi"
+    override val recentPlayers = "Giocatori recenti"
+    override val onbWelcome = "Benvenuto in Tennis Score Manager"
+    override val onbLang = "Scegli la lingua"
+    override val onbUseTitle = "Come userai TSM?"
+    override val onbUseReferee = "Segno il punteggio di una partita"
+    override val onbUseRefereeHint = "Dal telefono, da arbitro o mentre giochi"
+    override val onbUseBands = "Gioco coi braccialetti"
+    override val onbUseBandsHint = "Ogni giocatore segna i punti dal polso"
+    override val onbUseTrain = "Mi alleno"
+    override val onbUseTrainHint = "Fascia cardio, servizio, dritto, rovescio, volée"
+    override val onbUseVideo = "Riprendo le partite"
+    override val onbUseVideoHint = "Video, highlights e moviola"
+    override val onbNameTitle = "Come ti chiami?"
+    override val onbNameHint = "Serve per i tuoi progressi e il rating TSM. Puoi lasciarlo vuoto e scriverlo dopo in Altro › Tu."
+    override val onbSkip = "Salta"
+    override val onbStart = "Inizia"
+    override val moreProfile = "Tu"
+    override val moreProfileHint = "Il tuo nome, per progressi e rating"
+    override val moreTour = "Presentazione dell'app"
+    override val moreTourHint = "Le prime domande, di nuovo"
+    override val profileName = "Il tuo nome"
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2978,6 +3100,66 @@ object EnStrings : Strings {
     override val poseHintGround = "The app finds the body position in the clips, all on the phone, and measures three moments: preparation (wrist furthest back), contact and finish. They are estimates from a side view: most useful to compare your shots in with your shots out."
     override val poseAnalyzeShots = "Analyse the shots"
     override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analysing shot $a of $b…" }
+    override val tabPlay = "Play"
+    override val tabTrain = "Train"
+    override val tabVideo = "Video"
+    override val tabProgress = "Progress"
+    override val tabMore = "More"
+    override val playNewMatchHint = "Who plays, rules and how you keep score"
+    override val playRematch: (String) -> String = { "Rematch: $it" }
+    override val playResume: (String) -> String = { "Resume: $it" }
+    override val playTournamentHint = "Americano or Mexicano, with rotating pairs"
+    override val playUseAs = "Use this phone as"
+    override val playAsBoardHint = "The screen becomes a match scoreboard"
+    override val playAsCamera = "Camera phone"
+    override val playAsCameraHint = "Films the match with the umpire's score"
+    override val trainCardio = "Workout with the strap"
+    override val trainCardioHint = "Heart rate, laps, HRV and recovery"
+    override val videoRecord = "Record with this phone"
+    override val videoRecordHint = "Record a video, even without an umpire"
+    override val videoLibrary = "Your videos"
+    override val videoLibraryHint = "Point-by-point chapters, highlights, filters, import"
+    override val progressHistoryHint = "Finished matches: summaries, PDF, players"
+    override val progressTrendHint = "TSM rating, ranking and comparison over time"
+    override val progressRacketsHint = "Statistics and feel per racket"
+    override val moreDevices = "Devices"
+    override val moreDevicesHint = "Wristbands, straps, remotes, second phone, TV scoreboard"
+    override val moreVoice = "Language and voice"
+    override val moreVoiceHint = "App language, voice that calls the score"
+    override val moreRacketsHint = "Strings, tensions and restringing"
+    override val moreTransfer = "Transfer matches"
+    override val moreTransferHint = "To another phone, with a code"
+    override val statusBands: (Int) -> String = { "Wristbands $it/2" }
+    override val statusStraps: (Int) -> String = { "Straps $it" }
+    override val statusCamera = "Camera connected"
+    override val statusTv = "TV scoreboard"
+    override val statusNone = "No device connected"
+    override val playTournament = "Friends tournament"
+    override val step1Hint = "Step 1 of 2 · Who plays. All optional: you can go on even without names."
+    override val step2Hint = "Step 2 of 2 · How you keep score and the match rules."
+    override val moreDetails = "More details"
+    override val moreDetailsHint = "Club, court and tournament, if you like"
+    override val recentPlayers = "Recent players"
+    override val onbWelcome = "Welcome to Tennis Score Manager"
+    override val onbLang = "Choose the language"
+    override val onbUseTitle = "How will you use TSM?"
+    override val onbUseReferee = "I keep score of a match"
+    override val onbUseRefereeHint = "On the phone, as umpire or while playing"
+    override val onbUseBands = "I play with the wristbands"
+    override val onbUseBandsHint = "Each player scores points from the wrist"
+    override val onbUseTrain = "I train"
+    override val onbUseTrainHint = "Heart-rate strap, serve, forehand, backhand, volley"
+    override val onbUseVideo = "I film matches"
+    override val onbUseVideoHint = "Videos, highlights and replay"
+    override val onbNameTitle = "What's your name?"
+    override val onbNameHint = "It's used for your progress and TSM rating. You can leave it empty and add it later in More › You."
+    override val onbSkip = "Skip"
+    override val onbStart = "Start"
+    override val moreProfile = "You"
+    override val moreProfileHint = "Your name, for progress and rating"
+    override val moreTour = "App introduction"
+    override val moreTourHint = "The first questions, again"
+    override val profileName = "Your name"
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"

@@ -6,6 +6,7 @@ package com.tennis.scoremanager.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Business
@@ -44,6 +46,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,50 +89,24 @@ fun SetupScreen(c: MatchController) {
     val o by c.options.collectAsState()
     val rackets by c.rackets.collectAsState()
     val context = LocalContext.current
+    // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
+    androidx.activity.compose.BackHandler { c.back() }
     ScreenScaffold(
         title = s.setupTitle,
-        subtitle = s.setupSubtitle,
+        subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
-            GhostButton(s.clearFields, Icons.Filled.DeleteSweep, { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
         },
+        // Svuota i campi: in alto accanto al titolo, così in basso restano solo Indietro e Avanti.
+        action = {
+            androidx.compose.material3.IconButton(onClick = { c.updateSetup { SetupData(doubles = it.doubles, sport = it.sport) } }) {
+                Icon(Icons.Filled.DeleteSweep, s.clearFields, tint = TsmColors.TextDim)
+            }
+        },
     ) {
-        // Scorciatoie in una riga: allenamento con la fascia, progressi stampabili, storico delle partite, video registrati.
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HomeShortcut(Icons.Filled.MonitorHeart, TsmColors.Danger, s.workoutTitle, Modifier.weight(1f)) { c.openWorkouts() }
-            HomeShortcut(Icons.AutoMirrored.Filled.TrendingUp, TsmColors.Ball, s.progressTitle, Modifier.weight(1f)) { c.openProgress() }
-            HomeShortcut(Icons.Filled.History, TsmColors.Ball, s.historyTitle, Modifier.weight(1f)) { c.openHistory() }
-            HomeShortcut(Icons.Filled.VideoLibrary, TsmColors.Ball, s.videoTitle, Modifier.weight(1f)) { c.screen.value = Screen.VIDEOS }
-        }
-        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
-        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
-            Segmented(
-                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
-                selected = su.sport.ordinal,
-                onSelect = { i -> c.selectSport(Sport.entries[i]) },
-            )
-            if (su.sport == Sport.PADEL) {
-                Text(s.padelHint, color = TsmColors.TextDim)
-                // Tornei a coppie che cambiano: schermata a parte, senza toccare la partita normale.
-                GhostButton(s.tournamentButton, Icons.Filled.EmojiEvents, { c.openTournaments() }, Modifier.fillMaxWidth())
-            }
-        }
-        SectionCard(s.clubSection, Icons.Filled.Business) {
-            Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
-            Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
-            // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
-            SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
-                c.updateOptions { it.copy(addressLookup = v) }
-            }
-        }
-        // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
-        SectionCard(s.eventSection, Icons.Filled.EmojiEvents) {
-            Field(su.event, s.eventName, Icons.Filled.EmojiEvents) { v -> c.updateSetup { it.copy(event = v) } }
-            Field(su.category, s.eventCategory, Icons.Filled.Category) { v -> c.updateSetup { it.copy(category = v) } }
-            Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
-            Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
-        }
+        // Prima chi gioca (con i giocatori recenti da toccare), poi lo sport; circolo e torneo sotto, chiusi.
         SectionCard(if (su.doubles) s.doubles else s.singles, Icons.Filled.Groups) {
             Segmented(
                 listOf(SegOption(s.singles, Icons.Filled.Person), SegOption(s.doubles, Icons.Filled.Groups)),
@@ -137,21 +115,40 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        PlayerCard(c, su, Side.P1)
-        PlayerCard(c, su, Side.P2)
-        // Racchetta virtuale: le racchette con corde e tensioni, da confrontare nel tempo.
-        SectionCard(s.racketTitle, Icons.Filled.SportsTennis) {
-            Text(if (rackets.isEmpty()) s.racketHint else s.racketSetupHint, color = TsmColors.TextDim)
-            GhostButton(s.racketMine, Icons.Filled.SportsTennis, { c.openRackets() }, Modifier.fillMaxWidth())
+        val recent = remember(c.history.collectAsState().value) { c.progressPlayers().map { it.second }.take(8) }
+        PlayerCard(c, su, Side.P1, recent)
+        PlayerCard(c, su, Side.P2, recent)
+        // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
+        SectionCard(s.sportSection, Icons.Filled.SportsTennis) {
+            Segmented(
+                listOf(SegOption(s.sportTennis), SegOption(s.sportPadel)),
+                selected = su.sport.ordinal,
+                onSelect = { i -> c.selectSport(Sport.entries[i]) },
+            )
+            if (su.sport == Sport.PADEL) Text(s.padelHint, color = TsmColors.TextDim)
         }
-        // Il secondo telefono, collegato al monitor, fa da tabellone per quello dell'arbitro.
-        SectionCard(s.displayMode, Icons.Filled.Tv) {
-            Text(s.displayModeHint, color = TsmColors.TextDim)
-            GhostButton(s.displayMode, Icons.Filled.Tv, {
-                context.startActivity(Intent(context, DisplayActivity::class.java))
-            }, Modifier.fillMaxWidth())
+        // Circolo, campo e torneo: facoltativi, chiusi finché non servono (aperti se già scritti).
+        val filled = listOf(su.club, su.court, su.event, su.category, su.round).any { it.isNotBlank() }
+        var details by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(filled) }
+        SectionCard(s.moreDetails, Icons.Filled.Business) {
+            if (!details) {
+                Text(s.moreDetailsHint, color = TsmColors.TextDim)
+                GhostButton(s.moreDetails, Icons.Filled.Business, { details = true }, Modifier.fillMaxWidth())
+            } else {
+                Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
+                Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+                // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
+                SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
+                    c.updateOptions { it.copy(addressLookup = v) }
+                }
+                // Torneo: per i circuiti amatoriali e semiprofessionistici; tutto facoltativo.
+                Text(s.eventSection, color = TsmColors.TextMain, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Field(su.event, s.eventName, Icons.Filled.EmojiEvents) { v -> c.updateSetup { it.copy(event = v) } }
+                Field(su.category, s.eventCategory, Icons.Filled.Category) { v -> c.updateSetup { it.copy(category = v) } }
+                Field(su.round, s.eventRound, Icons.Filled.Flag) { v -> c.updateSetup { it.copy(round = v) } }
+                Text(s.eventHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
         }
-        AboutFooter()
     }
 }
 
@@ -160,7 +157,7 @@ private const val SOURCE_URL = "https://github.com/steve-linux/Tennis-Score-Mana
 
 /** Versione, licenza e assenza di garanzia (la GPL chiede di mostrarle nei programmi con interfaccia), più il link al codice. */
 @Composable
-private fun AboutFooter() {
+internal fun AboutFooter() {
     val s = LocalStrings.current
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -175,7 +172,7 @@ private fun AboutFooter() {
 }
 
 @Composable
-private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
+private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<String> = emptyList()) {
     val s = LocalStrings.current
     val accent = TsmColors.player(side)
     val title = if (side == Side.P1) s.player1 else s.player2
@@ -191,6 +188,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                     c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
                 }
             }
+        }
+        // Giocatori recenti (dallo storico): un tocco e il nome è scritto. Solo quelli non già in campo.
+        val inUse = listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet()
+        RecentNames(recent.filter { PlayerStats.key(it) !in inUse }, accent) { n ->
+            c.updateSetup { if (side == Side.P1) it.copy(p1a = n) else it.copy(p2a = n) }
         }
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
@@ -213,12 +215,30 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side) {
                     }
                 }
             }
+            RecentNames(recent.filter { PlayerStats.key(it) !in listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet() }, accent) { n ->
+                c.updateSetup { if (side == Side.P1) it.copy(p1b = n) else it.copy(p2b = n) }
+            }
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
             SexChoice(c, b, if (side == Side.P1) su.p1bSex else su.p2bSex, accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bSex = v) else it.copy(p2bSex = v) }
             }
+        }
+    }
+}
+
+/** Nomi dei giocatori recenti da toccare per scriverli nel campo (al massimo una riga che va a capo). */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun RecentNames(names: List<String>, accent: Color, onPick: (String) -> Unit) {
+    if (names.isEmpty()) return
+    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (n in names.take(6)) {
+            Text(
+                n, color = accent, fontSize = 13.sp,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { onPick(n) }.padding(horizontal = 10.dp, vertical = 6.dp),
+            )
         }
     }
 }

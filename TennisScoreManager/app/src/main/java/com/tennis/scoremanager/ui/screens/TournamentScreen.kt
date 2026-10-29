@@ -108,9 +108,9 @@ private fun TournamentList(c: MatchController) {
     val s = LocalStrings.current
     val all by c.tournaments.collectAsState()
     var creating by rememberSaveable { mutableStateOf(false) }
-    BackHandler { if (creating) creating = false else c.go(Screen.SETUP) }
+    BackHandler { if (creating) creating = false else c.home() }
     if (creating || all.isEmpty()) {
-        NewTournament(c) { if (all.isEmpty()) c.go(Screen.SETUP) else creating = false }
+        NewTournament(c) { if (all.isEmpty()) c.home() else creating = false }
         return
     }
     ScreenScaffold(
@@ -118,7 +118,7 @@ private fun TournamentList(c: MatchController) {
         subtitle = s.tournamentSubtitle,
         icon = Icons.Filled.EmojiEvents,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.go(Screen.SETUP) }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.home() }, Modifier.weight(1f))
             BigButton(s.tournamentNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
         },
     ) {

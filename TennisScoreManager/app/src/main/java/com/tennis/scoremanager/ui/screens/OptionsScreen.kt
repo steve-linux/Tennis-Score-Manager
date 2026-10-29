@@ -147,8 +147,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Pagina 2: modalità, braccialetti, lingua, voce, formato e sorteggio. */
+/** Pagina 2 della partita, oppure (da Altro) i dispositivi o lingua e voce: stessi riquadri, permessi compresi. */
+enum class OptionsPage { MATCH, DEVICES, VOICE }
+
 @Composable
-fun OptionsScreen(c: MatchController) {
+fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val o by c.options.collectAsState()
@@ -228,17 +231,31 @@ fun OptionsScreen(c: MatchController) {
         c.go(Screen.START)
     }
 
+    val match = page == OptionsPage.MATCH
+    val devices = page == OptionsPage.DEVICES
+    if (!match) androidx.activity.compose.BackHandler { c.back() }
     ScreenScaffold(
-        title = s.optionsTitle,
-        subtitle = null,
-        icon = Icons.Filled.Tune,
+        title = when (page) { OptionsPage.MATCH -> s.optionsTitle; OptionsPage.DEVICES -> s.moreDevices; OptionsPage.VOICE -> s.moreVoice },
+        subtitle = when (page) { OptionsPage.MATCH -> s.step2Hint; OptionsPage.DEVICES -> s.moreDevicesHint; OptionsPage.VOICE -> s.moreVoiceHint },
+        icon = when (page) { OptionsPage.MATCH -> Icons.Filled.Tune; OptionsPage.DEVICES -> Icons.Filled.Bluetooth; OptionsPage.VOICE -> Icons.Filled.Language },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { onNext() }, Modifier.weight(1f))
+            if (match) BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { onNext() }, Modifier.weight(1f))
         },
     ) {
+        // Dispositivi (da Altro): braccialetti, telecomandi e fasce si collegano qui una volta, valgono per tutte le partite.
+        if (devices) {
+            SectionCard(s.modeBands, Icons.Filled.Watch) {
+                Text(s.requirements, style = MaterialTheme.typography.titleMedium, color = TsmColors.TextMain)
+                RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
+                RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
+                RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
+                BandsSection(c, names, enabled = bandsReadyEnv)
+            }
+            SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
+        }
         // Modalità
-        SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
+        if (match) SectionCard(s.modeSection, Icons.Filled.SportsTennis) {
             // Una modalità per riga: tre nomi affiancati non ci stanno in tutte le lingue.
             Segmented(
                 listOf(
@@ -272,7 +289,7 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Fasce cardio: in tutte le modalità. Fino ad Android 11 la ricerca vuole anche la posizione.
-        HeartSection(
+        if (match || devices) HeartSection(
             c, names, btOn = btOn,
             permsOk = blePerms && (Build.VERSION.SDK_INT >= 31 || locPerm && locOn),
             onEnableBluetooth = { enableBluetooth() },
@@ -280,10 +297,10 @@ fun OptionsScreen(c: MatchController) {
         )
 
         // Secondo telefono a fondo campo: ponte per fasce e braccialetti, e tabellone.
-        RelaySection(c, names)
+        if (devices) RelaySection(c, names)
 
         // Lingua
-        SectionCard(s.languageSection, Icons.Filled.Language) {
+        if (page == OptionsPage.VOICE) SectionCard(s.languageSection, Icons.Filled.Language) {
             // Ogni lingua è scritta nella lingua stessa, così si ritrova anche se l'app è in una lingua che non si legge.
             // Bloccata mentre si generano i file vocali, come motore e voce (vedi VoiceSection).
             val generating = c.voiceProgress.collectAsState().value != null
@@ -298,13 +315,13 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Audio e voce
-        VoiceSection(c, o)
+        if (page == OptionsPage.VOICE) VoiceSection(c, o)
 
         // Tabellone su TV
-        TvSection(c)
+        if (devices) TvSection(c)
 
         // Formato
-        SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
+        if (match) SectionCard(s.formatSection, Icons.Filled.EmojiEvents) {
             // Il pro set ha 8 o 10 game, gli altri set 6 o 4: cambiando formato si torna a un valore valido.
             fun pick(f: MatchFormat) = c.updateOptions {
                 val pro = f == MatchFormat.PRO_SET
@@ -352,7 +369,7 @@ fun OptionsScreen(c: MatchController) {
         }
 
         // Sorteggio
-        CoinTossSection(c, o, names, su.doubles)
+        if (match) CoinTossSection(c, o, names, su.doubles)
     }
 
     if (locationDialog) {
