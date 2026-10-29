@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -49,6 +50,9 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.ServeSide
 import com.tennis.scoremanager.data.ServeTarget
 import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.data.ShotDirection
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.data.Wing
 import com.tennis.scoremanager.video.CameraActivity
 import com.tennis.scoremanager.video.ReplayActivity
 
@@ -61,7 +65,16 @@ fun serveTargetName(s: Strings, v: ServeTarget?) = when (v) {
     null -> s.serveTargetNone
 }
 
-/** Pagina Allenamento: avvio dell'allenamento al servizio e le sessioni salvate. */
+fun strokeLabel(s: Strings, v: TrainedStroke) = s.strokeName(v.band)
+fun directionName(s: Strings, v: ShotDirection?) = when (v) {
+    ShotDirection.CROSS -> s.dirCross
+    ShotDirection.MIDDLE -> s.dirMiddle
+    ShotDirection.LINE -> s.dirLine
+    null -> s.dirNone
+}
+fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
+
+/** Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e sessioni salvate. */
 @Composable
 fun ServeTrainingCard(c: MatchController) {
     val s = LocalStrings.current
@@ -69,11 +82,16 @@ fun ServeTrainingCard(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
+    var stroke by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(TrainedStroke.SERVE) }
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    SectionCard(s.serveTitle, Icons.Filled.SportsTennis) {
-        Text(s.serveHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
+        Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        val strokes = TrainedStroke.entries
+        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 4)
         BigButton(s.serveStart, Icons.Filled.Videocam, {
-            context.startActivity(Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true))
+            context.startActivity(
+                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
+            )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
         if (sessions.isNotEmpty()) {
@@ -82,13 +100,16 @@ fun ServeTrainingCard(c: MatchController) {
             for (sess in sessions.take(8)) {
                 val n = ServeTraining.count(sess.serves)
                 Row(Modifier.fillMaxWidth().clickable { open = sess }.padding(vertical = 6.dp)) {
-                    Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(
+                        "${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)} · ${strokeLabel(s, sess.stroke)}",
+                        color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f),
+                    )
                     Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
                 }
             }
         }
     }
-    if (help) ServePlacementDialog { help = false }
+    if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
@@ -97,27 +118,43 @@ fun ServeTrainingCard(c: MatchController) {
  * dietro, tratteggiata) e le indicazioni.
  */
 @Composable
-fun ServePlacementDialog(onClose: () -> Unit) {
+fun ServePlacementDialog(stroke: TrainedStroke = TrainedStroke.SERVE, onClose: () -> Unit) {
     val s = LocalStrings.current
+    val serve = stroke == TrainedStroke.SERVE
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text(s.servePlaceTitle) },
+        title = { Text(s.servePlaceTitle + " · " + strokeLabel(s, stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                PlacementDiagram()
-                Text("● " + s.servePlaceServer + "   ▮ " + s.servePlacePhone + "   ▯ " + s.servePlaceAlt, fontSize = 12.sp, color = TsmColors.TextDim)
-                Text(s.servePlaceText, fontSize = 13.sp, color = TsmColors.TextMain)
+                PlacementDiagram(stroke)
+                Text(
+                    "● " + (if (serve) s.servePlaceServer else s.placeHitter) + "   ▮ " + s.servePlacePhone + (if (serve) "   ▯ " + s.servePlaceAlt else ""),
+                    fontSize = 12.sp, color = TsmColors.TextDim,
+                )
+                Text(
+                    when (stroke) {
+                        TrainedStroke.SERVE -> s.servePlaceText
+                        TrainedStroke.VOLLEY -> s.placeVolleyText
+                        else -> s.placeGroundText
+                    },
+                    fontSize = 13.sp, color = TsmColors.TextMain,
+                )
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },
     )
 }
 
-/** Metà campo vista dall'alto, rete in alto: chi serve (giallo) a destra del segno centrale, il telefono (verde). */
+/**
+ * Metà campo vista dall'alto, rete in alto. Servizio: chi serve (giallo) a destra del segno centrale, il telefono
+ * (verde) a fianco e l'alternativa dietro. Dritto e rovescio: chi colpisce dietro la linea di fondo, il telefono di
+ * lato fuori dal corridoio. Volée: chi gioca a rete, il telefono di lato alla sua altezza.
+ */
 @Composable
-private fun PlacementDiagram() {
+private fun PlacementDiagram(stroke: TrainedStroke) {
     // 16 m di larghezza (campo da doppio con spazio ai lati) e 17,5 m di profondità: la metà campo e i 5 m dietro la linea.
-    Canvas(Modifier.fillMaxWidth().aspectRatio(16f / 17.5f)) {
+    // Al massimo 260 dp d'altezza: con il telefono in orizzontale (telecamera) resta spazio anche per le indicazioni.
+    Canvas(Modifier.fillMaxWidth().heightIn(max = 260.dp).aspectRatio(16f / 17.5f, matchHeightConstraintsFirst = true)) {
         val m = size.width / 16f
         val left = 2.5f * m
         val right = left + 10.97f * m
@@ -135,6 +172,14 @@ private fun PlacementDiagram() {
         val mid = (left + right) / 2
         drawLine(line, Offset(mid, net), Offset(mid, service), 2f)
         drawLine(Color.White, Offset(left - 0.9f * m, net), Offset(right + 0.9f * m, net), 4f)
+        if (stroke != TrainedStroke.SERVE) {
+            val hitter = if (stroke == TrainedStroke.VOLLEY) Offset(mid, net + 2f * m) else Offset(mid, base + 0.6f * m)
+            drawCircle(TsmColors.Player1, 0.45f * m, hitter)
+            val phone = Offset(right + 1f * m, hitter.y)
+            drawRect(TsmColors.Ball, Offset(phone.x - 0.3f * m, phone.y - 0.5f * m), Size(0.6f * m, 1f * m))
+            drawLine(TsmColors.Ball, phone, hitter, 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f)))
+            return@Canvas
+        }
         // Chi serve: dietro la linea di fondo, a destra del centro (servizio da destra).
         val server = Offset(mid + 1f * m, base + 0.5f * m)
         drawCircle(TsmColors.Player1, 0.45f * m, server)
@@ -150,8 +195,8 @@ private fun PlacementDiagram() {
 
 /** Riepilogo di una sessione: totali, per lato, prima e seconda, bersaglio, polso; sotto, le clip da rivedere. */
 @Composable
-fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>) {
-    val b = ServeTraining.breakdown(serves)
+fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE) {
+    val b = ServeTraining.breakdown(serves, stroke)
     Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
     @Composable
     fun rows(title: String, map: Map<String, ServeTraining.Count>) {
@@ -167,6 +212,8 @@ fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>) {
     rows(s.serveBySide, b.bySide.mapKeys { serveSideName(s, it.key) })
     rows(s.serveByKind, b.byKind.mapKeys { serveKindName(s, it.key) })
     rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
+    rows(s.byWing, b.byWing.mapKeys { wingName(s, it.key) })
+    rows(s.byDirection, b.byDirection.mapKeys { directionName(s, it.key) })
     val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
     val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
     if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
@@ -180,10 +227,10 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
     var ask by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text(s.serveSummary) },
+        title = { Text(s.serveSummary + " · " + strokeLabel(s, sess.stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ServeSummaryContent(s, sess.serves)
+                ServeSummaryContent(s, sess.serves, sess.stroke)
                 ServeReplayButtons(c, sess)
                 // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.
                 if (sess.serves.any { it.clip != null }) {

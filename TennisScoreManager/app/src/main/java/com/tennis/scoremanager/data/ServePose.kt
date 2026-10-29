@@ -53,7 +53,38 @@ data class ServePoseResult(
     val metrics: ServeMetrics?,
     /** Persone diverse viste nell'inquadratura (si segue chi serve); 0 = nessuna. */
     val people: Int = 1,
+    /** Dritto, rovescio e volée: le loro misure (per il servizio c'è [metrics]). */
+    val ground: GroundMetrics? = null,
 )
+
+/**
+ * Misure di dritto, rovescio e volée, ripresi di lato: i tre momenti sono la preparazione (polso più indietro), l'impatto
+ * (polso più veloce) e il finale (polso più in alto dopo l'impatto). Le distanze sono in frazioni della statura,
+ * "davanti" e "dietro" rispetto al centro del corpo nella direzione del colpo.
+ */
+@Serializable
+data class GroundMetrics(
+    /** Ginocchio più piegato tra preparazione e impatto (180° = gamba tesa). */
+    val kneeMinDeg: Float,
+    /** Gomito all'impatto (180° = braccio disteso). */
+    val elbowContactDeg: Float,
+    /** Altezza del polso all'impatto, sulla statura (circa 0,5 = all'altezza della vita). */
+    val contactHeight: Float,
+    /** Quanto davanti al corpo si colpisce (positivo = davanti). */
+    val contactInFront: Float,
+    /** Quanto indietro va il polso nella preparazione (ampiezza dell'apertura). */
+    val backswing: Float,
+    /** Altezza del polso nel finale, sulla statura. */
+    val finishHeight: Float,
+    val prepToContactMs: Long,
+    val quality: Float,
+    val prepT: Long,
+    val contactT: Long,
+    val finishT: Long,
+    val rightHanded: Boolean,
+) {
+    val reliable: Boolean get() = quality >= ServePose.MIN_QUALITY
+}
 
 object ServePose {
     const val NOSE = 0
@@ -164,6 +195,85 @@ object ServePose {
             kneeT = kneeFrame.t,
             contactT = contact.t,
             rightHanded = right,
+        )
+    }
+
+    /** Dritto, rovescio e volée: le misure dai fotogrammi in ordine di tempo; null se non si trovano i tre momenti. */
+    fun groundMetrics(frames: List<PoseFrame>): GroundMetrics? {
+        if (frames.size < 5) return null
+        fun speeds(w: Int): List<Pair<Int, Float>> = (1 until frames.size).mapNotNull { i ->
+            val a = frames[i - 1]; val b = frames[i]
+            if (!ok(a, w) || !ok(b, w) || b.t <= a.t) return@mapNotNull null
+            val dx = b.x[w] - a.x[w]; val dy = b.y[w] - a.y[w]
+            i to sqrt(dx * dx + dy * dy) / (b.t - a.t)
+        }
+        // Braccio che colpisce: il polso più veloce; l'impatto è il momento in cui va più veloce.
+        val sr = speeds(R_WRIST); val sl = speeds(L_WRIST)
+        val vr = sr.maxOfOrNull { it.second } ?: 0f
+        val vl = sl.maxOfOrNull { it.second } ?: 0f
+        if (vr == 0f && vl == 0f) return null
+        val right = vr >= vl
+        val hitW = if (right) R_WRIST else L_WRIST
+        val hitE = if (right) R_ELBOW else L_ELBOW
+        val hitS = if (right) R_SHOULDER else L_SHOULDER
+        val ci = (if (right) sr else sl).maxBy { it.second }.first
+        val contact = frames[ci]
+        // Direzione del colpo: dove va il polso all'impatto (in orizzontale).
+        val dir = (frames[ci].x[hitW] - frames[ci - 1].x[hitW]).let { if (it >= 0) 1f else -1f }
+        fun body(f: PoseFrame): Float? {
+            val pts = listOf(L_HIP, R_HIP, L_SHOULDER, R_SHOULDER).filter { f.s[it] >= MIN_SCORE }
+            return if (pts.size < 2) null else pts.map { f.x[it] }.average().toFloat()
+        }
+        // Preparazione: il polso più indietro (contro la direzione del colpo) tra 1,5 s e 0,15 s prima dell'impatto.
+        val pi = (0 until ci).filter { frames[it].t in (contact.t - 1_500)..(contact.t - 150) && ok(frames[it], hitW) && body(frames[it]) != null }
+            .minByOrNull { dir * (frames[it].x[hitW] - body(frames[it])!!) } ?: return null
+        val prep = frames[pi]
+        // Finale: il polso più in alto dopo l'impatto (entro 0,9 s).
+        val fi = (ci + 1 until frames.size).filter { frames[it].t in (contact.t + 100)..(contact.t + 900) && ok(frames[it], hitW) }
+            .minByOrNull { frames[it].y[hitW] } ?: return null
+        val finish = frames[fi]
+        fun knee(f: PoseFrame): Float? = listOfNotNull(
+            angle(f, L_HIP, L_KNEE, L_ANKLE).takeIf { ok(f, L_HIP, L_KNEE, L_ANKLE) },
+            angle(f, R_HIP, R_KNEE, R_ANKLE).takeIf { ok(f, R_HIP, R_KNEE, R_ANKLE) },
+        ).minOrNull()
+        val ki = (frames.indexOfFirst { it.t >= prep.t - 300 }.coerceAtLeast(0)..ci).filter { knee(frames[it]) != null }
+            .minByOrNull { knee(frames[it])!! } ?: return null
+        // Statura e terreno da tutti i fotogrammi (chi colpisce da fondo campo si muove, ma resta in piedi).
+        val ankle = { f: PoseFrame -> listOfNotNull(f.y[L_ANKLE].takeIf { ok(f, L_ANKLE) }, f.y[R_ANKLE].takeIf { ok(f, R_ANKLE) }).maxOrNull() }
+        val ground = median(frames.mapNotNull(ankle)) ?: return null
+        val noseToAnkle = median(frames.filter { ok(it, NOSE) }.mapNotNull { f -> ankle(f)?.let { it - f.y[NOSE] } }) ?: return null
+        val stature = noseToAnkle / NOSE_TO_ANKLE
+        if (stature <= 0.05f) return null
+        val elbow = if (ok(contact, hitS, hitE, hitW)) angle(contact, hitS, hitE, hitW) else return null
+        val bc = body(contact) ?: return null
+        val used = listOf(contact.s[hitW], contact.s[hitE], contact.s[hitS], prep.s[hitW], finish.s[hitW]) +
+            listOf(L_HIP, L_KNEE, L_ANKLE, R_HIP, R_KNEE, R_ANKLE).map { frames[ki].s[it] }
+        return GroundMetrics(
+            kneeMinDeg = knee(frames[ki])!!,
+            elbowContactDeg = elbow,
+            contactHeight = (ground - contact.y[hitW]) / stature,
+            contactInFront = dir * (contact.x[hitW] - bc) / stature,
+            backswing = -dir * (prep.x[hitW] - body(prep)!!) / stature,
+            finishHeight = (ground - finish.y[hitW]) / stature,
+            prepToContactMs = contact.t - prep.t,
+            quality = used.average().toFloat(),
+            prepT = prep.t, contactT = contact.t, finishT = finish.t,
+            rightHanded = right,
+        )
+    }
+
+    data class GroundMean(
+        val n: Int, val kneeMinDeg: Float, val elbowContactDeg: Float, val contactHeight: Float,
+        val contactInFront: Float, val backswing: Float, val finishHeight: Float, val prepToContactMs: Long,
+    )
+
+    fun groundMean(list: List<GroundMetrics>): GroundMean? {
+        val r = list.filter { it.reliable }.takeIf { it.isNotEmpty() } ?: return null
+        return GroundMean(
+            r.size, r.map { it.kneeMinDeg }.average().toFloat(), r.map { it.elbowContactDeg }.average().toFloat(),
+            r.map { it.contactHeight }.average().toFloat(), r.map { it.contactInFront }.average().toFloat(),
+            r.map { it.backswing }.average().toFloat(), r.map { it.finishHeight }.average().toFloat(),
+            r.map { it.prepToContactMs }.average().toLong(),
         )
     }
 

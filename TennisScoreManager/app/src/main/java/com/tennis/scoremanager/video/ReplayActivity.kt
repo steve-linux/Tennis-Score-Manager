@@ -109,8 +109,8 @@ class ReplayActivity : ComponentActivity() {
             setSeekParameters(androidx.media3.exoplayer.SeekParameters.EXACT)
             prepare()
             // Con lo scheletro si parte poco prima del caricamento, al rallentatore.
-            pose?.metrics?.let { m ->
-                seekAbs(this, poseAt + m.trophyT - 1_200)
+            (pose?.metrics?.trophyT ?: pose?.ground?.prepT)?.let { first ->
+                seekAbs(this, poseAt + first - 1_200)
                 playbackParameters = PlaybackParameters(0.5f)
             }
             play()
@@ -178,7 +178,7 @@ class ReplayActivity : ComponentActivity() {
     private fun Content(p: ExoPlayer) {
         val s = stringsFor(controller.options.value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null) 0.5f else 1f) }
+        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null || pose?.ground != null) 0.5f else 1f) }
         var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
@@ -247,8 +247,10 @@ class ReplayActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Btn(Icons.Filled.AccessibilityNew, null, skeleton) { skeleton = !skeleton }
-                    r.metrics?.let { m ->
-                        for ((label, t) in listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT)) {
+                    val moments = r.metrics?.let { m -> listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT) }
+                        ?: r.ground?.let { g -> listOf(s.posePrep to g.prepT, s.poseContact to g.contactT, s.poseFinish to g.finishT) }
+                    moments?.let { list ->
+                        for ((label, t) in list) {
                             Btn(null, label, false) {
                                 p.pause()
                                 playing = false

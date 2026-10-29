@@ -85,4 +85,48 @@ class ServePoseTest {
         assertEquals(2, mean.n)
         assertEquals(a.kneeMinDeg - 10, mean.kneeMinDeg, 0.01f)
     }
+
+    /**
+     * Un dritto finto di un destro visto di lato, corpo al centro (x 0,5): il polso va indietro fino a -500 ms (0,30),
+     * accelera fino all'impatto a 0 ms davanti al corpo (0,62) all'altezza della vita, finisce in alto a +400 ms.
+     */
+    private fun forehand(): List<PoseFrame> = (-1200L..800L step 50).map { t ->
+        val x = MutableList(17) { 0.5f }
+        val y = MutableList(17) { 0.5f }
+        fun p(i: Int, px: Float, py: Float) { x[i] = px; y[i] = py }
+        p(NOSE, 0.5f, 0.15f)
+        p(L_SHOULDER, 0.48f, 0.25f); p(R_SHOULDER, 0.52f, 0.25f)
+        p(L_HIP, 0.49f, 0.5f); p(R_HIP, 0.51f, 0.5f)
+        val bend = max(0f, 1f - abs(t + 250) / 400f) * 0.06f
+        p(L_KNEE, 0.49f + bend, 0.7f); p(R_KNEE, 0.51f + bend, 0.7f)
+        p(L_ANKLE, 0.49f, 0.9f); p(R_ANKLE, 0.51f, 0.9f)
+        p(L_ELBOW, 0.45f, 0.35f); p(L_WRIST, 0.45f, 0.42f)
+        val (wx, wy) = when {
+            t <= -500 -> 0.42f - 0.12f * (t + 1200) / 700f to 0.45f
+            t <= 0 -> { val k = (t + 500) / 500f; 0.30f + 0.32f * k * k * k to 0.5f }
+            t <= 400 -> 0.62f + 0.05f * t / 400f to 0.5f - 0.35f * t / 400f
+            else -> 0.67f to 0.15f + 0.1f * (t - 400) / 400f
+        }
+        p(R_WRIST, wx, wy)
+        p(R_ELBOW, (wx + 0.52f) / 2, (wy + 0.25f) / 2 + 0.01f)
+        PoseFrame(t, x, y, List(17) { 0.9f })
+    }
+
+    @Test
+    fun forehandMomentsAndMeasures() {
+        val m = ServePose.groundMetrics(forehand())!!
+        assertTrue(m.rightHanded)
+        assertEquals(0L, m.contactT)
+        assertEquals(-500L, m.prepT)
+        assertEquals(400L, m.finishT)
+        assertEquals(500L, m.prepToContactMs)
+        val stature = 0.75f / 0.89f
+        assertEquals(0.12f / stature, m.contactInFront, 0.01f)
+        assertEquals(0.20f / stature, m.backswing, 0.01f)
+        assertEquals(0.40f / stature, m.contactHeight, 0.01f)
+        assertEquals(0.75f / stature, m.finishHeight, 0.01f)
+        assertTrue("${m.kneeMinDeg}", m.kneeMinDeg < 175f)
+        assertTrue(m.reliable)
+        assertEquals(1, ServePose.groundMean(listOf(m))!!.n)
+    }
 }

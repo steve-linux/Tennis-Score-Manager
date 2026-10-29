@@ -41,4 +41,22 @@ class ServeTrainingTest {
         assertEquals(1800, ServeTraining.meanGyro(list))
         assertNull(ServeTraining.count(emptyList()).pct)
     }
+
+    @Test
+    fun groundstrokesAndVolleysByDirectionAndWing() {
+        fun a(inPlay: Boolean, dir: ShotDirection?, wing: Wing? = null) =
+            ServeAttempt(0, inPlay, ServeSide.DEUCE, ServeKind.FIRST, direction = dir, wing = wing)
+        val fh = listOf(a(true, ShotDirection.CROSS), a(false, ShotDirection.LINE), a(true, ShotDirection.LINE), a(true, null))
+        val b = ServeTraining.breakdown(fh, TrainedStroke.FOREHAND)
+        // Col dritto non ci sono lato, prima/seconda e bersaglio del servizio.
+        assertEquals(emptyMap<ServeSide, ServeTraining.Count>(), b.bySide)
+        assertEquals(emptyMap<ServeTarget, ServeTraining.Count>(), b.byTarget)
+        assertEquals(ServeTraining.Count(2, 1), b.byDirection[ShotDirection.LINE])
+        assertEquals(setOf(ShotDirection.CROSS, ShotDirection.LINE), b.byDirection.keys)
+        assertEquals(emptyMap<Wing, ServeTraining.Count>(), b.byWing)
+        val volley = ServeTraining.breakdown(listOf(a(true, null, Wing.FOREHAND), a(false, null, Wing.BACKHAND), a(true, null, Wing.BACKHAND)), TrainedStroke.VOLLEY)
+        assertEquals(50, volley.byWing.getValue(Wing.BACKHAND).pct)
+        // Le sessioni salvate prima erano di servizio.
+        assertEquals(TrainedStroke.SERVE, ServeSession("x", 0).stroke)
+    }
 }

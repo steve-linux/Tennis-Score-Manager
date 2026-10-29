@@ -7816,7 +7816,38 @@ data class ServePoseResult(
     val metrics: ServeMetrics?,
     /** Persone diverse viste nell'inquadratura (si segue chi serve); 0 = nessuna. */
     val people: Int = 1,
+    /** Dritto, rovescio e volée: le loro misure (per il servizio c'è [metrics]). */
+    val ground: GroundMetrics? = null,
 )
+
+/**
+ * Misure di dritto, rovescio e volée, ripresi di lato: i tre momenti sono la preparazione (polso più indietro), l'impatto
+ * (polso più veloce) e il finale (polso più in alto dopo l'impatto). Le distanze sono in frazioni della statura,
+ * "davanti" e "dietro" rispetto al centro del corpo nella direzione del colpo.
+ */
+@Serializable
+data class GroundMetrics(
+    /** Ginocchio più piegato tra preparazione e impatto (180° = gamba tesa). */
+    val kneeMinDeg: Float,
+    /** Gomito all'impatto (180° = braccio disteso). */
+    val elbowContactDeg: Float,
+    /** Altezza del polso all'impatto, sulla statura (circa 0,5 = all'altezza della vita). */
+    val contactHeight: Float,
+    /** Quanto davanti al corpo si colpisce (positivo = davanti). */
+    val contactInFront: Float,
+    /** Quanto indietro va il polso nella preparazione (ampiezza dell'apertura). */
+    val backswing: Float,
+    /** Altezza del polso nel finale, sulla statura. */
+    val finishHeight: Float,
+    val prepToContactMs: Long,
+    val quality: Float,
+    val prepT: Long,
+    val contactT: Long,
+    val finishT: Long,
+    val rightHanded: Boolean,
+) {
+    val reliable: Boolean get() = quality >= ServePose.MIN_QUALITY
+}
 
 object ServePose {
     const val NOSE = 0
@@ -7930,6 +7961,85 @@ object ServePose {
         )
     }
 
+    /** Dritto, rovescio e volée: le misure dai fotogrammi in ordine di tempo; null se non si trovano i tre momenti. */
+    fun groundMetrics(frames: List<PoseFrame>): GroundMetrics? {
+        if (frames.size < 5) return null
+        fun speeds(w: Int): List<Pair<Int, Float>> = (1 until frames.size).mapNotNull { i ->
+            val a = frames[i - 1]; val b = frames[i]
+            if (!ok(a, w) || !ok(b, w) || b.t <= a.t) return@mapNotNull null
+            val dx = b.x[w] - a.x[w]; val dy = b.y[w] - a.y[w]
+            i to sqrt(dx * dx + dy * dy) / (b.t - a.t)
+        }
+        // Braccio che colpisce: il polso più veloce; l'impatto è il momento in cui va più veloce.
+        val sr = speeds(R_WRIST); val sl = speeds(L_WRIST)
+        val vr = sr.maxOfOrNull { it.second } ?: 0f
+        val vl = sl.maxOfOrNull { it.second } ?: 0f
+        if (vr == 0f && vl == 0f) return null
+        val right = vr >= vl
+        val hitW = if (right) R_WRIST else L_WRIST
+        val hitE = if (right) R_ELBOW else L_ELBOW
+        val hitS = if (right) R_SHOULDER else L_SHOULDER
+        val ci = (if (right) sr else sl).maxBy { it.second }.first
+        val contact = frames[ci]
+        // Direzione del colpo: dove va il polso all'impatto (in orizzontale).
+        val dir = (frames[ci].x[hitW] - frames[ci - 1].x[hitW]).let { if (it >= 0) 1f else -1f }
+        fun body(f: PoseFrame): Float? {
+            val pts = listOf(L_HIP, R_HIP, L_SHOULDER, R_SHOULDER).filter { f.s[it] >= MIN_SCORE }
+            return if (pts.size < 2) null else pts.map { f.x[it] }.average().toFloat()
+        }
+        // Preparazione: il polso più indietro (contro la direzione del colpo) tra 1,5 s e 0,15 s prima dell'impatto.
+        val pi = (0 until ci).filter { frames[it].t in (contact.t - 1_500)..(contact.t - 150) && ok(frames[it], hitW) && body(frames[it]) != null }
+            .minByOrNull { dir * (frames[it].x[hitW] - body(frames[it])!!) } ?: return null
+        val prep = frames[pi]
+        // Finale: il polso più in alto dopo l'impatto (entro 0,9 s).
+        val fi = (ci + 1 until frames.size).filter { frames[it].t in (contact.t + 100)..(contact.t + 900) && ok(frames[it], hitW) }
+            .minByOrNull { frames[it].y[hitW] } ?: return null
+        val finish = frames[fi]
+        fun knee(f: PoseFrame): Float? = listOfNotNull(
+            angle(f, L_HIP, L_KNEE, L_ANKLE).takeIf { ok(f, L_HIP, L_KNEE, L_ANKLE) },
+            angle(f, R_HIP, R_KNEE, R_ANKLE).takeIf { ok(f, R_HIP, R_KNEE, R_ANKLE) },
+        ).minOrNull()
+        val ki = (frames.indexOfFirst { it.t >= prep.t - 300 }.coerceAtLeast(0)..ci).filter { knee(frames[it]) != null }
+            .minByOrNull { knee(frames[it])!! } ?: return null
+        // Statura e terreno da tutti i fotogrammi (chi colpisce da fondo campo si muove, ma resta in piedi).
+        val ankle = { f: PoseFrame -> listOfNotNull(f.y[L_ANKLE].takeIf { ok(f, L_ANKLE) }, f.y[R_ANKLE].takeIf { ok(f, R_ANKLE) }).maxOrNull() }
+        val ground = median(frames.mapNotNull(ankle)) ?: return null
+        val noseToAnkle = median(frames.filter { ok(it, NOSE) }.mapNotNull { f -> ankle(f)?.let { it - f.y[NOSE] } }) ?: return null
+        val stature = noseToAnkle / NOSE_TO_ANKLE
+        if (stature <= 0.05f) return null
+        val elbow = if (ok(contact, hitS, hitE, hitW)) angle(contact, hitS, hitE, hitW) else return null
+        val bc = body(contact) ?: return null
+        val used = listOf(contact.s[hitW], contact.s[hitE], contact.s[hitS], prep.s[hitW], finish.s[hitW]) +
+            listOf(L_HIP, L_KNEE, L_ANKLE, R_HIP, R_KNEE, R_ANKLE).map { frames[ki].s[it] }
+        return GroundMetrics(
+            kneeMinDeg = knee(frames[ki])!!,
+            elbowContactDeg = elbow,
+            contactHeight = (ground - contact.y[hitW]) / stature,
+            contactInFront = dir * (contact.x[hitW] - bc) / stature,
+            backswing = -dir * (prep.x[hitW] - body(prep)!!) / stature,
+            finishHeight = (ground - finish.y[hitW]) / stature,
+            prepToContactMs = contact.t - prep.t,
+            quality = used.average().toFloat(),
+            prepT = prep.t, contactT = contact.t, finishT = finish.t,
+            rightHanded = right,
+        )
+    }
+
+    data class GroundMean(
+        val n: Int, val kneeMinDeg: Float, val elbowContactDeg: Float, val contactHeight: Float,
+        val contactInFront: Float, val backswing: Float, val finishHeight: Float, val prepToContactMs: Long,
+    )
+
+    fun groundMean(list: List<GroundMetrics>): GroundMean? {
+        val r = list.filter { it.reliable }.takeIf { it.isNotEmpty() } ?: return null
+        return GroundMean(
+            r.size, r.map { it.kneeMinDeg }.average().toFloat(), r.map { it.elbowContactDeg }.average().toFloat(),
+            r.map { it.contactHeight }.average().toFloat(), r.map { it.contactInFront }.average().toFloat(),
+            r.map { it.backswing }.average().toFloat(), r.map { it.finishHeight }.average().toFloat(),
+            r.map { it.prepToContactMs }.average().toLong(),
+        )
+    }
+
     /** Media di ogni misura sui servizi affidabili (null se nessuno). */
     data class Mean(
         val n: Int, val kneeMinDeg: Float, val elbowContactDeg: Float, val contactHeight: Float,
@@ -7967,6 +8077,18 @@ enum class ServeKind { FIRST, SECOND }
 @Serializable
 enum class ServeTarget { T, BODY, WIDE }
 
+/** Colpo che si allena; [band] è il numero del colpo per il braccialetto (BandProtocol.STROKE_*), anche per il nome. */
+@Serializable
+enum class TrainedStroke(val band: Int) { SERVE(2), FOREHAND(0), BACKHAND(1), VOLLEY(3) }
+
+/** Direzione voluta per dritto, rovescio e volée. */
+@Serializable
+enum class ShotDirection { CROSS, MIDDLE, LINE }
+
+/** Volée di dritto o di rovescio. */
+@Serializable
+enum class Wing { FOREHAND, BACKHAND }
+
 /**
  * Un servizio dell'allenamento: quando ([at], ora del telefono), se è entrato, con che impostazioni, se il braccialetto
  * l'aveva riconosciuto ([detected]) e coi picchi del polso; [clip] è la cartella dei pezzi di video (null finché non
@@ -7983,6 +8105,9 @@ data class ServeAttempt(
     val gyroDps: Int? = null,
     val accelG: Double? = null,
     val clip: String? = null,
+    /** Dritto, rovescio e volée: direzione voluta e, per la volée, se di dritto o di rovescio. */
+    val direction: ShotDirection? = null,
+    val wing: Wing? = null,
 )
 
 @Serializable
@@ -7991,6 +8116,8 @@ data class ServeSession(
     val startedAt: Long,
     val endedAt: Long? = null,
     val serves: List<ServeAttempt> = emptyList(),
+    /** Colpo allenato (le sessioni salvate prima erano tutte di servizio). */
+    val stroke: TrainedStroke = TrainedStroke.SERVE,
 )
 
 /**
@@ -8031,14 +8158,22 @@ object ServeTraining {
         val bySide: Map<ServeSide, Count>,
         val byKind: Map<ServeKind, Count>,
         val byTarget: Map<ServeTarget, Count>,
+        val byDirection: Map<ShotDirection, Count> = emptyMap(),
+        val byWing: Map<Wing, Count> = emptyMap(),
     )
 
-    fun breakdown(serves: List<ServeAttempt>): Breakdown = Breakdown(
-        count(serves),
-        ServeSide.entries.associateWith { s -> count(serves.filter { it.side == s }) }.filterValues { it.total > 0 },
-        ServeKind.entries.associateWith { k -> count(serves.filter { it.kind == k }) }.filterValues { it.total > 0 },
-        ServeTarget.entries.associateWith { t -> count(serves.filter { it.target == t }) }.filterValues { it.total > 0 },
-    )
+    /** Righe del riepilogo: per il servizio lato, prima e seconda, bersaglio; per gli altri colpi direzione e dritto/rovescio. */
+    fun breakdown(serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE): Breakdown {
+        val serve = stroke == TrainedStroke.SERVE
+        return Breakdown(
+            count(serves),
+            if (!serve) emptyMap() else ServeSide.entries.associateWith { s -> count(serves.filter { it.side == s }) }.filterValues { it.total > 0 },
+            if (!serve) emptyMap() else ServeKind.entries.associateWith { k -> count(serves.filter { it.kind == k }) }.filterValues { it.total > 0 },
+            if (!serve) emptyMap() else ServeTarget.entries.associateWith { t -> count(serves.filter { it.target == t }) }.filterValues { it.total > 0 },
+            if (serve) emptyMap() else ShotDirection.entries.associateWith { d -> count(serves.filter { it.direction == d }) }.filterValues { it.total > 0 },
+            if (stroke != TrainedStroke.VOLLEY) emptyMap() else Wing.entries.associateWith { w -> count(serves.filter { it.wing == w }) }.filterValues { it.total > 0 },
+        )
+    }
 
     /** Media dei picchi del polso dei servizi riconosciuti (null se nessuno): dentro e fuori, per confrontarli. */
     fun meanGyro(serves: List<ServeAttempt>): Int? =
@@ -15077,6 +15212,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15115,6 +15251,9 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.ServeSide
 import com.tennis.scoremanager.data.ServeTarget
 import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.data.ShotDirection
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.data.Wing
 import com.tennis.scoremanager.video.CameraActivity
 import com.tennis.scoremanager.video.ReplayActivity
 
@@ -15127,7 +15266,16 @@ fun serveTargetName(s: Strings, v: ServeTarget?) = when (v) {
     null -> s.serveTargetNone
 }
 
-/** Pagina Allenamento: avvio dell'allenamento al servizio e le sessioni salvate. */
+fun strokeLabel(s: Strings, v: TrainedStroke) = s.strokeName(v.band)
+fun directionName(s: Strings, v: ShotDirection?) = when (v) {
+    ShotDirection.CROSS -> s.dirCross
+    ShotDirection.MIDDLE -> s.dirMiddle
+    ShotDirection.LINE -> s.dirLine
+    null -> s.dirNone
+}
+fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
+
+/** Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e sessioni salvate. */
 @Composable
 fun ServeTrainingCard(c: MatchController) {
     val s = LocalStrings.current
@@ -15135,11 +15283,16 @@ fun ServeTrainingCard(c: MatchController) {
     val sessions by c.serveSessions.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
+    var stroke by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(TrainedStroke.SERVE) }
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    SectionCard(s.serveTitle, Icons.Filled.SportsTennis) {
-        Text(s.serveHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
+        Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        val strokes = TrainedStroke.entries
+        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 4)
         BigButton(s.serveStart, Icons.Filled.Videocam, {
-            context.startActivity(Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true))
+            context.startActivity(
+                Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
+            )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
         if (sessions.isNotEmpty()) {
@@ -15148,13 +15301,16 @@ fun ServeTrainingCard(c: MatchController) {
             for (sess in sessions.take(8)) {
                 val n = ServeTraining.count(sess.serves)
                 Row(Modifier.fillMaxWidth().clickable { open = sess }.padding(vertical = 6.dp)) {
-                    Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(
+                        "${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)} · ${strokeLabel(s, sess.stroke)}",
+                        color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f),
+                    )
                     Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
                 }
             }
         }
     }
-    if (help) ServePlacementDialog { help = false }
+    if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
 }
 
@@ -15163,27 +15319,43 @@ fun ServeTrainingCard(c: MatchController) {
  * dietro, tratteggiata) e le indicazioni.
  */
 @Composable
-fun ServePlacementDialog(onClose: () -> Unit) {
+fun ServePlacementDialog(stroke: TrainedStroke = TrainedStroke.SERVE, onClose: () -> Unit) {
     val s = LocalStrings.current
+    val serve = stroke == TrainedStroke.SERVE
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text(s.servePlaceTitle) },
+        title = { Text(s.servePlaceTitle + " · " + strokeLabel(s, stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                PlacementDiagram()
-                Text("● " + s.servePlaceServer + "   ▮ " + s.servePlacePhone + "   ▯ " + s.servePlaceAlt, fontSize = 12.sp, color = TsmColors.TextDim)
-                Text(s.servePlaceText, fontSize = 13.sp, color = TsmColors.TextMain)
+                PlacementDiagram(stroke)
+                Text(
+                    "● " + (if (serve) s.servePlaceServer else s.placeHitter) + "   ▮ " + s.servePlacePhone + (if (serve) "   ▯ " + s.servePlaceAlt else ""),
+                    fontSize = 12.sp, color = TsmColors.TextDim,
+                )
+                Text(
+                    when (stroke) {
+                        TrainedStroke.SERVE -> s.servePlaceText
+                        TrainedStroke.VOLLEY -> s.placeVolleyText
+                        else -> s.placeGroundText
+                    },
+                    fontSize = 13.sp, color = TsmColors.TextMain,
+                )
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text(s.ok) } },
     )
 }
 
-/** Metà campo vista dall'alto, rete in alto: chi serve (giallo) a destra del segno centrale, il telefono (verde). */
+/**
+ * Metà campo vista dall'alto, rete in alto. Servizio: chi serve (giallo) a destra del segno centrale, il telefono
+ * (verde) a fianco e l'alternativa dietro. Dritto e rovescio: chi colpisce dietro la linea di fondo, il telefono di
+ * lato fuori dal corridoio. Volée: chi gioca a rete, il telefono di lato alla sua altezza.
+ */
 @Composable
-private fun PlacementDiagram() {
+private fun PlacementDiagram(stroke: TrainedStroke) {
     // 16 m di larghezza (campo da doppio con spazio ai lati) e 17,5 m di profondità: la metà campo e i 5 m dietro la linea.
-    Canvas(Modifier.fillMaxWidth().aspectRatio(16f / 17.5f)) {
+    // Al massimo 260 dp d'altezza: con il telefono in orizzontale (telecamera) resta spazio anche per le indicazioni.
+    Canvas(Modifier.fillMaxWidth().heightIn(max = 260.dp).aspectRatio(16f / 17.5f, matchHeightConstraintsFirst = true)) {
         val m = size.width / 16f
         val left = 2.5f * m
         val right = left + 10.97f * m
@@ -15201,6 +15373,14 @@ private fun PlacementDiagram() {
         val mid = (left + right) / 2
         drawLine(line, Offset(mid, net), Offset(mid, service), 2f)
         drawLine(Color.White, Offset(left - 0.9f * m, net), Offset(right + 0.9f * m, net), 4f)
+        if (stroke != TrainedStroke.SERVE) {
+            val hitter = if (stroke == TrainedStroke.VOLLEY) Offset(mid, net + 2f * m) else Offset(mid, base + 0.6f * m)
+            drawCircle(TsmColors.Player1, 0.45f * m, hitter)
+            val phone = Offset(right + 1f * m, hitter.y)
+            drawRect(TsmColors.Ball, Offset(phone.x - 0.3f * m, phone.y - 0.5f * m), Size(0.6f * m, 1f * m))
+            drawLine(TsmColors.Ball, phone, hitter, 2f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f)))
+            return@Canvas
+        }
         // Chi serve: dietro la linea di fondo, a destra del centro (servizio da destra).
         val server = Offset(mid + 1f * m, base + 0.5f * m)
         drawCircle(TsmColors.Player1, 0.45f * m, server)
@@ -15216,8 +15396,8 @@ private fun PlacementDiagram() {
 
 /** Riepilogo di una sessione: totali, per lato, prima e seconda, bersaglio, polso; sotto, le clip da rivedere. */
 @Composable
-fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>) {
-    val b = ServeTraining.breakdown(serves)
+fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE) {
+    val b = ServeTraining.breakdown(serves, stroke)
     Text(s.serveCountLine(b.all.inPlay, b.all.total) + (b.all.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 22.sp)
     @Composable
     fun rows(title: String, map: Map<String, ServeTraining.Count>) {
@@ -15233,6 +15413,8 @@ fun ServeSummaryContent(s: Strings, serves: List<ServeAttempt>) {
     rows(s.serveBySide, b.bySide.mapKeys { serveSideName(s, it.key) })
     rows(s.serveByKind, b.byKind.mapKeys { serveKindName(s, it.key) })
     rows(s.serveByTarget, b.byTarget.mapKeys { serveTargetName(s, it.key) })
+    rows(s.byWing, b.byWing.mapKeys { wingName(s, it.key) })
+    rows(s.byDirection, b.byDirection.mapKeys { directionName(s, it.key) })
     val gin = ServeTraining.meanGyro(serves.filter { it.inPlay })
     val gout = ServeTraining.meanGyro(serves.filter { !it.inPlay })
     if (gin != null && gout != null) Text(s.serveWrist(gin, gout), color = TsmColors.TextDim, fontSize = 13.sp)
@@ -15246,10 +15428,10 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
     var ask by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text(s.serveSummary) },
+        title = { Text(s.serveSummary + " · " + strokeLabel(s, sess.stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ServeSummaryContent(s, sess.serves)
+                ServeSummaryContent(s, sess.serves, sess.stroke)
                 ServeReplayButtons(c, sess)
                 // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.
                 if (sess.serves.any { it.clip != null }) {
@@ -16169,6 +16351,31 @@ interface Strings {
     val poseManyPeople: (Int) -> String
     val poseZoomHint: String
     val poseRedo: String
+    /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
+    val strokeTrainingTitle: String
+    val strokeTrainingHint: String
+    val dirCross: String
+    val dirMiddle: String
+    val dirLine: String
+    val dirNone: String
+    val wingFh: String
+    val wingBh: String
+    val byDirection: String
+    val byWing: String
+    val strokeWaiting: String
+    val strokeDetected: String
+    val placeHitter: String
+    val placeGroundText: String
+    val placeVolleyText: String
+    val posePrep: String
+    val poseFinish: String
+    val poseInFrontMetric: String
+    val poseBackswingMetric: String
+    val poseFinishMetric: String
+    val poseTimingGround: String
+    val poseHintGround: String
+    val poseAnalyzeShots: String
+    val poseAnalyzingShot: (Int, Int) -> String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -17192,9 +17399,33 @@ object ItStrings : Strings {
     override val poseModelDelete = "Elimina il modello (7 MB)"
     override val poseUnsupported = "L'analisi del movimento non è disponibile su questo dispositivo (processore x86)."
     override val poseWatch = "Guarda il video con lo scheletro"
-    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi serve (controlla nelle immagini)." }
+    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi colpisce (controlla nelle immagini)." }
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
+    override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val strokeTrainingHint = "Telefono sul cavalletto, braccialetto al polso: scegli il colpo e poi KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni colpo diventa una clip da rivedere e da analizzare."
+    override val dirCross = "Incrociato"
+    override val dirMiddle = "Al centro"
+    override val dirLine = "Lungolinea"
+    override val dirNone = "Nessuna"
+    override val wingFh = "Di dritto"
+    override val wingBh = "Di rovescio"
+    override val byDirection = "Per direzione"
+    override val byWing = "Di dritto e di rovescio"
+    override val strokeWaiting = "Colpisci: il braccialetto riconosce il colpo"
+    override val strokeDetected = "Colpo riconosciuto: dentro o fuori?"
+    override val placeHitter = "chi colpisce"
+    override val placeGroundText = "• Di lato a chi colpisce, perpendicolare alla direzione dei colpi, a 4-5 m: fuori dal corridoio, all'altezza del punto in cui si colpisce (di solito un passo dietro la linea di fondo).\n• Obiettivo a circa 1 m da terra, telefono in orizzontale e dritto.\n• Nell'inquadratura deve stare tutto lo swing: dalla preparazione al finale il polso si muove di circa 2 m avanti e indietro; se esce, allontana il telefono o usa il grandangolo.\n• Tienilo dallo stesso lato per tutta la sessione, così i colpi si confrontano.\n• Mai sulla traiettoria della palla: fuori dal campo, protetto dalla recinzione o da un carrello."
+    override val placeVolleyText = "• Di lato a chi gioca a rete, a 3-4 m, fuori dal corridoio, all'altezza del giocatore (circa 2 m dalla rete).\n• Obiettivo a circa 1 m da terra, telefono in orizzontale e dritto.\n• Il giocatore intero nell'inquadratura, con lo spazio per il passo in avanti verso la rete.\n• Mai sulla traiettoria della palla."
+    override val posePrep = "Preparazione"
+    override val poseFinish = "Finale"
+    override val poseInFrontMetric = "Impatto davanti al corpo"
+    override val poseBackswingMetric = "Ampiezza della preparazione"
+    override val poseFinishMetric = "Altezza del finale"
+    override val poseTimingGround = "Dalla preparazione all'impatto"
+    override val poseHintGround = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: preparazione (polso più indietro), impatto e finale. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi colpi dentro con quelli fuori."
+    override val poseAnalyzeShots = "Analizza i colpi"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisi del colpo $a di $b…" }
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -18204,9 +18435,33 @@ object EnStrings : Strings {
     override val poseModelDelete = "Delete the model (7 MB)"
     override val poseUnsupported = "Movement analysis isn't available on this device (x86 processor)."
     override val poseWatch = "Watch the video with the skeleton"
-    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the server was followed (check in the images)." }
+    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the hitter was followed (check in the images)." }
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
+    override val strokeTrainingTitle = "Stroke practice"
+    override val strokeTrainingHint = "Phone on the tripod, wristband on the wrist: choose the stroke, then KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every shot becomes a clip to watch again and analyse."
+    override val dirCross = "Cross-court"
+    override val dirMiddle = "Middle"
+    override val dirLine = "Down the line"
+    override val dirNone = "None"
+    override val wingFh = "Forehand"
+    override val wingBh = "Backhand"
+    override val byDirection = "By direction"
+    override val byWing = "Forehand and backhand"
+    override val strokeWaiting = "Hit: the wristband recognises the shot"
+    override val strokeDetected = "Shot recognised: in or out?"
+    override val placeHitter = "hitter"
+    override val placeGroundText = "• Beside the hitter, at right angles to the direction of the shots, 4-5 m away: outside the alley, level with where the ball is hit (usually a step behind the baseline).\n• Lens about 1 m above the ground, phone in landscape and level.\n• The whole swing must be in the frame: from preparation to finish the wrist moves about 2 m back and forth; if it goes out, move the phone back or use the wide lens.\n• Keep it on the same side for the whole session, so the shots can be compared.\n• Never in the ball's path: off the court, protected by the fence or a ball cart."
+    override val placeVolleyText = "• Beside the net player, 3-4 m away, outside the alley, level with the player (about 2 m from the net).\n• Lens about 1 m above the ground, phone in landscape and level.\n• The whole player in the frame, with room for the step forward towards the net.\n• Never in the ball's path."
+    override val posePrep = "Preparation"
+    override val poseFinish = "Finish"
+    override val poseInFrontMetric = "Contact in front of the body"
+    override val poseBackswingMetric = "Preparation size"
+    override val poseFinishMetric = "Finish height"
+    override val poseTimingGround = "From preparation to contact"
+    override val poseHintGround = "The app finds the body position in the clips, all on the phone, and measures three moments: preparation (wrist furthest back), contact and finish. They are estimates from a side view: most useful to compare your shots in with your shots out."
+    override val poseAnalyzeShots = "Analyse the shots"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analysing shot $a of $b…" }
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"
@@ -19239,9 +19494,33 @@ object DeStrings : Strings {
     override val poseModelDelete = "Modell löschen (7 MB)"
     override val poseUnsupported = "Die Bewegungsanalyse ist auf diesem Gerät nicht verfügbar (x86-Prozessor)."
     override val poseWatch = "Video mit Skelett ansehen"
-    override val poseManyPeople: (Int) -> String = { "$it Personen im Bild: Der Aufschläger wurde verfolgt (in den Bildern prüfen)." }
+    override val poseManyPeople: (Int) -> String = { "$it Personen im Bild: Der Schlagende wurde verfolgt (in den Bildern prüfen)." }
     override val poseZoomHint = "Bild antippen zum Vergrößern; zwei Finger zum Zoomen, doppelt tippen zum Zurücksetzen."
     override val poseRedo = "Erneut analysieren"
+    override val strokeTrainingTitle = "Schlagtraining"
+    override val strokeTrainingHint = "Telefon auf dem Stativ, Armband am Handgelenk: den Schlag wählen, dann KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht den letzten rückgängig. Jeder Schlag wird ein Clip zum Anschauen und Analysieren."
+    override val dirCross = "Cross"
+    override val dirMiddle = "Mitte"
+    override val dirLine = "Longline"
+    override val dirNone = "Keine"
+    override val wingFh = "Vorhand"
+    override val wingBh = "Rückhand"
+    override val byDirection = "Nach Richtung"
+    override val byWing = "Vorhand und Rückhand"
+    override val strokeWaiting = "Schlagen: Das Armband erkennt den Schlag"
+    override val strokeDetected = "Schlag erkannt: drin oder aus?"
+    override val placeHitter = "Schlagender"
+    override val placeGroundText = "• Neben dem Spieler, rechtwinklig zur Schlagrichtung, 4-5 m entfernt: außerhalb des Doppelkorridors, auf Höhe des Treffpunkts (meist einen Schritt hinter der Grundlinie).\n• Objektiv etwa 1 m über dem Boden, Telefon quer und gerade.\n• Der ganze Schwung muss im Bild sein: Von der Ausholbewegung bis zum Ausschwung bewegt sich das Handgelenk etwa 2 m vor und zurück; ragt es hinaus, Telefon weiter weg stellen oder Weitwinkel nehmen.\n• Für die ganze Einheit auf derselben Seite lassen, damit sich die Schläge vergleichen lassen.\n• Nie in der Flugbahn des Balls: außerhalb des Platzes, geschützt durch Zaun oder Ballwagen."
+    override val placeVolleyText = "• Neben dem Netzspieler, 3-4 m entfernt, außerhalb des Doppelkorridors, auf Höhe des Spielers (etwa 2 m vom Netz).\n• Objektiv etwa 1 m über dem Boden, Telefon quer und gerade.\n• Der ganze Spieler im Bild, mit Platz für den Schritt nach vorn zum Netz.\n• Nie in der Flugbahn des Balls."
+    override val posePrep = "Ausholen"
+    override val poseFinish = "Ausschwung"
+    override val poseInFrontMetric = "Treffpunkt vor dem Körper"
+    override val poseBackswingMetric = "Weite des Ausholens"
+    override val poseFinishMetric = "Höhe des Ausschwungs"
+    override val poseTimingGround = "Vom Ausholen zum Treffpunkt"
+    override val poseHintGround = "Die App erkennt die Körperhaltung in den Clips, alles auf dem Telefon, und misst drei Momente: Ausholen (Handgelenk am weitesten hinten), Treffpunkt und Ausschwung. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner guten Schläge mit den Fehlern."
+    override val poseAnalyzeShots = "Schläge analysieren"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Schlag $a von $b wird analysiert…" }
     override val matchNotesHint = "Schreib hier deine Notizen zum Match: Sie kommen ins PDF, in den geteilten Text und in die gespeicherten Dateien."
     override val formatPdf = "Vollständiges PDF (Ergebnis, Statistik, Verlauf, Fotos)"
     override val shareChoose = "Was teilst du?"
@@ -20267,9 +20546,33 @@ object EsStrings : Strings {
     override val poseModelDelete = "Eliminar el modelo (7 MB)"
     override val poseUnsupported = "El análisis del movimiento no está disponible en este dispositivo (procesador x86)."
     override val poseWatch = "Ver el vídeo con el esqueleto"
-    override val poseManyPeople: (Int) -> String = { "$it personas en el encuadre: se ha seguido a quien saca (compruébalo en las imágenes)." }
+    override val poseManyPeople: (Int) -> String = { "$it personas en el encuadre: se ha seguido a quien golpea (compruébalo en las imágenes)." }
     override val poseZoomHint = "Toca una imagen para ampliarla; dos dedos para el zoom, doble toque para volver."
     override val poseRedo = "Repetir el análisis"
+    override val strokeTrainingTitle = "Entrenamiento de golpes"
+    override val strokeTrainingHint = "Teléfono en el trípode, pulsera en la muñeca: elige el golpe y luego KEY1 dentro, KEY2 fuera, KEY1 mantenido anula el último. Cada golpe se convierte en un clip para volver a ver y analizar."
+    override val dirCross = "Cruzado"
+    override val dirMiddle = "Al centro"
+    override val dirLine = "Paralelo"
+    override val dirNone = "Ninguna"
+    override val wingFh = "De derecha"
+    override val wingBh = "De revés"
+    override val byDirection = "Por dirección"
+    override val byWing = "De derecha y de revés"
+    override val strokeWaiting = "Golpea: la pulsera reconoce el golpe"
+    override val strokeDetected = "Golpe reconocido: ¿dentro o fuera?"
+    override val placeHitter = "quien golpea"
+    override val placeGroundText = "• Al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m: fuera del pasillo, a la altura del punto de impacto (normalmente un paso detrás de la línea de fondo).\n• Objetivo a 1 m del suelo, teléfono en horizontal y recto.\n• Todo el swing tiene que entrar en el encuadre: de la preparación al final la muñeca se mueve unos 2 m adelante y atrás; si se sale, aleja el teléfono o usa el gran angular.\n• Déjalo del mismo lado toda la sesión, así los golpes se pueden comparar.\n• Nunca en la trayectoria de la pelota: fuera de la pista, protegido por la valla o un carro."
+    override val placeVolleyText = "• Al lado de quien juega en la red, a 3-4 m, fuera del pasillo, a la altura del jugador (unos 2 m de la red).\n• Objetivo a 1 m del suelo, teléfono en horizontal y recto.\n• El jugador entero en el encuadre, con espacio para el paso adelante hacia la red.\n• Nunca en la trayectoria de la pelota."
+    override val posePrep = "Preparación"
+    override val poseFinish = "Final"
+    override val poseInFrontMetric = "Impacto delante del cuerpo"
+    override val poseBackswingMetric = "Amplitud de la preparación"
+    override val poseFinishMetric = "Altura del final"
+    override val poseTimingGround = "De la preparación al impacto"
+    override val poseHintGround = "La app encuentra la posición del cuerpo en los clips, todo en el teléfono, y mide tres momentos: preparación (muñeca más atrás), impacto y final. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus golpes dentro con los de fuera."
+    override val poseAnalyzeShots = "Analizar los golpes"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analizando el golpe $a de $b…" }
     override val matchNotesHint = "Escribe aquí tus notas sobre el partido: van al PDF, al texto compartido y a los archivos guardados."
     override val formatPdf = "PDF completo (resultado, estadísticas, historial, fotos)"
     override val shareChoose = "¿Qué compartes?"
@@ -21297,9 +21600,33 @@ object FrStrings : Strings {
     override val poseModelDelete = "Supprimer le modèle (7 Mo)"
     override val poseUnsupported = "L'analyse du mouvement n'est pas disponible sur cet appareil (processeur x86)."
     override val poseWatch = "Voir la vidéo avec le squelette"
-    override val poseManyPeople: (Int) -> String = { "$it personnes dans le cadre : le serveur a été suivi (vérifiez sur les images)." }
+    override val poseManyPeople: (Int) -> String = { "$it personnes dans le cadre : le joueur qui frappe a été suivi (vérifiez sur les images)." }
     override val poseZoomHint = "Touchez une image pour l'agrandir ; deux doigts pour zoomer, double toucher pour revenir."
     override val poseRedo = "Refaire l'analyse"
+    override val strokeTrainingTitle = "Entraînement des coups"
+    override val strokeTrainingHint = "Téléphone sur le trépied, bracelet au poignet : choisissez le coup, puis KEY1 bon, KEY2 faute, KEY1 maintenu annule le dernier. Chaque coup devient un clip à revoir et à analyser."
+    override val dirCross = "Croisé"
+    override val dirMiddle = "Au centre"
+    override val dirLine = "Le long de la ligne"
+    override val dirNone = "Aucune"
+    override val wingFh = "Coup droit"
+    override val wingBh = "Revers"
+    override val byDirection = "Par direction"
+    override val byWing = "Coup droit et revers"
+    override val strokeWaiting = "Frappez : le bracelet reconnaît le coup"
+    override val strokeDetected = "Coup reconnu : bon ou faute ?"
+    override val placeHitter = "joueur qui frappe"
+    override val placeGroundText = "• À côté du joueur, perpendiculaire à la direction des coups, à 4-5 m : hors du couloir, au niveau du point de frappe (souvent un pas derrière la ligne de fond).\n• Objectif à environ 1 m du sol, téléphone à l'horizontale et droit.\n• Tout le geste doit être dans le cadre : de la préparation au finish, le poignet se déplace d'environ 2 m d'avant en arrière ; s'il sort, éloignez le téléphone ou utilisez le grand-angle.\n• Gardez-le du même côté pendant toute la séance, pour comparer les coups.\n• Jamais sur la trajectoire de la balle : hors du court, protégé par le grillage ou un chariot."
+    override val placeVolleyText = "• À côté du joueur au filet, à 3-4 m, hors du couloir, au niveau du joueur (environ 2 m du filet).\n• Objectif à environ 1 m du sol, téléphone à l'horizontale et droit.\n• Tout le joueur dans le cadre, avec la place pour le pas en avant vers le filet.\n• Jamais sur la trajectoire de la balle."
+    override val posePrep = "Préparation"
+    override val poseFinish = "Finish"
+    override val poseInFrontMetric = "Impact devant le corps"
+    override val poseBackswingMetric = "Ampleur de la préparation"
+    override val poseFinishMetric = "Hauteur du finish"
+    override val poseTimingGround = "De la préparation à l'impact"
+    override val poseHintGround = "L'appli trouve la position du corps dans les clips, entièrement sur le téléphone, et mesure trois moments : préparation (poignet le plus en arrière), impact et finish. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos coups bons et vos fautes."
+    override val poseAnalyzeShots = "Analyser les coups"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analyse du coup $a sur $b…" }
     override val matchNotesHint = "Écrivez ici vos notes sur le match : elles vont dans le PDF, le texte partagé et les fichiers enregistrés."
     override val formatPdf = "PDF complet (résultat, statistiques, déroulé, photos)"
     override val shareChoose = "Que partagez-vous ?"
@@ -22328,9 +22655,33 @@ object PtStrings : Strings {
     override val poseModelDelete = "Excluir o modelo (7 MB)"
     override val poseUnsupported = "A análise do movimento não está disponível neste aparelho (processador x86)."
     override val poseWatch = "Ver o vídeo com o esqueleto"
-    override val poseManyPeople: (Int) -> String = { "$it pessoas no enquadramento: foi seguido quem saca (confira nas imagens)." }
+    override val poseManyPeople: (Int) -> String = { "$it pessoas no enquadramento: foi seguido quem bate (confira nas imagens)." }
     override val poseZoomHint = "Toque numa imagem para ampliá-la; dois dedos para o zoom, toque duplo para voltar."
     override val poseRedo = "Refazer a análise"
+    override val strokeTrainingTitle = "Treino de golpes"
+    override val strokeTrainingHint = "Telefone no tripé, pulseira no pulso: escolha o golpe e depois KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz o último. Cada golpe vira um clipe para rever e analisar."
+    override val dirCross = "Cruzado"
+    override val dirMiddle = "No centro"
+    override val dirLine = "Paralela"
+    override val dirNone = "Nenhuma"
+    override val wingFh = "De forehand"
+    override val wingBh = "De backhand"
+    override val byDirection = "Por direção"
+    override val byWing = "De forehand e de backhand"
+    override val strokeWaiting = "Bata: a pulseira reconhece o golpe"
+    override val strokeDetected = "Golpe reconhecido: dentro ou fora?"
+    override val placeHitter = "quem bate"
+    override val placeGroundText = "• Ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m: fora do corredor, na altura do ponto de impacto (em geral um passo atrás da linha de fundo).\n• Lente a cerca de 1 m do chão, telefone na horizontal e reto.\n• O swing inteiro tem de caber no enquadramento: da preparação ao final o pulso se move uns 2 m para a frente e para trás; se sair, afaste o telefone ou use a grande-angular.\n• Deixe-o do mesmo lado durante toda a sessão, para comparar os golpes.\n• Nunca na trajetória da bola: fora da quadra, protegido pela grade ou por um carrinho."
+    override val placeVolleyText = "• Ao lado de quem joga na rede, a 3-4 m, fora do corredor, na altura do jogador (cerca de 2 m da rede).\n• Lente a cerca de 1 m do chão, telefone na horizontal e reto.\n• O jogador inteiro no enquadramento, com espaço para o passo à frente em direção à rede.\n• Nunca na trajetória da bola."
+    override val posePrep = "Preparação"
+    override val poseFinish = "Final"
+    override val poseInFrontMetric = "Impacto à frente do corpo"
+    override val poseBackswingMetric = "Amplitude da preparação"
+    override val poseFinishMetric = "Altura do final"
+    override val poseTimingGround = "Da preparação ao impacto"
+    override val poseHintGround = "O app encontra a posição do corpo nos clipes, tudo no telefone, e mede três momentos: preparação (pulso mais atrás), impacto e final. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus golpes dentro com os de fora."
+    override val poseAnalyzeShots = "Analisar os golpes"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisando o golpe $a de $b…" }
     override val matchNotesHint = "Escreva aqui suas notas sobre a partida: elas vão para o PDF, o texto compartilhado e os arquivos salvos."
     override val formatPdf = "PDF completo (resultado, estatísticas, histórico, fotos)"
     override val shareChoose = "O que você compartilha?"
@@ -28112,6 +28463,12 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.ServeSide
 import com.tennis.scoremanager.data.ServeTarget
 import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.data.ShotDirection
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.data.Wing
+import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.ui.wingName
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.CalibrationPanel
 import com.tennis.scoremanager.ui.ServePlacementDialog
@@ -28183,6 +28540,10 @@ class CameraActivity : ComponentActivity() {
     private val serveSide = MutableStateFlow(ServeSide.DEUCE)
     private val serveKind = MutableStateFlow(ServeKind.FIRST)
     private val serveTarget = MutableStateFlow<ServeTarget?>(null)
+    /** Dritto, rovescio e volée: direzione voluta e, per la volée, dritto o rovescio. */
+    private val shotDirection = MutableStateFlow<ShotDirection?>(null)
+    private val volleyWing = MutableStateFlow(Wing.FOREHAND)
+    private val trained: TrainedStroke get() = serveSession.value.stroke
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
     private val serveSummary = MutableStateFlow(false)
@@ -28337,8 +28698,10 @@ class CameraActivity : ComponentActivity() {
 
     private fun startServeTraining() {
         controller.serveTraining = true
-        // La prima volta si mostra subito dove mettere il telefono.
-        if (controller.storage.loadServeSessions().isEmpty()) placementHelp.value = true
+        val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
+        serveSession.value = serveSession.value.copy(stroke = stroke)
+        // La prima volta con questo colpo si mostra subito dove mettere il telefono.
+        if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
                 when (e.type) {
@@ -28382,7 +28745,13 @@ class CameraActivity : ComponentActivity() {
         used?.let { lastUsedDetectedAt = it.at }
         servePending.value = false
         val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$at"
-        saveServes { it + ServeAttempt(at, inPlay, serveSide.value, serveKind.value, serveTarget.value, used != null, used?.gyroDps, used?.accelG) }
+        val serve = trained == TrainedStroke.SERVE
+        saveServes {
+            it + ServeAttempt(
+                at, inPlay, serveSide.value, serveKind.value, serveTarget.value.takeIf { serve }, used != null, used?.gyroDps, used?.accelG,
+                direction = shotDirection.value.takeIf { !serve }, wing = volleyWing.value.takeIf { trained == TrainedStroke.VOLLEY },
+            )
+        }
         val n = ServeTraining.count(serveSession.value.serves)
         say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
         bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
@@ -28857,21 +29226,39 @@ class CameraActivity : ComponentActivity() {
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
                     Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
                 }
-                Pill(if (pending) str.serveDetected else str.serveWaiting, if (pending) TsmColors.Orange else TsmColors.SurfaceHigh)
+                val serve = sess.stroke == TrainedStroke.SERVE
+                Pill(
+                    strokeLabel(str, sess.stroke) + " · " + when {
+                        pending -> if (serve) str.serveDetected else str.strokeDetected
+                        else -> if (serve) str.serveWaiting else str.strokeWaiting
+                    },
+                    if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
+                )
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
                 Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
-                Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
-                    serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
-                }
-                Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
-                    serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
-                }
-                Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
-                    serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                if (sess.stroke == TrainedStroke.SERVE) {
+                    Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
+                        serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
+                    }
+                    Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
+                        serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
+                    }
+                    Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
+                        serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                    }
+                } else {
+                    val dir by shotDirection.collectAsState()
+                    val wing by volleyWing.collectAsState()
+                    if (sess.stroke == TrainedStroke.VOLLEY) Btn(Icons.Filled.SwapHoriz, wingName(str, wing), TsmColors.SurfaceHigh) {
+                        volleyWing.value = if (wing == Wing.FOREHAND) Wing.BACKHAND else Wing.FOREHAND
+                    }
+                    Btn(Icons.Filled.GpsFixed, directionName(str, dir), TsmColors.SurfaceHigh) {
+                        shotDirection.value = when (dir) { null -> ShotDirection.CROSS; ShotDirection.CROSS -> ShotDirection.MIDDLE; ShotDirection.MIDDLE -> ShotDirection.LINE; ShotDirection.LINE -> null }
+                    }
                 }
                 if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 Btn(Icons.Filled.HelpOutline, str.servePlaceShow, TsmColors.SurfaceHigh) { placementHelp.value = true }
@@ -28881,14 +29268,14 @@ class CameraActivity : ComponentActivity() {
                 }
             }
         }
-        if (placementHelp.collectAsState().value) ServePlacementDialog { placementHelp.value = false }
+        if (placementHelp.collectAsState().value) ServePlacementDialog(sess.stroke) { placementHelp.value = false }
         if (serveSummary.collectAsState().value) {
             AlertDialog(
                 onDismissRequest = { serveSummary.value = false },
                 title = { Text(str.serveSummary) },
                 text = {
                     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ServeSummaryContent(str, sess.serves)
+                        ServeSummaryContent(str, sess.serves, sess.stroke)
                         ServeReplayButtons(controller, sess)
                     }
                 },
@@ -29012,6 +29399,8 @@ class CameraActivity : ComponentActivity() {
     companion object {
         /** true = allenamento al servizio: telecamera e braccialetto sullo stesso telefono, senza arbitro. */
         const val EXTRA_SERVE = "serve"
+        /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
+        const val EXTRA_STROKE = "stroke"
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080
@@ -30333,6 +30722,7 @@ import android.os.Build
 import com.tennis.scoremanager.data.PoseFrame
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
+import com.tennis.scoremanager.data.TrainedStroke
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import java.io.Closeable
@@ -30466,12 +30856,17 @@ object ServeClipAnalysis {
     const val TROPHY = "key_trophy.jpg"
     const val KNEE = "key_knee.jpg"
     const val CONTACT = "key_contact.jpg"
+    /** Dritto, rovescio e volée: preparazione e finale (l'impatto è [CONTACT]). */
+    const val PREP = "key_prep.jpg"
+    const val FINISH = "key_finish.jpg"
     /** Finestra intorno al servizio: col servizio riconosciuto si sa bene dov'è, senza si guarda più largo. */
     private const val STEP_MS = 66L
     /** Fotogrammi letti per volta: 8 in 1080p sono circa 33 MB. */
     private const val CHUNK = 8
 
-    fun analyze(pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, onProgress: (Float) -> Unit = {}): ServePoseResult {
+    fun analyze(
+        pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, stroke: TrainedStroke = TrainedStroke.SERVE, onProgress: (Float) -> Unit = {},
+    ): ServePoseResult {
         val parts = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
         val starts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
         if (parts.isEmpty() || starts.size != parts.size) return ServePoseResult(emptyList(), null)
@@ -30491,7 +30886,7 @@ object ServeClipAnalysis {
         // Ricognizione: con più persone nell'inquadratura MoveNet ne segue una a caso. Si cercano le persone in tre
         // quadrati (sinistra, centro, destra) su alcuni fotogrammi, e si sceglie chi alza di più il braccio: chi serve.
         // Il ritaglio della ricognizione è in frazioni dell'altezza: i fotogrammi letti in fila sono più grandi.
-        val sc = scout(pose, times, ::frameAt)
+        val sc = scout(pose, times, ::frameAt, stroke == TrainedStroke.SERVE)
         val start = sc.crop
         val people = sc.people
         var center: Pair<Float, Float>? = null
@@ -30557,17 +30952,24 @@ object ServeClipAnalysis {
             }
             frames.sortBy { it.t }
             onProgress(1f)
-            val metrics = ServePose.metrics(frames)
+            val serve = stroke == TrainedStroke.SERVE
+            val metrics = if (serve) ServePose.metrics(frames) else null
+            val ground = if (serve) null else ServePose.groundMetrics(frames)
+            val moments = when {
+                metrics != null -> listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)
+                ground != null -> listOf(PREP to ground.prepT, CONTACT to ground.contactT, FINISH to ground.finishT)
+                else -> emptyList()
+            }
             // Le tre immagini dei momenti chiave, con lo scheletro: si riprendono dal video (non si tengono tutte in memoria).
-            if (metrics != null) {
-                for ((name, t) in listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)) {
+            run {
+                for ((name, t) in moments) {
                     val bmp = runCatching { frameAt(t + at) }.getOrNull() ?: continue
                     val f = frames.first { it.t == t }
                     runCatching { File(dir, name).outputStream().use { skeleton(bmp, f).compress(Bitmap.CompressFormat.JPEG, 85, it) } }
                     bmp.recycle()
                 }
             }
-            return ServePoseResult(frames, metrics, people)
+            return ServePoseResult(frames, metrics, people, ground)
         } finally {
             retrievers.values.forEach { runCatching { it.release() } }
         }
@@ -30582,8 +30984,8 @@ object ServeClipAnalysis {
 
     private data class Scout(val crop: RectF?, val people: Int, val others: List<Other>, val serverCx: Float?)
 
-    private fun scout(pose: PoseAnalyzer, times: List<Long>, frameAt: (Long) -> Bitmap?): Scout {
-        data class Seen(val cx: Float, val kp: Array<FloatArray>, val raise: Float, val width: Float)
+    private fun scout(pose: PoseAnalyzer, times: List<Long>, frameAt: (Long) -> Bitmap?, serve: Boolean = true): Scout {
+        data class Seen(val cx: Float, val kp: Array<FloatArray>, val raise: Float, val width: Float, val frame: Int)
         val seen = ArrayList<Seen>()
         var w = 0; var h = 0
         for (k in 0 until 8) {
@@ -30597,7 +30999,7 @@ object ServeClipAnalysis {
                 if (kp.count { it[2] >= ServePose.MIN_SCORE } < 8) continue
                 val tr = PoseAnalyzer.torso(kp) ?: continue
                 // Lo stesso corpo visto da due quadrati vicini finisce nello stesso gruppo, qui sotto.
-                seen += Seen(tr.first, kp, PoseAnalyzer.armRaise(kp), maxOf(tr.second, h * 0.03f))
+                seen += Seen(tr.first, kp, PoseAnalyzer.armRaise(kp), maxOf(tr.second, h * 0.03f), k)
             }
             bmp.recycle()
         }
@@ -30608,7 +31010,20 @@ object ServeClipAnalysis {
             val g = groups.lastOrNull()
             if (g != null && s.cx - g.last().cx < maxOf(g.last().width, s.width) * 1.5f) g += s else groups += mutableListOf(s)
         }
-        val server = groups.maxBy { g -> g.maxOf { it.raise } }
+        // Chi colpisce: col servizio chi alza di più il braccio; con gli altri colpi chi muove di più il polso tra un
+        // fotogramma e l'altro della ricognizione (lo swing), in larghezze di spalle.
+        fun activity(g: List<Seen>): Float {
+            var best = 0f
+            for (w in listOf(ServePose.L_WRIST, ServePose.R_WRIST)) {
+                val pts = g.sortedBy { it.frame }.filter { it.kp[w][2] >= ServePose.MIN_SCORE }
+                for (i in 1 until pts.size) {
+                    val dx = pts[i].kp[w][0] - pts[i - 1].kp[w][0]; val dy = pts[i].kp[w][1] - pts[i - 1].kp[w][1]
+                    best = maxOf(best, kotlin.math.sqrt(dx * dx + dy * dy) / maxOf(pts[i].width, 1f))
+                }
+            }
+            return best
+        }
+        val server = if (serve) groups.maxBy { g -> g.maxOf { it.raise } } else groups.maxBy { activity(it) }
         val best = server.maxBy { it.raise }
         val serverCx = server.map { it.cx }.average().toFloat()
         // Le altre persone: dove stanno di solito (mediana) e quanto sono larghe, senza mai coprire chi serve.
@@ -30843,8 +31258,8 @@ class ReplayActivity : ComponentActivity() {
             setSeekParameters(androidx.media3.exoplayer.SeekParameters.EXACT)
             prepare()
             // Con lo scheletro si parte poco prima del caricamento, al rallentatore.
-            pose?.metrics?.let { m ->
-                seekAbs(this, poseAt + m.trophyT - 1_200)
+            (pose?.metrics?.trophyT ?: pose?.ground?.prepT)?.let { first ->
+                seekAbs(this, poseAt + first - 1_200)
                 playbackParameters = PlaybackParameters(0.5f)
             }
             play()
@@ -30912,7 +31327,7 @@ class ReplayActivity : ComponentActivity() {
     private fun Content(p: ExoPlayer) {
         val s = stringsFor(controller.options.value.lang)
         var ratio by remember { mutableFloatStateOf(16f / 9f) }
-        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null) 0.5f else 1f) }
+        var speed by remember { mutableFloatStateOf(if (pose?.metrics != null || pose?.ground != null) 0.5f else 1f) }
         var skeleton by remember { mutableStateOf(pose != null) }
         var playing by remember { mutableStateOf(true) }
         var zoom by remember { mutableFloatStateOf(1f) }
@@ -30981,8 +31396,10 @@ class ReplayActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Btn(Icons.Filled.AccessibilityNew, null, skeleton) { skeleton = !skeleton }
-                    r.metrics?.let { m ->
-                        for ((label, t) in listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT)) {
+                    val moments = r.metrics?.let { m -> listOf(s.poseTrophy to m.trophyT, s.poseKnee to m.kneeT, s.poseContact to m.contactT) }
+                        ?: r.ground?.let { g -> listOf(s.posePrep to g.prepT, s.poseContact to g.contactT, s.poseFinish to g.finishT) }
+                    moments?.let { list ->
+                        for ((label, t) in list) {
                             Btn(null, label, false) {
                                 p.pause()
                                 playing = false
@@ -31421,6 +31838,8 @@ import com.tennis.scoremanager.data.ServeMetrics
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -31500,7 +31919,9 @@ class ServeAnalysisActivity : ComponentActivity() {
             withContext(Dispatchers.IO) {
                 for (a in sess.serves) {
                     val d = dir(sess, a) ?: continue
-                    for (name in listOf(ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT)) File(d, name).delete()
+                    for (name in listOf(
+                        ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT, ServeClipAnalysis.PREP, ServeClipAnalysis.FINISH,
+                    )) File(d, name).delete()
                 }
             }
             results.value = emptyMap()
@@ -31521,7 +31942,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                         for ((n, a) in todo.withIndex()) {
                             val d = dir(sess, a) ?: continue
                             progress.value = Triple(n + 1, todo.size, 0f)
-                            val r = ServeClipAnalysis.analyze(pose, d, a.at, a.detected) { f -> progress.value = Triple(n + 1, todo.size, f) }
+                            val r = ServeClipAnalysis.analyze(pose, d, a.at, a.detected, sess.stroke) { f -> progress.value = Triple(n + 1, todo.size, f) }
                             runCatching { File(d, ServeClipAnalysis.RESULT).writeText(json.encodeToString(ServePoseResult.serializer(), r)) }
                             results.value = results.value + (a.clip!! to r)
                         }
@@ -31544,7 +31965,7 @@ class ServeAnalysisActivity : ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(str.poseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-            Text(str.poseHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            Text(if (session.collectAsState().value?.stroke?.let { it != TrainedStroke.SERVE } == true) str.poseHintGround else str.poseHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val current = sess ?: return@Column
             val withClip = current.serves.filter { it.clip != null }
             val p = prog
@@ -31567,10 +31988,10 @@ class ServeAnalysisActivity : ComponentActivity() {
                     err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                 }
             } else if (p != null) {
-                Text(str.poseAnalyzing(p.first, p.second), color = TsmColors.TextMain)
+                Text(if (current.stroke == TrainedStroke.SERVE) str.poseAnalyzing(p.first, p.second) else str.poseAnalyzingShot(p.first, p.second), color = TsmColors.TextMain)
                 LinearProgressIndicator(progress = { (p.first - 1 + p.third) / p.second }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
             } else if (withClip.any { it.clip !in res.keys }) {
-                BigButton(str.poseAnalyzeAll, Icons.Filled.Insights, { analyzeAll() }, Modifier.fillMaxWidth())
+                BigButton(if (current.stroke == TrainedStroke.SERVE) str.poseAnalyzeAll else str.poseAnalyzeShots, Icons.Filled.Insights, { analyzeAll() }, Modifier.fillMaxWidth())
             } else if (withClip.isNotEmpty()) {
                 Text(str.poseDone, color = TsmColors.Ok)
                 // Dopo un aggiornamento dell'app l'analisi può venire meglio: si rifà da capo.
@@ -31589,28 +32010,83 @@ class ServeAnalysisActivity : ComponentActivity() {
         }
     }
 
-    /** Medie dei servizi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
+    /** Quello che si mostra di un'analisi: misure, riassunto, affidabilità e le tre immagini (etichetta, file). */
+    private data class Shown(val reliable: Boolean, val brief: String, val rows: List<Pair<String, String>>, val images: List<Pair<String, String>>)
+
+    private fun shown(stroke: TrainedStroke, r: ServePoseResult): Shown? {
+        val str = s
+        if (stroke == TrainedStroke.SERVE) {
+            val m = r.metrics ?: return null
+            return Shown(
+                m.reliable, "${str.poseKneeMetric} ${deg(m.kneeMinDeg)} · ${str.poseElbowMetric} ${deg(m.elbowContactDeg)}",
+                listOf(
+                    str.poseKneeMetric to deg(m.kneeMinDeg),
+                    str.poseElbowMetric to deg(m.elbowContactDeg),
+                    str.poseHeightMetric to str.poseHeightValue("%.2f".format(m.contactHeight)),
+                    str.poseTossMetric to deg(m.tossArmDeg),
+                    str.poseTiltMetric to deg(m.shoulderTiltDeg),
+                    str.poseTimingMetric to "${m.trophyToContactMs} ms",
+                ),
+                listOf(str.poseTrophy to ServeClipAnalysis.TROPHY, str.poseKnee to ServeClipAnalysis.KNEE, str.poseContact to ServeClipAnalysis.CONTACT),
+            )
+        }
+        val g = r.ground ?: return null
+        return Shown(
+            g.reliable, "${str.poseInFrontMetric} ${"%.2f".format(g.contactInFront)} · ${str.poseElbowMetric} ${deg(g.elbowContactDeg)}",
+            listOf(
+                str.poseKneeMetric to deg(g.kneeMinDeg),
+                str.poseElbowMetric to deg(g.elbowContactDeg),
+                str.poseHeightMetric to str.poseHeightValue("%.2f".format(g.contactHeight)),
+                str.poseInFrontMetric to str.poseHeightValue("%.2f".format(g.contactInFront)),
+                str.poseBackswingMetric to str.poseHeightValue("%.2f".format(g.backswing)),
+                str.poseFinishMetric to str.poseHeightValue("%.2f".format(g.finishHeight)),
+                str.poseTimingGround to "${g.prepToContactMs} ms",
+            ),
+            listOf(str.posePrep to ServeClipAnalysis.PREP, str.poseContact to ServeClipAnalysis.CONTACT, str.poseFinish to ServeClipAnalysis.FINISH),
+        )
+    }
+
+    /** Medie dei colpi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
     @Composable
     private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>) {
         val str = s
-        fun metricsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it]?.metrics } }
-        val ins = ServePose.mean(metricsOf(true))
-        val outs = ServePose.mean(metricsOf(false))
-        if (ins == null || outs == null) return
-        SectionCard(str.poseInVsOut, Icons.Filled.AccessibilityNew) {
-            Row(Modifier.fillMaxWidth()) {
-                Text("", modifier = Modifier.weight(2f))
-                Text("${str.serveIn} (${ins.n})", color = TsmColors.Ok, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text("${str.serveOut} (${outs.n})", color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            }
-            for ((label, a, b) in listOf(
+        fun of(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        val rows: List<Triple<String, String, String>>
+        val nIn: Int
+        val nOut: Int
+        if (sess.stroke == TrainedStroke.SERVE) {
+            val ins = ServePose.mean(of(true).mapNotNull { it.metrics }) ?: return
+            val outs = ServePose.mean(of(false).mapNotNull { it.metrics }) ?: return
+            nIn = ins.n; nOut = outs.n
+            rows = listOf(
                 Triple(str.poseKneeMetric, deg(ins.kneeMinDeg), deg(outs.kneeMinDeg)),
                 Triple(str.poseElbowMetric, deg(ins.elbowContactDeg), deg(outs.elbowContactDeg)),
                 Triple(str.poseHeightMetric, "%.2f".format(ins.contactHeight), "%.2f".format(outs.contactHeight)),
                 Triple(str.poseTossMetric, deg(ins.tossArmDeg), deg(outs.tossArmDeg)),
                 Triple(str.poseTiltMetric, deg(ins.shoulderTiltDeg), deg(outs.shoulderTiltDeg)),
                 Triple(str.poseTimingMetric, "${ins.trophyToContactMs} ms", "${outs.trophyToContactMs} ms"),
-            )) {
+            )
+        } else {
+            val ins = ServePose.groundMean(of(true).mapNotNull { it.ground }) ?: return
+            val outs = ServePose.groundMean(of(false).mapNotNull { it.ground }) ?: return
+            nIn = ins.n; nOut = outs.n
+            rows = listOf(
+                Triple(str.poseKneeMetric, deg(ins.kneeMinDeg), deg(outs.kneeMinDeg)),
+                Triple(str.poseElbowMetric, deg(ins.elbowContactDeg), deg(outs.elbowContactDeg)),
+                Triple(str.poseHeightMetric, "%.2f".format(ins.contactHeight), "%.2f".format(outs.contactHeight)),
+                Triple(str.poseInFrontMetric, "%.2f".format(ins.contactInFront), "%.2f".format(outs.contactInFront)),
+                Triple(str.poseBackswingMetric, "%.2f".format(ins.backswing), "%.2f".format(outs.backswing)),
+                Triple(str.poseFinishMetric, "%.2f".format(ins.finishHeight), "%.2f".format(outs.finishHeight)),
+                Triple(str.poseTimingGround, "${ins.prepToContactMs} ms", "${outs.prepToContactMs} ms"),
+            )
+        }
+        SectionCard(str.poseInVsOut, Icons.Filled.AccessibilityNew) {
+            Row(Modifier.fillMaxWidth()) {
+                Text("", modifier = Modifier.weight(2f))
+                Text("${str.serveIn} ($nIn)", color = TsmColors.Ok, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("${str.serveOut} ($nOut)", color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            }
+            for ((label, a, b) in rows) {
                 Row(Modifier.fillMaxWidth()) {
                     Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(2f))
                     Text(a, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
@@ -31620,41 +32096,39 @@ class ServeAnalysisActivity : ComponentActivity() {
         }
     }
 
-    /** Un servizio: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
+    /** Un colpo: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
     @Composable
     private fun ServeRow(sess: ServeSession, index: Int, a: ServeAttempt, r: ServePoseResult?, expanded: Boolean, onToggle: () -> Unit) {
         val str = s
-        val m = r?.metrics
+        val v = r?.let { shown(sess.stroke, it) }
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).clickable(enabled = r != null) { onToggle() }.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(Modifier.fillMaxWidth()) {
-                Text(str.poseServe(index + 1), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                val title = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
+                Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
                 a.clip == null -> Text(str.poseNoClip, color = TsmColors.TextDim, fontSize = 13.sp)
                 r == null -> Unit
-                m == null -> Text(str.poseNoBody, color = TsmColors.Orange, fontSize = 13.sp)
+                v == null -> Text(str.poseNoBody, color = TsmColors.Orange, fontSize = 13.sp)
                 else -> {
-                    if (!m.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
+                    if (!v.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
                     if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
-                    Text("${str.poseKneeMetric} ${deg(m.kneeMinDeg)} · ${str.poseElbowMetric} ${deg(m.elbowContactDeg)}", color = TsmColors.TextDim, fontSize = 13.sp)
-                    if (expanded) Details(sess, a, m)
+                    Text(v.brief, color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (expanded) Details(sess, a, v)
                 }
             }
         }
     }
 
     @Composable
-    private fun Details(sess: ServeSession, a: ServeAttempt, m: ServeMetrics) {
+    private fun Details(sess: ServeSession, a: ServeAttempt, v: Shown) {
         val str = s
         val d = dir(sess, a) ?: return
-        val images = remember(d) {
-            listOf(str.poseTrophy to ServeClipAnalysis.TROPHY, str.poseKnee to ServeClipAnalysis.KNEE, str.poseContact to ServeClipAnalysis.CONTACT)
-                .map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) }
-        }
+        val images = remember(d) { v.images.map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) } }
         // Il video della clip con lo scheletro sopra, nella moviola (rallentatore, fotogramma per fotogramma, zoom).
         GhostButton(str.poseWatch, Icons.Filled.PlayCircle, {
             val parts = d.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
@@ -31672,17 +32146,10 @@ class ServeAnalysisActivity : ComponentActivity() {
             bmp?.let { b -> KeyImage(b) { zoomed = b } }
         }
         zoomed?.let { ZoomDialog(it) { zoomed = null } }
-        for ((label, v) in listOf(
-            str.poseKneeMetric to deg(m.kneeMinDeg),
-            str.poseElbowMetric to deg(m.elbowContactDeg),
-            str.poseHeightMetric to str.poseHeightValue("%.2f".format(m.contactHeight)),
-            str.poseTossMetric to deg(m.tossArmDeg),
-            str.poseTiltMetric to deg(m.shoulderTiltDeg),
-            str.poseTimingMetric to "${m.trophyToContactMs} ms",
-        )) {
+        for ((label, value) in v.rows) {
             Row(Modifier.fillMaxWidth()) {
                 Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text(v, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(value, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
     }
@@ -45799,6 +46266,50 @@ class ServePoseTest {
         assertEquals(2, mean.n)
         assertEquals(a.kneeMinDeg - 10, mean.kneeMinDeg, 0.01f)
     }
+
+    /**
+     * Un dritto finto di un destro visto di lato, corpo al centro (x 0,5): il polso va indietro fino a -500 ms (0,30),
+     * accelera fino all'impatto a 0 ms davanti al corpo (0,62) all'altezza della vita, finisce in alto a +400 ms.
+     */
+    private fun forehand(): List<PoseFrame> = (-1200L..800L step 50).map { t ->
+        val x = MutableList(17) { 0.5f }
+        val y = MutableList(17) { 0.5f }
+        fun p(i: Int, px: Float, py: Float) { x[i] = px; y[i] = py }
+        p(NOSE, 0.5f, 0.15f)
+        p(L_SHOULDER, 0.48f, 0.25f); p(R_SHOULDER, 0.52f, 0.25f)
+        p(L_HIP, 0.49f, 0.5f); p(R_HIP, 0.51f, 0.5f)
+        val bend = max(0f, 1f - abs(t + 250) / 400f) * 0.06f
+        p(L_KNEE, 0.49f + bend, 0.7f); p(R_KNEE, 0.51f + bend, 0.7f)
+        p(L_ANKLE, 0.49f, 0.9f); p(R_ANKLE, 0.51f, 0.9f)
+        p(L_ELBOW, 0.45f, 0.35f); p(L_WRIST, 0.45f, 0.42f)
+        val (wx, wy) = when {
+            t <= -500 -> 0.42f - 0.12f * (t + 1200) / 700f to 0.45f
+            t <= 0 -> { val k = (t + 500) / 500f; 0.30f + 0.32f * k * k * k to 0.5f }
+            t <= 400 -> 0.62f + 0.05f * t / 400f to 0.5f - 0.35f * t / 400f
+            else -> 0.67f to 0.15f + 0.1f * (t - 400) / 400f
+        }
+        p(R_WRIST, wx, wy)
+        p(R_ELBOW, (wx + 0.52f) / 2, (wy + 0.25f) / 2 + 0.01f)
+        PoseFrame(t, x, y, List(17) { 0.9f })
+    }
+
+    @Test
+    fun forehandMomentsAndMeasures() {
+        val m = ServePose.groundMetrics(forehand())!!
+        assertTrue(m.rightHanded)
+        assertEquals(0L, m.contactT)
+        assertEquals(-500L, m.prepT)
+        assertEquals(400L, m.finishT)
+        assertEquals(500L, m.prepToContactMs)
+        val stature = 0.75f / 0.89f
+        assertEquals(0.12f / stature, m.contactInFront, 0.01f)
+        assertEquals(0.20f / stature, m.backswing, 0.01f)
+        assertEquals(0.40f / stature, m.contactHeight, 0.01f)
+        assertEquals(0.75f / stature, m.finishHeight, 0.01f)
+        assertTrue("${m.kneeMinDeg}", m.kneeMinDeg < 175f)
+        assertTrue(m.reliable)
+        assertEquals(1, ServePose.groundMean(listOf(m))!!.n)
+    }
 }
 TSM_EOF
 
@@ -45846,6 +46357,24 @@ class ServeTrainingTest {
         assertEquals(setOf(ServeTarget.T), b.byTarget.keys)
         assertEquals(1800, ServeTraining.meanGyro(list))
         assertNull(ServeTraining.count(emptyList()).pct)
+    }
+
+    @Test
+    fun groundstrokesAndVolleysByDirectionAndWing() {
+        fun a(inPlay: Boolean, dir: ShotDirection?, wing: Wing? = null) =
+            ServeAttempt(0, inPlay, ServeSide.DEUCE, ServeKind.FIRST, direction = dir, wing = wing)
+        val fh = listOf(a(true, ShotDirection.CROSS), a(false, ShotDirection.LINE), a(true, ShotDirection.LINE), a(true, null))
+        val b = ServeTraining.breakdown(fh, TrainedStroke.FOREHAND)
+        // Col dritto non ci sono lato, prima/seconda e bersaglio del servizio.
+        assertEquals(emptyMap<ServeSide, ServeTraining.Count>(), b.bySide)
+        assertEquals(emptyMap<ServeTarget, ServeTraining.Count>(), b.byTarget)
+        assertEquals(ServeTraining.Count(2, 1), b.byDirection[ShotDirection.LINE])
+        assertEquals(setOf(ShotDirection.CROSS, ShotDirection.LINE), b.byDirection.keys)
+        assertEquals(emptyMap<Wing, ServeTraining.Count>(), b.byWing)
+        val volley = ServeTraining.breakdown(listOf(a(true, null, Wing.FOREHAND), a(false, null, Wing.BACKHAND), a(true, null, Wing.BACKHAND)), TrainedStroke.VOLLEY)
+        assertEquals(50, volley.byWing.getValue(Wing.BACKHAND).pct)
+        // Le sessioni salvate prima erano di servizio.
+        assertEquals(TrainedStroke.SERVE, ServeSession("x", 0).stroke)
     }
 }
 TSM_EOF

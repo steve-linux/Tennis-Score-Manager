@@ -867,6 +867,31 @@ interface Strings {
     val poseManyPeople: (Int) -> String
     val poseZoomHint: String
     val poseRedo: String
+    /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
+    val strokeTrainingTitle: String
+    val strokeTrainingHint: String
+    val dirCross: String
+    val dirMiddle: String
+    val dirLine: String
+    val dirNone: String
+    val wingFh: String
+    val wingBh: String
+    val byDirection: String
+    val byWing: String
+    val strokeWaiting: String
+    val strokeDetected: String
+    val placeHitter: String
+    val placeGroundText: String
+    val placeVolleyText: String
+    val posePrep: String
+    val poseFinish: String
+    val poseInFrontMetric: String
+    val poseBackswingMetric: String
+    val poseFinishMetric: String
+    val poseTimingGround: String
+    val poseHintGround: String
+    val poseAnalyzeShots: String
+    val poseAnalyzingShot: (Int, Int) -> String
     val matchNotesHint: String
     val formatPdf: String
     val shareChoose: String
@@ -1890,9 +1915,33 @@ object ItStrings : Strings {
     override val poseModelDelete = "Elimina il modello (7 MB)"
     override val poseUnsupported = "L'analisi del movimento non è disponibile su questo dispositivo (processore x86)."
     override val poseWatch = "Guarda il video con lo scheletro"
-    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi serve (controlla nelle immagini)." }
+    override val poseManyPeople: (Int) -> String = { "$it persone nell'inquadratura: seguito chi colpisce (controlla nelle immagini)." }
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
+    override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val strokeTrainingHint = "Telefono sul cavalletto, braccialetto al polso: scegli il colpo e poi KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni colpo diventa una clip da rivedere e da analizzare."
+    override val dirCross = "Incrociato"
+    override val dirMiddle = "Al centro"
+    override val dirLine = "Lungolinea"
+    override val dirNone = "Nessuna"
+    override val wingFh = "Di dritto"
+    override val wingBh = "Di rovescio"
+    override val byDirection = "Per direzione"
+    override val byWing = "Di dritto e di rovescio"
+    override val strokeWaiting = "Colpisci: il braccialetto riconosce il colpo"
+    override val strokeDetected = "Colpo riconosciuto: dentro o fuori?"
+    override val placeHitter = "chi colpisce"
+    override val placeGroundText = "• Di lato a chi colpisce, perpendicolare alla direzione dei colpi, a 4-5 m: fuori dal corridoio, all'altezza del punto in cui si colpisce (di solito un passo dietro la linea di fondo).\n• Obiettivo a circa 1 m da terra, telefono in orizzontale e dritto.\n• Nell'inquadratura deve stare tutto lo swing: dalla preparazione al finale il polso si muove di circa 2 m avanti e indietro; se esce, allontana il telefono o usa il grandangolo.\n• Tienilo dallo stesso lato per tutta la sessione, così i colpi si confrontano.\n• Mai sulla traiettoria della palla: fuori dal campo, protetto dalla recinzione o da un carrello."
+    override val placeVolleyText = "• Di lato a chi gioca a rete, a 3-4 m, fuori dal corridoio, all'altezza del giocatore (circa 2 m dalla rete).\n• Obiettivo a circa 1 m da terra, telefono in orizzontale e dritto.\n• Il giocatore intero nell'inquadratura, con lo spazio per il passo in avanti verso la rete.\n• Mai sulla traiettoria della palla."
+    override val posePrep = "Preparazione"
+    override val poseFinish = "Finale"
+    override val poseInFrontMetric = "Impatto davanti al corpo"
+    override val poseBackswingMetric = "Ampiezza della preparazione"
+    override val poseFinishMetric = "Altezza del finale"
+    override val poseTimingGround = "Dalla preparazione all'impatto"
+    override val poseHintGround = "L'app trova la posizione del corpo nelle clip, tutto sul telefono, e misura tre momenti: preparazione (polso più indietro), impatto e finale. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi colpi dentro con quelli fuori."
+    override val poseAnalyzeShots = "Analizza i colpi"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analisi del colpo $a di $b…" }
     override val matchNotesHint = "Scrivi qui le tue note sulla partita: finiscono nel PDF, nel testo condiviso e nei file salvati."
     override val formatPdf = "PDF completo (risultato, statistiche, cronologia, foto)"
     override val shareChoose = "Cosa condividi?"
@@ -2902,9 +2951,33 @@ object EnStrings : Strings {
     override val poseModelDelete = "Delete the model (7 MB)"
     override val poseUnsupported = "Movement analysis isn't available on this device (x86 processor)."
     override val poseWatch = "Watch the video with the skeleton"
-    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the server was followed (check in the images)." }
+    override val poseManyPeople: (Int) -> String = { "$it people in the frame: the hitter was followed (check in the images)." }
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
+    override val strokeTrainingTitle = "Stroke practice"
+    override val strokeTrainingHint = "Phone on the tripod, wristband on the wrist: choose the stroke, then KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every shot becomes a clip to watch again and analyse."
+    override val dirCross = "Cross-court"
+    override val dirMiddle = "Middle"
+    override val dirLine = "Down the line"
+    override val dirNone = "None"
+    override val wingFh = "Forehand"
+    override val wingBh = "Backhand"
+    override val byDirection = "By direction"
+    override val byWing = "Forehand and backhand"
+    override val strokeWaiting = "Hit: the wristband recognises the shot"
+    override val strokeDetected = "Shot recognised: in or out?"
+    override val placeHitter = "hitter"
+    override val placeGroundText = "• Beside the hitter, at right angles to the direction of the shots, 4-5 m away: outside the alley, level with where the ball is hit (usually a step behind the baseline).\n• Lens about 1 m above the ground, phone in landscape and level.\n• The whole swing must be in the frame: from preparation to finish the wrist moves about 2 m back and forth; if it goes out, move the phone back or use the wide lens.\n• Keep it on the same side for the whole session, so the shots can be compared.\n• Never in the ball's path: off the court, protected by the fence or a ball cart."
+    override val placeVolleyText = "• Beside the net player, 3-4 m away, outside the alley, level with the player (about 2 m from the net).\n• Lens about 1 m above the ground, phone in landscape and level.\n• The whole player in the frame, with room for the step forward towards the net.\n• Never in the ball's path."
+    override val posePrep = "Preparation"
+    override val poseFinish = "Finish"
+    override val poseInFrontMetric = "Contact in front of the body"
+    override val poseBackswingMetric = "Preparation size"
+    override val poseFinishMetric = "Finish height"
+    override val poseTimingGround = "From preparation to contact"
+    override val poseHintGround = "The app finds the body position in the clips, all on the phone, and measures three moments: preparation (wrist furthest back), contact and finish. They are estimates from a side view: most useful to compare your shots in with your shots out."
+    override val poseAnalyzeShots = "Analyse the shots"
+    override val poseAnalyzingShot: (Int, Int) -> String = { a, b -> "Analysing shot $a of $b…" }
     override val matchNotesHint = "Write your notes on the match here: they go into the PDF, the shared text and the saved files."
     override val formatPdf = "Full PDF (result, statistics, log, photos)"
     override val shareChoose = "What do you share?"

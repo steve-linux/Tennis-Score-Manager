@@ -16,6 +16,7 @@ import android.os.Build
 import com.tennis.scoremanager.data.PoseFrame
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
+import com.tennis.scoremanager.data.TrainedStroke
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import java.io.Closeable
@@ -149,12 +150,17 @@ object ServeClipAnalysis {
     const val TROPHY = "key_trophy.jpg"
     const val KNEE = "key_knee.jpg"
     const val CONTACT = "key_contact.jpg"
+    /** Dritto, rovescio e volée: preparazione e finale (l'impatto è [CONTACT]). */
+    const val PREP = "key_prep.jpg"
+    const val FINISH = "key_finish.jpg"
     /** Finestra intorno al servizio: col servizio riconosciuto si sa bene dov'è, senza si guarda più largo. */
     private const val STEP_MS = 66L
     /** Fotogrammi letti per volta: 8 in 1080p sono circa 33 MB. */
     private const val CHUNK = 8
 
-    fun analyze(pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, onProgress: (Float) -> Unit = {}): ServePoseResult {
+    fun analyze(
+        pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, stroke: TrainedStroke = TrainedStroke.SERVE, onProgress: (Float) -> Unit = {},
+    ): ServePoseResult {
         val parts = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
         val starts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
         if (parts.isEmpty() || starts.size != parts.size) return ServePoseResult(emptyList(), null)
@@ -174,7 +180,7 @@ object ServeClipAnalysis {
         // Ricognizione: con più persone nell'inquadratura MoveNet ne segue una a caso. Si cercano le persone in tre
         // quadrati (sinistra, centro, destra) su alcuni fotogrammi, e si sceglie chi alza di più il braccio: chi serve.
         // Il ritaglio della ricognizione è in frazioni dell'altezza: i fotogrammi letti in fila sono più grandi.
-        val sc = scout(pose, times, ::frameAt)
+        val sc = scout(pose, times, ::frameAt, stroke == TrainedStroke.SERVE)
         val start = sc.crop
         val people = sc.people
         var center: Pair<Float, Float>? = null
@@ -240,17 +246,24 @@ object ServeClipAnalysis {
             }
             frames.sortBy { it.t }
             onProgress(1f)
-            val metrics = ServePose.metrics(frames)
+            val serve = stroke == TrainedStroke.SERVE
+            val metrics = if (serve) ServePose.metrics(frames) else null
+            val ground = if (serve) null else ServePose.groundMetrics(frames)
+            val moments = when {
+                metrics != null -> listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)
+                ground != null -> listOf(PREP to ground.prepT, CONTACT to ground.contactT, FINISH to ground.finishT)
+                else -> emptyList()
+            }
             // Le tre immagini dei momenti chiave, con lo scheletro: si riprendono dal video (non si tengono tutte in memoria).
-            if (metrics != null) {
-                for ((name, t) in listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)) {
+            run {
+                for ((name, t) in moments) {
                     val bmp = runCatching { frameAt(t + at) }.getOrNull() ?: continue
                     val f = frames.first { it.t == t }
                     runCatching { File(dir, name).outputStream().use { skeleton(bmp, f).compress(Bitmap.CompressFormat.JPEG, 85, it) } }
                     bmp.recycle()
                 }
             }
-            return ServePoseResult(frames, metrics, people)
+            return ServePoseResult(frames, metrics, people, ground)
         } finally {
             retrievers.values.forEach { runCatching { it.release() } }
         }
@@ -265,8 +278,8 @@ object ServeClipAnalysis {
 
     private data class Scout(val crop: RectF?, val people: Int, val others: List<Other>, val serverCx: Float?)
 
-    private fun scout(pose: PoseAnalyzer, times: List<Long>, frameAt: (Long) -> Bitmap?): Scout {
-        data class Seen(val cx: Float, val kp: Array<FloatArray>, val raise: Float, val width: Float)
+    private fun scout(pose: PoseAnalyzer, times: List<Long>, frameAt: (Long) -> Bitmap?, serve: Boolean = true): Scout {
+        data class Seen(val cx: Float, val kp: Array<FloatArray>, val raise: Float, val width: Float, val frame: Int)
         val seen = ArrayList<Seen>()
         var w = 0; var h = 0
         for (k in 0 until 8) {
@@ -280,7 +293,7 @@ object ServeClipAnalysis {
                 if (kp.count { it[2] >= ServePose.MIN_SCORE } < 8) continue
                 val tr = PoseAnalyzer.torso(kp) ?: continue
                 // Lo stesso corpo visto da due quadrati vicini finisce nello stesso gruppo, qui sotto.
-                seen += Seen(tr.first, kp, PoseAnalyzer.armRaise(kp), maxOf(tr.second, h * 0.03f))
+                seen += Seen(tr.first, kp, PoseAnalyzer.armRaise(kp), maxOf(tr.second, h * 0.03f), k)
             }
             bmp.recycle()
         }
@@ -291,7 +304,20 @@ object ServeClipAnalysis {
             val g = groups.lastOrNull()
             if (g != null && s.cx - g.last().cx < maxOf(g.last().width, s.width) * 1.5f) g += s else groups += mutableListOf(s)
         }
-        val server = groups.maxBy { g -> g.maxOf { it.raise } }
+        // Chi colpisce: col servizio chi alza di più il braccio; con gli altri colpi chi muove di più il polso tra un
+        // fotogramma e l'altro della ricognizione (lo swing), in larghezze di spalle.
+        fun activity(g: List<Seen>): Float {
+            var best = 0f
+            for (w in listOf(ServePose.L_WRIST, ServePose.R_WRIST)) {
+                val pts = g.sortedBy { it.frame }.filter { it.kp[w][2] >= ServePose.MIN_SCORE }
+                for (i in 1 until pts.size) {
+                    val dx = pts[i].kp[w][0] - pts[i - 1].kp[w][0]; val dy = pts[i].kp[w][1] - pts[i - 1].kp[w][1]
+                    best = maxOf(best, kotlin.math.sqrt(dx * dx + dy * dy) / maxOf(pts[i].width, 1f))
+                }
+            }
+            return best
+        }
+        val server = if (serve) groups.maxBy { g -> g.maxOf { it.raise } } else groups.maxBy { activity(it) }
         val best = server.maxBy { it.raise }
         val serverCx = server.map { it.cx }.average().toFloat()
         // Le altre persone: dove stanno di solito (mediana) e quanto sono larghe, senza mai coprire chi serve.

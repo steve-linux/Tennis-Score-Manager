@@ -16,6 +16,18 @@ enum class ServeKind { FIRST, SECOND }
 @Serializable
 enum class ServeTarget { T, BODY, WIDE }
 
+/** Colpo che si allena; [band] è il numero del colpo per il braccialetto (BandProtocol.STROKE_*), anche per il nome. */
+@Serializable
+enum class TrainedStroke(val band: Int) { SERVE(2), FOREHAND(0), BACKHAND(1), VOLLEY(3) }
+
+/** Direzione voluta per dritto, rovescio e volée. */
+@Serializable
+enum class ShotDirection { CROSS, MIDDLE, LINE }
+
+/** Volée di dritto o di rovescio. */
+@Serializable
+enum class Wing { FOREHAND, BACKHAND }
+
 /**
  * Un servizio dell'allenamento: quando ([at], ora del telefono), se è entrato, con che impostazioni, se il braccialetto
  * l'aveva riconosciuto ([detected]) e coi picchi del polso; [clip] è la cartella dei pezzi di video (null finché non
@@ -32,6 +44,9 @@ data class ServeAttempt(
     val gyroDps: Int? = null,
     val accelG: Double? = null,
     val clip: String? = null,
+    /** Dritto, rovescio e volée: direzione voluta e, per la volée, se di dritto o di rovescio. */
+    val direction: ShotDirection? = null,
+    val wing: Wing? = null,
 )
 
 @Serializable
@@ -40,6 +55,8 @@ data class ServeSession(
     val startedAt: Long,
     val endedAt: Long? = null,
     val serves: List<ServeAttempt> = emptyList(),
+    /** Colpo allenato (le sessioni salvate prima erano tutte di servizio). */
+    val stroke: TrainedStroke = TrainedStroke.SERVE,
 )
 
 /**
@@ -80,14 +97,22 @@ object ServeTraining {
         val bySide: Map<ServeSide, Count>,
         val byKind: Map<ServeKind, Count>,
         val byTarget: Map<ServeTarget, Count>,
+        val byDirection: Map<ShotDirection, Count> = emptyMap(),
+        val byWing: Map<Wing, Count> = emptyMap(),
     )
 
-    fun breakdown(serves: List<ServeAttempt>): Breakdown = Breakdown(
-        count(serves),
-        ServeSide.entries.associateWith { s -> count(serves.filter { it.side == s }) }.filterValues { it.total > 0 },
-        ServeKind.entries.associateWith { k -> count(serves.filter { it.kind == k }) }.filterValues { it.total > 0 },
-        ServeTarget.entries.associateWith { t -> count(serves.filter { it.target == t }) }.filterValues { it.total > 0 },
-    )
+    /** Righe del riepilogo: per il servizio lato, prima e seconda, bersaglio; per gli altri colpi direzione e dritto/rovescio. */
+    fun breakdown(serves: List<ServeAttempt>, stroke: TrainedStroke = TrainedStroke.SERVE): Breakdown {
+        val serve = stroke == TrainedStroke.SERVE
+        return Breakdown(
+            count(serves),
+            if (!serve) emptyMap() else ServeSide.entries.associateWith { s -> count(serves.filter { it.side == s }) }.filterValues { it.total > 0 },
+            if (!serve) emptyMap() else ServeKind.entries.associateWith { k -> count(serves.filter { it.kind == k }) }.filterValues { it.total > 0 },
+            if (!serve) emptyMap() else ServeTarget.entries.associateWith { t -> count(serves.filter { it.target == t }) }.filterValues { it.total > 0 },
+            if (serve) emptyMap() else ShotDirection.entries.associateWith { d -> count(serves.filter { it.direction == d }) }.filterValues { it.total > 0 },
+            if (stroke != TrainedStroke.VOLLEY) emptyMap() else Wing.entries.associateWith { w -> count(serves.filter { it.wing == w }) }.filterValues { it.total > 0 },
+        )
+    }
 
     /** Media dei picchi del polso dei servizi riconosciuti (null se nessuno): dentro e fuori, per confrontarli. */
     fun meanGyro(serves: List<ServeAttempt>): Int? =

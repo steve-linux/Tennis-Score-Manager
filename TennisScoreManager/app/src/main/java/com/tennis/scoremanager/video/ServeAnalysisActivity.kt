@@ -54,6 +54,8 @@ import com.tennis.scoremanager.data.ServeMetrics
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.BigButton
 import com.tennis.scoremanager.ui.GhostButton
 import com.tennis.scoremanager.ui.LocalStrings
@@ -133,7 +135,9 @@ class ServeAnalysisActivity : ComponentActivity() {
             withContext(Dispatchers.IO) {
                 for (a in sess.serves) {
                     val d = dir(sess, a) ?: continue
-                    for (name in listOf(ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT)) File(d, name).delete()
+                    for (name in listOf(
+                        ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT, ServeClipAnalysis.PREP, ServeClipAnalysis.FINISH,
+                    )) File(d, name).delete()
                 }
             }
             results.value = emptyMap()
@@ -154,7 +158,7 @@ class ServeAnalysisActivity : ComponentActivity() {
                         for ((n, a) in todo.withIndex()) {
                             val d = dir(sess, a) ?: continue
                             progress.value = Triple(n + 1, todo.size, 0f)
-                            val r = ServeClipAnalysis.analyze(pose, d, a.at, a.detected) { f -> progress.value = Triple(n + 1, todo.size, f) }
+                            val r = ServeClipAnalysis.analyze(pose, d, a.at, a.detected, sess.stroke) { f -> progress.value = Triple(n + 1, todo.size, f) }
                             runCatching { File(d, ServeClipAnalysis.RESULT).writeText(json.encodeToString(ServePoseResult.serializer(), r)) }
                             results.value = results.value + (a.clip!! to r)
                         }
@@ -177,7 +181,7 @@ class ServeAnalysisActivity : ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(str.poseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-            Text(str.poseHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            Text(if (session.collectAsState().value?.stroke?.let { it != TrainedStroke.SERVE } == true) str.poseHintGround else str.poseHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val current = sess ?: return@Column
             val withClip = current.serves.filter { it.clip != null }
             val p = prog
@@ -200,10 +204,10 @@ class ServeAnalysisActivity : ComponentActivity() {
                     err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
                 }
             } else if (p != null) {
-                Text(str.poseAnalyzing(p.first, p.second), color = TsmColors.TextMain)
+                Text(if (current.stroke == TrainedStroke.SERVE) str.poseAnalyzing(p.first, p.second) else str.poseAnalyzingShot(p.first, p.second), color = TsmColors.TextMain)
                 LinearProgressIndicator(progress = { (p.first - 1 + p.third) / p.second }, modifier = Modifier.fillMaxWidth(), color = TsmColors.Ball)
             } else if (withClip.any { it.clip !in res.keys }) {
-                BigButton(str.poseAnalyzeAll, Icons.Filled.Insights, { analyzeAll() }, Modifier.fillMaxWidth())
+                BigButton(if (current.stroke == TrainedStroke.SERVE) str.poseAnalyzeAll else str.poseAnalyzeShots, Icons.Filled.Insights, { analyzeAll() }, Modifier.fillMaxWidth())
             } else if (withClip.isNotEmpty()) {
                 Text(str.poseDone, color = TsmColors.Ok)
                 // Dopo un aggiornamento dell'app l'analisi può venire meglio: si rifà da capo.
@@ -222,28 +226,83 @@ class ServeAnalysisActivity : ComponentActivity() {
         }
     }
 
-    /** Medie dei servizi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
+    /** Quello che si mostra di un'analisi: misure, riassunto, affidabilità e le tre immagini (etichetta, file). */
+    private data class Shown(val reliable: Boolean, val brief: String, val rows: List<Pair<String, String>>, val images: List<Pair<String, String>>)
+
+    private fun shown(stroke: TrainedStroke, r: ServePoseResult): Shown? {
+        val str = s
+        if (stroke == TrainedStroke.SERVE) {
+            val m = r.metrics ?: return null
+            return Shown(
+                m.reliable, "${str.poseKneeMetric} ${deg(m.kneeMinDeg)} · ${str.poseElbowMetric} ${deg(m.elbowContactDeg)}",
+                listOf(
+                    str.poseKneeMetric to deg(m.kneeMinDeg),
+                    str.poseElbowMetric to deg(m.elbowContactDeg),
+                    str.poseHeightMetric to str.poseHeightValue("%.2f".format(m.contactHeight)),
+                    str.poseTossMetric to deg(m.tossArmDeg),
+                    str.poseTiltMetric to deg(m.shoulderTiltDeg),
+                    str.poseTimingMetric to "${m.trophyToContactMs} ms",
+                ),
+                listOf(str.poseTrophy to ServeClipAnalysis.TROPHY, str.poseKnee to ServeClipAnalysis.KNEE, str.poseContact to ServeClipAnalysis.CONTACT),
+            )
+        }
+        val g = r.ground ?: return null
+        return Shown(
+            g.reliable, "${str.poseInFrontMetric} ${"%.2f".format(g.contactInFront)} · ${str.poseElbowMetric} ${deg(g.elbowContactDeg)}",
+            listOf(
+                str.poseKneeMetric to deg(g.kneeMinDeg),
+                str.poseElbowMetric to deg(g.elbowContactDeg),
+                str.poseHeightMetric to str.poseHeightValue("%.2f".format(g.contactHeight)),
+                str.poseInFrontMetric to str.poseHeightValue("%.2f".format(g.contactInFront)),
+                str.poseBackswingMetric to str.poseHeightValue("%.2f".format(g.backswing)),
+                str.poseFinishMetric to str.poseHeightValue("%.2f".format(g.finishHeight)),
+                str.poseTimingGround to "${g.prepToContactMs} ms",
+            ),
+            listOf(str.posePrep to ServeClipAnalysis.PREP, str.poseContact to ServeClipAnalysis.CONTACT, str.poseFinish to ServeClipAnalysis.FINISH),
+        )
+    }
+
+    /** Medie dei colpi dentro e di quelli fuori, misura per misura (solo quelli con misure affidabili). */
     @Composable
     private fun Comparison(sess: ServeSession, res: Map<String, ServePoseResult>) {
         val str = s
-        fun metricsOf(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it]?.metrics } }
-        val ins = ServePose.mean(metricsOf(true))
-        val outs = ServePose.mean(metricsOf(false))
-        if (ins == null || outs == null) return
-        SectionCard(str.poseInVsOut, Icons.Filled.AccessibilityNew) {
-            Row(Modifier.fillMaxWidth()) {
-                Text("", modifier = Modifier.weight(2f))
-                Text("${str.serveIn} (${ins.n})", color = TsmColors.Ok, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text("${str.serveOut} (${outs.n})", color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-            }
-            for ((label, a, b) in listOf(
+        fun of(inPlay: Boolean) = sess.serves.filter { it.inPlay == inPlay }.mapNotNull { a -> a.clip?.let { res[it] } }
+        val rows: List<Triple<String, String, String>>
+        val nIn: Int
+        val nOut: Int
+        if (sess.stroke == TrainedStroke.SERVE) {
+            val ins = ServePose.mean(of(true).mapNotNull { it.metrics }) ?: return
+            val outs = ServePose.mean(of(false).mapNotNull { it.metrics }) ?: return
+            nIn = ins.n; nOut = outs.n
+            rows = listOf(
                 Triple(str.poseKneeMetric, deg(ins.kneeMinDeg), deg(outs.kneeMinDeg)),
                 Triple(str.poseElbowMetric, deg(ins.elbowContactDeg), deg(outs.elbowContactDeg)),
                 Triple(str.poseHeightMetric, "%.2f".format(ins.contactHeight), "%.2f".format(outs.contactHeight)),
                 Triple(str.poseTossMetric, deg(ins.tossArmDeg), deg(outs.tossArmDeg)),
                 Triple(str.poseTiltMetric, deg(ins.shoulderTiltDeg), deg(outs.shoulderTiltDeg)),
                 Triple(str.poseTimingMetric, "${ins.trophyToContactMs} ms", "${outs.trophyToContactMs} ms"),
-            )) {
+            )
+        } else {
+            val ins = ServePose.groundMean(of(true).mapNotNull { it.ground }) ?: return
+            val outs = ServePose.groundMean(of(false).mapNotNull { it.ground }) ?: return
+            nIn = ins.n; nOut = outs.n
+            rows = listOf(
+                Triple(str.poseKneeMetric, deg(ins.kneeMinDeg), deg(outs.kneeMinDeg)),
+                Triple(str.poseElbowMetric, deg(ins.elbowContactDeg), deg(outs.elbowContactDeg)),
+                Triple(str.poseHeightMetric, "%.2f".format(ins.contactHeight), "%.2f".format(outs.contactHeight)),
+                Triple(str.poseInFrontMetric, "%.2f".format(ins.contactInFront), "%.2f".format(outs.contactInFront)),
+                Triple(str.poseBackswingMetric, "%.2f".format(ins.backswing), "%.2f".format(outs.backswing)),
+                Triple(str.poseFinishMetric, "%.2f".format(ins.finishHeight), "%.2f".format(outs.finishHeight)),
+                Triple(str.poseTimingGround, "${ins.prepToContactMs} ms", "${outs.prepToContactMs} ms"),
+            )
+        }
+        SectionCard(str.poseInVsOut, Icons.Filled.AccessibilityNew) {
+            Row(Modifier.fillMaxWidth()) {
+                Text("", modifier = Modifier.weight(2f))
+                Text("${str.serveIn} ($nIn)", color = TsmColors.Ok, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("${str.serveOut} ($nOut)", color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            }
+            for ((label, a, b) in rows) {
                 Row(Modifier.fillMaxWidth()) {
                     Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(2f))
                     Text(a, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
@@ -253,41 +312,39 @@ class ServeAnalysisActivity : ComponentActivity() {
         }
     }
 
-    /** Un servizio: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
+    /** Un colpo: esito e misure in breve; aperto, le tre immagini con lo scheletro e tutte le misure. */
     @Composable
     private fun ServeRow(sess: ServeSession, index: Int, a: ServeAttempt, r: ServePoseResult?, expanded: Boolean, onToggle: () -> Unit) {
         val str = s
-        val m = r?.metrics
+        val v = r?.let { shown(sess.stroke, it) }
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).clickable(enabled = r != null) { onToggle() }.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(Modifier.fillMaxWidth()) {
-                Text(str.poseServe(index + 1), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                val title = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
+                Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text(if (a.inPlay) str.serveIn else str.serveOut, color = if (a.inPlay) TsmColors.Ok else TsmColors.Danger, fontWeight = FontWeight.Bold)
             }
             when {
                 a.clip == null -> Text(str.poseNoClip, color = TsmColors.TextDim, fontSize = 13.sp)
                 r == null -> Unit
-                m == null -> Text(str.poseNoBody, color = TsmColors.Orange, fontSize = 13.sp)
+                v == null -> Text(str.poseNoBody, color = TsmColors.Orange, fontSize = 13.sp)
                 else -> {
-                    if (!m.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
+                    if (!v.reliable) Text(str.poseUnreliable, color = TsmColors.Orange, fontSize = 13.sp)
                     if (r.people > 1) Text(str.poseManyPeople(r.people), color = TsmColors.Orange, fontSize = 13.sp)
-                    Text("${str.poseKneeMetric} ${deg(m.kneeMinDeg)} · ${str.poseElbowMetric} ${deg(m.elbowContactDeg)}", color = TsmColors.TextDim, fontSize = 13.sp)
-                    if (expanded) Details(sess, a, m)
+                    Text(v.brief, color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (expanded) Details(sess, a, v)
                 }
             }
         }
     }
 
     @Composable
-    private fun Details(sess: ServeSession, a: ServeAttempt, m: ServeMetrics) {
+    private fun Details(sess: ServeSession, a: ServeAttempt, v: Shown) {
         val str = s
         val d = dir(sess, a) ?: return
-        val images = remember(d) {
-            listOf(str.poseTrophy to ServeClipAnalysis.TROPHY, str.poseKnee to ServeClipAnalysis.KNEE, str.poseContact to ServeClipAnalysis.CONTACT)
-                .map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) }
-        }
+        val images = remember(d) { v.images.map { (label, name) -> label to ServeClipAnalysis.keyImage(d, name) } }
         // Il video della clip con lo scheletro sopra, nella moviola (rallentatore, fotogramma per fotogramma, zoom).
         GhostButton(str.poseWatch, Icons.Filled.PlayCircle, {
             val parts = d.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
@@ -305,17 +362,10 @@ class ServeAnalysisActivity : ComponentActivity() {
             bmp?.let { b -> KeyImage(b) { zoomed = b } }
         }
         zoomed?.let { ZoomDialog(it) { zoomed = null } }
-        for ((label, v) in listOf(
-            str.poseKneeMetric to deg(m.kneeMinDeg),
-            str.poseElbowMetric to deg(m.elbowContactDeg),
-            str.poseHeightMetric to str.poseHeightValue("%.2f".format(m.contactHeight)),
-            str.poseTossMetric to deg(m.tossArmDeg),
-            str.poseTiltMetric to deg(m.shoulderTiltDeg),
-            str.poseTimingMetric to "${m.trophyToContactMs} ms",
-        )) {
+        for ((label, value) in v.rows) {
             Row(Modifier.fillMaxWidth()) {
                 Text(label, color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text(v, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(value, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
     }

@@ -95,6 +95,12 @@ import com.tennis.scoremanager.data.ServeSession
 import com.tennis.scoremanager.data.ServeSide
 import com.tennis.scoremanager.data.ServeTarget
 import com.tennis.scoremanager.data.ServeTraining
+import com.tennis.scoremanager.data.ShotDirection
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.data.Wing
+import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.ui.wingName
 import com.tennis.scoremanager.model.Side
 import com.tennis.scoremanager.ui.CalibrationPanel
 import com.tennis.scoremanager.ui.ServePlacementDialog
@@ -166,6 +172,10 @@ class CameraActivity : ComponentActivity() {
     private val serveSide = MutableStateFlow(ServeSide.DEUCE)
     private val serveKind = MutableStateFlow(ServeKind.FIRST)
     private val serveTarget = MutableStateFlow<ServeTarget?>(null)
+    /** Dritto, rovescio e volée: direzione voluta e, per la volée, dritto o rovescio. */
+    private val shotDirection = MutableStateFlow<ShotDirection?>(null)
+    private val volleyWing = MutableStateFlow(Wing.FOREHAND)
+    private val trained: TrainedStroke get() = serveSession.value.stroke
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
     private val serveSummary = MutableStateFlow(false)
@@ -320,8 +330,10 @@ class CameraActivity : ComponentActivity() {
 
     private fun startServeTraining() {
         controller.serveTraining = true
-        // La prima volta si mostra subito dove mettere il telefono.
-        if (controller.storage.loadServeSessions().isEmpty()) placementHelp.value = true
+        val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
+        serveSession.value = serveSession.value.copy(stroke = stroke)
+        // La prima volta con questo colpo si mostra subito dove mettere il telefono.
+        if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
                 when (e.type) {
@@ -365,7 +377,13 @@ class CameraActivity : ComponentActivity() {
         used?.let { lastUsedDetectedAt = it.at }
         servePending.value = false
         val clip = "%03d".format(serveSession.value.serves.size + 1) + "_$at"
-        saveServes { it + ServeAttempt(at, inPlay, serveSide.value, serveKind.value, serveTarget.value, used != null, used?.gyroDps, used?.accelG) }
+        val serve = trained == TrainedStroke.SERVE
+        saveServes {
+            it + ServeAttempt(
+                at, inPlay, serveSide.value, serveKind.value, serveTarget.value.takeIf { serve }, used != null, used?.gyroDps, used?.accelG,
+                direction = shotDirection.value.takeIf { !serve }, wing = volleyWing.value.takeIf { trained == TrainedStroke.VOLLEY },
+            )
+        }
         val n = ServeTraining.count(serveSession.value.serves)
         say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
         bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
@@ -840,21 +858,39 @@ class CameraActivity : ComponentActivity() {
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
                     Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
                 }
-                Pill(if (pending) str.serveDetected else str.serveWaiting, if (pending) TsmColors.Orange else TsmColors.SurfaceHigh)
+                val serve = sess.stroke == TrainedStroke.SERVE
+                Pill(
+                    strokeLabel(str, sess.stroke) + " · " + when {
+                        pending -> if (serve) str.serveDetected else str.strokeDetected
+                        else -> if (serve) str.serveWaiting else str.strokeWaiting
+                    },
+                    if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
+                )
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
                 Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
-                Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
-                    serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
-                }
-                Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
-                    serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
-                }
-                Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
-                    serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                if (sess.stroke == TrainedStroke.SERVE) {
+                    Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
+                        serveSide.value = if (side == ServeSide.DEUCE) ServeSide.AD else ServeSide.DEUCE
+                    }
+                    Btn(Icons.Filled.LooksOne, serveKindName(str, kind), TsmColors.SurfaceHigh) {
+                        serveKind.value = if (kind == ServeKind.FIRST) ServeKind.SECOND else ServeKind.FIRST
+                    }
+                    Btn(Icons.Filled.GpsFixed, serveTargetName(str, target), TsmColors.SurfaceHigh) {
+                        serveTarget.value = when (target) { null -> ServeTarget.T; ServeTarget.T -> ServeTarget.BODY; ServeTarget.BODY -> ServeTarget.WIDE; ServeTarget.WIDE -> null }
+                    }
+                } else {
+                    val dir by shotDirection.collectAsState()
+                    val wing by volleyWing.collectAsState()
+                    if (sess.stroke == TrainedStroke.VOLLEY) Btn(Icons.Filled.SwapHoriz, wingName(str, wing), TsmColors.SurfaceHigh) {
+                        volleyWing.value = if (wing == Wing.FOREHAND) Wing.BACKHAND else Wing.FOREHAND
+                    }
+                    Btn(Icons.Filled.GpsFixed, directionName(str, dir), TsmColors.SurfaceHigh) {
+                        shotDirection.value = when (dir) { null -> ShotDirection.CROSS; ShotDirection.CROSS -> ShotDirection.MIDDLE; ShotDirection.MIDDLE -> ShotDirection.LINE; ShotDirection.LINE -> null }
+                    }
                 }
                 if (lenses.size > 1) Btn(Icons.Filled.Cameraswitch, lensName(str, li, lenses.size), TsmColors.SurfaceHigh) { useLens((li + 1) % lenses.size) }
                 Btn(Icons.Filled.HelpOutline, str.servePlaceShow, TsmColors.SurfaceHigh) { placementHelp.value = true }
@@ -864,14 +900,14 @@ class CameraActivity : ComponentActivity() {
                 }
             }
         }
-        if (placementHelp.collectAsState().value) ServePlacementDialog { placementHelp.value = false }
+        if (placementHelp.collectAsState().value) ServePlacementDialog(sess.stroke) { placementHelp.value = false }
         if (serveSummary.collectAsState().value) {
             AlertDialog(
                 onDismissRequest = { serveSummary.value = false },
                 title = { Text(str.serveSummary) },
                 text = {
                     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ServeSummaryContent(str, sess.serves)
+                        ServeSummaryContent(str, sess.serves, sess.stroke)
                         ServeReplayButtons(controller, sess)
                     }
                 },
@@ -995,6 +1031,8 @@ class CameraActivity : ComponentActivity() {
     companion object {
         /** true = allenamento al servizio: telecamera e braccialetto sullo stesso telefono, senza arbitro. */
         const val EXTRA_SERVE = "serve"
+        /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
+        const val EXTRA_STROKE = "stroke"
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080

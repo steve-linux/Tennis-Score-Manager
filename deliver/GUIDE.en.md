@@ -362,11 +362,11 @@ Page 1 › **Rackets** › **My rackets**: each physical racket has its own card
 - **In the summary** of the match (*Summary* tab) and of the workout you see the racket used, can link it afterwards too (the stringing mounted that day is used) and rate the **feel** from 1 to 5: control, comfort, power and fatigue.
 - **Comparison**: *by racket* or *by stringing* (same racket with different tensions or strings), pick setups A and B. Side-by-side bars for sessions, hours, matches won, points won, first serves in, points won on first and second serve, aces, double faults, winners and unforced errors per match, average wrist speed and wristband strokes, average heart rate, and average feel. The better value is in bold, but the app does not pick a winner: opponent, surface, conditions and form matter too.
 
-### 7.5 Serve practice (app 2.5)
+### 7.5 Stroke practice: serve, forehand, backhand and volley (app 2.5)
 
 A phone on a tripod films the server; the wristband on the wrist recognises the serve and the buttons say how it went. One phone is enough, no umpire.
 
-1. Page 1 › **Workout** › **Serve practice** › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
+1. Page 1 › **Workout** › **Stroke practice**, choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
 2. **Where to put the phone** (it opens by itself the first time, then from the *Where to put the phone?* button):
    - **beside the server**, on the hitting-arm side (right for a right-hander), **3-4 m** away, level with the baseline or half a metre behind;
    - lens **1-1.2 m** above the ground, phone **in landscape** and level, pointed at the server;
@@ -379,6 +379,11 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 6. Sessions stay in the **Serve practice** card: tap one for its summary and clips, or to delete it (clips included).
 7. **Movement analysis** (from the saved session): **Analyse the serves** finds the body position in the clips (MoveNet model: the first time the app asks to download it, 7 MB, from the project's GitHub page; then everything stays on the phone, no internet, a few seconds per serve; it can be deleted at the bottom of the screen. Not available on devices with an x86 processor) and measures three moments: **loading** (tossing arm up), deepest **knee** bend and **contact**. For each serve: the three images with the skeleton drawn and the measurements (deepest knee bend, elbow at contact, contact height relative to body height, tossing arm, shoulders at loading, time from loading to contact); at the top, **ins and outs** compared. They are estimates from a side view: they are most useful to compare your serves with each other. The body is recognised well with the whole person in the frame, from the side and in good light; racket and ball are not measured.
    Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update.
+
+**Forehand, backhand and volley** work the same way (KEY1 in, KEY2 out, a clip for every shot, summary and analysis), with these differences:
+- **Where to put the phone**: beside the hitter, at right angles to the direction of the shots, 4-5 m away and outside the alley, level with the contact point; lens about 1 m high; the whole swing in the frame (the wrist moves about 2 m back and forth). For the volley: beside the net player, 3-4 m away, level with the player. Always on the same side for the whole session, and never in the ball's path.
+- Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
+- **Movement analysis**: the three moments are **preparation** (wrist furthest back), **contact** (wrist fastest) and **finish** (wrist highest after contact). The measurements: deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
 
 ## 8. Scoreboard on a TV or monitor
 
