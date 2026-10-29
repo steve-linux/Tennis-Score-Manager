@@ -705,7 +705,7 @@ object PtStrings : Strings {
     override val historyMatches = "Partidas"
     override val historyPlayers = "Jogadores"
     override val historyEmpty = "Ainda nenhuma partida terminada. Cada partida que você termina entra aqui sozinha; com “Importar” você adiciona as salvas como JSON em outro telefone."
-    override val historyPlayersEmpty = "Os jogadores aparecem aqui quando você termina uma partida com os nomes escritos na página 1."
+    override val historyPlayersEmpty = "Os jogadores aparecem aqui quando você termina uma partida com os nomes escritos em Nova partida."
     override val historyRecord: (Int, Int) -> String = { w, l -> "Vencidas $w · perdidas $l" }
     override val historyHeadToHead = "Confronto direto"
     override val historyDeleteTitle = "Excluir a partida?"
@@ -749,7 +749,7 @@ object PtStrings : Strings {
     override val ratingShowAll = "Mostrar todos"
     override val ratingShowLess = "Mostrar menos"
     override val rematchTitle = "Revanche"
-    override val rematchHint = "Proponha outra partida: o convite pronto para mandar pelo WhatsApp ou onde preferir, a data na agenda e a mesma partida pronta na página 1."
+    override val rematchHint = "Proponha outra partida: o convite pronto para mandar pelo WhatsApp ou onde preferir, a data na agenda e a mesma partida pronta em Nova partida."
     override val rematchAsk = "Revanche?"
     override val rematchVersus = "contra"
     override val rematchLast: (String, String) -> String = { a, b -> "Da última vez: $a para $b" }
@@ -1019,7 +1019,7 @@ object PtStrings : Strings {
     override val tvQrHint = "No outro telefone: abra o Tennis Score Manager e toque em «Usar como placar» (conecta sozinho), ou leia o código com a câmera e abra no navegador."
     override val tvLook = "Aparência do placar"
     override val tvTitle = "Texto embaixo"
-    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vazio: sem texto" else "Vazio: «$it» (clube e quadra da página 1)" }
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vazio: sem texto" else "Vazio: «$it» (clube e quadra de Nova partida)" }
     override val tvColorOf: (String) -> String = { "Cor de $it" }
     override val tvShowClock = "Tempo de partida"
     override val tvShowTimers = "Relógio de serviço e pausas"
@@ -1063,7 +1063,7 @@ object PtStrings : Strings {
     override val racketBalance = "Equilíbrio (mm)"
     override val racketHead = "Cabeça (cm²)"
     override val racketPattern = "Padrão de cordas"
-    override val racketOwner = "Dono (nome da página 1)"
+    override val racketOwner = "Dono (nome escrito em Nova partida)"
     override val racketCheckHours = "Verificar cordas após (horas)"
     override val racketRetired = "Posta de lado"
     override val racketRetiredHint = "Deixa de ser proposta antes de jogar, mas fica nas comparações."
@@ -1092,7 +1092,7 @@ object PtStrings : Strings {
     override val compareByString = "Por encordoamento"
     override val compareA = "Configuração A"
     override val compareB = "Configuração B"
-    override val compareTooFew = "Para comparar são precisos jogos ou treinos com pelo menos duas configurações diferentes. Escolha a raquete na página 1 ou no treino, ou associe-a a partir do resumo."
+    override val compareTooFew = "Para comparar são precisos jogos ou treinos com pelo menos duas configurações diferentes. Escolha a raquete em Nova partida ou no treino, ou associe-a a partir do resumo."
     override val compareNote = "Os números mostram como correu cada configuração, não qual é a melhor: adversário, piso, condições e forma do dia também contam."
     override val compareSessions = "Sessões"
     override val comparePerMatch: (String) -> String = { "$it por jogo" }

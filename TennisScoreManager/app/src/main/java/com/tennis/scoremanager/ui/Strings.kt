@@ -775,7 +775,7 @@ interface Strings {
     val ratingNotCounted: String
     val ratingShowAll: String
     val ratingShowLess: String
-    /** Rivincita: invito da condividere, calendario e stessa partita in pagina 1. */
+    /** Rivincita: invito da condividere, calendario e stessa partita in Nuova partita. */
     val rematchTitle: String
     val rematchHint: String
     val rematchAsk: String
@@ -1084,7 +1084,7 @@ interface Strings {
     val displayBackAgain: String
     val displayRetry: String
 
-    // In fondo alla pagina 1: versione, licenza (GPL) e link al codice sorgente
+    // In fondo ad Altro: versione, licenza (GPL) e link al codice sorgente
 
     // Racchetta virtuale
     val racketTitle: String
@@ -1849,7 +1849,7 @@ object ItStrings : Strings {
     override val historyMatches = "Partite"
     override val historyPlayers = "Giocatori"
     override val historyEmpty = "Ancora nessuna partita finita. Ogni partita conclusa entra qui da sola; con «Importa» aggiungi quelle salvate come JSON su un altro telefono."
-    override val historyPlayersEmpty = "I giocatori compaiono qui quando finisci una partita coi loro nomi scritti a pagina 1."
+    override val historyPlayersEmpty = "I giocatori compaiono qui quando finisci una partita coi loro nomi scritti in Nuova partita."
     override val historyRecord: (Int, Int) -> String = { w, l -> "Vinte $w · perse $l" }
     override val historyHeadToHead = "Scontri diretti"
     override val historyDeleteTitle = "Eliminare la partita?"
@@ -1893,7 +1893,7 @@ object ItStrings : Strings {
     override val ratingShowAll = "Mostra tutti"
     override val ratingShowLess = "Mostra meno"
     override val rematchTitle = "Rivincita"
-    override val rematchHint = "Proponi un'altra partita: l'invito pronto da mandare su WhatsApp o dove preferisci, la data in calendario e la stessa partita pronta in pagina 1."
+    override val rematchHint = "Proponi un'altra partita: l'invito pronto da mandare su WhatsApp o dove preferisci, la data in calendario e la stessa partita pronta in Nuova partita."
     override val rematchAsk = "Rivincita?"
     override val rematchVersus = "contro"
     override val rematchLast: (String, String) -> String = { a, b -> "Ultima volta: $a per $b" }
@@ -2159,7 +2159,7 @@ object ItStrings : Strings {
     override val tvQrHint = "Sull'altro telefono: apri Tennis Score Manager e tocca «Usa come tabellone» (si collega da solo), oppure inquadra il codice con la fotocamera e aprilo nel browser."
     override val tvLook = "Aspetto del tabellone"
     override val tvTitle = "Scritta in basso"
-    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vuota: nessuna scritta" else "Vuota: «$it» (circolo e campo della pagina 1)" }
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Vuota: nessuna scritta" else "Vuota: «$it» (circolo e campo di Nuova partita)" }
     override val tvColorOf: (String) -> String = { "Colore di $it" }
     override val tvShowClock = "Tempo partita"
     override val tvShowTimers = "Cronometro servizio e pause"
@@ -2203,7 +2203,7 @@ object ItStrings : Strings {
     override val racketBalance = "Bilanciamento (mm)"
     override val racketHead = "Piatto corde (cm²)"
     override val racketPattern = "Schema corde"
-    override val racketOwner = "Di chi è (nome della pagina 1)"
+    override val racketOwner = "Di chi è (nome scritto in Nuova partita)"
     override val racketCheckHours = "Controllo corde dopo (ore)"
     override val racketRetired = "Messa da parte"
     override val racketRetiredHint = "Non si propone più prima di giocare, ma resta nei confronti."
@@ -2232,7 +2232,7 @@ object ItStrings : Strings {
     override val compareByString = "Per incordatura"
     override val compareA = "Configurazione A"
     override val compareB = "Configurazione B"
-    override val compareTooFew = "Per confrontare servono partite o allenamenti con almeno due configurazioni diverse. Scegli la racchetta in pagina 1 o nell'allenamento, oppure associala dal riepilogo."
+    override val compareTooFew = "Per confrontare servono partite o allenamenti con almeno due configurazioni diverse. Scegli la racchetta in Nuova partita o nell'allenamento, oppure associala dal riepilogo."
     override val compareNote = "I numeri dicono com'è andata con ciascuna configurazione, non quale sia la migliore: contano anche avversario, superficie, condizioni e forma del giorno."
     override val compareSessions = "Sessioni"
     override val comparePerMatch: (String) -> String = { "$it a partita" }
@@ -2945,7 +2945,7 @@ object EnStrings : Strings {
     override val historyMatches = "Matches"
     override val historyPlayers = "Players"
     override val historyEmpty = "No finished matches yet. Every match you finish lands here by itself; with “Import” you add matches saved as JSON on another phone."
-    override val historyPlayersEmpty = "Players show up here when you finish a match with their names written on page 1."
+    override val historyPlayersEmpty = "Players show up here when you finish a match with their names written in New match."
     override val historyRecord: (Int, Int) -> String = { w, l -> "Won $w · lost $l" }
     override val historyHeadToHead = "Head to head"
     override val historyDeleteTitle = "Delete the match?"
@@ -2989,7 +2989,7 @@ object EnStrings : Strings {
     override val ratingShowAll = "Show all"
     override val ratingShowLess = "Show less"
     override val rematchTitle = "Rematch"
-    override val rematchHint = "Suggest another match: an invite ready to send on WhatsApp or wherever you like, the date in your calendar and the same match ready on page 1."
+    override val rematchHint = "Suggest another match: an invite ready to send on WhatsApp or wherever you like, the date in your calendar and the same match ready in New match."
     override val rematchAsk = "Rematch?"
     override val rematchVersus = "vs"
     override val rematchLast: (String, String) -> String = { a, b -> "Last time: $a to $b" }
@@ -3256,7 +3256,7 @@ object EnStrings : Strings {
     override val tvQrHint = "On the other phone: open Tennis Score Manager and tap «Use as scoreboard» (it connects by itself), or scan the code with the camera and open it in the browser."
     override val tvLook = "Scoreboard look"
     override val tvTitle = "Bottom line"
-    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Empty: no text" else "Empty: «$it» (club and court from page 1)" }
+    override val tvTitleHint: (String) -> String = { if (it.isEmpty()) "Empty: no text" else "Empty: «$it» (club and court from New match)" }
     override val tvColorOf: (String) -> String = { "Colour of $it" }
     override val tvShowClock = "Match time"
     override val tvShowTimers = "Serve clock and breaks"
@@ -3300,7 +3300,7 @@ object EnStrings : Strings {
     override val racketBalance = "Balance (mm)"
     override val racketHead = "Head size (cm²)"
     override val racketPattern = "String pattern"
-    override val racketOwner = "Owner (name as on page 1)"
+    override val racketOwner = "Owner (name as in New match)"
     override val racketCheckHours = "Check strings after (hours)"
     override val racketRetired = "Retired"
     override val racketRetiredHint = "No longer offered before playing, but kept in comparisons."
@@ -3329,7 +3329,7 @@ object EnStrings : Strings {
     override val compareByString = "By stringing"
     override val compareA = "Setup A"
     override val compareB = "Setup B"
-    override val compareTooFew = "To compare you need matches or workouts with at least two different setups. Pick the racket on page 1 or in the workout, or link it from the summary."
+    override val compareTooFew = "To compare you need matches or workouts with at least two different setups. Pick the racket in New match or in the workout, or link it from the summary."
     override val compareNote = "The numbers show how each setup went, not which one is best: opponent, surface, conditions and form matter too."
     override val compareSessions = "Sessions"
     override val comparePerMatch: (String) -> String = { "$it per match" }
