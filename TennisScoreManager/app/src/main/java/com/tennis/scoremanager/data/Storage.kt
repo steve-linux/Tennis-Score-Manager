@@ -135,12 +135,77 @@ class Storage(context: Context) {
         File(workoutsDir, "$id.json").delete()
     }
 
-    /** Allenamenti al servizio: una sessione per file; le clip stanno nella cartella dei video dell'app. */
+    /** Allenamenti dei colpi: una sessione per file; le clip stanno in Documenti (vedi [serveClipsDir]). */
     private val servesDir: File get() = File(app.filesDir, "serves").apply { mkdirs() }
 
-    /** Cartella delle clip della sessione [id] (una sottocartella per servizio). */
-    fun serveClipsDir(id: String): File =
-        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id").apply { mkdirs() }
+    /**
+     * Cartella principale che si vede coi file manager: Documenti/Tennis Score Manager da Android 11 (lì l'app scrive e
+     * legge i suoi file senza permessi); su Android 8-10 la stessa struttura nella cartella dell'app, come per i file
+     * salvati.
+     */
+    val documentsRoot: File
+        get() = if (android.os.Build.VERSION.SDK_INT >= 30) {
+            File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOCUMENTS), "Tennis Score Manager")
+        } else {
+            File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS) ?: app.filesDir, "Tennis Score Manager")
+        }
+
+    /** Allenamento colpi/<colpo>, coi nomi nella lingua dell'app. */
+    fun strokeFolder(stroke: TrainedStroke, base: String, name: (Int) -> String): String = "$base/${name(stroke.band)}"
+
+    /** Crea le quattro cartelle dei colpi (Servizio, Dritto, Rovescio, Volée); false se Documenti non si può scrivere. */
+    fun ensureStrokeFolders(base: String, name: (Int) -> String): Boolean =
+        TrainedStroke.entries.map { File(documentsRoot, strokeFolder(it, base, name)) }.all { it.isDirectory || it.mkdirs() }
+
+    /** Cartella nuova per una sessione: Allenamento colpi/<colpo>/<data e ora>; null se Documenti non si può scrivere. */
+    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String): String? {
+        if (!ensureStrokeFolders(base, name)) return null
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
+        val rel = "${strokeFolder(stroke, base, name)}/$stamp"
+        return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
+    }
+
+    /** Dove stavano le clip prima della 2.5: la cartella dei video dell'app. */
+    private fun legacyClipsDir(id: String): File =
+        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id")
+
+    /** Cartella delle clip della sessione (una sottocartella per colpo). */
+    fun serveClipsDir(sess: ServeSession): File =
+        (sess.folder?.let { File(documentsRoot, it) } ?: legacyClipsDir(sess.id)).apply { mkdirs() }
+
+    /**
+     * Le sessioni di prima con le clip nella cartella dell'app: si spostano nelle cartelle dei colpi in Documenti,
+     * unendo i pezzi di ogni clip in un video solo. La cartella vecchia si cancella solo se tutto è stato copiato.
+     */
+    fun migrateServeSessions(base: String, name: (Int) -> String) {
+        for (sess in loadServeSessions().filter { it.folder == null }) {
+            val old = legacyClipsDir(sess.id)
+            val rel = newServeFolder(sess.stroke, sess.startedAt, base, name) ?: return
+            val dest = File(documentsRoot, rel)
+            val ok = runCatching {
+                for (clip in old.listFiles { f -> f.isDirectory }.orEmpty()) {
+                    val out = File(dest, clip.name).apply { mkdirs() }
+                    if (!com.tennis.scoremanager.video.ClipJoin.joinDir(clip, out)) error("clip ${clip.name}")
+                }
+                true
+            }.getOrDefault(false)
+            if (!ok) {
+                dest.deleteRecursively()
+                continue
+            }
+            saveServeSession(sess.copy(folder = rel))
+            old.deleteRecursively()
+        }
+    }
+
+    /** Spazio occupato dai video di una sessione, in byte. */
+    fun serveVideoBytes(sess: ServeSession): Long =
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.sumOf { it.length() }
+
+    /** Cancella solo i video di una sessione: restano i conteggi, le misure dell'analisi e le immagini dei momenti. */
+    fun deleteServeVideos(sess: ServeSession) {
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.toList().forEach { it.delete() }
+    }
 
     @Synchronized
     fun saveServeSession(sess: ServeSession) {
@@ -162,9 +227,9 @@ class Storage(context: Context) {
 
     /** Cancella la sessione e le sue clip. */
     @Synchronized
-    fun deleteServeSession(id: String) {
-        File(servesDir, "$id.json").delete()
-        serveClipsDir(id).deleteRecursively()
+    fun deleteServeSession(sess: ServeSession) {
+        File(servesDir, "${sess.id}.json").delete()
+        serveClipsDir(sess).deleteRecursively()
     }
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */

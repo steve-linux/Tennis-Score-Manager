@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -631,6 +631,7 @@ class MatchController(
             Screen.VIDEOS -> Screen.HOME
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
+            Screen.STROKE_SESSIONS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -884,16 +885,47 @@ class MatchController(
         scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
     }
 
-    fun deleteServeSession(id: String) {
+    /**
+     * Una volta per avvio: crea le quattro cartelle dei colpi in Documenti e ci sposta le clip delle sessioni di prima.
+     */
+    private var strokeFoldersDone = false
+
+    fun prepareStrokeFolders() {
+        if (strokeFoldersDone) return
+        strokeFoldersDone = true
         scope.launch {
-            withContext(io) { storage.deleteServeSession(id) }
+            withContext(io) {
+                runCatching {
+                    storage.ensureStrokeFolders(strings.strokeFolderName, strings.strokeName)
+                    storage.migrateServeSessions(strings.strokeFolderName, strings.strokeName)
+                }
+            }
             refreshServeSessions()
         }
     }
 
-    /** I pezzi di video dei servizi [serves] della sessione [id], in ordine, per la moviola. */
-    fun serveClipFiles(id: String, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
-        val dir = storage.serveClipsDir(id)
+    fun deleteServeSession(sess: com.tennis.scoremanager.data.ServeSession) = deleteServeSessions(listOf(sess))
+
+    /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
+    fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
+        scope.launch {
+            withContext(io) { list.forEach { if (videosOnly) storage.deleteServeVideos(it) else storage.deleteServeSession(it) } }
+            refreshServeSessions()
+        }
+    }
+
+    /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
+    val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
+
+    /** Apre tutte le sessioni del colpo [stroke]. */
+    fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
+        trainStroke.value = stroke
+        screen.value = Screen.STROKE_SESSIONS
+    }
+
+    /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
+    fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
+        val dir = storage.serveClipsDir(sess)
         return serves.mapNotNull { it.clip }.flatMap { c ->
             File(dir, c).listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
         }

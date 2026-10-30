@@ -331,7 +331,9 @@ class CameraActivity : ComponentActivity() {
     private fun startServeTraining() {
         controller.serveTraining = true
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
-        serveSession.value = serveSession.value.copy(stroke = stroke)
+        // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
+        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName)
+        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder)
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -356,7 +358,7 @@ class CameraActivity : ComponentActivity() {
     private fun endServeTraining() {
         controller.serveTraining = false
         val sess = serveSession.value
-        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess.id)
+        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
         else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
         controller.refreshServeSessions()
     }
@@ -392,9 +394,14 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch {
             val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
             if (wait > 0) delay(wait)
-            val dir = File(controller.storage.serveClipsDir(serveSession.value.id), clip)
+            val dir = File(controller.storage.serveClipsDir(serveSession.value), clip)
             val parts = withContext(Dispatchers.IO) {
-                runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, dir) }.getOrDefault(emptyList())
+                // I pezzi da 4 s si uniscono in un video solo (si apre e si condivide); se non riesce restano i pezzi.
+                val tmp = File(cacheDir, "serve_cut_$clip")
+                val cut = runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, tmp) }.getOrDefault(emptyList())
+                val ok = cut.isNotEmpty() && (ClipJoin.joinDir(tmp, dir) || runCatching { tmp.copyRecursively(dir, overwrite = true) }.getOrDefault(false))
+                tmp.deleteRecursively()
+                if (ok) cut else emptyList()
             }
             // Annullato nel frattempo: la clip non serve più.
             if (serveSession.value.serves.none { it.at == at } || parts.isEmpty()) {
@@ -408,7 +415,7 @@ class CameraActivity : ComponentActivity() {
     private fun undoServe(band: Side? = null) {
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
-        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value.id), c).deleteRecursively() } }
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
         bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")

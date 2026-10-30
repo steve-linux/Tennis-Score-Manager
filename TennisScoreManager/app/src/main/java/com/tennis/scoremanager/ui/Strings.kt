@@ -869,6 +869,26 @@ interface Strings {
     val poseRedo: String
     /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
     val strokeTrainingTitle: String
+    /** Cartella in Documenti/Tennis Score Manager con le quattro cartelle dei colpi. */
+    val strokeFolderName: String
+    /** Nome della cartella Documenti come la mostra il telefono. */
+    val documentsFolder: String
+    val strokeAllSessions: (Int) -> String
+    val strokeSessionsTitle: (String) -> String
+    val strokeSessionsWhere: (String) -> String
+    val strokeSpace: (String, Int) -> String
+    val strokeSelectAll: String
+    val strokeSelectHint: String
+    val strokeDeleteN: (Int) -> String
+    val strokeVideosN: (Int) -> String
+    val strokeDeleteAsk: (Int) -> String
+    val strokeVideosAsk: (Int) -> String
+    val strokeNoVideos: String
+    val strokeAnalysed: String
+    val strokeTrend: String
+    val strokeNone: String
+    val progressStrokes: String
+    val progressStrokesHint: String
     val strokeTrainingHint: String
     val dirCross: String
     val dirMiddle: String
@@ -1981,6 +2001,24 @@ object ItStrings : Strings {
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
     override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val strokeFolderName = "Allenamento colpi"
+    override val documentsFolder = "Documenti"
+    override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sessioni · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Video e analisi in $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sessioni · video: $mb" }
+    override val strokeSelectAll = "Seleziona tutte"
+    override val strokeSelectHint = "Tieni premuta una sessione per selezionarla, poi cancella le sessioni o solo i loro video."
+    override val strokeDeleteN: (Int) -> String = { n -> "Elimina ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Solo i video ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Eliminare $n sessioni con i loro video? Non si può annullare." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Eliminare i video di $n sessioni? Restano i conteggi, le misure dell'analisi e le immagini dei momenti chiave." }
+    override val strokeNoVideos = "video eliminati"
+    override val strokeAnalysed = "analizzata"
+    override val strokeTrend = "Colpi dentro, sessione dopo sessione"
+    override val strokeNone = "Ancora nessuna sessione di questo colpo."
+    override val progressStrokes = "Allenamento dei colpi"
+    override val progressStrokesHint = "Percentuale di colpi dentro, sessione dopo sessione."
     override val strokeTrainingHint = "Telefono sul cavalletto, braccialetto al polso: scegli il colpo e poi KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni colpo diventa una clip da rivedere e da analizzare."
     override val dirCross = "Incrociato"
     override val dirMiddle = "Al centro"
@@ -3077,6 +3115,24 @@ object EnStrings : Strings {
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
     override val strokeTrainingTitle = "Stroke practice"
+    override val strokeFolderName = "Stroke practice"
+    override val documentsFolder = "Documents"
+    override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sessions · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Videos and analysis in $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sessions · videos: $mb" }
+    override val strokeSelectAll = "Select all"
+    override val strokeSelectHint = "Press and hold a session to select it, then delete the sessions or only their videos."
+    override val strokeDeleteN: (Int) -> String = { n -> "Delete ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Videos only ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Delete $n sessions with their videos? This cannot be undone." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Delete the videos of $n sessions? Counts, analysis measurements and key-moment pictures stay." }
+    override val strokeNoVideos = "videos deleted"
+    override val strokeAnalysed = "analysed"
+    override val strokeTrend = "Shots in, session after session"
+    override val strokeNone = "No sessions of this stroke yet."
+    override val progressStrokes = "Stroke practice"
+    override val progressStrokesHint = "Percentage of shots in, session after session."
     override val strokeTrainingHint = "Phone on the tripod, wristband on the wrist: choose the stroke, then KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every shot becomes a clip to watch again and analyse."
     override val dirCross = "Cross-court"
     override val dirMiddle = "Middle"

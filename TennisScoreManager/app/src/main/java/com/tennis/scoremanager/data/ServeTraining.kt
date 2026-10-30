@@ -57,6 +57,11 @@ data class ServeSession(
     val serves: List<ServeAttempt> = emptyList(),
     /** Colpo allenato (le sessioni salvate prima erano tutte di servizio). */
     val stroke: TrainedStroke = TrainedStroke.SERVE,
+    /**
+     * Cartella delle clip dentro Documenti/Tennis Score Manager ("Allenamento colpi/Dritto/2026-10-29 22.26.40");
+     * null per le sessioni di prima, con le clip ancora nella cartella dell'app.
+     */
+    val folder: String? = null,
 )
 
 /**

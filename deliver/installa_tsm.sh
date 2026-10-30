@@ -1051,7 +1051,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -1556,6 +1556,7 @@ class MatchController(
             Screen.VIDEOS -> Screen.HOME
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
+            Screen.STROKE_SESSIONS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1809,16 +1810,47 @@ class MatchController(
         scope.launch { serveSessions.value = withContext(io) { storage.loadServeSessions() } }
     }
 
-    fun deleteServeSession(id: String) {
+    /**
+     * Una volta per avvio: crea le quattro cartelle dei colpi in Documenti e ci sposta le clip delle sessioni di prima.
+     */
+    private var strokeFoldersDone = false
+
+    fun prepareStrokeFolders() {
+        if (strokeFoldersDone) return
+        strokeFoldersDone = true
         scope.launch {
-            withContext(io) { storage.deleteServeSession(id) }
+            withContext(io) {
+                runCatching {
+                    storage.ensureStrokeFolders(strings.strokeFolderName, strings.strokeName)
+                    storage.migrateServeSessions(strings.strokeFolderName, strings.strokeName)
+                }
+            }
             refreshServeSessions()
         }
     }
 
-    /** I pezzi di video dei servizi [serves] della sessione [id], in ordine, per la moviola. */
-    fun serveClipFiles(id: String, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
-        val dir = storage.serveClipsDir(id)
+    fun deleteServeSession(sess: com.tennis.scoremanager.data.ServeSession) = deleteServeSessions(listOf(sess))
+
+    /** Cancella più sessioni insieme; con [videosOnly] solo i loro video (restano conteggi e analisi). */
+    fun deleteServeSessions(list: List<com.tennis.scoremanager.data.ServeSession>, videosOnly: Boolean = false) {
+        scope.launch {
+            withContext(io) { list.forEach { if (videosOnly) storage.deleteServeVideos(it) else storage.deleteServeSession(it) } }
+            refreshServeSessions()
+        }
+    }
+
+    /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
+    val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
+
+    /** Apre tutte le sessioni del colpo [stroke]. */
+    fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
+        trainStroke.value = stroke
+        screen.value = Screen.STROKE_SESSIONS
+    }
+
+    /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
+    fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
+        val dir = storage.serveClipsDir(sess)
         return serves.mapNotNull { it.clip }.flatMap { c ->
             File(dir, c).listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
         }
@@ -8316,6 +8348,11 @@ data class ServeSession(
     val serves: List<ServeAttempt> = emptyList(),
     /** Colpo allenato (le sessioni salvate prima erano tutte di servizio). */
     val stroke: TrainedStroke = TrainedStroke.SERVE,
+    /**
+     * Cartella delle clip dentro Documenti/Tennis Score Manager ("Allenamento colpi/Dritto/2026-10-29 22.26.40");
+     * null per le sessioni di prima, con le clip ancora nella cartella dell'app.
+     */
+    val folder: String? = null,
 )
 
 /**
@@ -8518,12 +8555,77 @@ class Storage(context: Context) {
         File(workoutsDir, "$id.json").delete()
     }
 
-    /** Allenamenti al servizio: una sessione per file; le clip stanno nella cartella dei video dell'app. */
+    /** Allenamenti dei colpi: una sessione per file; le clip stanno in Documenti (vedi [serveClipsDir]). */
     private val servesDir: File get() = File(app.filesDir, "serves").apply { mkdirs() }
 
-    /** Cartella delle clip della sessione [id] (una sottocartella per servizio). */
-    fun serveClipsDir(id: String): File =
-        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id").apply { mkdirs() }
+    /**
+     * Cartella principale che si vede coi file manager: Documenti/Tennis Score Manager da Android 11 (lì l'app scrive e
+     * legge i suoi file senza permessi); su Android 8-10 la stessa struttura nella cartella dell'app, come per i file
+     * salvati.
+     */
+    val documentsRoot: File
+        get() = if (android.os.Build.VERSION.SDK_INT >= 30) {
+            File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOCUMENTS), "Tennis Score Manager")
+        } else {
+            File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS) ?: app.filesDir, "Tennis Score Manager")
+        }
+
+    /** Allenamento colpi/<colpo>, coi nomi nella lingua dell'app. */
+    fun strokeFolder(stroke: TrainedStroke, base: String, name: (Int) -> String): String = "$base/${name(stroke.band)}"
+
+    /** Crea le quattro cartelle dei colpi (Servizio, Dritto, Rovescio, Volée); false se Documenti non si può scrivere. */
+    fun ensureStrokeFolders(base: String, name: (Int) -> String): Boolean =
+        TrainedStroke.entries.map { File(documentsRoot, strokeFolder(it, base, name)) }.all { it.isDirectory || it.mkdirs() }
+
+    /** Cartella nuova per una sessione: Allenamento colpi/<colpo>/<data e ora>; null se Documenti non si può scrivere. */
+    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String): String? {
+        if (!ensureStrokeFolders(base, name)) return null
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
+        val rel = "${strokeFolder(stroke, base, name)}/$stamp"
+        return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
+    }
+
+    /** Dove stavano le clip prima della 2.5: la cartella dei video dell'app. */
+    private fun legacyClipsDir(id: String): File =
+        File(app.getExternalFilesDir(android.os.Environment.DIRECTORY_MOVIES) ?: app.filesDir, "serves/$id")
+
+    /** Cartella delle clip della sessione (una sottocartella per colpo). */
+    fun serveClipsDir(sess: ServeSession): File =
+        (sess.folder?.let { File(documentsRoot, it) } ?: legacyClipsDir(sess.id)).apply { mkdirs() }
+
+    /**
+     * Le sessioni di prima con le clip nella cartella dell'app: si spostano nelle cartelle dei colpi in Documenti,
+     * unendo i pezzi di ogni clip in un video solo. La cartella vecchia si cancella solo se tutto è stato copiato.
+     */
+    fun migrateServeSessions(base: String, name: (Int) -> String) {
+        for (sess in loadServeSessions().filter { it.folder == null }) {
+            val old = legacyClipsDir(sess.id)
+            val rel = newServeFolder(sess.stroke, sess.startedAt, base, name) ?: return
+            val dest = File(documentsRoot, rel)
+            val ok = runCatching {
+                for (clip in old.listFiles { f -> f.isDirectory }.orEmpty()) {
+                    val out = File(dest, clip.name).apply { mkdirs() }
+                    if (!com.tennis.scoremanager.video.ClipJoin.joinDir(clip, out)) error("clip ${clip.name}")
+                }
+                true
+            }.getOrDefault(false)
+            if (!ok) {
+                dest.deleteRecursively()
+                continue
+            }
+            saveServeSession(sess.copy(folder = rel))
+            old.deleteRecursively()
+        }
+    }
+
+    /** Spazio occupato dai video di una sessione, in byte. */
+    fun serveVideoBytes(sess: ServeSession): Long =
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.sumOf { it.length() }
+
+    /** Cancella solo i video di una sessione: restano i conteggi, le misure dell'analisi e le immagini dei momenti. */
+    fun deleteServeVideos(sess: ServeSession) {
+        serveClipsDir(sess).walkTopDown().filter { it.isFile && it.extension == "mp4" }.toList().forEach { it.delete() }
+    }
 
     @Synchronized
     fun saveServeSession(sess: ServeSession) {
@@ -8545,9 +8647,9 @@ class Storage(context: Context) {
 
     /** Cancella la sessione e le sue clip. */
     @Synchronized
-    fun deleteServeSession(id: String) {
-        File(servesDir, "$id.json").delete()
-        serveClipsDir(id).deleteRecursively()
+    fun deleteServeSession(sess: ServeSession) {
+        File(servesDir, "${sess.id}.json").delete()
+        serveClipsDir(sess).deleteRecursively()
     }
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
@@ -13747,6 +13849,7 @@ fun AppRoot(c: MatchController) {
                 Screen.RACKETS -> RacketsScreen(c)
                 Screen.DEVICES -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.DEVICES)
                 Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
+                Screen.STROKE_SESSIONS -> com.tennis.scoremanager.ui.screens.StrokeSessionsScreen(c)
             }
         }
     }
@@ -15593,11 +15696,13 @@ package com.tennis.scoremanager.ui
 import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -15605,6 +15710,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
@@ -15661,43 +15767,98 @@ fun directionName(s: Strings, v: ShotDirection?) = when (v) {
 }
 fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
 
-/** Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e sessioni salvate. */
+/**
+ * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
+ * le altre in "Tutte le sessioni".
+ */
 @Composable
 fun ServeTrainingCard(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val sessions by c.serveSessions.collectAsState()
+    val stroke by c.trainStroke.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
-    var stroke by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(TrainedStroke.SERVE) }
     LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val mine = sessions.filter { it.stroke == stroke }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
         val strokes = TrainedStroke.entries
-        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 2)
+        // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
+        Segmented(
+            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+            strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+        )
         BigButton(s.serveStart, Icons.Filled.Videocam, {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
-        if (sessions.isNotEmpty()) {
-            Text(s.serveSessions, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-            val lang = c.options.value.lang
-            for (sess in sessions.take(8)) {
-                val n = ServeTraining.count(sess.serves)
-                Row(Modifier.fillMaxWidth().clickable { open = sess }.padding(vertical = 6.dp)) {
-                    Text(
-                        "${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)} · ${strokeLabel(s, sess.stroke)}",
-                        color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f),
-                    )
-                    Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
-                }
-            }
+        if (mine.isNotEmpty()) {
+            Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
+            for (sess in mine.take(RECENT_SESSIONS)) SessionRow(c, sess) { open = sess }
+            // Sempre, anche con poche sessioni: lì ci sono cartella, spazio occupato e la selezione per cancellare.
+            GhostButton(s.strokeAllSessions(mine.size), Icons.Filled.FolderOpen, { c.openStrokeSessions(stroke) }, Modifier.fillMaxWidth())
+        } else if (sessions.isNotEmpty()) {
+            Text(s.strokeNone, color = TsmColors.TextDim, fontSize = 13.sp)
         }
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */
+const val RECENT_SESSIONS = 3
+
+/** Una sessione in elenco: data e ora, colpi dentro e percentuale. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun SessionRow(
+    c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
+) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val n = ServeTraining.count(sess.serves)
+    Row(modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(vertical = 6.dp)) {
+        Column(Modifier.weight(1f)) {
+            Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp)
+            if (extra != null) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+    }
+}
+
+/**
+ * Percentuale di colpi dentro, sessione dopo sessione (dalla più vecchia), come una linea; con meno di due sessioni
+ * non si disegna. [onClick] apre Progressi.
+ */
+@Composable
+fun StrokeTrend(sessions: List<ServeSession>, title: String? = null, onClick: (() -> Unit)? = null) {
+    val s = LocalStrings.current
+    val pcts = sessions.sortedBy { it.startedAt }.mapNotNull { ServeTraining.count(it.serves).pct }.takeLast(20)
+    if (pcts.size < 2) return
+    Column(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)) {
+        Row(Modifier.fillMaxWidth()) {
+            Text(title ?: s.strokeTrend, color = if (title != null) TsmColors.TextMain else TsmColors.TextDim, fontSize = if (title != null) 14.sp else 12.sp,
+                fontWeight = if (title != null) FontWeight.Bold else FontWeight.Normal, modifier = Modifier.weight(1f).padding(end = 8.dp))
+            Text("${pcts.first()}% → ${pcts.last()}%", color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        }
+        val line = TsmColors.Ball
+        val grid = TsmColors.TextDim.copy(alpha = 0.3f)
+        // Scala sui valori (almeno 20 punti), così si vede anche un passo dall'80 all'83 %.
+        val lo = (minOf(pcts.min(), pcts.max() - 20).coerceAtLeast(0)).toFloat()
+        val hi = (maxOf(pcts.max(), pcts.min() + 20).coerceAtMost(100)).toFloat().coerceAtLeast(lo + 1)
+        Canvas(Modifier.fillMaxWidth().height(56.dp).padding(vertical = 6.dp)) {
+            drawLine(grid, Offset(0f, 0f), Offset(size.width, 0f), strokeWidth = 1f)
+            drawLine(grid, Offset(0f, size.height), Offset(size.width, size.height), strokeWidth = 1f)
+            val dx = size.width / (pcts.size - 1)
+            val pts = pcts.mapIndexed { i, p -> Offset(i * dx, size.height * (1 - (p - lo) / (hi - lo))) }
+            for (i in 1 until pts.size) drawLine(line, pts[i - 1], pts[i], strokeWidth = 4f)
+            for (p in pts) drawCircle(line, 5f, p)
+        }
+    }
 }
 
 /**
@@ -15840,7 +16001,7 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
         AlertDialog(
             onDismissRequest = { ask = false },
             text = { Text(s.serveDeleteAsk) },
-            confirmButton = { TextButton(onClick = { ask = false; c.deleteServeSession(sess.id); onClose() }) { Text(s.serveDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { ask = false; c.deleteServeSession(sess); onClose() }) { Text(s.serveDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
         )
     }
@@ -15856,7 +16017,7 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
         return
     }
     fun play(list: List<ServeAttempt>) {
-        val files = c.serveClipFiles(sess.id, list)
+        val files = c.serveClipFiles(sess, list)
         if (files.isEmpty()) return
         context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
     }
@@ -16739,6 +16900,26 @@ interface Strings {
     val poseRedo: String
     /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
     val strokeTrainingTitle: String
+    /** Cartella in Documenti/Tennis Score Manager con le quattro cartelle dei colpi. */
+    val strokeFolderName: String
+    /** Nome della cartella Documenti come la mostra il telefono. */
+    val documentsFolder: String
+    val strokeAllSessions: (Int) -> String
+    val strokeSessionsTitle: (String) -> String
+    val strokeSessionsWhere: (String) -> String
+    val strokeSpace: (String, Int) -> String
+    val strokeSelectAll: String
+    val strokeSelectHint: String
+    val strokeDeleteN: (Int) -> String
+    val strokeVideosN: (Int) -> String
+    val strokeDeleteAsk: (Int) -> String
+    val strokeVideosAsk: (Int) -> String
+    val strokeNoVideos: String
+    val strokeAnalysed: String
+    val strokeTrend: String
+    val strokeNone: String
+    val progressStrokes: String
+    val progressStrokesHint: String
     val strokeTrainingHint: String
     val dirCross: String
     val dirMiddle: String
@@ -17851,6 +18032,24 @@ object ItStrings : Strings {
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
     override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val strokeFolderName = "Allenamento colpi"
+    override val documentsFolder = "Documenti"
+    override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sessioni · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Video e analisi in $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sessioni · video: $mb" }
+    override val strokeSelectAll = "Seleziona tutte"
+    override val strokeSelectHint = "Tieni premuta una sessione per selezionarla, poi cancella le sessioni o solo i loro video."
+    override val strokeDeleteN: (Int) -> String = { n -> "Elimina ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Solo i video ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Eliminare $n sessioni con i loro video? Non si può annullare." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Eliminare i video di $n sessioni? Restano i conteggi, le misure dell'analisi e le immagini dei momenti chiave." }
+    override val strokeNoVideos = "video eliminati"
+    override val strokeAnalysed = "analizzata"
+    override val strokeTrend = "Colpi dentro, sessione dopo sessione"
+    override val strokeNone = "Ancora nessuna sessione di questo colpo."
+    override val progressStrokes = "Allenamento dei colpi"
+    override val progressStrokesHint = "Percentuale di colpi dentro, sessione dopo sessione."
     override val strokeTrainingHint = "Telefono sul cavalletto, braccialetto al polso: scegli il colpo e poi KEY1 dentro, KEY2 fuori, KEY1 tenuto premuto annulla l'ultimo. Ogni colpo diventa una clip da rivedere e da analizzare."
     override val dirCross = "Incrociato"
     override val dirMiddle = "Al centro"
@@ -18947,6 +19146,24 @@ object EnStrings : Strings {
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
     override val strokeTrainingTitle = "Stroke practice"
+    override val strokeFolderName = "Stroke practice"
+    override val documentsFolder = "Documents"
+    override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sessions · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Videos and analysis in $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sessions · videos: $mb" }
+    override val strokeSelectAll = "Select all"
+    override val strokeSelectHint = "Press and hold a session to select it, then delete the sessions or only their videos."
+    override val strokeDeleteN: (Int) -> String = { n -> "Delete ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Videos only ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Delete $n sessions with their videos? This cannot be undone." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Delete the videos of $n sessions? Counts, analysis measurements and key-moment pictures stay." }
+    override val strokeNoVideos = "videos deleted"
+    override val strokeAnalysed = "analysed"
+    override val strokeTrend = "Shots in, session after session"
+    override val strokeNone = "No sessions of this stroke yet."
+    override val progressStrokes = "Stroke practice"
+    override val progressStrokesHint = "Percentage of shots in, session after session."
     override val strokeTrainingHint = "Phone on the tripod, wristband on the wrist: choose the stroke, then KEY1 in, KEY2 out, KEY1 held down undoes the last one. Every shot becomes a clip to watch again and analyse."
     override val dirCross = "Cross-court"
     override val dirMiddle = "Middle"
@@ -20066,6 +20283,24 @@ object DeStrings : Strings {
     override val poseZoomHint = "Bild antippen zum Vergrößern; zwei Finger zum Zoomen, doppelt tippen zum Zurücksetzen."
     override val poseRedo = "Erneut analysieren"
     override val strokeTrainingTitle = "Schlagtraining"
+    override val strokeFolderName = "Schlagtraining"
+    override val documentsFolder = "Dokumente"
+    override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Einheiten · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Videos und Analyse in $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n Einheiten · Videos: $mb" }
+    override val strokeSelectAll = "Alle auswählen"
+    override val strokeSelectHint = "Halte eine Einheit gedrückt, um sie auszuwählen, und lösche dann die Einheiten oder nur ihre Videos."
+    override val strokeDeleteN: (Int) -> String = { n -> "Löschen ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Nur Videos ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "$n Einheiten mit ihren Videos löschen? Das lässt sich nicht rückgängig machen." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Die Videos von $n Einheiten löschen? Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben." }
+    override val strokeNoVideos = "Videos gelöscht"
+    override val strokeAnalysed = "analysiert"
+    override val strokeTrend = "Schläge im Feld, Einheit für Einheit"
+    override val strokeNone = "Noch keine Einheit für diesen Schlag."
+    override val progressStrokes = "Schlagtraining"
+    override val progressStrokesHint = "Anteil der Schläge im Feld, Einheit für Einheit."
     override val strokeTrainingHint = "Telefon auf dem Stativ, Armband am Handgelenk: den Schlag wählen, dann KEY1 drin, KEY2 aus, KEY1 gedrückt halten macht den letzten rückgängig. Jeder Schlag wird ein Clip zum Anschauen und Analysieren."
     override val dirCross = "Cross"
     override val dirMiddle = "Mitte"
@@ -21178,6 +21413,24 @@ object EsStrings : Strings {
     override val poseZoomHint = "Toca una imagen para ampliarla; dos dedos para el zoom, doble toque para volver."
     override val poseRedo = "Repetir el análisis"
     override val strokeTrainingTitle = "Entrenamiento de golpes"
+    override val strokeFolderName = "Entrenamiento de golpes"
+    override val documentsFolder = "Documentos"
+    override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sesiones · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Vídeos y análisis en $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sesiones · vídeos: $mb" }
+    override val strokeSelectAll = "Seleccionar todas"
+    override val strokeSelectHint = "Mantén pulsada una sesión para seleccionarla y luego borra las sesiones o solo sus vídeos."
+    override val strokeDeleteN: (Int) -> String = { n -> "Borrar ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Solo los vídeos ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "¿Borrar $n sesiones con sus vídeos? No se puede deshacer." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "¿Borrar los vídeos de $n sesiones? Se quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave." }
+    override val strokeNoVideos = "vídeos borrados"
+    override val strokeAnalysed = "analizada"
+    override val strokeTrend = "Golpes dentro, sesión tras sesión"
+    override val strokeNone = "Todavía no hay sesiones de este golpe."
+    override val progressStrokes = "Entrenamiento de golpes"
+    override val progressStrokesHint = "Porcentaje de golpes dentro, sesión tras sesión."
     override val strokeTrainingHint = "Teléfono en el trípode, pulsera en la muñeca: elige el golpe y luego KEY1 dentro, KEY2 fuera, KEY1 mantenido anula el último. Cada golpe se convierte en un clip para volver a ver y analizar."
     override val dirCross = "Cruzado"
     override val dirMiddle = "Al centro"
@@ -22292,6 +22545,24 @@ object FrStrings : Strings {
     override val poseZoomHint = "Touchez une image pour l'agrandir ; deux doigts pour zoomer, double toucher pour revenir."
     override val poseRedo = "Refaire l'analyse"
     override val strokeTrainingTitle = "Entraînement des coups"
+    override val strokeFolderName = "Entraînement des coups"
+    override val documentsFolder = "Documents"
+    override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Séances · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Vidéos et analyse dans $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n séances · vidéos : $mb" }
+    override val strokeSelectAll = "Tout sélectionner"
+    override val strokeSelectHint = "Appuyez longuement sur une séance pour la sélectionner, puis supprimez les séances ou seulement leurs vidéos."
+    override val strokeDeleteN: (Int) -> String = { n -> "Supprimer ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Vidéos seules ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Supprimer $n séances avec leurs vidéos ? C'est définitif." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Supprimer les vidéos de $n séances ? Les décomptes, les mesures de l'analyse et les images des moments clés restent." }
+    override val strokeNoVideos = "vidéos supprimées"
+    override val strokeAnalysed = "analysée"
+    override val strokeTrend = "Coups dedans, séance après séance"
+    override val strokeNone = "Pas encore de séance pour ce coup."
+    override val progressStrokes = "Entraînement des coups"
+    override val progressStrokesHint = "Pourcentage de coups dedans, séance après séance."
     override val strokeTrainingHint = "Téléphone sur le trépied, bracelet au poignet : choisissez le coup, puis KEY1 bon, KEY2 faute, KEY1 maintenu annule le dernier. Chaque coup devient un clip à revoir et à analyser."
     override val dirCross = "Croisé"
     override val dirMiddle = "Au centre"
@@ -23407,6 +23678,24 @@ object PtStrings : Strings {
     override val poseZoomHint = "Toque numa imagem para ampliá-la; dois dedos para o zoom, toque duplo para voltar."
     override val poseRedo = "Refazer a análise"
     override val strokeTrainingTitle = "Treino de golpes"
+    override val strokeFolderName = "Treino de golpes"
+    override val documentsFolder = "Documentos"
+    override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
+    override val strokeSessionsTitle: (String) -> String = { "Sessões · $it" }
+    override val strokeSessionsWhere: (String) -> String = { "Vídeos e análise em $it" }
+    override val strokeSpace: (String, Int) -> String = { mb, n -> "$n sessões · vídeos: $mb" }
+    override val strokeSelectAll = "Selecionar todas"
+    override val strokeSelectHint = "Segure uma sessão para selecioná-la e depois apague as sessões ou só os vídeos delas."
+    override val strokeDeleteN: (Int) -> String = { n -> "Apagar ($n)" }
+    override val strokeVideosN: (Int) -> String = { n -> "Só os vídeos ($n)" }
+    override val strokeDeleteAsk: (Int) -> String = { n -> "Apagar $n sessões com os vídeos? Não dá para desfazer." }
+    override val strokeVideosAsk: (Int) -> String = { n -> "Apagar os vídeos de $n sessões? Ficam as contagens, as medidas da análise e as imagens dos momentos-chave." }
+    override val strokeNoVideos = "vídeos apagados"
+    override val strokeAnalysed = "analisada"
+    override val strokeTrend = "Golpes dentro, sessão após sessão"
+    override val strokeNone = "Ainda não há sessões deste golpe."
+    override val progressStrokes = "Treino de golpes"
+    override val progressStrokesHint = "Porcentagem de golpes dentro, sessão após sessão."
     override val strokeTrainingHint = "Telefone no tripé, pulseira no pulso: escolha o golpe e depois KEY1 dentro, KEY2 fora, KEY1 pressionado desfaz o último. Cada golpe vira um clipe para rever e analisar."
     override val dirCross = "Cruzado"
     override val dirMiddle = "No centro"
@@ -24360,6 +24649,8 @@ fun HomeScreen(c: MatchController) {
     LaunchedEffect(Unit) {
         c.refreshHistory()
         c.refreshSaved()
+        // Le quattro cartelle dei colpi in Documenti (e le clip di prima spostate lì), una volta per avvio.
+        c.prepareStrokeFolders()
         kotlinx.coroutines.delay(400)
         if (!asked && !c.storage.onboarded && c.history.value.isEmpty() && c.saved.value.isEmpty()) tour = true
         asked = true
@@ -24529,6 +24820,27 @@ private fun ProgressTab(c: MatchController) {
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
+    val sessions by c.serveSessions.collectAsState()
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> sessions.any { it.stroke == t } }
+    if (done.isNotEmpty()) {
+        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes, Icons.Filled.SportsTennis) {
+            Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (t in done) {
+                val mine = sessions.filter { it.stroke == t }
+                val title = "${com.tennis.scoremanager.ui.strokeLabel(s, t)} · ${mine.size}"
+                Surface(onClick = { c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+                    // Con una sessione sola non c'è linea: basta il nome del colpo.
+                    if (mine.count { com.tennis.scoremanager.data.ServeTraining.count(it.serves).pct != null } >= 2) {
+                        com.tennis.scoremanager.ui.StrokeTrend(mine, title)
+                    } else {
+                        Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -28145,6 +28457,166 @@ private fun SavedRow(rec: MatchRecord, lang: Lang, onOpen: () -> Unit, onDelete:
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/StrokeSessionsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/StrokeSessionsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.VideocamOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.ServeSessionDialog
+import com.tennis.scoremanager.ui.SessionRow
+import com.tennis.scoremanager.ui.StrokeTrend
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.video.ServeClipAnalysis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+
+/** Quello che si sa di una sessione guardando la sua cartella: spazio dei video, se ce ne sono, se è analizzata. */
+private data class Disk(val bytes: Long, val videos: Boolean, val analysed: Boolean)
+
+/**
+ * Tutte le sessioni del colpo scelto in Allenati, per mese: cartella in Documenti, spazio occupato, andamento, e la
+ * selezione (tenendo premuto) per cancellare le sessioni o solo i loro video.
+ */
+@Composable
+fun StrokeSessionsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val stroke by c.trainStroke.collectAsState()
+    val all by c.serveSessions.collectAsState()
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val list = all.filter { it.stroke == stroke }
+    val lang = c.options.value.lang
+    val disk by produceState(emptyMap<String, Disk>(), list) {
+        value = withContext(Dispatchers.IO) {
+            list.associate { sess ->
+                val dir = c.storage.serveClipsDir(sess)
+                val bytes = c.storage.serveVideoBytes(sess)
+                val analysed = sess.serves.any { a -> a.clip?.let { File(File(dir, it), ServeClipAnalysis.RESULT).exists() } == true }
+                sess.id to Disk(bytes, bytes > 0, analysed)
+            }
+        }
+    }
+    var selected by remember { mutableStateOf(emptySet<String>()) }
+    val selecting = selected.isNotEmpty()
+    var open by remember { mutableStateOf<ServeSession?>(null) }
+    var ask by remember { mutableStateOf<Boolean?>(null) }  // true = solo i video
+    val name = strokeLabel(s, stroke)
+    fun mb(b: Long) = String.format(lang.locale, "%.0f MB", b / 1_048_576.0)
+    ScreenScaffold(
+        title = s.strokeSessionsTitle(name),
+        // Da Android 11 la cartella è Documenti; prima quella dell'app (come per i file salvati).
+        subtitle = s.strokeSessionsWhere(
+            if (android.os.Build.VERSION.SDK_INT >= 30) "${s.documentsFolder}/Tennis Score Manager/${s.strokeFolderName}/$name"
+            else File(c.storage.documentsRoot, "${s.strokeFolderName}/$name").absolutePath,
+        ),
+        icon = Icons.Filled.FolderOpen,
+        action = {
+            if (list.isNotEmpty()) {
+                IconButton(onClick = { selected = if (selecting) emptySet() else list.map { it.id }.toSet() }) {
+                    Icon(Icons.Filled.Checklist, s.strokeSelectAll, tint = TsmColors.Ball)
+                }
+            }
+        },
+        bottomBar = {
+            if (selecting) {
+                GhostButton(s.strokeVideosN(selected.size), Icons.Filled.VideocamOff, { ask = true }, Modifier.weight(1f))
+                GhostButton(s.strokeDeleteN(selected.size), Icons.Filled.Delete, { ask = false }, Modifier.weight(1f))
+            } else {
+                GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            }
+        },
+    ) {
+        if (list.isEmpty()) {
+            Text(s.strokeNone, color = TsmColors.TextDim)
+            return@ScreenScaffold
+        }
+        SectionCard(name, Icons.Filled.FolderOpen) {
+            Text(s.strokeSpace(mb(disk.values.sumOf { it.bytes }), list.size), color = TsmColors.TextMain)
+            StrokeTrend(list)
+            Text(s.strokeSelectHint, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        // Per mese, dalla più recente.
+        val month = SimpleDateFormat("LLLL yyyy", lang.locale)
+        for ((label, group) in list.sortedByDescending { it.startedAt }.groupBy { month.format(Date(it.startedAt)).replaceFirstChar { ch -> ch.titlecase(lang.locale) } }) {
+            SectionCard(label, Icons.Filled.FolderOpen) {
+                for (sess in group) {
+                    val d = disk[sess.id]
+                    val extra = listOfNotNull(
+                        d?.let { if (it.videos) mb(it.bytes) else s.strokeNoVideos },
+                        s.strokeAnalysed.takeIf { d?.analysed == true },
+                    ).joinToString(" · ").ifEmpty { null }
+                    val on = sess.id in selected
+                    fun toggle() { selected = if (on) selected - sess.id else selected + sess.id }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        if (selecting) {
+                            Checkbox(on, { toggle() }, colors = CheckboxDefaults.colors(checkedColor = TsmColors.Ball, checkmarkColor = TsmColors.OnBall))
+                        }
+                        // Tenendo premuto si seleziona; con la selezione attiva anche un tocco seleziona.
+                        SessionRow(c, sess, extra, Modifier.weight(1f), onLongClick = { toggle() }) { if (selecting) toggle() else open = sess }
+                    }
+                }
+            }
+        }
+    }
+    ask?.let { videosOnly ->
+        val chosen = list.filter { it.id in selected }
+        AlertDialog(
+            onDismissRequest = { ask = null },
+            text = { Text(if (videosOnly) s.strokeVideosAsk(chosen.size) else s.strokeDeleteAsk(chosen.size)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    c.deleteServeSessions(chosen, videosOnly)
+                    selected = emptySet()
+                    ask = null
+                }) { Text(if (videosOnly) s.strokeVideosN(chosen.size) else s.strokeDeleteN(chosen.size), color = TsmColors.Danger, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
+        )
+    }
+    open?.let { sess -> ServeSessionDialog(c, sess) { open = null; c.refreshServeSessions() } }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SummaryScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SummaryScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -29826,7 +30298,9 @@ class CameraActivity : ComponentActivity() {
     private fun startServeTraining() {
         controller.serveTraining = true
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
-        serveSession.value = serveSession.value.copy(stroke = stroke)
+        // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
+        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName)
+        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder)
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -29851,7 +30325,7 @@ class CameraActivity : ComponentActivity() {
     private fun endServeTraining() {
         controller.serveTraining = false
         val sess = serveSession.value
-        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess.id)
+        if (sess.serves.isEmpty()) controller.storage.deleteServeSession(sess)
         else controller.storage.saveServeSession(sess.copy(endedAt = sess.endedAt ?: System.currentTimeMillis()))
         controller.refreshServeSessions()
     }
@@ -29887,9 +30361,14 @@ class CameraActivity : ComponentActivity() {
         lifecycleScope.launch {
             val wait = at + ServeTraining.CLIP_AFTER_MS + 600 - System.currentTimeMillis()
             if (wait > 0) delay(wait)
-            val dir = File(controller.storage.serveClipsDir(serveSession.value.id), clip)
+            val dir = File(controller.storage.serveClipsDir(serveSession.value), clip)
             val parts = withContext(Dispatchers.IO) {
-                runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, dir) }.getOrDefault(emptyList())
+                // I pezzi da 4 s si uniscono in un video solo (si apre e si condivide); se non riesce restano i pezzi.
+                val tmp = File(cacheDir, "serve_cut_$clip")
+                val cut = runCatching { recorder.cutRange(at - ServeTraining.CLIP_BEFORE_MS, at + ServeTraining.CLIP_AFTER_MS, tmp) }.getOrDefault(emptyList())
+                val ok = cut.isNotEmpty() && (ClipJoin.joinDir(tmp, dir) || runCatching { tmp.copyRecursively(dir, overwrite = true) }.getOrDefault(false))
+                tmp.deleteRecursively()
+                if (ok) cut else emptyList()
             }
             // Annullato nel frattempo: la clip non serve più.
             if (serveSession.value.serves.none { it.at == at } || parts.isEmpty()) {
@@ -29903,7 +30382,7 @@ class CameraActivity : ComponentActivity() {
     private fun undoServe(band: Side? = null) {
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
-        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value.id), c).deleteRecursively() } }
+        last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
         bandShow(band, s.serveSayUndo, "${n.inPlay}/${n.total}")
@@ -30634,6 +31113,128 @@ object Chapters {
         return if (s >= 3600) String.format(Locale.ROOT, "%d:%02d:%02d", s / 3600, s / 60 % 60, s % 60)
         else String.format(Locale.ROOT, "%d:%02d", s / 60, s % 60)
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/ClipJoin.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/ClipJoin.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.media.MediaCodec
+import android.media.MediaExtractor
+import android.media.MediaFormat
+import android.media.MediaMuxer
+import android.util.Log
+import java.io.File
+import java.nio.ByteBuffer
+
+/**
+ * Unisce i pezzi da 4 s della memoria ([ReplayRecorder.cutRange]) in un video solo, senza ricodificare: vengono tutti
+ * dallo stesso codificatore, quindi basta rimetterli in fila coi loro tempi. Così ogni colpo nelle cartelle di
+ * Documenti è un MP4 che si apre e si condivide.
+ */
+object ClipJoin {
+    private const val TAG = "ClipJoin"
+    /** Nome del video unito di una clip. */
+    const val VIDEO = "video.mp4"
+
+    /**
+     * Mette in [out] i pezzi [parts] uno dopo l'altro; [starts] sono le loro ore d'inizio (ms), da cui si prendono gli
+     * scarti tra un pezzo e l'altro. false se non riesce (il file a metà si cancella).
+     */
+    fun join(parts: List<File>, starts: List<Long>, out: File): Boolean {
+        if (parts.isEmpty() || starts.size != parts.size) return false
+        var muxer: MediaMuxer? = null
+        return runCatching {
+            val m = MediaMuxer(out.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4).also { muxer = it }
+            // Tracce (video e, se c'è, audio) dal primo pezzo: gli altri hanno lo stesso formato.
+            val tracks = HashMap<String, Int>()
+            MediaExtractor().apply { setDataSource(parts[0].absolutePath) }.let { ex ->
+                for (i in 0 until ex.trackCount) {
+                    val f = ex.getTrackFormat(i)
+                    val kind = kind(f) ?: continue
+                    if (kind !in tracks) tracks[kind] = m.addTrack(f)
+                }
+                ex.release()
+            }
+            if ("video" !in tracks) error("nessuna traccia video")
+            m.start()
+            val last = HashMap<Int, Long>()
+            val buf = ByteBuffer.allocate(8 shl 20)
+            val info = MediaCodec.BufferInfo()
+            for ((k, p) in parts.withIndex()) {
+                val ex = MediaExtractor().apply { setDataSource(p.absolutePath) }
+                val map = HashMap<Int, Int>()
+                for (i in 0 until ex.trackCount) {
+                    val t = kind(ex.getTrackFormat(i))?.let { tracks[it] } ?: continue
+                    ex.selectTrack(i)
+                    map[i] = t
+                }
+                val offsetUs = (starts[k] - starts[0]) * 1000
+                while (true) {
+                    val n = ex.readSampleData(buf, 0)
+                    if (n < 0) break
+                    val t = map[ex.sampleTrackIndex]
+                    if (t != null) {
+                        val us = ex.sampleTime + offsetUs
+                        // Il muxer vuole tempi che crescono: un pezzo che si accavalla di qualche ms col precedente perde
+                        // solo quei campioni.
+                        if (us > (last[t] ?: -1L)) {
+                            val key = ex.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0
+                            info.set(0, n, us, if (key) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
+                            m.writeSampleData(t, buf, info)
+                            last[t] = us
+                        }
+                    }
+                    ex.advance()
+                }
+                ex.release()
+            }
+            m.stop()
+            true
+        }.onFailure { Log.w(TAG, "unione non riuscita", it) }.also {
+            runCatching { muxer?.release() }
+            if (it.isFailure) out.delete()
+        }.getOrDefault(false)
+    }
+
+    private fun kind(f: MediaFormat): String? {
+        val mime = f.getString(MediaFormat.KEY_MIME) ?: return null
+        return when {
+            mime.startsWith("video/") -> "video"
+            mime.startsWith("audio/") -> "audio"
+            else -> null
+        }
+    }
+
+    /**
+     * Copia la clip [src] (pezzi, [ReplayRecorder.STARTS], analisi e immagini) in [out] con i pezzi uniti in [VIDEO].
+     * Una clip senza video (cancellati) copia solo il resto. false se qualcosa non si copia.
+     */
+    fun joinDir(src: File, out: File): Boolean = runCatching {
+        out.mkdirs()
+        val parts = src.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+        val starts = runCatching { File(src, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
+        for (f in src.listFiles { f -> f.isFile && f.extension != "mp4" && f.name != ReplayRecorder.STARTS }.orEmpty()) {
+            f.copyTo(File(out, f.name), overwrite = true)
+        }
+        when {
+            parts.isEmpty() -> starts.firstOrNull()?.let { File(out, ReplayRecorder.STARTS).writeText(it.toString()) }
+            parts.size == 1 && parts[0].name == VIDEO || starts.size != parts.size -> {
+                // Già unita, o senza le ore dei pezzi: si copia com'è.
+                for (p in parts) p.copyTo(File(out, p.name), overwrite = true)
+                File(src, ReplayRecorder.STARTS).takeIf { it.exists() }?.copyTo(File(out, ReplayRecorder.STARTS), overwrite = true)
+            }
+            else -> {
+                if (!join(parts, starts, File(out, VIDEO))) error("unione")
+                File(out, ReplayRecorder.STARTS).writeText(starts[0].toString())
+            }
+        }
+        true
+    }.onFailure { Log.w(TAG, "copia della clip non riuscita", it) }.getOrDefault(false)
 }
 TSM_EOF
 
@@ -33054,7 +33655,10 @@ class ServeAnalysisActivity : ComponentActivity() {
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
     }
 
-    private fun dir(sess: ServeSession, a: ServeAttempt): File? = a.clip?.let { File(controller.storage.serveClipsDir(sess.id), it) }
+    private fun dir(sess: ServeSession, a: ServeAttempt): File? = a.clip?.let { File(controller.storage.serveClipsDir(sess), it) }
+
+    /** Clip col video ancora sul telefono (i video si possono cancellare tenendo l'analisi). */
+    private fun hasVideo(sess: ServeSession, a: ServeAttempt): Boolean = dir(sess, a)?.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true
 
     private fun loadResults(sess: ServeSession): Map<String, ServePoseResult> = sess.serves.mapNotNull { a ->
         val f = dir(sess, a)?.let { File(it, ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
@@ -33084,13 +33688,15 @@ class ServeAnalysisActivity : ComponentActivity() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 for (a in sess.serves) {
+                    // Senza video non si potrebbe rifare: l'analisi di prima resta.
+                    if (!hasVideo(sess, a)) continue
                     val d = dir(sess, a) ?: continue
                     for (name in listOf(
                         ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT, ServeClipAnalysis.PREP, ServeClipAnalysis.FINISH,
                     )) File(d, name).delete()
                 }
             }
-            results.value = emptyMap()
+            results.value = withContext(Dispatchers.IO) { loadResults(sess) }
             analyzeAll()
         }
     }
@@ -33099,7 +33705,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     private fun analyzeAll() {
         val sess = session.value ?: return
         if (job?.isActive == true) return
-        val todo = sess.serves.filter { it.clip != null && it.clip !in results.value.keys }
+        val todo = sess.serves.filter { it.clip != null && it.clip !in results.value.keys && hasVideo(sess, it) }
         if (todo.isEmpty()) return
         job = lifecycleScope.launch {
             withContext(Dispatchers.Default) {
@@ -54369,6 +54975,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 170 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 172 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -89,6 +89,8 @@ fun HomeScreen(c: MatchController) {
     LaunchedEffect(Unit) {
         c.refreshHistory()
         c.refreshSaved()
+        // Le quattro cartelle dei colpi in Documenti (e le clip di prima spostate lì), una volta per avvio.
+        c.prepareStrokeFolders()
         kotlinx.coroutines.delay(400)
         if (!asked && !c.storage.onboarded && c.history.value.isEmpty() && c.saved.value.isEmpty()) tour = true
         asked = true
@@ -258,6 +260,27 @@ private fun ProgressTab(c: MatchController) {
     ) { c.openProgress() }
     Entry(Icons.Filled.History, s.historyTitle, s.progressHistoryHint) { c.openHistory() }
     Entry(Icons.Filled.SportsTennis, s.racketMine, s.progressRacketsHint) { c.openRackets() }
+    // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
+    val sessions by c.serveSessions.collectAsState()
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> sessions.any { it.stroke == t } }
+    if (done.isNotEmpty()) {
+        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes, Icons.Filled.SportsTennis) {
+            Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (t in done) {
+                val mine = sessions.filter { it.stroke == t }
+                val title = "${com.tennis.scoremanager.ui.strokeLabel(s, t)} · ${mine.size}"
+                Surface(onClick = { c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+                    // Con una sessione sola non c'è linea: basta il nome del colpo.
+                    if (mine.count { com.tennis.scoremanager.data.ServeTraining.count(it.serves).pct != null } >= 2) {
+                        com.tennis.scoremanager.ui.StrokeTrend(mine, title)
+                    } else {
+                        Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

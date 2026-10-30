@@ -104,7 +104,10 @@ class ServeAnalysisActivity : ComponentActivity() {
         setContent { TsmTheme { androidx.compose.runtime.CompositionLocalProvider(LocalStrings provides s) { Content() } } }
     }
 
-    private fun dir(sess: ServeSession, a: ServeAttempt): File? = a.clip?.let { File(controller.storage.serveClipsDir(sess.id), it) }
+    private fun dir(sess: ServeSession, a: ServeAttempt): File? = a.clip?.let { File(controller.storage.serveClipsDir(sess), it) }
+
+    /** Clip col video ancora sul telefono (i video si possono cancellare tenendo l'analisi). */
+    private fun hasVideo(sess: ServeSession, a: ServeAttempt): Boolean = dir(sess, a)?.listFiles { f -> f.extension == "mp4" }?.isNotEmpty() == true
 
     private fun loadResults(sess: ServeSession): Map<String, ServePoseResult> = sess.serves.mapNotNull { a ->
         val f = dir(sess, a)?.let { File(it, ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
@@ -134,13 +137,15 @@ class ServeAnalysisActivity : ComponentActivity() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 for (a in sess.serves) {
+                    // Senza video non si potrebbe rifare: l'analisi di prima resta.
+                    if (!hasVideo(sess, a)) continue
                     val d = dir(sess, a) ?: continue
                     for (name in listOf(
                         ServeClipAnalysis.RESULT, ServeClipAnalysis.TROPHY, ServeClipAnalysis.KNEE, ServeClipAnalysis.CONTACT, ServeClipAnalysis.PREP, ServeClipAnalysis.FINISH,
                     )) File(d, name).delete()
                 }
             }
-            results.value = emptyMap()
+            results.value = withContext(Dispatchers.IO) { loadResults(sess) }
             analyzeAll()
         }
     }
@@ -149,7 +154,7 @@ class ServeAnalysisActivity : ComponentActivity() {
     private fun analyzeAll() {
         val sess = session.value ?: return
         if (job?.isActive == true) return
-        val todo = sess.serves.filter { it.clip != null && it.clip !in results.value.keys }
+        val todo = sess.serves.filter { it.clip != null && it.clip !in results.value.keys && hasVideo(sess, it) }
         if (todo.isEmpty()) return
         job = lifecycleScope.launch {
             withContext(Dispatchers.Default) {

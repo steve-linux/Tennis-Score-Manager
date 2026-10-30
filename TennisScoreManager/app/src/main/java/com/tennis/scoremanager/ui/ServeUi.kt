@@ -6,11 +6,13 @@ package com.tennis.scoremanager.ui
 import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -18,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
@@ -74,43 +77,98 @@ fun directionName(s: Strings, v: ShotDirection?) = when (v) {
 }
 fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
 
-/** Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e sessioni salvate. */
+/**
+ * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
+ * le altre in "Tutte le sessioni".
+ */
 @Composable
 fun ServeTrainingCard(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val sessions by c.serveSessions.collectAsState()
+    val stroke by c.trainStroke.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
-    var stroke by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(TrainedStroke.SERVE) }
     LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val mine = sessions.filter { it.stroke == stroke }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
         val strokes = TrainedStroke.entries
-        Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 2)
+        // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
+        Segmented(
+            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+            strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
+        )
         BigButton(s.serveStart, Icons.Filled.Videocam, {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
             )
         }, Modifier.fillMaxWidth())
         GhostButton(s.servePlaceShow, Icons.Filled.Videocam, { help = true }, Modifier.fillMaxWidth())
-        if (sessions.isNotEmpty()) {
-            Text(s.serveSessions, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-            val lang = c.options.value.lang
-            for (sess in sessions.take(8)) {
-                val n = ServeTraining.count(sess.serves)
-                Row(Modifier.fillMaxWidth().clickable { open = sess }.padding(vertical = 6.dp)) {
-                    Text(
-                        "${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)} · ${strokeLabel(s, sess.stroke)}",
-                        color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f),
-                    )
-                    Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
-                }
-            }
+        if (mine.isNotEmpty()) {
+            Text(s.strokeSessionsTitle(strokeLabel(s, stroke)), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            StrokeTrend(mine) { c.home(com.tennis.scoremanager.HomeTab.PROGRESS) }
+            for (sess in mine.take(RECENT_SESSIONS)) SessionRow(c, sess) { open = sess }
+            // Sempre, anche con poche sessioni: lì ci sono cartella, spazio occupato e la selezione per cancellare.
+            GhostButton(s.strokeAllSessions(mine.size), Icons.Filled.FolderOpen, { c.openStrokeSessions(stroke) }, Modifier.fillMaxWidth())
+        } else if (sessions.isNotEmpty()) {
+            Text(s.strokeNone, color = TsmColors.TextDim, fontSize = 13.sp)
         }
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */
+const val RECENT_SESSIONS = 3
+
+/** Una sessione in elenco: data e ora, colpi dentro e percentuale. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun SessionRow(
+    c: MatchController, sess: ServeSession, extra: String? = null, modifier: Modifier = Modifier, onLongClick: (() -> Unit)? = null, onClick: () -> Unit,
+) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val n = ServeTraining.count(sess.serves)
+    Row(modifier.fillMaxWidth().combinedClickable(onClick = onClick, onLongClick = onLongClick).padding(vertical = 6.dp)) {
+        Column(Modifier.weight(1f)) {
+            Text("${Reports.date(sess.startedAt, lang)} ${Reports.time(sess.startedAt, lang)}", color = TsmColors.TextMain, fontSize = 14.sp)
+            if (extra != null) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+        }
+        Text(s.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), color = TsmColors.Ball, fontSize = 14.sp)
+    }
+}
+
+/**
+ * Percentuale di colpi dentro, sessione dopo sessione (dalla più vecchia), come una linea; con meno di due sessioni
+ * non si disegna. [onClick] apre Progressi.
+ */
+@Composable
+fun StrokeTrend(sessions: List<ServeSession>, title: String? = null, onClick: (() -> Unit)? = null) {
+    val s = LocalStrings.current
+    val pcts = sessions.sortedBy { it.startedAt }.mapNotNull { ServeTraining.count(it.serves).pct }.takeLast(20)
+    if (pcts.size < 2) return
+    Column(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)) {
+        Row(Modifier.fillMaxWidth()) {
+            Text(title ?: s.strokeTrend, color = if (title != null) TsmColors.TextMain else TsmColors.TextDim, fontSize = if (title != null) 14.sp else 12.sp,
+                fontWeight = if (title != null) FontWeight.Bold else FontWeight.Normal, modifier = Modifier.weight(1f).padding(end = 8.dp))
+            Text("${pcts.first()}% → ${pcts.last()}%", color = TsmColors.TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        }
+        val line = TsmColors.Ball
+        val grid = TsmColors.TextDim.copy(alpha = 0.3f)
+        // Scala sui valori (almeno 20 punti), così si vede anche un passo dall'80 all'83 %.
+        val lo = (minOf(pcts.min(), pcts.max() - 20).coerceAtLeast(0)).toFloat()
+        val hi = (maxOf(pcts.max(), pcts.min() + 20).coerceAtMost(100)).toFloat().coerceAtLeast(lo + 1)
+        Canvas(Modifier.fillMaxWidth().height(56.dp).padding(vertical = 6.dp)) {
+            drawLine(grid, Offset(0f, 0f), Offset(size.width, 0f), strokeWidth = 1f)
+            drawLine(grid, Offset(0f, size.height), Offset(size.width, size.height), strokeWidth = 1f)
+            val dx = size.width / (pcts.size - 1)
+            val pts = pcts.mapIndexed { i, p -> Offset(i * dx, size.height * (1 - (p - lo) / (hi - lo))) }
+            for (i in 1 until pts.size) drawLine(line, pts[i - 1], pts[i], strokeWidth = 4f)
+            for (p in pts) drawCircle(line, 5f, p)
+        }
+    }
 }
 
 /**
@@ -253,7 +311,7 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
         AlertDialog(
             onDismissRequest = { ask = false },
             text = { Text(s.serveDeleteAsk) },
-            confirmButton = { TextButton(onClick = { ask = false; c.deleteServeSession(sess.id); onClose() }) { Text(s.serveDelete, color = TsmColors.Danger) } },
+            confirmButton = { TextButton(onClick = { ask = false; c.deleteServeSession(sess); onClose() }) { Text(s.serveDelete, color = TsmColors.Danger) } },
             dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
         )
     }
@@ -269,7 +327,7 @@ fun ServeReplayButtons(c: MatchController, sess: ServeSession) {
         return
     }
     fun play(list: List<ServeAttempt>) {
-        val files = c.serveClipFiles(sess.id, list)
+        val files = c.serveClipFiles(sess, list)
         if (files.isEmpty()) return
         context.startActivity(Intent(context, ReplayActivity::class.java).putExtra(ReplayActivity.EXTRA_FILES, files.map { it.absolutePath }.toTypedArray()))
     }
