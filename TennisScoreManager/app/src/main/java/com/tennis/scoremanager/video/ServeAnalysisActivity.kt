@@ -406,7 +406,7 @@ class ServeAnalysisActivity : ComponentActivity() {
         }
     }
 
-    private fun deg(v: Float) = "%.0f°".format(v)
+    private fun deg(v: Float?) = v?.let { "%.0f°".format(it) } ?: "—"
 
     override fun onDestroy() {
         job?.cancel()

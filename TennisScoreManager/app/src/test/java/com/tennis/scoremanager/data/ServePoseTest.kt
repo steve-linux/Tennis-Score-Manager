@@ -88,7 +88,8 @@ class ServePoseTest {
 
     /**
      * Un dritto finto di un destro visto di lato, corpo al centro (x 0,5): il polso va indietro fino a -500 ms (0,30),
-     * accelera fino all'impatto a 0 ms davanti al corpo (0,62) all'altezza della vita, finisce in alto a +400 ms.
+     * lì si ferma e accelera scendendo un poco fino all'impatto a 0 ms davanti al corpo (0,62) all'altezza della vita,
+     * finisce in alto a +400 ms.
      */
     private fun forehand(): List<PoseFrame> = (-1200L..800L step 50).map { t ->
         val x = MutableList(17) { 0.5f }
@@ -103,7 +104,7 @@ class ServePoseTest {
         p(L_ELBOW, 0.45f, 0.35f); p(L_WRIST, 0.45f, 0.42f)
         val (wx, wy) = when {
             t <= -500 -> 0.42f - 0.12f * (t + 1200) / 700f to 0.45f
-            t <= 0 -> { val k = (t + 500) / 500f; 0.30f + 0.32f * k * k * k to 0.5f }
+            t <= 0 -> { val k = (t + 500) / 500f; 0.30f + 0.32f * k * k * k to 0.45f + 0.05f * k }
             t <= 400 -> 0.62f + 0.05f * t / 400f to 0.5f - 0.35f * t / 400f
             else -> 0.67f to 0.15f + 0.1f * (t - 400) / 400f
         }
@@ -125,8 +126,42 @@ class ServePoseTest {
         assertEquals(0.20f / stature, m.backswing, 0.01f)
         assertEquals(0.40f / stature, m.contactHeight, 0.01f)
         assertEquals(0.75f / stature, m.finishHeight, 0.01f)
-        assertTrue("${m.kneeMinDeg}", m.kneeMinDeg < 175f)
+        assertTrue("${m.kneeMinDeg}", m.kneeMinDeg!! < 175f)
         assertTrue(m.reliable)
         assertEquals(1, ServePose.groundMean(listOf(m))!!.n)
+    }
+
+    @Test
+    fun forehandSurvivesSwappedWristsAndASpike() {
+        // MoveNet di lato scambia per qualche fotogramma il polso sinistro col destro, e un polso salta via per un attimo.
+        val frames = forehand().map { f ->
+            when (f.t) {
+                in -300L..-200L, in 100L..150L -> {
+                    val x = f.x.toMutableList(); val y = f.y.toMutableList()
+                    x[L_WRIST] = f.x[R_WRIST]; y[L_WRIST] = f.y[R_WRIST]; x[R_WRIST] = f.x[L_WRIST]; y[R_WRIST] = f.y[L_WRIST]
+                    f.copy(x = x, y = y)
+                }
+                -700L -> f.copy(x = f.x.toMutableList().also { it[R_WRIST] = 0.95f })
+                else -> f
+            }
+        }
+        val m = ServePose.groundMetrics(frames)!!
+        assertTrue(m.rightHanded)
+        assertEquals(0L, m.contactT)
+        assertEquals(-500L, m.prepT)
+        assertEquals(400L, m.finishT)
+    }
+
+    @Test
+    fun picksTheStrokeNearTheBandAndAVolleyEndsWhereTheWristStops() {
+        // Due dritti uguali a 2 s di distanza: col braccialetto vale quello dove lui dice.
+        val one = forehand()
+        val two = one.filter { it.t > -900 }.map { it.copy(t = it.t + 2_000) }
+        val both = one.filter { it.t < 1_100 } + two.filter { it.t >= 1_100 }
+        assertEquals(2_000L, ServePose.groundMetrics(both, expected = 1_900L..2_100L)!!.contactT)
+        assertEquals(0L, ServePose.groundMetrics(both, expected = -100L..100L)!!.contactT)
+        // Volée: il finale è il primo fotogramma in cui il polso è quasi fermo, non il punto più alto.
+        val volley = ServePose.groundMetrics(one, volley = true)!!
+        assertTrue("${volley.finishT}", volley.finishT in 100L..450L)
     }
 }

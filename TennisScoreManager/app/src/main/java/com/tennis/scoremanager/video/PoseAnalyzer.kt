@@ -157,6 +157,12 @@ object ServeClipAnalysis {
     private const val STEP_MS = 66L
     /** Fotogrammi letti per volta: 8 in 1080p sono circa 33 MB. */
     private const val CHUNK = 8
+    /** Seconda lettura intorno all'impatto di dritto, rovescio e volée: un fotogramma ogni 33 ms per ±0,2 s. */
+    private const val REFINE_MS = 200L
+    private const val REFINE_STEP_MS = 33L
+    private const val REFINE_FRAMES = 7
+    /** Senza colpo riconosciuto: dove ci si aspetta il colpo rispetto ad [at] (3 s prima del tasto). */
+    private const val UNDETECTED_ANCHOR_MS = 700L
 
     fun analyze(
         pose: PoseAnalyzer, dir: File, at: Long, detected: Boolean, stroke: TrainedStroke = TrainedStroke.SERVE, onProgress: (Float) -> Unit = {},
@@ -164,7 +170,13 @@ object ServeClipAnalysis {
         val parts = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
         val starts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
         if (parts.isEmpty() || starts.size != parts.size) return ServePoseResult(emptyList(), null)
-        val (from, to) = if (detected) at - 2_000 to at + 700 else at - 2_500 to at + 2_500
+        val serve = stroke == TrainedStroke.SERVE
+        // Il braccialetto dà l'ora del colpo circa 0,4 s dopo l'impatto: per gli altri colpi si guarda anche dopo, per il finale.
+        val (from, to) = when {
+            !detected -> at - 2_500 to at + 2_500
+            serve -> at - 2_000 to at + 700
+            else -> at - 2_200 to at + 900
+        }
         val times = (from..to step STEP_MS).toList()
         val frames = ArrayList<PoseFrame>()
         var crop: RectF? = null
@@ -215,17 +227,17 @@ object ServeClipAnalysis {
             }
             val scores = if (jumped) List(17) { 0f } else kp.map { it[2] }
             frames += PoseFrame(t - at, kp.map { it[0] / h }, kp.map { it[1] / h }, scores)
-            onProgress(++done / times.size.toFloat())
+            onProgress(++done / (times.size + REFINE_FRAMES).toFloat())
         }
-        try {
-            // Pezzo per pezzo, coi fotogrammi letti in fila (Android 9+): chiederli uno per uno farebbe ripartire ogni
-            // volta la decodifica dall'inizio del pezzo, dieci volte più lento.
-            for ((pi, ts) in times.groupBy { t -> starts.indexOfLast { it <= t } }.filterKeys { it >= 0 }.toSortedMap()) {
+        // I fotogrammi alle ore [wantedTimes] (ore del telefono), pezzo per pezzo e letti in fila (Android 9+): chiederli uno
+        // per uno farebbe ripartire ogni volta la decodifica dall'inizio del pezzo, dieci volte più lento.
+        fun readInOrder(wantedTimes: List<Long>, each: (Bitmap, Long) -> Unit) {
+            for ((pi, ts) in wantedTimes.groupBy { t -> starts.indexOfLast { it <= t } }.filterKeys { it >= 0 }.toSortedMap()) {
                 val r = retrievers.getOrPut(parts[pi]) { MediaMetadataRetriever().apply { setDataSource(parts[pi].absolutePath) } }
                 val count = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toIntOrNull() ?: 0
                 val durMs = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
                 if (Build.VERSION.SDK_INT < 28 || count <= 0 || durMs <= 0) {
-                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { process(it, t); it.recycle() }
+                    for (t in ts) runCatching { frameAt(t) }.getOrNull()?.let { each(it, t); it.recycle() }
                     continue
                 }
                 val wanted = ts.groupBy { t -> ((t - starts[pi]) * count / durMs).toInt().coerceIn(0, count - 1) }
@@ -237,18 +249,45 @@ object ServeClipAnalysis {
                     val n = minOf(CHUNK, hi - k + 1)
                     val list = runCatching { r.getFramesAtIndex(k, n, params) }.getOrDefault(emptyList())
                     list.forEachIndexed { j, bmp ->
-                        wanted[k + j]?.forEach { t -> process(bmp, t) }
+                        wanted[k + j]?.forEach { t -> each(bmp, t) }
                         bmp.recycle()
                     }
                     if (list.isEmpty()) break
                     k += n
                 }
             }
+        }
+        try {
+            readInOrder(times, ::process)
             frames.sortBy { it.t }
-            onProgress(1f)
-            val serve = stroke == TrainedStroke.SERVE
             val metrics = if (serve) ServePose.metrics(frames) else null
-            val ground = if (serve) null else ServePose.groundMetrics(frames)
+            val volley = stroke == TrainedStroke.VOLLEY
+            // Senza colpo riconosciuto [at] è 3 s prima del tasto: il colpo di solito è un po' dopo.
+            fun ground() = ServePose.groundMetrics(
+                frames, if (detected) ServePose.DETECTED_CONTACT else null, if (detected) 0 else UNDETECTED_ANCHOR_MS, volley,
+            )
+            var ground = if (serve) null else ground()
+            // Intorno all'impatto un fotogramma ogni 66 ms è poco (il polso fa quasi un metro): si leggono anche quelli
+            // in mezzo e si rifà il conto, cercando l'impatto lì vicino.
+            if (ground != null) {
+                val near = ground.contactT
+                val extra = (near - REFINE_MS..near + REFINE_MS step REFINE_STEP_MS).filter { t -> frames.none { abs(it.t - t) < REFINE_STEP_MS / 2 } }
+                readInOrder(extra.map { it + at }) { bmp, tAbs ->
+                    val t = tAbs - at
+                    val h = bmp.height
+                    // Ritaglio intorno al corpo del fotogramma letto più vicino.
+                    val ref = frames.minBy { abs(it.t - t) }
+                    val kpRef = Array(17) { i -> floatArrayOf(ref.x[i] * h, ref.y[i] * h, ref.s[i]) }
+                    val masks = sc.others.map { o -> RectF((o.cx - o.half) * h, 0f, (o.cx + o.half) * h, h.toFloat()) }
+                    val c = PoseAnalyzer.cropAround(kpRef, bmp.width, h) ?: PoseAnalyzer.full(bmp.width, h)
+                    val kp = pose.detect(bmp, c, masks)
+                    frames += PoseFrame(t, kp.map { it[0] / h }, kp.map { it[1] / h }, kp.map { it[2] })
+                    onProgress(++done / (times.size + REFINE_FRAMES).toFloat())
+                }
+                frames.sortBy { it.t }
+                ground = ServePose.groundMetrics(frames, near - REFINE_MS..near + REFINE_MS, near, volley) ?: ground
+            }
+            onProgress(1f)
             val moments = when {
                 metrics != null -> listOf(TROPHY to metrics.trophyT, KNEE to metrics.kneeT, CONTACT to metrics.contactT)
                 ground != null -> listOf(PREP to ground.prepT, CONTACT to ground.contactT, FINISH to ground.finishT)
