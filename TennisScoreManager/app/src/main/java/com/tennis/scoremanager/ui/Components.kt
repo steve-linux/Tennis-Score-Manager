@@ -133,6 +133,8 @@ fun AppRoot(c: MatchController) {
                 Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
                 Screen.STROKE_SESSIONS -> com.tennis.scoremanager.ui.screens.StrokeSessionsScreen(c)
                 Screen.HELP -> com.tennis.scoremanager.ui.screens.HelpScreen(c)
+                Screen.STUDENTS -> com.tennis.scoremanager.ui.screens.StudentsScreen(c)
+                Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
             }
         }
     }

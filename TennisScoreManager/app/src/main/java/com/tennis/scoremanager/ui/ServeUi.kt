@@ -5,6 +5,10 @@ package com.tennis.scoremanager.ui
 
 import android.content.Intent
 import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -89,14 +93,17 @@ fun ServeTrainingCard(c: MatchController) {
     val stroke by c.trainStroke.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
-    LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val mine = sessions.filter { it.stroke == stroke }
+    LaunchedEffect(Unit) { c.refreshServeSessions(); c.refreshStudents() }
+    val trainee by c.trainStudent.collectAsState()
+    // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
+    val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        TraineeRow(c)
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
-            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
         BigButton(s.serveStart, Icons.Filled.Videocam, {
@@ -117,6 +124,98 @@ fun ServeTrainingCard(c: MatchController) {
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Chi si allena: un allievo (le sessioni, le cartelle e l'andamento sono suoi) o nessuno. */
+@Composable
+fun TraineeRow(c: MatchController) {
+    val s = LocalStrings.current
+    val trainee by c.trainStudent.collectAsState()
+    val students by c.students.collectAsState()
+    val who = students.firstOrNull { it.id == trainee }
+    var pick by remember { mutableStateOf(false) }
+    var create by remember { mutableStateOf(false) }
+    Row(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp)).background(TsmColors.SurfaceHigh)
+            .clickable { pick = true }.padding(10.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        if (who != null) PlayerAvatar(c, who.name, TsmColors.Ball, 36.dp)
+        else Icon(Icons.Filled.Person, null, tint = TsmColors.TextDim, modifier = Modifier.size(36.dp))
+        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+            Text(s.trainWho, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(who?.name ?: s.trainNoStudent, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        }
+        Text(s.trainChange, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+    }
+    if (pick) {
+        AlertDialog(
+            onDismissRequest = { pick = false },
+            title = { Text(s.trainWho) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    @Composable fun option(label: String, id: String?, name: String?) = Row(
+                        Modifier.fillMaxWidth().clickable { c.setTrainStudent(id); pick = false }.padding(vertical = 8.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    ) {
+                        if (name != null) PlayerAvatar(c, name, if (id == trainee) TsmColors.Ball else TsmColors.TextDim, 32.dp)
+                        else Icon(Icons.Filled.Person, null, tint = TsmColors.TextDim, modifier = Modifier.size(32.dp))
+                        Text(label, color = if (id == trainee) TsmColors.Ball else TsmColors.TextMain, fontWeight = if (id == trainee) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier.padding(start = 10.dp))
+                    }
+                    option(s.trainNoStudent, null, null)
+                    for (st in students) option(st.name, st.id, st.name)
+                }
+            },
+            confirmButton = { TextButton(onClick = { pick = false; create = true }) { Text(s.studentNew) } },
+            dismissButton = { TextButton(onClick = { pick = false; c.openStudents() }) { Text(s.studentManage) } },
+        )
+    }
+    if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.setTrainStudent(it.id) } }
+}
+
+/** Nuovo allievo o modifica: nome (lo stesso delle partite, per ritrovarne foto e storico) e mano. */
+@Composable
+fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.Student?, onDone: (com.tennis.scoremanager.data.Student?) -> Unit) {
+    val s = LocalStrings.current
+    var name by remember { mutableStateOf(student?.name.orEmpty()) }
+    var hand by remember { mutableStateOf(student?.hand) }
+    var racket by remember { mutableStateOf(student?.racket) }
+    val rackets by c.rackets.collectAsState()
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (student == null) s.studentNew else s.studentEdit) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                androidx.compose.material3.OutlinedTextField(
+                    name, { name = it.take(40) }, label = { Text(s.studentName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
+                )
+                Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
+                val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
+                Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
+                // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
+                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                val choices = rackets.filter { !it.retired || it.id == racket }
+                if (choices.isEmpty()) Text(s.studentRacketNone, color = TsmColors.TextDim, fontSize = 12.sp)
+                else Segmented(
+                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank(), onClick = {
+                val st = (student ?: com.tennis.scoremanager.data.Student("st${System.currentTimeMillis()}", "", createdAt = System.currentTimeMillis()))
+                    .copy(name = name.trim(), hand = hand, racket = racket)
+                c.saveStudent(st)
+                // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
+                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = st.name)) }
+                onDone(st)
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
 }
 
 /** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */

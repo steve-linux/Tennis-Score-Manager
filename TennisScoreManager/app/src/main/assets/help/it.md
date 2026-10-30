@@ -287,6 +287,18 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - Al posto di lato, prima/seconda e bersaglio si sceglie la **direzione** voluta (**incrociato**, **al centro**, **lungolinea**) e, per la volée, se è **di dritto** o **di rovescio**; il riepilogo li conta a parte.
 - **Analisi del movimento**: i tre momenti sono **preparazione** (dove il polso si ferma in fondo all'apertura), **impatto** (polso più veloce; lì intorno l'app rilegge un fotogramma ogni 33 ms) e **finale** (polso più in alto dopo l'impatto; nella volée, dove il polso si ferma). Se nella finestra ci sono più colpi vale quello riconosciuto dal braccialetto; i polsi scambiati da MoveNet (succede di lato) si rimettono a posto da soli. Riprendi **di lato**: di fronte l'apertura va in profondità e non si vede. Le misure (*—* se il gomito o le gambe non si vedono): ginocchio più piegato, gomito all'impatto, altezza dell'impatto, quanto **davanti al corpo** si colpisce, **ampiezza della preparazione**, altezza del finale (tutte in rapporto alla statura) e il tempo dalla preparazione all'impatto. Il video con lo scheletro ha i tasti **Preparazione**, **Impatto** e **Finale**.
 
+### 7.6 Allievi: la parte per l'allenatore
+
+- **Allenati › Allievi** › **Nuovo allievo**: nome (lo stesso delle partite: così foto, storico e rating si ritrovano da soli) e mano.
+- **Chi si allena**: in Allenati, sopra *Inizia*, scegli l'allievo (o *Nessun allievo*). La sessione è sua: le ultime sessioni, *Tutte le sessioni*, l'andamento in Progressi e i numeri sui tasti dei colpi sono solo i suoi, e le clip vanno in **Allenamento colpi/<colpo>/<allievo>/<data e ora>**.
+- **La scheda dell'allievo** (tocca il nome in *Allievi*):
+  - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
+  - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
+  - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
+  - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
+  - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
+  - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

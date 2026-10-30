@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -631,8 +631,10 @@ class MatchController(
             Screen.VIDEOS -> Screen.HOME
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
-            Screen.STROKE_SESSIONS -> Screen.HOME
+            Screen.STROKE_SESSIONS -> strokeSessionsBack
             Screen.HELP -> Screen.HOME
+            Screen.STUDENTS -> Screen.HOME
+            Screen.STUDENT -> Screen.STUDENTS
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -980,11 +982,92 @@ class MatchController(
     /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
     val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
 
-    /** Apre tutte le sessioni del colpo [stroke]. */
+    /** Apre tutte le sessioni del colpo [stroke] (dell'allievo scelto); Indietro torna da dove si è partiti. */
     fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
         trainStroke.value = stroke
+        strokeSessionsBack = if (screen.value == Screen.STUDENT) Screen.STUDENT else Screen.HOME
         screen.value = Screen.STROKE_SESSIONS
     }
+
+    private var strokeSessionsBack = Screen.HOME
+
+    // ---------------------------------------------------------------- allievi (per l'allenatore)
+
+    val students = MutableStateFlow(storage.loadStudents().sortedBy { it.name.lowercase() })
+
+    /** Chi si allena con l'allenamento dei colpi: Student.id, null = nessun allievo. */
+    val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
+
+    /** Allievo aperto nella sua scheda. */
+    val openStudentId = MutableStateFlow<String?>(null)
+
+    fun refreshStudents() {
+        scope.launch { students.value = withContext(io) { storage.loadStudents() }.sortedBy { it.name.lowercase() } }
+    }
+
+    fun studentById(id: String?): com.tennis.scoremanager.data.Student? = id?.let { i -> students.value.firstOrNull { it.id == i } }
+
+    /** Aggiunge o cambia un allievo. */
+    fun saveStudent(st: com.tennis.scoremanager.data.Student) {
+        val list = students.value.filter { it.id != st.id } + st
+        students.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.saveStudents(list) }
+    }
+
+    /** Toglie un allievo: le sue sessioni restano (senza allievo, col nome di quel giorno). */
+    fun deleteStudent(id: String) {
+        val list = students.value.filter { it.id != id }
+        students.value = list
+        if (trainStudent.value == id) setTrainStudent(null)
+        scope.launch {
+            withContext(io) {
+                storage.saveStudents(list)
+                storage.loadServeSessions().filter { it.student == id }.forEach { storage.saveServeSession(it.copy(student = null)) }
+            }
+            refreshServeSessions()
+        }
+    }
+
+    /**
+     * Cancella l'allievo e quello che il telefono ha di suo: sessioni con video e analisi, note e foto; la sua racchetta
+     * resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli avversari.
+     */
+    fun purgeStudent(id: String) {
+        val st = studentById(id) ?: return
+        val list = students.value.filter { it.id != id }
+        students.value = list
+        if (trainStudent.value == id) setTrainStudent(null)
+        removePhoto(st.name)
+        rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
+        scope.launch {
+            withContext(io) {
+                storage.saveStudents(list)
+                storage.loadServeSessions().filter { it.student == id }.forEach { storage.deleteServeSession(it) }
+            }
+            refreshServeSessions()
+        }
+    }
+
+    fun setTrainStudent(id: String?) {
+        trainStudent.value = id
+        storage.trainStudent = id.orEmpty()
+    }
+
+    fun openStudents() {
+        refreshStudents()
+        screen.value = Screen.STUDENTS
+    }
+
+    fun openStudent(id: String) {
+        openStudentId.value = id
+        screen.value = Screen.STUDENT
+    }
+
+    /** Partite finite dell'allievo dallo storico (stesso nome), dalla più vecchia. */
+    fun studentMatches(name: String): List<PlayerStats.MatchLine> = PlayerStats.lines(played(), PlayerStats.key(name))
+
+    /** Rating TSM dell'allievo nello sport con più partite (null senza partite). */
+    fun studentRating(name: String) = ratingSports().firstOrNull()?.let { ratingTable(it).player(PlayerStats.key(name)) }
 
     /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
     fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {

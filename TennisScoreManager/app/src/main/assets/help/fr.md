@@ -287,6 +287,18 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - À la place du côté, premier/second et cible, on choisit la **direction** voulue (**croisé**, **au centre**, **le long de la ligne**) et, pour la volée, si elle est **de coup droit** ou **de revers** ; le bilan les compte à part.
 - **Analyse du mouvement** : les trois moments sont la **préparation** (là où le poignet s'arrête au bout de l'armé), l'**impact** (poignet le plus rapide ; autour, l'appli relit une image toutes les 33 ms) et le **finish** (poignet le plus haut après l'impact ; pour la volée, là où le poignet s'arrête). S'il y a plusieurs coups dans la fenêtre, c'est celui reconnu par le bracelet qui compte ; les poignets inversés par MoveNet (cela arrive de profil) sont remis en place tout seuls. Filmez **de profil** : de face, l'armé part en profondeur et ne se voit pas. Les mesures (*—* si le coude ou les jambes ne se voient pas) : genou le plus fléchi, coude à l'impact, hauteur de l'impact, distance de frappe **devant le corps**, **ampleur de la préparation**, hauteur du finish (toutes rapportées à la taille) et le temps de la préparation à l'impact. La vidéo avec le squelette a les boutons **Préparation**, **Impact** et **Finish**.
 
+### 7.6 Élèves : la partie pour l'entraîneur
+
+- **S'entraîner › Élèves** › **Nouvel élève** : nom (le même que dans les matchs : photo, historique et classement se retrouvent tout seuls) et main.
+- **Qui s'entraîne** : dans S'entraîner, au-dessus de *Commencer*, choisissez l'élève (ou *Aucun élève*). La séance est à lui : les dernières séances, *Toutes les séances*, l'évolution dans Progrès et les nombres sur les boutons des coups ne concernent que lui, et les clips vont dans **Entraînement des coups/<coup>/<élève>/<date et heure>**.
+- **La fiche de l'élève** (touchez le nom dans *Élèves*) :
+  - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
+  - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
+  - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
+  - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
+  - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
+  - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

@@ -604,6 +604,18 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - Statt Seite, erster/zweiter und Ziel wählt man die gewünschte **Richtung** (**Cross**, **Mitte**, **Longline**) und beim Volley, ob **Vorhand** oder **Rückhand**; die Übersicht zählt sie getrennt.
 - **Bewegungsanalyse**: Die drei Momente sind **Ausholen** (wo das Handgelenk am Ende der Ausholbewegung stehen bleibt), **Treffpunkt** (Handgelenk am schnellsten; dort liest die App ein Bild alle 33 ms) und **Ausschwung** (Handgelenk nach dem Treffpunkt am höchsten; beim Volley, wo das Handgelenk stehen bleibt). Sind mehrere Schläge im Fenster, zählt der vom Armband erkannte; von MoveNet vertauschte Handgelenke (passiert von der Seite) werden von selbst richtiggestellt. Von **der Seite** filmen: von vorn geht das Ausholen in die Tiefe und ist nicht zu sehen. Die Messwerte (*—*, wenn Ellbogen oder Beine nicht zu sehen sind): stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts, wie weit **vor dem Körper** getroffen wird, **Weite des Ausholens**, Höhe des Ausschwungs (alle im Verhältnis zur Körpergröße) und die Zeit vom Ausholen zum Treffpunkt. Das Video mit Skelett hat die Tasten **Ausholen**, **Treffpunkt** und **Ausschwung**.
 
+### 7.6 Schüler: der Teil für den Trainer
+
+- **Trainieren › Schüler** › **Neuer Schüler**: Name (derselbe wie in den Matches: Foto, Verlauf und Rating finden sich dann von selbst) und Hand.
+- **Wer trainiert**: unter Trainieren, über *Starten*, den Schüler wählen (oder *Kein Schüler*). Die Einheit gehört ihm: die letzten Einheiten, *Alle Einheiten*, der Verlauf in Fortschritt und die Zahlen auf den Schlag-Tasten zeigen nur seine, und die Clips kommen in **Schlagtraining/<Schlag>/<Schüler>/<Datum und Uhrzeit>**.
+- **Die Karte des Schülers** (den Namen unter *Schüler* antippen):
+  - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
+  - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
+  - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
+  - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
+  - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
+  - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -972,6 +984,18 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
 - **Movement analysis**: the three moments are **preparation** (where the wrist stops at the end of the take-back), **contact** (wrist fastest; around it the app reads one frame every 33 ms) and **finish** (wrist highest after contact; for the volley, where the wrist stops). If there are several shots in the window, the one recognised by the wristband counts; wrists swapped by MoveNet (it happens from the side) are put right by themselves. Film **from the side**: from the front the take-back goes in depth and can't be seen. The measurements (*—* if the elbow or legs can't be seen): deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
 
+### 7.6 Students: the coach's part
+
+- **Practice › Students** › **New student**: name (the same as in matches: photo, history and rating are then found by themselves) and hand.
+- **Who is practising**: in Practice, above *Start*, pick the student (or *No student*). The session is theirs: the last sessions, *All sessions*, the trend in Progress and the numbers on the stroke buttons are only theirs, and the clips go into **Stroke practice/<stroke>/<student>/<date and time>**.
+- **The student's card** (tap the name in *Students*):
+  - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
+  - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
+  - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
+  - **Coach's notes**: what to work on, goals; they save by themselves.
+  - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
+  - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1338,6 +1362,18 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 - **Dónde poner el teléfono**: al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m y fuera del pasillo, a la altura del punto de impacto; objetivo a 1 m; todo el swing en el encuadre (la muñeca se mueve unos 2 m adelante y atrás). Para la volea: al lado de quien juega en la red, a 3-4 m, a su altura. Siempre del mismo lado toda la sesión, y nunca en la trayectoria de la pelota.
 - En lugar de lado, primero/segundo y objetivo se elige la **dirección** deseada (**cruzado**, **al centro**, **paralelo**) y, para la volea, si es **de derecha** o **de revés**; el resumen los cuenta por separado.
 - **Análisis del movimiento**: los tres momentos son **preparación** (donde la muñeca se para al final del armado), **impacto** (muñeca más rápida; alrededor la app vuelve a leer un fotograma cada 33 ms) y **final** (muñeca más alta tras el impacto; en la volea, donde la muñeca se para). Si hay varios golpes en la ventana, cuenta el que reconoció la pulsera; las muñecas intercambiadas por MoveNet (pasa de lado) se corrigen solas. Graba **de lado**: de frente el armado va en profundidad y no se ve. Las medidas (*—* si no se ven el codo o las piernas): rodilla más flexionada, codo en el impacto, altura del impacto, cuánto **delante del cuerpo** se golpea, **amplitud de la preparación**, altura del final (todas respecto a la estatura) y el tiempo de la preparación al impacto. El vídeo con el esqueleto tiene los botones **Preparación**, **Impacto** y **Final**.
+
+### 7.6 Alumnos: la parte del entrenador
+
+- **Entrenar › Alumnos** › **Nuevo alumno**: nombre (el mismo de los partidos: así foto, historial y rating aparecen solos) y mano.
+- **Quién entrena**: en Entrenar, encima de *Empezar*, elige al alumno (o *Ningún alumno*). La sesión es suya: las últimas sesiones, *Todas las sesiones*, la evolución en Progresos y los números de los botones de los golpes son solo suyos, y los clips van a **Entrenamiento de golpes/<golpe>/<alumno>/<fecha y hora>**.
+- **La ficha del alumno** (toca el nombre en *Alumnos*):
+  - **Golpes**: para saque, derecha, revés y volea las sesiones, los golpes, la última vez y la línea de golpes dentro; al tocar un golpe se abren sus sesiones.
+  - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
+  - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
+  - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
+  - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
+  - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 
 ## 8. Marcador en un televisor o monitor
 
@@ -1706,6 +1742,18 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 - À la place du côté, premier/second et cible, on choisit la **direction** voulue (**croisé**, **au centre**, **le long de la ligne**) et, pour la volée, si elle est **de coup droit** ou **de revers** ; le bilan les compte à part.
 - **Analyse du mouvement** : les trois moments sont la **préparation** (là où le poignet s'arrête au bout de l'armé), l'**impact** (poignet le plus rapide ; autour, l'appli relit une image toutes les 33 ms) et le **finish** (poignet le plus haut après l'impact ; pour la volée, là où le poignet s'arrête). S'il y a plusieurs coups dans la fenêtre, c'est celui reconnu par le bracelet qui compte ; les poignets inversés par MoveNet (cela arrive de profil) sont remis en place tout seuls. Filmez **de profil** : de face, l'armé part en profondeur et ne se voit pas. Les mesures (*—* si le coude ou les jambes ne se voient pas) : genou le plus fléchi, coude à l'impact, hauteur de l'impact, distance de frappe **devant le corps**, **ampleur de la préparation**, hauteur du finish (toutes rapportées à la taille) et le temps de la préparation à l'impact. La vidéo avec le squelette a les boutons **Préparation**, **Impact** et **Finish**.
 
+### 7.6 Élèves : la partie pour l'entraîneur
+
+- **S'entraîner › Élèves** › **Nouvel élève** : nom (le même que dans les matchs : photo, historique et classement se retrouvent tout seuls) et main.
+- **Qui s'entraîne** : dans S'entraîner, au-dessus de *Commencer*, choisissez l'élève (ou *Aucun élève*). La séance est à lui : les dernières séances, *Toutes les séances*, l'évolution dans Progrès et les nombres sur les boutons des coups ne concernent que lui, et les clips vont dans **Entraînement des coups/<coup>/<élève>/<date et heure>**.
+- **La fiche de l'élève** (touchez le nom dans *Élèves*) :
+  - **Coups** : pour le service, le coup droit, le revers et la volée les séances, les coups, la dernière fois et la courbe des coups dedans ; toucher un coup ouvre ses séances.
+  - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
+  - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
+  - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
+  - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
+  - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2073,6 +2121,18 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 - Al posto di lato, prima/seconda e bersaglio si sceglie la **direzione** voluta (**incrociato**, **al centro**, **lungolinea**) e, per la volée, se è **di dritto** o **di rovescio**; il riepilogo li conta a parte.
 - **Analisi del movimento**: i tre momenti sono **preparazione** (dove il polso si ferma in fondo all'apertura), **impatto** (polso più veloce; lì intorno l'app rilegge un fotogramma ogni 33 ms) e **finale** (polso più in alto dopo l'impatto; nella volée, dove il polso si ferma). Se nella finestra ci sono più colpi vale quello riconosciuto dal braccialetto; i polsi scambiati da MoveNet (succede di lato) si rimettono a posto da soli. Riprendi **di lato**: di fronte l'apertura va in profondità e non si vede. Le misure (*—* se il gomito o le gambe non si vedono): ginocchio più piegato, gomito all'impatto, altezza dell'impatto, quanto **davanti al corpo** si colpisce, **ampiezza della preparazione**, altezza del finale (tutte in rapporto alla statura) e il tempo dalla preparazione all'impatto. Il video con lo scheletro ha i tasti **Preparazione**, **Impatto** e **Finale**.
 
+### 7.6 Allievi: la parte per l'allenatore
+
+- **Allenati › Allievi** › **Nuovo allievo**: nome (lo stesso delle partite: così foto, storico e rating si ritrovano da soli) e mano.
+- **Chi si allena**: in Allenati, sopra *Inizia*, scegli l'allievo (o *Nessun allievo*). La sessione è sua: le ultime sessioni, *Tutte le sessioni*, l'andamento in Progressi e i numeri sui tasti dei colpi sono solo i suoi, e le clip vanno in **Allenamento colpi/<colpo>/<allievo>/<data e ora>**.
+- **La scheda dell'allievo** (tocca il nome in *Allievi*):
+  - **Colpi**: per servizio, dritto, rovescio e volée le sessioni, i colpi, l'ultima volta e la linea dei colpi dentro; toccando un colpo si aprono le sue sessioni.
+  - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
+  - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
+  - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
+  - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
+  - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2439,6 +2499,18 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 - **Onde colocar o telefone**: ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m e fora do corredor, na altura do ponto de impacto; lente a cerca de 1 m; o swing inteiro no enquadramento (o pulso se move uns 2 m para a frente e para trás). Para o voleio: ao lado de quem joga na rede, a 3-4 m, na altura dele. Sempre do mesmo lado durante a sessão, e nunca na trajetória da bola.
 - No lugar de lado, primeiro/segundo e alvo escolhe-se a **direção** desejada (**cruzado**, **no centro**, **paralela**) e, para o voleio, se é **de forehand** ou **de backhand**; o resumo conta-os à parte.
 - **Análise do movimento**: os três momentos são **preparação** (onde o pulso para no fim da preparação), **impacto** (pulso mais rápido; ali perto o app relê um quadro a cada 33 ms) e **final** (pulso mais alto depois do impacto; no voleio, onde o pulso para). Se houver vários golpes na janela, vale o reconhecido pela pulseira; os pulsos trocados pelo MoveNet (acontece de lado) se corrigem sozinhos. Filme **de lado**: de frente a preparação vai em profundidade e não aparece. As medidas (*—* se o cotovelo ou as pernas não aparecem): joelho mais flexionado, cotovelo no impacto, altura do impacto, quanto **à frente do corpo** se bate, **amplitude da preparação**, altura do final (todas em relação à altura) e o tempo da preparação ao impacto. O vídeo com o esqueleto tem os botões **Preparação**, **Impacto** e **Final**.
+
+### 7.6 Alunos: a parte do treinador
+
+- **Treinar › Alunos** › **Novo aluno**: nome (o mesmo das partidas: assim foto, histórico e rating aparecem sozinhos) e mão.
+- **Quem treina**: em Treinar, acima de *Começar*, escolha o aluno (ou *Nenhum aluno*). A sessão é dele: as últimas sessões, *Todas as sessões*, a evolução em Progresso e os números nos botões dos golpes são só dele, e os clipes vão para **Treino de golpes/<golpe>/<aluno>/<data e hora>**.
+- **A ficha do aluno** (toque no nome em *Alunos*):
+  - **Golpes**: para saque, forehand, backhand e voleio as sessões, os golpes, a última vez e a linha dos golpes dentro; tocando num golpe abrem-se as sessões dele.
+  - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
+  - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
+  - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
+  - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele.
+  - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 
 ## 8. Placar na TV ou no monitor
 
@@ -3255,7 +3327,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -3760,8 +3832,10 @@ class MatchController(
             Screen.VIDEOS -> Screen.HOME
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
-            Screen.STROKE_SESSIONS -> Screen.HOME
+            Screen.STROKE_SESSIONS -> strokeSessionsBack
             Screen.HELP -> Screen.HOME
+            Screen.STUDENTS -> Screen.HOME
+            Screen.STUDENT -> Screen.STUDENTS
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4109,11 +4183,92 @@ class MatchController(
     /** Colpo scelto in Allenati (vale anche per la pagina di tutte le sessioni). */
     val trainStroke = MutableStateFlow(com.tennis.scoremanager.data.TrainedStroke.SERVE)
 
-    /** Apre tutte le sessioni del colpo [stroke]. */
+    /** Apre tutte le sessioni del colpo [stroke] (dell'allievo scelto); Indietro torna da dove si è partiti. */
     fun openStrokeSessions(stroke: com.tennis.scoremanager.data.TrainedStroke) {
         trainStroke.value = stroke
+        strokeSessionsBack = if (screen.value == Screen.STUDENT) Screen.STUDENT else Screen.HOME
         screen.value = Screen.STROKE_SESSIONS
     }
+
+    private var strokeSessionsBack = Screen.HOME
+
+    // ---------------------------------------------------------------- allievi (per l'allenatore)
+
+    val students = MutableStateFlow(storage.loadStudents().sortedBy { it.name.lowercase() })
+
+    /** Chi si allena con l'allenamento dei colpi: Student.id, null = nessun allievo. */
+    val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
+
+    /** Allievo aperto nella sua scheda. */
+    val openStudentId = MutableStateFlow<String?>(null)
+
+    fun refreshStudents() {
+        scope.launch { students.value = withContext(io) { storage.loadStudents() }.sortedBy { it.name.lowercase() } }
+    }
+
+    fun studentById(id: String?): com.tennis.scoremanager.data.Student? = id?.let { i -> students.value.firstOrNull { it.id == i } }
+
+    /** Aggiunge o cambia un allievo. */
+    fun saveStudent(st: com.tennis.scoremanager.data.Student) {
+        val list = students.value.filter { it.id != st.id } + st
+        students.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.saveStudents(list) }
+    }
+
+    /** Toglie un allievo: le sue sessioni restano (senza allievo, col nome di quel giorno). */
+    fun deleteStudent(id: String) {
+        val list = students.value.filter { it.id != id }
+        students.value = list
+        if (trainStudent.value == id) setTrainStudent(null)
+        scope.launch {
+            withContext(io) {
+                storage.saveStudents(list)
+                storage.loadServeSessions().filter { it.student == id }.forEach { storage.saveServeSession(it.copy(student = null)) }
+            }
+            refreshServeSessions()
+        }
+    }
+
+    /**
+     * Cancella l'allievo e quello che il telefono ha di suo: sessioni con video e analisi, note e foto; la sua racchetta
+     * resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli avversari.
+     */
+    fun purgeStudent(id: String) {
+        val st = studentById(id) ?: return
+        val list = students.value.filter { it.id != id }
+        students.value = list
+        if (trainStudent.value == id) setTrainStudent(null)
+        removePhoto(st.name)
+        rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
+        scope.launch {
+            withContext(io) {
+                storage.saveStudents(list)
+                storage.loadServeSessions().filter { it.student == id }.forEach { storage.deleteServeSession(it) }
+            }
+            refreshServeSessions()
+        }
+    }
+
+    fun setTrainStudent(id: String?) {
+        trainStudent.value = id
+        storage.trainStudent = id.orEmpty()
+    }
+
+    fun openStudents() {
+        refreshStudents()
+        screen.value = Screen.STUDENTS
+    }
+
+    fun openStudent(id: String) {
+        openStudentId.value = id
+        screen.value = Screen.STUDENT
+    }
+
+    /** Partite finite dell'allievo dallo storico (stesso nome), dalla più vecchia. */
+    fun studentMatches(name: String): List<PlayerStats.MatchLine> = PlayerStats.lines(played(), PlayerStats.key(name))
+
+    /** Rating TSM dell'allievo nello sport con più partite (null senza partite). */
+    fun studentRating(name: String) = ratingSports().firstOrNull()?.let { ratingTable(it).player(PlayerStats.key(name)) }
 
     /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
     fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
@@ -10780,6 +10935,11 @@ data class ServeSession(
      * null per le sessioni di prima, con le clip ancora nella cartella dell'app.
      */
     val folder: String? = null,
+    /** Allievo che si allena (Student.id) e il suo nome com'era quel giorno; null = senza allievo. */
+    val student: String? = null,
+    val studentName: String? = null,
+    /** Racchetta usata, com'era quel giorno (corde e tensione comprese). */
+    val racket: RacketUse? = null,
 )
 
 /**
@@ -11004,11 +11164,15 @@ class Storage(context: Context) {
     fun ensureStrokeFolders(base: String, name: (Int) -> String): Boolean =
         TrainedStroke.entries.map { File(documentsRoot, strokeFolder(it, base, name)) }.all { it.isDirectory || it.mkdirs() }
 
-    /** Cartella nuova per una sessione: Allenamento colpi/<colpo>/<data e ora>; null se Documenti non si può scrivere. */
-    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String): String? {
+    /**
+     * Cartella nuova per una sessione: Allenamento colpi/<colpo>/[<allievo>/]<data e ora>; null se Documenti non si può
+     * scrivere.
+     */
+    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String, student: String? = null): String? {
         if (!ensureStrokeFolders(base, name)) return null
         val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
-        val rel = "${strokeFolder(stroke, base, name)}/$stamp"
+        val who = student?.let { "/" + Students.folderName(it) }.orEmpty()
+        val rel = "${strokeFolder(stroke, base, name)}$who/$stamp"
         return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
     }
 
@@ -11076,8 +11240,34 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteServeSession(sess: ServeSession) {
         File(servesDir, "${sess.id}.json").delete()
-        serveClipsDir(sess).deleteRecursively()
+        val dir = serveClipsDir(sess)
+        dir.deleteRecursively()
+        // La cartella dell'allievo rimasta vuota se ne va con l'ultima sessione.
+        if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
+
+    /** Allievi dell'allenatore, in un file solo. */
+    private val studentsFile: File get() = File(app.filesDir, "students.json")
+
+    fun loadStudents(): List<Student> =
+        runCatching { json.decodeFromString(ListSerializer(Student.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveStudents(list: List<Student>) {
+        runCatching {
+            val tmp = File(app.filesDir, "students.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Student.serializer()), list))
+            if (!tmp.renameTo(studentsFile)) {
+                studentsFile.delete()
+                tmp.renameTo(studentsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allievi fallito", it) }
+    }
+
+    /** Chi si allena con l'allenamento dei colpi (Student.id; vuoto = nessun allievo). */
+    var trainStudent: String
+        get() = prefs.getString("train_student", null) ?: ""
+        set(v) = prefs.edit().putString("train_student", v).apply()
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")
@@ -11340,6 +11530,58 @@ class Storage(context: Context) {
     /** Cartella predefinita dello storico se l'utente non ne sceglie una. */
     val defaultHistoryDir: File
         get() = File(app.getExternalFilesDir(null) ?: app.filesDir, "Storico").apply { mkdirs() }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Students.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Students.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class Hand { RIGHT, LEFT }
+
+/**
+ * Un allievo dell'allenatore: le sessioni di allenamento dei colpi gli vanno assegnate all'avvio. Il nome è lo stesso
+ * delle partite (foto, storico e rating si ritrovano da lì).
+ */
+@Serializable
+data class Student(
+    val id: String,
+    val name: String,
+    val hand: Hand? = null,
+    val note: String = "",
+    val createdAt: Long = 0,
+    /** La sua racchetta (Racket.id): va con le sue sessioni di allenamento, com'era quel giorno. */
+    val racket: String? = null,
+)
+
+object Students {
+    /** Nome valido come cartella: senza i caratteri che i file system rifiutano. */
+    fun folderName(name: String): String = name.replace(Regex("""[\\/:*?"<>|]"""), " ").replace(Regex("\\s+"), " ").trim().ifEmpty { "?" }
+
+    /** Le sessioni di un allievo ([id] null = quelle senza allievo). */
+    fun sessionsOf(all: List<ServeSession>, id: String?): List<ServeSession> = all.filter { it.student == id }
+
+    /** Per un colpo: quante sessioni e colpi, la percentuale dentro della prima e dell'ultima sessione, l'ultima volta. */
+    data class StrokeLine(val stroke: TrainedStroke, val sessions: Int, val shots: Int, val firstPct: Int?, val lastPct: Int?, val lastAt: Long)
+
+    fun strokeLines(sessions: List<ServeSession>): List<StrokeLine> =
+        TrainedStroke.entries.mapNotNull { t ->
+            val mine = sessions.filter { it.stroke == t && it.serves.isNotEmpty() }.sortedBy { it.startedAt }
+            if (mine.isEmpty()) return@mapNotNull null
+            StrokeLine(
+                t, mine.size, mine.sumOf { it.serves.size },
+                ServeTraining.count(mine.first().serves).pct, ServeTraining.count(mine.last().serves).pct, mine.last().startedAt,
+            )
+        }
+
+    /** Una misura dell'analisi in due sessioni: [unit] "°" o "" (frazioni di statura), [better] il verso buono (+1, -1, 0 = nessuno). */
+    data class Change(val label: String, val before: Float?, val now: Float?, val unit: String, val better: Int)
 }
 TSM_EOF
 
@@ -16286,6 +16528,8 @@ fun AppRoot(c: MatchController) {
                 Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
                 Screen.STROKE_SESSIONS -> com.tennis.scoremanager.ui.screens.StrokeSessionsScreen(c)
                 Screen.HELP -> com.tennis.scoremanager.ui.screens.HelpScreen(c)
+                Screen.STUDENTS -> com.tennis.scoremanager.ui.screens.StudentsScreen(c)
+                Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
             }
         }
     }
@@ -18131,6 +18375,10 @@ package com.tennis.scoremanager.ui
 
 import android.content.Intent
 import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18215,14 +18463,17 @@ fun ServeTrainingCard(c: MatchController) {
     val stroke by c.trainStroke.collectAsState()
     var help by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<ServeSession?>(null) }
-    LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val mine = sessions.filter { it.stroke == stroke }
+    LaunchedEffect(Unit) { c.refreshServeSessions(); c.refreshStudents() }
+    val trainee by c.trainStudent.collectAsState()
+    // Solo le sessioni del colpo scelto e di chi si allena (senza allievo: quelle senza allievo).
+    val mine = sessions.filter { it.stroke == stroke && it.student == trainee }
     SectionCard(s.strokeTrainingTitle, Icons.Filled.SportsTennis) {
         Text(s.strokeTrainingHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        TraineeRow(c)
         val strokes = TrainedStroke.entries
         // Ogni colpo col numero delle sue sessioni: l'elenco qui sotto mostra solo quelle del colpo scelto.
         Segmented(
-            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
+            strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
         BigButton(s.serveStart, Icons.Filled.Videocam, {
@@ -18243,6 +18494,98 @@ fun ServeTrainingCard(c: MatchController) {
     }
     if (help) ServePlacementDialog(stroke) { help = false }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null } }
+}
+
+/** Chi si allena: un allievo (le sessioni, le cartelle e l'andamento sono suoi) o nessuno. */
+@Composable
+fun TraineeRow(c: MatchController) {
+    val s = LocalStrings.current
+    val trainee by c.trainStudent.collectAsState()
+    val students by c.students.collectAsState()
+    val who = students.firstOrNull { it.id == trainee }
+    var pick by remember { mutableStateOf(false) }
+    var create by remember { mutableStateOf(false) }
+    Row(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp)).background(TsmColors.SurfaceHigh)
+            .clickable { pick = true }.padding(10.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        if (who != null) PlayerAvatar(c, who.name, TsmColors.Ball, 36.dp)
+        else Icon(Icons.Filled.Person, null, tint = TsmColors.TextDim, modifier = Modifier.size(36.dp))
+        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+            Text(s.trainWho, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(who?.name ?: s.trainNoStudent, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        }
+        Text(s.trainChange, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+    }
+    if (pick) {
+        AlertDialog(
+            onDismissRequest = { pick = false },
+            title = { Text(s.trainWho) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    @Composable fun option(label: String, id: String?, name: String?) = Row(
+                        Modifier.fillMaxWidth().clickable { c.setTrainStudent(id); pick = false }.padding(vertical = 8.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    ) {
+                        if (name != null) PlayerAvatar(c, name, if (id == trainee) TsmColors.Ball else TsmColors.TextDim, 32.dp)
+                        else Icon(Icons.Filled.Person, null, tint = TsmColors.TextDim, modifier = Modifier.size(32.dp))
+                        Text(label, color = if (id == trainee) TsmColors.Ball else TsmColors.TextMain, fontWeight = if (id == trainee) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier.padding(start = 10.dp))
+                    }
+                    option(s.trainNoStudent, null, null)
+                    for (st in students) option(st.name, st.id, st.name)
+                }
+            },
+            confirmButton = { TextButton(onClick = { pick = false; create = true }) { Text(s.studentNew) } },
+            dismissButton = { TextButton(onClick = { pick = false; c.openStudents() }) { Text(s.studentManage) } },
+        )
+    }
+    if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.setTrainStudent(it.id) } }
+}
+
+/** Nuovo allievo o modifica: nome (lo stesso delle partite, per ritrovarne foto e storico) e mano. */
+@Composable
+fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.Student?, onDone: (com.tennis.scoremanager.data.Student?) -> Unit) {
+    val s = LocalStrings.current
+    var name by remember { mutableStateOf(student?.name.orEmpty()) }
+    var hand by remember { mutableStateOf(student?.hand) }
+    var racket by remember { mutableStateOf(student?.racket) }
+    val rackets by c.rackets.collectAsState()
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (student == null) s.studentNew else s.studentEdit) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                androidx.compose.material3.OutlinedTextField(
+                    name, { name = it.take(40) }, label = { Text(s.studentName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
+                )
+                Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
+                val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
+                Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
+                // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
+                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                val choices = rackets.filter { !it.retired || it.id == racket }
+                if (choices.isEmpty()) Text(s.studentRacketNone, color = TsmColors.TextDim, fontSize = 12.sp)
+                else Segmented(
+                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank(), onClick = {
+                val st = (student ?: com.tennis.scoremanager.data.Student("st${System.currentTimeMillis()}", "", createdAt = System.currentTimeMillis()))
+                    .copy(name = name.trim(), hand = hand, racket = racket)
+                c.saveStudent(st)
+                // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
+                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = st.name)) }
+                onDone(st)
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
 }
 
 /** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */
@@ -19359,6 +19702,43 @@ interface Strings {
     val trainBandPaused: String
     val trainBandResume: String
     val trainBandGo: String
+    val trainWho: String
+    val trainNoStudent: String
+    val trainChange: String
+    val studentsTitle: String
+    val studentsHint: String
+    val studentNew: String
+    val studentEdit: String
+    val studentName: String
+    val studentHand: String
+    val handRight: String
+    val handLeft: String
+    val studentManage: String
+    val studentNone: String
+    val studentStrokes: String
+    val studentStrokesNone: String
+    val studentMovement: String
+    val studentMovementNone: String
+    val studentMatches: String
+    val studentMatchesNone: String
+    val studentWon: String
+    val studentLost: String
+    val studentNotes: String
+    val studentNotesHint: String
+    val studentTrainNow: String
+    val studentDelete: String
+    val studentPhotoHint: String
+    val studentSessions: (Int) -> String
+    val studentLast: (String) -> String
+    val studentShots: (Int) -> String
+    val studentWonLost: (Int, Int) -> String
+    val studentDeleteAsk: (String) -> String
+    val studentRacket: String
+    val studentRacketNone: String
+    val studentRacketPick: String
+    val studentPurge: String
+    val studentPurgeConfirm: String
+    val studentPurgeAsk: (String, Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -20510,6 +20890,43 @@ object ItStrings : Strings {
     override val trainBandPaused = "Pausa"
     override val trainBandResume = "KEY1 riprende"
     override val trainBandGo = "Si riprende"
+    override val trainWho = "Chi si allena"
+    override val trainNoStudent = "Nessun allievo"
+    override val trainChange = "Cambia"
+    override val studentsTitle = "Allievi"
+    override val studentsHint = "Per l'allenatore: allenamenti, movimento, partite e note di ogni allievo"
+    override val studentNew = "Nuovo allievo"
+    override val studentEdit = "Modifica"
+    override val studentName = "Nome (come nelle partite)"
+    override val studentHand = "Mano"
+    override val handRight = "Destro"
+    override val handLeft = "Mancino"
+    override val studentManage = "Gestisci"
+    override val studentNone = "Ancora nessun allievo: aggiungine uno, poi sceglilo in Allenati prima di toccare Inizia."
+    override val studentStrokes = "Colpi"
+    override val studentStrokesNone = "Ancora nessun allenamento: scegli l'allievo in Allenati e tocca Inizia."
+    override val studentMovement = "Movimento: ultima sessione analizzata e quella prima"
+    override val studentMovementNone = "Analizza le clip di una sessione (Analisi del movimento) per vedere le misure."
+    override val studentMatches = "Partite"
+    override val studentMatchesNone = "Nessuna partita nello storico con questo nome."
+    override val studentWon = "Vinta"
+    override val studentLost = "Persa"
+    override val studentNotes = "Note dell'allenatore"
+    override val studentNotesHint = "Cosa lavorare, obiettivi, sensazioni…"
+    override val studentTrainNow = "Allena ora"
+    override val studentDelete = "Togli l'allievo"
+    override val studentPhotoHint = "Tocca per la foto: la stessa delle partite."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sessione" else "$n sessioni" }
+    override val studentLast: (String) -> String = { "ultima: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 colpo" else "$n colpi" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w vinte, $l perse" }
+    override val studentDeleteAsk: (String) -> String = { "Togliere $it dagli allievi? Le sue sessioni restano, senza allievo." }
+    override val studentRacket = "Racchetta"
+    override val studentRacketNone = "Nessuna racchetta in Le mie racchette: aggiungila da Progressi › Le mie racchette."
+    override val studentRacketPick = "Scegli la sua racchetta"
+    override val studentPurge = "Cancella l'allievo e i suoi dati"
+    override val studentPurgeConfirm = "Cancella tutto"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Cancellare $name e tutti i suoi dati da questo telefono? Si cancellano le sue $n sessioni con video e analisi, le note e la foto; la racchetta resta ma non è più sua. Le partite nello storico restano (ci sono anche gli avversari). Non si può annullare." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -21644,6 +22061,43 @@ object EnStrings : Strings {
     override val trainBandPaused = "Paused"
     override val trainBandResume = "KEY1 resumes"
     override val trainBandGo = "Resumed"
+    override val trainWho = "Who is practising"
+    override val trainNoStudent = "No student"
+    override val trainChange = "Change"
+    override val studentsTitle = "Students"
+    override val studentsHint = "For the coach: practice, movement, matches and notes of each student"
+    override val studentNew = "New student"
+    override val studentEdit = "Edit"
+    override val studentName = "Name (as in matches)"
+    override val studentHand = "Hand"
+    override val handRight = "Right-handed"
+    override val handLeft = "Left-handed"
+    override val studentManage = "Manage"
+    override val studentNone = "No students yet: add one, then choose them in Practice before tapping Start."
+    override val studentStrokes = "Strokes"
+    override val studentStrokesNone = "No practice yet: choose the student in Practice and tap Start."
+    override val studentMovement = "Movement: last analysed session and the one before"
+    override val studentMovementNone = "Analyse the clips of a session (Movement analysis) to see the measurements."
+    override val studentMatches = "Matches"
+    override val studentMatchesNone = "No matches in the history with this name."
+    override val studentWon = "Won"
+    override val studentLost = "Lost"
+    override val studentNotes = "Coach's notes"
+    override val studentNotesHint = "What to work on, goals, feelings…"
+    override val studentTrainNow = "Practise now"
+    override val studentDelete = "Remove student"
+    override val studentPhotoHint = "Tap for the photo: the same as in matches."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 session" else "$n sessions" }
+    override val studentLast: (String) -> String = { "last: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 shot" else "$n shots" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w won, $l lost" }
+    override val studentDeleteAsk: (String) -> String = { "Remove $it from the students? Their sessions stay, without a student." }
+    override val studentRacket = "Racket"
+    override val studentRacketNone = "No racket in My rackets yet: add it from Progress › My rackets."
+    override val studentRacketPick = "Pick their racket"
+    override val studentPurge = "Delete student and their data"
+    override val studentPurgeConfirm = "Delete everything"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Delete $name and all their data from this phone? Their $n sessions with videos and analysis, the notes and the photo are deleted; the racket stays but is no longer theirs. Matches in the history stay (the opponents are in them too). This cannot be undone." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -22801,6 +23255,43 @@ object DeStrings : Strings {
     override val trainBandPaused = "Angehalten"
     override val trainBandResume = "KEY1 weiter"
     override val trainBandGo = "Weiter"
+    override val trainWho = "Wer trainiert"
+    override val trainNoStudent = "Kein Schüler"
+    override val trainChange = "Ändern"
+    override val studentsTitle = "Schüler"
+    override val studentsHint = "Für den Trainer: Training, Bewegung, Matches und Notizen jedes Schülers"
+    override val studentNew = "Neuer Schüler"
+    override val studentEdit = "Bearbeiten"
+    override val studentName = "Name (wie in den Matches)"
+    override val studentHand = "Hand"
+    override val handRight = "Rechtshänder"
+    override val handLeft = "Linkshänder"
+    override val studentManage = "Verwalten"
+    override val studentNone = "Noch keine Schüler: füge einen hinzu und wähle ihn dann unter Trainieren, bevor du Starten tippst."
+    override val studentStrokes = "Schläge"
+    override val studentStrokesNone = "Noch kein Training: wähle den Schüler unter Trainieren und tippe Starten."
+    override val studentMovement = "Bewegung: letzte analysierte Einheit und die davor"
+    override val studentMovementNone = "Analysiere die Clips einer Einheit (Bewegungsanalyse), um die Messwerte zu sehen."
+    override val studentMatches = "Matches"
+    override val studentMatchesNone = "Kein Match im Verlauf mit diesem Namen."
+    override val studentWon = "Gewonnen"
+    override val studentLost = "Verloren"
+    override val studentNotes = "Notizen des Trainers"
+    override val studentNotesHint = "Woran arbeiten, Ziele, Eindrücke …"
+    override val studentTrainNow = "Jetzt trainieren"
+    override val studentDelete = "Schüler entfernen"
+    override val studentPhotoHint = "Antippen für das Foto: dasselbe wie in den Matches."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 Einheit" else "$n Einheiten" }
+    override val studentLast: (String) -> String = { "zuletzt: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 Schlag" else "$n Schläge" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w gewonnen, $l verloren" }
+    override val studentDeleteAsk: (String) -> String = { "$it aus den Schülern entfernen? Die Einheiten bleiben, ohne Schüler." }
+    override val studentRacket = "Schläger"
+    override val studentRacketNone = "Noch kein Schläger in Meine Schläger: unter Fortschritt › Meine Schläger hinzufügen."
+    override val studentRacketPick = "Seinen Schläger wählen"
+    override val studentPurge = "Schüler und seine Daten löschen"
+    override val studentPurgeConfirm = "Alles löschen"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "$name und alle seine Daten von diesem Telefon löschen? Gelöscht werden seine $n Einheiten mit Videos und Analyse, die Notizen und das Foto; der Schläger bleibt, gehört aber nicht mehr ihm. Die Matches im Verlauf bleiben (die Gegner sind auch darin). Das lässt sich nicht rückgängig machen." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -23951,6 +24442,43 @@ object EsStrings : Strings {
     override val trainBandPaused = "Pausa"
     override val trainBandResume = "KEY1 sigue"
     override val trainBandGo = "Seguimos"
+    override val trainWho = "Quién entrena"
+    override val trainNoStudent = "Ningún alumno"
+    override val trainChange = "Cambiar"
+    override val studentsTitle = "Alumnos"
+    override val studentsHint = "Para el entrenador: entrenamientos, movimiento, partidos y notas de cada alumno"
+    override val studentNew = "Nuevo alumno"
+    override val studentEdit = "Editar"
+    override val studentName = "Nombre (como en los partidos)"
+    override val studentHand = "Mano"
+    override val handRight = "Diestro"
+    override val handLeft = "Zurdo"
+    override val studentManage = "Gestionar"
+    override val studentNone = "Todavía no hay alumnos: añade uno y luego elígelo en Entrenar antes de tocar Empezar."
+    override val studentStrokes = "Golpes"
+    override val studentStrokesNone = "Todavía no hay entrenamientos: elige al alumno en Entrenar y toca Empezar."
+    override val studentMovement = "Movimiento: última sesión analizada y la anterior"
+    override val studentMovementNone = "Analiza los clips de una sesión (Análisis del movimiento) para ver las medidas."
+    override val studentMatches = "Partidos"
+    override val studentMatchesNone = "Ningún partido en el historial con este nombre."
+    override val studentWon = "Ganado"
+    override val studentLost = "Perdido"
+    override val studentNotes = "Notas del entrenador"
+    override val studentNotesHint = "Qué trabajar, objetivos, sensaciones…"
+    override val studentTrainNow = "Entrenar ahora"
+    override val studentDelete = "Quitar alumno"
+    override val studentPhotoHint = "Toca para la foto: la misma de los partidos."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sesión" else "$n sesiones" }
+    override val studentLast: (String) -> String = { "última: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 golpe" else "$n golpes" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w ganados, $l perdidos" }
+    override val studentDeleteAsk: (String) -> String = { "¿Quitar a $it de los alumnos? Sus sesiones se quedan, sin alumno." }
+    override val studentRacket = "Raqueta"
+    override val studentRacketNone = "No hay raquetas en Mis raquetas: añádela desde Progresos › Mis raquetas."
+    override val studentRacketPick = "Elegir su raqueta"
+    override val studentPurge = "Borrar alumno y sus datos"
+    override val studentPurgeConfirm = "Borrar todo"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "¿Borrar a $name y todos sus datos de este teléfono? Se borran sus $n sesiones con vídeos y análisis, las notas y la foto; la raqueta se queda pero ya no es suya. Los partidos del historial se quedan (también están los rivales). No se puede deshacer." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -25103,6 +25631,43 @@ object FrStrings : Strings {
     override val trainBandPaused = "En pause"
     override val trainBandResume = "KEY1 reprend"
     override val trainBandGo = "On reprend"
+    override val trainWho = "Qui s'entraîne"
+    override val trainNoStudent = "Aucun élève"
+    override val trainChange = "Changer"
+    override val studentsTitle = "Élèves"
+    override val studentsHint = "Pour l'entraîneur : entraînements, mouvement, matchs et notes de chaque élève"
+    override val studentNew = "Nouvel élève"
+    override val studentEdit = "Modifier"
+    override val studentName = "Nom (comme dans les matchs)"
+    override val studentHand = "Main"
+    override val handRight = "Droitier"
+    override val handLeft = "Gaucher"
+    override val studentManage = "Gérer"
+    override val studentNone = "Aucun élève pour l'instant : ajoutez-en un, puis choisissez-le dans S'entraîner avant de toucher Commencer."
+    override val studentStrokes = "Coups"
+    override val studentStrokesNone = "Pas encore d'entraînement : choisissez l'élève dans S'entraîner et touchez Commencer."
+    override val studentMovement = "Mouvement : dernière séance analysée et la précédente"
+    override val studentMovementNone = "Analysez les clips d'une séance (Analyse du mouvement) pour voir les mesures."
+    override val studentMatches = "Matchs"
+    override val studentMatchesNone = "Aucun match dans l'historique avec ce nom."
+    override val studentWon = "Gagné"
+    override val studentLost = "Perdu"
+    override val studentNotes = "Notes de l'entraîneur"
+    override val studentNotesHint = "Ce qu'il faut travailler, objectifs, sensations…"
+    override val studentTrainNow = "S'entraîner maintenant"
+    override val studentDelete = "Retirer l'élève"
+    override val studentPhotoHint = "Touchez pour la photo : la même que dans les matchs."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 séance" else "$n séances" }
+    override val studentLast: (String) -> String = { "dernière : $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 coup" else "$n coups" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w gagnés, $l perdus" }
+    override val studentDeleteAsk: (String) -> String = { "Retirer $it des élèves ? Ses séances restent, sans élève." }
+    override val studentRacket = "Raquette"
+    override val studentRacketNone = "Aucune raquette dans Mes raquettes : ajoutez-la depuis Progrès › Mes raquettes."
+    override val studentRacketPick = "Choisir sa raquette"
+    override val studentPurge = "Supprimer l'élève et ses données"
+    override val studentPurgeConfirm = "Tout supprimer"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Supprimer $name et toutes ses données de ce téléphone ? Ses $n séances avec vidéos et analyse, les notes et la photo sont supprimées ; la raquette reste mais n'est plus la sienne. Les matchs de l'historique restent (les adversaires y sont aussi). C'est définitif." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -26256,6 +26821,43 @@ object PtStrings : Strings {
     override val trainBandPaused = "Pausa"
     override val trainBandResume = "KEY1 retoma"
     override val trainBandGo = "Retomando"
+    override val trainWho = "Quem treina"
+    override val trainNoStudent = "Nenhum aluno"
+    override val trainChange = "Trocar"
+    override val studentsTitle = "Alunos"
+    override val studentsHint = "Para o treinador: treinos, movimento, partidas e notas de cada aluno"
+    override val studentNew = "Novo aluno"
+    override val studentEdit = "Editar"
+    override val studentName = "Nome (como nas partidas)"
+    override val studentHand = "Mão"
+    override val handRight = "Destro"
+    override val handLeft = "Canhoto"
+    override val studentManage = "Gerenciar"
+    override val studentNone = "Ainda não há alunos: adicione um e escolha-o em Treinar antes de tocar Começar."
+    override val studentStrokes = "Golpes"
+    override val studentStrokesNone = "Ainda não há treinos: escolha o aluno em Treinar e toque Começar."
+    override val studentMovement = "Movimento: última sessão analisada e a anterior"
+    override val studentMovementNone = "Analise os clipes de uma sessão (Análise do movimento) para ver as medidas."
+    override val studentMatches = "Partidas"
+    override val studentMatchesNone = "Nenhuma partida no histórico com este nome."
+    override val studentWon = "Ganha"
+    override val studentLost = "Perdida"
+    override val studentNotes = "Notas do treinador"
+    override val studentNotesHint = "O que trabalhar, objetivos, sensações…"
+    override val studentTrainNow = "Treinar agora"
+    override val studentDelete = "Remover aluno"
+    override val studentPhotoHint = "Toque para a foto: a mesma das partidas."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sessão" else "$n sessões" }
+    override val studentLast: (String) -> String = { "última: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 golpe" else "$n golpes" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w ganhas, $l perdidas" }
+    override val studentDeleteAsk: (String) -> String = { "Remover $it dos alunos? As sessões ficam, sem aluno." }
+    override val studentRacket = "Raquete"
+    override val studentRacketNone = "Ainda não há raquetes em As minhas raquetes: adicione em Progresso › As minhas raquetes."
+    override val studentRacketPick = "Escolher a raquete dele"
+    override val studentPurge = "Apagar aluno e os dados dele"
+    override val studentPurgeConfirm = "Apagar tudo"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Apagar $name e todos os dados dele deste telefone? Apagam-se as $n sessões com vídeos e análise, as notas e a foto; a raquete fica, mas não é mais dele. As partidas do histórico ficam (os adversários também estão nelas). Não dá para desfazer." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -27341,6 +27943,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -27556,6 +28159,8 @@ private fun TrainTab(c: MatchController) {
     Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     ServeTrainingCard(c)
+    // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
+    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
 
 @Composable
@@ -27585,12 +28190,14 @@ private fun ProgressTab(c: MatchController) {
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> sessions.any { it.stroke == t } }
+    val trainee by c.trainStudent.collectAsState()
+    val ofTrainee = sessions.filter { it.student == trainee }
+    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
     if (done.isNotEmpty()) {
-        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes, Icons.Filled.SportsTennis) {
+        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
-                val mine = sessions.filter { it.stroke == t }
+                val mine = ofTrainee.filter { it.stroke == t }
                 val title = "${com.tennis.scoremanager.ui.strokeLabel(s, t)} · ${mine.size}"
                 Surface(onClick = { c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
                     // Con una sessione sola non c'è linea: basta il nome del colpo.
@@ -31287,7 +31894,9 @@ fun StrokeSessionsScreen(c: MatchController) {
     val stroke by c.trainStroke.collectAsState()
     val all by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val list = all.filter { it.stroke == stroke }
+    val trainee by c.trainStudent.collectAsState()
+    val list = all.filter { it.stroke == stroke && it.student == trainee }
+    val who = c.studentById(trainee)?.name
     val lang = c.options.value.lang
     val disk by produceState(emptyMap<String, Disk>(), list) {
         value = withContext(Dispatchers.IO) {
@@ -31306,11 +31915,12 @@ fun StrokeSessionsScreen(c: MatchController) {
     val name = strokeLabel(s, stroke)
     fun mb(b: Long) = String.format(lang.locale, "%.0f MB", b / 1_048_576.0)
     ScreenScaffold(
-        title = s.strokeSessionsTitle(name),
+        title = s.strokeSessionsTitle(name + (who?.let { " · $it" } ?: "")),
         // Da Android 11 la cartella è Documenti; prima quella dell'app (come per i file salvati).
         subtitle = s.strokeSessionsWhere(
-            if (android.os.Build.VERSION.SDK_INT >= 30) "${s.documentsFolder}/Tennis Score Manager/${s.strokeFolderName}/$name"
-            else File(c.storage.documentsRoot, "${s.strokeFolderName}/$name").absolutePath,
+            (if (android.os.Build.VERSION.SDK_INT >= 30) "${s.documentsFolder}/Tennis Score Manager/${s.strokeFolderName}/$name"
+            else File(c.storage.documentsRoot, "${s.strokeFolderName}/$name").absolutePath) +
+                (who?.let { "/" + com.tennis.scoremanager.data.Students.folderName(it) } ?: ""),
         ),
         icon = Icons.Filled.FolderOpen,
         action = {
@@ -31377,6 +31987,326 @@ fun StrokeSessionsScreen(c: MatchController) {
         )
     }
     open?.let { sess -> ServeSessionDialog(c, sess) { open = null; c.refreshServeSessions() } }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/StudentsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/StudentsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.PersonRemove
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Hand
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
+import com.tennis.scoremanager.data.ServeSession
+import com.tennis.scoremanager.data.Student
+import com.tennis.scoremanager.data.Students
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.EditablePlayerAvatar
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.StrokeTrend
+import com.tennis.scoremanager.ui.StudentEditDialog
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.video.ServeClipAnalysis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/** Allievi dell'allenatore: chi sono, quante sessioni, l'ultima volta; da qui la scheda di ciascuno. */
+@Composable
+fun StudentsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val students by c.students.collectAsState()
+    val sessions by c.serveSessions.collectAsState()
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    var create by remember { mutableStateOf(false) }
+    val lang = c.options.value.lang
+    ScreenScaffold(
+        title = s.studentsTitle,
+        subtitle = s.studentsHint,
+        icon = Icons.Filled.Groups,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.studentNew, Icons.Filled.PersonAdd, { create = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (students.isEmpty()) Text(s.studentNone, color = TsmColors.TextDim)
+        for (st in students) {
+            val mine = Students.sessionsOf(sessions, st.id)
+            Row(
+                Modifier.fillMaxWidth().clickable { c.openStudent(st.id) }.padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PlayerAvatar(c, st.name, TsmColors.Ball, 48.dp)
+                Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                    Text(st.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    val last = mine.maxOfOrNull { it.startedAt }
+                    Text(
+                        s.studentSessions(mine.size) + (last?.let { " · " + s.studentLast(Reports.date(it, lang)) } ?: ""),
+                        color = TsmColors.TextDim, fontSize = 13.sp,
+                    )
+                    st.racket?.let { c.racketById(it) }?.label?.takeIf { it.isNotBlank() }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+            }
+        }
+    }
+    if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.openStudent(it.id) } }
+}
+
+/** Una sessione analizzata: le medie delle misure dei colpi affidabili. */
+private sealed interface Means {
+    data class Serve(val m: ServePose.Mean) : Means
+    data class Ground(val m: ServePose.GroundMean) : Means
+}
+
+private val json = Json { ignoreUnknownKeys = true }
+
+/** Le medie dell'analisi di una sessione (null se non è analizzata o nessun colpo è affidabile). */
+private fun means(c: MatchController, sess: ServeSession): Means? {
+    val dir = c.storage.serveClipsDir(sess)
+    val results = sess.serves.mapNotNull { a ->
+        val f = a.clip?.let { File(File(dir, it), ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
+        runCatching { json.decodeFromString(ServePoseResult.serializer(), f.readText()) }.getOrNull()
+    }
+    return if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(results.mapNotNull { it.metrics })?.let { Means.Serve(it) }
+    else ServePose.groundMean(results.mapNotNull { it.ground })?.let { Means.Ground(it) }
+}
+
+/**
+ * Scheda dell'allievo: colpi (percentuale dentro nel tempo), movimento (misure dell'ultima sessione analizzata contro
+ * quella prima), partite dallo storico col suo nome, note dell'allenatore.
+ */
+@Composable
+fun StudentScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val id by c.openStudentId.collectAsState()
+    val students by c.students.collectAsState()
+    val st = students.firstOrNull { it.id == id } ?: run {
+        LaunchedEffect(Unit) { c.back() }
+        return
+    }
+    val sessions by c.serveSessions.collectAsState()
+    LaunchedEffect(Unit) { c.refreshServeSessions() }
+    val mine = Students.sessionsOf(sessions, st.id)
+    val lang = c.options.value.lang
+    var edit by remember { mutableStateOf(false) }
+    var delete by remember { mutableStateOf(false) }
+    var purge by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = st.name,
+        subtitle = listOfNotNull(st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size)).joinToString(" · "),
+        icon = Icons.Filled.Groups,
+        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
+            BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
+        },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
+            Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+        // La racchetta con l'incordatura montata adesso; toccandola si apre Le mie racchette.
+        val rackets by c.rackets.collectAsState()
+        val racket = st.racket?.let { r -> rackets.firstOrNull { it.id == r } }
+        Row(
+            Modifier.fillMaxWidth().clickable { if (racket != null) c.openRackets() else edit = true }.padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.SportsTennis, null, tint = TsmColors.Ball)
+            Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 12.sp)
+                Text(racket?.label?.ifBlank { null } ?: s.studentRacketPick, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                racket?.current?.let { g ->
+                    val strings = listOf(g.brand, g.model).filter { it.isNotBlank() }.joinToString(" ")
+                    val kg = listOfNotNull(g.mainsKg, g.crossesKg).distinct().joinToString("/") { "%.1f".format(it) }
+                    Text(listOf(strings, kg.takeIf { it.isNotEmpty() }?.let { "$it kg" }, Reports.date(g.date, lang)).filter { !it.isNullOrBlank() }.joinToString(" · "),
+                        color = TsmColors.TextDim, fontSize = 13.sp)
+                }
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+        }
+
+        // Colpi: per ciascuno sessioni, colpi e la linea dei colpi dentro; toccando, le sue sessioni.
+        SectionCard(s.studentStrokes, Icons.Filled.SportsTennis) {
+            val lines = Students.strokeLines(mine)
+            if (lines.isEmpty()) Text(s.studentStrokesNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (l in lines) {
+                Column(Modifier.fillMaxWidth().clickable { c.setTrainStudent(st.id); c.openStrokeSessions(l.stroke) }.padding(vertical = 6.dp)) {
+                    Text(
+                        "${strokeLabel(s, l.stroke)} · ${s.studentSessions(l.sessions)} · ${s.studentShots(l.shots)}",
+                        color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                    )
+                    Text(s.studentLast(Reports.date(l.lastAt, lang)) + (l.lastPct?.let { " · $it%" } ?: ""), color = TsmColors.TextDim, fontSize = 13.sp)
+                    StrokeTrend(mine.filter { it.stroke == l.stroke })
+                }
+            }
+        }
+
+        // Movimento: per ogni colpo l'ultima sessione analizzata e quella prima, misura per misura.
+        val changes by produceState(emptyList<Pair<TrainedStroke, List<Students.Change>>>(), mine) {
+            value = withContext(Dispatchers.IO) {
+                TrainedStroke.entries.mapNotNull { t ->
+                    val analysed = mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.mapNotNull { means(c, it) }.take(2)
+                    val now = analysed.getOrNull(0) ?: return@mapNotNull null
+                    t to changesOf(s, now, analysed.getOrNull(1))
+                }
+            }
+        }
+        SectionCard(s.studentMovement, Icons.Filled.AccessibilityNew) {
+            if (changes.isEmpty()) Text(s.studentMovementNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            for ((t, rows) in changes) {
+                Text(strokeLabel(s, t), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                for (r in rows) {
+                    Row(Modifier.fillMaxWidth()) {
+                        Text(r.label, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        val fmt = { v: Float? -> v?.let { if (r.unit == "°") "%.0f°".format(it) else if (r.unit == "ms") "%.0f ms".format(it) else "%.2f".format(it) } ?: "—" }
+                        Text(
+                            if (r.before != null) "${fmt(r.before)} → ${fmt(r.now)}" else fmt(r.now),
+                            color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+
+        // Partite dallo storico con lo stesso nome, e il rating.
+        SectionCard(s.studentMatches, Icons.Filled.EmojiEvents) {
+            val lines = remember(st.name) { c.studentMatches(st.name) }
+            if (lines.isEmpty()) {
+                Text(s.studentMatchesNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            } else {
+                Text(s.studentWonLost(lines.count { it.won }, lines.count { !it.won }), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                remember(st.name) { c.studentRating(st.name) }?.let { Text("${s.ratingTitle}: ${it.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
+                for (m in lines.takeLast(5).reversed()) {
+                    Row(Modifier.fillMaxWidth()) {
+                        Text(Reports.date(m.rec.endedAt ?: m.rec.updatedAt, lang), color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        Text(
+                            (if (m.won) s.studentWon else s.studentLost) + " · ${m.pointsWonPct}%",
+                            color = if (m.won) TsmColors.Ok else TsmColors.Danger, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+
+        // Note dell'allenatore: si salvano da sole mentre si scrive.
+        SectionCard(s.studentNotes, Icons.Filled.EditNote) {
+            var note by remember(st.id) { mutableStateOf(st.note) }
+            LaunchedEffect(note) {
+                if (note == st.note) return@LaunchedEffect
+                delay(800)
+                c.saveStudent(st.copy(note = note))
+            }
+            OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
+        }
+        GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
+        // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
+        GhostButton(s.studentPurge, Icons.Filled.DeleteForever, { purge = true }, Modifier.fillMaxWidth())
+    }
+    if (purge) {
+        AlertDialog(
+            onDismissRequest = { purge = false },
+            title = { Text(s.studentPurge) },
+            text = { Text(s.studentPurgeAsk(st.name, mine.size)) },
+            confirmButton = {
+                TextButton(onClick = { purge = false; c.purgeStudent(st.id); c.back() }) {
+                    Text(s.studentPurgeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = { TextButton(onClick = { purge = false }) { Text(s.back) } },
+        )
+    }
+    if (edit) StudentEditDialog(c, st) { edit = false }
+    if (delete) {
+        AlertDialog(
+            onDismissRequest = { delete = false },
+            text = { Text(s.studentDeleteAsk(st.name)) },
+            confirmButton = { TextButton(onClick = { delete = false; c.deleteStudent(st.id); c.back() }) { Text(s.studentDelete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
+        )
+    }
+}
+
+/** Le righe del confronto: per il servizio e per gli altri colpi le misure dell'analisi. */
+private fun changesOf(s: com.tennis.scoremanager.ui.Strings, now: Means, before: Means?): List<Students.Change> = when (now) {
+    is Means.Serve -> {
+        val b = (before as? Means.Serve)?.m
+        val m = now.m
+        listOf(
+            Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
+            Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
+            Students.Change(s.poseHeightMetric, b?.contactHeight, m.contactHeight, "", 0),
+            Students.Change(s.poseTossMetric, b?.tossArmDeg, m.tossArmDeg, "°", 0),
+            Students.Change(s.poseTimingMetric, b?.trophyToContactMs?.toFloat(), m.trophyToContactMs.toFloat(), "ms", 0),
+        )
+    }
+    is Means.Ground -> {
+        val b = (before as? Means.Ground)?.m
+        val m = now.m
+        listOf(
+            Students.Change(s.poseInFrontMetric, b?.contactInFront, m.contactInFront, "", 0),
+            Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
+            Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
+            Students.Change(s.poseBackswingMetric, b?.backswing, m.backswing, "", 0),
+            Students.Change(s.poseFinishMetric, b?.finishHeight, m.finishHeight, "", 0),
+            Students.Change(s.poseTimingGround, b?.prepToContactMs?.toFloat(), m.prepToContactMs.toFloat(), "ms", 0),
+        )
+    }
 }
 TSM_EOF
 
@@ -33082,8 +34012,11 @@ class CameraActivity : ComponentActivity() {
         controller.serveTraining = true
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
-        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName)
-        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder)
+        // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
+        val student = controller.studentById(controller.trainStudent.value)
+        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
+        val racket = student?.racket?.let { controller.racketById(it) }?.use()
+        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket)
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -51309,6 +52242,48 @@ class StrokeReportTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/StudentsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/StudentsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class StudentsTest {
+    private fun sess(id: String, at: Long, stroke: TrainedStroke, student: String?, ins: Int, outs: Int) = ServeSession(
+        id, at, stroke = stroke, student = student,
+        serves = List(ins) { ServeAttempt(at, true, ServeSide.DEUCE, ServeKind.FIRST) } + List(outs) { ServeAttempt(at, false, ServeSide.DEUCE, ServeKind.FIRST) },
+    )
+
+    @Test
+    fun sessionsAndStrokeLinesPerStudent() {
+        val all = listOf(
+            sess("a", 1, TrainedStroke.FOREHAND, "rossi", 2, 2),
+            sess("b", 2, TrainedStroke.FOREHAND, "rossi", 3, 1),
+            sess("c", 3, TrainedStroke.FOREHAND, "verdi", 1, 0),
+            sess("d", 4, TrainedStroke.SERVE, null, 1, 1),
+            sess("e", 5, TrainedStroke.SERVE, "rossi", 0, 0),
+        )
+        val rossi = Students.sessionsOf(all, "rossi")
+        assertEquals(listOf("a", "b", "e"), rossi.map { it.id })
+        assertEquals(listOf("d"), Students.sessionsOf(all, null).map { it.id })
+        // Le sessioni vuote non contano; prima e ultima in ordine di tempo.
+        val lines = Students.strokeLines(rossi)
+        assertEquals(listOf(TrainedStroke.FOREHAND), lines.map { it.stroke })
+        assertEquals(Students.StrokeLine(TrainedStroke.FOREHAND, 2, 8, 50, 75, 2), lines[0])
+    }
+
+    @Test
+    fun folderNamesAreSafe() {
+        assertEquals("Mario Rossi", Students.folderName("  Mario/Rossi "))
+        assertEquals("?", Students.folderName("::"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -57951,6 +58926,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 181 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 184 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

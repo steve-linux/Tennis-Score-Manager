@@ -63,7 +63,9 @@ fun StrokeSessionsScreen(c: MatchController) {
     val stroke by c.trainStroke.collectAsState()
     val all by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val list = all.filter { it.stroke == stroke }
+    val trainee by c.trainStudent.collectAsState()
+    val list = all.filter { it.stroke == stroke && it.student == trainee }
+    val who = c.studentById(trainee)?.name
     val lang = c.options.value.lang
     val disk by produceState(emptyMap<String, Disk>(), list) {
         value = withContext(Dispatchers.IO) {
@@ -82,11 +84,12 @@ fun StrokeSessionsScreen(c: MatchController) {
     val name = strokeLabel(s, stroke)
     fun mb(b: Long) = String.format(lang.locale, "%.0f MB", b / 1_048_576.0)
     ScreenScaffold(
-        title = s.strokeSessionsTitle(name),
+        title = s.strokeSessionsTitle(name + (who?.let { " · $it" } ?: "")),
         // Da Android 11 la cartella è Documenti; prima quella dell'app (come per i file salvati).
         subtitle = s.strokeSessionsWhere(
-            if (android.os.Build.VERSION.SDK_INT >= 30) "${s.documentsFolder}/Tennis Score Manager/${s.strokeFolderName}/$name"
-            else File(c.storage.documentsRoot, "${s.strokeFolderName}/$name").absolutePath,
+            (if (android.os.Build.VERSION.SDK_INT >= 30) "${s.documentsFolder}/Tennis Score Manager/${s.strokeFolderName}/$name"
+            else File(c.storage.documentsRoot, "${s.strokeFolderName}/$name").absolutePath) +
+                (who?.let { "/" + com.tennis.scoremanager.data.Students.folderName(it) } ?: ""),
         ),
         icon = Icons.Filled.FolderOpen,
         action = {

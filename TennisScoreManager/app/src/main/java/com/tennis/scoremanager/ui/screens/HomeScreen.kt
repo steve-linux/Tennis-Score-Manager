@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -235,6 +236,8 @@ private fun TrainTab(c: MatchController) {
     Entry(Icons.Filled.MonitorHeart, s.trainCardio, s.trainCardioHint, main = true) { c.openWorkouts() }
     // Servizio, dritto, rovescio e volée: avvio, sessioni salvate, clip e analisi del movimento.
     ServeTrainingCard(c)
+    // Per l'allenatore: un allievo per scheda, con allenamenti, movimento, partite e note.
+    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
 
 @Composable
@@ -264,12 +267,14 @@ private fun ProgressTab(c: MatchController) {
     // Allenamento dei colpi: per ogni colpo la percentuale di colpi dentro, sessione dopo sessione.
     val sessions by c.serveSessions.collectAsState()
     LaunchedEffect(Unit) { c.refreshServeSessions() }
-    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> sessions.any { it.stroke == t } }
+    val trainee by c.trainStudent.collectAsState()
+    val ofTrainee = sessions.filter { it.student == trainee }
+    val done = com.tennis.scoremanager.data.TrainedStroke.entries.filter { t -> ofTrainee.any { it.stroke == t } }
     if (done.isNotEmpty()) {
-        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes, Icons.Filled.SportsTennis) {
+        com.tennis.scoremanager.ui.SectionCard(s.progressStrokes + (c.studentById(trainee)?.name?.let { " · $it" } ?: ""), Icons.Filled.SportsTennis) {
             Text(s.progressStrokesHint, color = TsmColors.TextDim, fontSize = 13.sp)
             for (t in done) {
-                val mine = sessions.filter { it.stroke == t }
+                val mine = ofTrainee.filter { it.stroke == t }
                 val title = "${com.tennis.scoremanager.ui.strokeLabel(s, t)} · ${mine.size}"
                 Surface(onClick = { c.openStrokeSessions(t) }, color = TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
                     // Con una sessione sola non c'è linea: basta il nome del colpo.

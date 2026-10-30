@@ -352,8 +352,11 @@ class CameraActivity : ComponentActivity() {
         controller.serveTraining = true
         val stroke = runCatching { TrainedStroke.valueOf(intent.getStringExtra(EXTRA_STROKE).orEmpty()) }.getOrDefault(TrainedStroke.SERVE)
         // Le clip vanno in Documenti/Tennis Score Manager/Allenamento colpi/<colpo>/<data e ora>.
-        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName)
-        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder)
+        // Con un allievo scelto in Allenati la sessione è sua, e la cartella ha il suo nome.
+        val student = controller.studentById(controller.trainStudent.value)
+        val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
+        val racket = student?.racket?.let { controller.racketById(it) }?.use()
+        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket)
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {

@@ -892,6 +892,43 @@ interface Strings {
     val trainBandPaused: String
     val trainBandResume: String
     val trainBandGo: String
+    val trainWho: String
+    val trainNoStudent: String
+    val trainChange: String
+    val studentsTitle: String
+    val studentsHint: String
+    val studentNew: String
+    val studentEdit: String
+    val studentName: String
+    val studentHand: String
+    val handRight: String
+    val handLeft: String
+    val studentManage: String
+    val studentNone: String
+    val studentStrokes: String
+    val studentStrokesNone: String
+    val studentMovement: String
+    val studentMovementNone: String
+    val studentMatches: String
+    val studentMatchesNone: String
+    val studentWon: String
+    val studentLost: String
+    val studentNotes: String
+    val studentNotesHint: String
+    val studentTrainNow: String
+    val studentDelete: String
+    val studentPhotoHint: String
+    val studentSessions: (Int) -> String
+    val studentLast: (String) -> String
+    val studentShots: (Int) -> String
+    val studentWonLost: (Int, Int) -> String
+    val studentDeleteAsk: (String) -> String
+    val studentRacket: String
+    val studentRacketNone: String
+    val studentRacketPick: String
+    val studentPurge: String
+    val studentPurgeConfirm: String
+    val studentPurgeAsk: (String, Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2043,6 +2080,43 @@ object ItStrings : Strings {
     override val trainBandPaused = "Pausa"
     override val trainBandResume = "KEY1 riprende"
     override val trainBandGo = "Si riprende"
+    override val trainWho = "Chi si allena"
+    override val trainNoStudent = "Nessun allievo"
+    override val trainChange = "Cambia"
+    override val studentsTitle = "Allievi"
+    override val studentsHint = "Per l'allenatore: allenamenti, movimento, partite e note di ogni allievo"
+    override val studentNew = "Nuovo allievo"
+    override val studentEdit = "Modifica"
+    override val studentName = "Nome (come nelle partite)"
+    override val studentHand = "Mano"
+    override val handRight = "Destro"
+    override val handLeft = "Mancino"
+    override val studentManage = "Gestisci"
+    override val studentNone = "Ancora nessun allievo: aggiungine uno, poi sceglilo in Allenati prima di toccare Inizia."
+    override val studentStrokes = "Colpi"
+    override val studentStrokesNone = "Ancora nessun allenamento: scegli l'allievo in Allenati e tocca Inizia."
+    override val studentMovement = "Movimento: ultima sessione analizzata e quella prima"
+    override val studentMovementNone = "Analizza le clip di una sessione (Analisi del movimento) per vedere le misure."
+    override val studentMatches = "Partite"
+    override val studentMatchesNone = "Nessuna partita nello storico con questo nome."
+    override val studentWon = "Vinta"
+    override val studentLost = "Persa"
+    override val studentNotes = "Note dell'allenatore"
+    override val studentNotesHint = "Cosa lavorare, obiettivi, sensazioni…"
+    override val studentTrainNow = "Allena ora"
+    override val studentDelete = "Togli l'allievo"
+    override val studentPhotoHint = "Tocca per la foto: la stessa delle partite."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 sessione" else "$n sessioni" }
+    override val studentLast: (String) -> String = { "ultima: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 colpo" else "$n colpi" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w vinte, $l perse" }
+    override val studentDeleteAsk: (String) -> String = { "Togliere $it dagli allievi? Le sue sessioni restano, senza allievo." }
+    override val studentRacket = "Racchetta"
+    override val studentRacketNone = "Nessuna racchetta in Le mie racchette: aggiungila da Progressi › Le mie racchette."
+    override val studentRacketPick = "Scegli la sua racchetta"
+    override val studentPurge = "Cancella l'allievo e i suoi dati"
+    override val studentPurgeConfirm = "Cancella tutto"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Cancellare $name e tutti i suoi dati da questo telefono? Si cancellano le sue $n sessioni con video e analisi, le note e la foto; la racchetta resta ma non è più sua. Le partite nello storico restano (ci sono anche gli avversari). Non si può annullare." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3177,6 +3251,43 @@ object EnStrings : Strings {
     override val trainBandPaused = "Paused"
     override val trainBandResume = "KEY1 resumes"
     override val trainBandGo = "Resumed"
+    override val trainWho = "Who is practising"
+    override val trainNoStudent = "No student"
+    override val trainChange = "Change"
+    override val studentsTitle = "Students"
+    override val studentsHint = "For the coach: practice, movement, matches and notes of each student"
+    override val studentNew = "New student"
+    override val studentEdit = "Edit"
+    override val studentName = "Name (as in matches)"
+    override val studentHand = "Hand"
+    override val handRight = "Right-handed"
+    override val handLeft = "Left-handed"
+    override val studentManage = "Manage"
+    override val studentNone = "No students yet: add one, then choose them in Practice before tapping Start."
+    override val studentStrokes = "Strokes"
+    override val studentStrokesNone = "No practice yet: choose the student in Practice and tap Start."
+    override val studentMovement = "Movement: last analysed session and the one before"
+    override val studentMovementNone = "Analyse the clips of a session (Movement analysis) to see the measurements."
+    override val studentMatches = "Matches"
+    override val studentMatchesNone = "No matches in the history with this name."
+    override val studentWon = "Won"
+    override val studentLost = "Lost"
+    override val studentNotes = "Coach's notes"
+    override val studentNotesHint = "What to work on, goals, feelings…"
+    override val studentTrainNow = "Practise now"
+    override val studentDelete = "Remove student"
+    override val studentPhotoHint = "Tap for the photo: the same as in matches."
+    override val studentSessions: (Int) -> String = { n -> if (n == 1) "1 session" else "$n sessions" }
+    override val studentLast: (String) -> String = { "last: $it" }
+    override val studentShots: (Int) -> String = { n -> if (n == 1) "1 shot" else "$n shots" }
+    override val studentWonLost: (Int, Int) -> String = { w, l -> "$w won, $l lost" }
+    override val studentDeleteAsk: (String) -> String = { "Remove $it from the students? Their sessions stay, without a student." }
+    override val studentRacket = "Racket"
+    override val studentRacketNone = "No racket in My rackets yet: add it from Progress › My rackets."
+    override val studentRacketPick = "Pick their racket"
+    override val studentPurge = "Delete student and their data"
+    override val studentPurgeConfirm = "Delete everything"
+    override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Delete $name and all their data from this phone? Their $n sessions with videos and analysis, the notes and the photo are deleted; the racket stays but is no longer theirs. Matches in the history stay (the opponents are in them too). This cannot be undone." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

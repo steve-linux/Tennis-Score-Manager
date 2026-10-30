@@ -157,11 +157,15 @@ class Storage(context: Context) {
     fun ensureStrokeFolders(base: String, name: (Int) -> String): Boolean =
         TrainedStroke.entries.map { File(documentsRoot, strokeFolder(it, base, name)) }.all { it.isDirectory || it.mkdirs() }
 
-    /** Cartella nuova per una sessione: Allenamento colpi/<colpo>/<data e ora>; null se Documenti non si può scrivere. */
-    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String): String? {
+    /**
+     * Cartella nuova per una sessione: Allenamento colpi/<colpo>/[<allievo>/]<data e ora>; null se Documenti non si può
+     * scrivere.
+     */
+    fun newServeFolder(stroke: TrainedStroke, startedAt: Long, base: String, name: (Int) -> String, student: String? = null): String? {
         if (!ensureStrokeFolders(base, name)) return null
         val stamp = java.text.SimpleDateFormat("yyyy-MM-dd HH.mm.ss", java.util.Locale.ROOT).format(java.util.Date(startedAt))
-        val rel = "${strokeFolder(stroke, base, name)}/$stamp"
+        val who = student?.let { "/" + Students.folderName(it) }.orEmpty()
+        val rel = "${strokeFolder(stroke, base, name)}$who/$stamp"
         return rel.takeIf { File(documentsRoot, it).let { d -> d.isDirectory || d.mkdirs() } }
     }
 
@@ -229,8 +233,34 @@ class Storage(context: Context) {
     @Synchronized
     fun deleteServeSession(sess: ServeSession) {
         File(servesDir, "${sess.id}.json").delete()
-        serveClipsDir(sess).deleteRecursively()
+        val dir = serveClipsDir(sess)
+        dir.deleteRecursively()
+        // La cartella dell'allievo rimasta vuota se ne va con l'ultima sessione.
+        if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
+
+    /** Allievi dell'allenatore, in un file solo. */
+    private val studentsFile: File get() = File(app.filesDir, "students.json")
+
+    fun loadStudents(): List<Student> =
+        runCatching { json.decodeFromString(ListSerializer(Student.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveStudents(list: List<Student>) {
+        runCatching {
+            val tmp = File(app.filesDir, "students.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Student.serializer()), list))
+            if (!tmp.renameTo(studentsFile)) {
+                studentsFile.delete()
+                tmp.renameTo(studentsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio allievi fallito", it) }
+    }
+
+    /** Chi si allena con l'allenamento dei colpi (Student.id; vuoto = nessun allievo). */
+    var trainStudent: String
+        get() = prefs.getString("train_student", null) ?: ""
+        set(v) = prefs.edit().putString("train_student", v).apply()
 
     /** Racchetta virtuale: tutte le racchette (con le incordature) in un file solo, sono poche. */
     private val racketsFile: File get() = File(app.filesDir, "rackets.json")

@@ -400,6 +400,18 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 - Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
 - **Movement analysis**: the three moments are **preparation** (where the wrist stops at the end of the take-back), **contact** (wrist fastest; around it the app reads one frame every 33 ms) and **finish** (wrist highest after contact; for the volley, where the wrist stops). If there are several shots in the window, the one recognised by the wristband counts; wrists swapped by MoveNet (it happens from the side) are put right by themselves. Film **from the side**: from the front the take-back goes in depth and can't be seen. The measurements (*—* if the elbow or legs can't be seen): deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
 
+### 7.6 Students: the coach's part (app 2.5)
+
+- **Practice › Students** › **New student**: name (the same as in matches: photo, history and rating are then found by themselves) and hand.
+- **Who is practising**: in Practice, above *Start*, pick the student (or *No student*). The session is theirs: the last sessions, *All sessions*, the trend in Progress and the numbers on the stroke buttons are only theirs, and the clips go into **Stroke practice/<stroke>/<student>/<date and time>**.
+- **The student's card** (tap the name in *Students*):
+  - **Strokes**: for serve, forehand, backhand and volley the sessions, the shots, the last time and the line of shots in; tapping a stroke opens its sessions.
+  - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
+  - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
+  - **Coach's notes**: what to work on, goals; they save by themselves.
+  - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
+  - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

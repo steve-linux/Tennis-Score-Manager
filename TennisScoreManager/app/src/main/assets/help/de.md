@@ -287,6 +287,18 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 - Statt Seite, erster/zweiter und Ziel wählt man die gewünschte **Richtung** (**Cross**, **Mitte**, **Longline**) und beim Volley, ob **Vorhand** oder **Rückhand**; die Übersicht zählt sie getrennt.
 - **Bewegungsanalyse**: Die drei Momente sind **Ausholen** (wo das Handgelenk am Ende der Ausholbewegung stehen bleibt), **Treffpunkt** (Handgelenk am schnellsten; dort liest die App ein Bild alle 33 ms) und **Ausschwung** (Handgelenk nach dem Treffpunkt am höchsten; beim Volley, wo das Handgelenk stehen bleibt). Sind mehrere Schläge im Fenster, zählt der vom Armband erkannte; von MoveNet vertauschte Handgelenke (passiert von der Seite) werden von selbst richtiggestellt. Von **der Seite** filmen: von vorn geht das Ausholen in die Tiefe und ist nicht zu sehen. Die Messwerte (*—*, wenn Ellbogen oder Beine nicht zu sehen sind): stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts, wie weit **vor dem Körper** getroffen wird, **Weite des Ausholens**, Höhe des Ausschwungs (alle im Verhältnis zur Körpergröße) und die Zeit vom Ausholen zum Treffpunkt. Das Video mit Skelett hat die Tasten **Ausholen**, **Treffpunkt** und **Ausschwung**.
 
+### 7.6 Schüler: der Teil für den Trainer
+
+- **Trainieren › Schüler** › **Neuer Schüler**: Name (derselbe wie in den Matches: Foto, Verlauf und Rating finden sich dann von selbst) und Hand.
+- **Wer trainiert**: unter Trainieren, über *Starten*, den Schüler wählen (oder *Kein Schüler*). Die Einheit gehört ihm: die letzten Einheiten, *Alle Einheiten*, der Verlauf in Fortschritt und die Zahlen auf den Schlag-Tasten zeigen nur seine, und die Clips kommen in **Schlagtraining/<Schlag>/<Schüler>/<Datum und Uhrzeit>**.
+- **Die Karte des Schülers** (den Namen unter *Schüler* antippen):
+  - **Schläge**: für Aufschlag, Vorhand, Rückhand und Volley die Einheiten, die Schläge, das letzte Mal und die Linie der Schläge im Feld; ein Schlag antippen öffnet seine Einheiten.
+  - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
+  - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
+  - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
+  - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
+  - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
