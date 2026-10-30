@@ -250,7 +250,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
                 RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
-                BandsSection(c, names, enabled = bandsReadyEnv)
+                BandsSection(c, names, enabled = bandsReadyEnv, devicesPage = true)
             }
             SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
         }
@@ -444,7 +444,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
 }
 
 @Composable
-private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
+private fun BandsSection(c: MatchController, names: Names, enabled: Boolean, devicesPage: Boolean = false) {
     val s = LocalStrings.current
     val o by c.options.collectAsState()
     val found by c.ble.found.collectAsState()
@@ -454,8 +454,8 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
 
     // Ricerca automatica e continua finché questa pagina è aperta e l'app è in primo piano.
     LifecycleResumeEffect(enabled) {
-        c.setBandScan(enabled)
-        onPauseOrDispose { c.setBandScan(false) }
+        c.setBandScan(enabled, devicesPage)
+        onPauseOrDispose { c.setBandScan(false, devicesPage) }
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {

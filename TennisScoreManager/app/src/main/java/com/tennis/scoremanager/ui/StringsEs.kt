@@ -840,6 +840,9 @@ object EsStrings : Strings {
     override val helpNoResults = "Sin resultados: prueba con otra palabra."
     override val helpNext = "Sección siguiente"
     override val helpRead = "Leer el capítulo"
+    override val trainRecOn = "Reconocimiento de golpes activado: el clip parte del golpe"
+    override val trainRecStarting = "Activando el reconocimiento de golpes…"
+    override val trainRecOldFw = "Firmware sin reconocimiento de golpes (hace falta la 2.4): el instante del golpe se estima por la tecla"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

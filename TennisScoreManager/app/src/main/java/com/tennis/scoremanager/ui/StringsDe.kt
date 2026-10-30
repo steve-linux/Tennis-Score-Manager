@@ -839,6 +839,9 @@ object DeStrings : Strings {
     override val helpNoResults = "Keine Treffer: Versuche ein anderes Wort."
     override val helpNext = "Nächster Abschnitt"
     override val helpRead = "Kapitel lesen"
+    override val trainRecOn = "Schlagerkennung an: der Clip beginnt beim Schlag"
+    override val trainRecStarting = "Schlagerkennung wird eingeschaltet …"
+    override val trainRecOldFw = "Firmware ohne Schlagerkennung (2.4 nötig): der Zeitpunkt des Schlags wird aus der Taste geschätzt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

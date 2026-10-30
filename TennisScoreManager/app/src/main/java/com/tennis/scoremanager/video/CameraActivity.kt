@@ -873,6 +873,14 @@ class CameraActivity : ComponentActivity() {
                     },
                     if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
                 )
+                // Riconoscimento dei colpi sul braccialetto: senza, l'istante del colpo si stima dal tasto.
+                band?.settings?.let { st ->
+                    when {
+                        !st.supportsStrokes -> Pill(str.trainRecOldFw, TsmColors.Orange)
+                        st.strokes -> Pill(str.trainRecOn, TsmColors.Ok)
+                        else -> Pill(str.trainRecStarting, TsmColors.SurfaceHigh)
+                    }
+                }
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {

@@ -843,6 +843,9 @@ object PtStrings : Strings {
     override val helpNoResults = "Nenhum resultado: tente outra palavra."
     override val helpNext = "Próxima seção"
     override val helpRead = "Ler o capítulo"
+    override val trainRecOn = "Reconhecimento de golpes ligado: o clipe parte do golpe"
+    override val trainRecStarting = "Ligando o reconhecimento de golpes…"
+    override val trainRecOldFw = "Firmware sem reconhecimento de golpes (precisa da 2.4): o instante do golpe é estimado pela tecla"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

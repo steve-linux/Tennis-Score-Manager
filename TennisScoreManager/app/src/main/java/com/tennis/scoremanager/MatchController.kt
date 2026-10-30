@@ -354,7 +354,7 @@ class MatchController(
         announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
-        if (options.value.mode == PlayMode.BANDS) restoreBands()
+        updateBandLinks()
         if (options.value.heartRate) restoreStraps()
         remotes.enabled = options.value.mode == PlayMode.REMOTES
         remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
@@ -599,7 +599,7 @@ class MatchController(
             syncBandLanguage(ble.bands.value)
         }
         if (old.mode != v.mode) {
-            if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
+            updateBandLinks()
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
         if (old.heartRate != v.heartRate) {
@@ -651,8 +651,24 @@ class MatchController(
     // ---------------------------------------------------------------- braccialetti
 
     private fun restoreBands() {
-        storage.bandAddress(true)?.let { ble.assign(Side.P1, it, storage.bandName(true)) }
-        storage.bandAddress(false)?.let { ble.assign(Side.P2, it, storage.bandName(false)) }
+        // Solo i lati non ancora collegati a quel braccialetto: assign chiude e riapre il collegamento.
+        for (side in Side.entries) {
+            val p1 = side == Side.P1
+            val addr = storage.bandAddress(p1) ?: continue
+            if (ble.bands.value[side]?.address != addr) ble.assign(side, addr, storage.bandName(p1))
+        }
+    }
+
+    /** Pagina Dispositivi aperta: lì i braccialetti si collegano e si cercano in qualsiasi modalità. */
+    @Volatile private var devicesOpen = false
+
+    /** I braccialetti servono: partita in modalità braccialetti, allenamento dei colpi o pagina Dispositivi. */
+    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen
+
+    /** Collega i braccialetti salvati quando servono, altrimenti li stacca (consumano meno e non segnano punti per sbaglio). */
+    private fun updateBandLinks() {
+        if (relay.isSatellite) return
+        if (bandsWanted()) restoreBands() else ble.disconnectAll()
     }
 
     fun assignBand(side: Side, address: String?, name: String?) {
@@ -671,13 +687,17 @@ class MatchController(
      * Ricerca automatica e continua mentre la pagina dei braccialetti è aperta (e l'app in primo piano).
      * I braccialetti trovati vanno da soli nei posti liberi: prima Giocatore 1, poi Giocatore 2.
      */
-    fun setBandScan(on: Boolean) {
-        autoAssign = on && options.value.mode == PlayMode.BANDS
+    fun setBandScan(on: Boolean, devicesPage: Boolean = false) {
+        if (devicesPage) {
+            devicesOpen = on
+            updateBandLinks()
+        }
+        autoAssign = on && bandsWanted()
         ble.setAutoScan(autoAssign)
     }
 
     private fun autoFill(found: List<FoundBand>) {
-        if (!autoAssign || options.value.mode != PlayMode.BANDS) return
+        if (!autoAssign || !bandsWanted()) return
         for (f in found.sortedByDescending { it.rssi }) {
             val bands = ble.bands.value
             if (bands.values.any { it.address == f.address } || f.address in autoBlocked) continue
@@ -842,6 +862,7 @@ class MatchController(
                 if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
             }
             syncBandLanguage(bands)
+            syncTrainingStrokes(bands)
         }
     }
 
@@ -876,8 +897,49 @@ class MatchController(
         }
     }
 
-    /** Allenamento al servizio aperto: i tasti del braccialetto vanno a lui, non alla partita. */
+    /**
+     * Allenamento dei colpi aperto: i tasti del braccialetto vanno a lui, non alla partita, e il riconoscimento dei colpi
+     * si accende da sé (serve l'istante del colpo per la clip e l'analisi; non serve la calibrazione).
+     */
     @Volatile var serveTraining = false
+        set(v) {
+            field = v
+            synchronized(trainingTried) { trainingTried.clear() }
+            if (v) {
+                // In allenamento il braccialetto serve qualunque sia la modalità della partita.
+                updateBandLinks()
+                syncTrainingStrokes(ble.bands.value)
+            } else {
+                // Prima si rimette com'era il riconoscimento, poi si staccano i braccialetti se non servono più.
+                syncTrainingStrokes(ble.bands.value)
+                scope.launch {
+                    delay(1_500)
+                    if (!serveTraining) updateBandLinks()
+                }
+            }
+        }
+
+    /** Braccialetti già provati in questo allenamento: se il riconoscimento lo si spegne a mano, resta spento. */
+    private val trainingTried = mutableSetOf<String>()
+
+    /** Accende il riconoscimento dei colpi durante l'allenamento e lo rimette com'era dopo. */
+    private fun syncTrainingStrokes(bands: Map<Side, com.tennis.scoremanager.ble.BandInfo>) {
+        for ((side, info) in bands) {
+            if (info.state != LinkState.READY) continue
+            val st = info.settings?.takeIf { it.supportsStrokes } ?: continue
+            val auto = storage.strokesAutoOn
+            if (serveTraining) {
+                val first = synchronized(trainingTried) { trainingTried.add(info.address) }
+                if (first && !st.strokes) {
+                    storage.strokesAutoOn = auto + info.address
+                    scope.launch { ble.writeSettings(side, st.copy(strokes = true)) }
+                }
+            } else if (info.address in auto) {
+                storage.strokesAutoOn = auto - info.address
+                if (st.strokes) scope.launch { ble.writeSettings(side, st.copy(strokes = false)) }
+            }
+        }
+    }
 
     /** Sessioni di allenamento al servizio salvate, dalla più recente. */
     val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())

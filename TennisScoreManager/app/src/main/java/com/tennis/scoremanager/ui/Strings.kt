@@ -876,6 +876,9 @@ interface Strings {
     val helpNoResults: String
     val helpNext: String
     val helpRead: String
+    val trainRecOn: String
+    val trainRecStarting: String
+    val trainRecOldFw: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2013,6 +2016,9 @@ object ItStrings : Strings {
     override val helpNoResults = "Nessun risultato: prova con un'altra parola."
     override val helpNext = "Sezione dopo"
     override val helpRead = "Leggi il capitolo"
+    override val trainRecOn = "Riconoscimento colpi acceso: la clip parte dal colpo"
+    override val trainRecStarting = "Accendo il riconoscimento dei colpi…"
+    override val trainRecOldFw = "Firmware senza riconoscimento dei colpi (serve la 2.4): l'istante del colpo si stima dal tasto"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3133,6 +3139,9 @@ object EnStrings : Strings {
     override val helpNoResults = "No results: try another word."
     override val helpNext = "Next section"
     override val helpRead = "Read the chapter"
+    override val trainRecOn = "Stroke recognition on: the clip starts from the shot"
+    override val trainRecStarting = "Turning on stroke recognition…"
+    override val trainRecOldFw = "Firmware without stroke recognition (2.4 needed): the moment of the shot is guessed from the key"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

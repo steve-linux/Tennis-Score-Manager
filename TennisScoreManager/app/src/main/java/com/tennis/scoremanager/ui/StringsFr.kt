@@ -842,6 +842,9 @@ object FrStrings : Strings {
     override val helpNoResults = "Aucun résultat : essayez un autre mot."
     override val helpNext = "Section suivante"
     override val helpRead = "Lire le chapitre"
+    override val trainRecOn = "Reconnaissance des coups activée : le clip part du coup"
+    override val trainRecStarting = "J'active la reconnaissance des coups…"
+    override val trainRecOldFw = "Firmware sans reconnaissance des coups (il faut la 2.4) : l'instant du coup est estimé d'après la touche"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

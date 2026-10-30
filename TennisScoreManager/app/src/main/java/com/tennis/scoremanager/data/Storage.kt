@@ -365,6 +365,14 @@ class Storage(context: Context) {
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
 
     fun bandAddress(p1: Boolean): String? = prefs.getString(if (p1) "band_p1" else "band_p2", null)
+
+    /**
+     * Braccialetti a cui l'allenamento dei colpi ha acceso il riconoscimento (indirizzi): finito l'allenamento si
+     * rispegne, anche più tardi se intanto il braccialetto era spento.
+     */
+    var strokesAutoOn: Set<String>
+        get() = prefs.getStringSet("strokes_auto_on", null).orEmpty().toSet()
+        set(v) = prefs.edit().putStringSet("strokes_auto_on", v).apply()
     fun bandName(p1: Boolean): String? = prefs.getString(if (p1) "band_p1_name" else "band_p2_name", null)
     fun setBand(p1: Boolean, address: String?, name: String?) {
         prefs.edit()

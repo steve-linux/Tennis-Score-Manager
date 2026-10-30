@@ -590,7 +590,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
    - um auch zu sehen, wohin der Ball geht, alternativ: 3-4 m **hinter** dem Aufschläger, etwas seitlich, 1,5-2 m hoch;
    - nie vor den Aufschläger oder in die Flugbahn des Balls.
 3. **Seite** (Einstand/Vorteil), **erster oder zweiter** und bei Bedarf das **Ziel** (durch die Mitte, auf den Körper, nach außen) wählen: Sie gelten für die folgenden Aufschläge.
-4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck.
+4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck. Deshalb **schaltet die App beim Start die Schlagerkennung** am Armband von selbst ein (Firmware 2.4; keine Kalibrierung nötig, nur der Zeitpunkt zählt) und stellt sie am Ende wieder zurück; *Schlagerkennung an* auf dem Bildschirm bestätigt es. Mit älterer Firmware wird der Zeitpunkt aus der Taste geschätzt.
 5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild).
 6. Unter **Starten** stehen die letzten 3 Einheiten **des gewählten Schlags** (die Schlag-Tasten zeigen die Zahl der Einheiten, z. B. *Rückhand · 4*) und die Linie der **Schläge im Feld, Einheit für Einheit**. **Alle Einheiten** öffnet die des gewählten Schlags, nach Monaten, mit dem Platz der Videos und ob sie schon analysiert sind. Eine Einheit antippen für Übersicht und Clips; **gedrückt halten**, um sie auszuwählen (das Symbol oben wählt alle), dann **Löschen** (Einheit und Videos) oder **Nur Videos** (schafft Platz: Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben). **Fortschritt** zeigt den Verlauf jedes Schlags.
    - **Wo die Videos liegen**: in **Dokumente/Tennis Score Manager/Schlagtraining**, mit den Ordnern **Aufschlag**, **Vorhand**, **Rückhand** und **Volley** (beim Start angelegt), darin ein Ordner pro Einheit (Datum und Uhrzeit) und einer pro Schlag, mit `video.mp4` (lässt sich in jeder App öffnen und teilen), der Analyse und den drei Bildern. Jeder Dateimanager zeigt sie, und sie bleiben auch beim Deinstallieren der App (als Archiv: eine neu installierte App übernimmt die Einheiten nicht). Unter Android 8-10 liegt dieselbe Struktur im App-Ordner. Clips von Einheiten vor 2.5 werden beim ersten Start von selbst dorthin verschoben.
@@ -956,7 +956,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
    - to also see where the ball goes, as an alternative: 3-4 m **behind** the server, a little to the side, 1.5-2 m high;
    - never in front of the server or in the ball's path.
 3. Choose the **side** (deuce/ad), **first or second** and, if you like, the **target** (down the T, body, wide): they apply to the following serves.
-4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press.
+4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press. That is why at start-up the app **turns stroke recognition on** on the wristband by itself (firmware 2.4; no calibration needed, only the moment counts) and puts it back as it was at the end; *Stroke recognition on* on the screen confirms it. With older firmware the moment is guessed from the key.
 5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame).
 6. Under **Start** you find the last 3 sessions **of the chosen stroke** (the stroke buttons show how many sessions each has, e.g. *Backhand · 4*) and the line of **shots in, session after session**. **All sessions** opens those of the chosen stroke, by month, with the space their videos take and whether they have been analysed. Tap a session for its summary and clips; **press and hold** to select it (the icon at the top selects them all), then **Delete** (session and videos) or **Videos only** (frees space: counts, analysis measurements and key-moment pictures stay). **Progress** shows the trend of each stroke.
    - **Where the videos are**: in **Documents/Tennis Score Manager/Stroke practice**, with the folders **Serve**, **Forehand**, **Backhand** and **Volley** (created at start-up) and inside them a folder per session (date and time) and one per shot, with `video.mp4` (opens and shares from any app), the analysis and the three pictures. Any file manager shows them and they stay even if you uninstall the app (keep them as an archive: a reinstalled app does not pick its sessions up again). On Android 8-10 the same structure is in the app folder. Clips of sessions from before 2.5 move there by themselves at the first start.
@@ -1321,7 +1321,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
    - para ver también adónde va la pelota, como alternativa: 3-4 m **detrás** de quien saca, un poco de lado, a 1,5-2 m de altura;
    - nunca delante de quien saca ni en la trayectoria de la pelota.
 3. Elige el **lado** (derecho/izquierdo), **primero o segundo** y, si quieres, el **objetivo** (a la T, al cuerpo, abierto): valen para los saques siguientes.
-4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar.
+4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar. Por eso al empezar la app **activa sola el reconocimiento de golpes** en la pulsera (firmware 2.4; no hace falta calibrar, solo cuenta el instante) y al final lo deja como estaba; *Reconocimiento de golpes activado* en pantalla lo confirma. Con un firmware más antiguo el instante se estima por la tecla.
 5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma).
 6. Debajo de **Empezar** están las 3 últimas sesiones **del golpe elegido** (los botones de los golpes muestran cuántas sesiones tiene cada uno, p. ej. *Revés · 4*) y la línea de **golpes dentro, sesión tras sesión**. **Todas las sesiones** abre las del golpe elegido, por mes, con el espacio de los vídeos y si ya están analizadas. Toca una sesión para el resumen y los clips; **mantenla pulsada** para seleccionarla (el icono de arriba las selecciona todas) y luego **Borrar** (sesión y vídeos) o **Solo los vídeos** (libera espacio: quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave). **Progresos** muestra la evolución de cada golpe.
    - **Dónde están los vídeos**: en **Documentos/Tennis Score Manager/Entrenamiento de golpes**, con las carpetas **Saque**, **Derecha**, **Revés** y **Volea** (creadas al arrancar) y dentro una carpeta por sesión (fecha y hora) y una por golpe, con `video.mp4` (se abre y se comparte desde cualquier app), el análisis y las tres imágenes. Se ven con cualquier gestor de archivos y se quedan aunque desinstales la app (guárdalos como archivo: una app reinstalada no recupera sus sesiones). En Android 8-10 la misma estructura está en la carpeta de la app. Los clips de las sesiones anteriores a la 2.5 se mueven allí solos en el primer arranque.
@@ -1686,7 +1686,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
    - pour voir aussi où va la balle, en alternative : 3-4 m **derrière** le serveur, un peu sur le côté, à 1,5-2 m de haut ;
    - jamais devant le serveur ni sur la trajectoire de la balle.
 3. Choisissez le **côté** (droit/gauche), **premier ou second** et, si vous voulez, la **cible** (au T, au corps, extérieur) : ils valent pour les services suivants.
-4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui.
+4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui. C'est pourquoi au démarrage l'appli **active d'elle-même la reconnaissance des coups** sur le bracelet (firmware 2.4 ; pas besoin de calibrage, seul l'instant compte) et la remet comme avant à la fin ; *Reconnaissance des coups activée* à l'écran le confirme. Avec un firmware plus ancien, l'instant est estimé d'après la touche.
 5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image).
 6. Sous **Commencer** se trouvent les 3 dernières séances **du coup choisi** (les boutons des coups indiquent le nombre de séances, p. ex. *Revers · 4*) et la courbe des **coups dedans, séance après séance**. **Toutes les séances** ouvre celles du coup choisi, par mois, avec la place prise par les vidéos et si elles sont déjà analysées. Touchez une séance pour son bilan et ses clips ; **appuyez longuement** pour la sélectionner (l'icône en haut les sélectionne toutes), puis **Supprimer** (séance et vidéos) ou **Vidéos seules** (libère de la place : restent les décomptes, les mesures de l'analyse et les images des moments clés). **Progrès** montre l'évolution de chaque coup.
    - **Où sont les vidéos** : dans **Documents/Tennis Score Manager/Entraînement des coups**, avec les dossiers **Service**, **Coup droit**, **Revers** et **Volée** (créés au démarrage) et dedans un dossier par séance (date et heure) et un par coup, avec `video.mp4` (s'ouvre et se partage depuis n'importe quelle appli), l'analyse et les trois images. Tout gestionnaire de fichiers les montre et ils restent même si vous désinstallez l'appli (gardez-les comme archive : une appli réinstallée ne reprend pas ses séances). Sur Android 8-10, la même structure est dans le dossier de l'appli. Les clips des séances d'avant la 2.5 y sont déplacés tout seuls au premier démarrage.
@@ -2051,7 +2051,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
    - per vedere anche dove va la palla, in alternativa: 3-4 m **dietro** chi serve, un po' di lato, a 1,5-2 m d'altezza;
    - mai davanti a chi serve né sulla traiettoria della palla.
 3. Scegli **lato** (destra/sinistra), **prima o seconda** e, se vuoi, il **bersaglio** (al T, al corpo, esterno): valgono per i servizi seguenti.
-4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto.
+4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto. Per questo, all'avvio l'app **accende da sola il riconoscimento dei colpi** sul braccialetto (firmware 2.4; non serve la calibrazione, conta solo l'istante) e alla fine lo rimette com'era; sullo schermo *Riconoscimento colpi acceso* lo conferma. Con un firmware più vecchio l'istante si stima dal tasto.
 5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma).
 6. Sotto **Inizia** ci sono le ultime 3 sessioni **del colpo scelto** (sui tasti dei colpi il numero delle sessioni, es. *Rovescio · 4*) e la linea dei **colpi dentro, sessione dopo sessione**. **Tutte le sessioni** apre quelle del colpo scelto, divise per mese, con lo spazio occupato dai video e se sono già analizzate. Tocca una sessione per il riepilogo e le clip; **tienila premuta** per selezionarla (l'icona in alto le seleziona tutte), poi **Elimina** (sessione e video) o **Solo i video** (libera spazio: restano conteggi, misure dell'analisi e immagini dei momenti chiave). In **Progressi** c'è l'andamento di ogni colpo.
    - **Dove stanno i video**: in **Documenti/Tennis Score Manager/Allenamento colpi**, con le cartelle **Servizio**, **Dritto**, **Rovescio** e **Volée** (create all'avvio) e dentro una cartella per sessione (data e ora) e una per colpo, con `video.mp4` (si apre e si condivide da qualsiasi app), l'analisi e le tre immagini. Si vedono con qualsiasi file manager e restano anche disinstallando l'app (come archivio: reinstallandola, le sessioni nell'app non tornano). Su Android 8-10 la stessa struttura sta nella cartella dell'app. Le clip delle sessioni di prima della 2.5 si spostano lì da sole al primo avvio.
@@ -2416,7 +2416,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
    - para ver também para onde vai a bola, como alternativa: 3-4 m **atrás** de quem saca, um pouco de lado, a 1,5-2 m de altura;
    - nunca na frente de quem saca nem na trajetória da bola.
 3. Escolha o **lado** (direito/esquerdo), **primeiro ou segundo** e, se quiser, o **alvo** (no T, no corpo, aberto): valem para os saques seguintes.
-4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão.
+4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão. Por isso, ao começar, o app **liga sozinho o reconhecimento de golpes** na pulseira (firmware 2.4; não precisa calibrar, só conta o instante) e no fim deixa como estava; *Reconhecimento de golpes ligado* na tela confirma. Com um firmware mais antigo o instante é estimado pela tecla.
 5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro).
 6. Embaixo de **Começar** ficam as 3 últimas sessões **do golpe escolhido** (os botões dos golpes mostram quantas sessões cada um tem, ex. *Backhand · 4*) e a linha dos **golpes dentro, sessão após sessão**. **Todas as sessões** abre as do golpe escolhido, por mês, com o espaço dos vídeos e se já foram analisadas. Toque numa sessão para o resumo e os clipes; **segure** para selecioná-la (o ícone no alto seleciona todas) e depois **Apagar** (sessão e vídeos) ou **Só os vídeos** (libera espaço: ficam as contagens, as medidas da análise e as imagens dos momentos-chave). **Progresso** mostra a evolução de cada golpe.
    - **Onde ficam os vídeos**: em **Documentos/Tennis Score Manager/Treino de golpes**, com as pastas **Saque**, **Forehand**, **Backhand** e **Voleio** (criadas ao abrir o app) e dentro uma pasta por sessão (data e hora) e uma por golpe, com `video.mp4` (abre e compartilha de qualquer app), a análise e as três imagens. Aparecem em qualquer gerenciador de arquivos e ficam mesmo desinstalando o app (guarde como arquivo: um app reinstalado não recupera as sessões). No Android 8-10 a mesma estrutura fica na pasta do app. Os clipes das sessões de antes da 2.5 vão para lá sozinhos na primeira abertura.
@@ -3471,7 +3471,7 @@ class MatchController(
         announcer.configure(options.value.ttsEngine, options.value.ttsVoice)
         scope.launch(io) { voice.writeReadme(strings) }
         refreshVoiceCount()
-        if (options.value.mode == PlayMode.BANDS) restoreBands()
+        updateBandLinks()
         if (options.value.heartRate) restoreStraps()
         remotes.enabled = options.value.mode == PlayMode.REMOTES
         remotes.onGesture = { side, g -> onRemoteGesture(side, g) }
@@ -3716,7 +3716,7 @@ class MatchController(
             syncBandLanguage(ble.bands.value)
         }
         if (old.mode != v.mode) {
-            if (v.mode == PlayMode.BANDS) restoreBands() else ble.disconnectAll()
+            updateBandLinks()
             remotes.enabled = v.mode == PlayMode.REMOTES
         }
         if (old.heartRate != v.heartRate) {
@@ -3768,8 +3768,24 @@ class MatchController(
     // ---------------------------------------------------------------- braccialetti
 
     private fun restoreBands() {
-        storage.bandAddress(true)?.let { ble.assign(Side.P1, it, storage.bandName(true)) }
-        storage.bandAddress(false)?.let { ble.assign(Side.P2, it, storage.bandName(false)) }
+        // Solo i lati non ancora collegati a quel braccialetto: assign chiude e riapre il collegamento.
+        for (side in Side.entries) {
+            val p1 = side == Side.P1
+            val addr = storage.bandAddress(p1) ?: continue
+            if (ble.bands.value[side]?.address != addr) ble.assign(side, addr, storage.bandName(p1))
+        }
+    }
+
+    /** Pagina Dispositivi aperta: lì i braccialetti si collegano e si cercano in qualsiasi modalità. */
+    @Volatile private var devicesOpen = false
+
+    /** I braccialetti servono: partita in modalità braccialetti, allenamento dei colpi o pagina Dispositivi. */
+    private fun bandsWanted() = options.value.mode == PlayMode.BANDS || serveTraining || devicesOpen
+
+    /** Collega i braccialetti salvati quando servono, altrimenti li stacca (consumano meno e non segnano punti per sbaglio). */
+    private fun updateBandLinks() {
+        if (relay.isSatellite) return
+        if (bandsWanted()) restoreBands() else ble.disconnectAll()
     }
 
     fun assignBand(side: Side, address: String?, name: String?) {
@@ -3788,13 +3804,17 @@ class MatchController(
      * Ricerca automatica e continua mentre la pagina dei braccialetti è aperta (e l'app in primo piano).
      * I braccialetti trovati vanno da soli nei posti liberi: prima Giocatore 1, poi Giocatore 2.
      */
-    fun setBandScan(on: Boolean) {
-        autoAssign = on && options.value.mode == PlayMode.BANDS
+    fun setBandScan(on: Boolean, devicesPage: Boolean = false) {
+        if (devicesPage) {
+            devicesOpen = on
+            updateBandLinks()
+        }
+        autoAssign = on && bandsWanted()
         ble.setAutoScan(autoAssign)
     }
 
     private fun autoFill(found: List<FoundBand>) {
-        if (!autoAssign || options.value.mode != PlayMode.BANDS) return
+        if (!autoAssign || !bandsWanted()) return
         for (f in found.sortedByDescending { it.rssi }) {
             val bands = ble.bands.value
             if (bands.values.any { it.address == f.address } || f.address in autoBlocked) continue
@@ -3959,6 +3979,7 @@ class MatchController(
                 if (info.address !in bandBaseMa.value) storage.bandBaseMa(info.address)?.let { bandBaseMa.value = bandBaseMa.value + (info.address to it) }
             }
             syncBandLanguage(bands)
+            syncTrainingStrokes(bands)
         }
     }
 
@@ -3993,8 +4014,49 @@ class MatchController(
         }
     }
 
-    /** Allenamento al servizio aperto: i tasti del braccialetto vanno a lui, non alla partita. */
+    /**
+     * Allenamento dei colpi aperto: i tasti del braccialetto vanno a lui, non alla partita, e il riconoscimento dei colpi
+     * si accende da sé (serve l'istante del colpo per la clip e l'analisi; non serve la calibrazione).
+     */
     @Volatile var serveTraining = false
+        set(v) {
+            field = v
+            synchronized(trainingTried) { trainingTried.clear() }
+            if (v) {
+                // In allenamento il braccialetto serve qualunque sia la modalità della partita.
+                updateBandLinks()
+                syncTrainingStrokes(ble.bands.value)
+            } else {
+                // Prima si rimette com'era il riconoscimento, poi si staccano i braccialetti se non servono più.
+                syncTrainingStrokes(ble.bands.value)
+                scope.launch {
+                    delay(1_500)
+                    if (!serveTraining) updateBandLinks()
+                }
+            }
+        }
+
+    /** Braccialetti già provati in questo allenamento: se il riconoscimento lo si spegne a mano, resta spento. */
+    private val trainingTried = mutableSetOf<String>()
+
+    /** Accende il riconoscimento dei colpi durante l'allenamento e lo rimette com'era dopo. */
+    private fun syncTrainingStrokes(bands: Map<Side, com.tennis.scoremanager.ble.BandInfo>) {
+        for ((side, info) in bands) {
+            if (info.state != LinkState.READY) continue
+            val st = info.settings?.takeIf { it.supportsStrokes } ?: continue
+            val auto = storage.strokesAutoOn
+            if (serveTraining) {
+                val first = synchronized(trainingTried) { trainingTried.add(info.address) }
+                if (first && !st.strokes) {
+                    storage.strokesAutoOn = auto + info.address
+                    scope.launch { ble.writeSettings(side, st.copy(strokes = true)) }
+                }
+            } else if (info.address in auto) {
+                storage.strokesAutoOn = auto - info.address
+                if (st.strokes) scope.launch { ble.writeSettings(side, st.copy(strokes = false)) }
+            }
+        }
+    }
 
     /** Sessioni di allenamento al servizio salvate, dalla più recente. */
     val serveSessions = MutableStateFlow<List<com.tennis.scoremanager.data.ServeSession>>(emptyList())
@@ -11138,6 +11200,14 @@ class Storage(context: Context) {
         s?.let { runCatching { json.decodeFromString(SetupData.serializer(), it) }.getOrNull() }
 
     fun bandAddress(p1: Boolean): String? = prefs.getString(if (p1) "band_p1" else "band_p2", null)
+
+    /**
+     * Braccialetti a cui l'allenamento dei colpi ha acceso il riconoscimento (indirizzi): finito l'allenamento si
+     * rispegne, anche più tardi se intanto il braccialetto era spento.
+     */
+    var strokesAutoOn: Set<String>
+        get() = prefs.getStringSet("strokes_auto_on", null).orEmpty().toSet()
+        set(v) = prefs.edit().putStringSet("strokes_auto_on", v).apply()
     fun bandName(p1: Boolean): String? = prefs.getString(if (p1) "band_p1_name" else "band_p2_name", null)
     fun setBand(p1: Boolean, address: String?, name: String?) {
         prefs.edit()
@@ -19261,6 +19331,9 @@ interface Strings {
     val helpNoResults: String
     val helpNext: String
     val helpRead: String
+    val trainRecOn: String
+    val trainRecStarting: String
+    val trainRecOldFw: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -20398,6 +20471,9 @@ object ItStrings : Strings {
     override val helpNoResults = "Nessun risultato: prova con un'altra parola."
     override val helpNext = "Sezione dopo"
     override val helpRead = "Leggi il capitolo"
+    override val trainRecOn = "Riconoscimento colpi acceso: la clip parte dal colpo"
+    override val trainRecStarting = "Accendo il riconoscimento dei colpi…"
+    override val trainRecOldFw = "Firmware senza riconoscimento dei colpi (serve la 2.4): l'istante del colpo si stima dal tasto"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -21518,6 +21594,9 @@ object EnStrings : Strings {
     override val helpNoResults = "No results: try another word."
     override val helpNext = "Next section"
     override val helpRead = "Read the chapter"
+    override val trainRecOn = "Stroke recognition on: the clip starts from the shot"
+    override val trainRecStarting = "Turning on stroke recognition…"
+    override val trainRecOldFw = "Firmware without stroke recognition (2.4 needed): the moment of the shot is guessed from the key"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -22661,6 +22740,9 @@ object DeStrings : Strings {
     override val helpNoResults = "Keine Treffer: Versuche ein anderes Wort."
     override val helpNext = "Nächster Abschnitt"
     override val helpRead = "Kapitel lesen"
+    override val trainRecOn = "Schlagerkennung an: der Clip beginnt beim Schlag"
+    override val trainRecStarting = "Schlagerkennung wird eingeschaltet …"
+    override val trainRecOldFw = "Firmware ohne Schlagerkennung (2.4 nötig): der Zeitpunkt des Schlags wird aus der Taste geschätzt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -23797,6 +23879,9 @@ object EsStrings : Strings {
     override val helpNoResults = "Sin resultados: prueba con otra palabra."
     override val helpNext = "Sección siguiente"
     override val helpRead = "Leer el capítulo"
+    override val trainRecOn = "Reconocimiento de golpes activado: el clip parte del golpe"
+    override val trainRecStarting = "Activando el reconocimiento de golpes…"
+    override val trainRecOldFw = "Firmware sin reconocimiento de golpes (hace falta la 2.4): el instante del golpe se estima por la tecla"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -24935,6 +25020,9 @@ object FrStrings : Strings {
     override val helpNoResults = "Aucun résultat : essayez un autre mot."
     override val helpNext = "Section suivante"
     override val helpRead = "Lire le chapitre"
+    override val trainRecOn = "Reconnaissance des coups activée : le clip part du coup"
+    override val trainRecStarting = "J'active la reconnaissance des coups…"
+    override val trainRecOldFw = "Firmware sans reconnaissance des coups (il faut la 2.4) : l'instant du coup est estimé d'après la touche"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -26074,6 +26162,9 @@ object PtStrings : Strings {
     override val helpNoResults = "Nenhum resultado: tente outra palavra."
     override val helpNext = "Próxima seção"
     override val helpRead = "Ler o capítulo"
+    override val trainRecOn = "Reconhecimento de golpes ligado: o clipe parte do golpe"
+    override val trainRecStarting = "Ligando o reconhecimento de golpes…"
+    override val trainRecOldFw = "Firmware sem reconhecimento de golpes (precisa da 2.4): o instante do golpe é estimado pela tecla"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -28890,7 +28981,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
                 RequirementRow(Icons.Filled.Bluetooth, s.bluetooth, btOn, s.enable) { enableBluetooth() }
                 RequirementRow(Icons.Filled.LocationOn, s.location, blePerms && locPerm, s.allow) { requestBandPermissions() }
                 RequirementRow(Icons.Filled.MyLocation, s.locationServices, locOn, s.enable) { openLocationSettings() }
-                BandsSection(c, names, enabled = bandsReadyEnv)
+                BandsSection(c, names, enabled = bandsReadyEnv, devicesPage = true)
             }
             SectionCard(s.modeRemotes, Icons.Filled.SettingsRemote) { RemotesSection(c, names) }
         }
@@ -29084,7 +29175,7 @@ fun OptionsScreen(c: MatchController, page: OptionsPage = OptionsPage.MATCH) {
 }
 
 @Composable
-private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
+private fun BandsSection(c: MatchController, names: Names, enabled: Boolean, devicesPage: Boolean = false) {
     val s = LocalStrings.current
     val o by c.options.collectAsState()
     val found by c.ble.found.collectAsState()
@@ -29094,8 +29185,8 @@ private fun BandsSection(c: MatchController, names: Names, enabled: Boolean) {
 
     // Ricerca automatica e continua finché questa pagina è aperta e l'app è in primo piano.
     LifecycleResumeEffect(enabled) {
-        c.setBandScan(enabled)
-        onPauseOrDispose { c.setBandScan(false) }
+        c.setBandScan(enabled, devicesPage)
+        onPauseOrDispose { c.setBandScan(false, devicesPage) }
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -33421,6 +33512,14 @@ class CameraActivity : ComponentActivity() {
                     },
                     if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
                 )
+                // Riconoscimento dei colpi sul braccialetto: senza, l'istante del colpo si stima dal tasto.
+                band?.settings?.let { st ->
+                    when {
+                        !st.supportsStrokes -> Pill(str.trainRecOldFw, TsmColors.Orange)
+                        st.strokes -> Pill(str.trainRecOn, TsmColors.Ok)
+                        else -> Pill(str.trainRecStarting, TsmColors.SurfaceHigh)
+                    }
+                }
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
