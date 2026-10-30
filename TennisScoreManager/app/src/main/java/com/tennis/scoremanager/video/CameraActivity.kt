@@ -21,6 +21,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -45,6 +46,11 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Sensors
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.HelpOutline
@@ -55,6 +61,7 @@ import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -181,6 +188,19 @@ class CameraActivity : ComponentActivity() {
     private val serveSummary = MutableStateFlow(false)
     private val placementHelp = MutableStateFlow(false)
     private var lastDetected: ServeTraining.Detected? = null
+
+    /**
+     * Allenamento in pausa: telecamera e memoria spente, i tasti del braccialetto non segnano (KEY1 riprende).
+     * [autoPaused]: messa da sola dopo [AUTO_PAUSE_MS] senza colpi; allora anche un colpo riconosciuto la toglie.
+     */
+    private val trainPaused = MutableStateFlow(false)
+    private var autoPaused = false
+    /** Ultimo segno di vita dell'allenamento (colpo segnato o riconosciuto, un tasto sullo schermo). */
+    @Volatile private var lastTrainActivity = System.currentTimeMillis()
+    /** Spazio dei video salvati in questa sessione (byte), per l'indicatore. */
+    private val trainBytes = MutableStateFlow(0L)
+    /** L'anteprima, per riaccenderla dopo la pausa. */
+    private var previewView: SurfaceView? = null
     private var lastUsedDetectedAt: Long? = null
     /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
     private val outlineOn = MutableStateFlow(false)
@@ -338,6 +358,11 @@ class CameraActivity : ComponentActivity() {
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
+                // In pausa KEY1 riprende e gli altri tasti non fanno niente (niente colpi segnati per sbaglio).
+                if (trainPaused.value) {
+                    if (e.type == BandProtocol.EVT_POINT) resumeTraining(e.side)
+                    return@collect
+                }
                 when (e.type) {
                     BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
                     BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
@@ -349,8 +374,23 @@ class CameraActivity : ComponentActivity() {
         // un dritto: conta l'istante, e i picchi del polso.
         lifecycleScope.launch {
             controller.ble.strokes.collect { st ->
+                // Dopo la pausa automatica si ricomincia a giocare: si riprende da soli (questo colpo non ha la clip).
+                if (trainPaused.value) {
+                    if (autoPaused) resumeTraining()
+                    return@collect
+                }
+                lastTrainActivity = System.currentTimeMillis()
                 lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
                 servePending.value = true
+            }
+        }
+        // Pausa automatica: dopo qualche minuto senza colpi si spegne la telecamera (batteria, calore).
+        lifecycleScope.launch {
+            while (true) {
+                delay(5_000)
+                if (!trainPaused.value && serveSummary.value.not() && System.currentTimeMillis() - lastTrainActivity > AUTO_PAUSE_MS) {
+                    pauseTraining(auto = true)
+                }
             }
         }
     }
@@ -373,8 +413,43 @@ class CameraActivity : ComponentActivity() {
      * Dentro o fuori, dal braccialetto o dallo schermo. L'istante è quello del servizio riconosciuto (se c'è), e la
      * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
      */
+    /** Spegne telecamera e memoria; i tasti del braccialetto non segnano finché non si riprende. */
+    private fun pauseTraining(auto: Boolean = false) {
+        if (trainPaused.value) return
+        trainPaused.value = true
+        autoPaused = auto
+        servePending.value = false
+        stream?.let { st ->
+            if (st.isRecording) st.stopRecord()
+            if (st.isOnPreview) st.stopPreview()
+        }
+        say(if (auto) s.trainSayAutoPaused else s.trainSayPaused)
+        bandShow(null, s.trainBandPaused, s.trainBandResume)
+    }
+
+    /** Riaccende telecamera e memoria: le clip ripartono dai colpi seguenti. */
+    private fun resumeTraining(band: Side? = null) {
+        if (!trainPaused.value) return
+        trainPaused.value = false
+        autoPaused = false
+        lastTrainActivity = System.currentTimeMillis()
+        val v = previewView
+        stream?.let { st ->
+            if (v != null && !st.isOnPreview && v.holder.surface.isValid) {
+                st.startPreview(v)
+                openLens()
+            }
+        }
+        startBuffer()
+        say(s.trainSayResumed)
+        val n = ServeTraining.count(serveSession.value.serves)
+        bandShow(band, s.trainBandGo, "${n.inPlay}/${n.total}")
+    }
+
     private fun serveOutcome(inPlay: Boolean, band: Side? = null) {
+        if (trainPaused.value) return
         val now = System.currentTimeMillis()
+        lastTrainActivity = now
         val (at, used) = ServeTraining.anchor(now, lastDetected, lastUsedDetectedAt)
         used?.let { lastUsedDetectedAt = it.at }
         servePending.value = false
@@ -409,10 +484,12 @@ class CameraActivity : ComponentActivity() {
                 return@launch
             }
             saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
+            trainBytes.value = withContext(Dispatchers.IO) { controller.storage.serveVideoBytes(serveSession.value) }
         }
     }
 
     private fun undoServe(band: Side? = null) {
+        lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
         last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
@@ -757,7 +834,10 @@ class CameraActivity : ComponentActivity() {
                 SurfaceView(ctx).apply {
                     holder.addCallback(object : SurfaceHolder.Callback {
                         override fun surfaceCreated(h: SurfaceHolder) {
+                            previewView = this@apply
                             if (!prepare()) return
+                            // In pausa la telecamera resta spenta anche tornando nell'app.
+                            if (trainPaused.value) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
                             openLens()
@@ -778,6 +858,18 @@ class CameraActivity : ComponentActivity() {
             Outline()
             }
             Level()
+            // In pausa l'anteprima resta ferma sull'ultima immagine: un velo scuro dice che la telecamera è spenta.
+            if (serveMode) {
+                val paused by trainPaused.collectAsState()
+                if (paused) {
+                    Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.75f)), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(64.dp))
+                            Text(str.trainBandPaused, color = TsmColors.TextMain, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
             if (serveMode) ServeControls() else {
                 Controls(onSettings = { settings = true }, onFraming = { framing = true })
                 Calibration()
@@ -856,36 +948,65 @@ class CameraActivity : ComponentActivity() {
         val target by serveTarget.collectAsState()
         val li by lensIndex.collectAsState()
         val msg by message.collectAsState()
+        val paused by trainPaused.collectAsState()
+        val bytes by trainBytes.collectAsState()
         val n = ServeTraining.count(sess.serves)
         val band = bands.entries.firstOrNull { it.value.state == com.tennis.scoremanager.ble.LinkState.READY }?.value
+        // Spiegazioni lunghe solo all'inizio (8 s) o toccando "i": il resto del tempo l'inquadratura resta libera.
+        var info by remember { mutableStateOf(true) }
+        LaunchedEffect(info) { if (info) { delay(8_000); info = false } }
+        // Anche i messaggi spariscono da soli.
+        LaunchedEffect(msg) {
+            val m = msg ?: return@LaunchedEffect
+            delay(5_000)
+            if (message.value == m) message.value = null
+        }
+        val serve = sess.stroke == TrainedStroke.SERVE
+        val st = band?.settings
+        val recColor = when {
+            st == null -> TsmColors.SurfaceHigh
+            !st.supportsStrokes -> TsmColors.Orange
+            st.strokes -> TsmColors.Ok
+            else -> TsmColors.SurfaceHigh
+        }
+        val clips = sess.serves.count { it.clip != null }
+        val mb = String.format(java.util.Locale.ROOT, "%.0f MB", bytes / 1_048_576.0)
         Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                // Una riga sola, piccola: conteggio, ultimo colpo, braccialetto, riconoscimento, memoria, "i".
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
-                    Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                    Chip(Icons.Filled.Watch, null, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                    if (band != null) Chip(Icons.Filled.Sensors, null, recColor)
+                    if (paused) Chip(Icons.Filled.Pause, null, TsmColors.Orange)
+                    else Chip(Icons.Filled.FiberManualRecord, "$clips · $mb", TsmColors.SurfaceHigh, tint = TsmColors.Danger)
+                    Chip(Icons.Filled.Info, null, if (info) TsmColors.Ball else TsmColors.SurfaceHigh, tint = if (info) TsmColors.OnBall else TsmColors.TextMain) { info = !info }
                 }
-                val serve = sess.stroke == TrainedStroke.SERVE
-                Pill(
-                    strokeLabel(str, sess.stroke) + " · " + when {
-                        pending -> if (serve) str.serveDetected else str.strokeDetected
-                        else -> if (serve) str.serveWaiting else str.strokeWaiting
-                    },
-                    if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
-                )
-                // Riconoscimento dei colpi sul braccialetto: senza, l'istante del colpo si stima dal tasto.
-                band?.settings?.let { st ->
-                    when {
-                        !st.supportsStrokes -> Pill(str.trainRecOldFw, TsmColors.Orange)
-                        st.strokes -> Pill(str.trainRecOn, TsmColors.Ok)
-                        else -> Pill(str.trainRecStarting, TsmColors.SurfaceHigh)
+                // Colpo riconosciuto in attesa di dentro/fuori: serve vederlo, resta finché non si risponde.
+                if (pending && !paused) Pill(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveDetected else str.strokeDetected, TsmColors.Orange)
+                if (info) {
+                    Column(
+                        Modifier.clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface.copy(alpha = 0.85f)).padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        @Composable fun line(t: String) = Text(t, color = TsmColors.TextMain, fontSize = 13.sp)
+                        line(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand)
+                        line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
+                        st?.let { line(if (!it.supportsStrokes) str.trainRecOldFw else if (it.strokes) str.trainRecOn else str.trainRecStarting) }
+                        line(if (paused) (if (autoPaused) str.trainAutoPaused else str.trainPaused) else str.trainMemory(clips, mb))
                     }
                 }
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
-                Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                if (paused) {
+                    Btn(Icons.Filled.PlayArrow, str.trainResume, TsmColors.Ok) { resumeTraining() }
+                } else {
+                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
+                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                    Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
+                }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
                 if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
@@ -999,6 +1120,22 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
+    /** Segnale piccolo con un'icona (e a volte un numero): toccabile se c'è [onClick]. */
+    @Composable
+    private fun Chip(
+        icon: androidx.compose.ui.graphics.vector.ImageVector, text: String?, color: androidx.compose.ui.graphics.Color,
+        tint: androidx.compose.ui.graphics.Color = TsmColors.TextMain, onClick: (() -> Unit)? = null,
+    ) {
+        Row(
+            Modifier.clip(RoundedCornerShape(10.dp)).background(color).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp))
+            if (text != null) Text(" $text", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+    }
+
     @Composable
     private fun Pill(text: String, color: androidx.compose.ui.graphics.Color) {
         Text(
@@ -1048,6 +1185,8 @@ class CameraActivity : ComponentActivity() {
         const val EXTRA_SERVE = "serve"
         /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
         const val EXTRA_STROKE = "stroke"
+        /** Pausa automatica dell'allenamento dopo questo tempo senza colpi. */
+        const val AUTO_PAUSE_MS = 5 * 60_000L
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080

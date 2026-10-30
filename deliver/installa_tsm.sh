@@ -591,6 +591,8 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
    - nie vor den Aufschläger oder in die Flugbahn des Balls.
 3. **Seite** (Einstand/Vorteil), **erster oder zweiter** und bei Bedarf das **Ziel** (durch die Mitte, auf den Körper, nach außen) wählen: Sie gelten für die folgenden Aufschläge.
 4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck. Deshalb **schaltet die App beim Start die Schlagerkennung** am Armband von selbst ein (Firmware 2.4; keine Kalibrierung nötig, nur der Zeitpunkt zählt) und stellt sie am Ende wieder zurück; *Schlagerkennung an* auf dem Bildschirm bestätigt es. Mit älterer Firmware wird der Zeitpunkt aus der Taste geschätzt.
+   - **Der Bildschirm**: oben eine einzige Zeile (drin von Versuchen, der letzte Schlag und drei Symbole: Armband, Schlagerkennung, Speicher mit Zahl der Clips und Platz); die Erklärungen erscheinen ein paar Sekunden am Anfang und beim Antippen von **i**, damit der Bildausschnitt frei bleibt. Die Kamera hält die letzten zwei Minuten im **Speicher** und speichert **nur die markierten Schläge** (einige Sekunden davor und danach): keine langen Videos zum Schneiden.
+   - **Anhalten** schaltet Kamera und Speicher aus (Akku, Wärme), während du Bälle aufsammelst: die Tasten des Armbands zählen nichts, KEY1 oder **Weiter** setzen fort. Nach **5 Minuten ohne Schlag** pausiert das Training von selbst (die Stimme sagt es) und läuft dann auch beim ersten erkannten Schlag weiter.
 5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild).
 6. Unter **Starten** stehen die letzten 3 Einheiten **des gewählten Schlags** (die Schlag-Tasten zeigen die Zahl der Einheiten, z. B. *Rückhand · 4*) und die Linie der **Schläge im Feld, Einheit für Einheit**. **Alle Einheiten** öffnet die des gewählten Schlags, nach Monaten, mit dem Platz der Videos und ob sie schon analysiert sind. Eine Einheit antippen für Übersicht und Clips; **gedrückt halten**, um sie auszuwählen (das Symbol oben wählt alle), dann **Löschen** (Einheit und Videos) oder **Nur Videos** (schafft Platz: Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben). **Fortschritt** zeigt den Verlauf jedes Schlags.
    - **Wo die Videos liegen**: in **Dokumente/Tennis Score Manager/Schlagtraining**, mit den Ordnern **Aufschlag**, **Vorhand**, **Rückhand** und **Volley** (beim Start angelegt), darin ein Ordner pro Einheit (Datum und Uhrzeit) und einer pro Schlag, mit `video.mp4` (lässt sich in jeder App öffnen und teilen), der Analyse und den drei Bildern. Jeder Dateimanager zeigt sie, und sie bleiben auch beim Deinstallieren der App (als Archiv: eine neu installierte App übernimmt die Einheiten nicht). Unter Android 8-10 liegt dieselbe Struktur im App-Ordner. Clips von Einheiten vor 2.5 werden beim ersten Start von selbst dorthin verschoben.
@@ -957,6 +959,8 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
    - never in front of the server or in the ball's path.
 3. Choose the **side** (deuce/ad), **first or second** and, if you like, the **target** (down the T, body, wide): they apply to the following serves.
 4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press. That is why at start-up the app **turns stroke recognition on** on the wristband by itself (firmware 2.4; no calibration needed, only the moment counts) and puts it back as it was at the end; *Stroke recognition on* on the screen confirms it. With older firmware the moment is guessed from the key.
+   - **The screen**: a single row at the top (in out of attempts, the last shot and three icons: wristband, stroke recognition, memory with the number of clips and the space); the explanations show for a few seconds at the start and when you tap **i**, so the frame stays clear. The camera keeps the last two minutes in **memory** and saves **only the marked shots** (a few seconds before and after): no long videos to trim.
+   - **Pause** turns camera and memory off (battery, heat) while you pick up balls: the wristband keys mark nothing, KEY1 or **Resume** start again. After **5 minutes without shots** it pauses by itself (the voice says so) and then also restarts at the first recognised shot.
 5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame).
 6. Under **Start** you find the last 3 sessions **of the chosen stroke** (the stroke buttons show how many sessions each has, e.g. *Backhand · 4*) and the line of **shots in, session after session**. **All sessions** opens those of the chosen stroke, by month, with the space their videos take and whether they have been analysed. Tap a session for its summary and clips; **press and hold** to select it (the icon at the top selects them all), then **Delete** (session and videos) or **Videos only** (frees space: counts, analysis measurements and key-moment pictures stay). **Progress** shows the trend of each stroke.
    - **Where the videos are**: in **Documents/Tennis Score Manager/Stroke practice**, with the folders **Serve**, **Forehand**, **Backhand** and **Volley** (created at start-up) and inside them a folder per session (date and time) and one per shot, with `video.mp4` (opens and shares from any app), the analysis and the three pictures. Any file manager shows them and they stay even if you uninstall the app (keep them as an archive: a reinstalled app does not pick its sessions up again). On Android 8-10 the same structure is in the app folder. Clips of sessions from before 2.5 move there by themselves at the first start.
@@ -1322,6 +1326,8 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
    - nunca delante de quien saca ni en la trayectoria de la pelota.
 3. Elige el **lado** (derecho/izquierdo), **primero o segundo** y, si quieres, el **objetivo** (a la T, al cuerpo, abierto): valen para los saques siguientes.
 4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar. Por eso al empezar la app **activa sola el reconocimiento de golpes** en la pulsera (firmware 2.4; no hace falta calibrar, solo cuenta el instante) y al final lo deja como estaba; *Reconocimiento de golpes activado* en pantalla lo confirma. Con un firmware más antiguo el instante se estima por la tecla.
+   - **La pantalla**: arriba una sola línea (dentro sobre intentos, el último golpe y tres iconos: pulsera, reconocimiento de golpes, memoria con el número de clips y el espacio); las explicaciones aparecen unos segundos al principio y al tocar **i**, para dejar libre el encuadre. La cámara guarda en **memoria** los dos últimos minutos y graba **solo los golpes marcados** (unos segundos antes y después): nada de vídeos largos que recortar.
+   - **Pausa** apaga cámara y memoria (batería, calor) mientras recoges las bolas: las teclas de la pulsera no marcan nada, KEY1 o **Seguir** vuelven a empezar. Tras **5 minutos sin golpes** se pone en pausa sola (lo dice la voz) y entonces también sigue con el primer golpe reconocido.
 5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma).
 6. Debajo de **Empezar** están las 3 últimas sesiones **del golpe elegido** (los botones de los golpes muestran cuántas sesiones tiene cada uno, p. ej. *Revés · 4*) y la línea de **golpes dentro, sesión tras sesión**. **Todas las sesiones** abre las del golpe elegido, por mes, con el espacio de los vídeos y si ya están analizadas. Toca una sesión para el resumen y los clips; **mantenla pulsada** para seleccionarla (el icono de arriba las selecciona todas) y luego **Borrar** (sesión y vídeos) o **Solo los vídeos** (libera espacio: quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave). **Progresos** muestra la evolución de cada golpe.
    - **Dónde están los vídeos**: en **Documentos/Tennis Score Manager/Entrenamiento de golpes**, con las carpetas **Saque**, **Derecha**, **Revés** y **Volea** (creadas al arrancar) y dentro una carpeta por sesión (fecha y hora) y una por golpe, con `video.mp4` (se abre y se comparte desde cualquier app), el análisis y las tres imágenes. Se ven con cualquier gestor de archivos y se quedan aunque desinstales la app (guárdalos como archivo: una app reinstalada no recupera sus sesiones). En Android 8-10 la misma estructura está en la carpeta de la app. Los clips de las sesiones anteriores a la 2.5 se mueven allí solos en el primer arranque.
@@ -1687,6 +1693,8 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
    - jamais devant le serveur ni sur la trajectoire de la balle.
 3. Choisissez le **côté** (droit/gauche), **premier ou second** et, si vous voulez, la **cible** (au T, au corps, extérieur) : ils valent pour les services suivants.
 4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui. C'est pourquoi au démarrage l'appli **active d'elle-même la reconnaissance des coups** sur le bracelet (firmware 2.4 ; pas besoin de calibrage, seul l'instant compte) et la remet comme avant à la fin ; *Reconnaissance des coups activée* à l'écran le confirme. Avec un firmware plus ancien, l'instant est estimé d'après la touche.
+   - **L'écran** : une seule ligne en haut (bons sur tentatives, le dernier coup et trois icônes : bracelet, reconnaissance des coups, mémoire avec le nombre de clips et la place) ; les explications s'affichent quelques secondes au début et en touchant **i**, pour laisser le cadre libre. La caméra garde en **mémoire** les deux dernières minutes et n'enregistre **que les coups marqués** (quelques secondes avant et après) : pas de longues vidéos à couper.
+   - **Mettre en pause** éteint caméra et mémoire (batterie, chaleur) pendant que vous ramassez les balles : les touches du bracelet ne marquent rien, KEY1 ou **Reprendre** relancent. Après **5 minutes sans coup**, la pause se met toute seule (la voix le dit) et repart aussi au premier coup reconnu.
 5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image).
 6. Sous **Commencer** se trouvent les 3 dernières séances **du coup choisi** (les boutons des coups indiquent le nombre de séances, p. ex. *Revers · 4*) et la courbe des **coups dedans, séance après séance**. **Toutes les séances** ouvre celles du coup choisi, par mois, avec la place prise par les vidéos et si elles sont déjà analysées. Touchez une séance pour son bilan et ses clips ; **appuyez longuement** pour la sélectionner (l'icône en haut les sélectionne toutes), puis **Supprimer** (séance et vidéos) ou **Vidéos seules** (libère de la place : restent les décomptes, les mesures de l'analyse et les images des moments clés). **Progrès** montre l'évolution de chaque coup.
    - **Où sont les vidéos** : dans **Documents/Tennis Score Manager/Entraînement des coups**, avec les dossiers **Service**, **Coup droit**, **Revers** et **Volée** (créés au démarrage) et dedans un dossier par séance (date et heure) et un par coup, avec `video.mp4` (s'ouvre et se partage depuis n'importe quelle appli), l'analyse et les trois images. Tout gestionnaire de fichiers les montre et ils restent même si vous désinstallez l'appli (gardez-les comme archive : une appli réinstallée ne reprend pas ses séances). Sur Android 8-10, la même structure est dans le dossier de l'appli. Les clips des séances d'avant la 2.5 y sont déplacés tout seuls au premier démarrage.
@@ -2052,6 +2060,8 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
    - mai davanti a chi serve né sulla traiettoria della palla.
 3. Scegli **lato** (destra/sinistra), **prima o seconda** e, se vuoi, il **bersaglio** (al T, al corpo, esterno): valgono per i servizi seguenti.
 4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto. Per questo, all'avvio l'app **accende da sola il riconoscimento dei colpi** sul braccialetto (firmware 2.4; non serve la calibrazione, conta solo l'istante) e alla fine lo rimette com'era; sullo schermo *Riconoscimento colpi acceso* lo conferma. Con un firmware più vecchio l'istante si stima dal tasto.
+   - **Lo schermo**: in alto una riga sola (dentro su tentativi, l'ultimo colpo e tre icone: braccialetto, riconoscimento dei colpi, memoria col numero di clip e lo spazio); le spiegazioni compaiono per qualche secondo all'inizio e toccando **i**, così l'inquadratura resta libera. La telecamera tiene in **memoria** gli ultimi due minuti e salva **solo i colpi segnati** (qualche secondo prima e dopo): niente video lunghi da tagliare.
+   - **Pausa** spegne telecamera e memoria (batteria, calore) mentre raccogli le palline: i tasti del braccialetto non segnano niente, KEY1 o **Riprendi** fanno ripartire. Dopo **5 minuti senza colpi** la pausa si mette da sola (la voce lo dice) e allora riparte anche al primo colpo riconosciuto.
 5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma).
 6. Sotto **Inizia** ci sono le ultime 3 sessioni **del colpo scelto** (sui tasti dei colpi il numero delle sessioni, es. *Rovescio · 4*) e la linea dei **colpi dentro, sessione dopo sessione**. **Tutte le sessioni** apre quelle del colpo scelto, divise per mese, con lo spazio occupato dai video e se sono già analizzate. Tocca una sessione per il riepilogo e le clip; **tienila premuta** per selezionarla (l'icona in alto le seleziona tutte), poi **Elimina** (sessione e video) o **Solo i video** (libera spazio: restano conteggi, misure dell'analisi e immagini dei momenti chiave). In **Progressi** c'è l'andamento di ogni colpo.
    - **Dove stanno i video**: in **Documenti/Tennis Score Manager/Allenamento colpi**, con le cartelle **Servizio**, **Dritto**, **Rovescio** e **Volée** (create all'avvio) e dentro una cartella per sessione (data e ora) e una per colpo, con `video.mp4` (si apre e si condivide da qualsiasi app), l'analisi e le tre immagini. Si vedono con qualsiasi file manager e restano anche disinstallando l'app (come archivio: reinstallandola, le sessioni nell'app non tornano). Su Android 8-10 la stessa struttura sta nella cartella dell'app. Le clip delle sessioni di prima della 2.5 si spostano lì da sole al primo avvio.
@@ -2417,6 +2427,8 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
    - nunca na frente de quem saca nem na trajetória da bola.
 3. Escolha o **lado** (direito/esquerdo), **primeiro ou segundo** e, se quiser, o **alvo** (no T, no corpo, aberto): valem para os saques seguintes.
 4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão. Por isso, ao começar, o app **liga sozinho o reconhecimento de golpes** na pulseira (firmware 2.4; não precisa calibrar, só conta o instante) e no fim deixa como estava; *Reconhecimento de golpes ligado* na tela confirma. Com um firmware mais antigo o instante é estimado pela tecla.
+   - **A tela**: no alto uma linha só (dentro sobre tentativas, o último golpe e três ícones: pulseira, reconhecimento de golpes, memória com o número de clipes e o espaço); as explicações aparecem por alguns segundos no começo e ao tocar em **i**, para deixar o enquadramento livre. A câmera guarda na **memória** os dois últimos minutos e salva **só os golpes marcados** (alguns segundos antes e depois): nada de vídeos longos para cortar.
+   - **Pausa** desliga câmera e memória (bateria, calor) enquanto você recolhe as bolas: as teclas da pulseira não marcam nada, KEY1 ou **Retomar** recomeçam. Depois de **5 minutos sem golpes** a pausa entra sozinha (a voz avisa) e aí também recomeça no primeiro golpe reconhecido.
 5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro).
 6. Embaixo de **Começar** ficam as 3 últimas sessões **do golpe escolhido** (os botões dos golpes mostram quantas sessões cada um tem, ex. *Backhand · 4*) e a linha dos **golpes dentro, sessão após sessão**. **Todas as sessões** abre as do golpe escolhido, por mês, com o espaço dos vídeos e se já foram analisadas. Toque numa sessão para o resumo e os clipes; **segure** para selecioná-la (o ícone no alto seleciona todas) e depois **Apagar** (sessão e vídeos) ou **Só os vídeos** (libera espaço: ficam as contagens, as medidas da análise e as imagens dos momentos-chave). **Progresso** mostra a evolução de cada golpe.
    - **Onde ficam os vídeos**: em **Documentos/Tennis Score Manager/Treino de golpes**, com as pastas **Saque**, **Forehand**, **Backhand** e **Voleio** (criadas ao abrir o app) e dentro uma pasta por sessão (data e hora) e uma por golpe, com `video.mp4` (abre e compartilha de qualquer app), a análise e as três imagens. Aparecem em qualquer gerenciador de arquivos e ficam mesmo desinstalando o app (guarde como arquivo: um app reinstalado não recupera as sessões). No Android 8-10 a mesma estrutura fica na pasta do app. Os clipes das sessões de antes da 2.5 vão para lá sozinhos na primeira abertura.
@@ -19334,6 +19346,19 @@ interface Strings {
     val trainRecOn: String
     val trainRecStarting: String
     val trainRecOldFw: String
+    val trainPause: String
+    val trainResume: String
+    val trainPaused: String
+    val trainAutoPaused: String
+    /** Indicatore dell'allenamento: clip salvate e spazio. */
+    val trainMemory: (Int, String) -> String
+    val trainSayPaused: String
+    val trainSayAutoPaused: String
+    val trainSayResumed: String
+    /** Sul braccialetto (maiuscolo, testo semplice). */
+    val trainBandPaused: String
+    val trainBandResume: String
+    val trainBandGo: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -20474,6 +20499,17 @@ object ItStrings : Strings {
     override val trainRecOn = "Riconoscimento colpi acceso: la clip parte dal colpo"
     override val trainRecStarting = "Accendo il riconoscimento dei colpi…"
     override val trainRecOldFw = "Firmware senza riconoscimento dei colpi (serve la 2.4): l'istante del colpo si stima dal tasto"
+    override val trainPause = "Pausa"
+    override val trainResume = "Riprendi"
+    override val trainPaused = "In pausa: telecamera spenta, i tasti non segnano. KEY1 o Riprendi per continuare."
+    override val trainAutoPaused = "Pausa automatica dopo 5 minuti senza colpi: KEY1, Riprendi o un colpo per continuare."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memoria attiva · si salvano solo i colpi segnati · $n clip, $mb" }
+    override val trainSayPaused = "Allenamento in pausa"
+    override val trainSayAutoPaused = "Nessun colpo da cinque minuti: allenamento in pausa"
+    override val trainSayResumed = "Si riprende"
+    override val trainBandPaused = "Pausa"
+    override val trainBandResume = "KEY1 riprende"
+    override val trainBandGo = "Si riprende"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -21597,6 +21633,17 @@ object EnStrings : Strings {
     override val trainRecOn = "Stroke recognition on: the clip starts from the shot"
     override val trainRecStarting = "Turning on stroke recognition…"
     override val trainRecOldFw = "Firmware without stroke recognition (2.4 needed): the moment of the shot is guessed from the key"
+    override val trainPause = "Pause"
+    override val trainResume = "Resume"
+    override val trainPaused = "Paused: camera off, keys don't score. KEY1 or Resume to carry on."
+    override val trainAutoPaused = "Paused automatically after 5 minutes without shots: KEY1, Resume or a shot to carry on."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memory on · only marked shots are saved · $n clips, $mb" }
+    override val trainSayPaused = "Practice paused"
+    override val trainSayAutoPaused = "No shots for five minutes: practice paused"
+    override val trainSayResumed = "Back to it"
+    override val trainBandPaused = "Paused"
+    override val trainBandResume = "KEY1 resumes"
+    override val trainBandGo = "Resumed"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -22743,6 +22790,17 @@ object DeStrings : Strings {
     override val trainRecOn = "Schlagerkennung an: der Clip beginnt beim Schlag"
     override val trainRecStarting = "Schlagerkennung wird eingeschaltet …"
     override val trainRecOldFw = "Firmware ohne Schlagerkennung (2.4 nötig): der Zeitpunkt des Schlags wird aus der Taste geschätzt"
+    override val trainPause = "Anhalten"
+    override val trainResume = "Weiter"
+    override val trainPaused = "Pause: Kamera aus, Tasten zählen nicht. KEY1 oder Weiter zum Fortsetzen."
+    override val trainAutoPaused = "Automatische Pause nach 5 Minuten ohne Schlag: KEY1, Weiter oder ein Schlag zum Fortsetzen."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Speicher an · nur markierte Schläge werden gespeichert · $n Clips, $mb" }
+    override val trainSayPaused = "Training pausiert"
+    override val trainSayAutoPaused = "Seit fünf Minuten kein Schlag: Training pausiert"
+    override val trainSayResumed = "Weiter geht's"
+    override val trainBandPaused = "Angehalten"
+    override val trainBandResume = "KEY1 weiter"
+    override val trainBandGo = "Weiter"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -23882,6 +23940,17 @@ object EsStrings : Strings {
     override val trainRecOn = "Reconocimiento de golpes activado: el clip parte del golpe"
     override val trainRecStarting = "Activando el reconocimiento de golpes…"
     override val trainRecOldFw = "Firmware sin reconocimiento de golpes (hace falta la 2.4): el instante del golpe se estima por la tecla"
+    override val trainPause = "Pausa"
+    override val trainResume = "Seguir"
+    override val trainPaused = "En pausa: cámara apagada, las teclas no cuentan. KEY1 o Seguir para continuar."
+    override val trainAutoPaused = "Pausa automática tras 5 minutos sin golpes: KEY1, Seguir o un golpe para continuar."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memoria activa · solo se guardan los golpes marcados · $n clips, $mb" }
+    override val trainSayPaused = "Entrenamiento en pausa"
+    override val trainSayAutoPaused = "Ningún golpe en cinco minutos: entrenamiento en pausa"
+    override val trainSayResumed = "Seguimos"
+    override val trainBandPaused = "Pausa"
+    override val trainBandResume = "KEY1 sigue"
+    override val trainBandGo = "Seguimos"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -25023,6 +25092,17 @@ object FrStrings : Strings {
     override val trainRecOn = "Reconnaissance des coups activée : le clip part du coup"
     override val trainRecStarting = "J'active la reconnaissance des coups…"
     override val trainRecOldFw = "Firmware sans reconnaissance des coups (il faut la 2.4) : l'instant du coup est estimé d'après la touche"
+    override val trainPause = "Mettre en pause"
+    override val trainResume = "Reprendre"
+    override val trainPaused = "En pause : caméra éteinte, les touches ne comptent pas. KEY1 ou Reprendre pour continuer."
+    override val trainAutoPaused = "Pause automatique après 5 minutes sans coup : KEY1, Reprendre ou un coup pour continuer."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Mémoire active · seuls les coups marqués sont enregistrés · $n clips, $mb" }
+    override val trainSayPaused = "Entraînement en pause"
+    override val trainSayAutoPaused = "Aucun coup depuis cinq minutes : entraînement en pause"
+    override val trainSayResumed = "On reprend"
+    override val trainBandPaused = "En pause"
+    override val trainBandResume = "KEY1 reprend"
+    override val trainBandGo = "On reprend"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -26165,6 +26245,17 @@ object PtStrings : Strings {
     override val trainRecOn = "Reconhecimento de golpes ligado: o clipe parte do golpe"
     override val trainRecStarting = "Ligando o reconhecimento de golpes…"
     override val trainRecOldFw = "Firmware sem reconhecimento de golpes (precisa da 2.4): o instante do golpe é estimado pela tecla"
+    override val trainPause = "Pausa"
+    override val trainResume = "Retomar"
+    override val trainPaused = "Em pausa: câmera desligada, as teclas não contam. KEY1 ou Retomar para continuar."
+    override val trainAutoPaused = "Pausa automática após 5 minutos sem golpes: KEY1, Retomar ou um golpe para continuar."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memória ativa · só os golpes marcados são salvos · $n clipes, $mb" }
+    override val trainSayPaused = "Treino em pausa"
+    override val trainSayAutoPaused = "Nenhum golpe em cinco minutos: treino em pausa"
+    override val trainSayResumed = "Retomando"
+    override val trainBandPaused = "Pausa"
+    override val trainBandResume = "KEY1 retoma"
+    override val trainBandGo = "Retomando"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -32660,6 +32751,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32684,6 +32776,11 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Sensors
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.HelpOutline
@@ -32694,6 +32791,7 @@ import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32820,6 +32918,19 @@ class CameraActivity : ComponentActivity() {
     private val serveSummary = MutableStateFlow(false)
     private val placementHelp = MutableStateFlow(false)
     private var lastDetected: ServeTraining.Detected? = null
+
+    /**
+     * Allenamento in pausa: telecamera e memoria spente, i tasti del braccialetto non segnano (KEY1 riprende).
+     * [autoPaused]: messa da sola dopo [AUTO_PAUSE_MS] senza colpi; allora anche un colpo riconosciuto la toglie.
+     */
+    private val trainPaused = MutableStateFlow(false)
+    private var autoPaused = false
+    /** Ultimo segno di vita dell'allenamento (colpo segnato o riconosciuto, un tasto sullo schermo). */
+    @Volatile private var lastTrainActivity = System.currentTimeMillis()
+    /** Spazio dei video salvati in questa sessione (byte), per l'indicatore. */
+    private val trainBytes = MutableStateFlow(0L)
+    /** L'anteprima, per riaccenderla dopo la pausa. */
+    private var previewView: SurfaceView? = null
     private var lastUsedDetectedAt: Long? = null
     /** Sagoma del campo sull'anteprima e sua taratura (ricordata per campo: "Circolo · Campo" dell'arbitro). */
     private val outlineOn = MutableStateFlow(false)
@@ -32977,6 +33088,11 @@ class CameraActivity : ComponentActivity() {
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
             controller.ble.events.collect { e ->
+                // In pausa KEY1 riprende e gli altri tasti non fanno niente (niente colpi segnati per sbaglio).
+                if (trainPaused.value) {
+                    if (e.type == BandProtocol.EVT_POINT) resumeTraining(e.side)
+                    return@collect
+                }
                 when (e.type) {
                     BandProtocol.EVT_POINT -> serveOutcome(true, e.side)
                     BandProtocol.EVT_UNDO -> serveOutcome(false, e.side)
@@ -32988,8 +33104,23 @@ class CameraActivity : ComponentActivity() {
         // un dritto: conta l'istante, e i picchi del polso.
         lifecycleScope.launch {
             controller.ble.strokes.collect { st ->
+                // Dopo la pausa automatica si ricomincia a giocare: si riprende da soli (questo colpo non ha la clip).
+                if (trainPaused.value) {
+                    if (autoPaused) resumeTraining()
+                    return@collect
+                }
+                lastTrainActivity = System.currentTimeMillis()
                 lastDetected = ServeTraining.Detected(System.currentTimeMillis(), st.stroke.peakGyroDps, st.stroke.peakAccelG)
                 servePending.value = true
+            }
+        }
+        // Pausa automatica: dopo qualche minuto senza colpi si spegne la telecamera (batteria, calore).
+        lifecycleScope.launch {
+            while (true) {
+                delay(5_000)
+                if (!trainPaused.value && serveSummary.value.not() && System.currentTimeMillis() - lastTrainActivity > AUTO_PAUSE_MS) {
+                    pauseTraining(auto = true)
+                }
             }
         }
     }
@@ -33012,8 +33143,43 @@ class CameraActivity : ComponentActivity() {
      * Dentro o fuori, dal braccialetto o dallo schermo. L'istante è quello del servizio riconosciuto (se c'è), e la
      * clip si prende quando la memoria della moviola ha anche i 3 secondi dopo.
      */
+    /** Spegne telecamera e memoria; i tasti del braccialetto non segnano finché non si riprende. */
+    private fun pauseTraining(auto: Boolean = false) {
+        if (trainPaused.value) return
+        trainPaused.value = true
+        autoPaused = auto
+        servePending.value = false
+        stream?.let { st ->
+            if (st.isRecording) st.stopRecord()
+            if (st.isOnPreview) st.stopPreview()
+        }
+        say(if (auto) s.trainSayAutoPaused else s.trainSayPaused)
+        bandShow(null, s.trainBandPaused, s.trainBandResume)
+    }
+
+    /** Riaccende telecamera e memoria: le clip ripartono dai colpi seguenti. */
+    private fun resumeTraining(band: Side? = null) {
+        if (!trainPaused.value) return
+        trainPaused.value = false
+        autoPaused = false
+        lastTrainActivity = System.currentTimeMillis()
+        val v = previewView
+        stream?.let { st ->
+            if (v != null && !st.isOnPreview && v.holder.surface.isValid) {
+                st.startPreview(v)
+                openLens()
+            }
+        }
+        startBuffer()
+        say(s.trainSayResumed)
+        val n = ServeTraining.count(serveSession.value.serves)
+        bandShow(band, s.trainBandGo, "${n.inPlay}/${n.total}")
+    }
+
     private fun serveOutcome(inPlay: Boolean, band: Side? = null) {
+        if (trainPaused.value) return
         val now = System.currentTimeMillis()
+        lastTrainActivity = now
         val (at, used) = ServeTraining.anchor(now, lastDetected, lastUsedDetectedAt)
         used?.let { lastUsedDetectedAt = it.at }
         servePending.value = false
@@ -33048,10 +33214,12 @@ class CameraActivity : ComponentActivity() {
                 return@launch
             }
             saveServes { list -> list.map { if (it.at == at) it.copy(clip = clip) else it } }
+            trainBytes.value = withContext(Dispatchers.IO) { controller.storage.serveVideoBytes(serveSession.value) }
         }
     }
 
     private fun undoServe(band: Side? = null) {
+        lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
         last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
@@ -33396,7 +33564,10 @@ class CameraActivity : ComponentActivity() {
                 SurfaceView(ctx).apply {
                     holder.addCallback(object : SurfaceHolder.Callback {
                         override fun surfaceCreated(h: SurfaceHolder) {
+                            previewView = this@apply
                             if (!prepare()) return
+                            // In pausa la telecamera resta spenta anche tornando nell'app.
+                            if (trainPaused.value) return
                             val st = stream()
                             if (!st.isOnPreview) st.startPreview(this@apply)
                             openLens()
@@ -33417,6 +33588,18 @@ class CameraActivity : ComponentActivity() {
             Outline()
             }
             Level()
+            // In pausa l'anteprima resta ferma sull'ultima immagine: un velo scuro dice che la telecamera è spenta.
+            if (serveMode) {
+                val paused by trainPaused.collectAsState()
+                if (paused) {
+                    Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.75f)), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Pause, null, tint = TsmColors.Orange, modifier = Modifier.size(64.dp))
+                            Text(str.trainBandPaused, color = TsmColors.TextMain, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
             if (serveMode) ServeControls() else {
                 Controls(onSettings = { settings = true }, onFraming = { framing = true })
                 Calibration()
@@ -33495,36 +33678,65 @@ class CameraActivity : ComponentActivity() {
         val target by serveTarget.collectAsState()
         val li by lensIndex.collectAsState()
         val msg by message.collectAsState()
+        val paused by trainPaused.collectAsState()
+        val bytes by trainBytes.collectAsState()
         val n = ServeTraining.count(sess.serves)
         val band = bands.entries.firstOrNull { it.value.state == com.tennis.scoremanager.ble.LinkState.READY }?.value
+        // Spiegazioni lunghe solo all'inizio (8 s) o toccando "i": il resto del tempo l'inquadratura resta libera.
+        var info by remember { mutableStateOf(true) }
+        LaunchedEffect(info) { if (info) { delay(8_000); info = false } }
+        // Anche i messaggi spariscono da soli.
+        LaunchedEffect(msg) {
+            val m = msg ?: return@LaunchedEffect
+            delay(5_000)
+            if (message.value == m) message.value = null
+        }
+        val serve = sess.stroke == TrainedStroke.SERVE
+        val st = band?.settings
+        val recColor = when {
+            st == null -> TsmColors.SurfaceHigh
+            !st.supportsStrokes -> TsmColors.Orange
+            st.strokes -> TsmColors.Ok
+            else -> TsmColors.SurfaceHigh
+        }
+        val clips = sess.serves.count { it.clip != null }
+        val mb = String.format(java.util.Locale.ROOT, "%.0f MB", bytes / 1_048_576.0)
         Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                // Una riga sola, piccola: conteggio, ultimo colpo, braccialetto, riconoscimento, memoria, "i".
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
-                    Pill(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                    Chip(Icons.Filled.Watch, null, if (band != null) TsmColors.Ok else TsmColors.Orange)
+                    if (band != null) Chip(Icons.Filled.Sensors, null, recColor)
+                    if (paused) Chip(Icons.Filled.Pause, null, TsmColors.Orange)
+                    else Chip(Icons.Filled.FiberManualRecord, "$clips · $mb", TsmColors.SurfaceHigh, tint = TsmColors.Danger)
+                    Chip(Icons.Filled.Info, null, if (info) TsmColors.Ball else TsmColors.SurfaceHigh, tint = if (info) TsmColors.OnBall else TsmColors.TextMain) { info = !info }
                 }
-                val serve = sess.stroke == TrainedStroke.SERVE
-                Pill(
-                    strokeLabel(str, sess.stroke) + " · " + when {
-                        pending -> if (serve) str.serveDetected else str.strokeDetected
-                        else -> if (serve) str.serveWaiting else str.strokeWaiting
-                    },
-                    if (pending) TsmColors.Orange else TsmColors.SurfaceHigh,
-                )
-                // Riconoscimento dei colpi sul braccialetto: senza, l'istante del colpo si stima dal tasto.
-                band?.settings?.let { st ->
-                    when {
-                        !st.supportsStrokes -> Pill(str.trainRecOldFw, TsmColors.Orange)
-                        st.strokes -> Pill(str.trainRecOn, TsmColors.Ok)
-                        else -> Pill(str.trainRecStarting, TsmColors.SurfaceHigh)
+                // Colpo riconosciuto in attesa di dentro/fuori: serve vederlo, resta finché non si risponde.
+                if (pending && !paused) Pill(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveDetected else str.strokeDetected, TsmColors.Orange)
+                if (info) {
+                    Column(
+                        Modifier.clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface.copy(alpha = 0.85f)).padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        @Composable fun line(t: String) = Text(t, color = TsmColors.TextMain, fontSize = 13.sp)
+                        line(band?.let { str.serveBandOk(it.name) } ?: str.serveNoBand)
+                        line(strokeLabel(str, sess.stroke) + " · " + if (serve) str.serveWaiting else str.strokeWaiting)
+                        st?.let { line(if (!it.supportsStrokes) str.trainRecOldFw else if (it.strokes) str.trainRecOn else str.trainRecStarting) }
+                        line(if (paused) (if (autoPaused) str.trainAutoPaused else str.trainPaused) else str.trainMemory(clips, mb))
                     }
                 }
                 msg?.let { Pill(it, TsmColors.SurfaceHigh) }
             }
             Row(Modifier.align(Alignment.End).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
-                Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                if (paused) {
+                    Btn(Icons.Filled.PlayArrow, str.trainResume, TsmColors.Ok) { resumeTraining() }
+                } else {
+                    Btn(Icons.Filled.CheckCircle, str.serveIn, TsmColors.Ok) { serveOutcome(true) }
+                    Btn(Icons.Filled.Cancel, str.serveOut, TsmColors.Danger) { serveOutcome(false) }
+                    Btn(Icons.Filled.Pause, str.trainPause, TsmColors.SurfaceHigh) { pauseTraining() }
+                }
                 Btn(Icons.AutoMirrored.Filled.Undo, str.serveUndo, TsmColors.SurfaceHigh) { undoServe() }
                 if (sess.stroke == TrainedStroke.SERVE) {
                     Btn(Icons.Filled.SwapHoriz, serveSideName(str, side), TsmColors.SurfaceHigh) {
@@ -33638,6 +33850,22 @@ class CameraActivity : ComponentActivity() {
         }
     }
 
+    /** Segnale piccolo con un'icona (e a volte un numero): toccabile se c'è [onClick]. */
+    @Composable
+    private fun Chip(
+        icon: androidx.compose.ui.graphics.vector.ImageVector, text: String?, color: androidx.compose.ui.graphics.Color,
+        tint: androidx.compose.ui.graphics.Color = TsmColors.TextMain, onClick: (() -> Unit)? = null,
+    ) {
+        Row(
+            Modifier.clip(RoundedCornerShape(10.dp)).background(color).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(icon, null, tint = tint, modifier = Modifier.size(18.dp))
+            if (text != null) Text(" $text", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+    }
+
     @Composable
     private fun Pill(text: String, color: androidx.compose.ui.graphics.Color) {
         Text(
@@ -33687,6 +33915,8 @@ class CameraActivity : ComponentActivity() {
         const val EXTRA_SERVE = "serve"
         /** Colpo dell'allenamento (TrainedStroke, di serie il servizio). */
         const val EXTRA_STROKE = "stroke"
+        /** Pausa automatica dell'allenamento dopo questo tempo senza colpi. */
+        const val AUTO_PAUSE_MS = 5 * 60_000L
         private const val TAG = "Telecamera"
         private const val WIDTH = 1920
         private const val HEIGHT = 1080

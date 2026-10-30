@@ -879,6 +879,19 @@ interface Strings {
     val trainRecOn: String
     val trainRecStarting: String
     val trainRecOldFw: String
+    val trainPause: String
+    val trainResume: String
+    val trainPaused: String
+    val trainAutoPaused: String
+    /** Indicatore dell'allenamento: clip salvate e spazio. */
+    val trainMemory: (Int, String) -> String
+    val trainSayPaused: String
+    val trainSayAutoPaused: String
+    val trainSayResumed: String
+    /** Sul braccialetto (maiuscolo, testo semplice). */
+    val trainBandPaused: String
+    val trainBandResume: String
+    val trainBandGo: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2019,6 +2032,17 @@ object ItStrings : Strings {
     override val trainRecOn = "Riconoscimento colpi acceso: la clip parte dal colpo"
     override val trainRecStarting = "Accendo il riconoscimento dei colpi…"
     override val trainRecOldFw = "Firmware senza riconoscimento dei colpi (serve la 2.4): l'istante del colpo si stima dal tasto"
+    override val trainPause = "Pausa"
+    override val trainResume = "Riprendi"
+    override val trainPaused = "In pausa: telecamera spenta, i tasti non segnano. KEY1 o Riprendi per continuare."
+    override val trainAutoPaused = "Pausa automatica dopo 5 minuti senza colpi: KEY1, Riprendi o un colpo per continuare."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memoria attiva · si salvano solo i colpi segnati · $n clip, $mb" }
+    override val trainSayPaused = "Allenamento in pausa"
+    override val trainSayAutoPaused = "Nessun colpo da cinque minuti: allenamento in pausa"
+    override val trainSayResumed = "Si riprende"
+    override val trainBandPaused = "Pausa"
+    override val trainBandResume = "KEY1 riprende"
+    override val trainBandGo = "Si riprende"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3142,6 +3166,17 @@ object EnStrings : Strings {
     override val trainRecOn = "Stroke recognition on: the clip starts from the shot"
     override val trainRecStarting = "Turning on stroke recognition…"
     override val trainRecOldFw = "Firmware without stroke recognition (2.4 needed): the moment of the shot is guessed from the key"
+    override val trainPause = "Pause"
+    override val trainResume = "Resume"
+    override val trainPaused = "Paused: camera off, keys don't score. KEY1 or Resume to carry on."
+    override val trainAutoPaused = "Paused automatically after 5 minutes without shots: KEY1, Resume or a shot to carry on."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memory on · only marked shots are saved · $n clips, $mb" }
+    override val trainSayPaused = "Practice paused"
+    override val trainSayAutoPaused = "No shots for five minutes: practice paused"
+    override val trainSayResumed = "Back to it"
+    override val trainBandPaused = "Paused"
+    override val trainBandResume = "KEY1 resumes"
+    override val trainBandGo = "Resumed"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

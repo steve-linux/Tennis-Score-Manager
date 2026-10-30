@@ -846,6 +846,17 @@ object PtStrings : Strings {
     override val trainRecOn = "Reconhecimento de golpes ligado: o clipe parte do golpe"
     override val trainRecStarting = "Ligando o reconhecimento de golpes…"
     override val trainRecOldFw = "Firmware sem reconhecimento de golpes (precisa da 2.4): o instante do golpe é estimado pela tecla"
+    override val trainPause = "Pausa"
+    override val trainResume = "Retomar"
+    override val trainPaused = "Em pausa: câmera desligada, as teclas não contam. KEY1 ou Retomar para continuar."
+    override val trainAutoPaused = "Pausa automática após 5 minutos sem golpes: KEY1, Retomar ou um golpe para continuar."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Memória ativa · só os golpes marcados são salvos · $n clipes, $mb" }
+    override val trainSayPaused = "Treino em pausa"
+    override val trainSayAutoPaused = "Nenhum golpe em cinco minutos: treino em pausa"
+    override val trainSayResumed = "Retomando"
+    override val trainBandPaused = "Pausa"
+    override val trainBandResume = "KEY1 retoma"
+    override val trainBandGo = "Retomando"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

@@ -842,6 +842,17 @@ object DeStrings : Strings {
     override val trainRecOn = "Schlagerkennung an: der Clip beginnt beim Schlag"
     override val trainRecStarting = "Schlagerkennung wird eingeschaltet …"
     override val trainRecOldFw = "Firmware ohne Schlagerkennung (2.4 nötig): der Zeitpunkt des Schlags wird aus der Taste geschätzt"
+    override val trainPause = "Anhalten"
+    override val trainResume = "Weiter"
+    override val trainPaused = "Pause: Kamera aus, Tasten zählen nicht. KEY1 oder Weiter zum Fortsetzen."
+    override val trainAutoPaused = "Automatische Pause nach 5 Minuten ohne Schlag: KEY1, Weiter oder ein Schlag zum Fortsetzen."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Speicher an · nur markierte Schläge werden gespeichert · $n Clips, $mb" }
+    override val trainSayPaused = "Training pausiert"
+    override val trainSayAutoPaused = "Seit fünf Minuten kein Schlag: Training pausiert"
+    override val trainSayResumed = "Weiter geht's"
+    override val trainBandPaused = "Angehalten"
+    override val trainBandResume = "KEY1 weiter"
+    override val trainBandGo = "Weiter"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

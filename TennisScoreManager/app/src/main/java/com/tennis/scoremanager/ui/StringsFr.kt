@@ -845,6 +845,17 @@ object FrStrings : Strings {
     override val trainRecOn = "Reconnaissance des coups activée : le clip part du coup"
     override val trainRecStarting = "J'active la reconnaissance des coups…"
     override val trainRecOldFw = "Firmware sans reconnaissance des coups (il faut la 2.4) : l'instant du coup est estimé d'après la touche"
+    override val trainPause = "Mettre en pause"
+    override val trainResume = "Reprendre"
+    override val trainPaused = "En pause : caméra éteinte, les touches ne comptent pas. KEY1 ou Reprendre pour continuer."
+    override val trainAutoPaused = "Pause automatique après 5 minutes sans coup : KEY1, Reprendre ou un coup pour continuer."
+    override val trainMemory: (Int, String) -> String = { n, mb -> "Mémoire active · seuls les coups marqués sont enregistrés · $n clips, $mb" }
+    override val trainSayPaused = "Entraînement en pause"
+    override val trainSayAutoPaused = "Aucun coup depuis cinq minutes : entraînement en pause"
+    override val trainSayResumed = "On reprend"
+    override val trainBandPaused = "En pause"
+    override val trainBandResume = "KEY1 reprend"
+    override val trainBandGo = "On reprend"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
