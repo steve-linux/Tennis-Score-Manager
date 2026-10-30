@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -632,6 +632,7 @@ class MatchController(
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
             Screen.STROKE_SESSIONS -> Screen.HOME
+            Screen.HELP -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null

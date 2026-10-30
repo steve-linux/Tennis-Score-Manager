@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
@@ -292,6 +293,7 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
+    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
     Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }

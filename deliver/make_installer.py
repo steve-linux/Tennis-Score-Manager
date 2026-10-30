@@ -5,6 +5,7 @@
 import base64
 import pathlib
 import subprocess
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROJ = ROOT / "TennisScoreManager"
@@ -14,11 +15,17 @@ FW_FILES = sorted(p for p in FW_DIR.iterdir() if p.is_file())
 OUT = ROOT / "deliver" / "installa_tsm.sh"
 DELIM = "TSM_EOF"
 
-# File tracciati da git dentro il progetto Android (niente build/, .gradle/, local.properties)
+# Prima la guida dell'app (Altro › Aiuto), presa dalle guide qui accanto: così è sempre aggiornata.
+sys.path.insert(0, str(ROOT / "deliver"))
+import make_help  # noqa: E402
+
+help_files = [str(p.relative_to(ROOT)) for p in make_help.main()]
+
+# File tracciati da git dentro il progetto Android (niente build/, .gradle/, local.properties), più la guida appena fatta
 files = subprocess.run(
     ["git", "-C", str(ROOT), "ls-files", "TennisScoreManager"], capture_output=True, text=True, check=True
-).stdout.split()
-files = [f for f in files if not f.endswith("local.properties")]
+).stdout.splitlines()
+files = sorted(set(f for f in files if not f.endswith("local.properties")) | set(help_files))
 
 lines = [
     "#!/usr/bin/env bash",

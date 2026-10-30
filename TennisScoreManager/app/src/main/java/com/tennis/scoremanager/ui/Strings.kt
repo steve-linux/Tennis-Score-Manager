@@ -870,6 +870,12 @@ interface Strings {
     /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
     val strokeTrainingTitle: String
     /** Cartella in Documenti/Tennis Score Manager con le quattro cartelle dei colpi. */
+    val moreHelp: String
+    val moreHelpHint: String
+    val helpSearch: String
+    val helpNoResults: String
+    val helpNext: String
+    val helpRead: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2001,6 +2007,12 @@ object ItStrings : Strings {
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
     override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val moreHelp = "Aiuto"
+    override val moreHelpHint = "Guida completa: come si usa ogni funzione, passo per passo"
+    override val helpSearch = "Cerca nella guida"
+    override val helpNoResults = "Nessun risultato: prova con un'altra parola."
+    override val helpNext = "Sezione dopo"
+    override val helpRead = "Leggi il capitolo"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3115,6 +3127,12 @@ object EnStrings : Strings {
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
     override val strokeTrainingTitle = "Stroke practice"
+    override val moreHelp = "Help"
+    override val moreHelpHint = "Full guide: how to use every feature, step by step"
+    override val helpSearch = "Search the guide"
+    override val helpNoResults = "No results: try another word."
+    override val helpNext = "Next section"
+    override val helpRead = "Read the chapter"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

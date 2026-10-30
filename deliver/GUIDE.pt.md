@@ -102,7 +102,7 @@ Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo 
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
-- **Mais**: **Você** (o seu nome), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, raquetes, transferir partidas, apresentação, versão e licença.
+- **Mais**: **Você** (o seu nome), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
 
 **Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
 

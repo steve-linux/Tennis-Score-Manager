@@ -102,7 +102,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
 
 **Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
 

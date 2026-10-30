@@ -102,7 +102,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
-- **Altro**: **Tu** (il tuo nome), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, racchette, trasferimento delle partite, presentazione, versione e licenza.
+- **Altro**: **Tu** (il tuo nome), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
 **Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 

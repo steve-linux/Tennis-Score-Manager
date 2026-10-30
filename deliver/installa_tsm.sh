@@ -26,6 +26,7 @@ echo ">> Creo le cartelle / creating folders"
 mkdir -p "$DEST/app"
 mkdir -p "$DEST/app/src/main"
 mkdir -p "$DEST/app/src/main/assets"
+mkdir -p "$DEST/app/src/main/assets/help"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/ble"
 mkdir -p "$DEST/app/src/main/java/com/tennis/scoremanager/data"
@@ -310,6 +311,2197 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
         </provider>
     </application>
 </manifest>
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/de.md
+cat > "$DEST/app/src/main/assets/help/de.md" << 'TSM_EOF'
+## 3.1 Wie die App aufgebaut ist
+
+Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen wirst (Punkte zählen, mit Armbändern spielen, trainieren, Matches filmen) und deinen Namen; man kann überspringen und es unter **Mehr › App-Einführung** wiederholen. Unten gibt es immer **fünf Reiter**:
+
+- **Spielen**: **Neues Match**, das unterbrochene Match zum Fortsetzen, die **Revanche** des letzten, das **Turnier unter Freunden** (Americano, Mexicano) und **Dieses Telefon verwenden als** Anzeigetafel oder Kamera. Oben der Stand der Geräte (Armbänder, Gurte, Kamera, TV): antippen, um sie zu verbinden.
+- **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
+- **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
+- **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
+- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+
+**Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
+
+## 4. Die Stimme (funktioniert ohne Internet)
+
+- Jede Ansage wird **in einem einzigen Satz** von der Sprachausgabe des Telefons mit einer installierten Stimme gesprochen: kein Internet und eine natürliche Satzmelodie. Die Namen der Spieler sind Teil des Satzes.
+- Mehr › **Sprache und Stimme** › **Audio und Stimme**:
+  - **Sprachausgabe-Engine**: *Standard des Telefons* (bei Samsung ist das Samsung TTS) oder eine Engine deiner Wahl, z. B. *Sprachdienste von Google*. In den Tests, auf Italienisch durchgeführt, klang Google natürlicher.
+  - **Stimme**: *Automatisch (beste offline)* oder eine bestimmte Stimme (Google führt seine Stimmen mit einem Code auf, als *Stimme …*; die als *online* markierten brauchen Internet).
+  - **Stimme testen**: spricht eine Folge von Beispielansagen mit den eingegebenen Namen. Während des Sprechens wird die Taste zu **Test beenden**: Tippe erneut darauf, um abzubrechen (der Test stoppt auch von selbst, wenn du die Seite verlässt). Die Sprachausgabe lässt sich nicht mitten im Satz anhalten, deshalb beendet die Taste sie; drückst du erneut, beginnt sie wieder von vorn.
+- Fehlt die Stimme der gewählten Sprache: **Einstellungen › Allgemeine Verwaltung › Sprache › Text-zu-Sprache** (oder *Text-zu-Sprache-Ausgabe*) → die Stimme dieser Sprache für die gewählte Engine herunterladen (die App zeigt auch die Taste **Stimme installieren**). Startet die Sprachausgabe gar nicht, sagt die App das mit einer eigenen Meldung und der Taste **Einstellungen öffnen** (Sprachausgabe-Einstellungen von Android).
+- **Aussprache**: Manche Engines sprechen Tenniswörter falsch aus (auf Italienisch z. B. „primo set“ als „primo settembre“, „tie-break“ als „time break“). Die App korrigiert sie selbst; die Korrekturen wurden geprüft, indem das echte Audio von Samsung und Google transkribiert wurde.
+- **Eigene Aufnahmen** (die natürlichste Stimme überhaupt: deine oder die eines Schiedsrichters): Im Ordner `Android/data/io.github.steve_linux.tsm/files/voice/` liegt `LEGGIMI.txt` (die „Lies mich“-Datei; die Erklärungen oben stehen in der Sprache der App und werden bei einem Sprachwechsel neu geschrieben) mit der Liste der 85 Schlüssel und Sätze. Nimm die Dateien unter diesen Namen auf (`score_1_0.mp3` = „fünfzehn null“ …), pack sie in ein ZIP mit einem Ordner pro Sprache (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) und verwende **ZIP importieren**. `LEGGIMI.txt` hat eine Spalte pro Sprache, durch Tabulatoren getrennt, und lässt sich daher auch gut als Tabelle öffnen. Aufnahmen haben immer Vorrang vor der Sprachausgabe; die Namen spricht weiterhin die Sprachausgabe. Im ZIP zählt der Ordner, in dem die Datei liegt (auch innerhalb anderer Ordner, z. B. `voice/de/`); Dateien außerhalb eines Sprachordners gehen an die aktuelle Sprache, `tts/`-Ordner werden ignoriert – man kann also auch den Ordner `voice/` der App zippen. Ein beschädigtes oder unvollständiges ZIP ändert nichts (*ZIP nicht lesbar oder unvollständig*). **Aufnahmen entfernen** fragt nach. Lässt sich eine Datei nicht abspielen, spricht die Sprachausgabe diesen Satz, und die Datei wird bis zum Neustart der App nicht mehr verwendet.
+- **Vorab erzeugte Audiodateien verwenden** (optional): Mit **Dateien erzeugen** legt die App einmalig die 85 Dateien mit der gewählten Stimme an (auch mit einer *Online*-Stimme, wenn gerade Internet da ist) und verwendet sie dann statt der laufenden Sprachausgabe. Das klingt eher „zusammengestückelt“, ist aber praktisch, um eine Online-Stimme offline mitzunehmen. Die bisherigen Dateien bleiben, bis die neuen fertig sind (kommt die Erzeugung nicht ans Ende: *Erzeugung nicht abgeschlossen*); währenddessen sind Sprache, Engine, Stimme, Stimmtest und Audio gesperrt.
+- **Externer Lautsprecher**: einfach per Bluetooth mit dem Telefon koppeln; die Stimme kommt über den Medienkanal (Medienlautstärke einstellen).
+- **Bluetooth-Kopfhörer oder -Ohrhörer**: werden genauso gekoppelt, und nur du hörst die Stimme, ohne die Nachbarplätze zu stören; praktisch auch für alle, die vom Platzrand aus zählen. Die Armbänder können gleichzeitig verbunden bleiben.
+- **Zwei Audiogeräte gleichzeitig**: Viele Telefone geben den Ton auf zwei Bluetooth-Geräten zugleich aus. Bei Samsung: beide verbinden, Schnelleinstellungen › **Medienausgabe** öffnen und beide anhaken. So hat jeder Spieler seine eigenen Ohrhörer, oder der Lautsprecher spielt für den Platz und Kopfhörer für die Person, die zählt.
+
+### 4.1 Sprachen
+
+Mehr › **Sprache und Stimme** › **Sprache**: Italiano, English, Français, Deutsch, Español, Português (jede Sprache ist in der Sprache selbst geschrieben, so findet man sie auch dann wieder, wenn die App auf eine Sprache eingestellt ist, die man nicht lesen kann). Die Wahl gilt zugleich für **Bildschirme, Schiedsrichterstimme, TV-Anzeigetafel, Zusammenfassung/Teilen und Armbänder**. Das Datum folgt der Sprache (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026* …).
+
+Die Ansagen sind keine Wort-für-Wort-Übersetzungen: Sie folgen den offiziellen Texten für Stuhlschiedsrichter des jeweiligen Verbands, also FFT *L'arbitrage en 255 questions* und ITF auf Französisch, den Unterlagen von DTB/BTV und Swiss Tennis, RFET *Deberes y procedimientos* und FPT *Deveres e Procedimentos* (dem einzigen veröffentlichten portugiesischen Ansagetext). Das Englische folgt der ITF. Im Englischen heißt die Null in den Satzergebnissen am Matchende *love* („six love, six four“), wie bei den Punkten.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Beginn | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15:0 · 15:15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40:40 · Vorteil | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| Spielende | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Gleichstand in Spielen | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Tie-Break | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Satz | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| Matchende | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Seitenwechsel | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Besonderheiten:
+- Im Französischen und Spanischen steht der Name **nach** „au service“/„al servicio“, im Deutschen nach „Aufschlag“. Das Französische nennt den Satz **manche** (außer in „jeu, set et match“) und den Tie-Break **jeu décisif**.
+- **10:6 … 10:9** im Match-Tie-Break: Auf Französisch, Spanisch und Portugiesisch sagt man „dix **à** huit“, „diez **a** ocho“, „dez **a** oito“, weil „dix huit“ / „diez ocho“ / „dez oito“ wie *achtzehn* klingen.
+- **Portugiesisch**: nur eine Option, mit Oberfläche und bevorzugter Stimme aus Brasilien (fehlt die brasilianische Stimme, wird die portugiesische verwendet) und den Ansagen aus dem FPT-Text, mit Wörtern, die in beiden Ländern gelten („jogo“ und nicht „game“, „partida“). Aus „Um set a um“ wurde „sets iguais“: Im Singular klingt *set* wie *sete* (sieben), und es hörte sich nach 7:1 an.
+- **Aussprache**: Alle Sätze aller Sprachen wurden von den Google-Stimmen vorgelesen und mit whisper transkribiert. Hinzugekommene Korrekturen: Im Deutschen wird „Tie-Break“ als „Taibreak“ gesprochen, mit einem Komma davor (sonst „Teilbreg“ oder „bei Detailbreak“); im Französischen wird das einzelne „à“ der vorab erzeugten Dateien als „a“ gesprochen (sonst „a accent grave“). **Samsung TTS ist in den neuen Sprachen noch nicht getestet.**
+- **Armbänder** (Firmware 2.2): Die App schickt die Sprache von selbst bei jeder Verbindung und bei jeder Änderung; das Armband speichert sie und verwendet sie auch ohne Verbindung (Telefonsuche, Laden, Ausschalten), ohne Umlaute und Akzente, weil die Schrift nur ASCII kennt (*EN CHARGE*, *LAEDT*, *CARGANDO* …). Mit Firmware 2.1 oder älter sind die Meldungen, die die App schickt, übersetzt; die internen Texte des Armbands bleiben italienisch. Ein frisch programmiertes Armband startet auf Italienisch; ab Firmware 2.2.2 wird seine Verbindungsmeldung in der Sprache der App neu gezeichnet, sobald die App sie schickt, etwa eine Sekunde nach dem Verbinden.
+
+## 6. Die Armbänder benutzen
+
+| Taste | Aktion |
+|---|---|
+| **KEY1** (vorn) kurz | Punkt für den Träger des Armbands (startet auch das Match auf der Seite MATCHBEGINN); ein Piepton bestätigt (Firmware 2.3 + App 2.4: sobald das Telefon ihn empfangen hat, etwa eine halbe Sekunde später) |
+| **KEY1** lang (1 s) | zeigt den Akku (und hält das Armband eingeschaltet, wenn es sich gleich wegen Inaktivität ausschalten würde) |
+| **KEY2** kurz | nimmt den letzten Punkt zurück (auch im Popup am Matchende); zwei tiefere Pieptöne (mit Firmware 2.3 bei der Bestätigung durch das Telefon) |
+| **KEY2** lang (2 s) | schaltet das Armband aus (bei angeschlossenem Kabel steht dort *LAEDT WEITER*: Es lädt auch ausgeschaltet; ab Firmware 2.3 schalten es auch KEY1 oder KEY2 wieder ein) |
+| Seitentaste | ein Klick schaltet ein; Doppelklick schaltet aus (Hardwarefunktion) |
+
+- Beim Einschalten blinkt **KOPPELN...** (0,35 s an alle 2 s, um Strom zu sparen). Die App verbindet sich von selbst mit den Armbändern, die sie kennt, sobald sie geöffnet ist; neue findet sie unter **Mehr › Geräte** (oder unter **Modus und Regeln** im Modus *Armbänder*).
+- Verbunden: **GEKOPPELT** für 3 Sekunden mit zwei Pieptönen, dann **GEKOPPELT MIT** + der Name des Spielers.
+- Bei jedem Punkt geht das Display an und zeigt den Spielstand des laufenden Spiels groß (links deiner, rechts der des Gegners; der grüne Ball zeigt, wer aufschlägt), dann geht es wieder aus. Am Spielende zeigt es Spiele und Sätze. Bestätigt das Telefon einen Tastendruck nicht innerhalb von 8 Sekunden (Verbindung verloren), erscheint **NICHT GESENDET** in Rot mit zwei tiefen Pieptönen: Drücke erneut, sobald die Verbindung wieder steht. Ein Tastendruck während einer kurzen Unterbrechung geht dagegen nicht verloren: Er wird gesendet, sobald sich das Armband wieder verbindet, und erst dann piept es.
+
+**Automatisches Ausschalten** (die Zeiten änderst du in der App, 6.1):
+
+| Situation | Was das Armband macht | Standard |
+|---|---|---|
+| Eingeschaltet, aber kein Telefon verbindet sich | blinkt KOPPELN, schaltet sich dann aus | **30 s** |
+| Telefon verloren (aus, außer Reichweite, Bluetooth aus, App abrupt beendet) | blinkt VERBINDE NEU und verbindet sich von selbst wieder, sobald es kann; sonst schaltet es sich aus | 3 min |
+| Verbunden, aber inaktiv (kein Punkt, keine Meldung) | warnt 30 s vorher mit **INAKTIV · KEY1 GEDRUECKT HALTEN** und einem Piepton, schaltet sich dann aus | 30 min |
+| Match beendet (am Telefon bestätigt) oder **Beenden** in der App | zeigt MATCH BEENDET / APP BEENDET und schaltet sich sofort aus | an (abschaltbar, 7.2) |
+| Akku leer (unter 3,30 V bei zwei Messungen hintereinander) | zeigt AKKU LEER und schaltet sich aus, statt halb eingeschaltet zu bleiben | immer |
+
+- In den letzten 10 Sekunden vor dem Ausschalten ohne Telefon zeigt es **AUSSCHALTEN · 8s - TASTE DRUECKEN** mit einem Piepton: Jede beliebige Taste lässt die Frist bis zum Ausschalten von vorn beginnen.
+- Wenn es sich von selbst ausschaltet, meldet es das dem Telefon: Im Match zeigt der orange Kasten *ARMBAND 1 AUS (INAKTIV)*, *(AKKU LEER)* … Nach dem Ausschalten am Matchende sucht das Telefon nicht mehr ständig danach und verbindet sich von selbst, sobald du es wieder einschaltest.
+
+
+Die übrigen Stromsparmaßnahmen: CPU mit 80 MHz, Display aus, wenn es nicht gebraucht wird, Bluetooth Low Energy (das Funkmodul wacht 2- bis 3-mal pro Sekunde auf, ein Tastendruck geht trotzdem innerhalb von ~120 ms raus), Piepser nur während der Pieptöne an, Mikrofon und 5 V aus, Bewegungssensor (IMU) nur mit Schlagerkennung an (6.4).
+
+### 6.1 Armband-Einstellungen
+
+Unter **Mehr › Geräte** oder **Modus und Regeln** (**Einstellungen** unter dem Armband jedes Spielers) oder während des Matches (oben auf **S1**/**S2** tippen oder auf das Schieberegler-Symbol). Sie werden **im Armband** gespeichert und bleiben auch nach dem Ausschalten erhalten; bei jeder Änderung zeigt das Armband seinen Namen mit *EINSTELLUNGEN OK*. Mit Firmware 2.4 gibt es außerdem den Abschnitt **Schläge** (6.4).
+
+| Einstellung | Werte | Standard |
+|---|---|---|
+| Name | bis zu 12 Zeichen (z. B. der Name des Spielers oder „S1“) | TSM-xxxx |
+| Displayhelligkeit | 5–100 % | 20 % |
+| Spielstand nach jedem Punkt sichtbar | Aus, 2, 3, 5, 8 s (die Zusammenfassung am Spielende bleibt 2 s länger) | 3 s |
+| Lautstärke des Piepsers | Stumm–100 % | 50 % |
+| Display gedreht | um es am anderen Handgelenk zu tragen | nein |
+| Ausschalten: beim Einschalten ohne Telefon | 15 s – 5 min | 30 s |
+| Ausschalten: Telefon verloren | 1–10 min | 3 min |
+| Ausschalten: verbunden, aber inaktiv | 10–60 min | 30 min |
+
+Darunter steht die **geschätzte Laufzeit** (bei voller Ladung und mit der aktuellen Ladung) mit dem Verbrauch nach Posten aufgeschlüsselt: Sie ändert sich schon, während du die Regler bewegst, noch vor dem Bestätigen. Dann folgen **Erkennen**, **Ausschalten** und **Auf das andere Armband kopieren** (gleiche Einstellungen, das andere Armband behält seinen Namen). **Ausschalten** fragt nach, auch während eines Matches.
+
+### 6.2 Laden
+
+Schließ das USB-C-Kabel an: Das Armband piept und zeigt 30 Sekunden lang den **Ladebildschirm**, dann geht das Display aus und leuchtet alle 10 Sekunden für 1,5 s auf (ein kurzer Blick, wie die Kontrollleuchte eines Ladegeräts). **Jede beliebige Taste** schaltet ihn für weitere 30 Sekunden ein. War das Armband aus, schalte es mit einem Klick auf die Seitentaste ein, um ihn zu sehen (geladen wird trotzdem, auch im ausgeschalteten Zustand).
+
+```
+ TSM-3FA2   USB 5.01V              ← Name und Spannung am Kabel
+ ┌──────────┐
+ │██████ ⚡  │▌   78%               ← Akkusymbol und Ladestand
+ └──────────┘
+        LAEDT                      ← oder VOLL GELADEN / USB-STROM
+ 4.12V  SEIT 42 MIN  ENDE ~25 MIN  ← Akkuspannung, bisherige Ladedauer, geschätztes Ende
+```
+
+- **Prozentwert**: Beim Laden liegt die gemessene Spannung höher als die tatsächliche (≈0,1 V); das Armband korrigiert das, lässt den Wert nie sinken und erreicht **100 %** erst, wenn das Ladegerät meldet, dass es fertig ist. Bei voller Ladung wechselt die Anzeige auf **VOLL GELADEN** mit der benötigten Zeit (*GELADEN IN 1H 25*), und das Display bleibt aus (kein Aufleuchten in der Nacht).
+- **Geschätztes Ende**: Der Power-Chip (PM1) misst den Ladestrom nicht, deshalb wird die Restzeit daraus abgeleitet, wie stark die Ladung in den letzten 10 Minuten gestiegen ist: Sie erscheint nach 10 Minuten, auf 5 gerundet, und ist eine Schätzung.
+- **USB-STROM**: Das Kabel steckt, aber der Akku lädt nicht (und ist nicht voll): schwaches Kabel oder Netzteil, oder der Akku ist abgeklemmt.
+- **Mit Kabel schaltet es sich nicht von selbst aus** (kein Ausschalten wegen fehlendem Telefon oder Inaktivität, kein *AKKU LEER*); ausschalten kannst du es mit KEY2 lang. Nach dem Abziehen des Kabels zeigt es **USB GETRENNT · AKKU 97%**, und ab dann laufen wieder die normalen Ausschaltzeiten (6).
+- **Mit dem Telefon verbunden** (z. B. an einer Powerbank im Match) hat der Spielstand Vorrang: nur eine kurze Meldung *LAEDT 78%*, und KEY1 lang zeigt *VOLL GELADEN* oder *LAEDT*.
+- **In der App**: die Zeile des Armbands (unter *Geräte* und *Modus und Regeln*) und seine Einstellungen zeigen *Lädt 78 %* oder *Voll geladen*; im Match tragen die Felder S1/S2 das Symbol ⚡. Auch das Protokoll `files/battery_log.csv` hat zwei Spalten mehr (USB-Spannung, voll geladen): praktisch, um nachzuprüfen, wie lange das Laden wirklich dauert.
+- Armband und App berechnen den Prozentwert jetzt mit **derselben Kurve** des LiPo-Akkus (vorher nutzte das Armband eine weniger genaue Gerade), deshalb zeigen beide dieselbe Zahl.
+
+> Mit echten Armbändern noch zu prüfen: Das Laden konnte nicht auf der Hardware getestet werden. Vor allem, wie oft das Ladegerät *voll geladen* meldet und wie genau der Prozentwert beim Laden ist.
+
+### 6.3 Ohne Armbänder: Bluetooth-Fernbedienungen
+
+Die günstigste Lösung, damit die Spieler selbst zählen: zwei **Bluetooth-Selfie-Fernbedienungen** (die mit dem Auslöseknopf, oft als *AB Shutter3* verkauft), 1 bis 3 € pro Stück. Android sieht sie als Tastatur: keine Firmware zum Aufspielen und keine Berechtigungen für die App. Jedes andere Bluetooth- (oder USB-)Tastenfeld oder jede Tastatur geht auch.
+
+1. Die Fernbedienung einschalten und in den **Bluetooth-Einstellungen** des Telefons koppeln, wie einen Kopfhörer (*Mehr › Geräte › Bluetooth-Einstellungen* öffnet sie). Mit der zweiten wiederholen.
+2. *Modus und Regeln* › Modus **Fernbedienungen** › **Zuordnen** unter Spieler 1 › die Taste seiner Fernbedienung drücken, die den Punkt geben soll; dann dasselbe für Spieler 2. Bei jedem Klick einer zugeordneten Fernbedienung zeigt ihre Zeile **Taste empfangen**: So lässt sich vor dem Spiel testen. **S1 ↔ S2 tauschen** vertauscht sie.
+3. **MATCHBEGINN**: Ein Klick auf eine Fernbedienung startet das Match, wie KEY1 an den Armbändern. Oben sind **S1**/**S2** farbig, wenn die Fernbedienungen verbunden sind.
+
+| Geste | Aktion |
+|---|---|
+| ein Klick | Punkt für den, der die Fernbedienung hält (kommt eine halbe Sekunde später: Die App wartet, ob es ein Doppelklick ist) |
+| Doppelklick | macht den letzten Punkt rückgängig (auch im Popup am Matchende) |
+| 1 s gedrückt halten | macht den letzten Punkt rückgängig |
+| die andere Taste (Fernbedienungen mit zwei Tasten) | macht den letzten Punkt sofort rückgängig; innerhalb einer halben Sekunde nach einem Klick gedrückt, verwirft sie diesen Klick |
+
+- Es gelten die Schutzregeln der Armbänder: Zwei Punkte im Abstand von weniger als 2 Sekunden zählen einmal, zwei kurz aufeinanderfolgende Rücknahmen entfernen nur einen Punkt, *Match beendet* wird nur am Telefon bestätigt.
+- Viele Selfie-Fernbedienungen haben zwei Knöpfe (*iOS* und *Android*): Die beim Zuordnen gedrückte Taste gibt den Punkt, die andere macht rückgängig. Bei der CAMKIX (eine *AB Shutter3*) sendet der große Knopf LAUTER und der kleine EINGABE: Ordne sie mit dem großen Knopf zu, dann wird der kleine zu „rückgängig“. Sendet eine Fernbedienung bei jedem Druck zwei Tasten, bleibt ein Druck ein Klick.
+- **Der Bildschirm muss mit der App im Vordergrund an bleiben** (während des Matches hält die App ihn selbst an). Anders als bei den Armbändern kommen die Tasten einer Bluetooth-Tastatur nur bei der sichtbaren App an: Bei gesperrtem Bildschirm oder einer anderen geöffneten App zählen sie nicht. Bei langen Matches das Telefon laden lassen.
+- Trennt sich eine Fernbedienung während des Matches (aus, leer, zu weit weg), zeigt der orange Kasten *FERNBEDIENUNG 1 GETRENNT* und *VERBUNDEN*, wenn sie zurück ist. Viele Fernbedienungen schlafen nach einigen Minuten ohne Klick ein: Der erste Klick weckt sie und geht manchmal verloren. Sagt die Stimme den Punkt nicht an, noch einmal drücken.
+- Reichweite: etwa zehn Meter, wie Bluetooth-Kopfhörer; mit dem Telefon am Netz, in Platzmitte, sind beide Seiten abgedeckt. Batterie: meist eine Knopfzelle CR2032, die monatelang hält.
+
+### 6.4 Schlagerkennung
+
+Mit Firmware 2.4 erkennt das Armband **Vorhand, Rückhand, Aufschlag und Volley** mit seinem Bewegungssensor (IMU) und schickt sie an die App, die sie pro Spieler zählt. Die Erkennung lernt von der Person, die das Armband trägt: Zuerst ist eine kurze **Kalibrierung** nötig, deren Beispiele im Armband gespeichert bleiben.
+
+1. **Befestige das Armband am Handgelenk**, immer gleich (gleiches Handgelenk, gleiche Richtung). Die Erkennung beruht auf der Richtung der Bewegungen: Ein gegenüber der Kalibrierung gedrehtes Armband verwechselt die Schläge.
+2. Armband-Einstellungen (6.1) › **Schläge** › **Kalibrierung**: Tippe neben *Vorhand* auf **Kalibrieren**. Das Armband zeigt *VORHAND · KALIBRIERUNG 0/20*.
+3. Spiele **5-10 Vorhände** mit einer kurzen Pause dazwischen: Bei jedem Schlag steigt der Zähler, auf dem Armband und in der App (mit Piepton, wenn die Lautstärke nicht auf null steht). Ist ein Schlag misslungen, tippe auf **Letzten rückgängig**. Dann **Fertig**.
+4. Wiederhole das für Rückhand, Aufschlag und Volley. Der Papierkorb löscht die Beispiele eines Schlags, um sie neu zu machen. Es werden höchstens 20 Beispiele pro Schlag behalten (darüber hinaus wird das älteste ersetzt). 3 Beispiele für mindestens zwei Schläge genügen (*Bereit: Es erkennt die kalibrierten Schläge*), aber mehr und vielfältigere Beispiele ergeben eine bessere Erkennung.
+5. Schalte **Schlagerkennung** ein. Mit **Schlag auf dem Armband anzeigen** erscheint der Schlag kurz mit der Sicherheit der Erkennung (z. B. *RUECKHAND 87%*), nur wenn das Display gerade weder Spielstand noch Meldung zeigt.
+
+- Während des Matches zeigt eine Zeile unter den Zeiten die Schläge jedes Spielers (*S1 VH 12 · RH 8 · A 5 · V 3*). Sie zählen erst ab Matchbeginn, nicht beim Einspielen oder Kalibrieren.
+- Die Zusammenfassung (7) enthält die Schläge nach Art, das **Handgelenk-Tempo** (Durchschnitt und Maximum in °/s: wie kräftig geschlagen wurde, nicht die Ballgeschwindigkeit) und die **Schläge pro Punkt** (Länge der Ballwechsel). Hat nur ein Spieler ein Armband mit Schlägen, zählen die Ballwechsel nur seine Schläge.
+- Ein Schlag, der keinem Beispiel ähnelt, wird nicht angezeigt und zählt als *nicht erkannt*: Passiert das oft, prüfe, wie du das Armband trägst, oder füge Beispiele hinzu.
+- Langsame Bewegungen (sich neu aufstellen, den Ball aufheben) zählen nicht: Ein Schlag muss 400 °/s Handgelenkdrehung und 2,5 g Beschleunigung überschreiten.
+- **Akku**: Der Sensor braucht etwa 1 mA mehr, rund zwanzig Minuten bei voller Ladung (die Schätzung in den Einstellungen berücksichtigt das). Ohne Schlagerkennung bleibt der Sensor aus.
+- Bei sehr harten Schlägen erreicht das Gyroskop sein Maximum (2000 °/s): Die Erkennung leidet nicht darunter, aber das angezeigte Tempo ist etwas zu niedrig.
+
+### 6.5 Brustgurte
+
+Herzfrequenz und Kalorien von **Bluetooth-Brustgurten** mit dem Standard-Herzfrequenzdienst: Coospo (getestet mit dem H6), Magene, Polar, Garmin, Wahoo… Sie funktionieren in jedem Modus, auch ohne Armbänder.
+
+1. Befeuchte die Elektroden und lege den Gurt an: Er schaltet sich bei Hautkontakt selbst ein.
+2. *Modus und Regeln* (oder *Mehr › Geräte*) › **Herzfrequenz** › **Brustgurte** einschalten und für jeden Spieler den Gurt wählen (nur einmal). **Tauschen** vertauscht sie.
+3. Optional **Alter, Gewicht und Geschlecht** der Person: für die Kalorien (Keytel-Formel, typischer Fehler ±20 %) und, mit dem Alter, für die Herzfrequenzzonen (geschätztes Maximum 208 − 0,7 × Alter).
+
+- Unter jedem Gurt: Status, Herzfrequenz, **Signal** in dBm (näher an 0 = stärker) und **Aussetzer**, also wie oft die Herzfrequenz länger als 3 Sekunden ausblieb, mit den verlorenen Sekunden (*2 Aussetzer (14 s)*). Sie zählen ab dem „Spiel“ des Matches, vorher ab der Wahl des Gurts. Sie zeigen, wie weit der Gurt reicht.
+- Im Match zeigt eine Zeile die Live-Herzfrequenz (*S1 · 142 bpm*). In der Zusammenfassung (7): durchschnittliche und maximale Herzfrequenz, Kalorien, Verlauf und Zeit in den Herzfrequenzzonen. Pausen zählen nicht.
+- **Reichweite**: Test drinnen mit dem H6, Telefon ruhend: verbunden bis 21 m, aber bei −100 dBm, an der Grenze; mit dem Rücken zum Telefon sinkt das Signal um 5-10 dBm. Im Einzel ist der ferne Spieler 24-30 m vom Telefon entfernt: Damit keine Daten verloren gehen, nutze das **zweite Telefon** (6.6).
+
+### 6.6 Zweites Telefon hinter der anderen Grundlinie
+
+Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar Meter weniger als die Platzlänge. Mit einem zweiten Telefon hinter der anderen Grundlinie hat jeder Spieler immer eines in der Nähe: Das zweite (**Satellit**) empfängt Gurte und Armbänder der Spieler auf seiner Seite und überbrückt zum **Haupttelefon**, das das Match führt.
+
+1. **Haupttelefon**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden**. Beim ersten Mal fragt es nach der Berechtigung *Geräte in der Nähe* (bis Android 12 nach dem Standort). Das Telefon erstellt ein **eigenes, nur lokales Netz**: keine SIM, keine Daten, kein Vereins-WLAN nötig. Ein QR-Code erscheint.
+2. **Satellit**: Mehr › **Geräte** › **Zweites Telefon** › **Als zweites Telefon dienen** › QR-Code scannen. Android fragt einmal, ob es sich mit dem Netz des Haupttelefons (*AndroidShare_…*) verbinden soll: **Verbinden** tippen. Der Satellit behält seine mobilen Daten. Er muss *Mit dem Haupttelefon verbunden* anzeigen.
+3. Der Satellit folgt selbst den auf dem Haupttelefon gewählten Gurten und Armbändern, auf denselben Seiten: nichts zu wählen. Lass ihn mit geöffneter App hinter der Grundlinie liegen.
+
+- **Seitenwechsel**: nichts zu tun. Jeder Gurt und jedes Armband bleibt beim verbundenen Telefon, solange das Signal hält, dann übernimmt das nähere (ein paar Sekunden). Das Haupttelefon zeigt *Über zweites Telefon*; während der Übergabe kann ein Armband kurz als getrennt erscheinen.
+- **Keine Daten verloren**: Herzfrequenz, Tasten und Schläge des Satelliten tragen die **Match-ID** und eine laufende Nummer, und der Satellit behält sie, bis das Haupttelefon sie bestätigt. Fällt das WLAN zwischen den Telefonen aus, kommt die Herzfrequenz später an und füllt die Lücken im Verlauf; Schläge zählen, wenn sie zum selben Match gehören. Eine **Taste** des Armbands, die mehr als 5 Sekunden später ankommt, gibt keinen Punkt: noch einmal drücken. Dieselbe Taste auf zwei Wegen zählt nur einmal.
+- Vom Haupttelefon zu den Armbändern gehen Spielstand, Meldungen, *Identifizieren*, Ausschalten und Einstellungen. Einstellungen ändert man besser mit dem Armband am Haupttelefon.
+- **Anzeigetafel**: Auf dem Satelliten öffnet **Anzeigetafel zeigen** die Anzeigetafel des Matches im Vollbild (wie in 8.3), bereits mit dem Haupttelefon verbunden.
+- Kann das Haupttelefon das Netz nicht erstellen (normaler Hotspot schon an), nutzt es das WLAN, in dem es ist: Dann müssen beide Telefone im selben Netz sein. Mit Android 9 oder älter zeigt der Satellit Netzname und Passwort, die man in den WLAN-Einstellungen von Hand wählt.
+- **Beenden** schließt Verbindung und Netz; der Satellit kehrt zu seinen eigenen Gurten und Armbändern zurück.
+
+## 7. So benutzt du die App
+
+1. **Neues Match** (optional): **Tennis** oder **Padel** (App 2.5: gleiche Regeln, Zeiten und Ansagen; mit Padel werden Doppel und Golden Point von selbst eingestellt, beides änderbar (statt Golden Point gibt es unter *Modus und Regeln* auch den *Star Point* der FIP: höchstens zwei Vorteile, dann ein entscheidender Punkt), und die Zusammenfassung nennt *Padel*), Verein, Platz, Einzel/Doppel, Namen (im Doppel zwei Namen pro Team). **Adresse des Platzes suchen** (standardmäßig aus) ergänzt den Spielbericht um die Adresse neben den Koordinaten: Sie kommt vom Geocoding-Dienst des Telefons, der mit Google-Diensten die Koordinaten an Google sendet. **Weiter**. Mit *Padel* erscheint auch **Americano- oder Mexicano-Turnier**: 4 bis 16 Spieler und 1 bis 4 Plätze, Spiele nach Punkten (16, 24 oder 32: die Punkte beider Paare ergeben zusammen die Summe) oder nach Zeit. Beim *Americano* wechseln die Paare jede Runde, damit jeder mit und gegen möglichst viele spielt; beim *Mexicano* wird ab der zweiten Runde nach Tabelle gespielt (1. und 4. gegen 2. und 3. auf demselben Platz). In jeder Runde trägt man das Ergebnis jedes Platzes ein (nach Punkten reicht eine Zahl, die andere ergänzt sich) oder zählt es mit *Punkt für Punkt zählen*, mit Ansage und, nach Zeit, Stoppuhr; bei mehr Spielern als Plätzen wird abwechselnd pausiert. **Nächste Runde** startet, wenn alle Ergebnisse da sind; die **Tabelle** zählt die Punkte jedes Spielers, dann Siege und Punktedifferenz, und lässt sich als Text teilen.
+2. **Modus und Regeln**:
+   - *Schiedsrichter*, *Armbänder* oder *Fernbedienungen* (6.3). Mit den Armbändern sind eingeschaltetes Bluetooth, Standortberechtigung und aktivierter Standort Pflicht: Die Zeilen unter **Voraussetzungen** aktualisieren sich live (auch wenn du Bluetooth oder Standort in den Schnelleinstellungen ausschaltest) und werden rot, mit einer Schaltfläche zum Beheben.
+   - Die **Suche läuft automatisch und ohne Unterbrechung**, solange die Seite offen ist: Schalte die Armbänder ein, und sie belegen von selbst die freien Plätze (erst Spieler 1, dann Spieler 2). **Erkennen** lässt das jeweilige Armband in der Farbe des Spielers (gelb oder rot) blinken und piepen, so siehst du sofort, welches du in der Hand hast; **S1 ↔ S2 tauschen** vertauscht sie, ohne die Verbindung zu trennen. Im Auswahlmenü kannst du jederzeit ein anderes wählen oder *Keins* (ein von Hand entferntes Armband setzt die Suche nicht wieder ein). Ein Armband kann nicht zwei Spielern zugeordnet sein.
+   - **Armbänder am Matchende und beim Beenden ausschalten** (standardmäßig an): Beim Bestätigen von *Match beendet* und mit *Beenden* schalten sich die Armbänder aus, statt auf die Inaktivität zu warten.
+   - Im Schiedsrichtermodus erscheint beim Tippen auf **Weiter** ohne Standort die Aufforderung, ihn einzuschalten (sonst fehlt der Ort in der Zusammenfassung).
+   - Format (*2 Gewinnsätze*, *3 Gewinnsätze*, *2 Sätze + Match-Tie-Break bis 10*, *Pro-Satz* bis 8 oder 10 Spiele, *nur Match-Tie-Break bis 10*), Spiele pro Satz (6, oder 4 bei Kurzsätzen mit Tie-Break bei 4 beide), Tie-Break in den Sätzen an/aus (aus: der Satz läuft, bis jemand 2 Spiele vorne liegt), No-Ad. Sprache und Stimme stehen unter *Mehr › Sprache und Stimme* (4.1).
+   - **Wahl (Münzwurf)**: Die Münze dreht sich und zeigt, wer gewinnt; du stellst ein, wer aufschlägt, und die Platzseiten **vom Schiedsrichterstuhl aus gesehen** (Platzskizze mit **Seiten tauschen**). Im Doppel wählst du außerdem, wer in jedem Team zuerst aufschlägt.
+3. **MATCHBEGINN** blinkt: Drücke die Schaltfläche, KEY1 an einem Armband oder eine Fernbedienung. Die Stimme sagt *„erster Satz“ · „Aufschlag [Name]“ · „spielen“* mit 1 Sekunde zwischen den Sätzen; die **Match Time** startet bei „spielen“.
+4. **Match**: oben links die Matchdauer, rechts der Countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rot in den letzten 5 s). Der orange Kasten leuchtet 5 s lang auf bei *Seitenwechsel, Tie-Break, Satzball, Matchball, Breakball …*. Die beiden quadratischen Tasten (gelb = Spieler 1, rot = Spieler 2) liegen auf der Seite, auf der die Spieler tatsächlich stehen, und tauschen bei jedem Seitenwechsel die Plätze; unter dem Aufschläger erscheint **On Serve**. Darunter: *Punkt zurück*, *Unterbrechen/Fortsetzen*, Audio (Lautsprechersymbol, durchgestrichen = aus), *Neues Match*, **Beenden**. Im Armbandmodus stehen unter den Zeiten **S1**/**S2** mit Akku und Restlaufzeit: Ein Tippen darauf öffnet die Armband-Einstellungen. Ein Doppeltipp auf *Punkt zurück* nimmt nur einen Punkt zurück (ein zweiter Tipp innerhalb 1 s zählt nicht); direkt nach einem Seitenwechsel wird der zweite Tipp eines Doppeltipps ignoriert, damit er nicht auf einer Schaltfläche der neuen Seite landet. Das **Schloss** unten sperrt den Bildschirm (etwa mit dem Telefon in der Tasche oder auf der Bank): Berührungen bewirken nichts, Armbänder und Fernbedienungen schon; Entsperren durch langes Drücken auf das Schloss.
+5. Beim letzten Punkt erscheint das Popup **Match beendet / Letzten Punkt zurücknehmen**. „Match beendet“ wird **nur am Telefon** bestätigt. Eine halbe Sekunde nach dem Erscheinen ignorieren seine Schaltflächen Tipps: Ein Doppeltipp auf den letzten Punkt nimmt nichts zurück.
+6. **Zusammenfassung**: Sieger, Namen, Ergebnis Satz für Satz mit den Tie-Break-Punkten, Dauer, Beginn und Ende, Datum, Verein, Platz, Ort, Format, gewonnene Punkte und Spiele. Schaltflächen **Dateien speichern** (Dateiname + frei wählbarer Ordner + Formate .txt/.json/.png und **vollständiges PDF** mit Ergebnis, Statistik des Matches und jedes Satzes, Verlauf und Fotos). **Teilen** fragt, ob das Bild mit Text (für WhatsApp und soziale Netze) oder das vollständige PDF gesendet wird. In der Übersicht hält **Fotos vom Match** bis zu 10 Erinnerungsfotos (aus der Galerie oder direkt aufgenommen): Sie bleiben auf dem Telefon, kommen ins PDF und mit der Übertragung auf das andere Telefon, nie ins Bild für soziale Netze, **Teilen** (Bild 1080×1350 + Text für WhatsApp/Instagram/…), **Neues Match**, **Beenden**. Unter den Fotos nimmt **Notizen** freien Text auf (bis zu 2000 Zeichen): Er speichert sich von selbst, kommt ins PDF, in den geteilten Text und in die .txt- und .json-Dateien und mit der Übertragung auf das andere Telefon; ins Bild für soziale Netze kommt er nicht. Ein beendetes Match kommt von selbst in den **Verlauf** (Reiter **Fortschritt**): die Liste der Matches, mit ihrer Zusammenfassung wieder zu öffnen oder zu löschen, und der Reiter **Spieler** mit Siegen, Niederlagen und direktem Vergleich aller, deren Name unter *Neues Match* steht (Groß-/Kleinschreibung und Leerzeichen zählen nicht; im Doppel zählt jeder Spieler). **Importieren** fügt Matches hinzu, die auf einem anderen Telefon mit *Dateien speichern* als .json gespeichert wurden: beendete kommen in den Verlauf, unbeendete zu den unterbrochenen Matches zum Fortsetzen. **Übertragen** (oben rechts im Verlauf) bringt Verlauf und unterbrochene Matches per QR-Code auf ein anderes Telefon: beide Telefone müssen im selben WLAN sein oder eines im Hotspot des anderen; auf dem Telefon mit den Daten tippst du *Senden* und lässt das Fenster mit dem Code offen, auf dem anderen *Empfangen* und scannst den Code (Kameraberechtigung nötig). So lässt sich auch ein laufendes Match auf einem anderen Telefon fortsetzen: unterbrechen, übertragen, fortsetzen. Die Matches kommen zu den vorhandenen hinzu. **Spielerfotos**: Tippe auf den Kreis neben dem Namen unter *Neues Match* (oder im Spielerdetail im Verlauf) und wähle ein Foto; es wird quadratisch zugeschnitten und über den Namen wiedergefunden. Es erscheint im Verlauf, in der Zusammenfassung und auf der TV-Anzeigetafel, bleibt nur auf diesem Telefon (es kommt bei der Übertragung mit) und landet nicht im geteilten Bild. Erneutes Tippen auf den Kreis ändert oder entfernt es. Schließt sich die App, während du auf der Zusammenfassung bist (Android schließt sie im Hintergrund, ein Update, ein Neustart des Telefons), findest du sie beim erneuten Öffnen wieder; nicht, wenn du sie selbst mit *Neues Match*, *Beenden* oder durch Entfernen der App aus den letzten Apps verlassen hast. Der Standardordner ist **Documents/Tennis Score Manager** (ab Android 10; unter Android 8 und 9 der App-Ordner): Er lässt sich mit jeder Dateien-App öffnen und bleibt auch nach dem Deinstallieren der App. Wird zweimal unter demselben Namen gespeichert, heißt die zweite Datei *Name (1)*; im Bild werden lange Texte (Namen, Adresse) an die Breite angepasst.
+
+   Die Zusammenfassung hat drei Reiter. **Übersicht**: die Daten oben und, mit Armbändern 2.4, Schläge, Handgelenk-Tempo und Schläge pro Punkt (6.4). **Statistiken**, für das Match oder einen Satz: die beiden Spieler im Vergleich mit Balken, die von der Mitte ausgehen (farbig bei dem, der vorne liegt), für gewonnene Aufschlag- und Returnpunkte und -spiele, abgewehrte und genutzte Breakbälle, gewonnene Punkte und Spiele gesamt, Punkte in Folge, letzte 10 Punkte, abgewehrte Matchbälle; mit Armbändern 2.4 auch Schläge nach Art und durchschnittliches Handgelenk-Tempo. **Punkt für Punkt**: Satz für Satz jedes Spiel mit dem Ball beim Aufschläger, *AUFSCHLAG VERLOREN* bei Breaks, der Spielstand nach jedem Punkt mit **BB** (Breakball), **SB** (Satzball) und **MB** (Matchball) und dem Ausgang (*SPIEL*, *BREAK*, *SATZ*, *MATCH*). Asse, Doppelfehler, erste Aufschläge, Winner und Fehler gibt es, wenn du unter *Modus und Regeln* die **Detaillierte Statistik** einschaltest: statt der zwei großen Tasten erscheinen *Ass* und *Aufschlagfehler* (beim zweiten Mal *Doppelfehler*) und für jeden Spieler *Winner*, *Fehler* (der Punkt geht an die andere Seite) und *Punkt*; *Punkt zurück* nimmt auch einen Aufschlagfehler zurück. Gedacht für jemanden, der vom Spielfeldrand zählt. Nach *Fehler* erscheint 6 Sekunden lang *Unerzwungen / Erzwungen*; mit Armbändern oder Fernbedienungen erscheint nach jedem Punkt *Wie endete der Punkt?* (Ass, Winner, Fehler): Antworten ist freiwillig, der Spielstand ändert sich nicht. Im Verlauf zeigt das Spielerdetail den **Verlauf**: gewonnene Punkte Match für Match und die Durchschnitte von Assen, Doppelfehlern, ersten Aufschlägen, Winnern und Fehlern. Die Statistik jedes Matches zählt auch verwandelte Spiel-, Satz- und Matchbälle, Zu-null-Spiele, Spiele in Folge, nach Break-Rückstand gewonnene Sätze und in der Karte **Zeiten** die Dauer jedes Satzes und das längste Spiel.
+
+   **Revanche** (unten in der Übersicht): schlägt denselben Wochentag und dieselbe Uhrzeit in der Woche darauf und den Verein des Matches vor; Datum, Uhrzeit und Ort lassen sich ändern, eine Notiz hinzufügen. **Einladung senden** öffnet das Teilen (WhatsApp, SMS, E-Mail…) mit der fertigen Nachricht: wer gegen wen, wann, wo und wie es letztes Mal ausging. **In den Kalender** legt den Termin in der Kalender-App an, **Match vorbereiten** holt Spieler, Verein, Platz und Regeln in *Neues Match* zurück (das Turnier nicht). Kein Konto: Die Einladung läuft über die Kanäle, die du schon nutzt.
+
+**App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie im Reiter **Spielen**.
+
+**Speichern**: Das Match speichert sich bei jedem Punkt von selbst. *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
+
+### 7.1 Training mit dem Gurt
+
+Zum Trainieren mit dem Brustgurt ohne Match: **Trainieren** › **Training mit dem Gurt**. Es wird **ein Gurt** verwendet, der von Spieler 1, mit Alter, Gewicht und Geschlecht für Kalorien und Zonen; man wählt ihn direkt dort (mit dem Schalter *Brustgurte*, Bluetooth und Berechtigungen, falls sie fehlen).
+
+1. **Starten**: groß die Live-Herzfrequenz, darunter die Zeit und die laufende Runde.
+2. **Runde** schließt einen Abschnitt des Trainings und beginnt den nächsten (wie die Rundentaste einer Stoppuhr): ein Sprint, eine Übung, eine Bahnrunde. **Pause / Weiter** hält die Zeit an; Pausen zählen nicht.
+3. **Beenden**: Die App zeichnet noch **eine Minute Erholung** auf (ruhig bleiben), um zu messen, wie stark die Herzfrequenz sinkt; **Jetzt speichern** überspringt sie.
+
+- **Zusammenfassung**: Dauer, durchschnittliche und maximale Herzfrequenz, Kalorien, **HRV (RMSSD)** aus den Schlagabständen, die der Gurt sendet (braucht etwa dreißig saubere Schläge; vergleiche sie mit deinen ähnlichen Trainings, nicht mit denen anderer), **Erholung in 1 Minute** (je stärker sie sinkt, desto besser), Verlauf, Herzfrequenzzonen und für jede Runde Dauer, Durchschnitt, Maximum und Erholung.
+- **CSV** (Sekunde für Sekunde, mit Runde und Erholungsminute) und ein einseitiges **PDF** mit Verlauf, Zonen-Torte und Runden zum Teilen.
+- Trainings bleiben auf demselben Bildschirm, getrennt von den Matches; man kann sie wieder öffnen oder löschen. Die Herzfrequenz kommt auch vom zweiten Telefon (6.6), und die Aufzeichnung läuft bei ausgeschaltetem Bildschirm weiter.
+
+### 7.2 Fortschritte
+
+**Fortschritt** › **TSM-Wertung · Fortschritte**: ein Dokument, um zu sehen, ob du besser wirst, **getrennt** für Trainings und Matches.
+
+- **Trainings**: Dauer, durchschnittliche und maximale Herzfrequenz, Kalorien, HRV, Erholung.
+- **Matches** eines Spielers aus dem Verlauf (aus der Liste gewählt): gewonnene Matches, gewonnene Punkte, Asse, Doppelfehler, erste Aufschläge im Feld, Winner, unerzwungene Fehler. Asse und die anderen detaillierten Werte gibt es nur bei Matches mit detaillierter Statistik; es sind Summen pro Match.
+- Für jeden Punkt der Durchschnitt der **ersten Hälfte** des Zeitraums und der **zweiten**: grünes ▲, wenn es besser wird, rotes ▼, wenn es schlechter wird (weniger Doppelfehler oder Fehler ist eine Verbesserung), =, wenn es gleich bleibt (unter 5 % Unterschied) oder nicht beurteilt werden kann (Herzfrequenz). Es braucht mindestens 2 Trainings oder Matches.
+- **Was verglichen wird**: Die **Filter** wählen den Zeitraum (alles, 30 Tage, 3 Monate, 1 Jahr), die **Wochentage** (zum Beispiel nur mittwochs, auch mehrere) und bei Matches **Turnier**, **Club** und **Gegner** aus dem Verlauf; darunter die Liste **Zum Vergleich** zum Abhaken (*Alle* / *Keine*). Vergleich, PDF und Druck verwenden nur die abgehakten.
+- **TSM-Wertung**: Unter *Matches*, über den Filtern, die Wertung des Spielers (alle starten bei 1500) mit den gezählten Matches, der Änderung im letzten und dem Verlauf, dazu die **TSM-Rangliste** aller Spieler der Historie. Es ist ein Elo, auf dem Telefon berechnet: Sie steigt, wenn du gewinnst, stärker gegen besser bewertete Spieler und bei klarem Ergebnis; im Doppel zählt der Durchschnitt des Paares; Tennis und Padel haben getrennte Ranglisten. In den ersten 5 Matches ist sie *vorläufig* und bewegt sich stärker. In der Zusammenfassung jedes Matches zeigt die Karte **TSM-Wertung**, wie viel jeder gewonnen oder verloren hat; mit **Freundschaftsspiel** bleibt das Match in der Historie, zählt aber nicht.
+- **PDF** (mit dem Verlauf jedes Punkts und der vollständigen Liste, bei Bedarf auf mehreren Seiten) zum Teilen, oder **Drucken** mit dem Android-Druckdienst (auch *Als PDF speichern*).
+
+### 7.3 Videos: Kamera-Telefon, Highlights und Zeitlupe
+
+Ein zweites Telefon auf einem Stativ filmt das Match und blendet den Spielstand des Schiedsrichters ins Video ein.
+
+1. **Schiedsrichter**: Mehr › **Geräte** › **Zweites Telefon** › **Zweites Telefon verwenden** (QR, wie in 6.6).
+2. **Kamera**: Mehr › **Geräte** › **Zweites Telefon** › **Als Kamera dienen**, QR scannen, dann **Kamera öffnen** (Berechtigungen für Kamera und Mikrofon; das Telefon muss in 1080p aufnehmen). Bei *Spielstand verbunden* ist die Einblendung im Video (**Einblendung** schaltet sie ein oder aus); ohne Schiedsrichter nimmt es nur das Video auf.
+   - **Aufnehmen / Stopp**: Das Video kommt in die Galerie (*Filme/Tennis Score Manager*) mit Kapiteln, eines pro Punkt.
+   - **Live**: RTMP-Übertragung zu YouTube, Twitch, Facebook oder einem eigenen Server; Server und Stream-Schlüssel unter *Live: Server*.
+   - **Ausrichten** (Bildausrichtung): Gib ein, wie viele Meter hinter der Grundlinie und wie hoch das Telefon steht und auf welchem Platz gespielt wird; die App nennt die Neigung nach unten, bei der beide Grundlinien und der entfernte Spieler im Video bleiben, und ob der Platz in der Breite passt. Oft begrenzt die Breite: vom Zaun aus (etwa 6 m) schneidet das Hauptobjektiv die nahen Ecken ab, das **Weitwinkel** nicht (**Objektiv … verwenden** oder die Taste **Objektiv**, bei gestoppter Aufnahme). Mit **Wasserwaage zeigen** erscheinen in der Vorschau der Horizont und Hinweise (*2° tiefer zielen*, *im Uhrzeigersinn drehen*…), grün wenn es passt, mit einer Vibration, wenn das Telefon richtig steht. Die Wasserwaage erscheint auch im Fenster **Kamera** auf dem Telefon des Schiedsrichters. Links und rechts kennen die Sensoren nicht: mit dem Auge prüfen, dass das Netz in der Mitte ist.
+   - **Umriss** (Platzumriss): In der Vorschau erscheinen die Platzlinien so, wie das Objektiv sie sieht, und sie folgen dem Telefon beim Neigen. Die Schieberegler (**Abstand**, **Höhe**, **Richtung**, **Seitlicher Versatz** und bei Bedarf **Bildwinkel** und **Neigungskorrektur**) bewegen, bis sie auf den echten Linien liegen: So stimmt auch die Mitte, und die empfohlene Neigung wird genau. Die Einstellung wird für den Platz des Matches (*Verein · Platz* des Schiedsrichters) gespeichert und beim nächsten Mal übernommen. Umriss und Regler gibt es auch im Fenster **Kamera** des Schiedsrichters. Je höher das Telefon, desto besser sieht man die entfernte Platzhälfte: aus 2,5 m ist sie knapp über dem Netz zusammengedrückt.
+3. **Kamera oben, vom Schiedsrichter gesteuert**: Auf dem Telefon des Schiedsrichters zeigt **Kamera** (neben *Zeitlupe* während des Matches, oder *Kamerabild und Steuerung* auf Mehr › **Geräte** › **Zweites Telefon**, praktisch zum Ausrichten vor dem Start) das Bild des Kamera-Telefons wie im Video, mit Grafik, dazu **Aufnehmen / Stopp**, **Live**, **Einblendung** und **Zoom**. Außerdem Aufnahmedauer, Akku und freier Speicher (orange, wenn knapp). Das Bild ist klein und ruckelt (etwa 3 Bilder pro Sekunde) und wird nur gesendet, solange man es ansieht; der Stream-Schlüssel wird auf dem Kamera-Telefon eingetragen.
+
+- **Video** › **Deine Videos**: die aufgenommenen Videos, Punkt für Punkt, Spiel für Spiel oder Satz für Satz anzusehen. **YouTube-Kapitel** bereitet die Kapitel zum Einfügen in die Beschreibung vor. **Video importieren** nimmt ein Video einer anderen Kamera (die Datei bleibt, wo sie ist): Die Punkte zählst du beim Ansehen, indem du am Ende jedes Punkts tippst, wer ihn gewonnen hat und, wenn du willst, wie er endete (*Letzten rückgängig* entfernt den letzten); Format und Regeln sind die von *Modus und Regeln*.
+- **Trainerfilter** (Filtersymbol): nur die Punkte eines Spielers, gewonnen oder verloren, bei eigenem Aufschlag oder Return, beim ersten oder zweiten Aufschlag, nach ihrem Ende, bei Breakbällen oder Satz- und Matchbällen. **Abspielen** reiht sie aneinander.
+- **Highlights**: automatischer Zusammenschnitt der schönsten Punkte (Asse, Winner, Breakbälle, Satz- und Matchbälle, lange Ballwechsel mit den Armbändern) in der mit den Pfeilen gewählten Reihenfolge, für höchstens 1, 3, 5, 10 oder 15 Minuten oder eine **Andere Länge** bis 90. Passt nicht alles hinein, werden zuerst die Stücke gekürzt, dann bleiben die unwichtigeren Punkte draußen. Das Ergebnis kommt in die Galerie.
+  - **Statistiken am Videoende**: 2 oder 3 Bildschirme zu je 10 Sekunden wie in Turnierübertragungen: Aufschlag und Breakbälle; Punkte, Fehler sowie kurze und lange Ballwechsel; Puls, falls ein Gurt getragen wurde. Das Match ist das im Verlauf, das während der Aufnahme gespielt wurde, oder das der Punkte eines importierten Videos. An den Seiten das Foto des Spielers; ohne Foto ein stilisiertes Porträt von Mann oder Frau (Wahl **Mann / Frau** unter *Neues Match*) (ohne Wahl der Mann; gilt in der ganzen App, auch unter *Neues Match*, im Verlauf, im Spielbericht, im PDF und auf der Anzeigetafel); darunter der Anteil gewonnener Punkte. Oben Turnier, Kategorie und Runde (*Weitere Angaben* unter *Neues Match*) oder Club und Platz.
+  - **Musik** unter den Statistiken, mit Ein- und Ausblendung: *Nowhere Land* von Kevin MacLeod (incompetech.com, Lizenz CC BY 4.0: Wenn du das Video veröffentlichst, nenne ihn), oder ein eigener Titel mit **Titel wählen** (es wird der Anfang verwendet; nur Musik verwenden, die du in deinen Videos nutzen darfst).
+  - Unten auf jeder Statistikseite steht **Erstellt mit Tennis Score Manager** mit der Adresse der Website.
+- **Zeitlupe**: Auf dem Telefon des Schiedsrichters fragt **Zeitlupe** bei verbundener Kamera den strittigen Punkt ab (*Letzter Punkt*, *Punkt davor* oder *Seit dem letzten gezählten Punkt*) und zeigt ihn, mit Pause und Bild für Bild. **Auch auf der Anzeigetafel** zeigt ihn zusätzlich auf der TV-Anzeigetafel.
+
+### 7.4 Schläger: virtueller Schläger
+
+**Fortschritt** (oder **Mehr**) › **Meine Schläger**: jeder echte Schläger hat seine eigene Karte (zwei Schläger desselben Modells sind zwei Karten: Saiten, Gewicht und Stunden unterscheiden sich).
+
+- **Karte**: Spitzname (A, B…), Marke, Modell, Gewicht, Balance, Kopfgröße und Besaitungsbild, von Hand eingegeben oder **aus dem Katalog** übernommen (Herstellerangaben, zu korrigieren, wenn du deinen gemessen hast). *Ausgemustert*: wird nicht mehr angeboten, bleibt aber im Vergleich.
+- **Besaitungen**: Typ (Monofil, Multifil, Synthetik, Naturdarm, Hybrid), Marke und Modell (auch aus den gängigen Saiten), Stärke, Spannung der Längs- und Quersaiten, Datum und Notizen. *Neue Besaitung* startet von der aktuellen. Für jede zählt die App die **Spielstunden** der zugeordneten Matches und Trainings und warnt beim Überschreiten der gewählten **Prüfgrenze** (standardmäßig 20 Stunden): aus der Zeit allein kennt sie die verbleibende Spannung nicht.
+- **Vor dem Spiel**: unter *Neues Match* unter der Rangliste jedes Spielers seinen Schläger wählen; im Training über dem Brustgurt. Match (Punkte, Schläge der Armbänder, Puls) und Training werden mit einer **Kopie** des Schlägers gespeichert, wie er an dem Tag war, samt Saite und Spannung: späteres Neubesaiten ändert vergangene Einheiten nicht.
+- **In der Zusammenfassung** des Matches (Reiter *Übersicht*) und des Trainings sieht man den benutzten Schläger, kann ihn auch nachträglich zuordnen (es gilt die an dem Tag aufgezogene Besaitung) und das **Spielgefühl** von 1 bis 5 bewerten: Kontrolle, Komfort, Power und Ermüdung.
+- **Vergleich**: *nach Schläger* oder *nach Besaitung* (gleicher Schläger mit anderen Spannungen oder Saiten), Konfigurationen A und B wählen. Balken nebeneinander für Einheiten, Stunden, gewonnene Matches, gewonnene Punkte, erste Aufschläge im Feld, Punkte nach erstem und zweitem Aufschlag, Asse, Doppelfehler, Winner und unerzwungene Fehler pro Match, mittlere Handgelenkgeschwindigkeit und Schläge der Armbänder, mittlerer Puls und mittleres Spielgefühl. Der bessere Wert ist fett, aber die App kürt keinen Sieger: Gegner, Belag, Bedingungen und Form zählen auch.
+
+### 7.5 Schlagtraining: Aufschlag, Vorhand, Rückhand und Volley
+
+Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erkennt den Aufschlag, und mit den Tasten sagt man, wie er war. Ein Telefon reicht, ohne Schiedsrichter.
+
+1. **Trainieren** › **Schlagtraining**, den Schlag wählen (**Aufschlag**, **Vorhand**, **Rückhand**, **Volley**) › **Starten** (das Armband muss wie in 6.1 verbunden sein; sonst mit den Tasten auf dem Bildschirm markieren).
+2. **Wo das Telefon hinkommt** (öffnet sich beim ersten Mal von selbst, dann über *Wo kommt das Telefon hin?*):
+   - **neben dem Aufschläger**, auf der Seite des Schlagarms (rechts bei Rechtshändern), **3-4 m** entfernt, auf Höhe der Grundlinie oder einen halben Meter dahinter;
+   - Objektiv **1-1,2 m** über dem Boden, Telefon **quer** und gerade, auf den Aufschläger gerichtet;
+   - im Bild muss **die ganze Person sein, von den Füßen bis zum Schläger oben** (etwa 2,7 m): Ragt der Schlägerkopf hinaus, Telefon weiter weg stellen oder auf **Weitwinkel** wechseln (Taste *Objektiv*);
+   - um auch zu sehen, wohin der Ball geht, alternativ: 3-4 m **hinter** dem Aufschläger, etwas seitlich, 1,5-2 m hoch;
+   - nie vor den Aufschläger oder in die Flugbahn des Balls.
+3. **Seite** (Einstand/Vorteil), **erster oder zweiter** und bei Bedarf das **Ziel** (durch die Mitte, auf den Körper, nach außen) wählen: Sie gelten für die folgenden Aufschläge.
+4. Aufschlagen und **KEY1 = drin** oder **KEY2 = aus** drücken; **KEY1 gedrückt halten** macht den letzten rückgängig. Die Stimme sagt den Stand (*Drin. 8 von 12*), das Armband zeigt ihn. Hat das Armband den Aufschlag erkannt, zählt dieser Moment, sonst einige Sekunden vor dem Tastendruck.
+5. Zu jedem Aufschlag wird ein **Clip** von einigen Sekunden gespeichert. **Fertig** zeigt die Übersicht: drin von Versuchen, nach Seite, erster und zweiter, Ziel und, wenn das Armband die Aufschläge erkannt hat, die mittlere Drehung des Handgelenks bei guten Aufschlägen und bei Fehlern. **Alle ansehen / Nur die guten / Nur die Fehler** öffnet die Clips in der Zeitlupe (Pause, Zeitlupe, Bild für Bild).
+6. Unter **Starten** stehen die letzten 3 Einheiten **des gewählten Schlags** (die Schlag-Tasten zeigen die Zahl der Einheiten, z. B. *Rückhand · 4*) und die Linie der **Schläge im Feld, Einheit für Einheit**. **Alle Einheiten** öffnet die des gewählten Schlags, nach Monaten, mit dem Platz der Videos und ob sie schon analysiert sind. Eine Einheit antippen für Übersicht und Clips; **gedrückt halten**, um sie auszuwählen (das Symbol oben wählt alle), dann **Löschen** (Einheit und Videos) oder **Nur Videos** (schafft Platz: Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben). **Fortschritt** zeigt den Verlauf jedes Schlags.
+   - **Wo die Videos liegen**: in **Dokumente/Tennis Score Manager/Schlagtraining**, mit den Ordnern **Aufschlag**, **Vorhand**, **Rückhand** und **Volley** (beim Start angelegt), darin ein Ordner pro Einheit (Datum und Uhrzeit) und einer pro Schlag, mit `video.mp4` (lässt sich in jeder App öffnen und teilen), der Analyse und den drei Bildern. Jeder Dateimanager zeigt sie, und sie bleiben auch beim Deinstallieren der App (als Archiv: eine neu installierte App übernimmt die Einheiten nicht). Unter Android 8-10 liegt dieselbe Struktur im App-Ordner. Clips von Einheiten vor 2.5 werden beim ersten Start von selbst dorthin verschoben.
+7. **Bewegungsanalyse** (aus der gespeicherten Einheit): **Aufschläge analysieren** erkennt die Körperhaltung in den Clips (Modell MoveNet: Beim ersten Mal bietet die App an, es herunterzuladen, 7 MB, von der Projektseite auf GitHub; danach bleibt alles auf dem Telefon, ohne Internet, ein paar Sekunden pro Aufschlag; löschen lässt es sich unten auf der Seite. Nicht verfügbar auf Geräten mit x86-Prozessor) und misst drei Momente: **Ausholen** (Wurfarm oben), stärkste **Kniebeuge** und **Treffpunkt**. Für jeden Aufschlag: die drei Bilder mit eingezeichnetem Skelett und die Messwerte (stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts im Verhältnis zur Körpergröße, Wurfarm, Schultern beim Ausholen, Zeit vom Ausholen zum Treffpunkt); oben **gute und Fehler** im Vergleich. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner Aufschläge untereinander. Der Körper wird gut erkannt, wenn die ganze Person im Bild ist, von der Seite und bei gutem Licht; Schläger und Ball werden nicht gemessen.
+   Einen Aufschlag antippen, um ihn zu öffnen: **Video mit Skelett ansehen** öffnet den Clip in der Zeitlupe mit dem darübergezeichneten Körper, verlangsamt, mit Tasten zum Springen zu **Ausholen**, **Knie** und **Treffpunkt** und einer zum Aus- und Einblenden des Skeletts; zwei Finger vergrößern Video und Skelett zusammen (bis 6×), doppelt tippen setzt zurück. Auch die drei Bilder lassen sich antippen, um sie bildschirmfüllend zu sehen und zu zoomen. Bei **mehreren Personen** im Bild folgt die App dem Aufschläger (wer den Arm am höchsten hebt) und deckt die anderen ab; das steht unter dem Aufschlag: in den Bildern prüfen. **Erneut analysieren** beginnt von vorn (die Clips bleiben), nützlich nach einem App-Update.
+
+**Vorhand, Rückhand und Volley** funktionieren genauso (KEY1 drin, KEY2 aus, ein Clip pro Schlag, Übersicht und Analyse), mit diesen Unterschieden:
+- **Wo das Telefon hinkommt**: neben dem Spieler, rechtwinklig zur Schlagrichtung, 4-5 m entfernt und außerhalb des Doppelkorridors, auf Höhe des Treffpunkts; Objektiv etwa 1 m hoch; der ganze Schwung im Bild (das Handgelenk bewegt sich etwa 2 m vor und zurück). Beim Volley: neben dem Netzspieler, 3-4 m entfernt, auf seiner Höhe. Immer auf derselben Seite für die ganze Einheit und nie in der Flugbahn des Balls.
+- Statt Seite, erster/zweiter und Ziel wählt man die gewünschte **Richtung** (**Cross**, **Mitte**, **Longline**) und beim Volley, ob **Vorhand** oder **Rückhand**; die Übersicht zählt sie getrennt.
+- **Bewegungsanalyse**: Die drei Momente sind **Ausholen** (wo das Handgelenk am Ende der Ausholbewegung stehen bleibt), **Treffpunkt** (Handgelenk am schnellsten; dort liest die App ein Bild alle 33 ms) und **Ausschwung** (Handgelenk nach dem Treffpunkt am höchsten; beim Volley, wo das Handgelenk stehen bleibt). Sind mehrere Schläge im Fenster, zählt der vom Armband erkannte; von MoveNet vertauschte Handgelenke (passiert von der Seite) werden von selbst richtiggestellt. Von **der Seite** filmen: von vorn geht das Ausholen in die Tiefe und ist nicht zu sehen. Die Messwerte (*—*, wenn Ellbogen oder Beine nicht zu sehen sind): stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts, wie weit **vor dem Körper** getroffen wird, **Weite des Ausholens**, Höhe des Ausschwungs (alle im Verhältnis zur Körpergröße) und die Zeit vom Ausholen zum Treffpunkt. Das Video mit Skelett hat die Tasten **Ausholen**, **Treffpunkt** und **Ausschwung**.
+
+## 8. Anzeigetafel auf TV oder Monitor
+
+Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
+
+### 8.1 Die möglichen Wege
+
+| Wie es auf den Monitor kommt | Was du brauchst | Vorteile | Nachteile |
+|---|---|---|---|
+| **Zweites Telefon mit Videoausgang** + USB-C/HDMI-Kabel, TSM-App in *Als Anzeigetafel verwenden* | ein Telefon, das über USB-C Video ausgibt (DisplayPort Alt Mode) | kein Internet; die Anzeigetafel füllt den ganzen Monitor in 16:9, und das Telefon bleibt frei | viele Telefone geben **kein** Video aus: meist ja bei Galaxy S/Note/Tab S (mit DeX: *Bildschirmspiegelung* wählen oder den automatischen Start von DeX ausschalten), nein bei fast allen Galaxy A. Im Datenblatt nach „DisplayPort“ / „Videoausgang“ suchen |
+| **Chromecast** (oder Google TV Streamer) am Monitor + ein beliebiges Telefon mit TSM in *Als Anzeigetafel verwenden* und **Streamen** (*Bildschirm übertragen* bis Android 14, Smart View bei Samsung) | Chromecast einmalig mit Google Home im Netz des Hotspots eingerichtet | jedes Telefon geht, kein langes Kabel | der Chromecast braucht **Internet** (mobile Daten am Hotspot); etwa 1 s Verzögerung; die Übertragung zeigt den Bildschirm des Telefons (im Querformat) |
+| **Browser** auf einem beliebigen Gerät am Monitor (Laptop, Tablet, TV-Box, Fire TV Stick …) | QR-Code scannen oder Adresse eintippen | keine App zu installieren | der Bildschirm schaltet sich von selbst aus, wenn du das nicht einstellst; bei jedem Öffnen **VOLLBILD** antippen |
+
+**Warum nicht über Bluetooth**: Das Telefon des Schiedsrichters bedient schon die beiden Armbänder per Bluetooth, wo es auf das Timing der Tasten ankommt; das WLAN ist davon getrennt, schneller und reicht weiter. **Warum nicht allein vom Telefon des Schiedsrichters zum Chromecast** (ohne zweites Telefon): Das ginge, braucht aber eine bei Google registrierte „Receiver“-App (Google Cast Developer Console, einmalig 5 $), die auf einer https-Website veröffentlicht ist; ein möglicher nächster Schritt.
+
+**Netzwerktipps**:
+- Die Anzeigetafel überträgt sehr wenig Daten (eine Nachricht bei jedem Punkt und alle 5 Sekunden) und verbraucht kein Internet-Datenvolumen.
+- Wenn das Telefon des Schiedsrichters den Hotspot macht, wähle in den Hotspot-Einstellungen das **5-GHz**-Band, falls vorhanden: Das Bluetooth der Armbänder arbeitet bei 2,4 GHz, so stören sie sich nicht gegenseitig.
+- Mit dem Chromecast sollte das Telefon des Schiedsrichters den Hotspot machen, mit **eingeschalteten mobilen Daten**; Anzeigetafel-Telefon und Chromecast verbinden sich mit diesem Hotspot.
+- Ohne Chromecast geht es auch umgekehrt (Hotspot auf dem Anzeigetafel-Telefon, wie in der ursprünglichen Idee): Die App des Schiedsrichters bleibt mit dem WLAN verbunden, auch wenn es kein Internet hat.
+
+### 8.2 Auf dem Telefon des Schiedsrichters
+
+1. Mehr › **Geräte** › **TV-Anzeigetafel** › **Anzeigetafel auf TV oder Monitor** einschalten. Ab Android 13 fragt die App nach der Berechtigung für Benachrichtigungen: Sie wird für die Benachrichtigung des Dienstes gebraucht, der die Anzeigetafel am Laufen hält.
+2. Es erscheinen die **Adresse** (z. B. `192.168.43.1:8080`), der **QR-Code** und wie viele Anzeigetafeln verbunden sind. Steht dort *Kein Netz*, schalte den Hotspot ein oder verbinde dich mit dem des anderen Telefons.
+3. **Vorschau auf diesem Telefon** öffnet die Anzeigetafel im Browser des Telefons selbst.
+4. **Aussehen der Anzeigetafel**: Farbe jedes Spielers (8 Farben), Matchdauer, Aufschlaguhr und Pausen, beendete Sätze, Meldungen (Breakball, Satzball, Seitenwechsel …), Ball beim Aufschläger, ausgeschaltete Segmente sichtbar, Text unten (leer = Verein und Platz aus *Neues Match*). Änderungen erscheinen sofort auf dem Monitor.
+5. Im Match steht oben in der Mitte **TV · 1** (verbundene Anzeigetafeln): Ein Tippen darauf zeigt Adresse und QR-Code wieder an.
+
+Bei eingeschalteter Anzeigetafel hält ein Vordergrunddienst (Benachrichtigung *Match läuft · TV-Anzeigetafel aktiv*) den Server auch bei ausgeschaltetem Bildschirm am Laufen, auch im Schiedsrichtermodus. Die Anzeigetafel ist **nur zum Anzeigen** da: Dort lässt sich nichts ändern. Er bleibt auch auf der Zusammenfassung und den anderen Seiten aktiv, solange die Anzeigetafel eingeschaltet ist (Benachrichtigung *TV-Anzeigetafel aktiv*); so bleibt das Endergebnis auch bei gesperrtem Telefon auf dem Monitor.
+
+Was sie außer dem Spielstand zeigt: *WARTEN AUF DAS MATCH* vor Beginn, *BEREIT ZUM SPIELEN* auf der Seite MATCHBEGINN, **TIE-BREAK** / **MATCH-TIE-BREAK** anstelle von *VS*, blinkend *MATCH UNTERBROCHEN*, **SIEGER [Name]** am Matchende mit allen Sätzen; Vorteil wird als **AD** angezeigt, auch auf den LED-Ziffern. Ein im Match-Tie-Break gewonnenes Match endet mit 1:0 bei den Spielen und 2:1 bei den Sätzen, [10-8] steht bei den beendeten Sätzen; lange Meldungen werden verkleinert, damit sie auf den Bildschirm passen.
+
+### 8.3 Auf dem Anzeigetafel-Telefon
+
+1. **Spielen** › **Als Anzeigetafel verwenden**.
+2. Das Telefon **sucht selbst** nach dem Telefon des Schiedsrichters (Ankündigung im Netz und Scan des Hotspots, wenige Sekunden) und merkt sich die letzte Adresse. Findet es ihn nicht: Hotspot und *TV-Anzeigetafel* prüfen, dann **Erneut suchen**, oder die vom Schiedsrichter angezeigte Adresse eintippen und **Verbinden**. Es findet es auch, wenn auf diesem Telefon ebenfalls *Anzeigetafel auf TV oder Monitor* eingeschaltet ist; verbindet sich das WLAN erst später, sucht es von selbst erneut.
+3. Die Anzeigetafel läuft im Vollbild, im Querformat, mit dauerhaft eingeschaltetem Bildschirm.
+   - **Mit HDMI-Kabel**: Die Anzeigetafel erscheint im Format des Monitors auf dem Monitor; das Telefon zeigt *Die Anzeigetafel ist auf dem externen Monitor* bei minimaler Helligkeit (**Auch hier zeigen**, um sie auch auf dem Telefon zu sehen). Nach dem Abziehen des Kabels kehrt sie auf das Telefon zurück.
+   - **Mit Chromecast**: Schnelleinstellungen öffnen › **Streamen** (oder **Bildschirm übertragen**) / **Smart View** › den Chromecast wählen.
+4. Verschwindet das Telefon des Schiedsrichters (außer Reichweite, App geschlossen), erscheint *VERBINDUNG VERLOREN - NEUER VERSUCH...*, und nach 20 Sekunden sucht es von selbst erneut danach, auch wenn sich die Adresse geändert hat. Auch nach einer Unterbrechung des Hotspots verbindet es sich von selbst wieder, sobald das Netz zurück ist. Es wechselt nie zum Telefon eines anderen Platzes: Um den Platz zu wechseln, *Als Anzeigetafel verwenden* verlassen und erneut suchen.
+5. Zum Beenden: **zweimal Zurück**.
+
+**Aus einem Browser** (Laptop, TV-Box): QR-Code scannen oder Adresse eintippen, dann **VOLLBILD** antippen (erscheint, wenn du die Maus bewegst oder den Bildschirm berührst). Stell das automatische Ausschalten des Bildschirms auf *nie*: Auf einer http-Seite kann der Browser den Bildschirm nicht selbst eingeschaltet halten. Nach einer Unterbrechung verbindet sich die Seite von selbst wieder; zu viele offene Anzeigetafeln sperren eine neue nicht mehr aus (die älteste wird geschlossen).
+
+
+## 9. Angewandte Regeln (ITF) und abgestimmte Entscheidungen
+
+- **Spiel**: 0-15-30-40, Einstand, Vorteil, Spiel. **No-Ad**: bei 40:40 entscheidender Punkt („Einstand, entscheidender Punkt“).
+- **Satz**: 6 Spiele mit 2 Spielen Abstand (7:5); bei **6:6 Tie-Break**.
+- **Tie-Break**: bis 7 mit 2 Punkten Abstand; wer an der Reihe ist, schlägt den 1. Punkt auf, danach je 2 Punkte; Seitenwechsel **alle 6 Punkte** und am Ende; wer im Tie-Break zuerst aufgeschlagen hat, hat im ersten Spiel des folgenden Satzes **Rückschlag**.
+- **Match-Tie-Break** (Format mit 2 Sätzen): bei 1:1 wird bis 10 Punkte mit 2 Punkten Abstand gespielt.
+- **Seitenwechsel** (ITF-Regel 10): nach dem 1., 3., 5. … Spiel jedes Satzes. Am Satzende wird nur gewechselt, wenn der Satz eine ungerade Zahl von Spielen hatte (6:3, 7:6); sonst (6:4) wird nach dem ersten Spiel des folgenden Satzes gewechselt. Der Tie-Break zählt als ein Spiel.
+- **Zeiten**: Shot Clock 25 s zwischen den Punkten; Changeover 90 s; Set Break 120 s am Satzende. Zusätzlich, wie gewünscht (keine ITF-Regel): **30 s** Wechselzeit nach dem 1. Spiel jedes Satzes, bei jedem Seitenwechsel im Tie-Break und bei 6:6; nach jeder Pause startet die Shot Clock.
+- **Doppel**: Aufschlagfolge A1-B1-A2-B2 für den ganzen Satz, auch im Tie-Break; zu Beginn jedes Satzes fragt die App nach der Reihenfolge (sie darf laut Regelwerk geändert werden).
+- **Ansagen**: Spielstand aus Sicht des Aufschlägers („fünfzehn null“, „null vierzig“, „fünfzehn beide“, „Einstand“, „Vorteil Rossi“); am Spielende „Spiel Rossi, Rossi führt drei zu zwei“ / „zwei beide“ + „Seitenwechsel“, wenn gewechselt wird; bei 6:6 „Spiel Rossi, sechs beide, Tie-Break“; im Tie-Break aus Sicht des Führenden („drei zu eins Rossi“, „sechs beide“); Satzende „Spiel Rossi, Rossi führt eins zu null in Sätzen“ / „ein Satz beide“; Matchende „Spiel, Satz und Sieg Rossi, sechs zu vier, drei zu sechs, sieben zu fünf“; „Korrektur“ + Spielstand, wenn ein Punkt zurückgenommen wird.
+
+**Entscheidungen gegenüber dem ursprünglichen Wunsch, um der ITF zu folgen:**
+1. **Bei 6:6 wird nicht gewechselt** (12 Spiele, also eine gerade Zahl): Die App macht die 30-s-Pause und sagt „Tie-Break“, aber nicht „Seitenwechsel“, und tauscht die Tasten nicht. Der erste Wechsel kommt nach 6 Punkten des Tie-Breaks.
+2. Der Wechsel am Satzende hängt von der Zahl der Spiele im Satz ab (siehe oben), er findet nicht immer statt.
+3. Bei 1:1 im Format mit Match-Tie-Break fügt die Stimme „Match-Tie-Break“ hinzu.
+
+## 11. Häufige Probleme
+
+- **Armband nicht gefunden**: Bluetooth und Standort an (grüne Zeilen)? Blinkt das Armband KOPPELN? (Ist es schon mit einem anderen Telefon verbunden, ist es nicht sichtbar.) Hat es sich inzwischen von selbst ausgeschaltet (30 s), schalte es mit einem Klick auf die Seitentaste wieder ein.
+- **Das Armband zeigt NICHT GESENDET**: Das Telefon hat den Tastendruck nicht innerhalb von 8 Sekunden bestätigt (Verbindung verloren oder App geschlossen). Drücke erneut, sobald das Armband wieder verbunden ist. Seltener Fall: War der Tastendruck angekommen und ging nur die Bestätigung verloren, zählt der Punkt doppelt; die Stimme sagt den Spielstand an, korrigiere mit *Punkt zurück*.
+- **Im Einstellungsbereich steht „Die Firmware dieses Armbands hat keine Einstellungen“**: Auf diesem Armband ist noch der alte Sketch, lade ihn neu hoch (Kapitel 5).
+- **Die Stimme spricht nicht oder spricht falsch**: Medienlautstärke, *Audio On*, Stimme der gewählten Sprache installiert (4); probiere eine andere Engine oder eine andere Stimme unter *Audio und Stimme*.
+- **Bildschirm während des Matches aus**: Im Armbandmodus hält ein Vordergrunddienst (Benachrichtigung „Match läuft“) Bluetooth, Stimme und Uhren aktiv; im Schiedsrichter- und Fernbedienungsmodus bleibt der Bildschirm an (mit den Fernbedienungen muss er das: 6.3).
+- **Die Fernbedienung tut nichts**: Ist sie dem Spieler zugeordnet (*Mehr › Geräte* › *Fernbedienungen*, Zeile mit seinem Namen)? Die App muss auf dem Match geöffnet sein, bei eingeschaltetem Bildschirm (6.3). Steht in der Zeile *Nicht verbunden*, eine Taste drücken, um sie aufzuwecken, oder sie in den Bluetooth-Einstellungen neu koppeln.
+- **Schläge werden verwechselt oder nicht erkannt**: Trage das Armband wie bei der Kalibrierung (gleiches Handgelenk, gleiche Richtung); sonst kalibriere neu und trage es dabei wie im Match (6.4).
+- **Das Armband zeigt SPEICHER VOLL**: Ein Kalibrierungsbeispiel konnte nicht gespeichert werden. Lösche die Beispiele eines Schlags (Papierkorb) und mache sie neu.
+- **Herausfinden, warum zwei Schläge verwechselt werden**: Schließe das Armband an den Computer an, öffne den seriellen Monitor (115200 Baud) und tippe `d`: Du bekommst die gespeicherten Beispiele und die letzten 40 Schläge, jeder mit seinen 11 Messwerten. Die letzten Schläge bleiben erhalten, bis sich das Armband ausschaltet oder neu startet.
+- **Das Anzeigetafel-Telefon findet den Schiedsrichter nicht**: Selbes Netz? (Eines der beiden macht den Hotspot, das andere ist damit verbunden.) *TV-Anzeigetafel* beim Schiedsrichter eingeschaltet? Probiere die Adresse von Hand. Manche Hotspots isolieren die verbundenen Geräte voneinander („Client-Isolierung“): Falls vorhanden, schalte sie aus.
+- **Der Browser des Telefons öffnet die Adresse nicht**, wenn die mobilen Daten an sind: Android leitet den Verkehr über die mobilen Daten, weil der Hotspot kein Internet hat. Nutze die App mit *Als Anzeigetafel verwenden* (sie regelt das selbst) oder schalte die mobilen Daten auf diesem Telefon aus.
+- **Monitor bleibt mit Kabel schwarz**: Dieses Telefon hat keinen Videoausgang über USB-C (8.1), oder Samsung DeX ist gestartet: *Bildschirmspiegelung* wählen.
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/en.md
+cat > "$DEST/app/src/main/assets/help/en.md" << 'TSM_EOF'
+## 3.1 How the app is organised
+
+At the **first start** the app asks three questions: the language, how you'll use it (keep score, play with the wristbands, train, film matches) and your name; you can skip it and do it again from **More › App introduction**. At the bottom there are always **five tabs**:
+
+- **Play**: **New match**, the suspended match to resume, a **rematch** of the last one, the **friends tournament** (Americano, Mexicano) and **Use this phone as** scoreboard or camera. At the top the status of the devices (wristbands, straps, camera, TV): tap it to connect them.
+- **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
+- **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
+- **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
+- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+
+**New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
+
+## 4. The voice (works without internet)
+
+- Each call is read **as a single sentence** by the phone's text-to-speech engine, using an installed voice: no internet and natural prosody. The players' names are part of the sentence.
+- More › **Language and voice** › **Audio and voice**:
+  - **Speech engine**: *Phone default* (on Samsung phones this is Samsung TTS) or an engine of your choice, for example *Speech Services by Google*. In our tests, which were done in Italian, Google sounded more natural.
+  - **Voice**: *Automatic (best offline)* or a specific voice (with Google the voices are listed by code, as *Voice* followed by a few letters; those marked *online* need internet).
+  - **Test voice**: reads a sequence of sample calls with the names you entered. While it is reading, the button becomes **Stop the test**: tap it again to stop (it also stops by itself when you leave the page). Text-to-speech can't be paused mid-sentence, so the button stops it; pressing it again starts over from the beginning.
+- If the voice for the chosen language is missing: **Settings › General management › Language › Text-to-speech** (or *Text-to-speech output*) → download the voice for that language for the chosen engine (the app also shows an **Install voice** button). If text-to-speech doesn't start at all, the app says so in a separate message with an **Open settings** button (Android's text-to-speech settings).
+- **Pronunciation**: some engines get tennis words wrong (in Italian, "primo set" read as "primo settembre", i.e. "first of September", and "tie-break" read as "time break"). The app corrects them by itself; the corrections were checked by transcribing the real audio from Samsung and Google.
+- **Custom recordings** (the most natural voice of all: yours or an umpire's): the folder `Android/data/io.github.steve_linux.tsm/files/voice/` contains `LEGGIMI.txt` (the "read me" file; the explanations at the top are in the app's language and are rewritten when you change it) listing the 85 keys and their phrases. Record the files with those names (`score_1_0.mp3` = "fifteen love"…), put them in a ZIP with one folder per language (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) and use **Import ZIP**. `LEGGIMI.txt` has one tab-separated column per language, so it also opens neatly as a spreadsheet. Recordings always take precedence over text-to-speech; the names are still read by text-to-speech. In the ZIP what counts is the folder that contains the file (also inside other folders, e.g. `voice/en/`); files outside a language folder go to the current language and `tts/` folders are ignored, so you can also zip the app's own `voice/` folder. A damaged or incomplete ZIP changes nothing (*ZIP unreadable or incomplete*). **Remove recordings** asks for confirmation. If a file can't be played, that phrase is spoken by text-to-speech and the file isn't used again until the app restarts.
+- **Use pre-generated audio files** (optional): with **Generate files** the app creates the 85 files once with the chosen voice (even an *online* voice, if there is internet at that moment) and then plays them instead of running text-to-speech live. It sounds more "stitched together", but it is useful for taking an online voice offline. The previous files stay until the new ones are ready (if generation doesn't finish: *Generation not completed*); while it runs, language, engine, voice, voice test and audio are locked.
+- **External speaker**: just pair it with the phone over Bluetooth; the voice comes out on the media channel (adjust the media volume).
+- **Bluetooth headphones or earbuds**: pair them the same way and only you hear the voice, without disturbing the courts next to you; also handy for whoever keeps score from the side of the court. The wristbands can stay connected at the same time.
+- **Two audio devices at once**: many phones can send audio to two Bluetooth devices at the same time. On Samsung: connect both, open the quick panel › **Media output** and tick both. Each player can then have their own earbuds, or the speaker plays for the court and headphones for whoever keeps score.
+
+### 4.1 Languages
+
+More › **Language and voice** › **Language**: Italiano, English, Français, Deutsch, Español, Português (each language is written in that language, so you can find it even when the app is set to a language you can't read). The choice applies at once to the **screens, umpire's voice, TV scoreboard, summary/sharing and wristbands**. Dates follow the language (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+
+The calls are not word-for-word translations: they follow each federation's official texts for chair umpires, namely the FFT *L'arbitrage en 255 questions* and the ITF in French, the DTB/BTV and Swiss Tennis materials, RFET *Deberes y procedimientos*, and FPT *Deveres e Procedimentos* (the only published Portuguese script). English follows the ITF. At the end of the match a zero in the set scores is read *love* ("six love, six four"), as in the points.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Start | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15-0 · 15-15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40-40 · advantage | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| End of game | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Games level | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Tie-break | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Set | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| End of match | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Change of ends | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Particulars:
+- In French and Spanish the name comes **after** "au service"/"al servicio", in German after "Aufschlag". French calls the set **manche** (except in "jeu, set et match") and the tie-break **jeu décisif**.
+- **10-6 … 10-9** in the match tie-break: in French, Spanish and Portuguese the call is "dix **à** huit", "diez **a** ocho", "dez **a** oito", because "dix huit" / "diez ocho" / "dez oito" sound like *eighteen*.
+- **Portuguese**: a single option, with a Brazilian interface and preferred voice (if the Brazilian voice is missing, the European Portuguese one is used) and the calls from the FPT script, using words that are valid in both countries ("jogo" rather than "game", "partida"). "Um set a um" became "sets iguais": in the singular, *set* is pronounced like *sete* (seven) and it sounded like 7-1.
+- **Pronunciation**: every phrase in every language was read by the Google voices and transcribed with whisper. Corrections added: in German "Tie-Break" is made to be read as "Taibreak", with a comma in front of it (otherwise you get "Teilbreg" or "bei Detailbreak"); in French the lone "à" of the pre-generated files is made to be read as "a" (otherwise the voice says "a accent grave"). **Samsung TTS has not been tried in the new languages yet.**
+- **Wristbands** (firmware 2.2): the app sends the language by itself on every connection and whenever you change it; the wristband stores it and uses it even when it isn't connected (looking for the phone, charging, powering off), without accents because the font is ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). With firmware 2.1 or earlier, the messages sent by the app are translated, but the wristband's own messages stay in Italian. A freshly programmed wristband starts in Italian; from firmware 2.2.2 its connection message is redrawn in the app's language as soon as the app sends it, about a second after connecting.
+
+## 6. Using the wristbands
+
+| Button | Action |
+|---|---|
+| **KEY1** (front) short | point to the wearer (it also starts the match from the MATCH START page); a beep confirms (firmware 2.3 + app 2.4: once the phone has received it, about half a second later) |
+| **KEY1** long (1 s) | shows the battery (and keeps the wristband on if it is about to switch off through inactivity) |
+| **KEY2** short | undoes the last point (also from the end-of-match popup); two lower beeps (with firmware 2.3, once the phone confirms) |
+| **KEY2** long (2 s) | switches the wristband off (with the cable plugged in it shows *STILL CHARGING*: it charges even when off; from firmware 2.3 KEY1 or KEY2 also turn it back on) |
+| Side button | one click switches it on; a double click switches it off (hardware function) |
+
+- At power-on **PAIRING...** flashes (on for 0.35 s every 2 s to save power). As soon as it is open, the app connects by itself to the wristbands it knows; new ones are found in **More › Devices** (or in **Mode and rules** with the *Wristbands* mode).
+- Connected: **PAIRED** for 3 seconds with two beeps, then **PAIRED WITH** + the player's name.
+- At every point the display lights up with the game score in large digits (yours on the left, the opponent's on the right; the green ball shows who is serving), then switches off. At the end of a game it shows games and sets. If the phone doesn't confirm a press within 8 seconds (link lost), **NOT SENT** appears in red with two low beeps: press again once it has reconnected. A press made during a short dropout is not lost: it is sent as soon as the wristband reconnects, and the beep comes then.
+
+**Automatic power-off** (the times can be changed from the app, 6.1):
+
+| Situation | What the wristband does | Default |
+|---|---|---|
+| On, but no phone connects | flashes PAIRING, then switches off | **30 s** |
+| Phone lost (switched off, out of range, Bluetooth off, app closed abruptly) | flashes RECONNECTING and reconnects by itself as soon as it can; otherwise it switches off | 3 min |
+| Connected but idle (no points, no messages) | 30 s beforehand it warns with **IDLE · HOLD KEY1** and a beep, then switches off | 30 min |
+| Match concluded (confirmed on the phone) or **Exit** in the app | shows MATCH OVER / APP CLOSED and switches off immediately | on (can be turned off, 7.2) |
+| Battery empty (below 3.30 V for two readings in a row) | shows BATTERY EMPTY and switches off, rather than staying on half-working | always |
+
+- In the last 10 seconds before switching off for lack of a phone it shows **POWERING OFF · 8s - PRESS ANY KEY** with a beep: any button postpones the power-off and restarts the countdown.
+- When it switches itself off it tells the phone: during a match the orange box shows *WRISTBAND 1 OFF (IDLE)*, *(BATTERY EMPTY)*… After the end-of-match switch-off the phone stops searching for it continuously and reconnects by itself when you switch it back on.
+
+
+The rest of the power saving: CPU at 80 MHz, display off when not needed, Bluetooth Low Energy (the radio wakes up 2-3 times a second, and a button press still gets through within ~120 ms), beeper powered only during beeps, microphone and 5V off, motion sensor (IMU) on only with stroke recognition (6.4).
+
+### 6.1 Wristband settings
+
+From **More › Devices** or **Mode and rules** (**Settings** under each player's wristband) or during the match (tap **P1**/**P2** at the top, or the sliders icon). They are saved **in the wristband** and are kept even when it is switched off; after every change the wristband shows its name with *SETTINGS SAVED*. With firmware 2.4 there is also the **Strokes** section (6.4).
+
+| Setting | Values | Default |
+|---|---|---|
+| Name | up to 12 characters (e.g. the player's name or "P1") | TSM-xxxx |
+| Display brightness | 5-100 % | 20 % |
+| Score shown after each point | Off, 2, 3, 5, 8 s (the end-of-game summary lasts 2 s longer) | 3 s |
+| Beeper volume | Mute-100 % | 50 % |
+| Flip display | to wear it on the other wrist | off |
+| Power-off: at power-on, if no phone connects | 15 s - 5 min | 30 s |
+| Power-off: if the phone link is lost | 1-10 min | 3 min |
+| Power-off: if connected but idle | 10-60 min | 30 min |
+
+Below them is the **battery life estimate** (from a full charge and at the current charge) with the draw broken down by item: it changes as you move the sliders, even before you confirm. Then **Identify**, **Power off** and **Copy to the other wristband** (same settings; the other wristband keeps its own name). **Power off** asks for confirmation, also during a match.
+
+### 6.2 Charging
+
+Plug in the USB-C cable: the wristband beeps and shows the **charging screen** for 30 seconds, then the display switches off and every 10 seconds lights up again for 1.5 s (a quick glance, like a charger's indicator light). **Any button** lights it up for another 30 seconds. If the wristband was off, switch it on with one click of the side button to see it (it charges anyway, even when off).
+
+```
+ TSM-3FA2   USB 5.01V            ← name and cable voltage
+ ┌──────────┐
+ │██████ ⚡  │▌   78%             ← battery icon and charge percentage
+ └──────────┘
+      CHARGING                   ← or FULLY CHARGED / USB POWERED
+ 4.12V  42 MIN IN  ~25 MIN LEFT  ← battery voltage, time on charge, estimated end
+```
+
+- **Percentage**: while charging, the measured voltage is higher than the real one (≈0.1 V); the wristband corrects for this, never lets the percentage go down and only reaches **100 %** when the charger says it has finished. When charging is complete the label becomes **FULLY CHARGED** with the time it took (*CHARGED IN 1H 25*) and the display stays off (no flashes at night).
+- **Estimated end**: the power chip (PM1) doesn't measure the charging current, so the time left is worked out from how much the charge has risen in the last 10 minutes: it appears after 10 minutes, rounded to 5, and it is only an estimate.
+- **USB POWERED**: the cable is there but the battery isn't charging (and isn't full): a poor cable or power supply, or a disconnected battery.
+- **With the cable plugged in it never switches itself off** (no power-off for a missing phone or inactivity, no *battery empty*); you can switch it off with a long press of KEY2. When the cable is unplugged it shows **USB UNPLUGGED · BATTERY 97%** and from then on the normal power-off times apply again (6).
+- **When connected to the phone** (e.g. a power bank during a match) the score takes priority: just a short *CHARGING 78%* message, and a long press of KEY1 shows *FULLY CHARGED* or *CHARGING*.
+- **In the app**: the wristband row (in *Devices* and in *Mode and rules*) and its settings show *Charging 78%* or *Fully charged*; during a match the P1/P2 pills show the ⚡ symbol. The `files/battery_log.csv` log also has two extra columns (USB voltage, fully charged): useful for checking how long charging really takes.
+- The wristband and the app now calculate the percentage with the **same curve** for the LiPo (the wristband used to use a less accurate straight line), so they show the same number.
+
+> Still to be checked with real wristbands: charging could not be tested on the hardware. In particular, how often the charger reports *fully charged* and how accurate the percentage is while charging.
+
+### 6.3 Without wristbands: Bluetooth remotes
+
+The cheapest way to let the players score: two **Bluetooth selfie remotes** (the ones with a shutter button, often sold as *AB Shutter3*), €1–3 each. Android sees them as a keyboard: no firmware to flash and no permissions for the app. Any other Bluetooth (or USB) keypad or keyboard works too.
+
+1. Switch the remote on and pair it in the phone's **Bluetooth settings**, like a headset (*More › Devices › Bluetooth settings* opens them). Repeat with the second one.
+2. *Mode and rules* › **Remotes** mode › **Assign** under Player 1 › press the button on their remote that will give the point; then the same for Player 2. Every click of an assigned remote shows **Key received** on its row, so you can test before playing. **Swap P1 ↔ P2** swaps them.
+3. **MATCH START**: one click on a remote starts the match, like KEY1 on the wristbands. At the top, **P1**/**P2** are coloured when the remotes are connected.
+
+| Gesture | Action |
+|---|---|
+| one click | point to whoever holds the remote (it arrives half a second later: the app waits to see whether it is a double click) |
+| double click | undo the last point (also from the end-of-match popup) |
+| hold for 1 s | undo the last point |
+| the other button (two-button remotes) | undo the last point, at once; pressed within half a second of a click, it cancels that click |
+
+- The wristband safeguards apply: two points less than 2 seconds apart count once, two undos close together remove a single point, *Match concluded* is confirmed on the phone only.
+- Many selfie remotes have two buttons (*iOS* and *Android*): the button pressed when assigning gives the point, the other one undoes. On the CAMKIX (an *AB Shutter3*) the big button sends VOLUME UP and the small one ENTER: assign it with the big button and the small one becomes “undo”. If a remote sends two keys per press, one press stays one click.
+- **The screen must stay on with the app in front** (during the match the app keeps it on by itself). Unlike the wristbands, the keys of a Bluetooth keyboard only reach the visible app: with the screen locked or another app open they don't count. For long matches keep the phone charging.
+- If a remote disconnects during the match (switched off, flat, too far) the orange box shows *REMOTE 1 DISCONNECTED*, and *CONNECTED* when it is back. Many remotes go to sleep after a few minutes without clicks: the first click wakes them up and is sometimes lost. If the voice doesn't call the point, press again.
+- Range: about ten metres, like Bluetooth headphones; with the phone near the net, at mid-court, both ends are covered. Battery: usually a CR2032 coin cell that lasts for months.
+
+### 6.4 Stroke recognition
+
+With firmware 2.4 the wristband recognizes **forehand, backhand, serve and volley** with its motion sensor (IMU) and sends them to the app, which counts them per player. Recognition learns from the person wearing the wristband: first a short **calibration** is needed, and its examples are stored in the wristband.
+
+1. **Strap the wristband to your wrist**, always the same way (same wrist, same direction). Recognition relies on the direction of the movements: a wristband turned around compared with the calibration mixes up the strokes.
+2. Wristband settings (6.1) › **Strokes** › **Calibration**: tap **Calibrate** next to *Forehand*. The wristband shows *FOREHAND · CALIBRATION 0/20*.
+3. Play **5-10 forehands** with a short pause between them: at each stroke the counter goes up, on the wristband and in the app (with a beep, if the volume is not zero). If a stroke went wrong, tap **Undo the last one**. Then **Done**.
+4. Repeat for backhand, serve and volley. The bin clears the examples of one stroke, to redo them. Up to 20 examples per stroke are kept (beyond that the oldest is replaced). 3 examples for at least two strokes are enough (*Ready: it recognizes the calibrated strokes*), but more and more varied examples give better recognition.
+5. Turn on **Stroke recognition**. With **Show the stroke on the wristband** the stroke appears for a moment with the recognition confidence (e.g. *BACKHAND 87%*), only when the display is not showing the score or a message.
+
+- During the match a row under the timers shows each player's strokes (*P1 F 12 · B 8 · S 5 · V 3*). They count only once the match has started, not during the warm-up or calibration.
+- The summary (7) has the strokes by type, the **wrist speed** (average and maximum, in °/s: how hard the stroke is hit, not the ball speed) and the **strokes per point** (rally length). If only one player has a wristband with strokes, rallies count only their strokes.
+- A stroke that looks like none of the examples is not shown and counts as *not recognized*: if it happens often, check how you wear the wristband or add examples.
+- Slow movements (getting back into position, picking up the ball) don't count: a stroke must exceed 400 °/s of wrist rotation and 2.5 g of acceleration.
+- **Battery**: the sensor uses about 1 mA more, around twenty minutes of a full charge (the estimate in the settings includes it). With recognition off the sensor stays off.
+- On very hard strokes the gyroscope reaches its maximum (2000 °/s): recognition is not affected, but the speed shown is slightly underestimated.
+
+### 6.5 Heart rate straps
+
+Heart rate and calories from **Bluetooth chest straps** using the standard heart rate service: Coospo (tested with the H6), Magene, Polar, Garmin, Wahoo… They work in every mode, even without bands.
+
+1. Wet the electrodes and put the strap on: it switches on by itself on contact with the skin.
+2. *Mode and rules* (or *More › Devices*) › **Heart rate** › turn on **Heart rate straps** and pick each player's strap (only once). **Swap** exchanges them.
+3. Optional **age, weight and sex** of the wearer: used for calories (Keytel formula, typical error ±20%) and, with the age, for heart rate zones (estimated maximum 208 − 0.7 × age).
+
+- Under each strap: status, heart rate, **signal** in dBm (closer to 0 = stronger) and **dropouts**, i.e. the times the heart rate did not arrive for more than 3 seconds, with the seconds lost (*2 dropouts (14 s)*). They count from the match's "play"; before that, from when the strap was picked. They show how far the strap reaches.
+- During the match a row shows the live heart rate (*P1 · 142 bpm*). In the summary (7): average and maximum heart rate, calories, chart over time and time in heart rate zones. Breaks don't count.
+- **Range**: tested indoors with the H6 and the phone standing still: connected up to 21 m, but at −100 dBm, at the limit; with your back to the phone the signal drops by 5-10 dBm. In singles the far player is 24-30 m from the phone: to avoid losing data use the **second phone** (6.6).
+
+### 6.6 Second phone behind the other baseline
+
+Straps and bands accept **one phone at a time** and reach a few metres less than the length of the court. With a second phone behind the other baseline every player always has one nearby: the second one (**satellite**) hears the straps and bands of the players on its side and acts as a bridge to the **main** phone, which keeps the match.
+
+1. **Main**: More › **Devices** › **Second phone** › **Use a second phone**. The first time it asks for the *Nearby devices* permission (location up to Android 12). The phone creates its **own local-only network**: no SIM or data, and no club Wi-Fi needed. A QR code appears.
+2. **Satellite**: More › **Devices** › **Second phone** › **Act as second phone** › scan the QR code. Android asks once to connect to the main phone's network (*AndroidShare_…*): tap **Connect**. The satellite keeps its mobile data. It should say *Connected to the main phone*.
+3. The satellite follows by itself the straps and bands picked on the main phone, on the same sides: nothing to pick. Leave it behind the baseline with the app open.
+
+- **Change of ends**: nothing to do. Each strap and band stays with the phone it is connected to while the signal holds, then the nearer phone takes it (a few seconds). The main phone shows *Via second phone*; during the handover a band may show as disconnected for a moment.
+- **No data lost**: heart rate, key presses and strokes from the satellite carry the **match ID** and a sequence number, and the satellite keeps them until the main phone confirms them. If the Wi-Fi between the phones drops, the heart rate arrives later and fills the gaps in the chart; strokes count if they belong to the same match. A band **key press** arriving more than 5 seconds late does not give the point: press again. The same press arriving by two routes counts once.
+- From the main phone to the bands go score, messages, *Identify*, switch-off and settings. Settings are best changed with the band connected to the main phone.
+- **Scoreboard**: on the satellite **Show the scoreboard** opens the match scoreboard full screen (as in 8.3), already connected to the main phone.
+- If the main phone cannot create the network (normal hotspot already on), it uses the Wi-Fi it is on: then both phones must be on the same network. With Android 9 or earlier the satellite shows the network name and password, to pick by hand in the Wi-Fi settings.
+- **Stop** closes the link and the network; the satellite goes back to its own straps and bands.
+
+## 7. Using the app
+
+1. **New match** (optional): **Tennis** or **Padel** (app 2.5: same rules, timers and calls; choosing Padel sets doubles and golden point by itself, both can be changed (instead of golden point, *Mode and rules* also offers the FIP *star point*: at most two advantages, then a deciding point), and the summary says *Padel*), club, court, singles/doubles, names (in doubles, two names per team). **Look up the court address** (off by default) adds the address to the summary next to the coordinates: it asks the phone's geocoding service, which with Google services sends the coordinates to Google. **Next**. With *Padel* you also get **Americano or Mexicano tournament**: 4 to 16 players and 1 to 4 courts, matches by points (16, 24 or 32: the two pairs' points add up to the total) or by time. In the *Americano* partners change every round so everyone plays with and against as many people as possible; in the *Mexicano*, from the second round, you play by standings (1st and 4th against 2nd and 3rd on the same court). Each round you write every court's result (in matches by points one number is enough, the other fills itself in) or count it with *Count point by point*, with the voice and, by time, the timer; with more players than places on court people sit out in turn. **Next round** starts when all results are in; the **Standings** count each player's points, then wins and point difference, and can be shared as text.
+2. **Mode and rules**:
+   - *Umpire*, *Wristbands* or *Remotes* (6.3). With the wristbands, Bluetooth on, location permission and location on are required: the **Requirements** rows update in real time (even if you turn Bluetooth or location off from the Quick Settings panel) and turn red, with a button to fix them.
+   - The **search is automatic and continuous** while the page is open: switch the wristbands on and they fill the free slots by themselves (Player 1 first, then Player 2). **Identify** makes that wristband flash in the player's colour (yellow or red) with beeps, so you can see at once which one you are holding; **Swap P1 ↔ P2** swaps them without disconnecting them. From the drop-down menu you can always choose another one or *None* (a wristband removed by hand is not put back by the search). A wristband can't be assigned to both players.
+   - **Switch the wristbands off at match end and on exit** (on by default): when *Match concluded* is confirmed and with *Exit*, the wristbands switch off instead of waiting for the idle timeout.
+   - In Umpire mode, if you press **Next** without location you are asked to turn it on (otherwise the place won't appear in the summary).
+   - Format (*3 sets*, *5 sets*, *2 sets + match tie-break to 10*, *pro set* to 8 or 10 games, *match tie-break to 10 only*), games per set (6, or 4 in short sets with a tie-break at 4-4), tie-break in sets on/off (off: the set goes on until someone leads by 2 games), No-Ad. Language and voice are in *More › Language and voice* (4.1).
+   - **Coin toss**: the coin spins and shows who wins; you set who serves and the court ends **as seen by the chair umpire** (court diagram with **Swap ends**). In doubles you also choose who serves first in each team.
+3. **MATCH START** flashes: press the button, KEY1 on a wristband or a remote. The voice says *"First set" · "[name] to serve" · "play"* with 1 second between the phrases; the **Match Time** starts on "play".
+4. **Match**: top left is the match time, top right the countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; red in the last 5 s). The orange box lights up for 5 s for *change ends, tie-break, set point, match point, break point…*. The two square buttons (yellow = Player 1, red = Player 2) are on the side where the players actually are and swap over at every change of ends; **On Serve** appears under the server. At the bottom: *Undo point*, *Suspend/Resume*, audio (speaker icon, crossed out = off), *New match*, **Exit**. In Wristbands mode, under the timers there are **P1**/**P2** with battery level and remaining battery life: tap them to open the wristband settings. A double tap on *Undo point* removes only one point (a second tap within 1 s doesn't count); right after a page change the second tap of a double tap is ignored, so it doesn't land on a button of the new page. The **lock** at the bottom locks the screen (for example with the phone in a pocket or on the bench): taps do nothing, wristbands and remotes still work; press and hold the lock to unlock.
+5. At the last point the **Match concluded / Undo last point** popup appears. "Match concluded" can be confirmed **only on the phone**. For half a second after it appears its buttons ignore taps: a double tap on the last point doesn't undo anything.
+6. **Summary**: winner, names, set-by-set score with tie-break points, duration, start and end time, date, club, court, place, format, points and games won. Buttons: **Save files** (file name + folder of your choice + .txt/.json/.png formats and a **full PDF** with result, statistics for the match and each set, log and photos). **Share** asks whether to send the image with text (for WhatsApp and social media) or the full PDF. In the Summary, **Match photos** keeps up to 10 souvenir photos (from the gallery or taken on the spot): they stay on the phone, go into the PDF and move to the other phone with the transfer, never into the social image, **Share** (1080×1350 image + text for WhatsApp/Instagram/…), **New match**, **Exit**. Below the photos, **Notes** takes free text (up to 2000 characters): it saves by itself, goes into the PDF, the shared text and the .txt and .json files, and moves to the other phone with the transfer; it doesn't go into the social image. A finished match goes into the **History** by itself (**Progress** tab): the list of matches, to reopen with their summary or delete, and a **Players** tab with wins, losses and head to head of everyone whose name is written in *New match* (case and spaces don't matter; in doubles each player counts). **Import** adds matches saved as .json with *Save files* on another phone: finished ones go into the history, unfinished ones into the suspended matches to resume. **Transfer** (top right in the History) moves history and suspended matches to another phone with a QR code: both phones must be on the same Wi-Fi network or one on the other's hotspot; on the phone that has them tap *Send* and keep the window with the code open, on the other tap *Receive* and scan the code (camera permission needed). This way you can also carry on a match in progress on another phone: suspend it, transfer and resume it. The matches are added to the ones the phone already has. **Player photos**: tap the circle next to the name in *New match* (or in the player detail in the History) and pick a photo; it is cropped square and found again from the name. It shows in the History, the summary and the TV scoreboard, stays only on this phone (it moves with the transfer) and is not put in the shared image. Tap the circle again to change or remove it. If the app closes while you are on the summary (Android closing it in the background, an update, a phone restart), you find it again when you reopen it; not if you left it yourself with *New match*, *Exit* or by removing the app from the recent apps. The default folder is **Documents/Tennis Score Manager** (from Android 10; on Android 8 and 9 the app folder): any file manager opens it and it stays even if you uninstall the app. Saving twice with the same name makes the second one *name (1)*; in the image long texts (names, address) are fitted to the width.
+
+   The summary has three tabs. **Summary**: the data above and, with 2.4 wristbands, strokes, wrist speed and strokes per point (6.4). **Statistics**, for the match or for one set: the two players compared with bars starting from the centre (coloured for whoever is ahead) for service and return points and games won, break points saved and won, total points and games, points in a row, last 10 points, match points saved; with 2.4 wristbands also strokes by type and average wrist speed. **Point by point**: set by set, every game with the ball of the server, *LOST SERVE* on breaks, the score after each point with **BP** (break point), **SP** (set point) and **MP** (match point) and the outcome (*GAME*, *BREAK*, *SET*, *MATCH*). Aces, double faults, first serves, winners and errors are there if you turn on **Detailed stats** in *Mode and rules*: instead of the two big buttons you get *Ace* and *Fault* (the second time it becomes *Double fault*) and, for each player, *Winner*, *Error* (the point goes to the other side) and *Point*; *Undo point* also removes a fault. It is meant for someone scoring from the side of the court. After *Error*, *Unforced / Forced* shows for 6 seconds; with wristbands or remotes, after every point *How did the point end?* (Ace, Winner, Error) shows: answering is optional and the score doesn't change. In the History, a player's detail shows the **trend**: points won match by match and the averages of aces, double faults, first serves, winners and errors. Each match's statistics also count game, set and match points converted, love games, games in a row, sets won from a break down and, in the **Times** card, the length of each set and the longest game.
+
+   **Rematch** (at the bottom of the summary): it suggests the same weekday and time the following week and the match's club; you can change date, time and place and add a note. **Send the invite** opens sharing (WhatsApp, SMS, email…) with the message ready: who plays whom, when, where and how it ended last time. **Add to calendar** creates the event in the calendar app, **Set up the match** brings players, club, court and rules back to *New match* (not the tournament). No account: the invite goes through the channels you already use.
+
+**Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
+
+**Saving**: the match saves itself at every point. *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
+
+### 7.1 Workout with the strap
+
+To train with the heart rate strap without a match: **Train** › **Workout with the strap**. It uses **one strap**, Player 1's, with age, weight and sex for calories and zones; you pick it right there (with the *Heart rate straps* switch, Bluetooth and permissions if missing).
+
+1. **Start**: the live heart rate in large type, below it the time and the current lap.
+2. **Lap** closes one piece of the workout and starts another (like the lap button of a stopwatch): a sprint, a drill, a lap of the track. **Pause / Resume** stops the time; pauses don't count.
+3. **Finish**: the app records **one more minute of recovery** (stay still) to measure how much the heart rate drops; **Save now** skips it.
+
+- **Summary**: duration, average and maximum heart rate, calories, **HRV (RMSSD)** from the beat-to-beat intervals sent by the strap (needs about thirty clean beats; compare it with your own similar workouts, not with other people's), **recovery in 1 minute** (the more it drops, the better), heart rate chart, heart rate zones and, for each lap, duration, average, maximum and recovery.
+- **CSV** (second by second, with the lap and the recovery minute) and a one-page **PDF** with chart, zone pie and laps, to share.
+- Workouts stay on the same screen, separate from matches; they can be reopened or deleted. The heart rate also arrives from the second phone (6.6) and recording continues with the screen off.
+
+### 7.2 Progress
+
+**Progress** › **TSM rating · Progress**: a document to see whether you are improving, **separate** for workouts and matches.
+
+- **Workouts**: duration, average and maximum heart rate, calories, HRV, recovery.
+- **Matches** of a player from the history (picked from the list): matches won, points won, aces, double faults, first serves in, winners, unforced errors. Aces and the other detailed values are only there for matches played with detailed statistics; they are totals per match.
+- For each item the average of the **first half** of the period and of the **second**: green ▲ if it improves, red ▼ if it gets worse (fewer double faults or errors is an improvement), = if it stays the same (less than 5% difference) or can't be judged (heart rate). At least 2 workouts or matches are needed.
+- **What to compare**: the **Filters** choose the period (all time, 30 days, 3 months, 1 year), the **days of the week** (for example only Wednesdays, also more than one) and, for matches, **tournament**, **club** and **opponent** taken from the history; below, the **To compare** list to tick (*All* / *None*). Comparison, PDF and printing use only the ticked ones.
+- **TSM rating**: in *Matches*, above the filters, the player's rating (everyone starts at 1500) with the matches counted, the change in the last one and the trend, plus the **TSM ranking** of every player in the history. It is an Elo worked out on the phone: it goes up when you win, more against higher-rated players and with a clear score; in doubles the pair's average counts; tennis and padel have separate rankings. For the first 5 matches it is *provisional* and moves more. In each match summary the **TSM rating** card shows how much each player gained or lost; with **Friendly** the match stays in the history but doesn't count.
+- **PDF** (with the trend of each item and the full list, on several pages if needed) to share, or **Print** with the Android print service (also *Save as PDF*).
+
+### 7.3 Videos: camera phone, highlights and replay
+
+A second phone on a tripod films the match and puts the umpire's score on the video.
+
+1. **Umpire**: More › **Devices** › **Second phone** › **Use a second phone** (QR, as in 6.6).
+2. **Camera**: More › **Devices** › **Second phone** › **Act as camera**, scan the QR, then **Open the camera** (camera and microphone permissions; the phone must record in 1080p). With *Score connected* the score graphics are on the video (**Overlay** turns them on or off); without an umpire it records the video only.
+   - **Record / Stop**: the video goes to the gallery (*Movies/Tennis Score Manager*) with chapters, one per point.
+   - **Go live**: RTMP broadcast to YouTube, Twitch, Facebook or your own server; server and stream key in *Live: server*.
+   - **Framing** (framing assistant): enter how many metres behind the baseline and how high you put the phone and which court you play on; the app gives the downward tilt that keeps both baselines and the far player in the video, and whether the court fits in width. Width is often the real limit: from the fence (about 6 m) the main lens cuts the near corners, the **wide** one doesn't (**Use the … lens**, or the **Lens** button, with recording stopped). With **Show the level** the preview shows the horizon and directions (*aim 2° lower*, *turn clockwise*…), green when right, with a vibration when the phone is in position. The level is also shown in the **Camera** window on the umpire's phone. The sensors can't tell left from right: check by eye that the net is in the middle.
+   - **Outline** (court outline): the preview shows the court lines as the lens sees them, and they follow the phone as you tilt it. Move the sliders (**Distance**, **Height**, **Direction**, **Sideways offset** and, if needed, **Field of view** and **Tilt correction**) until they match the real lines: that also sets the centring, and the suggested tilt becomes accurate. The calibration is remembered for the match court (the umpire's *Club · Court*) and restored next time. Outline and sliders are also in the umpire's **Camera** window. The higher the phone, the better you see the far half of the court: from 2.5 m it is squeezed just above the net.
+3. **Camera up high, controlled by the umpire**: on the umpire's phone **Camera** (next to *Replay* during the match, or *Camera view and controls* in More › **Devices** › **Second phone**, handy to set it up before starting) shows what the camera phone frames, as in the video and graphics included, with **Record / Stop**, **Go live**, **Overlay** and **zoom**. It also shows recording time, battery and free space (orange when low). The picture is small and choppy (about 3 frames per second) and is sent only while you watch it; the live stream key must be set on the camera phone.
+
+- **Video** › **Your videos**: the recorded videos, to watch point by point, game by game or set by set. **YouTube chapters** prepares the chapters to paste into the description. **Import video** takes a video shot with another camera (the file stays where it is): you score the points while watching, tapping at the end of each point who won it and, if you like, how it ended (*Undo last* removes the last one); format and rules are those of *Mode and rules*.
+- **Coach filters** (filter icon): only the points of one player, won or lost, serving or returning, on the first or second serve, by how they ended, on break points or on set and match points. **Play** queues them up.
+- **Highlights**: automatic edit of the best points (aces, winners, break points, set and match points, long rallies with the wristbands) in the priority order set with the arrows, for at most 1, 3, 5, 10 or 15 minutes or an **Other length** up to 90. If it doesn't all fit, clips are shortened first, then the less important points are left out. The result goes to the gallery.
+  - **Statistics at the end of the video**: 2 or 3 screens of 10 seconds like in tournament broadcasts: serve and break points; points, errors and short and long rallies; heart rate, if a strap was worn. The match is the one in the history played while recording, or the one scored on an imported video. At the sides, the player's photo; without a photo, a stylised man or woman portrait (**Man / Woman** choice in *New match*) (without a choice, the man; this applies across the app, also in *New match*, history, summary, PDF and TV scoreboard); below, the percentage of points won. At the top, tournament, category and round (*More details* in *New match*), or club and court.
+  - **Music** under the statistics, with fade in and out: *Nowhere Land* by Kevin MacLeod (incompetech.com, CC BY 4.0 licence: if you publish the video, credit it), or a track of yours with **Choose a track** (its beginning is used; only use music you have the right to put in your videos).
+  - At the bottom of every statistics screen there is the line **Made with Tennis Score Manager** with the website address.
+- **Replay**: on the umpire's phone, with the camera connected, **Replay** asks the camera for the disputed point (*Last point*, *Previous point* or *Since the last scored point*) and shows it, with pause and frame by frame. **Also on the scoreboard** shows it on the TV scoreboard too.
+
+### 7.4 Rackets: virtual racket
+
+**Progress** (or **More**) › **My rackets**: each physical racket has its own card (two rackets of the same model are two cards: strings, weight and hours differ).
+
+- **Card**: nickname (A, B…), brand, model, weight, balance, head size and string pattern, typed in or taken **from the catalogue** (manufacturer specs, to be corrected if you measured yours). *Retired*: no longer offered, but kept in comparisons.
+- **Stringings**: type (polyester, multifilament, synthetic gut, natural gut, hybrid), brand and model (also from the common strings), gauge, mains and crosses tension, date and notes. *New stringing* starts from the current one. For each one the app adds up the **hours played** in linked matches and workouts and warns when the chosen **check threshold** is passed (20 hours by default): from time alone it cannot tell how much tension is left.
+- **Before playing**: in *New match*, under each player's ranking, pick their racket; in the workout pick it above the strap. The match (points, wristband strokes, heart rate) and the workout are saved with a **copy** of the racket as it was that day, strings and tension included: restringing it later does not change past sessions.
+- **In the summary** of the match (*Summary* tab) and of the workout you see the racket used, can link it afterwards too (the stringing mounted that day is used) and rate the **feel** from 1 to 5: control, comfort, power and fatigue.
+- **Comparison**: *by racket* or *by stringing* (same racket with different tensions or strings), pick setups A and B. Side-by-side bars for sessions, hours, matches won, points won, first serves in, points won on first and second serve, aces, double faults, winners and unforced errors per match, average wrist speed and wristband strokes, average heart rate, and average feel. The better value is in bold, but the app does not pick a winner: opponent, surface, conditions and form matter too.
+
+### 7.5 Stroke practice: serve, forehand, backhand and volley
+
+A phone on a tripod films the server; the wristband on the wrist recognises the serve and the buttons say how it went. One phone is enough, no umpire.
+
+1. **Train** › **Stroke practice**, choose the stroke (**Serve**, **Forehand**, **Backhand**, **Volley**) › **Start** (the wristband must be connected as in 6.1; without it, mark with the on-screen buttons).
+2. **Where to put the phone** (it opens by itself the first time, then from the *Where to put the phone?* button):
+   - **beside the server**, on the hitting-arm side (right for a right-hander), **3-4 m** away, level with the baseline or half a metre behind;
+   - lens **1-1.2 m** above the ground, phone **in landscape** and level, pointed at the server;
+   - the frame must hold **the whole person, from the feet to the racket at the top** (about 2.7 m): if the racket head goes out, move the phone back or switch to the **wide** lens (*Lens* button);
+   - to also see where the ball goes, as an alternative: 3-4 m **behind** the server, a little to the side, 1.5-2 m high;
+   - never in front of the server or in the ball's path.
+3. Choose the **side** (deuce/ad), **first or second** and, if you like, the **target** (down the T, body, wide): they apply to the following serves.
+4. Serve and press **KEY1 = in** or **KEY2 = out**; **KEY1 held down** undoes the last one. The voice says the count (*In. 8 of 12*) and the wristband shows it. If the wristband recognised the serve, that moment is used; otherwise a few seconds before the button press.
+5. For every serve a **clip** of a few seconds around the shot is saved. **Done** shows the summary: ins out of attempts, by side, first and second, target and, if the wristband recognised the serves, the average wrist rotation on serves in and out. **Watch all / only the ins / only the outs** opens the clips in the replay (pause, slow motion, frame by frame).
+6. Under **Start** you find the last 3 sessions **of the chosen stroke** (the stroke buttons show how many sessions each has, e.g. *Backhand · 4*) and the line of **shots in, session after session**. **All sessions** opens those of the chosen stroke, by month, with the space their videos take and whether they have been analysed. Tap a session for its summary and clips; **press and hold** to select it (the icon at the top selects them all), then **Delete** (session and videos) or **Videos only** (frees space: counts, analysis measurements and key-moment pictures stay). **Progress** shows the trend of each stroke.
+   - **Where the videos are**: in **Documents/Tennis Score Manager/Stroke practice**, with the folders **Serve**, **Forehand**, **Backhand** and **Volley** (created at start-up) and inside them a folder per session (date and time) and one per shot, with `video.mp4` (opens and shares from any app), the analysis and the three pictures. Any file manager shows them and they stay even if you uninstall the app (keep them as an archive: a reinstalled app does not pick its sessions up again). On Android 8-10 the same structure is in the app folder. Clips of sessions from before 2.5 move there by themselves at the first start.
+7. **Movement analysis** (from the saved session): **Analyse the serves** finds the body position in the clips (MoveNet model: the first time the app asks to download it, 7 MB, from the project's GitHub page; then everything stays on the phone, no internet, a few seconds per serve; it can be deleted at the bottom of the screen. Not available on devices with an x86 processor) and measures three moments: **loading** (tossing arm up), deepest **knee** bend and **contact**. For each serve: the three images with the skeleton drawn and the measurements (deepest knee bend, elbow at contact, contact height relative to body height, tossing arm, shoulders at loading, time from loading to contact); at the top, **ins and outs** compared. They are estimates from a side view: they are most useful to compare your serves with each other. The body is recognised well with the whole person in the frame, from the side and in good light; racket and ball are not measured.
+   Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update.
+
+**Forehand, backhand and volley** work the same way (KEY1 in, KEY2 out, a clip for every shot, summary and analysis), with these differences:
+- **Where to put the phone**: beside the hitter, at right angles to the direction of the shots, 4-5 m away and outside the alley, level with the contact point; lens about 1 m high; the whole swing in the frame (the wrist moves about 2 m back and forth). For the volley: beside the net player, 3-4 m away, level with the player. Always on the same side for the whole session, and never in the ball's path.
+- Instead of side, first/second and target you choose the intended **direction** (**cross-court**, **middle**, **down the line**) and, for the volley, whether it is a **forehand** or **backhand** volley; the summary counts them separately.
+- **Movement analysis**: the three moments are **preparation** (where the wrist stops at the end of the take-back), **contact** (wrist fastest; around it the app reads one frame every 33 ms) and **finish** (wrist highest after contact; for the volley, where the wrist stops). If there are several shots in the window, the one recognised by the wristband counts; wrists swapped by MoveNet (it happens from the side) are put right by themselves. Film **from the side**: from the front the take-back goes in depth and can't be seen. The measurements (*—* if the elbow or legs can't be seen): deepest knee bend, elbow at contact, contact height, how far **in front of the body** you hit, **preparation size**, finish height (all relative to body height) and the time from preparation to contact. The skeleton video has **Preparation**, **Contact** and **Finish** buttons.
+
+## 8. Scoreboard on a TV or monitor
+
+The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
+
+### 8.1 The possible routes
+
+| How it gets to the monitor | What you need | Pros | Cons |
+|---|---|---|---|
+| **Second phone with video output** + USB-C/HDMI cable, TSM app in *Use as scoreboard* | a phone with video output over USB-C (DisplayPort Alt Mode) | no internet; the scoreboard fills the whole monitor in 16:9 and the phone stays free | many phones do **not** output video: as a rule Galaxy S/Note/Tab S do (with DeX: choose *Screen mirroring* or turn off DeX's automatic start), almost all Galaxy A models don't. Look for "DisplayPort" / "video output" in the spec sheet |
+| **Chromecast** (or Google TV Streamer) on the monitor + any phone with TSM in *Use as scoreboard* and **Cast** (*Screen Cast* up to Android 14, Smart View on Samsung) | a Chromecast set up once with Google Home on the hotspot's network | any phone will do, no long cable | the Chromecast needs **internet** (mobile data on the hotspot); about 1 s of delay; casting shows the phone's screen (in landscape) |
+| **Browser** on any device connected to the monitor (laptop, tablet, TV box, Fire TV Stick…) | scan the QR code or type in the address | no app to install | the screen switches off by itself unless you set it not to; you have to tap **FULL SCREEN** every time you open it |
+
+**Why not over Bluetooth**: the umpire's phone is already handling the two wristbands over Bluetooth, where button timing matters; Wi-Fi is separate, faster and has a longer range. **Why not straight from the umpire's phone to the Chromecast** (with no second phone): it can be done, but it needs a "receiver" app registered with Google (Google Cast Developer Console, a one-off $5) and published on an https site; it is a possible next step.
+
+**Network tips**:
+- The scoreboard sends very little data (one message at every point and every 5 seconds) and uses no internet data.
+- If the umpire's phone provides the hotspot, choose the **5 GHz** band in the hotspot settings if available: the wristbands' Bluetooth works at 2.4 GHz, so they won't interfere with each other.
+- With a Chromecast it is best for the umpire's phone to provide the hotspot, with **mobile data on**; the scoreboard phone and the Chromecast connect to that hotspot.
+- Without a Chromecast the opposite also works (hotspot on the scoreboard phone, as in the original idea): the umpire's app stays attached to the Wi-Fi even if it has no internet.
+
+### 8.2 On the umpire's phone
+
+1. More › **Devices** › **TV scoreboard** › turn on **Scoreboard on a TV or monitor**. On Android 13 and later the app asks for the notification permission: it's needed for the notification of the service that keeps the scoreboard running.
+2. The **address** (e.g. `192.168.43.1:8080`), the **QR code** and the number of connected scoreboards appear. If it says *No network*, turn on the hotspot or connect to the other phone's hotspot.
+3. **Preview on this phone** opens the scoreboard in the phone's own browser.
+4. **Scoreboard look**: each player's colour (8 colours), match time, serve clock and breaks, finished sets, messages (break point, set point, change ends…), ball next to the server, unlit segments visible, bottom line (empty = club and court from *New match*). Changes reach the monitor straight away.
+5. During the match, **TV · 1** (connected scoreboards) appears at the top centre: tap it to see the address and QR code again.
+
+While the scoreboard is on, a foreground service (notification *Match in progress · TV scoreboard on*) keeps the server running even with the screen off, in Umpire mode too. The scoreboard is **read-only**: nothing can be changed from it. It stays on also on the summary and the other pages as long as the scoreboard is on (notification *TV scoreboard on*), so the final result stays on the monitor even with the phone locked.
+
+What it shows besides the score: *WAITING FOR THE MATCH* before the start, *READY TO PLAY* on the MATCH START page, **TIE-BREAK** / **MATCH TIE-BREAK** in place of *VS*, a flashing *MATCH SUSPENDED*, **WINNER [name]** at the end of the match with all the sets; advantages read **AD** on the LED digits too. A match won in the match tie-break ends with 1-0 in games and 2-1 in sets, with [10-8] among the finished sets; long messages shrink to fit on the screen.
+
+### 8.3 On the scoreboard phone
+
+1. **Play** › **Use as scoreboard**.
+2. The phone **finds the umpire's phone by itself** (network announcement and hotspot scan, a few seconds) and remembers the last address. If it can't find it: check the hotspot and *TV scoreboard*, then tap **Search again**, or type in the address shown on the umpire's phone and tap **Connect**. It finds it even if *Scoreboard on a TV or monitor* is on on this phone too; if Wi-Fi only connects later, it searches again by itself.
+3. The scoreboard goes full screen, in landscape, with the screen always on.
+   - **With the HDMI cable**: the scoreboard goes to the monitor in the monitor's format; the phone shows *The scoreboard is on the external monitor* with brightness at minimum (**Show here too** to see it on the phone as well). Unplug the cable and it comes back to the phone.
+   - **With the Chromecast**: open the Quick Settings panel › **Cast** (or **Screen Cast**) / **Smart View** › choose the Chromecast.
+4. If the umpire's phone disappears (out of range, app closed), *CONNECTION LOST - RECONNECTING...* appears and after 20 seconds it searches again by itself, even if the address has changed. Even after a hotspot dropout it reconnects by itself as soon as the network is back. It never switches to another court's phone: to change court, leave *Use as scoreboard* and search again.
+5. To exit: press **back twice**.
+
+**From a browser** (laptop, TV box): scan the QR code or type in the address, then tap **FULL SCREEN** (it appears when you move the mouse or touch the screen). Set the screen timeout to *Never*: on an http page the browser can't keep the screen on by itself. After an outage the page reconnects by itself; too many open scoreboards no longer lock out a new one (the oldest is closed).
+
+
+## 9. Rules applied (ITF) and agreed choices
+
+- **Game**: 0-15-30-40, deuce, advantage, game. **No-Ad**: at 40-40, a deciding point ("deuce, deciding point").
+- **Set**: 6 games with a 2-game margin (7-5); at **6-6, a tie-break**.
+- **Tie-break**: to 7 with a 2-point margin; the player whose turn it is serves the 1st point, then 2 points each; change of ends **every 6 points** and at the end; whoever served first in the tie-break **receives** in the first game of the next set.
+- **Match tie-break** (2-set format): at one set all, played to 10 points with a 2-point margin.
+- **Change of ends** (ITF Rule 10): after the 1st, 3rd, 5th… game of each set. At the end of a set, ends are changed only if the set had an odd number of games (6-3, 7-6); otherwise (6-4) they are changed after the first game of the next set. The tie-break counts as one game.
+- **Times**: shot clock 25 s between points; changeover 90 s; set break 120 s at the end of a set. In addition, as requested (not an ITF rule): **30 s** to change ends after the 1st game of each set, at every change of ends in the tie-break and at 6-6; when any break ends, the shot clock starts.
+- **Doubles**: serving rotation A1-B1-A2-B2 for the whole set, tie-break included; at the start of each set the app asks for the order (it can be changed, as the rules allow).
+- **Calls**: the score is called from the server's side ("fifteen love", "love forty", "fifteen all", "deuce", "advantage Rossi"); at the end of a game "game Rossi, Rossi leads three games to two" / "two games all" + "change ends" when ends are changed; at 6-6 "game Rossi, six games all, tie-break"; in the tie-break the score is called from the leader's side ("three one Rossi", "six all"); end of set "game Rossi, Rossi leads one set to love" / "one set all"; end of match "game, set and match Rossi, six four, three six, seven five"; "correction" + the score when a point is undone.
+
+**Choices made compared with the original request, to follow the ITF:**
+1. **No change of ends at 6-6** (that makes 12 games, an even number): the app takes the 30 s break and says "tie-break", but it doesn't say "change ends" and doesn't swap the buttons. The first change is after 6 points of the tie-break.
+2. The change of ends at the end of a set depends on the number of games in the set (see above); it doesn't always happen.
+3. At one set all in the match tie-break format, the voice adds "match tie-break".
+
+## 11. Common problems
+
+- **Wristband not found**: are Bluetooth and location on (green rows)? Is the wristband flashing PAIRING? (If it is already connected to another phone, it isn't visible.) If in the meantime it has switched itself off (30 s), switch it back on with one click of the side button.
+- **The wristband shows NOT SENT**: the phone didn't confirm the press within 8 seconds (link lost or app closed). Press again once the wristband has reconnected. Rare case: if the press had arrived and only the confirmation was lost, the point counts twice; the voice calls the score, fix it with *Undo point*.
+- **The settings panel says "This wristband's firmware has no settings"**: that wristband still has the old sketch; upload the new one (chapter 5).
+- **The voice doesn't speak or reads badly**: media volume, *Audio On*, voice for the chosen language installed (4); try another engine or another voice in *Audio and voice*.
+- **Screen goes off during the match**: in Wristbands mode a foreground service (notification "Match in progress") keeps Bluetooth, voice and timers running; in Umpire and Remotes mode the screen stays on (with the remotes it has to: 6.3).
+- **The remote does nothing**: is it assigned to the player (*More › Devices* › *Remotes*, row with their name)? The app must be open on the match, with the screen on (6.3). If the row says *Not connected*, press a key to wake it up or pair it again in the Bluetooth settings.
+- **Strokes are mixed up or come out as not recognized**: wear the wristband as during calibration (same wrist, same direction); otherwise redo the calibration wearing it as in a match (6.4).
+- **The wristband shows MEMORY FULL**: a calibration example could not be saved. Clear the examples of one stroke (bin) and redo them.
+- **The scoreboard phone can't find the umpire's phone**: are they on the same network? (one of the two provides the hotspot, the other is connected to it). Is *TV scoreboard* on on the umpire's phone? Try typing the address by hand. Some hotspots isolate connected devices from each other ("client isolation"): if so, turn it off.
+- **The phone's browser won't open the address** while mobile data is on: Android sends the traffic over mobile data because the hotspot has no internet. Use the app in *Use as scoreboard* (it handles this by itself) or turn off mobile data on that phone.
+- **Black monitor with the cable**: that phone has no video output over USB-C (8.1), or Samsung DeX has started: choose *Screen mirroring*.
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/es.md
+cat > "$DEST/app/src/main/assets/help/es.md" << 'TSM_EOF'
+## 3.1 Cómo está organizada la app
+
+En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a usar (llevar el marcador, jugar con las pulseras, entrenar, grabar partidos) y tu nombre; se puede saltar y repetir desde **Más › Presentación de la app**. Abajo hay siempre **cinco pestañas**:
+
+- **Jugar**: **Nuevo partido**, el partido suspendido para reanudar, la **revancha** del último, el **torneo entre amigos** (Americano, Mexicano) y **Usar este teléfono como** marcador o cámara. Arriba el estado de los dispositivos (pulseras, bandas, cámara, TV): un toque para conectarlos.
+- **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
+- **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
+- **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
+- **Más**: **Tú** (tu nombre), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
+
+**Nuevo partido** son dos pasos: **quién juega** (individual o dobles, los nombres, con los jugadores recientes para tocar, y el deporte; club, pista y torneo en *Más detalles*) y **cómo llevas el marcador y las reglas**. Todo es opcional: se puede seguir sin nombres. Desde cada pantalla **Atrás** vuelve a la pestaña de la que se venía.
+
+## 4. La voz (funciona sin internet)
+
+- Cada canto lo lee **en una sola frase** la síntesis de voz del teléfono, con una voz instalada: sin internet y con una entonación natural. Los nombres de los jugadores forman parte de la frase.
+- Más › **Idioma y voz** › **Audio y voz**:
+  - **Motor de síntesis de voz**: *Predeterminado del teléfono* (en los Samsung es Samsung TTS) o el motor que elijas, por ejemplo *Servicios de voz de Google*. En nuestras pruebas, hechas en italiano, Google sonaba más natural.
+  - **Voz**: *Automática (la mejor sin conexión)* o una voz concreta (Google identifica sus voces con un código; las marcadas *en línea* necesitan internet).
+  - **Probar voz**: lee una secuencia de cantos de ejemplo con los nombres introducidos. Mientras lee, el botón pasa a ser **Detener la prueba**: tócalo otra vez para interrumpirla (también se detiene sola al salir de la página). La síntesis de voz no se puede pausar a mitad de frase, así que el botón la detiene; si lo vuelves a pulsar, empieza desde el principio.
+- Si falta la voz del idioma elegido: **Ajustes › Administración general › Idioma › Texto a voz** (o *Salida de texto a voz*) → descarga la voz de ese idioma para el motor elegido (la app muestra también el botón **Instalar voz**). Si la síntesis de voz no arranca en absoluto, la app lo indica con un mensaje aparte y el botón **Abrir ajustes** (ajustes de síntesis de voz de Android).
+- **Pronunciación**: algunos motores leen mal palabras del tenis (en italiano, "primo set" salía como "primo settembre" y "tie-break" como "time break"). La app las corrige sola; las correcciones se han verificado transcribiendo el audio real de Samsung y de Google.
+- **Grabaciones personalizadas** (la voz más natural de todas: la tuya o la de un juez): en la carpeta `Android/data/io.github.steve_linux.tsm/files/voice/` está `LEGGIMI.txt` (el archivo «léeme»; las explicaciones del principio están en el idioma de la app y se reescriben al cambiarlo) con la lista de las 85 claves y de sus frases. Graba los archivos con esos nombres (`score_1_0.mp3` = «quince cero»…), ponlos en un ZIP con una carpeta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) y usa **Importar ZIP**. `LEGGIMI.txt` tiene una columna por idioma separada por tabuladores, así que también se abre bien como hoja de cálculo. Las grabaciones siempre tienen prioridad sobre la síntesis; los nombres los sigue leyendo la síntesis. En el ZIP cuenta la carpeta que contiene el archivo (también dentro de otras carpetas, p. ej. `voice/es/`); los archivos fuera de una carpeta de idioma van al idioma actual y las carpetas `tts/` se ignoran, así que también se puede comprimir la carpeta `voice/` de la app. Un ZIP dañado o incompleto no cambia nada (*ZIP ilegible o incompleto*). **Quitar grabaciones** pide confirmación. Si un archivo no se puede reproducir, esa frase la dice la síntesis de voz y el archivo no se vuelve a usar hasta reiniciar la app.
+- **Usar archivos de audio pregenerados** (opcional): con **Generar archivos** la app crea una sola vez los 85 archivos con la voz elegida (incluso una voz *en línea*, si en ese momento hay internet) y después los usa en lugar de la síntesis continua. Suena más «a trozos», pero sirve para llevarse sin conexión una voz en línea. Los archivos anteriores se mantienen hasta que los nuevos estén listos (si la generación no termina: *Generación no completada*); mientras genera, idioma, motor, voz, prueba de voz y audio quedan bloqueados.
+- **Altavoz externo**: basta con emparejarlo por Bluetooth con el teléfono; la voz sale por el canal multimedia (ajusta el volumen multimedia).
+- **Auriculares Bluetooth**: se emparejan igual y la voz solo la oyes tú, sin molestar a las pistas de al lado; también sirven a quien lleva el marcador desde fuera de la pista. Las pulseras pueden seguir conectadas a la vez.
+- **Dos dispositivos de audio a la vez**: muchos teléfonos envían el audio a dos dispositivos Bluetooth al mismo tiempo. En Samsung: conecta los dos, abre el panel rápido › **Salida multimedia** y marca los dos. Así cada jugador puede tener sus auriculares, o el altavoz suena para la pista y los auriculares para quien lleva el marcador.
+
+### 4.1 Idiomas
+
+Más › **Idioma y voz** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito en su propia lengua, así lo encuentras aunque la app esté en un idioma que no entiendas). La elección se aplica a la vez a **pantallas, voz del juez, marcador de TV, resumen/compartir y pulseras**. Las fechas siguen el idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+
+Los cantos no son traducciones palabra por palabra: siguen los textos oficiales para jueces de silla de cada federación, es decir, FFT *L'arbitrage en 255 questions* e ITF en francés, los materiales de DTB/BTV y Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (el único guion portugués publicado). El inglés sigue a la ITF. En inglés, el cero de los sets al final del partido se dice *love* («six love, six four»), como en los puntos.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Inicio | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15-0 · 15-15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40-40 · ventaja | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| Fin del juego | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Juegos iguales | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Tie-break | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Set | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| Fin del partido | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Cambio de lado | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Particularidades:
+- En francés y en español el nombre va **después** de "au service"/"al servicio", en alemán después de "Aufschlag". El francés llama al set **manche** (salvo en "jeu, set et match") y al tie-break **jeu décisif**.
+- **10-6 … 10-9** en el súper tie-break: en francés, español y portugués se dice "dix **à** huit", "diez **a** ocho", "dez **a** oito", porque "dix huit" / "diez ocho" / "dez oito" se oyen como *dieciocho*.
+- **Portugués**: una sola opción, con la interfaz y la voz preferida de Brasil (si falta la voz brasileña se usa la portuguesa) y los cantos del guion de la FPT, con palabras válidas en los dos países ("jogo" y no "game", "partida"). "Um set a um" pasó a ser "sets iguais": en singular, *set* se pronuncia como *sete* y parecía 7-1.
+- **Pronunciación**: todas las frases de todos los idiomas se han hecho leer a las voces de Google y se han transcrito con whisper. Correcciones añadidas: en alemán, "Tie-Break" se hace leer "Taibreak", con una coma delante (si no, sale "Teilbreg" o "bei Detailbreak"); en francés, la "à" suelta de los archivos pregenerados se hace leer "a" (si no, sale "a accent grave"). **Samsung TTS todavía no se ha probado en los nuevos idiomas.**
+- **Pulseras** (firmware 2.2): la app envía por sí sola el idioma en cada conexión y cuando lo cambias; la pulsera lo guarda y lo usa también cuando no está conectada (búsqueda del teléfono, carga, apagado), sin tildes porque la fuente es ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o anterior, los mensajes que envía la app salen traducidos, pero los propios de la pulsera siguen en italiano. Una pulsera recién programada arranca en italiano; desde el firmware 2.2.2 su mensaje de conexión se vuelve a escribir en el idioma de la app en cuanto esta se lo envía, más o menos un segundo después de conectarse.
+
+## 6. Usar las pulseras
+
+| Botón | Acción |
+|---|---|
+| **KEY1** (frontal) corto | punto para quien lleva la pulsera (también inicia el partido desde la página INICIO DEL PARTIDO); un pitido lo confirma (firmware 2.3 + app 2.4: cuando el teléfono lo ha recibido, más o menos medio segundo después) |
+| **KEY1** largo (1 s) | muestra la batería (y mantiene encendida la pulsera si está a punto de apagarse por inactividad) |
+| **KEY2** corto | anula el último punto (también desde la ventana de fin de partido); dos pitidos más graves (con el firmware 2.3, al confirmarlo el teléfono) |
+| **KEY2** largo (2 s) | apaga la pulsera (con el cable conectado muestra *SIGUE CARGANDO*: se carga también apagada; desde el firmware 2.3 también KEY1 o KEY2 la vuelven a encender) |
+| Botón lateral | un clic enciende; doble clic apaga (función del hardware) |
+
+- Al encenderla parpadea **VINCULANDO...** (encendida 0,35 s cada 2 s, para ahorrar). La app se conecta sola a las pulseras que ya conoce en cuanto se abre; las nuevas las encuentra en **Más › Dispositivos** (o en **Modo y reglas** con el modo *Pulseras*).
+- Conectada: **VINCULADA** durante 3 segundos con dos pitidos, luego **VINCULADA A** + el nombre del jugador.
+- En cada punto la pantalla se enciende con el tanteo del juego en grande (a la izquierda el tuyo, a la derecha el del rival; la pelota verde indica quién saca) y luego se apaga. Al final de cada juego muestra juegos y sets. Si el teléfono no confirma una pulsación en 8 segundos (conexión perdida), aparece **NO ENVIADO** en rojo con dos pitidos graves: vuelve a pulsar cuando se haya reconectado. Una pulsación hecha durante un corte breve, en cambio, no se pierde: se envía en cuanto la pulsera se reconecta, y el pitido suena en ese momento.
+
+**Apagado automático** (los tiempos se cambian desde la app, 6.1):
+
+| Situación | Qué hace la pulsera | Predeterminado |
+|---|---|---|
+| Encendida, pero ningún teléfono se conecta | parpadea VINCULANDO y luego se apaga | **30 s** |
+| Teléfono perdido (apagado, fuera de alcance, Bluetooth desactivado, app cerrada de golpe) | parpadea RECONECTANDO y se vuelve a conectar sola en cuanto puede; si no, se apaga | 3 min |
+| Conectada pero inactiva (ningún punto, ningún mensaje) | 30 s antes avisa con **INACTIVO · MANTEN PULSADO KEY1** y un pitido, luego se apaga | 30 min |
+| Partido terminado (confirmado en el teléfono) o **Salir** en la app | muestra FIN DEL PARTIDO / APP CERRADA y se apaga enseguida | activado (se puede desactivar, 7.2) |
+| Batería agotada (por debajo de 3,30 V en dos lecturas seguidas) | muestra BATERIA AGOTADA y se apaga, para no quedarse encendida a medias | siempre |
+
+- En los últimos 10 segundos antes de apagarse sin teléfono muestra **APAGANDO · 8s - PULSA UN BOTON** con un pitido: cualquier botón aplaza el apagado y la cuenta vuelve a empezar.
+- Cuando se apaga sola se lo comunica al teléfono: durante el partido el recuadro naranja muestra *PULSERA 1 APAGADA (SIN USO)*, *(BATERÍA AGOTADA)*… Después del apagado al final del partido, el teléfono deja de buscarla continuamente y se reconecta solo cuando la vuelves a encender.
+
+
+El resto del ahorro: CPU a 80 MHz, pantalla apagada cuando no hace falta, Bluetooth de bajo consumo (la radio se despierta 2-3 veces por segundo; aun así, el botón responde en ~120 ms), zumbador activo solo durante los pitidos, micrófono y 5V apagados, sensor de movimiento (IMU) encendido solo con el reconocimiento de golpes (6.4).
+
+### 6.1 Ajustes de la pulsera
+
+Desde **Más › Dispositivos** o **Modo y reglas** (**Ajustes** debajo de la pulsera de cada jugador) o durante el partido (toca **J1**/**J2** arriba, o el icono de los controles deslizantes). Se guardan **en la pulsera** y se conservan aunque se apague; con cada cambio la pulsera muestra su nombre con *AJUSTES OK*. Con el firmware 2.4 también está la sección **Golpes** (6.4).
+
+| Ajuste | Valores | Predeterminado |
+|---|---|---|
+| Nombre | hasta 12 caracteres (p. ej. el nombre del jugador o "J1") | TSM-xxxx |
+| Brillo de la pantalla | 5-100 % | 20 % |
+| Marcador visible tras cada punto | No, 2, 3, 5, 8 s (el resumen de final de juego dura 2 s más) | 3 s |
+| Volumen del pitido | Silencio-100 % | 50 % |
+| Pantalla girada | para llevarla en la otra muñeca | no |
+| Apagado automático: al encenderla, si no se conecta ningún teléfono | 15 s - 5 min | 30 s |
+| Apagado automático: si pierde la conexión con el teléfono | 1-10 min | 3 min |
+| Apagado automático: si sigue conectada pero sin uso | 10-60 min | 30 min |
+
+Debajo aparece la **estimación de autonomía** (con la carga completa y con la carga actual) con el consumo desglosado: cambia mientras mueves los controles deslizantes, antes incluso de confirmar. Después, **Identificar**, **Apagar** y **Copiar a la otra pulsera** (mismos ajustes; el nombre sigue siendo el suyo). **Apagar** pide confirmación, también durante el partido.
+
+### 6.2 Carga
+
+Conecta el cable USB-C: la pulsera emite un pitido y muestra la **pantalla de carga** durante 30 segundos; luego la pantalla se apaga y cada 10 segundos se vuelve a encender 1,5 s (un vistazo, como el piloto de un cargador). **Cualquier botón** la vuelve a encender otros 30 segundos. Si la pulsera estaba apagada, enciéndela con un clic en el botón lateral para verla (la carga se produce igualmente, también con la pulsera apagada).
+
+```
+ TSM-3FA2   USB 5.01V             ← nombre y tensión del cable
+ ┌──────────┐
+ │██████ ⚡  │▌   78%              ← icono de batería y porcentaje de carga
+ └──────────┘
+      CARGANDO                    ← o bien CARGA COMPLETA / ALIMENTADO POR USB
+ 4.12V  HACE 42 MIN  FIN ~25 MIN  ← tensión de la batería, tiempo en carga, fin estimado
+```
+
+- **Porcentaje**: durante la carga la tensión medida es más alta que la real (≈0,1 V); la pulsera la corrige, nunca hace bajar el porcentaje y solo llega al **100 %** cuando el cargador indica que ha terminado. Con la carga completa, el texto pasa a **CARGA COMPLETA** con el tiempo empleado (*CARGADA EN 1H 25*) y la pantalla se queda apagada (nada de destellos por la noche).
+- **Fin estimado**: el chip de alimentación (PM1) no mide la corriente de carga, así que el tiempo que falta se calcula a partir de cuánto ha subido la carga en los últimos 10 minutos: aparece a los 10 minutos, redondeado a 5, y es una estimación.
+- **ALIMENTADO POR USB**: el cable está conectado pero la batería no se carga (y no está llena): cable o cargador insuficientes, o batería desconectada.
+- **Con el cable no se apaga sola** (ni por falta de teléfono, ni por inactividad, ni por *batería agotada*); se puede apagar con KEY2 largo. Al desconectar el cable muestra **USB DESCONECTADO · BATERIA 97%** y a partir de ahí vuelven a contar los tiempos normales de apagado (6).
+- **Conectada al teléfono** (p. ej. con una batería externa durante el partido) el tanteo tiene prioridad: solo un mensaje breve *CARGANDO 78%*, y KEY1 largo muestra *CARGA COMPLETA* o *CARGANDO*.
+- **En la app**: la fila de la pulsera (en *Dispositivos* y en *Modo y reglas*) y sus ajustes muestran *Cargando 78 %* o *Carga completa*; durante el partido, las etiquetas J1/J2 llevan el símbolo ⚡. El registro `files/battery_log.csv` también tiene dos columnas más (tensión USB, carga completa): útil para comprobar cuánto tarda realmente en cargarse.
+- La pulsera y la app calculan ahora el porcentaje con la **misma curva** de la batería LiPo (antes la pulsera usaba una recta menos precisa), así que muestran el mismo número.
+
+> Pendiente de comprobar con las pulseras reales: la carga no se ha podido probar en el hardware. En particular, con qué frecuencia indica el cargador *carga completa* y qué precisión tiene el porcentaje durante la carga.
+
+### 6.3 Sin pulseras: mandos Bluetooth
+
+El sistema más económico para que los jugadores se anoten los puntos: dos **mandos Bluetooth para selfies** (los del botón de disparo, a menudo vendidos como *AB Shutter3*), de 1 a 3 € cada uno. Android los ve como un teclado: sin firmware que cargar y sin permisos para la app. También sirve cualquier otra botonera o teclado Bluetooth (o USB).
+
+1. Enciende el mando y emparéjalo en los **ajustes de Bluetooth** del teléfono, como unos auriculares (*Más › Dispositivos › Ajustes de Bluetooth* los abre). Repite con el segundo.
+2. *Modo y reglas* › modo **Mandos** › **Asignar** debajo del Jugador 1 › pulsa la tecla de su mando que dará el punto; luego lo mismo para el Jugador 2. Con cada clic de un mando asignado su fila muestra **Tecla recibida**: así se prueba antes de jugar. **Intercambiar J1 ↔ J2** los invierte.
+3. **INICIO DEL PARTIDO**: un clic en un mando empieza el partido, como KEY1 de las pulseras. Arriba, **J1**/**J2** se colorean cuando los mandos están conectados.
+
+| Gesto | Acción |
+|---|---|
+| un clic | punto para quien tiene el mando (llega medio segundo después: la app espera a ver si es un doble clic) |
+| doble clic | deshace el último punto (también desde la ventana de fin de partido) |
+| mantener pulsado 1 s | deshace el último punto |
+| la otra tecla (mandos de dos teclas) | deshace el último punto, enseguida; pulsada menos de medio segundo después de un clic, anula ese clic |
+
+- Valen las protecciones de las pulseras: dos puntos con menos de 2 segundos de diferencia cuentan una sola vez, dos deshacer seguidos quitan un solo punto, *Partido terminado* solo se confirma desde el teléfono.
+- Muchos mandos para selfies tienen dos botones (*iOS* y *Android*): la tecla pulsada al asignarlo da el punto y la otra deshace. En el CAMKIX (un *AB Shutter3*) el botón grande envía SUBIR VOLUMEN y el pequeño INTRO: asígnalo con el botón grande y el pequeño pasa a ser «deshacer». Si un mando envía dos teclas en cada pulsación, una pulsación sigue siendo un clic.
+- **La pantalla debe seguir encendida con la app delante** (durante el partido la app la mantiene encendida sola). A diferencia de las pulseras, las teclas de un teclado Bluetooth solo llegan a la app visible: con la pantalla bloqueada u otra app abierta no cuentan. En partidos largos, deja el teléfono cargando.
+- Si un mando se desconecta durante el partido (apagado, sin pila, demasiado lejos) el recuadro naranja muestra *MANDO 1 DESCONECTADO*, y *CONECTADO* cuando vuelve. Muchos mandos se duermen tras unos minutos sin clics: el primer clic los despierta y a veces se pierde. Si la voz no canta el punto, pulsa otra vez.
+- Alcance: unos diez metros, como unos auriculares Bluetooth; con el teléfono junto a la red, en el centro de la pista, se cubren los dos lados. Pila: normalmente una CR2032, que dura meses.
+
+### 6.4 Reconocimiento de golpes
+
+Con el firmware 2.4 la pulsera reconoce **derecha, revés, saque y volea** con su sensor de movimiento (IMU) y los envía a la app, que los cuenta por jugador. El reconocimiento aprende de quien lleva la pulsera: primero hace falta una breve **calibración**, cuyos ejemplos se quedan guardados en la pulsera.
+
+1. **Sujeta la pulsera a la muñeca**, siempre igual (misma muñeca, mismo sentido). El reconocimiento se basa en la dirección de los movimientos: una pulsera girada respecto a la calibración confunde los golpes.
+2. Ajustes de la pulsera (6.1) › **Golpes** › **Calibración**: toca **Calibrar** junto a *Derecha*. La pulsera muestra *DERECHA · CALIBRACION 0/20*.
+3. Haz **5-10 derechas** con una pausa entre una y otra: con cada golpe sube el contador, en la pulsera y en la app (con un pitido si el volumen no está a cero). Si un golpe ha salido mal, toca **Deshacer el último**. Luego **Terminar**.
+4. Repite para revés, saque y volea. La papelera borra los ejemplos de un golpe para repetirlos. Se guardan como máximo 20 ejemplos por golpe (a partir de ahí se sustituye el más antiguo). Bastan 3 ejemplos de al menos dos golpes (*Lista: reconoce los golpes calibrados*), pero más ejemplos y más variados dan un reconocimiento mejor.
+5. Activa **Reconocimiento de golpes**. Con **Mostrar el golpe en la pulsera** el golpe aparece un momento con la seguridad del reconocimiento (p. ej. *REVES 87%*), solo si la pantalla no está mostrando el marcador o un mensaje.
+
+- Durante el partido, bajo los tiempos, una fila muestra los golpes de cada jugador (*J1 D 12 · R 8 · S 5 · V 3*). Cuentan solo con el partido empezado, no en el calentamiento ni en la calibración.
+- El resumen (7) incluye los golpes por tipo, la **velocidad de muñeca** (media y máxima, en °/s: la fuerza del golpe, no la velocidad de la pelota) y los **golpes por punto** (duración de los intercambios). Si solo un jugador tiene pulsera con golpes, los intercambios cuentan solo los suyos.
+- Un golpe que no se parece a ningún ejemplo no se muestra y cuenta como *no reconocido*: si pasa a menudo, revisa cómo llevas la pulsera o añade ejemplos.
+- Los movimientos lentos (recolocarse, recoger la pelota) no cuentan: un golpe tiene que superar 400 °/s de giro de muñeca y 2,5 g de aceleración.
+- **Batería**: el sensor gasta unos 1 mA más, unos veinte minutos de una carga completa (la estimación de los ajustes lo tiene en cuenta). Sin reconocimiento, el sensor queda apagado.
+- En los golpes muy fuertes el giroscopio llega a su máximo (2000 °/s): el reconocimiento no se resiente, pero la velocidad indicada sale algo por debajo de la real.
+
+### 6.5 Bandas de pecho
+
+Frecuencia cardíaca y calorías desde **bandas de pecho Bluetooth** con el servicio cardíaco estándar: Coospo (probada la H6), Magene, Polar, Garmin, Wahoo… Valen en todos los modos, incluso sin pulseras.
+
+1. Moja los electrodos y ponte la banda: se enciende sola al contacto con la piel.
+2. *Modo y reglas* (o *Más › Dispositivos*) › **Frecuencia cardíaca** › activa **Bandas de pecho** y elige la banda de cada jugador (una sola vez). **Intercambiar** las invierte.
+3. **Edad, peso y sexo** de quien la lleva (opcionales): para las calorías (fórmula de Keytel, error típico ±20 %) y, con la edad, para las zonas cardíacas (máximo estimado 208 − 0,7 × edad).
+
+- Bajo cada banda: estado, pulso, **señal** en dBm (más cerca de 0 = más fuerte) y **cortes**, es decir, las veces que el pulso no llegó durante más de 3 segundos, con los segundos perdidos (*2 cortes (14 s)*). Cuentan desde el «juego» del partido; antes, desde que se eligió la banda. Sirven para saber hasta dónde llega la banda.
+- En el partido una fila muestra el pulso en directo (*J1 · 142 bpm*). En el resumen (7): pulso medio y máximo, calorías, gráfico en el tiempo y tiempo en las zonas cardíacas. Las pausas no cuentan.
+- **Alcance**: prueba en casa con la H6 y el teléfono quieto: conectada hasta 21 m, pero a −100 dBm, al límite; de espaldas la señal baja 5-10 dBm. En individuales el jugador lejano está a 24-30 m del teléfono: para no perder datos usa el **segundo teléfono** (6.6).
+
+### 6.6 Segundo teléfono detrás de la otra línea de fondo
+
+Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos que el largo de la pista. Con un segundo teléfono detrás de la otra línea de fondo cada jugador tiene siempre uno cerca: el segundo (**satélite**) capta las bandas y pulseras de los jugadores de su lado y hace de puente con el **principal**, que lleva el partido.
+
+1. **Principal**: Más › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono**. La primera vez pide el permiso *Dispositivos cercanos* (la ubicación hasta Android 12). El teléfono crea su **propia red, solo local**: sin SIM ni datos, y sin necesidad del Wi-Fi del club. Aparece un QR.
+2. **Satélite**: Más › **Dispositivos** › **Segundo teléfono** › **Hacer de segundo teléfono** › escanea el QR. Android pide una vez conectarse a la red del principal (*AndroidShare_…*): toca **Conectar**. El satélite mantiene sus datos móviles. Debe decir *Conectado al teléfono principal*.
+3. El satélite sigue solo las bandas y pulseras elegidas en el principal, en los mismos lados: no hay que elegir nada. Déjalo detrás de la línea de fondo con la app abierta.
+
+- **Cambio de lado**: no hay que hacer nada. Cada banda y cada pulsera sigue con el teléfono al que está conectada mientras la señal aguante; luego la toma el más cercano (unos segundos). En el principal aparece *Desde el segundo teléfono*; durante el paso una pulsera puede aparecer desconectada un momento.
+- **Sin datos perdidos**: pulso, teclas y golpes del satélite llevan el **ID del partido** y un número correlativo, y el satélite los guarda hasta que el principal los confirma. Si el Wi-Fi entre los teléfonos se corta, el pulso llega después y rellena los huecos del gráfico; los golpes cuentan si son del mismo partido. Una **tecla** de la pulsera que llega más de 5 segundos tarde no da el punto: pulsa otra vez. La misma tecla llegada por dos caminos cuenta una sola vez.
+- Del principal a las pulseras pasan marcador, mensajes, *Identificar*, apagado y ajustes. Conviene cambiar los ajustes con la pulsera conectada al principal.
+- **Marcador**: en el satélite **Mostrar el marcador** abre el marcador del partido a pantalla completa (como en 8.3), ya conectado al principal.
+- Si el principal no puede crear la red (punto de acceso normal ya activo), usa el Wi-Fi en el que está: entonces los dos teléfonos deben estar en la misma red. Con Android 9 o anterior el satélite muestra nombre y contraseña de la red, para elegirla a mano en los ajustes de Wi-Fi.
+- **Detener** cierra la conexión y la red; el satélite vuelve a sus bandas y pulseras.
+
+## 7. Cómo se usa la app
+
+1. **Nuevo partido** (opcional): **Tenis** o **Pádel** (app 2.5: mismas reglas, tiempos y cantos; al elegir Pádel se ponen solos el dobles y el punto de oro, que se pueden cambiar (en lugar del punto de oro, *Modo y reglas* ofrece también el *Star Point* de la FIP: como máximo dos ventajas y luego un punto decisivo), y el resumen dice *Pádel*), club, pista, individual/dobles, nombres (en dobles, dos nombres por pareja). **Buscar la dirección de la pista** (desactivado por defecto) añade al resumen la dirección junto a las coordenadas: se la pide al servicio de geocodificación del teléfono, que con los servicios de Google envía las coordenadas a Google. **Siguiente**. Con *Pádel* aparece también **Torneo Americano o Mexicano**: de 4 a 16 jugadores y de 1 a 4 pistas, partidos a puntos (16, 24 o 32: los puntos de las dos parejas suman el total) o a tiempo. En el *Americano* las parejas cambian en cada ronda para que cada uno juegue con y contra el mayor número de personas; en el *Mexicano*, desde la segunda ronda, se juega por clasificación (1.º y 4.º contra 2.º y 3.º en la misma pista). En cada ronda se escribe el resultado de cada pista (a puntos basta un número, el otro se completa) o se cuenta con *Contar punto a punto*, con la voz y, a tiempo, el cronómetro; con más jugadores que plazas en pista se descansa por turnos. **Ronda siguiente** empieza cuando están todos los resultados; la **Clasificación** cuenta los puntos de cada uno, luego las victorias y la diferencia de puntos, y se comparte como texto.
+2. **Modo y reglas**:
+   - *Juez*, *Pulseras* o *Mandos* (6.3). Con las pulseras son obligatorios el Bluetooth activado, el permiso de ubicación y la ubicación activada: las filas de **Requisitos** se actualizan en tiempo real (aunque desactives el Bluetooth o la ubicación desde los ajustes rápidos) y se ponen en rojo, con el botón para arreglarlo.
+   - La **búsqueda es automática y continua** mientras la página está abierta: enciende las pulseras y ocupan solas los puestos libres (primero Jugador 1, luego Jugador 2). **Identificar** hace parpadear esa pulsera en el color del jugador (amarillo o rojo) con unos pitidos, así ves enseguida cuál tienes en la mano; **Intercambiar J1 ↔ J2** las invierte sin desconectarlas. En el menú desplegable siempre puedes elegir otra o *Ninguna* (la que quitas a mano no la vuelve a poner la búsqueda). Una pulsera no puede estar asignada a dos jugadores.
+   - **Apagar las pulseras al final del partido y al salir** (activado de serie): al confirmar *Partido terminado* y con *Salir*, las pulseras se apagan en lugar de esperar a la inactividad.
+   - En modo juez, si pulsas **Siguiente** sin ubicación aparece la invitación a activarla (si no, el lugar no aparecerá en el resumen).
+   - Formato (*3 sets*, *5 sets*, *2 sets + súper tie-break a 10*, *pro set* a 8 o 10 juegos, *solo súper tie-break a 10*), juegos por set (6, o 4 en sets cortos con tie-break en 4-4), tie-break en los sets sí/no (no: el set sigue hasta que alguien saque 2 juegos de ventaja), *Sin ventaja (punto decisivo)*. El idioma y la voz están en *Más › Idioma y voz* (4.1).
+   - **Sorteo**: la moneda gira e indica quién gana; indicas quién saca y los lados de la pista **vistos desde la silla del juez** (esquema de la pista con **Cambiar lados**). En dobles eliges también quién saca primero en cada pareja.
+3. **INICIO DEL PARTIDO** parpadea: pulsa el botón, KEY1 de una pulsera o un mando. La voz dice *«Primer set» · «al servicio [nombre]» · «jueguen»* con 1 segundo entre frases; el **Match Time** empieza con «jueguen».
+4. **Partido**: arriba a la izquierda, el tiempo de partido; a la derecha, la cuenta atrás (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; en rojo en los últimos 5 s). El recuadro naranja se enciende 5 s para *cambio de lado, tie-break, bola de set, bola de partido, bola de break…*. Los dos botones cuadrados (amarillo = Jugador 1, rojo = Jugador 2) están del lado en que se encuentran realmente los jugadores y se intercambian en cada cambio de lado; debajo de quien saca aparece **On Serve**. Abajo: *Anular punto*, *Suspender/Reanudar*, audio (icono del altavoz, tachado = apagado), *Nuevo partido*, **Salir**. En modo pulseras, debajo de los tiempos están **J1**/**J2** con batería y autonomía: al tocarlos se abren los ajustes de la pulsera. Un doble toque en *Anular punto* quita un solo punto (un segundo toque en menos de 1 s no cuenta); justo después de un cambio de página se ignora el segundo toque de un doble toque, para que no caiga en un botón de la página nueva. El **candado** de abajo bloquea la pantalla (por ejemplo con el teléfono en el bolsillo o en el banco): los toques no hacen nada, las pulseras y los mandos sí; se desbloquea manteniendo pulsado el candado.
+5. En el último punto aparece la ventana **Partido terminado / Anular el último punto**. «Partido terminado» se confirma **solo desde el teléfono**. Durante medio segundo después de aparecer, sus botones ignoran los toques: un doble toque en el último punto no anula nada.
+6. **Resumen**: ganador, nombres, resultado set por set con los puntos del tie-break, duración, hora de inicio y de fin, fecha, club, pista, lugar, formato, puntos y juegos ganados. Botones **Guardar archivos** (nombre de archivo + carpeta a elegir + formatos .txt/.json/.png y **PDF completo** con resultado, estadísticas del partido y de cada set, historial y fotos). **Compartir** pregunta si enviar la imagen con texto (para WhatsApp y las redes) o el PDF completo. En el Resumen, **Fotos del partido** guarda hasta 10 fotos de recuerdo (de la galería o hechas en el momento): se quedan en el teléfono, van al PDF y pasan al otro teléfono con la transferencia, nunca a la imagen para las redes, **Compartir** (imagen de 1080×1350 + texto para WhatsApp/Instagram/…), **Nuevo partido**, **Salir**. Debajo de las fotos, **Notas** admite un texto libre (hasta 2000 caracteres): se guarda solo, va al PDF, al texto compartido y a los archivos .txt y .json, y pasa al otro teléfono con la transferencia; no va a la imagen para las redes. El partido terminado entra solo en el **Historial** (pestaña **Progresos**): la lista de partidos, para volver a abrirlos con su resumen o eliminarlos, y la pestaña **Jugadores** con victorias, derrotas y cara a cara de quien tiene el nombre escrito en *Nuevo partido* (mayúsculas y espacios no cuentan; en dobles cuenta cada jugador). **Importar** añade los partidos guardados como .json con *Guardar archivos* en otro teléfono: los terminados van al historial y los no terminados a los partidos suspendidos para reanudar. **Transferir** (arriba a la derecha en el Historial) pasa el historial y los partidos suspendidos a otro teléfono con un código QR: los dos teléfonos deben estar en la misma red Wi-Fi o uno en el punto de acceso del otro; en el que los tiene toca *Enviar* y deja abierta la ventana con el código, en el otro *Recibir* y escanea el código (hace falta el permiso de la cámara). Así también puedes seguir un partido en curso en otro teléfono: suspéndelo, transfiérelo y reanúdalo. Los partidos se suman a los que el teléfono ya tiene. **Fotos de los jugadores**: toca el círculo junto al nombre en *Nuevo partido* (o en el detalle del jugador en el Historial) y elige una foto; se recorta cuadrada y se encuentra por el nombre. Aparece en el Historial, en el resumen y en el marcador de la TV, se queda solo en este teléfono (pasa al otro con la transferencia) y no va en la imagen compartida. Tocando otra vez el círculo la cambias o la quitas. Si la app se cierra mientras estás en el resumen (Android que la cierra en segundo plano, una actualización, un reinicio del teléfono), lo vuelves a encontrar al abrirla; no si lo has dejado tú con *Nuevo partido*, *Salir* o quitando la app de las recientes. La carpeta predeterminada es **Documents/Tennis Score Manager** (desde Android 10; en Android 8 y 9 la carpeta de la app): se abre con cualquier gestor de archivos y se queda aunque desinstales la app. Al guardar dos veces con el mismo nombre, el segundo pasa a ser *nombre (1)*; en la imagen los textos largos (nombres, dirección) se ajustan al ancho.
+
+   El resumen tiene tres pestañas. **Resumen**: los datos de arriba y, con las pulseras 2.4, golpes, velocidad de muñeca y golpes por punto (6.4). **Estadísticas**, del partido o de un set: los dos jugadores comparados con barras que salen del centro (coloreada la de quien va por delante) para puntos y juegos ganados con el saque y al resto, bolas de break salvadas y ganadas, total de puntos y juegos, puntos seguidos, últimos 10 puntos, bolas de partido salvadas; con las pulseras 2.4 también golpes por tipo y velocidad media de muñeca. **Punto a punto**: set por set, cada juego con la pelota de quien saca, *SAQUE PERDIDO* en las roturas, el marcador tras cada punto con **BB** (bola de break), **BS** (bola de set) y **BP** (bola de partido) y el desenlace (*JUEGO*, *ROTURA*, *SET*, *PARTIDO*). Aces, dobles faltas, primeros saques, golpes ganadores y errores aparecen si activas las **estadísticas detalladas** en *Modo y reglas*: en lugar de los dos botones grandes salen *Ace* y *Falta* (la segunda vez pasa a *Doble falta*) y, para cada jugador, *Ganador*, *Error* (el punto va al otro) y *Punto*; *Anular punto* también quita una falta. Está pensado para quien anota desde fuera de la pista. Después de *Error* aparece 6 segundos *No forzado / Forzado*; con pulseras o mandos, después de cada punto aparece *¿Cómo terminó el punto?* (Ace, Ganador, Error): responder es opcional y el marcador no cambia. En el Historial, el detalle de un jugador muestra la **evolución**: puntos ganados partido a partido y las medias de aces, dobles faltas, primeros saques, ganadores y errores. Las estadísticas de cada partido cuentan también bolas de juego, de set y de partido convertidas, juegos en blanco, juegos seguidos, sets ganados tras ir un break abajo y, en la tarjeta **Tiempos**, la duración de cada set y el juego más largo.
+
+   **Revancha** (al final del resumen): propone el mismo día de la semana y la misma hora, la semana siguiente, y el club del partido; se cambian fecha, hora y lugar y se añade una nota. **Mandar la invitación** abre el menú de compartir (WhatsApp, SMS, correo…) con el mensaje listo: quién contra quién, cuándo, dónde y cómo acabó la última vez. **Añadir al calendario** crea el evento en la app del calendario, **Preparar el partido** devuelve a *Nuevo partido* jugadores, club, pista y reglas (el torneo no). Sin cuentas: la invitación pasa por los canales que ya usas.
+
+**Para salir**: **Salir** (durante el partido pide confirmación, y también está en el resumen) cierra la app de verdad; lo mismo ocurre si la quitas de las aplicaciones recientes. Al volver a abrirla empieza desde la pestaña **Jugar**.
+
+**Guardado**: el partido se guarda solo en cada punto. *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
+
+### 7.1 Entrenamiento con la banda
+
+Para entrenar con la banda de pecho sin partido: **Entrenar** › **Entrenamiento con la banda**. Se usa **una banda**, la del Jugador 1, con edad, peso y sexo para calorías y zonas; se elige ahí mismo (con el interruptor *Bandas de pecho*, Bluetooth y permisos si faltan).
+
+1. **Iniciar**: en grande el pulso en directo, debajo el tiempo y la vuelta en curso.
+2. **Vuelta** cierra un tramo del entrenamiento y abre otro (como el botón de vuelta de un cronómetro): un sprint, un ejercicio, una vuelta a la pista. **Pausa / Reanudar** detiene el tiempo; las pausas no cuentan.
+3. **Terminar**: la app registra **un minuto más de recuperación** (quédate quieto) para medir cuánto baja el pulso; **Guardar ya** lo salta.
+
+- **Resumen**: duración, pulso medio y máximo, calorías, **VFC (RMSSD)** a partir de los intervalos entre latidos que manda la banda (hacen falta unos treinta latidos limpios; compárala con tus entrenamientos parecidos, no con los de otros), **recuperación en 1 minuto** (cuanto más baja, mejor), gráfico, zonas cardíacas y, por cada vuelta, duración, media, máximo y recuperación.
+- **CSV** (segundo a segundo, con la vuelta y el minuto de recuperación) y **PDF** de una página con gráfico, tarta de zonas y vueltas, para compartir.
+- Los entrenamientos quedan en la misma pantalla, aparte de los partidos; se reabren o se eliminan. El pulso llega también desde el segundo teléfono (6.6) y la grabación sigue con la pantalla apagada.
+
+### 7.2 Progresos
+
+**Progresos** › **Rating TSM · Progresos**: un documento para ver si mejoras, **separado** para entrenamientos y partidos.
+
+- **Entrenamientos**: duración, pulso medio y máximo, calorías, VFC, recuperación.
+- **Partidos** de un jugador del historial (elegido de la lista): partidos ganados, puntos ganados, aces, dobles faltas, primeros saques dentro, ganadores, errores no forzados. Los aces y los demás valores detallados solo existen en los partidos jugados con estadísticas detalladas; son totales por partido.
+- Para cada dato la media de la **primera mitad** del periodo y la de la **segunda**: ▲ verde si mejora, ▼ rojo si empeora (menos dobles faltas o errores es una mejora), = si se mantiene (menos del 5 % de diferencia) o si no se puede decir (pulso). Hacen falta al menos 2 entrenamientos o partidos.
+- **Qué comparar**: los **Filtros** eligen el periodo (todo, 30 días, 3 meses, 1 año), los **días de la semana** (por ejemplo solo los miércoles, también varios) y, para los partidos, **torneo**, **club** y **rival** del historial; debajo, la lista **Para comparar** para marcar (*Todos* / *Ninguno*). Comparación, PDF e impresión usan solo los marcados.
+- **Rating TSM**: en *Partidos*, encima de los filtros, el rating del jugador (todos empiezan en 1500) con los partidos contados, la variación del último y la evolución, y la **Clasificación TSM** de todos los jugadores del historial. Es un Elo calculado en el teléfono: sube cuando ganas, más contra quien tiene un rating más alto y con un resultado claro; en dobles cuenta la media de la pareja; tenis y pádel tienen clasificaciones separadas. En los 5 primeros partidos es *provisional* y se mueve más. En el resumen de cada partido la tarjeta **Rating TSM** muestra cuánto ganó o perdió cada uno; con **Amistoso** el partido sigue en el historial pero no cuenta.
+- **PDF** (con la evolución de cada dato y la lista completa, en varias páginas si hace falta) para compartir, o **Imprimir** con el servicio de impresión de Android (también *Guardar como PDF*).
+
+### 7.3 Vídeos: teléfono-cámara, mejores jugadas y repetición
+
+Un segundo teléfono en un trípode graba el partido y pone en el vídeo el marcador del árbitro.
+
+1. **Árbitro**: Más › **Dispositivos** › **Segundo teléfono** › **Usar un segundo teléfono** (QR, como en 6.6).
+2. **Cámara**: Más › **Dispositivos** › **Segundo teléfono** › **Hacer de cámara**, escanea el QR y luego **Abrir la cámara** (permisos de cámara y micrófono; el teléfono debe grabar en 1080p). Con *Marcador conectado* el gráfico del marcador está en el vídeo (**Gráfico** lo enciende o lo apaga); sin árbitro graba solo el vídeo.
+   - **Grabar / Parar**: el vídeo va a la galería (*Películas/Tennis Score Manager*) con capítulos, uno por punto.
+   - **Directo**: emisión RTMP en YouTube, Twitch, Facebook o un servidor tuyo; servidor y clave de la emisión en *Directo: servidor*.
+   - **Encuadrar** (asistente de encuadre): escribe a cuántos metros detrás de la línea de fondo y a qué altura has puesto el teléfono y en qué pista juegas; la app da la inclinación hacia abajo que mantiene en el vídeo las dos líneas de fondo y al jugador lejano, y dice si la pista cabe a lo ancho. A menudo el límite es el ancho: desde la valla (unos 6 m) el objetivo principal corta las esquinas cercanas, el **gran angular** no (**Usar el objetivo…**, o el botón **Objetivo**, con la grabación parada). Con **Mostrar el nivel** la vista previa muestra el horizonte e indicaciones (*apunta 2° más abajo*, *gira en sentido horario*…), en verde cuando está bien, con una vibración cuando el teléfono está en posición. El nivel también se ve en la ventana **Cámara** del teléfono del árbitro. Los sensores no saben izquierda y derecha: comprueba a ojo que la red esté en el centro.
+   - **Silueta** (silueta de la pista): la vista previa muestra las líneas de la pista como las ve el objetivo, y siguen al teléfono cuando lo inclinas. Mueve los controles (**Distancia**, **Altura**, **Dirección**, **Desplazamiento lateral** y, si hace falta, **Campo de visión** y **Corrección de inclinación**) hasta que coincidan con las reales: así se ajusta también el centrado, y la inclinación aconsejada se vuelve precisa. El ajuste se recuerda para la pista del partido (*Club · Pista* del árbitro) y se recupera la próxima vez. Silueta y controles también están en la ventana **Cámara** del árbitro. Cuanto más alto esté el teléfono, mejor se ve la mitad lejana de la pista: desde 2,5 m queda aplastada justo encima de la red.
+3. **Cámara en alto, manejada por el árbitro**: en el teléfono del árbitro, **Cámara** (junto a *Repetición* durante el partido, o *Encuadre y mandos de la cámara* en la Más › **Dispositivos** › **Segundo teléfono**, útil para colocarla antes de empezar) muestra el encuadre del teléfono-cámara tal como queda en el vídeo, con el gráfico, y **Grabar / Parar**, **Directo**, **Gráfico** y el **zoom**. También se ven la duración de la grabación, la batería y el espacio libre (en naranja si son bajos). La imagen es pequeña y a saltos (unos 3 fotogramas por segundo) y solo se envía mientras se mira; la clave del directo se pone en el teléfono-cámara.
+
+- **Vídeo** › **Tus vídeos**: los vídeos grabados, para verlos punto a punto, juego a juego o set a set. **Capítulos de YouTube** prepara los capítulos para pegar en la descripción. **Importar vídeo** toma un vídeo hecho con otra cámara (el archivo se queda donde está): los puntos se marcan mirándolo, tocando al final de cada punto quién lo ganó y, si quieres, cómo terminó (*Deshacer el último* quita el último); formato y reglas son los de *Modo y reglas*.
+- **Filtros de entrenador** (icono del filtro): solo los puntos de un jugador, ganados o perdidos, al saque o al resto, con el primer o el segundo saque, según cómo terminaron, en bolas de break o en bolas de set y de partido. **Reproducir** los pone en fila.
+- **Mejores jugadas**: montaje automático de los mejores puntos (aces, golpes ganadores, bolas de break, de set y de partido, peloteos largos con las pulseras) en el orden de prioridad elegido con las flechas, de como máximo 1, 3, 5, 10 o 15 minutos u **Otra duración** de hasta 90. Si no cabe todo, primero se acortan los trozos y luego se quedan fuera los puntos menos importantes. El resultado va a la galería.
+  - **Estadísticas al final del vídeo**: 2 o 3 pantallas de 10 segundos como en las retransmisiones de los torneos: saque y bolas de break; puntos, errores y peloteos cortos y largos; pulso, si se llevaba la banda. El partido es el del historial jugado mientras se grababa, o el de los puntos marcados en un vídeo importado. A los lados, la foto del jugador; sin foto, un retrato estilizado de hombre o de mujer (elección **Hombre / Mujer** en *Nuevo partido*) (sin elección, el del hombre; vale en toda la app, también en *Nuevo partido*, el historial, el resumen, el PDF y el marcador de la TV); debajo, el porcentaje de puntos ganados. Arriba, torneo, categoría y ronda (*Más detalles* en *Nuevo partido*), o club y pista.
+  - **Música** bajo las estadísticas, con fundido de entrada y de salida: *Nowhere Land* de Kevin MacLeod (incompetech.com, licencia CC BY 4.0: si publicas el vídeo, cítalo), o una pista tuya con **Elegir una pista** (se usa el principio; usa solo música que tengas derecho a poner en tus vídeos).
+  - Al pie de cada pantalla de estadísticas aparece **Creado con Tennis Score Manager** con la dirección del sitio.
+- **Repetición**: en el teléfono del árbitro, con la cámara conectada, **Repetición** pide a la cámara el punto dudoso (*Último punto*, *Punto anterior* o *Desde el último punto marcado*) y lo muestra, con pausa y fotograma a fotograma. **También en el marcador** lo enseña también en el marcador de la TV.
+
+### 7.4 Raquetas: raqueta virtual
+
+**Progresos** (o **Más**) › **Mis raquetas**: cada raqueta física tiene su ficha (dos raquetas del mismo modelo son dos fichas: cuerdas, peso y horas cambian).
+
+- **Ficha**: apodo (A, B…), marca, modelo, peso, balance, cabeza y patrón de cordaje, escritos a mano o tomados **del catálogo** (datos del fabricante, para corregir si has medido la tuya). *Retirada*: ya no se propone, pero sigue en las comparaciones.
+- **Encordados**: tipo (monofilamento, multifilamento, sintética, tripa natural, híbrido), marca y modelo (también de las cuerdas comunes), calibre, tensión de verticales y horizontales, fecha y notas. *Nuevo encordado* parte del montado. Para cada uno la app suma las **horas de juego** de los partidos y entrenamientos asociados y avisa al pasar el **umbral de revisión** elegido (20 horas por defecto): solo con el tiempo no puede saber cuánta tensión queda.
+- **Antes de jugar**: en *Nuevo partido*, bajo la clasificación de cada jugador, se elige su raqueta; en el entrenamiento, encima de la banda. El partido (puntos, golpes de las pulseras, pulso) y el entrenamiento se guardan con una **copia** de la raqueta tal como estaba ese día, cuerdas y tensión incluidas: volver a encordarla después no cambia las sesiones pasadas.
+- **En el resumen** del partido (pestaña *Resumen*) y del entrenamiento se ve la raqueta usada, se puede asociar también después (se toma el encordado montado ese día) y se valoran las **sensaciones** de 1 a 5: control, confort, potencia y cansancio.
+- **Comparación**: *por raqueta* o *por encordado* (misma raqueta con tensiones o cuerdas distintas), se eligen las configuraciones A y B. Barras lado a lado para sesiones, horas, partidos ganados, puntos ganados, primeros saques dentro, puntos ganados con el primero y el segundo, aces, dobles faltas, golpes ganadores y errores no forzados por partido, velocidad media de la muñeca y golpes de las pulseras, pulso medio y sensaciones medias. El mejor valor va en negrita, pero la app no elige ganadora: también cuentan rival, superficie, condiciones y forma.
+
+### 7.5 Entrenamiento de golpes: saque, derecha, revés y volea
+
+Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoce el saque y con los botones se dice cómo ha ido. Basta un teléfono, sin árbitro.
+
+1. **Entrenar** › **Entrenamiento de golpes**, elige el golpe (**Saque**, **Derecha**, **Revés**, **Volea**) › **Empezar** (la pulsera debe estar conectada como en 6.1; sin ella, se marca con los botones de la pantalla).
+2. **Dónde poner el teléfono** (la primera vez se abre solo, luego con el botón *¿Dónde pongo el teléfono?*):
+   - **al lado de quien saca**, en el lado del brazo que golpea (a la derecha para un diestro), a **3-4 m**, a la altura de la línea de fondo o medio metro detrás;
+   - objetivo a **1-1,2 m** del suelo, teléfono **en horizontal** y recto, apuntando a quien saca;
+   - en el encuadre debe entrar **toda la persona, de los pies a la raqueta arriba** (unos 2,7 m): si la cabeza de la raqueta se sale, aleja el teléfono o cambia al **gran angular** (botón *Objetivo*);
+   - para ver también adónde va la pelota, como alternativa: 3-4 m **detrás** de quien saca, un poco de lado, a 1,5-2 m de altura;
+   - nunca delante de quien saca ni en la trayectoria de la pelota.
+3. Elige el **lado** (derecho/izquierdo), **primero o segundo** y, si quieres, el **objetivo** (a la T, al cuerpo, abierto): valen para los saques siguientes.
+4. Saca y pulsa **KEY1 = dentro** o **KEY2 = fuera**; **KEY1 mantenido** anula el último. La voz dice el recuento (*Dentro. 8 de 12*) y la pulsera lo muestra. Si la pulsera reconoció el saque, se usa ese instante; si no, unos segundos antes de pulsar.
+5. De cada saque se guarda un **clip** de unos segundos alrededor del golpe. **Fin** muestra el resumen: dentro sobre intentos, por lado, primero y segundo, objetivo y, si la pulsera reconoció los saques, la rotación media de la muñeca en los saques dentro y en los de fuera. **Ver todos / solo los buenos / solo los fuera** abre los clips en la repetición (pausa, cámara lenta, fotograma a fotograma).
+6. Debajo de **Empezar** están las 3 últimas sesiones **del golpe elegido** (los botones de los golpes muestran cuántas sesiones tiene cada uno, p. ej. *Revés · 4*) y la línea de **golpes dentro, sesión tras sesión**. **Todas las sesiones** abre las del golpe elegido, por mes, con el espacio de los vídeos y si ya están analizadas. Toca una sesión para el resumen y los clips; **mantenla pulsada** para seleccionarla (el icono de arriba las selecciona todas) y luego **Borrar** (sesión y vídeos) o **Solo los vídeos** (libera espacio: quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave). **Progresos** muestra la evolución de cada golpe.
+   - **Dónde están los vídeos**: en **Documentos/Tennis Score Manager/Entrenamiento de golpes**, con las carpetas **Saque**, **Derecha**, **Revés** y **Volea** (creadas al arrancar) y dentro una carpeta por sesión (fecha y hora) y una por golpe, con `video.mp4` (se abre y se comparte desde cualquier app), el análisis y las tres imágenes. Se ven con cualquier gestor de archivos y se quedan aunque desinstales la app (guárdalos como archivo: una app reinstalada no recupera sus sesiones). En Android 8-10 la misma estructura está en la carpeta de la app. Los clips de las sesiones anteriores a la 2.5 se mueven allí solos en el primer arranque.
+7. **Análisis del movimiento** (desde la sesión guardada): **Analizar los saques** encuentra la posición del cuerpo en los clips (modelo MoveNet: la primera vez la app ofrece descargarlo, 7 MB, desde la página del proyecto en GitHub; después todo se queda en el teléfono, sin internet, unos segundos por saque; se puede eliminar al final de la pantalla. No está disponible en dispositivos con procesador x86) y mide tres momentos: **armado** (brazo del lanzamiento arriba), **rodillas** más flexionadas e **impacto**. Para cada saque: las tres imágenes con el esqueleto dibujado y las medidas (rodilla más flexionada, codo en el impacto, altura del impacto respecto a la estatura, brazo del lanzamiento, hombros en el armado, tiempo del armado al impacto); arriba, **dentro y fuera** comparados. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus saques entre sí. El cuerpo se reconoce bien con toda la persona en el encuadre, de lado y con buena luz; raqueta y pelota no se miden.
+   Toca un saque para abrirlo: **Ver el vídeo con el esqueleto** abre el clip en la repetición con el cuerpo dibujado encima, a cámara lenta, con botones para saltar a **Armado**, **Rodillas** e **Impacto** y otro para quitar o poner el esqueleto; dos dedos amplían vídeo y esqueleto juntos (hasta 6×), doble toque para volver. Las tres imágenes también se tocan para verlas a pantalla completa y ampliarlas. Con **varias personas** en el encuadre la app sigue a quien saca (quien más levanta el brazo) y tapa a las demás; lo indica debajo del saque: compruébalo en las imágenes. **Repetir el análisis** empieza de nuevo (los clips se quedan), útil tras una actualización de la app.
+
+**Derecha, revés y volea** funcionan igual (KEY1 dentro, KEY2 fuera, un clip por golpe, resumen y análisis), con estas diferencias:
+- **Dónde poner el teléfono**: al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m y fuera del pasillo, a la altura del punto de impacto; objetivo a 1 m; todo el swing en el encuadre (la muñeca se mueve unos 2 m adelante y atrás). Para la volea: al lado de quien juega en la red, a 3-4 m, a su altura. Siempre del mismo lado toda la sesión, y nunca en la trayectoria de la pelota.
+- En lugar de lado, primero/segundo y objetivo se elige la **dirección** deseada (**cruzado**, **al centro**, **paralelo**) y, para la volea, si es **de derecha** o **de revés**; el resumen los cuenta por separado.
+- **Análisis del movimiento**: los tres momentos son **preparación** (donde la muñeca se para al final del armado), **impacto** (muñeca más rápida; alrededor la app vuelve a leer un fotograma cada 33 ms) y **final** (muñeca más alta tras el impacto; en la volea, donde la muñeca se para). Si hay varios golpes en la ventana, cuenta el que reconoció la pulsera; las muñecas intercambiadas por MoveNet (pasa de lado) se corrigen solas. Graba **de lado**: de frente el armado va en profundidad y no se ve. Las medidas (*—* si no se ven el codo o las piernas): rodilla más flexionada, codo en el impacto, altura del impacto, cuánto **delante del cuerpo** se golpea, **amplitud de la preparación**, altura del final (todas respecto a la estatura) y el tiempo de la preparación al impacto. El vídeo con el esqueleto tiene los botones **Preparación**, **Impacto** y **Final**.
+
+## 8. Marcador en un televisor o monitor
+
+El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
+
+### 8.1 Las opciones posibles
+
+| Cómo llega al monitor | Qué hace falta | Ventajas | Inconvenientes |
+|---|---|---|---|
+| **Segundo teléfono con salida de vídeo** + cable USB-C/HDMI, app TSM en *Usar como marcador* | un teléfono que saque vídeo por el USB-C (DisplayPort Alt Mode) | sin internet; el marcador ocupa todo el monitor en 16:9 y el teléfono queda libre | muchos teléfonos **no** sacan vídeo: en general sí los Galaxy S/Note/Tab S (con DeX: elige *Duplicar pantalla* o desactiva el inicio automático de DeX), y no casi todos los Galaxy A. Busca «DisplayPort» / «salida de vídeo» en la ficha técnica |
+| **Chromecast** (o Google TV Streamer) en el monitor + cualquier teléfono con TSM en *Usar como marcador* y **Enviar** (*Enviar pantalla* hasta Android 14, Smart View en los Samsung) | un Chromecast configurado una vez con Google Home en la red del punto de acceso | sirve cualquier teléfono, sin cables largos | el Chromecast necesita **internet** (datos móviles en el punto de acceso); retraso de aproximadamente 1 s; se envía la pantalla del teléfono (en horizontal) |
+| **Navegador** en cualquier aparato conectado al monitor (portátil, tableta, TV box, Fire TV Stick…) | escanear el QR o escribir la dirección | no hay que instalar ninguna app | la pantalla se apaga sola si no la configuras; hay que tocar **PANTALLA COMPLETA** cada vez que se abre |
+
+**Por qué no por Bluetooth**: el teléfono del juez ya mantiene las dos pulseras por Bluetooth, donde cuentan los tiempos de los botones; el Wi-Fi va aparte, es más rápido y llega más lejos. **Por qué no directamente del teléfono del juez al Chromecast** (sin segundo teléfono): se puede hacer, pero hace falta una app «receptora» registrada en Google (Google Cast Developer Console, 5 $ de pago único) y publicada en un sitio https; es un posible paso futuro.
+
+**Consejos de red**:
+- El marcador envía poquísimos datos (un mensaje en cada punto y cada 5 segundos) y no consume tráfico de internet.
+- Si el teléfono del juez hace de punto de acceso, en los ajustes del punto de acceso elige la banda de **5 GHz** si la hay: el Bluetooth de las pulseras trabaja a 2,4 GHz y así no se interfieren.
+- Con el Chromecast conviene que el punto de acceso lo haga el teléfono del juez con los **datos móviles activados**; el teléfono-marcador y el Chromecast se conectan a ese punto de acceso.
+- Sin Chromecast también vale al revés (punto de acceso en el teléfono-marcador, como en la idea original): la app del juez se mantiene conectada al Wi-Fi aunque no tenga internet.
+
+### 8.2 En el teléfono del juez
+
+1. Más › **Dispositivos** › **Marcador en TV** › activa **Marcador en TV o monitor**. En Android 13 y posteriores la app pide el permiso de notificaciones: hace falta para la notificación del servicio que mantiene activo el marcador.
+2. Aparecen la **dirección** (p. ej. `192.168.43.1:8080`), el **QR** y cuántos marcadores hay conectados. Si pone *Sin red*, activa el punto de acceso o conéctate al del otro teléfono.
+3. **Vista previa en este teléfono** abre el marcador en el navegador del propio teléfono.
+4. **Aspecto del marcador**: color de cada jugador (8 colores), tiempo de partido, reloj de saque y descansos, sets terminados, mensajes (bola de break, bola de set, cambio de lado…), pelota junto a quien saca, segmentos apagados visibles, texto inferior (vacío = club y pista de *Nuevo partido*). Los cambios llegan al monitor al instante.
+5. Durante el partido, arriba en el centro aparece **TV · 1** (marcadores conectados): al tocarlo se vuelven a ver la dirección y el QR.
+
+Con el marcador activado, un servicio en primer plano (notificación *Partido en curso · marcador de TV activo*) mantiene vivo el servidor aunque la pantalla esté apagada, también en modo juez. El marcador es **de solo lectura**: desde él no se puede cambiar nada. Sigue activo también en el resumen y en las demás páginas mientras el marcador esté activado (notificación *Marcador de TV activo*), así el resultado final se queda en el monitor aunque el teléfono esté bloqueado.
+
+Qué muestra, además del tanteo: *ESPERANDO EL PARTIDO* antes de empezar, *LISTOS PARA JUGAR* en la página INICIO DEL PARTIDO, **TIE-BREAK** / **SÚPER TIE-BREAK** en lugar de *VS*, *PARTIDO SUSPENDIDO* parpadeando, **GANADOR [nombre]** al final del partido con todos los sets; las ventajas se leen **AD** también en las cifras LED. Un partido ganado en el súper tie-break termina con 1-0 en juegos y 2-1 en sets, con [10-8] entre los sets terminados; los mensajes largos se achican para caber en la pantalla.
+
+### 8.3 En el teléfono-marcador
+
+1. **Jugar** › **Usar como marcador**.
+2. El teléfono **busca solo** el teléfono del juez (anuncio en la red y escaneo del punto de acceso, unos segundos) y recuerda la última dirección. Si no lo encuentra: revisa el punto de acceso y *Marcador en TV*, luego **Buscar de nuevo**, o escribe la dirección que muestra el juez y pulsa **Conectar**. Lo encuentra aunque en este teléfono también esté activado *Marcador en TV o monitor*; si el Wi-Fi se conecta más tarde, vuelve a buscar solo.
+3. El marcador pasa a pantalla completa, en horizontal, con la pantalla siempre encendida.
+   - **Con el cable HDMI**: el marcador va al monitor en su formato; el teléfono muestra *El marcador está en el monitor externo* con el brillo al mínimo (**Mostrar también aquí** para verlo también en el teléfono). Al desconectar el cable vuelve al teléfono.
+   - **Con el Chromecast**: abre los ajustes rápidos › **Enviar** (o **Enviar pantalla**) / **Smart View** › elige el Chromecast.
+4. Si el teléfono del juez desaparece (fuera de alcance, app cerrada) aparece *CONEXIÓN PERDIDA - RECONECTANDO...* y a los 20 segundos lo vuelve a buscar solo, aunque haya cambiado de dirección. También tras un corte del punto de acceso se reconecta solo en cuanto vuelve la red. Nunca pasa al teléfono de otra pista: para cambiar de pista, sal de *Usar como marcador* y vuelve a buscar.
+5. Para salir: **atrás dos veces**.
+
+**Desde un navegador** (portátil, TV box): escanea el QR o escribe la dirección y toca **PANTALLA COMPLETA** (aparece al mover el ratón o al tocar la pantalla). Configura el apagado de la pantalla en *nunca*: en una página http el navegador no puede mantenerla encendida por sí solo. Tras un corte la página se reconecta sola; demasiados marcadores abiertos ya no bloquean uno nuevo (se cierra el más antiguo).
+
+
+## 9. Reglas aplicadas (ITF) y decisiones acordadas
+
+- **Juego**: 0-15-30-40, iguales, ventaja, juego. **Sin ventaja** (No-Ad): con 40-40, punto decisivo («iguales, punto decisivo»).
+- **Set**: 6 juegos con 2 de diferencia (7-5); con **6-6, tie-break**.
+- **Tie-break**: a 7 con 2 de diferencia; quien tiene el turno saca el 1.er punto y luego 2 puntos cada uno; cambio de lado **cada 6 puntos** y al final; quien sacó primero en el tie-break **resta** en el primer juego del set siguiente.
+- **Match tie-break** (formato de 2 sets): con 1-1 se juega a 10 puntos con 2 de diferencia.
+- **Cambio de lado** (regla 10 de la ITF): después del 1.º, 3.º, 5.º… juego de cada set. Al final de un set solo se cambia si el set ha tenido un número impar de juegos (6-3, 7-6); si no (6-4), se cambia después del primer juego del set siguiente. El tie-break cuenta como un juego.
+- **Tiempos**: shot clock de 25 s entre puntos; changeover de 90 s; set break de 120 s al final de cada set. Además, según lo pedido (no es regla ITF): **30 s** para cambiarse de lado después del 1.er juego de cada set, en cada cambio de lado del tie-break y con 6-6; al terminar cualquier pausa arranca el shot clock.
+- **Dobles**: rotación del saque A1-B1-A2-B2 durante todo el set, también en el tie-break; al principio de cada set la app pide el orden (se puede cambiar, como permite el reglamento).
+- **Cantos**: el tanteo se canta desde quien saca («quince cero», «cero cuarenta», «quince iguales», «iguales», «ventaja Rossi»); al final de cada juego, «juego Rossi, Rossi gana tres juegos a dos» / «dos juegos iguales» + «cambio de lado» cuando toca cambiar; con 6-6, «juego Rossi, seis juegos iguales, tie-break»; en el tie-break se canta desde quien va ganando («tres uno Rossi», «seis iguales»); al final del set, «juego Rossi, Rossi gana un set a cero» / «un set iguales»; al final del partido, «juego, set y partido Rossi, seis cuatro, tres seis, siete cinco»; «corrección» + tanteo cuando se anula un punto.
+
+**Decisiones tomadas respecto a la petición original, para seguir a la ITF:**
+1. **Con 6-6 no se cambia de lado** (son 12 juegos, número par): la app hace la pausa de 30 s y dice «tie-break», pero no dice «cambio de lado» ni intercambia los botones. El primer cambio llega tras 6 puntos del tie-break.
+2. El cambio al final del set depende del número de juegos del set (ver arriba); no se hace siempre.
+3. Con 1-1, en el formato con súper tie-break, la voz añade «súper tie-break».
+
+## 11. Problemas frecuentes
+
+- **No se encuentra la pulsera**: ¿Bluetooth y ubicación activados (filas en verde)? ¿La pulsera está parpadeando VINCULANDO? (Si ya está conectada a otro teléfono, no se ve.) Si mientras tanto se ha apagado sola (30 s), vuelve a encenderla con un clic en el botón lateral.
+- **La pulsera muestra NO ENVIADO**: el teléfono no ha confirmado la pulsación en 8 segundos (conexión perdida o app cerrada). Vuelve a pulsar cuando la pulsera se haya reconectado. Caso raro: si la pulsación había llegado y solo se perdió la confirmación, el punto cuenta dos veces; la voz canta el tanteo, corrígelo con *Anular punto*.
+- **En el panel de ajustes aparece «El firmware de esta pulsera no tiene ajustes»**: esa pulsera todavía tiene el sketch antiguo; vuelve a cargarlo (capítulo 5).
+- **La voz no habla o lee mal**: volumen multimedia, *Audio On*, voz del idioma elegido instalada (4); prueba otro motor u otra voz en *Audio y voz*.
+- **Pantalla apagada durante el partido**: en modo pulseras, un servicio en primer plano (notificación «Partido en curso») mantiene activos el Bluetooth, la voz y los cronómetros; en modo juez y mandos, la pantalla se queda encendida (con los mandos debe hacerlo: 6.3).
+- **El mando no hace nada**: ¿está asignado al jugador (*Más › Dispositivos* › *Mandos*, fila con su nombre)? La app tiene que estar abierta en el partido, con la pantalla encendida (6.3). Si la fila dice *No conectado*, pulsa una tecla para despertarlo o vuelve a emparejarlo en los ajustes de Bluetooth.
+- **Los golpes se confunden o salen como no reconocidos**: lleva la pulsera como durante la calibración (misma muñeca, mismo sentido); si no, repite la calibración llevándola como en el partido (6.4).
+- **La pulsera muestra MEMORIA LLENA**: no se ha podido guardar un ejemplo de calibración. Borra los ejemplos de un golpe (papelera) y repítelos.
+- **El teléfono-marcador no encuentra al juez**: ¿están en la misma red? (uno de los dos hace de punto de acceso y el otro está conectado a él). ¿*Marcador en TV* está activado en el teléfono del juez? Prueba a escribir la dirección a mano. Algunos puntos de acceso aíslan entre sí los dispositivos conectados («aislamiento de clientes»): si es así, desactívalo.
+- **El navegador del teléfono no abre la dirección** con los datos móviles activados: Android envía el tráfico por los datos móviles porque el punto de acceso no tiene internet. Usa la app en *Usar como marcador* (lo gestiona sola) o desactiva los datos móviles en ese teléfono.
+- **Monitor negro con el cable**: ese teléfono no tiene salida de vídeo por el USB-C (8.1), o se ha iniciado Samsung DeX: elige *Duplicar pantalla*.
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/fr.md
+cat > "$DEST/app/src/main/assets/help/fr.md" << 'TSM_EOF'
+## 3.1 Comment l'appli est organisée
+
+Au **premier démarrage**, l'appli pose trois questions : la langue, comment vous l'utiliserez (compter les points, jouer avec les bracelets, vous entraîner, filmer les matchs) et votre nom ; on peut passer et recommencer depuis **Plus › Présentation de l'appli**. En bas, il y a toujours **cinq onglets** :
+
+- **Jouer** : **Nouveau match**, le match suspendu à reprendre, la **revanche** du dernier, le **tournoi entre amis** (Americano, Mexicano) et **Utiliser ce téléphone comme** tableau ou caméra. En haut, l'état des appareils (bracelets, ceintures, caméra, TV) : un toucher pour les connecter.
+- **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
+- **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
+- **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
+- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+
+**Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
+
+## 4. La voix (fonctionne sans internet)
+
+- Chaque annonce est lue **d'une seule phrase** par la synthèse vocale du téléphone, avec une voix installée : pas d'internet et une prosodie naturelle. Les noms des joueurs font partie de la phrase.
+- Plus › **Langue et voix** › **Audio et voix** :
+  - **Moteur de synthèse vocale** : *Par défaut du téléphone* (sur les Samsung, c'est Samsung TTS) ou un moteur au choix, par exemple *Services vocaux Google*. Lors des tests, faits en italien, Google sonnait plus naturel.
+  - **Voix** : *Automatique (meilleure hors ligne)* ou une voix précise (Google désigne ses voix par un code, que l'application affiche sous la forme « Voix » + code ; celles marquées *en ligne* nécessitent internet).
+  - **Tester la voix** : lit une séquence d'annonces d'exemple avec les noms saisis. Pendant la lecture, le bouton devient **Arrêter le test** : touchez-le à nouveau pour l'interrompre (la lecture s'arrête aussi d'elle-même quand vous quittez la page). La synthèse vocale ne peut pas être mise en pause au milieu d'une phrase, donc le bouton l'arrête ; si vous appuyez de nouveau, elle reprend depuis le début.
+- S'il manque la voix de la langue choisie : **Paramètres › Gestion globale › Langue › Synthèse vocale** (ou *Sortie de la synthèse vocale*) → téléchargez la voix de cette langue pour le moteur choisi (l'application affiche aussi le bouton **Installer la voix**). Si la synthèse vocale ne démarre pas du tout, l'application l'indique par un message distinct avec le bouton **Ouvrir les paramètres** (paramètres de synthèse vocale d'Android).
+- **Prononciation** : certains moteurs lisent mal des mots du tennis (en italien, « primo set » était lu « primo settembre », « tie-break » était lu « time break »). L'application les corrige d'elle-même ; les corrections ont été vérifiées en transcrivant l'audio réel de Samsung et de Google.
+- **Enregistrements personnalisés** (la voix la plus naturelle qui soit : la vôtre ou celle d'un arbitre) : le dossier `Android/data/io.github.steve_linux.tsm/files/voice/` contient `LEGGIMI.txt` (le fichier « lisez-moi », dont les explications en tête sont dans la langue de l'application et sont réécrites quand vous la changez) avec la liste des 85 clés et des phrases. Enregistrez les fichiers sous ces noms (`score_1_0.mp3` = « quinze-zéro »…), mettez-les dans un ZIP avec un dossier par langue (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) et utilisez **Importer un ZIP**. `LEGGIMI.txt` a une colonne par langue, séparées par des tabulations : il s'ouvre donc aussi très bien comme feuille de calcul. Les enregistrements ont toujours la priorité sur la synthèse ; les noms restent lus par la synthèse. Dans le ZIP, c'est le dossier qui contient le fichier qui compte (même à l'intérieur d'autres dossiers, par ex. `voice/fr/`) ; les fichiers hors d'un dossier de langue vont à la langue actuelle et les dossiers `tts/` sont ignorés, on peut donc aussi zipper le dossier `voice/` de l'application. Un ZIP abîmé ou incomplet ne change rien (*ZIP illisible ou incomplet*). **Supprimer les enregistrements** demande une confirmation. Si un fichier ne peut pas être lu, la phrase est dite par la synthèse vocale et le fichier n'est plus utilisé jusqu'au redémarrage de l'application.
+- **Utiliser des fichiers audio pré-générés** (facultatif) : avec **Générer les fichiers**, l'application crée une fois pour toutes les 85 fichiers avec la voix choisie (même une voix *en ligne*, si internet est disponible à ce moment-là), puis les utilise à la place de la synthèse en continu. Le rendu est plus « haché », mais c'est utile pour emporter hors ligne une voix en ligne. Les fichiers précédents restent en place jusqu'à ce que les nouveaux soient prêts (si la génération n'aboutit pas : *Génération non terminée*) ; pendant la génération, langue, moteur, voix, test de la voix et audio sont bloqués.
+- **Enceinte externe** : il suffit de l'appairer au téléphone en Bluetooth ; la voix sort sur le canal multimédia (réglez le volume multimédia).
+- **Casque ou écouteurs Bluetooth** : ils s'appairent de la même façon et vous êtes seul à entendre la voix, sans déranger les courts voisins ; pratique aussi pour qui marque les points depuis le bord du court. Les bracelets peuvent rester connectés en même temps.
+- **Deux appareils audio à la fois** : beaucoup de téléphones envoient le son à deux appareils Bluetooth en même temps. Sur Samsung : connectez les deux, ouvrez le panneau rapide › **Sortie multimédia** et cochez-les tous les deux. Chaque joueur peut ainsi avoir ses écouteurs, ou l'enceinte joue pour le court et le casque pour qui marque les points.
+
+### 4.1 Langues
+
+Plus › **Langue et voix** › **Langue** : Italiano, English, Français, Deutsch, Español, Português (chaque langue est écrite dans sa propre langue, pour qu'on la retrouve même quand l'application est dans une langue qu'on ne lit pas). Le choix s'applique à la fois aux **écrans, à la voix de l'arbitre, au tableau d'affichage TV, au récapitulatif et au partage, et aux bracelets**. Les dates suivent la langue (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+
+Les annonces ne sont pas des traductions mot à mot : elles suivent les textes officiels pour les arbitres de chaise de chaque fédération, à savoir *L'arbitrage en 255 questions* de la FFT et l'ITF en français, les documents DTB/BTV et Swiss Tennis, *Deberes y procedimientos* de la RFET, *Deveres e Procedimentos* de la FPT (le seul script portugais publié). L'anglais suit l'ITF. En anglais, le zéro des manches en fin de match se dit *love* (« six love, six four »), comme pour les points.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Début | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15-0 · 15-15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40-40 · avantage | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| Fin de jeu | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Jeux à égalité | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Jeu décisif | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Manche | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| Fin du match | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Changement de côté | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Particularités :
+- En français et en espagnol, le nom vient **après** « au service »/« al servicio », en allemand après « Aufschlag ». Le français appelle le set **manche** (sauf dans « jeu, set et match ») et le tie-break **jeu décisif**.
+- **10-6 … 10-9** dans le super jeu décisif : en français, en espagnol et en portugais, on dit « dix **à** huit », « diez **a** ocho », « dez **a** oito », parce que « dix huit » / « diez ocho » / « dez oito » s'entendent comme *dix-huit*.
+- **Portugais** : une seule option, avec l'interface et la voix préférée du Brésil (si la voix brésilienne manque, on utilise la voix portugaise) et les annonces du script FPT, avec des mots valables dans les deux pays (« jogo » et non « game », « partida »). « Um set a um » est devenu « sets iguais » : au singulier, *set* se prononce comme *sete* et on entendait 7-1.
+- **Prononciation** : toutes les phrases de toutes les langues ont été lues par les voix Google et transcrites avec whisper. Corrections ajoutées : en allemand, « Tie-Break » est lu « Taibreak », précédé d'une virgule (sinon « Teilbreg » ou « bei Detailbreak ») ; en français, le « à » isolé des fichiers pré-générés est lu « a » (sinon « a accent grave »). **Samsung TTS n'a pas encore été testé dans les nouvelles langues.**
+- **Bracelets** (firmware 2.2) : l'application envoie d'elle-même la langue à chaque connexion et quand vous la changez ; le bracelet l'enregistre et l'utilise aussi hors connexion (recherche du téléphone, charge, extinction), sans accents car la police est en ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Avec un firmware 2.1 ou antérieur, les messages envoyés par l'application sont traduits, mais ceux du bracelet lui-même restent en italien. Un bracelet qui vient d'être programmé démarre en italien ; depuis le firmware 2.2.2, son message de connexion est réécrit dans la langue de l'application dès que celle-ci la lui envoie, environ une seconde après la connexion.
+
+## 6. Utiliser les bracelets
+
+| Bouton | Action |
+|---|---|
+| **KEY1** (en façade), appui court | point pour le joueur qui porte le bracelet (lance aussi le match depuis la page DÉBUT DU MATCH) ; un bip confirme (firmware 2.3 + application 2.4 : quand le téléphone l'a reçu, environ une demi-seconde après) |
+| **KEY1**, appui long (1 s) | affiche la batterie (et garde le bracelet allumé s'il est sur le point de s'éteindre pour inactivité) |
+| **KEY2**, appui court | annule le dernier point (aussi depuis la fenêtre de fin de match) ; deux bips plus graves (avec le firmware 2.3, à la confirmation du téléphone) |
+| **KEY2**, appui long (2 s) | éteint le bracelet (câble branché, il affiche *LA CHARGE CONTINUE* : il se recharge même éteint ; depuis le firmware 2.3, KEY1 ou KEY2 le rallument aussi) |
+| Bouton latéral | un clic allume ; un double clic éteint (fonction matérielle) |
+
+- À l'allumage, **APPAIRAGE...** clignote (allumé 0,35 s toutes les 2 s, pour économiser la batterie). L'application se connecte d'elle-même aux bracelets qu'elle connaît dès qu'elle est ouverte ; les nouveaux, elle les trouve dans **Plus › Appareils** (ou dans **Mode et règles** avec le mode *Bracelets*).
+- Une fois connecté : **APPAIRE** pendant 3 secondes avec deux bips, puis **ASSOCIE A** + le nom du joueur.
+- À chaque point, l'écran s'allume avec le score du jeu en grand (à gauche le vôtre, à droite celui de l'adversaire ; la balle verte indique qui sert), puis s'éteint. À la fin d'un jeu, il affiche les jeux et les manches. Si le téléphone ne confirme pas un appui dans les 8 secondes (liaison perdue), **NON ENVOYE** s'affiche en rouge avec deux bips graves : appuyez de nouveau une fois reconnecté. Un appui fait pendant une courte coupure n'est en revanche pas perdu : il part dès que le bracelet se reconnecte, et le bip retentit à ce moment-là.
+
+**Extinction automatique** (les délais se modifient depuis l'application, 6.1) :
+
+| Situation | Ce que fait le bracelet | Par défaut |
+|---|---|---|
+| Allumé, mais aucun téléphone ne se connecte | APPAIRAGE clignote, puis il s'éteint | **30 s** |
+| Téléphone perdu (éteint, hors de portée, Bluetooth désactivé, application fermée brutalement) | RECONNEXION clignote et il se reconnecte tout seul dès qu'il le peut ; sinon il s'éteint | 3 min |
+| Connecté mais inactif (aucun point, aucun message) | 30 s avant, il prévient avec **INACTIF · MAINTENIR KEY1** et un bip, puis il s'éteint | 30 min |
+| Match terminé (confirmé sur le téléphone) ou **Quitter** dans l'application | affiche FIN DU MATCH / APPLI FERMEE et s'éteint aussitôt | activé (désactivable, 7.2) |
+| Batterie vide (sous 3,30 V sur deux lectures consécutives) | affiche BATTERIE VIDE et s'éteint, pour ne pas rester allumé à moitié | toujours |
+
+- Pendant les 10 dernières secondes avant une extinction faute de téléphone, il affiche **EXTINCTION · 8s - APPUYER SUR UNE TOUCHE** avec un bip : n'importe quel bouton relance le délai depuis le début.
+- Quand il s'éteint tout seul, il le signale au téléphone : en match, le cadre orange affiche *BRACELET 1 ÉTEINT (INACTIF)*, *(BATTERIE VIDE)*… Après l'extinction en fin de match, le téléphone arrête de le chercher en continu et se reconnecte tout seul quand vous le rallumez.
+
+
+Les autres économies : CPU à 80 MHz, écran éteint quand il ne sert pas, Bluetooth basse consommation (la radio se réveille 2 à 3 fois par seconde, l'appui sur le bouton part quand même en ~120 ms), buzzer alimenté uniquement pendant les bips, micro et 5V éteints, capteur de mouvement (IMU) allumé seulement avec la reconnaissance des coups (6.4).
+
+### 6.1 Réglages du bracelet
+
+Depuis **Plus › Appareils** ou **Mode et règles** (**Réglages** sous le bracelet de chaque joueur) ou pendant le match (touchez **J1**/**J2** en haut, ou l'icône des curseurs). Ils sont enregistrés **dans le bracelet** et sont conservés même quand on l'éteint ; à chaque modification, le bracelet affiche son nom avec *REGLAGES OK*. Avec le firmware 2.4 il y a aussi la section **Coups** (6.4).
+
+| Réglage | Valeurs | Par défaut |
+|---|---|---|
+| Nom | jusqu'à 12 caractères (ex. le nom du joueur ou « J1 ») | TSM-xxxx |
+| Luminosité de l'écran | 5-100 % | 20 % |
+| Score affiché après chaque point | Non, 2, 3, 5, 8 s (le résumé de fin de jeu dure 2 s de plus) | 3 s |
+| Volume du bip | Muet-100 % | 50 % |
+| Écran retourné | pour porter le bracelet à l'autre poignet | non |
+| Extinction : à l'allumage sans téléphone | 15 s - 5 min | 30 s |
+| Extinction : téléphone perdu | 1-10 min | 3 min |
+| Extinction : connecté mais inactif | 10-60 min | 30 min |
+
+En dessous se trouve l'**estimation de l'autonomie** (avec une charge complète et avec la charge actuelle), avec la consommation détaillée par poste : elle change pendant que vous déplacez les curseurs, avant même de valider. Puis **Identifier**, **Éteindre** et **Copier sur l'autre bracelet** (mêmes réglages, mais chaque bracelet garde son nom). **Éteindre** demande une confirmation, même en cours de match.
+
+### 6.2 Charge
+
+Branchez le câble USB-C : le bracelet émet un bip et affiche l'**écran de charge** pendant 30 secondes, puis l'écran s'éteint et se rallume 1,5 s toutes les 10 secondes (un coup d'œil, comme le voyant d'un chargeur). **N'importe quel bouton** le rallume pour 30 secondes de plus. Si le bracelet était éteint, allumez-le d'un clic sur le bouton latéral pour voir cet écran (la charge a lieu de toute façon, même bracelet éteint).
+
+```
+ TSM-3FA2   USB 5.01V               ← nom et tension du câble
+ ┌──────────┐
+ │██████ ⚡  │▌   78%                ← icône de batterie et pourcentage de charge
+ └──────────┘
+      EN CHARGE                     ← ou CHARGE TERMINEE / ALIMENTE PAR USB
+ 4.12V  DEPUIS 42 MIN  FIN ~25 MIN  ← tension de la batterie, durée de charge, fin estimée
+```
+
+- **Pourcentage** : en charge, la tension mesurée est plus élevée que la tension réelle (≈0,1 V) ; le bracelet la corrige, ne fait jamais baisser le pourcentage et n'atteint **100 %** que lorsque le chargeur indique qu'il a terminé. Une fois la charge complète, le texte devient **CHARGE TERMINEE** avec le temps nécessaire (*CHARGEE EN 1H 25*) et l'écran reste éteint (pas de flashs la nuit).
+- **Fin estimée** : la puce d'alimentation (PM1) ne mesure pas le courant de charge, donc le temps restant est déduit de la progression de la charge sur les 10 dernières minutes : il apparaît au bout de 10 minutes, arrondi à 5, et reste une estimation.
+- **ALIMENTE PAR USB** : le câble est branché mais la batterie ne se charge pas (et n'est pas pleine) : câble ou chargeur trop faibles, ou batterie débranchée.
+- **Câble branché, il ne s'éteint pas tout seul** (pas d'extinction pour absence de téléphone ou inactivité, pas d'extinction *batterie vide*) ; on peut l'éteindre par un appui long sur KEY2. Une fois le câble débranché, il affiche **USB DEBRANCHE · BATTERIE 97%** et les délais normaux d'extinction repartent de là (6).
+- **Connecté au téléphone** (ex. avec une batterie externe pendant le match), le score a la priorité : seulement un court message *EN CHARGE 78%*, et un appui long sur KEY1 affiche *CHARGE TERMINEE* ou *EN CHARGE*.
+- **Dans l'application** : la ligne du bracelet (dans *Appareils* et dans *Mode et règles*) et ses réglages affichent *En charge 78 %* ou *Charge terminée* ; en match, les pastilles J1/J2 portent le symbole ⚡. Le journal `files/battery_log.csv` a aussi deux colonnes supplémentaires (tension USB, charge terminée) : utile pour vérifier en combien de temps il se recharge vraiment.
+- Le bracelet et l'application calculent désormais le pourcentage avec la **même courbe** LiPo (avant, le bracelet utilisait une droite moins précise) : ils affichent donc le même chiffre.
+
+> À vérifier avec les vrais bracelets : la charge n'a pas pu être testée sur le matériel. En particulier, à quelle fréquence le chargeur signale *charge terminée* et quelle est la précision du pourcentage pendant la charge.
+
+### 6.3 Sans bracelets : télécommandes Bluetooth
+
+La solution la plus économique pour laisser les joueurs marquer : deux **télécommandes Bluetooth pour selfie** (celles avec un bouton de déclenchement, souvent vendues sous le nom *AB Shutter3*), de 1 à 3 € pièce. Android les voit comme un clavier : pas de firmware à charger et aucune autorisation pour l'application. N'importe quel autre pavé ou clavier Bluetooth (ou USB) convient aussi.
+
+1. Allumez la télécommande et appairez-la dans les **réglages Bluetooth** du téléphone, comme un casque (*Plus › Appareils › Réglages Bluetooth* les ouvre). Recommencez avec la seconde.
+2. *Mode et règles* › mode **Télécommandes** › **Associer** sous le Joueur 1 › appuyez sur la touche de sa télécommande qui donnera le point ; puis pareil pour le Joueur 2. À chaque clic d'une télécommande associée, sa ligne affiche **Touche reçue** : on peut ainsi tester avant de jouer. **Échanger J1 ↔ J2** les inverse.
+3. **DÉBUT DU MATCH** : un clic sur une télécommande lance le match, comme KEY1 des bracelets. En haut, **J1**/**J2** sont en couleur quand les télécommandes sont connectées.
+
+| Geste | Action |
+|---|---|
+| un clic | point pour celui qui tient la télécommande (il arrive une demi-seconde plus tard : l'application attend de voir si c'est un double clic) |
+| double clic | annule le dernier point (même depuis la fenêtre de fin de match) |
+| appui de 1 s | annule le dernier point |
+| l'autre touche (télécommandes à deux touches) | annule le dernier point, tout de suite ; pressée moins d'une demi-seconde après un clic, elle annule ce clic |
+
+- Les protections des bracelets s'appliquent : deux points à moins de 2 secondes d'intervalle ne comptent qu'une fois, deux annulations rapprochées n'enlèvent qu'un point, *Match terminé* ne se confirme que sur le téléphone.
+- Beaucoup de télécommandes pour selfie ont deux boutons (*iOS* et *Android*) : la touche pressée lors de l'association donne le point, l'autre annule. Sur la CAMKIX (une *AB Shutter3*), le gros bouton envoie VOLUME HAUT et le petit ENTRÉE : associez-la avec le gros bouton et le petit devient « annuler ». Si une télécommande envoie deux touches à chaque appui, un appui reste un clic.
+- **L'écran doit rester allumé avec l'application au premier plan** (pendant le match, l'application le garde allumé toute seule). Contrairement aux bracelets, les touches d'un clavier Bluetooth n'arrivent qu'à l'application visible : écran verrouillé ou autre application ouverte, elles ne comptent pas. Pour les longs matchs, laissez le téléphone en charge.
+- Si une télécommande se déconnecte pendant le match (éteinte, pile vide, trop loin), l'encadré orange affiche *TÉLÉCOMMANDE 1 DÉCONNECTÉE*, puis *CONNECTÉE* à son retour. Beaucoup de télécommandes se mettent en veille après quelques minutes sans clic : le premier clic les réveille et se perd parfois. Si la voix n'annonce pas le point, appuyez de nouveau.
+- Portée : une dizaine de mètres, comme un casque Bluetooth ; avec le téléphone près du filet, au milieu du court, les deux côtés sont couverts. Pile : en général une CR2032, qui dure des mois.
+
+### 6.4 Reconnaissance des coups
+
+Avec le firmware 2.4, le bracelet reconnaît **coup droit, revers, service et volée** grâce à son capteur de mouvement (IMU) et les envoie à l'application, qui les compte par joueur. La reconnaissance apprend de la personne qui porte le bracelet : il faut d'abord un court **calibrage**, dont les exemples restent enregistrés dans le bracelet.
+
+1. **Attachez le bracelet au poignet**, toujours de la même façon (même poignet, même sens). La reconnaissance s'appuie sur la direction des mouvements : un bracelet tourné par rapport au calibrage confond les coups.
+2. Réglages du bracelet (6.1) › **Coups** › **Calibrage** : touchez **Calibrer** à côté de *Coup droit*. Le bracelet affiche *COUP DROIT · CALIBRAGE 0/20*.
+3. Faites **5 à 10 coups droits** avec une pause entre chacun : à chaque coup le compteur augmente, sur le bracelet et dans l'application (avec un bip si le volume n'est pas à zéro). Si un coup est raté, touchez **Annuler le dernier**. Puis **Terminer**.
+4. Recommencez pour le revers, le service et la volée. La corbeille efface les exemples d'un coup pour les refaire. On garde au plus 20 exemples par coup (au-delà, le plus ancien est remplacé). 3 exemples pour au moins deux coups suffisent (*Prêt : il reconnaît les coups calibrés*), mais plus d'exemples, et plus variés, donnent une meilleure reconnaissance.
+5. Activez **Reconnaissance des coups**. Avec **Afficher le coup sur le bracelet**, le coup apparaît un instant avec la confiance de la reconnaissance (p. ex. *REVERS 87%*), seulement si l'écran n'affiche ni le score ni un message.
+
+- Pendant le match, sous les chronos, une ligne montre les coups de chaque joueur (*J1 CD 12 · R 8 · S 5 · V 3*). Ils ne comptent qu'une fois le match commencé, pas pendant l'échauffement ni le calibrage.
+- Le récapitulatif (7) donne les coups par type, la **vitesse du poignet** (moyenne et maximale, en °/s : la force du coup, pas la vitesse de la balle) et les **coups par point** (longueur des échanges). Si un seul joueur a un bracelet avec les coups, les échanges ne comptent que les siens.
+- Un coup qui ne ressemble à aucun exemple n'est pas affiché et compte comme *non reconnu* : si cela arrive souvent, vérifiez comment vous portez le bracelet ou ajoutez des exemples.
+- Les mouvements lents (se replacer, ramasser la balle) ne comptent pas : un coup doit dépasser 400 °/s de rotation du poignet et 2,5 g d'accélération.
+- **Batterie** : le capteur consomme environ 1 mA de plus, une vingtaine de minutes sur une charge complète (l'estimation dans les réglages en tient compte). Sans la reconnaissance, le capteur reste éteint.
+- Sur les coups très puissants, le gyroscope atteint son maximum (2000 °/s) : la reconnaissance n'en souffre pas, mais la vitesse affichée est un peu sous-estimée.
+
+### 6.5 Ceintures cardio
+
+Fréquence cardiaque et calories depuis des **ceintures pectorales Bluetooth** utilisant le service cardio standard : Coospo (testée avec la H6), Magene, Polar, Garmin, Wahoo… Elles fonctionnent dans tous les modes, même sans bracelets.
+
+1. Mouillez les électrodes et mettez la ceinture : elle s'allume toute seule au contact de la peau.
+2. *Mode et règles* (ou *Plus › Appareils*) › **Fréquence cardiaque** › activez **Ceintures cardio** et choisissez la ceinture de chaque joueur (une seule fois). **Échanger** les inverse.
+3. **Âge, poids et sexe** de la personne (facultatifs) : pour les calories (formule de Keytel, erreur typique ±20 %) et, avec l'âge, pour les zones cardio (maximum estimé 208 − 0,7 × âge).
+
+- Sous chaque ceinture : état, fréquence, **signal** en dBm (plus proche de 0 = plus fort) et **coupures**, c'est-à-dire les fois où la fréquence n'est pas arrivée pendant plus de 3 secondes, avec les secondes perdues (*2 coupures (14 s)*). Elles comptent depuis le « jeu » du match ; avant, depuis le choix de la ceinture. Elles indiquent jusqu'où porte la ceinture.
+- Pendant le match une ligne montre la fréquence en direct (*J1 · 142 bpm*). Dans le récapitulatif (7) : fréquence moyenne et maximale, calories, graphique dans le temps et temps dans les zones cardio. Les pauses ne comptent pas.
+- **Portée** : essai à l'intérieur avec la H6, téléphone immobile : connectée jusqu'à 21 m, mais à −100 dBm, à la limite ; de dos le signal baisse de 5-10 dBm. En simple le joueur éloigné est à 24-30 m du téléphone : pour ne pas perdre de données utilisez le **second téléphone** (6.6).
+
+### 6.6 Second téléphone derrière l'autre ligne de fond
+
+Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelques mètres de moins que la longueur du court. Avec un second téléphone derrière l'autre ligne de fond, chaque joueur en a toujours un à proximité : le second (**satellite**) capte les ceintures et bracelets des joueurs de son côté et sert de relais vers le **principal**, qui tient le match.
+
+1. **Principal** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone**. La première fois il demande l'autorisation *Appareils à proximité* (la position jusqu'à Android 12). Le téléphone crée son **propre réseau local** : ni SIM ni données, pas besoin du Wi-Fi du club. Un QR apparaît.
+2. **Satellite** : Plus › **Appareils** › **Second téléphone** › **Servir de second téléphone** › scannez le QR. Android demande une fois de se connecter au réseau du principal (*AndroidShare_…*) : touchez **Connecter**. Le satellite garde ses données mobiles. Il doit afficher *Connecté au téléphone principal*.
+3. Le satellite suit tout seul les ceintures et bracelets choisis sur le principal, des mêmes côtés : rien à choisir. Laissez-le derrière la ligne de fond avec l'app ouverte.
+
+- **Changement de côté** : rien à faire. Chaque ceinture et chaque bracelet reste au téléphone auquel il est connecté tant que le signal tient, puis le téléphone le plus proche le prend (quelques secondes). Le principal affiche *Via le second téléphone* ; pendant le passage un bracelet peut apparaître déconnecté un instant.
+- **Aucune donnée perdue** : fréquence, touches et coups du satellite portent l'**ID du match** et un numéro d'ordre, et le satellite les garde jusqu'à la confirmation du principal. Si le Wi-Fi entre les téléphones tombe, la fréquence arrive plus tard et comble les trous du graphique ; les coups comptent s'ils sont du même match. Une **touche** du bracelet arrivée plus de 5 secondes après ne donne pas le point : appuyez à nouveau. La même touche arrivée par deux chemins compte une seule fois.
+- Du principal vers les bracelets passent score, messages, *Identifier*, extinction et réglages. Mieux vaut changer les réglages avec le bracelet connecté au principal.
+- **Tableau de score** : sur le satellite **Afficher le tableau de score** ouvre le tableau du match en plein écran (comme en 8.3), déjà connecté au principal.
+- Si le principal ne peut pas créer le réseau (point d'accès normal déjà actif), il utilise le Wi-Fi où il se trouve : les deux téléphones doivent alors être sur le même réseau. Avec Android 9 ou antérieur le satellite affiche nom et mot de passe du réseau, à choisir à la main dans les paramètres Wi-Fi.
+- **Arrêter** ferme la liaison et le réseau ; le satellite revient à ses ceintures et bracelets.
+
+## 7. Utiliser l'application
+
+1. **Nouveau match** (facultatif) : **Tennis** ou **Padel** (app 2.5 : mêmes règles, temps et annonces ; choisir Padel règle tout seul le double et le golden point (point en or), modifiables (à la place du golden point, *Mode et règles* propose aussi le *star point* de la FIP : deux avantages au maximum, puis un point décisif), et le résumé indique *Padel*), club, court, simple/double, noms (en double, deux noms par équipe). **Rechercher l'adresse du court** (désactivé par défaut) ajoute l'adresse au résumé à côté des coordonnées : elle est demandée au service de géocodage du téléphone, qui, avec les services Google, envoie les coordonnées à Google. **Suivant**. Avec *Padel* apparaît aussi **Tournoi Americano ou Mexicano** : de 4 à 16 joueurs et de 1 à 4 terrains, matchs aux points (16, 24 ou 32 : les points des deux paires additionnés font le total) ou au temps. Dans l'*Americano* les paires changent à chaque tour pour que chacun joue avec et contre le plus de monde possible ; dans le *Mexicano*, dès le deuxième tour, on joue selon le classement (1er et 4e contre 2e et 3e sur le même terrain). À chaque tour on écrit le résultat de chaque terrain (aux points un seul nombre suffit, l'autre se complète) ou on le compte avec *Compter point par point*, avec la voix et, au temps, le chrono ; s'il y a plus de joueurs que de places, on se repose à tour de rôle. **Tour suivant** démarre quand tous les résultats sont là ; le **Classement** compte les points de chacun, puis les victoires et la différence de points, et se partage en texte.
+2. **Mode et règles** :
+   - *Arbitre*, *Bracelets* ou *Télécommandes* (6.3). Avec les bracelets, le Bluetooth activé, l'autorisation de localisation et la localisation activée sont obligatoires : les lignes des **Prérequis** se mettent à jour en temps réel (même si vous coupez le Bluetooth ou la localisation depuis le volet des réglages rapides) et deviennent rouges, avec le bouton pour corriger.
+   - La **recherche est automatique et continue** tant que la page est ouverte : allumez les bracelets et ils se placent tout seuls sur les emplacements libres (d'abord Joueur 1, puis Joueur 2). **Identifier** fait clignoter le bracelet concerné dans la couleur du joueur (jaune ou rouge) avec des bips, pour voir tout de suite lequel vous avez en main ; **Échanger J1 ↔ J2** les inverse sans les déconnecter. Dans le menu déroulant, vous pouvez toujours en choisir un autre ou *Aucun* (un bracelet retiré à la main n'est pas remis par la recherche). Un bracelet ne peut pas être attribué à deux joueurs.
+   - **Éteindre les bracelets en fin de match et en quittant** (activé par défaut) : à la confirmation de *Match terminé* et avec *Quitter*, les bracelets s'éteignent au lieu d'attendre l'inactivité.
+   - En mode arbitre, si vous appuyez sur **Suivant** sans localisation, l'application vous invite à l'activer (sinon le lieu ne figurera pas dans le récapitulatif).
+   - Format (*3 manches*, *5 manches*, *2 manches + super jeu décisif à 10*, *pro set* en 8 ou 10 jeux, *super jeu décisif à 10 seulement*), jeux par manche (6, ou 4 en manches courtes avec jeu décisif à 4-4), jeu décisif dans les manches oui/non (non : la manche continue jusqu'à 2 jeux d'écart), No-Ad. Langue et voix sont dans *Plus › Langue et voix* (4.1).
+   - **Tirage au sort** : la pièce tourne et désigne le gagnant ; vous indiquez qui sert et les côtés du court **vus depuis la chaise d'arbitre** (schéma du court avec **Inverser les côtés**). En double, choisissez aussi qui sert en premier dans chaque équipe.
+3. **DÉBUT DU MATCH** clignote : appuyez sur le bouton, sur KEY1 d'un bracelet ou sur une télécommande. La voix annonce *« Première manche » · « au service [nom] » · « jouez »* avec 1 seconde entre les phrases ; le **Match Time** démarre sur « jouez ».
+4. **Match** : en haut à gauche la durée du match, à droite le compte à rebours (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time** ; en rouge pendant les 5 dernières secondes). Le cadre orange s'allume 5 s pour *changement de côté, jeu décisif, balle de set, balle de match, balle de break…*. Les deux boutons carrés (jaune = Joueur 1, rouge = Joueur 2) sont du côté où se trouvent réellement les joueurs et s'inversent à chaque changement de côté ; sous le serveur apparaît **On Serve**. En dessous : *Annuler le point*, *Suspendre/Reprendre*, audio (icône du haut-parleur, barrée = coupé), *Nouveau match*, **Quitter**. En mode bracelets, sous les temps se trouvent **J1**/**J2** avec la batterie et l'autonomie : les toucher ouvre les réglages du bracelet. Un double appui sur *Annuler le point* n'enlève qu'un point (un second appui dans la seconde ne compte pas) ; juste après un changement de page, le second appui d'un double appui est ignoré, pour qu'il ne tombe pas sur un bouton de la nouvelle page. Le **cadenas** en bas verrouille l'écran (par exemple téléphone en poche ou sur le banc) : les touchers ne font rien, bracelets et télécommandes oui ; on déverrouille en maintenant le cadenas appuyé.
+5. Au dernier point apparaît la fenêtre **Match terminé / Annuler le dernier point**. « Match terminé » se confirme **uniquement sur le téléphone**. Pendant une demi-seconde après son apparition, ses boutons ignorent les appuis : un double appui sur le dernier point n'annule rien.
+6. **Récapitulatif** : vainqueur, noms, score manche par manche avec les points du jeu décisif, durée, heures de début et de fin, date, club, court, lieu, format, points et jeux gagnés. Boutons **Enregistrer les fichiers** (nom du fichier + dossier au choix + formats .txt/.json/.png et **PDF complet** avec résultat, statistiques du match et de chaque manche, déroulé et photos). **Partager** demande s'il faut envoyer l'image avec le texte (pour WhatsApp et les réseaux) ou le PDF complet. Dans le Résumé, **Photos du match** garde jusqu'à 10 photos souvenir (de la galerie ou prises sur le moment) : elles restent sur le téléphone, vont dans le PDF et passent sur l'autre téléphone avec le transfert, jamais dans l'image pour les réseaux, **Partager** (image 1080×1350 + texte pour WhatsApp/Instagram/…), **Nouveau match**, **Quitter**. Sous les photos, **Notes du match** accueille un texte libre (jusqu'à 2000 caractères) : il s'enregistre tout seul, va dans le PDF, le texte partagé et les fichiers .txt et .json, et passe sur l'autre téléphone avec le transfert ; il ne va pas dans l'image pour les réseaux. Le match terminé entre tout seul dans l'**Historique** (onglet **Progrès**) : la liste des matchs, à rouvrir avec leur récapitulatif ou à supprimer, et l'onglet **Joueurs** avec victoires, défaites et face-à-face de ceux dont le nom est écrit dans *Nouveau match* (majuscules et espaces ne comptent pas ; en double chaque joueur compte). **Importer** ajoute les matchs enregistrés en .json avec *Enregistrer les fichiers* sur un autre téléphone : les terminés vont dans l'historique, les autres dans les matchs suspendus à reprendre. **Transférer** (en haut à droite dans l'Historique) déplace l'historique et les matchs suspendus vers un autre téléphone avec un code QR : les deux téléphones doivent être sur le même réseau Wi-Fi ou l'un sur le point d'accès de l'autre ; sur celui qui les a, touchez *Envoyer* et laissez ouverte la fenêtre avec le code, sur l'autre *Recevoir* et scannez le code (autorisation de l'appareil photo nécessaire). On peut ainsi continuer un match en cours sur un autre téléphone : suspendez-le, transférez et reprenez-le. Les matchs s'ajoutent à ceux que le téléphone a déjà. **Photos des joueurs** : touchez le cercle à côté du nom dans *Nouveau match* (ou dans le détail du joueur dans l'Historique) et choisissez une photo ; elle est recadrée au carré et se retrouve grâce au nom. Elle apparaît dans l'Historique, le récapitulatif et le tableau TV, reste uniquement sur ce téléphone (elle suit le transfert) et ne va pas dans l'image partagée. Touchez à nouveau le cercle pour la changer ou la retirer. Si l'application se ferme pendant que vous êtes sur le récapitulatif (Android qui la ferme en arrière-plan, une mise à jour, un redémarrage du téléphone), vous le retrouvez en la rouvrant ; pas si vous l'avez quitté vous-même avec *Nouveau match*, *Quitter* ou en retirant l'application des applications récentes. Le dossier par défaut est **Documents/Tennis Score Manager** (depuis Android 10 ; sous Android 8 et 9 le dossier de l'appli) : n'importe quel gestionnaire de fichiers l'ouvre et il reste même si l'on désinstalle l'appli. En enregistrant deux fois sous le même nom, le second devient *nom (1)* ; dans l'image, les textes longs (noms, adresse) s'adaptent à la largeur.
+
+   Le récapitulatif a trois onglets. **Résumé** : les données ci-dessus et, avec les bracelets 2.4, les coups, la vitesse du poignet et les coups par point (6.4). **Statistiques**, pour le match ou pour une manche : les deux joueurs comparés avec des barres qui partent du centre (colorée pour celui qui mène) pour les points et jeux gagnés au service et en retour, les balles de break sauvées et converties, le total des points et des jeux, les points d'affilée, les 10 derniers points, les balles de match sauvées ; avec les bracelets 2.4 aussi les coups par type et la vitesse moyenne du poignet. **Point par point** : manche par manche, chaque jeu avec la balle de celui qui sert, *SERVICE PERDU* sur les breaks, le score après chaque point avec **BB** (balle de break), **BS** (balle de set) et **BM** (balle de match) et l'issue (*JEU*, *BREAK*, *MANCHE*, *MATCH*). Aces, doubles fautes, premières balles, coups gagnants et erreurs sont là si vous activez les **statistiques détaillées** dans *Mode et règles* : à la place des deux grands boutons apparaissent *Ace* et *Faute* (la deuxième fois elle devient *Double faute*) et, pour chaque joueur, *Gagnant*, *Erreur* (le point va à l'autre) et *Point* ; *Annuler le point* enlève aussi une faute. C'est pensé pour qui marque depuis le bord du court. Après *Erreur*, *Directe / Provoquée* s'affiche 6 secondes ; avec bracelets ou télécommandes, après chaque point s'affiche *Comment s'est fini le point ?* (Ace, Gagnant, Erreur) : répondre est facultatif et le score ne change pas. Dans l'Historique, le détail d'un joueur montre l'**évolution** : points gagnés match par match et moyennes d'aces, doubles fautes, premières balles, coups gagnants et erreurs. Les statistiques de chaque match comptent aussi balles de jeu, de manche et de match converties, jeux blancs, jeux d'affilée, manches gagnées après un break de retard et, dans la carte **Durées**, la durée de chaque manche et le jeu le plus long.
+
+   **Revanche** (en bas du résumé) : propose le même jour de la semaine et la même heure, la semaine suivante, et le club du match ; on change date, heure et lieu et on ajoute une note. **Envoyer l'invitation** ouvre le partage (WhatsApp, SMS, e-mail…) avec le message prêt : qui contre qui, quand, où et comment s'est fini le dernier match. **Ajouter à l'agenda** crée l'événement dans l'appli d'agenda, **Préparer le match** remet dans *Nouveau match* joueurs, club, court et règles (pas le tournoi). Pas de compte : l'invitation passe par les canaux que vous utilisez déjà.
+
+**Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
+
+**Sauvegardes** : le match s'enregistre tout seul à chaque point. *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
+
+### 7.1 Entraînement avec la ceinture
+
+Pour s'entraîner avec la ceinture cardio sans match : **S'entraîner** › **Entraînement avec la ceinture**. On utilise **une ceinture**, celle du Joueur 1, avec âge, poids et sexe pour les calories et les zones ; on la choisit directement là (avec l'interrupteur *Ceintures cardio*, le Bluetooth et les autorisations s'ils manquent).
+
+1. **Démarrer** : en grand la fréquence en direct, dessous le temps et le tour en cours.
+2. **Tour** ferme une partie de l'entraînement et en ouvre une autre (comme le bouton tour d'un chronomètre) : un sprint, un exercice, un tour de piste. **Pause / Reprendre** arrête le temps ; les pauses ne comptent pas.
+3. **Terminer** : l'app enregistre encore **une minute de récupération** (restez immobile) pour mesurer de combien la fréquence baisse ; **Enregistrer** la saute.
+
+- **Récapitulatif** : durée, fréquence moyenne et maximale, calories, **VFC (RMSSD)** à partir des intervalles entre battements envoyés par la ceinture (il faut une trentaine de battements propres ; comparez-la à vos entraînements similaires, pas à ceux des autres), **récupération en 1 minute** (plus elle baisse, mieux c'est), graphique, zones cardio et, pour chaque tour, durée, moyenne, maximum et récupération.
+- **CSV** (seconde par seconde, avec le tour et la minute de récupération) et **PDF** d'une page avec graphique, camembert des zones et tours, à partager.
+- Les entraînements restent sur le même écran, à part des matchs ; on les rouvre ou les supprime. La fréquence arrive aussi du second téléphone (6.6) et l'enregistrement continue écran éteint.
+
+### 7.2 Progrès
+
+**Progrès** › **Classement TSM · Progrès** : un document pour voir si vous progressez, **séparé** pour les entraînements et les matchs.
+
+- **Entraînements** : durée, fréquence moyenne et maximale, calories, VFC, récupération.
+- **Matchs** d'un joueur de l'historique (choisi dans la liste) : matchs gagnés, points gagnés, aces, doubles fautes, premières balles, coups gagnants, fautes directes. Les aces et les autres valeurs détaillées n'existent que pour les matchs joués avec les statistiques détaillées ; ce sont des totaux par match.
+- Pour chaque élément la moyenne de la **première moitié** de la période et celle de la **seconde** : ▲ vert si ça progresse, ▼ rouge si ça baisse (moins de doubles fautes ou d'erreurs est un progrès), = si c'est stable (moins de 5 % d'écart) ou si on ne peut pas dire (fréquence). Il faut au moins 2 entraînements ou matchs.
+- **Quoi comparer** : les **Filtres** choisissent la période (tout, 30 jours, 3 mois, 1 an), les **jours de la semaine** (par exemple seulement les mercredis, aussi plusieurs) et, pour les matchs, **tournoi**, **club** et **adversaire** tirés de l'historique ; en dessous, la liste **À comparer** à cocher (*Tous* / *Aucun*). Comparaison, PDF et impression n'utilisent que les éléments cochés.
+- **Classement TSM** : dans *Matchs*, au-dessus des filtres, le classement du joueur (tout le monde part de 1500) avec les matchs comptés, la variation du dernier et l'évolution, et le **Classement TSM des joueurs** de tout l'historique. C'est un Elo calculé sur le téléphone : il monte quand vous gagnez, davantage contre un joueur mieux classé et avec un score net ; en double c'est la moyenne de la paire qui compte ; tennis et padel ont des classements séparés. Pendant les 5 premiers matchs il est *provisoire* et bouge davantage. Dans le récapitulatif de chaque match, la carte **Classement TSM** montre ce que chacun a gagné ou perdu ; avec **Amical**, le match reste dans l'historique mais ne compte pas.
+- **PDF** (avec l'évolution de chaque élément et la liste complète, sur plusieurs pages si besoin) à partager, ou **Imprimer** avec le service d'impression d'Android (aussi *Enregistrer en PDF*).
+
+### 7.3 Vidéos : téléphone-caméra, temps forts et ralenti
+
+Un deuxième téléphone sur un trépied filme le match et met le score de l'arbitre sur la vidéo.
+
+1. **Arbitre** : Plus › **Appareils** › **Second téléphone** › **Utiliser un second téléphone** (QR, comme en 6.6).
+2. **Caméra** : Plus › **Appareils** › **Second téléphone** › **Servir de caméra**, scannez le QR, puis **Ouvrir la caméra** (autorisations caméra et micro ; le téléphone doit filmer en 1080p). Avec *Score connecté*, l'habillage du score est sur la vidéo (**Habillage** l'active ou le désactive) ; sans arbitre, il filme seulement.
+   - **Filmer / Arrêter** : la vidéo va dans la galerie (*Films/Tennis Score Manager*) avec ses chapitres, un par point.
+   - **Direct** : diffusion RTMP sur YouTube, Twitch, Facebook ou votre serveur ; serveur et clé du flux dans *Direct : serveur*.
+   - **Cadrer** (assistant de cadrage) : indiquez à combien de mètres derrière la ligne de fond et à quelle hauteur vous avez mis le téléphone, et sur quel terrain vous jouez ; l'appli donne l'inclinaison vers le bas qui garde dans la vidéo les deux lignes de fond et le joueur éloigné, et dit si le terrain tient en largeur. C'est souvent la largeur qui limite : depuis le grillage (environ 6 m) l'objectif principal coupe les coins proches, le **grand-angle** non (**Utiliser l'objectif…**, ou le bouton **Objectif**, enregistrement arrêté). Avec **Afficher le niveau**, l'aperçu montre l'horizon et des indications (*visez 2° plus bas*, *tournez dans le sens horaire*…), en vert quand c'est bon, avec une vibration quand le téléphone est en place. Le niveau s'affiche aussi dans la fenêtre **Caméra** du téléphone de l'arbitre. Les capteurs ne savent pas la gauche et la droite : vérifiez à l'œil que le filet est au centre.
+   - **Tracé** (tracé du terrain) : l'aperçu montre les lignes du terrain telles que l'objectif les voit, et elles suivent le téléphone quand on l'incline. Déplacez les curseurs (**Distance**, **Hauteur**, **Direction**, **Décalage latéral** et, si besoin, **Champ de vision** et **Correction d'inclinaison**) jusqu'à ce qu'elles coïncident avec les vraies : cela règle aussi le centrage, et l'inclinaison conseillée devient précise. Le réglage est mémorisé pour le terrain du match (*Club · Court* de l'arbitre) et repris la fois suivante. Tracé et curseurs sont aussi dans la fenêtre **Caméra** de l'arbitre. Plus le téléphone est haut, mieux on voit la moitié éloignée du terrain : à 2,5 m elle est écrasée juste au-dessus du filet.
+3. **Caméra en hauteur, commandée par l'arbitre** : sur le téléphone de l'arbitre, **Caméra** (à côté de *Ralenti* pendant le match, ou *Cadrage et commandes de la caméra* en Plus › **Appareils** › **Second téléphone**, pratique pour la régler avant de commencer) montre le cadrage du téléphone-caméra tel qu'il est dans la vidéo, graphisme compris, avec **Filmer / Arrêter**, **Direct**, **Habillage** et le **zoom**. On voit aussi la durée de l'enregistrement, la batterie et l'espace libre (en orange s'ils sont bas). L'image est petite et saccadée (environ 3 images par seconde) et n'est envoyée que pendant qu'on la regarde ; la clé du direct se saisit sur le téléphone-caméra.
+
+- **Vidéo** › **Vos vidéos** : les vidéos enregistrées, à revoir point par point, jeu par jeu ou set par set. **Chapitres YouTube** prépare les chapitres à coller dans la description. **Importer une vidéo** prend une vidéo faite avec une autre caméra (le fichier reste où il est) : on marque les points en la regardant, en touchant à la fin de chaque point qui l'a gagné et, si vous voulez, comment il s'est terminé (*Annuler le dernier* enlève le dernier) ; format et règles sont ceux de *Mode et règles*.
+- **Filtres entraîneur** (icône du filtre) : seulement les points d'un joueur, gagnés ou perdus, au service ou au retour, sur la première ou la seconde balle, selon leur fin, sur les balles de break ou les balles de set et de match. **Lire** les enchaîne.
+- **Temps forts** : montage automatique des plus beaux points (aces, coups gagnants, balles de break, de set et de match, longs échanges avec les bracelets) dans l'ordre de priorité choisi avec les flèches, pour 1, 3, 5, 10 ou 15 minutes au maximum ou une **Autre durée** jusqu'à 90. Si tout ne tient pas, les extraits sont d'abord raccourcis, puis les points les moins importants restent dehors. Le résultat va dans la galerie.
+  - **Statistiques en fin de vidéo** : 2 ou 3 écrans de 10 secondes comme dans les directs des tournois : service et balles de break ; points, fautes et échanges courts et longs ; fréquence cardiaque, s'il y avait la ceinture. Le match est celui de l'historique joué pendant l'enregistrement, ou celui des points marqués sur une vidéo importée. Sur les côtés, la photo du joueur ; sans photo, un portrait stylisé d'homme ou de femme (choix **Homme / Femme** dans *Nouveau match*) (sans choix, celui de l'homme ; valable dans toute l'application, aussi dans *Nouveau match*, l'historique, le résumé, le PDF et le tableau TV) ; en bas, le pourcentage de points gagnés. En haut, tournoi, catégorie et tour (*Autres détails* dans *Nouveau match*), ou club et court.
+  - **Musique** sous les statistiques, avec fondu en entrée et en sortie : *Nowhere Land* de Kevin MacLeod (incompetech.com, licence CC BY 4.0 : si vous publiez la vidéo, citez-le), ou un morceau à vous avec **Choisir un morceau** (on en utilise le début ; n'utilisez que de la musique que vous avez le droit de mettre dans vos vidéos).
+  - En bas de chaque écran de statistiques figure la mention **Créé avec Tennis Score Manager** avec l'adresse du site.
+- **Ralenti** : sur le téléphone de l'arbitre, avec la caméra connectée, **Ralenti** demande à la caméra le point contesté (*Dernier point*, *Point précédent* ou *Depuis le dernier point marqué*) et l'affiche, avec pause et image par image. **Aussi sur le tableau** le montre aussi sur le tableau TV.
+
+### 7.4 Raquettes : raquette virtuelle
+
+**Progrès** (ou **Plus**) › **Mes raquettes** : chaque raquette physique a sa fiche (deux raquettes du même modèle font deux fiches : cordage, poids et heures diffèrent).
+
+- **Fiche** : surnom (A, B…), marque, modèle, poids, équilibre, tamis et plan de cordage, saisis à la main ou pris **depuis le catalogue** (données du fabricant, à corriger si vous avez mesuré la vôtre). *Mise de côté* : n'est plus proposée, mais reste dans les comparaisons.
+- **Cordages** : type (monofilament, multifilament, boyau synthétique, boyau naturel, hybride), marque et modèle (aussi parmi les cordages courants), calibre, tension des montants et des travers, date et remarques. *Nouveau cordage* part de celui en place. Pour chacun l'app additionne les **heures de jeu** des matchs et entraînements associés et prévient au-delà du **seuil de contrôle** choisi (20 heures par défaut) : le temps seul ne dit pas la tension restante.
+- **Avant de jouer** : dans *Nouveau match*, sous le classement de chaque joueur, on choisit sa raquette ; dans l'entraînement on la choisit au-dessus de la ceinture. Le match (points, coups des bracelets, fréquence cardiaque) et l'entraînement sont enregistrés avec une **copie** de la raquette telle qu'elle était ce jour-là, cordage et tension compris : la recorder ensuite ne change pas les séances passées.
+- **Dans le récapitulatif** du match (onglet *Résumé*) et de l'entraînement on voit la raquette utilisée, on peut l'associer après coup (le cordage en place ce jour-là est utilisé) et noter les **sensations** de 1 à 5 : contrôle, confort, puissance et fatigue.
+- **Comparaison** : *par raquette* ou *par cordage* (même raquette avec tensions ou cordages différents), on choisit les configurations A et B. Barres côte à côte pour séances, heures, matchs gagnés, points gagnés, premières balles, points gagnés sur première et seconde, aces, doubles fautes, coups gagnants et fautes directes par match, vitesse moyenne du poignet et coups des bracelets, fréquence cardiaque moyenne et sensations moyennes. La meilleure valeur est en gras, mais l'app ne désigne pas de gagnante : adversaire, surface, conditions et forme comptent aussi.
+
+### 7.5 Entraînement des coups : service, coup droit, revers et volée
+
+Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît le service et les boutons disent comment il s'est passé. Un seul téléphone suffit, sans arbitre.
+
+1. **S'entraîner** › **Entraînement des coups**, choisissez le coup (**Service**, **Coup droit**, **Revers**, **Volée**) › **Commencer** (le bracelet doit être connecté comme en 6.1 ; sinon, on marque avec les boutons à l'écran).
+2. **Où placer le téléphone** (s'ouvre tout seul la première fois, puis avec le bouton *Où placer le téléphone ?*) :
+   - **à côté du serveur**, du côté du bras qui frappe (à droite pour un droitier), à **3-4 m**, au niveau de la ligne de fond ou un demi-mètre derrière ;
+   - objectif à **1-1,2 m** du sol, téléphone **à l'horizontale** et droit, pointé sur le serveur ;
+   - le cadre doit contenir **toute la personne, des pieds à la raquette en haut** (environ 2,7 m) : si la tête de raquette sort, éloignez le téléphone ou passez au **grand-angle** (bouton *Objectif*) ;
+   - pour voir aussi où va la balle, en alternative : 3-4 m **derrière** le serveur, un peu sur le côté, à 1,5-2 m de haut ;
+   - jamais devant le serveur ni sur la trajectoire de la balle.
+3. Choisissez le **côté** (droit/gauche), **premier ou second** et, si vous voulez, la **cible** (au T, au corps, extérieur) : ils valent pour les services suivants.
+4. Servez et appuyez sur **KEY1 = bon** ou **KEY2 = faute** ; **KEY1 maintenu** annule le dernier. La voix donne le compte (*Bon. 8 sur 12*) et le bracelet l'affiche. Si le bracelet a reconnu le service, c'est cet instant qui compte ; sinon quelques secondes avant l'appui.
+5. Pour chaque service, un **clip** de quelques secondes autour du coup est enregistré. **Terminé** affiche le bilan : bons sur tentatives, par côté, premier et second, cible et, si le bracelet a reconnu les services, la rotation moyenne du poignet sur les bons et sur les fautes. **Tout revoir / Revoir les bons / Revoir les fautes** ouvre les clips dans le ralenti (pause, ralenti, image par image).
+6. Sous **Commencer** se trouvent les 3 dernières séances **du coup choisi** (les boutons des coups indiquent le nombre de séances, p. ex. *Revers · 4*) et la courbe des **coups dedans, séance après séance**. **Toutes les séances** ouvre celles du coup choisi, par mois, avec la place prise par les vidéos et si elles sont déjà analysées. Touchez une séance pour son bilan et ses clips ; **appuyez longuement** pour la sélectionner (l'icône en haut les sélectionne toutes), puis **Supprimer** (séance et vidéos) ou **Vidéos seules** (libère de la place : restent les décomptes, les mesures de l'analyse et les images des moments clés). **Progrès** montre l'évolution de chaque coup.
+   - **Où sont les vidéos** : dans **Documents/Tennis Score Manager/Entraînement des coups**, avec les dossiers **Service**, **Coup droit**, **Revers** et **Volée** (créés au démarrage) et dedans un dossier par séance (date et heure) et un par coup, avec `video.mp4` (s'ouvre et se partage depuis n'importe quelle appli), l'analyse et les trois images. Tout gestionnaire de fichiers les montre et ils restent même si vous désinstallez l'appli (gardez-les comme archive : une appli réinstallée ne reprend pas ses séances). Sur Android 8-10, la même structure est dans le dossier de l'appli. Les clips des séances d'avant la 2.5 y sont déplacés tout seuls au premier démarrage.
+7. **Analyse du mouvement** (depuis la séance enregistrée) : **Analyser les services** trouve la position du corps dans les clips (modèle MoveNet : la première fois, l'appli propose de le télécharger, 7 Mo, depuis la page du projet sur GitHub ; ensuite tout reste sur le téléphone, sans internet, quelques secondes par service ; il se supprime en bas de l'écran. Non disponible sur les appareils à processeur x86) et mesure trois moments : **armé** (bras de lancer en haut), **genoux** le plus fléchis et **impact**. Pour chaque service : les trois images avec le squelette dessiné et les mesures (genou le plus fléchi, coude à l'impact, hauteur de l'impact par rapport à la taille, bras de lancer, épaules à l'armé, temps de l'armé à l'impact) ; en haut, **bons et fautes** comparés. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos services entre eux. Le corps est bien reconnu avec toute la personne dans le cadre, de côté et avec une bonne lumière ; raquette et balle ne sont pas mesurées.
+   Touchez un service pour l'ouvrir : **Voir la vidéo avec le squelette** ouvre le clip dans le ralenti avec le corps dessiné par-dessus, au ralenti, avec des boutons pour aller à **Armé**, **Genoux** et **Impact** et un pour masquer ou remettre le squelette ; deux doigts agrandissent vidéo et squelette ensemble (jusqu'à 6×), double toucher pour revenir. Les trois images se touchent aussi pour les voir en plein écran et zoomer. Avec **plusieurs personnes** dans le cadre, l'appli suit le serveur (celui qui lève le plus le bras) et masque les autres ; c'est indiqué sous le service : vérifiez sur les images. **Refaire l'analyse** recommence (les clips restent), utile après une mise à jour de l'appli.
+
+**Coup droit, revers et volée** fonctionnent de la même façon (KEY1 bon, KEY2 faute, un clip par coup, bilan et analyse), avec ces différences :
+- **Où placer le téléphone** : à côté du joueur, perpendiculaire à la direction des coups, à 4-5 m et hors du couloir, au niveau du point de frappe ; objectif à environ 1 m ; tout le geste dans le cadre (le poignet se déplace d'environ 2 m d'avant en arrière). Pour la volée : à côté du joueur au filet, à 3-4 m, à son niveau. Toujours du même côté pendant la séance, et jamais sur la trajectoire de la balle.
+- À la place du côté, premier/second et cible, on choisit la **direction** voulue (**croisé**, **au centre**, **le long de la ligne**) et, pour la volée, si elle est **de coup droit** ou **de revers** ; le bilan les compte à part.
+- **Analyse du mouvement** : les trois moments sont la **préparation** (là où le poignet s'arrête au bout de l'armé), l'**impact** (poignet le plus rapide ; autour, l'appli relit une image toutes les 33 ms) et le **finish** (poignet le plus haut après l'impact ; pour la volée, là où le poignet s'arrête). S'il y a plusieurs coups dans la fenêtre, c'est celui reconnu par le bracelet qui compte ; les poignets inversés par MoveNet (cela arrive de profil) sont remis en place tout seuls. Filmez **de profil** : de face, l'armé part en profondeur et ne se voit pas. Les mesures (*—* si le coude ou les jambes ne se voient pas) : genou le plus fléchi, coude à l'impact, hauteur de l'impact, distance de frappe **devant le corps**, **ampleur de la préparation**, hauteur du finish (toutes rapportées à la taille) et le temps de la préparation à l'impact. La vidéo avec le squelette a les boutons **Préparation**, **Impact** et **Finish**.
+
+## 8. Tableau d'affichage sur TV ou écran
+
+Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
+
+### 8.1 Les solutions possibles
+
+| Comment l'image arrive à l'écran | Ce qu'il faut | Avantages | Inconvénients |
+|---|---|---|---|
+| **Deuxième téléphone avec sortie vidéo** + câble USB-C/HDMI, app TSM en mode *Utiliser comme tableau* | un téléphone qui sort la vidéo par l'USB-C (DisplayPort Alt Mode) | pas d'internet ; le tableau occupe tout l'écran en 16:9 et le téléphone reste libre | beaucoup de téléphones **ne** sortent **pas** la vidéo : en général oui pour les Galaxy S/Note/Tab S (avec DeX : choisissez *Duplication d'écran* ou désactivez le démarrage automatique de DeX), non pour presque tous les Galaxy A. Cherchez « DisplayPort » / « sortie vidéo » dans la fiche technique |
+| **Chromecast** (ou Google TV Streamer) sur l'écran + n'importe quel téléphone avec TSM en mode *Utiliser comme tableau* et **Caster** (*Diffusion de l'écran* jusqu'à Android 14, Smart View sur les Samsung) | un Chromecast configuré une fois avec Google Home sur le réseau du point d'accès | n'importe quel téléphone convient, pas de long câble | le Chromecast a besoin d'**internet** (données mobiles sur le point d'accès) ; environ 1 s de retard ; la diffusion montre l'écran du téléphone (à l'horizontale) |
+| **Navigateur** sur n'importe quel appareil branché à l'écran (ordinateur portable, tablette, box TV, Fire TV Stick…) | scanner le QR code ou taper l'adresse | aucune application à installer | l'écran se met en veille tout seul si vous ne le réglez pas ; il faut toucher **PLEIN ÉCRAN** à chaque ouverture |
+
+**Pourquoi pas en Bluetooth** : le téléphone de l'arbitre gère déjà les deux bracelets en Bluetooth, où la réactivité des boutons compte ; le Wi-Fi est séparé, plus rapide et porte plus loin. **Pourquoi pas directement du téléphone de l'arbitre au Chromecast** (sans deuxième téléphone) : c'est faisable, mais il faut une application « récepteur » enregistrée auprès de Google (Google Cast Developer Console, 5 $ une fois pour toutes) et publiée sur un site https ; c'est une évolution possible.
+
+**Conseils réseau** :
+- Le tableau échange très peu de données (un message à chaque point et toutes les 5 secondes) et ne consomme pas de trafic internet.
+- Si le téléphone de l'arbitre fait point d'accès, choisissez dans les réglages du point d'accès la bande **5 GHz** si elle est disponible : le Bluetooth des bracelets travaille à 2,4 GHz, et ainsi ils ne se gênent pas.
+- Avec le Chromecast, il vaut mieux que le point d'accès soit celui du téléphone de l'arbitre, avec les **données mobiles activées** ; le téléphone-tableau et le Chromecast se connectent à ce point d'accès.
+- Sans Chromecast, l'inverse convient aussi (point d'accès sur le téléphone-tableau, comme dans l'idée d'origine) : l'application de l'arbitre reste connectée à ce Wi-Fi même s'il n'a pas accès à internet.
+
+### 8.2 Sur le téléphone de l'arbitre
+
+1. Plus › **Appareils** › **Tableau d'affichage TV** › activez **Tableau d'affichage sur TV ou écran**. Sur Android 13 et ultérieur, l'application demande l'autorisation des notifications : elle sert à la notification du service qui maintient le tableau actif.
+2. L'**adresse** (ex. `192.168.43.1:8080`), le **QR code** et le nombre de tableaux connectés apparaissent. S'il est écrit *Aucun réseau*, activez le point d'accès ou connectez-vous à celui de l'autre téléphone.
+3. **Aperçu sur ce téléphone** ouvre le tableau dans le navigateur du téléphone lui-même.
+4. **Apparence du tableau** : couleur de chaque joueur (8 couleurs), durée du match, chrono du service et des pauses, manches terminées, messages (balle de break, balle de set, changement de côté…), balle à côté du serveur, segments éteints visibles, texte en bas (vide = club et court de *Nouveau match*). Les modifications arrivent aussitôt sur l'écran.
+5. En match, en haut au centre, se trouve **TV · 1** (tableaux connectés) : touchez-le pour revoir l'adresse et le QR code.
+
+Tant que le tableau est activé, un service au premier plan (notification *Match en cours · tableau TV actif*) maintient le serveur en marche même écran éteint, y compris en mode arbitre. Le tableau est en **lecture seule** : on ne peut rien y modifier. Il reste actif aussi sur le récapitulatif et les autres pages tant que le tableau est activé (notification *Tableau TV actif*), donc le résultat final reste à l'écran même téléphone verrouillé.
+
+Ce qu'il affiche en plus du score : *EN ATTENTE DU MATCH* avant le début, *PRÊTS À JOUER* sur la page DÉBUT DU MATCH, **JEU DÉCISIF** / **SUPER JEU DÉCISIF** à la place de *VS*, *MATCH SUSPENDU* en clignotant, **VAINQUEUR [nom]** en fin de match avec toutes les manches ; les avantages s'affichent **AD**, y compris sur les chiffres à LED. Un match gagné au super jeu décisif se termine avec 1-0 dans les jeux et 2-1 dans les manches, avec [10-8] parmi les manches terminées ; les messages longs rapetissent pour tenir à l'écran.
+
+### 8.3 Sur le téléphone-tableau
+
+1. **Jouer** › **Utiliser comme tableau**.
+2. Le téléphone **cherche tout seul** le téléphone de l'arbitre (annonce sur le réseau et balayage du point d'accès, quelques secondes) et mémorise la dernière adresse. S'il ne le trouve pas : vérifiez le point d'accès et *Tableau d'affichage TV*, puis **Chercher à nouveau**, ou tapez l'adresse affichée par l'arbitre et **Connecter**. Il le trouve même si *Tableau d'affichage sur TV ou écran* est aussi activé sur ce téléphone ; si le Wi-Fi se connecte plus tard, il cherche de nouveau tout seul.
+3. Le tableau passe en plein écran, à l'horizontale, avec l'écran toujours allumé.
+   - **Avec le câble HDMI** : le tableau s'affiche sur l'écran externe dans son format ; le téléphone affiche *Le tableau est sur l'écran externe* avec la luminosité au minimum (**Afficher aussi ici** pour le voir aussi sur le téléphone). Si on débranche le câble, il revient sur le téléphone.
+   - **Avec le Chromecast** : ouvrez le volet des réglages rapides › **Caster** (ou **Diffusion de l'écran**) / **Smart View** › choisissez le Chromecast.
+4. Si le téléphone de l'arbitre disparaît (hors de portée, application fermée), *CONNEXION PERDUE - RECONNEXION...* apparaît et, au bout de 20 secondes, le téléphone-tableau le recherche tout seul, même s'il a changé d'adresse. Même après une coupure du point d'accès, il se reconnecte tout seul dès que le réseau revient. Il ne passe jamais au téléphone d'un autre court : pour changer de court, quittez *Utiliser comme tableau* et cherchez de nouveau.
+5. Pour quitter : **retour deux fois**.
+
+**Depuis un navigateur** (ordinateur portable, box TV) : scannez le QR code ou tapez l'adresse, puis touchez **PLEIN ÉCRAN** (le bouton apparaît quand on bouge la souris ou qu'on touche l'écran). Réglez la mise en veille de l'écran sur *jamais* : sur une page http, le navigateur ne peut pas le garder allumé tout seul. Après une coupure, la page se reconnecte toute seule ; trop de tableaux ouverts ne bloquent plus le nouveau (le plus ancien est fermé).
+
+
+## 9. Règles appliquées (ITF) et choix convenus
+
+- **Jeu** : 0-15-30-40, égalité, avantage, jeu. **No-Ad** : à 40-40, point décisif (« égalité, point décisif »).
+- **Manche** : 6 jeux avec 2 jeux d'écart (7-5) ; à **6-6, jeu décisif**.
+- **Jeu décisif** : en 7 points avec 2 points d'écart ; le joueur dont c'est le tour sert le 1er point, puis 2 points chacun ; changement de côté **tous les 6 points** et à la fin ; celui qui a servi en premier dans le jeu décisif **relance** dans le premier jeu de la manche suivante.
+- **Super jeu décisif** (format 2 manches) : à une manche partout, on joue en 10 points avec 2 points d'écart.
+- **Changement de côté** (règle ITF 10) : après le 1er, 3e, 5e… jeu de chaque manche. En fin de manche, on ne change que si la manche compte un nombre impair de jeux (6-3, 7-6) ; sinon (6-4), on change après le premier jeu de la manche suivante. Le jeu décisif compte pour un jeu.
+- **Temps** : shot clock de 25 s entre les points ; changeover de 90 s ; set break de 120 s en fin de manche. En plus, à la demande (ce n'est pas une règle ITF) : **30 s** pour changer de côté après le 1er jeu de chaque manche, à chaque changement de côté dans le jeu décisif et à 6-6 ; à la fin de toute pause, le shot clock démarre.
+- **Double** : rotation du service A1-B1-A2-B2 pendant toute la manche, jeu décisif compris ; au début de chaque manche, l'application demande l'ordre (il peut changer, comme le prévoit le règlement).
+- **Annonces** : score annoncé en commençant par le serveur (« quinze-zéro », « zéro-quarante », « quinze A », « égalité », « avantage Rossi ») ; en fin de jeu, « jeu Rossi, Rossi mène trois jeux à deux » / « deux jeux partout » + « changement de côté » quand on change ; à 6-6, « jeu Rossi, six jeux partout, jeu décisif » ; dans le jeu décisif, le score est annoncé en commençant par celui qui mène (« trois un Rossi », « six partout ») ; en fin de manche, « jeu Rossi, Rossi mène une manche à zéro » / « une manche partout » ; en fin de match, « jeu, set et match Rossi, six quatre, trois six, sept cinq » ; « correction » + le score quand on annule un point.
+
+**Choix faits par rapport à la demande initiale, pour suivre l'ITF :**
+1. **À 6-6, on ne change pas de côté** (12 jeux, un nombre pair) : l'application fait la pause de 30 s et annonce « jeu décisif », mais n'annonce pas « changement de côté » et n'inverse pas les boutons. Le premier changement a lieu après 6 points du jeu décisif.
+2. Le changement de côté en fin de manche dépend du nombre de jeux de la manche (voir ci-dessus), il n'a pas lieu à chaque fois.
+3. À une manche partout, dans le format avec super jeu décisif, la voix ajoute « super jeu décisif ».
+
+## 11. Problèmes courants
+
+- **Bracelet introuvable** : Bluetooth et localisation activés (lignes vertes) ? Le bracelet clignote-t-il APPAIRAGE ? (S'il est déjà connecté à un autre téléphone, il n'est pas visible.) S'il s'est éteint tout seul entre-temps (30 s), rallumez-le d'un clic sur le bouton latéral.
+- **Le bracelet affiche NON ENVOYE** : le téléphone n'a pas confirmé l'appui dans les 8 secondes (liaison perdue ou application fermée). Appuyez de nouveau quand le bracelet est reconnecté. Cas rare : si l'appui était arrivé et que seule la confirmation s'est perdue, le point compte deux fois ; la voix annonce le score, corrigez avec *Annuler le point*.
+- **Le panneau des réglages affiche « Le firmware de ce bracelet n'a pas de réglages »** : ce bracelet a encore l'ancien sketch, rechargez-le (chapitre 5).
+- **La voix ne parle pas ou lit mal** : volume multimédia, *Audio On*, voix de la langue choisie installée (4) ; essayez un autre moteur ou une autre voix dans *Audio et voix*.
+- **Écran éteint pendant le match** : en mode bracelets, un service au premier plan (notification « Match en cours ») garde actifs le Bluetooth, la voix et les chronomètres ; en mode arbitre et télécommandes, l'écran reste allumé (avec les télécommandes, il le doit : 6.3).
+- **La télécommande ne fait rien** : est-elle associée au joueur (*Plus › Appareils* › *Télécommandes*, ligne avec son nom) ? L'application doit être ouverte sur le match, écran allumé (6.3). Si la ligne indique *Non connectée*, appuyez sur une touche pour la réveiller ou appairez-la de nouveau dans les réglages Bluetooth.
+- **Les coups sont confondus ou non reconnus** : portez le bracelet comme pendant le calibrage (même poignet, même sens) ; sinon refaites le calibrage en le portant comme en match (6.4).
+- **Le bracelet affiche MEMOIRE PLEINE** : un exemple de calibrage n'a pas pu être enregistré. Effacez les exemples d'un coup (corbeille) et refaites-les.
+- **Le téléphone-tableau ne trouve pas l'arbitre** : même réseau ? (l'un des deux fait point d'accès, l'autre y est connecté). *Tableau d'affichage TV* activé sur le téléphone de l'arbitre ? Essayez l'adresse à la main. Certains points d'accès isolent les appareils connectés les uns des autres (« isolation des clients ») : si c'est le cas, désactivez-la.
+- **Le navigateur du téléphone n'ouvre pas l'adresse** quand les données mobiles sont activées : Android envoie le trafic sur les données mobiles parce que le point d'accès n'a pas internet. Utilisez l'application en mode *Utiliser comme tableau* (elle gère cela toute seule) ou désactivez les données mobiles sur ce téléphone.
+- **Écran noir avec le câble** : ce téléphone n'a pas de sortie vidéo sur l'USB-C (8.1), ou Samsung DeX a démarré : choisissez *Duplication d'écran*.
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/it.md
+cat > "$DEST/app/src/main/assets/help/it.md" << 'TSM_EOF'
+## 3.1 Come è organizzata l'app
+
+Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segnare il punteggio, giocare coi braccialetti, allenarti, riprendere le partite) e il tuo nome; si può saltare e rifare da **Altro › Presentazione dell'app**. In basso ci sono sempre **cinque schede**:
+
+- **Gioca**: **Nuova partita**, la partita sospesa da riprendere, la **rivincita** dell'ultima, il **torneo tra amici** (Americano, Mexicano) e **Usa questo telefono come** tabellone o telecamera. In alto lo stato dei dispositivi (braccialetti, fasce, telecamera, TV): toccandolo si va a collegarli.
+- **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
+- **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
+- **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
+- **Altro**: **Tu** (il tuo nome), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
+
+**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
+
+## 4. La voce (funziona senza internet)
+
+- Ogni chiamata è letta **in un'unica frase** dalla sintesi vocale del telefono, con una voce installata: niente internet e prosodia naturale. I nomi dei giocatori entrano nella frase.
+- Altro › **Lingua e voce** › **Audio e voce**:
+  - **Motore sintesi vocale**: *Predefinito del telefono* (sui Samsung è Samsung TTS) oppure un motore a scelta, ad esempio *Servizi di sintesi vocale di Google*. Nei test Google italiano suona più naturale.
+  - **Voce**: *Automatica* (la migliore offline) oppure una voce precisa (con Google: Voce ITB, ITC, ITD, KDA; quelle *online* richiedono internet).
+  - **Prova voce**: legge una sequenza di chiamate di esempio con i nomi inseriti. Mentre legge il tasto diventa **Ferma la prova**: toccalo di nuovo per interromperla (si ferma da sola anche uscendo dalla pagina). La sintesi vocale non si può mettere in pausa a metà frase, quindi il tasto la ferma; ripremendolo riparte dall'inizio.
+- Se manca la voce della lingua scelta: **Impostazioni › Gestione generale › Lingua › Sintesi vocale** (o *Output sintesi vocale*) → scarica la voce di quella lingua per il motore scelto (l'app mostra anche il tasto **Installa voce**). Se invece la sintesi vocale non parte proprio, l'app lo dice con un messaggio a parte e il tasto **Apri impostazioni** (impostazioni della sintesi vocale di Android).
+- **Pronuncia**: alcuni motori sbagliano parole del tennis ("primo set" letto "primo settembre", "tie-break" letto "time break"). L'app le corregge da sola; le correzioni sono state verificate trascrivendo l'audio reale di Samsung e Google.
+- **Registrazioni personalizzate** (la voce più naturale in assoluto: la tua o quella di un arbitro): nella cartella `Android/data/io.github.steve_linux.tsm/files/voice/` c'è `LEGGIMI.txt` con l'elenco delle 85 chiavi e delle frasi (le spiegazioni in testa sono nella lingua dell'app e si riscrivono quando la cambi). Registra i file con quei nomi (`score_1_0.mp3` = "quindici zero"…), mettili in uno ZIP con una cartella per lingua (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e usa **Importa ZIP**. `LEGGIMI.txt` ha una colonna per lingua separata da tabulazioni, quindi si apre bene anche come foglio di calcolo. Le registrazioni hanno sempre la precedenza sulla sintesi; i nomi restano letti dalla sintesi. Nello ZIP conta la cartella che contiene il file (anche dentro altre cartelle, es. `voice/it/`); i file fuori da una cartella di lingua vanno alla lingua corrente e le cartelle `tts/` si ignorano, quindi si può zippare anche la cartella `voice/` dell'app. Uno ZIP rovinato o incompleto non cambia niente (*ZIP non leggibile o incompleto*). **Rimuovi registrazioni** chiede conferma. Se un file non si riesce a riprodurre, quella frase la dice la sintesi vocale e il file non si usa più fino al riavvio dell'app.
+- **Usa file audio pre-generati** (facoltativo): con **Genera file** l'app crea una volta gli 85 file con la voce scelta (anche una voce *online*, se in quel momento c'è internet) e poi li usa al posto della sintesi continua. Suona più "a pezzi", ma è utile per portarsi offline una voce online. I file di prima restano finché quelli nuovi non sono pronti (se la generazione non arriva in fondo: *Generazione non completata*); mentre genera, lingua, motore, voce, prova voce e audio sono bloccati.
+- **Cassa esterna**: basta accoppiarla al telefono in Bluetooth; la voce esce sul canale multimediale (regola il volume media).
+- **Cuffie o auricolari Bluetooth**: si accoppiano allo stesso modo e la voce la senti solo tu, senza disturbare i campi vicini; vanno bene anche per chi segna da bordo campo. I braccialetti possono restare collegati insieme alle cuffie.
+- **Due dispositivi audio insieme**: molti telefoni mandano l'audio a due dispositivi Bluetooth contemporaneamente. Sui Samsung: connetti entrambi, apri il pannello rapido › **Uscita multimediale** e spunta tutti e due. Così ogni giocatore può avere i suoi auricolari, oppure la cassa suona per il campo e le cuffie per chi segna.
+
+### 4.1 Lingue
+
+Altro › **Lingua e voce** › **Lingua**: Italiano, English, Français, Deutsch, Español, Português (ogni lingua è scritta nella lingua stessa, così la si ritrova anche con l'app in una lingua che non si legge). La scelta vale insieme per **schermate, voce dell'arbitro, tabellone TV, riepilogo/condivisione e braccialetti**. Le date seguono la lingua (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+
+Le chiamate non sono traduzioni parola per parola: seguono i testi ufficiali per i giudici di sedia di ciascuna federazione, cioè FFT *L'arbitrage en 255 questions* e ITF in francese, i materiali DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (l'unico copione portoghese pubblicato). L'inglese segue l'ITF. In inglese lo zero dei set a fine partita si dice *love* ("six love, six four"), come nei punti.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Inizio | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15-0 · 15-15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40-40 · vantaggio | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| Fine game | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Game pari | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Tie-break | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Set | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| Fine partita | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Cambio campo | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Particolarità:
+- In francese e spagnolo il nome va **dopo** "au service"/"al servicio", in tedesco dopo "Aufschlag". Il francese chiama il set **manche** (tranne in "jeu, set et match") e il tie-break **jeu décisif**.
+- **10-6 … 10-9** nel super tie-break: in francese, spagnolo e portoghese si dice "dix **à** huit", "diez **a** ocho", "dez **a** oito", perché "dix huit" / "diez ocho" / "dez oito" si sentono come *diciotto*.
+- **Portoghese**: una sola opzione, con interfaccia e voce preferita del Brasile (se manca la voce brasiliana si usa quella portoghese) e le chiamate del copione FPT, con parole valide nei due paesi ("jogo" e non "game", "partida"). "Um set a um" è diventato "sets iguais": al singolare *set* si pronuncia come *sete* e sembrava 7-1.
+- **Pronuncia**: tutte le frasi di tutte le lingue sono state fatte leggere alle voci Google e trascritte con whisper. Correzioni aggiunte: in tedesco "Tie-Break" si fa leggere "Taibreak", con una virgola davanti (altrimenti "Teilbreg" o "bei Detailbreak"); in francese la "à" isolata dei file pre-generati si fa leggere "a" (altrimenti "a accent grave"). **Samsung TTS nelle nuove lingue non è ancora stato provato.**
+- **Braccialetti** (firmware 2.2): l'app manda da sola la lingua a ogni collegamento e quando la cambi; il braccialetto la salva e la usa anche da scollegato (ricerca del telefono, ricarica, spegnimento), senza accenti perché il font è ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Con un firmware 2.1 o precedente i messaggi mandati dall'app sono tradotti, quelli interni del braccialetto restano in italiano. Un braccialetto appena programmato parte in italiano; dal firmware 2.2.2 il suo messaggio di collegamento viene riscritto nella lingua dell'app appena questa gliela manda, circa un secondo dopo il collegamento.
+
+## 6. Usare i braccialetti
+
+| Tasto | Azione |
+|---|---|
+| **KEY1** (frontale) corto | punto a chi indossa il braccialetto (avvia anche la partita dalla pagina INIZIO PARTITA); un bip conferma (firmware 2.3 + app 2.4: quando il telefono l'ha ricevuto, circa mezzo secondo dopo) |
+| **KEY1** lungo (1 s) | mostra la batteria (e tiene acceso il braccialetto se sta per spegnersi per inattività) |
+| **KEY2** corto | annulla l'ultimo punto (anche dal popup di fine partita); due bip più bassi (con il firmware 2.3 alla conferma del telefono) |
+| **KEY2** lungo (2 s) | spegne il braccialetto (col cavo collegato scrive *LA CARICA CONTINUA*: si ricarica anche spento; dal firmware 2.3 si riaccende anche con KEY1 o KEY2) |
+| Tasto laterale | un clic accende; doppio clic spegne (funzione hardware) |
+
+- All'accensione lampeggia **PAIRING...** (acceso 0,35 s ogni 2 s per risparmiare). L'app si collega da sola ai braccialetti che conosce appena è aperta; quelli nuovi li trova in **Altro › Dispositivi** (o in **Modalità e regole** con la modalità *Braccialetti*).
+- Collegato: **PAIRING OK** per 3 secondi con due bip, poi **ASSOCIATO A** + il nome del giocatore.
+- A ogni punto il display si accende con il punteggio del game in grande (a sinistra il tuo, a destra l'avversario; la pallina verde indica chi serve), poi si spegne. A fine game mostra game e set. Se il telefono non conferma un tocco entro 8 secondi (collegamento perso) compare **NON INVIATO** in rosso con due bip bassi: premi di nuovo quando è ricollegato. Un tocco fatto durante un'interruzione breve invece non si perde: parte appena il braccialetto si ricollega, e il bip arriva in quel momento.
+
+**Spegnimento automatico** (i tempi si cambiano dall'app, 6.1):
+
+| Situazione | Cosa fa il braccialetto | Predefinito |
+|---|---|---|
+| Acceso, ma nessun telefono si collega | lampeggia PAIRING, poi si spegne | **30 s** |
+| Telefono perso (spento, fuori portata, Bluetooth spento, app chiusa di colpo) | lampeggia RICONNESSIONE e si ricollega da solo appena può; altrimenti si spegne | 3 min |
+| Collegato ma inattivo (nessun punto, nessun messaggio) | 30 s prima avvisa con **INATTIVO · TIENI PREMUTO KEY1** e un bip, poi si spegne | 30 min |
+| Partita conclusa (confermata sul telefono) o **Esci** dall'app | mostra FINE PARTITA / APP CHIUSA e si spegne subito | attivo (si può disattivare, 7.2) |
+| Batteria scarica (sotto 3,30 V per due letture di fila) | mostra BATTERIA SCARICA e si spegne, per non restare acceso a metà | sempre |
+
+- Negli ultimi 10 secondi prima dello spegnimento senza telefono mostra **SPEGNIMENTO · 8s - PREMI UN TASTO** con un bip: un tasto qualsiasi rimanda lo spegnimento da capo.
+- Quando si spegne da solo lo dice al telefono: in partita il riquadro arancione mostra *BRACCIALETTO 1 SPENTO (INATTIVO)*, *(BATTERIA SCARICA)*… Dopo lo spegnimento a fine partita il telefono smette di cercarlo di continuo e si ricollega da solo quando lo riaccendi.
+
+
+Il resto del risparmio: CPU a 80 MHz, display spento quando non serve, Bluetooth a basso consumo (la radio si sveglia 2-3 volte al secondo, il tasto parte comunque entro ~120 ms), cicalino acceso solo durante i bip, microfono e 5V spenti, sensore di movimento (IMU) acceso solo col riconoscimento dei colpi (6.4).
+
+### 6.1 Impostazioni del braccialetto
+
+Da **Altro › Dispositivi** o da **Modalità e regole** (**Impostazioni** sotto il braccialetto di ciascun giocatore) o durante la partita (tocca **G1**/**G2** in alto, oppure l'icona dei cursori). Si salvano **nel braccialetto** e restano anche spegnendolo; a ogni modifica il braccialetto mostra il nome con *IMPOSTAZIONI OK*. Col firmware 2.4 c'è anche la sezione **Colpi** (6.4).
+
+| Impostazione | Valori | Predefinito |
+|---|---|---|
+| Nome | fino a 12 caratteri (es. il nome del giocatore o "G1") | TSM-xxxx |
+| Luminosità display | 5-100 % | 20 % |
+| Punteggio visibile dopo ogni punto | No, 2, 3, 5, 8 s (il riepilogo di fine game dura 2 s in più) | 3 s |
+| Volume cicalino | Muto-100 % | 50 % |
+| Display capovolto | per portarlo sull'altro polso | no |
+| Spegnimento: all'accensione senza telefono | 15 s - 5 min | 30 s |
+| Spegnimento: telefono perso | 1-10 min | 3 min |
+| Spegnimento: collegato ma inattivo | 10-60 min | 30 min |
+
+Sotto c'è la **stima dell'autonomia** (da carica piena e con la carica attuale) con il consumo diviso per voce: cambia mentre muovi i cursori, prima ancora di confermare. Poi **Identifica**, **Spegni** e **Copia sull'altro braccialetto** (stesse impostazioni, il nome resta il suo). **Spegni** chiede conferma, anche a partita in corso.
+
+### 6.2 Ricarica
+
+Collega il cavo USB-C: il braccialetto fa un bip e mostra la **schermata di carica** per 30 secondi, poi il display si spegne e ogni 10 secondi si riaccende per 1,5 s (un'occhiata, come la spia di un caricatore). **Un tasto qualsiasi** la riaccende per altri 30 secondi. Se il braccialetto era spento, accendilo con un clic sul tasto laterale per vederla (la carica avviene comunque, anche da spento).
+
+```
+ TSM-3FA2   USB 5.01V           ← nome e tensione del cavo
+ ┌──────────┐
+ │██████ ⚡  │▌   78%             ← pila e percentuale di carica
+ └──────────┘
+      IN CARICA                  ← oppure CARICA COMPLETA / ALIMENTATO DA USB
+ 4.12V  DA 42 MIN  FINE ~25 MIN  ← tensione batteria, da quanto è in carica, fine stimata
+```
+
+- **Percentuale**: in carica la tensione misurata è più alta di quella vera (≈0,1 V), il braccialetto la corregge, non la fa mai scendere e arriva a **100 %** solo quando il caricabatterie dice che ha finito. A carica completa la scritta diventa **CARICA COMPLETA** con il tempo impiegato (*CARICATA IN 1H 25*) e il display resta spento (niente lampi di notte).
+- **Fine stimata**: il chip di alimentazione (PM1) non misura la corrente di carica, quindi il tempo che manca si ricava da quanto è salita la carica negli ultimi 10 minuti: compare dopo 10 minuti, arrotondato a 5, ed è una stima.
+- **ALIMENTATO DA USB**: il cavo c'è ma la batteria non si carica (e non è piena): cavo o alimentatore scarsi, o batteria scollegata.
+- **Col cavo non si spegne da solo** (niente spegnimento per telefono assente o inattività, niente *batteria scarica*); si può spegnere con KEY2 lungo. Staccato il cavo mostra **USB SCOLLEGATO · BATTERIA 97%** e da lì ripartono i tempi normali di spegnimento (6).
+- **Collegato al telefono** (es. un powerbank in partita) il punteggio ha la precedenza: solo un messaggio breve *IN CARICA 78%*, e KEY1 lungo mostra *CARICA COMPLETA* o *IN CARICA*.
+- **Nell'app**: la riga del braccialetto (in *Dispositivi* e in *Modalità e regole*) e le sue impostazioni mostrano *In carica 78%* o *Carica completa*; in partita le pastiglie G1/G2 hanno il simbolo ⚡. Anche il registro `files/battery_log.csv` ha due colonne in più (tensione USB, carica completa): utile per verificare in quanto si ricarica davvero.
+- Braccialetto e app ora calcolano la percentuale con la **stessa curva** della LiPo (prima il braccialetto usava una retta meno precisa), quindi mostrano lo stesso numero.
+
+> Da verificare coi braccialetti veri: la ricarica non si è potuta provare sull'hardware. In particolare quanto spesso il caricabatterie segnala *carica completa* e quanto è precisa la percentuale in carica.
+
+### 6.3 Senza braccialetti: telecomandi Bluetooth
+
+Il sistema più economico per far segnare i punti ai giocatori: due **telecomandini Bluetooth da selfie** (quelli col tasto di scatto, spesso venduti come *AB Shutter3*), da 1 a 3 € l'uno. Android li vede come una tastiera: niente firmware da caricare e nessun permesso per l'app. Va bene anche qualsiasi altra pulsantiera o tastiera Bluetooth (o USB).
+
+1. Accendi il telecomando e accoppialo dalle **impostazioni Bluetooth** del telefono, come una cuffia (*Altro › Dispositivi › Impostazioni Bluetooth* le apre). Ripeti col secondo.
+2. *Modalità e regole* › modalità **Telecomandi** › **Associa** sotto il Giocatore 1 › premi il tasto del suo telecomando che darà il punto; poi lo stesso per il Giocatore 2. A ogni clic di un telecomando associato la sua riga mostra **Tasto ricevuto**: così si prova prima di giocare. **Scambia G1 ↔ G2** li inverte.
+3. **INIZIO PARTITA**: un clic su un telecomando avvia la partita, come KEY1 dei braccialetti. In alto **G1**/**G2** sono colorati quando i telecomandi sono collegati.
+
+| Gesto | Azione |
+|---|---|
+| un clic | punto a chi ha il telecomando (arriva dopo mezzo secondo: l'app aspetta di vedere se è un doppio clic) |
+| doppio clic | annulla l'ultimo punto (anche dal popup di fine partita) |
+| tenere premuto 1 s | annulla l'ultimo punto |
+| l'altro tasto (telecomandi a due tasti) | annulla l'ultimo punto, subito; premuto entro mezzo secondo da un clic, annulla quel clic |
+
+- Valgono le protezioni dei braccialetti: due punti a meno di 2 secondi contano una volta sola, due annulla ravvicinati tolgono un solo punto, *Partita conclusa* si conferma solo dal telefono.
+- Molti telecomandi da selfie hanno due tasti (*iOS* e *Android*): il tasto premuto all'associazione dà il punto, l'altro annulla. Sul CAMKIX (un *AB Shutter3*) il tasto grande manda VOLUME SU e il piccolo INVIO: associalo col tasto grande e il piccolo diventa «annulla». Se un telecomando manda due tasti a ogni pressione, una pressione resta un clic.
+- **Lo schermo deve restare acceso con l'app davanti** (in partita l'app lo tiene acceso da sola). A differenza dei braccialetti, i tasti di una tastiera Bluetooth arrivano solo all'app visibile: a schermo bloccato o con un'altra app aperta non contano. Per partite lunghe tieni il telefono in carica.
+- Se un telecomando si scollega in partita (spento, scarico, troppo lontano) il riquadro arancione mostra *TELECOMANDO 1 SCOLLEGATO*, e *COLLEGATO* quando torna. Molti telecomandi si addormentano dopo qualche minuto senza clic: il primo clic li risveglia e a volte va perso. Se la voce non dice il punto, premi ancora.
+- Portata: una decina di metri, come le cuffie Bluetooth; col telefono vicino alla rete, a metà campo, si coprono entrambi i lati. Pila: di solito una CR2032, che dura mesi.
+
+### 6.4 Riconoscimento dei colpi
+
+Col firmware 2.4 il braccialetto riconosce **dritto, rovescio, servizio e volée** con il sensore di movimento (IMU) e li manda all'app, che li conta per giocatore. Il riconoscimento impara da chi indossa il braccialetto: prima serve una breve **calibrazione**, i cui esempi restano salvati nel braccialetto.
+
+1. **Fissa il braccialetto al polso**, sempre nello stesso modo (stesso polso, stesso verso). Il riconoscimento si basa sulla direzione dei movimenti: un braccialetto girato rispetto alla calibrazione confonde i colpi.
+2. Impostazioni del braccialetto (6.1) › **Colpi** › **Calibrazione**: tocca **Calibra** accanto a *Dritto*. Il braccialetto mostra *DRITTO · CALIBRAZIONE 0/20*.
+3. Fai **5-10 dritti** con una pausa tra uno e l'altro: a ogni colpo il contatore sale, sul braccialetto e nell'app (e c'è un bip, se il volume non è a zero). Se un colpo è venuto male, tocca **Annulla l'ultimo**. Poi **Fine**.
+4. Ripeti per rovescio, servizio e volée. Il cestino cancella gli esempi di un colpo, per rifarli. Si tengono al massimo 20 esempi per colpo (oltre, il più vecchio viene sostituito). Bastano 3 esempi per almeno due colpi (*Pronto: riconosce i colpi calibrati*), ma più esempi e più varietà danno un riconoscimento migliore.
+5. Attiva **Riconoscimento colpi**. Con **Mostra il colpo sul braccialetto** il colpo compare per un attimo con la sicurezza del riconoscimento (es. *ROVESCIO 87%*), solo se il display non sta mostrando punteggio o messaggi.
+
+- In partita, sotto i tempi, una riga mostra i colpi di ciascun giocatore (*G1 D 12 · R 8 · S 5 · V 3*). Contano solo a partita iniziata, non nel riscaldamento né in calibrazione.
+- Nel riepilogo (7) ci sono i colpi per tipo, la **velocità del polso** (media e massima, in °/s: quanto è spinto il colpo, non la velocità della palla) e i **colpi per punto** (lunghezza degli scambi). Se solo un giocatore ha il braccialetto coi colpi, gli scambi contano solo i suoi.
+- Un colpo che non somiglia a nessun esempio non viene mostrato e conta come *non riconosciuto*: se capita spesso, controlla come porti il braccialetto o aggiungi esempi.
+- I movimenti lenti (riprendere posizione, raccogliere la palla) non contano: un colpo deve superare 400 °/s di rotazione del polso e 2,5 g di accelerazione.
+- **Batteria**: il sensore acceso consuma circa 1 mA in più, una ventina di minuti di autonomia su una carica piena (la stima nelle impostazioni ne tiene conto). Col riconoscimento spento il sensore resta spento.
+- Nei colpi molto forti il giroscopio arriva al suo massimo (2000 °/s): il riconoscimento non ne soffre, ma la velocità indicata è un po' sottostimata.
+
+### 6.5 Fasce cardio
+
+Battito e calorie da **fasce toraciche Bluetooth** che usano il servizio cardio standard: Coospo (provata la H6), Magene, Polar, Garmin, Wahoo… Valgono in tutte le modalità, anche senza braccialetti.
+
+1. Bagna gli elettrodi e indossa la fascia: si accende da sola a contatto con la pelle.
+2. *Modalità e regole* (o *Altro › Dispositivi*) › **Battito cardiaco** › attiva **Fasce cardio** e scegli la fascia di ciascun giocatore (si sceglie una volta sola). **Scambia** le inverte.
+3. Facoltativi **età, peso e sesso** di chi la indossa: servono per le calorie (formula di Keytel, errore tipico ±20%) e, con l'età, per le zone cardio (massimo stimato 208 − 0,7 × età).
+
+- Sotto ogni fascia: stato, battito, **segnale** in dBm (più vicino a 0 = più forte) e **stacchi**, cioè le volte in cui il battito non è arrivato per più di 3 secondi, con i secondi persi (*2 stacchi (14 s)*). Contano dal «gioco» della partita; prima, da quando la fascia è stata scelta. Servono a capire fin dove arriva la fascia.
+- In partita una riga mostra il battito dal vivo (*G1 · 142 bpm*). Nel riepilogo (7): battito medio e massimo, calorie, grafico nel tempo e tempo nelle zone cardio. Le pause non contano.
+- **Portata**: prova in casa con la H6, telefono fermo: collegata fino a 21 m, ma a −100 dBm, al limite; di schiena il segnale cala di 5-10 dBm. In singolare il giocatore lontano sta a 24-30 m dal telefono: per non perdere dati usa il **secondo telefono** (6.6).
+
+### 6.6 Secondo telefono a fondo campo
+
+Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi metri meno della lunghezza del campo. Con un secondo telefono all'altro fondo campo ogni giocatore ne ha sempre uno vicino: il secondo (**satellite**) sente fasce e braccialetti dei giocatori dalla sua parte e fa da ponte con il **principale**, che tiene la partita.
+
+1. **Principale**: Altro › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono**. La prima volta chiede il permesso *Dispositivi nelle vicinanze* (fino ad Android 12 la posizione). Il telefono crea una **rete sua, solo locale**: niente SIM né dati, e non serve il Wi-Fi del circolo. Compare un QR.
+2. **Satellite**: Altro › **Dispositivi** › **Secondo telefono** › **Fai da secondo telefono** › inquadra il QR. Android chiede una volta di collegarsi alla rete del principale (*AndroidShare_…*): tocca **Connetti**. Il satellite tiene i dati mobili. Deve dire *Collegato al telefono principale*.
+3. Il satellite segue da solo le fasce e i braccialetti scelti sul principale, sugli stessi lati: non si sceglie niente. Lascialo a fondo campo con l'app aperta.
+
+- **Cambio campo**: non serve fare niente. Ogni fascia e ogni braccialetto resta al telefono a cui è collegato finché il segnale regge, poi lo prende quello più vicino (qualche secondo). Sul principale compare *Dal secondo telefono*; durante il passaggio un braccialetto può risultare scollegato per un attimo.
+- **Niente dati persi**: battito, tasti e colpi del satellite portano l'**ID della partita** e un numero progressivo, e il satellite li tiene finché il principale non li conferma. Se il Wi-Fi tra i telefoni cade, il battito arriva dopo e riempie i buchi del grafico; i colpi contano se sono della stessa partita. Un **tasto** del braccialetto arrivato più di 5 secondi dopo invece non dà il punto: premi di nuovo. Lo stesso tasto arrivato da due strade conta una volta sola.
+- Dal principale ai braccialetti passano punteggio, messaggi, *Identifica*, spegnimento e impostazioni. Le impostazioni conviene cambiarle col braccialetto collegato al principale.
+- **Tabellone**: sul satellite **Mostra il tabellone** apre il tabellone della partita a schermo intero (come in 8.3), già collegato al principale.
+- Se il principale non riesce a creare la rete (hotspot normale già acceso), usa il Wi-Fi in cui si trova: in quel caso i due telefoni devono stare sulla stessa rete. Con Android 9 o prima il satellite mostra nome e password della rete, da scegliere a mano nelle impostazioni Wi-Fi.
+- **Smetti** chiude il collegamento e la rete; il satellite torna alle sue fasce e ai suoi braccialetti.
+
+## 7. Come si usa l'app
+
+1. **Nuova partita** (facoltativa): **Tennis** o **Padel** (app 2.5: stesse regole, tempi e chiamate; scegliendo Padel si impostano da soli doppio e golden point (punto d'oro), che si possono cambiare (al posto del golden point, in *Modalità e regole*, c'è anche lo *star point* della FIP: al massimo due vantaggi, poi un punto decisivo), e il riepilogo dice *Padel*), circolo, campo, singolare/doppio, nomi (nel doppio due nomi per squadra). **Cerca l'indirizzo del campo** (spento di serie) aggiunge al riepilogo l'indirizzo oltre alle coordinate: lo chiede al servizio di geocodifica del telefono, che con i servizi Google manda le coordinate a Google. **Avanti**. Con *Padel* compare anche **Torneo Americano o Mexicano**: da 4 a 16 giocatori e da 1 a 4 campi, partite a punti (16, 24 o 32: i punti delle due coppie sommati fanno il totale) o a tempo. Nell'*Americano* le coppie cambiano a ogni turno perché ognuno giochi con e contro più persone possibile; nel *Mexicano*, dal secondo turno, si gioca per classifica (1° e 4° contro 2° e 3° nello stesso campo). A ogni turno si scrive il risultato di ogni campo (nelle partite a punti basta un numero, l'altro si completa) oppure lo si conta con *Conta punto per punto*, con la voce e, a tempo, il cronometro; con più giocatori dei posti in campo si riposa a turno. **Turno successivo** parte quando tutti i risultati ci sono; la **Classifica** conta i punti fatti da ciascuno, poi le vittorie e la differenza punti, e si condivide come testo.
+2. **Modalità e regole**:
+   - *Arbitro*, *Braccialetti* o *Telecomandi* (6.3). Con i braccialetti sono obbligatori Bluetooth acceso, permesso posizione e posizione attiva: le righe dei **Requisiti** si aggiornano in tempo reale (anche se spegni Bluetooth o posizione dalla tendina) e diventano rosse con il pulsante per sistemarle.
+   - La **ricerca è automatica e continua** finché la pagina è aperta: accendi i braccialetti e vanno da soli nei posti liberi (prima Giocatore 1, poi Giocatore 2). **Identifica** fa lampeggiare quel braccialetto nel colore del giocatore (giallo o rosso) con dei bip, così vedi subito quale hai in mano; **Scambia G1 ↔ G2** li inverte senza scollegarli. Dal menu a tendina puoi sempre sceglierne un altro o *Nessuno* (quello tolto a mano non viene rimesso dalla ricerca). Un braccialetto non può stare su due giocatori.
+   - **Spegni i braccialetti a fine partita e all'uscita** (attivo di serie): alla conferma di *Partita conclusa* e con *Esci* i braccialetti si spengono invece di aspettare l'inattività.
+   - In modalità arbitro, premendo **Avanti** senza posizione compare l'invito ad attivarla (altrimenti il luogo non sarà nel riepilogo).
+   - Formato (*3 set*, *5 set*, *2 set + super tie-break a 10*, *pro set* a 8 o 10 game, *solo super tie-break a 10*), game per set (6 oppure 4 nei set brevi, con tie-break sul 4-4), tie-break nei set sì/no (no: il set va avanti finché uno ha 2 game di scarto), No-Ad. Lingua e voce sono in *Altro › Lingua e voce* (4.1).
+   - **Sorteggio**: la moneta gira e indica chi vince; imposti chi serve e i lati del campo **visti dal giudice di sedia** (schema del campo con **Inverti lati**). Nel doppio scegli anche chi serve per primo in ogni squadra.
+3. **INIZIO PARTITA** lampeggia: premi il pulsante, KEY1 di un braccialetto o un telecomando. La voce dice *"Primo set" · "[nome] al servizio" · "gioco"* con 1 secondo tra le frasi; il **Match Time** parte su "gioco".
+4. **Partita**: in alto a sinistra il tempo partita, a destra il countdown (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; rosso negli ultimi 5 s). Il riquadro arancione si accende 5 s per *cambio campo, tie-break, set point, match point, palla break…*. I due tasti quadrati (giallo = Giocatore 1, rosso = Giocatore 2) stanno dal lato in cui si trovano davvero i giocatori e si scambiano a ogni cambio campo; sotto chi serve compare **On Serve**. Sotto: *Annulla punto*, *Sospendi/Riprendi*, audio (icona dell'altoparlante, barrata = spento), *Nuova partita*, **Esci**. In modalità braccialetti, sotto i tempi ci sono **G1**/**G2** con batteria e autonomia: toccandoli si aprono le impostazioni del braccialetto. Un doppio tocco su *Annulla punto* toglie un solo punto (il secondo tocco entro 1 s non conta); subito dopo un cambio di pagina il secondo tocco di un doppio tocco viene ignorato, così non finisce sul pulsante della pagina nuova. Il **lucchetto** in basso blocca lo schermo (per esempio col telefono in tasca o in panchina): i tocchi non fanno niente, braccialetti e telecomandi sì; si sblocca tenendo premuto il lucchetto.
+5. All'ultimo punto compare il popup **Partita conclusa / Annulla ultimo punto**. "Partita conclusa" si conferma **solo dal telefono**. Per mezzo secondo dopo la comparsa i suoi pulsanti ignorano i tocchi: un doppio tocco sull'ultimo punto non annulla niente.
+6. **Riepilogo**: vincitore, nomi, punteggio set per set con i punti del tie-break, durata, ora di inizio e fine, data, circolo, campo, luogo, formato, punti e game vinti. Pulsanti **Salva file** (nome file + cartella a scelta + formati .txt/.json/.png e **PDF completo** con risultato, statistiche della partita e di ogni set, cronologia e foto). **Condividi** chiede se mandare l'immagine col testo (per WhatsApp e i social) o il PDF completo. Nel Riassunto, **Foto della partita** tiene fino a 10 foto ricordo (dalla galleria o scattate): restano sul telefono, vanno nel PDF e passano all'altro telefono col trasferimento, mai nell'immagine per i social, **Condividi** (immagine 1080×1350 + testo per WhatsApp/Instagram/…), **Nuova partita**, **Esci**. Sotto le foto, **Note** accoglie un testo libero (fino a 2000 caratteri): si salva da solo, va nel PDF, nel testo condiviso e nei file .txt e .json, e passa all'altro telefono col trasferimento; non va nell'immagine per i social. La partita finita entra da sola nello **Storico** (scheda **Progressi**): elenco delle partite, da riaprire col loro riepilogo o eliminare, e scheda **Giocatori** con vittorie, sconfitte e scontri diretti di chi ha il nome scritto in *Nuova partita* (maiuscole e spazi non contano; nel doppio conta ogni giocatore). **Importa** aggiunge le partite salvate come .json con *Salva file* su un altro telefono: le finite vanno nello storico, quelle non finite tra le partite sospese da riprendere. **Trasferisci** (in alto a destra nello Storico) sposta storico e partite sospese su un altro telefono con un QR: i due telefoni devono stare sulla stessa rete Wi-Fi o uno sull'hotspot dell'altro; su quello che li ha tocchi *Invia* e lasci aperta la finestra col codice, sull'altro *Ricevi* e inquadri il codice (serve il permesso della fotocamera). Così si continua su un altro telefono anche una partita in corso: sospendila, trasferisci e riprendila. Le partite si aggiungono a quelle che il telefono ha già. **Foto dei giocatori**: tocca il cerchio accanto al nome in *Nuova partita* (o nel dettaglio del giocatore nello Storico) e scegli una foto; si ritaglia quadrata e si ritrova dal nome. Compare nello Storico, nel riepilogo e sul tabellone TV, resta solo su questo telefono (passa all'altro col trasferimento) e non finisce nell'immagine condivisa. Toccando di nuovo il cerchio la si cambia o la si toglie. Se l'app si chiude mentre sei sul riepilogo (Android che la chiude in secondo piano, un aggiornamento, un riavvio del telefono), riaprendola lo ritrovi; non se l'hai lasciato tu con *Nuova partita*, *Esci* o togliendo l'app dalle recenti. La cartella predefinita è **Documenti/Tennis Score Manager** (da Android 10; su Android 8 e 9 la cartella dell'app): si apre da qualsiasi app di gestione file e resta anche disinstallando l'app. Salvando due volte con lo stesso nome il secondo diventa *nome (1)*; nell'immagine i testi lunghi (nomi, indirizzo) si adattano alla larghezza.
+
+   Il riepilogo ha tre schede. **Riassunto**: i dati qui sopra e, coi braccialetti 2.4, colpi, velocità del polso e colpi per punto (6.4). **Statistiche**, per la partita o per un set: i due giocatori a confronto con barre che partono dal centro (colorata quella di chi è avanti) per punti e game vinti al servizio e in risposta, palle break salvate e vinte, totale punti e game, punti di fila, ultimi 10 punti, match point annullati; coi braccialetti 2.4 anche colpi per tipo e velocità media del polso. **Cronologia**: set per set, ogni game con la pallina di chi serve, *SERVIZIO PERSO* sui break, il punteggio dopo ogni punto con **PB** (palla break), **SP** (set point) e **MP** (match point) e l'esito (*GAME*, *BREAK*, *SET*, *PARTITA*). Ace, doppi falli, prime di servizio, vincenti ed errori ci sono se in *Modalità e regole* accendi le **statistiche dettagliate**: al posto dei due tasti grandi compaiono *Ace* e *Fallo* (la seconda volta diventa *Doppio fallo*) e, per ciascun giocatore, *Vincente*, *Errore* (il punto va all'altro) e *Punto*; *Annulla punto* toglie anche un fallo. È pensata per chi segna da bordo campo. Dopo *Errore* compare per 6 secondi *Gratuito / Forzato*; con braccialetti o telecomandi, dopo ogni punto compare *Com'è finito il punto?* (Ace, Vincente, Errore): rispondere è facoltativo, il punteggio non cambia. Nello Storico il dettaglio di un giocatore mostra l'**andamento**: punti vinti partita per partita e le medie di ace, doppi falli, prime, vincenti ed errori. Le statistiche di ogni partita contano anche palle game, set point e match point trasformati, game vinti a zero, game di fila, set vinti da sotto di un break e, nella scheda **Tempi**, la durata di ogni set e il game più lungo.
+
+   **Rivincita** (in fondo al riassunto): propone lo stesso giorno della settimana e la stessa ora, la settimana dopo, e il circolo della partita; si cambiano data, ora e luogo e si aggiunge una nota. **Manda l'invito** apre la condivisione (WhatsApp, SMS, email…) con il messaggio pronto: chi contro chi, quando, dove e com'è finita l'ultima volta. **Metti in calendario** crea l'evento nell'app del calendario, **Prepara la partita** riporta in *Nuova partita* giocatori, circolo, campo e regole (il torneo no). Niente account: l'invito passa dai canali che usi già.
+
+**Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
+
+**Salvataggi**: la partita si salva da sola a ogni punto. *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
+
+### 7.1 Allenamento con la fascia
+
+Per allenarsi con la fascia cardio senza una partita: **Allenati** › **Allenamento con la fascia**. Si usa **una fascia**, quella del Giocatore 1, con età, peso e sesso per calorie e zone; si sceglie direttamente lì (con l'interruttore *Fasce cardio*, Bluetooth e permessi se mancano).
+
+1. **Avvia**: in grande il battito dal vivo, sotto il tempo e il giro in corso.
+2. **Giro** chiude un pezzo dell'allenamento e ne apre un altro (come il tasto giro di un cronometro): uno scatto, un esercizio, un giro di pista. **Pausa / Riprendi** ferma il tempo; le pause non contano.
+3. **Fine**: l'app registra ancora **un minuto di recupero** (stai fermo) per misurare quanto scende il battito; **Salva subito** lo salta.
+
+- **Riepilogo**: durata, battito medio e massimo, calorie, **HRV (RMSSD)** dagli intervalli tra un battito e l'altro mandati dalla fascia (servono almeno una trentina di battiti puliti; confrontala con i tuoi allenamenti simili, non con quelli degli altri), **recupero in 1 minuto** (più scende, meglio è), grafico del battito, zone cardio e, per ogni giro, durata, media, massimo e recupero.
+- **CSV** (secondo per secondo, con il giro e il minuto di recupero) e **PDF** di una pagina con grafico, torta delle zone e giri, da condividere.
+- Gli allenamenti restano nella stessa schermata, a parte dalle partite; si riaprono o si eliminano. Il battito arriva anche dal secondo telefono (6.6) e la registrazione continua a schermo spento.
+
+### 7.2 Progressi
+
+**Progressi** › **Rating TSM · Progressi**: un documento per vedere se migliori, **separato** per allenamenti e partite.
+
+- **Allenamenti**: durata, battito medio e massimo, calorie, HRV, recupero.
+- **Partite** di un giocatore dello storico (scelto dall'elenco): partite vinte, punti vinti, ace, doppi falli, prime in campo, vincenti, errori gratuiti. Ace e gli altri valori dettagliati ci sono solo per le partite giocate con le statistiche dettagliate; sono totali per partita.
+- Per ogni voce la media della **prima metà** del periodo e quella della **seconda**: ▲ verde se migliora, ▼ rossa se peggiora (meno doppi falli o errori è un miglioramento), = se resta uguale (meno del 5% di differenza) o se non si può dire (battito). Servono almeno 2 allenamenti o partite.
+- **Cosa confrontare**: i **Filtri** scelgono il periodo (tutto, 30 giorni, 3 mesi, 1 anno), i **giorni della settimana** (per esempio solo i mercoledì, anche più di uno) e, per le partite, **torneo**, **circolo** e **avversario** presi dallo storico; sotto, l'elenco **Da confrontare** da spuntare (*Tutti* / *Nessuno*). Confronto, PDF e stampa usano solo quelli spuntati.
+- **Rating TSM**: in *Partite*, sopra i filtri, il rating del giocatore (si parte da 1500) con le partite contate, la variazione dell'ultima e l'andamento, e la **Classifica TSM** di tutti i giocatori dello storico. È un Elo calcolato sul telefono: sale quando vinci, di più contro chi ha un rating più alto e con un punteggio netto; nel doppio conta la media della coppia; tennis e padel hanno classifiche separate. Nelle prime 5 partite è *provvisorio* e si muove di più. Nel riepilogo di ogni partita la scheda **Rating TSM** mostra quanto ha guadagnato o perso ciascuno; con **Amichevole** la partita resta nello storico ma non conta.
+- **PDF** (con l'andamento di ogni voce e l'elenco completo, su più pagine se serve) da condividere, o **Stampa** con il servizio di stampa di Android (anche *Salva come PDF*).
+
+### 7.3 Video: telefono-telecamera, highlights e moviola
+
+Un secondo telefono su un treppiede riprende la partita e mette sul video il punteggio dell'arbitro.
+
+1. **Arbitro**: Altro › **Dispositivi** › **Secondo telefono** › **Usa un secondo telefono** (QR, come in 6.6).
+2. **Telecamera**: Altro › **Dispositivi** › **Secondo telefono** › **Fai da telecamera**, inquadra il QR, poi **Apri la telecamera** (permessi di fotocamera e microfono; serve un telefono che registri in 1080p). Con *Punteggio collegato* la grafica del punteggio è sul video (**Grafica** la accende o la spegne); senza arbitro registra solo il video.
+   - **Registra / Ferma**: il video va in galleria (*Film/Tennis Score Manager*) con i capitoli, uno per punto.
+   - **Diretta**: trasmissione RTMP su YouTube, Twitch, Facebook o un server tuo; server e chiave dello stream in *Diretta: server*.
+   - **Inquadra** (assistente inquadratura): scrivi quanti metri dietro la linea di fondo e a che altezza hai messo il telefono e su che campo giochi; l'app dice l'inclinazione verso il basso che tiene nel video tutte e due le linee di fondo e il giocatore lontano, e se il campo ci sta in larghezza. Spesso il limite è proprio la larghezza: dalla recinzione (circa 6 m) l'obiettivo principale taglia gli angoli vicini, il **grandangolo** no (**Usa l'obiettivo…**, oppure il tasto **Obiettivo**, a registrazione ferma). Con **Mostra la livella** sull'anteprima compaiono l'orizzonte e le indicazioni (*punta più in basso di 2°*, *gira in senso orario*…), verdi quando va bene, con una vibrazione quando il telefono è in posizione. La livella si vede anche nel riquadro **Telecamera** del telefono dell'arbitro. Destra e sinistra i sensori non le sanno: controlla a occhio che la rete sia al centro.
+   - **Sagoma** (sagoma del campo): sull'anteprima compaiono le linee del campo come le vede l'obiettivo, e seguono il telefono mentre lo inclini. Muovi i cursori (**Distanza**, **Altezza**, **Direzione**, **Spostamento laterale** e, se serve, **Campo visivo** e **Correzione inclinazione**) finché combaciano con le linee vere: così si sistema anche la centratura, e l'inclinazione consigliata diventa precisa. La taratura viene ricordata per il campo della partita (*Circolo · Campo* dell'arbitro) e ripresa la volta dopo. Sagoma e cursori ci sono anche nel riquadro **Telecamera** dell'arbitro. Più in alto è il telefono, meglio si vede la metà lontana del campo: da 2,5 m è schiacciata appena sopra la rete.
+3. **Telecamera in alto, comandata dall'arbitro**: sul telefono dell'arbitro **Telecamera** (accanto a *Moviola* in partita, oppure *Inquadratura e comandi della telecamera* in Altro › **Dispositivi** › **Secondo telefono**, utile per sistemarla prima di iniziare) mostra l'inquadratura del telefono-telecamera com'è nel video, grafica compresa, con **Registra / Ferma**, **Diretta**, **Grafica** e lo **zoom**. Si vedono anche durata della registrazione, batteria e spazio libero (in arancione se sono bassi). L'immagine è piccola e a scatti (circa 3 fotogrammi al secondo) e passa solo mentre la si guarda; la chiave della diretta va messa sul telefono-telecamera.
+
+- **Video** › **I tuoi video**: i video registrati, da rivedere punto per punto, game per game o set per set. **Capitoli YouTube** prepara i capitoli da incollare nella descrizione. **Importa video** prende un video fatto con un'altra fotocamera (il file resta dov'è): i punti si segnano guardandolo, toccando a fine punto chi l'ha vinto e, se vuoi, com'è finito (*Annulla ultimo* toglie l'ultimo); formato e regole sono quelli di *Modalità e regole*.
+- **Filtri allenatore** (icona del filtro): solo i punti di un giocatore, vinti o persi, al servizio o in risposta, sulla prima o sulla seconda, per come sono finiti, sulle palle break o sui set e match point. **Riproduci** li mette in fila.
+- **Highlights**: montaggio automatico dei punti più belli (ace, vincenti, palle break, set e match point, scambi lunghi coi braccialetti) nell'ordine di precedenza scelto con le frecce, per al massimo 1, 3, 5, 10 o 15 minuti o un'**Altra durata** fino a 90. Se non ci sta tutto prima si accorciano i pezzi, poi restano fuori i punti meno importanti. Il risultato va in galleria.
+  - **Statistiche a fine video**: 2 o 3 schermate da 10 secondi come nelle dirette dei tornei: servizio e palle break; punti, errori e scambi corti e lunghi; battito, se c'era la fascia. La partita è quella dello storico giocata mentre si registrava, o quella dei punti segnati su un video importato. Ai lati la foto del giocatore; senza foto un ritratto stilizzato di uomo o di donna (scelta **Uomo / Donna** in *Nuova partita*) (senza scelta, quello dell'uomo; vale in tutta l'app, anche in *Nuova partita*, storico, riepilogo, PDF e tabellone TV); sotto, la percentuale di punti vinti. In alto torneo, categoria e turno (*Altri dettagli* in *Nuova partita*), oppure circolo e campo.
+  - **Musica** sotto le statistiche, con dissolvenza in entrata e in uscita: *Nowhere Land* di Kevin MacLeod (incompetech.com, licenza CC BY 4.0: se pubblichi il video, citalo nei crediti), oppure un brano tuo con **Scegli un brano** (se ne usa l'inizio; usa solo musica che hai il diritto di mettere nei tuoi video).
+  - In fondo a ogni schermata delle statistiche c'è la scritta **Creato con Tennis Score Manager** con l'indirizzo del sito.
+- **Moviola**: sul telefono dell'arbitro, con la telecamera collegata, **Moviola** chiede alla telecamera il punto contestato (*Ultimo punto*, *Punto prima* o *Dall'ultimo punto segnato*) e lo mostra, con pausa e fotogramma per fotogramma. **Anche sul tabellone** lo fa vedere anche sul tabellone TV.
+
+### 7.4 Racchette: racchetta virtuale
+
+**Progressi** (o **Altro**) › **Le mie racchette**: ogni racchetta fisica ha la sua scheda (due racchette dello stesso modello sono due schede: corde, peso e ore cambiano).
+
+- **Scheda**: soprannome (A, B…), marca, modello, peso, bilanciamento, piatto corde e schema; si possono scrivere a mano o prendere **dal catalogo** (dati del produttore, da correggere se hai misurato la tua). *Messa da parte*: non si propone più, ma resta nei confronti.
+- **Incordature**: tipo (monofilamento, multifilamento, sintetico, budello, ibrido), marca e modello (anche dalle corde comuni), calibro, tensione delle verticali e delle orizzontali, data e note. *Nuova incordatura* parte da quella montata. Per ognuna l'app somma le **ore di gioco** delle partite e degli allenamenti associati e avvisa quando si supera la **soglia di controllo** scelta (20 ore di serie): dal solo tempo non può sapere quanta tensione è rimasta.
+- **Prima di giocare**: in *Nuova partita*, sotto la classifica di ogni giocatore, si sceglie la sua racchetta; nell'allenamento la si sceglie sopra la fascia. La partita (punti, colpi dei braccialetti, battito) e l'allenamento si salvano con una **copia** della racchetta com'era quel giorno, corde e tensione comprese: reincordarla dopo non cambia le sessioni passate.
+- **Nel riepilogo** della partita (scheda *Riassunto*) e dell'allenamento si vede la racchetta usata, la si può associare anche dopo (si prende l'incordatura montata quel giorno) e si danno le **sensazioni** da 1 a 5: controllo, comfort, potenza e fatica.
+- **Confronto**: *per racchetta* o *per incordatura* (stessa racchetta con tensioni o corde diverse), si scelgono le configurazioni A e B. Barre affiancate per sessioni, ore, partite vinte, punti vinti, prime in campo, punti vinti con la prima e con la seconda, ace, doppi falli, vincenti ed errori gratuiti a partita, velocità media del polso e colpi dei braccialetti, battito medio, e le sensazioni medie. Il valore migliore è in grassetto, ma l'app non sceglie una vincitrice: contano anche avversario, superficie, condizioni e forma.
+
+### 7.5 Allenamento dei colpi: servizio, dritto, rovescio e volée
+
+Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosce il servizio e coi tasti si dice com'è andato. Basta un telefono, senza arbitro.
+
+1. **Allenati** › **Allenamento dei colpi**, scegli il colpo (**Servizio**, **Dritto**, **Rovescio**, **Volée**) › **Inizia** (serve il braccialetto collegato come in 6.1; senza, si segna dai tasti sullo schermo).
+2. **Dove mettere il telefono** (la prima volta si apre da solo, poi dal tasto *Dove mettere il telefono?*):
+   - **a fianco di chi serve**, dal lato del braccio che colpisce (a destra per un destro), a **3-4 m**, all'altezza della linea di fondo o mezzo metro dietro;
+   - obiettivo a **1-1,2 m** da terra, telefono **in orizzontale** e dritto, puntato su chi serve;
+   - nell'inquadratura deve stare **tutta la persona, dai piedi alla racchetta in alto** (circa 2,7 m): se la testa della racchetta esce, allontana il telefono o passa al **grandangolo** (tasto *Obiettivo*);
+   - per vedere anche dove va la palla, in alternativa: 3-4 m **dietro** chi serve, un po' di lato, a 1,5-2 m d'altezza;
+   - mai davanti a chi serve né sulla traiettoria della palla.
+3. Scegli **lato** (destra/sinistra), **prima o seconda** e, se vuoi, il **bersaglio** (al T, al corpo, esterno): valgono per i servizi seguenti.
+4. Servi e premi **KEY1 = dentro** o **KEY2 = fuori**; **KEY1 tenuto premuto** annulla l'ultimo. La voce dice il conteggio (*Dentro. 8 su 12*) e il braccialetto lo mostra. Se il braccialetto ha riconosciuto il servizio, l'istante è quello; altrimenti si prende qualche secondo prima del tasto.
+5. Per ogni servizio si salva una **clip** di qualche secondo intorno al colpo. **Fine** mostra il riepilogo: dentro su tentativi, per lato, per prima e seconda, per bersaglio e, se il braccialetto ha riconosciuto i servizi, la rotazione media del polso sui servizi dentro e su quelli fuori. **Rivedi tutti / solo i dentro / solo i fuori** apre le clip nella moviola (pausa, rallentatore, fotogramma per fotogramma).
+6. Sotto **Inizia** ci sono le ultime 3 sessioni **del colpo scelto** (sui tasti dei colpi il numero delle sessioni, es. *Rovescio · 4*) e la linea dei **colpi dentro, sessione dopo sessione**. **Tutte le sessioni** apre quelle del colpo scelto, divise per mese, con lo spazio occupato dai video e se sono già analizzate. Tocca una sessione per il riepilogo e le clip; **tienila premuta** per selezionarla (l'icona in alto le seleziona tutte), poi **Elimina** (sessione e video) o **Solo i video** (libera spazio: restano conteggi, misure dell'analisi e immagini dei momenti chiave). In **Progressi** c'è l'andamento di ogni colpo.
+   - **Dove stanno i video**: in **Documenti/Tennis Score Manager/Allenamento colpi**, con le cartelle **Servizio**, **Dritto**, **Rovescio** e **Volée** (create all'avvio) e dentro una cartella per sessione (data e ora) e una per colpo, con `video.mp4` (si apre e si condivide da qualsiasi app), l'analisi e le tre immagini. Si vedono con qualsiasi file manager e restano anche disinstallando l'app (come archivio: reinstallandola, le sessioni nell'app non tornano). Su Android 8-10 la stessa struttura sta nella cartella dell'app. Le clip delle sessioni di prima della 2.5 si spostano lì da sole al primo avvio.
+7. **Analisi del movimento** (dalla sessione salvata): **Analizza i servizi** trova la posizione del corpo nelle clip (modello MoveNet: la prima volta l'app chiede di scaricarlo, 7 MB, dalla pagina del progetto su GitHub; poi tutto sul telefono, niente internet, qualche secondo per servizio; si può eliminare in fondo alla schermata. Non c'è sui dispositivi con processore x86) e misura tre momenti: **caricamento** (braccio del lancio in alto), **ginocchia** più piegate e **impatto**. Per ogni servizio: le tre immagini con lo scheletro disegnato e le misure (ginocchio più piegato, gomito all'impatto, altezza dell'impatto rispetto alla statura, braccio del lancio, spalle al caricamento, tempo dal caricamento all'impatto); in alto il confronto **dentro e fuori**. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi servizi tra loro. Il corpo si riconosce bene con tutta la persona nell'inquadratura, di lato e con buona luce; racchetta e palla non si misurano.
+   Tocca un servizio per aprirlo: **Guarda il video con lo scheletro** apre la clip nella moviola col corpo disegnato sopra, al rallentatore, con i tasti per saltare a **Caricamento**, **Ginocchia** e **Impatto** e quello per togliere o rimettere lo scheletro; due dita ingrandiscono video e scheletro insieme (fino a 6×), doppio tocco per tornare normale. Anche le tre immagini si toccano per vederle a tutto schermo e ingrandirle. Con **più persone** nell'inquadratura l'app segue chi serve (chi alza di più il braccio) e copre le altre; lo dice sotto il servizio: controlla nelle immagini. **Rifai l'analisi** la ripete da capo (le clip restano), utile dopo un aggiornamento dell'app.
+
+**Dritto, rovescio e volée** funzionano allo stesso modo (KEY1 dentro, KEY2 fuori, clip per ogni colpo, riepilogo e analisi), con queste differenze:
+- **Dove mettere il telefono**: di lato a chi colpisce, perpendicolare alla direzione dei colpi, a 4-5 m e fuori dal corridoio, all'altezza del punto d'impatto; obiettivo a circa 1 m; tutto lo swing nell'inquadratura (il polso si muove di circa 2 m avanti e indietro). Per la volée: di lato a chi gioca a rete, a 3-4 m, all'altezza del giocatore. Sempre dallo stesso lato per tutta la sessione, e mai sulla traiettoria della palla.
+- Al posto di lato, prima/seconda e bersaglio si sceglie la **direzione** voluta (**incrociato**, **al centro**, **lungolinea**) e, per la volée, se è **di dritto** o **di rovescio**; il riepilogo li conta a parte.
+- **Analisi del movimento**: i tre momenti sono **preparazione** (dove il polso si ferma in fondo all'apertura), **impatto** (polso più veloce; lì intorno l'app rilegge un fotogramma ogni 33 ms) e **finale** (polso più in alto dopo l'impatto; nella volée, dove il polso si ferma). Se nella finestra ci sono più colpi vale quello riconosciuto dal braccialetto; i polsi scambiati da MoveNet (succede di lato) si rimettono a posto da soli. Riprendi **di lato**: di fronte l'apertura va in profondità e non si vede. Le misure (*—* se il gomito o le gambe non si vedono): ginocchio più piegato, gomito all'impatto, altezza dell'impatto, quanto **davanti al corpo** si colpisce, **ampiezza della preparazione**, altezza del finale (tutte in rapporto alla statura) e il tempo dalla preparazione all'impatto. Il video con lo scheletro ha i tasti **Preparazione**, **Impatto** e **Finale**.
+
+## 8. Tabellone su TV o monitor
+
+Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
+
+### 8.1 Le strade possibili
+
+| Come arriva al monitor | Cosa serve | Pro | Contro |
+|---|---|---|---|
+| **Secondo telefono con uscita video** + cavo USB-C/HDMI, app TSM in *Usa come tabellone* | un telefono che esce in video dalla USB-C (DisplayPort Alt Mode) | niente internet; il tabellone occupa tutto il monitor in 16:9 e il telefono resta libero | molti telefoni **non** escono in video: in genere sì i Galaxy S/Note/Tab S (con DeX: scegli *Duplica schermo* o disattiva l'avvio automatico di DeX), no quasi tutti i Galaxy A. Controlla "DisplayPort" / "uscita video" nella scheda tecnica |
+| **Chromecast** (o Google TV Streamer) sul monitor + un telefono qualsiasi con TSM in *Usa come tabellone* e **Trasmetti** (*Trasmissione schermo* fino ad Android 14, Smart View sui Samsung) | Chromecast configurato una volta con Google Home sulla rete dell'hotspot | qualsiasi telefono va bene, nessun cavo lungo | il Chromecast vuole **internet** (dati mobili sull'hotspot); ritardo di circa 1 s; la trasmissione mostra lo schermo del telefono (in orizzontale) |
+| **Browser** su qualsiasi apparecchio collegato al monitor (portatile, tablet, TV box, Fire TV Stick…) | inquadrare il QR o scrivere l'indirizzo | nessuna app da installare | lo schermo si spegne da solo se non lo imposti; si tocca **SCHERMO INTERO** a ogni apertura |
+
+**Perché non via Bluetooth**: il telefono dell'arbitro regge già i due braccialetti in Bluetooth, dove contano i tempi dei tasti; il Wi-Fi è separato, più veloce e arriva più lontano. **Perché non dal solo telefono dell'arbitro al Chromecast** (senza secondo telefono): si può fare, ma serve una app "ricevitore" registrata presso Google (Google Cast Developer Console, 5 $ una tantum) e pubblicata su un sito https; è un passo successivo possibile.
+
+**Consigli di rete**:
+- Il tabellone manda pochissimi dati (un messaggio a ogni punto e ogni 5 secondi), non consuma traffico internet.
+- Se il telefono dell'arbitro fa l'hotspot, nelle impostazioni dell'hotspot scegli la banda **5 GHz** se c'è: il Bluetooth dei braccialetti lavora a 2,4 GHz e così non si disturbano.
+- Con il Chromecast conviene che l'hotspot lo faccia il telefono dell'arbitro con i **dati mobili accesi**; telefono-tabellone e Chromecast si collegano a quell'hotspot.
+- Senza Chromecast va bene anche il contrario (hotspot sul telefono-tabellone, come nell'idea originale): l'app dell'arbitro tiene agganciato il Wi-Fi anche se non ha internet.
+
+### 8.2 Sul telefono dell'arbitro
+
+1. Altro › **Dispositivi** › **Tabellone su TV** › attiva **Tabellone su TV o monitor**. Su Android 13 e successivi l'app chiede il permesso delle notifiche: serve per la notifica del servizio che tiene acceso il tabellone.
+2. Compaiono l'**indirizzo** (es. `192.168.43.1:8080`), il **QR** e quanti tabelloni sono collegati. Se c'è scritto *Nessuna rete*, accendi l'hotspot o collegati a quello dell'altro telefono.
+3. **Anteprima su questo telefono** apre il tabellone nel browser del telefono stesso.
+4. **Aspetto del tabellone**: colore di ciascun giocatore (8 colori), tempo partita, cronometro servizio e pause, set conclusi, messaggi (palla break, set point, cambio campo…), pallina di chi serve, segmenti spenti visibili, scritta in basso (vuota = circolo e campo di *Nuova partita*). Le modifiche arrivano subito sul monitor.
+5. In partita, in alto al centro c'è **TV · 1** (tabelloni collegati): toccandolo si rivedono indirizzo e QR.
+
+Col tabellone acceso un servizio in primo piano (notifica *Partita in corso · tabellone TV attivo*) tiene vivo il server anche a schermo spento, pure in modalità arbitro. Il tabellone è **solo lettura**: da lì non si può cambiare niente. Resta attivo anche sul riepilogo e sulle altre pagine finché il tabellone è acceso (notifica *Tabellone TV attivo*), così il risultato finale resta sul monitor anche con il telefono bloccato.
+
+Cosa mostra, oltre al punteggio: *IN ATTESA DELLA PARTITA* prima di iniziare, *IN ATTESA DEL VIA* sulla pagina INIZIO PARTITA, **TIE-BREAK** / **MATCH TIE-BREAK** al posto di *VS*, *PARTITA SOSPESA* lampeggiante, **VINCE [nome]** a fine partita con tutti i set; i vantaggi si leggono **AD** anche sulle cifre a LED. Una partita vinta al super tie-break finisce con 1-0 nei game e 2-1 nei set, con [10-8] tra i set conclusi; i messaggi lunghi si rimpiccioliscono per stare nello schermo.
+
+### 8.3 Sul telefono-tabellone
+
+1. **Gioca** › **Usa come tabellone**.
+2. Il telefono **cerca da solo** il telefono dell'arbitro (annuncio sulla rete e scansione dell'hotspot, pochi secondi) e si ricorda l'ultimo indirizzo. Se non lo trova: controlla hotspot e *Tabellone su TV*, poi **Cerca di nuovo**, oppure scrivi l'indirizzo mostrato dall'arbitro e **Collega**. Lo trova anche se su questo telefono è acceso *Tabellone su TV o monitor*; se la rete Wi-Fi arriva dopo, cerca di nuovo da solo.
+3. Il tabellone va a schermo intero, in orizzontale, con lo schermo sempre acceso.
+   - **Con il cavo HDMI**: il tabellone va sul monitor nel suo formato; il telefono mostra *Il tabellone è sul monitor esterno* con la luminosità al minimo (**Mostra anche qui** per vederlo anche sul telefono). Staccando il cavo torna sul telefono.
+   - **Con il Chromecast**: apri la tendina › **Trasmetti** (o **Trasmissione schermo**) / **Smart View** › scegli il Chromecast.
+4. Se il telefono dell'arbitro sparisce (fuori portata, app chiusa) compare *CONNESSIONE PERSA - RICONNESSIONE...* e dopo 20 secondi lo ricerca da solo, anche se ha cambiato indirizzo. Anche dopo un'interruzione dell'hotspot si ricollega da solo appena torna la rete. Non passa mai al telefono di un altro campo: per cambiare campo esci da *Usa come tabellone* e cerca di nuovo.
+5. Per uscire: **indietro due volte**.
+
+**Da un browser** (portatile, TV box): inquadra il QR o scrivi l'indirizzo, poi tocca **SCHERMO INTERO** (compare muovendo il mouse o toccando lo schermo). Imposta lo spegnimento dello schermo su *mai*: in una pagina http il browser non può tenerlo acceso da solo. Dopo un'interruzione la pagina si ricollega da sola; troppi tabelloni aperti non bloccano più quello nuovo (si chiude il più vecchio).
+
+
+## 9. Regole applicate (ITF) e scelte concordate
+
+- **Game**: 0-15-30-40, parità, vantaggio, gioco. **No-Ad**: sul 40-40 punto decisivo ("parità, punto decisivo").
+- **Set**: 6 game con 2 di scarto (7-5); sul **6-6 tie-break**.
+- **Tie-break**: a 7 con 2 di scarto; chi è di turno serve il 1° punto, poi 2 punti a testa; cambio campo **ogni 6 punti** e alla fine; chi ha servito per primo nel tie-break **riceve** nel primo game del set successivo.
+- **Match tie-break** (formato 2 set): sull'1-1 si gioca a 10 punti con 2 di scarto.
+- **Cambio campo** (regola ITF 10): dopo il 1°, 3°, 5°… game di ogni set. A fine set si cambia solo se il set ha un numero dispari di game (6-3, 7-6); altrimenti (6-4) si cambia dopo il primo game del set successivo. Il tie-break conta come un game.
+- **Tempi**: shot clock 25 s tra i punti; changeover 90 s; set break 120 s a fine set. In più, come richiesto (non è regola ITF): **30 s** per spostarsi dopo il 1° game di ogni set, a ogni cambio campo nel tie-break e sul 6-6; finita qualsiasi pausa parte lo shot clock.
+- **Doppio**: rotazione del servizio A1-B1-A2-B2 per tutto il set, anche nel tie-break; all'inizio di ogni set l'app chiede l'ordine (si può cambiare, come da regolamento).
+- **Chiamate**: punteggio letto da chi serve ("quindici zero", "zero quaranta", "quindici pari", "parità", "vantaggio Rossi"); a fine game "gioco Rossi, Rossi conduce tre giochi a due" / "due giochi pari" + "cambio campo" quando si cambia; sul 6-6 "gioco Rossi, sei giochi pari, tie-break"; nel tie-break si legge da chi conduce ("tre a uno Rossi", "sei pari"); fine set "gioco Rossi, Rossi conduce un set a zero" / "un set pari"; fine partita "gioco, set, partita Rossi, sei quattro, tre sei, sette cinque"; "correzione" + punteggio quando si annulla un punto.
+
+**Scelte fatte rispetto alla richiesta originale, per seguire l'ITF:**
+1. **Sul 6-6 non si cambia campo** (sono 12 game, numero pari): l'app fa la pausa di 30 s e dice "tie-break", ma non dice "cambio campo" e non scambia i tasti. Il primo cambio è dopo 6 punti del tie-break.
+2. Il cambio a fine set dipende dal numero di game del set (vedi sopra), non avviene sempre.
+3. All'1-1 nel formato con super tie-break la voce aggiunge "super tie-break".
+
+## 11. Problemi comuni
+
+- **Braccialetto non trovato**: Bluetooth e posizione attivi (righe verdi)? Il braccialetto sta lampeggiando PAIRING? (Se è già collegato a un altro telefono non si vede.) Se nel frattempo si è spento da solo (30 s), riaccendilo con un clic sul tasto laterale.
+- **Il braccialetto mostra NON INVIATO**: il telefono non ha confermato il tocco entro 8 secondi (collegamento perso o app chiusa). Premi di nuovo quando il braccialetto è ricollegato. Caso raro: se il tocco era arrivato e si è persa solo la conferma, il punto conta due volte; la voce dice il punteggio, si corregge con *Annulla punto*.
+- **Nel pannello impostazioni c'è "Il firmware di questo braccialetto non ha le impostazioni"**: quel braccialetto ha ancora lo sketch vecchio, ricaricalo (capitolo 5).
+- **La voce non parla o legge male**: volume multimediale, *Audio On*, voce della lingua scelta installata (4); prova un altro motore o un'altra voce in *Audio e voce*.
+- **Schermo spento durante la partita**: in modalità braccialetti un servizio in primo piano (notifica "Partita in corso") tiene attivi Bluetooth, voce e cronometri; in modalità arbitro e telecomandi lo schermo resta acceso (con i telecomandi deve restarlo: 6.3).
+- **Il telecomando non fa niente**: è associato al giocatore (*Altro › Dispositivi* › *Telecomandi*, riga col suo nome)? L'app deve essere aperta sulla partita, a schermo acceso (6.3). Se la riga dice *Non collegato*, premi un tasto per svegliarlo oppure riaccoppialo dalle impostazioni Bluetooth.
+- **I colpi vengono confusi o risultano non riconosciuti**: il braccialetto va portato come durante la calibrazione (stesso polso, stesso verso); altrimenti rifai la calibrazione indossandolo come in partita (6.4).
+- **Il braccialetto mostra MEMORIA PIENA**: un esempio di calibrazione non si è potuto salvare. Cancella gli esempi di un colpo (cestino) e rifalli.
+- **Il telefono-tabellone non trova l'arbitro**: stessa rete? (uno dei due fa l'hotspot, l'altro è collegato). *Tabellone su TV* acceso sull'arbitro? Prova l'indirizzo a mano. Alcuni hotspot isolano i dispositivi collegati tra loro ("isolamento client"): se c'è, disattivalo.
+- **Il browser del telefono non apre l'indirizzo** con i dati mobili accesi: Android manda il traffico sui dati perché l'hotspot non ha internet. Usa l'app in *Usa come tabellone* (lo gestisce da sola) oppure spegni i dati mobili su quel telefono.
+- **Monitor nero col cavo**: quel telefono non ha l'uscita video sulla USB-C (8.1), oppure è partito Samsung DeX: scegli *Duplica schermo*.
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/assets/help/pt.md
+cat > "$DEST/app/src/main/assets/help/pt.md" << 'TSM_EOF'
+## 3.1 Como o app está organizado
+
+Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo (marcar o placar, jogar com as pulseiras, treinar, filmar partidas) e o seu nome; dá para pular e refazer em **Mais › Apresentação do app**. Embaixo há sempre **cinco abas**:
+
+- **Jogar**: **Nova partida**, a partida suspensa para retomar, a **revanche** da última, o **torneio entre amigos** (Americano, Mexicano) e **Usar este telefone como** placar ou câmera. No alto o estado dos dispositivos (pulseiras, cintas, câmera, TV): um toque para conectá-los.
+- **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
+- **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
+- **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
+- **Mais**: **Você** (o seu nome), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
+
+**Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
+
+## 4. A voz (funciona sem internet)
+
+- Cada anúncio é lido **numa única frase** pela síntese de voz do telefone, com uma voz instalada: sem internet e com prosódia natural. Os nomes dos jogadores entram na frase.
+- Mais › **Idioma e voz** › **Áudio e voz**:
+  - **Mecanismo de síntese de voz**: *Padrão do telefone* (nos Samsung é o Samsung TTS) ou um mecanismo à sua escolha, por exemplo *Serviços de voz do Google*. Nos testes, feitos em italiano, o Google soou mais natural.
+  - **Voz**: *Automática (melhor offline)* ou uma voz específica (o Google lista as vozes por código, como *Voz* seguido de três letras; as marcadas como *online* precisam de internet).
+  - **Testar voz**: lê uma sequência de anúncios de exemplo com os nomes digitados. Enquanto lê, o botão vira **Parar o teste**: toque de novo para interrompê-lo (ele também para sozinho quando você sai da página). A síntese de voz não pode ser pausada no meio de uma frase, por isso o botão a interrompe; tocando de novo, ela recomeça do início.
+- Se faltar a voz do idioma escolhido: **Configurações › Gerenciamento geral › Idioma › Conversão de texto em voz** (ou *Saída de conversão de texto em voz*) → baixe a voz desse idioma para o mecanismo escolhido (o app também mostra o botão **Instalar voz**). Se a síntese de voz nem chega a iniciar, o app avisa com uma mensagem própria e o botão **Abrir configurações** (configurações de síntese de voz do Android).
+- **Pronúncia**: alguns mecanismos erram palavras do tênis (em italiano, "primo set" lido como "primo settembre", "tie-break" lido como "time break"). O app as corrige sozinho; as correções foram verificadas transcrevendo o áudio real do Samsung e do Google.
+- **Gravações personalizadas** (a voz mais natural de todas: a sua ou a de um árbitro): na pasta `Android/data/io.github.steve_linux.tsm/files/voice/` há o `LEGGIMI.txt` ("leia-me"; as explicações do início ficam no idioma do app e são reescritas quando você o muda) com a lista das 85 chaves e das frases. Grave os arquivos com esses nomes (`score_1_0.mp3` = "quinze-zero"…), coloque-os num ZIP com uma pasta por idioma (`it/`, `en/`, `fr/`, `de/`, `es/`, `pt/`) e use **Importar ZIP**. O `LEGGIMI.txt` tem uma coluna por idioma, separadas por tabulações, então também abre bem como planilha. As gravações sempre têm prioridade sobre a síntese; os nomes continuam sendo lidos pela síntese. No ZIP vale a pasta que contém o arquivo (também dentro de outras pastas, ex. `voice/pt/`); arquivos fora de uma pasta de idioma vão para o idioma atual e as pastas `tts/` são ignoradas, então dá para compactar também a pasta `voice/` do app. Um ZIP danificado ou incompleto não muda nada (*ZIP ilegível ou incompleto*). **Remover gravações** pede confirmação. Se um arquivo não puder ser reproduzido, a frase é dita pela síntese de voz e o arquivo não é mais usado até o app reiniciar.
+- **Usar arquivos de áudio pré-gerados** (opcional): com **Gerar arquivos** o app cria uma vez os 85 arquivos com a voz escolhida (até mesmo uma voz *online*, se naquele momento houver internet) e depois os usa no lugar da síntese contínua. Soa mais "picotado", mas é útil para levar offline uma voz online. Os arquivos anteriores ficam até os novos estarem prontos (se a geração não chegar ao fim: *Geração não concluída*); durante a geração, idioma, mecanismo, voz, teste de voz e áudio ficam bloqueados.
+- **Caixa de som externa** (coluna): basta pareá-la com o telefone por Bluetooth; a voz sai pelo canal de mídia (ajuste o volume de mídia).
+- **Fones de ouvido Bluetooth**: são pareados do mesmo jeito e só você ouve a voz, sem incomodar as quadras vizinhas; servem também para quem marca o placar da beira da quadra. As pulseiras podem continuar conectadas ao mesmo tempo.
+- **Dois dispositivos de áudio ao mesmo tempo**: muitos telefones mandam o áudio para dois dispositivos Bluetooth juntos. No Samsung: conecte os dois, abra o painel rápido › **Saída de mídia** e marque os dois. Assim cada jogador pode ter o seu fone, ou a caixa de som toca para a quadra e o fone para quem marca o placar.
+
+### 4.1 Idiomas
+
+Mais › **Idioma e voz** › **Idioma**: Italiano, English, Français, Deutsch, Español, Português (cada idioma aparece escrito no próprio idioma, para que você o encontre mesmo com o app num idioma que não lê). A escolha vale ao mesmo tempo para **telas, voz do árbitro, placar na TV, resumo/compartilhamento e pulseiras**. As datas seguem o idioma (*mercredi 30 septembre 2026*, *Mittwoch, 30. September 2026*…).
+
+Os anúncios não são traduções palavra por palavra: seguem os textos oficiais para árbitros de cadeira de cada federação, ou seja, FFT *L'arbitrage en 255 questions* e ITF em francês, os materiais DTB/BTV e Swiss Tennis, RFET *Deberes y procedimientos*, FPT *Deveres e Procedimentos* (o único roteiro português publicado). O inglês segue a ITF. Em inglês, o zero dos sets no fim da partida é dito *love* ("six love, six four"), como nos pontos.
+
+| | Italiano | English | Français | Deutsch | Español | Português |
+|---|---|---|---|---|---|---|
+| Início | primo set · Rossi al servizio · gioco | first set · Rossi to serve · play | première manche · au service Rossi · jouez | erster Satz · Aufschlag Rossi · spielen | primer set · al servicio Rossi · jueguen | primeiro set · Rossi ao serviço · joguem |
+| 15-0 · 15-15 | quindici zero · quindici pari | fifteen love · fifteen all | quinze-zéro · quinze A | fünfzehn null · fünfzehn beide | quince cero · quince iguales | quinze-zero · quinze iguais |
+| 40-40 · vantagem | parità · vantaggio Rossi | deuce · advantage Rossi | égalité · avantage Rossi | Einstand · Vorteil Rossi | iguales · ventaja Rossi | iguais · vantagem Rossi |
+| Fim do jogo | gioco Rossi, Rossi conduce tre giochi a due | game Rossi, Rossi leads three games to two | jeu Rossi, Rossi mène trois jeux à deux | Spiel Rossi, Rossi führt drei zu zwei | juego Rossi, Rossi gana tres juegos a dos | jogo Rossi, Rossi vence por três jogos a dois |
+| Jogos iguais | due giochi pari | two games all | deux jeux partout | zwei beide | dos juegos iguales | dois jogos iguais |
+| Tie-break | tre a uno Rossi · sei pari | three one Rossi · six all | trois un Rossi · six partout | drei zu eins Rossi · sechs beide | tres uno Rossi · seis iguales | três a um Rossi · seis iguais |
+| Set | un set a zero · un set pari | one set to love · one set all | une manche à zéro · une manche partout | eins zu null in Sätzen · ein Satz beide | un set a cero · un set iguales | um set a zero · sets iguais |
+| Fim da partida | gioco, set, partita Rossi | game, set and match Rossi | jeu, set et match Rossi | Spiel, Satz und Sieg Rossi | juego, set y partido Rossi | jogo, set e partida Rossi |
+| Troca de lado | cambio campo | change ends | changement de côté | Seitenwechsel | cambio de lado | troca de lado |
+
+Particularidades:
+- Em francês e espanhol o nome vem **depois** de "au service"/"al servicio"; em alemão, depois de "Aufschlag". O francês chama o set de **manche** (exceto em "jeu, set et match") e o tie-break de **jeu décisif**.
+- **10-6 … 10-9** no tie-break decisivo: em francês, espanhol e português diz-se "dix **à** huit", "diez **a** ocho", "dez **a** oito", porque "dix huit" / "diez ocho" / "dez oito" soam como *dezoito*.
+- **Português**: uma única opção, com interface e voz preferida do Brasil (se faltar a voz brasileira, usa-se a de Portugal) e os anúncios do roteiro da FPT, com palavras válidas nos dois países ("jogo" e não "game", "partida"). "Um set a um" virou "sets iguais": no singular, *set* é pronunciado como *sete* e parecia 7-1.
+- **Pronúncia**: todas as frases de todos os idiomas foram lidas pelas vozes do Google e transcritas com o whisper. Correções acrescentadas: em alemão "Tie-Break" é lido como "Taibreak", com uma vírgula antes (senão sai "Teilbreg" ou "bei Detailbreak"); em francês o "à" isolado dos arquivos pré-gerados é lido como "a" (senão sai "a accent grave"). **O Samsung TTS nos novos idiomas ainda não foi testado.**
+- **Pulseiras** (firmware 2.2): o app envia sozinho o idioma a cada conexão e quando você o muda; a pulseira o salva e o usa também quando está desconectada (busca do telefone, recarga, desligamento), sem acentos porque a fonte é ASCII (*EN CHARGE*, *LAEDT*, *CARGANDO*…). Com um firmware 2.1 ou anterior, as mensagens enviadas pelo app saem traduzidas, mas as mensagens internas da pulseira continuam em italiano. Uma pulseira recém-programada começa em italiano; a partir do firmware 2.2.2, a mensagem de conexão é reescrita no idioma do app assim que ele o envia, cerca de um segundo depois de conectar.
+
+## 6. Usar as pulseiras
+
+| Botão | Ação |
+|---|---|
+| **KEY1** (frontal) curto | ponto para quem está usando a pulseira (também inicia a partida na página INÍCIO DA PARTIDA); um bipe confirma (firmware 2.3 + app 2.4: quando o telefone o recebeu, cerca de meio segundo depois) |
+| **KEY1** longo (1 s) | mostra a bateria (e mantém a pulseira ligada se ela estiver prestes a se desligar por inatividade) |
+| **KEY2** curto | anula o último ponto (também no popup de fim de partida); dois bipes mais graves (com o firmware 2.3, quando o telefone confirma) |
+| **KEY2** longo (2 s) | desliga a pulseira (com o cabo conectado mostra *CONTINUA CARREGANDO*: ela carrega mesmo desligada; a partir do firmware 2.3, KEY1 ou KEY2 também a ligam de novo) |
+| Botão lateral | um clique liga; clique duplo desliga (função do hardware) |
+
+- Ao ligar, pisca **PAREANDO...** (acesa 0,35 s a cada 2 s, para economizar). O app se conecta sozinho às pulseiras que já conhece assim que é aberto; as novas ele encontra em **Mais › Dispositivos** (ou em **Modo e regras** com o modo *Pulseiras*).
+- Conectada: **PAREADA** por 3 segundos com dois bipes, depois **PAREADA COM** + o nome do jogador.
+- A cada ponto a tela acende com o placar do jogo em tamanho grande (à esquerda o seu, à direita o do adversário; a bolinha verde indica quem serve) e depois apaga. No fim do jogo mostra jogos e sets. Se o telefone não confirmar um toque em 8 segundos (conexão perdida), aparece **NAO ENVIADO** em vermelho com dois bipes graves: pressione de novo quando ela tiver reconectado. Já um toque feito durante uma queda curta não se perde: é enviado assim que a pulseira reconecta, e o bipe toca nesse momento.
+
+**Desligamento automático** (os tempos são mudados no app, 6.1):
+
+| Situação | O que a pulseira faz | Padrão |
+|---|---|---|
+| Ligada, mas nenhum telefone se conecta | pisca PAREANDO e depois se desliga | **30 s** |
+| Telefone perdido (desligado, fora de alcance, Bluetooth desligado, app fechado de repente) | pisca RECONECTANDO e se reconecta sozinha assim que possível; senão se desliga | 3 min |
+| Conectada mas inativa (nenhum ponto, nenhuma mensagem) | 30 s antes avisa com **INATIVO · SEGURE KEY1** e um bipe, depois se desliga | 30 min |
+| Partida encerrada (confirmada no telefone) ou **Sair** no app | mostra FIM DA PARTIDA / APP FECHADO e se desliga na hora | ativo (pode ser desativado, 7.2) |
+| Bateria vazia (abaixo de 3,30 V em duas leituras seguidas) | mostra BATERIA VAZIA e se desliga, para não ficar funcionando pela metade | sempre |
+
+- Nos últimos 10 segundos antes de se desligar sem telefone, mostra **DESLIGANDO · 8s - APERTE UM BOTAO** com um bipe: qualquer botão reinicia a contagem do desligamento.
+- Quando se desliga sozinha, ela avisa o telefone: na partida, o quadro laranja mostra *PULSEIRA 1 DESLIGADA (SEM USO)*, *(BATERIA VAZIA)*… Depois do desligamento no fim da partida, o telefone para de procurá-la o tempo todo e reconecta sozinho quando você a liga de novo.
+
+
+O resto da economia: CPU a 80 MHz, tela apagada quando não é necessária, Bluetooth de baixo consumo (o rádio acorda 2-3 vezes por segundo, mas o toque no botão é enviado mesmo assim em até ~120 ms), bipe alimentado só enquanto toca, microfone e 5V desligados, sensor de movimento (IMU) ligado só com o reconhecimento de golpes (6.4).
+
+### 6.1 Ajustes da pulseira
+
+Em **Mais › Dispositivos** ou **Modo e regras** (**Ajustes** embaixo da pulseira de cada jogador) ou durante a partida (toque em **J1**/**J2** no alto, ou no ícone dos controles deslizantes). Eles são salvos **na pulseira** e continuam valendo mesmo depois de desligá-la; a cada mudança a pulseira mostra o nome com *AJUSTES OK*. Com o firmware 2.4 há também a seção **Golpes** (6.4).
+
+| Ajuste | Valores | Padrão |
+|---|---|---|
+| Nome | até 12 caracteres (ex. o nome do jogador ou "J1") | TSM-xxxx |
+| Brilho da tela | 5-100 % | 20 % |
+| Placar visível após cada ponto | Não, 2, 3, 5, 8 s (o resumo do fim do jogo dura 2 s a mais) | 3 s |
+| Volume do bipe | Mudo-100 % | 50 % |
+| Tela invertida | para usá-la no outro pulso | não |
+| Desligamento: ao ligar, se nenhum telefone se conectar | 15 s - 5 min | 30 s |
+| Desligamento: se perder a conexão com o telefone | 1-10 min | 3 min |
+| Desligamento: se ficar conectada mas sem uso | 10-60 min | 30 min |
+
+Embaixo fica a **estimativa de autonomia** (com a carga completa e com a carga atual), com o consumo dividido por item: ela muda enquanto você move os controles, antes mesmo de confirmar. Depois vêm **Identificar**, **Desligar** e **Copiar para a outra pulseira** (mesmos ajustes; o nome continua o dela). **Desligar** pede confirmação, também durante a partida.
+
+### 6.2 Recarga
+
+Conecte o cabo USB-C: a pulseira emite um bipe e mostra a **tela de carga** por 30 segundos; depois a tela se apaga e a cada 10 segundos acende por 1,5 s (uma olhada rápida, como a luz de um carregador). **Qualquer botão** a acende por mais 30 segundos. Se a pulseira estava desligada, ligue-a com um clique no botão lateral para vê-la (a carga acontece de qualquer forma, mesmo desligada).
+
+```
+ TSM-3FA2   USB 5.01V           ← nome e tensão do cabo
+ ┌──────────┐
+ │██████ ⚡  │▌   78%             ← ícone da bateria e porcentagem de carga
+ └──────────┘
+      CARREGANDO                 ← ou CARGA COMPLETA / ALIMENTADO POR USB
+ 4.12V  HA 42 MIN  FIM ~25 MIN   ← tensão da bateria, há quanto tempo carrega, fim estimado
+```
+
+- **Porcentagem**: durante a carga a tensão medida é maior que a real (≈0,1 V); a pulseira a corrige, nunca a deixa cair e só chega a **100 %** quando o carregador informa que terminou. Com a carga completa, o texto vira **CARGA COMPLETA** com o tempo gasto (*CARREGADA EM 1H 25*) e a tela fica apagada (nada de clarões à noite).
+- **Fim estimado**: o chip de alimentação (PM1) não mede a corrente de carga, então o tempo restante é calculado pelo quanto a carga subiu nos últimos 10 minutos: aparece depois de 10 minutos, arredondado de 5 em 5, e é uma estimativa.
+- **ALIMENTADO POR USB**: o cabo está conectado mas a bateria não carrega (e não está cheia): cabo ou fonte fracos, ou bateria desconectada.
+- **Com o cabo ela não se desliga sozinha** (nada de desligamento por falta de telefone ou por inatividade, nada de *bateria vazia*); pode ser desligada com KEY2 longo. Ao tirar o cabo, mostra **USB DESCONECTADO · BATERIA 97%** e a partir daí voltam a valer os tempos normais de desligamento (6).
+- **Conectada ao telefone** (ex. com um powerbank durante a partida) o placar tem prioridade: só uma mensagem curta *CARREGANDO 78%*, e KEY1 longo mostra *CARGA COMPLETA* ou *CARREGANDO*.
+- **No app**: a linha da pulseira (em *Dispositivos* e em *Modo e regras*) e os ajustes dela mostram *Carregando 78%* ou *Carga completa*; na partida, as etiquetas J1/J2 têm o símbolo ⚡. O registro `files/battery_log.csv` também tem duas colunas a mais (tensão USB, carga completa): útil para verificar em quanto tempo ela carrega de verdade.
+- Pulseira e app agora calculam a porcentagem com a **mesma curva** da LiPo (antes a pulseira usava uma reta menos precisa), então mostram o mesmo número.
+
+> A verificar com as pulseiras reais: a recarga não pôde ser testada no hardware. Em especial, com que frequência o carregador indica *carga completa* e quão precisa é a porcentagem durante a carga.
+
+### 6.3 Sem pulseiras: controles Bluetooth
+
+O jeito mais barato de deixar os jogadores marcarem os pontos: dois **controles Bluetooth de selfie** (os de botão de disparo, muitas vezes vendidos como *AB Shutter3*), que custam muito pouco. O Android os vê como um teclado: nenhum firmware para gravar e nenhuma permissão para o app. Qualquer outro teclado ou botoeira Bluetooth (ou USB) também serve.
+
+1. Ligue o controle e pareie nas **configurações de Bluetooth** do telefone, como um fone de ouvido (*Mais › Dispositivos › Configurações de Bluetooth* abre a tela). Repita com o segundo.
+2. *Modo e regras* › modo **Controles** › **Associar** embaixo do Jogador 1 › aperte a tecla do controle dele que vai dar o ponto; depois o mesmo para o Jogador 2. A cada clique de um controle associado a linha dele mostra **Tecla recebida**: assim dá para testar antes de jogar. **Trocar J1 ↔ J2** inverte os dois.
+3. **INÍCIO DA PARTIDA**: um clique num controle começa a partida, como o KEY1 das pulseiras. No alto, **J1**/**J2** ficam coloridos quando os controles estão conectados.
+
+| Gesto | Ação |
+|---|---|
+| um clique | ponto para quem está com o controle (chega meio segundo depois: o app espera para ver se é um clique duplo) |
+| clique duplo | desfaz o último ponto (também na janela de fim de partida) |
+| segurar 1 s | desfaz o último ponto |
+| a outra tecla (controles de duas teclas) | desfaz o último ponto, na hora; apertada menos de meio segundo depois de um clique, cancela esse clique |
+
+- Valem as proteções das pulseiras: dois pontos com menos de 2 segundos de diferença contam uma vez só, dois desfazer seguidos tiram um ponto só, *Partida encerrada* só se confirma no telefone.
+- Muitos controles de selfie têm dois botões (*iOS* e *Android*): a tecla apertada ao associar dá o ponto e a outra desfaz. No CAMKIX (um *AB Shutter3*) o botão grande manda AUMENTAR VOLUME e o pequeno ENTER: associe com o botão grande e o pequeno vira “desfazer”. Se um controle manda duas teclas a cada aperto, um aperto continua sendo um clique.
+- **A tela precisa ficar acesa com o app na frente** (durante a partida o app a mantém acesa sozinho). Diferente das pulseiras, as teclas de um teclado Bluetooth só chegam ao app visível: com a tela bloqueada ou outro app aberto elas não contam. Em partidas longas, deixe o telefone carregando.
+- Se um controle se desconecta durante a partida (desligado, sem bateria, longe demais) o quadro laranja mostra *CONTROLE 1 DESCONECTADO*, e *CONECTADO* quando volta. Muitos controles dormem depois de alguns minutos sem clique: o primeiro clique os desperta e às vezes se perde. Se a voz não anunciar o ponto, aperte de novo.
+- Alcance: uns dez metros, como um fone Bluetooth; com o telefone perto da rede, no meio da quadra, os dois lados ficam cobertos. Bateria: em geral uma CR2032, que dura meses.
+
+### 6.4 Reconhecimento de golpes
+
+Com o firmware 2.4 a pulseira reconhece **forehand, backhand, saque e voleio** com o sensor de movimento (IMU) e os envia ao app, que os conta por jogador. O reconhecimento aprende com quem usa a pulseira: antes é preciso uma breve **calibração**, cujos exemplos ficam salvos na pulseira.
+
+1. **Prenda a pulseira no pulso**, sempre do mesmo jeito (mesmo pulso, mesmo sentido). O reconhecimento se baseia na direção dos movimentos: uma pulseira virada em relação à calibração confunde os golpes.
+2. Ajustes da pulseira (6.1) › **Golpes** › **Calibração**: toque em **Calibrar** ao lado de *Forehand*. A pulseira mostra *FOREHAND · CALIBRACAO 0/20*.
+3. Faça **5-10 forehands** com uma pausa entre eles: a cada golpe o contador sobe, na pulseira e no app (com um bipe, se o volume não estiver no zero). Se um golpe saiu errado, toque em **Desfazer o último**. Depois **Concluir**.
+4. Repita para backhand, saque e voleio. A lixeira apaga os exemplos de um golpe, para refazê-los. São mantidos no máximo 20 exemplos por golpe (acima disso o mais antigo é substituído). Bastam 3 exemplos de pelo menos dois golpes (*Pronta: reconhece os golpes calibrados*), mas mais exemplos, e mais variados, dão um reconhecimento melhor.
+5. Ative **Reconhecimento de golpes**. Com **Mostrar o golpe na pulseira** o golpe aparece por um instante com a confiança do reconhecimento (ex. *BACKHAND 87%*), só se a tela não estiver mostrando o placar ou uma mensagem.
+
+- Durante a partida, abaixo dos tempos, uma linha mostra os golpes de cada jogador (*J1 F 12 · B 8 · S 5 · V 3*). Eles contam só com a partida iniciada, não no aquecimento nem na calibração.
+- O resumo (7) traz os golpes por tipo, a **velocidade do pulso** (média e máxima, em °/s: a força do golpe, não a velocidade da bola) e os **golpes por ponto** (duração das trocas de bola). Se só um jogador tem pulseira com golpes, as trocas contam só os golpes dele.
+- Um golpe que não se parece com nenhum exemplo não é mostrado e conta como *não reconhecido*: se acontecer muito, confira como você usa a pulseira ou acrescente exemplos.
+- Movimentos lentos (voltar à posição, pegar a bola) não contam: um golpe precisa passar de 400 °/s de rotação do pulso e 2,5 g de aceleração.
+- **Bateria**: o sensor gasta cerca de 1 mA a mais, uns vinte minutos de uma carga completa (a estimativa nos ajustes já considera isso). Sem reconhecimento, o sensor fica desligado.
+- Nos golpes muito fortes o giroscópio chega ao máximo (2000 °/s): o reconhecimento não é afetado, mas a velocidade mostrada fica um pouco abaixo da real.
+
+### 6.5 Cintas cardíacas
+
+Frequência cardíaca e calorias de **cintas peitorais Bluetooth** com o serviço cardíaco padrão: Coospo (testada a H6), Magene, Polar, Garmin, Wahoo… Valem em todos os modos, mesmo sem pulseiras.
+
+1. Molhe os eletrodos e coloque a cinta: ela liga sozinha em contato com a pele.
+2. *Modo e regras* (ou *Mais › Dispositivos*) › **Frequência cardíaca** › ative **Cintas cardíacas** e escolha a cinta de cada jogador (uma vez só). **Trocar** as inverte.
+3. **Idade, peso e sexo** de quem a usa (opcionais): para as calorias (fórmula de Keytel, erro típico ±20%) e, com a idade, para as zonas cardíacas (máximo estimado 208 − 0,7 × idade).
+
+- Sob cada cinta: estado, frequência, **sinal** em dBm (mais perto de 0 = mais forte) e **quedas**, ou seja, as vezes em que a frequência não chegou por mais de 3 segundos, com os segundos perdidos (*2 quedas (14 s)*). Contam a partir do «jogo» da partida; antes, desde a escolha da cinta. Mostram até onde a cinta alcança.
+- Na partida uma linha mostra a frequência ao vivo (*J1 · 142 bpm*). No resumo (7): frequência média e máxima, calorias, gráfico no tempo e tempo nas zonas cardíacas. As pausas não contam.
+- **Alcance**: teste em casa com a H6 e o telefone parado: conectada até 21 m, mas a −100 dBm, no limite; de costas o sinal cai 5-10 dBm. Em simples o jogador distante fica a 24-30 m do telefone: para não perder dados use o **segundo telefone** (6.6).
+
+### 6.6 Segundo telefone atrás da outra linha de fundo
+
+Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros a menos que o comprimento da quadra. Com um segundo telefone atrás da outra linha de fundo cada jogador sempre tem um por perto: o segundo (**satélite**) capta as cintas e pulseiras dos jogadores do seu lado e faz a ponte com o **principal**, que controla a partida.
+
+1. **Principal**: Mais › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone**. Na primeira vez pede a permissão *Dispositivos próximos* (a localização até o Android 12). O telefone cria a sua **própria rede, só local**: sem SIM nem dados, e sem precisar do Wi-Fi do clube. Aparece um QR.
+2. **Satélite**: Mais › **Dispositivos** › **Segundo telefone** › **Servir de segundo telefone** › escaneie o QR. O Android pede uma vez para conectar à rede do principal (*AndroidShare_…*): toque em **Conectar**. O satélite mantém os dados móveis. Deve mostrar *Conectado ao telefone principal*.
+3. O satélite segue sozinho as cintas e pulseiras escolhidas no principal, nos mesmos lados: não é preciso escolher nada. Deixe-o atrás da linha de fundo com o app aberto.
+
+- **Troca de lado**: não é preciso fazer nada. Cada cinta e cada pulseira fica com o telefone a que está conectada enquanto o sinal aguentar; depois o telefone mais próximo a assume (alguns segundos). No principal aparece *Pelo segundo telefone*; durante a passagem uma pulseira pode aparecer desconectada por um instante.
+- **Nenhum dado perdido**: frequência, botões e golpes do satélite levam o **ID da partida** e um número sequencial, e o satélite os guarda até o principal confirmar. Se o Wi-Fi entre os telefones cair, a frequência chega depois e preenche os buracos do gráfico; os golpes contam se forem da mesma partida. Um **botão** da pulseira que chega mais de 5 segundos depois não dá o ponto: aperte de novo. O mesmo botão chegado por dois caminhos conta uma vez só.
+- Do principal para as pulseiras passam placar, mensagens, *Identificar*, desligamento e configurações. É melhor mudar as configurações com a pulseira conectada ao principal.
+- **Placar**: no satélite **Mostrar o placar** abre o placar da partida em tela cheia (como em 8.3), já conectado ao principal.
+- Se o principal não conseguir criar a rede (hotspot normal já ligado), usa o Wi-Fi em que está: nesse caso os dois telefones devem estar na mesma rede. Com Android 9 ou anterior o satélite mostra nome e senha da rede, para escolher à mão nas configurações de Wi-Fi.
+- **Parar** fecha a conexão e a rede; o satélite volta às suas cintas e pulseiras.
+
+## 7. Como usar o app
+
+1. **Nova partida** (opcional): **Tênis** ou **Padel** (app 2.5: mesmas regras, tempos e anúncios; escolhendo Padel, dupla e golden point (ponto de ouro) são configurados sozinhos, dá para mudar (no lugar do golden point, *Modo e regras* oferece também o *star point* da FIP: no máximo duas vantagens, depois um ponto decisivo), e o resumo diz *Padel*), clube, quadra, simples/duplas, nomes (nas duplas, dois nomes por equipe). **Buscar o endereço da quadra** (desativado por padrão) acrescenta ao resumo o endereço junto com as coordenadas: ele é pedido ao serviço de geocodificação do telefone, que com os serviços do Google envia as coordenadas ao Google. **Avançar**. Com *Padel* aparece também **Torneio Americano ou Mexicano**: de 4 a 16 jogadores e de 1 a 4 quadras, partidas por pontos (16, 24 ou 32: os pontos das duas duplas somados dão o total) ou por tempo. No *Americano* as duplas mudam a cada rodada para que cada um jogue com e contra o maior número de pessoas; no *Mexicano*, a partir da segunda rodada, joga-se pela classificação (1º e 4º contra 2º e 3º na mesma quadra). A cada rodada escreve-se o resultado de cada quadra (por pontos basta um número, o outro se completa) ou conta-se com *Contar ponto a ponto*, com a voz e, por tempo, o cronômetro; com mais jogadores que lugares em quadra, descansa-se em revezamento. **Próxima rodada** começa quando todos os resultados estão lá; a **Classificação** conta os pontos de cada um, depois as vitórias e o saldo de pontos, e é compartilhada como texto.
+2. **Modo e regras**:
+   - *Árbitro*, *Pulseiras* ou *Controles* (6.3). Com as pulseiras são obrigatórios Bluetooth ligado, permissão de localização e localização ativada: as linhas dos **Requisitos** se atualizam em tempo real (mesmo se você desligar o Bluetooth ou a localização pelo painel de notificações) e ficam vermelhas, com o botão para corrigir.
+   - A **busca é automática e contínua** enquanto a página estiver aberta: ligue as pulseiras e elas ocupam sozinhas os lugares livres (primeiro Jogador 1, depois Jogador 2). **Identificar** faz aquela pulseira piscar na cor do jogador (amarelo ou vermelho) com bipes, para você ver logo qual tem na mão; **Trocar J1 ↔ J2** as inverte sem desconectá-las. No menu suspenso você sempre pode escolher outra ou *Nenhuma* (a que for tirada à mão não é recolocada pela busca). Uma pulseira não pode ficar com dois jogadores.
+   - **Desligar as pulseiras no fim da partida e ao sair** (ativado por padrão): ao confirmar *Partida encerrada* e com *Sair*, as pulseiras se desligam em vez de esperar a inatividade.
+   - No modo árbitro, tocando em **Avançar** sem localização aparece o convite para ativá-la (senão o local não vai constar no resumo).
+   - Formato (*3 sets*, *5 sets*, *2 sets + tie-break decisivo a 10*, *pro set* de 8 ou 10 jogos, *só tie-break decisivo a 10*), jogos por set (6, ou 4 em sets curtos com tie-break no 4-4), tie-break nos sets sim/não (não: o set continua até alguém ter 2 jogos de vantagem), *Sem vantagem* (No-Ad). Idioma e voz ficam em *Mais › Idioma e voz* (4.1).
+   - **Sorteio**: a moeda gira e indica quem vence; você define quem serve e os lados da quadra **vistos da cadeira do árbitro** (esquema da quadra com **Inverter lados**). Nas duplas, escolha também quem serve primeiro em cada equipe.
+3. **INÍCIO DA PARTIDA** pisca: toque no botão, pressione KEY1 de uma pulseira ou aperte um controle. A voz diz *"Primeiro set" · "[nome] ao serviço" · "joguem"* com 1 segundo entre as frases; o **Match Time** começa em "joguem".
+4. **Partida**: no alto à esquerda o tempo de partida, à direita a contagem regressiva (**Shot Clock** 25 s, **Changeover Time**, **Set Break Time**; em vermelho nos últimos 5 s). O quadro laranja acende por 5 s para *troca de lado, tie-break, set point, match point, break point…*. Os dois botões quadrados (amarelo = Jogador 1, vermelho = Jogador 2) ficam do lado em que os jogadores estão de verdade e trocam de lugar a cada troca de lado; embaixo de quem serve aparece **On Serve**. Embaixo: *Anular ponto*, *Suspender/Retomar*, áudio (ícone do alto-falante, riscado = desligado), *Nova partida*, **Sair**. No modo pulseiras, embaixo dos tempos ficam **J1**/**J2** com bateria e autonomia: tocando neles, abrem-se os ajustes da pulseira. Um toque duplo em *Anular ponto* tira um ponto só (um segundo toque em menos de 1 s não conta); logo depois de uma troca de página o segundo toque de um toque duplo é ignorado, para não cair num botão da página nova. O **cadeado** embaixo bloqueia a tela (por exemplo com o telefone no bolso ou no banco): os toques não fazem nada, pulseiras e controles sim; para desbloquear, segure o cadeado.
+5. No último ponto aparece o popup **Partida encerrada / Anular o último ponto**. "Partida encerrada" só se confirma **no telefone**. Por meio segundo depois de aparecer, os botões dele ignoram toques: um toque duplo no último ponto não anula nada.
+6. **Resumo**: vencedor, nomes, placar set a set com os pontos do tie-break, duração, hora de início e de fim, data, clube, quadra, local, formato, pontos e jogos ganhos. Botões **Salvar arquivos** (nome do arquivo + pasta à escolha + formatos .txt/.json/.png e **PDF completo** com resultado, estatísticas da partida e de cada set, histórico e fotos). **Compartilhar** pergunta se envia a imagem com texto (para WhatsApp e redes sociais) ou o PDF completo. No Resumo, **Fotos da partida** guarda até 10 fotos de recordação (da galeria ou tiradas na hora): ficam no telefone, vão para o PDF e passam para o outro telefone com a transferência, nunca para a imagem das redes, **Compartilhar** (imagem 1080×1350 + texto para WhatsApp/Instagram/…), **Nova partida**, **Sair**. Abaixo das fotos, **Notas** aceita um texto livre (até 2000 caracteres): salva sozinho, vai para o PDF, o texto compartilhado e os arquivos .txt e .json, e passa para o outro telefone com a transferência; não vai para a imagem das redes. A partida terminada entra sozinha no **Histórico** (aba **Progresso**): a lista das partidas, para reabrir com o resumo ou excluir, e a aba **Jogadores** com vitórias, derrotas e confronto direto de quem tem o nome escrito em *Nova partida* (maiúsculas e espaços não contam; nas duplas conta cada jogador). **Importar** adiciona as partidas salvas como .json com *Salvar arquivos* em outro telefone: as terminadas vão para o histórico e as não terminadas para as partidas suspensas para retomar. **Transferir** (no alto à direita no Histórico) passa o histórico e as partidas suspensas para outro telefone com um código QR: os dois telefones precisam estar na mesma rede Wi-Fi ou um no hotspot do outro; no que tem as partidas toque em *Enviar* e deixe aberta a janela com o código, no outro em *Receber* e escaneie o código (precisa da permissão da câmera). Assim dá para continuar em outro telefone até uma partida em andamento: suspenda, transfira e retome. As partidas se somam às que o telefone já tem. **Fotos dos jogadores**: toque no círculo ao lado do nome em *Nova partida* (ou no detalhe do jogador no Histórico) e escolha uma foto; ela é cortada quadrada e encontrada pelo nome. Aparece no Histórico, no resumo e no placar da TV, fica só neste telefone (vai junto na transferência) e não entra na imagem compartilhada. Tocando de novo no círculo você troca ou remove a foto. Se o app fechar enquanto você está no resumo (o Android fechando o app em segundo plano, uma atualização, uma reinicialização do telefone), ele volta quando o app é reaberto; não se você mesmo saiu com *Nova partida*, *Sair* ou tirando o app dos recentes. A pasta padrão é **Documents/Tennis Score Manager** (a partir do Android 10; no Android 8 e 9 a pasta do app): qualquer gerenciador de arquivos a abre e ela fica mesmo desinstalando o app. Salvando duas vezes com o mesmo nome, o segundo vira *nome (1)*; na imagem os textos longos (nomes, endereço) se ajustam à largura.
+
+   O resumo tem três abas. **Resumo**: os dados acima e, com as pulseiras 2.4, golpes, velocidade do pulso e golpes por ponto (6.4). **Estatísticas**, da partida ou de um set: os dois jogadores comparados com barras que saem do centro (colorida a de quem está à frente) para pontos e jogos ganhos no saque e na devolução, break points salvos e convertidos, total de pontos e jogos, pontos seguidos, últimos 10 pontos, match points salvos; com as pulseiras 2.4 também golpes por tipo e velocidade média do pulso. **Ponto a ponto**: set a set, cada jogo com a bola de quem saca, *SAQUE PERDIDO* nas quebras, o placar depois de cada ponto com **BP** (break point), **SP** (set point) e **MP** (match point) e o resultado (*JOGO*, *QUEBRA*, *SET*, *PARTIDA*). Aces, duplas faltas, primeiros saques, winners e erros aparecem se você ativar as **estatísticas detalhadas** em *Modo e regras*: no lugar dos dois botões grandes surgem *Ace* e *Falta* (na segunda vez vira *Dupla falta*) e, para cada jogador, *Winner*, *Erro* (o ponto vai para o outro) e *Ponto*; *Anular ponto* também tira uma falta. É pensado para quem marca da beira da quadra. Depois de *Erro* aparece por 6 segundos *Não forçado / Forçado*; com pulseiras ou controles, depois de cada ponto aparece *Como terminou o ponto?* (Ace, Winner, Erro): responder é opcional e o placar não muda. No Histórico, o detalhe de um jogador mostra a **evolução**: pontos ganhos partida a partida e as médias de aces, duplas faltas, primeiros saques, winners e erros. As estatísticas de cada partida contam também game, set e match points convertidos, games vencidos a zero, games seguidos, sets vencidos depois de estar um break atrás e, no cartão **Tempos**, a duração de cada set e o game mais longo.
+
+   **Revanche** (no fim do resumo): propõe o mesmo dia da semana e a mesma hora, na semana seguinte, e o clube da partida; dá para mudar data, hora e local e acrescentar uma nota. **Mandar o convite** abre o compartilhamento (WhatsApp, SMS, e-mail…) com a mensagem pronta: quem contra quem, quando, onde e como terminou da última vez. **Pôr na agenda** cria o evento no app de agenda, **Preparar a partida** traz de volta para *Nova partida* jogadores, clube, quadra e regras (o torneio não). Sem conta: o convite passa pelos canais que você já usa.
+
+**Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
+
+**Salvamento**: a partida é salva sozinha a cada ponto. *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
+
+### 7.1 Treino com a cinta
+
+Para treinar com a cinta cardíaca sem partida: **Treinar** › **Treino com a cinta**. Usa-se **uma cinta**, a do Jogador 1, com idade, peso e sexo para calorias e zonas; ela é escolhida ali mesmo (com o interruptor *Cintas cardíacas*, Bluetooth e permissões se faltarem).
+
+1. **Iniciar**: em destaque a frequência ao vivo, embaixo o tempo e a volta atual.
+2. **Volta** fecha um trecho do treino e abre outro (como o botão de volta de um cronômetro): um tiro, um exercício, uma volta na pista. **Pausar / Retomar** para o tempo; as pausas não contam.
+3. **Terminar**: o app grava **mais um minuto de recuperação** (fique parado) para medir quanto a frequência cai; **Salvar já** pula essa parte.
+
+- **Resumo**: duração, frequência média e máxima, calorias, **VFC (RMSSD)** a partir dos intervalos entre batimentos enviados pela cinta (são precisos uns trinta batimentos limpos; compare com os seus treinos parecidos, não com os dos outros), **recuperação em 1 minuto** (quanto mais cai, melhor), gráfico, zonas cardíacas e, para cada volta, duração, média, máximo e recuperação.
+- **CSV** (segundo a segundo, com a volta e o minuto de recuperação) e **PDF** de uma página com gráfico, pizza das zonas e voltas, para compartilhar.
+- Os treinos ficam na mesma tela, separados das partidas; podem ser reabertos ou excluídos. A frequência chega também do segundo telefone (6.6) e a gravação continua com a tela apagada.
+
+### 7.2 Progressos
+
+**Progresso** › **Rating TSM · Progressos**: um documento para ver se você está melhorando, **separado** para treinos e partidas.
+
+- **Treinos**: duração, frequência média e máxima, calorias, VFC, recuperação.
+- **Partidas** de um jogador do histórico (escolhido na lista): partidas vencidas, pontos ganhos, aces, duplas faltas, primeiros saques em quadra, winners, erros não forçados. Aces e os outros valores detalhados só existem nas partidas jogadas com estatísticas detalhadas; são totais por partida.
+- Para cada item a média da **primeira metade** do período e a da **segunda**: ▲ verde se melhora, ▼ vermelho se piora (menos duplas faltas ou erros é uma melhora), = se fica igual (menos de 5% de diferença) ou se não dá para dizer (frequência). São precisos pelo menos 2 treinos ou partidas.
+- **O que comparar**: os **Filtros** escolhem o período (tudo, 30 dias, 3 meses, 1 ano), os **dias da semana** (por exemplo só as quartas-feiras, também vários) e, para as partidas, **torneio**, **clube** e **adversário** do histórico; embaixo, a lista **Para comparar** para marcar (*Todos* / *Nenhum*). Comparação, PDF e impressão usam só os marcados.
+- **Rating TSM**: em *Partidas*, acima dos filtros, o rating do jogador (todos começam em 1500) com as partidas contadas, a variação da última e a evolução, e a **Classificação TSM** de todos os jogadores do histórico. É um Elo calculado no telefone: sobe quando você vence, mais contra quem tem rating mais alto e com placar folgado; nas duplas conta a média da dupla; tênis e padel têm classificações separadas. Nas 5 primeiras partidas é *provisório* e se move mais. No resumo de cada partida o cartão **Rating TSM** mostra quanto cada um ganhou ou perdeu; com **Amistoso** a partida fica no histórico mas não conta.
+- **PDF** (com a evolução de cada item e a lista completa, em várias páginas se necessário) para compartilhar, ou **Imprimir** com o serviço de impressão do Android (também *Salvar como PDF*).
+
+### 7.3 Vídeos: telefone-câmera, melhores momentos e replay
+
+Um segundo telefone num tripé filma a partida e coloca no vídeo o placar do árbitro.
+
+1. **Árbitro**: Mais › **Dispositivos** › **Segundo telefone** › **Usar um segundo telefone** (QR, como em 6.6).
+2. **Câmera**: Mais › **Dispositivos** › **Segundo telefone** › **Servir de câmera**, escaneie o QR e depois **Abrir a câmera** (permissões de câmera e microfone; o telefone precisa gravar em 1080p). Com *Placar conectado* o gráfico do placar está no vídeo (**Gráfico** liga ou desliga); sem árbitro grava só o vídeo.
+   - **Gravar / Parar**: o vídeo vai para a galeria (*Filmes/Tennis Score Manager*) com capítulos, um por ponto.
+   - **Ao vivo**: transmissão RTMP no YouTube, Twitch, Facebook ou num servidor seu; servidor e chave da transmissão em *Ao vivo: servidor*.
+   - **Enquadrar** (assistente de enquadramento): informe a quantos metros atrás da linha de fundo e a que altura você colocou o telefone e em que quadra joga; o app indica a inclinação para baixo que mantém no vídeo as duas linhas de fundo e o jogador distante, e diz se a quadra cabe na largura. Muitas vezes o limite é a largura: da grade (cerca de 6 m) a lente principal corta os cantos próximos, a **grande-angular** não (**Usar a lente…**, ou o botão **Lente**, com a gravação parada). Com **Mostrar o nível** a pré-visualização mostra o horizonte e indicações (*aponte 2° mais para baixo*, *gire no sentido horário*…), em verde quando está certo, com uma vibração quando o telefone está na posição. O nível aparece também na janela **Câmera** do telefone do árbitro. Os sensores não sabem esquerda e direita: confira a olho se a rede está no centro.
+   - **Contorno** (contorno da quadra): a pré-visualização mostra as linhas da quadra como a lente as vê, e elas acompanham o telefone quando você o inclina. Mova os controles (**Distância**, **Altura**, **Direção**, **Deslocamento lateral** e, se preciso, **Campo de visão** e **Correção da inclinação**) até coincidirem com as linhas reais: assim se acerta também o centro, e a inclinação sugerida fica precisa. O ajuste é lembrado para a quadra da partida (*Clube · Quadra* do árbitro) e recuperado na próxima vez. Contorno e controles também estão na janela **Câmera** do árbitro. Quanto mais alto o telefone, melhor se vê a metade distante da quadra: a 2,5 m ela fica espremida logo acima da rede.
+3. **Câmera no alto, comandada pelo árbitro**: no telefone do árbitro, **Câmera** (ao lado de *Replay* durante a partida, ou *Enquadramento e comandos da câmera* na Mais › **Dispositivos** › **Segundo telefone**, útil para ajustá-la antes de começar) mostra o enquadramento do telefone-câmera como fica no vídeo, com o gráfico, e **Gravar / Parar**, **Ao vivo**, **Gráfico** e o **zoom**. Mostra também a duração da gravação, a bateria e o espaço livre (em laranja quando baixos). A imagem é pequena e aos saltos (cerca de 3 quadros por segundo) e só é enviada enquanto se olha; a chave da transmissão é colocada no telefone-câmera.
+
+- **Vídeo** › **Seus vídeos**: os vídeos gravados, para rever ponto a ponto, game a game ou set a set. **Capítulos do YouTube** prepara os capítulos para colar na descrição. **Importar vídeo** pega um vídeo feito com outra câmera (o arquivo fica onde está): os pontos são marcados assistindo, tocando no fim de cada ponto quem o ganhou e, se quiser, como terminou (*Desfazer o último* tira o último); formato e regras são os de *Modo e regras*.
+- **Filtros do treinador** (ícone do filtro): só os pontos de um jogador, ganhos ou perdidos, no saque ou na devolução, no primeiro ou no segundo saque, pela forma como terminaram, em break points ou em set e match points. **Reproduzir** coloca-os em sequência.
+- **Melhores momentos**: montagem automática dos melhores pontos (aces, winners, break points, set e match points, trocas de bola longas com as pulseiras) na ordem de prioridade escolhida com as setas, de no máximo 1, 3, 5, 10 ou 15 minutos ou uma **Outra duração** até 90. Se não couber tudo, primeiro os trechos são encurtados, depois ficam de fora os pontos menos importantes. O resultado vai para a galeria.
+  - **Estatísticas no fim do vídeo**: 2 ou 3 telas de 10 segundos como nas transmissões dos torneios: saque e break points; pontos, erros e trocas de bola curtas e longas; batimentos, se a cinta foi usada. A partida é a do histórico jogada durante a gravação, ou a dos pontos marcados num vídeo importado. Nas laterais, a foto do jogador; sem foto, um retrato estilizado de homem ou de mulher (escolha **Homem / Mulher** em *Nova partida*) (sem escolha, o do homem; vale em todo o app, também em *Nova partida*, no histórico, no resumo, no PDF e no placar da TV); embaixo, a porcentagem de pontos ganhos. No alto, torneio, categoria e fase (*Mais detalhes* em *Nova partida*), ou clube e quadra.
+  - **Música** sob as estatísticas, com fade de entrada e de saída: *Nowhere Land* de Kevin MacLeod (incompetech.com, licença CC BY 4.0: se publicar o vídeo, dê o crédito), ou uma faixa sua com **Escolher uma faixa** (usa-se o começo; use só músicas que você tem o direito de colocar nos seus vídeos).
+  - No rodapé de cada tela de estatísticas aparece **Criado com Tennis Score Manager** com o endereço do site.
+- **Replay**: no telefone do árbitro, com a câmera conectada, **Replay** pede à câmera o ponto contestado (*Último ponto*, *Ponto anterior* ou *Desde o último ponto marcado*) e o mostra, com pausa e quadro a quadro. **Também no placar** mostra também no placar da TV.
+
+### 7.4 Raquetes: raquete virtual
+
+**Progresso** (ou **Mais**) › **As minhas raquetes**: cada raquete física tem a sua ficha (duas raquetes do mesmo modelo são duas fichas: cordas, peso e horas mudam).
+
+- **Ficha**: alcunha (A, B…), marca, modelo, peso, equilíbrio, cabeça e padrão de cordas, escritos à mão ou tirados **do catálogo** (dados do fabricante, a corrigir se mediu a sua). *Posta de lado*: deixa de ser proposta, mas fica nas comparações.
+- **Encordoamentos**: tipo (monofilamento, multifilamento, sintética, tripa natural, híbrido), marca e modelo (também das cordas comuns), calibre, tensão das verticais e das horizontais, data e notas. *Novo encordoamento* parte do montado. Para cada um a app soma as **horas de jogo** dos jogos e treinos associados e avisa ao passar o **limite de verificação** escolhido (20 horas por omissão): só pelo tempo não consegue saber quanta tensão resta.
+- **Antes de jogar**: em *Nova partida*, por baixo da classificação de cada jogador, escolhe-se a sua raquete; no treino, acima da cinta. O jogo (pontos, pancadas das pulseiras, batimento) e o treino são guardados com uma **cópia** da raquete como estava nesse dia, cordas e tensão incluídas: voltar a encordoá-la depois não muda as sessões passadas.
+- **No resumo** do jogo (separador *Resumo*) e do treino vê-se a raquete usada, pode associá-la também depois (usa-se o encordoamento montado nesse dia) e avaliar as **sensações** de 1 a 5: controlo, conforto, potência e cansaço.
+- **Comparação**: *por raquete* ou *por encordoamento* (mesma raquete com tensões ou cordas diferentes), escolhem-se as configurações A e B. Barras lado a lado para sessões, horas, jogos ganhos, pontos ganhos, primeiros serviços dentro, pontos ganhos com o primeiro e o segundo, ases, duplas faltas, winners e erros não forçados por jogo, velocidade média do pulso e pancadas das pulseiras, batimento médio e sensações médias. O melhor valor fica a negrito, mas a app não escolhe uma vencedora: adversário, piso, condições e forma também contam.
+
+### 7.5 Treino de golpes: saque, forehand, backhand e voleio
+
+Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e com os botões se diz como foi. Basta um telefone, sem árbitro.
+
+1. **Treinar** › **Treino de golpes**, escolha o golpe (**Saque**, **Forehand**, **Backhand**, **Voleio**) › **Começar** (a pulseira deve estar conectada como em 6.1; sem ela, marque pelos botões da tela).
+2. **Onde colocar o telefone** (abre sozinho na primeira vez, depois pelo botão *Onde coloco o telefone?*):
+   - **ao lado de quem saca**, do lado do braço que bate (à direita para um destro), a **3-4 m**, na altura da linha de fundo ou meio metro atrás;
+   - lente a **1-1,2 m** do chão, telefone **na horizontal** e reto, apontado para quem saca;
+   - no enquadramento tem de caber **a pessoa inteira, dos pés à raquete no alto** (cerca de 2,7 m): se a cabeça da raquete sair, afaste o telefone ou passe para a **grande-angular** (botão *Lente*);
+   - para ver também para onde vai a bola, como alternativa: 3-4 m **atrás** de quem saca, um pouco de lado, a 1,5-2 m de altura;
+   - nunca na frente de quem saca nem na trajetória da bola.
+3. Escolha o **lado** (direito/esquerdo), **primeiro ou segundo** e, se quiser, o **alvo** (no T, no corpo, aberto): valem para os saques seguintes.
+4. Saque e aperte **KEY1 = dentro** ou **KEY2 = fora**; **KEY1 pressionado** desfaz o último. A voz diz a contagem (*Dentro. 8 de 12*) e a pulseira mostra. Se a pulseira reconheceu o saque, vale esse instante; senão, alguns segundos antes do botão.
+5. De cada saque é salvo um **clipe** de alguns segundos em volta do golpe. **Fim** mostra o resumo: dentro sobre tentativas, por lado, primeiro e segundo, alvo e, se a pulseira reconheceu os saques, a rotação média do pulso nos saques dentro e nos de fora. **Rever todos / só os dentro / só os fora** abre os clipes no replay (pausa, câmera lenta, quadro a quadro).
+6. Embaixo de **Começar** ficam as 3 últimas sessões **do golpe escolhido** (os botões dos golpes mostram quantas sessões cada um tem, ex. *Backhand · 4*) e a linha dos **golpes dentro, sessão após sessão**. **Todas as sessões** abre as do golpe escolhido, por mês, com o espaço dos vídeos e se já foram analisadas. Toque numa sessão para o resumo e os clipes; **segure** para selecioná-la (o ícone no alto seleciona todas) e depois **Apagar** (sessão e vídeos) ou **Só os vídeos** (libera espaço: ficam as contagens, as medidas da análise e as imagens dos momentos-chave). **Progresso** mostra a evolução de cada golpe.
+   - **Onde ficam os vídeos**: em **Documentos/Tennis Score Manager/Treino de golpes**, com as pastas **Saque**, **Forehand**, **Backhand** e **Voleio** (criadas ao abrir o app) e dentro uma pasta por sessão (data e hora) e uma por golpe, com `video.mp4` (abre e compartilha de qualquer app), a análise e as três imagens. Aparecem em qualquer gerenciador de arquivos e ficam mesmo desinstalando o app (guarde como arquivo: um app reinstalado não recupera as sessões). No Android 8-10 a mesma estrutura fica na pasta do app. Os clipes das sessões de antes da 2.5 vão para lá sozinhos na primeira abertura.
+7. **Análise do movimento** (a partir da sessão salva): **Analisar os saques** encontra a posição do corpo nos clipes (modelo MoveNet: na primeira vez o app oferece baixá-lo, 7 MB, da página do projeto no GitHub; depois tudo fica no telefone, sem internet, alguns segundos por saque; pode ser excluído no fim da tela. Não está disponível em aparelhos com processador x86) e mede três momentos: **preparação** (braço do lançamento no alto), **joelhos** mais flexionados e **impacto**. Para cada saque: as três imagens com o esqueleto desenhado e as medidas (joelho mais flexionado, cotovelo no impacto, altura do impacto em relação à altura, braço do lançamento, ombros na preparação, tempo da preparação ao impacto); no alto, **dentro e fora** comparados. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus saques entre si. O corpo é bem reconhecido com a pessoa inteira no enquadramento, de lado e com boa luz; raquete e bola não são medidas.
+   Toque num saque para abri-lo: **Ver o vídeo com o esqueleto** abre o clipe no replay com o corpo desenhado por cima, em câmera lenta, com botões para saltar para **Preparação**, **Joelhos** e **Impacto** e outro para tirar ou pôr o esqueleto; dois dedos ampliam vídeo e esqueleto juntos (até 6×), toque duplo para voltar. As três imagens também se tocam para vê-las em tela cheia e ampliá-las. Com **várias pessoas** no enquadramento o app segue quem saca (quem mais levanta o braço) e cobre as outras; isso aparece embaixo do saque: confira nas imagens. **Refazer a análise** começa de novo (os clipes ficam), útil depois de uma atualização do app.
+
+**Forehand, backhand e voleio** funcionam do mesmo jeito (KEY1 dentro, KEY2 fora, um clipe por golpe, resumo e análise), com estas diferenças:
+- **Onde colocar o telefone**: ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m e fora do corredor, na altura do ponto de impacto; lente a cerca de 1 m; o swing inteiro no enquadramento (o pulso se move uns 2 m para a frente e para trás). Para o voleio: ao lado de quem joga na rede, a 3-4 m, na altura dele. Sempre do mesmo lado durante a sessão, e nunca na trajetória da bola.
+- No lugar de lado, primeiro/segundo e alvo escolhe-se a **direção** desejada (**cruzado**, **no centro**, **paralela**) e, para o voleio, se é **de forehand** ou **de backhand**; o resumo conta-os à parte.
+- **Análise do movimento**: os três momentos são **preparação** (onde o pulso para no fim da preparação), **impacto** (pulso mais rápido; ali perto o app relê um quadro a cada 33 ms) e **final** (pulso mais alto depois do impacto; no voleio, onde o pulso para). Se houver vários golpes na janela, vale o reconhecido pela pulseira; os pulsos trocados pelo MoveNet (acontece de lado) se corrigem sozinhos. Filme **de lado**: de frente a preparação vai em profundidade e não aparece. As medidas (*—* se o cotovelo ou as pernas não aparecem): joelho mais flexionado, cotovelo no impacto, altura do impacto, quanto **à frente do corpo** se bate, **amplitude da preparação**, altura do final (todas em relação à altura) e o tempo da preparação ao impacto. O vídeo com o esqueleto tem os botões **Preparação**, **Impacto** e **Final**.
+
+## 8. Placar na TV ou no monitor
+
+O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.
+
+### 8.1 Os caminhos possíveis
+
+| Como chega ao monitor | O que é preciso | Prós | Contras |
+|---|---|---|---|
+| **Segundo telefone com saída de vídeo** + cabo USB-C/HDMI, app TSM em *Usar como placar* | um telefone com saída de vídeo pela USB-C (DisplayPort Alt Mode) | sem internet; o placar ocupa todo o monitor em 16:9 e o telefone fica livre | muitos telefones **não** têm saída de vídeo: em geral têm os Galaxy S/Note/Tab S (com DeX: escolha *Espelhamento de tela* ou desative o início automático do DeX), e quase nenhum Galaxy A. Procure "DisplayPort" / "saída de vídeo" na ficha técnica |
+| **Chromecast** (ou Google TV Streamer) no monitor + um telefone qualquer com o TSM em *Usar como placar* e o botão de transmissão (**Transmitir**, **Transmissão** ou **Transmissão de tela**, conforme a versão do Android; Smart View nos Samsung) | Chromecast configurado uma vez com o Google Home na rede do hotspot | qualquer telefone serve, nenhum cabo longo | o Chromecast precisa de **internet** (dados móveis no hotspot); atraso de cerca de 1 s; a transmissão mostra a tela do telefone (na horizontal) |
+| **Navegador** em qualquer aparelho ligado ao monitor (computador portátil, tablet, TV box, Fire TV Stick…) | ler o QR ou digitar o endereço | nenhum app para instalar | a tela se apaga sozinha se você não configurar; é preciso tocar em **TELA CHEIA** toda vez que abrir |
+
+**Por que não por Bluetooth**: o telefone do árbitro já cuida das duas pulseiras por Bluetooth, onde os tempos dos botões importam; o Wi-Fi é separado, mais rápido e chega mais longe. **Por que não só do telefone do árbitro para o Chromecast** (sem segundo telefone): é possível, mas é preciso um app "receptor" registrado no Google (Google Cast Developer Console, US$ 5, pagamento único) e publicado num site https; é um próximo passo possível.
+
+**Dicas de rede**:
+- O placar envia pouquíssimos dados (uma mensagem a cada ponto e a cada 5 segundos) e não consome tráfego de internet.
+- Se o telefone do árbitro fizer o hotspot, nos ajustes do hotspot escolha a banda de **5 GHz**, se houver: o Bluetooth das pulseiras trabalha em 2,4 GHz e assim um não atrapalha o outro.
+- Com o Chromecast, convém que o hotspot seja feito pelo telefone do árbitro com os **dados móveis ativados**; o telefone-placar e o Chromecast se conectam a esse hotspot.
+- Sem Chromecast, também funciona o contrário (hotspot no telefone-placar, como na ideia original): o app do árbitro se mantém conectado ao Wi-Fi mesmo sem internet.
+
+### 8.2 No telefone do árbitro
+
+1. Mais › **Dispositivos** › **Placar na TV** › ative **Placar na TV ou monitor**. No Android 13 ou mais recente o app pede a permissão de notificações: ela é necessária para a notificação do serviço que mantém o placar ativo.
+2. Aparecem o **endereço** (ex. `192.168.43.1:8080`), o **QR** e quantos placares estão conectados. Se aparecer *Sem rede*, ative o hotspot ou conecte-se ao do outro telefone.
+3. **Prévia neste telefone** abre o placar no navegador do próprio telefone.
+4. **Aparência do placar**: cor de cada jogador (8 cores), tempo de partida, relógio de serviço e pausas, sets terminados, mensagens (break point, set point, troca de lado…), bola ao lado de quem serve, segmentos apagados visíveis, texto embaixo (vazio = clube e quadra de *Nova partida*). As mudanças chegam na hora ao monitor.
+5. Na partida, no alto ao centro, fica **TV · 1** (placares conectados): tocando nele, você vê de novo o endereço e o QR.
+
+Com o placar ativado, um serviço em primeiro plano (notificação *Partida em andamento · placar na TV ativo*) mantém o servidor vivo mesmo com a tela apagada, também no modo árbitro. O placar é **somente leitura**: não é possível mudar nada por ali. Ele continua ativo também no resumo e nas outras páginas enquanto o placar estiver ativado (notificação *Placar na TV ativo*), assim o resultado final fica no monitor mesmo com o telefone bloqueado.
+
+O que ele mostra, além da pontuação: *AGUARDANDO A PARTIDA* antes do início, *PRONTOS PARA JOGAR* na página INÍCIO DA PARTIDA, **TIE-BREAK** / **TIE-BREAK DECISIVO** no lugar de *VS*, *PARTIDA SUSPENSA* piscando, **VENCEDOR [nome]** no fim da partida com todos os sets; as vantagens aparecem como **AD** também nos dígitos de LED. Uma partida vencida no tie-break decisivo termina com 1-0 nos jogos e 2-1 nos sets, com [10-8] entre os sets concluídos; mensagens longas diminuem para caber na tela.
+
+### 8.3 No telefone-placar
+
+1. **Jogar** › **Usar como placar**.
+2. O telefone **procura sozinho** o telefone do árbitro (anúncio na rede e varredura do hotspot, poucos segundos) e lembra o último endereço. Se não o encontrar: verifique o hotspot e o *Placar na TV*, depois **Procurar de novo**, ou digite o endereço mostrado pelo árbitro e toque em **Conectar**. Ele o encontra mesmo se neste telefone também estiver ativado *Placar na TV ou monitor*; se o Wi-Fi só conectar depois, procura de novo sozinho.
+3. O placar fica em tela cheia, na horizontal, com a tela sempre acesa.
+   - **Com o cabo HDMI**: o placar vai para o monitor, no formato dele; o telefone mostra *O placar está no monitor externo* com o brilho no mínimo (**Mostrar aqui também** para vê-lo também no telefone). Tirando o cabo, ele volta para o telefone.
+   - **Com o Chromecast**: abra o painel de configurações rápidas › **Transmitir** (ou **Transmissão**, **Transmissão de tela**) / **Smart View** › escolha o Chromecast.
+4. Se o telefone do árbitro sumir (fora de alcance, app fechado), aparece *CONEXÃO PERDIDA - RECONECTANDO...* e depois de 20 segundos ele o procura de novo sozinho, mesmo que o endereço tenha mudado. Mesmo depois de uma queda do hotspot ele reconecta sozinho assim que a rede volta. Nunca passa para o telefone de outra quadra: para mudar de quadra, saia de *Usar como placar* e procure de novo.
+5. Para sair: **voltar duas vezes**.
+
+**Num navegador** (computador portátil, TV box): leia o QR ou digite o endereço, depois toque em **TELA CHEIA** (aparece ao mover o mouse ou tocar na tela). Configure o tempo limite da tela para *nunca*: numa página http o navegador não consegue mantê-la acesa sozinho. Depois de uma queda a página reconecta sozinha; placares demais abertos não bloqueiam mais um novo (o mais antigo é fechado).
+
+
+## 9. Regras aplicadas (ITF) e escolhas combinadas
+
+- **Jogo**: 0-15-30-40, iguais, vantagem, jogo. **Sem vantagem** (No-Ad): no 40-40, ponto decisivo ("iguais, ponto decisivo").
+- **Set**: 6 jogos com 2 de diferença (7-5); no **6-6, tie-break**.
+- **Tie-break**: a 7 com 2 de diferença; quem é da vez serve o 1º ponto, depois 2 pontos cada um; troca de lado **a cada 6 pontos** e no fim; quem serviu primeiro no tie-break **recebe** no primeiro jogo do set seguinte.
+- **Tie-break decisivo** (formato de 2 sets): no 1-1 joga-se até 10 pontos, com 2 de diferença.
+- **Troca de lado** (regra 10 da ITF): depois do 1º, 3º, 5º… jogo de cada set. No fim do set só se troca se o set teve um número ímpar de jogos (6-3, 7-6); senão (6-4), troca-se depois do primeiro jogo do set seguinte. O tie-break conta como um jogo.
+- **Tempos**: shot clock de 25 s entre os pontos; changeover de 90 s; set break de 120 s no fim do set. Além disso, como foi pedido (não é regra da ITF): **30 s** para trocar de lado depois do 1º jogo de cada set, a cada troca de lado no tie-break e no 6-6; terminada qualquer pausa, começa o shot clock.
+- **Duplas**: rotação do serviço A1-B1-A2-B2 durante todo o set, também no tie-break; no início de cada set o app pergunta a ordem (ela pode mudar, como manda o regulamento).
+- **Anúncios**: placar dito a partir de quem serve ("quinze-zero", "zero-quarenta", "quinze iguais", "iguais", "vantagem Rossi"); no fim do jogo, "jogo Rossi, Rossi vence por três jogos a dois" / "dois jogos iguais" + "troca de lado" quando há troca; no 6-6, "jogo Rossi, seis jogos iguais, tie-break"; no tie-break, o placar é dito a partir de quem está na frente ("três a um Rossi", "seis iguais"); no fim do set, "jogo Rossi, Rossi vence por um set a zero" / "sets iguais"; no fim da partida, "jogo, set e partida Rossi, seis quatro, três seis, sete cinco"; "correção" + placar quando um ponto é anulado.
+
+**Escolhas feitas em relação ao pedido original, para seguir a ITF:**
+1. **No 6-6 não há troca de lado** (são 12 jogos, número par): o app faz a pausa de 30 s e diz "tie-break", mas não diz "troca de lado" nem troca os botões de lugar. A primeira troca é depois de 6 pontos do tie-break.
+2. A troca no fim do set depende do número de jogos do set (veja acima), não acontece sempre.
+3. No 1-1, no formato com tie-break decisivo, a voz acrescenta "tie-break decisivo".
+
+## 11. Problemas comuns
+
+- **Pulseira não encontrada**: Bluetooth e localização ativados (linhas verdes)? A pulseira está piscando PAREANDO? (Se já estiver conectada a outro telefone, ela não aparece.) Se nesse meio-tempo ela se desligou sozinha (30 s), ligue-a de novo com um clique no botão lateral.
+- **A pulseira mostra NAO ENVIADO**: o telefone não confirmou o toque em 8 segundos (conexão perdida ou app fechado). Pressione de novo quando a pulseira tiver reconectado. Caso raro: se o toque tinha chegado e só a confirmação se perdeu, o ponto conta duas vezes; a voz anuncia o placar, corrija com *Anular ponto*.
+- **No painel de ajustes aparece "O firmware desta pulseira não tem ajustes"**: essa pulseira ainda tem o sketch antigo; carregue-o de novo (capítulo 5).
+- **A voz não fala ou lê errado**: volume de mídia, *Audio On*, voz do idioma escolhido instalada (4); tente outro mecanismo ou outra voz em *Áudio e voz*.
+- **Tela apagada durante a partida**: no modo pulseiras, um serviço em primeiro plano (notificação "Partida em andamento") mantém ativos Bluetooth, voz e cronômetros; nos modos árbitro e controles a tela fica acesa (com os controles ela precisa ficar: 6.3).
+- **O controle não faz nada**: ele está associado ao jogador (*Mais › Dispositivos* › *Controles*, linha com o nome dele)? O app precisa estar aberto na partida, com a tela acesa (6.3). Se a linha diz *Desconectado*, aperte uma tecla para despertá-lo ou pareie de novo nas configurações de Bluetooth.
+- **Os golpes são confundidos ou saem como não reconhecidos**: use a pulseira como durante a calibração (mesmo pulso, mesmo sentido); senão refaça a calibração usando-a como na partida (6.4).
+- **A pulseira mostra MEMORIA CHEIA**: um exemplo de calibração não pôde ser salvo. Apague os exemplos de um golpe (lixeira) e refaça.
+- **O telefone-placar não encontra o árbitro**: mesma rede? (um dos dois faz o hotspot, o outro está conectado a ele). *Placar na TV* ativado no telefone do árbitro? Tente o endereço à mão. Alguns hotspots isolam os dispositivos conectados entre si ("isolamento de clientes"): se houver essa opção, desative-a.
+- **O navegador do telefone não abre o endereço** com os dados móveis ativados: o Android manda o tráfego pelos dados móveis porque o hotspot não tem internet. Use o app em *Usar como placar* (ele resolve isso sozinho) ou desligue os dados móveis nesse telefone.
+- **Monitor preto com o cabo**: esse telefone não tem saída de vídeo pela USB-C (8.1), ou o Samsung DeX foi iniciado: escolha *Espelhamento de tela*.
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/assets/scoreboard.html
@@ -1051,7 +3243,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -1557,6 +3749,7 @@ class MatchController(
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
             Screen.STROKE_SESSIONS -> Screen.HOME
+            Screen.HELP -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -5612,6 +7805,166 @@ class HeartBucket {
     fun clear() {
         sum = 0
         count = 0
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/HelpDoc.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/HelpDoc.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.text.Normalizer
+
+/** Un pezzo di testo della guida, con lo stile: [ref] è il numero di una sezione da aprire toccandolo ("6.4"). */
+data class HelpSpan(val text: String, val bold: Boolean = false, val italic: Boolean = false, val code: Boolean = false, val ref: String? = null)
+
+/** Un blocco della guida: paragrafo, voce di elenco (puntato o numerato, [indent] = livello) o tabella. */
+sealed interface HelpBlock {
+    data class Para(val spans: List<HelpSpan>, val indent: Int = 0) : HelpBlock
+    data class Bullet(val spans: List<HelpSpan>, val indent: Int, val number: Int? = null) : HelpBlock
+    data class Table(val rows: List<List<List<HelpSpan>>>) : HelpBlock
+}
+
+/** Una sezione: [id] "6.4", livello 2 (capitolo) o 3, titolo senza numero, i blocchi e il testo semplice per cercare. */
+data class HelpSection(val id: String, val level: Int, val title: String, val blocks: List<HelpBlock>, val plain: String)
+
+/**
+ * La guida dell'app (assets/help/<lingua>.md, fatta da deliver/make_help.py dalle guide del repository): un Markdown
+ * semplice con titoli ## e ###, elenchi, tabelle, **grassetto**, *corsivo* e `codice`.
+ */
+object HelpDoc {
+    private val heading = Regex("""^(#{2,3}) (\d+(?:\.\d+)?)\.? (.*)$""")
+    private val numbered = Regex("""^(\s*)(\d+)\. (.*)$""")
+    private val bullet = Regex("""^(\s*)[-*] (.*)$""")
+
+    fun parse(md: String): List<HelpSection> {
+        data class Open(val id: String, val level: Int, val title: String, val lines: MutableList<String> = mutableListOf())
+        val raw = ArrayList<Open>()
+        for (line in md.lines()) {
+            val h = heading.matchEntire(line)
+            if (h != null) raw += Open(h.groupValues[2], h.groupValues[1].length, h.groupValues[3].trim())
+            else raw.lastOrNull()?.lines?.add(line)
+        }
+        val ids = raw.map { it.id }.toSet()
+        return raw.map { o ->
+            val blocks = blocks(o.lines, ids)
+            HelpSection(o.id, o.level, o.title, blocks, plainOf(o.title, blocks))
+        }
+    }
+
+    private fun blocks(lines: List<String>, ids: Set<String>): List<HelpBlock> {
+        val out = ArrayList<HelpBlock>()
+        var table: MutableList<List<List<HelpSpan>>>? = null
+        for (line in lines) {
+            if (line.trimStart().startsWith("|")) {
+                val cells = line.trim().trim('|').split('|').map { it.trim() }
+                // La riga |---|---| separa l'intestazione: non si mostra.
+                if (cells.all { c -> c.isNotEmpty() && c.all { it == '-' || it == ':' } }) continue
+                if (table == null) table = mutableListOf<List<List<HelpSpan>>>().also { out += HelpBlock.Table(it) }
+                table += cells.map { inline(it, ids) }
+                continue
+            }
+            table = null
+            if (line.isBlank()) continue
+            // Rientro: 2-3 spazi per livello.
+            fun level(spaces: Int) = if (spaces == 0) 0 else (spaces + 2) / 3
+            val n = numbered.matchEntire(line)
+            val b = bullet.matchEntire(line)
+            out += when {
+                n != null -> HelpBlock.Bullet(inline(n.groupValues[3], ids), level(n.groupValues[1].length), n.groupValues[2].toInt())
+                b != null -> HelpBlock.Bullet(inline(b.groupValues[2], ids), level(b.groupValues[1].length))
+                else -> HelpBlock.Para(inline(line.trim(), ids), level(line.length - line.trimStart().length))
+            }
+        }
+        return out
+    }
+
+    /**
+     * Grassetto, corsivo e codice; i rimandi tra parentesi a sezioni che ci sono ("(6.4)", "(4.1, 6.3)") diventano
+     * toccabili.
+     */
+    fun inline(text: String, ids: Set<String> = emptySet()): List<HelpSpan> {
+        val out = ArrayList<HelpSpan>()
+        val sb = StringBuilder()
+        var bold = false
+        var italic = false
+        fun flush() {
+            if (sb.isEmpty()) return
+            out += refs(sb.toString(), bold, italic, ids)
+            sb.clear()
+        }
+        var i = 0
+        while (i < text.length) {
+            val c = text[i]
+            when {
+                c == '`' -> {
+                    val end = text.indexOf('`', i + 1)
+                    if (end < 0) { sb.append(c); i++; continue }
+                    flush()
+                    out += HelpSpan(text.substring(i + 1, end), bold, italic, code = true)
+                    i = end + 1
+                    continue
+                }
+                text.startsWith("**", i) -> { flush(); bold = !bold; i += 2; continue }
+                // Un asterisco da solo è corsivo solo se apre o chiude una parola (non "5 * 3").
+                c == '*' && (italic || (i + 1 < text.length && !text[i + 1].isWhitespace())) -> { flush(); italic = !italic; i++; continue }
+                else -> sb.append(c)
+            }
+            i++
+        }
+        flush()
+        return out
+    }
+
+    private val refRegex = Regex("""(?<=\(|, )(\d+\.\d+|\d+)(?=[),])""")
+
+    private fun refs(s: String, bold: Boolean, italic: Boolean, ids: Set<String>): List<HelpSpan> {
+        if (ids.isEmpty()) return listOf(HelpSpan(s, bold, italic))
+        val out = ArrayList<HelpSpan>()
+        var last = 0
+        for (m in refRegex.findAll(s)) {
+            if (m.value !in ids) continue
+            if (m.range.first > last) out += HelpSpan(s.substring(last, m.range.first), bold, italic)
+            out += HelpSpan(m.value, bold, italic, ref = m.value)
+            last = m.range.last + 1
+        }
+        if (last < s.length) out += HelpSpan(s.substring(last), bold, italic)
+        return out
+    }
+
+    private fun plainOf(title: String, blocks: List<HelpBlock>): String = buildString {
+        append(title).append('\n')
+        for (b in blocks) {
+            when (b) {
+                is HelpBlock.Para -> b.spans.forEach { append(it.text) }
+                is HelpBlock.Bullet -> b.spans.forEach { append(it.text) }
+                is HelpBlock.Table -> b.rows.forEach { r -> r.forEach { c -> c.forEach { append(it.text).append(' ') } } }
+            }
+            append('\n')
+        }
+    }
+
+    /** Senza accenti e in minuscolo: "volee" trova "Volée". */
+    fun fold(s: String): String = Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "").lowercase()
+
+    /** Le sezioni che contengono tutte le parole di [query], i titoli prima. */
+    fun search(sections: List<HelpSection>, query: String): List<HelpSection> {
+        val words = fold(query).split(Regex("\\s+")).filter { it.length >= 2 }
+        if (words.isEmpty()) return emptyList()
+        val hits = sections.filter { s -> fold(s.plain).let { p -> words.all { it in p } } }
+        return hits.sortedByDescending { s -> words.count { it in fold(s.title) } }
+    }
+
+    /** Un pezzo di testo intorno alla prima parola trovata, per l'elenco dei risultati. */
+    fun snippet(section: HelpSection, query: String, width: Int = 120): String {
+        val text = section.plain.substringAfter('\n').replace('\n', ' ')
+        val w = fold(query).split(Regex("\\s+")).firstOrNull { it.length >= 2 } ?: return text.take(width)
+        val at = fold(text).indexOf(w).takeIf { it >= 0 } ?: return text.take(width)
+        val from = (at - width / 3).coerceAtLeast(0)
+        return (if (from > 0) "…" else "") + text.substring(from, (from + width).coerceAtMost(text.length)).trim() + if (from + width < text.length) "…" else ""
     }
 }
 TSM_EOF
@@ -13850,6 +16203,7 @@ fun AppRoot(c: MatchController) {
                 Screen.DEVICES -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.DEVICES)
                 Screen.VOICE -> OptionsScreen(c, com.tennis.scoremanager.ui.screens.OptionsPage.VOICE)
                 Screen.STROKE_SESSIONS -> com.tennis.scoremanager.ui.screens.StrokeSessionsScreen(c)
+                Screen.HELP -> com.tennis.scoremanager.ui.screens.HelpScreen(c)
             }
         }
     }
@@ -16901,6 +19255,12 @@ interface Strings {
     /** Allenamento di dritto, rovescio e volée (oltre al servizio). */
     val strokeTrainingTitle: String
     /** Cartella in Documenti/Tennis Score Manager con le quattro cartelle dei colpi. */
+    val moreHelp: String
+    val moreHelpHint: String
+    val helpSearch: String
+    val helpNoResults: String
+    val helpNext: String
+    val helpRead: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -18032,6 +20392,12 @@ object ItStrings : Strings {
     override val poseZoomHint = "Tocca un'immagine per ingrandirla; due dita per lo zoom, doppio tocco per tornare normale."
     override val poseRedo = "Rifai l'analisi"
     override val strokeTrainingTitle = "Allenamento dei colpi"
+    override val moreHelp = "Aiuto"
+    override val moreHelpHint = "Guida completa: come si usa ogni funzione, passo per passo"
+    override val helpSearch = "Cerca nella guida"
+    override val helpNoResults = "Nessun risultato: prova con un'altra parola."
+    override val helpNext = "Sezione dopo"
+    override val helpRead = "Leggi il capitolo"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -19146,6 +21512,12 @@ object EnStrings : Strings {
     override val poseZoomHint = "Tap an image to enlarge it; two fingers to zoom, double tap to go back."
     override val poseRedo = "Analyse again"
     override val strokeTrainingTitle = "Stroke practice"
+    override val moreHelp = "Help"
+    override val moreHelpHint = "Full guide: how to use every feature, step by step"
+    override val helpSearch = "Search the guide"
+    override val helpNoResults = "No results: try another word."
+    override val helpNext = "Next section"
+    override val helpRead = "Read the chapter"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -20283,6 +22655,12 @@ object DeStrings : Strings {
     override val poseZoomHint = "Bild antippen zum Vergrößern; zwei Finger zum Zoomen, doppelt tippen zum Zurücksetzen."
     override val poseRedo = "Erneut analysieren"
     override val strokeTrainingTitle = "Schlagtraining"
+    override val moreHelp = "Hilfe"
+    override val moreHelpHint = "Vollständige Anleitung: jede Funktion Schritt für Schritt"
+    override val helpSearch = "In der Anleitung suchen"
+    override val helpNoResults = "Keine Treffer: Versuche ein anderes Wort."
+    override val helpNext = "Nächster Abschnitt"
+    override val helpRead = "Kapitel lesen"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -21413,6 +23791,12 @@ object EsStrings : Strings {
     override val poseZoomHint = "Toca una imagen para ampliarla; dos dedos para el zoom, doble toque para volver."
     override val poseRedo = "Repetir el análisis"
     override val strokeTrainingTitle = "Entrenamiento de golpes"
+    override val moreHelp = "Ayuda"
+    override val moreHelpHint = "Guía completa: cómo se usa cada función, paso a paso"
+    override val helpSearch = "Buscar en la guía"
+    override val helpNoResults = "Sin resultados: prueba con otra palabra."
+    override val helpNext = "Sección siguiente"
+    override val helpRead = "Leer el capítulo"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -22545,6 +24929,12 @@ object FrStrings : Strings {
     override val poseZoomHint = "Touchez une image pour l'agrandir ; deux doigts pour zoomer, double toucher pour revenir."
     override val poseRedo = "Refaire l'analyse"
     override val strokeTrainingTitle = "Entraînement des coups"
+    override val moreHelp = "Aide"
+    override val moreHelpHint = "Guide complet : comment utiliser chaque fonction, pas à pas"
+    override val helpSearch = "Chercher dans le guide"
+    override val helpNoResults = "Aucun résultat : essayez un autre mot."
+    override val helpNext = "Section suivante"
+    override val helpRead = "Lire le chapitre"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -23678,6 +26068,12 @@ object PtStrings : Strings {
     override val poseZoomHint = "Toque numa imagem para ampliá-la; dois dedos para o zoom, toque duplo para voltar."
     override val poseRedo = "Refazer a análise"
     override val strokeTrainingTitle = "Treino de golpes"
+    override val moreHelp = "Ajuda"
+    override val moreHelpHint = "Guia completo: como usar cada função, passo a passo"
+    override val helpSearch = "Pesquisar no guia"
+    override val helpNoResults = "Nenhum resultado: tente outra palavra."
+    override val helpNext = "Próxima seção"
+    override val helpRead = "Ler o capítulo"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -24248,6 +26644,189 @@ fun QrCode(text: String, size: Dp) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.HelpBlock
+import com.tennis.scoremanager.data.HelpDoc
+import com.tennis.scoremanager.data.HelpSection
+import com.tennis.scoremanager.data.HelpSpan
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.TsmColors
+
+/**
+ * Altro › Aiuto: la guida completa nella lingua dell'app (la stessa del repository, senza le parti per chi sviluppa),
+ * con l'indice, la ricerca e i rimandi tra sezioni toccabili.
+ */
+@Composable
+fun HelpScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val sections = remember(lang) {
+        val text = runCatching { context.assets.open("help/${lang.code}.md").bufferedReader().readText() }
+            .recoverCatching { context.assets.open("help/en.md").bufferedReader().readText() }.getOrDefault("")
+        HelpDoc.parse(text)
+    }
+    var query by rememberSaveable { mutableStateOf("") }
+    var openId by rememberSaveable { mutableStateOf<String?>(null) }
+    val open = sections.firstOrNull { it.id == openId }
+    // Indietro: dalla sezione all'indice, dall'indice ad Altro.
+    BackHandler { if (open != null) openId = null else c.back() }
+    // Una sezione nuova parte dall'alto (la pagina ricorda lo scorrimento).
+    androidx.compose.runtime.key(openId) { ScreenScaffold(
+        title = open?.let { "${it.id} ${it.title}" } ?: s.moreHelp,
+        subtitle = if (open == null) s.moreHelpHint else null,
+        icon = Icons.AutoMirrored.Filled.Help,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (open != null) openId = null else c.back() }, Modifier.weight(1f))
+            if (open != null) {
+                val next = sections.getOrNull(sections.indexOf(open) + 1)
+                if (next != null) GhostButton(s.helpNext, Icons.AutoMirrored.Filled.ArrowForward, { openId = next.id }, Modifier.weight(1f))
+            }
+        },
+    ) {
+        if (open != null) {
+            Section(open) { ref -> openId = ref }
+            return@ScreenScaffold
+        }
+        OutlinedTextField(
+            query, { query = it }, Modifier.fillMaxWidth(), singleLine = true,
+            label = { Text(s.helpSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) },
+            trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Filled.Close, null) } },
+        )
+        if (query.isNotBlank()) {
+            val hits = HelpDoc.search(sections, query)
+            if (hits.isEmpty()) Text(s.helpNoResults, color = TsmColors.TextDim)
+            for (h in hits) {
+                Column(Modifier.fillMaxWidth().background(TsmColors.Surface, RoundedCornerShape(14.dp)).clickable { openId = h.id }.padding(14.dp)) {
+                    Text("${h.id} ${h.title}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    Text(HelpDoc.snippet(h, query), color = TsmColors.TextDim, fontSize = 13.sp)
+                }
+            }
+            return@ScreenScaffold
+        }
+        // Indice: un riquadro per capitolo, coi paragrafi dentro.
+        var chapter: HelpSection? = null
+        val groups = LinkedHashMap<HelpSection, MutableList<HelpSection>>()
+        for (sec in sections) {
+            if (sec.level == 2 || chapter == null) { chapter = sec; groups[sec] = mutableListOf() } else groups[chapter]!!.add(sec)
+        }
+        for ((ch, subs) in groups) {
+            SectionCard("${ch.id} ${ch.title}", Icons.AutoMirrored.Filled.Help) {
+                IndexRow(s.helpRead) { openId = ch.id }
+                for (sub in subs) IndexRow("${sub.id} ${sub.title}") { openId = sub.id }
+            }
+        }
+    } }
+}
+
+@Composable
+private fun IndexRow(text: String, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp)) {
+        Text(text, color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+    }
+}
+
+/** Il testo di una sezione: paragrafi, elenchi rientrati, tabelle come righe; i rimandi aprono la loro sezione. */
+@Composable
+private fun Section(sec: HelpSection, onRef: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        for (b in sec.blocks) when (b) {
+            is HelpBlock.Para -> Text(styled(b.spans, onRef), color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.padding(start = (b.indent * 18).dp))
+            is HelpBlock.Bullet -> Row(Modifier.padding(start = (b.indent * 18).dp)) {
+                Text(b.number?.let { "$it." } ?: "•", color = TsmColors.Ball, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(8.dp))
+                Text(styled(b.spans, onRef), color = TsmColors.TextMain, fontSize = 15.sp, modifier = Modifier.weight(1f))
+            }
+            is HelpBlock.Table -> Column(
+                Modifier.fillMaxWidth().background(TsmColors.Surface, RoundedCornerShape(12.dp)).padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // Su un telefono le colonne non ci stanno: ogni riga è la prima cella e sotto le altre.
+                for ((i, row) in b.rows.withIndex()) {
+                    val head = i == 0
+                    Column {
+                        Text(styled(row.first(), onRef), color = if (head) TsmColors.TextDim else TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        for (cell in row.drop(1)) Text(styled(cell, onRef), color = if (head) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun styled(spans: List<HelpSpan>, onRef: (String) -> Unit): AnnotatedString = buildAnnotatedString {
+    for (sp in spans) {
+        val style = SpanStyle(
+            fontWeight = if (sp.bold) FontWeight.Bold else null,
+            fontStyle = if (sp.italic) FontStyle.Italic else null,
+            fontFamily = if (sp.code) FontFamily.Monospace else null,
+            background = if (sp.code) TsmColors.Surface else androidx.compose.ui.graphics.Color.Unspecified,
+        )
+        val ref = sp.ref
+        if (ref != null) {
+            withLink(LinkAnnotation.Clickable(ref, TextLinkStyles(SpanStyle(color = TsmColors.Ball, textDecoration = TextDecoration.Underline))) { onRef(ref) }) {
+                withStyle(style) { append(sp.text) }
+            }
+        } else {
+            withStyle(style) { append(sp.text) }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HistoryScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HistoryScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -24580,6 +27159,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
@@ -24852,6 +27432,7 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
+    Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
     Entry(Icons.Filled.SportsTennis, s.racketMine, s.moreRacketsHint) { c.openRackets() }
     Entry(Icons.Filled.SwapHoriz, s.moreTransfer, s.moreTransferHint) { c.openHistory() }
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
@@ -47319,6 +49900,72 @@ class HeartStatsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/HelpDocTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/HelpDocTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.io.File
+
+class HelpDocTest {
+    private fun guide(lang: String) = HelpDoc.parse(File("src/main/assets/help/$lang.md").readText())
+
+    @Test
+    fun everyLanguageHasTheSameSections() {
+        val it = guide("it").map { it.id }
+        assertTrue("$it", it.containsAll(listOf("3.1", "4", "6", "6.4", "7", "7.5", "8", "11")))
+        // Niente installazione, firmware né codice: sono per chi sviluppa.
+        assertFalse(it.any { id -> id.split('.')[0] in setOf("0", "1", "2", "5", "10") })
+        for (lang in listOf("en", "fr", "de", "es", "pt")) assertEquals(lang, it, guide(lang).map { it.id })
+        // Ogni sezione ha qualcosa da leggere.
+        for (s in guide("it")) assertTrue(s.id, s.blocks.isNotEmpty() || s.level == 2)
+    }
+
+    @Test
+    fun inlineStylesAndCrossReferences() {
+        val spans = HelpDoc.inline("Premi **KEY1** e poi *tenuto* il `tasto` (6.4) o (es. 4.1, NC)", setOf("6.4", "4.1"))
+        assertEquals(HelpSpan("KEY1", bold = true), spans[1])
+        assertEquals(HelpSpan("tenuto", italic = true), spans[3])
+        assertEquals(HelpSpan("tasto", code = true), spans[5])
+        assertEquals("6.4", spans.single { it.ref != null }.ref)
+        assertEquals("Premi KEY1 e poi tenuto il tasto (6.4) o (es. 4.1, NC)", spans.joinToString("") { it.text })
+    }
+
+    @Test
+    fun listsTablesAndSearch() {
+        val doc = HelpDoc.parse(
+            """
+            ## 6. Braccialetti
+            Testo.
+            | Tasto | Cosa fa |
+            |---|---|
+            | **KEY1** | punto |
+            1. Primo
+               - dentro
+            2. Secondo
+            ### 6.1 Impostazioni della Volée
+            - voce
+            """.trimIndent(),
+        )
+        val b = doc[0].blocks
+        assertTrue(b[1] is HelpBlock.Table)
+        assertEquals(2, (b[1] as HelpBlock.Table).rows.size)
+        assertEquals(HelpBlock.Bullet(listOf(HelpSpan("dentro")), 1), b[3])
+        assertEquals(2, (b[4] as HelpBlock.Bullet).number)
+        // Senza accenti e in minuscolo; i titoli prima.
+        assertEquals(listOf("6.1"), HelpDoc.search(doc, "volee").map { it.id })
+        assertEquals(listOf("6"), HelpDoc.search(doc, "key1 punto").map { it.id })
+        assertTrue(HelpDoc.search(guide("it"), "telecomando").isNotEmpty())
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/MatchStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -54975,6 +57622,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 172 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 181 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

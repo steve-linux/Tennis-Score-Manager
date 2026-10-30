@@ -102,7 +102,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, raquettes, transfert des matchs, présentation, version et licence.
+- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
 
 **Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
 

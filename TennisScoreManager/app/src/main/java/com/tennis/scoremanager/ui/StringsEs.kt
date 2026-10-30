@@ -834,6 +834,12 @@ object EsStrings : Strings {
     override val poseZoomHint = "Toca una imagen para ampliarla; dos dedos para el zoom, doble toque para volver."
     override val poseRedo = "Repetir el análisis"
     override val strokeTrainingTitle = "Entrenamiento de golpes"
+    override val moreHelp = "Ayuda"
+    override val moreHelpHint = "Guía completa: cómo se usa cada función, paso a paso"
+    override val helpSearch = "Buscar en la guía"
+    override val helpNoResults = "Sin resultados: prueba con otra palabra."
+    override val helpNext = "Sección siguiente"
+    override val helpRead = "Leer el capítulo"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

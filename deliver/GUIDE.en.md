@@ -102,7 +102,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, rackets, match transfer, introduction, version and licence.
+- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
 
 **New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
 

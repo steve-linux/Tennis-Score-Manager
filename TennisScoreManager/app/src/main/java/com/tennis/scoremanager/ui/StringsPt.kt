@@ -837,6 +837,12 @@ object PtStrings : Strings {
     override val poseZoomHint = "Toque numa imagem para ampliá-la; dois dedos para o zoom, toque duplo para voltar."
     override val poseRedo = "Refazer a análise"
     override val strokeTrainingTitle = "Treino de golpes"
+    override val moreHelp = "Ajuda"
+    override val moreHelpHint = "Guia completo: como usar cada função, passo a passo"
+    override val helpSearch = "Pesquisar no guia"
+    override val helpNoResults = "Nenhum resultado: tente outra palavra."
+    override val helpNext = "Próxima seção"
+    override val helpRead = "Ler o capítulo"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

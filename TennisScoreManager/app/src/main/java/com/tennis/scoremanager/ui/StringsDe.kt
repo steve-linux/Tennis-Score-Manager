@@ -833,6 +833,12 @@ object DeStrings : Strings {
     override val poseZoomHint = "Bild antippen zum Vergrößern; zwei Finger zum Zoomen, doppelt tippen zum Zurücksetzen."
     override val poseRedo = "Erneut analysieren"
     override val strokeTrainingTitle = "Schlagtraining"
+    override val moreHelp = "Hilfe"
+    override val moreHelpHint = "Vollständige Anleitung: jede Funktion Schritt für Schritt"
+    override val helpSearch = "In der Anleitung suchen"
+    override val helpNoResults = "Keine Treffer: Versuche ein anderes Wort."
+    override val helpNext = "Nächster Abschnitt"
+    override val helpRead = "Kapitel lesen"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

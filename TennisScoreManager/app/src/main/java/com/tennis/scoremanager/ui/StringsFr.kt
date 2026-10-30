@@ -836,6 +836,12 @@ object FrStrings : Strings {
     override val poseZoomHint = "Touchez une image pour l'agrandir ; deux doigts pour zoomer, double toucher pour revenir."
     override val poseRedo = "Refaire l'analyse"
     override val strokeTrainingTitle = "Entraînement des coups"
+    override val moreHelp = "Aide"
+    override val moreHelpHint = "Guide complet : comment utiliser chaque fonction, pas à pas"
+    override val helpSearch = "Chercher dans le guide"
+    override val helpNoResults = "Aucun résultat : essayez un autre mot."
+    override val helpNext = "Section suivante"
+    override val helpRead = "Lire le chapitre"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
