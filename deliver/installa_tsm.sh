@@ -323,7 +323,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Profil und Daten** (Sicherung, Wiederherstellung, Löschen: 7.8), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
 
 **Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
 
@@ -630,6 +630,14 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Matches von einem anderen Telefon** (Übertragung oder *Importieren*): ein bekannter Spieler wird von selbst verknüpft; ein neuer kommt mit seiner Kennung dazu; hat er den Namen eines deiner Spieler, fragt die App einmal **Wer ist das?** (*Ja, das ist er* verknüpft beide, beim nächsten Mal wird er erkannt; *Nein, eine andere Person* fügt ihn hinzu). Matches alter Versionen ohne Spieler werden über den Namen verknüpft.
 - **Foto** und **Mann/Frau** gelten noch für den Namen: zwei Namensvettern teilen sie.
 
+### 7.8 Du, und Profil und Daten
+
+- **Du** ist dein Spieler in der Datenbank: Fortschritt und Rating gehen von ihm aus. Beim ersten Start reichen Vor- und Nachname (und Spitzname); danach öffnet **Mehr › Du** deine Karte. Hast du ihn noch nicht gewählt, bietet *Wer bist du?* die vorhandenen Spieler an (du hast schon Matches gespielt) oder **Ich bin neu**. Auf der Karte eines anderen Spielers macht **Das bin ich** ihn zu deinem.
+- **Mehr › Profil und Daten**:
+  - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
+  - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
+  - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -717,7 +725,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Players** (the database: 7.7), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+- **More**: **You** (your name), **Players** (the database: 7.7), **Profile and data** (backup, restore, delete: 7.8), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
 
 **New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
 
@@ -1024,6 +1032,14 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **Matches from another phone** (transfer or *Import*): a player the phone knows links by itself; a new one is added with its ID; if it has the name of one of yours the app asks once **Who is it?** (*Yes, it's them* links the two, so next time it is recognised; *No, someone else* adds them). Matches from old versions, without players, link by name.
 - The **photo** and **man/woman** still belong to the name: two namesakes share them.
 
+### 7.8 You, and Profile and data
+
+- **You** is your player in the database: Progress and rating start from them. At the first start first and last name (and nickname) are enough; then **More › You** opens your card. If you haven't chosen it yet, *Who are you?* offers the existing players (you have already played matches) or **I'm new**. On another player's card, **This is me** makes it yours.
+- **More › Profile and data**:
+  - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
+  - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
+  - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1110,7 +1126,7 @@ En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a 
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
-- **Más**: **Tú** (tu nombre), **Jugadores** (la base: 7.7), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
+- **Más**: **Tú** (tu nombre), **Jugadores** (la base: 7.7), **Perfil y datos** (copia, restauración, borrado: 7.8), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
 
 **Nuevo partido** son dos pasos: **quién juega** (individual o dobles, los nombres, con los jugadores recientes para tocar, y el deporte; club, pista y torneo en *Más detalles*) y **cómo llevas el marcador y las reglas**. Todo es opcional: se puede seguir sin nombres. Desde cada pantalla **Atrás** vuelve a la pestaña de la que se venía.
 
@@ -1417,6 +1433,14 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - **Partidos de otro teléfono** (transferencia o *Importar*): un jugador que el teléfono conoce se enlaza solo; uno nuevo se añade con su identificador; si tiene el nombre de uno de los tuyos la app pregunta una vez **¿Quién es?** (*Sí, es él* enlaza los dos y la próxima vez lo reconoce; *No, otra persona* lo añade). Los partidos de versiones antiguas, sin jugadores, se enlazan por el nombre.
 - La **foto** y **hombre/mujer** siguen siendo del nombre: dos homónimos las comparten.
 
+### 7.8 Tú, y Perfil y datos
+
+- **Tú** es tu jugador de la base: Progresos y rating parten de él. En el primer arranque bastan nombre y apellido (y apodo); luego **Más › Tú** abre tu ficha. Si aún no lo has elegido, *¿Quién eres?* propone los jugadores que hay (ya has jugado partidos) o **Soy nuevo**. En la ficha de otro jugador, **Soy yo** lo hace tuyo.
+- **Más › Perfil y datos**:
+  - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
+  - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
+  - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
@@ -1503,7 +1527,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Profil et données** (sauvegarde, restauration, effacement : 7.8), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
 
 **Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
 
@@ -1810,6 +1834,14 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Matchs d'un autre téléphone** (transfert ou *Importer*) : un joueur connu du téléphone se relie tout seul ; un nouveau s'ajoute avec son identifiant ; s'il a le nom d'un des vôtres l'appli demande une fois **Qui est-ce ?** (*Oui, c'est lui* relie les deux, la fois suivante il est reconnu ; *Non, une autre personne* l'ajoute). Les matchs des anciennes versions, sans joueurs, se relient par le nom.
 - La **photo** et **homme/femme** valent encore pour le nom : deux homonymes les partagent.
 
+### 7.8 Vous, et Profil et données
+
+- **Vous** est votre joueur de la base : Progrès et classement partent de lui. Au premier démarrage prénom et nom (et surnom) suffisent ; ensuite **Plus › Vous** ouvre votre fiche. Si vous ne l'avez pas encore choisi, *Qui êtes-vous ?* propose les joueurs existants (vous avez déjà joué des matchs) ou **Je suis nouveau**. Sur la fiche d'un autre joueur, **C'est moi** le rend vôtre.
+- **Plus › Profil et données** :
+  - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
+  - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
+  - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -1896,7 +1928,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
-- **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
+- **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Profilo e dati** (backup, ripristino, cancellazione: 7.8), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
 **Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 
@@ -2203,6 +2235,14 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Partite da un altro telefono** (trasferimento o *Importa*): un giocatore che il telefono conosce si aggancia da solo; uno nuovo si aggiunge col suo identificativo; se ha il nome di uno dei tuoi l'app chiede una volta **Chi è?** (*Sì, è lui* lega i due, così le volte dopo lo riconosce; *No, un'altra persona* lo aggiunge). Le partite delle versioni vecchie, senza giocatori, si agganciano per nome.
 - La **foto** e **uomo/donna** valgono ancora per il nome: due omonimi le condividono.
 
+### 7.8 Tu, e Profilo e dati
+
+- **Tu** è il tuo giocatore del database: Progressi e rating partono da lui. Alla prima apertura bastano nome e cognome (e il soprannome); poi **Altro › Tu** apre la tua scheda. Se non l'hai ancora scelto, *Chi sei?* propone i giocatori che ci sono (hai già giocato partite) o **Sono nuovo**. Nella scheda di un altro giocatore, **Sono io** lo rende tuo.
+- **Altro › Profilo e dati**:
+  - **Crea il backup**: un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce; con **Includi i video** anche clip dei colpi, moviola e highlights (il file diventa grande). Lo salvi dove vuoi (Download, un PC, una chiavetta): niente cloud. Non entrano il modello dell'analisi del movimento (si riscarica) e i file che hai salvato tu in Documenti.
+  - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
+  - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2289,7 +2329,7 @@ Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo 
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
-- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
+- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Perfil e dados** (backup, restauração, apagar: 7.8), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
 
 **Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
 
@@ -2595,6 +2635,14 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Separar um homônimo** (em *Partidas*): marque as partidas de outra pessoa com o mesmo nome, que vira um jogador novo.
 - **Partidas de outro telefone** (transferência ou *Importar*): um jogador que o telefone conhece se liga sozinho; um novo entra com o identificador dele; se tem o nome de um dos seus o app pergunta uma vez **Quem é?** (*Sim, é ele* liga os dois e da próxima vez reconhece; *Não, outra pessoa* adiciona). Partidas de versões antigas, sem jogadores, se ligam pelo nome.
 - A **foto** e **homem/mulher** ainda valem para o nome: dois homônimos as compartilham.
+
+### 7.8 Você, e Perfil e dados
+
+- **Você** é o seu jogador do banco: Progresso e rating partem dele. Na primeira abertura bastam nome e sobrenome (e apelido); depois **Mais › Você** abre a sua ficha. Se ainda não escolheu, *Quem é você?* oferece os jogadores que existem (você já jogou partidas) ou **Sou novo**. Na ficha de outro jogador, **Sou eu** faz dele o seu.
+- **Mais › Perfil e dados**:
+  - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
+  - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
+  - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3411,7 +3459,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -3921,6 +3969,7 @@ class MatchController(
             Screen.STUDENTS -> Screen.HOME
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
+            Screen.DATA -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4466,6 +4515,22 @@ class MatchController(
 
     /** Rating TSM del giocatore nello sport con più partite (null senza partite). */
     fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = ratingSports().firstOrNull()?.let { ratingTable(it).player(p.id) }
+
+    /**
+     * Tu: il tuo giocatore del database. Prima del database c'era solo il nome (Altro › Tu): se è di un giocatore solo,
+     * è lui.
+     */
+    fun me(): com.tennis.scoremanager.data.PlayerProfile? =
+        playerById(storage.myPlayerId) ?: com.tennis.scoremanager.data.Players.byName(players.value, storage.myName).singleOrNull()
+
+    /** Sei tu: il tuo nome segue quello del giocatore (per le versioni e i punti dell'app che usano ancora il nome). */
+    fun setMe(p: com.tennis.scoremanager.data.PlayerProfile?) {
+        storage.myPlayerId = p?.id.orEmpty()
+        storage.myName = p?.name.orEmpty()
+    }
+
+    /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
+    fun myKey(): String = me()?.id ?: keyForName(storage.myName)
 
     /** Chi è un nome scritto (es. il proprio, in Altro › Tu): il giocatore del database se è uno solo, sennò il nome. */
     fun keyForName(name: String): String =
@@ -6157,6 +6222,19 @@ class MatchController(
 
     /** "Esci": l'app si chiude davvero e alla prossima apertura riparte dalla prima schermata. */
     fun exitApp(activity: Activity) = shutdown { activity.finishAndRemoveTask() }
+
+    /**
+     * Dopo un ripristino o una cancellazione di tutti i dati: si chiude subito, senza salvare niente (salvando si
+     * riscriverebbero le impostazioni di prima sopra quelle nuove). Riaprendo l'app riparte dai dati nuovi.
+     */
+    fun closeAfterData() {
+        closing = true
+        runCatching { ble.disconnectAll() }
+        runCatching { relay.stop() }
+        runCatching { heart.disconnectAll() }
+        runCatching { MatchService.stop(app) }
+        android.os.Process.killProcess(android.os.Process.myPid())
+    }
 
     /** L'app è stata tolta dalle app recenti mentre il servizio della partita era attivo: stessa cosa di "Esci". */
     fun onTaskRemoved(stopService: () -> Unit) = shutdown(stopService)
@@ -8159,6 +8237,160 @@ class StrapGaps {
         const val GAP_MS = 3_000L
         /** Il secondo che ci si aspetta comunque tra una misura e l'altra non è perso. */
         private const val EXPECTED_MS = 1_000L
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Backup.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Backup.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.content.Context
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+
+/**
+ * Backup completo in un file ZIP che resta di chi lo fa (nessun cloud): partite, giocatori, sessioni, racchette,
+ * allenamenti, tornei, foto, impostazioni, registrazioni della voce, analisi e immagini dei colpi; a scelta i video.
+ * Non entrano il modello dell'analisi (si riscarica) e i file salvati dall'utente in Documenti (sono già suoi).
+ *
+ * Nel file: manifest.json, files/... (cartella interna), prefs/... (impostazioni), external/... (cartella dell'app),
+ * documents/... (Allenamento colpi in Documenti).
+ */
+object Backup {
+    const val VERSION = 1
+    /** Cartelle interne che non entrano: il modello dell'analisi del movimento e i file di sistema. */
+    private val SKIP_FILES = setOf("pose", "profileInstalled", "profileinstaller_profileWrittenFor_lastUpdateTime.dat")
+    /** Impostazioni dell'app (shared_prefs). */
+    private val PREFS = listOf("tsm.xml", "tv_server.xml")
+    /** Nella cartella dell'app: la voce sempre, i video (moviola, highlights) a scelta. */
+    private const val EXT_VIDEOS = "Movies"
+    private const val EXT_VOICE = "voice"
+
+    @Serializable
+    data class Manifest(val version: Int = VERSION, val app: String = "", val createdAt: Long = 0, val videos: Boolean = false)
+
+    private val json = Json { ignoreUnknownKeys = true; prettyPrint = true }
+
+    private fun prefsDir(c: Context) = File(c.applicationInfo.dataDir, "shared_prefs")
+    private fun extDir(c: Context): File? = c.getExternalFilesDir(null)
+    private fun strokes(storage: Storage, folder: String) = File(storage.documentsRoot, folder)
+
+    private fun isVideo(f: File) = f.extension.equals("mp4", ignoreCase = true)
+
+    /** Quanto pesano i video che entrerebbero col backup (clip dei colpi, moviola, highlights), in byte. */
+    fun videoBytes(c: Context, storage: Storage, strokesFolder: String): Long =
+        listOfNotNull(extDir(c)?.let { File(it, EXT_VIDEOS) }, strokes(storage, strokesFolder))
+            .sumOf { d -> d.walkTopDown().filter { it.isFile && isVideo(it) }.sumOf { it.length() } }
+
+    /** Scrive il backup in [out]; [onProgress] riceve i file scritti. */
+    fun write(c: Context, storage: Storage, out: OutputStream, videos: Boolean, version: String, strokesFolder: String, onProgress: (Int) -> Unit = {}) {
+        var n = 0
+        ZipOutputStream(out.buffered()).use { zip ->
+            fun put(name: String, f: File) {
+                zip.putNextEntry(ZipEntry(name).apply { time = f.lastModified() })
+                f.inputStream().use { it.copyTo(zip) }
+                zip.closeEntry()
+                onProgress(++n)
+            }
+            fun tree(prefix: String, root: File, keep: (File) -> Boolean) {
+                if (!root.exists()) return
+                root.walkTopDown().filter { it.isFile && keep(it) }.forEach { put(prefix + it.relativeTo(root).invariantSeparatorsPath, it) }
+            }
+            zip.putNextEntry(ZipEntry("manifest.json"))
+            zip.write(json.encodeToString(Manifest.serializer(), Manifest(app = version, createdAt = System.currentTimeMillis(), videos = videos)).toByteArray())
+            zip.closeEntry()
+            c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.forEach { f ->
+                if (f.isDirectory) tree("files/${f.name}/", f) { true } else put("files/${f.name}", f)
+            }
+            PREFS.map { File(prefsDir(c), it) }.filter { it.exists() }.forEach { put("prefs/${it.name}", it) }
+            extDir(c)?.let { ext ->
+                tree("external/$EXT_VOICE/", File(ext, EXT_VOICE)) { true }
+                if (videos) tree("external/$EXT_VIDEOS/", File(ext, EXT_VIDEOS)) { true }
+            }
+            // Le clip dei colpi: analisi e immagini sempre (sono piccole e le sessioni le usano), i video a scelta.
+            tree("documents/$strokesFolder/", strokes(storage, strokesFolder)) { videos || !isVideo(it) }
+        }
+    }
+
+    /** Legge solo il manifest (per chiedere conferma prima di ripristinare); null se non è un backup dell'app. */
+    fun peek(input: InputStream): Manifest? = ZipInputStream(input.buffered()).use { zip ->
+        val e = zip.nextEntry ?: return null
+        if (e.name != "manifest.json") return null
+        runCatching { json.decodeFromString(Manifest.serializer(), zip.readBytes().decodeToString()) }.getOrNull()
+    }
+
+    /**
+     * Ripristina: prima estrae tutto in una cartella d'appoggio (se il file è rovinato non si tocca niente), poi
+     * cancella i dati di adesso e mette quelli del backup. Dopo, l'app va riavviata (le impostazioni stanno in
+     * memoria). false se il file non è un backup valido.
+     */
+    fun restore(c: Context, storage: Storage, input: InputStream): Boolean {
+        val stage = File(c.cacheDir, "restore").apply { deleteRecursively(); mkdirs() }
+        var manifest: Manifest? = null
+        ZipInputStream(input.buffered()).use { zip ->
+            while (true) {
+                val e = zip.nextEntry ?: break
+                if (e.isDirectory) continue
+                // Niente percorsi che escono dalla cartella (../), niente nomi strani.
+                if (e.name.contains("..") || e.name.startsWith("/")) return false.also { stage.deleteRecursively() }
+                if (e.name == "manifest.json") {
+                    manifest = runCatching { json.decodeFromString(Manifest.serializer(), zip.readBytes().decodeToString()) }.getOrNull()
+                    continue
+                }
+                val f = File(stage, e.name)
+                f.parentFile?.mkdirs()
+                f.outputStream().use { zip.copyTo(it) }
+            }
+        }
+        if (manifest == null || manifest!!.version > VERSION) {
+            stage.deleteRecursively()
+            return false
+        }
+        wipe(c, storage, videos = manifest!!.videos, strokesFolders = File(stage, "documents").list()?.toList().orEmpty())
+        fun move(from: File, to: File) {
+            if (!from.exists()) return
+            from.walkTopDown().filter { it.isFile }.forEach { f ->
+                val dest = File(to, f.relativeTo(from).path)
+                dest.parentFile?.mkdirs()
+                if (!f.renameTo(dest)) f.copyTo(dest, overwrite = true)
+            }
+        }
+        move(File(stage, "files"), c.filesDir)
+        move(File(stage, "prefs"), prefsDir(c))
+        extDir(c)?.let { move(File(stage, "external"), it) }
+        move(File(stage, "documents"), storage.documentsRoot)
+        stage.deleteRecursively()
+        return true
+    }
+
+    /**
+     * Cancella i dati dell'app: cartella interna (non il modello dell'analisi), impostazioni, voce, analisi delle clip
+     * dei colpi in Documenti ([strokesFolders]); con [videos] anche i video delle clip, la moviola e gli highlights. I file salvati
+     * dall'utente in Documenti e i video della galleria restano.
+     */
+    fun wipe(c: Context, storage: Storage, videos: Boolean, strokesFolders: List<String>) {
+        c.filesDir.listFiles().orEmpty().filter { it.name !in SKIP_FILES }.forEach { it.deleteRecursively() }
+        PREFS.map { File(prefsDir(c), it) }.forEach { it.delete() }
+        extDir(c)?.let { ext ->
+            File(ext, EXT_VOICE).deleteRecursively()
+            if (videos) File(ext, EXT_VIDEOS).deleteRecursively()
+        }
+        // Senza i video si tolgono solo analisi e immagini: i video delle clip restano dove sono.
+        strokesFolders.forEach { name ->
+            val d = strokes(storage, name)
+            if (videos) d.deleteRecursively()
+            else d.walkTopDown().filter { it.isFile && !isVideo(it) }.toList().forEach { it.delete() }
+        }
     }
 }
 TSM_EOF
@@ -11701,6 +11933,11 @@ class Storage(context: Context) {
     var myName: String
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
+
+    /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
+    var myPlayerId: String
+        get() = prefs.getString("my_player", null) ?: ""
+        set(v) = prefs.edit().putString("my_player", v).apply()
 
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
@@ -17035,6 +17272,7 @@ fun AppRoot(c: MatchController) {
                 Screen.STUDENTS -> com.tennis.scoremanager.ui.screens.StudentsScreen(c)
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
+                Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
             }
         }
     }
@@ -17884,6 +18122,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/OnboardingUi.kt" << 'T
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17947,12 +18186,22 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
-    var name by remember { mutableStateOf(c.storage.myName) }
+    // Tu: nome e cognome (obbligatori per la tua scheda di giocatore) e soprannome.
+    var first by remember { mutableStateOf("") }
+    var last by remember { mutableStateOf("") }
+    var nick by remember { mutableStateOf("") }
     fun finish() {
         c.storage.onboarded = true
-        val n = name.trim()
-        c.storage.myName = n
-        if (n.isNotEmpty() && c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = n) }
+        if (first.isNotBlank() && last.isNotBlank()) {
+            // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
+            val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
+                ?: com.tennis.scoremanager.data.PlayerProfile(
+                    com.tennis.scoremanager.data.Players.newId(), com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
+                    first.trim(), last.trim(), nick.trim(), createdAt = System.currentTimeMillis(),
+                ).also { c.savePlayer(it) }
+            c.setMe(p)
+            if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
+        }
         when (use) {
             Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
@@ -17997,10 +18246,13 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     }
                     else -> {
                         Text(s.onbNameTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        OutlinedTextField(
-                            name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
+                        @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = OutlinedTextField(
+                            v, { onChange(it.take(40)) }, label = { Text(label) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
                             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
                         )
+                        field(first, s.playerFirstName) { first = it }
+                        field(last, s.playerLastName) { last = it }
+                        field(nick, s.playerNickname) { nick = it }
                         Text(s.onbNameHint, color = TsmColors.TextDim, fontSize = 13.sp)
                     }
                 }
@@ -18030,24 +18282,41 @@ private fun Choice(icon: ImageVector, title: String, hint: String, on: Boolean, 
     }
 }
 
-/** Altro › Tu: il proprio nome (Progressi parte da lì, la scheda Progressi mostra il proprio rating). */
+/**
+ * Altro › Tu, senza il tuo giocatore: chi sei? Uno dei giocatori del database (hai già giocato partite) o una scheda
+ * nuova con nome e cognome.
+ */
 @Composable
 fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    var name by remember { mutableStateOf(c.storage.myName) }
+    val players by c.players.collectAsState()
+    var query by remember { mutableStateOf(c.storage.myName) }
+    var create by remember { mutableStateOf(false) }
+    if (create) {
+        PlayerEditDialog(c, null, prefill = query) { p ->
+            create = false
+            if (p != null) { c.setMe(p); onDone() }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text(s.moreProfile) },
+        title = { Text(s.meWho) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
-                )
                 Text(s.moreProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                OutlinedTextField(query, { query = it.take(40) }, label = { Text(s.playersSearch) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                val list = (if (query.isBlank()) players else com.tennis.scoremanager.data.Players.search(players, query)).take(6)
+                for (p in list) Row(
+                    Modifier.fillMaxWidth().clickable { c.setMe(p); onDone() }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                    Text(" " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
             }
         },
-        confirmButton = { TextButton(onClick = { c.storage.myName = name; onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = { create = true }) { Text(s.meNew) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
@@ -20339,6 +20608,34 @@ interface Strings {
     val playerIncomplete: String
     val playerComplete: String
     val playerTwinWarning: (String) -> String
+    val meWho: String
+    val meNew: String
+    val meIsYou: String
+    val meThisIsMe: String
+    val dataTitle: String
+    val dataHint: String
+    val dataBackup: String
+    val dataBackupHint: String
+    val dataVideosHint: String
+    val dataBackupDo: String
+    val dataBackupDone: String
+    val dataBackupFailed: String
+    val dataBusy: String
+    val dataRestore: String
+    val dataRestoreHint: String
+    val dataRestoreDo: String
+    val dataRestoreDone: String
+    val dataNotBackup: String
+    val dataWipe: String
+    val dataWipeHint: String
+    val dataWipeVideos: String
+    val dataWipeVideosHint: String
+    val dataWipeAsk: String
+    val dataWipeAsk2: String
+    val dataWipeConfirm: String
+    val dataWipeDone: String
+    val dataVideos: (Int) -> String
+    val dataRestoreAsk: (String, String, Boolean) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -21560,6 +21857,34 @@ object ItStrings : Strings {
     override val playerIncomplete = "da completare"
     override val playerComplete = "Completa nome e cognome"
     override val playerTwinWarning: (String) -> String = { "C'è già un $it: se è lui sceglilo sopra, se è un'altra persona va bene così." }
+    override val meWho = "Chi sei?"
+    override val meNew = "Sono nuovo"
+    override val meIsYou = "Sei tu"
+    override val meThisIsMe = "Sono io"
+    override val dataTitle = "Profilo e dati"
+    override val dataHint = "Backup in un file che resta tuo, ripristino su questo o su un altro telefono, cancellazione di tutto"
+    override val dataBackup = "Backup"
+    override val dataBackupHint = "Un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce. Salvalo dove vuoi (anche su un PC o in una chiavetta): nessun cloud."
+    override val dataVideosHint = "Le clip dei colpi, la moviola e gli highlights: il file diventa grande."
+    override val dataBackupDo = "Crea il backup"
+    override val dataBackupDone = "Backup salvato."
+    override val dataBackupFailed = "Il backup non è riuscito: controlla lo spazio libero e riprova."
+    override val dataBusy = "Un momento…"
+    override val dataRestore = "Ripristina"
+    override val dataRestoreHint = "Rimette i dati di un backup su questo telefono, anche nuovo. Sostituisce tutto quello che c'è adesso: se ti serve, prima fai un backup."
+    override val dataRestoreDo = "Ripristina"
+    override val dataRestoreDone = "Ripristino fatto. L'app ora si chiude: riaprila e ritrovi i dati del backup."
+    override val dataNotBackup = "Questo file non è un backup di Tennis Score Manager (o è rovinato): non è cambiato niente."
+    override val dataWipe = "Cancella tutti i dati"
+    override val dataWipeHint = "Partite, giocatori, allievi, sessioni, note, racchette, foto e impostazioni: l'app torna come appena installata. I file che hai salvato tu in Documenti e i video della galleria restano."
+    override val dataWipeVideos = "Anche i video"
+    override val dataWipeVideosHint = "Le clip dei colpi, la moviola e gli highlights dell'app."
+    override val dataWipeAsk = "Cancellare tutti i dati dell'app da questo telefono? Se ti servono, prima fai un backup."
+    override val dataWipeAsk2 = "Sicuro? Non si può annullare."
+    override val dataWipeConfirm = "Cancella tutto"
+    override val dataWipeDone = "Fatto. L'app ora si chiude: riaprendola riparte da capo."
+    override val dataVideos: (Int) -> String = { mb -> "Includi i video ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup del $date (app $app" + (if (videos) ", con i video" else ", senza video") + "). Sostituisce tutti i dati di adesso: se ti servono, prima fai un backup." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -22764,6 +23089,34 @@ object EnStrings : Strings {
     override val playerIncomplete = "to complete"
     override val playerComplete = "Complete first and last name"
     override val playerTwinWarning: (String) -> String = { "There is already a $it: if it's them pick them above, if it's someone else that's fine." }
+    override val meWho = "Who are you?"
+    override val meNew = "I'm new"
+    override val meIsYou = "This is you"
+    override val meThisIsMe = "This is me"
+    override val dataTitle = "Profile and data"
+    override val dataHint = "Backup in a file that stays yours, restore on this or another phone, delete everything"
+    override val dataBackup = "Backup"
+    override val dataBackupHint = "A ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings. Save it wherever you like (even on a PC or a USB stick): no cloud."
+    override val dataVideosHint = "Stroke clips, replay and highlights: the file gets big."
+    override val dataBackupDo = "Create the backup"
+    override val dataBackupDone = "Backup saved."
+    override val dataBackupFailed = "The backup did not work: check the free space and try again."
+    override val dataBusy = "One moment…"
+    override val dataRestore = "Restore"
+    override val dataRestoreHint = "Puts the data of a backup on this phone, even a new one. It replaces everything that is here now: if you need it, make a backup first."
+    override val dataRestoreDo = "Restore"
+    override val dataRestoreDone = "Restore done. The app now closes: open it again and you will find the data of the backup."
+    override val dataNotBackup = "This file is not a Tennis Score Manager backup (or it is damaged): nothing has changed."
+    override val dataWipe = "Delete all data"
+    override val dataWipeHint = "Matches, players, students, sessions, notes, rackets, photos and settings: the app goes back to just installed. Files you saved in Documents and videos in the gallery stay."
+    override val dataWipeVideos = "Videos too"
+    override val dataWipeVideosHint = "The app's stroke clips, replay and highlights."
+    override val dataWipeAsk = "Delete all the app's data from this phone? If you need it, make a backup first."
+    override val dataWipeAsk2 = "Sure? This cannot be undone."
+    override val dataWipeConfirm = "Delete everything"
+    override val dataWipeDone = "Done. The app now closes: when you open it again it starts from scratch."
+    override val dataVideos: (Int) -> String = { mb -> "Include the videos ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup of $date (app $app" + (if (videos) ", with videos" else ", without videos") + "). It replaces all the data here now: if you need it, make a backup first." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -23991,6 +24344,34 @@ object DeStrings : Strings {
     override val playerIncomplete = "unvollständig"
     override val playerComplete = "Vor- und Nachname ergänzen"
     override val playerTwinWarning: (String) -> String = { "Es gibt schon einen $it: wenn er es ist, wähle ihn oben; wenn es eine andere Person ist, passt es so." }
+    override val meWho = "Wer bist du?"
+    override val meNew = "Ich bin neu"
+    override val meIsYou = "Das bist du"
+    override val meThisIsMe = "Das bin ich"
+    override val dataTitle = "Profil und Daten"
+    override val dataHint = "Sicherung in einer Datei, die dir gehört, Wiederherstellung auf diesem oder einem anderen Telefon, alles löschen"
+    override val dataBackup = "Sicherung"
+    override val dataBackupHint = "Eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen. Speichere sie, wo du willst (auch auf einem PC oder USB-Stick): keine Cloud."
+    override val dataVideosHint = "Schlag-Clips, Zeitlupe und Highlights: die Datei wird groß."
+    override val dataBackupDo = "Sicherung erstellen"
+    override val dataBackupDone = "Sicherung gespeichert."
+    override val dataBackupFailed = "Die Sicherung hat nicht geklappt: prüfe den freien Speicher und versuche es nochmal."
+    override val dataBusy = "Einen Moment …"
+    override val dataRestore = "Wiederherstellen"
+    override val dataRestoreHint = "Spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues. Ersetzt alles, was jetzt da ist: wenn nötig, erst eine Sicherung machen."
+    override val dataRestoreDo = "Wiederherstellen"
+    override val dataRestoreDone = "Wiederherstellung fertig. Die App schließt sich jetzt: öffne sie wieder, dann findest du die Daten der Sicherung."
+    override val dataNotBackup = "Diese Datei ist keine Sicherung von Tennis Score Manager (oder beschädigt): es hat sich nichts geändert."
+    override val dataWipe = "Alle Daten löschen"
+    override val dataWipeHint = "Matches, Spieler, Schüler, Einheiten, Notizen, Schläger, Fotos und Einstellungen: die App ist wieder wie frisch installiert. Deine in Dokumente gespeicherten Dateien und die Videos der Galerie bleiben."
+    override val dataWipeVideos = "Auch die Videos"
+    override val dataWipeVideosHint = "Schlag-Clips, Zeitlupe und Highlights der App."
+    override val dataWipeAsk = "Alle Daten der App von diesem Telefon löschen? Wenn nötig, erst eine Sicherung machen."
+    override val dataWipeAsk2 = "Sicher? Das lässt sich nicht rückgängig machen."
+    override val dataWipeConfirm = "Alles löschen"
+    override val dataWipeDone = "Erledigt. Die App schließt sich jetzt: beim nächsten Öffnen beginnt sie von vorn."
+    override val dataVideos: (Int) -> String = { mb -> "Videos einschließen ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sicherung vom $date (App $app" + (if (videos) ", mit Videos" else ", ohne Videos") + "). Sie ersetzt alle jetzigen Daten: wenn nötig, erst eine Sicherung machen." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -25211,6 +25592,34 @@ object EsStrings : Strings {
     override val playerIncomplete = "por completar"
     override val playerComplete = "Completar nombre y apellido"
     override val playerTwinWarning: (String) -> String = { "Ya hay un $it: si es él elígelo arriba; si es otra persona, está bien así." }
+    override val meWho = "¿Quién eres?"
+    override val meNew = "Soy nuevo"
+    override val meIsYou = "Eres tú"
+    override val meThisIsMe = "Soy yo"
+    override val dataTitle = "Perfil y datos"
+    override val dataHint = "Copia de seguridad en un archivo que es tuyo, restauración en este u otro teléfono, borrar todo"
+    override val dataBackup = "Copia de seguridad"
+    override val dataBackupHint = "Un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz. Guárdalo donde quieras (también en un PC o un pendrive): nada de nube."
+    override val dataVideosHint = "Los clips de golpes, la moviola y los highlights: el archivo se hace grande."
+    override val dataBackupDo = "Crear la copia"
+    override val dataBackupDone = "Copia guardada."
+    override val dataBackupFailed = "La copia no ha salido bien: revisa el espacio libre y vuelve a intentarlo."
+    override val dataBusy = "Un momento…"
+    override val dataRestore = "Restaurar"
+    override val dataRestoreHint = "Pone los datos de una copia en este teléfono, aunque sea nuevo. Sustituye todo lo que hay ahora: si te hace falta, haz antes una copia."
+    override val dataRestoreDo = "Restaurar"
+    override val dataRestoreDone = "Restauración hecha. La app se cierra ahora: ábrela de nuevo y encontrarás los datos de la copia."
+    override val dataNotBackup = "Este archivo no es una copia de Tennis Score Manager (o está dañado): no ha cambiado nada."
+    override val dataWipe = "Borrar todos los datos"
+    override val dataWipeHint = "Partidos, jugadores, alumnos, sesiones, notas, raquetas, fotos y ajustes: la app vuelve a estar como recién instalada. Los archivos que guardaste en Documentos y los vídeos de la galería se quedan."
+    override val dataWipeVideos = "También los vídeos"
+    override val dataWipeVideosHint = "Los clips de golpes, la moviola y los highlights de la app."
+    override val dataWipeAsk = "¿Borrar todos los datos de la app de este teléfono? Si te hacen falta, haz antes una copia."
+    override val dataWipeAsk2 = "¿Seguro? No se puede deshacer."
+    override val dataWipeConfirm = "Borrar todo"
+    override val dataWipeDone = "Hecho. La app se cierra ahora: al abrirla empieza de cero."
+    override val dataVideos: (Int) -> String = { mb -> "Incluir los vídeos ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Copia del $date (app $app" + (if (videos) ", con vídeos" else ", sin vídeos") + "). Sustituye todos los datos de ahora: si te hacen falta, haz antes una copia." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -26433,6 +26842,34 @@ object FrStrings : Strings {
     override val playerIncomplete = "à compléter"
     override val playerComplete = "Compléter prénom et nom"
     override val playerTwinWarning: (String) -> String = { "Il y a déjà un $it : si c'est lui choisissez-le au-dessus, si c'est une autre personne c'est bon." }
+    override val meWho = "Qui êtes-vous ?"
+    override val meNew = "Je suis nouveau"
+    override val meIsYou = "C'est vous"
+    override val meThisIsMe = "C'est moi"
+    override val dataTitle = "Profil et données"
+    override val dataHint = "Sauvegarde dans un fichier qui reste à vous, restauration sur ce téléphone ou un autre, effacement de tout"
+    override val dataBackup = "Sauvegarde"
+    override val dataBackupHint = "Un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix. Enregistrez-le où vous voulez (même sur un PC ou une clé USB) : pas de cloud."
+    override val dataVideosHint = "Les clips des coups, le ralenti et les highlights : le fichier devient gros."
+    override val dataBackupDo = "Créer la sauvegarde"
+    override val dataBackupDone = "Sauvegarde enregistrée."
+    override val dataBackupFailed = "La sauvegarde n'a pas réussi : vérifiez l'espace libre et réessayez."
+    override val dataBusy = "Un instant…"
+    override val dataRestore = "Restaurer"
+    override val dataRestoreHint = "Remet les données d'une sauvegarde sur ce téléphone, même neuf. Remplace tout ce qu'il y a maintenant : si besoin, faites d'abord une sauvegarde."
+    override val dataRestoreDo = "Restaurer"
+    override val dataRestoreDone = "Restauration faite. L'appli se ferme : rouvrez-la et vous retrouverez les données de la sauvegarde."
+    override val dataNotBackup = "Ce fichier n'est pas une sauvegarde de Tennis Score Manager (ou il est abîmé) : rien n'a changé."
+    override val dataWipe = "Effacer toutes les données"
+    override val dataWipeHint = "Matchs, joueurs, élèves, séances, notes, raquettes, photos et réglages : l'appli redevient comme juste installée. Les fichiers que vous avez enregistrés dans Documents et les vidéos de la galerie restent."
+    override val dataWipeVideos = "Les vidéos aussi"
+    override val dataWipeVideosHint = "Les clips des coups, le ralenti et les highlights de l'appli."
+    override val dataWipeAsk = "Effacer toutes les données de l'appli de ce téléphone ? Si besoin, faites d'abord une sauvegarde."
+    override val dataWipeAsk2 = "Sûr ? C'est définitif."
+    override val dataWipeConfirm = "Tout effacer"
+    override val dataWipeDone = "Fait. L'appli se ferme : en la rouvrant elle repart de zéro."
+    override val dataVideos: (Int) -> String = { mb -> "Inclure les vidéos ($mb Mo)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sauvegarde du $date (appli $app" + (if (videos) ", avec les vidéos" else ", sans vidéos") + "). Elle remplace toutes les données actuelles : si besoin, faites d'abord une sauvegarde." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -27656,6 +28093,34 @@ object PtStrings : Strings {
     override val playerIncomplete = "a completar"
     override val playerComplete = "Completar nome e sobrenome"
     override val playerTwinWarning: (String) -> String = { "Já existe um $it: se for ele escolha acima; se for outra pessoa, tudo bem." }
+    override val meWho = "Quem é você?"
+    override val meNew = "Sou novo"
+    override val meIsYou = "É você"
+    override val meThisIsMe = "Sou eu"
+    override val dataTitle = "Perfil e dados"
+    override val dataHint = "Backup num arquivo que é seu, restauração neste ou em outro telefone, apagar tudo"
+    override val dataBackup = "Backup"
+    override val dataBackupHint = "Um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz. Salve onde quiser (também num PC ou pen drive): sem nuvem."
+    override val dataVideosHint = "Os clipes de golpes, o replay e os highlights: o arquivo fica grande."
+    override val dataBackupDo = "Criar o backup"
+    override val dataBackupDone = "Backup salvo."
+    override val dataBackupFailed = "O backup não deu certo: confira o espaço livre e tente de novo."
+    override val dataBusy = "Um momento…"
+    override val dataRestore = "Restaurar"
+    override val dataRestoreHint = "Coloca os dados de um backup neste telefone, mesmo novo. Substitui tudo o que há agora: se precisar, faça antes um backup."
+    override val dataRestoreDo = "Restaurar"
+    override val dataRestoreDone = "Restauração feita. O app vai fechar: abra de novo e encontrará os dados do backup."
+    override val dataNotBackup = "Este arquivo não é um backup do Tennis Score Manager (ou está danificado): nada mudou."
+    override val dataWipe = "Apagar todos os dados"
+    override val dataWipeHint = "Partidas, jogadores, alunos, sessões, notas, raquetes, fotos e configurações: o app volta a ficar como recém-instalado. Os arquivos que você salvou em Documentos e os vídeos da galeria ficam."
+    override val dataWipeVideos = "Também os vídeos"
+    override val dataWipeVideosHint = "Os clipes de golpes, o replay e os highlights do app."
+    override val dataWipeAsk = "Apagar todos os dados do app deste telefone? Se precisar, faça antes um backup."
+    override val dataWipeAsk2 = "Tem certeza? Não dá para desfazer."
+    override val dataWipeConfirm = "Apagar tudo"
+    override val dataWipeDone = "Feito. O app vai fechar: ao abrir de novo, começa do zero."
+    override val dataVideos: (Int) -> String = { mb -> "Incluir os vídeos ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup de $date (app $app" + (if (videos) ", com vídeos" else ", sem vídeos") + "). Substitui todos os dados atuais: se precisar, faça antes um backup." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -28226,6 +28691,175 @@ fun QrCode(text: String, size: Dp) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/DataScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/DataScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.BuildConfig
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Backup
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+/**
+ * Altro › Profilo e dati: backup completo in un file che resta tuo, ripristino (anche su un telefono nuovo) e
+ * cancellazione di tutti i dati. Dopo ripristino e cancellazione l'app si chiude: riaprendola riparte dai dati nuovi.
+ */
+@Composable
+fun DataScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    BackHandler { c.back() }
+    val lang = c.options.value.lang
+    var videos by remember { mutableStateOf(false) }
+    var wipeVideos by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf<String?>(null) }
+    var restoreAsk by remember { mutableStateOf<Pair<Uri, Backup.Manifest>?>(null) }
+    var wipeAsk by remember { mutableStateOf(0) }  // 0 = no, 1 = prima domanda, 2 = conferma
+    var closeAfter by remember { mutableStateOf(false) }
+    val videoMb by produceState(0L) {
+        value = withContext(Dispatchers.IO) { Backup.videoBytes(context, c.storage, s.strokeFolderName) / 1_048_576 }
+    }
+    val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        busy = s.dataBusy
+        scope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                runCatching {
+                    context.contentResolver.openOutputStream(uri)?.use { Backup.write(context, c.storage, it, videos, BuildConfig.VERSION_NAME, s.strokeFolderName) } ?: error("open")
+                }.isSuccess
+            }
+            busy = null
+            message = if (ok) s.dataBackupDone else s.dataBackupFailed
+        }
+    }
+    val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        scope.launch {
+            val m = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.peek(it) } }.getOrNull() }
+            if (m == null) message = s.dataNotBackup else restoreAsk = uri to m
+        }
+    }
+    ScreenScaffold(
+        title = s.dataTitle,
+        subtitle = s.dataHint,
+        icon = Icons.Filled.Backup,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        SectionCard(s.dataBackup, Icons.Filled.Backup) {
+            Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
+            BigButton(s.dataBackupDo, Icons.Filled.Backup, {
+                val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+                create.launch("TennisScoreManager-backup-$stamp.zip")
+            }, Modifier.fillMaxWidth())
+        }
+        SectionCard(s.dataRestore, Icons.Filled.Restore) {
+            Text(s.dataRestoreHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            GhostButton(s.dataRestoreDo, Icons.Filled.Restore, { open.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }, Modifier.fillMaxWidth())
+        }
+        SectionCard(s.dataWipe, Icons.Filled.DeleteForever, accent = TsmColors.Danger) {
+            Text(s.dataWipeHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            SwitchRow(Icons.Filled.Videocam, s.dataWipeVideos, s.dataWipeVideosHint, wipeVideos) { wipeVideos = it }
+            GhostButton(s.dataWipe, Icons.Filled.DeleteForever, { wipeAsk = 1 }, Modifier.fillMaxWidth())
+        }
+    }
+    busy?.let { AlertDialog(onDismissRequest = {}, text = { Text(it) }, confirmButton = {}) }
+    message?.let { m ->
+        AlertDialog(
+            onDismissRequest = { message = null; if (closeAfter) c.closeAfterData() },
+            text = { Text(m) },
+            confirmButton = { TextButton(onClick = { message = null; if (closeAfter) c.closeAfterData() }) { Text(s.ok) } },
+        )
+    }
+    restoreAsk?.let { (uri, m) ->
+        AlertDialog(
+            onDismissRequest = { restoreAsk = null },
+            title = { Text(s.dataRestore) },
+            text = { Text(s.dataRestoreAsk(Reports.date(m.createdAt, lang), m.app, m.videos)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    restoreAsk = null
+                    busy = s.dataBusy
+                    scope.launch {
+                        val ok = withContext(Dispatchers.IO) {
+                            runCatching { context.contentResolver.openInputStream(uri)?.use { Backup.restore(context, c.storage, it) } == true }.getOrDefault(false)
+                        }
+                        busy = null
+                        closeAfter = ok
+                        message = if (ok) s.dataRestoreDone else s.dataNotBackup
+                    }
+                }) { Text(s.dataRestoreDo, color = TsmColors.Danger, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton(onClick = { restoreAsk = null }) { Text(s.back) } },
+        )
+    }
+    if (wipeAsk > 0) {
+        AlertDialog(
+            onDismissRequest = { wipeAsk = 0 },
+            title = { Text(s.dataWipe) },
+            text = { Text(if (wipeAsk == 1) s.dataWipeAsk else s.dataWipeAsk2) },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (wipeAsk == 1) { wipeAsk = 2; return@TextButton }
+                    wipeAsk = 0
+                    busy = s.dataBusy
+                    scope.launch {
+                        withContext(Dispatchers.IO) { Backup.wipe(context, c.storage, wipeVideos, listOf(s.strokeFolderName)) }
+                        busy = null
+                        closeAfter = true
+                        message = s.dataWipeDone
+                    }
+                }) { Text(if (wipeAsk == 1) s.next else s.dataWipeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton(onClick = { wipeAsk = 0 }) { Text(s.back) } },
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -28741,6 +29375,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -28978,9 +29613,9 @@ private fun ProgressTab(c: MatchController) {
     val s = LocalStrings.current
     // Col proprio nome (Altro › Tu) la voce mostra subito il proprio rating.
     val history by c.history.collectAsState()
-    val me = c.storage.myName
+    val me = c.me()?.name ?: c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.keyForName(me)) }
+        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
     }
     Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
@@ -29017,10 +29652,16 @@ private fun ProgressTab(c: MatchController) {
 private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     val s = LocalStrings.current
     var profile by remember { mutableStateOf(false) }
-    val me = c.storage.myName
-    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) { profile = true }
+    val players by c.players.collectAsState()
+    val mine = remember(players) { c.me() }
+    val me = mine?.name ?: c.storage.myName
+    // Col tuo giocatore si apre la tua scheda; senza, si sceglie chi sei.
+    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) {
+        if (mine != null) c.openStudent(mine.id) else profile = true
+    }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
     Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
@@ -31391,7 +32032,7 @@ fun ProgressScreen(c: MatchController) {
     val players = remember(history) { c.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
-    val me = c.keyForName(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
+    val me = c.myKey().takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
     val key = if (matches) (player ?: me ?: players.firstOrNull()?.first) else null
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }
@@ -33008,6 +33649,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
@@ -33173,6 +33815,9 @@ fun StudentScreen(c: MatchController) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
             Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
         }
+        // Sei tu? Il tuo giocatore è quello di Progressi, del rating e di Altro › Tu.
+        if (c.me()?.id == st.id) Text(s.meIsYou, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+        else GhostButton(s.meThisIsMe, Icons.Filled.Person, { c.setMe(st) }, Modifier.fillMaxWidth())
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
@@ -60125,6 +60770,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 186 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 188 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

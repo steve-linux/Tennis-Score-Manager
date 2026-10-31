@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -636,6 +636,7 @@ class MatchController(
             Screen.STUDENTS -> Screen.HOME
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
+            Screen.DATA -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1181,6 +1182,22 @@ class MatchController(
 
     /** Rating TSM del giocatore nello sport con più partite (null senza partite). */
     fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = ratingSports().firstOrNull()?.let { ratingTable(it).player(p.id) }
+
+    /**
+     * Tu: il tuo giocatore del database. Prima del database c'era solo il nome (Altro › Tu): se è di un giocatore solo,
+     * è lui.
+     */
+    fun me(): com.tennis.scoremanager.data.PlayerProfile? =
+        playerById(storage.myPlayerId) ?: com.tennis.scoremanager.data.Players.byName(players.value, storage.myName).singleOrNull()
+
+    /** Sei tu: il tuo nome segue quello del giocatore (per le versioni e i punti dell'app che usano ancora il nome). */
+    fun setMe(p: com.tennis.scoremanager.data.PlayerProfile?) {
+        storage.myPlayerId = p?.id.orEmpty()
+        storage.myName = p?.name.orEmpty()
+    }
+
+    /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
+    fun myKey(): String = me()?.id ?: keyForName(storage.myName)
 
     /** Chi è un nome scritto (es. il proprio, in Altro › Tu): il giocatore del database se è uno solo, sennò il nome. */
     fun keyForName(name: String): String =
@@ -2872,6 +2889,19 @@ class MatchController(
 
     /** "Esci": l'app si chiude davvero e alla prossima apertura riparte dalla prima schermata. */
     fun exitApp(activity: Activity) = shutdown { activity.finishAndRemoveTask() }
+
+    /**
+     * Dopo un ripristino o una cancellazione di tutti i dati: si chiude subito, senza salvare niente (salvando si
+     * riscriverebbero le impostazioni di prima sopra quelle nuove). Riaprendo l'app riparte dai dati nuovi.
+     */
+    fun closeAfterData() {
+        closing = true
+        runCatching { ble.disconnectAll() }
+        runCatching { relay.stop() }
+        runCatching { heart.disconnectAll() }
+        runCatching { MatchService.stop(app) }
+        android.os.Process.killProcess(android.os.Process.myPid())
+    }
 
     /** L'app è stata tolta dalle app recenti mentre il servizio della partita era attivo: stessa cosa di "Esci". */
     fun onTaskRemoved(stopService: () -> Unit) = shutdown(stopService)

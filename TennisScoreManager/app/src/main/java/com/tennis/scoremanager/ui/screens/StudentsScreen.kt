@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.MergeType
@@ -176,6 +177,9 @@ fun StudentScreen(c: MatchController) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
             Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
         }
+        // Sei tu? Il tuo giocatore è quello di Progressi, del rating e di Altro › Tu.
+        if (c.me()?.id == st.id) Text(s.meIsYou, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+        else GhostButton(s.meThisIsMe, Icons.Filled.Person, { c.setMe(st) }, Modifier.fillMaxWidth())
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->

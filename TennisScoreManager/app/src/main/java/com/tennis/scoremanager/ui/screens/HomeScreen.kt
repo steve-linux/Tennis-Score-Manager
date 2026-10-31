@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -257,9 +258,9 @@ private fun ProgressTab(c: MatchController) {
     val s = LocalStrings.current
     // Col proprio nome (Altro › Tu) la voce mostra subito il proprio rating.
     val history by c.history.collectAsState()
-    val me = c.storage.myName
+    val me = c.me()?.name ?: c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.keyForName(me)) }
+        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.myKey()) }
     }
     Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
@@ -296,10 +297,16 @@ private fun ProgressTab(c: MatchController) {
 private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     val s = LocalStrings.current
     var profile by remember { mutableStateOf(false) }
-    val me = c.storage.myName
-    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) { profile = true }
+    val players by c.players.collectAsState()
+    val mine = remember(players) { c.me() }
+    val me = mine?.name ?: c.storage.myName
+    // Col tuo giocatore si apre la tua scheda; senza, si sceglie chi sei.
+    Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) {
+        if (mine != null) c.openStudent(mine.id) else profile = true
+    }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+    Entry(Icons.Filled.Backup, s.dataTitle, s.dataHint) { c.go(Screen.DATA) }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
     Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }

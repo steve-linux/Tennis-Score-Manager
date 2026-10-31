@@ -6,7 +6,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Profil und Daten** (Sicherung, Wiederherstellung, Löschen: 7.8), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
 
 **Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
 
@@ -312,6 +312,14 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Namensvetter trennen** (unter *Matches*): die Matches einer anderen Person mit demselben Namen anhaken, sie wird ein neuer Spieler.
 - **Matches von einem anderen Telefon** (Übertragung oder *Importieren*): ein bekannter Spieler wird von selbst verknüpft; ein neuer kommt mit seiner Kennung dazu; hat er den Namen eines deiner Spieler, fragt die App einmal **Wer ist das?** (*Ja, das ist er* verknüpft beide, beim nächsten Mal wird er erkannt; *Nein, eine andere Person* fügt ihn hinzu). Matches alter Versionen ohne Spieler werden über den Namen verknüpft.
 - **Foto** und **Mann/Frau** gelten noch für den Namen: zwei Namensvettern teilen sie.
+
+### 7.8 Du, und Profil und Daten
+
+- **Du** ist dein Spieler in der Datenbank: Fortschritt und Rating gehen von ihm aus. Beim ersten Start reichen Vor- und Nachname (und Spitzname); danach öffnet **Mehr › Du** deine Karte. Hast du ihn noch nicht gewählt, bietet *Wer bist du?* die vorhandenen Spieler an (du hast schon Matches gespielt) oder **Ich bin neu**. Auf der Karte eines anderen Spielers macht **Das bin ich** ihn zu deinem.
+- **Mehr › Profil und Daten**:
+  - **Sicherung erstellen**: eine ZIP-Datei mit Matches, Spielern, Schülern, Schlageinheiten mit Analyse, Schlägern, Trainings, Turnieren, Fotos, Einstellungen und Sprachaufnahmen; mit **Videos einschließen** auch Schlag-Clips, Zeitlupe und Highlights (die Datei wird groß). Speichere sie, wo du willst (Download, ein PC, ein USB-Stick): keine Cloud. Das Modell der Bewegungsanalyse (wird neu geladen) und deine in Dokumente gespeicherten Dateien sind nicht dabei.
+  - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
+  - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
 
 ## 8. Anzeigetafel auf TV oder Monitor
 

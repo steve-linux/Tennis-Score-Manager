@@ -102,7 +102,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Players** (the database: 7.7), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+- **More**: **You** (your name), **Players** (the database: 7.7), **Profile and data** (backup, restore, delete: 7.8), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
 
 **New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
 
@@ -425,6 +425,14 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Split a homonym** (in *Matches*): tick the matches of another person with the same name, who becomes a new player.
 - **Matches from another phone** (transfer or *Import*): a player the phone knows links by itself; a new one is added with its ID; if it has the name of one of yours the app asks once **Who is it?** (*Yes, it's them* links the two, so next time it is recognised; *No, someone else* adds them). Matches from old versions, without players, link by name.
 - The **photo** and **man/woman** still belong to the name: two namesakes share them.
+
+### 7.8 You, and Profile and data (app 2.5)
+
+- **You** is your player in the database: Progress and rating start from them. At the first start first and last name (and nickname) are enough; then **More › You** opens your card. If you haven't chosen it yet, *Who are you?* offers the existing players (you have already played matches) or **I'm new**. On another player's card, **This is me** makes it yours.
+- **More › Profile and data**:
+  - **Create the backup**: a ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings; with **Include the videos** also stroke clips, replay and highlights (the file gets big). Save it wherever you like (Download, a PC, a USB stick): no cloud. The movement analysis model (downloaded again) and files you saved in Documents are not included.
+  - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
+  - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
 
 ## 8. Scoreboard on a TV or monitor
 

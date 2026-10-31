@@ -431,6 +431,11 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
+    var myPlayerId: String
+        get() = prefs.getString("my_player", null) ?: ""
+        set(v) = prefs.edit().putString("my_player", v).apply()
+
     /** Telefono-telecamera: obiettivo scelto (id della fotocamera, null = quello di serie). */
     var cameraLensId: String?
         get() = prefs.getString("camera_lens", null)

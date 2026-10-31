@@ -4,6 +4,7 @@
 package com.tennis.scoremanager.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,12 +68,22 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
-    var name by remember { mutableStateOf(c.storage.myName) }
+    // Tu: nome e cognome (obbligatori per la tua scheda di giocatore) e soprannome.
+    var first by remember { mutableStateOf("") }
+    var last by remember { mutableStateOf("") }
+    var nick by remember { mutableStateOf("") }
     fun finish() {
         c.storage.onboarded = true
-        val n = name.trim()
-        c.storage.myName = n
-        if (n.isNotEmpty() && c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = n) }
+        if (first.isNotBlank() && last.isNotBlank()) {
+            // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
+            val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
+                ?: com.tennis.scoremanager.data.PlayerProfile(
+                    com.tennis.scoremanager.data.Players.newId(), com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
+                    first.trim(), last.trim(), nick.trim(), createdAt = System.currentTimeMillis(),
+                ).also { c.savePlayer(it) }
+            c.setMe(p)
+            if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
+        }
         when (use) {
             Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
@@ -117,10 +128,13 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                     }
                     else -> {
                         Text(s.onbNameTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        OutlinedTextField(
-                            name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
+                        @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = OutlinedTextField(
+                            v, { onChange(it.take(40)) }, label = { Text(label) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
                             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
                         )
+                        field(first, s.playerFirstName) { first = it }
+                        field(last, s.playerLastName) { last = it }
+                        field(nick, s.playerNickname) { nick = it }
                         Text(s.onbNameHint, color = TsmColors.TextDim, fontSize = 13.sp)
                     }
                 }
@@ -150,24 +164,41 @@ private fun Choice(icon: ImageVector, title: String, hint: String, on: Boolean, 
     }
 }
 
-/** Altro › Tu: il proprio nome (Progressi parte da lì, la scheda Progressi mostra il proprio rating). */
+/**
+ * Altro › Tu, senza il tuo giocatore: chi sei? Uno dei giocatori del database (hai già giocato partite) o una scheda
+ * nuova con nome e cognome.
+ */
 @Composable
 fun ProfileDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
-    var name by remember { mutableStateOf(c.storage.myName) }
+    val players by c.players.collectAsState()
+    var query by remember { mutableStateOf(c.storage.myName) }
+    var create by remember { mutableStateOf(false) }
+    if (create) {
+        PlayerEditDialog(c, null, prefill = query) { p ->
+            create = false
+            if (p != null) { c.setMe(p); onDone() }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = onDone,
-        title = { Text(s.moreProfile) },
+        title = { Text(s.meWho) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    name, { name = it.take(40) }, label = { Text(s.profileName) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words), modifier = Modifier.fillMaxWidth(),
-                )
                 Text(s.moreProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                OutlinedTextField(query, { query = it.take(40) }, label = { Text(s.playersSearch) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                val list = (if (query.isBlank()) players else com.tennis.scoremanager.data.Players.search(players, query)).take(6)
+                for (p in list) Row(
+                    Modifier.fillMaxWidth().clickable { c.setMe(p); onDone() }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                    Text(" " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
             }
         },
-        confirmButton = { TextButton(onClick = { c.storage.myName = name; onDone() }) { Text(s.ok) } },
+        confirmButton = { TextButton(onClick = { create = true }) { Text(s.meNew) } },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }

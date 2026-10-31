@@ -102,7 +102,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Profil et données** (sauvegarde, restauration, effacement : 7.8), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
 
 **Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
 
@@ -425,6 +425,14 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Séparer un homonyme** (dans *Matchs*) : cochez les matchs d'une autre personne du même nom, qui devient un nouveau joueur.
 - **Matchs d'un autre téléphone** (transfert ou *Importer*) : un joueur connu du téléphone se relie tout seul ; un nouveau s'ajoute avec son identifiant ; s'il a le nom d'un des vôtres l'appli demande une fois **Qui est-ce ?** (*Oui, c'est lui* relie les deux, la fois suivante il est reconnu ; *Non, une autre personne* l'ajoute). Les matchs des anciennes versions, sans joueurs, se relient par le nom.
 - La **photo** et **homme/femme** valent encore pour le nom : deux homonymes les partagent.
+
+### 7.8 Vous, et Profil et données (app 2.5)
+
+- **Vous** est votre joueur de la base : Progrès et classement partent de lui. Au premier démarrage prénom et nom (et surnom) suffisent ; ensuite **Plus › Vous** ouvre votre fiche. Si vous ne l'avez pas encore choisi, *Qui êtes-vous ?* propose les joueurs existants (vous avez déjà joué des matchs) ou **Je suis nouveau**. Sur la fiche d'un autre joueur, **C'est moi** le rend vôtre.
+- **Plus › Profil et données** :
+  - **Créer la sauvegarde** : un fichier ZIP avec matchs, joueurs, élèves, séances de coups avec leur analyse, raquettes, entraînements, tournois, photos, réglages et enregistrements de la voix ; avec **Inclure les vidéos** aussi clips des coups, ralenti et highlights (le fichier devient gros). Enregistrez-le où vous voulez (Download, un PC, une clé) : pas de cloud. Le modèle de l'analyse du mouvement (il se retélécharge) et les fichiers que vous avez enregistrés dans Documents n'y sont pas.
+  - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
+  - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
 
 ## 8. Tableau d'affichage sur TV ou écran
 

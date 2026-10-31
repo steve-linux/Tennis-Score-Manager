@@ -102,7 +102,7 @@ Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo 
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
-- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
+- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Perfil e dados** (backup, restauração, apagar: 7.8), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
 
 **Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
 
@@ -425,6 +425,14 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Separar um homônimo** (em *Partidas*): marque as partidas de outra pessoa com o mesmo nome, que vira um jogador novo.
 - **Partidas de outro telefone** (transferência ou *Importar*): um jogador que o telefone conhece se liga sozinho; um novo entra com o identificador dele; se tem o nome de um dos seus o app pergunta uma vez **Quem é?** (*Sim, é ele* liga os dois e da próxima vez reconhece; *Não, outra pessoa* adiciona). Partidas de versões antigas, sem jogadores, se ligam pelo nome.
 - A **foto** e **homem/mulher** ainda valem para o nome: dois homônimos as compartilham.
+
+### 7.8 Você, e Perfil e dados (app 2.5)
+
+- **Você** é o seu jogador do banco: Progresso e rating partem dele. Na primeira abertura bastam nome e sobrenome (e apelido); depois **Mais › Você** abre a sua ficha. Se ainda não escolheu, *Quem é você?* oferece os jogadores que existem (você já jogou partidas) ou **Sou novo**. Na ficha de outro jogador, **Sou eu** faz dele o seu.
+- **Mais › Perfil e dados**:
+  - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
+  - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
+  - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
 
 ## 8. Placar na TV ou no monitor
 

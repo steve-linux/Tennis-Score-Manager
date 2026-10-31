@@ -962,6 +962,34 @@ interface Strings {
     val playerIncomplete: String
     val playerComplete: String
     val playerTwinWarning: (String) -> String
+    val meWho: String
+    val meNew: String
+    val meIsYou: String
+    val meThisIsMe: String
+    val dataTitle: String
+    val dataHint: String
+    val dataBackup: String
+    val dataBackupHint: String
+    val dataVideosHint: String
+    val dataBackupDo: String
+    val dataBackupDone: String
+    val dataBackupFailed: String
+    val dataBusy: String
+    val dataRestore: String
+    val dataRestoreHint: String
+    val dataRestoreDo: String
+    val dataRestoreDone: String
+    val dataNotBackup: String
+    val dataWipe: String
+    val dataWipeHint: String
+    val dataWipeVideos: String
+    val dataWipeVideosHint: String
+    val dataWipeAsk: String
+    val dataWipeAsk2: String
+    val dataWipeConfirm: String
+    val dataWipeDone: String
+    val dataVideos: (Int) -> String
+    val dataRestoreAsk: (String, String, Boolean) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2183,6 +2211,34 @@ object ItStrings : Strings {
     override val playerIncomplete = "da completare"
     override val playerComplete = "Completa nome e cognome"
     override val playerTwinWarning: (String) -> String = { "C'è già un $it: se è lui sceglilo sopra, se è un'altra persona va bene così." }
+    override val meWho = "Chi sei?"
+    override val meNew = "Sono nuovo"
+    override val meIsYou = "Sei tu"
+    override val meThisIsMe = "Sono io"
+    override val dataTitle = "Profilo e dati"
+    override val dataHint = "Backup in un file che resta tuo, ripristino su questo o su un altro telefono, cancellazione di tutto"
+    override val dataBackup = "Backup"
+    override val dataBackupHint = "Un file ZIP con partite, giocatori, allievi, sessioni dei colpi con le analisi, racchette, allenamenti, tornei, foto, impostazioni e registrazioni della voce. Salvalo dove vuoi (anche su un PC o in una chiavetta): nessun cloud."
+    override val dataVideosHint = "Le clip dei colpi, la moviola e gli highlights: il file diventa grande."
+    override val dataBackupDo = "Crea il backup"
+    override val dataBackupDone = "Backup salvato."
+    override val dataBackupFailed = "Il backup non è riuscito: controlla lo spazio libero e riprova."
+    override val dataBusy = "Un momento…"
+    override val dataRestore = "Ripristina"
+    override val dataRestoreHint = "Rimette i dati di un backup su questo telefono, anche nuovo. Sostituisce tutto quello che c'è adesso: se ti serve, prima fai un backup."
+    override val dataRestoreDo = "Ripristina"
+    override val dataRestoreDone = "Ripristino fatto. L'app ora si chiude: riaprila e ritrovi i dati del backup."
+    override val dataNotBackup = "Questo file non è un backup di Tennis Score Manager (o è rovinato): non è cambiato niente."
+    override val dataWipe = "Cancella tutti i dati"
+    override val dataWipeHint = "Partite, giocatori, allievi, sessioni, note, racchette, foto e impostazioni: l'app torna come appena installata. I file che hai salvato tu in Documenti e i video della galleria restano."
+    override val dataWipeVideos = "Anche i video"
+    override val dataWipeVideosHint = "Le clip dei colpi, la moviola e gli highlights dell'app."
+    override val dataWipeAsk = "Cancellare tutti i dati dell'app da questo telefono? Se ti servono, prima fai un backup."
+    override val dataWipeAsk2 = "Sicuro? Non si può annullare."
+    override val dataWipeConfirm = "Cancella tutto"
+    override val dataWipeDone = "Fatto. L'app ora si chiude: riaprendola riparte da capo."
+    override val dataVideos: (Int) -> String = { mb -> "Includi i video ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup del $date (app $app" + (if (videos) ", con i video" else ", senza video") + "). Sostituisce tutti i dati di adesso: se ti servono, prima fai un backup." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3387,6 +3443,34 @@ object EnStrings : Strings {
     override val playerIncomplete = "to complete"
     override val playerComplete = "Complete first and last name"
     override val playerTwinWarning: (String) -> String = { "There is already a $it: if it's them pick them above, if it's someone else that's fine." }
+    override val meWho = "Who are you?"
+    override val meNew = "I'm new"
+    override val meIsYou = "This is you"
+    override val meThisIsMe = "This is me"
+    override val dataTitle = "Profile and data"
+    override val dataHint = "Backup in a file that stays yours, restore on this or another phone, delete everything"
+    override val dataBackup = "Backup"
+    override val dataBackupHint = "A ZIP file with matches, players, students, stroke sessions with their analysis, rackets, workouts, tournaments, photos, settings and voice recordings. Save it wherever you like (even on a PC or a USB stick): no cloud."
+    override val dataVideosHint = "Stroke clips, replay and highlights: the file gets big."
+    override val dataBackupDo = "Create the backup"
+    override val dataBackupDone = "Backup saved."
+    override val dataBackupFailed = "The backup did not work: check the free space and try again."
+    override val dataBusy = "One moment…"
+    override val dataRestore = "Restore"
+    override val dataRestoreHint = "Puts the data of a backup on this phone, even a new one. It replaces everything that is here now: if you need it, make a backup first."
+    override val dataRestoreDo = "Restore"
+    override val dataRestoreDone = "Restore done. The app now closes: open it again and you will find the data of the backup."
+    override val dataNotBackup = "This file is not a Tennis Score Manager backup (or it is damaged): nothing has changed."
+    override val dataWipe = "Delete all data"
+    override val dataWipeHint = "Matches, players, students, sessions, notes, rackets, photos and settings: the app goes back to just installed. Files you saved in Documents and videos in the gallery stay."
+    override val dataWipeVideos = "Videos too"
+    override val dataWipeVideosHint = "The app's stroke clips, replay and highlights."
+    override val dataWipeAsk = "Delete all the app's data from this phone? If you need it, make a backup first."
+    override val dataWipeAsk2 = "Sure? This cannot be undone."
+    override val dataWipeConfirm = "Delete everything"
+    override val dataWipeDone = "Done. The app now closes: when you open it again it starts from scratch."
+    override val dataVideos: (Int) -> String = { mb -> "Include the videos ($mb MB)" }
+    override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup of $date (app $app" + (if (videos) ", with videos" else ", without videos") + "). It replaces all the data here now: if you need it, make a backup first." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
