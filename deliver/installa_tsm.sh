@@ -647,6 +647,12 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
 - **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
 
+### 7.10 Geführte Übungen
+
+- Eine **Übung** ist ein Schlag mit Schritten nacheinander: zum Beispiel *20 Vorhand cross, dann 20 longline*, oder beim Aufschlag *10 erste Aufschläge von der Einstandseite durch die Mitte, dann 10 nach außen…*. Es gibt vier fertige Beispiele, eines pro Schlag.
+- **Übungen** (im Reiter *Schüler* des Trainers oder über die Auswahl unter *Starten*): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
+- Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1058,6 +1064,12 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - The scoreboard is there in every role: nothing stops you from scoring a match.
 - **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
 
+### 7.10 Guided drills
+
+- A **drill** is a stroke and steps in a row: for example *20 cross-court forehands, then 20 down the line*, or for the serve *10 first serves from the deuce side to the T, then 10 wide…*. There are four ready examples, one per stroke.
+- **Drills** (from the coach's *Students* tab, or from the choice under *Start*): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
+- In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1467,6 +1479,12 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
 - El marcador está en todos los roles: nada te impide anotar un partido.
 - **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
+
+### 7.10 Ejercicios guiados
+
+- Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
+- **Ejercicios** (desde la pestaña *Alumnos* del entrenador, o desde la elección bajo *Empezar*): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
+- En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -1878,6 +1896,12 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
 - **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
 
+### 7.10 Exercices guidés
+
+- Un **exercice** est un coup et des étapes à la suite : par exemple *20 coups droits croisés, puis 20 le long de la ligne*, ou pour le service *10 premières côté égalité au T, puis 10 extérieures…*. Il y a quatre exemples prêts, un par coup.
+- **Exercices** (depuis l'onglet *Élèves* de l'entraîneur, ou depuis le choix sous *Commencer*) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
+- Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2288,6 +2312,12 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
 
+### 7.10 Esercizi guidati
+
+- Un **esercizio** è un colpo e dei passi in fila: per esempio *20 dritti incrociati, poi 20 lungolinea*, o per il servizio *10 prime da destra al T, poi 10 esterne…*. Ci sono quattro esempi pronti, uno per colpo.
+- **Esercizi** (dalla scheda *Allievi* dell'allenatore, o dalla scelta sotto *Inizia*): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
+- In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2697,6 +2727,12 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
 - O placar está em todos os papéis: nada impede você de marcar uma partida.
 - **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
+
+### 7.10 Exercícios guiados
+
+- Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
+- **Exercícios** (na aba *Alunos* do treinador, ou na escolha embaixo de *Começar*): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
+- Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3513,7 +3549,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4040,6 +4076,7 @@ class MatchController(
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
             Screen.DATA -> Screen.HOME
+            Screen.DRILLS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4597,6 +4634,29 @@ class MatchController(
     fun setMe(p: com.tennis.scoremanager.data.PlayerProfile?) {
         storage.myPlayerId = p?.id.orEmpty()
         storage.myName = p?.name.orEmpty()
+    }
+
+    // ---------------------------------------------------------------- esercizi guidati
+
+    /** Gli esercizi guidati; la prima volta gli esempi, uno per colpo (si cambiano o si tolgono a piacere). */
+    val drills = MutableStateFlow(storage.loadDrills() ?: com.tennis.scoremanager.data.Drills.templates({ strings.drillTemplateName(it.band) }, System.currentTimeMillis()))
+
+    /** Esercizio scelto per il prossimo allenamento (Drill.id), null = libero. */
+    val trainDrill = MutableStateFlow<String?>(null)
+
+    fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+
+    fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
+        val list = drills.value.filter { it.id != d.id } + d
+        drills.value = list
+        scope.launch(io) { storage.saveDrills(list) }
+    }
+
+    fun deleteDrill(id: String) {
+        val list = drills.value.filter { it.id != id }
+        drills.value = list
+        if (trainDrill.value == id) trainDrill.value = null
+        scope.launch(io) { storage.saveDrills(list) }
     }
 
     // ---------------------------------------------------------------- ruoli
@@ -8490,6 +8550,81 @@ object Backup {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Drills.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Drills.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/**
+ * Un passo di un esercizio: [count] colpi con queste impostazioni (quelle null restano come sono). Servizio: lato,
+ * prima o seconda, bersaglio; dritto, rovescio e volée: direzione; volée: dritto o rovescio.
+ */
+@Serializable
+data class DrillStep(
+    val count: Int,
+    val side: ServeSide? = null,
+    val kind: ServeKind? = null,
+    val target: ServeTarget? = null,
+    val direction: ShotDirection? = null,
+    val wing: Wing? = null,
+)
+
+/** Un esercizio guidato: nome, colpo e i passi in fila ("20 dritti incrociati, poi 20 lungolinea"). */
+@Serializable
+data class Drill(
+    val id: String,
+    val name: String,
+    val stroke: TrainedStroke,
+    val steps: List<DrillStep>,
+    val createdAt: Long = 0,
+) {
+    val total: Int get() = steps.sumOf { it.count }
+}
+
+object Drills {
+    /** A che punto è l'esercizio dopo [shots] colpi segnati: passo, colpi fatti nel passo, finito. */
+    data class Progress(val step: Int, val done: Int, val finished: Boolean) {
+        /** Il colpo appena segnato ha chiuso un passo (e se ne apre un altro, o l'esercizio è finito). */
+        val stepJustEnded: Boolean get() = done == 0 && (step > 0 || finished)
+    }
+
+    fun progress(drill: Drill, shots: Int): Progress {
+        var left = shots
+        for ((i, st) in drill.steps.withIndex()) {
+            if (left < st.count) return Progress(i, left, false)
+            left -= st.count
+        }
+        return Progress(drill.steps.size, 0, true)
+    }
+
+    /** Il passo in corso (null se l'esercizio è finito o vuoto). */
+    fun current(drill: Drill, shots: Int): DrillStep? = progress(drill, shots).let { p -> if (p.finished) null else drill.steps.getOrNull(p.step) }
+
+    /** Esempi pronti, per colpo: si aggiungono all'elenco e si cambiano a piacere. */
+    fun templates(names: (TrainedStroke) -> String, now: Long): List<Drill> = listOf(
+        Drill("t-serve-t-wide", names(TrainedStroke.SERVE), TrainedStroke.SERVE, listOf(
+            DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.T),
+            DrillStep(10, side = ServeSide.DEUCE, kind = ServeKind.FIRST, target = ServeTarget.WIDE),
+            DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.T),
+            DrillStep(10, side = ServeSide.AD, kind = ServeKind.FIRST, target = ServeTarget.WIDE),
+        ), now),
+        Drill("t-forehand-cross-line", names(TrainedStroke.FOREHAND), TrainedStroke.FOREHAND, listOf(
+            DrillStep(20, direction = ShotDirection.CROSS), DrillStep(20, direction = ShotDirection.LINE),
+        ), now),
+        Drill("t-backhand-cross-line", names(TrainedStroke.BACKHAND), TrainedStroke.BACKHAND, listOf(
+            DrillStep(20, direction = ShotDirection.CROSS), DrillStep(20, direction = ShotDirection.LINE),
+        ), now),
+        Drill("t-volley-fh-bh", names(TrainedStroke.VOLLEY), TrainedStroke.VOLLEY, listOf(
+            DrillStep(15, wing = Wing.FOREHAND, direction = ShotDirection.CROSS), DrillStep(15, wing = Wing.BACKHAND, direction = ShotDirection.CROSS),
+        ), now),
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/HeartStats.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/HeartStats.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -11531,6 +11666,8 @@ data class ServeSession(
     val studentName: String? = null,
     /** Racchetta usata, com'era quel giorno (corde e tensione comprese). */
     val racket: RacketUse? = null,
+    /** Esercizio guidato seguito (nome di quel giorno); null = allenamento libero. */
+    val drillName: String? = null,
 )
 
 /**
@@ -11835,6 +11972,24 @@ class Storage(context: Context) {
         dir.deleteRecursively()
         // La cartella dell'allievo rimasta vuota se ne va con l'ultima sessione.
         if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
+    }
+
+    /** Esercizi guidati, in un file solo. */
+    private val drillsFile: File get() = File(app.filesDir, "drills.json")
+
+    fun loadDrills(): List<Drill>? =
+        runCatching { json.decodeFromString(ListSerializer(Drill.serializer()), drillsFile.readText()) }.getOrNull()
+
+    @Synchronized
+    fun saveDrills(list: List<Drill>) {
+        runCatching {
+            val tmp = File(app.filesDir, "drills.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Drill.serializer()), list))
+            if (!tmp.renameTo(drillsFile)) {
+                drillsFile.delete()
+                tmp.renameTo(drillsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
@@ -17392,6 +17547,7 @@ fun AppRoot(c: MatchController) {
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
+                Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
             }
         }
     }
@@ -19412,6 +19568,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
@@ -19468,6 +19625,57 @@ fun directionName(s: Strings, v: ShotDirection?) = when (v) {
 }
 fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
 
+/** Un passo di un esercizio a parole: "20 · Prima · Destra · Al T", "20 · Incrociato". */
+fun stepLabel(s: Strings, step: com.tennis.scoremanager.data.DrillStep): String = listOfNotNull(
+    step.count.toString(), step.wing?.let { wingName(s, it) }, step.direction?.let { directionName(s, it) },
+    step.kind?.let { serveKindName(s, it) }, step.side?.let { serveSideName(s, it) }, step.target?.let { serveTargetName(s, it) },
+).joinToString(" · ")
+
+/** I passi di un esercizio in una riga: "20 · Incrociato, poi 20 · Lungolinea". */
+fun drillSummary(s: Strings, d: com.tennis.scoremanager.data.Drill): String = d.steps.joinToString(s.drillThen) { stepLabel(s, it) }
+
+/** L'esercizio da seguire col colpo scelto (o libero), e dove si cambiano gli esercizi. */
+@Composable
+fun DrillRow(c: MatchController, stroke: TrainedStroke) {
+    val s = LocalStrings.current
+    val drills by c.drills.collectAsState()
+    val chosen by c.trainDrill.collectAsState()
+    val mine = drills.filter { it.stroke == stroke }
+    val cur = mine.firstOrNull { it.id == chosen }
+    var pick by remember { mutableStateOf(false) }
+    Row(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp)).background(TsmColors.SurfaceHigh)
+            .clickable { pick = true }.padding(10.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.FormatListNumbered, null, tint = if (cur != null) TsmColors.Ball else TsmColors.TextDim, modifier = Modifier.size(36.dp))
+        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+            Text(s.drillChoose, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(cur?.name ?: s.drillFree, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            cur?.let { Text(drillSummary(s, it), color = TsmColors.TextDim, fontSize = 12.sp) }
+        }
+        Text(s.trainChange, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+    }
+    if (pick) AlertDialog(
+        onDismissRequest = { pick = false },
+        title = { Text(s.drillChoose) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                @Composable fun option(label: String, hint: String?, id: String?) = Column(
+                    Modifier.fillMaxWidth().clickable { c.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
+                ) {
+                    Text(label, color = if (id == cur?.id) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
+                }
+                option(s.drillFree, null, null)
+                for (d in mine) option(d.name, drillSummary(s, d), d.id)
+            }
+        },
+        confirmButton = { TextButton(onClick = { pick = false; c.go(com.tennis.scoremanager.Screen.DRILLS) }) { Text(s.drillsTitle) } },
+        dismissButton = { TextButton(onClick = { pick = false }) { Text(s.back) } },
+    )
+}
+
 /**
  * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
  * le altre in "Tutte le sessioni".
@@ -19493,6 +19701,7 @@ fun ServeTrainingCard(c: MatchController) {
             strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
+        DrillRow(c, stroke)
         BigButton(s.serveStart, Icons.Filled.Videocam, {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
@@ -19835,6 +20044,7 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
         title = { Text(s.serveSummary + " · " + strokeLabel(s, sess.stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                sess.drillName?.let { Text(s.drillSession(it), color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
                 ServeSummaryContent(s, sess.serves, sess.stroke)
                 ServeReplayButtons(c, sess)
                 // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.
@@ -20899,6 +21109,26 @@ interface Strings {
     val onbPrivacyTitle: String
     val onbPrivacyText: String
     val backupDueHint: (String?) -> String
+    val drillsTitle: String
+    val drillsHint: String
+    val drillNew: String
+    val drillsNone: String
+    val drillName: String
+    val drillAddStep: String
+    val drillDelete: String
+    val drillThen: String
+    val drillChoose: String
+    val drillFree: String
+    val drillSayDone: String
+    val drillBandNext: String
+    val drillFinished: String
+    val drillStep: (Int) -> String
+    val drillShots: (Int) -> String
+    val drillDeleteAsk: (String) -> String
+    val drillSayNext: (String) -> String
+    val drillStepOf: (Int, Int) -> String
+    val drillTemplateName: (Int) -> String
+    val drillSession: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -22169,6 +22399,26 @@ object ItStrings : Strings {
     override val onbPrivacyTitle = "I tuoi dati"
     override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Fai ogni tanto un backup in Altro › Profilo e dati: è l'unica copia."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
+    override val drillsTitle = "Esercizi"
+    override val drillsHint = "Esercizi guidati: un colpo e i passi in fila (es. 20 dritti incrociati, poi 20 lungolinea)"
+    override val drillNew = "Nuovo esercizio"
+    override val drillsNone = "Ancora nessun esercizio."
+    override val drillName = "Nome dell'esercizio"
+    override val drillAddStep = "Aggiungi un passo"
+    override val drillDelete = "Elimina l'esercizio"
+    override val drillThen = ", poi "
+    override val drillChoose = "Esercizio"
+    override val drillFree = "Libero (nessun esercizio)"
+    override val drillSayDone = "Esercizio finito"
+    override val drillBandNext = "Prossimo"
+    override val drillFinished = "Esercizio finito"
+    override val drillStep: (Int) -> String = { "Passo $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 colpo" else "$n colpi" }
+    override val drillDeleteAsk: (String) -> String = { "Eliminare l'esercizio $it? Le sessioni fatte restano." }
+    override val drillSayNext: (String) -> String = { "Ora $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i di $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Dritto: incrociati e lungolinea", "Rovescio: incrociati e lungolinea", "Servizio: al T ed esterno, da destra e da sinistra", "Volée: di dritto e di rovescio").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Esercizio: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -23422,6 +23672,26 @@ object EnStrings : Strings {
     override val onbPrivacyTitle = "Your data"
     override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Make a backup now and then in More › Profile and data: it is the only copy."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
+    override val drillsTitle = "Drills"
+    override val drillsHint = "Guided drills: a stroke and its steps in a row (e.g. 20 cross-court forehands, then 20 down the line)"
+    override val drillNew = "New drill"
+    override val drillsNone = "No drills yet."
+    override val drillName = "Drill name"
+    override val drillAddStep = "Add a step"
+    override val drillDelete = "Delete the drill"
+    override val drillThen = ", then "
+    override val drillChoose = "Drill"
+    override val drillFree = "Free (no drill)"
+    override val drillSayDone = "Drill finished"
+    override val drillBandNext = "Next"
+    override val drillFinished = "Drill finished"
+    override val drillStep: (Int) -> String = { "Step $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 shot" else "$n shots" }
+    override val drillDeleteAsk: (String) -> String = { "Delete the drill $it? Sessions already done stay." }
+    override val drillSayNext: (String) -> String = { "Now $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Step $i of $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Forehand: cross-court and down the line", "Backhand: cross-court and down the line", "Serve: T and wide, deuce and ad side", "Volley: forehand and backhand").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Drill: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -24698,6 +24968,26 @@ object DeStrings : Strings {
     override val onbPrivacyTitle = "Deine Daten"
     override val onbPrivacyText = "Matches, Spieler, Videos und Notizen bleiben auf diesem Telefon: kein Konto, kein Server. Wenn du Schüler betreust (auch Minderjährige), frage nach ihrer Zustimmung, sie zu filmen und ihre Daten zu behalten; du kannst sie jederzeit löschen. Mach ab und zu eine Sicherung unter Mehr › Profil und Daten: das ist die einzige Kopie."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Du hast noch nie eine Sicherung gespeichert: tippen, um eine zu machen." else "Letzte Sicherung: $last. Tippen, um eine neue zu machen." }
+    override val drillsTitle = "Übungen"
+    override val drillsHint = "Geführte Übungen: ein Schlag und seine Schritte nacheinander (z. B. 20 Vorhand cross, dann 20 longline)"
+    override val drillNew = "Neue Übung"
+    override val drillsNone = "Noch keine Übungen."
+    override val drillName = "Name der Übung"
+    override val drillAddStep = "Schritt hinzufügen"
+    override val drillDelete = "Übung löschen"
+    override val drillThen = ", dann "
+    override val drillChoose = "Übung"
+    override val drillFree = "Frei (keine Übung)"
+    override val drillSayDone = "Übung beendet"
+    override val drillBandNext = "Weiter"
+    override val drillFinished = "Übung beendet"
+    override val drillStep: (Int) -> String = { "Schritt $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 Schlag" else "$n Schläge" }
+    override val drillDeleteAsk: (String) -> String = { "Übung $it löschen? Bereits gemachte Einheiten bleiben." }
+    override val drillSayNext: (String) -> String = { "Jetzt $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Schritt $i von $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Vorhand: cross und longline", "Rückhand: cross und longline", "Aufschlag: durch die Mitte und nach außen, Einstand- und Vorteilseite", "Volley: Vorhand und Rückhand").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Übung: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -25967,6 +26257,26 @@ object EsStrings : Strings {
     override val onbPrivacyTitle = "Tus datos"
     override val onbPrivacyText = "Partidos, jugadores, vídeos y notas se quedan en este teléfono: sin cuenta, sin servidor. Si sigues a alumnos (también menores), pide su consentimiento para grabarlos y guardar sus datos; puedes borrarlos cuando quieras. Haz de vez en cuando una copia en Más › Perfil y datos: es la única copia."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Todavía no has guardado ninguna copia: toca para hacerla." else "Última copia: $last. Toca para hacer otra." }
+    override val drillsTitle = "Ejercicios"
+    override val drillsHint = "Ejercicios guiados: un golpe y sus pasos seguidos (p. ej. 20 derechas cruzadas, luego 20 paralelas)"
+    override val drillNew = "Ejercicio nuevo"
+    override val drillsNone = "Todavía no hay ejercicios."
+    override val drillName = "Nombre del ejercicio"
+    override val drillAddStep = "Añadir un paso"
+    override val drillDelete = "Borrar el ejercicio"
+    override val drillThen = ", luego "
+    override val drillChoose = "Ejercicio"
+    override val drillFree = "Libre (sin ejercicio)"
+    override val drillSayDone = "Ejercicio terminado"
+    override val drillBandNext = "Siguiente"
+    override val drillFinished = "Ejercicio terminado"
+    override val drillStep: (Int) -> String = { "Paso $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 golpe" else "$n golpes" }
+    override val drillDeleteAsk: (String) -> String = { "¿Borrar el ejercicio $it? Las sesiones hechas se quedan." }
+    override val drillSayNext: (String) -> String = { "Ahora $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Paso $i de $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Derecha: cruzadas y paralelas", "Revés: cruzados y paralelos", "Saque: a la T y abierto, lado iguales y ventaja", "Volea: de derecha y de revés").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Ejercicio: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -27238,6 +27548,26 @@ object FrStrings : Strings {
     override val onbPrivacyTitle = "Vos données"
     override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
+    override val drillsTitle = "Exercices"
+    override val drillsHint = "Exercices guidés : un coup et ses étapes à la suite (p. ex. 20 coups droits croisés, puis 20 le long de la ligne)"
+    override val drillNew = "Nouvel exercice"
+    override val drillsNone = "Pas encore d'exercice."
+    override val drillName = "Nom de l'exercice"
+    override val drillAddStep = "Ajouter une étape"
+    override val drillDelete = "Supprimer l'exercice"
+    override val drillThen = ", puis "
+    override val drillChoose = "Exercice"
+    override val drillFree = "Libre (sans exercice)"
+    override val drillSayDone = "Exercice terminé"
+    override val drillBandNext = "Suivant"
+    override val drillFinished = "Exercice terminé"
+    override val drillStep: (Int) -> String = { "Étape $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 coup" else "$n coups" }
+    override val drillDeleteAsk: (String) -> String = { "Supprimer l'exercice $it ? Les séances faites restent." }
+    override val drillSayNext: (String) -> String = { "Maintenant $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Étape $i sur $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Coup droit : croisés et long de ligne", "Revers : croisés et long de ligne", "Service : au T et extérieur, côté égalité et avantage", "Volée : coup droit et revers").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Exercice : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -28510,6 +28840,26 @@ object PtStrings : Strings {
     override val onbPrivacyTitle = "Seus dados"
     override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Faça de vez em quando um backup em Mais › Perfil e dados: é a única cópia."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Você ainda nunca salvou um backup: toque para fazer." else "Último backup: $last. Toque para fazer um novo." }
+    override val drillsTitle = "Exercícios"
+    override val drillsHint = "Exercícios guiados: um golpe e os passos em sequência (ex. 20 forehands cruzados, depois 20 na paralela)"
+    override val drillNew = "Novo exercício"
+    override val drillsNone = "Ainda não há exercícios."
+    override val drillName = "Nome do exercício"
+    override val drillAddStep = "Adicionar um passo"
+    override val drillDelete = "Apagar o exercício"
+    override val drillThen = ", depois "
+    override val drillChoose = "Exercício"
+    override val drillFree = "Livre (sem exercício)"
+    override val drillSayDone = "Exercício terminado"
+    override val drillBandNext = "Próximo"
+    override val drillFinished = "Exercício terminado"
+    override val drillStep: (Int) -> String = { "Passo $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 golpe" else "$n golpes" }
+    override val drillDeleteAsk: (String) -> String = { "Apagar o exercício $it? As sessões feitas ficam." }
+    override val drillSayNext: (String) -> String = { "Agora $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i de $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Forehand: cruzado e paralela", "Backhand: cruzado e paralela", "Saque: no T e aberto, lado de iguais e de vantagem", "Voleio: de forehand e de backhand").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Exercício: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -29261,6 +29611,172 @@ fun DataScreen(c: MatchController) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/DrillsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/DrillsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Drill
+import com.tennis.scoremanager.data.DrillStep
+import com.tennis.scoremanager.data.ServeKind
+import com.tennis.scoremanager.data.ServeSide
+import com.tennis.scoremanager.data.ServeTarget
+import com.tennis.scoremanager.data.ShotDirection
+import com.tennis.scoremanager.data.TrainedStroke
+import com.tennis.scoremanager.data.Wing
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.drillSummary
+import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.serveKindName
+import com.tennis.scoremanager.ui.serveSideName
+import com.tennis.scoremanager.ui.serveTargetName
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.ui.wingName
+
+/** Gli esercizi guidati, per colpo: si creano, si cambiano, si tolgono; si scelgono sotto Inizia. */
+@Composable
+fun DrillsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val drills by c.drills.collectAsState()
+    var edit by remember { mutableStateOf<Drill?>(null) }
+    var creating by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = s.drillsTitle,
+        subtitle = s.drillsHint,
+        icon = Icons.Filled.FormatListNumbered,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.drillNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (drills.isEmpty()) Text(s.drillsNone, color = TsmColors.TextDim)
+        for (t in TrainedStroke.entries) {
+            val mine = drills.filter { it.stroke == t }
+            if (mine.isEmpty()) continue
+            SectionCard(strokeLabel(s, t), Icons.Filled.FormatListNumbered) {
+                for (d in mine) Row(Modifier.fillMaxWidth().clickable { edit = d }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(d.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(drillSummary(s, d), color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+                }
+            }
+        }
+    }
+    if (creating) DrillEditDialog(c, null) { creating = false }
+    edit?.let { d -> DrillEditDialog(c, d) { edit = null } }
+}
+
+/** Nome, colpo e passi: per ogni passo quanti colpi e, secondo il colpo, lato, prima/seconda, bersaglio o direzione. */
+@Composable
+private fun DrillEditDialog(c: MatchController, drill: Drill?, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var name by remember { mutableStateOf(drill?.name.orEmpty()) }
+    var stroke by remember { mutableStateOf(drill?.stroke ?: c.trainStroke.value) }
+    var steps by remember { mutableStateOf(drill?.steps ?: listOf(DrillStep(20))) }
+    var ask by remember { mutableStateOf(false) }
+    fun set(i: Int, st: DrillStep) { steps = steps.toMutableList().also { it[i] = st } }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (drill == null) s.drillNew else s.studentEdit) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(name, { name = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.drillName) })
+                val strokes = TrainedStroke.entries
+                Segmented(strokes.map { SegOption(strokeLabel(s, it)) }, strokes.indexOf(stroke), { stroke = strokes[it] }, columns = 2)
+                for ((i, st) in steps.withIndex()) {
+                    SectionCard(s.drillStep(i + 1), Icons.Filled.FormatListNumbered) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { set(i, st.copy(count = (st.count - 5).coerceAtLeast(1))) }) { Icon(Icons.Filled.Remove, null) }
+                            Text(s.drillShots(st.count), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            IconButton(onClick = { set(i, st.copy(count = (st.count + 5).coerceAtMost(200))) }) { Icon(Icons.Filled.Add, null) }
+                            if (steps.size > 1) IconButton(onClick = { steps = steps.filterIndexed { k, _ -> k != i } }) { Icon(Icons.Filled.Delete, null, tint = TsmColors.Danger) }
+                        }
+                        @Composable fun <T> pick(values: List<T?>, label: (T) -> String, cur: T?, onPick: (T?) -> Unit) =
+                            Segmented(values.map { v -> SegOption(v?.let(label) ?: "—") }, values.indexOf(cur), { onPick(values[it]) })
+                        if (stroke == TrainedStroke.SERVE) {
+                            pick(listOf(null, ServeSide.DEUCE, ServeSide.AD), { serveSideName(s, it) }, st.side) { set(i, st.copy(side = it)) }
+                            pick(listOf(null, ServeKind.FIRST, ServeKind.SECOND), { serveKindName(s, it) }, st.kind) { set(i, st.copy(kind = it)) }
+                            pick(listOf(null, ServeTarget.T, ServeTarget.BODY, ServeTarget.WIDE), { serveTargetName(s, it) }, st.target) { set(i, st.copy(target = it)) }
+                        } else {
+                            if (stroke == TrainedStroke.VOLLEY) pick(listOf(null, Wing.FOREHAND, Wing.BACKHAND), { wingName(s, it) }, st.wing) { set(i, st.copy(wing = it)) }
+                            pick(listOf(null, ShotDirection.CROSS, ShotDirection.MIDDLE, ShotDirection.LINE), { directionName(s, it) }, st.direction) { set(i, st.copy(direction = it)) }
+                        }
+                    }
+                }
+                GhostButton(s.drillAddStep, Icons.Filled.Add, { steps = steps + steps.last().copy() }, Modifier.fillMaxWidth())
+                if (drill != null) GhostButton(s.drillDelete, Icons.Filled.Delete, { ask = true }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank(), onClick = {
+                // Cambiando colpo, le impostazioni che quel colpo non ha si tolgono.
+                val clean = steps.map { st ->
+                    if (stroke == TrainedStroke.SERVE) st.copy(direction = null, wing = null)
+                    else st.copy(side = null, kind = null, target = null, wing = st.wing.takeIf { stroke == TrainedStroke.VOLLEY })
+                }
+                c.saveDrill((drill ?: Drill("d${System.currentTimeMillis()}", "", stroke, emptyList(), System.currentTimeMillis())).copy(name = name.trim(), stroke = stroke, steps = clean))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (ask && drill != null) {
+        AlertDialog(
+            onDismissRequest = { ask = false },
+            text = { Text(s.drillDeleteAsk(drill.name)) },
+            confirmButton = { TextButton(onClick = { ask = false; c.deleteDrill(drill.id); onDone() }) { Text(s.drillDelete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { ask = false }) { Text(s.back) } },
+        )
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/HelpScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -29777,6 +30293,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
@@ -29947,6 +30464,7 @@ private fun CoachTab(c: MatchController) {
     val students by c.students.collectAsState()
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
     ServeTrainingCard(c)
 }
 
@@ -36015,6 +36533,7 @@ import com.tennis.scoremanager.data.ShotDirection
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.data.Wing
 import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.stepLabel
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.wingName
 import com.tennis.scoremanager.model.Side
@@ -36092,6 +36611,30 @@ class CameraActivity : ComponentActivity() {
     private val shotDirection = MutableStateFlow<ShotDirection?>(null)
     private val volleyWing = MutableStateFlow(Wing.FOREHAND)
     private val trained: TrainedStroke get() = serveSession.value.stroke
+
+    /** Esercizio guidato in corso (scelto sotto Inizia per questo colpo); null = allenamento libero. */
+    private val drill = MutableStateFlow<com.tennis.scoremanager.data.Drill?>(null)
+
+    /** Mette le impostazioni del passo in corso (quelle che il passo dice; le altre restano). */
+    private fun applyDrillStep() {
+        val d = drill.value ?: return
+        val st = com.tennis.scoremanager.data.Drills.current(d, serveSession.value.serves.size) ?: return
+        st.side?.let { serveSide.value = it }
+        st.kind?.let { serveKind.value = it }
+        if (trained == TrainedStroke.SERVE) serveTarget.value = st.target ?: serveTarget.value
+        else st.direction?.let { shotDirection.value = it }
+        st.wing?.let { volleyWing.value = it }
+    }
+
+    /** Dopo un colpo segnato: se il passo è finito, il prossimo (o la fine), da dire a voce; null = si continua. */
+    private fun drillAdvance(): String? {
+        val d = drill.value ?: return null
+        val p = com.tennis.scoremanager.data.Drills.progress(d, serveSession.value.serves.size)
+        if (!p.stepJustEnded) return null
+        if (p.finished) return s.drillSayDone
+        applyDrillStep()
+        return s.drillSayNext(s.drillStepOf(p.step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[p.step]))
+    }
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
     private val serveSummary = MutableStateFlow(false)
@@ -36265,7 +36808,12 @@ class CameraActivity : ComponentActivity() {
         val student = controller.studentById(controller.trainStudent.value)
         val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketById(it) }?.use()
-        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket)
+        // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
+        drill.value = controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        serveSession.value = serveSession.value.copy(
+            stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
+        )
+        applyDrillStep()
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -36374,8 +36922,11 @@ class CameraActivity : ComponentActivity() {
             )
         }
         val n = ServeTraining.count(serveSession.value.serves)
-        say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
-        bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        // Con un esercizio, a fine passo la voce dice anche il prossimo (e le impostazioni cambiano da sole).
+        val next = drillAdvance()
+        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
+        if (next != null) bandShow(band, s.drillBandNext, next.take(20))
+        else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
         val st = stream ?: return
         if (!st.isOnPreview) return
         lifecycleScope.launch {
@@ -36404,6 +36955,8 @@ class CameraActivity : ComponentActivity() {
         lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
+        // Tolto un colpo, l'esercizio torna al passo di prima se serve.
+        applyDrillStep()
         last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
@@ -36889,6 +37442,12 @@ class CameraActivity : ComponentActivity() {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    // Esercizio: passo e colpi fatti nel passo.
+                    val d by drill.collectAsState()
+                    d?.let { dd ->
+                        val p = com.tennis.scoremanager.data.Drills.progress(dd, sess.serves.size)
+                        Pill(if (p.finished) str.drillFinished else str.drillStepOf(p.step + 1, dd.steps.size) + " · ${p.done}/${dd.steps[p.step].count}", if (p.finished) TsmColors.Ok else TsmColors.SurfaceHigh)
+                    }
                     Chip(Icons.Filled.Watch, null, if (band != null) TsmColors.Ok else TsmColors.Orange)
                     if (band != null) Chip(Icons.Filled.Sensors, null, recColor)
                     if (paused) Chip(Icons.Filled.Pause, null, TsmColors.Orange)
@@ -53241,6 +53800,50 @@ class DataTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DrillsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DrillsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class DrillsTest {
+    private val drill = Drill("d", "Incrociati e lungolinea", TrainedStroke.FOREHAND, listOf(
+        DrillStep(3, direction = ShotDirection.CROSS), DrillStep(2, direction = ShotDirection.LINE),
+    ))
+
+    @Test
+    fun stepsFollowTheShots() {
+        assertEquals(5, drill.total)
+        assertEquals(Drills.Progress(0, 0, false), Drills.progress(drill, 0))
+        assertEquals(Drills.Progress(0, 2, false), Drills.progress(drill, 2))
+        // Il terzo colpo chiude il primo passo: si passa al lungolinea.
+        val p3 = Drills.progress(drill, 3)
+        assertEquals(Drills.Progress(1, 0, false), p3)
+        assertTrue(p3.stepJustEnded)
+        assertEquals(ShotDirection.LINE, Drills.current(drill, 3)?.direction)
+        // Finito: niente passo in corso.
+        val p5 = Drills.progress(drill, 5)
+        assertTrue(p5.finished && p5.stepJustEnded)
+        assertNull(Drills.current(drill, 7))
+        // Un passo a metà non è appena finito.
+        assertTrue(!Drills.progress(drill, 1).stepJustEnded)
+    }
+
+    @Test
+    fun templatesForEveryStroke() {
+        val t = Drills.templates({ it.name }, 1)
+        assertEquals(TrainedStroke.entries.toSet(), t.map { it.stroke }.toSet())
+        assertTrue(t.all { d -> d.steps.isNotEmpty() && d.steps.all { it.count > 0 } })
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/GroundPoseRealTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/GroundPoseRealTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -61281,6 +61884,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 189 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 192 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

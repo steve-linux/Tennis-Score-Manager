@@ -976,6 +976,26 @@ object PtStrings : Strings {
     override val onbPrivacyTitle = "Seus dados"
     override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Faça de vez em quando um backup em Mais › Perfil e dados: é a única cópia."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Você ainda nunca salvou um backup: toque para fazer." else "Último backup: $last. Toque para fazer um novo." }
+    override val drillsTitle = "Exercícios"
+    override val drillsHint = "Exercícios guiados: um golpe e os passos em sequência (ex. 20 forehands cruzados, depois 20 na paralela)"
+    override val drillNew = "Novo exercício"
+    override val drillsNone = "Ainda não há exercícios."
+    override val drillName = "Nome do exercício"
+    override val drillAddStep = "Adicionar um passo"
+    override val drillDelete = "Apagar o exercício"
+    override val drillThen = ", depois "
+    override val drillChoose = "Exercício"
+    override val drillFree = "Livre (sem exercício)"
+    override val drillSayDone = "Exercício terminado"
+    override val drillBandNext = "Próximo"
+    override val drillFinished = "Exercício terminado"
+    override val drillStep: (Int) -> String = { "Passo $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 golpe" else "$n golpes" }
+    override val drillDeleteAsk: (String) -> String = { "Apagar o exercício $it? As sessões feitas ficam." }
+    override val drillSayNext: (String) -> String = { "Agora $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i de $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Forehand: cruzado e paralela", "Backhand: cruzado e paralela", "Saque: no T e aberto, lado de iguais e de vantagem", "Voleio: de forehand e de backhand").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Exercício: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

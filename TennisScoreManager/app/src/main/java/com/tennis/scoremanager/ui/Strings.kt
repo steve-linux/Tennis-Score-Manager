@@ -1011,6 +1011,26 @@ interface Strings {
     val onbPrivacyTitle: String
     val onbPrivacyText: String
     val backupDueHint: (String?) -> String
+    val drillsTitle: String
+    val drillsHint: String
+    val drillNew: String
+    val drillsNone: String
+    val drillName: String
+    val drillAddStep: String
+    val drillDelete: String
+    val drillThen: String
+    val drillChoose: String
+    val drillFree: String
+    val drillSayDone: String
+    val drillBandNext: String
+    val drillFinished: String
+    val drillStep: (Int) -> String
+    val drillShots: (Int) -> String
+    val drillDeleteAsk: (String) -> String
+    val drillSayNext: (String) -> String
+    val drillStepOf: (Int, Int) -> String
+    val drillTemplateName: (Int) -> String
+    val drillSession: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2281,6 +2301,26 @@ object ItStrings : Strings {
     override val onbPrivacyTitle = "I tuoi dati"
     override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Fai ogni tanto un backup in Altro › Profilo e dati: è l'unica copia."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
+    override val drillsTitle = "Esercizi"
+    override val drillsHint = "Esercizi guidati: un colpo e i passi in fila (es. 20 dritti incrociati, poi 20 lungolinea)"
+    override val drillNew = "Nuovo esercizio"
+    override val drillsNone = "Ancora nessun esercizio."
+    override val drillName = "Nome dell'esercizio"
+    override val drillAddStep = "Aggiungi un passo"
+    override val drillDelete = "Elimina l'esercizio"
+    override val drillThen = ", poi "
+    override val drillChoose = "Esercizio"
+    override val drillFree = "Libero (nessun esercizio)"
+    override val drillSayDone = "Esercizio finito"
+    override val drillBandNext = "Prossimo"
+    override val drillFinished = "Esercizio finito"
+    override val drillStep: (Int) -> String = { "Passo $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 colpo" else "$n colpi" }
+    override val drillDeleteAsk: (String) -> String = { "Eliminare l'esercizio $it? Le sessioni fatte restano." }
+    override val drillSayNext: (String) -> String = { "Ora $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i di $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Dritto: incrociati e lungolinea", "Rovescio: incrociati e lungolinea", "Servizio: al T ed esterno, da destra e da sinistra", "Volée: di dritto e di rovescio").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Esercizio: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3534,6 +3574,26 @@ object EnStrings : Strings {
     override val onbPrivacyTitle = "Your data"
     override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Make a backup now and then in More › Profile and data: it is the only copy."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
+    override val drillsTitle = "Drills"
+    override val drillsHint = "Guided drills: a stroke and its steps in a row (e.g. 20 cross-court forehands, then 20 down the line)"
+    override val drillNew = "New drill"
+    override val drillsNone = "No drills yet."
+    override val drillName = "Drill name"
+    override val drillAddStep = "Add a step"
+    override val drillDelete = "Delete the drill"
+    override val drillThen = ", then "
+    override val drillChoose = "Drill"
+    override val drillFree = "Free (no drill)"
+    override val drillSayDone = "Drill finished"
+    override val drillBandNext = "Next"
+    override val drillFinished = "Drill finished"
+    override val drillStep: (Int) -> String = { "Step $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 shot" else "$n shots" }
+    override val drillDeleteAsk: (String) -> String = { "Delete the drill $it? Sessions already done stay." }
+    override val drillSayNext: (String) -> String = { "Now $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Step $i of $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Forehand: cross-court and down the line", "Backhand: cross-court and down the line", "Serve: T and wide, deuce and ad side", "Volley: forehand and backhand").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Drill: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

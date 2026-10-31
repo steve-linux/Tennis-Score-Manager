@@ -239,6 +239,24 @@ class Storage(context: Context) {
         if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
 
+    /** Esercizi guidati, in un file solo. */
+    private val drillsFile: File get() = File(app.filesDir, "drills.json")
+
+    fun loadDrills(): List<Drill>? =
+        runCatching { json.decodeFromString(ListSerializer(Drill.serializer()), drillsFile.readText()) }.getOrNull()
+
+    @Synchronized
+    fun saveDrills(list: List<Drill>) {
+        runCatching {
+            val tmp = File(app.filesDir, "drills.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Drill.serializer()), list))
+            if (!tmp.renameTo(drillsFile)) {
+                drillsFile.delete()
+                tmp.renameTo(drillsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+    }
+
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
     private val playersFile: File get() = File(app.filesDir, "players.json")
     /** Gli allievi della prima versione, prima del database: si leggono una volta e diventano giocatori. */

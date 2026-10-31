@@ -67,6 +67,8 @@ data class ServeSession(
     val studentName: String? = null,
     /** Racchetta usata, com'era quel giorno (corde e tensione comprese). */
     val racket: RacketUse? = null,
+    /** Esercizio guidato seguito (nome di quel giorno); null = allenamento libero. */
+    val drillName: String? = null,
 )
 
 /**

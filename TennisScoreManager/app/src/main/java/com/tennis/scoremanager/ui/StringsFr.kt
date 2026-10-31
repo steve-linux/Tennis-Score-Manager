@@ -975,6 +975,26 @@ object FrStrings : Strings {
     override val onbPrivacyTitle = "Vos données"
     override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
     override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
+    override val drillsTitle = "Exercices"
+    override val drillsHint = "Exercices guidés : un coup et ses étapes à la suite (p. ex. 20 coups droits croisés, puis 20 le long de la ligne)"
+    override val drillNew = "Nouvel exercice"
+    override val drillsNone = "Pas encore d'exercice."
+    override val drillName = "Nom de l'exercice"
+    override val drillAddStep = "Ajouter une étape"
+    override val drillDelete = "Supprimer l'exercice"
+    override val drillThen = ", puis "
+    override val drillChoose = "Exercice"
+    override val drillFree = "Libre (sans exercice)"
+    override val drillSayDone = "Exercice terminé"
+    override val drillBandNext = "Suivant"
+    override val drillFinished = "Exercice terminé"
+    override val drillStep: (Int) -> String = { "Étape $it" }
+    override val drillShots: (Int) -> String = { n -> if (n == 1) "1 coup" else "$n coups" }
+    override val drillDeleteAsk: (String) -> String = { "Supprimer l'exercice $it ? Les séances faites restent." }
+    override val drillSayNext: (String) -> String = { "Maintenant $it" }
+    override val drillStepOf: (Int, Int) -> String = { i, n -> "Étape $i sur $n" }
+    override val drillTemplateName: (Int) -> String = { listOf("Coup droit : croisés et long de ligne", "Revers : croisés et long de ligne", "Service : au T et extérieur, côté égalité et avantage", "Volée : coup droit et revers").getOrElse(it) { "?" } }
+    override val drillSession: (String) -> String = { "Exercice : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -653,6 +653,7 @@ class MatchController(
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
             Screen.DATA -> Screen.HOME
+            Screen.DRILLS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1210,6 +1211,29 @@ class MatchController(
     fun setMe(p: com.tennis.scoremanager.data.PlayerProfile?) {
         storage.myPlayerId = p?.id.orEmpty()
         storage.myName = p?.name.orEmpty()
+    }
+
+    // ---------------------------------------------------------------- esercizi guidati
+
+    /** Gli esercizi guidati; la prima volta gli esempi, uno per colpo (si cambiano o si tolgono a piacere). */
+    val drills = MutableStateFlow(storage.loadDrills() ?: com.tennis.scoremanager.data.Drills.templates({ strings.drillTemplateName(it.band) }, System.currentTimeMillis()))
+
+    /** Esercizio scelto per il prossimo allenamento (Drill.id), null = libero. */
+    val trainDrill = MutableStateFlow<String?>(null)
+
+    fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+
+    fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
+        val list = drills.value.filter { it.id != d.id } + d
+        drills.value = list
+        scope.launch(io) { storage.saveDrills(list) }
+    }
+
+    fun deleteDrill(id: String) {
+        val list = drills.value.filter { it.id != id }
+        drills.value = list
+        if (trainDrill.value == id) trainDrill.value = null
+        scope.launch(io) { storage.saveDrills(list) }
     }
 
     // ---------------------------------------------------------------- ruoli

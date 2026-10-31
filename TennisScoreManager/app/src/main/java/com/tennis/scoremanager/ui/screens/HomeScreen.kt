@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
@@ -191,6 +192,7 @@ private fun CoachTab(c: MatchController) {
     val students by c.students.collectAsState()
     Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
     for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    Entry(Icons.Filled.FormatListNumbered, s.drillsTitle, s.drillsHint) { c.go(Screen.DRILLS) }
     ServeTrainingCard(c)
 }
 

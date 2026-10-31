@@ -106,6 +106,7 @@ import com.tennis.scoremanager.data.ShotDirection
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.data.Wing
 import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.stepLabel
 import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.ui.wingName
 import com.tennis.scoremanager.model.Side
@@ -183,6 +184,30 @@ class CameraActivity : ComponentActivity() {
     private val shotDirection = MutableStateFlow<ShotDirection?>(null)
     private val volleyWing = MutableStateFlow(Wing.FOREHAND)
     private val trained: TrainedStroke get() = serveSession.value.stroke
+
+    /** Esercizio guidato in corso (scelto sotto Inizia per questo colpo); null = allenamento libero. */
+    private val drill = MutableStateFlow<com.tennis.scoremanager.data.Drill?>(null)
+
+    /** Mette le impostazioni del passo in corso (quelle che il passo dice; le altre restano). */
+    private fun applyDrillStep() {
+        val d = drill.value ?: return
+        val st = com.tennis.scoremanager.data.Drills.current(d, serveSession.value.serves.size) ?: return
+        st.side?.let { serveSide.value = it }
+        st.kind?.let { serveKind.value = it }
+        if (trained == TrainedStroke.SERVE) serveTarget.value = st.target ?: serveTarget.value
+        else st.direction?.let { shotDirection.value = it }
+        st.wing?.let { volleyWing.value = it }
+    }
+
+    /** Dopo un colpo segnato: se il passo è finito, il prossimo (o la fine), da dire a voce; null = si continua. */
+    private fun drillAdvance(): String? {
+        val d = drill.value ?: return null
+        val p = com.tennis.scoremanager.data.Drills.progress(d, serveSession.value.serves.size)
+        if (!p.stepJustEnded) return null
+        if (p.finished) return s.drillSayDone
+        applyDrillStep()
+        return s.drillSayNext(s.drillStepOf(p.step + 1, d.steps.size) + ": " + stepLabel(s, d.steps[p.step]))
+    }
     /** Servizio riconosciuto e non ancora segnato (dentro o fuori). */
     private val servePending = MutableStateFlow(false)
     private val serveSummary = MutableStateFlow(false)
@@ -356,7 +381,12 @@ class CameraActivity : ComponentActivity() {
         val student = controller.studentById(controller.trainStudent.value)
         val folder = controller.storage.newServeFolder(stroke, serveSession.value.startedAt, s.strokeFolderName, s.strokeName, student?.name)
         val racket = student?.racket?.let { controller.racketById(it) }?.use()
-        serveSession.value = serveSession.value.copy(stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket)
+        // L'esercizio scelto sotto Inizia, se è di questo colpo: si parte dal primo passo.
+        drill.value = controller.drillById(controller.trainDrill.value)?.takeIf { it.stroke == stroke && it.steps.isNotEmpty() }
+        serveSession.value = serveSession.value.copy(
+            stroke = stroke, folder = folder, student = student?.id, studentName = student?.name, racket = racket, drillName = drill.value?.name,
+        )
+        applyDrillStep()
         // La prima volta con questo colpo si mostra subito dove mettere il telefono.
         if (controller.storage.loadServeSessions().none { it.stroke == stroke }) placementHelp.value = true
         lifecycleScope.launch {
@@ -465,8 +495,11 @@ class CameraActivity : ComponentActivity() {
             )
         }
         val n = ServeTraining.count(serveSession.value.serves)
-        say(if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total))
-        bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
+        // Con un esercizio, a fine passo la voce dice anche il prossimo (e le impostazioni cambiano da sole).
+        val next = drillAdvance()
+        say((if (inPlay) s.serveSayIn(n.inPlay, n.total) else s.serveSayOut(n.inPlay, n.total)) + (next?.let { ". $it" } ?: ""))
+        if (next != null) bandShow(band, s.drillBandNext, next.take(20))
+        else bandShow(band, if (inPlay) s.serveIn else s.serveOut, "${n.inPlay}/${n.total}" + (n.pct?.let { "  $it%" } ?: ""))
         val st = stream ?: return
         if (!st.isOnPreview) return
         lifecycleScope.launch {
@@ -495,6 +528,8 @@ class CameraActivity : ComponentActivity() {
         lastTrainActivity = System.currentTimeMillis()
         val last = serveSession.value.serves.lastOrNull() ?: return
         saveServes { it.dropLast(1) }
+        // Tolto un colpo, l'esercizio torna al passo di prima se serve.
+        applyDrillStep()
         last.clip?.let { c -> lifecycleScope.launch(Dispatchers.IO) { File(controller.storage.serveClipsDir(serveSession.value), c).deleteRecursively() } }
         say(s.serveSayUndo)
         val n = ServeTraining.count(serveSession.value.serves)
@@ -980,6 +1015,12 @@ class CameraActivity : ComponentActivity() {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Pill(str.serveCountLine(n.inPlay, n.total) + (n.pct?.let { " · $it%" } ?: ""), TsmColors.SurfaceHigh)
                     sess.serves.lastOrNull()?.let { Pill(if (it.inPlay) str.serveIn else str.serveOut, if (it.inPlay) TsmColors.Ok else TsmColors.Danger) }
+                    // Esercizio: passo e colpi fatti nel passo.
+                    val d by drill.collectAsState()
+                    d?.let { dd ->
+                        val p = com.tennis.scoremanager.data.Drills.progress(dd, sess.serves.size)
+                        Pill(if (p.finished) str.drillFinished else str.drillStepOf(p.step + 1, dd.steps.size) + " · ${p.done}/${dd.steps[p.step].count}", if (p.finished) TsmColors.Ok else TsmColors.SurfaceHigh)
+                    }
                     Chip(Icons.Filled.Watch, null, if (band != null) TsmColors.Ok else TsmColors.Orange)
                     if (band != null) Chip(Icons.Filled.Sensors, null, recColor)
                     if (paused) Chip(Icons.Filled.Pause, null, TsmColors.Orange)

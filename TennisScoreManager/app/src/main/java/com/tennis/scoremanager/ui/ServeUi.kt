@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Videocam
@@ -81,6 +82,57 @@ fun directionName(s: Strings, v: ShotDirection?) = when (v) {
 }
 fun wingName(s: Strings, v: Wing) = if (v == Wing.FOREHAND) s.wingFh else s.wingBh
 
+/** Un passo di un esercizio a parole: "20 · Prima · Destra · Al T", "20 · Incrociato". */
+fun stepLabel(s: Strings, step: com.tennis.scoremanager.data.DrillStep): String = listOfNotNull(
+    step.count.toString(), step.wing?.let { wingName(s, it) }, step.direction?.let { directionName(s, it) },
+    step.kind?.let { serveKindName(s, it) }, step.side?.let { serveSideName(s, it) }, step.target?.let { serveTargetName(s, it) },
+).joinToString(" · ")
+
+/** I passi di un esercizio in una riga: "20 · Incrociato, poi 20 · Lungolinea". */
+fun drillSummary(s: Strings, d: com.tennis.scoremanager.data.Drill): String = d.steps.joinToString(s.drillThen) { stepLabel(s, it) }
+
+/** L'esercizio da seguire col colpo scelto (o libero), e dove si cambiano gli esercizi. */
+@Composable
+fun DrillRow(c: MatchController, stroke: TrainedStroke) {
+    val s = LocalStrings.current
+    val drills by c.drills.collectAsState()
+    val chosen by c.trainDrill.collectAsState()
+    val mine = drills.filter { it.stroke == stroke }
+    val cur = mine.firstOrNull { it.id == chosen }
+    var pick by remember { mutableStateOf(false) }
+    Row(
+        Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp)).background(TsmColors.SurfaceHigh)
+            .clickable { pick = true }.padding(10.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.FormatListNumbered, null, tint = if (cur != null) TsmColors.Ball else TsmColors.TextDim, modifier = Modifier.size(36.dp))
+        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+            Text(s.drillChoose, color = TsmColors.TextDim, fontSize = 12.sp)
+            Text(cur?.name ?: s.drillFree, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            cur?.let { Text(drillSummary(s, it), color = TsmColors.TextDim, fontSize = 12.sp) }
+        }
+        Text(s.trainChange, color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+    }
+    if (pick) AlertDialog(
+        onDismissRequest = { pick = false },
+        title = { Text(s.drillChoose) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                @Composable fun option(label: String, hint: String?, id: String?) = Column(
+                    Modifier.fillMaxWidth().clickable { c.trainDrill.value = id; pick = false }.padding(vertical = 8.dp),
+                ) {
+                    Text(label, color = if (id == cur?.id) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    hint?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
+                }
+                option(s.drillFree, null, null)
+                for (d in mine) option(d.name, drillSummary(s, d), d.id)
+            }
+        },
+        confirmButton = { TextButton(onClick = { pick = false; c.go(com.tennis.scoremanager.Screen.DRILLS) }) { Text(s.drillsTitle) } },
+        dismissButton = { TextButton(onClick = { pick = false }) { Text(s.back) } },
+    )
+}
+
 /**
  * Pagina Allenamento: scelta del colpo (servizio, dritto, rovescio, volée), avvio e le ultime sessioni di quel colpo;
  * le altre in "Tutte le sessioni".
@@ -106,6 +158,7 @@ fun ServeTrainingCard(c: MatchController) {
             strokes.map { t -> SegOption(strokeLabel(s, t) + sessions.count { it.stroke == t && it.student == trainee }.takeIf { it > 0 }?.let { " · $it" }.orEmpty()) },
             strokes.indexOf(stroke), { c.trainStroke.value = strokes[it] }, columns = 2,
         )
+        DrillRow(c, stroke)
         BigButton(s.serveStart, Icons.Filled.Videocam, {
             context.startActivity(
                 Intent(context, CameraActivity::class.java).putExtra(CameraActivity.EXTRA_SERVE, true).putExtra(CameraActivity.EXTRA_STROKE, stroke.name),
@@ -448,6 +501,7 @@ fun ServeSessionDialog(c: MatchController, sess: ServeSession, onClose: () -> Un
         title = { Text(s.serveSummary + " · " + strokeLabel(s, sess.stroke)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                sess.drillName?.let { Text(s.drillSession(it), color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
                 ServeSummaryContent(s, sess.serves, sess.stroke)
                 ServeReplayButtons(c, sess)
                 // Posizione del corpo nelle clip: misure dei momenti chiave, dentro contro fuori.

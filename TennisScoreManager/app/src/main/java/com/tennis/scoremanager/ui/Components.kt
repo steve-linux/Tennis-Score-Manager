@@ -137,6 +137,7 @@ fun AppRoot(c: MatchController) {
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
+                Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
             }
         }
     }
