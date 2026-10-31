@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.CallSplit
+import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessibilityNew
@@ -47,7 +51,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
-import com.tennis.scoremanager.data.Student
+import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Students
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.BigButton
@@ -139,8 +143,10 @@ fun StudentScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val id by c.openStudentId.collectAsState()
-    val students by c.students.collectAsState()
-    val st = students.firstOrNull { it.id == id } ?: run {
+    // La scheda vale per ogni giocatore del database: gli allievi hanno in più allenamenti e "Allena ora".
+    val everyone by c.players.collectAsState()
+    val history by c.history.collectAsState()
+    val st = everyone.firstOrNull { it.id == id } ?: run {
         LaunchedEffect(Unit) { c.back() }
         return
     }
@@ -151,20 +157,30 @@ fun StudentScreen(c: MatchController) {
     var edit by remember { mutableStateOf(false) }
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
+    var merge by remember { mutableStateOf(false) }
+    var split by remember { mutableStateOf(false) }
     ScreenScaffold(
         title = st.name,
-        subtitle = listOfNotNull(st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size)).joinToString(" · "),
+        subtitle = listOfNotNull(
+            st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),
+        ).joinToString(" · "),
         icon = Icons.Filled.Groups,
         action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
             Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+        // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
+        if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
+        com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
+            if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
+            c.savePlayer(st.copy(student = on))
         }
         // La racchetta con l'incordatura montata adesso; toccandola si apre Le mie racchette.
         val rackets by c.rackets.collectAsState()
@@ -232,12 +248,12 @@ fun StudentScreen(c: MatchController) {
 
         // Partite dallo storico con lo stesso nome, e il rating.
         SectionCard(s.studentMatches, Icons.Filled.EmojiEvents) {
-            val lines = remember(st.name) { c.studentMatches(st.name) }
+            val lines = remember(st, history) { c.studentMatches(st) }
             if (lines.isEmpty()) {
                 Text(s.studentMatchesNone, color = TsmColors.TextDim, fontSize = 13.sp)
             } else {
                 Text(s.studentWonLost(lines.count { it.won }, lines.count { !it.won }), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                remember(st.name) { c.studentRating(st.name) }?.let { Text("${s.ratingTitle}: ${it.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
+                remember(st, history) { c.studentRating(st) }?.let { Text("${s.ratingTitle}: ${it.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
                 for (m in lines.takeLast(5).reversed()) {
                     Row(Modifier.fillMaxWidth()) {
                         Text(Reports.date(m.rec.endedAt ?: m.rec.updatedAt, lang), color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
@@ -247,6 +263,8 @@ fun StudentScreen(c: MatchController) {
                         )
                     }
                 }
+                // Due persone con lo stesso nome finite insieme: si spuntano le partite dell'altra.
+                GhostButton(s.playerSplit, Icons.Filled.CallSplit, { split = true }, Modifier.fillMaxWidth())
             }
         }
 
@@ -256,11 +274,12 @@ fun StudentScreen(c: MatchController) {
             LaunchedEffect(note) {
                 if (note == st.note) return@LaunchedEffect
                 delay(800)
-                c.saveStudent(st.copy(note = note))
+                c.savePlayer(st.copy(note = note))
             }
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
         }
-        GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
+        GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
+        if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
         GhostButton(s.studentPurge, Icons.Filled.DeleteForever, { purge = true }, Modifier.fillMaxWidth())
     }
@@ -270,7 +289,8 @@ fun StudentScreen(c: MatchController) {
             title = { Text(s.studentPurge) },
             text = { Text(s.studentPurgeAsk(st.name, mine.size)) },
             confirmButton = {
-                TextButton(onClick = { purge = false; c.purgeStudent(st.id); c.back() }) {
+                // Sparito il giocatore, la scheda torna indietro da sola (una volta).
+                TextButton(onClick = { purge = false; c.purgeStudent(st.id) }) {
                     Text(s.studentPurgeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
                 }
             },
@@ -278,6 +298,8 @@ fun StudentScreen(c: MatchController) {
         )
     }
     if (edit) StudentEditDialog(c, st) { edit = false }
+    if (merge) MergeDialog(c, st) { merge = false }
+    if (split) SplitDialog(c, st) { split = false }
     if (delete) {
         AlertDialog(
             onDismissRequest = { delete = false },
@@ -286,6 +308,75 @@ fun StudentScreen(c: MatchController) {
             dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
         )
     }
+}
+
+/**
+ * Unisci: si sceglie l'altro giocatore (la stessa persona scritta in due modi o creata due volte) e si conferma; le
+ * sue partite e sessioni diventano di questo.
+ */
+@Composable
+private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val everyone by c.players.collectAsState()
+    var query by remember { mutableStateOf("") }
+    var other by remember { mutableStateOf<PlayerProfile?>(null) }
+    val o = other
+    if (o != null) {
+        AlertDialog(
+            onDismissRequest = onDone,
+            text = { Text(s.playerMergeAsk(o.name, st.name)) },
+            confirmButton = { TextButton(onClick = { c.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
+            dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+        )
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.playerMerge) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.playerMergeHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) })
+                val list = (if (query.isBlank()) everyone else com.tennis.scoremanager.data.Players.search(everyone, query)).filter { it.id != st.id }.take(8)
+                for (p in list) Row(Modifier.fillMaxWidth().clickable { other = p }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                    Text(" " + p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Separa un omonimo: si spuntano le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo. */
+@Composable
+private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val lines = remember(st) { c.studentMatches(st).reversed() }
+    var picked by remember { mutableStateOf(emptySet<String>()) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.playerSplit) },
+        text = {
+            Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                Text(s.playerSplitHint(st.name), color = TsmColors.TextDim, fontSize = 13.sp)
+                for (m in lines) {
+                    val on = m.rec.id in picked
+                    val opp = com.tennis.scoremanager.data.PlayerStats.names(m.rec.setup, com.tennis.scoremanager.data.Students.sideIn(m.rec, st)?.other ?: com.tennis.scoremanager.model.Side.P2).joinToString(" / ")
+                    Row(Modifier.fillMaxWidth().clickable { picked = if (on) picked - m.rec.id else picked + m.rec.id }, verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(on, { picked = if (on) picked - m.rec.id else picked + m.rec.id })
+                        Text("${Reports.date(m.rec.endedAt ?: m.rec.updatedAt, lang)} · $opp · " + (if (m.won) s.studentWon else s.studentLost), color = TsmColors.TextMain, fontSize = 13.sp)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = picked.isNotEmpty(), onClick = { c.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 
 /** Le righe del confronto: per il servizio e per gli altri colpi le misure dell'analisi. */

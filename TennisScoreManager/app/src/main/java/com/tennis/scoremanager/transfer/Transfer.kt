@@ -22,6 +22,11 @@ data class TransferBundle(
     val photos: Map<String, String> = emptyMap(),
     /** Foto ricordo per id della partita (JPEG in base64). */
     val matchPhotos: Map<String, List<String>> = emptyMap(),
+    /**
+     * Le schede dei giocatori delle partite (nome, cognome, soprannome, mano, alias): chi riceve le ritrova complete.
+     * Le note dell'allenatore, la racchetta e il segno di allievo restano su chi le ha.
+     */
+    val players: List<com.tennis.scoremanager.data.PlayerProfile> = emptyList(),
 )
 
 /**

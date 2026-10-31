@@ -6,7 +6,7 @@ En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a 
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
-- **Más**: **Tú** (tu nombre), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
+- **Más**: **Tú** (tu nombre), **Jugadores** (la base: 7.7), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
 
 **Nuevo partido** son dos pasos: **quién juega** (individual o dobles, los nombres, con los jugadores recientes para tocar, y el deporte; club, pista y torneo en *Más detalles*) y **cómo llevas el marcador y las reglas**. Todo es opcional: se puede seguir sin nombres. Desde cada pantalla **Atrás** vuelve a la pestaña de la que se venía.
 
@@ -298,6 +298,20 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
+
+### 7.7 Jugadores: la base
+
+Cada persona que juega o entrena es un **jugador** de la base, con un identificador que sigue siendo el mismo en cada teléfono: estadísticas, rating e historial son de esa persona aunque haya un homónimo, también después de pasar partidos de un teléfono a otro.
+
+- **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Un nombre escrito en Nuevo partido que no está en la base pide nombre y apellido al tocar *Siguiente* (el apodo es lo escrito). Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
+- **Nuevo partido**: mientras escribes el nombre aparecen los jugadores que coinciden (un toque y el partido es suyo); si el nombre es de un solo jugador se enlaza solo (*✓ … de la base de jugadores*; **No es él** crea otra persona con el mismo nombre). Con dos jugadores del mismo nombre la app pregunta cuál; un nombre nuevo se convierte en jugador al empezar el partido.
+- **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
+- **Más › Jugadores**: todos, con búsqueda; *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
+  - **Alumno**: lo pone (o lo quita) entre los alumnos.
+  - **Unir con otro jugador**: la misma persona escrita de dos formas («Rossi» y «Mario Rossi») o creada dos veces; partidos y sesiones pasan a él.
+  - **Separar un homónimo** (en *Partidos*): marca los partidos de otra persona con el mismo nombre, que pasa a ser un jugador nuevo.
+- **Partidos de otro teléfono** (transferencia o *Importar*): un jugador que el teléfono conoce se enlaza solo; uno nuevo se añade con su identificador; si tiene el nombre de uno de los tuyos la app pregunta una vez **¿Quién es?** (*Sí, es él* enlaza los dos y la próxima vez lo reconoce; *No, otra persona* lo añade). Los partidos de versiones antiguas, sin jugadores, se enlazan por el nombre.
+- La **foto** y **hombre/mujer** siguen siendo del nombre: dos homónimos las comparten.
 
 ## 8. Marcador en un televisor o monitor
 

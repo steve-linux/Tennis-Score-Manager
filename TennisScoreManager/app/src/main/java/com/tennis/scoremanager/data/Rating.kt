@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
  * - Peso ([kFactor]): alto nelle prime partite, perché il rating trovi presto il suo posto, poi più stabile.
  * - Non contano le partite non finite, quelle segnate come amichevoli e i lati senza nomi scritti.
  *
- * I giocatori sono riconosciuti dal nome, come nello storico ([PlayerStats.key]).
+ * I giocatori sono riconosciuti dall'identificativo del database, o dal nome nelle partite di prima ([PlayerStats.ident]).
  */
 object Rating {
     const val START = 1500
@@ -34,6 +34,8 @@ object Rating {
         val sides: Map<Side, List<String>>,
         val winner: Side,
         val games: Map<Side, Int>,
+        /** Chi sono i giocatori di ciascun lato (PlayerStats.ident), negli stessi posti di [sides]; null = dai nomi. */
+        val keys: Map<Side, List<String>>? = null,
     )
 
     /** Rating di un giocatore: valore, partite contate, e il valore dopo ciascuna (per l'andamento). */
@@ -74,10 +76,14 @@ object Rating {
         val deltas = LinkedHashMap<String, Map<String, Int>>()
         for (g in games.filter { it.sport == sport }.sortedBy { it.at }) {
             // Nome scritto e chiave di ciascun giocatore, lato per lato.
-            val named = Side.entries.associateWith { side ->
-                g.sides[side].orEmpty().map { it.trim() }.filter { it.isNotEmpty() }.distinctBy { PlayerStats.key(it) }
+            // Coi giocatori del database conta l'identificativo: due omonimi restano due persone.
+            val pairs = Side.entries.associateWith { side ->
+                val ns = g.sides[side].orEmpty().map { it.trim() }
+                val ks = g.keys?.get(side) ?: ns.map { PlayerStats.key(it) }
+                ns.zip(ks).filter { it.first.isNotEmpty() }.distinctBy { it.second }
             }
-            val keys = named.mapValues { (_, ns) -> ns.map { PlayerStats.key(it) } }
+            val named = pairs.mapValues { (_, ps) -> ps.map { it.first } }
+            val keys = pairs.mapValues { (_, ps) -> ps.map { it.second } }
             if (keys.values.any { it.isEmpty() }) continue
             // Un nome su tutti e due i lati (errore di battitura): la partita non dice niente, si salta.
             if (keys.getValue(Side.P1).any { it in keys.getValue(Side.P2) }) continue
@@ -119,6 +125,7 @@ object Rating {
             sides = Side.entries.associateWith { PlayerStats.names(rec.setup, it) },
             winner = winner,
             games = games,
+            keys = Side.entries.associateWith { side -> PlayerStats.whos(rec.setup, side).map { it.key } },
         )
     }
 }

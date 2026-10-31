@@ -174,44 +174,105 @@ fun TraineeRow(c: MatchController) {
     if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.setTrainStudent(it.id) } }
 }
 
-/** Nuovo allievo o modifica: nome (lo stesso delle partite, per ritrovarne foto e storico) e mano. */
+/** Nuovo allievo o modifica di un giocatore (vedi [PlayerEditDialog]): dagli allievi nasce un allievo. */
 @Composable
-fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.Student?, onDone: (com.tennis.scoremanager.data.Student?) -> Unit) {
+fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.PlayerProfile?, onDone: (com.tennis.scoremanager.data.PlayerProfile?) -> Unit) =
+    PlayerEditDialog(c, student, asStudent = true, onDone = onDone)
+
+/**
+ * Giocatore nuovo o modifica: nome e cognome obbligatori (identificano la persona), soprannome facoltativo (se c'è, è
+ * il nome che si vede in partita), mano e racchetta. Creandone uno nuovo si propongono i giocatori che ci sono già con
+ * quel nome, per non fare doppioni; [prefill] è il nome scritto in Nuova partita.
+ */
+@Composable
+fun PlayerEditDialog(
+    c: MatchController, player: com.tennis.scoremanager.data.PlayerProfile?, asStudent: Boolean = false, prefill: String = "",
+    onDone: (com.tennis.scoremanager.data.PlayerProfile?) -> Unit,
+) {
     val s = LocalStrings.current
-    var name by remember { mutableStateOf(student?.name.orEmpty()) }
-    var hand by remember { mutableStateOf(student?.hand) }
-    var racket by remember { mutableStateOf(student?.racket) }
+    // Dal nome scritto: due parole o più sono nome e cognome, una sola è il soprannome.
+    val words = prefill.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    var first by remember { mutableStateOf(player?.firstName ?: if (words.size >= 2) words.first() else "") }
+    var last by remember { mutableStateOf(player?.lastName ?: if (words.size >= 2) words.drop(1).joinToString(" ") else "") }
+    var nick by remember { mutableStateOf(player?.nickname ?: if (words.size == 1) words[0] else "") }
+    var hand by remember { mutableStateOf(player?.hand) }
+    var racket by remember { mutableStateOf(player?.racket) }
     val rackets by c.rackets.collectAsState()
+    // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
+    var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
+    val players by c.players.collectAsState()
+    @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = androidx.compose.material3.OutlinedTextField(
+        v, { onChange(it.take(40)) }, label = { Text(label) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
+    )
     AlertDialog(
         onDismissRequest = { onDone(null) },
-        title = { Text(if (student == null) s.studentNew else s.studentEdit) },
+        title = { Text(if (player != null) s.studentEdit else if (asStudent) s.studentNew else s.playerNewTitle) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                androidx.compose.material3.OutlinedTextField(
-                    name, { name = it.take(40) }, label = { Text(s.studentName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
-                )
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                field(first, s.playerFirstName) { first = it }
+                field(last, s.playerLastName) { last = it }
+                field(nick, s.playerNickname) { nick = it }
+                Text(s.playerNameRule, color = TsmColors.TextDim, fontSize = 12.sp)
+                if (player == null) {
+                    val q = listOf("$first $last".trim(), nick.trim(), last.trim()).firstOrNull { it.length >= 2 }.orEmpty()
+                    val hits = com.tennis.scoremanager.data.Players.search(players.filter { !asStudent || !it.student }, q).take(4)
+                    for (p in hits) {
+                        val on = existing?.id == p.id
+                        Row(
+                            Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                                .background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh)
+                                .clickable {
+                                    existing = if (on) null else p
+                                    if (!on) {
+                                        if (p.firstName.isNotBlank()) first = p.firstName
+                                        if (p.lastName.isNotBlank()) last = p.lastName
+                                        nick = p.nickname.ifBlank { if (p.complete) "" else p.name }
+                                        hand = p.hand ?: hand; racket = p.racket ?: racket
+                                    }
+                                }
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            PlayerAvatar(c, p.name, if (on) TsmColors.OnBall else TsmColors.Ball, 28.dp)
+                            Text(
+                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playerHint(p)?.let { " · $it" } ?: ""),
+                                color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                    if (hits.isNotEmpty()) Text(if (existing != null) s.studentFromExisting else s.studentPickExisting, color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+                // Un altro con lo stesso nome e cognome: si può (omonimo), ma lo si dice.
+                val twins = com.tennis.scoremanager.data.Players.sameFullName(players, first, last, except = player?.id ?: existing?.id)
+                if (first.isNotBlank() && last.isNotBlank() && twins.isNotEmpty()) Text(s.playerTwinWarning("${first.trim()} ${last.trim()}"), color = TsmColors.Orange, fontSize = 12.sp)
                 Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
                 val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
-                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
                 val choices = rackets.filter { !it.retired || it.id == racket }
-                if (choices.isEmpty()) Text(s.studentRacketNone, color = TsmColors.TextDim, fontSize = 12.sp)
-                else Segmented(
-                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
-                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
-                )
+                if (choices.isNotEmpty()) {
+                    Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Segmented(
+                        listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                        (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                    )
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = name.isNotBlank(), onClick = {
-                val st = (student ?: com.tennis.scoremanager.data.Student("st${System.currentTimeMillis()}", "", createdAt = System.currentTimeMillis()))
-                    .copy(name = name.trim(), hand = hand, racket = racket)
-                c.saveStudent(st)
+            TextButton(enabled = first.isNotBlank() && last.isNotBlank(), onClick = {
+                val base = player ?: existing
+                    ?: com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), "", createdAt = System.currentTimeMillis())
+                val p = base.copy(
+                    firstName = first.trim(), lastName = last.trim(), nickname = nick.trim(),
+                    name = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
+                    hand = hand, racket = racket, student = base.student || asStudent && player == null,
+                )
+                c.savePlayer(p)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
-                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = st.name)) }
-                onDone(st)
+                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
+                onDone(p)
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },

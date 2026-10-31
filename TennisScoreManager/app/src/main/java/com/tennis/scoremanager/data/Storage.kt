@@ -239,25 +239,103 @@ class Storage(context: Context) {
         if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
 
-    /** Allievi dell'allenatore, in un file solo. */
+    /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
+    private val playersFile: File get() = File(app.filesDir, "players.json")
+    /** Gli allievi della prima versione, prima del database: si leggono una volta e diventano giocatori. */
     private val studentsFile: File get() = File(app.filesDir, "students.json")
 
-    fun loadStudents(): List<Student> =
-        runCatching { json.decodeFromString(ListSerializer(Student.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
-
     @Synchronized
-    fun saveStudents(list: List<Student>) {
-        runCatching {
-            val tmp = File(app.filesDir, "students.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Student.serializer()), list))
-            if (!tmp.renameTo(studentsFile)) {
-                studentsFile.delete()
-                tmp.renameTo(studentsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allievi fallito", it) }
+    fun loadPlayers(): List<PlayerProfile> {
+        if (!playersFile.exists() && studentsFile.exists()) {
+            val old = runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+            savePlayers(old.map { it.copy(student = true) })
+            studentsFile.delete()
+        }
+        // Nati dallo storico con un nome solo: quel nome è il soprannome (le partite non cambiano), nome e cognome da completare.
+        return runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), playersFile.readText()) }.getOrDefault(emptyList())
+            .map { if (it.firstName.isBlank() && it.lastName.isBlank() && it.nickname.isBlank()) it.copy(nickname = it.name) else it }
     }
 
-    /** Chi si allena con l'allenamento dei colpi (Student.id; vuoto = nessun allievo). */
+    @Synchronized
+    fun savePlayers(list: List<PlayerProfile>) {
+        runCatching {
+            val tmp = File(app.filesDir, "players.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(PlayerProfile.serializer()), list))
+            if (!tmp.renameTo(playersFile)) {
+                playersFile.delete()
+                tmp.renameTo(playersFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
+    }
+
+    /** Domande in sospeso sui giocatori arrivati da un altro telefono con un nome che abbiamo già. */
+    private val questionsFile: File get() = File(app.filesDir, "player_questions.json")
+
+    fun loadPlayerQuestions(): List<Players.Question> =
+        runCatching { json.decodeFromString(ListSerializer(Players.Question.serializer()), questionsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun savePlayerQuestions(list: List<Players.Question>) {
+        runCatching { if (list.isEmpty()) questionsFile.delete() else questionsFile.writeText(json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
+    }
+
+    /**
+     * Riscrive le partite salvate (storico e sospese): i posti con un identificativo in [from] passano a [to]; con
+     * [onlyMatches] solo quelle partite (per separare un omonimo). Restituisce quante partite sono cambiate.
+     */
+    @Synchronized
+    fun remapPlayer(from: Set<String>, to: String, onlyMatches: Set<String>? = null): Int {
+        var changed = 0
+        fun fix(rec: MatchRecord, save: (MatchRecord) -> Unit) {
+            if (onlyMatches != null && rec.id !in onlyMatches) return
+            var su = rec.setup
+            for (slot in Players.slots(su)) if (slot.id in from) su = Players.withId(su, slot, to)
+            if (su != rec.setup) {
+                save(rec.copy(setup = su))
+                changed++
+            }
+        }
+        loadFinished().forEach { fix(it, ::saveFinished) }
+        matchesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+            .forEach { fix(it, ::saveMatch) }
+        return changed
+    }
+
+    /**
+     * Dà un giocatore del database a ogni nome scritto nelle partite salvate (storico e sospese) che non lo ha ancora:
+     * al primo avvio tutte, poi solo quelle arrivate da versioni vecchie. Dalla più vecchia, così lo stesso nome è
+     * sempre la stessa persona; con due giocatori dello stesso nome (omonimi) quel posto resta col solo nome.
+     * Restituisce quante partite sono cambiate.
+     */
+    @Synchronized
+    fun assignPlayerIds(now: Long = System.currentTimeMillis()): Int {
+        var players = loadPlayers()
+        var changed = 0
+        fun fix(rec: MatchRecord, save: (MatchRecord) -> Unit) {
+            // Un identificativo che è l'alias di un nostro giocatore (unito, o legato a un altro telefono) diventa il suo.
+            var canon = rec.setup
+            for (slot in Players.slots(canon)) {
+                val p = Players.byId(players, slot.id) ?: continue
+                if (p.id != slot.id) canon = Players.withId(canon, slot, p.id)
+            }
+            val (su, created) = Players.assign(canon, players, now)
+            if (su == rec.setup) return
+            players = players + created
+            save(rec.copy(setup = su))
+            changed++
+        }
+        val finished = loadFinished().sortedBy { it.startedAt ?: it.updatedAt }
+        val before = players.size
+        for (rec in finished) fix(rec, ::saveFinished)
+        val open = matchesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+        for (rec in open.sortedBy { it.startedAt ?: it.updatedAt }) fix(rec, ::saveMatch)
+        if (players.size != before) savePlayers(players)
+        return changed
+    }
+
+    /** Chi si allena con l'allenamento dei colpi (PlayerProfile.id; vuoto = nessun allievo). */
     var trainStudent: String
         get() = prefs.getString("train_student", null) ?: ""
         set(v) = prefs.edit().putString("train_student", v).apply()

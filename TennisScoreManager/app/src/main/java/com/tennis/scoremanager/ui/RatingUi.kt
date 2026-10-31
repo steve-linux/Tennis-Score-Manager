@@ -148,8 +148,9 @@ fun SummaryRatingCard(c: MatchController, m: LiveMatch) {
         }
         Text(s.ratingInMatch, color = TsmColors.TextDim, fontSize = 13.sp)
         for (side in Side.entries) {
-            for (name in PlayerStats.names(rec.setup, side)) {
-                val k = PlayerStats.key(name)
+            for (w in PlayerStats.whos(rec.setup, side)) {
+                val name = w.name
+                val k = w.key
                 val d = deltas[k] ?: continue
                 // Il rating subito dopo questa partita (quelle giocate dopo l'hanno già cambiato).
                 val after = table.player(k)?.history?.firstOrNull { it.first == (rec.endedAt ?: rec.startedAt ?: rec.updatedAt) }?.second

@@ -102,7 +102,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
 
 **Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
 
@@ -411,6 +411,20 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
+
+### 7.7 Joueurs : la base (app 2.5)
+
+Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un identifiant qui reste le même sur chaque téléphone : statistiques, classement et historique sont à cette personne même avec un homonyme, y compris après avoir passé des matchs d'un téléphone à l'autre.
+
+- **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Un nom écrit dans Nouveau match qui n'est pas dans la base demande prénom et nom en touchant *Suivant* (le surnom est ce qui a été écrit). Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
+- **Nouveau match** : pendant que vous écrivez le nom, les joueurs qui correspondent apparaissent (un toucher et le match est à lui) ; si le nom n'appartient qu'à un joueur il se relie tout seul (*✓ … de la base des joueurs* ; **Ce n'est pas lui** crée une autre personne du même nom). Avec deux joueurs du même nom l'appli demande lequel ; un nom nouveau devient un joueur au début du match.
+- **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
+- **Plus › Joueurs** : tous, avec la recherche ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
+  - **Élève** : le met (ou le retire) parmi les élèves.
+  - **Fusionner avec un autre joueur** : la même personne écrite de deux façons (« Rossi » et « Mario Rossi ») ou créée deux fois ; matchs et séances passent à lui.
+  - **Séparer un homonyme** (dans *Matchs*) : cochez les matchs d'une autre personne du même nom, qui devient un nouveau joueur.
+- **Matchs d'un autre téléphone** (transfert ou *Importer*) : un joueur connu du téléphone se relie tout seul ; un nouveau s'ajoute avec son identifiant ; s'il a le nom d'un des vôtres l'appli demande une fois **Qui est-ce ?** (*Oui, c'est lui* relie les deux, la fois suivante il est reconnu ; *Non, une autre personne* l'ajoute). Les matchs des anciennes versions, sans joueurs, se relient par le nom.
+- La **photo** et **homme/femme** valent encore pour le nom : deux homonymes les partagent.
 
 ## 8. Tableau d'affichage sur TV ou écran
 

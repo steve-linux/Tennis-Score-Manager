@@ -6,7 +6,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
-- **Altro**: **Tu** (il tuo nome), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
+- **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
 **Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 
@@ -298,6 +298,20 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
+
+### 7.7 Giocatori: il database
+
+Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
+
+- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. Un nome scritto in Nuova partita che nel database non c'è chiede nome e cognome toccando *Avanti* (il soprannome è quello scritto). I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **Nuova partita**: mentre scrivi il nome compaiono i giocatori che corrispondono (un tocco e la partita è sua); se il nome è di un solo giocatore si collega da solo (*✓ … dal database*; **Non è lui** crea un'altra persona con lo stesso nome). Con due giocatori dello stesso nome l'app chiede quale; un nome nuovo diventa un giocatore all'inizio della partita.
+- **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
+- **Altro › Giocatori**: tutti, con la ricerca; *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
+  - **Allievo**: lo mette (o lo toglie) tra gli allievi.
+  - **Unisci con un altro giocatore**: la stessa persona scritta in due modi ("Rossi" e "Mario Rossi") o creata due volte; partite e sessioni passano a lui.
+  - **Separa un omonimo** (in *Partite*): spunti le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo.
+- **Partite da un altro telefono** (trasferimento o *Importa*): un giocatore che il telefono conosce si aggancia da solo; uno nuovo si aggiunge col suo identificativo; se ha il nome di uno dei tuoi l'app chiede una volta **Chi è?** (*Sì, è lui* lega i due, così le volte dopo lo riconosce; *No, un'altra persona* lo aggiunge). Le partite delle versioni vecchie, senza giocatori, si agganciano per nome.
+- La **foto** e **uomo/donna** valgono ancora per il nome: due omonimi le condividono.
 
 ## 8. Tabellone su TV o monitor
 

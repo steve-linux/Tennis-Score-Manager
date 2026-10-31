@@ -80,7 +80,7 @@ fun ProgressScreen(c: MatchController) {
     val players = remember(history) { c.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
-    val me = PlayerStats.key(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
+    val me = c.keyForName(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
     val key = if (matches) (player ?: me ?: players.firstOrNull()?.first) else null
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }

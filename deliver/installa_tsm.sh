@@ -323,7 +323,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
 
 **Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
 
@@ -616,6 +616,20 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 
+### 7.7 Spieler: die Datenbank
+
+Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit einer Kennung, die auf jedem Telefon gleich bleibt: Statistik, Rating und Verlauf gehören dieser Person auch bei einem Namensvetter, auch nachdem Matches von einem Telefon aufs andere gewandert sind.
+
+- **Vorname, Nachname und Spitzname**: Vor- und Nachname sind Pflicht und kennzeichnen die Person; der **Spitzname** (freiwillig) ist, wie man sie auf dem Platz nennt: Match, Anzeigetafel, Ansage und Statistik verwenden den Spitznamen, wenn es einen gibt, sonst Vor- und Nachname. Ein in Neues Match getippter Name, der nicht in der Datenbank ist, fragt beim Tippen auf *Weiter* nach Vor- und Nachname (der Spitzname ist das Getippte). Aus dem Verlauf entstandene Spieler haben nur einen Namen, der zum Spitznamen wird: unter *Spieler* sind sie *unvollständig*, und die Karte bietet **Vor- und Nachname ergänzen**.
+- **Neues Match**: beim Tippen des Namens erscheinen die passenden Spieler (ein Tipp und das Match gehört ihm); gehört der Name nur einem Spieler, wird er von selbst verknüpft (*✓ … aus der Spielerdatenbank*; **Nicht er** legt eine andere Person mit demselben Namen an). Bei zwei Spielern mit gleichem Namen fragt die App, welcher; ein neuer Name wird beim Matchbeginn zum Spieler.
+- **Beim ersten Start** legt die App für jeden Namen der bisherigen Matches einen Spieler an.
+- **Mehr › Spieler**: alle, mit Suche; *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
+  - **Schüler**: nimmt ihn unter die Schüler auf (oder wieder heraus).
+  - **Mit einem anderen Spieler zusammenführen**: dieselbe Person auf zwei Arten geschrieben („Rossi“ und „Mario Rossi“) oder zweimal angelegt; Matches und Einheiten gehen auf ihn über.
+  - **Namensvetter trennen** (unter *Matches*): die Matches einer anderen Person mit demselben Namen anhaken, sie wird ein neuer Spieler.
+- **Matches von einem anderen Telefon** (Übertragung oder *Importieren*): ein bekannter Spieler wird von selbst verknüpft; ein neuer kommt mit seiner Kennung dazu; hat er den Namen eines deiner Spieler, fragt die App einmal **Wer ist das?** (*Ja, das ist er* verknüpft beide, beim nächsten Mal wird er erkannt; *Nein, eine andere Person* fügt ihn hinzu). Matches alter Versionen ohne Spieler werden über den Namen verknüpft.
+- **Foto** und **Mann/Frau** gelten noch für den Namen: zwei Namensvettern teilen sie.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -703,7 +717,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+- **More**: **You** (your name), **Players** (the database: 7.7), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
 
 **New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
 
@@ -996,6 +1010,20 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 
+### 7.7 Players: the database
+
+Everyone who plays or practises is a **player** in the database, with an ID that stays the same on every phone: statistics, rating and history belong to that person even with a namesake, also after matches have moved from one phone to another.
+
+- **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. A name typed in New match that is not in the database asks for first and last name when you tap *Next* (the nickname is what you typed). Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
+- **New match**: while you type the name, the matching players appear (one tap and the match is theirs); if the name belongs to a single player it links by itself (*✓ … from the players database*; **Not them** creates another person with the same name). With two players of the same name the app asks which one; a new name becomes a player when the match starts.
+- **At the first start** the app creates a player for every name in the matches already played.
+- **More › Players**: everyone, with search; *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
+  - **Student**: puts them among the students (or takes them off).
+  - **Merge with another player**: the same person written two ways ("Rossi" and "Mario Rossi") or created twice; matches and sessions move to them.
+  - **Split a homonym** (in *Matches*): tick the matches of another person with the same name, who becomes a new player.
+- **Matches from another phone** (transfer or *Import*): a player the phone knows links by itself; a new one is added with its ID; if it has the name of one of yours the app asks once **Who is it?** (*Yes, it's them* links the two, so next time it is recognised; *No, someone else* adds them). Matches from old versions, without players, link by name.
+- The **photo** and **man/woman** still belong to the name: two namesakes share them.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1082,7 +1110,7 @@ En el **primer arranque** la app hace tres preguntas: el idioma, cómo la vas a 
 - **Entrenar**: entrenamiento con la banda de pulso y **entrenamiento de golpes** (saque, derecha, revés, volea) con las sesiones guardadas.
 - **Vídeo**: **Grabar con este teléfono**, **Tus vídeos** (capítulos, mejores jugadas, filtros, importar) y el teléfono-cámara.
 - **Progresos**: **Rating TSM · Progresos** (con tu nombre muestra enseguida tu rating), **Historial**, **Mis raquetas**.
-- **Más**: **Tú** (tu nombre), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
+- **Más**: **Tú** (tu nombre), **Jugadores** (la base: 7.7), **Dispositivos** (pulseras, mandos, bandas, segundo teléfono, marcador en TV), **Idioma y voz**, **Ayuda** (esta guía, con búsqueda y referencias que se tocan), raquetas, transferir partidos, presentación, versión y licencia.
 
 **Nuevo partido** son dos pasos: **quién juega** (individual o dobles, los nombres, con los jugadores recientes para tocar, y el deporte; club, pista y torneo en *Más detalles*) y **cómo llevas el marcador y las reglas**. Todo es opcional: se puede seguir sin nombres. Desde cada pantalla **Atrás** vuelve a la pestaña de la que se venía.
 
@@ -1375,6 +1403,20 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 
+### 7.7 Jugadores: la base
+
+Cada persona que juega o entrena es un **jugador** de la base, con un identificador que sigue siendo el mismo en cada teléfono: estadísticas, rating e historial son de esa persona aunque haya un homónimo, también después de pasar partidos de un teléfono a otro.
+
+- **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Un nombre escrito en Nuevo partido que no está en la base pide nombre y apellido al tocar *Siguiente* (el apodo es lo escrito). Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
+- **Nuevo partido**: mientras escribes el nombre aparecen los jugadores que coinciden (un toque y el partido es suyo); si el nombre es de un solo jugador se enlaza solo (*✓ … de la base de jugadores*; **No es él** crea otra persona con el mismo nombre). Con dos jugadores del mismo nombre la app pregunta cuál; un nombre nuevo se convierte en jugador al empezar el partido.
+- **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
+- **Más › Jugadores**: todos, con búsqueda; *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
+  - **Alumno**: lo pone (o lo quita) entre los alumnos.
+  - **Unir con otro jugador**: la misma persona escrita de dos formas («Rossi» y «Mario Rossi») o creada dos veces; partidos y sesiones pasan a él.
+  - **Separar un homónimo** (en *Partidos*): marca los partidos de otra persona con el mismo nombre, que pasa a ser un jugador nuevo.
+- **Partidos de otro teléfono** (transferencia o *Importar*): un jugador que el teléfono conoce se enlaza solo; uno nuevo se añade con su identificador; si tiene el nombre de uno de los tuyos la app pregunta una vez **¿Quién es?** (*Sí, es él* enlaza los dos y la próxima vez lo reconoce; *No, otra persona* lo añade). Los partidos de versiones antiguas, sin jugadores, se enlazan por el nombre.
+- La **foto** y **hombre/mujer** siguen siendo del nombre: dos homónimos las comparten.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
@@ -1461,7 +1503,7 @@ Au **premier démarrage**, l'appli pose trois questions : la langue, comment vou
 - **S'entraîner** : entraînement avec la ceinture cardio et **entraînement des coups** (service, coup droit, revers, volée) avec les séances enregistrées.
 - **Vidéo** : **Filmer avec ce téléphone**, **Vos vidéos** (chapitres, temps forts, filtres, import) et le téléphone-caméra.
 - **Progrès** : **Classement TSM · Progrès** (avec votre nom, votre classement s'affiche tout de suite), **Historique**, **Mes raquettes**.
-- **Plus** : **Vous** (votre nom), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
+- **Plus** : **Vous** (votre nom), **Joueurs** (la base : 7.7), **Appareils** (bracelets, télécommandes, ceintures, second téléphone, tableau TV), **Langue et voix**, **Aide** (ce guide, avec recherche et renvois cliquables), raquettes, transfert des matchs, présentation, version et licence.
 
 **Nouveau match** se fait en deux étapes : **qui joue** (simple ou double, les noms, avec les joueurs récents à toucher, et le sport ; club, court et tournoi dans *Autres détails*) et **façon de compter et règles**. Tout est facultatif : on peut continuer sans noms. Depuis chaque écran, **Retour** ramène à l'onglet de départ.
 
@@ -1754,6 +1796,20 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 
+### 7.7 Joueurs : la base
+
+Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un identifiant qui reste le même sur chaque téléphone : statistiques, classement et historique sont à cette personne même avec un homonyme, y compris après avoir passé des matchs d'un téléphone à l'autre.
+
+- **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Un nom écrit dans Nouveau match qui n'est pas dans la base demande prénom et nom en touchant *Suivant* (le surnom est ce qui a été écrit). Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
+- **Nouveau match** : pendant que vous écrivez le nom, les joueurs qui correspondent apparaissent (un toucher et le match est à lui) ; si le nom n'appartient qu'à un joueur il se relie tout seul (*✓ … de la base des joueurs* ; **Ce n'est pas lui** crée une autre personne du même nom). Avec deux joueurs du même nom l'appli demande lequel ; un nom nouveau devient un joueur au début du match.
+- **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
+- **Plus › Joueurs** : tous, avec la recherche ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
+  - **Élève** : le met (ou le retire) parmi les élèves.
+  - **Fusionner avec un autre joueur** : la même personne écrite de deux façons (« Rossi » et « Mario Rossi ») ou créée deux fois ; matchs et séances passent à lui.
+  - **Séparer un homonyme** (dans *Matchs*) : cochez les matchs d'une autre personne du même nom, qui devient un nouveau joueur.
+- **Matchs d'un autre téléphone** (transfert ou *Importer*) : un joueur connu du téléphone se relie tout seul ; un nouveau s'ajoute avec son identifiant ; s'il a le nom d'un des vôtres l'appli demande une fois **Qui est-ce ?** (*Oui, c'est lui* relie les deux, la fois suivante il est reconnu ; *Non, une autre personne* l'ajoute). Les matchs des anciennes versions, sans joueurs, se relient par le nom.
+- La **photo** et **homme/femme** valent encore pour le nom : deux homonymes les partagent.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -1840,7 +1896,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Allenati**: allenamento con la fascia cardio e **allenamento dei colpi** (servizio, dritto, rovescio, volée) con le sessioni salvate.
 - **Video**: **Riprendi con questo telefono**, **I tuoi video** (capitoli, highlights, filtri, importa) e il telefono-telecamera.
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
-- **Altro**: **Tu** (il tuo nome), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
+- **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
 **Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 
@@ -2133,6 +2189,20 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 
+### 7.7 Giocatori: il database
+
+Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
+
+- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. Un nome scritto in Nuova partita che nel database non c'è chiede nome e cognome toccando *Avanti* (il soprannome è quello scritto). I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **Nuova partita**: mentre scrivi il nome compaiono i giocatori che corrispondono (un tocco e la partita è sua); se il nome è di un solo giocatore si collega da solo (*✓ … dal database*; **Non è lui** crea un'altra persona con lo stesso nome). Con due giocatori dello stesso nome l'app chiede quale; un nome nuovo diventa un giocatore all'inizio della partita.
+- **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
+- **Altro › Giocatori**: tutti, con la ricerca; *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
+  - **Allievo**: lo mette (o lo toglie) tra gli allievi.
+  - **Unisci con un altro giocatore**: la stessa persona scritta in due modi ("Rossi" e "Mario Rossi") o creata due volte; partite e sessioni passano a lui.
+  - **Separa un omonimo** (in *Partite*): spunti le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo.
+- **Partite da un altro telefono** (trasferimento o *Importa*): un giocatore che il telefono conosce si aggancia da solo; uno nuovo si aggiunge col suo identificativo; se ha il nome di uno dei tuoi l'app chiede una volta **Chi è?** (*Sì, è lui* lega i due, così le volte dopo lo riconosce; *No, un'altra persona* lo aggiunge). Le partite delle versioni vecchie, senza giocatori, si agganciano per nome.
+- La **foto** e **uomo/donna** valgono ancora per il nome: due omonimi le condividono.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2219,7 +2289,7 @@ Na **primeira vez** o app faz três perguntas: o idioma, como você vai usá-lo 
 - **Treinar**: treino com a cinta cardíaca e **treino de golpes** (saque, forehand, backhand, voleio) com as sessões salvas.
 - **Vídeo**: **Gravar com este telefone**, **Seus vídeos** (capítulos, melhores momentos, filtros, importar) e o telefone-câmera.
 - **Progresso**: **Rating TSM · Progressos** (com o seu nome mostra na hora o seu rating), **Histórico**, **As minhas raquetes**.
-- **Mais**: **Você** (o seu nome), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
+- **Mais**: **Você** (o seu nome), **Jogadores** (o banco: 7.7), **Dispositivos** (pulseiras, controles, cintas, segundo telefone, placar na TV), **Idioma e voz**, **Ajuda** (este guia, com pesquisa e referências para tocar), raquetes, transferir partidas, apresentação, versão e licença.
 
 **Nova partida** são dois passos: **quem joga** (simples ou duplas, os nomes, com os jogadores recentes para tocar, e o esporte; clube, quadra e torneio em *Mais detalhes*) e **como você marca o placar e as regras**. Tudo é opcional: dá para seguir mesmo sem nomes. De cada tela **Voltar** retorna à aba de onde se veio.
 
@@ -2511,6 +2581,20 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele.
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
+
+### 7.7 Jogadores: o banco
+
+Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador que continua o mesmo em cada telefone: estatísticas, rating e histórico são dessa pessoa mesmo com um homônimo, também depois de passar partidas de um telefone para outro.
+
+- **Nome, sobrenome e apelido**: nome e sobrenome são obrigatórios e identificam a pessoa; o **apelido** (opcional) é como ela é chamada em quadra: partida, placar, voz e estatísticas usam o apelido se houver, senão nome e sobrenome. Um nome escrito em Nova partida que não está no banco pede nome e sobrenome ao tocar em *Avançar* (o apelido é o que foi escrito). Os jogadores nascidos do histórico têm um nome só, que vira o apelido: em *Jogadores* aparecem *a completar* e a ficha oferece **Completar nome e sobrenome**.
+- **Nova partida**: enquanto você escreve o nome aparecem os jogadores que combinam (um toque e a partida é dele); se o nome é de um só jogador ele se liga sozinho (*✓ … do banco de jogadores*; **Não é ele** cria outra pessoa com o mesmo nome). Com dois jogadores do mesmo nome o app pergunta qual; um nome novo vira jogador no início da partida.
+- **Na primeira abertura** o app cria um jogador para cada nome das partidas já jogadas.
+- **Mais › Jogadores**: todos, com pesquisa; *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
+  - **Aluno**: coloca (ou tira) entre os alunos.
+  - **Juntar com outro jogador**: a mesma pessoa escrita de dois jeitos ("Rossi" e "Mario Rossi") ou criada duas vezes; partidas e sessões passam para ele.
+  - **Separar um homônimo** (em *Partidas*): marque as partidas de outra pessoa com o mesmo nome, que vira um jogador novo.
+- **Partidas de outro telefone** (transferência ou *Importar*): um jogador que o telefone conhece se liga sozinho; um novo entra com o identificador dele; se tem o nome de um dos seus o app pergunta uma vez **Quem é?** (*Sim, é ele* liga os dois e da próxima vez reconhece; *Não, outra pessoa* adiciona). Partidas de versões antigas, sem jogadores, se ligam pelo nome.
+- A **foto** e **homem/mulher** ainda valem para o nome: dois homônimos as compartilham.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3327,7 +3411,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -3835,7 +3919,8 @@ class MatchController(
             Screen.STROKE_SESSIONS -> strokeSessionsBack
             Screen.HELP -> Screen.HOME
             Screen.STUDENTS -> Screen.HOME
-            Screen.STUDENT -> Screen.STUDENTS
+            Screen.STUDENT -> studentBack
+            Screen.PLAYERS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4192,58 +4277,154 @@ class MatchController(
 
     private var strokeSessionsBack = Screen.HOME
 
-    // ---------------------------------------------------------------- allievi (per l'allenatore)
+    // ---------------------------------------------------------------- giocatori e allievi
 
-    val students = MutableStateFlow(storage.loadStudents().sortedBy { it.name.lowercase() })
+    /** Il database dei giocatori, per nome. Gli allievi sono quelli con student. */
+    val players = MutableStateFlow(storage.loadPlayers().sortedBy { it.name.lowercase() })
 
-    /** Chi si allena con l'allenamento dei colpi: Student.id, null = nessun allievo. */
+    /** Gli allievi dell'allenatore (giocatori con student). */
+    val students: StateFlow<List<com.tennis.scoremanager.data.PlayerProfile>> =
+        players.map { l -> l.filter { it.student } }.stateIn(scope, SharingStarted.Eagerly, players.value.filter { it.student })
+
+    /** Chi si allena con l'allenamento dei colpi: PlayerProfile.id, null = nessun allievo. */
     val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
 
-    /** Allievo aperto nella sua scheda. */
+    /** Giocatore aperto nella sua scheda. */
     val openStudentId = MutableStateFlow<String?>(null)
 
-    fun refreshStudents() {
-        scope.launch { students.value = withContext(io) { storage.loadStudents() }.sortedBy { it.name.lowercase() } }
+    fun refreshPlayers() {
+        scope.launch { players.value = withContext(io) { storage.loadPlayers() }.sortedBy { it.name.lowercase() } }
     }
 
-    fun studentById(id: String?): com.tennis.scoremanager.data.Student? = id?.let { i -> students.value.firstOrNull { it.id == i } }
+    fun refreshStudents() = refreshPlayers()
 
-    /** Aggiunge o cambia un allievo. */
-    fun saveStudent(st: com.tennis.scoremanager.data.Student) {
-        val list = students.value.filter { it.id != st.id } + st
-        students.value = list.sortedBy { it.name.lowercase() }
-        scope.launch(io) { storage.saveStudents(list) }
+    /** Il giocatore di un identificativo (anche di un suo alias). */
+    fun playerById(id: String?): com.tennis.scoremanager.data.PlayerProfile? =
+        id?.let { com.tennis.scoremanager.data.Players.byId(players.value, it) }
+
+    fun studentById(id: String?) = playerById(id)
+
+    /** Aggiunge o cambia un giocatore (stesso id). */
+    fun savePlayer(p: com.tennis.scoremanager.data.PlayerProfile) {
+        val list = players.value.filter { it.id != p.id } + p
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.savePlayers(list) }
     }
 
-    /** Toglie un allievo: le sue sessioni restano (senza allievo, col nome di quel giorno). */
-    fun deleteStudent(id: String) {
-        val list = students.value.filter { it.id != id }
-        students.value = list
-        if (trainStudent.value == id) setTrainStudent(null)
+    fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
+
+    /** Domande in sospeso sui giocatori arrivati da un altro telefono ("è lui?"). */
+    val playerQuestions = MutableStateFlow(storage.loadPlayerQuestions())
+
+    /**
+     * Risposta a una domanda: [localId] = è il nostro giocatore (i due identificativi si legano e le sue partite
+     * arrivate diventano sue); null = un'altra persona, che si aggiunge col suo identificativo.
+     */
+    fun answerPlayerQuestion(q: com.tennis.scoremanager.data.Players.Question, localId: String?) {
+        val rest = playerQuestions.value.filter { it.incomingId != q.incomingId }
+        playerQuestions.value = rest
         scope.launch {
             withContext(io) {
-                storage.saveStudents(list)
-                storage.loadServeSessions().filter { it.student == id }.forEach { storage.saveServeSession(it.copy(student = null)) }
+                var people = storage.loadPlayers()
+                if (localId != null) {
+                    people = people.map { if (it.id == localId) it.copy(aliases = it.aliases + q.incomingId) else it }
+                    storage.savePlayers(people)
+                    storage.remapPlayer(setOf(q.incomingId), localId)
+                } else if (people.none { it.id == q.incomingId }) {
+                    storage.savePlayers(people + com.tennis.scoremanager.data.PlayerProfile(q.incomingId, q.name, nickname = q.name, createdAt = System.currentTimeMillis()))
+                }
+                storage.savePlayerQuestions(rest)
             }
+            refreshPlayers()
+            refreshHistory()
+            refreshSaved()
+        }
+    }
+
+    /**
+     * Unisce [other] a [keep]: è la stessa persona scritta in due modi o creata due volte. Le partite e le sessioni di
+     * [other] diventano di [keep], che tiene anche i suoi identificativi (così le partite che arriveranno da altri
+     * telefoni lo riconoscono).
+     */
+    fun mergePlayers(keep: String, other: String) {
+        val a = playerById(keep) ?: return
+        val b = playerById(other) ?: return
+        if (a.id == b.id) return
+        val merged = a.copy(
+            aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
+            hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
+            note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
+        )
+        val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
+        players.value = list.sortedBy { it.name.lowercase() }
+        if (trainStudent.value == b.id) setTrainStudent(a.id)
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
+                storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
+            }
+            refreshHistory()
+            refreshSaved()
             refreshServeSessions()
         }
     }
 
     /**
-     * Cancella l'allievo e quello che il telefono ha di suo: sessioni con video e analisi, note e foto; la sua racchetta
-     * resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli avversari.
+     * Separa un omonimo: le partite [matchIds] di [id] sono di un'altra persona con lo stesso nome, che nasce ora.
+     * Restituisce il giocatore nuovo.
+     */
+    fun splitPlayer(id: String, matchIds: Set<String>): com.tennis.scoremanager.data.PlayerProfile? {
+        val p = playerById(id) ?: return null
+        if (matchIds.isEmpty()) return null
+        val twin = com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), p.name, nickname = p.name, createdAt = System.currentTimeMillis())
+        val list = players.value + twin
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(p.id) + p.aliases, twin.id, matchIds)
+            }
+            refreshHistory()
+            refreshSaved()
+        }
+        return twin
+    }
+
+    /** Un giocatore nuovo nel database (anche con lo stesso nome di un altro: un omonimo). */
+    /** Posto di Nuova partita per cui si sta creando un giocatore (nome e cognome da chiedere); null = nessuno. */
+    val playerToCreate = MutableStateFlow<com.tennis.scoremanager.data.Players.Slot?>(null)
+
+    /** Per distinguere due omonimi: quante partite ha e l'ultima volta (null senza partite). */
+    fun playerHint(p: com.tennis.scoremanager.data.PlayerProfile): String? {
+        val lines = studentMatches(p)
+        val last = lines.lastOrNull() ?: return if (p.student) strings.studentsTitle else null
+        return strings.playerMatchesHint(lines.size, com.tennis.scoremanager.data.Reports.date(last.rec.endedAt ?: last.rec.updatedAt, options.value.lang))
+    }
+
+    /** Toglie un allievo dall'elenco: resta un giocatore, e le sue sessioni restano sue. */
+    fun deleteStudent(id: String) {
+        val p = playerById(id) ?: return
+        if (trainStudent.value == id) setTrainStudent(null)
+        savePlayer(p.copy(student = false))
+    }
+
+    /**
+     * Cancella l'allievo e quello che il telefono ha di suo: il giocatore, le sessioni con video e analisi, note e
+     * foto; la sua racchetta resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli
+     * avversari (vi resta il nome).
      */
     fun purgeStudent(id: String) {
-        val st = studentById(id) ?: return
-        val list = students.value.filter { it.id != id }
-        students.value = list
+        val st = playerById(id) ?: return
+        val list = players.value.filter { it.id != st.id }
+        players.value = list
         if (trainStudent.value == id) setTrainStudent(null)
         removePhoto(st.name)
         rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
         scope.launch {
             withContext(io) {
-                storage.saveStudents(list)
-                storage.loadServeSessions().filter { it.student == id }.forEach { storage.deleteServeSession(it) }
+                storage.savePlayers(list)
+                storage.loadServeSessions().filter { it.student == st.id }.forEach { storage.deleteServeSession(it) }
             }
             refreshServeSessions()
         }
@@ -4255,20 +4436,40 @@ class MatchController(
     }
 
     fun openStudents() {
-        refreshStudents()
+        refreshPlayers()
         screen.value = Screen.STUDENTS
     }
 
     fun openStudent(id: String) {
         openStudentId.value = id
+        studentBack = if (screen.value == Screen.PLAYERS) Screen.PLAYERS else Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
-    /** Partite finite dell'allievo dallo storico (stesso nome), dalla più vecchia. */
-    fun studentMatches(name: String): List<PlayerStats.MatchLine> = PlayerStats.lines(played(), PlayerStats.key(name))
+    private var studentBack = Screen.STUDENTS
 
-    /** Rating TSM dell'allievo nello sport con più partite (null senza partite). */
-    fun studentRating(name: String) = ratingSports().firstOrNull()?.let { ratingTable(it).player(PlayerStats.key(name)) }
+    /** Altro › Giocatori: tutto il database. */
+    fun openPlayers() {
+        refreshPlayers()
+        refreshHistory()
+        screen.value = Screen.PLAYERS
+    }
+
+    /** Chi è il giocatore nelle statistiche: il suo identificativo e quelli che sono lui (alias). */
+    private fun keysOf(p: com.tennis.scoremanager.data.PlayerProfile): Set<String> = setOf(p.id) + p.aliases
+
+    /** Partite finite del giocatore dallo storico, dalla più vecchia. */
+    fun studentMatches(p: com.tennis.scoremanager.data.PlayerProfile): List<PlayerStats.MatchLine> {
+        val keys = keysOf(p)
+        return PlayerStats.linesBy(played()) { rec -> Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } } }
+    }
+
+    /** Rating TSM del giocatore nello sport con più partite (null senza partite). */
+    fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = ratingSports().firstOrNull()?.let { ratingTable(it).player(p.id) }
+
+    /** Chi è un nome scritto (es. il proprio, in Altro › Tu): il giocatore del database se è uno solo, sennò il nome. */
+    fun keyForName(name: String): String =
+        com.tennis.scoremanager.data.Players.byName(players.value, name).singleOrNull()?.id ?: PlayerStats.key(name)
 
     /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
     fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
@@ -4550,7 +4751,14 @@ class MatchController(
         val now = System.currentTimeMillis()
         // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
-        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
+        // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
+        val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
+        if (created.isNotEmpty()) {
+            val list = players.value + created
+            players.value = list.sortedBy { it.name.lowercase() }
+            scope.launch(io) { storage.savePlayers(list) }
+        }
+        val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -5028,7 +5236,8 @@ class MatchController(
     private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
 
     /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
-    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
+    /** Giocatori dello storico (chi è, nome): col nome del database se è un giocatore del database. */
+    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to (playerById(it.key)?.name ?: it.name) }
 
     /** Rating TSM di uno sport, dalle partite finite dello storico (le amichevoli non contano). */
     fun ratingTable(sport: com.tennis.scoremanager.data.Sport): com.tennis.scoremanager.data.Rating.Table =
@@ -5168,6 +5377,8 @@ class MatchController(
     fun refreshHistory() {
         scope.launch {
             history.value = withContext(io) {
+                // Le partite senza giocatori del database (di prima, o arrivate da versioni vecchie) li ricevono ora.
+                if (storage.assignPlayerIds() > 0) players.value = storage.loadPlayers().sortedBy { it.name.lowercase() }
                 // Prima dello storico l'app teneva solo l'ultima partita finita: entra anche lei.
                 storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
                 storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
@@ -5223,10 +5434,27 @@ class MatchController(
     }
 
     /** Salva partite arrivate da fuori: le finite nello storico, le altre tra le sospese. Restituisce (finite, sospese). */
-    private fun importRecords(recs: List<MatchRecord>): Pair<Int, Int> {
+    private fun importRecords(recs: List<MatchRecord>, info: List<com.tennis.scoremanager.data.PlayerProfile> = emptyList()): Pair<Int, Int> {
         var done = 0
         var open = 0
-        for (rec in recs) {
+        // I giocatori delle partite arrivate: quelli che conosciamo si agganciano, quelli nuovi si aggiungono col loro
+        // identificativo, chi ha il nome di uno dei nostri resta in sospeso finché l'utente non dice se è lui.
+        var people = storage.loadPlayers()
+        val questions = storage.loadPlayerQuestions().toMutableList()
+        val now = System.currentTimeMillis()
+        val resolved = recs.map { rec ->
+            val (su, created, asks) = com.tennis.scoremanager.data.Players.resolveIncoming(rec.setup, people, now)
+            people = people + created
+            asks.filter { q -> questions.none { it.incomingId == q.incomingId } }.forEach { questions += it }
+            rec.copy(setup = su)
+        }
+        // Le schede arrivate completano i nostri giocatori (nome, cognome, soprannome, mano dove mancano) e quelli nuovi.
+        people = com.tennis.scoremanager.data.Players.fillFrom(people, info)
+        storage.savePlayers(people)
+        storage.savePlayerQuestions(questions)
+        players.value = people.sortedBy { it.name.lowercase() }
+        playerQuestions.value = questions
+        for (rec in resolved) {
             val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
             if (state.isFinished) {
                 storage.saveFinished(rec.copy(finished = true, suspended = false))
@@ -5572,7 +5800,11 @@ class MatchController(
                     m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
                 }.filterValues { it.isNotEmpty() }
                 storage.json.encodeToString(
-                    TransferBundle.serializer(), TransferBundle(matches = all, photos = photos, matchPhotos = matchPhotos),
+                    TransferBundle.serializer(), TransferBundle(
+                        matches = all, photos = photos, matchPhotos = matchPhotos,
+                        players = all.flatMap { com.tennis.scoremanager.data.Players.slots(it.setup) }.mapNotNull { playerById(it.id) }.distinctBy { it.id }
+                            .map { com.tennis.scoremanager.data.PlayerProfile(it.id, it.name, it.firstName, it.lastName, it.nickname, it.hand, aliases = it.aliases) },
+                    ),
                 ).toByteArray()
             },
             onServed = { transferServed.value++ },
@@ -5611,7 +5843,7 @@ class MatchController(
                             runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
                         }
                     }
-                    importRecords(bundle.matches)
+                    importRecords(bundle.matches, bundle.players)
                 }.getOrNull()
             }
             _toasts.tryEmit(
@@ -8688,6 +8920,14 @@ data class SetupData(
     /** Racchetta virtuale: id della racchetta scelta per ciascun lato ("" = nessuna). */
     val p1Racket: String = "",
     val p2Racket: String = "",
+    /**
+     * Giocatore del database (Player.id) in ciascun posto: la partita è di quella persona anche se c'è un omonimo, e
+     * resta sua passando da un telefono all'altro. Vuoto = solo il nome (partite di prima o da versioni vecchie).
+     */
+    val p1aId: String = "",
+    val p1bId: String = "",
+    val p2aId: String = "",
+    val p2bId: String = "",
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
@@ -9210,22 +9450,35 @@ object PlayerStats {
 
     fun key(name: String): String = name.trim().lowercase(Locale.ROOT)
 
+    /**
+     * Chi è un giocatore nelle statistiche: l'identificativo del database se la partita lo ha, altrimenti il nome
+     * (partite di prima). Due identificativi non si confondono mai con un nome.
+     */
+    fun ident(id: String, name: String): String = id.ifEmpty { key(name) }
+
+    /** Un giocatore in un posto della partita: chi è ([key], vedi [ident]) e come è scritto. */
+    data class Who(val key: String, val name: String)
+
     /** Nomi scritti di un lato: uno nel singolare, fino a due nel doppio. */
-    fun names(setup: SetupData, side: Side): List<String> {
-        val all = if (side == Side.P1) listOf(setup.p1a, setup.p1b) else listOf(setup.p2a, setup.p2b)
-        return all.take(if (setup.doubles) 2 else 1).map { it.trim() }.filter { it.isNotEmpty() }
+    fun names(setup: SetupData, side: Side): List<String> = whos(setup, side).map { it.name }
+
+    /** I giocatori di un lato, coi nomi scritti: uno nel singolare, fino a due nel doppio. */
+    fun whos(setup: SetupData, side: Side): List<Who> {
+        val all = if (side == Side.P1) listOf(setup.p1a to setup.p1aId, setup.p1b to setup.p1bId) else listOf(setup.p2a to setup.p2aId, setup.p2b to setup.p2bId)
+        return all.take(if (setup.doubles) 2 else 1).map { (n, id) -> n.trim() to id }.filter { it.first.isNotEmpty() }.map { (n, id) -> Who(ident(id, n), n) }
     }
 
     fun sideOf(rec: MatchRecord, key: String): Side? =
-        Side.entries.firstOrNull { side -> names(rec.setup, side).any { key(it) == key } }
+        Side.entries.firstOrNull { side -> whos(rec.setup, side).any { it.key == key } }
 
     /** Giocatori dalle partite finite, dal più presente; il nome è scritto come nella partita più recente. */
     fun players(matches: List<Played>): List<Player> {
         val out = LinkedHashMap<String, Player>()
         for (m in matches.filter { it.winner != null }.sortedByDescending { it.rec.endedAt ?: it.rec.updatedAt }) {
             for (side in Side.entries) {
-                for (n in names(m.rec.setup, side)) {
-                    val k = key(n)
+                for (w in whos(m.rec.setup, side)) {
+                    val k = w.key
+                    val n = w.name
                     val p = out[k] ?: Player(k, n, 0, 0)
                     out[k] = p.copy(played = p.played + 1, won = p.won + if (m.winner == side) 1 else 0)
                 }
@@ -9240,9 +9493,12 @@ object PlayerStats {
     data class MatchLine(val rec: MatchRecord, val won: Boolean, val pointsWonPct: Int, val detail: MatchStats.SideTotals?)
 
     /** Partite finite di [key], dalla più vecchia, con la percentuale di punti vinti e le statistiche dettagliate. */
-    fun lines(matches: List<Played>, key: String): List<MatchLine> =
-        matchesOf(matches, key).filter { it.winner != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.map { m ->
-            val side = sideOf(m.rec, key)!!
+    fun lines(matches: List<Played>, key: String): List<MatchLine> = linesBy(matches) { sideOf(it, key) }
+
+    /** Come [lines], con la parte del giocatore data da [sideOf] (null = partita non sua). */
+    fun linesBy(matches: List<Played>, sideOf: (MatchRecord) -> Side?): List<MatchLine> =
+        matches.filter { it.winner != null && sideOf(it.rec) != null }.sortedBy { it.rec.endedAt ?: it.rec.updatedAt }.map { m ->
+            val side = sideOf(m.rec)!!
             val pts = MatchStats.points(m.rec)
             val t = MatchStats.totals(pts).getValue(side)
             MatchLine(
@@ -9258,8 +9514,9 @@ object PlayerStats {
         val out = LinkedHashMap<String, Rival>()
         for (m in matchesOf(matches, key).filter { it.winner != null }.sortedByDescending { it.rec.endedAt ?: it.rec.updatedAt }) {
             val me = sideOf(m.rec, key) ?: continue
-            for (n in names(m.rec.setup, me.other)) {
-                val k = key(n)
+            for (w in whos(m.rec.setup, me.other)) {
+                val k = w.key
+                val n = w.name
                 val r = out[k] ?: Rival(k, n, 0, 0)
                 out[k] = if (m.winner == me) r.copy(won = r.won + 1) else r.copy(lost = r.lost + 1)
             }
@@ -9913,7 +10170,7 @@ import kotlin.math.roundToInt
  * - Peso ([kFactor]): alto nelle prime partite, perché il rating trovi presto il suo posto, poi più stabile.
  * - Non contano le partite non finite, quelle segnate come amichevoli e i lati senza nomi scritti.
  *
- * I giocatori sono riconosciuti dal nome, come nello storico ([PlayerStats.key]).
+ * I giocatori sono riconosciuti dall'identificativo del database, o dal nome nelle partite di prima ([PlayerStats.ident]).
  */
 object Rating {
     const val START = 1500
@@ -9929,6 +10186,8 @@ object Rating {
         val sides: Map<Side, List<String>>,
         val winner: Side,
         val games: Map<Side, Int>,
+        /** Chi sono i giocatori di ciascun lato (PlayerStats.ident), negli stessi posti di [sides]; null = dai nomi. */
+        val keys: Map<Side, List<String>>? = null,
     )
 
     /** Rating di un giocatore: valore, partite contate, e il valore dopo ciascuna (per l'andamento). */
@@ -9969,10 +10228,14 @@ object Rating {
         val deltas = LinkedHashMap<String, Map<String, Int>>()
         for (g in games.filter { it.sport == sport }.sortedBy { it.at }) {
             // Nome scritto e chiave di ciascun giocatore, lato per lato.
-            val named = Side.entries.associateWith { side ->
-                g.sides[side].orEmpty().map { it.trim() }.filter { it.isNotEmpty() }.distinctBy { PlayerStats.key(it) }
+            // Coi giocatori del database conta l'identificativo: due omonimi restano due persone.
+            val pairs = Side.entries.associateWith { side ->
+                val ns = g.sides[side].orEmpty().map { it.trim() }
+                val ks = g.keys?.get(side) ?: ns.map { PlayerStats.key(it) }
+                ns.zip(ks).filter { it.first.isNotEmpty() }.distinctBy { it.second }
             }
-            val keys = named.mapValues { (_, ns) -> ns.map { PlayerStats.key(it) } }
+            val named = pairs.mapValues { (_, ps) -> ps.map { it.first } }
+            val keys = pairs.mapValues { (_, ps) -> ps.map { it.second } }
             if (keys.values.any { it.isEmpty() }) continue
             // Un nome su tutti e due i lati (errore di battitura): la partita non dice niente, si salta.
             if (keys.getValue(Side.P1).any { it in keys.getValue(Side.P2) }) continue
@@ -10014,6 +10277,7 @@ object Rating {
             sides = Side.entries.associateWith { PlayerStats.names(rec.setup, it) },
             winner = winner,
             games = games,
+            keys = Side.entries.associateWith { side -> PlayerStats.whos(rec.setup, side).map { it.key } },
         )
     }
 }
@@ -10935,7 +11199,7 @@ data class ServeSession(
      * null per le sessioni di prima, con le clip ancora nella cartella dell'app.
      */
     val folder: String? = null,
-    /** Allievo che si allena (Student.id) e il suo nome com'era quel giorno; null = senza allievo. */
+    /** Allievo che si allena (PlayerProfile.id) e il suo nome com'era quel giorno; null = senza allievo. */
     val student: String? = null,
     val studentName: String? = null,
     /** Racchetta usata, com'era quel giorno (corde e tensione comprese). */
@@ -11246,25 +11510,103 @@ class Storage(context: Context) {
         if (sess.student != null) dir.parentFile?.takeIf { it.list().isNullOrEmpty() }?.delete()
     }
 
-    /** Allievi dell'allenatore, in un file solo. */
+    /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
+    private val playersFile: File get() = File(app.filesDir, "players.json")
+    /** Gli allievi della prima versione, prima del database: si leggono una volta e diventano giocatori. */
     private val studentsFile: File get() = File(app.filesDir, "students.json")
 
-    fun loadStudents(): List<Student> =
-        runCatching { json.decodeFromString(ListSerializer(Student.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
-
     @Synchronized
-    fun saveStudents(list: List<Student>) {
-        runCatching {
-            val tmp = File(app.filesDir, "students.tmp")
-            tmp.writeText(json.encodeToString(ListSerializer(Student.serializer()), list))
-            if (!tmp.renameTo(studentsFile)) {
-                studentsFile.delete()
-                tmp.renameTo(studentsFile)
-            }
-        }.onFailure { Log.e("Storage", "Salvataggio allievi fallito", it) }
+    fun loadPlayers(): List<PlayerProfile> {
+        if (!playersFile.exists() && studentsFile.exists()) {
+            val old = runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), studentsFile.readText()) }.getOrDefault(emptyList())
+            savePlayers(old.map { it.copy(student = true) })
+            studentsFile.delete()
+        }
+        // Nati dallo storico con un nome solo: quel nome è il soprannome (le partite non cambiano), nome e cognome da completare.
+        return runCatching { json.decodeFromString(ListSerializer(PlayerProfile.serializer()), playersFile.readText()) }.getOrDefault(emptyList())
+            .map { if (it.firstName.isBlank() && it.lastName.isBlank() && it.nickname.isBlank()) it.copy(nickname = it.name) else it }
     }
 
-    /** Chi si allena con l'allenamento dei colpi (Student.id; vuoto = nessun allievo). */
+    @Synchronized
+    fun savePlayers(list: List<PlayerProfile>) {
+        runCatching {
+            val tmp = File(app.filesDir, "players.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(PlayerProfile.serializer()), list))
+            if (!tmp.renameTo(playersFile)) {
+                playersFile.delete()
+                tmp.renameTo(playersFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio giocatori fallito", it) }
+    }
+
+    /** Domande in sospeso sui giocatori arrivati da un altro telefono con un nome che abbiamo già. */
+    private val questionsFile: File get() = File(app.filesDir, "player_questions.json")
+
+    fun loadPlayerQuestions(): List<Players.Question> =
+        runCatching { json.decodeFromString(ListSerializer(Players.Question.serializer()), questionsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun savePlayerQuestions(list: List<Players.Question>) {
+        runCatching { if (list.isEmpty()) questionsFile.delete() else questionsFile.writeText(json.encodeToString(ListSerializer(Players.Question.serializer()), list)) }
+    }
+
+    /**
+     * Riscrive le partite salvate (storico e sospese): i posti con un identificativo in [from] passano a [to]; con
+     * [onlyMatches] solo quelle partite (per separare un omonimo). Restituisce quante partite sono cambiate.
+     */
+    @Synchronized
+    fun remapPlayer(from: Set<String>, to: String, onlyMatches: Set<String>? = null): Int {
+        var changed = 0
+        fun fix(rec: MatchRecord, save: (MatchRecord) -> Unit) {
+            if (onlyMatches != null && rec.id !in onlyMatches) return
+            var su = rec.setup
+            for (slot in Players.slots(su)) if (slot.id in from) su = Players.withId(su, slot, to)
+            if (su != rec.setup) {
+                save(rec.copy(setup = su))
+                changed++
+            }
+        }
+        loadFinished().forEach { fix(it, ::saveFinished) }
+        matchesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+            .forEach { fix(it, ::saveMatch) }
+        return changed
+    }
+
+    /**
+     * Dà un giocatore del database a ogni nome scritto nelle partite salvate (storico e sospese) che non lo ha ancora:
+     * al primo avvio tutte, poi solo quelle arrivate da versioni vecchie. Dalla più vecchia, così lo stesso nome è
+     * sempre la stessa persona; con due giocatori dello stesso nome (omonimi) quel posto resta col solo nome.
+     * Restituisce quante partite sono cambiate.
+     */
+    @Synchronized
+    fun assignPlayerIds(now: Long = System.currentTimeMillis()): Int {
+        var players = loadPlayers()
+        var changed = 0
+        fun fix(rec: MatchRecord, save: (MatchRecord) -> Unit) {
+            // Un identificativo che è l'alias di un nostro giocatore (unito, o legato a un altro telefono) diventa il suo.
+            var canon = rec.setup
+            for (slot in Players.slots(canon)) {
+                val p = Players.byId(players, slot.id) ?: continue
+                if (p.id != slot.id) canon = Players.withId(canon, slot, p.id)
+            }
+            val (su, created) = Players.assign(canon, players, now)
+            if (su == rec.setup) return
+            players = players + created
+            save(rec.copy(setup = su))
+            changed++
+        }
+        val finished = loadFinished().sortedBy { it.startedAt ?: it.updatedAt }
+        val before = players.size
+        for (rec in finished) fix(rec, ::saveFinished)
+        val open = matchesDir.listFiles { f -> f.extension == "json" }.orEmpty()
+            .mapNotNull { f -> runCatching { json.decodeFromString(MatchRecord.serializer(), f.readText()) }.getOrNull() }
+        for (rec in open.sortedBy { it.startedAt ?: it.updatedAt }) fix(rec, ::saveMatch)
+        if (players.size != before) savePlayers(players)
+        return changed
+    }
+
+    /** Chi si allena con l'allenamento dei colpi (PlayerProfile.id; vuoto = nessun allievo). */
     var trainStudent: String
         get() = prefs.getString("train_student", null) ?: ""
         set(v) = prefs.edit().putString("train_student", v).apply()
@@ -11546,23 +11888,180 @@ import kotlinx.serialization.Serializable
 enum class Hand { RIGHT, LEFT }
 
 /**
- * Un allievo dell'allenatore: le sessioni di allenamento dei colpi gli vanno assegnate all'avvio. Il nome è lo stesso
- * delle partite (foto, storico e rating si ritrovano da lì).
+ * Un giocatore del database: chi gioca le partite e chi si allena. Ha un identificativo casuale (UUID) che resta lo
+ * stesso su ogni telefono, così le partite passate da un telefono all'altro restano sue anche con un omonimo. Gli
+ * allievi dell'allenatore sono giocatori con [student].
  */
 @Serializable
-data class Student(
+data class PlayerProfile(
     val id: String,
+    /** Come lo si chiama in partita, sul tabellone e nelle statistiche: il soprannome, o "Nome Cognome" (vedi [display]). */
     val name: String,
+    /** Nome e cognome: obbligatori per un giocatore nuovo; vuoti nei giocatori nati dallo storico (da completare). */
+    val firstName: String = "",
+    val lastName: String = "",
+    /** Soprannome facoltativo: se c'è, è il nome che si vede. */
+    val nickname: String = "",
     val hand: Hand? = null,
     val note: String = "",
     val createdAt: Long = 0,
     /** La sua racchetta (Racket.id): va con le sue sessioni di allenamento, com'era quel giorno. */
     val racket: String? = null,
-)
+    /** Allievo dell'allenatore: compare in Allenati › Allievi e si sceglie in "Chi si allena". */
+    val student: Boolean = false,
+    /** Altri identificativi che sono lui: lo stesso giocatore creato su un altro telefono, o unito a questo. */
+    val aliases: Set<String> = emptySet(),
+) {
+    /** Nome e cognome, per esteso. */
+    val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")
+
+    /** Ha nome e cognome (quelli nati dallo storico ne hanno uno solo finché non li si completa). */
+    val complete: Boolean get() = firstName.isNotBlank() && lastName.isNotBlank()
+
+    companion object {
+        /** Il nome che si vede: il soprannome se c'è, altrimenti nome e cognome. */
+        fun display(first: String, last: String, nick: String): String =
+            nick.trim().ifEmpty { listOf(first.trim(), last.trim()).filter { it.isNotEmpty() }.joinToString(" ") }
+    }
+}
+
+object Players {
+    fun newId(): String = java.util.UUID.randomUUID().toString()
+
+    /** Il giocatore di un identificativo, anche se è uno dei suoi alias. */
+    fun byId(players: List<PlayerProfile>, id: String): PlayerProfile? =
+        if (id.isEmpty()) null else players.firstOrNull { it.id == id } ?: players.firstOrNull { id in it.aliases }
+
+    /**
+     * I giocatori che si chiamano così: per il nome che si vede, il soprannome o nome e cognome (maiuscole e spazi non
+     * contano).
+     */
+    fun byName(players: List<PlayerProfile>, name: String): List<PlayerProfile> {
+        val k = PlayerStats.key(name)
+        if (k.isEmpty()) return emptyList()
+        return players.filter { p -> listOf(p.name, p.nickname, p.fullName).any { it.isNotBlank() && PlayerStats.key(it) == k } }
+    }
+
+    /** Omonimi veri: stesso nome e cognome (esclusi [except]). */
+    fun sameFullName(players: List<PlayerProfile>, first: String, last: String, except: String? = null): List<PlayerProfile> {
+        val k = PlayerStats.key("$first $last")
+        return players.filter { it.id != except && it.complete && PlayerStats.key(it.fullName) == k }
+    }
+
+    /** Senza accenti e in minuscolo, per cercare. */
+    fun fold(s: String): String = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "").lowercase().trim()
+
+    /** Giocatori che corrispondono a quello che si sta scrivendo: prima chi inizia così, poi chi lo contiene. */
+    fun search(players: List<PlayerProfile>, text: String): List<PlayerProfile> {
+        val q = fold(text)
+        if (q.isEmpty()) return emptyList()
+        fun texts(p: PlayerProfile) = listOf(p.name, p.nickname, p.fullName, p.lastName).filter { it.isNotBlank() }.map(::fold)
+        val hits = players.filter { p -> texts(p).any { it.contains(q) } }
+        return hits.sortedWith(compareBy<PlayerProfile> { p -> texts(p).none { it.startsWith(q) } }.thenBy { it.name.lowercase() })
+    }
+
+    /** I posti di una partita: lato, secondo del doppio, nome scritto e identificativo. */
+    data class Slot(val side: com.tennis.scoremanager.model.Side, val second: Boolean, val name: String, val id: String, val fromNext: Boolean = false)
+
+    fun slots(su: SetupData): List<Slot> = buildList {
+        add(Slot(com.tennis.scoremanager.model.Side.P1, false, su.p1a, su.p1aId))
+        add(Slot(com.tennis.scoremanager.model.Side.P2, false, su.p2a, su.p2aId))
+        if (su.doubles) {
+            add(Slot(com.tennis.scoremanager.model.Side.P1, true, su.p1b, su.p1bId))
+            add(Slot(com.tennis.scoremanager.model.Side.P2, true, su.p2b, su.p2bId))
+        }
+    }
+
+    fun withId(su: SetupData, slot: Slot, id: String): SetupData = when {
+        slot.side == com.tennis.scoremanager.model.Side.P1 && !slot.second -> su.copy(p1aId = id)
+        slot.side == com.tennis.scoremanager.model.Side.P1 -> su.copy(p1bId = id)
+        !slot.second -> su.copy(p2aId = id)
+        else -> su.copy(p2bId = id)
+    }
+
+    /**
+     * Dà un giocatore a ogni nome scritto senza identificativo: quello del database con quel nome se è uno solo, uno
+     * nuovo se non c'è. Con più giocatori di quel nome (omonimi) il posto resta col solo nome: lo si sceglie a mano.
+     * Restituisce la partita aggiornata e i giocatori nuovi da salvare.
+     */
+    fun assign(su: SetupData, players: List<PlayerProfile>, now: Long): Pair<SetupData, List<PlayerProfile>> {
+        var out = su
+        val created = ArrayList<PlayerProfile>()
+        for (slot in slots(su)) {
+            if (slot.id.isNotEmpty() || slot.name.isBlank()) continue
+            val same = byName(players + created, slot.name)
+            val id = when (same.size) {
+                0 -> PlayerProfile(newId(), slot.name.trim(), nickname = slot.name.trim(), createdAt = now).also { created += it }.id
+                1 -> same[0].id
+                else -> continue
+            }
+            out = withId(out, slot, id)
+        }
+        return out to created
+    }
+
+    /**
+     * Una domanda all'arrivo di partite da un altro telefono: il giocatore [incomingId] si chiama come uno o più dei
+     * nostri ([candidates]). È lo stesso (lo si lega) o un'altra persona (lo si aggiunge col suo identificativo)?
+     */
+    @Serializable
+    data class Question(val incomingId: String, val name: String, val candidates: List<String>)
+
+    /**
+     * Una partita arrivata da un altro telefono: ogni posto prende il nostro identificativo se il giocatore lo
+     * conosciamo (anche come alias); un giocatore che non conosciamo diventa nostro col suo identificativo, così i due
+     * telefoni restano allineati, a meno che non ci sia già qualcuno col suo nome: allora resta così e si chiede.
+     * I posti senza identificativo (versioni vecchie) li sistema poi [assign]. Restituisce la partita, i giocatori nuovi
+     * e le domande.
+     */
+    fun resolveIncoming(su: SetupData, players: List<PlayerProfile>, now: Long): Triple<SetupData, List<PlayerProfile>, List<Question>> {
+        var out = su
+        val created = ArrayList<PlayerProfile>()
+        val questions = ArrayList<Question>()
+        for (slot in slots(su)) {
+            if (slot.id.isEmpty() || slot.name.isBlank()) continue
+            val known = byId(players + created, slot.id)
+            if (known != null) {
+                if (known.id != slot.id) out = withId(out, slot, known.id)
+                continue
+            }
+            val same = byName(players, slot.name)
+            if (same.isEmpty()) created += PlayerProfile(slot.id, slot.name.trim(), nickname = slot.name.trim(), createdAt = now)
+            else if (questions.none { it.incomingId == slot.id }) questions += Question(slot.id, slot.name.trim(), same.map { it.id })
+        }
+        return Triple(out, created, questions)
+    }
+
+    /**
+     * Completa i nostri giocatori con le schede arrivate da un altro telefono (per identificativo o alias): nome,
+     * cognome, soprannome e mano solo dove da noi mancano; gli alias si aggiungono.
+     */
+    fun fillFrom(players: List<PlayerProfile>, info: List<PlayerProfile>): List<PlayerProfile> = players.map { p ->
+        val other = info.firstOrNull { it.id == p.id || it.id in p.aliases || p.id in it.aliases } ?: return@map p
+        val first = p.firstName.ifBlank { other.firstName }
+        val last = p.lastName.ifBlank { other.lastName }
+        // Il soprannome di chi l'ha completato vale solo se da noi il giocatore non era completo.
+        val nick = if (p.complete) p.nickname else other.nickname.ifBlank { if (other.complete) "" else p.nickname }
+        p.copy(
+            firstName = first, lastName = last, nickname = nick, name = if (p.complete) p.name else PlayerProfile.display(first, last, nick),
+            hand = p.hand ?: other.hand, aliases = p.aliases + other.aliases + other.id - p.id,
+        )
+    }
+
+    /** Posti con un nome di più giocatori (omonimi) e senza identificativo: chi è va scelto. */
+    fun ambiguous(su: SetupData, players: List<PlayerProfile>): List<Slot> =
+        slots(su).filter { it.id.isEmpty() && it.name.isNotBlank() && byName(players, it.name).size > 1 }
+}
 
 object Students {
     /** Nome valido come cartella: senza i caratteri che i file system rifiutano. */
     fun folderName(name: String): String = name.replace(Regex("""[\\/:*?"<>|]"""), " ").replace(Regex("\\s+"), " ").trim().ifEmpty { "?" }
+
+    /** Da che parte gioca un giocatore (o uno dei suoi alias) in una partita. */
+    fun sideIn(rec: MatchRecord, p: PlayerProfile): com.tennis.scoremanager.model.Side? {
+        val keys = setOf(p.id) + p.aliases
+        return com.tennis.scoremanager.model.Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } }
+    }
 
     /** Le sessioni di un allievo ([id] null = quelle senza allievo). */
     fun sessionsOf(all: List<ServeSession>, id: String?): List<ServeSession> = all.filter { it.student == id }
@@ -14242,6 +14741,11 @@ data class TransferBundle(
     val photos: Map<String, String> = emptyMap(),
     /** Foto ricordo per id della partita (JPEG in base64). */
     val matchPhotos: Map<String, List<String>> = emptyMap(),
+    /**
+     * Le schede dei giocatori delle partite (nome, cognome, soprannome, mano, alias): chi riceve le ritrova complete.
+     * Le note dell'allenatore, la racchetta e il segno di allievo restano su chi le ha.
+     */
+    val players: List<com.tennis.scoremanager.data.PlayerProfile> = emptyList(),
 )
 
 /**
@@ -16530,6 +17034,7 @@ fun AppRoot(c: MatchController) {
                 Screen.HELP -> com.tennis.scoremanager.ui.screens.HelpScreen(c)
                 Screen.STUDENTS -> com.tennis.scoremanager.ui.screens.StudentsScreen(c)
                 Screen.STUDENT -> com.tennis.scoremanager.ui.screens.StudentScreen(c)
+                Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
             }
         }
     }
@@ -17817,8 +18322,9 @@ fun SummaryRatingCard(c: MatchController, m: LiveMatch) {
         }
         Text(s.ratingInMatch, color = TsmColors.TextDim, fontSize = 13.sp)
         for (side in Side.entries) {
-            for (name in PlayerStats.names(rec.setup, side)) {
-                val k = PlayerStats.key(name)
+            for (w in PlayerStats.whos(rec.setup, side)) {
+                val name = w.name
+                val k = w.key
                 val d = deltas[k] ?: continue
                 // Il rating subito dopo questa partita (quelle giocate dopo l'hanno già cambiato).
                 val after = table.player(k)?.history?.firstOrNull { it.first == (rec.endedAt ?: rec.startedAt ?: rec.updatedAt) }?.second
@@ -18544,44 +19050,105 @@ fun TraineeRow(c: MatchController) {
     if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.setTrainStudent(it.id) } }
 }
 
-/** Nuovo allievo o modifica: nome (lo stesso delle partite, per ritrovarne foto e storico) e mano. */
+/** Nuovo allievo o modifica di un giocatore (vedi [PlayerEditDialog]): dagli allievi nasce un allievo. */
 @Composable
-fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.Student?, onDone: (com.tennis.scoremanager.data.Student?) -> Unit) {
+fun StudentEditDialog(c: MatchController, student: com.tennis.scoremanager.data.PlayerProfile?, onDone: (com.tennis.scoremanager.data.PlayerProfile?) -> Unit) =
+    PlayerEditDialog(c, student, asStudent = true, onDone = onDone)
+
+/**
+ * Giocatore nuovo o modifica: nome e cognome obbligatori (identificano la persona), soprannome facoltativo (se c'è, è
+ * il nome che si vede in partita), mano e racchetta. Creandone uno nuovo si propongono i giocatori che ci sono già con
+ * quel nome, per non fare doppioni; [prefill] è il nome scritto in Nuova partita.
+ */
+@Composable
+fun PlayerEditDialog(
+    c: MatchController, player: com.tennis.scoremanager.data.PlayerProfile?, asStudent: Boolean = false, prefill: String = "",
+    onDone: (com.tennis.scoremanager.data.PlayerProfile?) -> Unit,
+) {
     val s = LocalStrings.current
-    var name by remember { mutableStateOf(student?.name.orEmpty()) }
-    var hand by remember { mutableStateOf(student?.hand) }
-    var racket by remember { mutableStateOf(student?.racket) }
+    // Dal nome scritto: due parole o più sono nome e cognome, una sola è il soprannome.
+    val words = prefill.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    var first by remember { mutableStateOf(player?.firstName ?: if (words.size >= 2) words.first() else "") }
+    var last by remember { mutableStateOf(player?.lastName ?: if (words.size >= 2) words.drop(1).joinToString(" ") else "") }
+    var nick by remember { mutableStateOf(player?.nickname ?: if (words.size == 1) words[0] else "") }
+    var hand by remember { mutableStateOf(player?.hand) }
+    var racket by remember { mutableStateOf(player?.racket) }
     val rackets by c.rackets.collectAsState()
+    // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
+    var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
+    val players by c.players.collectAsState()
+    @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = androidx.compose.material3.OutlinedTextField(
+        v, { onChange(it.take(40)) }, label = { Text(label) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
+    )
     AlertDialog(
         onDismissRequest = { onDone(null) },
-        title = { Text(if (student == null) s.studentNew else s.studentEdit) },
+        title = { Text(if (player != null) s.studentEdit else if (asStudent) s.studentNew else s.playerNewTitle) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                androidx.compose.material3.OutlinedTextField(
-                    name, { name = it.take(40) }, label = { Text(s.studentName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words),
-                )
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                field(first, s.playerFirstName) { first = it }
+                field(last, s.playerLastName) { last = it }
+                field(nick, s.playerNickname) { nick = it }
+                Text(s.playerNameRule, color = TsmColors.TextDim, fontSize = 12.sp)
+                if (player == null) {
+                    val q = listOf("$first $last".trim(), nick.trim(), last.trim()).firstOrNull { it.length >= 2 }.orEmpty()
+                    val hits = com.tennis.scoremanager.data.Players.search(players.filter { !asStudent || !it.student }, q).take(4)
+                    for (p in hits) {
+                        val on = existing?.id == p.id
+                        Row(
+                            Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+                                .background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh)
+                                .clickable {
+                                    existing = if (on) null else p
+                                    if (!on) {
+                                        if (p.firstName.isNotBlank()) first = p.firstName
+                                        if (p.lastName.isNotBlank()) last = p.lastName
+                                        nick = p.nickname.ifBlank { if (p.complete) "" else p.name }
+                                        hand = p.hand ?: hand; racket = p.racket ?: racket
+                                    }
+                                }
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            PlayerAvatar(c, p.name, if (on) TsmColors.OnBall else TsmColors.Ball, 28.dp)
+                            Text(
+                                " " + p.name + (p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { " ($it)" } ?: "") + (c.playerHint(p)?.let { " · $it" } ?: ""),
+                                color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                    if (hits.isNotEmpty()) Text(if (existing != null) s.studentFromExisting else s.studentPickExisting, color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+                // Un altro con lo stesso nome e cognome: si può (omonimo), ma lo si dice.
+                val twins = com.tennis.scoremanager.data.Players.sameFullName(players, first, last, except = player?.id ?: existing?.id)
+                if (first.isNotBlank() && last.isNotBlank() && twins.isNotEmpty()) Text(s.playerTwinWarning("${first.trim()} ${last.trim()}"), color = TsmColors.Orange, fontSize = 12.sp)
                 Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
                 val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
-                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
                 val choices = rackets.filter { !it.retired || it.id == racket }
-                if (choices.isEmpty()) Text(s.studentRacketNone, color = TsmColors.TextDim, fontSize = 12.sp)
-                else Segmented(
-                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
-                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
-                )
+                if (choices.isNotEmpty()) {
+                    Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Segmented(
+                        listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                        (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                    )
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = name.isNotBlank(), onClick = {
-                val st = (student ?: com.tennis.scoremanager.data.Student("st${System.currentTimeMillis()}", "", createdAt = System.currentTimeMillis()))
-                    .copy(name = name.trim(), hand = hand, racket = racket)
-                c.saveStudent(st)
+            TextButton(enabled = first.isNotBlank() && last.isNotBlank(), onClick = {
+                val base = player ?: existing
+                    ?: com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), "", createdAt = System.currentTimeMillis())
+                val p = base.copy(
+                    firstName = first.trim(), lastName = last.trim(), nickname = nick.trim(),
+                    name = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
+                    hand = hand, racket = racket, student = base.student || asStudent && player == null,
+                )
+                c.savePlayer(p)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
-                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = st.name)) }
-                onDone(st)
+                racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
+                onDone(p)
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -19739,6 +20306,39 @@ interface Strings {
     val studentPurge: String
     val studentPurgeConfirm: String
     val studentPurgeAsk: (String, Int) -> String
+    val playerLinked: (String) -> String
+    val playerHomonyms: (Int, String) -> String
+    val playerCreate: (String) -> String
+    val playerMatchesHint: (Int, String) -> String
+    val studentPickExisting: String
+    val studentFromExisting: String
+    val playerNotHim: String
+    val playerNew: (String) -> String
+    val playersTitle: String
+    val playersHint: String
+    val playersSearch: String
+    val playersNone: String
+    val playerTwin: String
+    val playerStudentToggle: String
+    val playerStudentToggleHint: String
+    val playerMerge: String
+    val playerMergeHint: String
+    val playerSplit: String
+    val questionTitle: String
+    val questionNo: String
+    val playerMergeAsk: (String, String) -> String
+    val playerSplitHint: (String) -> String
+    val playerSplitDo: (Int) -> String
+    val questionText: (String) -> String
+    val questionYes: (String) -> String
+    val playerNewTitle: String
+    val playerFirstName: String
+    val playerLastName: String
+    val playerNickname: String
+    val playerNameRule: String
+    val playerIncomplete: String
+    val playerComplete: String
+    val playerTwinWarning: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -20924,9 +21524,42 @@ object ItStrings : Strings {
     override val studentRacket = "Racchetta"
     override val studentRacketNone = "Nessuna racchetta in Le mie racchette: aggiungila da Progressi › Le mie racchette."
     override val studentRacketPick = "Scegli la sua racchetta"
-    override val studentPurge = "Cancella l'allievo e i suoi dati"
+    override val studentPurge = "Cancella il giocatore e i suoi dati"
     override val studentPurgeConfirm = "Cancella tutto"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Cancellare $name e tutti i suoi dati da questo telefono? Si cancellano le sue $n sessioni con video e analisi, le note e la foto; la racchetta resta ma non è più sua. Le partite nello storico restano (ci sono anche gli avversari). Non si può annullare." }
+    override val playerLinked: (String) -> String = { "✓ $it, dal database dei giocatori" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Ci sono $n giocatori di nome $name: tocca quello giusto o creane un altro." }
+    override val playerCreate: (String) -> String = { "Un altro $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partita, $d" else "$n partite, l'ultima $d" }
+    override val studentPickExisting = "Tocca il giocatore se è lui: le sue partite sono già nel database."
+    override val studentFromExisting = "Allievo dal database dei giocatori: con le sue partite."
+    override val playerNotHim = "Non è lui: un altro giocatore"
+    override val playerNew: (String) -> String = { "Nuovo giocatore: $it entra nel database all'inizio della partita" }
+    override val playersTitle = "Giocatori"
+    override val playersHint = "Tutti i giocatori delle partite e gli allievi: unisci chi è scritto in due modi, separa gli omonimi"
+    override val playersSearch = "Cerca"
+    override val playersNone = "Ancora nessun giocatore: si aggiungono da soli con le partite."
+    override val playerTwin = "omonimo"
+    override val playerStudentToggle = "Allievo"
+    override val playerStudentToggleHint = "Compare in Allenati › Allievi e in Chi si allena"
+    override val playerMerge = "Unisci con un altro giocatore"
+    override val playerMergeHint = "La stessa persona scritta in due modi o creata due volte: le sue partite e sessioni passano a questo giocatore."
+    override val playerSplit = "Separa un omonimo"
+    override val questionTitle = "Chi è?"
+    override val questionNo = "No, un'altra persona"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Unire $a a $b? Le partite e le sessioni di $a diventano di $b. Non si può annullare." }
+    override val playerSplitHint: (String) -> String = { "Spunta le partite che sono di un'altra persona di nome $it: diventeranno di un giocatore nuovo." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Sposta 1 partita" else "Sposta $n partite" }
+    override val questionText: (String) -> String = { "$it arriva da un altro telefono insieme alle partite. È uno dei tuoi?" }
+    override val questionYes: (String) -> String = { "Sì, è $it" }
+    override val playerNewTitle = "Nuovo giocatore"
+    override val playerFirstName = "Nome *"
+    override val playerLastName = "Cognome *"
+    override val playerNickname = "Soprannome (facoltativo)"
+    override val playerNameRule = "Nome e cognome sono obbligatori. In partita, sul tabellone e nella voce si usa il soprannome se c'è, sennò nome e cognome."
+    override val playerIncomplete = "da completare"
+    override val playerComplete = "Completa nome e cognome"
+    override val playerTwinWarning: (String) -> String = { "C'è già un $it: se è lui sceglilo sopra, se è un'altra persona va bene così." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -22095,9 +22728,42 @@ object EnStrings : Strings {
     override val studentRacket = "Racket"
     override val studentRacketNone = "No racket in My rackets yet: add it from Progress › My rackets."
     override val studentRacketPick = "Pick their racket"
-    override val studentPurge = "Delete student and their data"
+    override val studentPurge = "Delete player and their data"
     override val studentPurgeConfirm = "Delete everything"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Delete $name and all their data from this phone? Their $n sessions with videos and analysis, the notes and the photo are deleted; the racket stays but is no longer theirs. Matches in the history stay (the opponents are in them too). This cannot be undone." }
+    override val playerLinked: (String) -> String = { "✓ $it, from the players database" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "There are $n players called $name: tap the right one or create another." }
+    override val playerCreate: (String) -> String = { "Another $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matches, last $d" }
+    override val studentPickExisting = "Tap the player if it's them: their matches are already in the database."
+    override val studentFromExisting = "Student from the players database: with their matches."
+    override val playerNotHim = "Not them: another player"
+    override val playerNew: (String) -> String = { "New player: $it joins the database when the match starts" }
+    override val playersTitle = "Players"
+    override val playersHint = "Everyone from the matches and the students: merge those written two ways, split homonyms"
+    override val playersSearch = "Search"
+    override val playersNone = "No players yet: they add themselves with the matches."
+    override val playerTwin = "same name"
+    override val playerStudentToggle = "Student"
+    override val playerStudentToggleHint = "Shows in Practice › Students and in Who is practising"
+    override val playerMerge = "Merge with another player"
+    override val playerMergeHint = "The same person written two ways or created twice: their matches and sessions move to this player."
+    override val playerSplit = "Split a homonym"
+    override val questionTitle = "Who is it?"
+    override val questionNo = "No, someone else"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Merge $a into $b? The matches and sessions of $a become $b's. This cannot be undone." }
+    override val playerSplitHint: (String) -> String = { "Tick the matches that belong to another person called $it: they will go to a new player." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Move 1 match" else "Move $n matches" }
+    override val questionText: (String) -> String = { "$it comes from another phone with the matches. Is it one of yours?" }
+    override val questionYes: (String) -> String = { "Yes, it's $it" }
+    override val playerNewTitle = "New player"
+    override val playerFirstName = "First name *"
+    override val playerLastName = "Last name *"
+    override val playerNickname = "Nickname (optional)"
+    override val playerNameRule = "First and last name are required. In the match, on the scoreboard and in the voice the nickname is used if there is one, otherwise first and last name."
+    override val playerIncomplete = "to complete"
+    override val playerComplete = "Complete first and last name"
+    override val playerTwinWarning: (String) -> String = { "There is already a $it: if it's them pick them above, if it's someone else that's fine." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -23289,9 +23955,42 @@ object DeStrings : Strings {
     override val studentRacket = "Schläger"
     override val studentRacketNone = "Noch kein Schläger in Meine Schläger: unter Fortschritt › Meine Schläger hinzufügen."
     override val studentRacketPick = "Seinen Schläger wählen"
-    override val studentPurge = "Schüler und seine Daten löschen"
+    override val studentPurge = "Spieler und seine Daten löschen"
     override val studentPurgeConfirm = "Alles löschen"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "$name und alle seine Daten von diesem Telefon löschen? Gelöscht werden seine $n Einheiten mit Videos und Analyse, die Notizen und das Foto; der Schläger bleibt, gehört aber nicht mehr ihm. Die Matches im Verlauf bleiben (die Gegner sind auch darin). Das lässt sich nicht rückgängig machen." }
+    override val playerLinked: (String) -> String = { "✓ $it, aus der Spielerdatenbank" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Es gibt $n Spieler namens $name: tippe den richtigen an oder lege einen neuen an." }
+    override val playerCreate: (String) -> String = { "Ein anderer $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 Match, $d" else "$n Matches, zuletzt $d" }
+    override val studentPickExisting = "Tippe den Spieler an, wenn er es ist: seine Matches sind schon in der Datenbank."
+    override val studentFromExisting = "Schüler aus der Spielerdatenbank: mit seinen Matches."
+    override val playerNotHim = "Nicht er: ein anderer Spieler"
+    override val playerNew: (String) -> String = { "Neuer Spieler: $it kommt beim Matchbeginn in die Datenbank" }
+    override val playersTitle = "Spieler"
+    override val playersHint = "Alle Spieler aus den Matches und die Schüler: zweimal geschriebene zusammenführen, Namensvettern trennen"
+    override val playersSearch = "Suchen"
+    override val playersNone = "Noch keine Spieler: sie kommen mit den Matches von selbst dazu."
+    override val playerTwin = "gleicher Name"
+    override val playerStudentToggle = "Schüler"
+    override val playerStudentToggleHint = "Erscheint unter Trainieren › Schüler und bei Wer trainiert"
+    override val playerMerge = "Mit einem anderen Spieler zusammenführen"
+    override val playerMergeHint = "Dieselbe Person auf zwei Arten geschrieben oder zweimal angelegt: ihre Matches und Einheiten gehen auf diesen Spieler über."
+    override val playerSplit = "Namensvetter trennen"
+    override val questionTitle = "Wer ist das?"
+    override val questionNo = "Nein, eine andere Person"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "$a mit $b zusammenführen? Die Matches und Einheiten von $a gehören dann $b. Das lässt sich nicht rückgängig machen." }
+    override val playerSplitHint: (String) -> String = { "Hake die Matches einer anderen Person namens $it an: sie gehen an einen neuen Spieler." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "1 Match verschieben" else "$n Matches verschieben" }
+    override val questionText: (String) -> String = { "$it kommt mit den Matches von einem anderen Telefon. Ist das einer von deinen?" }
+    override val questionYes: (String) -> String = { "Ja, das ist $it" }
+    override val playerNewTitle = "Neuer Spieler"
+    override val playerFirstName = "Vorname *"
+    override val playerLastName = "Nachname *"
+    override val playerNickname = "Spitzname (freiwillig)"
+    override val playerNameRule = "Vor- und Nachname sind Pflicht. Im Match, auf der Anzeigetafel und in der Ansage wird der Spitzname verwendet, wenn es einen gibt, sonst Vor- und Nachname."
+    override val playerIncomplete = "unvollständig"
+    override val playerComplete = "Vor- und Nachname ergänzen"
+    override val playerTwinWarning: (String) -> String = { "Es gibt schon einen $it: wenn er es ist, wähle ihn oben; wenn es eine andere Person ist, passt es so." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -24476,9 +25175,42 @@ object EsStrings : Strings {
     override val studentRacket = "Raqueta"
     override val studentRacketNone = "No hay raquetas en Mis raquetas: añádela desde Progresos › Mis raquetas."
     override val studentRacketPick = "Elegir su raqueta"
-    override val studentPurge = "Borrar alumno y sus datos"
+    override val studentPurge = "Borrar jugador y sus datos"
     override val studentPurgeConfirm = "Borrar todo"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "¿Borrar a $name y todos sus datos de este teléfono? Se borran sus $n sesiones con vídeos y análisis, las notas y la foto; la raqueta se queda pero ya no es suya. Los partidos del historial se quedan (también están los rivales). No se puede deshacer." }
+    override val playerLinked: (String) -> String = { "✓ $it, de la base de jugadores" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Hay $n jugadores llamados $name: toca el correcto o crea otro." }
+    override val playerCreate: (String) -> String = { "Otro $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partido, $d" else "$n partidos, el último $d" }
+    override val studentPickExisting = "Toca al jugador si es él: sus partidos ya están en la base."
+    override val studentFromExisting = "Alumno de la base de jugadores: con sus partidos."
+    override val playerNotHim = "No es él: otro jugador"
+    override val playerNew: (String) -> String = { "Jugador nuevo: $it entra en la base al empezar el partido" }
+    override val playersTitle = "Jugadores"
+    override val playersHint = "Todos los jugadores de los partidos y los alumnos: une a quien está escrito de dos formas, separa a los homónimos"
+    override val playersSearch = "Buscar"
+    override val playersNone = "Todavía no hay jugadores: se añaden solos con los partidos."
+    override val playerTwin = "homónimo"
+    override val playerStudentToggle = "Alumno"
+    override val playerStudentToggleHint = "Aparece en Entrenar › Alumnos y en Quién entrena"
+    override val playerMerge = "Unir con otro jugador"
+    override val playerMergeHint = "La misma persona escrita de dos formas o creada dos veces: sus partidos y sesiones pasan a este jugador."
+    override val playerSplit = "Separar un homónimo"
+    override val questionTitle = "¿Quién es?"
+    override val questionNo = "No, otra persona"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "¿Unir $a a $b? Los partidos y sesiones de $a pasan a ser de $b. No se puede deshacer." }
+    override val playerSplitHint: (String) -> String = { "Marca los partidos de otra persona llamada $it: pasarán a un jugador nuevo." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Mover 1 partido" else "Mover $n partidos" }
+    override val questionText: (String) -> String = { "$it llega de otro teléfono con los partidos. ¿Es uno de los tuyos?" }
+    override val questionYes: (String) -> String = { "Sí, es $it" }
+    override val playerNewTitle = "Jugador nuevo"
+    override val playerFirstName = "Nombre *"
+    override val playerLastName = "Apellido *"
+    override val playerNickname = "Apodo (opcional)"
+    override val playerNameRule = "Nombre y apellido son obligatorios. En el partido, en el marcador y en la voz se usa el apodo si lo hay, si no nombre y apellido."
+    override val playerIncomplete = "por completar"
+    override val playerComplete = "Completar nombre y apellido"
+    override val playerTwinWarning: (String) -> String = { "Ya hay un $it: si es él elígelo arriba; si es otra persona, está bien así." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -25665,9 +26397,42 @@ object FrStrings : Strings {
     override val studentRacket = "Raquette"
     override val studentRacketNone = "Aucune raquette dans Mes raquettes : ajoutez-la depuis Progrès › Mes raquettes."
     override val studentRacketPick = "Choisir sa raquette"
-    override val studentPurge = "Supprimer l'élève et ses données"
+    override val studentPurge = "Supprimer le joueur et ses données"
     override val studentPurgeConfirm = "Tout supprimer"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Supprimer $name et toutes ses données de ce téléphone ? Ses $n séances avec vidéos et analyse, les notes et la photo sont supprimées ; la raquette reste mais n'est plus la sienne. Les matchs de l'historique restent (les adversaires y sont aussi). C'est définitif." }
+    override val playerLinked: (String) -> String = { "✓ $it, de la base des joueurs" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Il y a $n joueurs nommés $name : touchez le bon ou créez-en un autre." }
+    override val playerCreate: (String) -> String = { "Un autre $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matchs, dernier le $d" }
+    override val studentPickExisting = "Touchez le joueur si c'est lui : ses matchs sont déjà dans la base."
+    override val studentFromExisting = "Élève tiré de la base des joueurs : avec ses matchs."
+    override val playerNotHim = "Ce n'est pas lui : un autre joueur"
+    override val playerNew: (String) -> String = { "Nouveau joueur : $it entre dans la base au début du match" }
+    override val playersTitle = "Joueurs"
+    override val playersHint = "Tous les joueurs des matchs et les élèves : fusionnez ceux écrits de deux façons, séparez les homonymes"
+    override val playersSearch = "Chercher"
+    override val playersNone = "Pas encore de joueurs : ils s'ajoutent tout seuls avec les matchs."
+    override val playerTwin = "homonyme"
+    override val playerStudentToggle = "Élève"
+    override val playerStudentToggleHint = "Apparaît dans S'entraîner › Élèves et dans Qui s'entraîne"
+    override val playerMerge = "Fusionner avec un autre joueur"
+    override val playerMergeHint = "La même personne écrite de deux façons ou créée deux fois : ses matchs et séances passent à ce joueur."
+    override val playerSplit = "Séparer un homonyme"
+    override val questionTitle = "Qui est-ce ?"
+    override val questionNo = "Non, une autre personne"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Fusionner $a avec $b ? Les matchs et séances de $a deviennent ceux de $b. C'est définitif." }
+    override val playerSplitHint: (String) -> String = { "Cochez les matchs d'une autre personne nommée $it : ils iront à un nouveau joueur." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Déplacer 1 match" else "Déplacer $n matchs" }
+    override val questionText: (String) -> String = { "$it arrive d'un autre téléphone avec les matchs. Est-ce l'un des vôtres ?" }
+    override val questionYes: (String) -> String = { "Oui, c'est $it" }
+    override val playerNewTitle = "Nouveau joueur"
+    override val playerFirstName = "Prénom *"
+    override val playerLastName = "Nom *"
+    override val playerNickname = "Surnom (facultatif)"
+    override val playerNameRule = "Prénom et nom sont obligatoires. Dans le match, sur le tableau et dans la voix on utilise le surnom s'il y en a un, sinon prénom et nom."
+    override val playerIncomplete = "à compléter"
+    override val playerComplete = "Compléter prénom et nom"
+    override val playerTwinWarning: (String) -> String = { "Il y a déjà un $it : si c'est lui choisissez-le au-dessus, si c'est une autre personne c'est bon." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -26855,9 +27620,42 @@ object PtStrings : Strings {
     override val studentRacket = "Raquete"
     override val studentRacketNone = "Ainda não há raquetes em As minhas raquetes: adicione em Progresso › As minhas raquetes."
     override val studentRacketPick = "Escolher a raquete dele"
-    override val studentPurge = "Apagar aluno e os dados dele"
+    override val studentPurge = "Apagar jogador e os dados dele"
     override val studentPurgeConfirm = "Apagar tudo"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Apagar $name e todos os dados dele deste telefone? Apagam-se as $n sessões com vídeos e análise, as notas e a foto; a raquete fica, mas não é mais dele. As partidas do histórico ficam (os adversários também estão nelas). Não dá para desfazer." }
+    override val playerLinked: (String) -> String = { "✓ $it, do banco de jogadores" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Há $n jogadores chamados $name: toque no certo ou crie outro." }
+    override val playerCreate: (String) -> String = { "Outro $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partida, $d" else "$n partidas, a última em $d" }
+    override val studentPickExisting = "Toque no jogador se for ele: as partidas dele já estão no banco."
+    override val studentFromExisting = "Aluno do banco de jogadores: com as partidas dele."
+    override val playerNotHim = "Não é ele: outro jogador"
+    override val playerNew: (String) -> String = { "Jogador novo: $it entra no banco no início da partida" }
+    override val playersTitle = "Jogadores"
+    override val playersHint = "Todos os jogadores das partidas e os alunos: junte quem está escrito de dois jeitos, separe os homônimos"
+    override val playersSearch = "Pesquisar"
+    override val playersNone = "Ainda não há jogadores: entram sozinhos com as partidas."
+    override val playerTwin = "homônimo"
+    override val playerStudentToggle = "Aluno"
+    override val playerStudentToggleHint = "Aparece em Treinar › Alunos e em Quem treina"
+    override val playerMerge = "Juntar com outro jogador"
+    override val playerMergeHint = "A mesma pessoa escrita de dois jeitos ou criada duas vezes: as partidas e sessões passam para este jogador."
+    override val playerSplit = "Separar um homônimo"
+    override val questionTitle = "Quem é?"
+    override val questionNo = "Não, outra pessoa"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Juntar $a com $b? As partidas e sessões de $a passam a ser de $b. Não dá para desfazer." }
+    override val playerSplitHint: (String) -> String = { "Marque as partidas de outra pessoa chamada $it: vão para um jogador novo." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Mover 1 partida" else "Mover $n partidas" }
+    override val questionText: (String) -> String = { "$it chega de outro telefone com as partidas. É um dos seus?" }
+    override val questionYes: (String) -> String = { "Sim, é $it" }
+    override val playerNewTitle = "Jogador novo"
+    override val playerFirstName = "Nome *"
+    override val playerLastName = "Sobrenome *"
+    override val playerNickname = "Apelido (opcional)"
+    override val playerNameRule = "Nome e sobrenome são obrigatórios. Na partida, no placar e na voz usa-se o apelido se houver, senão nome e sobrenome."
+    override val playerIncomplete = "a completar"
+    override val playerComplete = "Completar nome e sobrenome"
+    override val playerTwinWarning: (String) -> String = { "Já existe um $it: se for ele escolha acima; se for outra pessoa, tudo bem." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -28008,6 +28806,9 @@ fun HomeScreen(c: MatchController) {
     val tab by c.homeTab.collectAsState()
     val history by c.history.collectAsState()
     val saved by c.saved.collectAsState()
+    // Partite arrivate da un altro telefono con un giocatore che si chiama come uno dei nostri: è lui?
+    val questions by c.playerQuestions.collectAsState()
+    questions.firstOrNull()?.let { PlayerQuestionDialog(c, it) }
     // Prima accensione: le tre domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
     var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     var asked by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
@@ -28179,7 +28980,7 @@ private fun ProgressTab(c: MatchController) {
     val history by c.history.collectAsState()
     val me = c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(PlayerStats.key(me)) }
+        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.keyForName(me)) }
     }
     Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
@@ -28219,6 +29020,7 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     val me = c.storage.myName
     Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) { profile = true }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
     Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
@@ -28227,6 +29029,32 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
     // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
     AboutFooter()
+}
+
+/** Una domanda alla volta: il giocatore arrivato è uno dei nostri con quel nome, o un'altra persona? */
+@Composable
+private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.data.Players.Question) {
+    val s = LocalStrings.current
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = {},
+        title = { Text(s.questionTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.questionText(q.name))
+                for (id in q.candidates) {
+                    val p = c.playerById(id) ?: continue
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.answerPlayerQuestion(q, p.id) }.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                        Text(" " + s.questionYes(p.name) + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                    }
+                }
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
+    )
 }
 TSM_EOF
 
@@ -30390,6 +31218,95 @@ fun CourtDiagram(p1Left: Boolean, server: Side, names: Names, s: Strings) {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/PlayersScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/PlayersScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Players
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.TsmColors
+
+/**
+ * Altro › Giocatori: il database di tutti, chi ha giocato e gli allievi, con la ricerca. Dalla scheda di ciascuno si
+ * uniscono due giocatori che sono la stessa persona e si separano gli omonimi.
+ */
+@Composable
+fun PlayersScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val players by c.players.collectAsState()
+    val history by c.history.collectAsState()
+    var query by rememberSaveable { mutableStateOf("") }
+    val list = if (query.isBlank()) players else Players.search(players, query)
+    // Gli omonimi si vedono subito: stesso nome, più giocatori.
+    val twins = remember(players) { players.groupBy { com.tennis.scoremanager.data.PlayerStats.key(it.name) }.filterValues { it.size > 1 }.keys }
+    val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
+    ScreenScaffold(
+        title = s.playersTitle,
+        subtitle = s.playersHint,
+        icon = Icons.Filled.Groups,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+        if (players.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim)
+        for (p in list) {
+            Row(Modifier.fillMaxWidth().clickable { c.openStudent(p.id) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                PlayerAvatar(c, p.name, TsmColors.Ball, 44.dp)
+                Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        if (p.student) Icon(Icons.Filled.School, s.studentsTitle, tint = TsmColors.Ball, modifier = Modifier.padding(start = 6.dp).size(16.dp))
+                    }
+                    // Nome e cognome per esteso sotto il soprannome; da completare in arancione.
+                    p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { Text(it, color = TsmColors.TextDim, fontSize = 13.sp) }
+                    val warn = !p.complete || com.tennis.scoremanager.data.PlayerStats.key(p.name) in twins
+                    val hint = listOfNotNull(
+                        hints[p.id], s.playerTwin.takeIf { com.tennis.scoremanager.data.PlayerStats.key(p.name) in twins }, s.playerIncomplete.takeIf { !p.complete },
+                    ).joinToString(" · ")
+                    if (hint.isNotEmpty()) Text(hint, color = if (warn) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+            }
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/ProgressScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/ProgressScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -30474,7 +31391,7 @@ fun ProgressScreen(c: MatchController) {
     val players = remember(history) { c.progressPlayers() }
     var player by rememberSaveable { mutableStateOf<String?>(null) }
     // Si parte da chi usa l'app (Altro › Tu), se ha partite; altrimenti dal giocatore con più partite.
-    val me = PlayerStats.key(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
+    val me = c.keyForName(c.storage.myName).takeIf { k -> k.isNotEmpty() && players.any { it.first == k } }
     val key = if (matches) (player ?: me ?: players.firstOrNull()?.first) else null
     // Filtri e spunte valgono per la scheda e il giocatore scelti: cambiandoli si riparte da tutto.
     var filter by remember(matches, key) { mutableStateOf(ProgressFilter()) }
@@ -31276,6 +32193,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -31301,6 +32221,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31348,13 +32269,29 @@ fun SetupScreen(c: MatchController) {
     val context = LocalContext.current
     // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
     androidx.activity.compose.BackHandler { c.back() }
+    // Un nome che nel database non c'è: prima di andare avanti si chiedono nome e cognome (il soprannome è quello scritto).
+    val creating by c.playerToCreate.collectAsState()
+    fun missing(setup: SetupData) = com.tennis.scoremanager.data.Players.slots(setup)
+        .firstOrNull { it.name.isNotBlank() && it.id.isEmpty() && com.tennis.scoremanager.data.Players.byName(c.players.value, it.name).isEmpty() }
+    creating?.let { slot ->
+        com.tennis.scoremanager.ui.PlayerEditDialog(c, null, prefill = slot.name) { p ->
+            c.playerToCreate.value = null
+            if (p != null) {
+                c.updateSetup { it.withPlayer(c, slot.side, slot.second, p.name, p.id) }
+                // Il prossimo nome nuovo, o avanti.
+                if (slot.fromNext) missing(c.setup.value)?.let { c.playerToCreate.value = it.copy(fromNext = true) } ?: c.go(Screen.OPTIONS)
+            }
+        }
+    }
     ScreenScaffold(
         title = s.setupTitle,
         subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
+            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, {
+                missing(su)?.let { c.playerToCreate.value = it.copy(fromNext = true) } ?: c.go(Screen.OPTIONS)
+            }, Modifier.weight(1f))
         },
         // Svuota i campi: in alto accanto al titolo, così in basso restano solo Indietro e Avanti.
         action = {
@@ -31372,7 +32309,7 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        val recent = remember(c.history.collectAsState().value) { c.progressPlayers().map { it.second }.take(8) }
+        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progressPlayers().take(12) }
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
@@ -31429,7 +32366,7 @@ internal fun AboutFooter() {
 }
 
 @Composable
-private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<String> = emptyList()) {
+private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<Pair<String, String>> = emptyList()) {
     val s = LocalStrings.current
     val accent = TsmColors.player(side)
     val title = if (side == Side.P1) s.player1 else s.player2
@@ -31442,15 +32379,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
             EditablePlayerAvatar(c, a, accent, 52.dp)
             Box(Modifier.weight(1f)) {
                 Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
-                    c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+                    c.updateSetup { it.withPlayer(c, side, false, v, null) }
                 }
             }
         }
-        // Giocatori recenti (dallo storico): un tocco e il nome è scritto. Solo quelli non già in campo.
-        val inUse = listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet()
-        RecentNames(recent.filter { PlayerStats.key(it) !in inUse }, accent) { n ->
-            c.updateSetup { if (side == Side.P1) it.copy(p1a = n) else it.copy(p2a = n) }
-        }
+        PlayerChoices(c, su, side, false, recent, accent)
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
@@ -31468,13 +32401,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
                 EditablePlayerAvatar(c, b, accent, 52.dp)
                 Box(Modifier.weight(1f)) {
                     Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
-                        c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+                        c.updateSetup { it.withPlayer(c, side, true, v, null) }
                     }
                 }
             }
-            RecentNames(recent.filter { PlayerStats.key(it) !in listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet() }, accent) { n ->
-                c.updateSetup { if (side == Side.P1) it.copy(p1b = n) else it.copy(p2b = n) }
-            }
+            PlayerChoices(c, su, side, true, recent, accent)
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
@@ -31485,17 +32416,89 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
     }
 }
 
-/** Nomi dei giocatori recenti da toccare per scriverli nel campo (al massimo una riga che va a capo). */
+/**
+ * Il nome di un posto in campo, col giocatore del database se lo si è scelto ([id]). Scritto a mano resta di quel
+ * giocatore solo finché è ancora il suo nome.
+ */
+private fun SetupData.withPlayer(c: MatchController, side: Side, second: Boolean, name: String, id: String?): SetupData {
+    val cur = when { side == Side.P1 && !second -> p1aId; side == Side.P1 -> p1bId; !second -> p2aId; else -> p2bId }
+    val keep = id ?: cur.takeIf { c.playerById(it)?.let { p -> PlayerStats.key(p.name) == PlayerStats.key(name) } == true }.orEmpty()
+    return when {
+        side == Side.P1 && !second -> copy(p1a = name, p1aId = keep)
+        side == Side.P1 -> copy(p1b = name, p1bId = keep)
+        !second -> copy(p2a = name, p2aId = keep)
+        else -> copy(p2b = name, p2bId = keep)
+    }
+}
+
+/**
+ * Sotto il nome: mentre si scrive, i giocatori del database che corrispondono (un tocco e la partita è di quella
+ * persona); a campo vuoto, i giocatori recenti. Se ci sono più giocatori con quel nome (omonimi) bisogna sceglierne
+ * uno o crearne uno nuovo; se il nome non c'è, il giocatore si crea da solo all'inizio della partita.
+ */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun RecentNames(names: List<String>, accent: Color, onPick: (String) -> Unit) {
-    if (names.isEmpty()) return
-    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        for (n in names.take(6)) {
-            Text(
-                n, color = accent, fontSize = 13.sp,
-                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { onPick(n) }.padding(horizontal = 10.dp, vertical = 6.dp),
-            )
+private fun PlayerChoices(c: MatchController, su: SetupData, side: Side, second: Boolean, recent: List<Pair<String, String>>, accent: Color) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    val name = when { side == Side.P1 && !second -> su.p1a; side == Side.P1 -> su.p1b; !second -> su.p2a; else -> su.p2b }
+    val id = when { side == Side.P1 && !second -> su.p1aId; side == Side.P1 -> su.p1bId; !second -> su.p2aId; else -> su.p2bId }
+    // Chi è già negli altri posti non si propone.
+    val others = com.tennis.scoremanager.data.Players.slots(su).filter { it.side != side || it.second != second }
+    val takenIds = others.map { it.id }.filter { it.isNotEmpty() }.toSet()
+    val takenNames = others.map { PlayerStats.key(it.name) }.filter { it.isNotEmpty() }.toSet()
+    val linked = c.playerById(id)
+    @Composable fun chip(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector?, onClick: () -> Unit) = Row(
+        Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon != null) Icon(icon, null, tint = accent, modifier = Modifier.size(14.dp))
+        Text((if (icon != null) " " else "") + label, color = accent, fontSize = 13.sp)
+    }
+    val same = com.tennis.scoremanager.data.Players.byName(players, name).filter { it.id !in takenIds }
+    // Un solo giocatore con quel nome: è lui, lo si collega da solo (chi è un omonimo tocca "Non è lui").
+    LaunchedEffect(name, id, same.size) {
+        if (id.isEmpty() && same.size == 1) c.updateSetup { it.withPlayer(c, side, second, name, same[0].id) }
+    }
+    val flow: @Composable (@Composable () -> Unit) -> Unit = { content ->
+        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { content() }
+    }
+    when {
+        linked != null -> {
+            Text(s.playerLinked(linked.name), color = TsmColors.TextDim, fontSize = 12.sp)
+            flow {
+                chip(s.playerNotHim, Icons.Filled.PersonAdd) {
+                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
+                }
+            }
+        }
+        name.isBlank() -> {
+            val picks = recent.filter { (k, n) -> k !in takenIds && PlayerStats.key(n) !in takenNames }.take(6)
+            if (picks.isNotEmpty()) flow {
+                for ((k, n) in picks) chip(n, null) { c.updateSetup { it.withPlayer(c, side, second, n, c.playerById(k)?.id) } }
+            }
+        }
+        same.size > 1 -> {
+            // Omonimi: si distinguono da quante partite hanno e dall'ultima volta.
+            Text(s.playerHomonyms(same.size, name.trim()), color = TsmColors.Orange, fontSize = 12.sp)
+            flow {
+                for (p in same) chip(p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), if (p.student) Icons.Filled.School else Icons.Filled.Person) {
+                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
+                }
+                chip(s.playerCreate(name.trim()), Icons.Filled.PersonAdd) {
+                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
+                }
+            }
+        }
+        else -> {
+            // Nome nuovo: i giocatori che gli somigliano (forse è uno di loro), sennò si crea all'inizio della partita.
+            val hits = com.tennis.scoremanager.data.Players.search(players, name).filter { it.id !in takenIds }.take(6)
+            if (hits.isNotEmpty()) flow {
+                for (p in hits) chip(p.name, if (p.student) Icons.Filled.School else Icons.Filled.Person) {
+                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
+                }
+            }
+            Text(s.playerNew(name.trim()), color = TsmColors.TextDim, fontSize = 12.sp)
         }
     }
 }
@@ -32005,6 +33008,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.CallSplit
+import androidx.compose.material.icons.filled.MergeType
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccessibilityNew
@@ -32041,7 +33048,7 @@ import com.tennis.scoremanager.data.Reports
 import com.tennis.scoremanager.data.ServePose
 import com.tennis.scoremanager.data.ServePoseResult
 import com.tennis.scoremanager.data.ServeSession
-import com.tennis.scoremanager.data.Student
+import com.tennis.scoremanager.data.PlayerProfile
 import com.tennis.scoremanager.data.Students
 import com.tennis.scoremanager.data.TrainedStroke
 import com.tennis.scoremanager.ui.BigButton
@@ -32133,8 +33140,10 @@ fun StudentScreen(c: MatchController) {
     val s = LocalStrings.current
     BackHandler { c.back() }
     val id by c.openStudentId.collectAsState()
-    val students by c.students.collectAsState()
-    val st = students.firstOrNull { it.id == id } ?: run {
+    // La scheda vale per ogni giocatore del database: gli allievi hanno in più allenamenti e "Allena ora".
+    val everyone by c.players.collectAsState()
+    val history by c.history.collectAsState()
+    val st = everyone.firstOrNull { it.id == id } ?: run {
         LaunchedEffect(Unit) { c.back() }
         return
     }
@@ -32145,20 +33154,30 @@ fun StudentScreen(c: MatchController) {
     var edit by remember { mutableStateOf(false) }
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
+    var merge by remember { mutableStateOf(false) }
+    var split by remember { mutableStateOf(false) }
     ScreenScaffold(
         title = st.name,
-        subtitle = listOfNotNull(st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size)).joinToString(" · "),
+        subtitle = listOfNotNull(
+            st.fullName.takeIf { it.isNotBlank() && it != st.name }, st.hand?.let { if (it == Hand.RIGHT) s.handRight else s.handLeft }, s.studentSessions(mine.size),
+        ).joinToString(" · "),
         icon = Icons.Filled.Groups,
         action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
             Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+        // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
+        if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
+        com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
+            if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
+            c.savePlayer(st.copy(student = on))
         }
         // La racchetta con l'incordatura montata adesso; toccandola si apre Le mie racchette.
         val rackets by c.rackets.collectAsState()
@@ -32226,12 +33245,12 @@ fun StudentScreen(c: MatchController) {
 
         // Partite dallo storico con lo stesso nome, e il rating.
         SectionCard(s.studentMatches, Icons.Filled.EmojiEvents) {
-            val lines = remember(st.name) { c.studentMatches(st.name) }
+            val lines = remember(st, history) { c.studentMatches(st) }
             if (lines.isEmpty()) {
                 Text(s.studentMatchesNone, color = TsmColors.TextDim, fontSize = 13.sp)
             } else {
                 Text(s.studentWonLost(lines.count { it.won }, lines.count { !it.won }), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                remember(st.name) { c.studentRating(st.name) }?.let { Text("${s.ratingTitle}: ${it.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
+                remember(st, history) { c.studentRating(st) }?.let { Text("${s.ratingTitle}: ${it.rating}", color = TsmColors.Ball, fontWeight = FontWeight.Bold) }
                 for (m in lines.takeLast(5).reversed()) {
                     Row(Modifier.fillMaxWidth()) {
                         Text(Reports.date(m.rec.endedAt ?: m.rec.updatedAt, lang), color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
@@ -32241,6 +33260,8 @@ fun StudentScreen(c: MatchController) {
                         )
                     }
                 }
+                // Due persone con lo stesso nome finite insieme: si spuntano le partite dell'altra.
+                GhostButton(s.playerSplit, Icons.Filled.CallSplit, { split = true }, Modifier.fillMaxWidth())
             }
         }
 
@@ -32250,11 +33271,12 @@ fun StudentScreen(c: MatchController) {
             LaunchedEffect(note) {
                 if (note == st.note) return@LaunchedEffect
                 delay(800)
-                c.saveStudent(st.copy(note = note))
+                c.savePlayer(st.copy(note = note))
             }
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
         }
-        GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
+        GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
+        if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
         GhostButton(s.studentPurge, Icons.Filled.DeleteForever, { purge = true }, Modifier.fillMaxWidth())
     }
@@ -32264,7 +33286,8 @@ fun StudentScreen(c: MatchController) {
             title = { Text(s.studentPurge) },
             text = { Text(s.studentPurgeAsk(st.name, mine.size)) },
             confirmButton = {
-                TextButton(onClick = { purge = false; c.purgeStudent(st.id); c.back() }) {
+                // Sparito il giocatore, la scheda torna indietro da sola (una volta).
+                TextButton(onClick = { purge = false; c.purgeStudent(st.id) }) {
                     Text(s.studentPurgeConfirm, color = TsmColors.Danger, fontWeight = FontWeight.Bold)
                 }
             },
@@ -32272,6 +33295,8 @@ fun StudentScreen(c: MatchController) {
         )
     }
     if (edit) StudentEditDialog(c, st) { edit = false }
+    if (merge) MergeDialog(c, st) { merge = false }
+    if (split) SplitDialog(c, st) { split = false }
     if (delete) {
         AlertDialog(
             onDismissRequest = { delete = false },
@@ -32280,6 +33305,75 @@ fun StudentScreen(c: MatchController) {
             dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
         )
     }
+}
+
+/**
+ * Unisci: si sceglie l'altro giocatore (la stessa persona scritta in due modi o creata due volte) e si conferma; le
+ * sue partite e sessioni diventano di questo.
+ */
+@Composable
+private fun MergeDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val everyone by c.players.collectAsState()
+    var query by remember { mutableStateOf("") }
+    var other by remember { mutableStateOf<PlayerProfile?>(null) }
+    val o = other
+    if (o != null) {
+        AlertDialog(
+            onDismissRequest = onDone,
+            text = { Text(s.playerMergeAsk(o.name, st.name)) },
+            confirmButton = { TextButton(onClick = { c.mergePlayers(st.id, o.id); onDone() }) { Text(s.playerMerge, color = TsmColors.Danger, fontWeight = FontWeight.Bold) } },
+            dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+        )
+        return
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.playerMerge) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.playerMergeHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) })
+                val list = (if (query.isBlank()) everyone else com.tennis.scoremanager.data.Players.search(everyone, query)).filter { it.id != st.id }.take(8)
+                for (p in list) Row(Modifier.fillMaxWidth().clickable { other = p }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                    Text(" " + p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Separa un omonimo: si spuntano le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo. */
+@Composable
+private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val lines = remember(st) { c.studentMatches(st).reversed() }
+    var picked by remember { mutableStateOf(emptySet<String>()) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.playerSplit) },
+        text = {
+            Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                Text(s.playerSplitHint(st.name), color = TsmColors.TextDim, fontSize = 13.sp)
+                for (m in lines) {
+                    val on = m.rec.id in picked
+                    val opp = com.tennis.scoremanager.data.PlayerStats.names(m.rec.setup, com.tennis.scoremanager.data.Students.sideIn(m.rec, st)?.other ?: com.tennis.scoremanager.model.Side.P2).joinToString(" / ")
+                    Row(Modifier.fillMaxWidth().clickable { picked = if (on) picked - m.rec.id else picked + m.rec.id }, verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(on, { picked = if (on) picked - m.rec.id else picked + m.rec.id })
+                        Text("${Reports.date(m.rec.endedAt ?: m.rec.updatedAt, lang)} · $opp · " + (if (m.won) s.studentWon else s.studentLost), color = TsmColors.TextMain, fontSize = 13.sp)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = picked.isNotEmpty(), onClick = { c.splitPlayer(st.id, picked); onDone() }) { Text(s.playerSplitDo(picked.size), color = TsmColors.Danger) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 
 /** Le righe del confronto: per il servizio e per gli altri colpi le misure dell'analisi. */
@@ -51515,6 +52609,111 @@ class PlayerStatsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/PlayersTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/PlayersTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Side
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class PlayersTest {
+    private val rossi = PlayerProfile("id-rossi", "Rossi")
+
+    @Test
+    fun namesBecomePlayersOnceAndHomonymsWait() {
+        // Un nome nuovo crea un giocatore; uno che c'è (maiuscole e spazi non contano) usa il suo.
+        val (su, created) = Players.assign(SetupData(p1a = "rossi ", p2a = "Bianchi"), listOf(rossi), 1)
+        assertEquals("id-rossi", su.p1aId)
+        assertEquals(listOf("Bianchi"), created.map { it.name })
+        assertEquals(created[0].id, su.p2aId)
+        // Due volte lo stesso nome nuovo nella stessa partita (doppio): una persona sola.
+        val (dbl, made) = Players.assign(SetupData(doubles = true, p1a = "Verdi", p1b = "Neri", p2a = "Verdi", p2b = "Gialli"), emptyList(), 1)
+        assertEquals(dbl.p1aId, dbl.p2aId)
+        assertEquals(3, made.size)
+        // Con due giocatori dello stesso nome il posto resta col solo nome: lo si sceglie a mano.
+        val twin = PlayerProfile("id-rossi-2", "Rossi")
+        val (amb, none) = Players.assign(SetupData(p1a = "Rossi"), listOf(rossi, twin), 1)
+        assertEquals("", amb.p1aId)
+        assertTrue(none.isEmpty())
+        assertEquals(1, Players.ambiguous(amb, listOf(rossi, twin)).size)
+        // Già scelto: non si tocca.
+        assertEquals("id-rossi-2", Players.assign(SetupData(p1a = "Rossi", p1aId = "id-rossi-2"), listOf(rossi, twin), 1).first.p1aId)
+    }
+
+    @Test
+    fun searchAndAliases() {
+        val list = listOf(PlayerProfile("1", "Mario Rossi"), PlayerProfile("2", "Rosà Verdi"), PlayerProfile("3", "Bianchi", aliases = setOf("x-9")))
+        assertEquals(listOf("2", "1"), Players.search(list, "ros").map { it.id })
+        assertEquals("3", Players.byId(list, "x-9")?.id)
+        assertEquals(null, Players.byId(list, ""))
+    }
+
+    @Test
+    fun statsCountPeopleNotNames() {
+        fun rec(id: String, p1Id: String) = MatchRecord(
+            id, SetupData(p1a = "Rossi", p1aId = p1Id, p2a = "Bianchi", p2aId = "b"),
+            MatchOptions(), com.tennis.scoremanager.model.RulesConfig(), finished = true,
+        )
+        val played = listOf(PlayerStats.Played(rec("m1", "r1"), Side.P1), PlayerStats.Played(rec("m2", "r2"), Side.P2))
+        // Due Rossi diversi: due giocatori, ciascuno con la sua partita.
+        val players = PlayerStats.players(played)
+        assertEquals(3, players.size)
+        assertEquals(1, players.first { it.key == "r1" }.won)
+        assertEquals(0, players.first { it.key == "r2" }.won)
+        assertNotEquals(PlayerStats.lines(played, "r1").map { it.rec.id }, PlayerStats.lines(played, "r2").map { it.rec.id })
+        // Le partite di prima, senza identificativi, restano per nome.
+        assertEquals("rossi", PlayerStats.ident("", " Rossi"))
+    }
+
+    @Test
+    fun matchesFromAnotherPhone() {
+        val mine = listOf(PlayerProfile("A", "Rossi", aliases = setOf("A-old")), PlayerProfile("B", "Bianchi"))
+        // Conosciuto (anche come alias): prende il nostro identificativo.
+        val (known, n1, q1) = Players.resolveIncoming(SetupData(p1a = "Rossi", p1aId = "A-old", p2a = "Bianchi", p2aId = "B"), mine, 1)
+        assertEquals("A", known.p1aId)
+        assertTrue(n1.isEmpty() && q1.isEmpty())
+        // Sconosciuto con un nome nuovo: diventa nostro col suo identificativo (i telefoni restano allineati).
+        val (_, n2, q2) = Players.resolveIncoming(SetupData(p1a = "Verdi", p1aId = "V-9", p2a = "Bianchi", p2aId = "B"), mine, 1)
+        assertEquals(listOf("V-9" to "Verdi"), n2.map { it.id to it.name })
+        assertTrue(q2.isEmpty())
+        // Sconosciuto col nome di uno dei nostri: si chiede se è lui, e intanto resta col suo identificativo.
+        val (asked, n3, q3) = Players.resolveIncoming(SetupData(p1a = "Rossi", p1aId = "R-2", p2a = "Neri"), mine, 1)
+        assertEquals("R-2", asked.p1aId)
+        assertEquals(listOf(Players.Question("R-2", "Rossi", listOf("A"))), q3)
+        // I posti senza identificativo (versioni vecchie) li sistema assign.
+        assertTrue(n3.isEmpty())
+        assertEquals("", asked.p2aId)
+    }
+
+    @Test
+    fun nicknameFirstAndLastName() {
+        assertEquals("Ste", PlayerProfile.display("Stefano", "Spagnolo", "Ste"))
+        assertEquals("Mario Rossi", PlayerProfile.display(" Mario ", "Rossi", " "))
+        val ste = PlayerProfile("s", "Ste", "Stefano", "Spagnolo", "Ste")
+        val old = PlayerProfile("o", "Mario", nickname = "Mario")
+        assertTrue(ste.complete)
+        assertTrue(!old.complete)
+        // Si trova per il nome che si vede, il soprannome, nome e cognome o solo il cognome.
+        assertEquals(listOf("s"), Players.byName(listOf(ste, old), "stefano spagnolo").map { it.id })
+        assertEquals(listOf("s"), Players.byName(listOf(ste, old), "Ste").map { it.id })
+        assertEquals(listOf("s"), Players.search(listOf(ste, old), "spag").map { it.id })
+        // Omonimi veri: stesso nome e cognome.
+        assertEquals(listOf("s"), Players.sameFullName(listOf(ste, old), "stefano", "SPAGNOLO").map { it.id })
+        // Le schede da un altro telefono completano chi da noi è incompleto, senza toccare chi è completo.
+        val filled = Players.fillFrom(listOf(old, ste), listOf(PlayerProfile("o", "Mario Rossi", "Mario", "Rossi"), PlayerProfile("s", "X", "Altro", "Nome", "X")))
+        assertEquals("Mario Rossi", filled[0].name)
+        assertTrue(filled[0].complete)
+        assertEquals(ste, filled[1])
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ProgressFilterTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ProgressFilterTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -58926,6 +60125,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 184 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 186 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -44,6 +47,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -91,13 +95,29 @@ fun SetupScreen(c: MatchController) {
     val context = LocalContext.current
     // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
     androidx.activity.compose.BackHandler { c.back() }
+    // Un nome che nel database non c'è: prima di andare avanti si chiedono nome e cognome (il soprannome è quello scritto).
+    val creating by c.playerToCreate.collectAsState()
+    fun missing(setup: SetupData) = com.tennis.scoremanager.data.Players.slots(setup)
+        .firstOrNull { it.name.isNotBlank() && it.id.isEmpty() && com.tennis.scoremanager.data.Players.byName(c.players.value, it.name).isEmpty() }
+    creating?.let { slot ->
+        com.tennis.scoremanager.ui.PlayerEditDialog(c, null, prefill = slot.name) { p ->
+            c.playerToCreate.value = null
+            if (p != null) {
+                c.updateSetup { it.withPlayer(c, slot.side, slot.second, p.name, p.id) }
+                // Il prossimo nome nuovo, o avanti.
+                if (slot.fromNext) missing(c.setup.value)?.let { c.playerToCreate.value = it.copy(fromNext = true) } ?: c.go(Screen.OPTIONS)
+            }
+        }
+    }
     ScreenScaffold(
         title = s.setupTitle,
         subtitle = s.step1Hint,
         icon = Icons.Filled.SportsTennis,
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
-            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, { c.go(Screen.OPTIONS) }, Modifier.weight(1f))
+            BigButton(s.next, Icons.AutoMirrored.Filled.ArrowForward, {
+                missing(su)?.let { c.playerToCreate.value = it.copy(fromNext = true) } ?: c.go(Screen.OPTIONS)
+            }, Modifier.weight(1f))
         },
         // Svuota i campi: in alto accanto al titolo, così in basso restano solo Indietro e Avanti.
         action = {
@@ -115,7 +135,7 @@ fun SetupScreen(c: MatchController) {
             )
             if (su.doubles) Text(s.doublesHint, color = TsmColors.TextDim)
         }
-        val recent = remember(c.history.collectAsState().value) { c.progressPlayers().map { it.second }.take(8) }
+        val recent = remember(c.history.collectAsState().value, c.players.collectAsState().value) { c.progressPlayers().take(12) }
         PlayerCard(c, su, Side.P1, recent)
         PlayerCard(c, su, Side.P2, recent)
         // Il padel si conta come il tennis: sceglierlo propone doppio e punto d'oro (si possono sempre cambiare).
@@ -172,7 +192,7 @@ internal fun AboutFooter() {
 }
 
 @Composable
-private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<String> = emptyList()) {
+private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: List<Pair<String, String>> = emptyList()) {
     val s = LocalStrings.current
     val accent = TsmColors.player(side)
     val title = if (side == Side.P1) s.player1 else s.player2
@@ -185,15 +205,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
             EditablePlayerAvatar(c, a, accent, 52.dp)
             Box(Modifier.weight(1f)) {
                 Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
-                    c.updateSetup { if (side == Side.P1) it.copy(p1a = v) else it.copy(p2a = v) }
+                    c.updateSetup { it.withPlayer(c, side, false, v, null) }
                 }
             }
         }
-        // Giocatori recenti (dallo storico): un tocco e il nome è scritto. Solo quelli non già in campo.
-        val inUse = listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet()
-        RecentNames(recent.filter { PlayerStats.key(it) !in inUse }, accent) { n ->
-            c.updateSetup { if (side == Side.P1) it.copy(p1a = n) else it.copy(p2a = n) }
-        }
+        PlayerChoices(c, su, side, false, recent, accent)
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
@@ -211,13 +227,11 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
                 EditablePlayerAvatar(c, b, accent, 52.dp)
                 Box(Modifier.weight(1f)) {
                     Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
-                        c.updateSetup { if (side == Side.P1) it.copy(p1b = v) else it.copy(p2b = v) }
+                        c.updateSetup { it.withPlayer(c, side, true, v, null) }
                     }
                 }
             }
-            RecentNames(recent.filter { PlayerStats.key(it) !in listOf(su.p1a, su.p1b, su.p2a, su.p2b).map { PlayerStats.key(it) }.toSet() }, accent) { n ->
-                c.updateSetup { if (side == Side.P1) it.copy(p1b = n) else it.copy(p2b = n) }
-            }
+            PlayerChoices(c, su, side, true, recent, accent)
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
@@ -228,17 +242,89 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
     }
 }
 
-/** Nomi dei giocatori recenti da toccare per scriverli nel campo (al massimo una riga che va a capo). */
+/**
+ * Il nome di un posto in campo, col giocatore del database se lo si è scelto ([id]). Scritto a mano resta di quel
+ * giocatore solo finché è ancora il suo nome.
+ */
+private fun SetupData.withPlayer(c: MatchController, side: Side, second: Boolean, name: String, id: String?): SetupData {
+    val cur = when { side == Side.P1 && !second -> p1aId; side == Side.P1 -> p1bId; !second -> p2aId; else -> p2bId }
+    val keep = id ?: cur.takeIf { c.playerById(it)?.let { p -> PlayerStats.key(p.name) == PlayerStats.key(name) } == true }.orEmpty()
+    return when {
+        side == Side.P1 && !second -> copy(p1a = name, p1aId = keep)
+        side == Side.P1 -> copy(p1b = name, p1bId = keep)
+        !second -> copy(p2a = name, p2aId = keep)
+        else -> copy(p2b = name, p2bId = keep)
+    }
+}
+
+/**
+ * Sotto il nome: mentre si scrive, i giocatori del database che corrispondono (un tocco e la partita è di quella
+ * persona); a campo vuoto, i giocatori recenti. Se ci sono più giocatori con quel nome (omonimi) bisogna sceglierne
+ * uno o crearne uno nuovo; se il nome non c'è, il giocatore si crea da solo all'inizio della partita.
+ */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun RecentNames(names: List<String>, accent: Color, onPick: (String) -> Unit) {
-    if (names.isEmpty()) return
-    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        for (n in names.take(6)) {
-            Text(
-                n, color = accent, fontSize = 13.sp,
-                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { onPick(n) }.padding(horizontal = 10.dp, vertical = 6.dp),
-            )
+private fun PlayerChoices(c: MatchController, su: SetupData, side: Side, second: Boolean, recent: List<Pair<String, String>>, accent: Color) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    val name = when { side == Side.P1 && !second -> su.p1a; side == Side.P1 -> su.p1b; !second -> su.p2a; else -> su.p2b }
+    val id = when { side == Side.P1 && !second -> su.p1aId; side == Side.P1 -> su.p1bId; !second -> su.p2aId; else -> su.p2bId }
+    // Chi è già negli altri posti non si propone.
+    val others = com.tennis.scoremanager.data.Players.slots(su).filter { it.side != side || it.second != second }
+    val takenIds = others.map { it.id }.filter { it.isNotEmpty() }.toSet()
+    val takenNames = others.map { PlayerStats.key(it.name) }.filter { it.isNotEmpty() }.toSet()
+    val linked = c.playerById(id)
+    @Composable fun chip(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector?, onClick: () -> Unit) = Row(
+        Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (icon != null) Icon(icon, null, tint = accent, modifier = Modifier.size(14.dp))
+        Text((if (icon != null) " " else "") + label, color = accent, fontSize = 13.sp)
+    }
+    val same = com.tennis.scoremanager.data.Players.byName(players, name).filter { it.id !in takenIds }
+    // Un solo giocatore con quel nome: è lui, lo si collega da solo (chi è un omonimo tocca "Non è lui").
+    LaunchedEffect(name, id, same.size) {
+        if (id.isEmpty() && same.size == 1) c.updateSetup { it.withPlayer(c, side, second, name, same[0].id) }
+    }
+    val flow: @Composable (@Composable () -> Unit) -> Unit = { content ->
+        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { content() }
+    }
+    when {
+        linked != null -> {
+            Text(s.playerLinked(linked.name), color = TsmColors.TextDim, fontSize = 12.sp)
+            flow {
+                chip(s.playerNotHim, Icons.Filled.PersonAdd) {
+                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
+                }
+            }
+        }
+        name.isBlank() -> {
+            val picks = recent.filter { (k, n) -> k !in takenIds && PlayerStats.key(n) !in takenNames }.take(6)
+            if (picks.isNotEmpty()) flow {
+                for ((k, n) in picks) chip(n, null) { c.updateSetup { it.withPlayer(c, side, second, n, c.playerById(k)?.id) } }
+            }
+        }
+        same.size > 1 -> {
+            // Omonimi: si distinguono da quante partite hanno e dall'ultima volta.
+            Text(s.playerHomonyms(same.size, name.trim()), color = TsmColors.Orange, fontSize = 12.sp)
+            flow {
+                for (p in same) chip(p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), if (p.student) Icons.Filled.School else Icons.Filled.Person) {
+                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
+                }
+                chip(s.playerCreate(name.trim()), Icons.Filled.PersonAdd) {
+                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
+                }
+            }
+        }
+        else -> {
+            // Nome nuovo: i giocatori che gli somigliano (forse è uno di loro), sennò si crea all'inizio della partita.
+            val hits = com.tennis.scoremanager.data.Players.search(players, name).filter { it.id !in takenIds }.take(6)
+            if (hits.isNotEmpty()) flow {
+                for (p in hits) chip(p.name, if (p.student) Icons.Filled.School else Icons.Filled.Person) {
+                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
+                }
+            }
+            Text(s.playerNew(name.trim()), color = TsmColors.TextDim, fontSize = 12.sp)
         }
     }
 }

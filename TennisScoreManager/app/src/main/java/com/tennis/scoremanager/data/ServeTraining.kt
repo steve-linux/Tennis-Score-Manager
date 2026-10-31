@@ -62,7 +62,7 @@ data class ServeSession(
      * null per le sessioni di prima, con le clip ancora nella cartella dell'app.
      */
     val folder: String? = null,
-    /** Allievo che si allena (Student.id) e il suo nome com'era quel giorno; null = senza allievo. */
+    /** Allievo che si allena (PlayerProfile.id) e il suo nome com'era quel giorno; null = senza allievo. */
     val student: String? = null,
     val studentName: String? = null,
     /** Racchetta usata, com'era quel giorno (corde e tensione comprese). */

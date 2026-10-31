@@ -85,6 +85,9 @@ fun HomeScreen(c: MatchController) {
     val tab by c.homeTab.collectAsState()
     val history by c.history.collectAsState()
     val saved by c.saved.collectAsState()
+    // Partite arrivate da un altro telefono con un giocatore che si chiama come uno dei nostri: è lui?
+    val questions by c.playerQuestions.collectAsState()
+    questions.firstOrNull()?.let { PlayerQuestionDialog(c, it) }
     // Prima accensione: le tre domande, solo a chi non ha ancora partite (gli altri la trovano in Altro).
     var tour by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     var asked by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
@@ -256,7 +259,7 @@ private fun ProgressTab(c: MatchController) {
     val history by c.history.collectAsState()
     val me = c.storage.myName
     val mine = remember(history, me) {
-        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(PlayerStats.key(me)) }
+        if (me.isBlank()) null else c.ratingSports().firstOrNull()?.let { c.ratingTable(it).player(c.keyForName(me)) }
     }
     Entry(
         Icons.AutoMirrored.Filled.TrendingUp, "${s.ratingTitle} · ${s.progressTitle}",
@@ -296,6 +299,7 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     val me = c.storage.myName
     Entry(Icons.Filled.Person, if (me.isBlank()) s.moreProfile else "${s.moreProfile}: $me", s.moreProfileHint) { profile = true }
     if (profile) com.tennis.scoremanager.ui.ProfileDialog(c) { profile = false }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.Bluetooth, s.moreDevices, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     Entry(Icons.Filled.Language, s.moreVoice, s.moreVoiceHint) { c.go(Screen.VOICE) }
     Entry(Icons.AutoMirrored.Filled.Help, s.moreHelp, s.moreHelpHint) { c.go(Screen.HELP) }
@@ -304,4 +308,30 @@ private fun MoreTab(c: MatchController, onTour: () -> Unit) {
     Entry(Icons.Filled.School, s.moreTour, s.moreTourHint) { onTour() }
     // Versione, licenza e codice sorgente (la GPL chiede di mostrarli).
     AboutFooter()
+}
+
+/** Una domanda alla volta: il giocatore arrivato è uno dei nostri con quel nome, o un'altra persona? */
+@Composable
+private fun PlayerQuestionDialog(c: MatchController, q: com.tennis.scoremanager.data.Players.Question) {
+    val s = LocalStrings.current
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = {},
+        title = { Text(s.questionTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.questionText(q.name))
+                for (id in q.candidates) {
+                    val p = c.playerById(id) ?: continue
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { c.answerPlayerQuestion(q, p.id) }.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 32.dp)
+                        Text(" " + s.questionYes(p.name) + (c.playerHint(p)?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontSize = 14.sp)
+                    }
+                }
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.answerPlayerQuestion(q, null) }) { Text(s.questionNo) } },
+    )
 }

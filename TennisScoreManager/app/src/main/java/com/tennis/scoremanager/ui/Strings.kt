@@ -929,6 +929,39 @@ interface Strings {
     val studentPurge: String
     val studentPurgeConfirm: String
     val studentPurgeAsk: (String, Int) -> String
+    val playerLinked: (String) -> String
+    val playerHomonyms: (Int, String) -> String
+    val playerCreate: (String) -> String
+    val playerMatchesHint: (Int, String) -> String
+    val studentPickExisting: String
+    val studentFromExisting: String
+    val playerNotHim: String
+    val playerNew: (String) -> String
+    val playersTitle: String
+    val playersHint: String
+    val playersSearch: String
+    val playersNone: String
+    val playerTwin: String
+    val playerStudentToggle: String
+    val playerStudentToggleHint: String
+    val playerMerge: String
+    val playerMergeHint: String
+    val playerSplit: String
+    val questionTitle: String
+    val questionNo: String
+    val playerMergeAsk: (String, String) -> String
+    val playerSplitHint: (String) -> String
+    val playerSplitDo: (Int) -> String
+    val questionText: (String) -> String
+    val questionYes: (String) -> String
+    val playerNewTitle: String
+    val playerFirstName: String
+    val playerLastName: String
+    val playerNickname: String
+    val playerNameRule: String
+    val playerIncomplete: String
+    val playerComplete: String
+    val playerTwinWarning: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2114,9 +2147,42 @@ object ItStrings : Strings {
     override val studentRacket = "Racchetta"
     override val studentRacketNone = "Nessuna racchetta in Le mie racchette: aggiungila da Progressi › Le mie racchette."
     override val studentRacketPick = "Scegli la sua racchetta"
-    override val studentPurge = "Cancella l'allievo e i suoi dati"
+    override val studentPurge = "Cancella il giocatore e i suoi dati"
     override val studentPurgeConfirm = "Cancella tutto"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Cancellare $name e tutti i suoi dati da questo telefono? Si cancellano le sue $n sessioni con video e analisi, le note e la foto; la racchetta resta ma non è più sua. Le partite nello storico restano (ci sono anche gli avversari). Non si può annullare." }
+    override val playerLinked: (String) -> String = { "✓ $it, dal database dei giocatori" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "Ci sono $n giocatori di nome $name: tocca quello giusto o creane un altro." }
+    override val playerCreate: (String) -> String = { "Un altro $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 partita, $d" else "$n partite, l'ultima $d" }
+    override val studentPickExisting = "Tocca il giocatore se è lui: le sue partite sono già nel database."
+    override val studentFromExisting = "Allievo dal database dei giocatori: con le sue partite."
+    override val playerNotHim = "Non è lui: un altro giocatore"
+    override val playerNew: (String) -> String = { "Nuovo giocatore: $it entra nel database all'inizio della partita" }
+    override val playersTitle = "Giocatori"
+    override val playersHint = "Tutti i giocatori delle partite e gli allievi: unisci chi è scritto in due modi, separa gli omonimi"
+    override val playersSearch = "Cerca"
+    override val playersNone = "Ancora nessun giocatore: si aggiungono da soli con le partite."
+    override val playerTwin = "omonimo"
+    override val playerStudentToggle = "Allievo"
+    override val playerStudentToggleHint = "Compare in Allenati › Allievi e in Chi si allena"
+    override val playerMerge = "Unisci con un altro giocatore"
+    override val playerMergeHint = "La stessa persona scritta in due modi o creata due volte: le sue partite e sessioni passano a questo giocatore."
+    override val playerSplit = "Separa un omonimo"
+    override val questionTitle = "Chi è?"
+    override val questionNo = "No, un'altra persona"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Unire $a a $b? Le partite e le sessioni di $a diventano di $b. Non si può annullare." }
+    override val playerSplitHint: (String) -> String = { "Spunta le partite che sono di un'altra persona di nome $it: diventeranno di un giocatore nuovo." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Sposta 1 partita" else "Sposta $n partite" }
+    override val questionText: (String) -> String = { "$it arriva da un altro telefono insieme alle partite. È uno dei tuoi?" }
+    override val questionYes: (String) -> String = { "Sì, è $it" }
+    override val playerNewTitle = "Nuovo giocatore"
+    override val playerFirstName = "Nome *"
+    override val playerLastName = "Cognome *"
+    override val playerNickname = "Soprannome (facoltativo)"
+    override val playerNameRule = "Nome e cognome sono obbligatori. In partita, sul tabellone e nella voce si usa il soprannome se c'è, sennò nome e cognome."
+    override val playerIncomplete = "da completare"
+    override val playerComplete = "Completa nome e cognome"
+    override val playerTwinWarning: (String) -> String = { "C'è già un $it: se è lui sceglilo sopra, se è un'altra persona va bene così." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3285,9 +3351,42 @@ object EnStrings : Strings {
     override val studentRacket = "Racket"
     override val studentRacketNone = "No racket in My rackets yet: add it from Progress › My rackets."
     override val studentRacketPick = "Pick their racket"
-    override val studentPurge = "Delete student and their data"
+    override val studentPurge = "Delete player and their data"
     override val studentPurgeConfirm = "Delete everything"
     override val studentPurgeAsk: (String, Int) -> String = { name, n -> "Delete $name and all their data from this phone? Their $n sessions with videos and analysis, the notes and the photo are deleted; the racket stays but is no longer theirs. Matches in the history stay (the opponents are in them too). This cannot be undone." }
+    override val playerLinked: (String) -> String = { "✓ $it, from the players database" }
+    override val playerHomonyms: (Int, String) -> String = { n, name -> "There are $n players called $name: tap the right one or create another." }
+    override val playerCreate: (String) -> String = { "Another $it" }
+    override val playerMatchesHint: (Int, String) -> String = { n, d -> if (n == 1) "1 match, $d" else "$n matches, last $d" }
+    override val studentPickExisting = "Tap the player if it's them: their matches are already in the database."
+    override val studentFromExisting = "Student from the players database: with their matches."
+    override val playerNotHim = "Not them: another player"
+    override val playerNew: (String) -> String = { "New player: $it joins the database when the match starts" }
+    override val playersTitle = "Players"
+    override val playersHint = "Everyone from the matches and the students: merge those written two ways, split homonyms"
+    override val playersSearch = "Search"
+    override val playersNone = "No players yet: they add themselves with the matches."
+    override val playerTwin = "same name"
+    override val playerStudentToggle = "Student"
+    override val playerStudentToggleHint = "Shows in Practice › Students and in Who is practising"
+    override val playerMerge = "Merge with another player"
+    override val playerMergeHint = "The same person written two ways or created twice: their matches and sessions move to this player."
+    override val playerSplit = "Split a homonym"
+    override val questionTitle = "Who is it?"
+    override val questionNo = "No, someone else"
+    override val playerMergeAsk: (String, String) -> String = { a, b -> "Merge $a into $b? The matches and sessions of $a become $b's. This cannot be undone." }
+    override val playerSplitHint: (String) -> String = { "Tick the matches that belong to another person called $it: they will go to a new player." }
+    override val playerSplitDo: (Int) -> String = { n -> if (n == 1) "Move 1 match" else "Move $n matches" }
+    override val questionText: (String) -> String = { "$it comes from another phone with the matches. Is it one of yours?" }
+    override val questionYes: (String) -> String = { "Yes, it's $it" }
+    override val playerNewTitle = "New player"
+    override val playerFirstName = "First name *"
+    override val playerLastName = "Last name *"
+    override val playerNickname = "Nickname (optional)"
+    override val playerNameRule = "First and last name are required. In the match, on the scoreboard and in the voice the nickname is used if there is one, otherwise first and last name."
+    override val playerIncomplete = "to complete"
+    override val playerComplete = "Complete first and last name"
+    override val playerTwinWarning: (String) -> String = { "There is already a $it: if it's them pick them above, if it's someone else that's fine." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

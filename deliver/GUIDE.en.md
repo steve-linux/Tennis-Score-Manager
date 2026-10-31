@@ -102,7 +102,7 @@ At the **first start** the app asks three questions: the language, how you'll us
 - **Train**: workout with the heart-rate strap and **stroke practice** (serve, forehand, backhand, volley) with the saved sessions.
 - **Video**: **Record with this phone**, **Your videos** (chapters, highlights, filters, import) and the camera phone.
 - **Progress**: **TSM rating · Progress** (with your name it shows your rating straight away), **History**, **My rackets**.
-- **More**: **You** (your name), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
+- **More**: **You** (your name), **Players** (the database: 7.7), **Devices** (wristbands, remotes, straps, second phone, TV scoreboard), **Language and voice**, **Help** (this guide, with search and tappable cross-references), rackets, match transfer, introduction, version and licence.
 
 **New match** has two steps: **who plays** (singles or doubles, names, with recent players to tap, and the sport; club, court and tournament under *More details*) and **how you keep score and the rules**. Everything is optional: you can go on even without names. From every screen **Back** returns to the tab you came from.
 
@@ -411,6 +411,20 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Coach's notes**: what to work on, goals; they save by themselves.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
+
+### 7.7 Players: the database (app 2.5)
+
+Everyone who plays or practises is a **player** in the database, with an ID that stays the same on every phone: statistics, rating and history belong to that person even with a namesake, also after matches have moved from one phone to another.
+
+- **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. A name typed in New match that is not in the database asks for first and last name when you tap *Next* (the nickname is what you typed). Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
+- **New match**: while you type the name, the matching players appear (one tap and the match is theirs); if the name belongs to a single player it links by itself (*✓ … from the players database*; **Not them** creates another person with the same name). With two players of the same name the app asks which one; a new name becomes a player when the match starts.
+- **At the first start** the app creates a player for every name in the matches already played.
+- **More › Players**: everyone, with search; *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
+  - **Student**: puts them among the students (or takes them off).
+  - **Merge with another player**: the same person written two ways ("Rossi" and "Mario Rossi") or created twice; matches and sessions move to them.
+  - **Split a homonym** (in *Matches*): tick the matches of another person with the same name, who becomes a new player.
+- **Matches from another phone** (transfer or *Import*): a player the phone knows links by itself; a new one is added with its ID; if it has the name of one of yours the app asks once **Who is it?** (*Yes, it's them* links the two, so next time it is recognised; *No, someone else* adds them). Matches from old versions, without players, link by name.
+- The **photo** and **man/woman** still belong to the name: two namesakes share them.
 
 ## 8. Scoreboard on a TV or monitor
 

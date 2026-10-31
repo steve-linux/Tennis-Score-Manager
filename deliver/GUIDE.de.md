@@ -102,7 +102,7 @@ Beim **ersten Start** stellt die App drei Fragen: die Sprache, wie du sie nutzen
 - **Trainieren**: Training mit dem Brustgurt und **Schlagtraining** (Aufschlag, Vorhand, Rückhand, Volley) mit den gespeicherten Einheiten.
 - **Video**: **Mit diesem Telefon aufnehmen**, **Deine Videos** (Kapitel, Highlights, Filter, Import) und das Kamera-Telefon.
 - **Fortschritt**: **TSM-Wertung · Fortschritte** (mit deinem Namen erscheint sofort deine Wertung), **Verlauf**, **Meine Schläger**.
-- **Mehr**: **Du** (dein Name), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
+- **Mehr**: **Du** (dein Name), **Spieler** (die Datenbank: 7.7), **Geräte** (Armbänder, Fernbedienungen, Gurte, zweites Telefon, TV-Anzeigetafel), **Sprache und Stimme**, **Hilfe** (diese Anleitung, mit Suche und antippbaren Verweisen), Schläger, Matches übertragen, Einführung, Version und Lizenz.
 
 **Neues Match** hat zwei Schritte: **wer spielt** (Einzel oder Doppel, Namen, mit den letzten Spielern zum Antippen, und die Sportart; Verein, Platz und Turnier unter *Weitere Angaben*) und **wie gezählt wird und die Regeln**. Alles ist freiwillig: Es geht auch ohne Namen weiter. Von jeder Seite führt **Zurück** zum Reiter, von dem man kam.
 
@@ -411,6 +411,20 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
+
+### 7.7 Spieler: die Datenbank (app 2.5)
+
+Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit einer Kennung, die auf jedem Telefon gleich bleibt: Statistik, Rating und Verlauf gehören dieser Person auch bei einem Namensvetter, auch nachdem Matches von einem Telefon aufs andere gewandert sind.
+
+- **Vorname, Nachname und Spitzname**: Vor- und Nachname sind Pflicht und kennzeichnen die Person; der **Spitzname** (freiwillig) ist, wie man sie auf dem Platz nennt: Match, Anzeigetafel, Ansage und Statistik verwenden den Spitznamen, wenn es einen gibt, sonst Vor- und Nachname. Ein in Neues Match getippter Name, der nicht in der Datenbank ist, fragt beim Tippen auf *Weiter* nach Vor- und Nachname (der Spitzname ist das Getippte). Aus dem Verlauf entstandene Spieler haben nur einen Namen, der zum Spitznamen wird: unter *Spieler* sind sie *unvollständig*, und die Karte bietet **Vor- und Nachname ergänzen**.
+- **Neues Match**: beim Tippen des Namens erscheinen die passenden Spieler (ein Tipp und das Match gehört ihm); gehört der Name nur einem Spieler, wird er von selbst verknüpft (*✓ … aus der Spielerdatenbank*; **Nicht er** legt eine andere Person mit demselben Namen an). Bei zwei Spielern mit gleichem Namen fragt die App, welcher; ein neuer Name wird beim Matchbeginn zum Spieler.
+- **Beim ersten Start** legt die App für jeden Namen der bisherigen Matches einen Spieler an.
+- **Mehr › Spieler**: alle, mit Suche; *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
+  - **Schüler**: nimmt ihn unter die Schüler auf (oder wieder heraus).
+  - **Mit einem anderen Spieler zusammenführen**: dieselbe Person auf zwei Arten geschrieben („Rossi“ und „Mario Rossi“) oder zweimal angelegt; Matches und Einheiten gehen auf ihn über.
+  - **Namensvetter trennen** (unter *Matches*): die Matches einer anderen Person mit demselben Namen anhaken, sie wird ein neuer Spieler.
+- **Matches von einem anderen Telefon** (Übertragung oder *Importieren*): ein bekannter Spieler wird von selbst verknüpft; ein neuer kommt mit seiner Kennung dazu; hat er den Namen eines deiner Spieler, fragt die App einmal **Wer ist das?** (*Ja, das ist er* verknüpft beide, beim nächsten Mal wird er erkannt; *Nein, eine andere Person* fügt ihn hinzu). Matches alter Versionen ohne Spieler werden über den Namen verknüpft.
+- **Foto** und **Mann/Frau** gelten noch für den Namen: zwei Namensvettern teilen sie.
 
 ## 8. Anzeigetafel auf TV oder Monitor
 

@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS }
 
 /** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
 enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
@@ -634,7 +634,8 @@ class MatchController(
             Screen.STROKE_SESSIONS -> strokeSessionsBack
             Screen.HELP -> Screen.HOME
             Screen.STUDENTS -> Screen.HOME
-            Screen.STUDENT -> Screen.STUDENTS
+            Screen.STUDENT -> studentBack
+            Screen.PLAYERS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -991,58 +992,154 @@ class MatchController(
 
     private var strokeSessionsBack = Screen.HOME
 
-    // ---------------------------------------------------------------- allievi (per l'allenatore)
+    // ---------------------------------------------------------------- giocatori e allievi
 
-    val students = MutableStateFlow(storage.loadStudents().sortedBy { it.name.lowercase() })
+    /** Il database dei giocatori, per nome. Gli allievi sono quelli con student. */
+    val players = MutableStateFlow(storage.loadPlayers().sortedBy { it.name.lowercase() })
 
-    /** Chi si allena con l'allenamento dei colpi: Student.id, null = nessun allievo. */
+    /** Gli allievi dell'allenatore (giocatori con student). */
+    val students: StateFlow<List<com.tennis.scoremanager.data.PlayerProfile>> =
+        players.map { l -> l.filter { it.student } }.stateIn(scope, SharingStarted.Eagerly, players.value.filter { it.student })
+
+    /** Chi si allena con l'allenamento dei colpi: PlayerProfile.id, null = nessun allievo. */
     val trainStudent = MutableStateFlow(storage.trainStudent.ifEmpty { null })
 
-    /** Allievo aperto nella sua scheda. */
+    /** Giocatore aperto nella sua scheda. */
     val openStudentId = MutableStateFlow<String?>(null)
 
-    fun refreshStudents() {
-        scope.launch { students.value = withContext(io) { storage.loadStudents() }.sortedBy { it.name.lowercase() } }
+    fun refreshPlayers() {
+        scope.launch { players.value = withContext(io) { storage.loadPlayers() }.sortedBy { it.name.lowercase() } }
     }
 
-    fun studentById(id: String?): com.tennis.scoremanager.data.Student? = id?.let { i -> students.value.firstOrNull { it.id == i } }
+    fun refreshStudents() = refreshPlayers()
 
-    /** Aggiunge o cambia un allievo. */
-    fun saveStudent(st: com.tennis.scoremanager.data.Student) {
-        val list = students.value.filter { it.id != st.id } + st
-        students.value = list.sortedBy { it.name.lowercase() }
-        scope.launch(io) { storage.saveStudents(list) }
+    /** Il giocatore di un identificativo (anche di un suo alias). */
+    fun playerById(id: String?): com.tennis.scoremanager.data.PlayerProfile? =
+        id?.let { com.tennis.scoremanager.data.Players.byId(players.value, it) }
+
+    fun studentById(id: String?) = playerById(id)
+
+    /** Aggiunge o cambia un giocatore (stesso id). */
+    fun savePlayer(p: com.tennis.scoremanager.data.PlayerProfile) {
+        val list = players.value.filter { it.id != p.id } + p
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch(io) { storage.savePlayers(list) }
     }
 
-    /** Toglie un allievo: le sue sessioni restano (senza allievo, col nome di quel giorno). */
-    fun deleteStudent(id: String) {
-        val list = students.value.filter { it.id != id }
-        students.value = list
-        if (trainStudent.value == id) setTrainStudent(null)
+    fun saveStudent(st: com.tennis.scoremanager.data.PlayerProfile) = savePlayer(st.copy(student = true))
+
+    /** Domande in sospeso sui giocatori arrivati da un altro telefono ("è lui?"). */
+    val playerQuestions = MutableStateFlow(storage.loadPlayerQuestions())
+
+    /**
+     * Risposta a una domanda: [localId] = è il nostro giocatore (i due identificativi si legano e le sue partite
+     * arrivate diventano sue); null = un'altra persona, che si aggiunge col suo identificativo.
+     */
+    fun answerPlayerQuestion(q: com.tennis.scoremanager.data.Players.Question, localId: String?) {
+        val rest = playerQuestions.value.filter { it.incomingId != q.incomingId }
+        playerQuestions.value = rest
         scope.launch {
             withContext(io) {
-                storage.saveStudents(list)
-                storage.loadServeSessions().filter { it.student == id }.forEach { storage.saveServeSession(it.copy(student = null)) }
+                var people = storage.loadPlayers()
+                if (localId != null) {
+                    people = people.map { if (it.id == localId) it.copy(aliases = it.aliases + q.incomingId) else it }
+                    storage.savePlayers(people)
+                    storage.remapPlayer(setOf(q.incomingId), localId)
+                } else if (people.none { it.id == q.incomingId }) {
+                    storage.savePlayers(people + com.tennis.scoremanager.data.PlayerProfile(q.incomingId, q.name, nickname = q.name, createdAt = System.currentTimeMillis()))
+                }
+                storage.savePlayerQuestions(rest)
             }
+            refreshPlayers()
+            refreshHistory()
+            refreshSaved()
+        }
+    }
+
+    /**
+     * Unisce [other] a [keep]: è la stessa persona scritta in due modi o creata due volte. Le partite e le sessioni di
+     * [other] diventano di [keep], che tiene anche i suoi identificativi (così le partite che arriveranno da altri
+     * telefoni lo riconoscono).
+     */
+    fun mergePlayers(keep: String, other: String) {
+        val a = playerById(keep) ?: return
+        val b = playerById(other) ?: return
+        if (a.id == b.id) return
+        val merged = a.copy(
+            aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
+            hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
+            note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
+        )
+        val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
+        players.value = list.sortedBy { it.name.lowercase() }
+        if (trainStudent.value == b.id) setTrainStudent(a.id)
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
+                storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
+            }
+            refreshHistory()
+            refreshSaved()
             refreshServeSessions()
         }
     }
 
     /**
-     * Cancella l'allievo e quello che il telefono ha di suo: sessioni con video e analisi, note e foto; la sua racchetta
-     * resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli avversari.
+     * Separa un omonimo: le partite [matchIds] di [id] sono di un'altra persona con lo stesso nome, che nasce ora.
+     * Restituisce il giocatore nuovo.
+     */
+    fun splitPlayer(id: String, matchIds: Set<String>): com.tennis.scoremanager.data.PlayerProfile? {
+        val p = playerById(id) ?: return null
+        if (matchIds.isEmpty()) return null
+        val twin = com.tennis.scoremanager.data.PlayerProfile(com.tennis.scoremanager.data.Players.newId(), p.name, nickname = p.name, createdAt = System.currentTimeMillis())
+        val list = players.value + twin
+        players.value = list.sortedBy { it.name.lowercase() }
+        scope.launch {
+            withContext(io) {
+                storage.savePlayers(list)
+                storage.remapPlayer(setOf(p.id) + p.aliases, twin.id, matchIds)
+            }
+            refreshHistory()
+            refreshSaved()
+        }
+        return twin
+    }
+
+    /** Un giocatore nuovo nel database (anche con lo stesso nome di un altro: un omonimo). */
+    /** Posto di Nuova partita per cui si sta creando un giocatore (nome e cognome da chiedere); null = nessuno. */
+    val playerToCreate = MutableStateFlow<com.tennis.scoremanager.data.Players.Slot?>(null)
+
+    /** Per distinguere due omonimi: quante partite ha e l'ultima volta (null senza partite). */
+    fun playerHint(p: com.tennis.scoremanager.data.PlayerProfile): String? {
+        val lines = studentMatches(p)
+        val last = lines.lastOrNull() ?: return if (p.student) strings.studentsTitle else null
+        return strings.playerMatchesHint(lines.size, com.tennis.scoremanager.data.Reports.date(last.rec.endedAt ?: last.rec.updatedAt, options.value.lang))
+    }
+
+    /** Toglie un allievo dall'elenco: resta un giocatore, e le sue sessioni restano sue. */
+    fun deleteStudent(id: String) {
+        val p = playerById(id) ?: return
+        if (trainStudent.value == id) setTrainStudent(null)
+        savePlayer(p.copy(student = false))
+    }
+
+    /**
+     * Cancella l'allievo e quello che il telefono ha di suo: il giocatore, le sessioni con video e analisi, note e
+     * foto; la sua racchetta resta tra le racchette ma non è più sua. Le partite dello storico no: sono anche degli
+     * avversari (vi resta il nome).
      */
     fun purgeStudent(id: String) {
-        val st = studentById(id) ?: return
-        val list = students.value.filter { it.id != id }
-        students.value = list
+        val st = playerById(id) ?: return
+        val list = players.value.filter { it.id != st.id }
+        players.value = list
         if (trainStudent.value == id) setTrainStudent(null)
         removePhoto(st.name)
         rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
         scope.launch {
             withContext(io) {
-                storage.saveStudents(list)
-                storage.loadServeSessions().filter { it.student == id }.forEach { storage.deleteServeSession(it) }
+                storage.savePlayers(list)
+                storage.loadServeSessions().filter { it.student == st.id }.forEach { storage.deleteServeSession(it) }
             }
             refreshServeSessions()
         }
@@ -1054,20 +1151,40 @@ class MatchController(
     }
 
     fun openStudents() {
-        refreshStudents()
+        refreshPlayers()
         screen.value = Screen.STUDENTS
     }
 
     fun openStudent(id: String) {
         openStudentId.value = id
+        studentBack = if (screen.value == Screen.PLAYERS) Screen.PLAYERS else Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
-    /** Partite finite dell'allievo dallo storico (stesso nome), dalla più vecchia. */
-    fun studentMatches(name: String): List<PlayerStats.MatchLine> = PlayerStats.lines(played(), PlayerStats.key(name))
+    private var studentBack = Screen.STUDENTS
 
-    /** Rating TSM dell'allievo nello sport con più partite (null senza partite). */
-    fun studentRating(name: String) = ratingSports().firstOrNull()?.let { ratingTable(it).player(PlayerStats.key(name)) }
+    /** Altro › Giocatori: tutto il database. */
+    fun openPlayers() {
+        refreshPlayers()
+        refreshHistory()
+        screen.value = Screen.PLAYERS
+    }
+
+    /** Chi è il giocatore nelle statistiche: il suo identificativo e quelli che sono lui (alias). */
+    private fun keysOf(p: com.tennis.scoremanager.data.PlayerProfile): Set<String> = setOf(p.id) + p.aliases
+
+    /** Partite finite del giocatore dallo storico, dalla più vecchia. */
+    fun studentMatches(p: com.tennis.scoremanager.data.PlayerProfile): List<PlayerStats.MatchLine> {
+        val keys = keysOf(p)
+        return PlayerStats.linesBy(played()) { rec -> Side.entries.firstOrNull { side -> PlayerStats.whos(rec.setup, side).any { it.key in keys } } }
+    }
+
+    /** Rating TSM del giocatore nello sport con più partite (null senza partite). */
+    fun studentRating(p: com.tennis.scoremanager.data.PlayerProfile) = ratingSports().firstOrNull()?.let { ratingTable(it).player(p.id) }
+
+    /** Chi è un nome scritto (es. il proprio, in Altro › Tu): il giocatore del database se è uno solo, sennò il nome. */
+    fun keyForName(name: String): String =
+        com.tennis.scoremanager.data.Players.byName(players.value, name).singleOrNull()?.id ?: PlayerStats.key(name)
 
     /** I pezzi di video dei servizi [serves] della sessione [sess], in ordine, per la moviola. */
     fun serveClipFiles(sess: com.tennis.scoremanager.data.ServeSession, serves: List<com.tennis.scoremanager.data.ServeAttempt>): List<File> {
@@ -1349,7 +1466,14 @@ class MatchController(
         val now = System.currentTimeMillis()
         // Il suffisso casuale rende l'ID unico anche tra telefoni diversi (il satellite lo mette su ogni misura).
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
-        val rec = MatchRecord(id = "m$now-$suffix", setup = su, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
+        // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
+        val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
+        if (created.isNotEmpty()) {
+            val list = players.value + created
+            players.value = list.sortedBy { it.name.lowercase() }
+            scope.launch(io) { storage.savePlayers(list) }
+        }
+        val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -1827,7 +1951,8 @@ class MatchController(
     private fun played() = history.value.map { PlayerStats.Played(it.record, it.state.winner) }
 
     /** Giocatori dello storico (chiave, nome), per scegliere di chi fare il documento delle partite. */
-    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to it.name }
+    /** Giocatori dello storico (chi è, nome): col nome del database se è un giocatore del database. */
+    fun progressPlayers(): List<Pair<String, String>> = PlayerStats.players(played()).map { it.key to (playerById(it.key)?.name ?: it.name) }
 
     /** Rating TSM di uno sport, dalle partite finite dello storico (le amichevoli non contano). */
     fun ratingTable(sport: com.tennis.scoremanager.data.Sport): com.tennis.scoremanager.data.Rating.Table =
@@ -1967,6 +2092,8 @@ class MatchController(
     fun refreshHistory() {
         scope.launch {
             history.value = withContext(io) {
+                // Le partite senza giocatori del database (di prima, o arrivate da versioni vecchie) li ricevono ora.
+                if (storage.assignPlayerIds() > 0) players.value = storage.loadPlayers().sortedBy { it.name.lowercase() }
                 // Prima dello storico l'app teneva solo l'ultima partita finita: entra anche lei.
                 storage.loadLastFinished()?.let { if (!storage.hasFinished(it.id)) storage.saveFinished(it) }
                 storage.loadFinished().map { LiveMatch(it, ScoreEngine.replay(it.rules, it.events)) }
@@ -2022,10 +2149,27 @@ class MatchController(
     }
 
     /** Salva partite arrivate da fuori: le finite nello storico, le altre tra le sospese. Restituisce (finite, sospese). */
-    private fun importRecords(recs: List<MatchRecord>): Pair<Int, Int> {
+    private fun importRecords(recs: List<MatchRecord>, info: List<com.tennis.scoremanager.data.PlayerProfile> = emptyList()): Pair<Int, Int> {
         var done = 0
         var open = 0
-        for (rec in recs) {
+        // I giocatori delle partite arrivate: quelli che conosciamo si agganciano, quelli nuovi si aggiungono col loro
+        // identificativo, chi ha il nome di uno dei nostri resta in sospeso finché l'utente non dice se è lui.
+        var people = storage.loadPlayers()
+        val questions = storage.loadPlayerQuestions().toMutableList()
+        val now = System.currentTimeMillis()
+        val resolved = recs.map { rec ->
+            val (su, created, asks) = com.tennis.scoremanager.data.Players.resolveIncoming(rec.setup, people, now)
+            people = people + created
+            asks.filter { q -> questions.none { it.incomingId == q.incomingId } }.forEach { questions += it }
+            rec.copy(setup = su)
+        }
+        // Le schede arrivate completano i nostri giocatori (nome, cognome, soprannome, mano dove mancano) e quelli nuovi.
+        people = com.tennis.scoremanager.data.Players.fillFrom(people, info)
+        storage.savePlayers(people)
+        storage.savePlayerQuestions(questions)
+        players.value = people.sortedBy { it.name.lowercase() }
+        playerQuestions.value = questions
+        for (rec in resolved) {
             val state = runCatching { ScoreEngine.replay(rec.rules, rec.events) }.getOrNull() ?: continue
             if (state.isFinished) {
                 storage.saveFinished(rec.copy(finished = true, suspended = false))
@@ -2371,7 +2515,11 @@ class MatchController(
                     m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
                 }.filterValues { it.isNotEmpty() }
                 storage.json.encodeToString(
-                    TransferBundle.serializer(), TransferBundle(matches = all, photos = photos, matchPhotos = matchPhotos),
+                    TransferBundle.serializer(), TransferBundle(
+                        matches = all, photos = photos, matchPhotos = matchPhotos,
+                        players = all.flatMap { com.tennis.scoremanager.data.Players.slots(it.setup) }.mapNotNull { playerById(it.id) }.distinctBy { it.id }
+                            .map { com.tennis.scoremanager.data.PlayerProfile(it.id, it.name, it.firstName, it.lastName, it.nickname, it.hand, aliases = it.aliases) },
+                    ),
                 ).toByteArray()
             },
             onServed = { transferServed.value++ },
@@ -2410,7 +2558,7 @@ class MatchController(
                             runCatching { storage.addMatchPhoto(id, Base64.decode(b64, Base64.DEFAULT)) }
                         }
                     }
-                    importRecords(bundle.matches)
+                    importRecords(bundle.matches, bundle.players)
                 }.getOrNull()
             }
             _toasts.tryEmit(

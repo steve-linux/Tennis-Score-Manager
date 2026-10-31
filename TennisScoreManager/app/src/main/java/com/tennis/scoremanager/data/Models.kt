@@ -45,6 +45,14 @@ data class SetupData(
     /** Racchetta virtuale: id della racchetta scelta per ciascun lato ("" = nessuna). */
     val p1Racket: String = "",
     val p2Racket: String = "",
+    /**
+     * Giocatore del database (Player.id) in ciascun posto: la partita è di quella persona anche se c'è un omonimo, e
+     * resta sua passando da un telefono all'altro. Vuoto = solo il nome (partite di prima o da versioni vecchie).
+     */
+    val p1aId: String = "",
+    val p1bId: String = "",
+    val p2aId: String = "",
+    val p2bId: String = "",
 )
 
 /** REMOTES = telecomandini Bluetooth da selfie al posto dei braccialetti. */
