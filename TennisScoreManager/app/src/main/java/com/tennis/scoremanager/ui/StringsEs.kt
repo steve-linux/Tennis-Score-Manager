@@ -952,6 +952,27 @@ object EsStrings : Strings {
     override val dataWipeDone = "Hecho. La app se cierra ahora: al abrirla empieza de cero."
     override val dataVideos: (Int) -> String = { mb -> "Incluir los vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Copia del $date (app $app" + (if (videos) ", con vídeos" else ", sin vídeos") + "). Sustituye todos los datos de ahora: si te hacen falta, haz antes una copia." }
+    override val tabTournaments = "Torneos"
+    override val tabCourts = "Pistas"
+    override val roleCoach = "Entrenador"
+    override val roleClub = "Club"
+    override val roleYouHint = "Juegas, entrenas, tus vídeos, progresos y raquetas."
+    override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, movimiento, partidos y notas. Arbitras los partidos entre alumnos."
+    override val roleClubHint = "Torneos, pistas con sus marcadores de TV, jugadores y entrenadores."
+    override val rolesTitle = "Roles"
+    override val rolesHint = "Puedes tener más de uno (quien juega y entrena): cambian las pestañas de la primera pantalla, los datos son los mismos. Arriba pasas de un rol a otro."
+    override val clubNoName = "El club"
+    override val clubNoCourts = "Toca para escribir el nombre y las pistas"
+    override val clubCourtsLabel = "Pistas (una por línea)"
+    override val clubCourtsHint = "P. ej. Pista 1, Pista 2, Central: se tocan en Nuevo partido y sirven para torneos y marcadores."
+    override val backupDueTitle = "Es hora de una copia de seguridad"
+    override val backupReminder = "Recordatorio de copia"
+    override val backupReminderHint = "Cada 30 días, en la primera pantalla, te recuerda guardar una copia."
+    override val onbRolesTitle = "¿Quién usa la app?"
+    override val onbClubTitle = "Tu club"
+    override val onbPrivacyTitle = "Tus datos"
+    override val onbPrivacyText = "Partidos, jugadores, vídeos y notas se quedan en este teléfono: sin cuenta, sin servidor. Si sigues a alumnos (también menores), pide su consentimiento para grabarlos y guardar sus datos; puedes borrarlos cuando quieras. Haz de vez en cuando una copia en Más › Perfil y datos: es la única copia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Todavía no has guardado ninguna copia: toca para hacerla." else "Última copia: $last. Toca para hacer otra." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

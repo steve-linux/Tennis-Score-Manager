@@ -321,6 +321,15 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
   - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
 
+### 7.9 Ruoli: Tu, Allenatore, Circolo
+
+- In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
+  - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
+  - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
+  - **Circolo**: **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
+- Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
+- **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

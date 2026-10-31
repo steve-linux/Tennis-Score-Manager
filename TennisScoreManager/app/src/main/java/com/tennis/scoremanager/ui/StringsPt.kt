@@ -955,6 +955,27 @@ object PtStrings : Strings {
     override val dataWipeDone = "Feito. O app vai fechar: ao abrir de novo, começa do zero."
     override val dataVideos: (Int) -> String = { mb -> "Incluir os vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup de $date (app $app" + (if (videos) ", com vídeos" else ", sem vídeos") + "). Substitui todos os dados atuais: se precisar, faça antes um backup." }
+    override val tabTournaments = "Torneios"
+    override val tabCourts = "Quadras"
+    override val roleCoach = "Treinador"
+    override val roleClub = "Clube"
+    override val roleYouHint = "Você joga, treina, seus vídeos, progresso e raquetes."
+    override val roleCoachHint = "Seus alunos: treino de golpes, movimento, partidas e notas. Você arbitra as partidas entre alunos."
+    override val roleClubHint = "Torneios, quadras com seus placares de TV, jogadores e treinadores."
+    override val rolesTitle = "Papéis"
+    override val rolesHint = "Você pode ter mais de um (quem joga e treina): mudam as abas da primeira tela, os dados são os mesmos. No alto você passa de um papel a outro."
+    override val clubNoName = "O clube"
+    override val clubNoCourts = "Toque para escrever o nome e as quadras"
+    override val clubCourtsLabel = "Quadras (uma por linha)"
+    override val clubCourtsHint = "Ex. Quadra 1, Quadra 2, Central: você toca nelas em Nova partida e servem a torneios e placares."
+    override val backupDueTitle = "Hora de fazer um backup"
+    override val backupReminder = "Lembrete de backup"
+    override val backupReminderHint = "A cada 30 dias, na primeira tela, lembra você de salvar um backup."
+    override val onbRolesTitle = "Quem usa o app?"
+    override val onbClubTitle = "O seu clube"
+    override val onbPrivacyTitle = "Seus dados"
+    override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Faça de vez em quando um backup em Mais › Perfil e dados: é a única cópia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Você ainda nunca salvou um backup: toque para fazer." else "Último backup: $last. Toque para fazer um novo." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

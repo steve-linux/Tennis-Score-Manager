@@ -10,7 +10,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Videocam
@@ -18,6 +20,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -77,6 +80,7 @@ fun DataScreen(c: MatchController) {
                 }.isSuccess
             }
             busy = null
+            if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
             message = if (ok) s.dataBackupDone else s.dataBackupFailed
         }
     }
@@ -93,8 +97,16 @@ fun DataScreen(c: MatchController) {
         icon = Icons.Filled.Backup,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // Chi usa l'app: i ruoli cambiano le schede della prima schermata, non i dati.
+        val roles by c.roles.collectAsState()
+        SectionCard(s.rolesTitle, Icons.Filled.Groups) {
+            Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            com.tennis.scoremanager.ui.RolesPicker(roles) { c.setRoles(it) }
+        }
         SectionCard(s.dataBackup, Icons.Filled.Backup) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            var reminder by remember { mutableStateOf(c.storage.backupReminder) }
+            SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())

@@ -954,6 +954,27 @@ object FrStrings : Strings {
     override val dataWipeDone = "Fait. L'appli se ferme : en la rouvrant elle repart de zéro."
     override val dataVideos: (Int) -> String = { mb -> "Inclure les vidéos ($mb Mo)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sauvegarde du $date (appli $app" + (if (videos) ", avec les vidéos" else ", sans vidéos") + "). Elle remplace toutes les données actuelles : si besoin, faites d'abord une sauvegarde." }
+    override val tabTournaments = "Tournois"
+    override val tabCourts = "Terrains"
+    override val roleCoach = "Entraîneur"
+    override val roleClub = "Club"
+    override val roleYouHint = "Vous jouez, vous vous entraînez, vos vidéos, progrès et raquettes."
+    override val roleCoachHint = "Vos élèves : entraînement des coups, mouvement, matchs et notes. Vous arbitrez les matchs entre élèves."
+    override val roleClubHint = "Tournois, courts avec leurs tableaux TV, joueurs et entraîneurs."
+    override val rolesTitle = "Rôles"
+    override val rolesHint = "Vous pouvez en avoir plusieurs (qui joue et entraîne) : ils changent les onglets du premier écran, les données sont les mêmes. En haut vous passez d'un rôle à l'autre."
+    override val clubNoName = "Le club"
+    override val clubNoCourts = "Touchez pour écrire le nom et les courts"
+    override val clubCourtsLabel = "Terrains (un par ligne)"
+    override val clubCourtsHint = "Ex. Court 1, Court 2, Central : on les touche dans Nouveau match et ils servent aux tournois et aux tableaux."
+    override val backupDueTitle = "C'est l'heure d'une sauvegarde"
+    override val backupReminder = "Rappel de sauvegarde"
+    override val backupReminderHint = "Tous les 30 jours, sur le premier écran, il vous rappelle d'enregistrer une sauvegarde."
+    override val onbRolesTitle = "Qui utilise l'appli ?"
+    override val onbClubTitle = "Votre club"
+    override val onbPrivacyTitle = "Vos données"
+    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

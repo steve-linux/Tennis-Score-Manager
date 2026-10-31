@@ -321,6 +321,15 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
 
+### 7.9 Rôles : Vous, Entraîneur, Club
+
+- Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
+  - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
+  - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
+  - **Club** : **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
+- Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
+- **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

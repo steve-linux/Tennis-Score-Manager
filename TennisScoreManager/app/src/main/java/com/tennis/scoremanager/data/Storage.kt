@@ -431,6 +431,30 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Ruoli scelti (Role.name) e quello attivo; di serie Tu, come prima dei ruoli. */
+    var roles: Set<String>
+        get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
+        set(v) = prefs.edit().putStringSet("roles", v).apply()
+    var activeRole: String
+        get() = prefs.getString("active_role", null) ?: "PLAYER"
+        set(v) = prefs.edit().putString("active_role", v).apply()
+
+    /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
+    var clubName: String
+        get() = prefs.getString("club_name", null) ?: ""
+        set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+    var clubCourts: List<String>
+        get() = prefs.getString("club_courts", null)?.split('\n')?.filter { it.isNotBlank() } ?: emptyList()
+        set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
+
+    /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    var backupReminder: Boolean
+        get() = prefs.getBoolean("backup_reminder", false)
+        set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()
+    var lastBackupAt: Long
+        get() = prefs.getLong("last_backup", 0L)
+        set(v) = prefs.edit().putLong("last_backup", v).apply()
+
     /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
     var myPlayerId: String
         get() = prefs.getString("my_player", null) ?: ""

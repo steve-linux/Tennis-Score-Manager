@@ -434,6 +434,15 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
 
+### 7.9 Roles: You, Coach, Club (app 2.6)
+
+- In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
+  - **You**: Play, Practice, Video, Progress, More (the app as always).
+  - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
+  - **Club**: **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
+- The scoreboard is there in every role: nothing stops you from scoring a match.
+- **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

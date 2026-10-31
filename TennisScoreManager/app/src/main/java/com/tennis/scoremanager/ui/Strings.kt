@@ -990,6 +990,27 @@ interface Strings {
     val dataWipeDone: String
     val dataVideos: (Int) -> String
     val dataRestoreAsk: (String, String, Boolean) -> String
+    val tabTournaments: String
+    val tabCourts: String
+    val roleCoach: String
+    val roleClub: String
+    val roleYouHint: String
+    val roleCoachHint: String
+    val roleClubHint: String
+    val rolesTitle: String
+    val rolesHint: String
+    val clubNoName: String
+    val clubNoCourts: String
+    val clubCourtsLabel: String
+    val clubCourtsHint: String
+    val backupDueTitle: String
+    val backupReminder: String
+    val backupReminderHint: String
+    val onbRolesTitle: String
+    val onbClubTitle: String
+    val onbPrivacyTitle: String
+    val onbPrivacyText: String
+    val backupDueHint: (String?) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2239,6 +2260,27 @@ object ItStrings : Strings {
     override val dataWipeDone = "Fatto. L'app ora si chiude: riaprendola riparte da capo."
     override val dataVideos: (Int) -> String = { mb -> "Includi i video ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup del $date (app $app" + (if (videos) ", con i video" else ", senza video") + "). Sostituisce tutti i dati di adesso: se ti servono, prima fai un backup." }
+    override val tabTournaments = "Tornei"
+    override val tabCourts = "Campi"
+    override val roleCoach = "Allenatore"
+    override val roleClub = "Circolo"
+    override val roleYouHint = "Giochi, ti alleni, i tuoi video, progressi e racchette."
+    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, movimento, partite e note. Arbitri le partite tra allievi."
+    override val roleClubHint = "Tornei, campi coi loro tabelloni TV, giocatori e allenatori."
+    override val rolesTitle = "Ruoli"
+    override val rolesHint = "Puoi averne più di uno (chi gioca e allena): cambiano le schede della prima schermata, i dati sono gli stessi. In alto passi da un ruolo all'altro."
+    override val clubNoName = "Il circolo"
+    override val clubNoCourts = "Tocca per scrivere nome e campi"
+    override val clubCourtsLabel = "Campi (uno per riga)"
+    override val clubCourtsHint = "Es. Campo 1, Campo 2, Centrale: si toccano in Nuova partita e servono a tornei e tabelloni."
+    override val backupDueTitle = "È ora di fare un backup"
+    override val backupReminder = "Promemoria del backup"
+    override val backupReminderHint = "Ogni 30 giorni, nella prima schermata, ti ricorda di salvare un backup."
+    override val onbRolesTitle = "Chi usa l'app?"
+    override val onbClubTitle = "Il tuo circolo"
+    override val onbPrivacyTitle = "I tuoi dati"
+    override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Fai ogni tanto un backup in Altro › Profilo e dati: è l'unica copia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3471,6 +3513,27 @@ object EnStrings : Strings {
     override val dataWipeDone = "Done. The app now closes: when you open it again it starts from scratch."
     override val dataVideos: (Int) -> String = { mb -> "Include the videos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup of $date (app $app" + (if (videos) ", with videos" else ", without videos") + "). It replaces all the data here now: if you need it, make a backup first." }
+    override val tabTournaments = "Tournaments"
+    override val tabCourts = "Courts"
+    override val roleCoach = "Coach"
+    override val roleClub = "Club"
+    override val roleYouHint = "You play, practise, your videos, progress and rackets."
+    override val roleCoachHint = "Your students: stroke practice, movement, matches and notes. You umpire matches between students."
+    override val roleClubHint = "Tournaments, courts with their TV scoreboards, players and coaches."
+    override val rolesTitle = "Roles"
+    override val rolesHint = "You can have more than one (someone who plays and coaches): they change the tabs of the first screen, the data is the same. At the top you switch between roles."
+    override val clubNoName = "The club"
+    override val clubNoCourts = "Tap to write name and courts"
+    override val clubCourtsLabel = "Courts (one per line)"
+    override val clubCourtsHint = "E.g. Court 1, Court 2, Centre: you tap them in New match and they serve tournaments and scoreboards."
+    override val backupDueTitle = "Time for a backup"
+    override val backupReminder = "Backup reminder"
+    override val backupReminderHint = "Every 30 days, on the first screen, it reminds you to save a backup."
+    override val onbRolesTitle = "Who uses the app?"
+    override val onbClubTitle = "Your club"
+    override val onbPrivacyTitle = "Your data"
+    override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Make a backup now and then in More › Profile and data: it is the only copy."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

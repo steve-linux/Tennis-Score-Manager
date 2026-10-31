@@ -86,6 +86,7 @@ import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -157,6 +158,17 @@ fun SetupScreen(c: MatchController) {
             } else {
                 Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
                 Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+                // I campi del circolo (Circolo › Campi): un tocco e circolo e campo sono scritti.
+                val courts = c.storage.clubCourts
+                if (courts.isNotEmpty()) androidx.compose.foundation.layout.FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    for (ct in courts) Text(
+                        ct, color = if (su.court == ct) TsmColors.OnBall else TsmColors.Ball, fontSize = 13.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(if (su.court == ct) TsmColors.Ball else TsmColors.SurfaceHigh)
+                            .clickable { c.updateSetup { it.copy(court = ct, club = it.club.ifBlank { c.storage.clubName }) } }.padding(horizontal = 10.dp, vertical = 6.dp),
+                    )
+                }
                 // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
                 SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
                     c.updateOptions { it.copy(addressLookup = v) }

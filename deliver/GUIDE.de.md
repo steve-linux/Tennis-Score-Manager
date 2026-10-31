@@ -434,6 +434,15 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
 
+### 7.9 Rollen: Du, Trainer, Verein (app 2.6)
+
+- Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
+  - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
+  - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
+  - **Verein**: **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
+- Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
+- **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

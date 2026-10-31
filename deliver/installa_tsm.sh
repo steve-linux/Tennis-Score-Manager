@@ -638,6 +638,15 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Wiederherstellen**: spielt die Daten einer Sicherung auf dieses Telefon, auch ein neues; sie ersetzt alles, was da ist (eine Sicherung ohne Videos lässt die vorhandenen Videos). Danach schließt sich die App: beim Öffnen findest du die Daten der Sicherung.
   - **Alle Daten löschen**: die App ist wieder wie frisch installiert (zwei Bestätigungen; mit **Auch die Videos** auch Clips, Zeitlupe und Highlights). In Dokumente gespeicherte Dateien und Videos der Galerie bleiben.
 
+### 7.9 Rollen: Du, Trainer, Verein
+
+- Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
+  - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
+  - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
+  - **Verein**: **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
+- Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
+- **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1040,6 +1049,15 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **Restore**: puts the data of a backup on this phone, even a new one; it replaces everything that is there (a backup without videos leaves the videos that are there). Then the app closes: open it again and you find the data of the backup.
   - **Delete all data**: the app goes back to just installed (two confirmations; with **Videos too** also clips, replay and highlights). Files saved in Documents and videos in the gallery stay.
 
+### 7.9 Roles: You, Coach, Club
+
+- In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
+  - **You**: Play, Practice, Video, Progress, More (the app as always).
+  - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
+  - **Club**: **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
+- The scoreboard is there in every role: nothing stops you from scoring a match.
+- **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1440,6 +1458,15 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Crear la copia**: un archivo ZIP con partidos, jugadores, alumnos, sesiones de golpes con su análisis, raquetas, entrenamientos, torneos, fotos, ajustes y grabaciones de la voz; con **Incluir los vídeos** también clips de golpes, moviola y highlights (el archivo se hace grande). Guárdalo donde quieras (Download, un PC, un pendrive): nada de nube. No entran el modelo del análisis del movimiento (se vuelve a descargar) ni los archivos que guardaste en Documentos.
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
+
+### 7.9 Roles: Tú, Entrenador, Club
+
+- En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
+  - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
+  - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
+  - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
+- El marcador está en todos los roles: nada te impide anotar un partido.
+- **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
 
 ## 8. Marcador en un televisor o monitor
 
@@ -1842,6 +1869,15 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Restaurer** : remet les données d'une sauvegarde sur ce téléphone, même neuf ; elle remplace tout ce qu'il y a (une sauvegarde sans vidéos laisse les vidéos présentes). Ensuite l'appli se ferme : en la rouvrant vous retrouvez les données de la sauvegarde.
   - **Effacer toutes les données** : l'appli redevient comme juste installée (deux confirmations ; avec **Les vidéos aussi** également clips, ralenti et highlights). Les fichiers enregistrés dans Documents et les vidéos de la galerie restent.
 
+### 7.9 Rôles : Vous, Entraîneur, Club
+
+- Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
+  - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
+  - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
+  - **Club** : **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
+- Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
+- **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2243,6 +2279,15 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Ripristina**: rimette i dati di un backup su questo telefono, anche nuovo; sostituisce tutto quello che c'è (un backup senza video lascia i video che ci sono). Poi l'app si chiude: riaprendola ritrovi i dati del backup.
   - **Cancella tutti i dati**: l'app torna come appena installata (due conferme; con **Anche i video** pure clip, moviola e highlights). I file salvati in Documenti e i video della galleria restano.
 
+### 7.9 Ruoli: Tu, Allenatore, Circolo
+
+- In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
+  - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
+  - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
+  - **Circolo**: **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
+- Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
+- **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2643,6 +2688,15 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Criar o backup**: um arquivo ZIP com partidas, jogadores, alunos, sessões de golpes com a análise, raquetes, treinos, torneios, fotos, configurações e gravações da voz; com **Incluir os vídeos** também clipes de golpes, replay e highlights (o arquivo fica grande). Salve onde quiser (Download, um PC, um pen drive): sem nuvem. Não entram o modelo da análise do movimento (é baixado de novo) nem os arquivos que você salvou em Documentos.
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
   - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
+
+### 7.9 Papéis: Você, Treinador, Clube
+
+- Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
+  - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
+  - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
+  - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
+- O placar está em todos os papéis: nada impede você de marcar uma partida.
+- **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
 
 ## 8. Placar na TV ou no monitor
 
@@ -3461,8 +3515,24 @@ import kotlinx.serialization.json.Json
 
 enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
 
-/** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
+/**
+ * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
+ * ([Role.tabs]).
+ */
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE }
+
+/**
+ * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
+ * Il tabellone c'è in tutti: l'allenatore arbitra le partite tra allievi, il circolo quelle dei tornei.
+ */
+enum class Role(val tabs: List<HomeTab>) {
+    /** Tu: giochi, ti alleni, i tuoi video e progressi (l'app di sempre). */
+    PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
+    /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
+    /** Circolo: tornei, campi coi loro tabelloni, giocatori e allenatori. */
+    CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+}
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -4528,6 +4598,31 @@ class MatchController(
         storage.myPlayerId = p?.id.orEmpty()
         storage.myName = p?.name.orEmpty()
     }
+
+    // ---------------------------------------------------------------- ruoli
+
+    /** I ruoli scelti (almeno uno) e quello attivo, che decide le schede della prima schermata. */
+    val roles = MutableStateFlow(storage.roles.mapNotNull { r -> Role.entries.firstOrNull { it.name == r } }.toSet().ifEmpty { setOf(Role.PLAYER) })
+    val activeRole = MutableStateFlow(Role.entries.firstOrNull { it.name == storage.activeRole }?.takeIf { it in roles.value } ?: roles.value.first())
+
+    /** Cambia i ruoli; se quello attivo non c'è più si passa al primo rimasto. Almeno uno resta sempre. */
+    fun setRoles(set: Set<Role>) {
+        val v = set.ifEmpty { setOf(Role.PLAYER) }
+        roles.value = Role.entries.filter { it in v }.toSet()
+        storage.roles = roles.value.map { it.name }.toSet()
+        if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
+    }
+
+    /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
+    fun setActiveRole(r: Role) {
+        activeRole.value = r
+        storage.activeRole = r.name
+        homeTab.value = r.tabs.first()
+    }
+
+    /** Il backup va ricordato: promemoria acceso, ultimo backup da più di 30 giorni (o mai) e qualcosa da salvare. */
+    fun backupDue(now: Long = System.currentTimeMillis()): Boolean =
+        storage.backupReminder && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
 
     /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
     fun myKey(): String = me()?.id ?: keyForName(storage.myName)
@@ -11934,6 +12029,30 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Ruoli scelti (Role.name) e quello attivo; di serie Tu, come prima dei ruoli. */
+    var roles: Set<String>
+        get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
+        set(v) = prefs.edit().putStringSet("roles", v).apply()
+    var activeRole: String
+        get() = prefs.getString("active_role", null) ?: "PLAYER"
+        set(v) = prefs.edit().putString("active_role", v).apply()
+
+    /** Circolo: nome e campi (uno per riga), per i tornei, i tabelloni e Nuova partita. */
+    var clubName: String
+        get() = prefs.getString("club_name", null) ?: ""
+        set(v) = prefs.edit().putString("club_name", v.trim()).apply()
+    var clubCourts: List<String>
+        get() = prefs.getString("club_courts", null)?.split('\n')?.filter { it.isNotBlank() } ?: emptyList()
+        set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
+
+    /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    var backupReminder: Boolean
+        get() = prefs.getBoolean("backup_reminder", false)
+        set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()
+    var lastBackupAt: Long
+        get() = prefs.getLong("last_backup", 0L)
+        set(v) = prefs.edit().putLong("last_backup", v).apply()
+
     /** Tu: il tuo giocatore del database (PlayerProfile.id; vuoto = non ancora scelto). */
     var myPlayerId: String
         get() = prefs.getString("my_player", null) ?: ""
@@ -18139,6 +18258,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
@@ -18176,6 +18296,9 @@ import com.tennis.scoremanager.model.Lang
 /** Come si userà l'app: decide la modalità di serie e la scheda da cui si parte. */
 private enum class Use { REFEREE, BANDS, TRAIN, VIDEO }
 
+/** I passi della prima apertura; alcuni solo per certi ruoli. */
+private enum class Step { LANG, ROLES, YOU, USE, CLUB, PRIVACY }
+
 /**
  * Prima accensione: lingua, come si userà l'app e il proprio nome, a tutto schermo. Si può saltare; alla fine
  * l'app parte dalla scheda giusta (coi braccialetti, dai dispositivi da collegare).
@@ -18186,12 +18309,32 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
+    // Ruoli (Tu, Allenatore, Circolo), circolo e promemoria del backup.
+    var roles by remember { mutableStateOf(c.roles.value) }
+    var club by remember { mutableStateOf(c.storage.clubName) }
+    var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    var reminder by remember { mutableStateOf(true) }
+    val steps = Step.entries.filter { st ->
+        when (st) {
+            Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
+            Step.CLUB -> com.tennis.scoremanager.Role.CLUB in roles
+            else -> true
+        }
+    }
+    val current = steps[step.coerceIn(0, steps.size - 1)]
     // Tu: nome e cognome (obbligatori per la tua scheda di giocatore) e soprannome.
     var first by remember { mutableStateOf("") }
     var last by remember { mutableStateOf("") }
     var nick by remember { mutableStateOf("") }
     fun finish() {
         c.storage.onboarded = true
+        c.setRoles(roles)
+        if (com.tennis.scoremanager.Role.CLUB in roles) {
+            c.storage.clubName = club
+            c.storage.clubCourts = courts.lines()
+            if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
+        }
+        c.storage.backupReminder = reminder
         if (first.isNotBlank() && last.isNotBlank()) {
             // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
             val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
@@ -18202,7 +18345,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             c.setMe(p)
             if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
         }
-        when (use) {
+        // Si parte dal primo ruolo scelto; per chi gioca, dalla scheda dell'uso detto.
+        val first = com.tennis.scoremanager.Role.entries.first { it in roles }
+        c.setActiveRole(first)
+        if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
             Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> c.home(HomeTab.TRAIN)
@@ -18223,17 +18369,31 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(s.onbWelcome, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text("${step + 1} / 3", color = TsmColors.TextDim, fontSize = 13.sp)
+                    Text("${step + 1} / ${steps.size}", color = TsmColors.TextDim, fontSize = 13.sp)
                 }
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                when (step) {
-                    0 -> {
+                when (current) {
+                    Step.LANG -> {
                         Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
                         Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
                     }
-                    1 -> {
+                    Step.ROLES -> {
+                        Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                        RolesPicker(roles) { roles = it }
+                    }
+                    Step.CLUB -> {
+                        Text(s.onbClubTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        ClubFields(club, courts, { club = it }, { courts = it })
+                    }
+                    Step.PRIVACY -> {
+                        Text(s.onbPrivacyTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(s.onbPrivacyText, color = TsmColors.TextMain, fontSize = 15.sp)
+                        SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it }
+                    }
+                    Step.USE -> {
                         Text(s.onbUseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         for ((u, icon, title, hint) in listOf(
                             Quad(Use.REFEREE, Icons.Filled.Gavel, s.onbUseReferee, s.onbUseRefereeHint),
@@ -18244,7 +18404,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                             Choice(icon, title, hint, use == u) { use = u }
                         }
                     }
-                    else -> {
+                    Step.YOU -> {
                         Text(s.onbNameTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = OutlinedTextField(
                             v, { onChange(it.take(40)) }, label = { Text(label) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
@@ -18259,7 +18419,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 GhostButton(s.onbSkip, Icons.AutoMirrored.Filled.ArrowForward, { finish() }, Modifier.weight(1f))
-                BigButton(if (step < 2) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (step < 2) step++ else finish() }, Modifier.weight(1f))
+                val lastStep = step >= steps.size - 1
+                BigButton(if (!lastStep) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (!lastStep) step++ else finish() }, Modifier.weight(1f))
             }
             Spacer(Modifier.height(4.dp))
         }
@@ -19138,6 +19299,87 @@ private fun Btn(icon: ImageVector?, label: String?, on: Boolean, onClick: () -> 
             label?.let { Text(it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/RolesUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/RolesUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.Role
+
+/** I tre ruoli, ciascuno acceso o spento (almeno uno resta): in Profilo e dati e alla prima apertura. */
+@Composable
+fun RolesPicker(selected: Set<Role>, onChange: (Set<Role>) -> Unit) {
+    val s = LocalStrings.current
+    for ((r, title, hint) in listOf(
+        Triple(Role.PLAYER, s.moreProfile, s.roleYouHint),
+        Triple(Role.COACH, s.roleCoach, s.roleCoachHint),
+        Triple(Role.CLUB, s.roleClub, s.roleClubHint),
+    )) {
+        val icon = when (r) { Role.PLAYER -> Icons.Filled.Person; Role.COACH -> Icons.Filled.School; Role.CLUB -> Icons.Filled.Business }
+        SwitchRow(icon, title, hint, r in selected) { on ->
+            val next = if (on) selected + r else selected - r
+            if (next.isNotEmpty()) onChange(next)
+        }
+    }
+}
+
+/** Il circolo: nome e campi (uno per riga), per Nuova partita, i tornei e i tabelloni. */
+@Composable
+fun ClubFields(name: String, courts: String, onName: (String) -> Unit, onCourts: (String) -> Unit) {
+    val s = LocalStrings.current
+    OutlinedTextField(
+        name, { onName(it.take(60)) }, label = { Text(s.clubName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+    )
+    OutlinedTextField(courts, { onCourts(it.take(400)) }, label = { Text(s.clubCourtsLabel) }, minLines = 3, modifier = Modifier.fillMaxWidth())
+    Text(s.clubCourtsHint, color = TsmColors.TextDim, fontSize = 12.sp)
+}
+
+@Composable
+fun ClubDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var name by remember { mutableStateOf(c.storage.clubName) }
+    var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.roleClub) },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }) } },
+        confirmButton = {
+            TextButton(onClick = {
+                c.storage.clubName = name
+                c.storage.clubCourts = courts.lines()
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 TSM_EOF
 
@@ -20636,6 +20878,27 @@ interface Strings {
     val dataWipeDone: String
     val dataVideos: (Int) -> String
     val dataRestoreAsk: (String, String, Boolean) -> String
+    val tabTournaments: String
+    val tabCourts: String
+    val roleCoach: String
+    val roleClub: String
+    val roleYouHint: String
+    val roleCoachHint: String
+    val roleClubHint: String
+    val rolesTitle: String
+    val rolesHint: String
+    val clubNoName: String
+    val clubNoCourts: String
+    val clubCourtsLabel: String
+    val clubCourtsHint: String
+    val backupDueTitle: String
+    val backupReminder: String
+    val backupReminderHint: String
+    val onbRolesTitle: String
+    val onbClubTitle: String
+    val onbPrivacyTitle: String
+    val onbPrivacyText: String
+    val backupDueHint: (String?) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -21885,6 +22148,27 @@ object ItStrings : Strings {
     override val dataWipeDone = "Fatto. L'app ora si chiude: riaprendola riparte da capo."
     override val dataVideos: (Int) -> String = { mb -> "Includi i video ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup del $date (app $app" + (if (videos) ", con i video" else ", senza video") + "). Sostituisce tutti i dati di adesso: se ti servono, prima fai un backup." }
+    override val tabTournaments = "Tornei"
+    override val tabCourts = "Campi"
+    override val roleCoach = "Allenatore"
+    override val roleClub = "Circolo"
+    override val roleYouHint = "Giochi, ti alleni, i tuoi video, progressi e racchette."
+    override val roleCoachHint = "I tuoi allievi: allenamenti dei colpi, movimento, partite e note. Arbitri le partite tra allievi."
+    override val roleClubHint = "Tornei, campi coi loro tabelloni TV, giocatori e allenatori."
+    override val rolesTitle = "Ruoli"
+    override val rolesHint = "Puoi averne più di uno (chi gioca e allena): cambiano le schede della prima schermata, i dati sono gli stessi. In alto passi da un ruolo all'altro."
+    override val clubNoName = "Il circolo"
+    override val clubNoCourts = "Tocca per scrivere nome e campi"
+    override val clubCourtsLabel = "Campi (uno per riga)"
+    override val clubCourtsHint = "Es. Campo 1, Campo 2, Centrale: si toccano in Nuova partita e servono a tornei e tabelloni."
+    override val backupDueTitle = "È ora di fare un backup"
+    override val backupReminder = "Promemoria del backup"
+    override val backupReminderHint = "Ogni 30 giorni, nella prima schermata, ti ricorda di salvare un backup."
+    override val onbRolesTitle = "Chi usa l'app?"
+    override val onbClubTitle = "Il tuo circolo"
+    override val onbPrivacyTitle = "I tuoi dati"
+    override val onbPrivacyText = "Partite, giocatori, video e note restano su questo telefono: nessun account, nessun server. Se segui allievi (anche minorenni), chiedi il loro consenso a riprenderli e a tenerne i dati; li puoi cancellare quando vuoi. Fai ogni tanto un backup in Altro › Profilo e dati: è l'unica copia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Non hai ancora mai salvato un backup: tocca per farlo." else "Ultimo backup: $last. Tocca per farne uno nuovo." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -23117,6 +23401,27 @@ object EnStrings : Strings {
     override val dataWipeDone = "Done. The app now closes: when you open it again it starts from scratch."
     override val dataVideos: (Int) -> String = { mb -> "Include the videos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup of $date (app $app" + (if (videos) ", with videos" else ", without videos") + "). It replaces all the data here now: if you need it, make a backup first." }
+    override val tabTournaments = "Tournaments"
+    override val tabCourts = "Courts"
+    override val roleCoach = "Coach"
+    override val roleClub = "Club"
+    override val roleYouHint = "You play, practise, your videos, progress and rackets."
+    override val roleCoachHint = "Your students: stroke practice, movement, matches and notes. You umpire matches between students."
+    override val roleClubHint = "Tournaments, courts with their TV scoreboards, players and coaches."
+    override val rolesTitle = "Roles"
+    override val rolesHint = "You can have more than one (someone who plays and coaches): they change the tabs of the first screen, the data is the same. At the top you switch between roles."
+    override val clubNoName = "The club"
+    override val clubNoCourts = "Tap to write name and courts"
+    override val clubCourtsLabel = "Courts (one per line)"
+    override val clubCourtsHint = "E.g. Court 1, Court 2, Centre: you tap them in New match and they serve tournaments and scoreboards."
+    override val backupDueTitle = "Time for a backup"
+    override val backupReminder = "Backup reminder"
+    override val backupReminderHint = "Every 30 days, on the first screen, it reminds you to save a backup."
+    override val onbRolesTitle = "Who uses the app?"
+    override val onbClubTitle = "Your club"
+    override val onbPrivacyTitle = "Your data"
+    override val onbPrivacyText = "Matches, players, videos and notes stay on this phone: no account, no server. If you coach students (even minors), ask for their consent to film them and keep their data; you can delete it whenever you like. Make a backup now and then in More › Profile and data: it is the only copy."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "You have never saved a backup yet: tap to make one." else "Last backup: $last. Tap to make a new one." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -24372,6 +24677,27 @@ object DeStrings : Strings {
     override val dataWipeDone = "Erledigt. Die App schließt sich jetzt: beim nächsten Öffnen beginnt sie von vorn."
     override val dataVideos: (Int) -> String = { mb -> "Videos einschließen ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sicherung vom $date (App $app" + (if (videos) ", mit Videos" else ", ohne Videos") + "). Sie ersetzt alle jetzigen Daten: wenn nötig, erst eine Sicherung machen." }
+    override val tabTournaments = "Turniere"
+    override val tabCourts = "Plätze"
+    override val roleCoach = "Trainer"
+    override val roleClub = "Verein"
+    override val roleYouHint = "Du spielst, trainierst, deine Videos, Fortschritte und Schläger."
+    override val roleCoachHint = "Deine Schüler: Schlagtraining, Bewegung, Matches und Notizen. Du leitest Matches zwischen Schülern."
+    override val roleClubHint = "Turniere, Plätze mit ihren TV-Anzeigetafeln, Spieler und Trainer."
+    override val rolesTitle = "Rollen"
+    override val rolesHint = "Du kannst mehrere haben (wer spielt und trainiert): sie ändern die Reiter des ersten Bildschirms, die Daten bleiben dieselben. Oben wechselst du die Rolle."
+    override val clubNoName = "Der Verein"
+    override val clubNoCourts = "Tippen, um Name und Plätze einzutragen"
+    override val clubCourtsLabel = "Plätze (einer pro Zeile)"
+    override val clubCourtsHint = "Z. B. Platz 1, Platz 2, Center Court: man tippt sie in Neues Match an, sie dienen Turnieren und Anzeigetafeln."
+    override val backupDueTitle = "Zeit für eine Sicherung"
+    override val backupReminder = "Erinnerung an die Sicherung"
+    override val backupReminderHint = "Alle 30 Tage erinnert dich der erste Bildschirm daran, eine Sicherung zu speichern."
+    override val onbRolesTitle = "Wer nutzt die App?"
+    override val onbClubTitle = "Dein Verein"
+    override val onbPrivacyTitle = "Deine Daten"
+    override val onbPrivacyText = "Matches, Spieler, Videos und Notizen bleiben auf diesem Telefon: kein Konto, kein Server. Wenn du Schüler betreust (auch Minderjährige), frage nach ihrer Zustimmung, sie zu filmen und ihre Daten zu behalten; du kannst sie jederzeit löschen. Mach ab und zu eine Sicherung unter Mehr › Profil und Daten: das ist die einzige Kopie."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Du hast noch nie eine Sicherung gespeichert: tippen, um eine zu machen." else "Letzte Sicherung: $last. Tippen, um eine neue zu machen." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -25620,6 +25946,27 @@ object EsStrings : Strings {
     override val dataWipeDone = "Hecho. La app se cierra ahora: al abrirla empieza de cero."
     override val dataVideos: (Int) -> String = { mb -> "Incluir los vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Copia del $date (app $app" + (if (videos) ", con vídeos" else ", sin vídeos") + "). Sustituye todos los datos de ahora: si te hacen falta, haz antes una copia." }
+    override val tabTournaments = "Torneos"
+    override val tabCourts = "Pistas"
+    override val roleCoach = "Entrenador"
+    override val roleClub = "Club"
+    override val roleYouHint = "Juegas, entrenas, tus vídeos, progresos y raquetas."
+    override val roleCoachHint = "Tus alumnos: entrenamiento de golpes, movimiento, partidos y notas. Arbitras los partidos entre alumnos."
+    override val roleClubHint = "Torneos, pistas con sus marcadores de TV, jugadores y entrenadores."
+    override val rolesTitle = "Roles"
+    override val rolesHint = "Puedes tener más de uno (quien juega y entrena): cambian las pestañas de la primera pantalla, los datos son los mismos. Arriba pasas de un rol a otro."
+    override val clubNoName = "El club"
+    override val clubNoCourts = "Toca para escribir el nombre y las pistas"
+    override val clubCourtsLabel = "Pistas (una por línea)"
+    override val clubCourtsHint = "P. ej. Pista 1, Pista 2, Central: se tocan en Nuevo partido y sirven para torneos y marcadores."
+    override val backupDueTitle = "Es hora de una copia de seguridad"
+    override val backupReminder = "Recordatorio de copia"
+    override val backupReminderHint = "Cada 30 días, en la primera pantalla, te recuerda guardar una copia."
+    override val onbRolesTitle = "¿Quién usa la app?"
+    override val onbClubTitle = "Tu club"
+    override val onbPrivacyTitle = "Tus datos"
+    override val onbPrivacyText = "Partidos, jugadores, vídeos y notas se quedan en este teléfono: sin cuenta, sin servidor. Si sigues a alumnos (también menores), pide su consentimiento para grabarlos y guardar sus datos; puedes borrarlos cuando quieras. Haz de vez en cuando una copia en Más › Perfil y datos: es la única copia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Todavía no has guardado ninguna copia: toca para hacerla." else "Última copia: $last. Toca para hacer otra." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -26870,6 +27217,27 @@ object FrStrings : Strings {
     override val dataWipeDone = "Fait. L'appli se ferme : en la rouvrant elle repart de zéro."
     override val dataVideos: (Int) -> String = { mb -> "Inclure les vidéos ($mb Mo)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Sauvegarde du $date (appli $app" + (if (videos) ", avec les vidéos" else ", sans vidéos") + "). Elle remplace toutes les données actuelles : si besoin, faites d'abord une sauvegarde." }
+    override val tabTournaments = "Tournois"
+    override val tabCourts = "Terrains"
+    override val roleCoach = "Entraîneur"
+    override val roleClub = "Club"
+    override val roleYouHint = "Vous jouez, vous vous entraînez, vos vidéos, progrès et raquettes."
+    override val roleCoachHint = "Vos élèves : entraînement des coups, mouvement, matchs et notes. Vous arbitrez les matchs entre élèves."
+    override val roleClubHint = "Tournois, courts avec leurs tableaux TV, joueurs et entraîneurs."
+    override val rolesTitle = "Rôles"
+    override val rolesHint = "Vous pouvez en avoir plusieurs (qui joue et entraîne) : ils changent les onglets du premier écran, les données sont les mêmes. En haut vous passez d'un rôle à l'autre."
+    override val clubNoName = "Le club"
+    override val clubNoCourts = "Touchez pour écrire le nom et les courts"
+    override val clubCourtsLabel = "Terrains (un par ligne)"
+    override val clubCourtsHint = "Ex. Court 1, Court 2, Central : on les touche dans Nouveau match et ils servent aux tournois et aux tableaux."
+    override val backupDueTitle = "C'est l'heure d'une sauvegarde"
+    override val backupReminder = "Rappel de sauvegarde"
+    override val backupReminderHint = "Tous les 30 jours, sur le premier écran, il vous rappelle d'enregistrer une sauvegarde."
+    override val onbRolesTitle = "Qui utilise l'appli ?"
+    override val onbClubTitle = "Votre club"
+    override val onbPrivacyTitle = "Vos données"
+    override val onbPrivacyText = "Matchs, joueurs, vidéos et notes restent sur ce téléphone : pas de compte, pas de serveur. Si vous suivez des élèves (même mineurs), demandez leur accord pour les filmer et garder leurs données ; vous pouvez les effacer quand vous voulez. Faites de temps en temps une sauvegarde dans Plus › Profil et données : c'est la seule copie."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Vous n'avez encore jamais enregistré de sauvegarde : touchez pour en faire une." else "Dernière sauvegarde : $last. Touchez pour en faire une nouvelle." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -28121,6 +28489,27 @@ object PtStrings : Strings {
     override val dataWipeDone = "Feito. O app vai fechar: ao abrir de novo, começa do zero."
     override val dataVideos: (Int) -> String = { mb -> "Incluir os vídeos ($mb MB)" }
     override val dataRestoreAsk: (String, String, Boolean) -> String = { date, app, videos -> "Backup de $date (app $app" + (if (videos) ", com vídeos" else ", sem vídeos") + "). Substitui todos os dados atuais: se precisar, faça antes um backup." }
+    override val tabTournaments = "Torneios"
+    override val tabCourts = "Quadras"
+    override val roleCoach = "Treinador"
+    override val roleClub = "Clube"
+    override val roleYouHint = "Você joga, treina, seus vídeos, progresso e raquetes."
+    override val roleCoachHint = "Seus alunos: treino de golpes, movimento, partidas e notas. Você arbitra as partidas entre alunos."
+    override val roleClubHint = "Torneios, quadras com seus placares de TV, jogadores e treinadores."
+    override val rolesTitle = "Papéis"
+    override val rolesHint = "Você pode ter mais de um (quem joga e treina): mudam as abas da primeira tela, os dados são os mesmos. No alto você passa de um papel a outro."
+    override val clubNoName = "O clube"
+    override val clubNoCourts = "Toque para escrever o nome e as quadras"
+    override val clubCourtsLabel = "Quadras (uma por linha)"
+    override val clubCourtsHint = "Ex. Quadra 1, Quadra 2, Central: você toca nelas em Nova partida e servem a torneios e placares."
+    override val backupDueTitle = "Hora de fazer um backup"
+    override val backupReminder = "Lembrete de backup"
+    override val backupReminderHint = "A cada 30 dias, na primeira tela, lembra você de salvar um backup."
+    override val onbRolesTitle = "Quem usa o app?"
+    override val onbClubTitle = "O seu clube"
+    override val onbPrivacyTitle = "Seus dados"
+    override val onbPrivacyText = "Partidas, jogadores, vídeos e notas ficam neste telefone: sem conta, sem servidor. Se você acompanha alunos (inclusive menores), peça o consentimento para filmá-los e guardar os dados; você pode apagar quando quiser. Faça de vez em quando um backup em Mais › Perfil e dados: é a única cópia."
+    override val backupDueHint: (String?) -> String = { last -> if (last == null) "Você ainda nunca salvou um backup: toque para fazer." else "Último backup: $last. Toque para fazer um novo." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -28705,7 +29094,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Videocam
@@ -28713,6 +29104,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -28772,6 +29164,7 @@ fun DataScreen(c: MatchController) {
                 }.isSuccess
             }
             busy = null
+            if (ok) c.storage.lastBackupAt = System.currentTimeMillis()
             message = if (ok) s.dataBackupDone else s.dataBackupFailed
         }
     }
@@ -28788,8 +29181,16 @@ fun DataScreen(c: MatchController) {
         icon = Icons.Filled.Backup,
         bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
     ) {
+        // Chi usa l'app: i ruoli cambiano le schede della prima schermata, non i dati.
+        val roles by c.roles.collectAsState()
+        SectionCard(s.rolesTitle, Icons.Filled.Groups) {
+            Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            com.tennis.scoremanager.ui.RolesPicker(roles) { c.setRoles(it) }
+        }
         SectionCard(s.dataBackup, Icons.Filled.Backup) {
             Text(s.dataBackupHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            var reminder by remember { mutableStateOf(c.storage.backupReminder) }
+            SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it; c.storage.backupReminder = it }
             SwitchRow(Icons.Filled.Videocam, s.dataVideos(videoMb.toInt()), s.dataVideosHint, videos) { videos = it }
             BigButton(s.dataBackupDo, Icons.Filled.Backup, {
                 val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
@@ -29364,6 +29765,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -29375,6 +29777,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -29457,36 +29860,131 @@ fun HomeScreen(c: MatchController) {
         asked = true
     }
     if (tour) com.tennis.scoremanager.ui.OnboardingFlow(c) { tour = false }
-    // Da un'altra scheda "Indietro" torna a Gioca; da Gioca esce dall'app come sempre.
-    BackHandler(enabled = tab != HomeTab.PLAY) { c.homeTab.value = HomeTab.PLAY }
-    val (title, icon) = when (tab) {
-        HomeTab.PLAY -> s.tabPlay to Icons.Filled.SportsTennis
-        HomeTab.TRAIN -> s.tabTrain to Icons.Filled.FitnessCenter
-        HomeTab.VIDEO -> s.tabVideo to Icons.Filled.Videocam
-        HomeTab.PROGRESS -> s.tabProgress to Icons.AutoMirrored.Filled.TrendingUp
-        HomeTab.MORE -> s.tabMore to Icons.Filled.MoreHoriz
-    }
-    ScreenScaffold(title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tab) { c.homeTab.value = it } }) {
+    // Le schede del ruolo attivo (Tu, Allenatore, Circolo); una scheda che il ruolo non ha porta alla sua prima.
+    val role by c.activeRole.collectAsState()
+    val roles by c.roles.collectAsState()
+    val tabs = role.tabs
+    LaunchedEffect(role, tab) { if (tab !in tabs) c.homeTab.value = tabs.first() }
+    // Da un'altra scheda "Indietro" torna alla prima; dalla prima esce dall'app come sempre.
+    BackHandler(enabled = tab != tabs.first()) { c.homeTab.value = tabs.first() }
+    val (title, icon) = tabInfo(s, tab)
+    ScreenScaffold(
+        title = title, subtitle = null, icon = icon, bottomBar = { TabBar(tabs, tab) { c.homeTab.value = it } },
+        action = if (roles.size > 1) { { RoleSwitch(c) } } else null,
+    ) {
+        // Promemoria del backup (se acceso in Profilo e dati): ogni 30 giorni.
+        if (c.backupDue()) Entry(Icons.Filled.Backup, s.backupDueTitle, s.backupDueHint(c.storage.lastBackupAt.takeIf { it > 0 }?.let { com.tennis.scoremanager.data.Reports.date(it, c.options.value.lang) })) { c.go(Screen.DATA) }
         when (tab) {
             HomeTab.PLAY -> PlayTab(c)
             HomeTab.TRAIN -> TrainTab(c)
             HomeTab.VIDEO -> VideoTab(c)
             HomeTab.PROGRESS -> ProgressTab(c)
             HomeTab.MORE -> MoreTab(c) { tour = true }
+            HomeTab.STUDENTS -> CoachTab(c)
+            HomeTab.TOURNAMENTS -> TournamentsTab(c)
+            HomeTab.COURTS -> CourtsTab(c)
+            HomeTab.PEOPLE -> PeopleTab(c)
         }
     }
 }
 
+/** Titolo e icona di una scheda. */
+private fun tabInfo(s: com.tennis.scoremanager.ui.Strings, t: HomeTab): Pair<String, ImageVector> = when (t) {
+    HomeTab.PLAY -> s.tabPlay to Icons.Filled.SportsTennis
+    HomeTab.TRAIN -> s.tabTrain to Icons.Filled.FitnessCenter
+    HomeTab.VIDEO -> s.tabVideo to Icons.Filled.Videocam
+    HomeTab.PROGRESS -> s.tabProgress to Icons.AutoMirrored.Filled.TrendingUp
+    HomeTab.MORE -> s.tabMore to Icons.Filled.MoreHoriz
+    HomeTab.STUDENTS -> s.studentsTitle to Icons.Filled.Groups
+    HomeTab.TOURNAMENTS -> s.tabTournaments to Icons.Filled.EmojiEvents
+    HomeTab.COURTS -> s.tabCourts to Icons.Filled.Tv
+    HomeTab.PEOPLE -> s.playersTitle to Icons.Filled.Groups
+}
+
+fun roleName(s: com.tennis.scoremanager.ui.Strings, r: com.tennis.scoremanager.Role) = when (r) {
+    com.tennis.scoremanager.Role.PLAYER -> s.moreProfile
+    com.tennis.scoremanager.Role.COACH -> s.roleCoach
+    com.tennis.scoremanager.Role.CLUB -> s.roleClub
+}
+
+fun roleIcon(r: com.tennis.scoremanager.Role): ImageVector = when (r) {
+    com.tennis.scoremanager.Role.PLAYER -> Icons.Filled.Person
+    com.tennis.scoremanager.Role.COACH -> Icons.Filled.School
+    com.tennis.scoremanager.Role.CLUB -> Icons.Filled.Business
+}
+
+/** Il ruolo attivo, in alto: toccandolo si passa a un altro dei propri ruoli. */
 @Composable
-private fun RowScope.TabBar(current: HomeTab, onSelect: (HomeTab) -> Unit) {
+private fun RoleSwitch(c: MatchController) {
     val s = LocalStrings.current
-    for ((t, label, icon) in listOf(
-        Triple(HomeTab.PLAY, s.tabPlay, Icons.Filled.SportsTennis),
-        Triple(HomeTab.TRAIN, s.tabTrain, Icons.Filled.FitnessCenter),
-        Triple(HomeTab.VIDEO, s.tabVideo, Icons.Filled.Videocam),
-        Triple(HomeTab.PROGRESS, s.tabProgress, Icons.AutoMirrored.Filled.TrendingUp),
-        Triple(HomeTab.MORE, s.tabMore, Icons.Filled.MoreHoriz),
-    )) {
+    val role by c.activeRole.collectAsState()
+    val roles by c.roles.collectAsState()
+    var open by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            Modifier.clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).clickable { open = true }.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(roleIcon(role), null, tint = TsmColors.Ball, modifier = Modifier.size(18.dp))
+            Text(" " + roleName(s, role) + " ▾", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+        androidx.compose.material3.DropdownMenu(open, { open = false }) {
+            for (r in com.tennis.scoremanager.Role.entries.filter { it in roles }) {
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(roleName(s, r), fontWeight = if (r == role) FontWeight.Bold else FontWeight.Normal) },
+                    leadingIcon = { Icon(roleIcon(r), null, tint = if (r == role) TsmColors.Ball else TsmColors.TextDim) },
+                    onClick = { open = false; c.setActiveRole(r) },
+                )
+            }
+        }
+    }
+}
+
+/** Allenatore: chi si allena e i suoi allenamenti dei colpi, gli allievi, una partita tra allievi. */
+@Composable
+private fun CoachTab(c: MatchController) {
+    val s = LocalStrings.current
+    val students by c.students.collectAsState()
+    Entry(Icons.Filled.Groups, s.studentsTitle, s.studentsHint, main = true) { c.openStudents() }
+    for (st in students.take(6)) Entry(Icons.Filled.Person, st.name, c.playerHint(st)) { c.openStudent(st.id) }
+    ServeTrainingCard(c)
+}
+
+/** Circolo: i tornei, una partita, un telefono come tabellone. */
+@Composable
+private fun TournamentsTab(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint, main = true) { c.openTournaments() }
+    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
+    Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
+}
+
+/** Circolo: nome e campi (si usano in Nuova partita e per i tabelloni), il tabellone TV. */
+@Composable
+private fun CourtsTab(c: MatchController) {
+    val s = LocalStrings.current
+    var edit by remember { mutableStateOf(false) }
+    val name = c.storage.clubName
+    val courts = c.storage.clubCourts
+    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · "), main = true) { edit = true }
+    Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
+    if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
+}
+
+/** Circolo: giocatori e allievi del database. */
+@Composable
+private fun PeopleTab(c: MatchController) {
+    val s = LocalStrings.current
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = true) { c.openPlayers() }
+    Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
+}
+
+@Composable
+private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (HomeTab) -> Unit) {
+    val s = LocalStrings.current
+    for (t in tabs) {
+        val (label, icon) = tabInfo(s, t)
         val on = t == current
         Column(
             Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).clickable { onSelect(t) }
@@ -32901,6 +33399,7 @@ import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun SetupScreen(c: MatchController) {
     val s = LocalStrings.current
@@ -32972,6 +33471,17 @@ fun SetupScreen(c: MatchController) {
             } else {
                 Field(su.club, s.clubName, Icons.Filled.Business) { v -> c.updateSetup { it.copy(club = v) } }
                 Field(su.court, s.courtNumber, Icons.Filled.Tag, KeyboardType.Text) { v -> c.updateSetup { it.copy(court = v) } }
+                // I campi del circolo (Circolo › Campi): un tocco e circolo e campo sono scritti.
+                val courts = c.storage.clubCourts
+                if (courts.isNotEmpty()) androidx.compose.foundation.layout.FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    for (ct in courts) Text(
+                        ct, color = if (su.court == ct) TsmColors.OnBall else TsmColors.Ball, fontSize = 13.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(if (su.court == ct) TsmColors.Ball else TsmColors.SurfaceHigh)
+                            .clickable { c.updateSetup { it.copy(court = ct, club = it.club.ifBlank { c.storage.clubName }) } }.padding(horizontal = 10.dp, vertical = 6.dp),
+                    )
+                }
                 // Facoltativo e spento di default: il Geocoder di sistema, con i servizi Google, manda le coordinate a Google.
                 SwitchRow(Icons.Filled.Place, s.addressLookup, s.addressLookupHint, o.addressLookup) { v ->
                     c.updateOptions { it.copy(addressLookup = v) }
@@ -33808,7 +34318,7 @@ fun StudentScreen(c: MatchController) {
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
             // Si sceglie lui in Allenati e si torna lì, pronti per Inizia.
-            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(HomeTab.TRAIN) }, Modifier.weight(1f))
+            if (st.student) BigButton(s.studentTrainNow, Icons.Filled.Videocam, { c.setTrainStudent(st.id); c.home(if (c.activeRole.value == com.tennis.scoremanager.Role.COACH) HomeTab.STUDENTS else HomeTab.TRAIN) }, Modifier.weight(1f))
         },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -55420,7 +55930,8 @@ class StringsTest {
             // Restano uguali solo nomi propri e termini del tennis: Bluetooth, Firmware, Audio On/Off, online...
             // e, coi tornei, Americano e Mexicano (nomi propri) e "12 minutes", "24 points" (uguali in francese);
             // con l'allenamento anche "Pause", e coi video "Point", "Date", "points", "Ace", "Zoom", e con la sagoma "Distance", "Direction", "Padel", uguali in francese.
-            assertTrue("$lang copia l'inglese in: $same", same.size < 52)
+            // Coi ruoli anche "Club" (il ruolo del circolo), uguale in francese.
+            assertTrue("$lang copia l'inglese in: $same", same.size < 54)
             val sentences = same.filter { k -> (en[k] ?: "").count { c -> c == ' ' } >= 3 }
             assertTrue("$lang frasi non tradotte: $sentences", sentences.isEmpty())
         }
@@ -60770,6 +61281,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 188 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 189 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

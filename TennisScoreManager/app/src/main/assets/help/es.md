@@ -321,6 +321,15 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Restaurar**: pone los datos de una copia en este teléfono, aunque sea nuevo; sustituye todo lo que hay (una copia sin vídeos deja los vídeos que hay). Luego la app se cierra: al abrirla encuentras los datos de la copia.
   - **Borrar todos los datos**: la app vuelve a estar como recién instalada (dos confirmaciones; con **También los vídeos** también clips, moviola y highlights). Los archivos guardados en Documentos y los vídeos de la galería se quedan.
 
+### 7.9 Roles: Tú, Entrenador, Club
+
+- En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
+  - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
+  - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
+  - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
+- El marcador está en todos los roles: nada te impide anotar un partido.
+- **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

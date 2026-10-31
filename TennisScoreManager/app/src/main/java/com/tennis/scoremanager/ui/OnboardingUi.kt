@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
@@ -58,6 +59,9 @@ import com.tennis.scoremanager.model.Lang
 /** Come si userà l'app: decide la modalità di serie e la scheda da cui si parte. */
 private enum class Use { REFEREE, BANDS, TRAIN, VIDEO }
 
+/** I passi della prima apertura; alcuni solo per certi ruoli. */
+private enum class Step { LANG, ROLES, YOU, USE, CLUB, PRIVACY }
+
 /**
  * Prima accensione: lingua, come si userà l'app e il proprio nome, a tutto schermo. Si può saltare; alla fine
  * l'app parte dalla scheda giusta (coi braccialetti, dai dispositivi da collegare).
@@ -68,12 +72,32 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
     val o by c.options.collectAsState()
     var step by remember { mutableIntStateOf(0) }
     var use by remember { mutableStateOf<Use?>(null) }
+    // Ruoli (Tu, Allenatore, Circolo), circolo e promemoria del backup.
+    var roles by remember { mutableStateOf(c.roles.value) }
+    var club by remember { mutableStateOf(c.storage.clubName) }
+    var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    var reminder by remember { mutableStateOf(true) }
+    val steps = Step.entries.filter { st ->
+        when (st) {
+            Step.USE -> com.tennis.scoremanager.Role.PLAYER in roles
+            Step.CLUB -> com.tennis.scoremanager.Role.CLUB in roles
+            else -> true
+        }
+    }
+    val current = steps[step.coerceIn(0, steps.size - 1)]
     // Tu: nome e cognome (obbligatori per la tua scheda di giocatore) e soprannome.
     var first by remember { mutableStateOf("") }
     var last by remember { mutableStateOf("") }
     var nick by remember { mutableStateOf("") }
     fun finish() {
         c.storage.onboarded = true
+        c.setRoles(roles)
+        if (com.tennis.scoremanager.Role.CLUB in roles) {
+            c.storage.clubName = club
+            c.storage.clubCourts = courts.lines()
+            if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
+        }
+        c.storage.backupReminder = reminder
         if (first.isNotBlank() && last.isNotBlank()) {
             // Se c'è già (stesso nome e cognome) sei tu, sennò la tua scheda nasce ora.
             val p = com.tennis.scoremanager.data.Players.sameFullName(c.players.value, first, last).singleOrNull()
@@ -84,7 +108,10 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             c.setMe(p)
             if (c.setup.value.p1a.isBlank()) c.updateSetup { it.copy(p1a = p.name, p1aId = p.id) }
         }
-        when (use) {
+        // Si parte dal primo ruolo scelto; per chi gioca, dalla scheda dell'uso detto.
+        val first = com.tennis.scoremanager.Role.entries.first { it in roles }
+        c.setActiveRole(first)
+        if (first == com.tennis.scoremanager.Role.PLAYER) when (use) {
             Use.REFEREE -> { c.updateOptions { it.copy(mode = PlayMode.REFEREE) }; c.home(HomeTab.PLAY) }
             Use.BANDS -> { c.updateOptions { it.copy(mode = PlayMode.BANDS) }; c.home(HomeTab.PLAY); c.go(Screen.DEVICES) }
             Use.TRAIN -> c.home(HomeTab.TRAIN)
@@ -105,17 +132,31 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(s.onbWelcome, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text("${step + 1} / 3", color = TsmColors.TextDim, fontSize = 13.sp)
+                    Text("${step + 1} / ${steps.size}", color = TsmColors.TextDim, fontSize = 13.sp)
                 }
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                when (step) {
-                    0 -> {
+                when (current) {
+                    Step.LANG -> {
                         Text(s.onbLang, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         // Ogni lingua è scritta in sé stessa: si ritrova anche se l'app parte in una lingua che non si legge.
                         Segmented(Lang.entries.map { SegOption("${it.flag}  ${it.label}") }, o.lang.ordinal, { i -> c.updateOptions { it.copy(lang = Lang.entries[i]) } }, columns = 2)
                     }
-                    1 -> {
+                    Step.ROLES -> {
+                        Text(s.onbRolesTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(s.rolesHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                        RolesPicker(roles) { roles = it }
+                    }
+                    Step.CLUB -> {
+                        Text(s.onbClubTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        ClubFields(club, courts, { club = it }, { courts = it })
+                    }
+                    Step.PRIVACY -> {
+                        Text(s.onbPrivacyTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(s.onbPrivacyText, color = TsmColors.TextMain, fontSize = 15.sp)
+                        SwitchRow(Icons.Filled.Alarm, s.backupReminder, s.backupReminderHint, reminder) { reminder = it }
+                    }
+                    Step.USE -> {
                         Text(s.onbUseTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         for ((u, icon, title, hint) in listOf(
                             Quad(Use.REFEREE, Icons.Filled.Gavel, s.onbUseReferee, s.onbUseRefereeHint),
@@ -126,7 +167,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
                             Choice(icon, title, hint, use == u) { use = u }
                         }
                     }
-                    else -> {
+                    Step.YOU -> {
                         Text(s.onbNameTitle, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         @Composable fun field(v: String, label: String, onChange: (String) -> Unit) = OutlinedTextField(
                             v, { onChange(it.take(40)) }, label = { Text(label) }, leadingIcon = { Icon(Icons.Filled.Person, null) }, singleLine = true,
@@ -141,7 +182,8 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 GhostButton(s.onbSkip, Icons.AutoMirrored.Filled.ArrowForward, { finish() }, Modifier.weight(1f))
-                BigButton(if (step < 2) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (step < 2) step++ else finish() }, Modifier.weight(1f))
+                val lastStep = step >= steps.size - 1
+                BigButton(if (!lastStep) s.next else s.onbStart, Icons.AutoMirrored.Filled.ArrowForward, { if (!lastStep) step++ else finish() }, Modifier.weight(1f))
             }
             Spacer(Modifier.height(4.dp))
         }

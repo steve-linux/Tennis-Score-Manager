@@ -434,6 +434,15 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Restaurar**: coloca os dados de um backup neste telefone, mesmo novo; substitui tudo o que há (um backup sem vídeos deixa os vídeos que existem). Depois o app fecha: ao abrir de novo você encontra os dados do backup.
   - **Apagar todos os dados**: o app volta a ficar como recém-instalado (duas confirmações; com **Também os vídeos** também clipes, replay e highlights). Os arquivos salvos em Documentos e os vídeos da galeria ficam.
 
+### 7.9 Papéis: Você, Treinador, Clube (app 2.6)
+
+- Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
+  - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
+  - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
+  - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
+- O placar está em todos os papéis: nada impede você de marcar uma partida.
+- **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

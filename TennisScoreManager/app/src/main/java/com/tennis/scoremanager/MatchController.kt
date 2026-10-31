@@ -128,8 +128,24 @@ import kotlinx.serialization.json.Json
 
 enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA }
 
-/** Le cinque schede della prima schermata, organizzate per cosa si vuole fare. */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE }
+/**
+ * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
+ * ([Role.tabs]).
+ */
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE }
+
+/**
+ * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
+ * Il tabellone c'è in tutti: l'allenatore arbitra le partite tra allievi, il circolo quelle dei tornei.
+ */
+enum class Role(val tabs: List<HomeTab>) {
+    /** Tu: giochi, ti alleni, i tuoi video e progressi (l'app di sempre). */
+    PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
+    /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
+    COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
+    /** Circolo: tornei, campi coi loro tabelloni, giocatori e allenatori. */
+    CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+}
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
@@ -1195,6 +1211,31 @@ class MatchController(
         storage.myPlayerId = p?.id.orEmpty()
         storage.myName = p?.name.orEmpty()
     }
+
+    // ---------------------------------------------------------------- ruoli
+
+    /** I ruoli scelti (almeno uno) e quello attivo, che decide le schede della prima schermata. */
+    val roles = MutableStateFlow(storage.roles.mapNotNull { r -> Role.entries.firstOrNull { it.name == r } }.toSet().ifEmpty { setOf(Role.PLAYER) })
+    val activeRole = MutableStateFlow(Role.entries.firstOrNull { it.name == storage.activeRole }?.takeIf { it in roles.value } ?: roles.value.first())
+
+    /** Cambia i ruoli; se quello attivo non c'è più si passa al primo rimasto. Almeno uno resta sempre. */
+    fun setRoles(set: Set<Role>) {
+        val v = set.ifEmpty { setOf(Role.PLAYER) }
+        roles.value = Role.entries.filter { it in v }.toSet()
+        storage.roles = roles.value.map { it.name }.toSet()
+        if (activeRole.value !in roles.value) setActiveRole(roles.value.first())
+    }
+
+    /** Passa a un ruolo: la prima schermata mostra le sue schede, partendo dalla prima. */
+    fun setActiveRole(r: Role) {
+        activeRole.value = r
+        storage.activeRole = r.name
+        homeTab.value = r.tabs.first()
+    }
+
+    /** Il backup va ricordato: promemoria acceso, ultimo backup da più di 30 giorni (o mai) e qualcosa da salvare. */
+    fun backupDue(now: Long = System.currentTimeMillis()): Boolean =
+        storage.backupReminder && now - storage.lastBackupAt > 30L * 24 * 3600 * 1000 && (history.value.isNotEmpty() || serveSessions.value.isNotEmpty())
 
     /** Chi sei nelle statistiche: il tuo giocatore, o il tuo nome se non l'hai ancora scelto. */
     fun myKey(): String = me()?.id ?: keyForName(storage.myName)
