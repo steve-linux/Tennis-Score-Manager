@@ -140,16 +140,7 @@ class ReplayActivity : ComponentActivity() {
     }
 
     /** I punti del corpo all'istante [rel] (ms dal servizio), tra i due fotogrammi analizzati più vicini. */
-    private fun poseAt(rel: Long): PoseFrame? {
-        val frames = pose?.frames ?: return null
-        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
-        val j = frames.indexOfFirst { it.t >= rel }
-        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
-        val a = frames[j - 1]
-        val b = frames[j]
-        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
-        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
-    }
+    private fun poseAt(rel: Long): PoseFrame? = pose?.frames?.let { ServePose.frameAt(it, rel) }
 
     /** Lo scheletro sopra il video: x e y dei punti sono in frazioni dell'altezza dell'immagine. */
     @Composable
@@ -163,15 +154,7 @@ class ReplayActivity : ComponentActivity() {
             }
         }
         val f = frame ?: return
-        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            val h = size.height
-            val bone = TsmColors.Ball
-            for ((a, b) in ServePose.BONES) {
-                if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
-                drawLine(bone, Offset(f.x[a] * h, f.y[a] * h), Offset(f.x[b] * h, f.y[b] * h), strokeWidth = h / 110, cap = androidx.compose.ui.graphics.StrokeCap.Round)
-            }
-            for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) drawCircle(androidx.compose.ui.graphics.Color.White, h / 120, Offset(f.x[i] * h, f.y[i] * h))
-        }
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) { drawSkeleton(f, TsmColors.Ball) }
     }
 
     @Composable

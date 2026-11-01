@@ -1044,6 +1044,11 @@ interface Strings {
     val reportFailed: String
     val reportPeriod: (String, String) -> String
     val reportCoach: (String) -> String
+    val compareWith: String
+    val comparePick: String
+    val compareNone: String
+    val compareOverlay: String
+    val compareThisSession: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2347,6 +2352,11 @@ object ItStrings : Strings {
     override val reportFailed = "Il report non è riuscito: riprova."
     override val reportPeriod: (String, String) -> String = { a, b -> "dal $a al $b" }
     override val reportCoach: (String) -> String = { "allenatore: $it" }
+    override val compareWith = "Confronta con un altro colpo"
+    override val comparePick = "Con quale colpo?"
+    override val compareNone = "Nessun altro colpo di questo tipo analizzato e con il video."
+    override val compareOverlay = "Sovrapponi"
+    override val compareThisSession = "questa sessione"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3633,6 +3643,11 @@ object EnStrings : Strings {
     override val reportFailed = "The report did not work: try again."
     override val reportPeriod: (String, String) -> String = { a, b -> "from $a to $b" }
     override val reportCoach: (String) -> String = { "coach: $it" }
+    override val compareWith = "Compare with another shot"
+    override val comparePick = "With which shot?"
+    override val compareNone = "No other shot of this kind analysed and with its video."
+    override val compareOverlay = "Overlay"
+    override val compareThisSession = "this session"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

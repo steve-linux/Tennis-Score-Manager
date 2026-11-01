@@ -1008,6 +1008,11 @@ object FrStrings : Strings {
     override val reportFailed = "Le bilan n'a pas réussi : réessayez."
     override val reportPeriod: (String, String) -> String = { a, b -> "du $a au $b" }
     override val reportCoach: (String) -> String = { "entraîneur : $it" }
+    override val compareWith = "Comparer avec un autre coup"
+    override val comparePick = "Avec quel coup ?"
+    override val compareNone = "Aucun autre coup de ce type analysé et avec sa vidéo."
+    override val compareOverlay = "Superposer"
+    override val compareThisSession = "cette séance"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

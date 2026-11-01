@@ -33,6 +33,8 @@ object TsmColors {
     val Court = Color(0xFF1F7A4D)
     val CourtLine = Color(0xFFE8F5E9)
     val Ok = Color(0xFF4CAF50)
+    /** Il secondo colpo nel confronto dei video. */
+    val Cyan = Color(0xFF29B6F6)
 
     fun player(side: Side) = if (side == Side.P1) Player1 else Player2
     fun onPlayer(side: Side) = if (side == Side.P1) OnPlayer1 else OnPlayer2

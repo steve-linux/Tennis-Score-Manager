@@ -1005,6 +1005,11 @@ object DeStrings : Strings {
     override val reportFailed = "Der Bericht hat nicht geklappt: versuche es nochmal."
     override val reportPeriod: (String, String) -> String = { a, b -> "vom $a bis $b" }
     override val reportCoach: (String) -> String = { "Trainer: $it" }
+    override val compareWith = "Mit einem anderen Schlag vergleichen"
+    override val comparePick = "Mit welchem Schlag?"
+    override val compareNone = "Kein anderer Schlag dieser Art analysiert und mit Video."
+    override val compareOverlay = "Überlagern"
+    override val compareThisSession = "diese Einheit"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

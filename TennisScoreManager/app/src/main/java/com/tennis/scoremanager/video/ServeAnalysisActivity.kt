@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.PlayCircle
@@ -360,6 +361,10 @@ class ServeAnalysisActivity : ComponentActivity() {
                     .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at),
             )
         }, Modifier.fillMaxWidth())
+        // Lo stesso colpo di un altro giorno (o di questa sessione) accanto, allineato sull'impatto.
+        var pick by remember { mutableStateOf(false) }
+        GhostButton(str.compareWith, Icons.AutoMirrored.Filled.CompareArrows, { pick = true }, Modifier.fillMaxWidth())
+        if (pick) ComparePicker(sess, a) { pick = false }
         Text(str.poseZoomHint, color = TsmColors.TextDim, fontSize = 12.sp)
         var zoomed by remember { mutableStateOf<Bitmap?>(null) }
         for ((label, bmp) in images) {
@@ -373,6 +378,70 @@ class ServeAnalysisActivity : ComponentActivity() {
                 Text(value, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
+    }
+
+    /** Un colpo analizzato da confrontare: sessione, colpo, cartella della clip. */
+    private class Candidate(val sess: ServeSession, val index: Int, val a: ServeAttempt, val dir: File)
+
+    /** Gli altri colpi dello stesso tipo e della stessa persona, analizzati e col video, dal più recente. */
+    private fun candidates(sess: ServeSession, a: ServeAttempt): List<Candidate> =
+        controller.storage.loadServeSessions().filter { it.stroke == sess.stroke && it.student == sess.student }.flatMap { o ->
+            o.serves.mapIndexedNotNull { i, b ->
+                val d = dir(o, b) ?: return@mapIndexedNotNull null
+                if (b.clip == a.clip && o.id == sess.id) return@mapIndexedNotNull null
+                if (!File(d, ServeClipAnalysis.RESULT).exists() || !hasVideo(o, b)) return@mapIndexedNotNull null
+                Candidate(o, i, b, d)
+            }
+        }.sortedByDescending { it.a.at }.take(80)
+
+    /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
+    private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
+        val str = s
+        val lang = controller.options.value.lang
+        val name = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
+        val loc = com.tennis.scoremanager.data.Reports.locale(lang)
+        val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "dMMMHHmm"), loc).format(java.util.Date(a.at))
+        return "$name · $day · ${if (a.inPlay) str.serveIn else str.serveOut}"
+    }
+
+    @Composable
+    private fun ComparePicker(sess: ServeSession, a: ServeAttempt, onDone: () -> Unit) {
+        val str = s
+        val list by androidx.compose.runtime.produceState<List<Candidate>?>(null) { value = withContext(Dispatchers.IO) { candidates(sess, a) } }
+        val dirA = dir(sess, a) ?: return
+        val indexA = sess.serves.indexOf(a)
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = onDone,
+            title = { Text(str.comparePick) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    val l = list
+                    when {
+                        l == null -> LinearProgressIndicator(Modifier.fillMaxWidth(), color = TsmColors.Ball)
+                        l.isEmpty() -> Text(str.compareNone, color = TsmColors.TextDim)
+                        else -> for (c in l) {
+                            Column(
+                                Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable {
+                                    startActivity(
+                                        android.content.Intent(this@ServeAnalysisActivity, CompareActivity::class.java)
+                                            .putExtra(CompareActivity.EXTRA_DIR + "a", dirA.absolutePath).putExtra(CompareActivity.EXTRA_AT + "a", a.at)
+                                            .putExtra(CompareActivity.EXTRA_LABEL + "a", label(sess, indexA, a))
+                                            .putExtra(CompareActivity.EXTRA_DIR + "b", c.dir.absolutePath).putExtra(CompareActivity.EXTRA_AT + "b", c.a.at)
+                                            .putExtra(CompareActivity.EXTRA_LABEL + "b", label(c.sess, c.index, c.a)),
+                                    )
+                                    onDone()
+                                }.padding(10.dp),
+                            ) {
+                                Text(label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { androidx.compose.material3.TextButton(onClick = onDone) { Text(str.back) } },
+        )
     }
 
     @Composable

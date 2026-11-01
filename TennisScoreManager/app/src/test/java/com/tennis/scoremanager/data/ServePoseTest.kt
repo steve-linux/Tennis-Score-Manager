@@ -164,4 +164,38 @@ class ServePoseTest {
         val volley = ServePose.groundMetrics(one, volley = true)!!
         assertTrue("${volley.finishT}", volley.finishT in 100L..450L)
     }
+
+    /** Un corpo fermo: anche a (cx, cy), spalle [torso] più in alto, il resto attorno. */
+    private fun still(t: Long, cx: Float, cy: Float, torso: Float): PoseFrame {
+        val x = MutableList(17) { cx }
+        val y = MutableList(17) { cy }
+        for (k in listOf(L_SHOULDER, R_SHOULDER)) y[k] = cy - torso
+        x[L_HIP] = cx - torso / 4; x[R_HIP] = cx + torso / 4
+        x[L_SHOULDER] = cx - torso / 3; x[R_SHOULDER] = cx + torso / 3
+        y[L_WRIST] = cy - torso * 1.5f
+        return PoseFrame(t, x, y, List(17) { 0.9f })
+    }
+
+    @Test
+    fun frameAtInterpolatesBetweenFrames() {
+        val frames = listOf(still(0, 0.5f, 0.5f, 0.2f), still(100, 0.7f, 0.5f, 0.2f))
+        val f = ServePose.frameAt(frames, 50)!!
+        assertEquals(0.6f, f.x[L_KNEE], 1e-4f)
+        assertNull(ServePose.frameAt(frames, 400))
+        assertNull(ServePose.frameAt(emptyList(), 0))
+    }
+
+    @Test
+    fun alignPutsHipsAndTorsoOnTheReference() {
+        val ref = still(0, 0.5f, 0.6f, 0.2f)
+        // Lo stesso corpo ripreso più lontano (busto metà) e spostato.
+        val other = still(0, 1.1f, 0.4f, 0.1f)
+        val g = ServePose.align(ref, other)!!
+        for (k in listOf(L_HIP, R_HIP, L_SHOULDER, R_SHOULDER, L_WRIST)) {
+            assertEquals(ref.x[k], g.x[k], 1e-4f)
+            assertEquals(ref.y[k], g.y[k], 1e-4f)
+        }
+        // Senza anche visibili non si allinea.
+        assertNull(ServePose.align(ref, other.copy(s = List(17) { if (it == L_HIP || it == R_HIP) 0f else 0.9f })))
+    }
 }

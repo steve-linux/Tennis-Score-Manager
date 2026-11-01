@@ -287,6 +287,13 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:name=".video.ServeAnalysisActivity"
             android:exported="false" />
 
+        <!-- Confronto di due colpi analizzati, con lo scheletro -->
+        <activity
+            android:name=".video.CompareActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
+
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
         <activity
             android:name=".video.CameraActivity"
@@ -597,7 +604,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 6. Unter **Starten** stehen die letzten 3 Einheiten **des gewählten Schlags** (die Schlag-Tasten zeigen die Zahl der Einheiten, z. B. *Rückhand · 4*) und die Linie der **Schläge im Feld, Einheit für Einheit**. **Alle Einheiten** öffnet die des gewählten Schlags, nach Monaten, mit dem Platz der Videos und ob sie schon analysiert sind. Eine Einheit antippen für Übersicht und Clips; **gedrückt halten**, um sie auszuwählen (das Symbol oben wählt alle), dann **Löschen** (Einheit und Videos) oder **Nur Videos** (schafft Platz: Zählungen, Messwerte der Analyse und Bilder der Schlüsselmomente bleiben). **Fortschritt** zeigt den Verlauf jedes Schlags.
    - **Wo die Videos liegen**: in **Dokumente/Tennis Score Manager/Schlagtraining**, mit den Ordnern **Aufschlag**, **Vorhand**, **Rückhand** und **Volley** (beim Start angelegt), darin ein Ordner pro Einheit (Datum und Uhrzeit) und einer pro Schlag, mit `video.mp4` (lässt sich in jeder App öffnen und teilen), der Analyse und den drei Bildern. Jeder Dateimanager zeigt sie, und sie bleiben auch beim Deinstallieren der App (als Archiv: eine neu installierte App übernimmt die Einheiten nicht). Unter Android 8-10 liegt dieselbe Struktur im App-Ordner. Clips von Einheiten vor 2.5 werden beim ersten Start von selbst dorthin verschoben.
 7. **Bewegungsanalyse** (aus der gespeicherten Einheit): **Aufschläge analysieren** erkennt die Körperhaltung in den Clips (Modell MoveNet: Beim ersten Mal bietet die App an, es herunterzuladen, 7 MB, von der Projektseite auf GitHub; danach bleibt alles auf dem Telefon, ohne Internet, ein paar Sekunden pro Aufschlag; löschen lässt es sich unten auf der Seite. Nicht verfügbar auf Geräten mit x86-Prozessor) und misst drei Momente: **Ausholen** (Wurfarm oben), stärkste **Kniebeuge** und **Treffpunkt**. Für jeden Aufschlag: die drei Bilder mit eingezeichnetem Skelett und die Messwerte (stärkste Kniebeuge, Ellbogen im Treffpunkt, Höhe des Treffpunkts im Verhältnis zur Körpergröße, Wurfarm, Schultern beim Ausholen, Zeit vom Ausholen zum Treffpunkt); oben **gute und Fehler** im Vergleich. Es sind Schätzungen aus einer Seitenansicht: Sie dienen vor allem dem Vergleich deiner Aufschläge untereinander. Der Körper wird gut erkannt, wenn die ganze Person im Bild ist, von der Seite und bei gutem Licht; Schläger und Ball werden nicht gemessen.
-   Einen Aufschlag antippen, um ihn zu öffnen: **Video mit Skelett ansehen** öffnet den Clip in der Zeitlupe mit dem darübergezeichneten Körper, verlangsamt, mit Tasten zum Springen zu **Ausholen**, **Knie** und **Treffpunkt** und einer zum Aus- und Einblenden des Skeletts; zwei Finger vergrößern Video und Skelett zusammen (bis 6×), doppelt tippen setzt zurück. Auch die drei Bilder lassen sich antippen, um sie bildschirmfüllend zu sehen und zu zoomen. Bei **mehreren Personen** im Bild folgt die App dem Aufschläger (wer den Arm am höchsten hebt) und deckt die anderen ab; das steht unter dem Aufschlag: in den Bildern prüfen. **Erneut analysieren** beginnt von vorn (die Clips bleiben), nützlich nach einem App-Update.
+   Einen Aufschlag antippen, um ihn zu öffnen: **Video mit Skelett ansehen** öffnet den Clip in der Zeitlupe mit dem darübergezeichneten Körper, verlangsamt, mit Tasten zum Springen zu **Ausholen**, **Knie** und **Treffpunkt** und einer zum Aus- und Einblenden des Skeletts; zwei Finger vergrößern Video und Skelett zusammen (bis 6×), doppelt tippen setzt zurück. **Mit einem anderen Schlag vergleichen** stellt denselben Schlag von einem anderen Tag oder aus derselben Einheit daneben (nur analysierte mit Video, von derselben Person): die zwei Videos mit Skelett, übereinander (nebeneinander mit dem Telefon quer), am Treffpunkt ausgerichtet und in Schleife über denselben Abschnitt, mit Tempo, Bild für Bild und den Schlüsselmomenten; **Überlagern** zeichnet im ersten auch das Skelett des zweiten (blau), Hüften an derselben Stelle und Oberkörper gleich lang, so sieht man, wo sich die Bewegung ändert. Auch die drei Bilder lassen sich antippen, um sie bildschirmfüllend zu sehen und zu zoomen. Bei **mehreren Personen** im Bild folgt die App dem Aufschläger (wer den Arm am höchsten hebt) und deckt die anderen ab; das steht unter dem Aufschlag: in den Bildern prüfen. **Erneut analysieren** beginnt von vorn (die Clips bleiben), nützlich nach einem App-Update.
 
 **Vorhand, Rückhand und Volley** funktionieren genauso (KEY1 drin, KEY2 aus, ein Clip pro Schlag, Übersicht und Analyse), mit diesen Unterschieden:
 - **Wo das Telefon hinkommt**: neben dem Spieler, rechtwinklig zur Schlagrichtung, 4-5 m entfernt und außerhalb des Doppelkorridors, auf Höhe des Treffpunkts; Objektiv etwa 1 m hoch; der ganze Schwung im Bild (das Handgelenk bewegt sich etwa 2 m vor und zurück). Beim Volley: neben dem Netzspieler, 3-4 m entfernt, auf seiner Höhe. Immer auf derselben Seite für die ganze Einheit und nie in der Flugbahn des Balls.
@@ -1015,7 +1022,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 6. Under **Start** you find the last 3 sessions **of the chosen stroke** (the stroke buttons show how many sessions each has, e.g. *Backhand · 4*) and the line of **shots in, session after session**. **All sessions** opens those of the chosen stroke, by month, with the space their videos take and whether they have been analysed. Tap a session for its summary and clips; **press and hold** to select it (the icon at the top selects them all), then **Delete** (session and videos) or **Videos only** (frees space: counts, analysis measurements and key-moment pictures stay). **Progress** shows the trend of each stroke.
    - **Where the videos are**: in **Documents/Tennis Score Manager/Stroke practice**, with the folders **Serve**, **Forehand**, **Backhand** and **Volley** (created at start-up) and inside them a folder per session (date and time) and one per shot, with `video.mp4` (opens and shares from any app), the analysis and the three pictures. Any file manager shows them and they stay even if you uninstall the app (keep them as an archive: a reinstalled app does not pick its sessions up again). On Android 8-10 the same structure is in the app folder. Clips of sessions from before 2.5 move there by themselves at the first start.
 7. **Movement analysis** (from the saved session): **Analyse the serves** finds the body position in the clips (MoveNet model: the first time the app asks to download it, 7 MB, from the project's GitHub page; then everything stays on the phone, no internet, a few seconds per serve; it can be deleted at the bottom of the screen. Not available on devices with an x86 processor) and measures three moments: **loading** (tossing arm up), deepest **knee** bend and **contact**. For each serve: the three images with the skeleton drawn and the measurements (deepest knee bend, elbow at contact, contact height relative to body height, tossing arm, shoulders at loading, time from loading to contact); at the top, **ins and outs** compared. They are estimates from a side view: they are most useful to compare your serves with each other. The body is recognised well with the whole person in the frame, from the side and in good light; racket and ball are not measured.
-   Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update.
+   Tap a serve to open it: **Watch the video with the skeleton** opens the clip in the replay with the body drawn on top, in slow motion, with buttons to jump to **Loading**, **Knees** and **Contact** and one to hide or show the skeleton; two fingers zoom video and skeleton together (up to 6×), double tap to go back. **Compare with another shot** puts the same stroke from another day or the same session next to it (only analysed ones with their video, of the same person): the two videos with the skeleton, one above the other (side by side with the phone in landscape), lined up on contact and looping over the same stretch, with speed, frame by frame and the key moments; **Overlay** also draws the second skeleton (in blue) on the first, with the hips in the same place and the torso the same length, so you see where the movement changes. The three images can also be tapped to see them full screen and zoom in. With **several people** in the frame the app follows the server (whoever raises the arm highest) and covers the others; it says so under the serve: check in the images. **Analyse again** starts over (the clips stay), useful after an app update.
 
 **Forehand, backhand and volley** work the same way (KEY1 in, KEY2 out, a clip for every shot, summary and analysis), with these differences:
 - **Where to put the phone**: beside the hitter, at right angles to the direction of the shots, 4-5 m away and outside the alley, level with the contact point; lens about 1 m high; the whole swing in the frame (the wrist moves about 2 m back and forth). For the volley: beside the net player, 3-4 m away, level with the player. Always on the same side for the whole session, and never in the ball's path.
@@ -1432,7 +1439,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 6. Debajo de **Empezar** están las 3 últimas sesiones **del golpe elegido** (los botones de los golpes muestran cuántas sesiones tiene cada uno, p. ej. *Revés · 4*) y la línea de **golpes dentro, sesión tras sesión**. **Todas las sesiones** abre las del golpe elegido, por mes, con el espacio de los vídeos y si ya están analizadas. Toca una sesión para el resumen y los clips; **mantenla pulsada** para seleccionarla (el icono de arriba las selecciona todas) y luego **Borrar** (sesión y vídeos) o **Solo los vídeos** (libera espacio: quedan los recuentos, las medidas del análisis y las imágenes de los momentos clave). **Progresos** muestra la evolución de cada golpe.
    - **Dónde están los vídeos**: en **Documentos/Tennis Score Manager/Entrenamiento de golpes**, con las carpetas **Saque**, **Derecha**, **Revés** y **Volea** (creadas al arrancar) y dentro una carpeta por sesión (fecha y hora) y una por golpe, con `video.mp4` (se abre y se comparte desde cualquier app), el análisis y las tres imágenes. Se ven con cualquier gestor de archivos y se quedan aunque desinstales la app (guárdalos como archivo: una app reinstalada no recupera sus sesiones). En Android 8-10 la misma estructura está en la carpeta de la app. Los clips de las sesiones anteriores a la 2.5 se mueven allí solos en el primer arranque.
 7. **Análisis del movimiento** (desde la sesión guardada): **Analizar los saques** encuentra la posición del cuerpo en los clips (modelo MoveNet: la primera vez la app ofrece descargarlo, 7 MB, desde la página del proyecto en GitHub; después todo se queda en el teléfono, sin internet, unos segundos por saque; se puede eliminar al final de la pantalla. No está disponible en dispositivos con procesador x86) y mide tres momentos: **armado** (brazo del lanzamiento arriba), **rodillas** más flexionadas e **impacto**. Para cada saque: las tres imágenes con el esqueleto dibujado y las medidas (rodilla más flexionada, codo en el impacto, altura del impacto respecto a la estatura, brazo del lanzamiento, hombros en el armado, tiempo del armado al impacto); arriba, **dentro y fuera** comparados. Son estimaciones a partir de un vídeo de lado: sirven sobre todo para comparar tus saques entre sí. El cuerpo se reconoce bien con toda la persona en el encuadre, de lado y con buena luz; raqueta y pelota no se miden.
-   Toca un saque para abrirlo: **Ver el vídeo con el esqueleto** abre el clip en la repetición con el cuerpo dibujado encima, a cámara lenta, con botones para saltar a **Armado**, **Rodillas** e **Impacto** y otro para quitar o poner el esqueleto; dos dedos amplían vídeo y esqueleto juntos (hasta 6×), doble toque para volver. Las tres imágenes también se tocan para verlas a pantalla completa y ampliarlas. Con **varias personas** en el encuadre la app sigue a quien saca (quien más levanta el brazo) y tapa a las demás; lo indica debajo del saque: compruébalo en las imágenes. **Repetir el análisis** empieza de nuevo (los clips se quedan), útil tras una actualización de la app.
+   Toca un saque para abrirlo: **Ver el vídeo con el esqueleto** abre el clip en la repetición con el cuerpo dibujado encima, a cámara lenta, con botones para saltar a **Armado**, **Rodillas** e **Impacto** y otro para quitar o poner el esqueleto; dos dedos amplían vídeo y esqueleto juntos (hasta 6×), doble toque para volver. **Comparar con otro golpe** pone al lado el mismo golpe de otro día o de la misma sesión (solo los analizados y con vídeo, de la misma persona): los dos vídeos con el esqueleto, uno encima del otro (uno al lado del otro con el teléfono en horizontal), alineados en el impacto y en bucle sobre el mismo tramo, con velocidad, fotograma a fotograma y los momentos clave; **Superponer** dibuja en el primero también el esqueleto del segundo (en azul), con las caderas en el mismo punto y el tronco de la misma longitud, para ver dónde cambia el movimiento. Las tres imágenes también se tocan para verlas a pantalla completa y ampliarlas. Con **varias personas** en el encuadre la app sigue a quien saca (quien más levanta el brazo) y tapa a las demás; lo indica debajo del saque: compruébalo en las imágenes. **Repetir el análisis** empieza de nuevo (los clips se quedan), útil tras una actualización de la app.
 
 **Derecha, revés y volea** funcionan igual (KEY1 dentro, KEY2 fuera, un clip por golpe, resumen y análisis), con estas diferencias:
 - **Dónde poner el teléfono**: al lado de quien golpea, perpendicular a la dirección de los golpes, a 4-5 m y fuera del pasillo, a la altura del punto de impacto; objetivo a 1 m; todo el swing en el encuadre (la muñeca se mueve unos 2 m adelante y atrás). Para la volea: al lado de quien juega en la red, a 3-4 m, a su altura. Siempre del mismo lado toda la sesión, y nunca en la trayectoria de la pelota.
@@ -1849,7 +1856,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 6. Sous **Commencer** se trouvent les 3 dernières séances **du coup choisi** (les boutons des coups indiquent le nombre de séances, p. ex. *Revers · 4*) et la courbe des **coups dedans, séance après séance**. **Toutes les séances** ouvre celles du coup choisi, par mois, avec la place prise par les vidéos et si elles sont déjà analysées. Touchez une séance pour son bilan et ses clips ; **appuyez longuement** pour la sélectionner (l'icône en haut les sélectionne toutes), puis **Supprimer** (séance et vidéos) ou **Vidéos seules** (libère de la place : restent les décomptes, les mesures de l'analyse et les images des moments clés). **Progrès** montre l'évolution de chaque coup.
    - **Où sont les vidéos** : dans **Documents/Tennis Score Manager/Entraînement des coups**, avec les dossiers **Service**, **Coup droit**, **Revers** et **Volée** (créés au démarrage) et dedans un dossier par séance (date et heure) et un par coup, avec `video.mp4` (s'ouvre et se partage depuis n'importe quelle appli), l'analyse et les trois images. Tout gestionnaire de fichiers les montre et ils restent même si vous désinstallez l'appli (gardez-les comme archive : une appli réinstallée ne reprend pas ses séances). Sur Android 8-10, la même structure est dans le dossier de l'appli. Les clips des séances d'avant la 2.5 y sont déplacés tout seuls au premier démarrage.
 7. **Analyse du mouvement** (depuis la séance enregistrée) : **Analyser les services** trouve la position du corps dans les clips (modèle MoveNet : la première fois, l'appli propose de le télécharger, 7 Mo, depuis la page du projet sur GitHub ; ensuite tout reste sur le téléphone, sans internet, quelques secondes par service ; il se supprime en bas de l'écran. Non disponible sur les appareils à processeur x86) et mesure trois moments : **armé** (bras de lancer en haut), **genoux** le plus fléchis et **impact**. Pour chaque service : les trois images avec le squelette dessiné et les mesures (genou le plus fléchi, coude à l'impact, hauteur de l'impact par rapport à la taille, bras de lancer, épaules à l'armé, temps de l'armé à l'impact) ; en haut, **bons et fautes** comparés. Ce sont des estimations à partir d'une vue de côté : elles servent surtout à comparer vos services entre eux. Le corps est bien reconnu avec toute la personne dans le cadre, de côté et avec une bonne lumière ; raquette et balle ne sont pas mesurées.
-   Touchez un service pour l'ouvrir : **Voir la vidéo avec le squelette** ouvre le clip dans le ralenti avec le corps dessiné par-dessus, au ralenti, avec des boutons pour aller à **Armé**, **Genoux** et **Impact** et un pour masquer ou remettre le squelette ; deux doigts agrandissent vidéo et squelette ensemble (jusqu'à 6×), double toucher pour revenir. Les trois images se touchent aussi pour les voir en plein écran et zoomer. Avec **plusieurs personnes** dans le cadre, l'appli suit le serveur (celui qui lève le plus le bras) et masque les autres ; c'est indiqué sous le service : vérifiez sur les images. **Refaire l'analyse** recommence (les clips restent), utile après une mise à jour de l'appli.
+   Touchez un service pour l'ouvrir : **Voir la vidéo avec le squelette** ouvre le clip dans le ralenti avec le corps dessiné par-dessus, au ralenti, avec des boutons pour aller à **Armé**, **Genoux** et **Impact** et un pour masquer ou remettre le squelette ; deux doigts agrandissent vidéo et squelette ensemble (jusqu'à 6×), double toucher pour revenir. **Comparer avec un autre coup** place à côté le même coup d'un autre jour ou de la même séance (seulement ceux analysés et avec leur vidéo, de la même personne) : les deux vidéos avec le squelette, l'une au-dessus de l'autre (côte à côte avec le téléphone à l'horizontale), alignées sur l'impact et en boucle sur le même passage, avec vitesse, image par image et les moments clés ; **Superposer** dessine aussi dans la première le squelette de la seconde (en bleu), hanches au même endroit et buste de même longueur, pour voir où le mouvement change. Les trois images se touchent aussi pour les voir en plein écran et zoomer. Avec **plusieurs personnes** dans le cadre, l'appli suit le serveur (celui qui lève le plus le bras) et masque les autres ; c'est indiqué sous le service : vérifiez sur les images. **Refaire l'analyse** recommence (les clips restent), utile après une mise à jour de l'appli.
 
 **Coup droit, revers et volée** fonctionnent de la même façon (KEY1 bon, KEY2 faute, un clip par coup, bilan et analyse), avec ces différences :
 - **Où placer le téléphone** : à côté du joueur, perpendiculaire à la direction des coups, à 4-5 m et hors du couloir, au niveau du point de frappe ; objectif à environ 1 m ; tout le geste dans le cadre (le poignet se déplace d'environ 2 m d'avant en arrière). Pour la volée : à côté du joueur au filet, à 3-4 m, à son niveau. Toujours du même côté pendant la séance, et jamais sur la trajectoire de la balle.
@@ -2266,7 +2273,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 6. Sotto **Inizia** ci sono le ultime 3 sessioni **del colpo scelto** (sui tasti dei colpi il numero delle sessioni, es. *Rovescio · 4*) e la linea dei **colpi dentro, sessione dopo sessione**. **Tutte le sessioni** apre quelle del colpo scelto, divise per mese, con lo spazio occupato dai video e se sono già analizzate. Tocca una sessione per il riepilogo e le clip; **tienila premuta** per selezionarla (l'icona in alto le seleziona tutte), poi **Elimina** (sessione e video) o **Solo i video** (libera spazio: restano conteggi, misure dell'analisi e immagini dei momenti chiave). In **Progressi** c'è l'andamento di ogni colpo.
    - **Dove stanno i video**: in **Documenti/Tennis Score Manager/Allenamento colpi**, con le cartelle **Servizio**, **Dritto**, **Rovescio** e **Volée** (create all'avvio) e dentro una cartella per sessione (data e ora) e una per colpo, con `video.mp4` (si apre e si condivide da qualsiasi app), l'analisi e le tre immagini. Si vedono con qualsiasi file manager e restano anche disinstallando l'app (come archivio: reinstallandola, le sessioni nell'app non tornano). Su Android 8-10 la stessa struttura sta nella cartella dell'app. Le clip delle sessioni di prima della 2.5 si spostano lì da sole al primo avvio.
 7. **Analisi del movimento** (dalla sessione salvata): **Analizza i servizi** trova la posizione del corpo nelle clip (modello MoveNet: la prima volta l'app chiede di scaricarlo, 7 MB, dalla pagina del progetto su GitHub; poi tutto sul telefono, niente internet, qualche secondo per servizio; si può eliminare in fondo alla schermata. Non c'è sui dispositivi con processore x86) e misura tre momenti: **caricamento** (braccio del lancio in alto), **ginocchia** più piegate e **impatto**. Per ogni servizio: le tre immagini con lo scheletro disegnato e le misure (ginocchio più piegato, gomito all'impatto, altezza dell'impatto rispetto alla statura, braccio del lancio, spalle al caricamento, tempo dal caricamento all'impatto); in alto il confronto **dentro e fuori**. Sono stime da un video di lato: valgono soprattutto per confrontare i tuoi servizi tra loro. Il corpo si riconosce bene con tutta la persona nell'inquadratura, di lato e con buona luce; racchetta e palla non si misurano.
-   Tocca un servizio per aprirlo: **Guarda il video con lo scheletro** apre la clip nella moviola col corpo disegnato sopra, al rallentatore, con i tasti per saltare a **Caricamento**, **Ginocchia** e **Impatto** e quello per togliere o rimettere lo scheletro; due dita ingrandiscono video e scheletro insieme (fino a 6×), doppio tocco per tornare normale. Anche le tre immagini si toccano per vederle a tutto schermo e ingrandirle. Con **più persone** nell'inquadratura l'app segue chi serve (chi alza di più il braccio) e copre le altre; lo dice sotto il servizio: controlla nelle immagini. **Rifai l'analisi** la ripete da capo (le clip restano), utile dopo un aggiornamento dell'app.
+   Tocca un servizio per aprirlo: **Guarda il video con lo scheletro** apre la clip nella moviola col corpo disegnato sopra, al rallentatore, con i tasti per saltare a **Caricamento**, **Ginocchia** e **Impatto** e quello per togliere o rimettere lo scheletro; due dita ingrandiscono video e scheletro insieme (fino a 6×), doppio tocco per tornare normale. **Confronta con un altro colpo** mette accanto lo stesso colpo di un altro giorno o della stessa sessione (solo quelli analizzati e col video, della stessa persona): i due video con lo scheletro, uno sopra l'altro (affiancati col telefono in orizzontale), allineati sull'impatto e in loop sullo stesso tratto, con velocità, fotogramma per fotogramma e i momenti chiave; **Sovrapponi** disegna nel primo anche lo scheletro del secondo (in azzurro), con le anche nello stesso punto e il busto della stessa lunghezza, così si vede dove il movimento cambia. Anche le tre immagini si toccano per vederle a tutto schermo e ingrandirle. Con **più persone** nell'inquadratura l'app segue chi serve (chi alza di più il braccio) e copre le altre; lo dice sotto il servizio: controlla nelle immagini. **Rifai l'analisi** la ripete da capo (le clip restano), utile dopo un aggiornamento dell'app.
 
 **Dritto, rovescio e volée** funzionano allo stesso modo (KEY1 dentro, KEY2 fuori, clip per ogni colpo, riepilogo e analisi), con queste differenze:
 - **Dove mettere il telefono**: di lato a chi colpisce, perpendicolare alla direzione dei colpi, a 4-5 m e fuori dal corridoio, all'altezza del punto d'impatto; obiettivo a circa 1 m; tutto lo swing nell'inquadratura (il polso si muove di circa 2 m avanti e indietro). Per la volée: di lato a chi gioca a rete, a 3-4 m, all'altezza del giocatore. Sempre dallo stesso lato per tutta la sessione, e mai sulla traiettoria della palla.
@@ -2683,7 +2690,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 6. Embaixo de **Começar** ficam as 3 últimas sessões **do golpe escolhido** (os botões dos golpes mostram quantas sessões cada um tem, ex. *Backhand · 4*) e a linha dos **golpes dentro, sessão após sessão**. **Todas as sessões** abre as do golpe escolhido, por mês, com o espaço dos vídeos e se já foram analisadas. Toque numa sessão para o resumo e os clipes; **segure** para selecioná-la (o ícone no alto seleciona todas) e depois **Apagar** (sessão e vídeos) ou **Só os vídeos** (libera espaço: ficam as contagens, as medidas da análise e as imagens dos momentos-chave). **Progresso** mostra a evolução de cada golpe.
    - **Onde ficam os vídeos**: em **Documentos/Tennis Score Manager/Treino de golpes**, com as pastas **Saque**, **Forehand**, **Backhand** e **Voleio** (criadas ao abrir o app) e dentro uma pasta por sessão (data e hora) e uma por golpe, com `video.mp4` (abre e compartilha de qualquer app), a análise e as três imagens. Aparecem em qualquer gerenciador de arquivos e ficam mesmo desinstalando o app (guarde como arquivo: um app reinstalado não recupera as sessões). No Android 8-10 a mesma estrutura fica na pasta do app. Os clipes das sessões de antes da 2.5 vão para lá sozinhos na primeira abertura.
 7. **Análise do movimento** (a partir da sessão salva): **Analisar os saques** encontra a posição do corpo nos clipes (modelo MoveNet: na primeira vez o app oferece baixá-lo, 7 MB, da página do projeto no GitHub; depois tudo fica no telefone, sem internet, alguns segundos por saque; pode ser excluído no fim da tela. Não está disponível em aparelhos com processador x86) e mede três momentos: **preparação** (braço do lançamento no alto), **joelhos** mais flexionados e **impacto**. Para cada saque: as três imagens com o esqueleto desenhado e as medidas (joelho mais flexionado, cotovelo no impacto, altura do impacto em relação à altura, braço do lançamento, ombros na preparação, tempo da preparação ao impacto); no alto, **dentro e fora** comparados. São estimativas a partir de um vídeo de lado: servem sobretudo para comparar os seus saques entre si. O corpo é bem reconhecido com a pessoa inteira no enquadramento, de lado e com boa luz; raquete e bola não são medidas.
-   Toque num saque para abri-lo: **Ver o vídeo com o esqueleto** abre o clipe no replay com o corpo desenhado por cima, em câmera lenta, com botões para saltar para **Preparação**, **Joelhos** e **Impacto** e outro para tirar ou pôr o esqueleto; dois dedos ampliam vídeo e esqueleto juntos (até 6×), toque duplo para voltar. As três imagens também se tocam para vê-las em tela cheia e ampliá-las. Com **várias pessoas** no enquadramento o app segue quem saca (quem mais levanta o braço) e cobre as outras; isso aparece embaixo do saque: confira nas imagens. **Refazer a análise** começa de novo (os clipes ficam), útil depois de uma atualização do app.
+   Toque num saque para abri-lo: **Ver o vídeo com o esqueleto** abre o clipe no replay com o corpo desenhado por cima, em câmera lenta, com botões para saltar para **Preparação**, **Joelhos** e **Impacto** e outro para tirar ou pôr o esqueleto; dois dedos ampliam vídeo e esqueleto juntos (até 6×), toque duplo para voltar. **Comparar com outro golpe** coloca ao lado o mesmo golpe de outro dia ou da mesma sessão (só os analisados e com vídeo, da mesma pessoa): os dois vídeos com o esqueleto, um em cima do outro (lado a lado com o telefone na horizontal), alinhados no impacto e em loop no mesmo trecho, com velocidade, quadro a quadro e os momentos-chave; **Sobrepor** desenha no primeiro também o esqueleto do segundo (em azul), com os quadris no mesmo ponto e o tronco do mesmo comprimento, para ver onde o movimento muda. As três imagens também se tocam para vê-las em tela cheia e ampliá-las. Com **várias pessoas** no enquadramento o app segue quem saca (quem mais levanta o braço) e cobre as outras; isso aparece embaixo do saque: confira nas imagens. **Refazer a análise** começa de novo (os clipes ficam), útil depois de uma atualização do app.
 
 **Forehand, backhand e voleio** funcionam do mesmo jeito (KEY1 dentro, KEY2 fora, um clipe por golpe, resumo e análise), com estas diferenças:
 - **Onde colocar o telefone**: ao lado de quem bate, perpendicular à direção dos golpes, a 4-5 m e fora do corredor, na altura do ponto de impacto; lente a cerca de 1 m; o swing inteiro no enquadramento (o pulso se move uns 2 m para a frente e para trás). Para o voleio: ao lado de quem joga na rede, a 3-4 m, na altura dele. Sempre do mesmo lado durante a sessão, e nunca na trajetória da bola.
@@ -11258,6 +11265,40 @@ object ServePose {
     )
 
     const val MIN_SCORE = 0.3f
+
+    /** I punti del corpo all'istante [rel] (ms dal colpo), tra i due fotogrammi analizzati più vicini; null fuori dalla clip. */
+    fun frameAt(frames: List<PoseFrame>, rel: Long): PoseFrame? {
+        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
+        val j = frames.indexOfFirst { it.t >= rel }
+        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
+        val a = frames[j - 1]
+        val b = frames[j]
+        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
+        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
+    }
+
+    /** Centro dei punti [i] che si vedono abbastanza (null se nessuno). */
+    private fun center(f: PoseFrame, vararg i: Int): Pair<Float, Float>? {
+        val ok = i.filter { f.s[it] >= MIN_SCORE }
+        if (ok.isEmpty()) return null
+        return ok.map { f.x[it] }.average().toFloat() to ok.map { f.y[it] }.average().toFloat()
+    }
+
+    /**
+     * [other] spostato e ingrandito sopra [ref]: stesso centro delle anche e stessa lunghezza del busto (anche-spalle),
+     * per confrontare il movimento di due colpi ripresi da distanze diverse. null se busto o anche non si vedono.
+     */
+    fun align(ref: PoseFrame, other: PoseFrame): PoseFrame? {
+        val rh = center(ref, L_HIP, R_HIP) ?: return null
+        val rs = center(ref, L_SHOULDER, R_SHOULDER) ?: return null
+        val oh = center(other, L_HIP, R_HIP) ?: return null
+        val os = center(other, L_SHOULDER, R_SHOULDER) ?: return null
+        val rl = kotlin.math.hypot(rs.first - rh.first, rs.second - rh.second)
+        val ol = kotlin.math.hypot(os.first - oh.first, os.second - oh.second)
+        if (rl < 1e-3f || ol < 1e-3f) return null
+        val k = rl / ol
+        return other.copy(x = other.x.map { rh.first + (it - oh.first) * k }, y = other.y.map { rh.second + (it - oh.second) * k })
+    }
     const val MIN_QUALITY = 0.4f
     /** Dal naso alla caviglia c'è circa l'89 % della statura. */
     private const val NOSE_TO_ANKLE = 0.89f
@@ -21577,6 +21618,11 @@ interface Strings {
     val reportFailed: String
     val reportPeriod: (String, String) -> String
     val reportCoach: (String) -> String
+    val compareWith: String
+    val comparePick: String
+    val compareNone: String
+    val compareOverlay: String
+    val compareThisSession: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -22880,6 +22926,11 @@ object ItStrings : Strings {
     override val reportFailed = "Il report non è riuscito: riprova."
     override val reportPeriod: (String, String) -> String = { a, b -> "dal $a al $b" }
     override val reportCoach: (String) -> String = { "allenatore: $it" }
+    override val compareWith = "Confronta con un altro colpo"
+    override val comparePick = "Con quale colpo?"
+    override val compareNone = "Nessun altro colpo di questo tipo analizzato e con il video."
+    override val compareOverlay = "Sovrapponi"
+    override val compareThisSession = "questa sessione"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -24166,6 +24217,11 @@ object EnStrings : Strings {
     override val reportFailed = "The report did not work: try again."
     override val reportPeriod: (String, String) -> String = { a, b -> "from $a to $b" }
     override val reportCoach: (String) -> String = { "coach: $it" }
+    override val compareWith = "Compare with another shot"
+    override val comparePick = "With which shot?"
+    override val compareNone = "No other shot of this kind analysed and with its video."
+    override val compareOverlay = "Overlay"
+    override val compareThisSession = "this session"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -25475,6 +25531,11 @@ object DeStrings : Strings {
     override val reportFailed = "Der Bericht hat nicht geklappt: versuche es nochmal."
     override val reportPeriod: (String, String) -> String = { a, b -> "vom $a bis $b" }
     override val reportCoach: (String) -> String = { "Trainer: $it" }
+    override val compareWith = "Mit einem anderen Schlag vergleichen"
+    override val comparePick = "Mit welchem Schlag?"
+    override val compareNone = "Kein anderer Schlag dieser Art analysiert und mit Video."
+    override val compareOverlay = "Überlagern"
+    override val compareThisSession = "diese Einheit"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -26777,6 +26838,11 @@ object EsStrings : Strings {
     override val reportFailed = "El informe no ha salido bien: vuelve a intentarlo."
     override val reportPeriod: (String, String) -> String = { a, b -> "del $a al $b" }
     override val reportCoach: (String) -> String = { "entrenador: $it" }
+    override val compareWith = "Comparar con otro golpe"
+    override val comparePick = "¿Con qué golpe?"
+    override val compareNone = "Ningún otro golpe de este tipo analizado y con su vídeo."
+    override val compareOverlay = "Superponer"
+    override val compareThisSession = "esta sesión"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -28081,6 +28147,11 @@ object FrStrings : Strings {
     override val reportFailed = "Le bilan n'a pas réussi : réessayez."
     override val reportPeriod: (String, String) -> String = { a, b -> "du $a au $b" }
     override val reportCoach: (String) -> String = { "entraîneur : $it" }
+    override val compareWith = "Comparer avec un autre coup"
+    override val comparePick = "Avec quel coup ?"
+    override val compareNone = "Aucun autre coup de ce type analysé et avec sa vidéo."
+    override val compareOverlay = "Superposer"
+    override val compareThisSession = "cette séance"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -29386,6 +29457,11 @@ object PtStrings : Strings {
     override val reportFailed = "O relatório não deu certo: tente de novo."
     override val reportPeriod: (String, String) -> String = { a, b -> "de $a a $b" }
     override val reportCoach: (String) -> String = { "treinador: $it" }
+    override val compareWith = "Comparar com outro golpe"
+    override val comparePick = "Com qual golpe?"
+    override val compareNone = "Nenhum outro golpe deste tipo analisado e com o vídeo."
+    override val compareOverlay = "Sobrepor"
+    override val compareThisSession = "esta sessão"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -29715,6 +29791,8 @@ object TsmColors {
     val Court = Color(0xFF1F7A4D)
     val CourtLine = Color(0xFFE8F5E9)
     val Ok = Color(0xFF4CAF50)
+    /** Il secondo colpo nel confronto dei video. */
+    val Cyan = Color(0xFF29B6F6)
 
     fun player(side: Side) = if (side == Side.P1) Player1 else Player2
     fun onPlayer(side: Side) = if (side == Side.P1) OnPlayer1 else OnPlayer2
@@ -38466,6 +38544,283 @@ data class CoachFilter(
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/CompareActivity.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/CompareActivity.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import android.graphics.Color
+import android.net.Uri
+import android.os.Bundle
+import android.view.TextureView
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.exoplayer.ExoPlayer
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.data.PoseFrame
+import com.tennis.scoremanager.data.ServePose
+import com.tennis.scoremanager.data.ServePoseResult
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.TsmTheme
+import com.tennis.scoremanager.ui.stringsFor
+import java.io.File
+
+/**
+ * Confronto di due colpi analizzati dello stesso tipo: i due video con lo scheletro, uno sopra l'altro (affiancati in
+ * orizzontale), allineati sull'impatto e in loop sullo stesso tratto, con velocità, fotogramma per fotogramma e i
+ * momenti chiave in comune. "Sovrapponi" disegna lo scheletro del secondo sopra il primo, con le anche nello stesso
+ * punto e il busto della stessa lunghezza: si vede subito dove il movimento cambia.
+ */
+class CompareActivity : ComponentActivity() {
+    private val controller get() = (application as TsmApp).controller
+
+    /** Un colpo: video a pezzi, analisi, ore d'inizio dei pezzi, istante del colpo e l'etichetta in alto. */
+    private class Side(val files: List<File>, val pose: ServePoseResult, val starts: List<Long>, val at: Long, val label: String) {
+        val contactT: Long = pose.metrics?.contactT ?: pose.ground?.contactT ?: 0L
+        /** I tre momenti chiave, in ms dall'impatto. */
+        val moments: List<Long> = (pose.metrics?.let { listOf(it.trophyT, it.kneeT, it.contactT) } ?: pose.ground?.let { listOf(it.prepT, it.contactT, it.finishT) }).orEmpty()
+            .map { it - contactT }
+        lateinit var player: ExoPlayer
+
+        /** Dove si è adesso, in ms dall'impatto. */
+        fun rel(): Long = (starts.getOrNull(player.currentMediaItemIndex) ?: 0L) + player.currentPosition - at - contactT
+
+        fun seekRel(rel: Long) {
+            val abs = at + contactT + rel
+            val i = starts.indexOfLast { it <= abs }.coerceAtLeast(0)
+            player.seekTo(i, (abs - (starts.getOrNull(i) ?: abs)).coerceAtLeast(0))
+        }
+
+        fun frame(rel: Long): PoseFrame? = ServePose.frameAt(pose.frames, rel + contactT)
+    }
+
+    private val sides = mutableListOf<Side>()
+    /** Il tratto in loop, in ms dall'impatto: da poco prima del primo momento chiave a poco dopo l'ultimo. */
+    private var from = -1_500L
+    private var to = 700L
+    /** I lettori ci sono (non se mancava uno dei due colpi). */
+    private var started = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.decorView.setBackgroundColor(Color.BLACK)
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        for (k in listOf("a", "b")) {
+            val dir = File(intent.getStringExtra("$EXTRA_DIR$k") ?: continue)
+            val files = dir.listFiles { f -> f.extension == "mp4" }.orEmpty().sortedBy { it.name }
+            val starts = runCatching { File(dir, ReplayRecorder.STARTS).readLines().mapNotNull { it.trim().toLongOrNull() } }.getOrDefault(emptyList())
+            val pose = runCatching { json.decodeFromString(ServePoseResult.serializer(), File(dir, ServeClipAnalysis.RESULT).readText()) }.getOrNull()
+            if (files.isEmpty() || pose == null || starts.size != files.size) continue
+            sides += Side(files, pose, starts, intent.getLongExtra("$EXTRA_AT$k", 0L), intent.getStringExtra("$EXTRA_LABEL$k").orEmpty())
+        }
+        if (sides.size != 2) {
+            finish()
+            return
+        }
+        from = sides.minOf { it.moments.minOrNull() ?: 0L } - 500
+        to = sides.maxOf { it.moments.maxOrNull() ?: 0L } + 600
+        for (sd in sides) {
+            sd.player = ExoPlayer.Builder(this).build().apply {
+                setMediaItems(sd.files.map { MediaItem.fromUri(Uri.fromFile(it)) })
+                setSeekParameters(androidx.media3.exoplayer.SeekParameters.EXACT)
+                volume = 0f
+                playbackParameters = PlaybackParameters(0.5f)
+                prepare()
+            }
+            sd.seekRel(from)
+        }
+        started = true
+        sides.forEach { it.player.play() }
+        setContent { TsmTheme { Content() } }
+    }
+
+    override fun onDestroy() {
+        if (started) sides.forEach { it.player.release() }
+        super.onDestroy()
+    }
+
+    /** Tutti e due allo stesso punto rispetto all'impatto. */
+    private fun seekAll(rel: Long) = sides.forEach { it.seekRel(rel) }
+
+    @Composable
+    private fun Content() {
+        val s = stringsFor(controller.options.value.lang)
+        var speed by remember { mutableFloatStateOf(0.5f) }
+        var playing by remember { mutableStateOf(true) }
+        var skeleton by remember { mutableStateOf(true) }
+        var overlay by remember { mutableStateOf(false) }
+        // Istante mostrato (ms dall'impatto) per ciascun colpo: segue il video a ogni fotogramma.
+        var rels by remember { mutableStateOf(listOf(from, from)) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                withFrameNanos { }
+                val a = sides[0].rel()
+                if (playing) {
+                    // Finito il tratto si riparte insieme; se il secondo resta indietro (o avanti) lo si riallinea.
+                    if (a > to || a < from - 300) seekAll(from)
+                    else if (kotlin.math.abs(sides[1].rel() - a) > 120) sides[1].seekRel(a)
+                }
+                rels = sides.map { it.rel() }
+            }
+        }
+        fun pause() { sides.forEach { it.player.pause() }; playing = false }
+        fun step(ms: Long) { pause(); sides.forEach { it.seekRel(it.rel() + ms) } }
+        Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)) {
+            BoxWithConstraints(Modifier.fillMaxSize().statusBarsPadding().padding(bottom = 132.dp).navigationBarsPadding()) {
+                val wide = maxWidth > maxHeight
+                @Composable fun cell(i: Int, modifier: Modifier) {
+                    val sd = sides[i]
+                    run {
+                        val other = sides[1 - i]
+                        Box(modifier.padding(4.dp), contentAlignment = Alignment.Center) {
+                            VideoBox(sd) {
+                                if (skeleton) {
+                                    val f = sd.frame(rels[i])
+                                    // Sovrapposto: nel primo anche lo scheletro del secondo, allineato su anche e busto.
+                                    val g = if (overlay && i == 0 && f != null) other.frame(rels[1])?.let { ServePose.align(f, it) } else null
+                                    Canvas(Modifier.fillMaxSize()) {
+                                        g?.let { drawSkeleton(it, TsmColors.Cyan, TsmColors.Cyan) }
+                                        f?.let { drawSkeleton(it, if (i == 0) TsmColors.Ball else TsmColors.Cyan) }
+                                    }
+                                }
+                            }
+                            Text(
+                                sd.label, color = if (i == 0) TsmColors.Ball else TsmColors.Cyan, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                // Il primo lascia posto alla X per chiudere.
+                                modifier = Modifier.align(Alignment.TopStart).padding(end = if (i == 0) 60.dp else 0.dp).background(androidx.compose.ui.graphics.Color(0xAA0B1220), RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
+                            )
+                        }
+                    }
+                }
+                if (wide) Row(Modifier.fillMaxSize()) { cell(0, Modifier.weight(1f).fillMaxSize()); cell(1, Modifier.weight(1f).fillMaxSize()) }
+                else Column(Modifier.fillMaxSize()) { cell(0, Modifier.weight(1f).fillMaxSize()); cell(1, Modifier.weight(1f).fillMaxSize()) }
+            }
+            Btn(Icons.Filled.Close, null, false, Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(12.dp)) { finish() }
+            Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().background(androidx.compose.ui.graphics.Color(0xAA0B1220)).padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // Su uno schermo stretto i momenti chiave non ci stanno tutti: la riga scorre.
+                Row(
+                    Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Btn(Icons.Filled.AccessibilityNew, null, skeleton) { skeleton = !skeleton }
+                    Btn(Icons.Filled.Layers, s.compareOverlay, overlay) { overlay = !overlay; if (overlay) skeleton = true }
+                    // I momenti chiave: ciascun video al suo (fermi, per guardarli bene).
+                    val names = if (sides[0].pose.metrics != null) listOf(s.poseTrophy, s.poseKnee, s.poseContact) else listOf(s.posePrep, s.poseContact, s.poseFinish)
+                    names.forEachIndexed { k, label ->
+                        Btn(null, label, false) { pause(); sides.forEach { sd -> sd.moments.getOrNull(k)?.let { sd.seekRel(it) } } }
+                    }
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+                    for (v in listOf(1f, 0.5f, 0.25f)) {
+                        Btn(null, if (v == 1f) "1×" else if (v == 0.5f) "½×" else "¼×", speed == v) {
+                            speed = v
+                            sides.forEach { it.player.playbackParameters = PlaybackParameters(v) }
+                        }
+                    }
+                    Btn(Icons.Filled.SkipPrevious, null, false) { step(-33) }
+                    Btn(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, false) {
+                        if (playing) pause() else {
+                            // Si riparte insieme, dal punto del primo.
+                            sides[1].seekRel(sides[0].rel())
+                            sides.forEach { it.player.play() }
+                            playing = true
+                        }
+                    }
+                    Btn(Icons.Filled.SkipNext, null, false) { step(33) }
+                }
+            }
+        }
+    }
+
+    /** Il video di un colpo con le sue proporzioni, il più grande possibile; [over] ci disegna sopra. */
+    @Composable
+    private fun VideoBox(sd: Side, over: @Composable () -> Unit) {
+        var ratio by remember { mutableFloatStateOf(16f / 9f) }
+        remember(sd) {
+            sd.player.addListener(object : Player.Listener {
+                override fun onVideoSizeChanged(v: VideoSize) {
+                    if (v.width > 0 && v.height > 0) ratio = v.width * v.pixelWidthHeightRatio / v.height
+                }
+            })
+        }
+        Box(Modifier.aspectRatio(ratio)) {
+            AndroidView(factory = { ctx -> TextureView(ctx).also { sd.player.setVideoTextureView(it) } }, modifier = Modifier.fillMaxSize())
+            over()
+        }
+    }
+
+    @Composable
+    private fun Btn(icon: ImageVector?, label: String?, on: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+        Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = if (on) TsmColors.Orange else TsmColors.SurfaceHigh, modifier = modifier) {
+            Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                icon?.let { Icon(it, null, tint = if (on) TsmColors.OnOrange else TsmColors.TextMain) }
+                label?.let {
+                    Text(if (icon != null) " $it" else it, color = if (on) TsmColors.OnOrange else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1)
+                }
+            }
+        }
+    }
+
+    companion object {
+        /** Per i due colpi ("a" e "b" in fondo): cartella della clip, istante del colpo, etichetta. */
+        const val EXTRA_DIR = "dir_"
+        const val EXTRA_AT = "at_"
+        const val EXTRA_LABEL = "label_"
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/Framing.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/Framing.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -40231,16 +40586,7 @@ class ReplayActivity : ComponentActivity() {
     }
 
     /** I punti del corpo all'istante [rel] (ms dal servizio), tra i due fotogrammi analizzati più vicini. */
-    private fun poseAt(rel: Long): PoseFrame? {
-        val frames = pose?.frames ?: return null
-        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
-        val j = frames.indexOfFirst { it.t >= rel }
-        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
-        val a = frames[j - 1]
-        val b = frames[j]
-        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
-        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
-    }
+    private fun poseAt(rel: Long): PoseFrame? = pose?.frames?.let { ServePose.frameAt(it, rel) }
 
     /** Lo scheletro sopra il video: x e y dei punti sono in frazioni dell'altezza dell'immagine. */
     @Composable
@@ -40254,15 +40600,7 @@ class ReplayActivity : ComponentActivity() {
             }
         }
         val f = frame ?: return
-        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            val h = size.height
-            val bone = TsmColors.Ball
-            for ((a, b) in ServePose.BONES) {
-                if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
-                drawLine(bone, Offset(f.x[a] * h, f.y[a] * h), Offset(f.x[b] * h, f.y[b] * h), strokeWidth = h / 110, cap = androidx.compose.ui.graphics.StrokeCap.Round)
-            }
-            for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) drawCircle(androidx.compose.ui.graphics.Color.White, h / 120, Offset(f.x[i] * h, f.y[i] * h))
-        }
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) { drawSkeleton(f, TsmColors.Ball) }
     }
 
     @Composable
@@ -40751,6 +41089,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.PlayCircle
@@ -41086,6 +41425,10 @@ class ServeAnalysisActivity : ComponentActivity() {
                     .putExtra(ReplayActivity.EXTRA_POSE_AT, a.at),
             )
         }, Modifier.fillMaxWidth())
+        // Lo stesso colpo di un altro giorno (o di questa sessione) accanto, allineato sull'impatto.
+        var pick by remember { mutableStateOf(false) }
+        GhostButton(str.compareWith, Icons.AutoMirrored.Filled.CompareArrows, { pick = true }, Modifier.fillMaxWidth())
+        if (pick) ComparePicker(sess, a) { pick = false }
         Text(str.poseZoomHint, color = TsmColors.TextDim, fontSize = 12.sp)
         var zoomed by remember { mutableStateOf<Bitmap?>(null) }
         for ((label, bmp) in images) {
@@ -41099,6 +41442,70 @@ class ServeAnalysisActivity : ComponentActivity() {
                 Text(value, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
+    }
+
+    /** Un colpo analizzato da confrontare: sessione, colpo, cartella della clip. */
+    private class Candidate(val sess: ServeSession, val index: Int, val a: ServeAttempt, val dir: File)
+
+    /** Gli altri colpi dello stesso tipo e della stessa persona, analizzati e col video, dal più recente. */
+    private fun candidates(sess: ServeSession, a: ServeAttempt): List<Candidate> =
+        controller.storage.loadServeSessions().filter { it.stroke == sess.stroke && it.student == sess.student }.flatMap { o ->
+            o.serves.mapIndexedNotNull { i, b ->
+                val d = dir(o, b) ?: return@mapIndexedNotNull null
+                if (b.clip == a.clip && o.id == sess.id) return@mapIndexedNotNull null
+                if (!File(d, ServeClipAnalysis.RESULT).exists() || !hasVideo(o, b)) return@mapIndexedNotNull null
+                Candidate(o, i, b, d)
+            }
+        }.sortedByDescending { it.a.at }.take(80)
+
+    /** "Dritto 3 · 29 ott 22:26 · Dentro": corto, sta in una riga sopra il video. */
+    private fun label(sess: ServeSession, index: Int, a: ServeAttempt): String {
+        val str = s
+        val lang = controller.options.value.lang
+        val name = if (sess.stroke == TrainedStroke.SERVE) str.poseServe(index + 1) else "${strokeLabel(str, sess.stroke)} ${index + 1}"
+        val loc = com.tennis.scoremanager.data.Reports.locale(lang)
+        val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "dMMMHHmm"), loc).format(java.util.Date(a.at))
+        return "$name · $day · ${if (a.inPlay) str.serveIn else str.serveOut}"
+    }
+
+    @Composable
+    private fun ComparePicker(sess: ServeSession, a: ServeAttempt, onDone: () -> Unit) {
+        val str = s
+        val list by androidx.compose.runtime.produceState<List<Candidate>?>(null) { value = withContext(Dispatchers.IO) { candidates(sess, a) } }
+        val dirA = dir(sess, a) ?: return
+        val indexA = sess.serves.indexOf(a)
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = onDone,
+            title = { Text(str.comparePick) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    val l = list
+                    when {
+                        l == null -> LinearProgressIndicator(Modifier.fillMaxWidth(), color = TsmColors.Ball)
+                        l.isEmpty() -> Text(str.compareNone, color = TsmColors.TextDim)
+                        else -> for (c in l) {
+                            Column(
+                                Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable {
+                                    startActivity(
+                                        android.content.Intent(this@ServeAnalysisActivity, CompareActivity::class.java)
+                                            .putExtra(CompareActivity.EXTRA_DIR + "a", dirA.absolutePath).putExtra(CompareActivity.EXTRA_AT + "a", a.at)
+                                            .putExtra(CompareActivity.EXTRA_LABEL + "a", label(sess, indexA, a))
+                                            .putExtra(CompareActivity.EXTRA_DIR + "b", c.dir.absolutePath).putExtra(CompareActivity.EXTRA_AT + "b", c.a.at)
+                                            .putExtra(CompareActivity.EXTRA_LABEL + "b", label(c.sess, c.index, c.a)),
+                                    )
+                                    onDone()
+                                }.padding(10.dp),
+                            ) {
+                                Text(label(c.sess, c.index, c.a), color = if (c.a.inPlay) TsmColors.TextMain else TsmColors.Danger, fontSize = 14.sp)
+                                if (c.sess.id == sess.id) Text(str.compareThisSession, color = TsmColors.TextDim, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { androidx.compose.material3.TextButton(onClick = onDone) { Text(str.back) } },
+        )
     }
 
     @Composable
@@ -41147,6 +41554,31 @@ class ServeAnalysisActivity : ComponentActivity() {
     companion object {
         const val EXTRA_ID = "session"
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/video/Skeleton.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/video/Skeleton.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.video
+
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import com.tennis.scoremanager.data.PoseFrame
+import com.tennis.scoremanager.data.ServePose
+
+/** Lo scheletro sopra il video: x e y dei punti sono in frazioni dell'altezza dell'immagine (il riquadro del video). */
+fun DrawScope.drawSkeleton(f: PoseFrame, bone: Color, joint: Color = Color.White) {
+    val h = size.height
+    for ((a, b) in ServePose.BONES) {
+        if (f.s[a] < ServePose.MIN_SCORE || f.s[b] < ServePose.MIN_SCORE) continue
+        drawLine(bone, Offset(f.x[a] * h, f.y[a] * h), Offset(f.x[b] * h, f.y[b] * h), strokeWidth = h / 110, cap = StrokeCap.Round)
+    }
+    for (i in 0 until 17) if (f.s[i] >= ServePose.MIN_SCORE) drawCircle(joint, h / 120, Offset(f.x[i] * h, f.y[i] * h))
 }
 TSM_EOF
 
@@ -55563,6 +55995,40 @@ class ServePoseTest {
         val volley = ServePose.groundMetrics(one, volley = true)!!
         assertTrue("${volley.finishT}", volley.finishT in 100L..450L)
     }
+
+    /** Un corpo fermo: anche a (cx, cy), spalle [torso] più in alto, il resto attorno. */
+    private fun still(t: Long, cx: Float, cy: Float, torso: Float): PoseFrame {
+        val x = MutableList(17) { cx }
+        val y = MutableList(17) { cy }
+        for (k in listOf(L_SHOULDER, R_SHOULDER)) y[k] = cy - torso
+        x[L_HIP] = cx - torso / 4; x[R_HIP] = cx + torso / 4
+        x[L_SHOULDER] = cx - torso / 3; x[R_SHOULDER] = cx + torso / 3
+        y[L_WRIST] = cy - torso * 1.5f
+        return PoseFrame(t, x, y, List(17) { 0.9f })
+    }
+
+    @Test
+    fun frameAtInterpolatesBetweenFrames() {
+        val frames = listOf(still(0, 0.5f, 0.5f, 0.2f), still(100, 0.7f, 0.5f, 0.2f))
+        val f = ServePose.frameAt(frames, 50)!!
+        assertEquals(0.6f, f.x[L_KNEE], 1e-4f)
+        assertNull(ServePose.frameAt(frames, 400))
+        assertNull(ServePose.frameAt(emptyList(), 0))
+    }
+
+    @Test
+    fun alignPutsHipsAndTorsoOnTheReference() {
+        val ref = still(0, 0.5f, 0.6f, 0.2f)
+        // Lo stesso corpo ripreso più lontano (busto metà) e spostato.
+        val other = still(0, 1.1f, 0.4f, 0.1f)
+        val g = ServePose.align(ref, other)!!
+        for (k in listOf(L_HIP, R_HIP, L_SHOULDER, R_SHOULDER, L_WRIST)) {
+            assertEquals(ref.x[k], g.x[k], 1e-4f)
+            assertEquals(ref.y[k], g.y[k], 1e-4f)
+        }
+        // Senza anche visibili non si allinea.
+        assertNull(ServePose.align(ref, other.copy(s = List(17) { if (it == L_HIP || it == R_HIP) 0f else 0.9f })))
+    }
 }
 TSM_EOF
 
@@ -62408,6 +62874,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 195 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 197 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

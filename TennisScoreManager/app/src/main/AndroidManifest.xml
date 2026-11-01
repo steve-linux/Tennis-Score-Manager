@@ -109,6 +109,13 @@
             android:name=".video.ServeAnalysisActivity"
             android:exported="false" />
 
+        <!-- Confronto di due colpi analizzati, con lo scheletro -->
+        <activity
+            android:name=".video.CompareActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density" />
+
         <!-- Telefono-telecamera: registra e trasmette la partita con la grafica del punteggio -->
         <activity
             android:name=".video.CameraActivity"

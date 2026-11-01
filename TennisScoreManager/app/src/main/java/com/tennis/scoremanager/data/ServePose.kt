@@ -109,6 +109,40 @@ object ServePose {
     )
 
     const val MIN_SCORE = 0.3f
+
+    /** I punti del corpo all'istante [rel] (ms dal colpo), tra i due fotogrammi analizzati più vicini; null fuori dalla clip. */
+    fun frameAt(frames: List<PoseFrame>, rel: Long): PoseFrame? {
+        if (frames.isEmpty() || rel < frames.first().t - 70 || rel > frames.last().t + 70) return null
+        val j = frames.indexOfFirst { it.t >= rel }
+        if (j <= 0) return frames[if (j == 0) 0 else frames.lastIndex]
+        val a = frames[j - 1]
+        val b = frames[j]
+        val k = ((rel - a.t).toFloat() / (b.t - a.t).coerceAtLeast(1)).coerceIn(0f, 1f)
+        return PoseFrame(rel, List(17) { a.x[it] + (b.x[it] - a.x[it]) * k }, List(17) { a.y[it] + (b.y[it] - a.y[it]) * k }, List(17) { minOf(a.s[it], b.s[it]) })
+    }
+
+    /** Centro dei punti [i] che si vedono abbastanza (null se nessuno). */
+    private fun center(f: PoseFrame, vararg i: Int): Pair<Float, Float>? {
+        val ok = i.filter { f.s[it] >= MIN_SCORE }
+        if (ok.isEmpty()) return null
+        return ok.map { f.x[it] }.average().toFloat() to ok.map { f.y[it] }.average().toFloat()
+    }
+
+    /**
+     * [other] spostato e ingrandito sopra [ref]: stesso centro delle anche e stessa lunghezza del busto (anche-spalle),
+     * per confrontare il movimento di due colpi ripresi da distanze diverse. null se busto o anche non si vedono.
+     */
+    fun align(ref: PoseFrame, other: PoseFrame): PoseFrame? {
+        val rh = center(ref, L_HIP, R_HIP) ?: return null
+        val rs = center(ref, L_SHOULDER, R_SHOULDER) ?: return null
+        val oh = center(other, L_HIP, R_HIP) ?: return null
+        val os = center(other, L_SHOULDER, R_SHOULDER) ?: return null
+        val rl = kotlin.math.hypot(rs.first - rh.first, rs.second - rh.second)
+        val ol = kotlin.math.hypot(os.first - oh.first, os.second - oh.second)
+        if (rl < 1e-3f || ol < 1e-3f) return null
+        val k = rl / ol
+        return other.copy(x = other.x.map { rh.first + (it - oh.first) * k }, y = other.y.map { rh.second + (it - oh.second) * k })
+    }
     const val MIN_QUALITY = 0.4f
     /** Dal naso alla caviglia c'è circa l'89 % della statura. */
     private const val NOSE_TO_ANKLE = 0.89f

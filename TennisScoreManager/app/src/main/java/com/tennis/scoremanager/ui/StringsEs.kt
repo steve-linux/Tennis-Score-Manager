@@ -1006,6 +1006,11 @@ object EsStrings : Strings {
     override val reportFailed = "El informe no ha salido bien: vuelve a intentarlo."
     override val reportPeriod: (String, String) -> String = { a, b -> "del $a al $b" }
     override val reportCoach: (String) -> String = { "entrenador: $it" }
+    override val compareWith = "Comparar con otro golpe"
+    override val comparePick = "¿Con qué golpe?"
+    override val compareNone = "Ningún otro golpe de este tipo analizado y con su vídeo."
+    override val compareOverlay = "Superponer"
+    override val compareThisSession = "esta sesión"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

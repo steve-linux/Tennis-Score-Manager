@@ -1009,6 +1009,11 @@ object PtStrings : Strings {
     override val reportFailed = "O relatório não deu certo: tente de novo."
     override val reportPeriod: (String, String) -> String = { a, b -> "de $a a $b" }
     override val reportCoach: (String) -> String = { "treinador: $it" }
+    override val compareWith = "Comparar com outro golpe"
+    override val comparePick = "Com qual golpe?"
+    override val compareNone = "Nenhum outro golpe deste tipo analisado e com o vídeo."
+    override val compareOverlay = "Sobrepor"
+    override val compareThisSession = "esta sessão"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
