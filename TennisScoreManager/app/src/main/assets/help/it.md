@@ -347,6 +347,18 @@ Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, p
 - Sotto ogni socio l'app dice cosa manca: consenso privacy, tessera FITP dell'anno, certificato mancante, scaduto o in scadenza entro un mese, dati del genitore, un contatto. In rosso quello che impedisce di giocare (tessera e certificato), in arancione il resto. **Da sistemare** mostra solo chi ha qualcosa da fare.
 - I dati da socio restano sul telefono: quando le partite passano a un altro telefono viaggiano solo nome, cognome, soprannome e mano. **Togli dai soci** cancella tessere, certificato e consensi; il giocatore e le sue partite restano.
 
+### 7.12 Quote e pagamenti
+
+In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del circolo. L'app **registra** i pagamenti, non li incassa: niente carte né conti collegati.
+
+- **Nuova quota**: nome (es. *Quota sociale 2027*), tipo (quota sociale, tessera FITP, corso, torneo, altro), importo e, se serve, la scadenza. Toccando una quota, **Addebita a tutti i soci** la mette a chi non l'ha ancora; sotto si vede quanti hanno pagato.
+- Nella scheda del socio, **Quote e pagamenti** mostra cosa deve: *pagato*, *da pagare*, *mancano 100,00 €*, in rosso *in ritardo* dopo la scadenza. **Nuovo addebito** aggiunge una quota del circolo o un altro importo (una lezione, un'incordatura).
+- Toccando un addebito, **Registra pagamento**: importo (di solito quanto manca: si può pagare anche a rate), data, metodo (contanti, bonifico, POS, Satispay, altro) e riferimento (CRO, causale). Con **Ricevuta subito** si apre la ricevuta in PDF da mandare o stampare, numerata per anno (*1/2027*, a gennaio si riparte da 1). È un **documento non fiscale**: per le ricevute fiscali e la contabilità vale quello che dice il vostro commercialista.
+- Un pagamento sbagliato si annulla (il numero della ricevuta non si riusa); un addebito senza pagamenti si elimina, con dei pagamenti si **annulla**: non si deve più e i pagamenti restano nel registro.
+- In alto: incassato nell'anno e quanto c'è da incassare; **Da incassare** elenca chi deve, dal debito più grande. Anche in *Soci* chi deve qualcosa è tra i *da sistemare*.
+- **Esporta i pagamenti (CSV)**: tutti i pagamenti dell'anno con data, ricevuta, nome, descrizione, metodo, riferimento e importo, per il foglio di calcolo del commercialista.
+- Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Profilo e dati*.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

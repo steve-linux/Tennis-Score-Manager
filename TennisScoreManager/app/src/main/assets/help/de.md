@@ -347,6 +347,18 @@ Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschrie
 - Unter jedem Mitglied steht, was fehlt: Datenschutz-Einwilligung, FITP-Ausweis des Jahres, Attest fehlt, abgelaufen oder läuft innerhalb eines Monats ab, Daten des Elternteils, ein Kontakt. Rot, was am Spielen hindert (Ausweis und Attest), orange der Rest. **Zu erledigen** zeigt nur, wer etwas zu tun hat.
 - Die Mitgliedsdaten bleiben auf dem Telefon: Gehen Matches auf ein anderes Telefon, reisen nur Vorname, Nachname, Spitzname und Hand mit. **Aus den Mitgliedern entfernen** löscht Ausweise, Attest und Einwilligungen; der Spieler und seine Matches bleiben.
 
+### 7.12 Beiträge und Zahlungen
+
+Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register des Vereins geführt. Die App **erfasst** Zahlungen, sie zieht sie nicht ein: keine Karten oder Konten verknüpft.
+
+- **Neuer Beitrag**: Name (z. B. *Mitgliedsbeitrag 2027*), Art (Mitgliedsbeitrag, FITP-Ausweis, Kurs, Turnier, Sonstiges), Betrag und bei Bedarf die Fälligkeit. Einen Beitrag antippen: **Allen Mitgliedern berechnen** gibt ihn allen, die ihn noch nicht haben; darunter, wie viele bezahlt haben.
+- In der Karte des Mitglieds zeigt **Beiträge und Zahlungen**, was offen ist: *bezahlt*, *offen*, *noch 100,00 €*, rot *überfällig* nach der Fälligkeit. **Neue Forderung** fügt einen Vereinsbeitrag oder einen anderen Betrag hinzu (eine Stunde, eine Besaitung).
+- Eine Forderung antippen, dann **Zahlung erfassen**: Betrag (meist der Rest: Raten gehen auch), Datum, Zahlungsart (bar, Überweisung, Karte, Satispay, sonstige) und Referenz. Mit **Quittung gleich** öffnet sich die PDF-Quittung zum Senden oder Drucken, pro Jahr nummeriert (*1/2027*, im Januar wieder ab 1). Sie ist **kein Steuerbeleg**: Für Steuerbelege und Buchhaltung gilt, was euer Steuerberater sagt.
+- Eine falsche Zahlung wird storniert (die Quittungsnummer wird nicht wiederverwendet); eine Forderung ohne Zahlungen wird gelöscht, mit Zahlungen **storniert**: nicht mehr fällig, die Zahlungen bleiben im Register.
+- Oben: eingenommen im Jahr und noch offen; **Offen** listet, wer schuldet, die größte Schuld zuerst. Auch unter *Mitglieder* steht, wer etwas schuldet, bei *zu erledigen*.
+- **Zahlungen exportieren (CSV)**: alle Zahlungen des Jahres mit Datum, Quittung, Name, Beschreibung, Zahlungsart, Referenz und Betrag, für die Tabelle des Steuerberaters.
+- Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Profil und Daten*.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

@@ -257,6 +257,24 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
+    /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
+    private val clubBookFile: File get() = File(app.filesDir, "club_book.json")
+
+    fun loadClubBook(): ClubBook =
+        runCatching { json.decodeFromString(ClubBook.serializer(), clubBookFile.readText()) }.getOrDefault(ClubBook())
+
+    @Synchronized
+    fun saveClubBook(book: ClubBook) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_book.tmp")
+            tmp.writeText(json.encodeToString(ClubBook.serializer(), book))
+            if (!tmp.renameTo(clubBookFile)) {
+                clubBookFile.delete()
+                tmp.renameTo(clubBookFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
+    }
+
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
     private val playersFile: File get() = File(app.filesDir, "players.json")
     /** Gli allievi della prima versione, prima del database: si leggono una volta e diventano giocatori. */

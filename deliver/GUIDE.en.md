@@ -460,6 +460,18 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 - Under each member the app says what is missing: privacy consent, this year's FITP card, certificate missing, expired or expiring within a month, parent details, a contact. In red what stops them playing (card and certificate), in orange the rest. **To sort out** shows only those with something to do.
 - Member data stays on the phone: when matches go to another phone only first name, last name, nickname and hand travel. **Remove from members** deletes cards, certificate and consents; the player and their matches stay.
 
+### 7.12 Fees and payments (app 2.6)
+
+**Players › Fees and payments** (Club role) keeps the club's register. The app **records** payments, it doesn't collect them: no cards or bank accounts linked.
+
+- **New fee**: name (e.g. *Membership 2027*), type (membership, FITP card, course, tournament, other), amount and, if needed, a due date. Tap a fee and **Charge all members** gives it to whoever doesn't have it yet; below you see how many have paid.
+- On the member's card, **Fees and payments** shows what they owe: *paid*, *to pay*, *€100.00 left*, in red *late* after the due date. **New charge** adds a club fee or another amount (a lesson, a restringing).
+- Tap a charge, then **Record payment**: amount (usually what's left: instalments are fine), date, method (cash, bank transfer, card, Satispay, other) and reference (transfer ID, note). With **Receipt now** the PDF receipt opens to send or print, numbered per year (*1/2027*, back to 1 in January). It is a **non-fiscal document**: for fiscal receipts and accounting, follow your accountant.
+- A wrong payment can be cancelled (the receipt number is not reused); a charge without payments is deleted, one with payments is **cancelled**: no longer owed, and the payments stay in the register.
+- At the top: collected this year and what's still to collect; **To collect** lists who owes, biggest debt first. In *Members* too, whoever owes something is among those *to sort out*.
+- **Export payments (CSV)**: all the year's payments with date, receipt, name, description, method, reference and amount, for the accountant's spreadsheet.
+- Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Profile and data* backup.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

@@ -347,6 +347,18 @@ Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pe
 - Debajo de cada socio la app dice qué falta: consentimiento de privacidad, licencia FITP del año, certificado que falta, caducado o que caduca en menos de un mes, datos del padre o madre, un contacto. En rojo lo que impide jugar (licencia y certificado), en naranja el resto. **Por resolver** muestra solo a quien tiene algo pendiente.
 - Los datos de socio se quedan en el teléfono: cuando los partidos pasan a otro teléfono solo viajan nombre, apellido, apodo y mano. **Quitar de los socios** borra licencias, certificado y consentimientos; el jugador y sus partidos se quedan.
 
+### 7.12 Cuotas y pagos
+
+En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La app **registra** los pagos, no los cobra: ninguna tarjeta ni cuenta vinculada.
+
+- **Nueva cuota**: nombre (p. ej. *Cuota de socio 2027*), tipo (cuota de socio, licencia FITP, curso, torneo, otra), importe y, si hace falta, el vencimiento. Tocando una cuota, **Cargar a todos los socios** la asigna a quien aún no la tiene; debajo se ve cuántos han pagado.
+- En la ficha del socio, **Cuotas y pagos** muestra lo que debe: *pagado*, *por pagar*, *faltan 100,00 €*, en rojo *con retraso* tras el vencimiento. **Nuevo cargo** añade una cuota del club u otro importe (una clase, un encordado).
+- Tocando un cargo, **Registrar pago**: importe (normalmente lo que falta: se puede pagar a plazos), fecha, método (efectivo, transferencia, tarjeta, Satispay, otro) y referencia. Con **Recibo ahora** se abre el recibo en PDF para enviar o imprimir, numerado por año (*1/2027*, en enero se vuelve a 1). Es un **documento no fiscal**: para recibos fiscales y contabilidad, sigue lo que diga vuestro gestor.
+- Un pago equivocado se anula (el número de recibo no se reutiliza); un cargo sin pagos se elimina, con pagos se **anula**: ya no se debe y los pagos quedan en el registro.
+- Arriba: cobrado en el año y lo que queda por cobrar; **Por cobrar** lista quién debe, de la deuda mayor a la menor. También en *Socios* quien debe algo está entre los *por resolver*.
+- **Exportar los pagos (CSV)**: todos los pagos del año con fecha, recibo, nombre, descripción, método, referencia e importe, para la hoja de cálculo del gestor.
+- Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Perfil y datos*.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

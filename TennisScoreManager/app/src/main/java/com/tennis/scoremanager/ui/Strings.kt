@@ -1097,6 +1097,69 @@ interface Strings {
     val issueNoFitp: (Int) -> String
     val issueMedicalSoon: (String) -> String
     val memberMedicalShort: (String) -> String
+    val paymentsTitle: String
+    val paymentsHint: String
+    val paymentsExport: String
+    val paymentsExportHint: String
+    val paymentsCsvName: String
+    val paymentsCsvHeader: String
+    val feesTitle: String
+    val feesNone: String
+    val feeNew: String
+    val feeName: String
+    val feeAmount: String
+    val feeDue: String
+    val feeKindMembership: String
+    val feeKindFitp: String
+    val feeKindCourse: String
+    val feeKindTournament: String
+    val feeKindOther: String
+    val feeDelete: String
+    val feeChargeAll: String
+    val feeChargeAllDone: String
+    val dueTitle: String
+    val dueNone: String
+    val chargeNew: String
+    val chargeFree: String
+    val chargeLabel: String
+    val chargePaid: String
+    val chargeUnpaid: String
+    val chargeCancelled: String
+    val chargeCancel: String
+    val chargeDelete: String
+    val chargeDeleteAsk: String
+    val chargeCancelAsk: String
+    val payRecord: String
+    val payAmount: String
+    val payDate: String
+    val payCash: String
+    val payTransfer: String
+    val payPos: String
+    val paySatispay: String
+    val payOther: String
+    val payRef: String
+    val payReceipt: String
+    val payReceiptNow: String
+    val payDelete: String
+    val payDeleteAsk: String
+    val receiptTitle: String
+    val receiptNotFiscal: String
+    val receiptReceivedFrom: String
+    val receiptFor: String
+    val receiptAmount: String
+    val receiptMethod: String
+    val receiptSignature: String
+    val moneyInvalid: String
+    val paymentsIncome: (Int, String) -> String
+    val paymentsOpen: (String, Int) -> String
+    val feeDueShort: (String) -> String
+    val feeChargedLine: (Int, Int) -> String
+    val feeDeleteAsk: (String) -> String
+    val feeChargeAllAsk: (String, Int) -> String
+    val chargePartial: (String) -> String
+    val chargeLate: (String) -> String
+    val payReceiptNo: (String) -> String
+    val issueFeeDue: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2453,6 +2516,69 @@ object ItStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "manca la tessera FITP $it" }
     override val issueMedicalSoon: (String) -> String = { "certificato in scadenza il $it" }
     override val memberMedicalShort: (String) -> String = { "certificato fino al $it" }
+    override val paymentsTitle = "Quote e pagamenti"
+    override val paymentsHint = "Quote sociali, tessere e corsi: chi deve, chi ha pagato, ricevute ed esportazione"
+    override val paymentsExport = "Esporta i pagamenti (CSV)"
+    override val paymentsExportHint = "Tutti i pagamenti dell'anno, con numero di ricevuta, metodo e riferimento: si apre con un foglio di calcolo, per il commercialista."
+    override val paymentsCsvName = "Pagamenti"
+    override val paymentsCsvHeader = "Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo"
+    override val feesTitle = "Quote"
+    override val feesNone = "Nessuna quota: creane una con Nuova quota (es. Quota sociale 2027)."
+    override val feeNew = "Nuova quota"
+    override val feeName = "Nome (es. Quota sociale 2027)"
+    override val feeAmount = "Importo"
+    override val feeDue = "Da pagare entro"
+    override val feeKindMembership = "Quota sociale"
+    override val feeKindFitp = "Tessera FITP"
+    override val feeKindCourse = "Corso"
+    override val feeKindTournament = "Torneo"
+    override val feeKindOther = "Altro"
+    override val feeDelete = "Elimina la quota"
+    override val feeChargeAll = "Addebita a tutti i soci"
+    override val feeChargeAllDone = "Tutti i soci hanno già questa quota."
+    override val dueTitle = "Da incassare"
+    override val dueNone = "Nessuna quota da incassare."
+    override val chargeNew = "Nuovo addebito"
+    override val chargeFree = "Altro importo"
+    override val chargeLabel = "Descrizione"
+    override val chargePaid = "pagato"
+    override val chargeUnpaid = "da pagare"
+    override val chargeCancelled = "annullato"
+    override val chargeCancel = "Annulla l'addebito"
+    override val chargeDelete = "Elimina l'addebito"
+    override val chargeDeleteAsk = "Eliminare questo addebito?"
+    override val chargeCancelAsk = "Annullare l'addebito? Non si deve più; i pagamenti fatti restano nel registro."
+    override val payRecord = "Registra pagamento"
+    override val payAmount = "Importo pagato"
+    override val payDate = "Data"
+    override val payCash = "Contanti"
+    override val payTransfer = "Bonifico"
+    override val payPos = "POS"
+    override val paySatispay = "Satispay"
+    override val payOther = "Altro"
+    override val payRef = "Riferimento (CRO, causale…)"
+    override val payReceipt = "Ricevuta"
+    override val payReceiptNow = "Ricevuta subito (PDF)"
+    override val payDelete = "Annulla il pagamento"
+    override val payDeleteAsk = "Annullare questo pagamento? Il numero della ricevuta non si riusa."
+    override val receiptTitle = "Ricevuta"
+    override val receiptNotFiscal = "Documento non fiscale"
+    override val receiptReceivedFrom = "Ricevuto da"
+    override val receiptFor = "Per"
+    override val receiptAmount = "Importo"
+    override val receiptMethod = "Metodo"
+    override val receiptSignature = "Firma"
+    override val moneyInvalid = "Importo non valido"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Incassato nel $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "Da incassare: $a da $n ${if (n == 1) "persona" else "persone"}" }
+    override val feeDueShort: (String) -> String = { "entro il $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid pagati su $total" }
+    override val feeDeleteAsk: (String) -> String = { "Eliminare la quota $it? Gli addebiti già fatti restano." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Addebitare $name a $n ${if (n == 1) "socio" else "soci"} che non ${if (n == 1) "l'ha" else "l'hanno"} ancora?" }
+    override val chargePartial: (String) -> String = { "mancano $it" }
+    override val chargeLate: (String) -> String = { "in ritardo: mancano $it" }
+    override val payReceiptNo: (String) -> String = { "Ricevuta n. $it" }
+    override val issueFeeDue: (String) -> String = { "da pagare: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3792,6 +3918,69 @@ object EnStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "FITP card $it missing" }
     override val issueMedicalSoon: (String) -> String = { "certificate expires on $it" }
     override val memberMedicalShort: (String) -> String = { "certificate until $it" }
+    override val paymentsTitle = "Fees and payments"
+    override val paymentsHint = "Membership fees, cards and courses: who owes, who paid, receipts and export"
+    override val paymentsExport = "Export payments (CSV)"
+    override val paymentsExportHint = "All the year's payments, with receipt number, method and reference: it opens in a spreadsheet, for the accountant."
+    override val paymentsCsvName = "Payments"
+    override val paymentsCsvHeader = "Date;Receipt;Name;Description;Method;Reference;Amount"
+    override val feesTitle = "Fees"
+    override val feesNone = "No fees: create one with New fee (e.g. Membership 2027)."
+    override val feeNew = "New fee"
+    override val feeName = "Name (e.g. Membership 2027)"
+    override val feeAmount = "Amount"
+    override val feeDue = "Due by"
+    override val feeKindMembership = "Membership"
+    override val feeKindFitp = "FITP card"
+    override val feeKindCourse = "Course"
+    override val feeKindTournament = "Tournament"
+    override val feeKindOther = "Other"
+    override val feeDelete = "Delete fee"
+    override val feeChargeAll = "Charge all members"
+    override val feeChargeAllDone = "All members already have this fee."
+    override val dueTitle = "To collect"
+    override val dueNone = "Nothing to collect."
+    override val chargeNew = "New charge"
+    override val chargeFree = "Other amount"
+    override val chargeLabel = "Description"
+    override val chargePaid = "paid"
+    override val chargeUnpaid = "to pay"
+    override val chargeCancelled = "cancelled"
+    override val chargeCancel = "Cancel the charge"
+    override val chargeDelete = "Delete the charge"
+    override val chargeDeleteAsk = "Delete this charge?"
+    override val chargeCancelAsk = "Cancel the charge? It is no longer owed; payments made stay in the register."
+    override val payRecord = "Record payment"
+    override val payAmount = "Amount paid"
+    override val payDate = "Date"
+    override val payCash = "Cash"
+    override val payTransfer = "Bank transfer"
+    override val payPos = "Card (POS)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Other"
+    override val payRef = "Reference (transfer ID, note…)"
+    override val payReceipt = "Receipt"
+    override val payReceiptNow = "Receipt now (PDF)"
+    override val payDelete = "Cancel the payment"
+    override val payDeleteAsk = "Cancel this payment? The receipt number is not reused."
+    override val receiptTitle = "Receipt"
+    override val receiptNotFiscal = "Non-fiscal document"
+    override val receiptReceivedFrom = "Received from"
+    override val receiptFor = "For"
+    override val receiptAmount = "Amount"
+    override val receiptMethod = "Method"
+    override val receiptSignature = "Signed by"
+    override val moneyInvalid = "Invalid amount"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Collected in $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "To collect: $a from $n ${if (n == 1) "person" else "people"}" }
+    override val feeDueShort: (String) -> String = { "by $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid paid of $total" }
+    override val feeDeleteAsk: (String) -> String = { "Delete the fee $it? Charges already made stay." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Charge $name to $n ${if (n == 1) "member" else "members"} who ${if (n == 1) "doesn't" else "don't"} have it yet?" }
+    override val chargePartial: (String) -> String = { "$it left" }
+    override val chargeLate: (String) -> String = { "late: $it left" }
+    override val payReceiptNo: (String) -> String = { "Receipt no. $it" }
+    override val issueFeeDue: (String) -> String = { "to pay: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

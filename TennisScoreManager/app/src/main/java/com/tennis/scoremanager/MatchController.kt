@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -655,6 +655,7 @@ class MatchController(
             Screen.DATA -> Screen.HOME
             Screen.DRILLS -> Screen.HOME
             Screen.MEMBERS -> Screen.HOME
+            Screen.PAYMENTS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1097,6 +1098,7 @@ class MatchController(
             withContext(io) {
                 storage.savePlayers(list)
                 storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
+                saveClubBook(com.tennis.scoremanager.data.Fees.remap(clubBook.value, setOf(b.id) + b.aliases, a.id))
                 storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
             }
             refreshHistory()
@@ -1155,6 +1157,8 @@ class MatchController(
         players.value = list
         if (trainStudent.value == id) setTrainStudent(null)
         removePhoto(st.name)
+        // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
+        saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
         rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
         scope.launch {
             withContext(io) {
@@ -1177,7 +1181,7 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; else -> Screen.STUDENTS }
+        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; Screen.PAYMENTS -> Screen.PAYMENTS; else -> Screen.STUDENTS }
         screen.value = Screen.STUDENT
     }
 
@@ -1187,6 +1191,12 @@ class MatchController(
     fun openMembers() {
         refreshPlayers()
         screen.value = Screen.MEMBERS
+    }
+
+    /** Circolo › Quote e pagamenti. */
+    fun openPayments() {
+        refreshPlayers()
+        screen.value = Screen.PAYMENTS
     }
 
     /** Altro › Giocatori: tutto il database. */
@@ -1230,6 +1240,43 @@ class MatchController(
     val trainDrill = MutableStateFlow<String?>(null)
 
     fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+
+    /** Il registro del circolo: quote, addebiti e pagamenti. */
+    val clubBook = MutableStateFlow(storage.loadClubBook())
+
+    fun saveClubBook(book: com.tennis.scoremanager.data.ClubBook) {
+        clubBook.value = book
+        scope.launch(io) { storage.saveClubBook(book) }
+    }
+
+    /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
+    fun receiptFile(chargeId: String, paymentId: String): File? {
+        val c = clubBook.value.charges.firstOrNull { it.id == chargeId } ?: return null
+        val p = c.payments.firstOrNull { it.id == paymentId } ?: return null
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt.replace('/', '-')} ${c.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(c, p, storage.clubName, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** I pagamenti di un anno in CSV, per il commercialista. */
+    fun paymentsCsv(year: Int): File? {
+        val s = strings
+        val lang = options.value.lang
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.paymentsCsvName} $year.csv")
+        return runCatching {
+            // Date in cifre (01/11/2026): il foglio di calcolo le riconosce come date.
+            val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "ddMMyyyy"), lang.locale)
+            val text = com.tennis.scoremanager.data.Fees.csv(clubBook.value, year, s.paymentsCsvHeader, { com.tennis.scoremanager.ui.payMethodName(s, it) }, { day.format(java.util.Date(it)) }, lang.locale)
+            // Il BOM fa riconoscere al foglio di calcolo le lettere accentate.
+            f.writeText("\uFEFF" + text)
+            f
+        }.getOrNull()
+    }
 
     fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
         val list = drills.value.filter { it.id != d.id } + d
@@ -2117,7 +2164,7 @@ class MatchController(
             from = days?.let { now - it * 24L * 3600 * 1000 }, now = now,
         )
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\/:*?\"<>|]"), "_")
+        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\\\/:*?\"<>|]"), "_")
         return runCatching {
             if (pdf) File(dir, "$base.pdf").also { f ->
                 f.outputStream().use { com.tennis.scoremanager.data.StudentReportPdf.write(r, s, options.value.lang, "${s.generatedWith} · ${Reports.date(now, options.value.lang)}", it) }

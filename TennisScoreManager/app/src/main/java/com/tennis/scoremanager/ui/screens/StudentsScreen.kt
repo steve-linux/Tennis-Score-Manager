@@ -170,6 +170,7 @@ fun StudentScreen(c: MatchController) {
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
+        ChargesSection(c, st)
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
             if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
             c.savePlayer(st.copy(student = on))

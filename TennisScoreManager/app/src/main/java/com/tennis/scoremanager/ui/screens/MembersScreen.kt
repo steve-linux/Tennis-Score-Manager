@@ -98,11 +98,15 @@ fun MembersScreen(c: MatchController) {
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     var adding by remember { mutableStateOf(false) }
+    val book by c.clubBook.collectAsState()
     val members = players.filter { it.member != null }
     val issues = remember(members) { members.associate { it.id to Members.issues(it, now) } }
-    val todo = members.count { issues[it.id].orEmpty().isNotEmpty() }
+    // Quanto deve ciascuno al circolo: anche questo è da sistemare.
+    val owed = remember(members, book) { members.associate { it.id to com.tennis.scoremanager.data.Fees.owed(book, it) } }
+    fun todo(p: PlayerProfile) = issues[p.id].orEmpty().isNotEmpty() || (owed[p.id] ?: 0) > 0
+    val todo = members.count(::todo)
     val shown = (if (query.isBlank()) members else Players.search(members, query))
-        .filter { !todoOnly || issues[it.id].orEmpty().isNotEmpty() }
+        .filter { !todoOnly || todo(it) }
     ScreenScaffold(
         title = s.membersTitle,
         subtitle = s.membersHint,
@@ -132,7 +136,8 @@ fun MembersScreen(c: MatchController) {
                         m.medicalUntil?.takeIf { list.none { i -> i == Members.Issue.MEDICAL_SOON || i == Members.Issue.MEDICAL_EXPIRED } }?.let { s.memberMedicalShort(shortDate(it, lang)) },
                     ).joinToString(" · ")
                     if (line.isNotEmpty()) Text(line, color = TsmColors.TextDim, fontSize = 13.sp)
-                    if (list.isEmpty()) Text(s.memberOk, color = TsmColors.Ok, fontSize = 13.sp)
+                    owed[p.id]?.takeIf { it > 0 }?.let { Text(s.issueFeeDue(com.tennis.scoremanager.data.Fees.money(it, lang.locale)), color = TsmColors.Orange, fontSize = 13.sp) }
+                    if (list.isEmpty() && (owed[p.id] ?: 0) == 0) Text(s.memberOk, color = TsmColors.Ok, fontSize = 13.sp)
                     else Text(
                         list.joinToString(" · ") { issueText(s, p, it, now, lang) },
                         color = if (list.any(Members::blocking)) TsmColors.Danger else TsmColors.Orange, fontSize = 13.sp,

@@ -671,6 +671,18 @@ Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschrie
 - Unter jedem Mitglied steht, was fehlt: Datenschutz-Einwilligung, FITP-Ausweis des Jahres, Attest fehlt, abgelaufen oder läuft innerhalb eines Monats ab, Daten des Elternteils, ein Kontakt. Rot, was am Spielen hindert (Ausweis und Attest), orange der Rest. **Zu erledigen** zeigt nur, wer etwas zu tun hat.
 - Die Mitgliedsdaten bleiben auf dem Telefon: Gehen Matches auf ein anderes Telefon, reisen nur Vorname, Nachname, Spitzname und Hand mit. **Aus den Mitgliedern entfernen** löscht Ausweise, Attest und Einwilligungen; der Spieler und seine Matches bleiben.
 
+### 7.12 Beiträge und Zahlungen
+
+Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register des Vereins geführt. Die App **erfasst** Zahlungen, sie zieht sie nicht ein: keine Karten oder Konten verknüpft.
+
+- **Neuer Beitrag**: Name (z. B. *Mitgliedsbeitrag 2027*), Art (Mitgliedsbeitrag, FITP-Ausweis, Kurs, Turnier, Sonstiges), Betrag und bei Bedarf die Fälligkeit. Einen Beitrag antippen: **Allen Mitgliedern berechnen** gibt ihn allen, die ihn noch nicht haben; darunter, wie viele bezahlt haben.
+- In der Karte des Mitglieds zeigt **Beiträge und Zahlungen**, was offen ist: *bezahlt*, *offen*, *noch 100,00 €*, rot *überfällig* nach der Fälligkeit. **Neue Forderung** fügt einen Vereinsbeitrag oder einen anderen Betrag hinzu (eine Stunde, eine Besaitung).
+- Eine Forderung antippen, dann **Zahlung erfassen**: Betrag (meist der Rest: Raten gehen auch), Datum, Zahlungsart (bar, Überweisung, Karte, Satispay, sonstige) und Referenz. Mit **Quittung gleich** öffnet sich die PDF-Quittung zum Senden oder Drucken, pro Jahr nummeriert (*1/2027*, im Januar wieder ab 1). Sie ist **kein Steuerbeleg**: Für Steuerbelege und Buchhaltung gilt, was euer Steuerberater sagt.
+- Eine falsche Zahlung wird storniert (die Quittungsnummer wird nicht wiederverwendet); eine Forderung ohne Zahlungen wird gelöscht, mit Zahlungen **storniert**: nicht mehr fällig, die Zahlungen bleiben im Register.
+- Oben: eingenommen im Jahr und noch offen; **Offen** listet, wer schuldet, die größte Schuld zuerst. Auch unter *Mitglieder* steht, wer etwas schuldet, bei *zu erledigen*.
+- **Zahlungen exportieren (CSV)**: alle Zahlungen des Jahres mit Datum, Quittung, Name, Beschreibung, Zahlungsart, Referenz und Betrag, für die Tabelle des Steuerberaters.
+- Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Profil und Daten*.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1099,6 +1111,18 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 - Under each member the app says what is missing: privacy consent, this year's FITP card, certificate missing, expired or expiring within a month, parent details, a contact. In red what stops them playing (card and certificate), in orange the rest. **To sort out** shows only those with something to do.
 - Member data stays on the phone: when matches go to another phone only first name, last name, nickname and hand travel. **Remove from members** deletes cards, certificate and consents; the player and their matches stay.
 
+### 7.12 Fees and payments
+
+**Players › Fees and payments** (Club role) keeps the club's register. The app **records** payments, it doesn't collect them: no cards or bank accounts linked.
+
+- **New fee**: name (e.g. *Membership 2027*), type (membership, FITP card, course, tournament, other), amount and, if needed, a due date. Tap a fee and **Charge all members** gives it to whoever doesn't have it yet; below you see how many have paid.
+- On the member's card, **Fees and payments** shows what they owe: *paid*, *to pay*, *€100.00 left*, in red *late* after the due date. **New charge** adds a club fee or another amount (a lesson, a restringing).
+- Tap a charge, then **Record payment**: amount (usually what's left: instalments are fine), date, method (cash, bank transfer, card, Satispay, other) and reference (transfer ID, note). With **Receipt now** the PDF receipt opens to send or print, numbered per year (*1/2027*, back to 1 in January). It is a **non-fiscal document**: for fiscal receipts and accounting, follow your accountant.
+- A wrong payment can be cancelled (the receipt number is not reused); a charge without payments is deleted, one with payments is **cancelled**: no longer owed, and the payments stay in the register.
+- At the top: collected this year and what's still to collect; **To collect** lists who owes, biggest debt first. In *Members* too, whoever owes something is among those *to sort out*.
+- **Export payments (CSV)**: all the year's payments with date, receipt, name, description, method, reference and amount, for the accountant's spreadsheet.
+- Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Profile and data* backup.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1525,6 +1549,18 @@ Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pe
 - Del certificado se guardan **solo el tipo y la caducidad**, no el documento: es un dato de salud y queda en el expediente del club.
 - Debajo de cada socio la app dice qué falta: consentimiento de privacidad, licencia FITP del año, certificado que falta, caducado o que caduca en menos de un mes, datos del padre o madre, un contacto. En rojo lo que impide jugar (licencia y certificado), en naranja el resto. **Por resolver** muestra solo a quien tiene algo pendiente.
 - Los datos de socio se quedan en el teléfono: cuando los partidos pasan a otro teléfono solo viajan nombre, apellido, apodo y mano. **Quitar de los socios** borra licencias, certificado y consentimientos; el jugador y sus partidos se quedan.
+
+### 7.12 Cuotas y pagos
+
+En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La app **registra** los pagos, no los cobra: ninguna tarjeta ni cuenta vinculada.
+
+- **Nueva cuota**: nombre (p. ej. *Cuota de socio 2027*), tipo (cuota de socio, licencia FITP, curso, torneo, otra), importe y, si hace falta, el vencimiento. Tocando una cuota, **Cargar a todos los socios** la asigna a quien aún no la tiene; debajo se ve cuántos han pagado.
+- En la ficha del socio, **Cuotas y pagos** muestra lo que debe: *pagado*, *por pagar*, *faltan 100,00 €*, en rojo *con retraso* tras el vencimiento. **Nuevo cargo** añade una cuota del club u otro importe (una clase, un encordado).
+- Tocando un cargo, **Registrar pago**: importe (normalmente lo que falta: se puede pagar a plazos), fecha, método (efectivo, transferencia, tarjeta, Satispay, otro) y referencia. Con **Recibo ahora** se abre el recibo en PDF para enviar o imprimir, numerado por año (*1/2027*, en enero se vuelve a 1). Es un **documento no fiscal**: para recibos fiscales y contabilidad, sigue lo que diga vuestro gestor.
+- Un pago equivocado se anula (el número de recibo no se reutiliza); un cargo sin pagos se elimina, con pagos se **anula**: ya no se debe y los pagos quedan en el registro.
+- Arriba: cobrado en el año y lo que queda por cobrar; **Por cobrar** lista quién debe, de la deuda mayor a la menor. También en *Socios* quien debe algo está entre los *por resolver*.
+- **Exportar los pagos (CSV)**: todos los pagos del año con fecha, recibo, nombre, descripción, método, referencia e importe, para la hoja de cálculo del gestor.
+- Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Perfil y datos*.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -1953,6 +1989,18 @@ Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'ap
 - Sous chaque adhérent, l'appli indique ce qui manque : consentement RGPD, licence FITP de l'année, certificat manquant, expiré ou qui expire dans le mois, coordonnées du parent, un contact. En rouge ce qui empêche de jouer (licence et certificat), en orange le reste. **À régler** ne montre que ceux qui ont quelque chose à faire.
 - Les données d'adhérent restent sur le téléphone : quand les matchs passent à un autre téléphone, seuls prénom, nom, surnom et main voyagent. **Retirer des adhérents** efface licences, certificat et consentements ; le joueur et ses matchs restent.
 
+### 7.12 Cotisations et paiements
+
+Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre du club. L'appli **enregistre** les paiements, elle ne les encaisse pas : aucune carte ni compte relié.
+
+- **Nouvelle cotisation** : nom (ex. *Cotisation 2027*), type (cotisation, licence FITP, cours, tournoi, autre), montant et, si besoin, l'échéance. En touchant une cotisation, **Facturer à tous les adhérents** l'attribue à ceux qui ne l'ont pas encore ; en dessous, combien ont payé.
+- Dans la fiche de l'adhérent, **Cotisations et paiements** montre ce qu'il doit : *payé*, *à payer*, *reste 100,00 €*, en rouge *en retard* après l'échéance. **Nouvelle facturation** ajoute une cotisation du club ou un autre montant (une leçon, un cordage).
+- En touchant une facturation, **Enregistrer un paiement** : montant (en général ce qui reste : on peut payer en plusieurs fois), date, mode (espèces, virement, carte, Satispay, autre) et référence. Avec **Reçu tout de suite**, le reçu PDF s'ouvre pour l'envoyer ou l'imprimer, numéroté par année (*1/2027*, on repart de 1 en janvier). C'est un **document non fiscal** : pour les reçus fiscaux et la comptabilité, suivez votre comptable.
+- Un paiement erroné s'annule (le numéro du reçu n'est pas réutilisé) ; une facturation sans paiement se supprime, avec des paiements elle s'**annule** : elle n'est plus due et les paiements restent dans le registre.
+- En haut : encaissé dans l'année et reste à encaisser ; **À encaisser** liste qui doit, de la plus grosse dette. Dans *Adhérents* aussi, qui doit quelque chose est parmi ceux *à régler*.
+- **Exporter les paiements (CSV)** : tous les paiements de l'année avec date, reçu, nom, libellé, mode, référence et montant, pour le tableur du comptable.
+- En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Profil et données*.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2380,6 +2428,18 @@ Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, p
 - Sotto ogni socio l'app dice cosa manca: consenso privacy, tessera FITP dell'anno, certificato mancante, scaduto o in scadenza entro un mese, dati del genitore, un contatto. In rosso quello che impedisce di giocare (tessera e certificato), in arancione il resto. **Da sistemare** mostra solo chi ha qualcosa da fare.
 - I dati da socio restano sul telefono: quando le partite passano a un altro telefono viaggiano solo nome, cognome, soprannome e mano. **Togli dai soci** cancella tessere, certificato e consensi; il giocatore e le sue partite restano.
 
+### 7.12 Quote e pagamenti
+
+In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del circolo. L'app **registra** i pagamenti, non li incassa: niente carte né conti collegati.
+
+- **Nuova quota**: nome (es. *Quota sociale 2027*), tipo (quota sociale, tessera FITP, corso, torneo, altro), importo e, se serve, la scadenza. Toccando una quota, **Addebita a tutti i soci** la mette a chi non l'ha ancora; sotto si vede quanti hanno pagato.
+- Nella scheda del socio, **Quote e pagamenti** mostra cosa deve: *pagato*, *da pagare*, *mancano 100,00 €*, in rosso *in ritardo* dopo la scadenza. **Nuovo addebito** aggiunge una quota del circolo o un altro importo (una lezione, un'incordatura).
+- Toccando un addebito, **Registra pagamento**: importo (di solito quanto manca: si può pagare anche a rate), data, metodo (contanti, bonifico, POS, Satispay, altro) e riferimento (CRO, causale). Con **Ricevuta subito** si apre la ricevuta in PDF da mandare o stampare, numerata per anno (*1/2027*, a gennaio si riparte da 1). È un **documento non fiscale**: per le ricevute fiscali e la contabilità vale quello che dice il vostro commercialista.
+- Un pagamento sbagliato si annulla (il numero della ricevuta non si riusa); un addebito senza pagamenti si elimina, con dei pagamenti si **annulla**: non si deve più e i pagamenti restano nel registro.
+- In alto: incassato nell'anno e quanto c'è da incassare; **Da incassare** elenca chi deve, dal debito più grande. Anche in *Soci* chi deve qualcosa è tra i *da sistemare*.
+- **Esporta i pagamenti (CSV)**: tutti i pagamenti dell'anno con data, ricevuta, nome, descrizione, metodo, riferimento e importo, per il foglio di calcolo del commercialista.
+- Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Profilo e dati*.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2806,6 +2866,18 @@ Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, 
 - Do atestado se guardam **só o tipo e o vencimento**, não o documento: é um dado de saúde e fica no arquivo do clube.
 - Embaixo de cada sócio o app diz o que falta: consentimento de privacidade, cartão FITP do ano, atestado que falta, vencido ou que vence em menos de um mês, dados do responsável, um contato. Em vermelho o que impede de jogar (cartão e atestado), em laranja o resto. **A resolver** mostra só quem tem algo pendente.
 - Os dados de sócio ficam no telefone: quando as partidas passam para outro telefone só viajam nome, sobrenome, apelido e mão. **Tirar dos sócios** apaga cartões, atestado e consentimentos; o jogador e as partidas dele ficam.
+
+### 7.12 Mensalidades e pagamentos
+
+Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do clube. O app **registra** os pagamentos, não os recebe: nenhum cartão ou conta vinculado.
+
+- **Nova mensalidade**: nome (ex. *Anuidade 2027*), tipo (anuidade, cartão FITP, curso, torneio, outro), valor e, se precisar, o vencimento. Tocando numa mensalidade, **Cobrar de todos os sócios** a atribui a quem ainda não a tem; embaixo se vê quantos pagaram.
+- Na ficha do sócio, **Mensalidades e pagamentos** mostra o que ele deve: *pago*, *a pagar*, *faltam 100,00 €*, em vermelho *atrasado* depois do vencimento. **Nova cobrança** adiciona uma mensalidade do clube ou outro valor (uma aula, um encordoamento).
+- Tocando numa cobrança, **Registrar pagamento**: valor (geralmente o que falta: dá para pagar em parcelas), data, método (dinheiro, transferência, cartão, Satispay, outro) e referência. Com **Recibo agora** abre o recibo em PDF para enviar ou imprimir, numerado por ano (*1/2027*, em janeiro volta a 1). É um **documento não fiscal**: para recibos fiscais e contabilidade, siga o seu contador.
+- Um pagamento errado se cancela (o número do recibo não é reutilizado); uma cobrança sem pagamentos se exclui, com pagamentos se **cancela**: não é mais devida e os pagamentos ficam no registro.
+- No alto: recebido no ano e o que falta receber; **A receber** lista quem deve, da maior dívida para a menor. Também em *Sócios* quem deve algo está entre os *a resolver*.
+- **Exportar os pagamentos (CSV)**: todos os pagamentos do ano com data, recibo, nome, descrição, método, referência e valor, para a planilha do contador.
+- Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Perfil e dados*.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3622,7 +3694,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4151,6 +4223,7 @@ class MatchController(
             Screen.DATA -> Screen.HOME
             Screen.DRILLS -> Screen.HOME
             Screen.MEMBERS -> Screen.HOME
+            Screen.PAYMENTS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4593,6 +4666,7 @@ class MatchController(
             withContext(io) {
                 storage.savePlayers(list)
                 storage.remapPlayer(setOf(b.id) + b.aliases, a.id)
+                saveClubBook(com.tennis.scoremanager.data.Fees.remap(clubBook.value, setOf(b.id) + b.aliases, a.id))
                 storage.loadServeSessions().filter { it.student == b.id }.forEach { storage.saveServeSession(it.copy(student = a.id)) }
             }
             refreshHistory()
@@ -4651,6 +4725,8 @@ class MatchController(
         players.value = list
         if (trainStudent.value == id) setTrainStudent(null)
         removePhoto(st.name)
+        // Dal registro del circolo via gli addebiti non pagati; i pagamenti fatti restano col nome (contabilità).
+        saveClubBook(com.tennis.scoremanager.data.Fees.forget(clubBook.value, setOf(st.id) + st.aliases))
         rackets.value.filter { it.owner.isNotBlank() && PlayerStats.key(it.owner) == PlayerStats.key(st.name) }.forEach { saveRacket(it.copy(owner = "")) }
         scope.launch {
             withContext(io) {
@@ -4673,7 +4749,7 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; else -> Screen.STUDENTS }
+        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; Screen.PAYMENTS -> Screen.PAYMENTS; else -> Screen.STUDENTS }
         screen.value = Screen.STUDENT
     }
 
@@ -4683,6 +4759,12 @@ class MatchController(
     fun openMembers() {
         refreshPlayers()
         screen.value = Screen.MEMBERS
+    }
+
+    /** Circolo › Quote e pagamenti. */
+    fun openPayments() {
+        refreshPlayers()
+        screen.value = Screen.PAYMENTS
     }
 
     /** Altro › Giocatori: tutto il database. */
@@ -4726,6 +4808,43 @@ class MatchController(
     val trainDrill = MutableStateFlow<String?>(null)
 
     fun drillById(id: String?): com.tennis.scoremanager.data.Drill? = id?.let { i -> drills.value.firstOrNull { it.id == i } }
+
+    /** Il registro del circolo: quote, addebiti e pagamenti. */
+    val clubBook = MutableStateFlow(storage.loadClubBook())
+
+    fun saveClubBook(book: com.tennis.scoremanager.data.ClubBook) {
+        clubBook.value = book
+        scope.launch(io) { storage.saveClubBook(book) }
+    }
+
+    /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
+    fun receiptFile(chargeId: String, paymentId: String): File? {
+        val c = clubBook.value.charges.firstOrNull { it.id == chargeId } ?: return null
+        val p = c.payments.firstOrNull { it.id == paymentId } ?: return null
+        val s = strings
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.receiptTitle} ${p.receipt.replace('/', '-')} ${c.name}.pdf".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        return runCatching {
+            f.outputStream().use { com.tennis.scoremanager.data.ReceiptPdf.write(c, p, storage.clubName, s, options.value.lang, it) }
+            f
+        }.getOrNull()
+    }
+
+    /** I pagamenti di un anno in CSV, per il commercialista. */
+    fun paymentsCsv(year: Int): File? {
+        val s = strings
+        val lang = options.value.lang
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.paymentsCsvName} $year.csv")
+        return runCatching {
+            // Date in cifre (01/11/2026): il foglio di calcolo le riconosce come date.
+            val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(lang.locale, "ddMMyyyy"), lang.locale)
+            val text = com.tennis.scoremanager.data.Fees.csv(clubBook.value, year, s.paymentsCsvHeader, { com.tennis.scoremanager.ui.payMethodName(s, it) }, { day.format(java.util.Date(it)) }, lang.locale)
+            // Il BOM fa riconoscere al foglio di calcolo le lettere accentate.
+            f.writeText("\uFEFF" + text)
+            f
+        }.getOrNull()
+    }
 
     fun saveDrill(d: com.tennis.scoremanager.data.Drill) {
         val list = drills.value.filter { it.id != d.id } + d
@@ -5613,7 +5732,7 @@ class MatchController(
             from = days?.let { now - it * 24L * 3600 * 1000 }, now = now,
         )
         val dir = File(app.cacheDir, "share").apply { mkdirs() }
-        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\/:*?\"<>|]"), "_")
+        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\\\/:*?\"<>|]"), "_")
         return runCatching {
             if (pdf) File(dir, "$base.pdf").also { f ->
                 f.outputStream().use { com.tennis.scoremanager.data.StudentReportPdf.write(r, s, options.value.lang, "${s.generatedWith} · ${Reports.date(now, options.value.lang)}", it) }
@@ -8656,6 +8775,214 @@ object Backup {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubBook.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubBook.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+import java.util.Locale
+
+/** Che cosa si paga: la quota sociale, la tessera FITP (che passa dal circolo), un corso, un torneo, altro. */
+@Serializable
+enum class FeeKind { MEMBERSHIP, FITP, COURSE, TOURNAMENT, OTHER }
+
+@Serializable
+enum class PayMethod { CASH, TRANSFER, POS, SATISPAY, OTHER }
+
+/** Una quota del circolo ("Quota sociale 2027", 150 €): si addebita ai soci. Importi in centesimi. */
+@Serializable
+data class Fee(
+    val id: String,
+    val name: String,
+    val cents: Int,
+    val kind: FeeKind = FeeKind.OTHER,
+    /** Da pagare entro (null = senza scadenza). */
+    val due: Long? = null,
+    val createdAt: Long = 0,
+    /** Il torneo a cui appartiene (quota d'iscrizione), se c'è. */
+    val tournament: String? = null,
+)
+
+/** Un versamento, con il numero della ricevuta ("12/2026"). */
+@Serializable
+data class Payment(
+    val id: String,
+    val cents: Int,
+    val at: Long,
+    val method: PayMethod,
+    /** CRO del bonifico, causale, numero dello scontrino del POS… */
+    val ref: String = "",
+    val receipt: String = "",
+)
+
+/**
+ * Quello che una persona deve: una quota (o un importo libero) e i suoi versamenti. [name] è il nome di quel giorno,
+ * così il registro resta leggibile anche se il giocatore viene cancellato (i pagamenti fatti si tengono).
+ */
+@Serializable
+data class Charge(
+    val id: String,
+    /** PlayerProfile.id ("" se il giocatore è stato cancellato). */
+    val player: String,
+    val name: String,
+    val fee: String? = null,
+    val label: String,
+    val cents: Int,
+    val createdAt: Long,
+    val due: Long? = null,
+    val payments: List<Payment> = emptyList(),
+    /** Annullato (storno): non si deve più, i pagamenti fatti restano. */
+    val cancelled: Boolean = false,
+) {
+    val paid: Int get() = payments.sumOf { it.cents }
+    val left: Int get() = if (cancelled) 0 else (cents - paid).coerceAtLeast(0)
+    val settled: Boolean get() = left == 0
+}
+
+/** Il registro del circolo: quote, addebiti coi pagamenti e la numerazione delle ricevute (una per anno). */
+@Serializable
+data class ClubBook(
+    val fees: List<Fee> = emptyList(),
+    val charges: List<Charge> = emptyList(),
+    val receiptYear: Int = 0,
+    val receiptNext: Int = 1,
+)
+
+object Fees {
+    enum class Status { PAID, PARTIAL, UNPAID, LATE, CANCELLED }
+
+    fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
+
+    private fun year(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.YEAR)
+
+    fun status(c: Charge, now: Long): Status = when {
+        c.cancelled -> Status.CANCELLED
+        c.settled -> Status.PAID
+        c.due != null && endOfDay(c.due) < now -> Status.LATE
+        c.paid > 0 -> Status.PARTIAL
+        else -> Status.UNPAID
+    }
+
+    private fun endOfDay(t: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = t
+        set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59)
+    }.timeInMillis
+
+    /** Gli addebiti di una persona (anche quelli col suo vecchio identificativo, se è stata unita a un'altra). */
+    fun of(book: ClubBook, p: PlayerProfile): List<Charge> {
+        val keys = setOf(p.id) + p.aliases
+        return book.charges.filter { it.player in keys }.sortedByDescending { it.createdAt }
+    }
+
+    /** Quanto deve ancora, in centesimi. */
+    fun owed(book: ClubBook, p: PlayerProfile): Int = of(book, p).sumOf { it.left }
+
+    /** Addebita [fee] ai [people] che non l'hanno ancora; restituisce il registro e quanti addebiti nuovi. */
+    fun chargeAll(book: ClubBook, fee: Fee, people: List<PlayerProfile>, now: Long): Pair<ClubBook, Int> {
+        val already = book.charges.filter { it.fee == fee.id && !it.cancelled }.map { it.player }.toSet()
+        val new = people.filter { p -> p.id !in already && p.aliases.none { it in already } }.map { p ->
+            Charge(newId("c"), p.id, p.name, fee.id, fee.name, fee.cents, now, fee.due)
+        }
+        return book.copy(charges = book.charges + new) to new.size
+    }
+
+    /** Un addebito singolo. */
+    fun charge(book: ClubBook, p: PlayerProfile, label: String, cents: Int, now: Long, fee: Fee? = null): ClubBook =
+        book.copy(charges = book.charges + Charge(newId("c"), p.id, p.name, fee?.id, label, cents, now, fee?.due))
+
+    /**
+     * Registra un versamento di [cents] sull'addebito [chargeId] col numero di ricevuta dell'anno del pagamento
+     * ("12/2026"; a gennaio si riparte da 1). null se l'addebito non c'è o l'importo non va.
+     */
+    fun pay(book: ClubBook, chargeId: String, cents: Int, at: Long, method: PayMethod, ref: String): Pair<ClubBook, Payment>? {
+        val c = book.charges.firstOrNull { it.id == chargeId } ?: return null
+        if (cents <= 0 || c.cancelled) return null
+        val y = year(at)
+        val n = if (book.receiptYear == y) book.receiptNext else 1
+        val pay = Payment(newId("p"), cents, at, method, ref.trim(), "$n/$y")
+        val charges = book.charges.map { if (it.id == chargeId) it.copy(payments = it.payments + pay) else it }
+        return book.copy(charges = charges, receiptYear = y, receiptNext = n + 1) to pay
+    }
+
+    /** Toglie un pagamento registrato per sbaglio (il numero della ricevuta non si riusa). */
+    fun unpay(book: ClubBook, chargeId: String, paymentId: String): ClubBook =
+        book.copy(charges = book.charges.map { c -> if (c.id == chargeId) c.copy(payments = c.payments.filter { it.id != paymentId }) else c })
+
+    /** Annulla un addebito con dei pagamenti (storno), cancella uno senza. */
+    fun cancel(book: ClubBook, chargeId: String): ClubBook {
+        val c = book.charges.firstOrNull { it.id == chargeId } ?: return book
+        return if (c.payments.isEmpty()) book.copy(charges = book.charges - c)
+        else book.copy(charges = book.charges.map { if (it.id == chargeId) it.copy(cancelled = true) else it })
+    }
+
+    /** I pagamenti di un anno, dal più vecchio, con l'addebito di ciascuno. */
+    fun payments(book: ClubBook, year: Int): List<Pair<Charge, Payment>> =
+        book.charges.flatMap { c -> c.payments.filter { year(it.at) == year }.map { c to it } }.sortedBy { it.second.at }
+
+    fun income(book: ClubBook, year: Int): Int = payments(book, year).sumOf { it.second.cents }
+
+    /** Quanto c'è da incassare e da quante persone. */
+    fun open(book: ClubBook): Pair<Int, Int> {
+        val open = book.charges.filter { it.left > 0 }
+        return open.sumOf { it.left } to open.map { it.player.ifEmpty { it.name } }.distinct().size
+    }
+
+    /** Quante persone hanno pagato [fee] e a quante è stata addebitata. */
+    fun feeProgress(book: ClubBook, fee: Fee): Pair<Int, Int> {
+        val list = book.charges.filter { it.fee == fee.id && !it.cancelled }
+        return list.count { it.settled } to list.size
+    }
+
+    /** Quando un giocatore viene cancellato: via gli addebiti senza pagamenti, gli altri restano col nome (registro). */
+    fun forget(book: ClubBook, keys: Set<String>): ClubBook = book.copy(
+        charges = book.charges.mapNotNull { c ->
+            if (c.player !in keys) c else if (c.payments.isEmpty()) null else c.copy(player = "")
+        },
+    )
+
+    /** Due giocatori uniti: gli addebiti dell'altro passano a chi resta. */
+    fun remap(book: ClubBook, from: Set<String>, to: String): ClubBook =
+        book.copy(charges = book.charges.map { if (it.player in from) it.copy(player = to) else it })
+
+    /** "150,00 €" nella lingua dell'app. */
+    fun money(cents: Int, locale: Locale): String = java.text.NumberFormat.getCurrencyInstance(locale).apply {
+        currency = java.util.Currency.getInstance("EUR")
+    }.format(cents / 100.0)
+
+    /** "150", "150,5", "150.50", "1.234,56" → centesimi; null se non è un importo. */
+    fun parse(text: String): Int? {
+        var t = text.trim().replace("€", "").replace(" ", "")
+        if (t.isEmpty()) return null
+        // Con entrambi i separatori, l'ultimo è quello dei decimali.
+        val lastComma = t.lastIndexOf(','); val lastDot = t.lastIndexOf('.')
+        t = when {
+            lastComma >= 0 && lastDot >= 0 -> if (lastComma > lastDot) t.replace(".", "").replace(',', '.') else t.replace(",", "")
+            lastComma >= 0 -> t.replace(',', '.')
+            else -> t
+        }
+        if (!Regex("^\\d{1,6}(\\.\\d{1,2})?$").matches(t)) return null
+        return Math.round(t.toDouble() * 100).toInt()
+    }
+
+    /**
+     * I pagamenti dell'anno in CSV per il commercialista: punto e virgola e, nelle lingue con la virgola decimale,
+     * importi con la virgola (si aprono così in un foglio di calcolo).
+     */
+    fun csv(book: ClubBook, year: Int, header: String, method: (PayMethod) -> String, date: (Long) -> String, locale: Locale): String {
+        val sep = java.text.DecimalFormatSymbols.getInstance(locale).decimalSeparator
+        fun q(s: String) = if (s.any { it == ';' || it == '"' || it == '\n' }) "\"" + s.replace("\"", "\"\"") + "\"" else s
+        val rows = payments(book, year).map { (c, p) ->
+            listOf(date(p.at), p.receipt, c.name, c.label, method(p.method), p.ref, "%d%c%02d".format(p.cents / 100, sep, p.cents % 100)).joinToString(";") { q(it) }
+        }
+        return (listOf(header) + rows).joinToString("\r\n") + "\r\n"
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Drills.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Drills.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -10961,6 +11288,76 @@ object Rating {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ReceiptPdf.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ReceiptPdf.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.payMethodName
+import java.io.OutputStream
+
+/**
+ * La ricevuta di un pagamento, su un foglio A5: circolo, numero e data, da chi, per cosa, importo e metodo, lo spazio
+ * per la firma. È un documento non fiscale e lo dice: le ricevute fiscali le fa chi tiene la contabilità.
+ */
+object ReceiptPdf {
+    private const val W = 420
+    private const val H = 595
+    private const val M = 36f
+
+    fun write(c: Charge, p: Payment, club: String, s: Strings, lang: Lang, out: OutputStream) {
+        val doc = PdfDocument()
+        val page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, 1).create())
+        val cv = page.canvas
+        fun paint(size: Float, color: Int = 0xFF111827.toInt(), bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+            isAntiAlias = true; textSize = size; this.color = color; textAlign = align
+            typeface = Typeface.create(Typeface.SANS_SERIF, if (bold) Typeface.BOLD else Typeface.NORMAL)
+        }
+        val grey = 0xFF6B7280.toInt()
+        val rule = Paint().apply { color = 0xFFD1D5DB.toInt(); strokeWidth = 1f }
+        var y = M + 20f
+        cv.drawText(club.ifBlank { s.receiptTitle }, M, y, paint(18f, bold = true))
+        y += 26f
+        cv.drawText(s.payReceiptNo(p.receipt), M, y, paint(12f, bold = true))
+        cv.drawText(Reports.date(p.at, lang), W - M, y, paint(10f, grey, align = Paint.Align.RIGHT))
+        y += 12f
+        cv.drawLine(M, y, W - M, y, rule)
+        y += 28f
+        // Le righe: etichetta grigia sopra, valore sotto.
+        fun field(label: String, value: String) {
+            if (value.isBlank()) return
+            cv.drawText(label, M, y, paint(9f, grey))
+            y += 15f
+            cv.drawText(value, M, y, paint(12f))
+            y += 24f
+        }
+        field(s.receiptReceivedFrom, c.name)
+        field(s.receiptFor, c.label)
+        field(s.receiptMethod, listOf(payMethodName(s, p.method), p.ref).filter { it.isNotBlank() }.joinToString(" · "))
+        cv.drawText(s.receiptAmount, M, y, paint(9f, grey))
+        y += 26f
+        cv.drawText(Fees.money(p.cents, lang.locale), M, y, paint(24f, bold = true))
+        y += 40f
+        // Firma di chi incassa.
+        val sx = W - M - 150f
+        cv.drawLine(sx, y + 30f, W - M, y + 30f, rule)
+        cv.drawText(s.receiptSignature, sx, y + 44f, paint(9f, grey))
+        cv.drawText(s.receiptNotFiscal, M, H - M - 14f, paint(9f, grey, bold = true))
+        cv.drawText(s.generatedWith, M, H - M, paint(8f, grey))
+        doc.finishPage(page)
+        doc.writeTo(out)
+        doc.close()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Rematch.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Rematch.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -12240,6 +12637,24 @@ class Storage(context: Context) {
                 tmp.renameTo(drillsFile)
             }
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+    }
+
+    /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
+    private val clubBookFile: File get() = File(app.filesDir, "club_book.json")
+
+    fun loadClubBook(): ClubBook =
+        runCatching { json.decodeFromString(ClubBook.serializer(), clubBookFile.readText()) }.getOrDefault(ClubBook())
+
+    @Synchronized
+    fun saveClubBook(book: ClubBook) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_book.tmp")
+            tmp.writeText(json.encodeToString(ClubBook.serializer(), book))
+            if (!tmp.renameTo(clubBookFile)) {
+                clubBookFile.delete()
+                tmp.renameTo(clubBookFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del registro del circolo fallito", it) }
     }
 
     /** Il database dei giocatori, in un file solo (gli allievi sono giocatori con student). */
@@ -18067,6 +18482,50 @@ private fun Cmd(icon: ImageVector, label: String, color: Color, enabled: Boolean
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ClubUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.data.FeeKind
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.PayMethod
+
+/** I nomi delle cose del registro del circolo, nella lingua dell'app. */
+fun payMethodName(s: Strings, m: PayMethod): String = when (m) {
+    PayMethod.CASH -> s.payCash
+    PayMethod.TRANSFER -> s.payTransfer
+    PayMethod.POS -> s.payPos
+    PayMethod.SATISPAY -> s.paySatispay
+    PayMethod.OTHER -> s.payOther
+}
+
+fun feeKindName(s: Strings, k: FeeKind): String = when (k) {
+    FeeKind.MEMBERSHIP -> s.feeKindMembership
+    FeeKind.FITP -> s.feeKindFitp
+    FeeKind.COURSE -> s.feeKindCourse
+    FeeKind.TOURNAMENT -> s.feeKindTournament
+    FeeKind.OTHER -> s.feeKindOther
+}
+
+fun chargeStatusName(s: Strings, st: Fees.Status, left: String): String = when (st) {
+    Fees.Status.PAID -> s.chargePaid
+    Fees.Status.PARTIAL -> s.chargePartial(left)
+    Fees.Status.UNPAID -> s.chargeUnpaid
+    Fees.Status.LATE -> s.chargeLate(left)
+    Fees.Status.CANCELLED -> s.chargeCancelled
+}
+
+fun chargeStatusColor(st: Fees.Status) = when (st) {
+    Fees.Status.PAID -> TsmColors.Ok
+    Fees.Status.PARTIAL, Fees.Status.UNPAID -> TsmColors.Orange
+    Fees.Status.LATE -> TsmColors.Danger
+    Fees.Status.CANCELLED -> TsmColors.TextDim
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/Components.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/Components.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -18210,6 +18669,7 @@ fun AppRoot(c: MatchController) {
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
                 Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
                 Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
+                Screen.PAYMENTS -> com.tennis.scoremanager.ui.screens.PaymentsScreen(c)
             }
         }
     }
@@ -21857,6 +22317,69 @@ interface Strings {
     val issueNoFitp: (Int) -> String
     val issueMedicalSoon: (String) -> String
     val memberMedicalShort: (String) -> String
+    val paymentsTitle: String
+    val paymentsHint: String
+    val paymentsExport: String
+    val paymentsExportHint: String
+    val paymentsCsvName: String
+    val paymentsCsvHeader: String
+    val feesTitle: String
+    val feesNone: String
+    val feeNew: String
+    val feeName: String
+    val feeAmount: String
+    val feeDue: String
+    val feeKindMembership: String
+    val feeKindFitp: String
+    val feeKindCourse: String
+    val feeKindTournament: String
+    val feeKindOther: String
+    val feeDelete: String
+    val feeChargeAll: String
+    val feeChargeAllDone: String
+    val dueTitle: String
+    val dueNone: String
+    val chargeNew: String
+    val chargeFree: String
+    val chargeLabel: String
+    val chargePaid: String
+    val chargeUnpaid: String
+    val chargeCancelled: String
+    val chargeCancel: String
+    val chargeDelete: String
+    val chargeDeleteAsk: String
+    val chargeCancelAsk: String
+    val payRecord: String
+    val payAmount: String
+    val payDate: String
+    val payCash: String
+    val payTransfer: String
+    val payPos: String
+    val paySatispay: String
+    val payOther: String
+    val payRef: String
+    val payReceipt: String
+    val payReceiptNow: String
+    val payDelete: String
+    val payDeleteAsk: String
+    val receiptTitle: String
+    val receiptNotFiscal: String
+    val receiptReceivedFrom: String
+    val receiptFor: String
+    val receiptAmount: String
+    val receiptMethod: String
+    val receiptSignature: String
+    val moneyInvalid: String
+    val paymentsIncome: (Int, String) -> String
+    val paymentsOpen: (String, Int) -> String
+    val feeDueShort: (String) -> String
+    val feeChargedLine: (Int, Int) -> String
+    val feeDeleteAsk: (String) -> String
+    val feeChargeAllAsk: (String, Int) -> String
+    val chargePartial: (String) -> String
+    val chargeLate: (String) -> String
+    val payReceiptNo: (String) -> String
+    val issueFeeDue: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -23213,6 +23736,69 @@ object ItStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "manca la tessera FITP $it" }
     override val issueMedicalSoon: (String) -> String = { "certificato in scadenza il $it" }
     override val memberMedicalShort: (String) -> String = { "certificato fino al $it" }
+    override val paymentsTitle = "Quote e pagamenti"
+    override val paymentsHint = "Quote sociali, tessere e corsi: chi deve, chi ha pagato, ricevute ed esportazione"
+    override val paymentsExport = "Esporta i pagamenti (CSV)"
+    override val paymentsExportHint = "Tutti i pagamenti dell'anno, con numero di ricevuta, metodo e riferimento: si apre con un foglio di calcolo, per il commercialista."
+    override val paymentsCsvName = "Pagamenti"
+    override val paymentsCsvHeader = "Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo"
+    override val feesTitle = "Quote"
+    override val feesNone = "Nessuna quota: creane una con Nuova quota (es. Quota sociale 2027)."
+    override val feeNew = "Nuova quota"
+    override val feeName = "Nome (es. Quota sociale 2027)"
+    override val feeAmount = "Importo"
+    override val feeDue = "Da pagare entro"
+    override val feeKindMembership = "Quota sociale"
+    override val feeKindFitp = "Tessera FITP"
+    override val feeKindCourse = "Corso"
+    override val feeKindTournament = "Torneo"
+    override val feeKindOther = "Altro"
+    override val feeDelete = "Elimina la quota"
+    override val feeChargeAll = "Addebita a tutti i soci"
+    override val feeChargeAllDone = "Tutti i soci hanno già questa quota."
+    override val dueTitle = "Da incassare"
+    override val dueNone = "Nessuna quota da incassare."
+    override val chargeNew = "Nuovo addebito"
+    override val chargeFree = "Altro importo"
+    override val chargeLabel = "Descrizione"
+    override val chargePaid = "pagato"
+    override val chargeUnpaid = "da pagare"
+    override val chargeCancelled = "annullato"
+    override val chargeCancel = "Annulla l'addebito"
+    override val chargeDelete = "Elimina l'addebito"
+    override val chargeDeleteAsk = "Eliminare questo addebito?"
+    override val chargeCancelAsk = "Annullare l'addebito? Non si deve più; i pagamenti fatti restano nel registro."
+    override val payRecord = "Registra pagamento"
+    override val payAmount = "Importo pagato"
+    override val payDate = "Data"
+    override val payCash = "Contanti"
+    override val payTransfer = "Bonifico"
+    override val payPos = "POS"
+    override val paySatispay = "Satispay"
+    override val payOther = "Altro"
+    override val payRef = "Riferimento (CRO, causale…)"
+    override val payReceipt = "Ricevuta"
+    override val payReceiptNow = "Ricevuta subito (PDF)"
+    override val payDelete = "Annulla il pagamento"
+    override val payDeleteAsk = "Annullare questo pagamento? Il numero della ricevuta non si riusa."
+    override val receiptTitle = "Ricevuta"
+    override val receiptNotFiscal = "Documento non fiscale"
+    override val receiptReceivedFrom = "Ricevuto da"
+    override val receiptFor = "Per"
+    override val receiptAmount = "Importo"
+    override val receiptMethod = "Metodo"
+    override val receiptSignature = "Firma"
+    override val moneyInvalid = "Importo non valido"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Incassato nel $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "Da incassare: $a da $n ${if (n == 1) "persona" else "persone"}" }
+    override val feeDueShort: (String) -> String = { "entro il $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid pagati su $total" }
+    override val feeDeleteAsk: (String) -> String = { "Eliminare la quota $it? Gli addebiti già fatti restano." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Addebitare $name a $n ${if (n == 1) "socio" else "soci"} che non ${if (n == 1) "l'ha" else "l'hanno"} ancora?" }
+    override val chargePartial: (String) -> String = { "mancano $it" }
+    override val chargeLate: (String) -> String = { "in ritardo: mancano $it" }
+    override val payReceiptNo: (String) -> String = { "Ricevuta n. $it" }
+    override val issueFeeDue: (String) -> String = { "da pagare: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -24552,6 +25138,69 @@ object EnStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "FITP card $it missing" }
     override val issueMedicalSoon: (String) -> String = { "certificate expires on $it" }
     override val memberMedicalShort: (String) -> String = { "certificate until $it" }
+    override val paymentsTitle = "Fees and payments"
+    override val paymentsHint = "Membership fees, cards and courses: who owes, who paid, receipts and export"
+    override val paymentsExport = "Export payments (CSV)"
+    override val paymentsExportHint = "All the year's payments, with receipt number, method and reference: it opens in a spreadsheet, for the accountant."
+    override val paymentsCsvName = "Payments"
+    override val paymentsCsvHeader = "Date;Receipt;Name;Description;Method;Reference;Amount"
+    override val feesTitle = "Fees"
+    override val feesNone = "No fees: create one with New fee (e.g. Membership 2027)."
+    override val feeNew = "New fee"
+    override val feeName = "Name (e.g. Membership 2027)"
+    override val feeAmount = "Amount"
+    override val feeDue = "Due by"
+    override val feeKindMembership = "Membership"
+    override val feeKindFitp = "FITP card"
+    override val feeKindCourse = "Course"
+    override val feeKindTournament = "Tournament"
+    override val feeKindOther = "Other"
+    override val feeDelete = "Delete fee"
+    override val feeChargeAll = "Charge all members"
+    override val feeChargeAllDone = "All members already have this fee."
+    override val dueTitle = "To collect"
+    override val dueNone = "Nothing to collect."
+    override val chargeNew = "New charge"
+    override val chargeFree = "Other amount"
+    override val chargeLabel = "Description"
+    override val chargePaid = "paid"
+    override val chargeUnpaid = "to pay"
+    override val chargeCancelled = "cancelled"
+    override val chargeCancel = "Cancel the charge"
+    override val chargeDelete = "Delete the charge"
+    override val chargeDeleteAsk = "Delete this charge?"
+    override val chargeCancelAsk = "Cancel the charge? It is no longer owed; payments made stay in the register."
+    override val payRecord = "Record payment"
+    override val payAmount = "Amount paid"
+    override val payDate = "Date"
+    override val payCash = "Cash"
+    override val payTransfer = "Bank transfer"
+    override val payPos = "Card (POS)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Other"
+    override val payRef = "Reference (transfer ID, note…)"
+    override val payReceipt = "Receipt"
+    override val payReceiptNow = "Receipt now (PDF)"
+    override val payDelete = "Cancel the payment"
+    override val payDeleteAsk = "Cancel this payment? The receipt number is not reused."
+    override val receiptTitle = "Receipt"
+    override val receiptNotFiscal = "Non-fiscal document"
+    override val receiptReceivedFrom = "Received from"
+    override val receiptFor = "For"
+    override val receiptAmount = "Amount"
+    override val receiptMethod = "Method"
+    override val receiptSignature = "Signed by"
+    override val moneyInvalid = "Invalid amount"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Collected in $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "To collect: $a from $n ${if (n == 1) "person" else "people"}" }
+    override val feeDueShort: (String) -> String = { "by $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid paid of $total" }
+    override val feeDeleteAsk: (String) -> String = { "Delete the fee $it? Charges already made stay." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Charge $name to $n ${if (n == 1) "member" else "members"} who ${if (n == 1) "doesn't" else "don't"} have it yet?" }
+    override val chargePartial: (String) -> String = { "$it left" }
+    override val chargeLate: (String) -> String = { "late: $it left" }
+    override val payReceiptNo: (String) -> String = { "Receipt no. $it" }
+    override val issueFeeDue: (String) -> String = { "to pay: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -25914,6 +26563,69 @@ object DeStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "FITP-Ausweis $it fehlt" }
     override val issueMedicalSoon: (String) -> String = { "Attest läuft am $it ab" }
     override val memberMedicalShort: (String) -> String = { "Attest bis $it" }
+    override val paymentsTitle = "Beiträge und Zahlungen"
+    override val paymentsHint = "Mitgliedsbeiträge, Ausweise und Kurse: wer schuldet, wer gezahlt hat, Quittungen und Export"
+    override val paymentsExport = "Zahlungen exportieren (CSV)"
+    override val paymentsExportHint = "Alle Zahlungen des Jahres mit Quittungsnummer, Zahlungsart und Referenz: öffnet sich in einer Tabellenkalkulation, für den Steuerberater."
+    override val paymentsCsvName = "Zahlungen"
+    override val paymentsCsvHeader = "Datum;Quittung;Name;Beschreibung;Zahlungsart;Referenz;Betrag"
+    override val feesTitle = "Beiträge"
+    override val feesNone = "Keine Beiträge: mit Neuer Beitrag anlegen (z. B. Mitgliedsbeitrag 2027)."
+    override val feeNew = "Neuer Beitrag"
+    override val feeName = "Name (z. B. Mitgliedsbeitrag 2027)"
+    override val feeAmount = "Betrag"
+    override val feeDue = "Zu zahlen bis"
+    override val feeKindMembership = "Mitgliedsbeitrag"
+    override val feeKindFitp = "FITP-Ausweis"
+    override val feeKindCourse = "Kurs"
+    override val feeKindTournament = "Turnier"
+    override val feeKindOther = "Sonstiges"
+    override val feeDelete = "Beitrag löschen"
+    override val feeChargeAll = "Allen Mitgliedern berechnen"
+    override val feeChargeAllDone = "Alle Mitglieder haben diesen Beitrag schon."
+    override val dueTitle = "Offen"
+    override val dueNone = "Nichts offen."
+    override val chargeNew = "Neue Forderung"
+    override val chargeFree = "Anderer Betrag"
+    override val chargeLabel = "Beschreibung"
+    override val chargePaid = "bezahlt"
+    override val chargeUnpaid = "offen"
+    override val chargeCancelled = "storniert"
+    override val chargeCancel = "Forderung stornieren"
+    override val chargeDelete = "Forderung löschen"
+    override val chargeDeleteAsk = "Diese Forderung löschen?"
+    override val chargeCancelAsk = "Forderung stornieren? Sie ist nicht mehr fällig; geleistete Zahlungen bleiben im Register."
+    override val payRecord = "Zahlung erfassen"
+    override val payAmount = "Gezahlter Betrag"
+    override val payDate = "Datum"
+    override val payCash = "Bar"
+    override val payTransfer = "Überweisung"
+    override val payPos = "Karte (POS)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Sonstige"
+    override val payRef = "Referenz (Überweisungs-ID, Verwendungszweck…)"
+    override val payReceipt = "Quittung"
+    override val payReceiptNow = "Quittung gleich (PDF)"
+    override val payDelete = "Zahlung stornieren"
+    override val payDeleteAsk = "Diese Zahlung stornieren? Die Quittungsnummer wird nicht wiederverwendet."
+    override val receiptTitle = "Quittung"
+    override val receiptNotFiscal = "Kein Steuerbeleg"
+    override val receiptReceivedFrom = "Erhalten von"
+    override val receiptFor = "Für"
+    override val receiptAmount = "Betrag"
+    override val receiptMethod = "Zahlungsart"
+    override val receiptSignature = "Unterschrift"
+    override val moneyInvalid = "Ungültiger Betrag"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Eingenommen $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "Offen: $a von $n ${if (n == 1) "Person" else "Personen"}" }
+    override val feeDueShort: (String) -> String = { "bis $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid von $total bezahlt" }
+    override val feeDeleteAsk: (String) -> String = { "Beitrag $it löschen? Bereits erstellte Forderungen bleiben." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "$name $n ${if (n == 1) "Mitglied" else "Mitgliedern"} berechnen, ${if (n == 1) "das ihn noch nicht hat" else "die ihn noch nicht haben"}?" }
+    override val chargePartial: (String) -> String = { "noch $it" }
+    override val chargeLate: (String) -> String = { "überfällig: noch $it" }
+    override val payReceiptNo: (String) -> String = { "Quittung Nr. $it" }
+    override val issueFeeDue: (String) -> String = { "offen: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -27269,6 +27981,69 @@ object EsStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "falta la licencia FITP $it" }
     override val issueMedicalSoon: (String) -> String = { "certificado caduca el $it" }
     override val memberMedicalShort: (String) -> String = { "certificado hasta el $it" }
+    override val paymentsTitle = "Cuotas y pagos"
+    override val paymentsHint = "Cuotas de socio, licencias y cursos: quién debe, quién ha pagado, recibos y exportación"
+    override val paymentsExport = "Exportar los pagos (CSV)"
+    override val paymentsExportHint = "Todos los pagos del año, con número de recibo, método y referencia: se abre con una hoja de cálculo, para el gestor."
+    override val paymentsCsvName = "Pagos"
+    override val paymentsCsvHeader = "Fecha;Recibo;Nombre;Descripción;Método;Referencia;Importe"
+    override val feesTitle = "Cuotas"
+    override val feesNone = "Ninguna cuota: crea una con Nueva cuota (p. ej. Cuota de socio 2027)."
+    override val feeNew = "Nueva cuota"
+    override val feeName = "Nombre (p. ej. Cuota de socio 2027)"
+    override val feeAmount = "Importe"
+    override val feeDue = "A pagar antes del"
+    override val feeKindMembership = "Cuota de socio"
+    override val feeKindFitp = "Licencia FITP"
+    override val feeKindCourse = "Curso"
+    override val feeKindTournament = "Torneo"
+    override val feeKindOther = "Otra"
+    override val feeDelete = "Eliminar la cuota"
+    override val feeChargeAll = "Cargar a todos los socios"
+    override val feeChargeAllDone = "Todos los socios ya tienen esta cuota."
+    override val dueTitle = "Por cobrar"
+    override val dueNone = "Nada por cobrar."
+    override val chargeNew = "Nuevo cargo"
+    override val chargeFree = "Otro importe"
+    override val chargeLabel = "Descripción"
+    override val chargePaid = "pagado"
+    override val chargeUnpaid = "por pagar"
+    override val chargeCancelled = "anulado"
+    override val chargeCancel = "Anular el cargo"
+    override val chargeDelete = "Eliminar el cargo"
+    override val chargeDeleteAsk = "¿Eliminar este cargo?"
+    override val chargeCancelAsk = "¿Anular el cargo? Ya no se debe; los pagos hechos se quedan en el registro."
+    override val payRecord = "Registrar pago"
+    override val payAmount = "Importe pagado"
+    override val payDate = "Fecha"
+    override val payCash = "Efectivo"
+    override val payTransfer = "Transferencia"
+    override val payPos = "Tarjeta (TPV)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Otro"
+    override val payRef = "Referencia (n.º de transferencia, concepto…)"
+    override val payReceipt = "Recibo"
+    override val payReceiptNow = "Recibo ahora (PDF)"
+    override val payDelete = "Anular el pago"
+    override val payDeleteAsk = "¿Anular este pago? El número de recibo no se reutiliza."
+    override val receiptTitle = "Recibo"
+    override val receiptNotFiscal = "Documento no fiscal"
+    override val receiptReceivedFrom = "Recibido de"
+    override val receiptFor = "Por"
+    override val receiptAmount = "Importe"
+    override val receiptMethod = "Método"
+    override val receiptSignature = "Firma"
+    override val moneyInvalid = "Importe no válido"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Cobrado en $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "Por cobrar: $a de $n ${if (n == 1) "persona" else "personas"}" }
+    override val feeDueShort: (String) -> String = { "antes del $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid pagados de $total" }
+    override val feeDeleteAsk: (String) -> String = { "¿Eliminar la cuota $it? Los cargos ya hechos se quedan." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "¿Cargar $name a $n ${if (n == 1) "socio" else "socios"} que aún no la ${if (n == 1) "tiene" else "tienen"}?" }
+    override val chargePartial: (String) -> String = { "faltan $it" }
+    override val chargeLate: (String) -> String = { "con retraso: faltan $it" }
+    override val payReceiptNo: (String) -> String = { "Recibo n.º $it" }
+    override val issueFeeDue: (String) -> String = { "por pagar: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -28626,6 +29401,69 @@ object FrStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "licence FITP $it manquante" }
     override val issueMedicalSoon: (String) -> String = { "certificat expire le $it" }
     override val memberMedicalShort: (String) -> String = { "certificat jusqu'au $it" }
+    override val paymentsTitle = "Cotisations et paiements"
+    override val paymentsHint = "Cotisations, licences et cours : qui doit, qui a payé, reçus et export"
+    override val paymentsExport = "Exporter les paiements (CSV)"
+    override val paymentsExportHint = "Tous les paiements de l'année, avec numéro de reçu, mode et référence : s'ouvre dans un tableur, pour le comptable."
+    override val paymentsCsvName = "Paiements"
+    override val paymentsCsvHeader = "Date;Reçu;Nom;Description;Mode;Référence;Montant"
+    override val feesTitle = "Cotisations"
+    override val feesNone = "Aucune cotisation : créez-en une avec Nouvelle cotisation (ex. Cotisation 2027)."
+    override val feeNew = "Nouvelle cotisation"
+    override val feeName = "Nom (ex. Cotisation 2027)"
+    override val feeAmount = "Montant"
+    override val feeDue = "À payer avant le"
+    override val feeKindMembership = "Cotisation"
+    override val feeKindFitp = "Licence FITP"
+    override val feeKindCourse = "Cours"
+    override val feeKindTournament = "Tournoi"
+    override val feeKindOther = "Autre"
+    override val feeDelete = "Supprimer la cotisation"
+    override val feeChargeAll = "Facturer à tous les adhérents"
+    override val feeChargeAllDone = "Tous les adhérents ont déjà cette cotisation."
+    override val dueTitle = "À encaisser"
+    override val dueNone = "Rien à encaisser."
+    override val chargeNew = "Nouvelle facturation"
+    override val chargeFree = "Autre montant"
+    override val chargeLabel = "Libellé"
+    override val chargePaid = "payé"
+    override val chargeUnpaid = "à payer"
+    override val chargeCancelled = "annulé"
+    override val chargeCancel = "Annuler la facturation"
+    override val chargeDelete = "Supprimer la facturation"
+    override val chargeDeleteAsk = "Supprimer cette facturation ?"
+    override val chargeCancelAsk = "Annuler la facturation ? Elle n'est plus due ; les paiements faits restent dans le registre."
+    override val payRecord = "Enregistrer un paiement"
+    override val payAmount = "Montant payé"
+    override val payDate = "Date du paiement"
+    override val payCash = "Espèces"
+    override val payTransfer = "Virement"
+    override val payPos = "Carte (TPE)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Autre"
+    override val payRef = "Référence (n° de virement, libellé…)"
+    override val payReceipt = "Reçu"
+    override val payReceiptNow = "Reçu tout de suite (PDF)"
+    override val payDelete = "Annuler le paiement"
+    override val payDeleteAsk = "Annuler ce paiement ? Le numéro du reçu n'est pas réutilisé."
+    override val receiptTitle = "Reçu"
+    override val receiptNotFiscal = "Document non fiscal"
+    override val receiptReceivedFrom = "Reçu de"
+    override val receiptFor = "Pour"
+    override val receiptAmount = "Montant"
+    override val receiptMethod = "Mode"
+    override val receiptSignature = "Signature"
+    override val moneyInvalid = "Montant non valide"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Encaissé en $y : $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "À encaisser : $a de $n ${if (n == 1) "personne" else "personnes"}" }
+    override val feeDueShort: (String) -> String = { "avant le $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid payés sur $total" }
+    override val feeDeleteAsk: (String) -> String = { "Supprimer la cotisation $it ? Les facturations déjà faites restent." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Facturer $name à $n ${if (n == 1) "adhérent" else "adhérents"} qui ne ${if (n == 1) "l'a" else "l'ont"} pas encore ?" }
+    override val chargePartial: (String) -> String = { "reste $it" }
+    override val chargeLate: (String) -> String = { "en retard : reste $it" }
+    override val payReceiptNo: (String) -> String = { "Reçu n° $it" }
+    override val issueFeeDue: (String) -> String = { "à payer : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -29984,6 +30822,69 @@ object PtStrings : Strings {
     override val issueNoFitp: (Int) -> String = { "falta o cartão FITP $it" }
     override val issueMedicalSoon: (String) -> String = { "atestado vence em $it" }
     override val memberMedicalShort: (String) -> String = { "atestado até $it" }
+    override val paymentsTitle = "Mensalidades e pagamentos"
+    override val paymentsHint = "Mensalidades, cartões e cursos: quem deve, quem pagou, recibos e exportação"
+    override val paymentsExport = "Exportar os pagamentos (CSV)"
+    override val paymentsExportHint = "Todos os pagamentos do ano, com número do recibo, método e referência: abre numa planilha, para o contador."
+    override val paymentsCsvName = "Pagamentos"
+    override val paymentsCsvHeader = "Data;Recibo;Nome;Descrição;Método;Referência;Valor"
+    override val feesTitle = "Mensalidades"
+    override val feesNone = "Nenhuma mensalidade: crie uma com Nova mensalidade (ex. Anuidade 2027)."
+    override val feeNew = "Nova mensalidade"
+    override val feeName = "Nome (ex. Anuidade 2027)"
+    override val feeAmount = "Valor"
+    override val feeDue = "Pagar até"
+    override val feeKindMembership = "Anuidade"
+    override val feeKindFitp = "Cartão FITP"
+    override val feeKindCourse = "Curso"
+    override val feeKindTournament = "Torneio"
+    override val feeKindOther = "Outro"
+    override val feeDelete = "Excluir a mensalidade"
+    override val feeChargeAll = "Cobrar de todos os sócios"
+    override val feeChargeAllDone = "Todos os sócios já têm esta mensalidade."
+    override val dueTitle = "A receber"
+    override val dueNone = "Nada a receber."
+    override val chargeNew = "Nova cobrança"
+    override val chargeFree = "Outro valor"
+    override val chargeLabel = "Descrição"
+    override val chargePaid = "pago"
+    override val chargeUnpaid = "a pagar"
+    override val chargeCancelled = "cancelado"
+    override val chargeCancel = "Cancelar a cobrança"
+    override val chargeDelete = "Excluir a cobrança"
+    override val chargeDeleteAsk = "Excluir esta cobrança?"
+    override val chargeCancelAsk = "Cancelar a cobrança? Não é mais devida; os pagamentos feitos ficam no registro."
+    override val payRecord = "Registrar pagamento"
+    override val payAmount = "Valor pago"
+    override val payDate = "Data"
+    override val payCash = "Dinheiro"
+    override val payTransfer = "Transferência"
+    override val payPos = "Cartão (POS)"
+    override val paySatispay = "Satispay"
+    override val payOther = "Outro"
+    override val payRef = "Referência (comprovante, descrição…)"
+    override val payReceipt = "Recibo"
+    override val payReceiptNow = "Recibo agora (PDF)"
+    override val payDelete = "Cancelar o pagamento"
+    override val payDeleteAsk = "Cancelar este pagamento? O número do recibo não é reutilizado."
+    override val receiptTitle = "Recibo"
+    override val receiptNotFiscal = "Documento não fiscal"
+    override val receiptReceivedFrom = "Recebido de"
+    override val receiptFor = "Referente a"
+    override val receiptAmount = "Valor"
+    override val receiptMethod = "Método"
+    override val receiptSignature = "Assinatura"
+    override val moneyInvalid = "Valor inválido"
+    override val paymentsIncome: (Int, String) -> String = { y, a -> "Recebido em $y: $a" }
+    override val paymentsOpen: (String, Int) -> String = { a, n -> "A receber: $a de $n ${if (n == 1) "pessoa" else "pessoas"}" }
+    override val feeDueShort: (String) -> String = { "até $it" }
+    override val feeChargedLine: (Int, Int) -> String = { paid, total -> "$paid pagos de $total" }
+    override val feeDeleteAsk: (String) -> String = { "Excluir a mensalidade $it? As cobranças já feitas ficam." }
+    override val feeChargeAllAsk: (String, Int) -> String = { name, n -> "Cobrar $name de $n ${if (n == 1) "sócio" else "sócios"} que ainda não a ${if (n == 1) "tem" else "têm"}?" }
+    override val chargePartial: (String) -> String = { "faltam $it" }
+    override val chargeLate: (String) -> String = { "atrasado: faltam $it" }
+    override val payReceiptNo: (String) -> String = { "Recibo n.º $it" }
+    override val issueFeeDue: (String) -> String = { "a pagar: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -31419,6 +32320,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Business
@@ -31622,6 +32524,7 @@ private fun CourtsTab(c: MatchController) {
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
     Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
+    Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
@@ -33140,11 +34043,15 @@ fun MembersScreen(c: MatchController) {
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     var adding by remember { mutableStateOf(false) }
+    val book by c.clubBook.collectAsState()
     val members = players.filter { it.member != null }
     val issues = remember(members) { members.associate { it.id to Members.issues(it, now) } }
-    val todo = members.count { issues[it.id].orEmpty().isNotEmpty() }
+    // Quanto deve ciascuno al circolo: anche questo è da sistemare.
+    val owed = remember(members, book) { members.associate { it.id to com.tennis.scoremanager.data.Fees.owed(book, it) } }
+    fun todo(p: PlayerProfile) = issues[p.id].orEmpty().isNotEmpty() || (owed[p.id] ?: 0) > 0
+    val todo = members.count(::todo)
     val shown = (if (query.isBlank()) members else Players.search(members, query))
-        .filter { !todoOnly || issues[it.id].orEmpty().isNotEmpty() }
+        .filter { !todoOnly || todo(it) }
     ScreenScaffold(
         title = s.membersTitle,
         subtitle = s.membersHint,
@@ -33174,7 +34081,8 @@ fun MembersScreen(c: MatchController) {
                         m.medicalUntil?.takeIf { list.none { i -> i == Members.Issue.MEDICAL_SOON || i == Members.Issue.MEDICAL_EXPIRED } }?.let { s.memberMedicalShort(shortDate(it, lang)) },
                     ).joinToString(" · ")
                     if (line.isNotEmpty()) Text(line, color = TsmColors.TextDim, fontSize = 13.sp)
-                    if (list.isEmpty()) Text(s.memberOk, color = TsmColors.Ok, fontSize = 13.sp)
+                    owed[p.id]?.takeIf { it > 0 }?.let { Text(s.issueFeeDue(com.tennis.scoremanager.data.Fees.money(it, lang.locale)), color = TsmColors.Orange, fontSize = 13.sp) }
+                    if (list.isEmpty() && (owed[p.id] ?: 0) == 0) Text(s.memberOk, color = TsmColors.Ok, fontSize = 13.sp)
                     else Text(
                         list.joinToString(" · ") { issueText(s, p, it, now, lang) },
                         color = if (list.any(Members::blocking)) TsmColors.Danger else TsmColors.Orange, fontSize = 13.sp,
@@ -34334,6 +35242,443 @@ fun CourtDiagram(p1Left: Boolean, server: Side, names: Names, s: Strings) {
             Text("${s.right} ▶", color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.End)
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/PaymentsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/PaymentsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.DatePickerDialog
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Euro
+import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Charge
+import com.tennis.scoremanager.data.Fee
+import com.tennis.scoremanager.data.FeeKind
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.Members
+import com.tennis.scoremanager.data.PayMethod
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.chargeStatusColor
+import com.tennis.scoremanager.ui.chargeStatusName
+import com.tennis.scoremanager.ui.feeKindName
+import com.tennis.scoremanager.ui.payMethodName
+import java.util.Calendar
+
+/** Mezzogiorno del giorno scelto: la data non cambia col fuso orario. */
+private fun noonOf(y: Int, m: Int, d: Int): Long = Calendar.getInstance().apply { set(y, m, d, 12, 0, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+
+private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEAR), get(Calendar.MONTH), get(Calendar.DAY_OF_MONTH)) }
+
+/** Un bottone con la data; toccandolo si sceglie dal calendario. */
+@Composable
+private fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
+        val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
+        DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+    }, Modifier.fillMaxWidth())
+}
+
+@Composable
+private fun MoneyField(text: String, label: String, onChange: (String) -> Unit) {
+    val s = LocalStrings.current
+    val bad = text.isNotBlank() && Fees.parse(text) == null
+    OutlinedTextField(
+        text, { onChange(it.take(12)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(label) }, isError = bad,
+        supportingText = if (bad) ({ Text(s.moneyInvalid) }) else null,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), leadingIcon = { Icon(Icons.Filled.Euro, null) },
+    )
+}
+
+/** "150,00" per riempire un campo importo. */
+private fun plain(cents: Int, lang: com.tennis.scoremanager.model.Lang): String {
+    val sep = java.text.DecimalFormatSymbols.getInstance(lang.locale).decimalSeparator
+    return "%d%c%02d".format(cents / 100, sep, cents % 100)
+}
+
+/**
+ * Circolo › Quote e pagamenti: le quote del circolo (si addebitano a tutti i soci in un colpo), chi deve ancora
+ * pagare, quanto si è incassato nell'anno e l'esportazione dei pagamenti per il commercialista.
+ */
+@Composable
+fun PaymentsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    BackHandler { c.back() }
+    val book by c.clubBook.collectAsState()
+    val players by c.players.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    val year = Members.year(now)
+    var editFee by remember { mutableStateOf<Fee?>(null) }
+    var newFee by remember { mutableStateOf(false) }
+    var exportYear by remember { mutableStateOf(year) }
+    ScreenScaffold(
+        title = s.paymentsTitle,
+        subtitle = s.paymentsHint,
+        icon = Icons.Filled.Payments,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.feeNew, Icons.Filled.Add, { newFee = true }, Modifier.weight(1f))
+        },
+    ) {
+        val (openCents, openPeople) = Fees.open(book)
+        Text(s.paymentsIncome(year, Fees.money(Fees.income(book, year), lang.locale)), color = TsmColors.Ok, fontWeight = FontWeight.Bold)
+        if (openCents > 0) Text(s.paymentsOpen(Fees.money(openCents, lang.locale), openPeople), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
+
+        SectionCard(s.feesTitle, Icons.Filled.Receipt) {
+            if (book.fees.isEmpty()) Text(s.feesNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            for (f in book.fees.sortedByDescending { it.createdAt }) {
+                val (paid, total) = Fees.feeProgress(book, f)
+                Row(Modifier.fillMaxWidth().clickable { editFee = f }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(f.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(
+                            listOfNotNull(Fees.money(f.cents, lang.locale), feeKindName(s, f.kind), f.due?.let { s.feeDueShort(shortDate(it, lang)) },
+                                s.feeChargedLine(paid, total).takeIf { total > 0 }).joinToString(" · "),
+                            color = TsmColors.TextDim, fontSize = 13.sp,
+                        )
+                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+                }
+            }
+        }
+
+        // Chi deve ancora pagare, dal debito più grande.
+        SectionCard(s.dueTitle, Icons.Filled.Payments, accent = TsmColors.Orange) {
+            val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
+                .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
+            if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            for ((key, list, left) in open) {
+                val p = players.firstOrNull { it.id == key || key in it.aliases }
+                Row(
+                    Modifier.fillMaxWidth().clickable(enabled = p != null) { p?.let { c.openStudent(it.id) } }.padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(p?.name ?: list.first().name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(list.joinToString(" · ") { it.label }, color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    val late = list.any { Fees.status(it, now) == Fees.Status.LATE }
+                    Text(Fees.money(left, lang.locale), color = if (late) TsmColors.Danger else TsmColors.Orange, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        SectionCard(s.paymentsExport, Icons.Filled.TableChart) {
+            Text(s.paymentsExportHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            val years = listOf(year - 1, year)
+            Segmented(years.map { SegOption(it.toString()) }, years.indexOf(exportYear), { exportYear = years[it] })
+            GhostButton(s.paymentsExport, Icons.Filled.TableChart, {
+                val f = c.paymentsCsv(exportYear)
+                if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
+                else context.startActivity(c.shareFileIntent(f, "text/csv"))
+            }, Modifier.fillMaxWidth())
+        }
+    }
+    if (newFee) FeeDialog(c, null) { newFee = false }
+    editFee?.let { f -> FeeDialog(c, f) { editFee = null } }
+}
+
+/** Quota nuova o da cambiare: nome, tipo, importo, scadenza; da qui la si addebita a tutti i soci. */
+@Composable
+private fun FeeDialog(c: MatchController, fee: Fee?, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val players by c.players.collectAsState()
+    var name by remember { mutableStateOf(fee?.name.orEmpty()) }
+    var kind by remember { mutableStateOf(fee?.kind ?: FeeKind.MEMBERSHIP) }
+    var amount by remember { mutableStateOf(fee?.let { plain(it.cents, lang) }.orEmpty()) }
+    var due by remember { mutableStateOf(fee?.due) }
+    var askAll by remember { mutableStateOf(false) }
+    var askDelete by remember { mutableStateOf(false) }
+    val cents = Fees.parse(amount)
+    fun current(): Fee? {
+        val v = cents ?: return null
+        if (name.isBlank()) return null
+        return (fee ?: Fee(Fees.newId("f"), "", 0, createdAt = System.currentTimeMillis())).copy(name = name.trim(), kind = kind, cents = v, due = due)
+    }
+    fun save(f: Fee) {
+        val book = c.clubBook.value
+        c.saveClubBook(book.copy(fees = book.fees.filter { it.id != f.id } + f))
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (fee == null) s.feeNew else fee.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(name, { name = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.feeName) })
+                val kinds = FeeKind.entries
+                Segmented(kinds.map { SegOption(feeKindName(s, it)) }, kinds.indexOf(kind), { kind = kinds[it] }, columns = 3)
+                MoneyField(amount, s.feeAmount) { amount = it }
+                DateButton(s.feeDue, due, lang) { due = it }
+                if (fee != null) {
+                    val members = players.filter { it.member != null }
+                    GhostButton(s.feeChargeAll, Icons.Filled.GroupAdd, { askAll = true }, Modifier.fillMaxWidth(), enabled = members.isNotEmpty())
+                    TextButton(onClick = { askDelete = true }) { Text(s.feeDelete, color = TsmColors.Danger) }
+                }
+            }
+        },
+        confirmButton = { TextButton(enabled = current() != null, onClick = { current()?.let(::save); onDone() }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (askAll) {
+        val f = current() ?: fee!!
+        val members = players.filter { it.member != null }
+        val todo = Fees.chargeAll(c.clubBook.value, f, members, 0L).second
+        AlertDialog(
+            onDismissRequest = { askAll = false },
+            text = { Text(if (todo == 0) s.feeChargeAllDone else s.feeChargeAllAsk(f.name, todo)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    askAll = false
+                    if (todo > 0) {
+                        save(f)
+                        c.saveClubBook(Fees.chargeAll(c.clubBook.value, f, members, System.currentTimeMillis()).first)
+                    }
+                    onDone()
+                }) { Text(if (todo == 0) s.ok else s.feeChargeAll) }
+            },
+            dismissButton = { if (todo > 0) TextButton(onClick = { askAll = false }) { Text(s.back) } },
+        )
+    }
+    if (askDelete && fee != null) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.feeDeleteAsk(fee.name)) },
+        confirmButton = {
+            TextButton(onClick = {
+                val book = c.clubBook.value
+                c.saveClubBook(book.copy(fees = book.fees.filter { it.id != fee.id }))
+                askDelete = false
+                onDone()
+            }) { Text(s.feeDelete, color = TsmColors.Danger) }
+        },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+}
+
+/** Nella scheda del giocatore: le sue quote coi pagamenti; da qui si addebita, si incassa e si fa la ricevuta. */
+@Composable
+fun ChargesSection(c: MatchController, p: PlayerProfile) {
+    val s = LocalStrings.current
+    val book by c.clubBook.collectAsState()
+    val roles by c.roles.collectAsState()
+    val lang = c.options.value.lang
+    val mine = Fees.of(book, p)
+    if (mine.isEmpty() && (p.member == null || com.tennis.scoremanager.Role.CLUB !in roles)) return
+    val now = System.currentTimeMillis()
+    var adding by remember { mutableStateOf(false) }
+    var open by remember { mutableStateOf<String?>(null) }
+    SectionCard(s.paymentsTitle, Icons.Filled.Payments) {
+        val owed = mine.sumOf { it.left }
+        if (owed > 0) Text(s.issueFeeDue(Fees.money(owed, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
+        for (ch in mine) {
+            val st = Fees.status(ch, now)
+            Row(Modifier.fillMaxWidth().clickable { open = ch.id }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(ch.label, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    Text(chargeStatusName(s, st, Fees.money(ch.left, lang.locale)), color = chargeStatusColor(st), fontSize = 13.sp)
+                }
+                Text(Fees.money(ch.cents, lang.locale), color = TsmColors.TextMain)
+            }
+        }
+        GhostButton(s.chargeNew, Icons.Filled.Add, { adding = true }, Modifier.fillMaxWidth())
+    }
+    if (adding) NewChargeDialog(c, p) { adding = false }
+    open?.let { id -> book.charges.firstOrNull { it.id == id }?.let { ChargeDialog(c, it) { open = null } } ?: run { open = null } }
+}
+
+/** Un addebito nuovo: una delle quote del circolo o un importo libero. */
+@Composable
+private fun NewChargeDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val book by c.clubBook.collectAsState()
+    val lang = c.options.value.lang
+    var free by remember { mutableStateOf(book.fees.isEmpty()) }
+    var label by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.chargeNew) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (!free) {
+                    for (f in book.fees.sortedByDescending { it.createdAt }) {
+                        Row(
+                            Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable {
+                                c.saveClubBook(Fees.charge(c.clubBook.value, p, f.name, f.cents, System.currentTimeMillis(), f))
+                                onDone()
+                            }.padding(10.dp),
+                        ) {
+                            Text(f.name, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                            Text(Fees.money(f.cents, lang.locale), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    GhostButton(s.chargeFree, Icons.Filled.Euro, { free = true }, Modifier.fillMaxWidth())
+                } else {
+                    OutlinedTextField(label, { label = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.chargeLabel) })
+                    MoneyField(amount, s.feeAmount) { amount = it }
+                }
+            }
+        },
+        confirmButton = {
+            if (free) TextButton(enabled = label.isNotBlank() && (Fees.parse(amount) ?: 0) > 0, onClick = {
+                c.saveClubBook(Fees.charge(c.clubBook.value, p, label.trim(), Fees.parse(amount)!!, System.currentTimeMillis()))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Un addebito: i pagamenti con la ricevuta, "Registra pagamento", annulla. */
+@Composable
+private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    var paying by remember { mutableStateOf(false) }
+    var unpay by remember { mutableStateOf<String?>(null) }
+    var cancel by remember { mutableStateOf(false) }
+    fun share(paymentId: String) {
+        val f = c.receiptFile(ch.id, paymentId)
+        if (f == null) Toast.makeText(context, s.reportFailed, Toast.LENGTH_LONG).show()
+        else context.startActivity(c.shareFileIntent(f, "application/pdf"))
+    }
+    val st = Fees.status(ch, System.currentTimeMillis())
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(ch.label) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("${Fees.money(ch.cents, lang.locale)} · ${chargeStatusName(s, st, Fees.money(ch.left, lang.locale))}", color = chargeStatusColor(st), fontWeight = FontWeight.Bold)
+                ch.due?.let { Text(s.feeDueShort(shortDate(it, lang)), color = TsmColors.TextDim, fontSize = 13.sp) }
+                for (p in ch.payments) {
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("${Fees.money(p.cents, lang.locale)} · ${payMethodName(s, p.method)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text(listOf(shortDate(p.at, lang), s.payReceiptNo(p.receipt), p.ref).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 12.sp)
+                        }
+                        androidx.compose.material3.IconButton(onClick = { share(p.id) }) { Icon(Icons.Filled.Receipt, s.payReceipt, tint = TsmColors.Ball) }
+                        androidx.compose.material3.IconButton(onClick = { unpay = p.id }) { Icon(Icons.Filled.Delete, s.payDelete, tint = TsmColors.TextDim) }
+                    }
+                }
+                if (ch.left > 0) BigButton(s.payRecord, Icons.Filled.Euro, { paying = true }, Modifier.fillMaxWidth())
+                if (!ch.cancelled) TextButton(onClick = { cancel = true }) { Text(if (ch.payments.isEmpty()) s.chargeDelete else s.chargeCancel, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+    if (paying) PayDialog(c, ch, onPaid = { id -> paying = false; share(id) }) { paying = false }
+    unpay?.let { pid ->
+        AlertDialog(
+            onDismissRequest = { unpay = null },
+            text = { Text(s.payDeleteAsk) },
+            confirmButton = { TextButton(onClick = { c.saveClubBook(Fees.unpay(c.clubBook.value, ch.id, pid)); unpay = null }) { Text(s.payDelete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { unpay = null }) { Text(s.back) } },
+        )
+    }
+    if (cancel) AlertDialog(
+        onDismissRequest = { cancel = false },
+        text = { Text(if (ch.payments.isEmpty()) s.chargeDeleteAsk else s.chargeCancelAsk) },
+        confirmButton = {
+            TextButton(onClick = { c.saveClubBook(Fees.cancel(c.clubBook.value, ch.id)); cancel = false; onDone() }) {
+                Text(if (ch.payments.isEmpty()) s.chargeDelete else s.chargeCancel, color = TsmColors.Danger)
+            }
+        },
+        dismissButton = { TextButton(onClick = { cancel = false }) { Text(s.back) } },
+    )
+}
+
+/** Registra un versamento: importo (di solito quanto manca), data, metodo, riferimento. Poi si offre la ricevuta. */
+@Composable
+private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var amount by remember { mutableStateOf(plain(ch.left, lang)) }
+    var at by remember { mutableStateOf(today()) }
+    var method by remember { mutableStateOf(PayMethod.CASH) }
+    var ref by remember { mutableStateOf("") }
+    var receipt by remember { mutableStateOf(true) }
+    val cents = Fees.parse(amount)
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.payRecord) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(ch.label, color = TsmColors.TextDim, fontSize = 13.sp)
+                MoneyField(amount, s.payAmount) { amount = it }
+                DateButton(s.payDate, at, lang) { at = it }
+                val methods = PayMethod.entries
+                Segmented(methods.map { SegOption(payMethodName(s, it)) }, methods.indexOf(method), { method = methods[it] }, columns = 3)
+                if (method != PayMethod.CASH) OutlinedTextField(ref, { ref = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.payRef) })
+                com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Receipt, s.payReceiptNow, null, receipt) { receipt = it }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = cents != null && cents > 0, onClick = {
+                val r = Fees.pay(c.clubBook.value, ch.id, cents!!, at, method, if (method == PayMethod.CASH) "" else ref) ?: return@TextButton onDone()
+                c.saveClubBook(r.first)
+                if (receipt) onPaid(r.second.id) else onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 TSM_EOF
 
@@ -36298,6 +37643,7 @@ fun StudentScreen(c: MatchController) {
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
+        ChargesSection(c, st)
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
             if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
             c.savePlayer(st.copy(student = on))
@@ -55533,6 +56879,117 @@ class StrokeProtocolTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubBookTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+import java.util.Locale
+
+class ClubBookTest {
+    private fun day(y: Int, m: Int, d: Int): Long = Calendar.getInstance().apply { set(y, m - 1, d, 12, 0, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val now = day(2026, 11, 1)
+    private val rossi = PlayerProfile("a", "Rossi", "Mario", "Rossi", member = Membership())
+    private val bianchi = PlayerProfile("b", "Bianchi", "Anna", "Bianchi", member = Membership(), aliases = setOf("b-old"))
+    private val fee = Fee("f1", "Quota sociale 2027", 15_000, FeeKind.MEMBERSHIP, due = day(2027, 1, 31))
+
+    @Test
+    fun chargeAllSkipsWhoAlreadyHasIt() {
+        val (b1, n1) = Fees.chargeAll(ClubBook(fees = listOf(fee)), fee, listOf(rossi), now)
+        assertEquals(1, n1)
+        val (b2, n2) = Fees.chargeAll(b1, fee, listOf(rossi, bianchi), now)
+        assertEquals(1, n2)
+        assertEquals(2, b2.charges.size)
+        assertEquals(15_000, Fees.owed(b2, bianchi))
+        assertEquals(30_000 to 2, Fees.open(b2))
+    }
+
+    @Test
+    fun paymentsReceiptsAndStatus() {
+        var b = Fees.chargeAll(ClubBook(), fee, listOf(rossi), now).first
+        val id = b.charges.single().id
+        assertEquals(Fees.Status.UNPAID, Fees.status(b.charges.single(), now))
+        val (b1, p1) = Fees.pay(b, id, 5_000, day(2026, 12, 20), PayMethod.CASH, "")!!
+        assertEquals("1/2026", p1.receipt)
+        assertEquals(Fees.Status.PARTIAL, Fees.status(b1.charges.single(), now))
+        assertEquals(10_000, b1.charges.single().left)
+        // A gennaio la numerazione riparte.
+        val (b2, p2) = Fees.pay(b1, id, 10_000, day(2027, 1, 5), PayMethod.TRANSFER, " CRO 123 ")!!
+        assertEquals("1/2027", p2.receipt)
+        assertEquals("CRO 123", p2.ref)
+        assertEquals(Fees.Status.PAID, Fees.status(b2.charges.single(), now))
+        assertEquals(5_000, Fees.income(b2, 2026))
+        assertEquals(10_000, Fees.income(b2, 2027))
+        assertEquals(1 to 1, Fees.feeProgress(b2, fee))
+        // Importo zero o addebito che non c'è: niente.
+        assertNull(Fees.pay(b2, id, 0, now, PayMethod.CASH, ""))
+        assertNull(Fees.pay(b2, "x", 100, now, PayMethod.CASH, ""))
+        // Tolto un pagamento, il numero non torna indietro.
+        b = Fees.unpay(b2, id, p2.id)
+        assertEquals(10_000, b.charges.single().left)
+        assertEquals("2/2027", Fees.pay(b, id, 100, day(2027, 2, 1), PayMethod.POS, "")!!.second.receipt)
+    }
+
+    @Test
+    fun lateAndCancelled() {
+        val b = Fees.charge(ClubBook(), rossi, "Corso", 8_000, now, fee.copy(due = day(2026, 10, 15)))
+        val c = b.charges.single()
+        assertEquals(Fees.Status.LATE, Fees.status(c, now))
+        // Senza pagamenti si cancella, con pagamenti si annulla (storno) e non si deve più.
+        assertTrue(Fees.cancel(b, c.id).charges.isEmpty())
+        val paid = Fees.pay(b, c.id, 1_000, now, PayMethod.CASH, "")!!.first
+        val cancelled = Fees.cancel(paid, c.id).charges.single()
+        assertEquals(Fees.Status.CANCELLED, Fees.status(cancelled, now))
+        assertEquals(0, cancelled.left)
+    }
+
+    @Test
+    fun forgetAndRemap() {
+        var b = Fees.chargeAll(ClubBook(), fee, listOf(rossi, bianchi), now).first
+        val rid = b.charges.first { it.player == "a" }.id
+        b = Fees.pay(b, rid, 15_000, now, PayMethod.CASH, "")!!.first
+        // Rossi cancellato: il pagamento resta col nome, l'addebito di Bianchi non c'entra.
+        val f = Fees.forget(b, setOf("a"))
+        assertEquals(listOf("", "b"), f.charges.map { it.player }.sorted())
+        assertEquals("Rossi", f.charges.first { it.player == "" }.name)
+        // Senza pagamenti, l'addebito sparisce.
+        assertEquals(1, Fees.forget(b, setOf("b")).charges.size)
+        // Uniti: gli addebiti del vecchio identificativo passano a chi resta.
+        val old = b.copy(charges = b.charges.map { if (it.player == "b") it.copy(player = "b-old") else it })
+        assertEquals(15_000, Fees.owed(old, bianchi))
+        assertEquals(setOf("a"), Fees.remap(b, setOf("b"), "a").charges.map { it.player }.toSet())
+    }
+
+    @Test
+    fun parseAndMoney() {
+        assertEquals(15_000, Fees.parse("150"))
+        assertEquals(15_050, Fees.parse("150,5"))
+        assertEquals(15_050, Fees.parse("150.50 €"))
+        assertEquals(123_456, Fees.parse("1.234,56"))
+        assertEquals(123_456, Fees.parse("1,234.56"))
+        assertNull(Fees.parse("abc"))
+        assertNull(Fees.parse("1,234"))
+        assertNull(Fees.parse(""))
+        assertTrue(Fees.money(15_050, Locale.ITALY).contains("150,50"))
+    }
+
+    @Test
+    fun csvForTheAccountant() {
+        var b = Fees.charge(ClubBook(), rossi, "Quota; sociale", 15_050, now)
+        b = Fees.pay(b, b.charges.single().id, 15_050, now, PayMethod.TRANSFER, "CRO 1")!!.first
+        val csv = Fees.csv(b, 2026, "Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo", { it.name }, { "01/11/2026" }, Locale.ITALY)
+        assertEquals("Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo\r\n01/11/2026;1/2026;Rossi;\"Quota; sociale\";TRANSFER;CRO 1;150,50\r\n", csv)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DataTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DataTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -63806,6 +65263,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 200 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 205 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

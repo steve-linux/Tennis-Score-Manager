@@ -347,6 +347,18 @@ Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'ap
 - Sous chaque adhérent, l'appli indique ce qui manque : consentement RGPD, licence FITP de l'année, certificat manquant, expiré ou qui expire dans le mois, coordonnées du parent, un contact. En rouge ce qui empêche de jouer (licence et certificat), en orange le reste. **À régler** ne montre que ceux qui ont quelque chose à faire.
 - Les données d'adhérent restent sur le téléphone : quand les matchs passent à un autre téléphone, seuls prénom, nom, surnom et main voyagent. **Retirer des adhérents** efface licences, certificat et consentements ; le joueur et ses matchs restent.
 
+### 7.12 Cotisations et paiements
+
+Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre du club. L'appli **enregistre** les paiements, elle ne les encaisse pas : aucune carte ni compte relié.
+
+- **Nouvelle cotisation** : nom (ex. *Cotisation 2027*), type (cotisation, licence FITP, cours, tournoi, autre), montant et, si besoin, l'échéance. En touchant une cotisation, **Facturer à tous les adhérents** l'attribue à ceux qui ne l'ont pas encore ; en dessous, combien ont payé.
+- Dans la fiche de l'adhérent, **Cotisations et paiements** montre ce qu'il doit : *payé*, *à payer*, *reste 100,00 €*, en rouge *en retard* après l'échéance. **Nouvelle facturation** ajoute une cotisation du club ou un autre montant (une leçon, un cordage).
+- En touchant une facturation, **Enregistrer un paiement** : montant (en général ce qui reste : on peut payer en plusieurs fois), date, mode (espèces, virement, carte, Satispay, autre) et référence. Avec **Reçu tout de suite**, le reçu PDF s'ouvre pour l'envoyer ou l'imprimer, numéroté par année (*1/2027*, on repart de 1 en janvier). C'est un **document non fiscal** : pour les reçus fiscaux et la comptabilité, suivez votre comptable.
+- Un paiement erroné s'annule (le numéro du reçu n'est pas réutilisé) ; une facturation sans paiement se supprime, avec des paiements elle s'**annule** : elle n'est plus due et les paiements restent dans le registre.
+- En haut : encaissé dans l'année et reste à encaisser ; **À encaisser** liste qui doit, de la plus grosse dette. Dans *Adhérents* aussi, qui doit quelque chose est parmi ceux *à régler*.
+- **Exporter les paiements (CSV)** : tous les paiements de l'année avec date, reçu, nom, libellé, mode, référence et montant, pour le tableur du comptable.
+- En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Profil et données*.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

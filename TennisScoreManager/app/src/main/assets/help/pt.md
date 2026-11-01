@@ -347,6 +347,18 @@ Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, 
 - Embaixo de cada sócio o app diz o que falta: consentimento de privacidade, cartão FITP do ano, atestado que falta, vencido ou que vence em menos de um mês, dados do responsável, um contato. Em vermelho o que impede de jogar (cartão e atestado), em laranja o resto. **A resolver** mostra só quem tem algo pendente.
 - Os dados de sócio ficam no telefone: quando as partidas passam para outro telefone só viajam nome, sobrenome, apelido e mão. **Tirar dos sócios** apaga cartões, atestado e consentimentos; o jogador e as partidas dele ficam.
 
+### 7.12 Mensalidades e pagamentos
+
+Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do clube. O app **registra** os pagamentos, não os recebe: nenhum cartão ou conta vinculado.
+
+- **Nova mensalidade**: nome (ex. *Anuidade 2027*), tipo (anuidade, cartão FITP, curso, torneio, outro), valor e, se precisar, o vencimento. Tocando numa mensalidade, **Cobrar de todos os sócios** a atribui a quem ainda não a tem; embaixo se vê quantos pagaram.
+- Na ficha do sócio, **Mensalidades e pagamentos** mostra o que ele deve: *pago*, *a pagar*, *faltam 100,00 €*, em vermelho *atrasado* depois do vencimento. **Nova cobrança** adiciona uma mensalidade do clube ou outro valor (uma aula, um encordoamento).
+- Tocando numa cobrança, **Registrar pagamento**: valor (geralmente o que falta: dá para pagar em parcelas), data, método (dinheiro, transferência, cartão, Satispay, outro) e referência. Com **Recibo agora** abre o recibo em PDF para enviar ou imprimir, numerado por ano (*1/2027*, em janeiro volta a 1). É um **documento não fiscal**: para recibos fiscais e contabilidade, siga o seu contador.
+- Um pagamento errado se cancela (o número do recibo não é reutilizado); uma cobrança sem pagamentos se exclui, com pagamentos se **cancela**: não é mais devida e os pagamentos ficam no registro.
+- No alto: recebido no ano e o que falta receber; **A receber** lista quem deve, da maior dívida para a menor. Também em *Sócios* quem deve algo está entre os *a resolver*.
+- **Exportar os pagamentos (CSV)**: todos os pagamentos do ano com data, recibo, nome, descrição, método, referência e valor, para a planilha do contador.
+- Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Perfil e dados*.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.
