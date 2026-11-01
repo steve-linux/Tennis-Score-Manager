@@ -380,6 +380,17 @@ O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre 
 - **Um por um**: a mensagem de cada um (toque para ler tudo) e os botões **WhatsApp** (abre a conversa com aquele número e o texto pronto), **SMS** e **E-mail**. A marca lembra quem você já avisou.
 - Números sem prefixo valem como italianos (+39). Para os **menores** escreve-se ao telefone do responsável (*Dados do sócio*), com "um aviso sobre Luca". Quem não tem telefone nem e-mail é indicado: adicione na ficha dele.
 
+### 7.15 Quadras e agenda
+
+Com o papel **Clube**, na aba **Quadras**.
+
+- **As quadras**: crie uma quadra (**Nova quadra**), ordene e toque numa para mudá-la: nome (ao renomear, reservas, períodos e partidas dos torneios acompanham), piso (**saibro, grama, rápida**, outro), **coberta ou descoberta**, **iluminação**, **aquecimento**, os **preços** dela (por hora, com iluminação, adicional de aquecimento por hora; vazios = os gerais) e **uma ou mais fotos** da galeria. **Excluir a quadra** remove também as reservas dela a partir de hoje.
+- **Agenda das quadras**: o dia com uma quadra por coluna e uma hora por linha (◀ ▶ e o calendário para mudar de dia). Toque num horário livre para reservar: quadra, dia, hora e duração, tipo (jogo, aula, fechada, outro), jogadores do banco de dados e convidados, nota. O **preço** se calcula sozinho (iluminação a partir da hora definida, aquecimento se pedido) e pode ser alterado; **Cobrar dos jogadores** divide em partes iguais e leva para *Mensalidades e pagamentos*. **Como se paga**: *na quadra* ou *online*; com a reserva cobrada, **Pago: …** marca como paga com um dos meios de pagamento do clube. **Toda semana por N semanas** repete a reserva (as datas com a quadra ocupada são puladas e o app avisa). **Avisar os jogadores** envia quadra, dia, hora e como pagar.
+- As **partidas dos torneios** com quadra e horário aparecem sozinhas; o app não deixa reservar por cima de outra reserva ou de uma partida.
+- **Não reserváveis**: períodos em que as quadras não se reservam, para **cursos**, **torneios**, **manutenção** ou outro: quadras (ou todas), de um dia a outro, dias da semana, faixa de horário ou o dia todo; para um torneio, nome e datas vêm do torneio. Nos períodos dos cursos entram as aulas deles (tocando o horário abre uma aula já pronta).
+- **Horários e preços**: abertura e fechamento, duração de um horário (30, 60, 90 minutos), preço por hora geral e com iluminação, a partir de que hora precisa de iluminação, quanto dura uma partida de torneio na agenda.
+- **Meios de pagamento** (em *Mensalidades e pagamentos*): quem administra o clube decide. Começa com dinheiro, cartão, transferência e Satispay e dá para adicionar outros (PayPal, Revolut, Bancomat Pay, um link SumUp…): nome, link/IBAN/número e se é pago a distância. Escolhe-se um ao registrar um pagamento (o nome vai nos recibos e no CSV); os a distância, com os dados, vão nos avisos e lembretes. O app não recebe: registra e envia as instruções.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

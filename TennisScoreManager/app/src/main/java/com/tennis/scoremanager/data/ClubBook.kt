@@ -14,6 +14,14 @@ enum class FeeKind { MEMBERSHIP, FITP, COURSE, TOURNAMENT, OTHER }
 @Serializable
 enum class PayMethod { CASH, TRANSFER, POS, SATISPAY, OTHER }
 
+/**
+ * Un modo di pagamento che il circolo accetta, deciso da chi lo gestisce ("Satispay", "PayPal", "Bonifico"…):
+ * [details] il link, l'IBAN o il numero; [online] = si paga a distanza, e allora va negli avvisi. [method] è il tipo
+ * per il registro (OTHER per quelli aggiunti).
+ */
+@Serializable
+data class PayType(val id: String, val name: String, val details: String = "", val online: Boolean = false, val method: PayMethod = PayMethod.OTHER)
+
 /** Una quota del circolo ("Quota sociale 2027", 150 €): si addebita ai soci. Importi in centesimi. */
 @Serializable
 data class Fee(
@@ -38,6 +46,8 @@ data class Payment(
     /** CRO del bonifico, causale, numero dello scontrino del POS… */
     val ref: String = "",
     val receipt: String = "",
+    /** Il nome del modo di pagamento del circolo ("PayPal"); vuoto = quello di [method]. */
+    val methodName: String = "",
 )
 
 /**
@@ -71,9 +81,25 @@ data class ClubBook(
     val charges: List<Charge> = emptyList(),
     val receiptYear: Int = 0,
     val receiptNext: Int = 1,
+    /** I modi di pagamento del circolo (vuoto = quelli proposti: contanti, POS, bonifico, Satispay). */
+    val payTypes: List<PayType> = emptyList(),
 )
 
 object Fees {
+    /** I modi proposti finché il circolo non sceglie i suoi ([names]: i nomi nella lingua dell'app). */
+    fun defaultTypes(names: (PayMethod) -> String): List<PayType> = listOf(
+        PayType("cash", names(PayMethod.CASH), method = PayMethod.CASH),
+        PayType("pos", names(PayMethod.POS), method = PayMethod.POS),
+        PayType("transfer", names(PayMethod.TRANSFER), online = true, method = PayMethod.TRANSFER),
+        PayType("satispay", names(PayMethod.SATISPAY), online = true, method = PayMethod.SATISPAY),
+    )
+
+    /** I modi di pagamento del circolo, o quelli proposti. */
+    fun types(book: ClubBook, names: (PayMethod) -> String): List<PayType> = book.payTypes.ifEmpty { defaultTypes(names) }
+
+    /** I modi a distanza con link, IBAN o numero: "Satispay: link". */
+    fun onlineTypes(book: ClubBook, names: (PayMethod) -> String): List<PayType> = types(book, names).filter { it.online && it.details.isNotBlank() }
+
     enum class Status { PAID, PARTIAL, UNPAID, LATE, CANCELLED }
 
     fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
@@ -119,12 +145,12 @@ object Fees {
      * Registra un versamento di [cents] sull'addebito [chargeId] col numero di ricevuta dell'anno del pagamento
      * ("12/2026"; a gennaio si riparte da 1). null se l'addebito non c'è o l'importo non va.
      */
-    fun pay(book: ClubBook, chargeId: String, cents: Int, at: Long, method: PayMethod, ref: String): Pair<ClubBook, Payment>? {
+    fun pay(book: ClubBook, chargeId: String, cents: Int, at: Long, method: PayMethod, ref: String, methodName: String = ""): Pair<ClubBook, Payment>? {
         val c = book.charges.firstOrNull { it.id == chargeId } ?: return null
         if (cents <= 0 || c.cancelled) return null
         val y = year(at)
         val n = if (book.receiptYear == y) book.receiptNext else 1
-        val pay = Payment(newId("p"), cents, at, method, ref.trim(), "$n/$y")
+        val pay = Payment(newId("p"), cents, at, method, ref.trim(), "$n/$y", methodName.trim())
         val charges = book.charges.map { if (it.id == chargeId) it.copy(payments = it.payments + pay) else it }
         return book.copy(charges = charges, receiptYear = y, receiptNext = n + 1) to pay
     }
@@ -197,7 +223,7 @@ object Fees {
         val sep = java.text.DecimalFormatSymbols.getInstance(locale).decimalSeparator
         fun q(s: String) = if (s.any { it == ';' || it == '"' || it == '\n' }) "\"" + s.replace("\"", "\"\"") + "\"" else s
         val rows = payments(book, year).map { (c, p) ->
-            listOf(date(p.at), p.receipt, c.name, c.label, method(p.method), p.ref, "%d%c%02d".format(p.cents / 100, sep, p.cents % 100)).joinToString(";") { q(it) }
+            listOf(date(p.at), p.receipt, c.name, c.label, p.methodName.ifBlank { method(p.method) }, p.ref, "%d%c%02d".format(p.cents / 100, sep, p.cents % 100)).joinToString(";") { q(it) }
         }
         return (listOf(header) + rows).joinToString("\r\n") + "\r\n"
     }

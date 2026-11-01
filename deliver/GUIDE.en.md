@@ -493,6 +493,17 @@ The app prepares the messages, already written and personal ("Hi Mario, …"), a
 - **One by one**: each person's own message (tap it to read it all) and the **WhatsApp** (opens the chat with that number and the text ready), **SMS** and **Email** buttons. The tick remembers who you've already notified.
 - Numbers without a prefix count as Italian (+39). For **under-18s** the message goes to the parent's phone (*Member details*), as "a notice about Luca". Whoever has neither phone nor email is flagged: add them on their card.
 
+### 7.15 Courts and planner (app 2.6)
+
+With the **Club** role, on the **Courts** tab.
+
+- **Courts**: create a court (**New court**), put them in order and tap one to change it: name (renaming it, bookings, periods and tournament matches follow), surface (**clay, grass, hard**, other), **indoor or outdoor**, **lights**, **heating**, its own **prices** (per hour, with lights, heating supplement per hour; empty = the general ones) and **one or more photos** from the gallery. **Delete the court** also removes its bookings from today on.
+- **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay.
+- **Tournament matches** with a court and a time appear by themselves; the app won't let you book over another booking or a match.
+- **Not bookable**: periods when courts can't be booked, for **courses**, **tournaments**, **maintenance** or other: courts (or all), from day to day, days of the week, time slot or all day; for a tournament the name and dates come from it. Course lessons can go into course periods (tapping the slot opens a ready lesson).
+- **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
+- **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

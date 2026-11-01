@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -214,11 +215,15 @@ private fun TournamentsTab(c: MatchController) {
 private fun CourtsTab(c: MatchController) {
     val s = LocalStrings.current
     var edit by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
     val name = c.storage.clubName
-    val courts = c.storage.clubCourts
-    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · "), main = true) { edit = true }
+    val courts by c.clubCourts.collectAsState()
+    Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
+    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
+    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
 }
 
 /** Circolo: giocatori e allievi del database. */

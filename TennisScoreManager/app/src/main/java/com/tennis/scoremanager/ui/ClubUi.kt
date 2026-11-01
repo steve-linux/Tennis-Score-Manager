@@ -16,6 +16,9 @@ fun payMethodName(s: Strings, m: PayMethod): String = when (m) {
     PayMethod.OTHER -> s.payOther
 }
 
+/** Il nome di un pagamento registrato: quello del modo del circolo, o del tipo. */
+fun paymentName(s: Strings, p: com.tennis.scoremanager.data.Payment): String = p.methodName.ifBlank { payMethodName(s, p.method) }
+
 fun feeKindName(s: Strings, k: FeeKind): String = when (k) {
     FeeKind.MEMBERSHIP -> s.feeKindMembership
     FeeKind.FITP -> s.feeKindFitp

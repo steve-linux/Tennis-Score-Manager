@@ -104,4 +104,19 @@ class ClubBookTest {
         val csv = Fees.csv(b, 2026, "Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo", { it.name }, { "01/11/2026" }, Locale.ITALY)
         assertEquals("Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo\r\n01/11/2026;1/2026;Rossi;\"Quota; sociale\";TRANSFER;CRO 1;150,50\r\n", csv)
     }
+
+    @Test
+    fun clubPaymentTypes() {
+        val names = { m: PayMethod -> m.name.lowercase() }
+        // Finché il circolo non sceglie, quelli proposti; a distanza solo quelli con link, IBAN o numero.
+        assertEquals(listOf("cash", "pos", "transfer", "satispay"), Fees.types(ClubBook(), names).map { it.id })
+        assertTrue(Fees.onlineTypes(ClubBook(), names).isEmpty())
+        val book = ClubBook(payTypes = listOf(PayType("c", "Contanti", method = PayMethod.CASH), PayType("pp", "PayPal", "paypal.me/tcprova", online = true), PayType("s", "Satispay", "", online = true)))
+        assertEquals(listOf("PayPal"), Fees.onlineTypes(book, names).map { it.name })
+        // Il nome scelto dal circolo va nel registro e nel CSV.
+        var b = Fees.charge(book, rossi, "Campo", 1_600, now)
+        b = Fees.pay(b, b.charges.single().id, 1_600, now, PayMethod.OTHER, "", "PayPal")!!.first
+        assertEquals("PayPal", b.charges.single().payments.single().methodName)
+        assertTrue(Fees.csv(b, 2026, "h", { it.name }, { "d" }, Locale.ITALY).contains(";PayPal;"))
+    }
 }

@@ -1285,6 +1285,109 @@ interface Strings {
     val ntEmailAll: (Int) -> String
     val ntSmsAll: (Int) -> String
     val ntOneByOne: (Int, Int) -> String
+    val planTitle: String
+    val planHint: String
+    val planSettings: String
+    val planDay: String
+    val planToday: String
+    val bkNew: String
+    val bkDuration: String
+    val bkConflict: String
+    val bkAddPlayer: String
+    val bkGuests: String
+    val bkNote: String
+    val bkPrice: String
+    val bkLights: String
+    val bkRepeatNo: String
+    val bkNotify: String
+    val bkDelete: String
+    val bkDeleteAsk: String
+    val bkDeleteOne: String
+    val bkDeleteSeries: String
+    val planOpen: String
+    val planClose: String
+    val planSlot: String
+    val planPrice: String
+    val planPriceLights: String
+    val planLightsFrom: String
+    val planTournamentMinutes: String
+    val bkPlay: String
+    val bkLesson: String
+    val bkClosed: String
+    val bkOther: String
+    val bkTitle: String
+    val planBusy: (Int) -> String
+    val bkSkipped: (String) -> String
+    val bkMinutes: (Int) -> String
+    val bkCharge: (Int) -> String
+    val bkRepeatWeeks: (Int) -> String
+    val bkNotice: (String) -> String
+    val blkTitle: String
+    val blkHint: String
+    val blkNew: String
+    val blkNone: String
+    val blkLabel: String
+    val blkCourse: String
+    val blkTournament: String
+    val blkMaintenance: String
+    val blkAllCourts: String
+    val blkFrom: String
+    val blkTo: String
+    val blkDays: String
+    val blkAllDay: String
+    val blkStart: String
+    val blkEnd: String
+    val blkDelete: String
+    val blkEveryDay: String
+    val crtCovered: String
+    val crtOpen: String
+    val crtHeating: String
+    val crtNoLightsWarn: String
+    val crtTitle: String
+    val crtTapToSet: String
+    val crtClay: String
+    val crtGrass: String
+    val crtHard: String
+    val crtLightsShort: String
+    val crtHeatedShort: String
+    val crtLights: String
+    val crtPricesHint: String
+    val crtHeatingSupplement: String
+    val bkPayWhere: String
+    val bkPayCourt: String
+    val blkBlocked: (String) -> String
+    val blkCell: (String) -> String
+    val blkFromTournament: (String) -> String
+    val crtHeatingPrice: (String) -> String
+    val ntPayCourt: (String) -> String
+    val ntPayHow: String
+    val bkPayOnline: String
+    val payOptionsNone: String
+    val ptTitle: String
+    val ptHint: String
+    val ptNew: String
+    val ptName: String
+    val ptDetails: String
+    val ptOnline: String
+    val ptOnlineHint: String
+    val ptOnlineShort: String
+    val ptAtClub: String
+    val ptDelete: String
+    val crtNew: String
+    val crtName: String
+    val crtDelete: String
+    val crtExists: String
+    val crtPhotos: String
+    val crtPhotosAfter: String
+    val crtPhotoAdd: String
+    val crtPhotoRemove: String
+    val blkShort: String
+    val clubNameHint: String
+    val clubCourtsElsewhere: String
+    val ntPayOnline: (String) -> String
+    val bkPaidWith: (String) -> String
+    val crtDeleteAsk: (String, Int) -> String
+    val crtPhotosCount: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2829,6 +2932,109 @@ object ItStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "Email a tutti in copia nascosta ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS a tutti ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno per uno ($done su $n)" }
+    override val planTitle = "Planning dei campi"
+    override val planHint = "Prenotazioni, lezioni e chiusure, giorno per giorno; le partite dei tornei ci sono già"
+    override val planSettings = "Orari e prezzi"
+    override val planDay = "Giorno"
+    override val planToday = "Torna a oggi"
+    override val bkNew = "Nuova prenotazione"
+    override val bkDuration = "Durata"
+    override val bkConflict = "Il campo è già occupato in quell'orario."
+    override val bkAddPlayer = "Aggiungi giocatore"
+    override val bkGuests = "Ospiti (nomi separati da virgola)"
+    override val bkNote = "Nota"
+    override val bkPrice = "Prezzo"
+    override val bkLights = "Con le luci"
+    override val bkRepeatNo = "Non si ripete"
+    override val bkNotify = "Avvisa i giocatori"
+    override val bkDelete = "Elimina la prenotazione"
+    override val bkDeleteAsk = "Eliminare la prenotazione? Gli addebiti non pagati si tolgono."
+    override val bkDeleteOne = "Solo questa"
+    override val bkDeleteSeries = "Questa e le prossime della serie"
+    override val planOpen = "Apertura"
+    override val planClose = "Chiusura"
+    override val planSlot = "Durata di una casella"
+    override val planPrice = "Prezzo all'ora"
+    override val planPriceLights = "Prezzo all'ora con le luci"
+    override val planLightsFrom = "Luci dalle"
+    override val planTournamentMinutes = "Durata di una partita di torneo"
+    override val bkPlay = "Gioco"
+    override val bkLesson = "Lezione"
+    override val bkClosed = "Chiuso"
+    override val bkOther = "Altro"
+    override val bkTitle = "Prenotazione"
+    override val planBusy: (Int) -> String = { "${it}h occupato" }
+    override val bkSkipped: (String) -> String = { "Saltate perché il campo era occupato: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} h" else if (it > 60) "${it / 60} h ${it % 60}'" else "$it min" }
+    override val bkCharge: (Int) -> String = { "Addebita ai giocatori (diviso per $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Ogni settimana per $it settimane" }
+    override val bkNotice: (String) -> String = { "Prenotazione: $it" }
+    override val blkTitle = "Campi non prenotabili"
+    override val blkHint = "Per corsi, tornei e manutenzione: in quegli orari non si prenota (le lezioni dei corsi sì, e le partite del torneo si vedono sopra)."
+    override val blkNew = "Nuovo periodo non prenotabile"
+    override val blkNone = "Nessun periodo non prenotabile."
+    override val blkLabel = "Nome (es. Scuola tennis, Torneo sociale)"
+    override val blkCourse = "Corso"
+    override val blkTournament = "Torneo"
+    override val blkMaintenance = "Manutenzione"
+    override val blkAllCourts = "Tutti i campi"
+    override val blkFrom = "Dal"
+    override val blkTo = "Al"
+    override val blkDays = "Giorni"
+    override val blkAllDay = "Tutto il giorno"
+    override val blkStart = "Dalle"
+    override val blkEnd = "Alle"
+    override val blkDelete = "Elimina"
+    override val blkEveryDay = "tutti i giorni"
+    override val crtCovered = "coperto"
+    override val crtOpen = "scoperto"
+    override val crtHeating = "Riscaldamento"
+    override val crtNoLightsWarn = "Questo campo non ha le luci."
+    override val crtTitle = "Campi"
+    override val crtTapToSet = "tocca per impostarlo"
+    override val crtClay = "Terra"
+    override val crtGrass = "Erba"
+    override val crtHard = "Cemento"
+    override val crtLightsShort = "luci"
+    override val crtHeatedShort = "riscaldato"
+    override val crtLights = "Luci"
+    override val crtPricesHint = "Prezzi di questo campo: vuoti = quelli generali."
+    override val crtHeatingSupplement = "Supplemento riscaldamento all'ora"
+    override val bkPayWhere = "Come si paga"
+    override val bkPayCourt = "Al campo"
+    override val blkBlocked: (String) -> String = { "Non prenotabile: $it" }
+    override val blkCell: (String) -> String = { "Non prenotabile\n$it" }
+    override val blkFromTournament: (String) -> String = { "Dal torneo: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it all'ora" }
+    override val ntPayCourt: (String) -> String = { "Si paga al campo: $it a testa." }
+    override val ntPayHow = "Puoi pagare con:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "Nessun modo di pagamento a distanza con link, IBAN o numero: aggiungilo in Quote e pagamenti › Modi di pagamento."
+    override val ptTitle = "Modi di pagamento"
+    override val ptHint = "Quelli che il circolo accetta, scelti da chi lo gestisce: si scelgono quando si registra un pagamento. Quelli a distanza (Satispay, PayPal, Revolut, Bancomat Pay, bonifico, un link SumUp…) con link, IBAN o numero vanno negli avvisi e nei solleciti."
+    override val ptNew = "Nuovo modo di pagamento"
+    override val ptName = "Nome (es. Satispay, PayPal, Bonifico)"
+    override val ptDetails = "Link, IBAN o numero (facoltativo)"
+    override val ptOnline = "Si paga a distanza"
+    override val ptOnlineHint = "Va negli avvisi e nei solleciti, con il link, l'IBAN o il numero."
+    override val ptOnlineShort = "a distanza"
+    override val ptAtClub = "in segreteria"
+    override val ptDelete = "Elimina"
+    override val crtNew = "Nuovo campo"
+    override val crtName = "Nome del campo"
+    override val crtDelete = "Elimina il campo"
+    override val crtExists = "C'è già un campo con questo nome."
+    override val crtPhotos = "Foto"
+    override val crtPhotosAfter = "Le foto si aggiungono dopo aver salvato il campo."
+    override val crtPhotoAdd = "Aggiungi foto"
+    override val crtPhotoRemove = "Togli la foto"
+    override val blkShort = "Non prenotabili"
+    override val clubNameHint = "Il nome del circolo, negli avvisi e sulle ricevute"
+    override val clubCourtsElsewhere = "I campi si creano, si rinominano e si eliminano in Campi › I campi."
+    override val ntPayOnline: (String) -> String = { "Si paga a distanza: $it a testa." }
+    override val bkPaidWith: (String) -> String = { "Pagato: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Eliminare $name?" + if (n > 0) " Si cancellano anche le $n prenotazioni da oggi in poi." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it foto" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -4356,6 +4562,109 @@ object EnStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "Email to all in BCC ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS to all ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "One by one ($done of $n)" }
+    override val planTitle = "Court planner"
+    override val planHint = "Bookings, lessons and closures, day by day; tournament matches are already in"
+    override val planSettings = "Hours and prices"
+    override val planDay = "Day"
+    override val planToday = "Back to today"
+    override val bkNew = "New booking"
+    override val bkDuration = "Duration"
+    override val bkConflict = "The court is already taken at that time."
+    override val bkAddPlayer = "Add player"
+    override val bkGuests = "Guests (names separated by commas)"
+    override val bkNote = "Note"
+    override val bkPrice = "Price"
+    override val bkLights = "With lights"
+    override val bkRepeatNo = "Doesn't repeat"
+    override val bkNotify = "Notify the players"
+    override val bkDelete = "Delete booking"
+    override val bkDeleteAsk = "Delete the booking? Unpaid charges are removed."
+    override val bkDeleteOne = "This one only"
+    override val bkDeleteSeries = "This and the next in the series"
+    override val planOpen = "Opening"
+    override val planClose = "Closing"
+    override val planSlot = "Length of a slot"
+    override val planPrice = "Price per hour"
+    override val planPriceLights = "Price per hour with lights"
+    override val planLightsFrom = "Lights from"
+    override val planTournamentMinutes = "Length of a tournament match"
+    override val bkPlay = "Play"
+    override val bkLesson = "Lesson"
+    override val bkClosed = "Closed"
+    override val bkOther = "Other"
+    override val bkTitle = "Booking"
+    override val planBusy: (Int) -> String = { "${it}h booked" }
+    override val bkSkipped: (String) -> String = { "Skipped because the court was taken: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} hr" else if (it > 60) "${it / 60} hr ${it % 60} mins" else "$it mins" }
+    override val bkCharge: (Int) -> String = { "Charge the players (split by $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Every week for $it weeks" }
+    override val bkNotice: (String) -> String = { "Booking: $it" }
+    override val blkTitle = "Non-bookable courts"
+    override val blkHint = "For courses, tournaments and maintenance: no booking at those times (course lessons yes, and tournament matches show on top)."
+    override val blkNew = "New non-bookable period"
+    override val blkNone = "No non-bookable periods."
+    override val blkLabel = "Name (e.g. Tennis school, Social tournament)"
+    override val blkCourse = "Course"
+    override val blkTournament = "Tournament"
+    override val blkMaintenance = "Maintenance"
+    override val blkAllCourts = "All courts"
+    override val blkFrom = "From"
+    override val blkTo = "To"
+    override val blkDays = "Days"
+    override val blkAllDay = "All day"
+    override val blkStart = "From"
+    override val blkEnd = "Until"
+    override val blkDelete = "Delete"
+    override val blkEveryDay = "every day"
+    override val crtCovered = "indoor"
+    override val crtOpen = "outdoor"
+    override val crtHeating = "Heating"
+    override val crtNoLightsWarn = "This court has no lights."
+    override val crtTitle = "Courts"
+    override val crtTapToSet = "tap to set it up"
+    override val crtClay = "Clay"
+    override val crtGrass = "Grass"
+    override val crtHard = "Hard"
+    override val crtLightsShort = "lights"
+    override val crtHeatedShort = "heated"
+    override val crtLights = "Lights"
+    override val crtPricesHint = "Prices for this court: empty = the general ones."
+    override val crtHeatingSupplement = "Heating supplement per hour"
+    override val bkPayWhere = "How it's paid"
+    override val bkPayCourt = "At the court"
+    override val blkBlocked: (String) -> String = { "Not bookable: $it" }
+    override val blkCell: (String) -> String = { "Not bookable\n$it" }
+    override val blkFromTournament: (String) -> String = { "From the tournament: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it per hour" }
+    override val ntPayCourt: (String) -> String = { "Pay at the court: $it each." }
+    override val ntPayHow = "You can pay with:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "No remote payment method with a link, IBAN or number: add one in Fees and payments › Payment methods."
+    override val ptTitle = "Payment methods"
+    override val ptHint = "The ones the club accepts, chosen by whoever runs it: you pick one when recording a payment. Remote ones (Satispay, PayPal, Revolut, Bancomat Pay, bank transfer, a SumUp link…) with a link, IBAN or number go into notices and reminders."
+    override val ptNew = "New payment method"
+    override val ptName = "Name (e.g. Satispay, PayPal, Bank transfer)"
+    override val ptDetails = "Link, IBAN or number (optional)"
+    override val ptOnline = "Paid remotely"
+    override val ptOnlineHint = "It goes into notices and reminders, with the link, IBAN or number."
+    override val ptOnlineShort = "remote"
+    override val ptAtClub = "at the office"
+    override val ptDelete = "Delete"
+    override val crtNew = "New court"
+    override val crtName = "Court name"
+    override val crtDelete = "Delete the court"
+    override val crtExists = "There is already a court with this name."
+    override val crtPhotos = "Photos"
+    override val crtPhotosAfter = "Photos can be added once the court is saved."
+    override val crtPhotoAdd = "Add photos"
+    override val crtPhotoRemove = "Remove photo"
+    override val blkShort = "Not bookable"
+    override val clubNameHint = "The club's name, in notices and on receipts"
+    override val clubCourtsElsewhere = "Courts are created, renamed and deleted in Courts › Courts."
+    override val ntPayOnline: (String) -> String = { "Pay remotely: $it each." }
+    override val bkPaidWith: (String) -> String = { "Paid: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Delete $name?" + if (n > 0) " The $n bookings from today on are deleted too." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "photo" else "photos"}" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

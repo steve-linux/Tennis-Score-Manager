@@ -257,6 +257,24 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
+    /** Il planning dei campi: orari, prezzi e prenotazioni. */
+    private val courtPlanFile: File get() = File(app.filesDir, "club_courts.json")
+
+    fun loadCourtPlan(): CourtPlan =
+        runCatching { json.decodeFromString(CourtPlan.serializer(), courtPlanFile.readText()) }.getOrDefault(CourtPlan())
+
+    @Synchronized
+    fun saveCourtPlan(plan: CourtPlan) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_courts.tmp")
+            tmp.writeText(json.encodeToString(CourtPlan.serializer(), plan))
+            if (!tmp.renameTo(courtPlanFile)) {
+                courtPlanFile.delete()
+                tmp.renameTo(courtPlanFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
+    }
+
     /** I tornei del circolo (sociali e FITP), in un file solo. */
     private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
 

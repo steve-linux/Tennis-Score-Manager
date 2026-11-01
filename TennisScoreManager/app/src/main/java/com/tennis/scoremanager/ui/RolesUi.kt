@@ -46,12 +46,14 @@ fun RolesPicker(selected: Set<Role>, onChange: (Set<Role>) -> Unit) {
 
 /** Il circolo: nome e campi (uno per riga), per Nuova partita, i tornei e i tabelloni. */
 @Composable
-fun ClubFields(name: String, courts: String, onName: (String) -> Unit, onCourts: (String) -> Unit) {
+fun ClubFields(name: String, courts: String, onName: (String) -> Unit, onCourts: (String) -> Unit, courtsHere: Boolean = true) {
     val s = LocalStrings.current
     OutlinedTextField(
         name, { onName(it.take(60)) }, label = { Text(s.clubName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words),
     )
+    // Con i campi già fatti si cambiano in Campi › I campi (lì rinominarli non stacca le prenotazioni).
+    if (!courtsHere) { Text(s.clubCourtsElsewhere, color = TsmColors.TextDim, fontSize = 12.sp); return }
     OutlinedTextField(courts, { onCourts(it.take(400)) }, label = { Text(s.clubCourtsLabel) }, minLines = 3, modifier = Modifier.fillMaxWidth())
     Text(s.clubCourtsHint, color = TsmColors.TextDim, fontSize = 12.sp)
 }
@@ -61,14 +63,15 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     var name by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    val hadNone = remember { c.storage.clubCourts.isEmpty() }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.roleClub) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }) } },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }, courtsHere = hadNone) } },
         confirmButton = {
             TextButton(onClick = {
                 c.storage.clubName = name
-                c.storage.clubCourts = courts.lines()
+                if (hadNone) c.setClubCourts(courts.lines())
                 onDone()
             }) { Text(s.ok) }
         },

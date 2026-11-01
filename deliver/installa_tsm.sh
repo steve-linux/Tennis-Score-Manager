@@ -704,6 +704,17 @@ Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hall
 - **Einzeln**: für jeden seine Nachricht (antippen, um alles zu lesen) und die Tasten **WhatsApp** (öffnet den Chat mit der Nummer und dem fertigen Text), **SMS** und **E-Mail**. Der Haken merkt sich, wen du schon benachrichtigt hast.
 - Nummern ohne Vorwahl gelten als italienisch (+39). Bei **Minderjährigen** geht die Nachricht an das Telefon des Elternteils (*Mitgliedsdaten*), als „eine Nachricht zu Luca“. Wer weder Telefon noch E-Mail hat, wird angezeigt: in seiner Karte ergänzen.
 
+### 7.15 Plätze und Platzbelegung
+
+Mit der Rolle **Verein**, im Reiter **Plätze**.
+
+- **Plätze**: einen Platz anlegen (**Neuer Platz**), sortieren und antippen, um ihn zu ändern: Name (beim Umbenennen folgen Buchungen, Zeiträume und Turniermatches), Belag (**Sand, Rasen, Hartplatz**, sonstiger), **Halle oder Freiplatz**, **Licht**, **Heizung**, eigene **Preise** (pro Stunde, mit Licht, Heizungszuschlag pro Stunde; leer = die allgemeinen) und **ein oder mehrere Fotos** aus der Galerie. **Platz löschen** entfernt auch seine Buchungen ab heute.
+- **Platzbelegung**: der Tag mit einem Platz pro Spalte und einer Stunde pro Zeile (◀ ▶ und der Kalender zum Tageswechsel). Ein freies Feld antippen zum Buchen: Platz, Tag, Uhrzeit und Dauer, Art (Spiel, Stunde, gesperrt, sonstiges), Spieler aus der Datenbank und Gäste, Notiz. Der **Preis** rechnet sich selbst (Licht ab der eingestellten Uhrzeit, Heizung auf Wunsch) und lässt sich ändern; **Den Spielern berechnen** teilt ihn gleichmäßig und trägt ihn in *Beiträge und Zahlungen* ein. **Wie bezahlt wird**: *am Platz* oder *online*; ist die Buchung berechnet, markiert **Bezahlt: …** sie mit einer der Zahlungsarten des Vereins als bezahlt. **Jede Woche, N Wochen lang** wiederholt die Buchung (Tage mit belegtem Platz werden übersprungen und die App sagt welche). **Spieler benachrichtigen** schickt Platz, Tag, Uhrzeit und Zahlungsweise.
+- **Turniermatches** mit Platz und Uhrzeit erscheinen von selbst; die App lässt nicht über eine andere Buchung oder ein Match buchen.
+- **Nicht buchbar**: Zeiträume, in denen Plätze nicht buchbar sind, für **Kurse**, **Turniere**, **Platzpflege** oder anderes: Plätze (oder alle), von Tag bis Tag, Wochentage, Zeitfenster oder ganzer Tag; bei einem Turnier kommen Name und Daten vom Turnier. In Kurszeiträume kommen die Kursstunden (Feld antippen öffnet eine fertige Stunde).
+- **Zeiten und Preise**: Öffnung und Schließung, Länge eines Feldes (30, 60, 90 Minuten), allgemeiner Preis pro Stunde und mit Licht, ab wann Licht nötig ist, wie lange ein Turniermatch in der Belegung dauert.
+- **Zahlungsarten** (unter *Beiträge und Zahlungen*): legt die Vereinsverwaltung fest. Vorgegeben sind bar, Karte, Überweisung und Satispay; weitere lassen sich hinzufügen (PayPal, Revolut, Bancomat Pay, ein SumUp-Link…): Name, Link/IBAN/Nummer und ob es eine Fernzahlung ist. Man wählt eine beim Erfassen einer Zahlung (der Name steht auf Quittung und CSV); Fernzahlungen mit ihren Angaben stehen in Nachrichten und Erinnerungen. Die App kassiert nicht: sie erfasst und verschickt die Hinweise.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1165,6 +1176,17 @@ The app prepares the messages, already written and personal ("Hi Mario, …"), a
 - **One by one**: each person's own message (tap it to read it all) and the **WhatsApp** (opens the chat with that number and the text ready), **SMS** and **Email** buttons. The tick remembers who you've already notified.
 - Numbers without a prefix count as Italian (+39). For **under-18s** the message goes to the parent's phone (*Member details*), as "a notice about Luca". Whoever has neither phone nor email is flagged: add them on their card.
 
+### 7.15 Courts and planner
+
+With the **Club** role, on the **Courts** tab.
+
+- **Courts**: create a court (**New court**), put them in order and tap one to change it: name (renaming it, bookings, periods and tournament matches follow), surface (**clay, grass, hard**, other), **indoor or outdoor**, **lights**, **heating**, its own **prices** (per hour, with lights, heating supplement per hour; empty = the general ones) and **one or more photos** from the gallery. **Delete the court** also removes its bookings from today on.
+- **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay.
+- **Tournament matches** with a court and a time appear by themselves; the app won't let you book over another booking or a match.
+- **Not bookable**: periods when courts can't be booked, for **courses**, **tournaments**, **maintenance** or other: courts (or all), from day to day, days of the week, time slot or all day; for a tournament the name and dates come from it. Course lessons can go into course periods (tapping the slot opens a ready lesson).
+- **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
+- **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1624,6 +1646,17 @@ La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y a
 - **A todos**: el texto para todos (orden de juego, lista de inscritos, cuadro). **Compartir** lo manda a un grupo de WhatsApp, a Telegram, Instagram, Facebook… con la imagen si la hay; **Correo a todos** los pone en copia oculta; **SMS a todos** abre un SMS con todos los números.
 - **Uno a uno**: el mensaje de cada uno (tócalo para leerlo entero) y los botones **WhatsApp** (abre el chat con ese número y el texto listo), **SMS** y **Correo**. La marca recuerda a quién ya has avisado.
 - Los números sin prefijo cuentan como italianos (+39). Para los **menores** se escribe al teléfono del padre o la madre (*Datos del socio*), con «un aviso sobre Luca». Quien no tiene ni teléfono ni correo se señala: añádelos en su ficha.
+
+### 7.15 Pistas y planning
+
+Con el rol **Club**, en la pestaña **Pistas**.
+
+- **Las pistas**: se crea una pista (**Nueva pista**), se ordenan y se toca una para cambiarla: nombre (al renombrarla, reservas, periodos y partidos de los torneos la siguen), superficie (**tierra batida, hierba, cemento**, otra), **cubierta o descubierta**, **luz**, **calefacción**, sus **precios** (por hora, con luz, suplemento de calefacción por hora; vacíos = los generales) y **una o varias fotos** de la galería. **Eliminar la pista** quita también sus reservas desde hoy.
+- **Planning de pistas**: el día con una pista por columna y una hora por fila (◀ ▶ y el calendario para cambiar de día). Toca una casilla libre para reservar: pista, día, hora y duración, tipo (juego, clase, cerrada, otro), jugadores de la base de datos e invitados, nota. El **precio** se calcula solo (luz desde la hora fijada, calefacción si se pide) y se puede cambiar; **Cargar a los jugadores** lo divide a partes iguales y lo lleva a *Cuotas y pagos*. **Cómo se paga**: *en la pista* u *online*; con la reserva cargada, **Pagado: …** la marca pagada con uno de los medios de pago del club. **Cada semana durante N semanas** repite la reserva (las fechas con la pista ocupada se saltan y la app lo dice). **Avisar a los jugadores** envía pista, día, hora y cómo pagar.
+- Los **partidos de los torneos** con pista y horario aparecen solos; la app no deja reservar encima de otra reserva o de un partido.
+- **No reservables**: periodos en que las pistas no se reservan, por **cursos**, **torneos**, **mantenimiento** u otro: pistas (o todas), de un día a otro, días de la semana, franja horaria o todo el día; para un torneo, nombre y fechas vienen del torneo. En los periodos de los cursos van sus clases (tocando la casilla se abre una clase ya preparada).
+- **Horarios y precios**: apertura y cierre, duración de una casilla (30, 60, 90 minutos), precio por hora general y con luz, desde qué hora hace falta la luz, cuánto dura un partido de torneo en el planning.
+- **Medios de pago** (en *Cuotas y pagos*): los decide quien gestiona el club. Se parte de efectivo, tarjeta, transferencia y Satispay y se añaden otros (PayPal, Revolut, Bancomat Pay, un enlace SumUp…): nombre, enlace/IBAN/número y si se paga a distancia. Se elige uno al registrar un pago (el nombre va en recibos y CSV); los de pago a distancia, con sus datos, van en avisos y recordatorios. La app no cobra: registra y envía las instrucciones.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2085,6 +2118,17 @@ L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, �
 - **Un par un** : le message de chacun (touchez-le pour tout lire) et les boutons **WhatsApp** (ouvre la discussion avec ce numéro et le texte prêt), **SMS** et **E-mail**. La coche rappelle qui a déjà été prévenu.
 - Les numéros sans indicatif comptent comme italiens (+39). Pour les **mineurs**, on écrit au téléphone du parent (*Données de l'adhérent*), avec « un avis pour Luca ». Qui n'a ni téléphone ni e-mail est signalé : ajoutez-les dans sa fiche.
 
+### 7.15 Terrains et planning
+
+Avec le rôle **Club**, dans l'onglet **Terrains**.
+
+- **Les terrains** : on crée un terrain (**Nouveau terrain**), on les met en ordre et on en touche un pour le modifier : nom (en le renommant, réservations, périodes et matchs des tournois suivent), surface (**terre battue, gazon, dur**, autre), **couvert ou extérieur**, **éclairage**, **chauffage**, ses **tarifs** (à l'heure, avec éclairage, supplément chauffage à l'heure ; vides = les tarifs généraux) et **une ou plusieurs photos** de la galerie. **Supprimer le terrain** retire aussi ses réservations à partir d'aujourd'hui.
+- **Planning des terrains** : la journée avec un terrain par colonne et une heure par ligne (◀ ▶ et le calendrier pour changer de jour). Touchez une case libre pour réserver : terrain, jour, heure et durée, type (jeu, leçon, fermé, autre), joueurs de la base et invités, remarque. Le **tarif** se calcule tout seul (éclairage à partir de l'heure choisie, chauffage si on le demande) et peut être modifié ; **Facturer aux joueurs** le divise en parts égales et le met dans *Cotisations et paiements*. **Comment on paie** : *au terrain* ou *en ligne* ; une fois facturée, **Payé : …** la marque payée avec un des moyens de paiement du club. **Chaque semaine pendant N semaines** répète la réservation (les dates où le terrain est pris sont sautées et l'appli les indique). **Prévenir les joueurs** envoie terrain, jour, heure et comment payer.
+- Les **matchs des tournois** avec terrain et horaire apparaissent tout seuls ; l'appli ne laisse pas réserver par-dessus une autre réservation ou un match.
+- **Non réservables** : périodes où les terrains ne se réservent pas, pour **cours**, **tournois**, **entretien** ou autre : terrains (ou tous), du jour au jour, jours de la semaine, plage horaire ou toute la journée ; pour un tournoi, nom et dates viennent du tournoi. Les leçons des cours vont dans leurs périodes (toucher la case ouvre une leçon prête).
+- **Horaires et tarifs** : ouverture et fermeture, durée d'une case (30, 60, 90 minutes), tarif horaire général et avec éclairage, heure à partir de laquelle il faut l'éclairage, durée d'un match de tournoi dans le planning.
+- **Moyens de paiement** (dans *Cotisations et paiements*) : c'est qui gère le club qui les choisit. On part d'espèces, carte, virement et Satispay et on en ajoute d'autres (PayPal, Revolut, Bancomat Pay, un lien SumUp…) : nom, lien/IBAN/numéro et s'il se paie à distance. On en choisit un en enregistrant un paiement (le nom figure sur les reçus et le CSV) ; ceux à distance, avec leurs détails, vont dans les avis et les relances. L'appli n'encaisse pas : elle enregistre et envoie les instructions.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2545,6 +2589,17 @@ L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l
 - **Uno per uno**: per ciascuno il suo messaggio (toccandolo si legge tutto) e i tasti **WhatsApp** (si apre la chat con quel numero e il testo già scritto), **SMS** ed **Email**. La spunta ricorda chi hai già avvisato.
 - I numeri senza prefisso valgono come italiani (+39). Per i **minorenni** si scrive al telefono del genitore (*Dati del socio*), con "un avviso per Luca". Chi non ha né telefono né email è segnalato: aggiungili nella sua scheda.
 
+### 7.15 Campi e planning
+
+Col ruolo **Circolo**, nella scheda **Campi**.
+
+- **I campi**: si crea un campo (**Nuovo campo**), lo si mette in ordine e lo si tocca per cambiarlo: nome (rinominandolo, prenotazioni, periodi e partite dei tornei lo seguono), superficie (**terra, erba, cemento**, altro), **coperto o scoperto**, **luci**, **riscaldamento**, i **prezzi** suoi (all'ora, con le luci, supplemento riscaldamento all'ora; vuoti = quelli generali) e **una o più foto** dalla galleria. **Elimina il campo** toglie anche le sue prenotazioni da oggi in poi.
+- **Planning dei campi**: il giorno con un campo per colonna e un'ora per riga (◀ ▶ e il calendario per cambiare giorno). Tocca una casella libera per prenotare: campo, giorno, ora e durata, tipo (gioco, lezione, chiuso, altro), giocatori dal database e ospiti, nota. Il **prezzo** si calcola da solo (luci dall'ora scelta, riscaldamento se lo si chiede) e si può cambiare; **Addebita ai giocatori** lo divide in parti uguali e lo mette in *Quote e pagamenti*. **Come si paga**: *al campo* o *online*; a prenotazione addebitata, **Pagato: …** la segna pagata con uno dei modi di pagamento del circolo. **Ogni settimana per N settimane** ripete la prenotazione (le date col campo occupato si saltano e l'app le dice). **Avvisa i giocatori** manda campo, giorno, ora e come si paga.
+- Le **partite dei tornei** con campo e orario compaiono da sole; l'app non lascia prenotare sopra un'altra prenotazione o una partita.
+- **Non prenotabili**: periodi in cui i campi non si prenotano, per **corsi**, **tornei**, **manutenzione** o altro: campi (o tutti), dal giorno al giorno, giorni della settimana, fascia oraria o tutto il giorno; per un torneo si prendono nome e date dal torneo. Nei periodi dei corsi si mettono le loro lezioni (toccando la casella si apre una lezione già pronta).
+- **Orari e prezzi**: apertura e chiusura, durata di una casella (30, 60, 90 minuti), prezzo all'ora generale e con le luci, da che ora servono le luci, quanto dura nel planning una partita di torneo.
+- **Modi di pagamento** (in *Quote e pagamenti*): li decide chi gestisce il circolo. Si parte da contanti, POS, bonifico e Satispay e se ne aggiungono altri (PayPal, Revolut, Bancomat Pay, un link SumUp…): nome, link/IBAN/numero e se si paga a distanza. Si scelgono quando si registra un pagamento (il nome va su ricevute e CSV); quelli a distanza, con i loro dettagli, vanno negli avvisi e nei solleciti. L'app non incassa: registra e manda le istruzioni.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -3004,6 +3059,17 @@ O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre 
 - **A todos**: o texto para todos (ordem de jogos, lista de inscritos, chave). **Compartilhar** envia num grupo do WhatsApp, no Telegram, Instagram, Facebook… com a imagem se houver; **E-mail a todos** coloca todos em cópia oculta; **SMS a todos** abre um SMS com todos os números.
 - **Um por um**: a mensagem de cada um (toque para ler tudo) e os botões **WhatsApp** (abre a conversa com aquele número e o texto pronto), **SMS** e **E-mail**. A marca lembra quem você já avisou.
 - Números sem prefixo valem como italianos (+39). Para os **menores** escreve-se ao telefone do responsável (*Dados do sócio*), com "um aviso sobre Luca". Quem não tem telefone nem e-mail é indicado: adicione na ficha dele.
+
+### 7.15 Quadras e agenda
+
+Com o papel **Clube**, na aba **Quadras**.
+
+- **As quadras**: crie uma quadra (**Nova quadra**), ordene e toque numa para mudá-la: nome (ao renomear, reservas, períodos e partidas dos torneios acompanham), piso (**saibro, grama, rápida**, outro), **coberta ou descoberta**, **iluminação**, **aquecimento**, os **preços** dela (por hora, com iluminação, adicional de aquecimento por hora; vazios = os gerais) e **uma ou mais fotos** da galeria. **Excluir a quadra** remove também as reservas dela a partir de hoje.
+- **Agenda das quadras**: o dia com uma quadra por coluna e uma hora por linha (◀ ▶ e o calendário para mudar de dia). Toque num horário livre para reservar: quadra, dia, hora e duração, tipo (jogo, aula, fechada, outro), jogadores do banco de dados e convidados, nota. O **preço** se calcula sozinho (iluminação a partir da hora definida, aquecimento se pedido) e pode ser alterado; **Cobrar dos jogadores** divide em partes iguais e leva para *Mensalidades e pagamentos*. **Como se paga**: *na quadra* ou *online*; com a reserva cobrada, **Pago: …** marca como paga com um dos meios de pagamento do clube. **Toda semana por N semanas** repete a reserva (as datas com a quadra ocupada são puladas e o app avisa). **Avisar os jogadores** envia quadra, dia, hora e como pagar.
+- As **partidas dos torneios** com quadra e horário aparecem sozinhas; o app não deixa reservar por cima de outra reserva ou de uma partida.
+- **Não reserváveis**: períodos em que as quadras não se reservam, para **cursos**, **torneios**, **manutenção** ou outro: quadras (ou todas), de um dia a outro, dias da semana, faixa de horário ou o dia todo; para um torneio, nome e datas vêm do torneio. Nos períodos dos cursos entram as aulas deles (tocando o horário abre uma aula já pronta).
+- **Horários e preços**: abertura e fechamento, duração de um horário (30, 60, 90 minutos), preço por hora geral e com iluminação, a partir de que hora precisa de iluminação, quanto dura uma partida de torneio na agenda.
+- **Meios de pagamento** (em *Mensalidades e pagamentos*): quem administra o clube decide. Começa com dinheiro, cartão, transferência e Satispay e dá para adicionar outros (PayPal, Revolut, Bancomat Pay, um link SumUp…): nome, link/IBAN/número e se é pago a distância. Escolhe-se um ao registrar um pagamento (o nome vai nos recibos e no CSV); os a distância, com os dados, vão nos avisos e lembretes. O app não recebe: registra e envia as instruções.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3820,7 +3886,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4353,6 +4419,7 @@ class MatchController(
             Screen.CLUB_TOURNAMENTS -> Screen.HOME
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             Screen.NOTICE -> noticeBack
+            Screen.COURTS_PLAN -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4879,7 +4946,7 @@ class MatchController(
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT) } ?: Screen.STUDENTS
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -5092,6 +5159,228 @@ class MatchController(
         }
     }
 
+    // ---- Planning dei campi ----
+
+    val courtPlan = MutableStateFlow(storage.loadCourtPlan())
+
+    fun openCourtsPlan() {
+        refreshPlayers()
+        screen.value = Screen.COURTS_PLAN
+    }
+
+    fun saveCourtSettings(st: com.tennis.scoremanager.data.CourtSettings) {
+        val p = courtPlan.value.copy(settings = st)
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    private fun putBookings(list: List<com.tennis.scoremanager.data.CourtBooking>, remove: Set<String> = emptySet()) {
+        val ids = list.map { it.id }.toSet() + remove
+        val p = courtPlan.value.copy(bookings = courtPlan.value.bookings.filter { it.id !in ids } + list)
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    /** "Campo 1 · sab 14 nov 18:00": la descrizione negli addebiti e negli avvisi. */
+    fun bookingLabel(b: com.tennis.scoremanager.data.CourtBooking): String {
+        val lang = options.value.lang
+        val loc = lang.locale
+        val day = java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "EEEdMMM"), loc).format(java.util.Date(b.start))
+        return "${b.court} · $day ${com.tennis.scoremanager.data.Reports.time(b.start, lang)}"
+    }
+
+    /**
+     * Salva una prenotazione (nuova o cambiata), ripetuta per [weeks] settimane; con [charge] il prezzo si divide tra
+     * i giocatori del database e va nel registro. Restituisce le date saltate perché il campo era occupato.
+     */
+    fun saveBooking(b: com.tennis.scoremanager.data.CourtBooking, weeks: Int, charge: Boolean): List<Long> {
+        val (list, skipped) = if (weeks > 1) com.tennis.scoremanager.data.CourtPlans.weekly(courtPlan.value, clubTournaments.value, b, weeks) else listOf(b) to emptyList()
+        val old = courtPlan.value.bookings.firstOrNull { it.id == b.id }
+        var book = clubBook.value
+        // Cambiando una prenotazione, gli addebiti di prima non pagati si tolgono e si rifanno.
+        old?.charges?.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
+        val now = System.currentTimeMillis()
+        val saved = list.map { x ->
+            val people = x.players.mapNotNull { playerById(it) }
+            if (!charge || x.cents <= 0 || people.isEmpty()) x.copy(charges = old?.takeIf { it.id == x.id }?.charges?.filter { id -> book.charges.any { it.id == id } }.orEmpty())
+            else {
+                val parts = com.tennis.scoremanager.data.CourtPlans.split(x.cents, people.size)
+                val before = book.charges.map { it.id }.toSet()
+                people.forEachIndexed { i, p -> book = com.tennis.scoremanager.data.Fees.charge(book, p, bookingLabel(x), parts[i], now) }
+                x.copy(charges = book.charges.map { it.id }.filter { it !in before })
+            }
+        }
+        saveClubBook(book)
+        putBookings(saved)
+        return skipped
+    }
+
+    /** Com'è fatto un campo e i suoi prezzi. */
+    /** I modi di pagamento del circolo (quelli proposti finché non se ne sceglie uno). */
+    fun payTypes(): List<com.tennis.scoremanager.data.PayType> = com.tennis.scoremanager.data.Fees.types(clubBook.value) { com.tennis.scoremanager.ui.payMethodName(strings, it) }
+
+    fun savePayTypes(list: List<com.tennis.scoremanager.data.PayType>) = saveClubBook(clubBook.value.copy(payTypes = list))
+
+    fun saveCourtInfo(info: com.tennis.scoremanager.data.CourtInfo) {
+        val st = courtPlan.value.settings
+        saveCourtSettings(st.copy(courts = st.courts.filter { it.name != info.name } + info))
+    }
+
+    /** I campi del circolo, nell'ordine in cui si vedono (Nuova partita, planning, tornei). */
+    val clubCourts = MutableStateFlow(storage.clubCourts)
+
+    fun setClubCourts(list: List<String>) {
+        val clean = list.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+        storage.clubCourts = clean
+        clubCourts.value = clean
+    }
+
+    /** Un campo nuovo con le sue caratteristiche; false se il nome c'è già. */
+    fun addCourt(info: com.tennis.scoremanager.data.CourtInfo): Boolean {
+        val name = info.name.trim()
+        if (name.isEmpty() || clubCourts.value.any { it.equals(name, ignoreCase = true) }) return false
+        setClubCourts(clubCourts.value + name)
+        saveCourtInfo(info.copy(name = name))
+        return true
+    }
+
+    /**
+     * Rinomina un campo: lo seguono caratteristiche e prezzi, prenotazioni, periodi non prenotabili e partite dei
+     * tornei. false se il nome nuovo è già di un altro campo.
+     */
+    fun renameCourt(old: String, new: String): Boolean {
+        val n = new.trim()
+        if (n.isEmpty()) return false
+        if (n == old) return true
+        if (clubCourts.value.any { it != old && it.equals(n, ignoreCase = true) }) return false
+        setClubCourts(clubCourts.value.map { if (it == old) n else it })
+        val p = courtPlan.value
+        val np = p.copy(
+            settings = p.settings.copy(courts = p.settings.courts.map { if (it.name == old) it.copy(name = n) else it }),
+            bookings = p.bookings.map { if (it.court == old) it.copy(court = n) else it },
+            blocks = p.blocks.map { b -> b.copy(courts = b.courts.map { if (it == old) n else it }) },
+        )
+        courtPlan.value = np
+        scope.launch(io) { storage.saveCourtPlan(np) }
+        for (t in clubTournaments.value) if (t.matches.any { it.court == old }) saveClubTournament(t.copy(matches = t.matches.map { if (it.court == old) it.copy(court = n) else it }))
+        return true
+    }
+
+    /** Le prenotazioni da oggi in poi su quel campo (quelle che sparirebbero eliminandolo). */
+    fun futureBookings(court: String): Int {
+        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
+        return courtPlan.value.bookings.count { it.court == court && it.start >= today }
+    }
+
+    /** Elimina un campo: via le sue prenotazioni future (con gli addebiti non pagati) e le sue caratteristiche. */
+    fun deleteCourt(court: String) {
+        courtPlan.value.settings.info(court).photos.forEach { n -> scope.launch(io) { courtPhotoFile(n).delete() } }
+        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
+        courtPlan.value.bookings.filter { it.court == court && it.start >= today }.forEach { deleteBooking(it, false) }
+        setClubCourts(clubCourts.value - court)
+        val p = courtPlan.value
+        val np = p.copy(
+            settings = p.settings.copy(courts = p.settings.courts.filter { it.name != court }),
+            blocks = p.blocks.mapNotNull { b -> if (court !in b.courts) b else b.copy(courts = b.courts - court).takeIf { it.courts.isNotEmpty() } },
+        )
+        courtPlan.value = np
+        scope.launch(io) { storage.saveCourtPlan(np) }
+    }
+
+    /** La cartella delle foto dei campi (nei dati dell'app: va nel backup). */
+    private val courtPhotosDir: File get() = File(app.filesDir, "court_photos").apply { mkdirs() }
+
+    fun courtPhotoFile(name: String): File = File(courtPhotosDir, name)
+
+    /** Aggiunge al campo le foto scelte, ridotte (lato lungo 1600 px) e in JPEG. */
+    fun addCourtPhotos(court: String, uris: List<android.net.Uri>) {
+        if (uris.isEmpty()) return
+        scope.launch {
+            val names = withContext(io) {
+                uris.mapNotNull { uri ->
+                    runCatching {
+                        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
+                        var sample = 1
+                        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 1600) sample *= 2
+                        val bmp = app.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }) } ?: return@runCatching null
+                        val k = 1600f / maxOf(bmp.width, bmp.height)
+                        val out = if (k < 1f) android.graphics.Bitmap.createScaledBitmap(bmp, (bmp.width * k).toInt(), (bmp.height * k).toInt(), true) else bmp
+                        val name = "c" + java.util.UUID.randomUUID().toString().take(12) + ".jpg"
+                        courtPhotoFile(name).outputStream().use { out.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
+                        if (out !== bmp) out.recycle()
+                        bmp.recycle()
+                        name
+                    }.getOrNull()
+                }
+            }
+            val info = courtPlan.value.settings.info(court)
+            saveCourtInfo(info.copy(photos = info.photos + names))
+        }
+    }
+
+    fun removeCourtPhoto(court: String, name: String) {
+        val info = courtPlan.value.settings.info(court)
+        saveCourtInfo(info.copy(photos = info.photos - name))
+        scope.launch(io) { courtPhotoFile(name).delete() }
+    }
+
+    /** Sposta un campo di un posto nell'elenco ([up] = verso l'inizio). */
+    fun moveCourt(court: String, up: Boolean) {
+        val l = clubCourts.value.toMutableList()
+        val i = l.indexOf(court); val j = if (up) i - 1 else i + 1
+        if (i < 0 || j !in l.indices) return
+        l[i] = l[j].also { l[j] = l[i] }
+        setClubCourts(l)
+    }
+
+    /** Salva (o toglie, con [delete]) un periodo di campi non prenotabili. */
+    fun saveCourtBlock(b: com.tennis.scoremanager.data.CourtBlock, delete: Boolean = false) {
+        val p = courtPlan.value.copy(blocks = courtPlan.value.blocks.filter { it.id != b.id } + listOfNotNull(b.takeIf { !delete }))
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    /** Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. */
+    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean) {
+        val gone = if (wholeSeries && b.series != null) courtPlan.value.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
+        var book = clubBook.value
+        gone.flatMap { it.charges }.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
+        saveClubBook(book)
+        putBookings(emptyList(), gone.map { it.id }.toSet())
+    }
+
+    /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
+    fun courtLine(court: String): String {
+        val i = courtPlan.value.settings.info(court)
+        val s = strings
+        return listOfNotNull(court, i.surface?.let { com.tennis.scoremanager.ui.screens.surfaceName(s, it) }, if (i.covered) s.crtCovered else null).joinToString(" · ")
+    }
+
+    /** Registra il pagamento di tutti gli addebiti aperti della prenotazione (al campo o con Satispay). */
+    fun payBooking(b: com.tennis.scoremanager.data.CourtBooking, type: com.tennis.scoremanager.data.PayType) {
+        var book = clubBook.value
+        val now = System.currentTimeMillis()
+        for (id in b.charges) {
+            val ch = book.charges.firstOrNull { it.id == id } ?: continue
+            if (ch.left > 0) com.tennis.scoremanager.data.Fees.pay(book, id, ch.left, now, type.method, "", type.name)?.let { book = it.first }
+        }
+        saveClubBook(book)
+    }
+
+    /** Avvisa i giocatori della prenotazione: campo, giorno e ora, e come si paga. */
+    fun noticeBooking(b: com.tennis.scoremanager.data.CourtBooking) {
+        val s = strings; val now = System.currentTimeMillis(); val lang = options.value.lang
+        val heads = (b.players.size + b.names.size).coerceAtLeast(1)
+        val each = com.tennis.scoremanager.data.Fees.money(com.tennis.scoremanager.data.CourtPlans.split(b.cents, heads).firstOrNull() ?: 0, lang.locale)
+        val pay = if (b.cents <= 0) emptyList() else if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE)
+            listOf(s.ntPayOnline(each)) + com.tennis.scoremanager.data.Notices.payLines(s, clubBook.value) else listOf(s.ntPayCourt(each))
+        val text = (listOf(s.bkNotice("${courtLine(b.court)} · ${bookingLabel(b).substringAfter(" · ")}"), (b.names + b.players.mapNotNull { playerById(it)?.name }).distinct().joinToString(" · "))
+            + pay + listOfNotNull(b.note.ifBlank { null }, clubSign.ifBlank { null })).joinToString("\n")
+        val rec = b.players.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.bkTitle, bookingLabel(b), text, rec))
+    }
+
     // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
 
     val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
@@ -5169,7 +5458,7 @@ class MatchController(
         val book = clubBook.value
         val rec = players.value.mapNotNull { p ->
             val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 }
-            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now), now)
+            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now, com.tennis.scoremanager.data.Notices.payLines(s, book)), now)
         }
         openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntDuesButton, s.paymentsTitle, "", rec))
     }
@@ -9172,6 +9461,14 @@ enum class FeeKind { MEMBERSHIP, FITP, COURSE, TOURNAMENT, OTHER }
 @Serializable
 enum class PayMethod { CASH, TRANSFER, POS, SATISPAY, OTHER }
 
+/**
+ * Un modo di pagamento che il circolo accetta, deciso da chi lo gestisce ("Satispay", "PayPal", "Bonifico"…):
+ * [details] il link, l'IBAN o il numero; [online] = si paga a distanza, e allora va negli avvisi. [method] è il tipo
+ * per il registro (OTHER per quelli aggiunti).
+ */
+@Serializable
+data class PayType(val id: String, val name: String, val details: String = "", val online: Boolean = false, val method: PayMethod = PayMethod.OTHER)
+
 /** Una quota del circolo ("Quota sociale 2027", 150 €): si addebita ai soci. Importi in centesimi. */
 @Serializable
 data class Fee(
@@ -9196,6 +9493,8 @@ data class Payment(
     /** CRO del bonifico, causale, numero dello scontrino del POS… */
     val ref: String = "",
     val receipt: String = "",
+    /** Il nome del modo di pagamento del circolo ("PayPal"); vuoto = quello di [method]. */
+    val methodName: String = "",
 )
 
 /**
@@ -9229,9 +9528,25 @@ data class ClubBook(
     val charges: List<Charge> = emptyList(),
     val receiptYear: Int = 0,
     val receiptNext: Int = 1,
+    /** I modi di pagamento del circolo (vuoto = quelli proposti: contanti, POS, bonifico, Satispay). */
+    val payTypes: List<PayType> = emptyList(),
 )
 
 object Fees {
+    /** I modi proposti finché il circolo non sceglie i suoi ([names]: i nomi nella lingua dell'app). */
+    fun defaultTypes(names: (PayMethod) -> String): List<PayType> = listOf(
+        PayType("cash", names(PayMethod.CASH), method = PayMethod.CASH),
+        PayType("pos", names(PayMethod.POS), method = PayMethod.POS),
+        PayType("transfer", names(PayMethod.TRANSFER), online = true, method = PayMethod.TRANSFER),
+        PayType("satispay", names(PayMethod.SATISPAY), online = true, method = PayMethod.SATISPAY),
+    )
+
+    /** I modi di pagamento del circolo, o quelli proposti. */
+    fun types(book: ClubBook, names: (PayMethod) -> String): List<PayType> = book.payTypes.ifEmpty { defaultTypes(names) }
+
+    /** I modi a distanza con link, IBAN o numero: "Satispay: link". */
+    fun onlineTypes(book: ClubBook, names: (PayMethod) -> String): List<PayType> = types(book, names).filter { it.online && it.details.isNotBlank() }
+
     enum class Status { PAID, PARTIAL, UNPAID, LATE, CANCELLED }
 
     fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
@@ -9277,12 +9592,12 @@ object Fees {
      * Registra un versamento di [cents] sull'addebito [chargeId] col numero di ricevuta dell'anno del pagamento
      * ("12/2026"; a gennaio si riparte da 1). null se l'addebito non c'è o l'importo non va.
      */
-    fun pay(book: ClubBook, chargeId: String, cents: Int, at: Long, method: PayMethod, ref: String): Pair<ClubBook, Payment>? {
+    fun pay(book: ClubBook, chargeId: String, cents: Int, at: Long, method: PayMethod, ref: String, methodName: String = ""): Pair<ClubBook, Payment>? {
         val c = book.charges.firstOrNull { it.id == chargeId } ?: return null
         if (cents <= 0 || c.cancelled) return null
         val y = year(at)
         val n = if (book.receiptYear == y) book.receiptNext else 1
-        val pay = Payment(newId("p"), cents, at, method, ref.trim(), "$n/$y")
+        val pay = Payment(newId("p"), cents, at, method, ref.trim(), "$n/$y", methodName.trim())
         val charges = book.charges.map { if (it.id == chargeId) it.copy(payments = it.payments + pay) else it }
         return book.copy(charges = charges, receiptYear = y, receiptNext = n + 1) to pay
     }
@@ -9355,7 +9670,7 @@ object Fees {
         val sep = java.text.DecimalFormatSymbols.getInstance(locale).decimalSeparator
         fun q(s: String) = if (s.any { it == ';' || it == '"' || it == '\n' }) "\"" + s.replace("\"", "\"\"") + "\"" else s
         val rows = payments(book, year).map { (c, p) ->
-            listOf(date(p.at), p.receipt, c.name, c.label, method(p.method), p.ref, "%d%c%02d".format(p.cents / 100, sep, p.cents % 100)).joinToString(";") { q(it) }
+            listOf(date(p.at), p.receipt, c.name, c.label, p.methodName.ifBlank { method(p.method) }, p.ref, "%d%c%02d".format(p.cents / 100, sep, p.cents % 100)).joinToString(";") { q(it) }
         }
         return (listOf(header) + rows).joinToString("\r\n") + "\r\n"
     }
@@ -9808,6 +10123,241 @@ object ClubTournaments {
 
     /** Nome del turno del tabellone dal numero di giocatori rimasti: 2 = finale, 4 = semifinali… */
     fun playersInRound(t: ClubTournament, round: Int): Int = t.matches.count { it.round == round } * 2
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/CourtPlan.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/CourtPlan.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+
+/** La superficie del campo. */
+@Serializable
+enum class Surface { CLAY, GRASS, HARD, OTHER }
+
+/**
+ * Com'è fatto un campo e quanto costa: coperto o scoperto, luci, riscaldamento; i prezzi all'ora (null = quelli
+ * generali del planning) e il supplemento all'ora per il riscaldamento.
+ */
+@Serializable
+data class CourtInfo(
+    val name: String,
+    val surface: Surface? = null,
+    val covered: Boolean = false,
+    val lights: Boolean = true,
+    val heating: Boolean = false,
+    val centsPerHour: Int? = null,
+    val centsPerHourLights: Int? = null,
+    val heatingCentsPerHour: Int = 0,
+    /** Le foto del campo (file nella cartella dell'app, files/court_photos). */
+    val photos: List<String> = emptyList(),
+)
+
+/** Come si paga la prenotazione: al campo (contanti o POS in segreteria) o online (Satispay, PayPal, bonifico…). */
+@Serializable
+enum class PayWhere { COURT, ONLINE }
+
+/** Per cosa è occupato il campo: gioco, lezione, chiuso (manutenzione), altro. Le partite dei tornei si aggiungono da sole. */
+@Serializable
+enum class BookingKind { PLAY, LESSON, CLOSED, OTHER }
+
+/**
+ * Una prenotazione: campo, inizio e durata, chi gioca (giocatori del database e/o nomi scritti), prezzo e, se
+ * addebitato, gli addebiti nel registro. [series] lega le prenotazioni ripetute ogni settimana.
+ */
+@Serializable
+data class CourtBooking(
+    val id: String,
+    val court: String,
+    val start: Long,
+    val minutes: Int = 60,
+    val kind: BookingKind = BookingKind.PLAY,
+    val players: List<String> = emptyList(),
+    val names: List<String> = emptyList(),
+    val note: String = "",
+    val lights: Boolean = false,
+    val cents: Int = 0,
+    val charges: List<String> = emptyList(),
+    val series: String? = null,
+    val heating: Boolean = false,
+    val payWhere: PayWhere = PayWhere.COURT,
+) {
+    val end: Long get() = start + minutes * 60_000L
+}
+
+/** Orari del circolo e prezzi: dalle [openHour] alle [closeHour], caselle da [slotMinutes]; prezzi all'ora. */
+@Serializable
+data class CourtSettings(
+    val openHour: Int = 8,
+    val closeHour: Int = 23,
+    val slotMinutes: Int = 60,
+    val centsPerHour: Int = 0,
+    val centsPerHourLights: Int = 0,
+    /** Da quest'ora servono le luci (e vale il prezzo con le luci). */
+    val lightsFrom: Int = 18,
+    /** Quanto dura di solito una partita di torneo nel planning. */
+    val tournamentMinutes: Int = 90,
+    /** Com'è fatto ogni campo (per nome); quelli che mancano hanno i valori generali. */
+    val courts: List<CourtInfo> = emptyList(),
+) {
+    fun info(court: String): CourtInfo = courts.firstOrNull { it.name == court } ?: CourtInfo(court)
+}
+
+/** Perché i campi non si possono prenotare: un corso (scuola tennis), un torneo, la manutenzione, altro. */
+@Serializable
+enum class BlockReason { COURSE, TOURNAMENT, MAINTENANCE, OTHER }
+
+/**
+ * Campi non prenotabili: [courts] (vuoto = tutti) dal giorno [from] al giorno [to], nei giorni della settimana
+ * [weekdays] (1 = lunedì … 7 = domenica; vuoto = tutti), dalle [startMin] alle [endMin] (minuti dalla mezzanotte).
+ * Nei blocchi di un corso si possono mettere le sue lezioni; in quelli di un torneo si vedono le sue partite.
+ */
+@Serializable
+data class CourtBlock(
+    val id: String,
+    val label: String,
+    val reason: BlockReason = BlockReason.OTHER,
+    val courts: List<String> = emptyList(),
+    val from: Long,
+    val to: Long,
+    val weekdays: Set<Int> = emptySet(),
+    val startMin: Int = 0,
+    val endMin: Int = 24 * 60,
+    val tournament: String? = null,
+)
+
+@Serializable
+data class CourtPlan(val settings: CourtSettings = CourtSettings(), val bookings: List<CourtBooking> = emptyList(), val blocks: List<CourtBlock> = emptyList())
+
+/** Una casella occupata nel planning: una prenotazione, una partita di torneo o un blocco (non si cambiano da qui). */
+data class Occupied(
+    val court: String, val start: Long, val end: Long, val booking: CourtBooking? = null, val tournament: ClubTournament? = null, val match: CTMatch? = null,
+    val block: CourtBlock? = null,
+)
+
+object CourtPlans {
+    fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
+
+    /** Mezzanotte del giorno di [t]. */
+    fun dayStart(t: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = t; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    fun at(day: Long, hour: Int, minute: Int = 0): Long = Calendar.getInstance().apply {
+        timeInMillis = dayStart(day); set(Calendar.HOUR_OF_DAY, hour); set(Calendar.MINUTE, minute)
+    }.timeInMillis
+
+    fun addDays(t: Long, days: Int): Long = Calendar.getInstance().apply { timeInMillis = t; add(Calendar.DAY_OF_YEAR, days) }.timeInMillis
+
+    /** Gli inizi delle caselle del giorno, dall'apertura alla chiusura. */
+    fun slots(day: Long, s: CourtSettings): List<Long> {
+        val step = s.slotMinutes.coerceIn(15, 180)
+        val out = mutableListOf<Long>()
+        var m = s.openHour * 60
+        while (m + step <= s.closeHour * 60) { out += at(day, m / 60, m % 60); m += step }
+        return out
+    }
+
+    /** Tutto ciò che occupa i campi in quel giorno: prenotazioni e partite di torneo con campo e orario. */
+    fun occupied(plan: CourtPlan, tournaments: List<ClubTournament>, day: Long): List<Occupied> {
+        val from = dayStart(day); val to = addDays(from, 1)
+        val b = plan.bookings.filter { it.start < to && it.end > from }.map { Occupied(it.court, it.start, it.end, booking = it) }
+        val t = tournaments.flatMap { tt ->
+            tt.matches.filter { m -> m.court.isNotBlank() && m.at != null && m.at in from until to && !m.bye }
+                .map { m -> Occupied(m.court, m.at!!, m.at + plan.settings.tournamentMinutes * 60_000L, tournament = tt, match = m) }
+        }
+        val k = blocksOn(plan, day, courts = null)
+        return (b + t + k).sortedBy { it.start }
+    }
+
+    /** 1 = lunedì … 7 = domenica. */
+    fun weekday(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.DAY_OF_WEEK).let { if (it == Calendar.SUNDAY) 7 else it - 1 }
+
+    /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
+    fun blockActive(b: CourtBlock, day: Long): Boolean {
+        val d = dayStart(day)
+        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
+    }
+
+    /** I blocchi del giorno, campo per campo ([courts] = i campi del circolo, per i blocchi "tutti i campi"). */
+    fun blocksOn(plan: CourtPlan, day: Long, courts: List<String>?): List<Occupied> = plan.blocks.filter { blockActive(it, day) }.flatMap { b ->
+        val start = at(day, b.startMin / 60, b.startMin % 60)
+        val end = at(day, 0) + b.endMin * 60_000L
+        val list = if (b.courts.isEmpty()) courts ?: listOf(ALL) else b.courts
+        list.map { Occupied(it, start, end, block = b) }
+    }
+
+    /** Il campo "tutti": un blocco senza campi scelti vale per ognuno. */
+    const val ALL = "*"
+
+    /** Il blocco copre quel campo (anche se è un blocco di tutti i campi). */
+    fun blockCovers(o: Occupied, court: String): Boolean = o.block != null && (o.court == court || o.court == ALL)
+
+    /**
+     * Si può prenotare lì? I blocchi fermano le prenotazioni, tranne le lezioni nei blocchi dei corsi; le
+     * prenotazioni di chiusura (manutenzione) si possono mettere sempre.
+     */
+    fun blockedBy(plan: CourtPlan, court: String, start: Long, end: Long, kind: BookingKind): List<CourtBlock> =
+        blocksOn(plan, start, null).filter { blockCovers(it, court) && it.start < end && it.end > start }
+            .mapNotNull { it.block }.filter { b -> kind != BookingKind.CLOSED && !(kind == BookingKind.LESSON && b.reason == BlockReason.COURSE) }.distinct()
+
+    /** Cosa si sovrappone a [court] tra [start] e [end] (escluso [except], la prenotazione che si sta cambiando). */
+    fun conflicts(plan: CourtPlan, tournaments: List<ClubTournament>, court: String, start: Long, end: Long, except: String? = null): List<Occupied> =
+        occupied(plan, tournaments, start).filter { it.block == null && it.court == court && (except == null || it.booking?.id != except) && it.start < end && it.end > start }
+
+    /**
+     * Il prezzo: le ore prima delle luci al prezzo normale, quelle dopo al prezzo con le luci (un campo senza luci
+     * resta al prezzo normale), più il riscaldamento se lo si chiede. Prezzi del campo, o quelli generali. Chiuso e
+     * altro: 0.
+     */
+    fun price(s: CourtSettings, start: Long, minutes: Int, kind: BookingKind, court: String = "", heating: Boolean = false): Int {
+        if (kind == BookingKind.CLOSED || kind == BookingKind.OTHER) return 0
+        val info = s.info(court)
+        val base = info.centsPerHour ?: s.centsPerHour
+        val dark = if (info.lights) info.centsPerHourLights ?: s.centsPerHourLights else base
+        val lightsAt = at(start, s.lightsFrom)
+        val end = start + minutes * 60_000L
+        val darkMs = (end - maxOf(start, lightsAt)).coerceAtLeast(0)
+        val dayMs = (minutes * 60_000L - darkMs).coerceAtLeast(0)
+        val heat = if (heating && info.heating) minutes * 60_000L * info.heatingCentsPerHour else 0L
+        return Math.round((dayMs * base + darkMs * dark + heat) / 3_600_000.0).toInt()
+    }
+
+    /** Servono le luci se la prenotazione arriva oltre l'ora delle luci. */
+    fun needsLights(s: CourtSettings, start: Long, minutes: Int): Boolean = start + minutes * 60_000L > at(start, s.lightsFrom)
+
+    /**
+     * La stessa prenotazione ogni settimana per [weeks] settimane (lei compresa): restituisce quelle che si possono
+     * fare e le date saltate perché il campo è già occupato.
+     */
+    fun weekly(plan: CourtPlan, tournaments: List<ClubTournament>, b: CourtBooking, weeks: Int): Pair<List<CourtBooking>, List<Long>> {
+        val series = b.series ?: newId("s")
+        val ok = mutableListOf<CourtBooking>(); val skipped = mutableListOf<Long>()
+        var cur = plan
+        for (w in 0 until weeks.coerceIn(1, 52)) {
+            val start = addDays(b.start, 7 * w)
+            val nb = b.copy(id = if (w == 0) b.id else newId("b"), start = start, series = series, charges = emptyList())
+            if (conflicts(cur, tournaments, nb.court, nb.start, nb.end, except = b.id.takeIf { w == 0 }).isEmpty() && blockedBy(cur, nb.court, nb.start, nb.end, nb.kind).isEmpty()) {
+                ok += nb; cur = cur.copy(bookings = cur.bookings + nb)
+            } else skipped += start
+        }
+        return ok to skipped
+    }
+
+    /** Divide [cents] tra [n] persone; i centesimi in più ai primi (10 € in 3: 3,34 + 3,33 + 3,33). */
+    fun split(cents: Int, n: Int): List<Int> {
+        if (n <= 0) return emptyList()
+        val base = cents / n; val extra = cents % n
+        return List(n) { base + if (it < extra) 1 else 0 }
+    }
+
+    /** Quanto è occupato ogni campo nel giorno (minuti), per vedere a colpo d'occhio i campi liberi. */
+    fun busyMinutes(occ: List<Occupied>, court: String): Int = occ.filter { it.court == court && it.block == null }.sumOf { ((it.end - it.start) / 60_000L).toInt() }
 }
 TSM_EOF
 
@@ -11044,16 +11594,21 @@ object Notices {
     }
 
     /** Il sollecito: cosa resta da pagare, voce per voce, e il totale. */
-    fun duesText(s: Strings, p: PlayerProfile, open: List<Charge>, club: String, lang: Lang, now: Long): String {
+    fun duesText(s: Strings, p: PlayerProfile, open: List<Charge>, club: String, lang: Lang, now: Long, pay: List<String> = emptyList()): String {
         val lines = mutableListOf(hello(s, p, now), s.ntDues)
         for (c in open) lines += "• ${c.label}: ${Fees.money(c.left, lang.locale)}" + (c.due?.let { " (" + s.feeDueShort(day(it, lang)) + ")" } ?: "")
         if (open.size > 1) lines += s.ntTotal(Fees.money(open.sumOf { it.left }, lang.locale))
+        if (pay.isNotEmpty()) lines += listOf(s.ntPayHow) + pay
         return (lines + sign(club)).joinToString("\n")
     }
 
     /** Cosa manca al socio per essere in regola. */
     fun memberText(s: Strings, p: PlayerProfile, issues: List<String>, club: String, now: Long): String =
         (listOf(hello(s, p, now), s.ntMemberTodo) + issues.map { "• $it" } + listOf(s.ntMemberHow) + sign(club)).joinToString("\n")
+
+    /** "• Satispay: link", "• Bonifico: IT60…": i modi online del circolo, per gli avvisi. */
+    fun payLines(s: Strings, book: ClubBook): List<String> =
+        Fees.onlineTypes(book) { com.tennis.scoremanager.ui.payMethodName(s, it) }.map { "• ${it.name}: ${it.details.trim()}" }
 
     /** Le partite con l'orario in quel giorno. */
     fun onDay(ms: List<CTMatch>, dayMs: Long): List<CTMatch> {
@@ -12287,7 +12842,7 @@ object ReceiptPdf {
         }
         field(s.receiptReceivedFrom, c.name)
         field(s.receiptFor, c.label)
-        field(s.receiptMethod, listOf(payMethodName(s, p.method), p.ref).filter { it.isNotBlank() }.joinToString(" · "))
+        field(s.receiptMethod, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "))
         cv.drawText(s.receiptAmount, M, y, paint(9f, grey))
         y += 26f
         cv.drawText(Fees.money(p.cents, lang.locale), M, y, paint(24f, bold = true))
@@ -13584,6 +14139,24 @@ class Storage(context: Context) {
                 tmp.renameTo(drillsFile)
             }
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+    }
+
+    /** Il planning dei campi: orari, prezzi e prenotazioni. */
+    private val courtPlanFile: File get() = File(app.filesDir, "club_courts.json")
+
+    fun loadCourtPlan(): CourtPlan =
+        runCatching { json.decodeFromString(CourtPlan.serializer(), courtPlanFile.readText()) }.getOrDefault(CourtPlan())
+
+    @Synchronized
+    fun saveCourtPlan(plan: CourtPlan) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_courts.tmp")
+            tmp.writeText(json.encodeToString(CourtPlan.serializer(), plan))
+            if (!tmp.renameTo(courtPlanFile)) {
+                courtPlanFile.delete()
+                tmp.renameTo(courtPlanFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
     }
 
     /** I tornei del circolo (sociali e FITP), in un file solo. */
@@ -19504,6 +20077,9 @@ fun payMethodName(s: Strings, m: PayMethod): String = when (m) {
     PayMethod.OTHER -> s.payOther
 }
 
+/** Il nome di un pagamento registrato: quello del modo del circolo, o del tipo. */
+fun paymentName(s: Strings, p: com.tennis.scoremanager.data.Payment): String = p.methodName.ifBlank { payMethodName(s, p.method) }
+
 fun feeKindName(s: Strings, k: FeeKind): String = when (k) {
     FeeKind.MEMBERSHIP -> s.feeKindMembership
     FeeKind.FITP -> s.feeKindFitp
@@ -19675,6 +20251,7 @@ fun AppRoot(c: MatchController) {
                 Screen.CLUB_TOURNAMENTS -> com.tennis.scoremanager.ui.screens.ClubTournamentsScreen(c)
                 Screen.CLUB_TOURNAMENT -> com.tennis.scoremanager.ui.screens.ClubTournamentScreen(c)
                 Screen.NOTICE -> com.tennis.scoremanager.ui.screens.NoticeScreen(c)
+                Screen.COURTS_PLAN -> com.tennis.scoremanager.ui.screens.CourtsPlanScreen(c)
             }
         }
     }
@@ -20614,7 +21191,7 @@ fun OnboardingFlow(c: MatchController, onDone: () -> Unit) {
         c.setRoles(roles)
         if (com.tennis.scoremanager.Role.CLUB in roles) {
             c.storage.clubName = club
-            c.storage.clubCourts = courts.lines()
+            c.setClubCourts(courts.lines())
             if (c.setup.value.club.isBlank() && club.isNotBlank()) c.updateSetup { it.copy(club = club.trim()) }
         }
         c.storage.backupReminder = reminder
@@ -21635,12 +22212,14 @@ fun RolesPicker(selected: Set<Role>, onChange: (Set<Role>) -> Unit) {
 
 /** Il circolo: nome e campi (uno per riga), per Nuova partita, i tornei e i tabelloni. */
 @Composable
-fun ClubFields(name: String, courts: String, onName: (String) -> Unit, onCourts: (String) -> Unit) {
+fun ClubFields(name: String, courts: String, onName: (String) -> Unit, onCourts: (String) -> Unit, courtsHere: Boolean = true) {
     val s = LocalStrings.current
     OutlinedTextField(
         name, { onName(it.take(60)) }, label = { Text(s.clubName) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(capitalization = KeyboardCapitalization.Words),
     )
+    // Con i campi già fatti si cambiano in Campi › I campi (lì rinominarli non stacca le prenotazioni).
+    if (!courtsHere) { Text(s.clubCourtsElsewhere, color = TsmColors.TextDim, fontSize = 12.sp); return }
     OutlinedTextField(courts, { onCourts(it.take(400)) }, label = { Text(s.clubCourtsLabel) }, minLines = 3, modifier = Modifier.fillMaxWidth())
     Text(s.clubCourtsHint, color = TsmColors.TextDim, fontSize = 12.sp)
 }
@@ -21650,14 +22229,15 @@ fun ClubDialog(c: MatchController, onDone: () -> Unit) {
     val s = LocalStrings.current
     var name by remember { mutableStateOf(c.storage.clubName) }
     var courts by remember { mutableStateOf(c.storage.clubCourts.joinToString("\n")) }
+    val hadNone = remember { c.storage.clubCourts.isEmpty() }
     AlertDialog(
         onDismissRequest = onDone,
         title = { Text(s.roleClub) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }) } },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { ClubFields(name, courts, { name = it }, { courts = it }, courtsHere = hadNone) } },
         confirmButton = {
             TextButton(onClick = {
                 c.storage.clubName = name
-                c.storage.clubCourts = courts.lines()
+                if (hadNone) c.setClubCourts(courts.lines())
                 onDone()
             }) { Text(s.ok) }
         },
@@ -23510,6 +24090,109 @@ interface Strings {
     val ntEmailAll: (Int) -> String
     val ntSmsAll: (Int) -> String
     val ntOneByOne: (Int, Int) -> String
+    val planTitle: String
+    val planHint: String
+    val planSettings: String
+    val planDay: String
+    val planToday: String
+    val bkNew: String
+    val bkDuration: String
+    val bkConflict: String
+    val bkAddPlayer: String
+    val bkGuests: String
+    val bkNote: String
+    val bkPrice: String
+    val bkLights: String
+    val bkRepeatNo: String
+    val bkNotify: String
+    val bkDelete: String
+    val bkDeleteAsk: String
+    val bkDeleteOne: String
+    val bkDeleteSeries: String
+    val planOpen: String
+    val planClose: String
+    val planSlot: String
+    val planPrice: String
+    val planPriceLights: String
+    val planLightsFrom: String
+    val planTournamentMinutes: String
+    val bkPlay: String
+    val bkLesson: String
+    val bkClosed: String
+    val bkOther: String
+    val bkTitle: String
+    val planBusy: (Int) -> String
+    val bkSkipped: (String) -> String
+    val bkMinutes: (Int) -> String
+    val bkCharge: (Int) -> String
+    val bkRepeatWeeks: (Int) -> String
+    val bkNotice: (String) -> String
+    val blkTitle: String
+    val blkHint: String
+    val blkNew: String
+    val blkNone: String
+    val blkLabel: String
+    val blkCourse: String
+    val blkTournament: String
+    val blkMaintenance: String
+    val blkAllCourts: String
+    val blkFrom: String
+    val blkTo: String
+    val blkDays: String
+    val blkAllDay: String
+    val blkStart: String
+    val blkEnd: String
+    val blkDelete: String
+    val blkEveryDay: String
+    val crtCovered: String
+    val crtOpen: String
+    val crtHeating: String
+    val crtNoLightsWarn: String
+    val crtTitle: String
+    val crtTapToSet: String
+    val crtClay: String
+    val crtGrass: String
+    val crtHard: String
+    val crtLightsShort: String
+    val crtHeatedShort: String
+    val crtLights: String
+    val crtPricesHint: String
+    val crtHeatingSupplement: String
+    val bkPayWhere: String
+    val bkPayCourt: String
+    val blkBlocked: (String) -> String
+    val blkCell: (String) -> String
+    val blkFromTournament: (String) -> String
+    val crtHeatingPrice: (String) -> String
+    val ntPayCourt: (String) -> String
+    val ntPayHow: String
+    val bkPayOnline: String
+    val payOptionsNone: String
+    val ptTitle: String
+    val ptHint: String
+    val ptNew: String
+    val ptName: String
+    val ptDetails: String
+    val ptOnline: String
+    val ptOnlineHint: String
+    val ptOnlineShort: String
+    val ptAtClub: String
+    val ptDelete: String
+    val crtNew: String
+    val crtName: String
+    val crtDelete: String
+    val crtExists: String
+    val crtPhotos: String
+    val crtPhotosAfter: String
+    val crtPhotoAdd: String
+    val crtPhotoRemove: String
+    val blkShort: String
+    val clubNameHint: String
+    val clubCourtsElsewhere: String
+    val ntPayOnline: (String) -> String
+    val bkPaidWith: (String) -> String
+    val crtDeleteAsk: (String, Int) -> String
+    val crtPhotosCount: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -25054,6 +25737,109 @@ object ItStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "Email a tutti in copia nascosta ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS a tutti ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno per uno ($done su $n)" }
+    override val planTitle = "Planning dei campi"
+    override val planHint = "Prenotazioni, lezioni e chiusure, giorno per giorno; le partite dei tornei ci sono già"
+    override val planSettings = "Orari e prezzi"
+    override val planDay = "Giorno"
+    override val planToday = "Torna a oggi"
+    override val bkNew = "Nuova prenotazione"
+    override val bkDuration = "Durata"
+    override val bkConflict = "Il campo è già occupato in quell'orario."
+    override val bkAddPlayer = "Aggiungi giocatore"
+    override val bkGuests = "Ospiti (nomi separati da virgola)"
+    override val bkNote = "Nota"
+    override val bkPrice = "Prezzo"
+    override val bkLights = "Con le luci"
+    override val bkRepeatNo = "Non si ripete"
+    override val bkNotify = "Avvisa i giocatori"
+    override val bkDelete = "Elimina la prenotazione"
+    override val bkDeleteAsk = "Eliminare la prenotazione? Gli addebiti non pagati si tolgono."
+    override val bkDeleteOne = "Solo questa"
+    override val bkDeleteSeries = "Questa e le prossime della serie"
+    override val planOpen = "Apertura"
+    override val planClose = "Chiusura"
+    override val planSlot = "Durata di una casella"
+    override val planPrice = "Prezzo all'ora"
+    override val planPriceLights = "Prezzo all'ora con le luci"
+    override val planLightsFrom = "Luci dalle"
+    override val planTournamentMinutes = "Durata di una partita di torneo"
+    override val bkPlay = "Gioco"
+    override val bkLesson = "Lezione"
+    override val bkClosed = "Chiuso"
+    override val bkOther = "Altro"
+    override val bkTitle = "Prenotazione"
+    override val planBusy: (Int) -> String = { "${it}h occupato" }
+    override val bkSkipped: (String) -> String = { "Saltate perché il campo era occupato: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} h" else if (it > 60) "${it / 60} h ${it % 60}'" else "$it min" }
+    override val bkCharge: (Int) -> String = { "Addebita ai giocatori (diviso per $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Ogni settimana per $it settimane" }
+    override val bkNotice: (String) -> String = { "Prenotazione: $it" }
+    override val blkTitle = "Campi non prenotabili"
+    override val blkHint = "Per corsi, tornei e manutenzione: in quegli orari non si prenota (le lezioni dei corsi sì, e le partite del torneo si vedono sopra)."
+    override val blkNew = "Nuovo periodo non prenotabile"
+    override val blkNone = "Nessun periodo non prenotabile."
+    override val blkLabel = "Nome (es. Scuola tennis, Torneo sociale)"
+    override val blkCourse = "Corso"
+    override val blkTournament = "Torneo"
+    override val blkMaintenance = "Manutenzione"
+    override val blkAllCourts = "Tutti i campi"
+    override val blkFrom = "Dal"
+    override val blkTo = "Al"
+    override val blkDays = "Giorni"
+    override val blkAllDay = "Tutto il giorno"
+    override val blkStart = "Dalle"
+    override val blkEnd = "Alle"
+    override val blkDelete = "Elimina"
+    override val blkEveryDay = "tutti i giorni"
+    override val crtCovered = "coperto"
+    override val crtOpen = "scoperto"
+    override val crtHeating = "Riscaldamento"
+    override val crtNoLightsWarn = "Questo campo non ha le luci."
+    override val crtTitle = "Campi"
+    override val crtTapToSet = "tocca per impostarlo"
+    override val crtClay = "Terra"
+    override val crtGrass = "Erba"
+    override val crtHard = "Cemento"
+    override val crtLightsShort = "luci"
+    override val crtHeatedShort = "riscaldato"
+    override val crtLights = "Luci"
+    override val crtPricesHint = "Prezzi di questo campo: vuoti = quelli generali."
+    override val crtHeatingSupplement = "Supplemento riscaldamento all'ora"
+    override val bkPayWhere = "Come si paga"
+    override val bkPayCourt = "Al campo"
+    override val blkBlocked: (String) -> String = { "Non prenotabile: $it" }
+    override val blkCell: (String) -> String = { "Non prenotabile\n$it" }
+    override val blkFromTournament: (String) -> String = { "Dal torneo: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it all'ora" }
+    override val ntPayCourt: (String) -> String = { "Si paga al campo: $it a testa." }
+    override val ntPayHow = "Puoi pagare con:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "Nessun modo di pagamento a distanza con link, IBAN o numero: aggiungilo in Quote e pagamenti › Modi di pagamento."
+    override val ptTitle = "Modi di pagamento"
+    override val ptHint = "Quelli che il circolo accetta, scelti da chi lo gestisce: si scelgono quando si registra un pagamento. Quelli a distanza (Satispay, PayPal, Revolut, Bancomat Pay, bonifico, un link SumUp…) con link, IBAN o numero vanno negli avvisi e nei solleciti."
+    override val ptNew = "Nuovo modo di pagamento"
+    override val ptName = "Nome (es. Satispay, PayPal, Bonifico)"
+    override val ptDetails = "Link, IBAN o numero (facoltativo)"
+    override val ptOnline = "Si paga a distanza"
+    override val ptOnlineHint = "Va negli avvisi e nei solleciti, con il link, l'IBAN o il numero."
+    override val ptOnlineShort = "a distanza"
+    override val ptAtClub = "in segreteria"
+    override val ptDelete = "Elimina"
+    override val crtNew = "Nuovo campo"
+    override val crtName = "Nome del campo"
+    override val crtDelete = "Elimina il campo"
+    override val crtExists = "C'è già un campo con questo nome."
+    override val crtPhotos = "Foto"
+    override val crtPhotosAfter = "Le foto si aggiungono dopo aver salvato il campo."
+    override val crtPhotoAdd = "Aggiungi foto"
+    override val crtPhotoRemove = "Togli la foto"
+    override val blkShort = "Non prenotabili"
+    override val clubNameHint = "Il nome del circolo, negli avvisi e sulle ricevute"
+    override val clubCourtsElsewhere = "I campi si creano, si rinominano e si eliminano in Campi › I campi."
+    override val ntPayOnline: (String) -> String = { "Si paga a distanza: $it a testa." }
+    override val bkPaidWith: (String) -> String = { "Pagato: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Eliminare $name?" + if (n > 0) " Si cancellano anche le $n prenotazioni da oggi in poi." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it foto" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -26581,6 +27367,109 @@ object EnStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "Email to all in BCC ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS to all ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "One by one ($done of $n)" }
+    override val planTitle = "Court planner"
+    override val planHint = "Bookings, lessons and closures, day by day; tournament matches are already in"
+    override val planSettings = "Hours and prices"
+    override val planDay = "Day"
+    override val planToday = "Back to today"
+    override val bkNew = "New booking"
+    override val bkDuration = "Duration"
+    override val bkConflict = "The court is already taken at that time."
+    override val bkAddPlayer = "Add player"
+    override val bkGuests = "Guests (names separated by commas)"
+    override val bkNote = "Note"
+    override val bkPrice = "Price"
+    override val bkLights = "With lights"
+    override val bkRepeatNo = "Doesn't repeat"
+    override val bkNotify = "Notify the players"
+    override val bkDelete = "Delete booking"
+    override val bkDeleteAsk = "Delete the booking? Unpaid charges are removed."
+    override val bkDeleteOne = "This one only"
+    override val bkDeleteSeries = "This and the next in the series"
+    override val planOpen = "Opening"
+    override val planClose = "Closing"
+    override val planSlot = "Length of a slot"
+    override val planPrice = "Price per hour"
+    override val planPriceLights = "Price per hour with lights"
+    override val planLightsFrom = "Lights from"
+    override val planTournamentMinutes = "Length of a tournament match"
+    override val bkPlay = "Play"
+    override val bkLesson = "Lesson"
+    override val bkClosed = "Closed"
+    override val bkOther = "Other"
+    override val bkTitle = "Booking"
+    override val planBusy: (Int) -> String = { "${it}h booked" }
+    override val bkSkipped: (String) -> String = { "Skipped because the court was taken: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} hr" else if (it > 60) "${it / 60} hr ${it % 60} mins" else "$it mins" }
+    override val bkCharge: (Int) -> String = { "Charge the players (split by $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Every week for $it weeks" }
+    override val bkNotice: (String) -> String = { "Booking: $it" }
+    override val blkTitle = "Non-bookable courts"
+    override val blkHint = "For courses, tournaments and maintenance: no booking at those times (course lessons yes, and tournament matches show on top)."
+    override val blkNew = "New non-bookable period"
+    override val blkNone = "No non-bookable periods."
+    override val blkLabel = "Name (e.g. Tennis school, Social tournament)"
+    override val blkCourse = "Course"
+    override val blkTournament = "Tournament"
+    override val blkMaintenance = "Maintenance"
+    override val blkAllCourts = "All courts"
+    override val blkFrom = "From"
+    override val blkTo = "To"
+    override val blkDays = "Days"
+    override val blkAllDay = "All day"
+    override val blkStart = "From"
+    override val blkEnd = "Until"
+    override val blkDelete = "Delete"
+    override val blkEveryDay = "every day"
+    override val crtCovered = "indoor"
+    override val crtOpen = "outdoor"
+    override val crtHeating = "Heating"
+    override val crtNoLightsWarn = "This court has no lights."
+    override val crtTitle = "Courts"
+    override val crtTapToSet = "tap to set it up"
+    override val crtClay = "Clay"
+    override val crtGrass = "Grass"
+    override val crtHard = "Hard"
+    override val crtLightsShort = "lights"
+    override val crtHeatedShort = "heated"
+    override val crtLights = "Lights"
+    override val crtPricesHint = "Prices for this court: empty = the general ones."
+    override val crtHeatingSupplement = "Heating supplement per hour"
+    override val bkPayWhere = "How it's paid"
+    override val bkPayCourt = "At the court"
+    override val blkBlocked: (String) -> String = { "Not bookable: $it" }
+    override val blkCell: (String) -> String = { "Not bookable\n$it" }
+    override val blkFromTournament: (String) -> String = { "From the tournament: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it per hour" }
+    override val ntPayCourt: (String) -> String = { "Pay at the court: $it each." }
+    override val ntPayHow = "You can pay with:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "No remote payment method with a link, IBAN or number: add one in Fees and payments › Payment methods."
+    override val ptTitle = "Payment methods"
+    override val ptHint = "The ones the club accepts, chosen by whoever runs it: you pick one when recording a payment. Remote ones (Satispay, PayPal, Revolut, Bancomat Pay, bank transfer, a SumUp link…) with a link, IBAN or number go into notices and reminders."
+    override val ptNew = "New payment method"
+    override val ptName = "Name (e.g. Satispay, PayPal, Bank transfer)"
+    override val ptDetails = "Link, IBAN or number (optional)"
+    override val ptOnline = "Paid remotely"
+    override val ptOnlineHint = "It goes into notices and reminders, with the link, IBAN or number."
+    override val ptOnlineShort = "remote"
+    override val ptAtClub = "at the office"
+    override val ptDelete = "Delete"
+    override val crtNew = "New court"
+    override val crtName = "Court name"
+    override val crtDelete = "Delete the court"
+    override val crtExists = "There is already a court with this name."
+    override val crtPhotos = "Photos"
+    override val crtPhotosAfter = "Photos can be added once the court is saved."
+    override val crtPhotoAdd = "Add photos"
+    override val crtPhotoRemove = "Remove photo"
+    override val blkShort = "Not bookable"
+    override val clubNameHint = "The club's name, in notices and on receipts"
+    override val clubCourtsElsewhere = "Courts are created, renamed and deleted in Courts › Courts."
+    override val ntPayOnline: (String) -> String = { "Pay remotely: $it each." }
+    override val bkPaidWith: (String) -> String = { "Paid: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Delete $name?" + if (n > 0) " The $n bookings from today on are deleted too." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "photo" else "photos"}" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -28131,6 +29020,109 @@ object DeStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "E-Mail an alle in Blindkopie ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS an alle ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Einzeln ($done von $n)" }
+    override val planTitle = "Platzbelegung"
+    override val planHint = "Buchungen, Stunden und Sperrungen, Tag für Tag; Turniermatches sind schon drin"
+    override val planSettings = "Zeiten und Preise"
+    override val planDay = "Tag"
+    override val planToday = "Zurück zu heute"
+    override val bkNew = "Neue Buchung"
+    override val bkDuration = "Dauer"
+    override val bkConflict = "Der Platz ist zu dieser Zeit schon belegt."
+    override val bkAddPlayer = "Spieler hinzufügen"
+    override val bkGuests = "Gäste (Namen mit Komma getrennt)"
+    override val bkNote = "Notiz"
+    override val bkPrice = "Preis"
+    override val bkLights = "Mit Licht"
+    override val bkRepeatNo = "Wiederholt sich nicht"
+    override val bkNotify = "Spieler benachrichtigen"
+    override val bkDelete = "Buchung löschen"
+    override val bkDeleteAsk = "Buchung löschen? Unbezahlte Forderungen werden entfernt."
+    override val bkDeleteOne = "Nur diese"
+    override val bkDeleteSeries = "Diese und die nächsten der Serie"
+    override val planOpen = "Öffnung"
+    override val planClose = "Schließung"
+    override val planSlot = "Länge eines Feldes"
+    override val planPrice = "Preis pro Stunde"
+    override val planPriceLights = "Preis pro Stunde mit Licht"
+    override val planLightsFrom = "Licht ab"
+    override val planTournamentMinutes = "Dauer eines Turniermatches"
+    override val bkPlay = "Spiel"
+    override val bkLesson = "Stunde"
+    override val bkClosed = "Gesperrt"
+    override val bkOther = "Sonstiges"
+    override val bkTitle = "Buchung"
+    override val planBusy: (Int) -> String = { "${it} Std. belegt" }
+    override val bkSkipped: (String) -> String = { "Übersprungen, weil der Platz belegt war: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} Std." else if (it > 60) "${it / 60} Std. ${it % 60}" else "$it Min." }
+    override val bkCharge: (Int) -> String = { "Den Spielern berechnen (geteilt durch $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Jede Woche, $it Wochen lang" }
+    override val bkNotice: (String) -> String = { "Buchung: $it" }
+    override val blkTitle = "Nicht buchbare Plätze"
+    override val blkHint = "Für Kurse, Turniere und Pflege: zu diesen Zeiten keine Buchungen (Kursstunden schon, und Turniermatches erscheinen darüber)."
+    override val blkNew = "Neuer nicht buchbarer Zeitraum"
+    override val blkNone = "Keine nicht buchbaren Zeiträume."
+    override val blkLabel = "Name (z. B. Tennisschule, Vereinsturnier)"
+    override val blkCourse = "Kurs"
+    override val blkTournament = "Turnier"
+    override val blkMaintenance = "Platzpflege"
+    override val blkAllCourts = "Alle Plätze"
+    override val blkFrom = "Vom"
+    override val blkTo = "Bis"
+    override val blkDays = "Tage"
+    override val blkAllDay = "Ganzer Tag"
+    override val blkStart = "Von"
+    override val blkEnd = "Bis"
+    override val blkDelete = "Löschen"
+    override val blkEveryDay = "jeden Tag"
+    override val crtCovered = "Halle"
+    override val crtOpen = "Freiplatz"
+    override val crtHeating = "Heizung"
+    override val crtNoLightsWarn = "Dieser Platz hat kein Licht."
+    override val crtTitle = "Plätze"
+    override val crtTapToSet = "antippen zum Einrichten"
+    override val crtClay = "Sand"
+    override val crtGrass = "Rasen"
+    override val crtHard = "Hartplatz"
+    override val crtLightsShort = "Licht"
+    override val crtHeatedShort = "beheizt"
+    override val crtLights = "Licht"
+    override val crtPricesHint = "Preise dieses Platzes: leer = die allgemeinen."
+    override val crtHeatingSupplement = "Heizungszuschlag pro Stunde"
+    override val bkPayWhere = "Wie bezahlt wird"
+    override val bkPayCourt = "Am Platz"
+    override val blkBlocked: (String) -> String = { "Nicht buchbar: $it" }
+    override val blkCell: (String) -> String = { "Nicht buchbar\n$it" }
+    override val blkFromTournament: (String) -> String = { "Vom Turnier: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it pro Stunde" }
+    override val ntPayCourt: (String) -> String = { "Bezahlt wird am Platz: $it pro Person." }
+    override val ntPayHow = "Du kannst bezahlen mit:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "Keine Fernzahlung mit Link, IBAN oder Nummer: unter Beiträge und Zahlungen › Zahlungsarten hinzufügen."
+    override val ptTitle = "Zahlungsarten"
+    override val ptHint = "Die der Verein annimmt, festgelegt von der Verwaltung: man wählt eine beim Erfassen einer Zahlung. Fernzahlungen (Satispay, PayPal, Revolut, Bancomat Pay, Überweisung, ein SumUp-Link…) mit Link, IBAN oder Nummer stehen in Nachrichten und Erinnerungen."
+    override val ptNew = "Neue Zahlungsart"
+    override val ptName = "Name (z. B. Satispay, PayPal, Überweisung)"
+    override val ptDetails = "Link, IBAN oder Nummer (optional)"
+    override val ptOnline = "Fernzahlung"
+    override val ptOnlineHint = "Steht in Nachrichten und Erinnerungen, mit Link, IBAN oder Nummer."
+    override val ptOnlineShort = "aus der Ferne"
+    override val ptAtClub = "in der Geschäftsstelle"
+    override val ptDelete = "Löschen"
+    override val crtNew = "Neuer Platz"
+    override val crtName = "Name des Platzes"
+    override val crtDelete = "Platz löschen"
+    override val crtExists = "Es gibt schon einen Platz mit diesem Namen."
+    override val crtPhotos = "Fotos"
+    override val crtPhotosAfter = "Fotos lassen sich hinzufügen, wenn der Platz gespeichert ist."
+    override val crtPhotoAdd = "Fotos hinzufügen"
+    override val crtPhotoRemove = "Foto entfernen"
+    override val blkShort = "Nicht buchbar"
+    override val clubNameHint = "Der Name des Vereins, in Nachrichten und auf Quittungen"
+    override val clubCourtsElsewhere = "Plätze werden unter Plätze › Plätze angelegt, umbenannt und gelöscht."
+    override val ntPayOnline: (String) -> String = { "Bezahlt wird aus der Ferne: $it pro Person." }
+    override val bkPaidWith: (String) -> String = { "Bezahlt: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "$name löschen?" + if (n > 0) " Auch die $n Buchungen ab heute werden gelöscht." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "Foto" else "Fotos"}" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -29674,6 +30666,109 @@ object EsStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "Correo a todos con copia oculta ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS a todos ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno a uno ($done de $n)" }
+    override val planTitle = "Planning de pistas"
+    override val planHint = "Reservas, clases y cierres, día a día; los partidos de los torneos ya están"
+    override val planSettings = "Horarios y precios"
+    override val planDay = "Día"
+    override val planToday = "Volver a hoy"
+    override val bkNew = "Nueva reserva"
+    override val bkDuration = "Duración"
+    override val bkConflict = "La pista ya está ocupada a esa hora."
+    override val bkAddPlayer = "Añadir jugador"
+    override val bkGuests = "Invitados (nombres separados por comas)"
+    override val bkNote = "Nota"
+    override val bkPrice = "Precio"
+    override val bkLights = "Con luz"
+    override val bkRepeatNo = "No se repite"
+    override val bkNotify = "Avisar a los jugadores"
+    override val bkDelete = "Eliminar la reserva"
+    override val bkDeleteAsk = "¿Eliminar la reserva? Los cargos sin pagar se quitan."
+    override val bkDeleteOne = "Solo esta"
+    override val bkDeleteSeries = "Esta y las siguientes de la serie"
+    override val planOpen = "Apertura"
+    override val planClose = "Cierre"
+    override val planSlot = "Duración de una casilla"
+    override val planPrice = "Precio por hora"
+    override val planPriceLights = "Precio por hora con luz"
+    override val planLightsFrom = "Luz desde las"
+    override val planTournamentMinutes = "Duración de un partido de torneo"
+    override val bkPlay = "Juego"
+    override val bkLesson = "Clase"
+    override val bkClosed = "Cerrada"
+    override val bkOther = "Otro"
+    override val bkTitle = "Reserva"
+    override val planBusy: (Int) -> String = { "${it}h ocupada" }
+    override val bkSkipped: (String) -> String = { "Saltadas porque la pista estaba ocupada: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} h" else if (it > 60) "${it / 60} h ${it % 60}'" else "$it min" }
+    override val bkCharge: (Int) -> String = { "Cargar a los jugadores (dividido entre $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Cada semana durante $it semanas" }
+    override val bkNotice: (String) -> String = { "Reserva: $it" }
+    override val blkTitle = "Pistas no reservables"
+    override val blkHint = "Para cursos, torneos y mantenimiento: en esas horas no se reserva (las clases de los cursos sí, y los partidos del torneo se ven encima)."
+    override val blkNew = "Nuevo periodo no reservable"
+    override val blkNone = "Ningún periodo no reservable."
+    override val blkLabel = "Nombre (p. ej. Escuela de tenis, Torneo social)"
+    override val blkCourse = "Curso"
+    override val blkTournament = "Torneo"
+    override val blkMaintenance = "Mantenimiento"
+    override val blkAllCourts = "Todas las pistas"
+    override val blkFrom = "Desde"
+    override val blkTo = "Hasta"
+    override val blkDays = "Días"
+    override val blkAllDay = "Todo el día"
+    override val blkStart = "De"
+    override val blkEnd = "A"
+    override val blkDelete = "Eliminar"
+    override val blkEveryDay = "todos los días"
+    override val crtCovered = "cubierta"
+    override val crtOpen = "descubierta"
+    override val crtHeating = "Calefacción"
+    override val crtNoLightsWarn = "Esta pista no tiene luz."
+    override val crtTitle = "Pistas"
+    override val crtTapToSet = "toca para configurarla"
+    override val crtClay = "Tierra batida"
+    override val crtGrass = "Hierba"
+    override val crtHard = "Cemento"
+    override val crtLightsShort = "luz"
+    override val crtHeatedShort = "climatizada"
+    override val crtLights = "Luz"
+    override val crtPricesHint = "Precios de esta pista: vacíos = los generales."
+    override val crtHeatingSupplement = "Suplemento de calefacción por hora"
+    override val bkPayWhere = "Cómo se paga"
+    override val bkPayCourt = "En la pista"
+    override val blkBlocked: (String) -> String = { "No reservable: $it" }
+    override val blkCell: (String) -> String = { "No reservable\n$it" }
+    override val blkFromTournament: (String) -> String = { "Del torneo: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it por hora" }
+    override val ntPayCourt: (String) -> String = { "Se paga en la pista: $it por persona." }
+    override val ntPayHow = "Puedes pagar con:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "Ningún medio de pago a distancia con enlace, IBAN o número: añádelo en Cuotas y pagos › Medios de pago."
+    override val ptTitle = "Medios de pago"
+    override val ptHint = "Los que acepta el club, elegidos por quien lo gestiona: se elige uno al registrar un pago. Los de pago a distancia (Satispay, PayPal, Revolut, Bancomat Pay, transferencia, un enlace SumUp…) con enlace, IBAN o número van en los avisos y recordatorios."
+    override val ptNew = "Nuevo medio de pago"
+    override val ptName = "Nombre (p. ej. Satispay, PayPal, Transferencia)"
+    override val ptDetails = "Enlace, IBAN o número (opcional)"
+    override val ptOnline = "Se paga a distancia"
+    override val ptOnlineHint = "Va en los avisos y recordatorios, con el enlace, el IBAN o el número."
+    override val ptOnlineShort = "a distancia"
+    override val ptAtClub = "en secretaría"
+    override val ptDelete = "Eliminar"
+    override val crtNew = "Nueva pista"
+    override val crtName = "Nombre de la pista"
+    override val crtDelete = "Eliminar la pista"
+    override val crtExists = "Ya hay una pista con este nombre."
+    override val crtPhotos = "Fotos"
+    override val crtPhotosAfter = "Las fotos se añaden después de guardar la pista."
+    override val crtPhotoAdd = "Añadir fotos"
+    override val crtPhotoRemove = "Quitar la foto"
+    override val blkShort = "No reservables"
+    override val clubNameHint = "El nombre del club, en los avisos y en los recibos"
+    override val clubCourtsElsewhere = "Las pistas se crean, se renombran y se eliminan en Pistas › Pistas."
+    override val ntPayOnline: (String) -> String = { "Se paga a distancia: $it por persona." }
+    override val bkPaidWith: (String) -> String = { "Pagado: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "¿Eliminar $name?" + if (n > 0) " También se borran las $n reservas desde hoy." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -31219,6 +32314,109 @@ object FrStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "E-mail à tous en copie cachée ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS à tous ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Un par un ($done sur $n)" }
+    override val planTitle = "Planning des terrains"
+    override val planHint = "Réservations, leçons et fermetures, jour par jour ; les matchs des tournois y sont déjà"
+    override val planSettings = "Horaires et tarifs"
+    override val planDay = "Jour"
+    override val planToday = "Revenir à aujourd'hui"
+    override val bkNew = "Nouvelle réservation"
+    override val bkDuration = "Durée"
+    override val bkConflict = "Le terrain est déjà pris à cette heure-là."
+    override val bkAddPlayer = "Ajouter un joueur"
+    override val bkGuests = "Invités (noms séparés par des virgules)"
+    override val bkNote = "Remarque"
+    override val bkPrice = "Tarif"
+    override val bkLights = "Avec éclairage"
+    override val bkRepeatNo = "Ne se répète pas"
+    override val bkNotify = "Prévenir les joueurs"
+    override val bkDelete = "Supprimer la réservation"
+    override val bkDeleteAsk = "Supprimer la réservation ? Les facturations non payées sont retirées."
+    override val bkDeleteOne = "Seulement celle-ci"
+    override val bkDeleteSeries = "Celle-ci et les suivantes de la série"
+    override val planOpen = "Ouverture"
+    override val planClose = "Fermeture"
+    override val planSlot = "Durée d'une case"
+    override val planPrice = "Tarif horaire"
+    override val planPriceLights = "Tarif horaire avec éclairage"
+    override val planLightsFrom = "Éclairage à partir de"
+    override val planTournamentMinutes = "Durée d'un match de tournoi"
+    override val bkPlay = "Jeu"
+    override val bkLesson = "Leçon"
+    override val bkClosed = "Fermé"
+    override val bkOther = "Autre"
+    override val bkTitle = "Réservation"
+    override val planBusy: (Int) -> String = { "${it}h occupé" }
+    override val bkSkipped: (String) -> String = { "Sautées car le terrain était pris : $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} h" else if (it > 60) "${it / 60} h ${it % 60}" else "$it min" }
+    override val bkCharge: (Int) -> String = { "Facturer aux joueurs (divisé par $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Chaque semaine pendant $it semaines" }
+    override val bkNotice: (String) -> String = { "Réservation : $it" }
+    override val blkTitle = "Terrains non réservables"
+    override val blkHint = "Pour les cours, tournois et l'entretien : pas de réservation à ces heures-là (les leçons des cours si, et les matchs du tournoi s'affichent par-dessus)."
+    override val blkNew = "Nouvelle période non réservable"
+    override val blkNone = "Aucune période non réservable."
+    override val blkLabel = "Nom (ex. École de tennis, Tournoi interne)"
+    override val blkCourse = "Cours"
+    override val blkTournament = "Tournoi"
+    override val blkMaintenance = "Entretien"
+    override val blkAllCourts = "Tous les terrains"
+    override val blkFrom = "Du"
+    override val blkTo = "Au"
+    override val blkDays = "Jours"
+    override val blkAllDay = "Toute la journée"
+    override val blkStart = "De"
+    override val blkEnd = "À"
+    override val blkDelete = "Supprimer"
+    override val blkEveryDay = "tous les jours"
+    override val crtCovered = "couvert"
+    override val crtOpen = "extérieur"
+    override val crtHeating = "Chauffage"
+    override val crtNoLightsWarn = "Ce terrain n'a pas d'éclairage."
+    override val crtTitle = "Terrains"
+    override val crtTapToSet = "touchez pour le configurer"
+    override val crtClay = "Terre battue"
+    override val crtGrass = "Gazon"
+    override val crtHard = "Dur"
+    override val crtLightsShort = "éclairage"
+    override val crtHeatedShort = "chauffé"
+    override val crtLights = "Éclairage"
+    override val crtPricesHint = "Tarifs de ce terrain : vides = les tarifs généraux."
+    override val crtHeatingSupplement = "Supplément chauffage par heure"
+    override val bkPayWhere = "Comment on paie"
+    override val bkPayCourt = "Au terrain"
+    override val blkBlocked: (String) -> String = { "Non réservable : $it" }
+    override val blkCell: (String) -> String = { "Non réservable\n$it" }
+    override val blkFromTournament: (String) -> String = { "Depuis le tournoi : $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it de l'heure" }
+    override val ntPayCourt: (String) -> String = { "Paiement au terrain : $it par personne." }
+    override val ntPayHow = "Vous pouvez payer avec :"
+    override val bkPayOnline = "En ligne"
+    override val payOptionsNone = "Aucun moyen de paiement à distance avec lien, IBAN ou numéro : ajoutez-en un dans Cotisations et paiements › Moyens de paiement."
+    override val ptTitle = "Moyens de paiement"
+    override val ptHint = "Ceux que le club accepte, choisis par qui le gère : on en choisit un en enregistrant un paiement. Ceux à distance (Satispay, PayPal, Revolut, Bancomat Pay, virement, un lien SumUp…) avec lien, IBAN ou numéro figurent dans les avis et les relances."
+    override val ptNew = "Nouveau moyen de paiement"
+    override val ptName = "Nom (ex. Satispay, PayPal, Virement)"
+    override val ptDetails = "Lien, IBAN ou numéro (facultatif)"
+    override val ptOnline = "Paiement à distance"
+    override val ptOnlineHint = "Il figure dans les avis et les relances, avec le lien, l'IBAN ou le numéro."
+    override val ptOnlineShort = "à distance"
+    override val ptAtClub = "au secrétariat"
+    override val ptDelete = "Supprimer"
+    override val crtNew = "Nouveau terrain"
+    override val crtName = "Nom du terrain"
+    override val crtDelete = "Supprimer le terrain"
+    override val crtExists = "Il y a déjà un terrain avec ce nom."
+    override val crtPhotos = "Photos du terrain"
+    override val crtPhotosAfter = "Les photos s'ajoutent une fois le terrain enregistré."
+    override val crtPhotoAdd = "Ajouter des photos"
+    override val crtPhotoRemove = "Retirer la photo"
+    override val blkShort = "Non réservables"
+    override val clubNameHint = "Le nom du club, dans les avis et sur les reçus"
+    override val clubCourtsElsewhere = "Les terrains se créent, se renomment et se suppriment dans Terrains › Terrains."
+    override val ntPayOnline: (String) -> String = { "Paiement à distance : $it par personne." }
+    override val bkPaidWith: (String) -> String = { "Payé : $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Supprimer $name ?" + if (n > 0) " Les $n réservations à partir d'aujourd'hui sont aussi effacées." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it image${if (it == 1) "" else "s"}" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -32765,6 +33963,109 @@ object PtStrings : Strings {
     override val ntEmailAll: (Int) -> String = { "E-mail a todos com cópia oculta ($it)" }
     override val ntSmsAll: (Int) -> String = { "SMS a todos ($it)" }
     override val ntOneByOne: (Int, Int) -> String = { done, n -> "Um por um ($done de $n)" }
+    override val planTitle = "Agenda das quadras"
+    override val planHint = "Reservas, aulas e fechamentos, dia a dia; as partidas dos torneios já estão"
+    override val planSettings = "Horários e preços"
+    override val planDay = "Dia"
+    override val planToday = "Voltar para hoje"
+    override val bkNew = "Nova reserva"
+    override val bkDuration = "Duração"
+    override val bkConflict = "A quadra já está ocupada nesse horário."
+    override val bkAddPlayer = "Adicionar jogador"
+    override val bkGuests = "Convidados (nomes separados por vírgula)"
+    override val bkNote = "Nota"
+    override val bkPrice = "Preço"
+    override val bkLights = "Com iluminação"
+    override val bkRepeatNo = "Não se repete"
+    override val bkNotify = "Avisar os jogadores"
+    override val bkDelete = "Excluir a reserva"
+    override val bkDeleteAsk = "Excluir a reserva? As cobranças não pagas são removidas."
+    override val bkDeleteOne = "Só esta"
+    override val bkDeleteSeries = "Esta e as próximas da série"
+    override val planOpen = "Abertura"
+    override val planClose = "Fechamento"
+    override val planSlot = "Duração de um horário"
+    override val planPrice = "Preço por hora"
+    override val planPriceLights = "Preço por hora com iluminação"
+    override val planLightsFrom = "Iluminação a partir das"
+    override val planTournamentMinutes = "Duração de uma partida de torneio"
+    override val bkPlay = "Jogo"
+    override val bkLesson = "Aula"
+    override val bkClosed = "Fechada"
+    override val bkOther = "Outro"
+    override val bkTitle = "Reserva"
+    override val planBusy: (Int) -> String = { "${it}h ocupada" }
+    override val bkSkipped: (String) -> String = { "Puladas porque a quadra estava ocupada: $it" }
+    override val bkMinutes: (Int) -> String = { if (it % 60 == 0) "${it / 60} h" else if (it > 60) "${it / 60} h ${it % 60}'" else "$it min" }
+    override val bkCharge: (Int) -> String = { "Cobrar dos jogadores (dividido por $it)" }
+    override val bkRepeatWeeks: (Int) -> String = { "Toda semana por $it semanas" }
+    override val bkNotice: (String) -> String = { "Reserva: $it" }
+    override val blkTitle = "Quadras não reserváveis"
+    override val blkHint = "Para cursos, torneios e manutenção: nesses horários não se reserva (as aulas dos cursos sim, e as partidas do torneio aparecem por cima)."
+    override val blkNew = "Novo período não reservável"
+    override val blkNone = "Nenhum período não reservável."
+    override val blkLabel = "Nome (ex. Escola de tênis, Torneio social)"
+    override val blkCourse = "Curso"
+    override val blkTournament = "Torneio"
+    override val blkMaintenance = "Manutenção"
+    override val blkAllCourts = "Todas as quadras"
+    override val blkFrom = "De"
+    override val blkTo = "Até"
+    override val blkDays = "Dias"
+    override val blkAllDay = "O dia todo"
+    override val blkStart = "Das"
+    override val blkEnd = "Às"
+    override val blkDelete = "Excluir"
+    override val blkEveryDay = "todos os dias"
+    override val crtCovered = "coberta"
+    override val crtOpen = "descoberta"
+    override val crtHeating = "Aquecimento"
+    override val crtNoLightsWarn = "Esta quadra não tem iluminação."
+    override val crtTitle = "Quadras"
+    override val crtTapToSet = "toque para configurar"
+    override val crtClay = "Saibro"
+    override val crtGrass = "Grama"
+    override val crtHard = "Rápida"
+    override val crtLightsShort = "iluminação"
+    override val crtHeatedShort = "aquecida"
+    override val crtLights = "Iluminação"
+    override val crtPricesHint = "Preços desta quadra: vazios = os gerais."
+    override val crtHeatingSupplement = "Adicional de aquecimento por hora"
+    override val bkPayWhere = "Como se paga"
+    override val bkPayCourt = "Na quadra"
+    override val blkBlocked: (String) -> String = { "Não reservável: $it" }
+    override val blkCell: (String) -> String = { "Não reservável\n$it" }
+    override val blkFromTournament: (String) -> String = { "Do torneio: $it" }
+    override val crtHeatingPrice: (String) -> String = { "+$it por hora" }
+    override val ntPayCourt: (String) -> String = { "Paga-se na quadra: $it por pessoa." }
+    override val ntPayHow = "Você pode pagar com:"
+    override val bkPayOnline = "Online"
+    override val payOptionsNone = "Nenhum meio de pagamento a distância com link, IBAN ou número: adicione em Mensalidades e pagamentos › Meios de pagamento."
+    override val ptTitle = "Meios de pagamento"
+    override val ptHint = "Os que o clube aceita, escolhidos por quem o administra: escolhe-se um ao registrar um pagamento. Os a distância (Satispay, PayPal, Revolut, Bancomat Pay, transferência, um link SumUp…) com link, IBAN ou número vão nos avisos e lembretes."
+    override val ptNew = "Novo meio de pagamento"
+    override val ptName = "Nome (ex. Satispay, PayPal, Transferência)"
+    override val ptDetails = "Link, IBAN ou número (opcional)"
+    override val ptOnline = "Paga-se a distância"
+    override val ptOnlineHint = "Vai nos avisos e lembretes, com o link, o IBAN ou o número."
+    override val ptOnlineShort = "a distância"
+    override val ptAtClub = "na secretaria"
+    override val ptDelete = "Excluir"
+    override val crtNew = "Nova quadra"
+    override val crtName = "Nome da quadra"
+    override val crtDelete = "Excluir a quadra"
+    override val crtExists = "Já existe uma quadra com este nome."
+    override val crtPhotos = "Fotos"
+    override val crtPhotosAfter = "As fotos se adicionam depois de salvar a quadra."
+    override val crtPhotoAdd = "Adicionar fotos"
+    override val crtPhotoRemove = "Tirar a foto"
+    override val blkShort = "Não reserváveis"
+    override val clubNameHint = "O nome do clube, nos avisos e nos recibos"
+    override val clubCourtsElsewhere = "As quadras se criam, renomeiam e excluem em Quadras › Quadras."
+    override val ntPayOnline: (String) -> String = { "Paga-se a distância: $it por pessoa." }
+    override val bkPaidWith: (String) -> String = { "Pago: $it" }
+    override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Excluir $name?" + if (n > 0) " As $n reservas a partir de hoje também são apagadas." else "" }
+    override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -33925,6 +35226,677 @@ private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone:
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/CourtsPlanScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/CourtsPlanScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.TimePickerDialog
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Euro
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.BookingKind
+import com.tennis.scoremanager.data.CourtBooking
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.Occupied
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Players
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerEditDialog
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.ctRoundName
+import java.util.Calendar
+
+private const val CELL_W = 118
+private const val CELL_H = 54
+private const val TIME_W = 52
+
+fun bookingKindName(s: Strings, k: BookingKind): String = when (k) {
+    BookingKind.PLAY -> s.bkPlay
+    BookingKind.LESSON -> s.bkLesson
+    BookingKind.CLOSED -> s.bkClosed
+    BookingKind.OTHER -> s.bkOther
+}
+
+private fun kindColor(o: Occupied): Color = when {
+    o.block != null -> TsmColors.Outline.copy(alpha = 0.55f)
+    o.match != null -> TsmColors.Player1.copy(alpha = 0.35f)
+    o.booking?.kind == BookingKind.LESSON -> TsmColors.Cyan.copy(alpha = 0.35f)
+    o.booking?.kind == BookingKind.CLOSED -> TsmColors.Danger.copy(alpha = 0.3f)
+    o.booking?.kind == BookingKind.OTHER -> TsmColors.Outline
+    else -> TsmColors.Ball.copy(alpha = 0.3f)
+}
+
+/** Chi c'è in una casella: i giocatori, o la partita del torneo, o il motivo della chiusura. */
+private fun occupiedLabel(c: MatchController, s: Strings, o: Occupied): String {
+    o.match?.let { m ->
+        val t = o.tournament!!
+        fun n(id: String?) = t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> c.playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString("/") } ?: "—"
+        return "${t.name} · ${ctRoundName(s, t, m)}\n${n(m.a)} – ${n(m.b)}"
+    }
+    o.block?.let { k -> return s.blkCell(k.label.ifBlank { blockReasonName(s, k.reason) }) }
+    val b = o.booking ?: return ""
+    val who = (b.players.mapNotNull { c.playerById(it)?.name } + b.names).joinToString(" · ")
+    return listOf(if (b.kind == BookingKind.PLAY) "" else bookingKindName(s, b.kind), who, b.note).filter { it.isNotBlank() }.joinToString("\n")
+}
+
+/**
+ * Circolo › Campi › Planning: il giorno, un campo per colonna e un'ora per riga. Si tocca una casella libera per
+ * prenotare, una prenotazione per cambiarla; le partite dei tornei con campo e orario ci sono già.
+ */
+@Composable
+fun CourtsPlanScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    BackHandler { c.back() }
+    val plan by c.courtPlan.collectAsState()
+    val tournaments by c.clubTournaments.collectAsState()
+    val lang = c.options.value.lang
+    val courts by c.clubCourts.collectAsState()
+    var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
+    var editing by remember { mutableStateOf<CourtBooking?>(null) }
+    var settings by remember { mutableStateOf(false) }
+    var blocks by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
+    var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
+    val occ = CourtPlans.occupied(plan, tournaments, day)
+    val slots = CourtPlans.slots(day, plan.settings)
+    val stepMs = plan.settings.slotMinutes * 60_000L
+    ScreenScaffold(
+        title = s.planTitle,
+        subtitle = com.tennis.scoremanager.data.Notices.day(day, lang),
+        icon = Icons.Filled.CalendarMonth,
+        action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.planSettings, tint = TsmColors.Ball) } },
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        // Il giorno: indietro, oggi, il calendario, avanti.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { day = CourtPlans.addDays(day, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
+            DateButton(s.planDay, day, lang) { day = CourtPlans.dayStart(it) }
+            IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
+        }
+        if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
+            GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
+        }
+        // Quanto è libero ogni campo, a colpo d'occhio.
+        Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
+        Column(Modifier.horizontalScroll(rememberScrollState())) {
+            Row {
+                Box(Modifier.width(TIME_W.dp))
+                for (ct in courts) Column(Modifier.width(CELL_W.dp).padding(horizontal = 4.dp, vertical = 6.dp)) {
+                    Text(ct, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(courtTraits(s, plan.settings.info(ct)), color = TsmColors.TextDim, fontSize = 11.sp, maxLines = 2, lineHeight = 13.sp)
+                }
+            }
+            for (slot in slots) {
+                Row {
+                    Text(Reports.time(slot, lang), color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.width(TIME_W.dp).padding(top = 4.dp))
+                    for (ct in courts) {
+                        val o = occ.firstOrNull { it.block == null && it.court == ct && it.start < slot + stepMs && it.end > slot }
+                            ?: occ.firstOrNull { CourtPlans.blockCovers(it, ct) && it.start < slot + stepMs && it.end > slot }
+                        val starts = o != null && (o.start >= slot || slot == slots.first())
+                        Box(
+                            Modifier.width(CELL_W.dp).height(CELL_H.dp).padding(1.dp).clip(RoundedCornerShape(6.dp))
+                                .background(o?.let(::kindColor) ?: TsmColors.Surface)
+                                .border(1.dp, TsmColors.Outline.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                                .clickable {
+                                    when {
+                                        o?.booking != null -> editing = o.booking
+                                        o?.tournament != null -> c.openClubTournament(o.tournament.id)
+                                        // Nel blocco di un corso si mettono le sue lezioni; gli altri blocchi si aprono per cambiarli.
+                                        o?.block?.reason == com.tennis.scoremanager.data.BlockReason.COURSE ->
+                                            editing = CourtBooking(CourtPlans.newId("b"), ct, slot, plan.settings.slotMinutes, BookingKind.LESSON, note = o.block.label)
+                                        o?.block != null -> editBlock = o.block
+                                        else -> editing = CourtBooking(CourtPlans.newId("b"), ct, slot, plan.settings.slotMinutes)
+                                    }
+                                }.padding(4.dp),
+                        ) {
+                            if (o == null) Icon(Icons.Filled.Add, null, tint = TsmColors.Outline, modifier = Modifier.align(Alignment.Center))
+                            else if (starts) Text(occupiedLabel(c, s, o), color = TsmColors.TextMain, fontSize = 11.sp, maxLines = 3, overflow = TextOverflow.Ellipsis, lineHeight = 13.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    editing?.let { b ->
+        BookingDialog(c, b, isNew = plan.bookings.none { it.id == b.id }) { skipped ->
+            editing = null
+            if (!skipped.isNullOrEmpty()) Toast.makeText(context, s.bkSkipped(skipped.joinToString(", ") { shortDate(it, lang) }), Toast.LENGTH_LONG).show()
+        }
+    }
+    if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
+    if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
+    editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
+}
+
+/** Prenotazione nuova o da cambiare. [onDone] riceve le date saltate di una ripetizione (null = annullata). */
+@Composable
+private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, onDone: (List<Long>?) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val plan by c.courtPlan.collectAsState()
+    val tournaments by c.clubTournaments.collectAsState()
+    val courts = c.storage.clubCourts
+    var b by remember { mutableStateOf(b0) }
+    var weeks by remember { mutableStateOf(1) }
+    var guests by remember { mutableStateOf(b0.names.joinToString(", ")) }
+    var priceText by remember { mutableStateOf(if (isNew) "" else plain(b0.cents, lang)) }
+    var manualPrice by remember { mutableStateOf(!isNew) }
+    var charge by remember { mutableStateOf(b0.charges.isNotEmpty() || isNew) }
+    var picking by remember { mutableStateOf(false) }
+    var askDelete by remember { mutableStateOf(false) }
+    val info = plan.settings.info(b.court)
+    val autoPrice = CourtPlans.price(plan.settings, b.start, b.minutes, b.kind, b.court, b.heating)
+    // Il prezzo calcolato finché non lo si scrive a mano (una prenotazione salvata tiene il suo).
+    val cents = if (manualPrice) Fees.parse(priceText) ?: 0 else autoPrice
+    val conflicts = CourtPlans.conflicts(plan, tournaments, b.court, b.start, b.end, except = b.id)
+    val blocked = CourtPlans.blockedBy(plan, b.court, b.start, b.end, b.kind)
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (isNew) s.bkNew else c.bookingLabel(b0)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (courts.size > 1) Segmented(courts.map { SegOption(it) }, courts.indexOf(b.court), { b = b.copy(court = courts[it]) }, columns = minOf(3, courts.size))
+                DateButton(s.planDay, b.start, lang) { d ->
+                    val old = Calendar.getInstance().apply { timeInMillis = b.start }
+                    b = b.copy(start = CourtPlans.at(d, old.get(Calendar.HOUR_OF_DAY), old.get(Calendar.MINUTE)))
+                }
+                GhostButton("${s.ctTime}: ${Reports.time(b.start, lang)} – ${Reports.time(b.end, lang)}", Icons.Filled.Schedule, {
+                    val cal = Calendar.getInstance().apply { timeInMillis = b.start }
+                    TimePickerDialog(context, { _, h, m -> b = b.copy(start = CourtPlans.at(b.start, h, m)) }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+                }, Modifier.fillMaxWidth())
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.bkDuration, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { b = b.copy(minutes = (b.minutes - 30).coerceAtLeast(30)) }) { Icon(Icons.Filled.Remove, null) }
+                    Text(s.bkMinutes(b.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    IconButton(onClick = { b = b.copy(minutes = (b.minutes + 30).coerceAtMost(600)) }) { Icon(Icons.Filled.Add, null) }
+                }
+                val kinds = BookingKind.entries
+                Segmented(kinds.map { SegOption(bookingKindName(s, it)) }, kinds.indexOf(b.kind), { b = b.copy(kind = kinds[it]) }, columns = 2)
+                if (conflicts.isNotEmpty()) Text(s.bkConflict, color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                for (k in blocked) Text(s.blkBlocked(k.label.ifBlank { blockReasonName(s, k.reason) }), color = TsmColors.Danger, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                if (b.kind != BookingKind.CLOSED) {
+                    // Chi gioca: dal database (si possono addebitare) e ospiti scritti a mano.
+                    for (id in b.players) c.playerById(id)?.let { p ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(p.name, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                            IconButton(onClick = { b = b.copy(players = b.players - id) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                        }
+                    }
+                    if (b.players.size < 4) GhostButton(s.bkAddPlayer, Icons.Filled.PersonAdd, { picking = true }, Modifier.fillMaxWidth())
+                    OutlinedTextField(guests, { guests = it.take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkGuests) })
+                }
+                OutlinedTextField(b.note, { b = b.copy(note = it.take(80)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.bkNote) })
+                if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) {
+                    if (info.heating) SwitchRow(Icons.Filled.Thermostat, s.crtHeating, info.heatingCentsPerHour.takeIf { it > 0 }?.let { s.crtHeatingPrice(Fees.money(it, lang.locale)) }, b.heating) { b = b.copy(heating = it); manualPrice = false }
+                    MoneyField(if (manualPrice) priceText else plain(autoPrice, lang), s.bkPrice) { priceText = it; manualPrice = true }
+                    if (CourtPlans.needsLights(plan.settings, b.start, b.minutes)) Text(if (info.lights) s.bkLights else s.crtNoLightsWarn, color = if (info.lights) TsmColors.TextDim else TsmColors.Orange, fontSize = 12.sp)
+                    // Come si paga: al campo o con Satispay (va nell'avviso ai giocatori).
+                    if (cents > 0) {
+                        Text(s.bkPayWhere, color = TsmColors.TextDim, fontSize = 13.sp)
+                        val ways = com.tennis.scoremanager.data.PayWhere.entries
+                        Segmented(listOf(SegOption(s.bkPayCourt), SegOption(s.bkPayOnline)), ways.indexOf(b.payWhere), { b = b.copy(payWhere = ways[it]) })
+                        if (b.payWhere == com.tennis.scoremanager.data.PayWhere.ONLINE) {
+                            c.clubBook.collectAsState().value
+                            val ons = c.payTypes().filter { it.online && it.details.isNotBlank() }
+                            Text(if (ons.isEmpty()) s.payOptionsNone else ons.joinToString(" · ") { it.name }, color = if (ons.isEmpty()) TsmColors.Orange else TsmColors.TextDim, fontSize = 12.sp)
+                        }
+                    }
+                    // Prenotazione già addebitata: si segna pagata in un tocco.
+                    val book by c.clubBook.collectAsState()
+                    val left = b0.charges.sumOf { id -> book.charges.firstOrNull { it.id == id }?.left ?: 0 }
+                    if (!isNew && b0.charges.isNotEmpty()) {
+                        if (left == 0) Text(s.chargePaid, color = TsmColors.Ok, fontWeight = FontWeight.Bold)
+                        else {
+                            Text(s.issueFeeDue(Fees.money(left, lang.locale)), color = TsmColors.Orange, fontWeight = FontWeight.Bold)
+                            // Un tasto per ogni modo di pagamento del circolo.
+                            for (t in c.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
+                        }
+                    }
+                    if (b.players.isNotEmpty() && cents > 0) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                }
+                if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
+                    Text(if (weeks == 1) s.bkRepeatNo else s.bkRepeatWeeks(weeks), color = TsmColors.TextMain, modifier = Modifier.weight(1f).padding(start = 8.dp))
+                    IconButton(onClick = { weeks = (weeks - 1).coerceAtLeast(1) }) { Icon(Icons.Filled.Remove, null) }
+                    IconButton(onClick = { weeks = (weeks + 1).coerceAtMost(40) }) { Icon(Icons.Filled.Add, null) }
+                }
+                if (!isNew) {
+                    if (b0.players.isNotEmpty()) GhostButton(s.bkNotify, Icons.Filled.Campaign, { onDone(null); c.noticeBooking(b0) }, Modifier.fillMaxWidth())
+                    TextButton(onClick = { askDelete = true }) { Text(s.bkDelete, color = TsmColors.Danger) }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = conflicts.isEmpty() && blocked.isEmpty(), onClick = {
+                val saved = b.copy(
+                    names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
+                    lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
+                )
+                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty()))
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (picking) PlayerPickDialog(c, b.players.toSet()) { p -> picking = false; p?.let { b = b.copy(players = b.players + it.id) } }
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.bkDeleteAsk) },
+        confirmButton = {
+            Column(horizontalAlignment = Alignment.End) {
+                TextButton(onClick = { askDelete = false; c.deleteBooking(b0, false); onDone(null) }) { Text(s.bkDeleteOne, color = TsmColors.Danger) }
+                if (b0.series != null) TextButton(onClick = { askDelete = false; c.deleteBooking(b0, true); onDone(null) }) { Text(s.bkDeleteSeries, color = TsmColors.Danger) }
+            }
+        },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+}
+
+/** Sceglie un giocatore dal database (o ne crea uno), esclusi quelli già scelti. */
+@Composable
+private fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    var query by remember { mutableStateOf("") }
+    var creating by remember { mutableStateOf(false) }
+    val free = players.filter { it.id !in except }
+    val list = (if (query.isBlank()) free else Players.search(free, query)).sortedBy { if (it.member != null) 0 else 1 }
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(s.bkAddPlayer) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                GhostButton(s.membersNewPlayer, Icons.Filled.PersonAdd, { creating = true }, Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+                for (p in list.take(50)) Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 8.dp))
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) onDone(p) }
+}
+
+/** Orari, caselle, prezzi e luci del planning. */
+@Composable
+private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var st by remember { mutableStateOf(st0) }
+    var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
+    var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
+    var courtsOpen by remember { mutableStateOf(false) }
+    @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+        IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
+        Text("%02d:00".format(v), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        IconButton(onClick = { onChange((v + 1).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.planSettings) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                stepper(s.planOpen, st.openHour, 0, st.closeHour - 1) { st = st.copy(openHour = it) }
+                stepper(s.planClose, st.closeHour, st.openHour + 1, 24) { st = st.copy(closeHour = it) }
+                Text(s.planSlot, color = TsmColors.TextDim, fontSize = 13.sp)
+                val slots = listOf(30, 60, 90)
+                Segmented(slots.map { SegOption(s.bkMinutes(it)) }, slots.indexOf(st.slotMinutes), { st = st.copy(slotMinutes = slots[it]) })
+                MoneyField(price, s.planPrice) { price = it }
+                MoneyField(priceL, s.planPriceLights) { priceL = it }
+                stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
+                GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
+                Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
+                val tm = listOf(60, 90, 120)
+                Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = Fees.parse(price.ifBlank { "0" }) != null && Fees.parse(priceL.ifBlank { "0" }) != null, onClick = {
+                // I campi si cambiano nel loro dialogo: qui si tengono come sono adesso.
+                c.saveCourtSettings(st.copy(courts = c.courtPlan.value.settings.courts, centsPerHour = Fees.parse(price.ifBlank { "0" }) ?: 0, centsPerHourLights = Fees.parse(priceL.ifBlank { "0" }) ?: 0))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
+}
+
+fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {
+    com.tennis.scoremanager.data.Surface.CLAY -> s.crtClay
+    com.tennis.scoremanager.data.Surface.GRASS -> s.crtGrass
+    com.tennis.scoremanager.data.Surface.HARD -> s.crtHard
+    com.tennis.scoremanager.data.Surface.OTHER -> s.bkOther
+}
+
+/** "Terra · coperto · luci · riscaldato". */
+fun courtTraits(s: Strings, i: com.tennis.scoremanager.data.CourtInfo): String = listOfNotNull(
+    i.surface?.let { surfaceName(s, it) }, if (i.covered) s.crtCovered else s.crtOpen, s.crtLightsShort.takeIf { i.lights }, s.crtHeatedShort.takeIf { i.heating },
+).joinToString(" · ")
+
+/**
+ * I campi del circolo: si creano, si mettono in ordine, si toccano per cambiarli (nome, caratteristiche, prezzi,
+ * foto) o eliminarli.
+ */
+@Composable
+fun CourtsManageDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val courts by c.clubCourts.collectAsState()
+    val plan by c.courtPlan.collectAsState()
+    var edit by remember { mutableStateOf<com.tennis.scoremanager.data.CourtInfo?>(null) }
+    var creating by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.crtTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (courts.isEmpty()) Text(s.clubNoCourts, color = TsmColors.TextDim)
+                for ((idx, ct) in courts.withIndex()) {
+                    val i = plan.settings.info(ct)
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { edit = i }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        i.photos.firstOrNull()?.let { CourtThumb(c, it, 48) }
+                        Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                            Text(ct, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text(
+                                listOfNotNull(courtTraits(s, i), i.centsPerHour?.let { Fees.money(it, lang.locale) + "/h" }, i.photos.size.takeIf { it > 0 }?.let { s.crtPhotosCount(it) }).joinToString(" · "),
+                                color = TsmColors.TextDim, fontSize = 12.sp,
+                            )
+                        }
+                        if (idx > 0) IconButton(onClick = { c.moveCourt(ct, true) }) { Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim) }
+                    }
+                }
+                GhostButton(s.crtNew, Icons.Filled.Add, { creating = true }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+    edit?.let { i -> CourtInfoDialog(c, i, isNew = false) { edit = null } }
+    if (creating) CourtInfoDialog(c, com.tennis.scoremanager.data.CourtInfo(""), isNew = true) { creating = false }
+}
+
+/** Una foto del campo, quadrata e ritagliata. */
+@Composable
+private fun CourtThumb(c: MatchController, name: String, size: Int, onClick: (() -> Unit)? = null) {
+    val bmp = remember(name) { runCatching { android.graphics.BitmapFactory.decodeFile(c.courtPhotoFile(name).absolutePath, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) }.getOrNull() }
+    bmp ?: return
+    androidx.compose.foundation.Image(
+        bmp.asImageBitmap(), null, contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+        modifier = Modifier.width(size.dp).height(size.dp).clip(RoundedCornerShape(8.dp)).let { m -> if (onClick != null) m.clickable { onClick() } else m },
+    )
+}
+
+/** Com'è fatto un campo: nome, superficie, coperto, luci, riscaldamento, i suoi prezzi (vuoti = quelli generali) e le foto. */
+@Composable
+private fun CourtInfoDialog(c: MatchController, i0: com.tennis.scoremanager.data.CourtInfo, isNew: Boolean, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val plan by c.courtPlan.collectAsState()
+    var i by remember { mutableStateOf(i0) }
+    var name by remember { mutableStateOf(i0.name) }
+    var price by remember { mutableStateOf(i0.centsPerHour?.let { plain(it, lang) }.orEmpty()) }
+    var priceL by remember { mutableStateOf(i0.centsPerHourLights?.let { plain(it, lang) }.orEmpty()) }
+    var heat by remember { mutableStateOf(i0.heatingCentsPerHour.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
+    var askDelete by remember { mutableStateOf(false) }
+    var big by remember { mutableStateOf<String?>(null) }
+    val ok = name.isNotBlank() && listOf(price, priceL, heat).all { it.isBlank() || Fees.parse(it) != null }
+    // Le foto si leggono dal planning: si aggiungono e si tolgono subito, anche prima di OK.
+    val photos = if (isNew) emptyList() else plan.settings.info(i0.name).photos
+    val pick = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia(6)) { uris ->
+        c.addCourtPhotos(i0.name, uris)
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (isNew) s.crtNew else i0.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(name, { name = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.crtName) })
+                val surfaces = listOf(null) + com.tennis.scoremanager.data.Surface.entries
+                Segmented(surfaces.map { SegOption(it?.let { x -> surfaceName(s, x) } ?: "—") }, surfaces.indexOf(i.surface), { i = i.copy(surface = surfaces[it]) }, columns = 3)
+                Segmented(listOf(SegOption(s.crtOpen), SegOption(s.crtCovered)), if (i.covered) 1 else 0, { i = i.copy(covered = it == 1) })
+                SwitchRow(Icons.Filled.Lightbulb, s.crtLights, null, i.lights) { i = i.copy(lights = it) }
+                SwitchRow(Icons.Filled.Thermostat, s.crtHeating, null, i.heating) { i = i.copy(heating = it) }
+                Text(s.crtPricesHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                MoneyField(price, s.planPrice) { price = it }
+                if (i.lights) MoneyField(priceL, s.planPriceLights) { priceL = it }
+                if (i.heating) MoneyField(heat, s.crtHeatingSupplement) { heat = it }
+                Text(s.crtPhotos, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                if (isNew) Text(s.crtPhotosAfter, color = TsmColors.TextDim, fontSize = 12.sp)
+                else {
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        for (p in photos) Box {
+                            CourtThumb(c, p, 84) { big = p }
+                            IconButton(onClick = { c.removeCourtPhoto(i0.name, p) }, modifier = Modifier.align(Alignment.TopEnd).width(28.dp).height(28.dp)) {
+                                Icon(Icons.Filled.Close, s.crtPhotoRemove, tint = Color.White, modifier = Modifier.background(Color(0x99000000), RoundedCornerShape(14.dp)))
+                            }
+                        }
+                    }
+                    GhostButton(s.crtPhotoAdd, Icons.Filled.AddPhotoAlternate, {
+                        pick.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }, Modifier.fillMaxWidth())
+                    TextButton(onClick = { askDelete = true }) { Text(s.crtDelete, color = TsmColors.Danger) }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = ok, onClick = {
+                val n = name.trim()
+                val saved = i.copy(
+                    name = n, centsPerHour = price.ifBlank { null }?.let(Fees::parse), centsPerHourLights = priceL.ifBlank { null }?.let(Fees::parse),
+                    heatingCentsPerHour = heat.ifBlank { null }?.let(Fees::parse) ?: 0,
+                )
+                val done = if (isNew) c.addCourt(saved) else c.renameCourt(i0.name, n).also { okRename ->
+                    // Le foto sono quelle di adesso (aggiunte o tolte mentre il dialogo era aperto).
+                    if (okRename) c.saveCourtInfo(saved.copy(photos = c.courtPlan.value.settings.info(n).photos))
+                }
+                if (done) onDone() else Toast.makeText(context, s.crtExists, Toast.LENGTH_LONG).show()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.crtDeleteAsk(i0.name, c.futureBookings(i0.name))) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCourt(i0.name); onDone() }) { Text(s.crtDelete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+    big?.let { p ->
+        androidx.compose.ui.window.Dialog(onDismissRequest = { big = null }, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
+            val bmp = remember(p) { runCatching { android.graphics.BitmapFactory.decodeFile(c.courtPhotoFile(p).absolutePath) }.getOrNull() }
+            Box(Modifier.fillMaxWidth().background(Color.Black).clickable { big = null }, contentAlignment = Alignment.Center) {
+                bmp?.let { androidx.compose.foundation.Image(it.asImageBitmap(), null, modifier = Modifier.fillMaxWidth(), contentScale = androidx.compose.ui.layout.ContentScale.Fit) }
+            }
+        }
+    }
+}
+
+fun blockReasonName(s: Strings, r: com.tennis.scoremanager.data.BlockReason): String = when (r) {
+    com.tennis.scoremanager.data.BlockReason.COURSE -> s.blkCourse
+    com.tennis.scoremanager.data.BlockReason.TOURNAMENT -> s.blkTournament
+    com.tennis.scoremanager.data.BlockReason.MAINTENANCE -> s.blkMaintenance
+    com.tennis.scoremanager.data.BlockReason.OTHER -> s.bkOther
+}
+
+/** "L M M G V S D" nella lingua dell'app (1 = lunedì). */
+private fun dayInitial(d: Int, lang: com.tennis.scoremanager.model.Lang): String {
+    val cal = Calendar.getInstance().apply { set(Calendar.DAY_OF_WEEK, if (d == 7) Calendar.SUNDAY else d + 1) }
+    return java.text.SimpleDateFormat("EEE", lang.locale).format(cal.time).take(3)
+}
+
+/** "Lun Mer Ven · 15:00-18:00 · Campo 1, Campo 2 · 1 set – 31 mag". */
+private fun blockLine(s: Strings, b: com.tennis.scoremanager.data.CourtBlock, lang: com.tennis.scoremanager.model.Lang): String = listOf(
+    blockReasonName(s, b.reason),
+    if (b.weekdays.isEmpty()) s.blkEveryDay else b.weekdays.sorted().joinToString(" ") { dayInitial(it, lang) },
+    if (b.startMin == 0 && b.endMin == 24 * 60) s.blkAllDay else "%02d:%02d-%02d:%02d".format(b.startMin / 60, b.startMin % 60, b.endMin / 60, b.endMin % 60),
+    if (b.courts.isEmpty()) s.blkAllCourts else b.courts.joinToString(", "),
+    if (CourtPlans.dayStart(b.from) == CourtPlans.dayStart(b.to)) shortDate(b.from, lang) else "${shortDate(b.from, lang)} – ${shortDate(b.to, lang)}",
+).joinToString(" · ")
+
+/** I periodi di campi non prenotabili: si toccano per cambiarli, se ne crea uno nuovo. */
+@Composable
+private fun BlocksDialog(c: MatchController, onEdit: (com.tennis.scoremanager.data.CourtBlock) -> Unit, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val plan by c.courtPlan.collectAsState()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.blkTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.blkHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (plan.blocks.isEmpty()) Text(s.blkNone, color = TsmColors.TextDim)
+                for (b in plan.blocks.sortedBy { it.from }) {
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { onEdit(b) }.padding(10.dp)) {
+                        Text(b.label.ifBlank { blockReasonName(s, b.reason) }, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(blockLine(s, b, lang), color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                }
+                GhostButton(s.blkNew, Icons.Filled.Add, {
+                    val today = CourtPlans.dayStart(System.currentTimeMillis())
+                    onEdit(com.tennis.scoremanager.data.CourtBlock(CourtPlans.newId("k"), "", from = today, to = today))
+                }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+}
+
+/** Un periodo non prenotabile: nome, motivo (dal torneo prende nome e date), campi, date, giorni e orario. */
+@Composable
+private fun BlockEditDialog(c: MatchController, b0: com.tennis.scoremanager.data.CourtBlock, isNew: Boolean, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val courts = c.storage.clubCourts
+    val tournaments by c.clubTournaments.collectAsState()
+    var b by remember { mutableStateOf(b0) }
+    fun time(min: Int, onPick: (Int) -> Unit) = TimePickerDialog(context, { _, h, m -> onPick(h * 60 + m) }, (min / 60).coerceAtMost(23), min % 60, true).show()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (isNew) s.blkNew else b0.label.ifBlank { s.blkTitle }) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(b.label, { b = b.copy(label = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.blkLabel) })
+                val reasons = com.tennis.scoremanager.data.BlockReason.entries
+                Segmented(reasons.map { SegOption(blockReasonName(s, it)) }, reasons.indexOf(b.reason), { b = b.copy(reason = reasons[it]) }, columns = 2)
+                // Dal torneo: nome e date già pronti.
+                if (b.reason == com.tennis.scoremanager.data.BlockReason.TOURNAMENT) for (t in tournaments.filter { it.start != null && it.champion == null }) {
+                    GhostButton(s.blkFromTournament(t.name), Icons.Filled.CalendarMonth, {
+                        b = b.copy(label = t.name, tournament = t.id, from = CourtPlans.dayStart(t.start!!), to = CourtPlans.dayStart(t.end ?: t.start))
+                    }, Modifier.fillMaxWidth())
+                }
+                SwitchRow(Icons.Filled.Block, s.blkAllCourts, null, b.courts.isEmpty()) { all -> b = b.copy(courts = if (all) emptyList() else courts.take(1)) }
+                if (b.courts.isNotEmpty()) for (ct in courts) SwitchRow(Icons.Filled.Block, ct, null, ct in b.courts) { on ->
+                    val list = if (on) b.courts + ct else b.courts - ct
+                    b = b.copy(courts = list.ifEmpty { listOf(ct) })
+                }
+                DateButton(s.blkFrom, b.from, lang) { d -> b = b.copy(from = CourtPlans.dayStart(d), to = maxOf(CourtPlans.dayStart(d), b.to)) }
+                DateButton(s.blkTo, b.to, lang) { d -> b = b.copy(to = maxOf(CourtPlans.dayStart(d), b.from)) }
+                Text(s.blkDays, color = TsmColors.TextDim, fontSize = 13.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (d in 1..7) {
+                        val on = d in b.weekdays
+                        Text(
+                            dayInitial(d, lang), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1,
+                            modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh)
+                                .clickable { b = b.copy(weekdays = if (on) b.weekdays - d else b.weekdays + d) }.padding(horizontal = 6.dp, vertical = 8.dp),
+                        )
+                    }
+                }
+                if (b.weekdays.isEmpty()) Text(s.blkEveryDay, color = TsmColors.TextDim, fontSize = 12.sp)
+                val allDay = b.startMin == 0 && b.endMin == 24 * 60
+                SwitchRow(Icons.Filled.Schedule, s.blkAllDay, null, allDay) { on -> b = if (on) b.copy(startMin = 0, endMin = 24 * 60) else b.copy(startMin = 15 * 60, endMin = 18 * 60) }
+                if (!allDay) {
+                    GhostButton("${s.blkStart}: %02d:%02d".format(b.startMin / 60, b.startMin % 60), Icons.Filled.Schedule, { time(b.startMin) { m -> b = b.copy(startMin = m, endMin = maxOf(b.endMin, m + 30)) } }, Modifier.fillMaxWidth())
+                    GhostButton("${s.blkEnd}: %02d:%02d".format(b.endMin / 60, b.endMin % 60), Icons.Filled.Schedule, { time(b.endMin) { m -> b = b.copy(endMin = maxOf(m, b.startMin + 30)) } }, Modifier.fillMaxWidth())
+                }
+                if (!isNew) TextButton(onClick = { c.saveCourtBlock(b0, delete = true); onDone() }) { Text(s.blkDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = { TextButton(onClick = { c.saveCourtBlock(b.copy(label = b.label.trim())); onDone() }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/DataScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/DataScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -34788,6 +36760,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
@@ -34981,11 +36954,15 @@ private fun TournamentsTab(c: MatchController) {
 private fun CourtsTab(c: MatchController) {
     val s = LocalStrings.current
     var edit by remember { mutableStateOf(false) }
+    var manage by remember { mutableStateOf(false) }
     val name = c.storage.clubName
-    val courts = c.storage.clubCourts
-    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · "), main = true) { edit = true }
+    val courts by c.clubCourts.collectAsState()
+    Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
+    Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
+    Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
+    if (manage) CourtsManageDialog(c) { manage = false }
 }
 
 /** Circolo: giocatori e allievi del database. */
@@ -37910,6 +39887,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Delete
@@ -38009,6 +39987,7 @@ fun PaymentsScreen(c: MatchController) {
     var editFee by remember { mutableStateOf<Fee?>(null) }
     var newFee by remember { mutableStateOf(false) }
     var exportYear by remember { mutableStateOf(year) }
+    var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
         title = s.paymentsTitle,
         subtitle = s.paymentsHint,
@@ -38062,6 +40041,24 @@ fun PaymentsScreen(c: MatchController) {
             }
         }
 
+        // I modi di pagamento li sceglie il circolo: quelli a distanza, con link, IBAN o numero, vanno negli avvisi.
+        SectionCard(s.ptTitle, Icons.Filled.Euro) {
+            Text(s.ptHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            val types = c.payTypes()
+            for ((i, t) in types.withIndex()) {
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { editType = t }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(listOfNotNull(s.ptOnlineShort.takeIf { t.online }, t.details.ifBlank { null }).joinToString(" · ").ifBlank { s.ptAtClub }, color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 2)
+                    }
+                    if (i > 0) androidx.compose.material3.IconButton(onClick = { c.savePayTypes(types.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } }) }) {
+                        Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim)
+                    }
+                }
+            }
+            GhostButton(s.ptNew, Icons.Filled.Add, { editType = com.tennis.scoremanager.data.PayType(Fees.newId("t"), "") }, Modifier.fillMaxWidth())
+        }
+
         SectionCard(s.paymentsExport, Icons.Filled.TableChart) {
             Text(s.paymentsExportHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val years = listOf(year - 1, year)
@@ -38074,6 +40071,7 @@ fun PaymentsScreen(c: MatchController) {
         }
     }
     if (newFee) FeeDialog(c, null) { newFee = false }
+    editType?.let { t -> PayTypeDialog(c, t) { editType = null } }
     editFee?.let { f -> FeeDialog(c, f) { editFee = null } }
 }
 
@@ -38253,7 +40251,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
                 for (p in ch.payments) {
                     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text("${Fees.money(p.cents, lang.locale)} · ${payMethodName(s, p.method)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text("${Fees.money(p.cents, lang.locale)} · ${com.tennis.scoremanager.ui.paymentName(s, p)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                             Text(listOf(shortDate(p.at, lang), s.payReceiptNo(p.receipt), p.ref).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 12.sp)
                         }
                         androidx.compose.material3.IconButton(onClick = { share(p.id) }) { Icon(Icons.Filled.Receipt, s.payReceipt, tint = TsmColors.Ball) }
@@ -38294,7 +40292,10 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
     val lang = c.options.value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
     var at by remember { mutableStateOf(today()) }
-    var method by remember { mutableStateOf(PayMethod.CASH) }
+    // I modi di pagamento del circolo: il primo è quello proposto.
+    val types = remember { c.payTypes() }
+    var type by remember { mutableStateOf(types.first()) }
+    val method = type.method
     var ref by remember { mutableStateOf("") }
     var receipt by remember { mutableStateOf(true) }
     val cents = Fees.parse(amount)
@@ -38306,17 +40307,45 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
                 Text(ch.label, color = TsmColors.TextDim, fontSize = 13.sp)
                 MoneyField(amount, s.payAmount) { amount = it }
                 DateButton(s.payDate, at, lang) { at = it }
-                val methods = PayMethod.entries
-                Segmented(methods.map { SegOption(payMethodName(s, it)) }, methods.indexOf(method), { method = methods[it] }, columns = 3)
+                Segmented(types.map { SegOption(it.name) }, types.indexOf(type), { type = types[it] }, columns = minOf(3, types.size))
                 if (method != PayMethod.CASH) OutlinedTextField(ref, { ref = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.payRef) })
                 com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Receipt, s.payReceiptNow, null, receipt) { receipt = it }
             }
         },
         confirmButton = {
             TextButton(enabled = cents != null && cents > 0, onClick = {
-                val r = Fees.pay(c.clubBook.value, ch.id, cents!!, at, method, if (method == PayMethod.CASH) "" else ref) ?: return@TextButton onDone()
+                val r = Fees.pay(c.clubBook.value, ch.id, cents!!, at, method, if (method == PayMethod.CASH) "" else ref, type.name) ?: return@TextButton onDone()
                 c.saveClubBook(r.first)
                 if (receipt) onPaid(r.second.id) else onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Un modo di pagamento del circolo: nome, link/IBAN/numero, se si paga a distanza. */
+@Composable
+private fun PayTypeDialog(c: MatchController, t0: com.tennis.scoremanager.data.PayType, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var t by remember { mutableStateOf(t0) }
+    val types = c.payTypes()
+    val isNew = types.none { it.id == t0.id }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (isNew) s.ptNew else t0.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(t.name, { t = t.copy(name = it.take(30)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ptName) })
+                OutlinedTextField(t.details, { t = t.copy(details = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.ptDetails) })
+                com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Euro, s.ptOnline, s.ptOnlineHint, t.online) { t = t.copy(online = it) }
+                if (!isNew && types.size > 1) TextButton(onClick = { c.savePayTypes(types.filter { it.id != t0.id }); onDone() }) { Text(s.ptDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = t.name.isNotBlank(), onClick = {
+                val saved = t.copy(name = t.name.trim(), details = t.details.trim())
+                c.savePayTypes(if (isNew) types + saved else types.map { if (it.id == saved.id) saved else it })
+                onDone()
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
@@ -59629,6 +61658,21 @@ class ClubBookTest {
         val csv = Fees.csv(b, 2026, "Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo", { it.name }, { "01/11/2026" }, Locale.ITALY)
         assertEquals("Data;Ricevuta;Nome;Descrizione;Metodo;Riferimento;Importo\r\n01/11/2026;1/2026;Rossi;\"Quota; sociale\";TRANSFER;CRO 1;150,50\r\n", csv)
     }
+
+    @Test
+    fun clubPaymentTypes() {
+        val names = { m: PayMethod -> m.name.lowercase() }
+        // Finché il circolo non sceglie, quelli proposti; a distanza solo quelli con link, IBAN o numero.
+        assertEquals(listOf("cash", "pos", "transfer", "satispay"), Fees.types(ClubBook(), names).map { it.id })
+        assertTrue(Fees.onlineTypes(ClubBook(), names).isEmpty())
+        val book = ClubBook(payTypes = listOf(PayType("c", "Contanti", method = PayMethod.CASH), PayType("pp", "PayPal", "paypal.me/tcprova", online = true), PayType("s", "Satispay", "", online = true)))
+        assertEquals(listOf("PayPal"), Fees.onlineTypes(book, names).map { it.name })
+        // Il nome scelto dal circolo va nel registro e nel CSV.
+        var b = Fees.charge(book, rossi, "Campo", 1_600, now)
+        b = Fees.pay(b, b.charges.single().id, 1_600, now, PayMethod.OTHER, "", "PayPal")!!.first
+        assertEquals("PayPal", b.charges.single().payments.single().methodName)
+        assertTrue(Fees.csv(b, 2026, "h", { it.name }, { "d" }, Locale.ITALY).contains(";PayPal;"))
+    }
 }
 TSM_EOF
 
@@ -59764,6 +61808,118 @@ class ClubTournamentTest {
         assertEquals(listOf("e"), ClubTournaments.eligible(t, listOf(p), book, 0).map { it.id })
         // Senza obbligo di pagamento entra lo stesso.
         assertTrue(ClubTournaments.problems(t.copy(requirePaid = false), p, ClubBook(), 0).isEmpty())
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/CourtPlanTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/CourtPlanTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class CourtPlanTest {
+    private fun at(y: Int, m: Int, d: Int, h: Int, min: Int = 0): Long = Calendar.getInstance().apply { set(y, m - 1, d, h, min, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val settings = CourtSettings(openHour = 8, closeHour = 23, slotMinutes = 60, centsPerHour = 1_000, centsPerHourLights = 1_600, lightsFrom = 18)
+
+    @Test
+    fun slotsOfTheDay() {
+        val s = CourtPlans.slots(at(2026, 11, 14, 15), settings)
+        assertEquals(15, s.size)
+        assertEquals(at(2026, 11, 14, 8), s.first())
+        assertEquals(at(2026, 11, 14, 22), s.last())
+        assertEquals(30, CourtPlans.slots(at(2026, 11, 14, 15), settings.copy(slotMinutes = 30)).size)
+    }
+
+    @Test
+    fun priceWithAndWithoutLights() {
+        assertEquals(1_000, CourtPlans.price(settings, at(2026, 11, 14, 10), 60, BookingKind.PLAY))
+        assertEquals(1_600, CourtPlans.price(settings, at(2026, 11, 14, 19), 60, BookingKind.PLAY))
+        // 17:30-18:30: mezz'ora di giorno e mezz'ora con le luci.
+        assertEquals(1_300, CourtPlans.price(settings, at(2026, 11, 14, 17, 30), 60, BookingKind.PLAY))
+        assertEquals(0, CourtPlans.price(settings, at(2026, 11, 14, 10), 60, BookingKind.CLOSED))
+        assertTrue(CourtPlans.needsLights(settings, at(2026, 11, 14, 17, 30), 60))
+        assertFalse(CourtPlans.needsLights(settings, at(2026, 11, 14, 17), 60))
+    }
+
+    @Test
+    fun conflictsWithBookingsAndTournamentMatches() {
+        val b = CourtBooking("b1", "Campo 1", at(2026, 11, 14, 10), 60)
+        val plan = CourtPlan(settings, listOf(b))
+        val t = ClubTournament("t", "Sociale", matches = listOf(CTMatch("m", 1, 0, a = "e1", b = "e2", court = "Campo 2", at = at(2026, 11, 14, 9))))
+        assertEquals(1, CourtPlans.conflicts(plan, listOf(t), "Campo 1", at(2026, 11, 14, 10, 30), at(2026, 11, 14, 11, 30)).size)
+        // Subito dopo, nessuna sovrapposizione; la prenotazione che si sta cambiando non conta.
+        assertTrue(CourtPlans.conflicts(plan, listOf(t), "Campo 1", at(2026, 11, 14, 11), at(2026, 11, 14, 12)).isEmpty())
+        assertTrue(CourtPlans.conflicts(plan, listOf(t), "Campo 1", at(2026, 11, 14, 10), at(2026, 11, 14, 11), except = "b1").isEmpty())
+        // La partita del torneo dura 90 minuti: occupa il Campo 2 fino alle 10:30.
+        assertEquals(1, CourtPlans.conflicts(plan, listOf(t), "Campo 2", at(2026, 11, 14, 10), at(2026, 11, 14, 11)).size)
+        assertEquals(2, CourtPlans.occupied(plan, listOf(t), at(2026, 11, 14, 0)).size)
+        assertEquals(60, CourtPlans.busyMinutes(CourtPlans.occupied(plan, listOf(t), at(2026, 11, 14, 0)), "Campo 1"))
+    }
+
+    @Test
+    fun weeklySkipsBusyDates() {
+        val busy = CourtBooking("x", "Campo 1", at(2026, 11, 21, 18), 60)
+        val plan = CourtPlan(settings, listOf(busy))
+        val lesson = CourtBooking("l", "Campo 1", at(2026, 11, 14, 18), 60, BookingKind.LESSON)
+        val (ok, skipped) = CourtPlans.weekly(plan, emptyList(), lesson, 4)
+        assertEquals(3, ok.size)
+        assertEquals(listOf(at(2026, 11, 21, 18)), skipped)
+        assertEquals("l", ok.first().id)
+        assertEquals(1, ok.map { it.series }.toSet().size)
+        assertEquals(at(2026, 12, 5, 18), ok.last().start)
+    }
+
+    @Test
+    fun splitAmongPlayers() {
+        assertEquals(listOf(334, 333, 333), CourtPlans.split(1_000, 3))
+        assertEquals(listOf(400, 400, 400, 400), CourtPlans.split(1_600, 4))
+        assertTrue(CourtPlans.split(1_000, 0).isEmpty())
+    }
+
+    @Test
+    fun blocksStopBookingsButNotCourseLessons() {
+        // Scuola tennis: Campo 1, lunedì e mercoledì 15-18, da novembre a dicembre.
+        val course = CourtBlock("k", "Scuola tennis", BlockReason.COURSE, listOf("Campo 1"), at(2026, 11, 1, 0), at(2026, 12, 31, 0), setOf(1, 3), 15 * 60, 18 * 60)
+        val plan = CourtPlan(settings, blocks = listOf(course))
+        val monday = at(2026, 11, 16, 16)
+        assertEquals(1, CourtPlans.weekday(monday))
+        assertEquals(listOf(course), CourtPlans.blockedBy(plan, "Campo 1", monday, monday + 3_600_000, BookingKind.PLAY))
+        // Le lezioni del corso sì; il Campo 2 è libero; il martedì e dopo le 18 pure.
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 1", monday, monday + 3_600_000, BookingKind.LESSON).isEmpty())
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 2", monday, monday + 3_600_000, BookingKind.PLAY).isEmpty())
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 1", at(2026, 11, 17, 16), at(2026, 11, 17, 17), BookingKind.PLAY).isEmpty())
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 1", at(2026, 11, 16, 18), at(2026, 11, 16, 19), BookingKind.PLAY).isEmpty())
+        // Dopo la fine del periodo non vale più.
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 1", at(2027, 1, 4, 16), at(2027, 1, 4, 17), BookingKind.PLAY).isEmpty())
+        // Torneo su tutti i campi, tutto il giorno: ferma anche le lezioni, e la ripetizione settimanale lo salta.
+        val tour = CourtBlock("t", "Sociale", BlockReason.TOURNAMENT, emptyList(), at(2026, 11, 21, 0), at(2026, 11, 22, 0))
+        val p2 = plan.copy(blocks = plan.blocks + tour)
+        assertEquals(listOf(tour), CourtPlans.blockedBy(p2, "Campo 2", at(2026, 11, 21, 10), at(2026, 11, 21, 11), BookingKind.LESSON))
+        val (ok, skipped) = CourtPlans.weekly(p2, emptyList(), CourtBooking("b", "Campo 2", at(2026, 11, 14, 10), 60), 3)
+        assertEquals(2, ok.size); assertEquals(listOf(at(2026, 11, 21, 10)), skipped)
+        // I blocchi non contano come ore occupate.
+        assertEquals(0, CourtPlans.busyMinutes(CourtPlans.occupied(p2, emptyList(), at(2026, 11, 21, 0)), "Campo 2"))
+    }
+
+    @Test
+    fun pricesPerCourtWithLightsAndHeating() {
+        val covered = CourtInfo("Campo 3", Surface.HARD, covered = true, lights = true, heating = true, centsPerHour = 2_000, centsPerHourLights = 2_500, heatingCentsPerHour = 600)
+        val dark = CourtInfo("Campo 4", Surface.CLAY, lights = false)
+        val st = settings.copy(courts = listOf(covered, dark))
+        assertEquals(2_000, CourtPlans.price(st, at(2026, 11, 14, 10), 60, BookingKind.PLAY, "Campo 3"))
+        assertEquals(3_100, CourtPlans.price(st, at(2026, 11, 14, 19), 60, BookingKind.PLAY, "Campo 3", heating = true))
+        // Senza luci resta il prezzo normale (quello generale, il campo non ne ha uno suo); il riscaldamento non c'è.
+        assertEquals(1_000, CourtPlans.price(st, at(2026, 11, 14, 19), 60, BookingKind.PLAY, "Campo 4", heating = true))
+        // Un campo senza scheda ha i prezzi generali.
+        assertEquals(1_600, CourtPlans.price(st, at(2026, 11, 14, 19), 60, BookingKind.PLAY, "Campo 9"))
     }
 }
 TSM_EOF
@@ -68113,6 +70269,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 213 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 216 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -493,6 +493,17 @@ L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l
 - **Uno per uno**: per ciascuno il suo messaggio (toccandolo si legge tutto) e i tasti **WhatsApp** (si apre la chat con quel numero e il testo già scritto), **SMS** ed **Email**. La spunta ricorda chi hai già avvisato.
 - I numeri senza prefisso valgono come italiani (+39). Per i **minorenni** si scrive al telefono del genitore (*Dati del socio*), con "un avviso per Luca". Chi non ha né telefono né email è segnalato: aggiungili nella sua scheda.
 
+### 7.15 Campi e planning (app 2.6)
+
+Col ruolo **Circolo**, nella scheda **Campi**.
+
+- **I campi**: si crea un campo (**Nuovo campo**), lo si mette in ordine e lo si tocca per cambiarlo: nome (rinominandolo, prenotazioni, periodi e partite dei tornei lo seguono), superficie (**terra, erba, cemento**, altro), **coperto o scoperto**, **luci**, **riscaldamento**, i **prezzi** suoi (all'ora, con le luci, supplemento riscaldamento all'ora; vuoti = quelli generali) e **una o più foto** dalla galleria. **Elimina il campo** toglie anche le sue prenotazioni da oggi in poi.
+- **Planning dei campi**: il giorno con un campo per colonna e un'ora per riga (◀ ▶ e il calendario per cambiare giorno). Tocca una casella libera per prenotare: campo, giorno, ora e durata, tipo (gioco, lezione, chiuso, altro), giocatori dal database e ospiti, nota. Il **prezzo** si calcola da solo (luci dall'ora scelta, riscaldamento se lo si chiede) e si può cambiare; **Addebita ai giocatori** lo divide in parti uguali e lo mette in *Quote e pagamenti*. **Come si paga**: *al campo* o *online*; a prenotazione addebitata, **Pagato: …** la segna pagata con uno dei modi di pagamento del circolo. **Ogni settimana per N settimane** ripete la prenotazione (le date col campo occupato si saltano e l'app le dice). **Avvisa i giocatori** manda campo, giorno, ora e come si paga.
+- Le **partite dei tornei** con campo e orario compaiono da sole; l'app non lascia prenotare sopra un'altra prenotazione o una partita.
+- **Non prenotabili**: periodi in cui i campi non si prenotano, per **corsi**, **tornei**, **manutenzione** o altro: campi (o tutti), dal giorno al giorno, giorni della settimana, fascia oraria o tutto il giorno; per un torneo si prendono nome e date dal torneo. Nei periodi dei corsi si mettono le loro lezioni (toccando la casella si apre una lezione già pronta).
+- **Orari e prezzi**: apertura e chiusura, durata di una casella (30, 60, 90 minuti), prezzo all'ora generale e con le luci, da che ora servono le luci, quanto dura nel planning una partita di torneo.
+- **Modi di pagamento** (in *Quote e pagamenti*): li decide chi gestisce il circolo. Si parte da contanti, POS, bonifico e Satispay e se ne aggiungono altri (PayPal, Revolut, Bancomat Pay, un link SumUp…): nome, link/IBAN/numero e se si paga a distanza. Si scelgono quando si registra un pagamento (il nome va su ricevute e CSV); quelli a distanza, con i loro dettagli, vanno negli avvisi e nei solleciti. L'app non incassa: registra e manda le istruzioni.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

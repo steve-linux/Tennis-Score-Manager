@@ -493,6 +493,17 @@ La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y a
 - **Uno a uno**: el mensaje de cada uno (tócalo para leerlo entero) y los botones **WhatsApp** (abre el chat con ese número y el texto listo), **SMS** y **Correo**. La marca recuerda a quién ya has avisado.
 - Los números sin prefijo cuentan como italianos (+39). Para los **menores** se escribe al teléfono del padre o la madre (*Datos del socio*), con «un aviso sobre Luca». Quien no tiene ni teléfono ni correo se señala: añádelos en su ficha.
 
+### 7.15 Pistas y planning (app 2.6)
+
+Con el rol **Club**, en la pestaña **Pistas**.
+
+- **Las pistas**: se crea una pista (**Nueva pista**), se ordenan y se toca una para cambiarla: nombre (al renombrarla, reservas, periodos y partidos de los torneos la siguen), superficie (**tierra batida, hierba, cemento**, otra), **cubierta o descubierta**, **luz**, **calefacción**, sus **precios** (por hora, con luz, suplemento de calefacción por hora; vacíos = los generales) y **una o varias fotos** de la galería. **Eliminar la pista** quita también sus reservas desde hoy.
+- **Planning de pistas**: el día con una pista por columna y una hora por fila (◀ ▶ y el calendario para cambiar de día). Toca una casilla libre para reservar: pista, día, hora y duración, tipo (juego, clase, cerrada, otro), jugadores de la base de datos e invitados, nota. El **precio** se calcula solo (luz desde la hora fijada, calefacción si se pide) y se puede cambiar; **Cargar a los jugadores** lo divide a partes iguales y lo lleva a *Cuotas y pagos*. **Cómo se paga**: *en la pista* u *online*; con la reserva cargada, **Pagado: …** la marca pagada con uno de los medios de pago del club. **Cada semana durante N semanas** repite la reserva (las fechas con la pista ocupada se saltan y la app lo dice). **Avisar a los jugadores** envía pista, día, hora y cómo pagar.
+- Los **partidos de los torneos** con pista y horario aparecen solos; la app no deja reservar encima de otra reserva o de un partido.
+- **No reservables**: periodos en que las pistas no se reservan, por **cursos**, **torneos**, **mantenimiento** u otro: pistas (o todas), de un día a otro, días de la semana, franja horaria o todo el día; para un torneo, nombre y fechas vienen del torneo. En los periodos de los cursos van sus clases (tocando la casilla se abre una clase ya preparada).
+- **Horarios y precios**: apertura y cierre, duración de una casilla (30, 60, 90 minutos), precio por hora general y con luz, desde qué hora hace falta la luz, cuánto dura un partido de torneo en el planning.
+- **Medios de pago** (en *Cuotas y pagos*): los decide quien gestiona el club. Se parte de efectivo, tarjeta, transferencia y Satispay y se añaden otros (PayPal, Revolut, Bancomat Pay, un enlace SumUp…): nombre, enlace/IBAN/número y si se paga a distancia. Se elige uno al registrar un pago (el nombre va en recibos y CSV); los de pago a distancia, con sus datos, van en avisos y recordatorios. La app no cobra: registra y envía las instrucciones.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

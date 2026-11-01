@@ -94,16 +94,21 @@ object Notices {
     }
 
     /** Il sollecito: cosa resta da pagare, voce per voce, e il totale. */
-    fun duesText(s: Strings, p: PlayerProfile, open: List<Charge>, club: String, lang: Lang, now: Long): String {
+    fun duesText(s: Strings, p: PlayerProfile, open: List<Charge>, club: String, lang: Lang, now: Long, pay: List<String> = emptyList()): String {
         val lines = mutableListOf(hello(s, p, now), s.ntDues)
         for (c in open) lines += "• ${c.label}: ${Fees.money(c.left, lang.locale)}" + (c.due?.let { " (" + s.feeDueShort(day(it, lang)) + ")" } ?: "")
         if (open.size > 1) lines += s.ntTotal(Fees.money(open.sumOf { it.left }, lang.locale))
+        if (pay.isNotEmpty()) lines += listOf(s.ntPayHow) + pay
         return (lines + sign(club)).joinToString("\n")
     }
 
     /** Cosa manca al socio per essere in regola. */
     fun memberText(s: Strings, p: PlayerProfile, issues: List<String>, club: String, now: Long): String =
         (listOf(hello(s, p, now), s.ntMemberTodo) + issues.map { "• $it" } + listOf(s.ntMemberHow) + sign(club)).joinToString("\n")
+
+    /** "• Satispay: link", "• Bonifico: IT60…": i modi online del circolo, per gli avvisi. */
+    fun payLines(s: Strings, book: ClubBook): List<String> =
+        Fees.onlineTypes(book) { com.tennis.scoremanager.ui.payMethodName(s, it) }.map { "• ${it.name}: ${it.details.trim()}" }
 
     /** Le partite con l'orario in quel giorno. */
     fun onDay(ms: List<CTMatch>, dayMs: Long): List<CTMatch> {

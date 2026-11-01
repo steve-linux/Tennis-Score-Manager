@@ -48,7 +48,7 @@ object ReceiptPdf {
         }
         field(s.receiptReceivedFrom, c.name)
         field(s.receiptFor, c.label)
-        field(s.receiptMethod, listOf(payMethodName(s, p.method), p.ref).filter { it.isNotBlank() }.joinToString(" · "))
+        field(s.receiptMethod, listOf(p.methodName.ifBlank { payMethodName(s, p.method) }, p.ref).filter { it.isNotBlank() }.joinToString(" · "))
         cv.drawText(s.receiptAmount, M, y, paint(9f, grey))
         y += 26f
         cv.drawText(Fees.money(p.cents, lang.locale), M, y, paint(24f, bold = true))

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Delete
@@ -120,6 +121,7 @@ fun PaymentsScreen(c: MatchController) {
     var editFee by remember { mutableStateOf<Fee?>(null) }
     var newFee by remember { mutableStateOf(false) }
     var exportYear by remember { mutableStateOf(year) }
+    var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
         title = s.paymentsTitle,
         subtitle = s.paymentsHint,
@@ -173,6 +175,24 @@ fun PaymentsScreen(c: MatchController) {
             }
         }
 
+        // I modi di pagamento li sceglie il circolo: quelli a distanza, con link, IBAN o numero, vanno negli avvisi.
+        SectionCard(s.ptTitle, Icons.Filled.Euro) {
+            Text(s.ptHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            val types = c.payTypes()
+            for ((i, t) in types.withIndex()) {
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { editType = t }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(listOfNotNull(s.ptOnlineShort.takeIf { t.online }, t.details.ifBlank { null }).joinToString(" · ").ifBlank { s.ptAtClub }, color = TsmColors.TextDim, fontSize = 12.sp, maxLines = 2)
+                    }
+                    if (i > 0) androidx.compose.material3.IconButton(onClick = { c.savePayTypes(types.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } }) }) {
+                        Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim)
+                    }
+                }
+            }
+            GhostButton(s.ptNew, Icons.Filled.Add, { editType = com.tennis.scoremanager.data.PayType(Fees.newId("t"), "") }, Modifier.fillMaxWidth())
+        }
+
         SectionCard(s.paymentsExport, Icons.Filled.TableChart) {
             Text(s.paymentsExportHint, color = TsmColors.TextDim, fontSize = 13.sp)
             val years = listOf(year - 1, year)
@@ -185,6 +205,7 @@ fun PaymentsScreen(c: MatchController) {
         }
     }
     if (newFee) FeeDialog(c, null) { newFee = false }
+    editType?.let { t -> PayTypeDialog(c, t) { editType = null } }
     editFee?.let { f -> FeeDialog(c, f) { editFee = null } }
 }
 
@@ -364,7 +385,7 @@ private fun ChargeDialog(c: MatchController, ch: Charge, onDone: () -> Unit) {
                 for (p in ch.payments) {
                     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text("${Fees.money(p.cents, lang.locale)} · ${payMethodName(s, p.method)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text("${Fees.money(p.cents, lang.locale)} · ${com.tennis.scoremanager.ui.paymentName(s, p)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
                             Text(listOf(shortDate(p.at, lang), s.payReceiptNo(p.receipt), p.ref).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 12.sp)
                         }
                         androidx.compose.material3.IconButton(onClick = { share(p.id) }) { Icon(Icons.Filled.Receipt, s.payReceipt, tint = TsmColors.Ball) }
@@ -405,7 +426,10 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
     val lang = c.options.value.lang
     var amount by remember { mutableStateOf(plain(ch.left, lang)) }
     var at by remember { mutableStateOf(today()) }
-    var method by remember { mutableStateOf(PayMethod.CASH) }
+    // I modi di pagamento del circolo: il primo è quello proposto.
+    val types = remember { c.payTypes() }
+    var type by remember { mutableStateOf(types.first()) }
+    val method = type.method
     var ref by remember { mutableStateOf("") }
     var receipt by remember { mutableStateOf(true) }
     val cents = Fees.parse(amount)
@@ -417,17 +441,45 @@ private fun PayDialog(c: MatchController, ch: Charge, onPaid: (String) -> Unit, 
                 Text(ch.label, color = TsmColors.TextDim, fontSize = 13.sp)
                 MoneyField(amount, s.payAmount) { amount = it }
                 DateButton(s.payDate, at, lang) { at = it }
-                val methods = PayMethod.entries
-                Segmented(methods.map { SegOption(payMethodName(s, it)) }, methods.indexOf(method), { method = methods[it] }, columns = 3)
+                Segmented(types.map { SegOption(it.name) }, types.indexOf(type), { type = types[it] }, columns = minOf(3, types.size))
                 if (method != PayMethod.CASH) OutlinedTextField(ref, { ref = it.take(60) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.payRef) })
                 com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Receipt, s.payReceiptNow, null, receipt) { receipt = it }
             }
         },
         confirmButton = {
             TextButton(enabled = cents != null && cents > 0, onClick = {
-                val r = Fees.pay(c.clubBook.value, ch.id, cents!!, at, method, if (method == PayMethod.CASH) "" else ref) ?: return@TextButton onDone()
+                val r = Fees.pay(c.clubBook.value, ch.id, cents!!, at, method, if (method == PayMethod.CASH) "" else ref, type.name) ?: return@TextButton onDone()
                 c.saveClubBook(r.first)
                 if (receipt) onPaid(r.second.id) else onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Un modo di pagamento del circolo: nome, link/IBAN/numero, se si paga a distanza. */
+@Composable
+private fun PayTypeDialog(c: MatchController, t0: com.tennis.scoremanager.data.PayType, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var t by remember { mutableStateOf(t0) }
+    val types = c.payTypes()
+    val isNew = types.none { it.id == t0.id }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (isNew) s.ptNew else t0.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(t.name, { t = t.copy(name = it.take(30)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ptName) })
+                OutlinedTextField(t.details, { t = t.copy(details = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.ptDetails) })
+                com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.Euro, s.ptOnline, s.ptOnlineHint, t.online) { t = t.copy(online = it) }
+                if (!isNew && types.size > 1) TextButton(onClick = { c.savePayTypes(types.filter { it.id != t0.id }); onDone() }) { Text(s.ptDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = t.name.isNotBlank(), onClick = {
+                val saved = t.copy(name = t.name.trim(), details = t.details.trim())
+                c.savePayTypes(if (isNew) types + saved else types.map { if (it.id == saved.id) saved else it })
+                onDone()
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
