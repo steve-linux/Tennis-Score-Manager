@@ -1502,6 +1502,14 @@ interface Strings {
     val tmCalledUp: (String) -> String
     val tmSingleN: (Int) -> String
     val tmDoubleN: (Int) -> String
+    val transferPickTitle: String
+    val transferPickHint: String
+    val transferPickAll: String
+    val transferPickNone: String
+    val transferPickWeek: String
+    val transferPickPlayer: String
+    val transferSuspended: String
+    val transferSendN: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3263,6 +3271,14 @@ object ItStrings : Strings {
     override val tmCalledUp: (String) -> String = { "sei convocato per $it." }
     override val tmSingleN: (Int) -> String = { "Singolare $it" }
     override val tmDoubleN: (Int) -> String = { "Doppio $it" }
+    override val transferPickTitle = "Quali partite invii?"
+    override val transferPickHint = "Scegli le partite da mandare all'altro telefono: con loro vanno le foto e le schede dei loro giocatori."
+    override val transferPickAll = "Tutte"
+    override val transferPickNone = "Nessuna"
+    override val transferPickWeek = "Ultimi 7 giorni"
+    override val transferPickPlayer = "Di un giocatore…"
+    override val transferSuspended = "sospesa"
+    override val transferSendN: (Int) -> String = { "Invia ($it)" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5007,6 +5023,14 @@ object EnStrings : Strings {
     override val tmCalledUp: (String) -> String = { "you're called up for $it." }
     override val tmSingleN: (Int) -> String = { "Singles $it" }
     override val tmDoubleN: (Int) -> String = { "Doubles $it" }
+    override val transferPickTitle = "Which matches do you send?"
+    override val transferPickHint = "Pick the matches to send to the other phone: their players' photos and cards go with them."
+    override val transferPickAll = "All"
+    override val transferPickNone = "None"
+    override val transferPickWeek = "Last 7 days"
+    override val transferPickPlayer = "Of a player…"
+    override val transferSuspended = "suspended"
+    override val transferSendN: (Int) -> String = { "Send ($it)" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

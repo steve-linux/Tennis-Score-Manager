@@ -1467,6 +1467,14 @@ object PtStrings : Strings {
     override val tmCalledUp: (String) -> String = { "você está convocado para $it." }
     override val tmSingleN: (Int) -> String = { "Simples $it" }
     override val tmDoubleN: (Int) -> String = { "Duplas $it" }
+    override val transferPickTitle = "Quais partidas você envia?"
+    override val transferPickHint = "Escolha as partidas para mandar ao outro telefone: com elas vão as fotos e fichas dos jogadores."
+    override val transferPickAll = "Todas"
+    override val transferPickNone = "Nenhuma"
+    override val transferPickWeek = "Últimos 7 dias"
+    override val transferPickPlayer = "De um jogador…"
+    override val transferSuspended = "suspensa"
+    override val transferSendN: (Int) -> String = { "Enviar ($it)" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

@@ -70,6 +70,8 @@ import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 /**
  * Storico: le partite finite salvate sul telefono e i giocatori, riconosciuti dal nome, con vittorie, sconfitte
@@ -87,6 +89,7 @@ fun HistoryScreen(c: MatchController) {
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { c.importMatches(it) }
     val scanner = rememberLauncherForActivityResult(ScanContract()) { r -> r.contents?.let { c.receiveFrom(it) } }
     var transferMenu by remember { mutableStateOf(false) }
+    var choosing by remember { mutableStateOf(false) }
     val sendUrl by c.transferUrl.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) { c.refreshHistory() }
@@ -136,7 +139,8 @@ fun HistoryScreen(c: MatchController) {
             confirmButton = {
                 TextButton(onClick = {
                     transferMenu = false
-                    if (!c.startSending()) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+                    // Prima si scelgono le partite da inviare.
+                    choosing = true
                 }) { Text(s.transferSend) }
             },
             dismissButton = {
@@ -150,7 +154,68 @@ fun HistoryScreen(c: MatchController) {
             },
         )
     }
+    if (choosing) TransferPickDialog(c) { ids ->
+        choosing = false
+        if (ids != null && !c.startSending(ids)) Toast.makeText(context, s.transferNoNetwork, Toast.LENGTH_LONG).show()
+    }
     sendUrl?.let { url -> SendDialog(c, url) }
+}
+
+/**
+ * Chi invia sceglie le partite: una casella per ciascuna (finite e sospese, dalla più recente) e le scelte rapide
+ * tutte, nessuna, ultimi 7 giorni, di un giocatore. [onDone] riceve gli id scelti (null = annullato).
+ */
+@Composable
+private fun TransferPickDialog(c: MatchController, onDone: (Set<String>?) -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val all = remember { c.sendableMatches() }
+    // Di solito si manda l'ultima partita: parte già spuntata.
+    var picked by remember { mutableStateOf(setOfNotNull(all.firstOrNull()?.id)) }
+    var byPlayer by remember { mutableStateOf(false) }
+    val players = remember(all) { com.tennis.scoremanager.data.PlayerStats.players(all.map { com.tennis.scoremanager.data.PlayerStats.Played(it, null) }) }
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(s.transferPickTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (all.isEmpty()) { Text(s.historyEmpty, color = TsmColors.TextDim); return@Column }
+                Text(s.transferPickHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                // Scelte rapide.
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    TextButton(onClick = { picked = all.map { it.id }.toSet() }) { Text(s.transferPickAll, color = TsmColors.Ball) }
+                    TextButton(onClick = { picked = emptySet() }) { Text(s.transferPickNone, color = TsmColors.Ball) }
+                    TextButton(onClick = {
+                        val from = System.currentTimeMillis() - 7 * 86_400_000L
+                        picked = all.filter { it.updatedAt >= from }.map { it.id }.toSet()
+                    }) { Text(s.transferPickWeek, color = TsmColors.Ball) }
+                }
+                TextButton(onClick = { byPlayer = !byPlayer }) { Text(s.transferPickPlayer, color = TsmColors.Ball) }
+                if (byPlayer) for (p in players) {
+                    Text(p.name, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clickable {
+                        picked = picked + all.filter { m -> com.tennis.scoremanager.model.Side.entries.any { side -> com.tennis.scoremanager.data.PlayerStats.whos(m.setup, side).any { it.key == p.key } } }.map { it.id }
+                        byPlayer = false
+                    }.padding(vertical = 6.dp, horizontal = 8.dp))
+                }
+                for (m in all) {
+                    val on = m.id in picked
+                    Row(Modifier.fillMaxWidth().clickable { picked = if (on) picked - m.id else picked + m.id }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(checked = on, onCheckedChange = { picked = if (it) picked + m.id else picked - m.id })
+                        Column(Modifier.weight(1f)) {
+                            val who = com.tennis.scoremanager.model.Side.entries.joinToString(" – ") { side -> com.tennis.scoremanager.data.PlayerStats.names(m.setup, side).joinToString(" / ").ifBlank { "?" } }
+                            Text(who, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(
+                                listOfNotNull(com.tennis.scoremanager.data.Reports.date(m.updatedAt, lang), m.setup.event.ifBlank { null }, s.transferSuspended.takeIf { !m.finished }).joinToString(" · "),
+                                color = TsmColors.TextDim, fontSize = 12.sp,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(enabled = picked.isNotEmpty(), onClick = { onDone(picked) }) { Text(s.transferSendN(picked.size)) } },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
 }
 
 /** Finestra di chi invia: il QR con l'indirizzo. Chiudendola il server si spegne. */

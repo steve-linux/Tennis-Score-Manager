@@ -1466,6 +1466,14 @@ object FrStrings : Strings {
     override val tmCalledUp: (String) -> String = { "vous êtes convoqué pour $it." }
     override val tmSingleN: (Int) -> String = { "Simple $it" }
     override val tmDoubleN: (Int) -> String = { "Double $it" }
+    override val transferPickTitle = "Quels matchs envoyez-vous ?"
+    override val transferPickHint = "Choisissez les matchs à envoyer à l'autre téléphone : les photos et fiches de leurs joueurs partent avec."
+    override val transferPickAll = "Tous"
+    override val transferPickNone = "Aucun"
+    override val transferPickWeek = "7 derniers jours"
+    override val transferPickPlayer = "D'un joueur…"
+    override val transferSuspended = "suspendu"
+    override val transferSendN: (Int) -> String = { "Envoyer ($it)" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

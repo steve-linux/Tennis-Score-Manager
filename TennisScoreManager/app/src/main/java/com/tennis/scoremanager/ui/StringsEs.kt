@@ -1464,6 +1464,14 @@ object EsStrings : Strings {
     override val tmCalledUp: (String) -> String = { "estás convocado para $it." }
     override val tmSingleN: (Int) -> String = { "Individual $it" }
     override val tmDoubleN: (Int) -> String = { "Dobles $it" }
+    override val transferPickTitle = "¿Qué partidos envías?"
+    override val transferPickHint = "Elige los partidos que mandar al otro teléfono: con ellos van las fotos y fichas de sus jugadores."
+    override val transferPickAll = "Todos"
+    override val transferPickNone = "Ninguno"
+    override val transferPickWeek = "Últimos 7 días"
+    override val transferPickPlayer = "De un jugador…"
+    override val transferSuspended = "suspendido"
+    override val transferSendN: (Int) -> String = { "Enviar ($it)" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

@@ -1463,6 +1463,14 @@ object DeStrings : Strings {
     override val tmCalledUp: (String) -> String = { "du bist aufgestellt für $it." }
     override val tmSingleN: (Int) -> String = { "Einzel $it" }
     override val tmDoubleN: (Int) -> String = { "Doppel $it" }
+    override val transferPickTitle = "Welche Matches sendest du?"
+    override val transferPickHint = "Wähle die Matches für das andere Telefon: Fotos und Karten ihrer Spieler gehen mit."
+    override val transferPickAll = "Alle"
+    override val transferPickNone = "Keine"
+    override val transferPickWeek = "Letzte 7 Tage"
+    override val transferPickPlayer = "Eines Spielers…"
+    override val transferSuspended = "unterbrochen"
+    override val transferSendN: (Int) -> String = { "Senden ($it)" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

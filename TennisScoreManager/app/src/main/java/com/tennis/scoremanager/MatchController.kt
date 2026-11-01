@@ -3410,15 +3410,22 @@ class MatchController(
     val transferServed = MutableStateFlow(0)
     private var transferServer: TransferServer? = null
 
-    /** Apre il server e prepara il QR. false = nessuna rete locale (Wi-Fi o hotspot) a cui l'altro possa collegarsi. */
-    fun startSending(): Boolean {
+    /** Le partite che si possono inviare: finite e sospese, dalla più recente. */
+    fun sendableMatches(): List<MatchRecord> = (storage.loadFinished() + storage.loadUnfinished()).distinctBy { it.id }.sortedByDescending { it.updatedAt }
+
+    /**
+     * Apre il server e prepara il QR con le partite [ids] scelte da chi invia (null = tutte). Con le partite viaggiano
+     * solo le foto e le schede dei loro giocatori. false = nessuna rete locale (Wi-Fi o hotspot) per l'altro telefono.
+     */
+    fun startSending(ids: Set<String>? = null): Boolean {
         stopSending()
         val host = TvServer.localAddresses().firstOrNull() ?: return false
         val server = TransferServer(
             payload = {
-                val all = storage.loadFinished() + storage.loadUnfinished()
-                // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una).
-                val photos = storage.photoKeys().associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
+                val all = (storage.loadFinished() + storage.loadUnfinished()).filter { ids == null || it.id in ids }
+                // Le foto viaggiano con le partite (piccole: qualche decina di kB l'una), solo dei giocatori di queste.
+                val keys = all.flatMap { m -> Side.entries.flatMap { PlayerStats.names(m.setup, it) } }.map { PlayerStats.key(it) }.toSet()
+                val photos = storage.photoKeys().filter { it in keys }.associateWith { k -> Base64.encodeToString(storage.photoFile(k).readBytes(), Base64.NO_WRAP) }
                 val matchPhotos = all.associate { m ->
                     m.id to storage.matchPhotos(m.id).map { Base64.encodeToString(it.readBytes(), Base64.NO_WRAP) }
                 }.filterValues { it.isNotEmpty() }
