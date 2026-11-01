@@ -683,6 +683,18 @@ Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register d
 - **Zahlungen exportieren (CSV)**: alle Zahlungen des Jahres mit Datum, Quittung, Name, Beschreibung, Zahlungsart, Referenz und Betrag, für die Tabelle des Steuerberaters.
 - Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Profil und Daten*.
 
+### 7.13 Vereinsturniere
+
+Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne** und **FITP**-Turniere verwaltet: Meldungen, Gebühren, Auslosung, Tableau, Gruppen und Ergebnisse. Bei FITP-Turnieren hilft die App Verein und Oberschiedsrichter, ersetzt aber nicht die offiziellen Systeme des Verbands.
+
+- **Neues Turnier**: Name, intern oder FITP, Einzel oder Doppel, Kategorie, **K.-o.-System** oder **Gruppen + Tableau** (wie viele Gruppen und wie viele pro Gruppe weiterkommen), Daten, **Meldegebühr** pro Spieler (sie wird ein Beitrag unter *Beiträge und Zahlungen*), *ins Tableau nur, wer bezahlt hat*, **höchste Rangliste** (z. B. *4.1*: 4.1 und darunter; leer = offen). Bei FITP auch Turniercode und Oberschiedsrichter.
+- **Anmelden**: aus der Datenbank wählen (zuerst die Mitglieder) oder einen Spieler anlegen; im Doppel beide wählen. Mit Gebühr wird die Meldung jedem berechnet und in seiner Karte kassiert (auch mit Quittung).
+- Unter jeder Meldung steht, ob sie **in Ordnung** ist. **FITP**: Wettkampfausweis des Jahres, Wettkampfattest gültig am ersten Turniertag, Rangliste im Limit. **Intern**: gültiges Attest (Nichtmitglieder werden angezeigt, dürfen aber spielen). Für alle: Meldegebühr bezahlt, wenn verlangt. Rot, wer nicht ausgelost wird.
+- **Setzliste**: nach FITP-Rangliste (die Stärksten zuerst); eine Meldung antippen, um von Hand zu setzen. Zwei Gesetzte bis 8 Plätze, danach einer je vier.
+- **Auslosung**: nur gültige Meldungen. Im Tableau steht die Nummer 1 oben, die 2 unten, 3 und 4 (dann 5-8) werden auf ihre Plätze gelost; **Freilose** gehen an die ersten Gesetzten, die von selbst weiterkommen. Mit Gruppen: Verteilung in Schlangenlinie nach Rangliste, jeder gegen jeden; danach **Finaltableau** mit den Gruppensiegern gesetzt und den Zweiten in der Hälfte gegenüber ihrem Gruppensieger. Solange es kein Ergebnis gibt: **Auslosung wiederholen**.
+- **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
+- Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1123,6 +1135,18 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 - **Export payments (CSV)**: all the year's payments with date, receipt, name, description, method, reference and amount, for the accountant's spreadsheet.
 - Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Profile and data* backup.
 
+### 7.13 Club tournaments
+
+With the **Club** role, **Tournaments › Club tournaments** manages **social** and **FITP** tournaments: entries, fees, draw, draw sheet, groups and results. For FITP tournaments the app helps the club and the referee, but it doesn't replace the Federation's official systems.
+
+- **New tournament**: name, social or FITP, singles or doubles, category, **knockout** or **groups + draw** (how many groups and how many go through from each), dates, **entry fee** per player (it becomes a fee in *Fees and payments*), *only paid entries in the draw*, **maximum ranking** (e.g. *4.1*: 4.1 and below may enter; empty = open). For FITP also the tournament code and the referee.
+- **Enter**: pick from the database (members first) or create a player; for doubles pick both. With a fee, the entry is charged to each player and collected from their card (with a receipt too).
+- Under each entry the app says whether it is **in order**. **FITP**: this year's competitive card, competitive certificate valid on the start date, ranking within the limit. **Social**: valid certificate (non-members are flagged, but may play). For all: entry paid, if required. In red whoever won't be drawn.
+- **Seeds**: from the FITP ranking (strongest first); tap an entry to set one by hand. Two seeds up to 8 places, then one every four.
+- **Draw**: only entries in order go in. In the draw sheet seed 1 goes at the top, seed 2 at the bottom, 3 and 4 (then 5-8) drawn among their places; **byes** go to the top seeds and move on by themselves. With groups: snake distribution by ranking and round robin; once the groups are over, **Final draw** with the group winners seeded and the runners-up in the half opposite their group winner. Until there's a result, **Redo the draw**.
+- **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
+- Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1561,6 +1585,18 @@ En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La
 - Arriba: cobrado en el año y lo que queda por cobrar; **Por cobrar** lista quién debe, de la deuda mayor a la menor. También en *Socios* quien debe algo está entre los *por resolver*.
 - **Exportar los pagos (CSV)**: todos los pagos del año con fecha, recibo, nombre, descripción, método, referencia e importe, para la hoja de cálculo del gestor.
 - Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Perfil y datos*.
+
+### 7.13 Torneos del club
+
+Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneos **sociales** y los **FITP**: inscripciones, cuotas, sorteo, cuadro, grupos y resultados. En los torneos FITP la app ayuda al club y al juez árbitro, pero no sustituye los sistemas oficiales de la Federación.
+
+- **Nuevo torneo**: nombre, social o FITP, individual o dobles, categoría, **eliminación directa** o **grupos + cuadro** (cuántos grupos y cuántos pasan de cada uno), fechas, **cuota de inscripción** por jugador (se convierte en una cuota en *Cuotas y pagos*), *en el cuadro solo quien ha pagado*, **clasificación máxima** (p. ej. *4.1*: entran los 4.1 y los de abajo; vacío = open). En los FITP también el código del torneo y el juez árbitro.
+- **Inscribir**: se elige de la base de datos (primero los socios) o se crea un jugador; en dobles se eligen los dos. Con cuota, la inscripción se carga a cada uno y se cobra desde su ficha (también con recibo).
+- Debajo de cada inscrito la app dice si está **en regla**. **FITP**: licencia de competición del año, certificado de competición válido el día del inicio, clasificación dentro del límite. **Social**: certificado válido (quien no es socio se señala, pero puede jugar). Para todos: la inscripción pagada, si se exige. En rojo quien no entra en el sorteo.
+- **Cabezas de serie**: por la clasificación FITP (el más fuerte primero); tocando un inscrito se elige también a mano. Dos cabezas de serie hasta 8 plazas, luego una cada cuatro.
+- **Sorteo**: entran solo los inscritos en regla. En el cuadro el cabeza de serie 1 va arriba, el 2 abajo, el 3 y el 4 (y luego 5-8) sorteados entre sus puestos; los **byes** van a los primeros cabezas de serie, que pasan solos. Con grupos: reparto en serpentina por clasificación y todos contra todos; terminados los grupos, **Cuadro final** con los primeros como cabezas de serie y los segundos en la mitad opuesta al primero de su grupo. Mientras no haya resultados, **Repetir el sorteo**.
+- **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
+- Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2001,6 +2037,18 @@ Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre
 - **Exporter les paiements (CSV)** : tous les paiements de l'année avec date, reçu, nom, libellé, mode, référence et montant, pour le tableur du comptable.
 - En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Profil et données*.
 
+### 7.13 Tournois du club
+
+Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **internes** et **FITP** : inscriptions, droits, tirage, tableau, poules et résultats. Pour les tournois FITP l'appli aide le club et le juge-arbitre, mais ne remplace pas les systèmes officiels de la Fédération.
+
+- **Nouveau tournoi** : nom, interne ou FITP, simple ou double, catégorie, **élimination directe** ou **poules + tableau** (combien de poules et combien de qualifiés par poule), dates, **droit d'inscription** par joueur (il devient une cotisation dans *Cotisations et paiements*), *au tableau seulement ceux qui ont payé*, **classement maximum** (ex. *4.1* : les 4.1 et en dessous ; vide = open). Pour les FITP aussi le code du tournoi et le juge-arbitre.
+- **Inscrire** : on choisit dans la base (d'abord les adhérents) ou on crée un joueur ; en double on choisit les deux. Avec un droit, l'inscription est facturée à chacun et s'encaisse depuis sa fiche (avec reçu).
+- Sous chaque inscrit, l'appli dit s'il est **en règle**. **FITP** : licence compétition de l'année, certificat compétition valable le jour du début, classement dans la limite. **Interne** : certificat valable (les non-adhérents sont signalés, mais peuvent jouer). Pour tous : l'inscription payée, si on l'exige. En rouge ceux qui ne seront pas tirés.
+- **Têtes de série** : d'après le classement FITP (le plus fort d'abord) ; en touchant un inscrit on la choisit aussi à la main. Deux têtes de série jusqu'à 8 places, puis une toutes les quatre.
+- **Tirage au sort** : seuls les inscrits en règle entrent. Au tableau la tête de série 1 va en haut, la 2 en bas, la 3 et la 4 (puis 5-8) tirées entre leurs places ; les **exempts** vont aux premières têtes de série, qui passent toutes seules. Avec les poules : répartition en serpentin par classement et chacun contre tous ; poules terminées, **Tableau final** avec les premiers en têtes de série et les deuxièmes dans la moitié opposée au premier de leur poule. Tant qu'il n'y a pas de résultat, **Refaire le tirage**.
+- **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
+- En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2440,6 +2488,18 @@ In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del 
 - **Esporta i pagamenti (CSV)**: tutti i pagamenti dell'anno con data, ricevuta, nome, descrizione, metodo, riferimento e importo, per il foglio di calcolo del commercialista.
 - Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Profilo e dati*.
 
+### 7.13 Tornei del circolo
+
+Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i tornei **sociali** e quelli **FITP**: iscrizioni, quote, sorteggio, tabellone, gironi e risultati. Per i tornei FITP l'app aiuta il circolo e il giudice arbitro, ma non sostituisce i sistemi ufficiali della Federazione.
+
+- **Nuovo torneo**: nome, sociale o FITP, singolare o doppio, categoria, **eliminazione diretta** o **gironi + tabellone** (quanti gironi e quanti passano da ciascuno), date, **quota d'iscrizione** per giocatore (diventa una quota in *Quote e pagamenti*), *nel tabellone solo chi ha pagato*, **classifica massima** (es. *4.1*: entrano i 4.1 e chi è sotto; vuoto = open). Per i FITP anche il codice del torneo e il giudice arbitro.
+- **Iscrivi**: si sceglie dal database (prima i soci) o si crea un giocatore; nel doppio si scelgono i due. Con la quota, l'iscrizione si addebita a ciascuno e si incassa dalla sua scheda (anche con la ricevuta).
+- Sotto ogni iscritto l'app dice se è **in regola**. **FITP**: tessera agonistica dell'anno, certificato agonistico valido il giorno d'inizio, classifica nel limite. **Sociale**: certificato valido (chi non è socio si segnala, ma può giocare). Per tutti: l'iscrizione pagata, se la si chiede. In rosso chi non entra nel sorteggio.
+- **Teste di serie**: dalla classifica FITP (più forte = prima); toccando un iscritto la si sceglie anche a mano. Due teste di serie fino a 8 posti, poi una ogni quattro.
+- **Sorteggio**: entrano solo gli iscritti in regola. Nel tabellone la testa di serie 1 va in cima, la 2 in fondo, la 3 e la 4 (e poi le 5-8) sorteggiate tra i loro posti; i **bye** vanno alle prime teste di serie e passano da soli. Con i gironi: distribuzione a serpentina per classifica e tutti contro tutti; a gironi finiti, **Tabellone finale** con i primi come teste di serie e i secondi nella metà opposta al primo del loro girone. Finché non c'è un risultato, **Rifai il sorteggio**.
+- **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
+- Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2878,6 +2938,18 @@ Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do 
 - No alto: recebido no ano e o que falta receber; **A receber** lista quem deve, da maior dívida para a menor. Também em *Sócios* quem deve algo está entre os *a resolver*.
 - **Exportar os pagamentos (CSV)**: todos os pagamentos do ano com data, recibo, nome, descrição, método, referência e valor, para a planilha do contador.
 - Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Perfil e dados*.
+
+### 7.13 Torneios do clube
+
+Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os torneios **sociais** e os **FITP**: inscrições, taxas, sorteio, chave, grupos e resultados. Nos torneios FITP o app ajuda o clube e o árbitro geral, mas não substitui os sistemas oficiais da Federação.
+
+- **Novo torneio**: nome, social ou FITP, simples ou duplas, categoria, **eliminação direta** ou **grupos + chave** (quantos grupos e quantos passam de cada um), datas, **taxa de inscrição** por jogador (vira uma mensalidade em *Mensalidades e pagamentos*), *na chave só quem pagou*, **ranking máximo** (ex. *4.1*: entram os 4.1 e os abaixo; vazio = open). Nos FITP também o código do torneio e o árbitro geral.
+- **Inscrever**: escolha no banco de dados (primeiro os sócios) ou crie um jogador; nas duplas escolha os dois. Com taxa, a inscrição é cobrada de cada um e recebida na ficha dele (também com recibo).
+- Embaixo de cada inscrito o app diz se está **em ordem**. **FITP**: cartão de competição do ano, atestado de competição válido no dia do início, ranking dentro do limite. **Social**: atestado válido (quem não é sócio é indicado, mas pode jogar). Para todos: a inscrição paga, se exigida. Em vermelho quem não entra no sorteio.
+- **Cabeças de chave**: pelo ranking FITP (o mais forte primeiro); tocando num inscrito dá para escolher à mão. Dois cabeças de chave até 8 posições, depois um a cada quatro.
+- **Sorteio**: entram só os inscritos em ordem. Na chave o cabeça 1 vai no topo, o 2 no fim, o 3 e o 4 (depois 5-8) sorteados entre as suas posições; os **byes** vão para os primeiros cabeças, que passam sozinhos. Com grupos: distribuição em serpentina pelo ranking e todos contra todos; terminados os grupos, **Chave final** com os primeiros como cabeças e os segundos na metade oposta ao primeiro do seu grupo. Enquanto não houver resultado, **Refazer o sorteio**.
+- **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
+- Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3694,7 +3766,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4224,6 +4296,8 @@ class MatchController(
             Screen.DRILLS -> Screen.HOME
             Screen.MEMBERS -> Screen.HOME
             Screen.PAYMENTS -> Screen.HOME
+            Screen.CLUB_TOURNAMENTS -> Screen.HOME
+            Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4749,7 +4823,8 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; Screen.PAYMENTS -> Screen.PAYMENTS; else -> Screen.STUDENTS }
+        // Indietro torna da dove si è aperta la scheda.
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -4815,6 +4890,151 @@ class MatchController(
     fun saveClubBook(book: com.tennis.scoremanager.data.ClubBook) {
         clubBook.value = book
         scope.launch(io) { storage.saveClubBook(book) }
+    }
+
+    // ---- Tornei del circolo (sociali e FITP) ----
+
+    val clubTournaments = MutableStateFlow(storage.loadClubTournaments())
+    val openClubTournamentId = MutableStateFlow<String?>(null)
+    /** Partita del tabellone che si sta per giocare col segnapunti: (torneo, partita). */
+    private var pendingClubMatch: Pair<String, String>? = null
+
+    fun openClubTournaments() {
+        refreshPlayers()
+        screen.value = Screen.CLUB_TOURNAMENTS
+    }
+
+    fun openClubTournament(id: String) {
+        openClubTournamentId.value = id
+        screen.value = Screen.CLUB_TOURNAMENT
+    }
+
+    fun clubTournament(id: String?): com.tennis.scoremanager.data.ClubTournament? = id?.let { i -> clubTournaments.value.firstOrNull { it.id == i } }
+
+    fun saveClubTournament(t: com.tennis.scoremanager.data.ClubTournament) {
+        val list = clubTournaments.value.filter { it.id != t.id } + t
+        clubTournaments.value = list
+        // La quota d'iscrizione è una quota del registro: nome e importo seguono il torneo.
+        if (t.feeCents > 0) {
+            val book = clubBook.value
+            val fee = book.fees.firstOrNull { it.id == t.feeId }
+            val name = strings.ctFeeName(t.name)
+            val want = (fee ?: com.tennis.scoremanager.data.Fee(t.feeId ?: com.tennis.scoremanager.data.Fees.newId("f"), name, t.feeCents, com.tennis.scoremanager.data.FeeKind.TOURNAMENT, createdAt = System.currentTimeMillis(), tournament = t.id))
+                .copy(name = name, cents = t.feeCents, due = t.start)
+            if (want != fee) saveClubBook(book.copy(fees = book.fees.filter { it.id != want.id } + want))
+            if (t.feeId != want.id) return saveClubTournament(t.copy(feeId = want.id))
+        }
+        scope.launch(io) { storage.saveClubTournaments(list) }
+    }
+
+    /** Toglie il torneo; dal registro spariscono le iscrizioni non pagate (quelle pagate restano: contabilità). */
+    fun deleteClubTournament(id: String) {
+        val t = clubTournament(id) ?: return
+        val list = clubTournaments.value.filter { it.id != id }
+        clubTournaments.value = list
+        t.feeId?.let { f -> dropUnpaidFees(f, null) }
+        scope.launch(io) { storage.saveClubTournaments(list) }
+    }
+
+    private fun dropUnpaidFees(feeId: String, players: Set<String>?) {
+        var book = clubBook.value
+        for (ch in book.charges.filter { it.fee == feeId && (players == null || it.player in players) && it.payments.isEmpty() }) book = com.tennis.scoremanager.data.Fees.cancel(book, ch.id)
+        saveClubBook(book)
+    }
+
+    /** Iscrive un giocatore (o una coppia); con la quota, l'iscrizione si addebita a ciascuno. */
+    fun addClubEntry(t: com.tennis.scoremanager.data.ClubTournament, people: List<com.tennis.scoremanager.data.PlayerProfile>) {
+        val now = System.currentTimeMillis()
+        val e = com.tennis.scoremanager.data.CTEntry(com.tennis.scoremanager.data.ClubTournaments.newId("e"), people.map { it.id }, people.map { it.name }, at = now)
+        val saved = t.copy(entries = t.entries + e)
+        saveClubTournament(saved)
+        val cur = clubTournament(t.id) ?: return
+        val fee = clubBook.value.fees.firstOrNull { it.id == cur.feeId } ?: return
+        var book = clubBook.value
+        for (p in people) if (book.charges.none { it.fee == fee.id && it.player == p.id && !it.cancelled }) book = com.tennis.scoremanager.data.Fees.charge(book, p, fee.name, fee.cents, now, fee)
+        saveClubBook(book)
+    }
+
+    fun removeClubEntry(t: com.tennis.scoremanager.data.ClubTournament, entryId: String) {
+        val e = t.entries.firstOrNull { it.id == entryId } ?: return
+        saveClubTournament(t.copy(entries = t.entries - e))
+        t.feeId?.let { dropUnpaidFees(it, e.players.toSet()) }
+    }
+
+    /** Il sorteggio: entrano gli iscritti in regola, in ordine di classifica; gironi o tabellone. */
+    fun drawClubTournament(t: com.tennis.scoremanager.data.ClubTournament): Boolean {
+        val now = System.currentTimeMillis()
+        val ok = com.tennis.scoremanager.data.ClubTournaments.eligible(t, players.value, clubBook.value, now)
+        if (ok.size < 2) return false
+        val ids = com.tennis.scoremanager.data.ClubTournaments.ordered(ok, players.value).map { it.id }
+        val ms = if (t.format == com.tennis.scoremanager.data.CTFormat.GROUPS) com.tennis.scoremanager.data.ClubTournaments.groupsDraw(ids, t.groups)
+        else com.tennis.scoremanager.data.ClubTournaments.knockout(ids, kotlin.random.Random(now), now)
+        saveClubTournament(t.copy(matches = ms, drawnAt = now))
+        return true
+    }
+
+    /** Finiti i gironi: il tabellone con chi passa. */
+    fun clubKnockoutFromGroups(t: com.tennis.scoremanager.data.ClubTournament) {
+        val ko = com.tennis.scoremanager.data.ClubTournaments.knockoutFromGroups(t, kotlin.random.Random(System.currentTimeMillis()), System.currentTimeMillis())
+        saveClubTournament(t.copy(matches = t.matches.filter { it.round == 0 } + ko))
+    }
+
+    /** Rifà il sorteggio da capo (si può finché non c'è un risultato). */
+    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null))
+
+    fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
+        saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))
+
+    fun setClubSchedule(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, court: String, at: Long?) =
+        saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(court = court, at = at) else it }))
+
+    /** Nome del turno: finale, semifinali, quarti, ottavi… o "Girone A". */
+    fun clubRoundName(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch): String = com.tennis.scoremanager.ui.ctRoundName(strings, t, m)
+
+    /**
+     * Gioca una partita del tabellone col segnapunti: Nuova partita si apre con giocatori, torneo, turno e campo già
+     * scritti; a partita finita il risultato torna da solo nel tabellone.
+     */
+    fun playClubMatch(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch) {
+        val a = t.entries.firstOrNull { it.id == m.a } ?: return
+        val b = t.entries.firstOrNull { it.id == m.b } ?: return
+        fun p(e: com.tennis.scoremanager.data.CTEntry, i: Int) = e.players.getOrNull(i)?.let { playerById(it) }
+        fun name(e: com.tennis.scoremanager.data.CTEntry, i: Int) = p(e, i)?.name ?: e.names.getOrNull(i).orEmpty()
+        fun rank(e: com.tennis.scoremanager.data.CTEntry, i: Int) = p(e, i)?.member?.ranking.orEmpty()
+        updateSetup {
+            it.copy(
+                club = storage.clubName.ifBlank { it.club }, court = m.court.ifBlank { it.court }, doubles = t.doubles,
+                p1a = name(a, 0), p1b = if (t.doubles) name(a, 1) else "", p2a = name(b, 0), p2b = if (t.doubles) name(b, 1) else "",
+                p1aId = a.players.getOrNull(0).orEmpty(), p1bId = if (t.doubles) a.players.getOrNull(1).orEmpty() else "",
+                p2aId = b.players.getOrNull(0).orEmpty(), p2bId = if (t.doubles) b.players.getOrNull(1).orEmpty() else "",
+                p1aRank = rank(a, 0), p1bRank = if (t.doubles) rank(a, 1) else "", p2aRank = rank(b, 0), p2bRank = if (t.doubles) rank(b, 1) else "",
+                event = t.name, category = t.category, round = clubRoundName(t, m),
+            )
+        }
+        pendingClubMatch = t.id to m.id
+        go(Screen.SETUP)
+    }
+
+    /** La partita appena iniziata è quella del tabellone scelta con [playClubMatch]. */
+    private fun linkClubMatch(recordId: String, su: SetupData) {
+        val (tid, mid) = pendingClubMatch ?: return
+        pendingClubMatch = null
+        val t = clubTournament(tid) ?: return
+        val m = t.matches.firstOrNull { it.id == mid } ?: return
+        // Solo se in campo ci sono proprio loro: chi è tornato indietro e ha iniziato un'altra partita non la lega al torneo.
+        val a = t.entries.firstOrNull { it.id == m.a }?.players?.firstOrNull()
+        val b = t.entries.firstOrNull { it.id == m.b }?.players?.firstOrNull()
+        if (a == null || b == null || su.p1aId != a || su.p2aId != b) return
+        saveClubTournament(t.copy(matches = t.matches.map { if (it.id == mid) it.copy(record = recordId) else it }))
+    }
+
+    /** A partita finita, il risultato va nel tabellone (Giocatore 1 = il primo iscritto della partita). */
+    private fun clubMatchFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        for (t in clubTournaments.value) {
+            val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
+            val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+        }
     }
 
     /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
@@ -5179,6 +5399,7 @@ class MatchController(
             scope.launch(io) { storage.savePlayers(list) }
         }
         val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
+        linkClubMatch(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -5438,6 +5659,7 @@ class MatchController(
             batteryEnd = endBattery, heart = heartMap,
         )
         runningSince = null
+        clubMatchFinished(rec, lm.state)
         scope.launch(io) {
             storage.deleteMatch(rec.id)
             storage.saveFinished(rec)
@@ -8980,6 +9202,361 @@ object Fees {
         }
         return (listOf(header) + rows).joinToString("\r\n") + "\r\n"
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+import kotlin.random.Random
+
+/** Torneo sociale (interno al circolo) o FITP (con le regole della Federazione su tessera, certificato e classifica). */
+@Serializable
+enum class CTKind { SOCIAL, FITP }
+
+/** Eliminazione diretta, oppure gironi all'italiana e poi tabellone a eliminazione. */
+@Serializable
+enum class CTFormat { KNOCKOUT, GROUPS }
+
+/** Un iscritto: un giocatore (singolare) o una coppia (doppio); [names] com'erano all'iscrizione. */
+@Serializable
+data class CTEntry(
+    val id: String,
+    val players: List<String>,
+    val names: List<String>,
+    /** Testa di serie scelta a mano (1 = la prima); null = dalla classifica. */
+    val seed: Int? = null,
+    val at: Long = 0,
+)
+
+/**
+ * Una partita. [round] 0 = gironi ([group] il girone), da 1 il tabellone (1 = primo turno). [a] e [b] sono gli
+ * iscritti (CTEntry.id); nel tabellone null = ancora da decidere, o bye nel primo turno. [score] è dal lato di [a].
+ */
+@Serializable
+data class CTMatch(
+    val id: String,
+    val round: Int,
+    val slot: Int,
+    val group: Int? = null,
+    val a: String? = null,
+    val b: String? = null,
+    val winner: String? = null,
+    val score: String = "",
+    /** Vinta a tavolino (l'altro non si è presentato) o per ritiro durante la partita. */
+    val walkover: Boolean = false,
+    val retired: Boolean = false,
+    val court: String = "",
+    val at: Long? = null,
+    /** La partita segnata col segnapunti (MatchRecord.id), se è stata giocata dal vivo. */
+    val record: String? = null,
+) {
+    val played: Boolean get() = winner != null
+    val bye: Boolean get() = round == 1 && (a == null) != (b == null)
+}
+
+@Serializable
+data class ClubTournament(
+    val id: String,
+    val name: String,
+    val kind: CTKind = CTKind.SOCIAL,
+    val format: CTFormat = CTFormat.KNOCKOUT,
+    val doubles: Boolean = false,
+    /** Categoria o tabellone ("Singolare maschile", "Over 45", "Lim. 4.1"). */
+    val category: String = "",
+    val start: Long? = null,
+    val end: Long? = null,
+    /** Quota d'iscrizione per giocatore (centesimi) e la quota corrispondente nel registro del circolo. */
+    val feeCents: Int = 0,
+    val feeId: String? = null,
+    /** Nel tabellone solo chi ha pagato l'iscrizione. */
+    val requirePaid: Boolean = true,
+    /** Classifica massima ("4.1" = possono iscriversi i 4.1 e chi è sotto); vuota = open. */
+    val rankLimit: String = "",
+    /** Torneo FITP: codice del torneo e giudice arbitro. */
+    val fitpCode: String = "",
+    val referee: String = "",
+    /** Gironi: quanti e quanti passano da ciascuno al tabellone. */
+    val groups: Int = 2,
+    val qualify: Int = 2,
+    val entries: List<CTEntry> = emptyList(),
+    val matches: List<CTMatch> = emptyList(),
+    /** Quando è stato fatto il sorteggio (null = iscrizioni aperte). */
+    val drawnAt: Long? = null,
+    val createdAt: Long = 0,
+) {
+    val drawn: Boolean get() = drawnAt != null
+    /** Turni del tabellone (1 = primo turno). */
+    val rounds: Int get() = matches.filter { it.round > 0 }.maxOfOrNull { it.round } ?: 0
+    /** Il vincitore: chi ha vinto la finale. */
+    val champion: String? get() = if (rounds == 0) null else matches.firstOrNull { it.round == rounds }?.winner
+    val groupsDone: Boolean get() = matches.filter { it.round == 0 }.let { it.isNotEmpty() && it.all(CTMatch::played) }
+}
+
+object ClubTournaments {
+    /** Perché un giocatore non può entrare nel tabellone ([blocking]) o cosa conviene controllare. */
+    enum class Problem { NOT_MEMBER, NO_MEDICAL, MEDICAL_NOT_AGONISTIC, NO_FITP_CARD, NOT_AGONIST_CARD, RANK_TOO_HIGH, UNPAID }
+
+    fun blocking(p: Problem): Boolean = p != Problem.NOT_MEMBER
+
+    fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
+
+    private fun year(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.YEAR)
+
+    /** Ha pagato l'iscrizione al torneo (o non c'è quota). */
+    fun paid(t: ClubTournament, p: PlayerProfile, book: ClubBook): Boolean {
+        if (t.feeCents <= 0 || t.feeId == null) return true
+        val keys = setOf(p.id) + p.aliases
+        val mine = book.charges.filter { it.fee == t.feeId && it.player in keys }
+        return mine.isNotEmpty() && mine.all { it.settled }
+    }
+
+    /**
+     * I problemi di un giocatore per [t], al giorno d'inizio (o a [now] se non c'è). FITP: tessera agonistica
+     * dell'anno, certificato agonistico valido, classifica nel limite. Sociale: certificato valido e, solo da
+     * controllare, se non è socio. Per tutti: l'iscrizione pagata, se la si chiede.
+     */
+    fun problems(t: ClubTournament, p: PlayerProfile, book: ClubBook, now: Long): List<Problem> {
+        val day = t.start ?: now
+        val m = p.member
+        val out = mutableListOf<Problem>()
+        if (t.kind == CTKind.SOCIAL && m == null) out += Problem.NOT_MEMBER
+        if (m == null || !Members.medicalValid(m, day)) out += Problem.NO_MEDICAL
+        else if (t.kind == CTKind.FITP && m.medical != MedicalKind.AGONISTIC) out += Problem.MEDICAL_NOT_AGONISTIC
+        if (t.kind == CTKind.FITP) {
+            if (m == null || m.fitpNumber.isBlank() || m.fitpYear != year(day)) out += Problem.NO_FITP_CARD
+            else if (m.fitpCard != FitpCard.AGONIST) out += Problem.NOT_AGONIST_CARD
+        }
+        Members.rankingValue(t.rankLimit)?.let { limit ->
+            // Più basso = più forte: chi è più forte del limite non entra; senza classifica vale come NC.
+            if ((Members.rankingValue(m?.ranking.orEmpty()) ?: 4.9) < limit - 1e-9) out += Problem.RANK_TOO_HIGH
+        }
+        if (t.requirePaid && !paid(t, p, book)) out += Problem.UNPAID
+        return out
+    }
+
+    /** Gli iscritti che possono entrare nel tabellone (nessun problema grave per nessuno dei giocatori). */
+    fun eligible(t: ClubTournament, players: List<PlayerProfile>, book: ClubBook, now: Long): List<CTEntry> = t.entries.filter { e ->
+        e.players.all { id -> Players.byId(players, id)?.let { p -> problems(t, p, book, now).none(::blocking) } == true }
+    }
+
+    /** La classifica di un iscritto per le teste di serie: la migliore della coppia (senza = 5, in fondo). */
+    fun rank(e: CTEntry, players: List<PlayerProfile>): Double =
+        e.players.mapNotNull { Players.byId(players, it)?.member?.ranking?.let(Members::rankingValue) }.let { r ->
+            if (r.isEmpty()) 5.0 else if (r.size == 1 && e.players.size == 2) (r[0] + 5.0) / 2 else r.average()
+        }
+
+    /** Ordine per le teste di serie: prima quelle scelte a mano, poi per classifica, a pari classifica chi si è iscritto prima. */
+    fun ordered(entries: List<CTEntry>, players: List<PlayerProfile>): List<CTEntry> =
+        entries.sortedWith(compareBy<CTEntry>({ it.seed ?: Int.MAX_VALUE }, { rank(it, players) }, { it.at }))
+
+    fun drawSize(n: Int): Int { var s = 1; while (s < n) s *= 2; return s }
+
+    /** Teste di serie: due fino a 8 posti, poi una ogni quattro (16 → 4, 32 → 8). */
+    fun seedCount(size: Int): Int = if (size <= 2) 0 else maxOf(2, size / 4)
+
+    /** Per ogni posto del tabellone, il numero di testa di serie che ci va (posto 0 = la 1, ultimo = la 2). */
+    fun seedOrder(size: Int): List<Int> {
+        var order = listOf(1)
+        var n = 1
+        while (n < size) {
+            n *= 2
+            // Le coppie si alternano (1-8, 5-4, 3-6, 7-2): così la 2 finisce in fondo al tabellone.
+            order = order.flatMapIndexed { i, k -> if (i % 2 == 0) listOf(k, n + 1 - k) else listOf(n + 1 - k, k) }
+        }
+        return order
+    }
+
+    private fun knockoutMatches(slots: List<String?>, now: Long): List<CTMatch> {
+        val size = slots.size
+        val out = mutableListOf<CTMatch>()
+        var round = 1
+        var count = size / 2
+        while (count >= 1) {
+            for (i in 0 until count) {
+                out += if (round == 1) CTMatch(newId("m"), 1, i, a = slots[2 * i], b = slots[2 * i + 1]) else CTMatch(newId("m"), round, i)
+            }
+            round++
+            count /= 2
+        }
+        return propagate(out)
+    }
+
+    /**
+     * Il tabellone a eliminazione: teste di serie nei loro posti (la 1 in alto, la 2 in fondo, 3-4 e 5-8 sorteggiate
+     * tra i loro posti), i bye contro le prime teste di serie, gli altri a sorte.
+     */
+    fun knockout(ordered: List<String>, random: Random, now: Long): List<CTMatch> {
+        val n = ordered.size
+        if (n < 2) return emptyList()
+        val size = drawSize(n)
+        val order = seedOrder(size)
+        val posOf = IntArray(size + 1).also { a -> order.forEachIndexed { pos, k -> a[k] = pos } }
+        val slots = arrayOfNulls<String>(size)
+        val taken = BooleanArray(size)
+        val seeds = minOf(seedCount(size), n)
+        // Teste di serie: 1 e 2 fisse, poi i gruppi 3-4, 5-8, 9-16 sorteggiati tra i loro posti.
+        var k = 1
+        while (k <= seeds) {
+            val tierEnd = if (k <= 2) k else minOf(seeds, k * 2 - 2)
+            val positions = (k..tierEnd).map { posOf[it] }.shuffled(random)
+            for ((i, s) in (k..tierEnd).withIndex()) { slots[positions[i]] = ordered[s - 1]; taken[positions[i]] = true }
+            k = tierEnd + 1
+        }
+        // I bye vanno contro le teste di serie, in ordine (e oltre, contro i posti dei numeri dopo).
+        val byes = size - n
+        for (b in 1..byes) taken[posOf[b] xor 1] = true
+        val rest = ordered.drop(seeds).shuffled(random)
+        var r = 0
+        for (pos in 0 until size) if (!taken[pos] && slots[pos] == null) { slots[pos] = rest[r++]; taken[pos] = true }
+        return knockoutMatches(slots.toList(), now)
+    }
+
+    /** Gironi a serpentina per classifica (1 nel girone A, 2 nel B… e poi a ritroso), tutti contro tutti. */
+    fun groupsDraw(ordered: List<String>, groups: Int): List<CTMatch> {
+        val g = groups.coerceIn(1, maxOf(1, ordered.size / 2))
+        val lists = List(g) { mutableListOf<String>() }
+        ordered.forEachIndexed { i, e ->
+            val row = i / g
+            val col = i % g
+            lists[if (row % 2 == 0) col else g - 1 - col] += e
+        }
+        val out = mutableListOf<CTMatch>()
+        for ((gi, members) in lists.withIndex()) {
+            var slot = 0
+            for (pair in roundRobin(members)) out += CTMatch(newId("m"), 0, slot++, group = gi, a = pair.first, b = pair.second)
+        }
+        return out
+    }
+
+    /** Tutti contro tutti col metodo del cerchio: le partite turno per turno, così chi ha giocato riposa. */
+    fun <T> roundRobin(list: List<T>): List<Pair<T, T>> {
+        val items: MutableList<T?> = list.toMutableList<T?>().also { if (it.size % 2 == 1) it += null }
+        val n = items.size
+        val out = mutableListOf<Pair<T, T>>()
+        repeat(n - 1) {
+            for (i in 0 until n / 2) {
+                val a = items[i]; val b = items[n - 1 - i]
+                if (a != null && b != null) out += a to b
+            }
+            items.add(1, items.removeAt(n - 1))
+        }
+        return out
+    }
+
+    /** I membri di ogni girone, nell'ordine del sorteggio. */
+    fun groupMembers(t: ClubTournament): List<List<String>> =
+        t.matches.filter { it.round == 0 }.groupBy { it.group ?: 0 }.toSortedMap().values.map { ms -> ms.flatMap { listOfNotNull(it.a, it.b) }.distinct() }
+
+    /** I set di un punteggio dal lato di a: "6-4 3-6 10-8" → [(6,4),(3,6),(10,8)]; "7-6(5)" vale 7-6. */
+    fun sets(score: String): List<Pair<Int, Int>> =
+        Regex("(\\d{1,2})\\s*[-/]\\s*(\\d{1,2})").findAll(score.replace(Regex("\\(\\d+\\)"), "")).map { it.groupValues[1].toInt() to it.groupValues[2].toInt() }.toList()
+
+    /** Chi ha vinto secondo il punteggio (più set; a pari set, più game): "a", "b" o null. */
+    fun winnerFromScore(score: String): String? {
+        val s = sets(score)
+        if (s.isEmpty()) return null
+        val wa = s.count { it.first > it.second }; val wb = s.count { it.second > it.first }
+        if (wa != wb) return if (wa > wb) "a" else "b"
+        val ga = s.sumOf { it.first }; val gb = s.sumOf { it.second }
+        return if (ga == gb) null else if (ga > gb) "a" else "b"
+    }
+
+    data class Standing(val entry: String, val played: Int, val won: Int, val setsWon: Int, val setsLost: Int, val gamesWon: Int, val gamesLost: Int)
+
+    /** La classifica di un girone: vittorie, poi differenza set, poi differenza game, poi lo scontro diretto. */
+    fun standings(t: ClubTournament, group: Int): List<Standing> {
+        val members = groupMembers(t).getOrNull(group).orEmpty()
+        val ms = t.matches.filter { it.round == 0 && it.group == group && it.played }
+        val table = members.map { e ->
+            var played = 0; var won = 0; var sw = 0; var sl = 0; var gw = 0; var gl = 0
+            for (m in ms) {
+                val mine = when (e) { m.a -> true; m.b -> false; else -> continue }
+                played++
+                if (m.winner == e) won++
+                for ((x, y) in sets(m.score)) {
+                    val (f, a) = if (mine) x to y else y to x
+                    gw += f; gl += a
+                    if (f > a) sw++ else if (a > f) sl++
+                }
+            }
+            Standing(e, played, won, sw, sl, gw, gl)
+        }
+        fun beat(x: String, y: String) = ms.any { (it.a == x && it.b == y || it.a == y && it.b == x) && it.winner == x }
+        return table.sortedWith { x, y ->
+            compareValuesBy(y, x, { it.won }, { it.setsWon - it.setsLost }, { it.gamesWon - it.gamesLost }).takeIf { it != 0 }
+                ?: if (beat(x.entry, y.entry)) -1 else if (beat(y.entry, x.entry)) 1 else 0
+        }
+    }
+
+    /**
+     * Il tabellone dopo i gironi: i primi come teste di serie (A1, B1…), i secondi nella metà opposta al primo del
+     * loro girone, così due dello stesso girone si ritrovano solo in finale (con due gironi) o il più tardi possibile.
+     */
+    fun knockoutFromGroups(t: ClubTournament, random: Random, now: Long): List<CTMatch> {
+        val tables = (0 until groupMembers(t).size).map { standings(t, it).map(Standing::entry) }
+        val q = t.qualify.coerceAtLeast(1)
+        val winners = tables.mapNotNull { it.getOrNull(0) }
+        val others = (1 until q).flatMap { k -> tables.mapIndexedNotNull { g, list -> list.getOrNull(k)?.let { it to g } } }
+        val n = winners.size + others.size
+        if (n < 2) return emptyList()
+        val size = drawSize(n)
+        val order = seedOrder(size)
+        val posOf = IntArray(size + 1).also { a -> order.forEachIndexed { pos, k -> a[k] = pos } }
+        val slots = arrayOfNulls<String>(size)
+        val taken = BooleanArray(size)
+        val groupHalf = mutableMapOf<Int, Boolean>()
+        winners.forEachIndexed { i, w -> val pos = posOf[i + 1]; slots[pos] = w; taken[pos] = true; groupHalf[i] = pos < size / 2 }
+        for (b in 1..(size - n)) taken[posOf[b] xor 1] = true
+        for ((e, g) in others) {
+            val top = groupHalf[g]?.not()
+            // Nella metà opposta al primo del girone; se non c'è posto, dove c'è.
+            val free = (0 until size).filter { !taken[it] }
+            val pos = free.filter { top == null || (it < size / 2) == top }.let { if (it.isEmpty()) free else it }.let { it[random.nextInt(it.size)] }
+            slots[pos] = e; taken[pos] = true
+        }
+        return knockoutMatches(slots.toList(), now)
+    }
+
+    /**
+     * Porta i vincitori al turno dopo (anche i bye del primo turno). Se un risultato cambia, la partita dopo che
+     * non ha più quel giocatore perde il suo risultato.
+     */
+    fun propagate(matches: List<CTMatch>): List<CTMatch> {
+        // Solo il tabellone: le partite dei gironi non hanno un turno dopo (e i loro slot si ripetono tra gironi).
+        val byKey = matches.filter { it.round > 0 }.associateBy { it.round to it.slot }.toMutableMap()
+        // Bye: passa da solo.
+        for ((k, m) in byKey.toMap()) if (m.round == 1 && m.bye && m.winner == null) byKey[k] = m.copy(winner = m.a ?: m.b)
+        val rounds = matches.maxOfOrNull { it.round } ?: 0
+        for (r in 1 until rounds) {
+            for (m in byKey.values.filter { it.round == r }.sortedBy { it.slot }) {
+                val key = r + 1 to m.slot / 2
+                val next = byKey[key] ?: continue
+                var n = if (m.slot % 2 == 0) next.copy(a = m.winner) else next.copy(b = m.winner)
+                if (n.winner != null && n.winner != n.a && n.winner != n.b) n = n.copy(winner = null, score = "", walkover = false, retired = false, record = null)
+                byKey[key] = n
+            }
+        }
+        return matches.map { if (it.round == 0) it else byKey[it.round to it.slot] ?: it }
+    }
+
+    /** Il risultato di una partita (anche per correggerlo); il tabellone si aggiorna. */
+    fun setResult(t: ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean = false, retired: Boolean = false, record: String? = null): ClubTournament {
+        val ms = t.matches.map { m ->
+            if (m.id != matchId) m
+            else m.copy(winner = winner?.takeIf { it == m.a || it == m.b }, score = score.trim(), walkover = walkover, retired = retired, record = record ?: m.record)
+        }
+        return t.copy(matches = propagate(ms))
+    }
+
+    /** Nome del turno del tabellone dal numero di giocatori rimasti: 2 = finale, 4 = semifinali… */
+    fun playersInRound(t: ClubTournament, round: Int): Int = t.matches.count { it.round == round } * 2
 }
 TSM_EOF
 
@@ -12637,6 +13214,24 @@ class Storage(context: Context) {
                 tmp.renameTo(drillsFile)
             }
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+    }
+
+    /** I tornei del circolo (sociali e FITP), in un file solo. */
+    private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
+
+    fun loadClubTournaments(): List<ClubTournament> =
+        runCatching { json.decodeFromString(ListSerializer(ClubTournament.serializer()), clubTournamentsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveClubTournaments(list: List<ClubTournament>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_tournaments.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(ClubTournament.serializer()), list))
+            if (!tmp.renameTo(clubTournamentsFile)) {
+                clubTournamentsFile.delete()
+                tmp.renameTo(clubTournamentsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
     }
 
     /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
@@ -18482,6 +19077,43 @@ private fun Cmd(icon: ImageVector, label: String, color: Color, enabled: Boolean
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubTournamentUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ClubTournamentUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import com.tennis.scoremanager.data.CTMatch
+import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.ClubTournaments
+
+/** "Finale", "Semifinale", "Quarti di finale", "Ottavi di finale", "1° turno", "Girone A". */
+fun ctRoundName(s: Strings, t: ClubTournament, m: CTMatch): String {
+    if (m.round == 0) return s.ctGroup(groupLetter(m.group ?: 0))
+    return when (ClubTournaments.playersInRound(t, m.round)) {
+        2 -> s.ctFinal
+        4 -> s.ctSemi
+        8 -> s.ctQuarter
+        16 -> s.ctLast16
+        32 -> s.ctLast32
+        else -> s.ctRoundN(m.round)
+    }
+}
+
+fun groupLetter(g: Int): String = ('A' + g).toString()
+
+fun ctProblemText(s: Strings, p: ClubTournaments.Problem): String = when (p) {
+    ClubTournaments.Problem.NOT_MEMBER -> s.ctNotMember
+    ClubTournaments.Problem.NO_MEDICAL -> s.ctNoMedical
+    ClubTournaments.Problem.MEDICAL_NOT_AGONISTIC -> s.ctMedicalNotAgonistic
+    ClubTournaments.Problem.NO_FITP_CARD -> s.ctNoFitpCard
+    ClubTournaments.Problem.NOT_AGONIST_CARD -> s.ctNotAgonistCard
+    ClubTournaments.Problem.RANK_TOO_HIGH -> s.ctRankTooHigh
+    ClubTournaments.Problem.UNPAID -> s.ctUnpaid
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ClubUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -18670,6 +19302,8 @@ fun AppRoot(c: MatchController) {
                 Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
                 Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
                 Screen.PAYMENTS -> com.tennis.scoremanager.ui.screens.PaymentsScreen(c)
+                Screen.CLUB_TOURNAMENTS -> com.tennis.scoremanager.ui.screens.ClubTournamentsScreen(c)
+                Screen.CLUB_TOURNAMENT -> com.tennis.scoremanager.ui.screens.ClubTournamentScreen(c)
             }
         }
     }
@@ -22380,6 +23014,93 @@ interface Strings {
     val chargeLate: (String) -> String
     val payReceiptNo: (String) -> String
     val issueFeeDue: (String) -> String
+    val ctTitle: String
+    val ctHint: String
+    val ctNew: String
+    val ctNone: String
+    val ctOpen: String
+    val ctRunning: String
+    val ctDone: String
+    val ctSocial: String
+    val ctDoubles: String
+    val ctSingles: String
+    val ctFormatGroups: String
+    val ctFormatKnockout: String
+    val ctDraw: String
+    val ctMakeKnockout: String
+    val ctTabEntries: String
+    val ctTabDraw: String
+    val ctTabMatches: String
+    val ctUndoDraw: String
+    val ctDrawTooFew: String
+    val ctPaidOnlyShort: String
+    val ctAddEntry: String
+    val ctNoEntries: String
+    val ctInOrder: String
+    val ctBye: String
+    val ctWalkover: String
+    val ctRetired: String
+    val ctNotDrawn: String
+    val ctColWon: String
+    val ctColSets: String
+    val ctColGames: String
+    val ctGroupsFirst: String
+    val ctToPlay: String
+    val ctPlayed: String
+    val ctPlayLive: String
+    val ctWinner: String
+    val ctScore: String
+    val ctWalkoverLong: String
+    val ctRetiredLong: String
+    val ctWhere: String
+    val ctCourt: String
+    val ctTime: String
+    val ctClearResult: String
+    val ctSeedHint: String
+    val ctSeedAuto: String
+    val ctRemoveEntry: String
+    val ctName: String
+    val ctFitpHint: String
+    val ctSocialHint: String
+    val ctCategory: String
+    val ctGroupsCount: String
+    val ctQualify: String
+    val ctStart: String
+    val ctEnd: String
+    val ctFee: String
+    val ctPaidOnly: String
+    val ctPaidOnlyHint: String
+    val ctLimit: String
+    val ctFitpCode: String
+    val ctReferee: String
+    val ctDelete: String
+    val ctFinal: String
+    val ctSemi: String
+    val ctQuarter: String
+    val ctLast16: String
+    val ctLast32: String
+    val ctNotMember: String
+    val ctNoMedical: String
+    val ctMedicalNotAgonistic: String
+    val ctNoFitpCard: String
+    val ctNotAgonistCard: String
+    val ctRankTooHigh: String
+    val ctUnpaid: String
+    val ctEntriesCount: (Int) -> String
+    val ctChampion: (String) -> String
+    val ctLimitShort: (String) -> String
+    val ctDrawAsk: (Int) -> String
+    val ctDrawExcluded: (Int) -> String
+    val ctDates: (String, String) -> String
+    val ctFeeLine: (String) -> String
+    val ctFitpCodeLine: (String) -> String
+    val ctRefereeLine: (String) -> String
+    val ctGroup: (String) -> String
+    val ctSeedN: (Int) -> String
+    val ctPickPartner: (String) -> String
+    val ctDeleteAsk: (String) -> String
+    val ctFeeName: (String) -> String
+    val ctRoundN: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -23799,6 +24520,93 @@ object ItStrings : Strings {
     override val chargeLate: (String) -> String = { "in ritardo: mancano $it" }
     override val payReceiptNo: (String) -> String = { "Ricevuta n. $it" }
     override val issueFeeDue: (String) -> String = { "da pagare: $it" }
+    override val ctTitle = "Tornei del circolo"
+    override val ctHint = "Sociali e FITP: iscrizioni, quote, tabellone, gironi e risultati"
+    override val ctNew = "Nuovo torneo"
+    override val ctNone = "Nessun torneo: crealo con Nuovo torneo."
+    override val ctOpen = "Iscrizioni aperte"
+    override val ctRunning = "In corso"
+    override val ctDone = "Conclusi"
+    override val ctSocial = "Sociale"
+    override val ctDoubles = "Doppio"
+    override val ctSingles = "Singolare"
+    override val ctFormatGroups = "Gironi + tabellone"
+    override val ctFormatKnockout = "Eliminazione diretta"
+    override val ctDraw = "Sorteggio"
+    override val ctMakeKnockout = "Tabellone finale"
+    override val ctTabEntries = "Iscritti"
+    override val ctTabDraw = "Tabellone"
+    override val ctTabMatches = "Partite"
+    override val ctUndoDraw = "Rifai il sorteggio"
+    override val ctDrawTooFew = "Servono almeno due iscritti in regola."
+    override val ctPaidOnlyShort = "solo chi ha pagato"
+    override val ctAddEntry = "Iscrivi"
+    override val ctNoEntries = "Nessun iscritto."
+    override val ctInOrder = "in regola"
+    override val ctBye = "bye"
+    override val ctWalkover = "w.o."
+    override val ctRetired = "rit."
+    override val ctNotDrawn = "Il tabellone si fa col sorteggio, dalla scheda Iscritti."
+    override val ctColWon = "V"
+    override val ctColSets = "Set"
+    override val ctColGames = "Game"
+    override val ctGroupsFirst = "Il tabellone finale si fa a gironi finiti."
+    override val ctToPlay = "Da giocare"
+    override val ctPlayed = "Giocate"
+    override val ctPlayLive = "Gioca col segnapunti"
+    override val ctWinner = "Chi ha vinto"
+    override val ctScore = "Punteggio (es. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Vinta a tavolino (w.o.)"
+    override val ctRetiredLong = "Ritiro durante la partita"
+    override val ctWhere = "Dove e quando"
+    override val ctCourt = "Campo"
+    override val ctTime = "Ora"
+    override val ctClearResult = "Cancella il risultato"
+    override val ctSeedHint = "Testa di serie: di solito dalla classifica FITP; qui la si sceglie a mano."
+    override val ctSeedAuto = "dalla classifica"
+    override val ctRemoveEntry = "Ritira l'iscrizione"
+    override val ctName = "Nome del torneo"
+    override val ctFitpHint = "FITP: tessera agonistica dell'anno, certificato agonistico valido all'inizio e classifica nel limite."
+    override val ctSocialHint = "Sociale: certificato medico valido; chi non è socio si segnala."
+    override val ctCategory = "Categoria (es. Singolare maschile, Over 45)"
+    override val ctGroupsCount = "Gironi"
+    override val ctQualify = "Passano da ogni girone"
+    override val ctStart = "Inizio"
+    override val ctEnd = "Fine"
+    override val ctFee = "Quota d'iscrizione (per giocatore)"
+    override val ctPaidOnly = "Nel tabellone solo chi ha pagato"
+    override val ctPaidOnlyHint = "Chi non ha pagato resta tra gli iscritti ma non entra nel sorteggio."
+    override val ctLimit = "Classifica massima (es. 4.1; vuoto = open)"
+    override val ctFitpCode = "Codice del torneo FITP"
+    override val ctReferee = "Giudice arbitro"
+    override val ctDelete = "Elimina il torneo"
+    override val ctFinal = "Finale"
+    override val ctSemi = "Semifinali"
+    override val ctQuarter = "Quarti di finale"
+    override val ctLast16 = "Ottavi di finale"
+    override val ctLast32 = "Sedicesimi di finale"
+    override val ctNotMember = "non socio"
+    override val ctNoMedical = "certificato non valido"
+    override val ctMedicalNotAgonistic = "certificato non agonistico"
+    override val ctNoFitpCard = "manca la tessera FITP dell'anno"
+    override val ctNotAgonistCard = "tessera non agonista"
+    override val ctRankTooHigh = "classifica oltre il limite"
+    override val ctUnpaid = "iscrizione da pagare"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "iscritto" else "iscritti"}" }
+    override val ctChampion: (String) -> String = { "Vince $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "Entrano nel sorteggio $it iscritti in regola, in ordine di classifica per le teste di serie." }
+    override val ctDrawExcluded: (Int) -> String = { "$it non ${if (it == 1) "entra" else "entrano"}: non in regola (vedi Iscritti)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "dal $a al $b" }
+    override val ctFeeLine: (String) -> String = { "iscrizione $it" }
+    override val ctFitpCodeLine: (String) -> String = { "codice FITP $it" }
+    override val ctRefereeLine: (String) -> String = { "giudice arbitro $it" }
+    override val ctGroup: (String) -> String = { "Girone $it" }
+    override val ctSeedN: (Int) -> String = { "testa di serie n. $it" }
+    override val ctPickPartner: (String) -> String = { "Il compagno di $it" }
+    override val ctDeleteAsk: (String) -> String = { "Eliminare il torneo $it? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro." }
+    override val ctFeeName: (String) -> String = { "Iscrizione $it" }
+    override val ctRoundN: (Int) -> String = { "$it° turno" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -25201,6 +26009,93 @@ object EnStrings : Strings {
     override val chargeLate: (String) -> String = { "late: $it left" }
     override val payReceiptNo: (String) -> String = { "Receipt no. $it" }
     override val issueFeeDue: (String) -> String = { "to pay: $it" }
+    override val ctTitle = "Club tournaments"
+    override val ctHint = "Social and FITP: entries, fees, draw, groups and results"
+    override val ctNew = "New tournament"
+    override val ctNone = "No tournaments: create one with New tournament."
+    override val ctOpen = "Entries open"
+    override val ctRunning = "In progress"
+    override val ctDone = "Finished"
+    override val ctSocial = "Social"
+    override val ctDoubles = "Doubles"
+    override val ctSingles = "Singles"
+    override val ctFormatGroups = "Groups + draw"
+    override val ctFormatKnockout = "Knockout"
+    override val ctDraw = "Draw"
+    override val ctMakeKnockout = "Final draw"
+    override val ctTabEntries = "Entries"
+    override val ctTabDraw = "Draw sheet"
+    override val ctTabMatches = "Matches"
+    override val ctUndoDraw = "Redo the draw"
+    override val ctDrawTooFew = "At least two entries in order are needed."
+    override val ctPaidOnlyShort = "paid only"
+    override val ctAddEntry = "Enter"
+    override val ctNoEntries = "No entries."
+    override val ctInOrder = "in order"
+    override val ctBye = "bye"
+    override val ctWalkover = "w/o"
+    override val ctRetired = "ret."
+    override val ctNotDrawn = "The draw sheet comes from the draw, on the Entries tab."
+    override val ctColWon = "W"
+    override val ctColSets = "Sets"
+    override val ctColGames = "Games"
+    override val ctGroupsFirst = "The final draw is made once the groups are over."
+    override val ctToPlay = "To play"
+    override val ctPlayed = "Played"
+    override val ctPlayLive = "Play with the scorer"
+    override val ctWinner = "Winner"
+    override val ctScore = "Score (e.g. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Won by walkover (w/o)"
+    override val ctRetiredLong = "Retired during the match"
+    override val ctWhere = "Where and when"
+    override val ctCourt = "Court"
+    override val ctTime = "Time"
+    override val ctClearResult = "Clear the result"
+    override val ctSeedHint = "Seed: usually from the FITP ranking; here you choose it by hand."
+    override val ctSeedAuto = "from the ranking"
+    override val ctRemoveEntry = "Withdraw the entry"
+    override val ctName = "Tournament name"
+    override val ctFitpHint = "FITP: this year's competitive card, competitive certificate valid at the start and ranking within the limit."
+    override val ctSocialHint = "Social: valid medical certificate; non-members are flagged."
+    override val ctCategory = "Category (e.g. Men's singles, Over 45)"
+    override val ctGroupsCount = "Groups"
+    override val ctQualify = "Qualify from each group"
+    override val ctStart = "Start"
+    override val ctEnd = "End"
+    override val ctFee = "Entry fee (per player)"
+    override val ctPaidOnly = "Only paid entries in the draw"
+    override val ctPaidOnlyHint = "Who hasn't paid stays among the entries but is not drawn."
+    override val ctLimit = "Maximum ranking (e.g. 4.1; empty = open)"
+    override val ctFitpCode = "FITP tournament code"
+    override val ctReferee = "Referee"
+    override val ctDelete = "Delete the tournament"
+    override val ctFinal = "Final"
+    override val ctSemi = "Semi-finals"
+    override val ctQuarter = "Quarter-finals"
+    override val ctLast16 = "Round of 16"
+    override val ctLast32 = "Round of 32"
+    override val ctNotMember = "not a member"
+    override val ctNoMedical = "certificate not valid"
+    override val ctMedicalNotAgonistic = "certificate not competitive"
+    override val ctNoFitpCard = "no FITP card for this year"
+    override val ctNotAgonistCard = "non-competitive card"
+    override val ctRankTooHigh = "ranking above the limit"
+    override val ctUnpaid = "entry fee to pay"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "entry" else "entries"}" }
+    override val ctChampion: (String) -> String = { "Winner: $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "$it entries in order go into the draw, seeded by ranking." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "is" else "are"} left out: not in order (see Entries)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "$a to $b" }
+    override val ctFeeLine: (String) -> String = { "entry fee $it" }
+    override val ctFitpCodeLine: (String) -> String = { "FITP code $it" }
+    override val ctRefereeLine: (String) -> String = { "referee $it" }
+    override val ctGroup: (String) -> String = { "Group $it" }
+    override val ctSeedN: (Int) -> String = { "seed no. $it" }
+    override val ctPickPartner: (String) -> String = { "$it's partner" }
+    override val ctDeleteAsk: (String) -> String = { "Delete the tournament $it? Unpaid entry fees are removed, payments stay in the register." }
+    override val ctFeeName: (String) -> String = { "Entry $it" }
+    override val ctRoundN: (Int) -> String = { "Round $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -26626,6 +27521,93 @@ object DeStrings : Strings {
     override val chargeLate: (String) -> String = { "überfällig: noch $it" }
     override val payReceiptNo: (String) -> String = { "Quittung Nr. $it" }
     override val issueFeeDue: (String) -> String = { "offen: $it" }
+    override val ctTitle = "Vereinsturniere"
+    override val ctHint = "Intern und FITP: Anmeldungen, Gebühren, Tableau, Gruppen und Ergebnisse"
+    override val ctNew = "Neues Turnier"
+    override val ctNone = "Keine Turniere: mit Neues Turnier anlegen."
+    override val ctOpen = "Anmeldung offen"
+    override val ctRunning = "Laufend"
+    override val ctDone = "Beendet"
+    override val ctSocial = "Intern"
+    override val ctDoubles = "Doppel"
+    override val ctSingles = "Einzel"
+    override val ctFormatGroups = "Gruppen + Tableau"
+    override val ctFormatKnockout = "K.-o.-System"
+    override val ctDraw = "Auslosung"
+    override val ctMakeKnockout = "Finaltableau"
+    override val ctTabEntries = "Gemeldet"
+    override val ctTabDraw = "Tableau"
+    override val ctTabMatches = "Matches"
+    override val ctUndoDraw = "Auslosung wiederholen"
+    override val ctDrawTooFew = "Mindestens zwei gültige Meldungen nötig."
+    override val ctPaidOnlyShort = "nur bezahlt"
+    override val ctAddEntry = "Anmelden"
+    override val ctNoEntries = "Keine Meldungen."
+    override val ctInOrder = "in Ordnung"
+    override val ctBye = "Freilos"
+    override val ctWalkover = "kampflos"
+    override val ctRetired = "Aufgabe"
+    override val ctNotDrawn = "Das Tableau entsteht durch die Auslosung, im Reiter Gemeldet."
+    override val ctColWon = "S"
+    override val ctColSets = "Sätze"
+    override val ctColGames = "Spiele"
+    override val ctGroupsFirst = "Das Finaltableau gibt es nach den Gruppen."
+    override val ctToPlay = "Zu spielen"
+    override val ctPlayed = "Gespielt"
+    override val ctPlayLive = "Mit dem Zähler spielen"
+    override val ctWinner = "Sieger"
+    override val ctScore = "Ergebnis (z. B. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Kampflos gewonnen"
+    override val ctRetiredLong = "Aufgabe während des Matches"
+    override val ctWhere = "Wo und wann"
+    override val ctCourt = "Platz"
+    override val ctTime = "Uhrzeit"
+    override val ctClearResult = "Ergebnis löschen"
+    override val ctSeedHint = "Setzung: meist nach FITP-Rangliste; hier wählt man sie von Hand."
+    override val ctSeedAuto = "nach Rangliste"
+    override val ctRemoveEntry = "Meldung zurückziehen"
+    override val ctName = "Name des Turniers"
+    override val ctFitpHint = "FITP: Wettkampfausweis des Jahres, Wettkampfattest gültig zum Beginn und Rangliste im Limit."
+    override val ctSocialHint = "Intern: gültiges ärztliches Attest; Nichtmitglieder werden angezeigt."
+    override val ctCategory = "Kategorie (z. B. Herreneinzel, Ü45)"
+    override val ctGroupsCount = "Gruppen"
+    override val ctQualify = "Weiter pro Gruppe"
+    override val ctStart = "Beginn"
+    override val ctEnd = "Ende"
+    override val ctFee = "Meldegebühr (pro Spieler)"
+    override val ctPaidOnly = "Ins Tableau nur, wer bezahlt hat"
+    override val ctPaidOnlyHint = "Wer nicht bezahlt hat, bleibt gemeldet, wird aber nicht ausgelost."
+    override val ctLimit = "Höchste Rangliste (z. B. 4.1; leer = offen)"
+    override val ctFitpCode = "FITP-Turniercode"
+    override val ctReferee = "Oberschiedsrichter"
+    override val ctDelete = "Turnier löschen"
+    override val ctFinal = "Finale"
+    override val ctSemi = "Halbfinale"
+    override val ctQuarter = "Viertelfinale"
+    override val ctLast16 = "Achtelfinale"
+    override val ctLast32 = "Sechzehntelfinale"
+    override val ctNotMember = "kein Mitglied"
+    override val ctNoMedical = "Attest ungültig"
+    override val ctMedicalNotAgonistic = "Attest nicht für Wettkampf"
+    override val ctNoFitpCard = "kein FITP-Ausweis für dieses Jahr"
+    override val ctNotAgonistCard = "Freizeitausweis"
+    override val ctRankTooHigh = "Rangliste über dem Limit"
+    override val ctUnpaid = "Meldegebühr offen"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "Meldung" else "Meldungen"}" }
+    override val ctChampion: (String) -> String = { "Sieger: $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "$it gültige Meldungen kommen in die Auslosung, gesetzt nach Rangliste." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "bleibt" else "bleiben"} draußen: nicht in Ordnung (siehe Gemeldet)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "$a bis $b" }
+    override val ctFeeLine: (String) -> String = { "Meldegebühr $it" }
+    override val ctFitpCodeLine: (String) -> String = { "FITP-Code $it" }
+    override val ctRefereeLine: (String) -> String = { "Oberschiedsrichter $it" }
+    override val ctGroup: (String) -> String = { "Gruppe $it" }
+    override val ctSeedN: (Int) -> String = { "Setzplatz $it" }
+    override val ctPickPartner: (String) -> String = { "Partner von $it" }
+    override val ctDeleteAsk: (String) -> String = { "Turnier $it löschen? Unbezahlte Meldegebühren werden entfernt, Zahlungen bleiben im Register." }
+    override val ctFeeName: (String) -> String = { "Meldung $it" }
+    override val ctRoundN: (Int) -> String = { "$it. Runde" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -28044,6 +29026,93 @@ object EsStrings : Strings {
     override val chargeLate: (String) -> String = { "con retraso: faltan $it" }
     override val payReceiptNo: (String) -> String = { "Recibo n.º $it" }
     override val issueFeeDue: (String) -> String = { "por pagar: $it" }
+    override val ctTitle = "Torneos del club"
+    override val ctHint = "Sociales y FITP: inscripciones, cuotas, cuadro, grupos y resultados"
+    override val ctNew = "Nuevo torneo"
+    override val ctNone = "Ningún torneo: crea uno con Nuevo torneo."
+    override val ctOpen = "Inscripciones abiertas"
+    override val ctRunning = "En curso"
+    override val ctDone = "Terminados"
+    override val ctSocial = "Social"
+    override val ctDoubles = "Dobles"
+    override val ctSingles = "Individual"
+    override val ctFormatGroups = "Grupos + cuadro"
+    override val ctFormatKnockout = "Eliminación directa"
+    override val ctDraw = "Sorteo"
+    override val ctMakeKnockout = "Cuadro final"
+    override val ctTabEntries = "Inscritos"
+    override val ctTabDraw = "Cuadro"
+    override val ctTabMatches = "Partidos"
+    override val ctUndoDraw = "Repetir el sorteo"
+    override val ctDrawTooFew = "Hacen falta al menos dos inscritos en regla."
+    override val ctPaidOnlyShort = "solo pagados"
+    override val ctAddEntry = "Inscribir"
+    override val ctNoEntries = "Ningún inscrito."
+    override val ctInOrder = "en regla"
+    override val ctBye = "bye"
+    override val ctWalkover = "w.o."
+    override val ctRetired = "ret."
+    override val ctNotDrawn = "El cuadro sale del sorteo, desde la pestaña Inscritos."
+    override val ctColWon = "V"
+    override val ctColSets = "Sets"
+    override val ctColGames = "Juegos"
+    override val ctGroupsFirst = "El cuadro final se hace al terminar los grupos."
+    override val ctToPlay = "Por jugar"
+    override val ctPlayed = "Jugados"
+    override val ctPlayLive = "Jugar con el marcador"
+    override val ctWinner = "Ganador"
+    override val ctScore = "Resultado (p. ej. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Ganado por w.o."
+    override val ctRetiredLong = "Retirada durante el partido"
+    override val ctWhere = "Dónde y cuándo"
+    override val ctCourt = "Pista"
+    override val ctTime = "Hora"
+    override val ctClearResult = "Borrar el resultado"
+    override val ctSeedHint = "Cabeza de serie: normalmente por la clasificación FITP; aquí se elige a mano."
+    override val ctSeedAuto = "por clasificación"
+    override val ctRemoveEntry = "Retirar la inscripción"
+    override val ctName = "Nombre del torneo"
+    override val ctFitpHint = "FITP: licencia de competición del año, certificado de competición válido al inicio y clasificación dentro del límite."
+    override val ctSocialHint = "Social: certificado médico válido; quien no es socio se señala."
+    override val ctCategory = "Categoría (p. ej. Individual masculino, +45)"
+    override val ctGroupsCount = "Grupos"
+    override val ctQualify = "Pasan de cada grupo"
+    override val ctStart = "Inicio"
+    override val ctEnd = "Fin"
+    override val ctFee = "Cuota de inscripción (por jugador)"
+    override val ctPaidOnly = "En el cuadro solo quien ha pagado"
+    override val ctPaidOnlyHint = "Quien no ha pagado sigue inscrito pero no entra en el sorteo."
+    override val ctLimit = "Clasificación máxima (p. ej. 4.1; vacío = open)"
+    override val ctFitpCode = "Código del torneo FITP"
+    override val ctReferee = "Juez árbitro"
+    override val ctDelete = "Eliminar el torneo"
+    override val ctFinal = "Final"
+    override val ctSemi = "Semifinales"
+    override val ctQuarter = "Cuartos de final"
+    override val ctLast16 = "Octavos de final"
+    override val ctLast32 = "Dieciseisavos de final"
+    override val ctNotMember = "no es socio"
+    override val ctNoMedical = "certificado no válido"
+    override val ctMedicalNotAgonistic = "certificado no de competición"
+    override val ctNoFitpCard = "falta la licencia FITP del año"
+    override val ctNotAgonistCard = "licencia no de competición"
+    override val ctRankTooHigh = "clasificación por encima del límite"
+    override val ctUnpaid = "inscripción por pagar"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "inscrito" else "inscritos"}" }
+    override val ctChampion: (String) -> String = { "Gana $it" }
+    override val ctLimitShort: (String) -> String = { "lím. $it" }
+    override val ctDrawAsk: (Int) -> String = { "Entran en el sorteo $it inscritos en regla, con cabezas de serie por clasificación." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "se queda" else "se quedan"} fuera: no en regla (ver Inscritos)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "del $a al $b" }
+    override val ctFeeLine: (String) -> String = { "inscripción $it" }
+    override val ctFitpCodeLine: (String) -> String = { "código FITP $it" }
+    override val ctRefereeLine: (String) -> String = { "juez árbitro $it" }
+    override val ctGroup: (String) -> String = { "Grupo $it" }
+    override val ctSeedN: (Int) -> String = { "cabeza de serie n.º $it" }
+    override val ctPickPartner: (String) -> String = { "Pareja de $it" }
+    override val ctDeleteAsk: (String) -> String = { "¿Eliminar el torneo $it? Las inscripciones sin pagar se borran, los pagos quedan en el registro." }
+    override val ctFeeName: (String) -> String = { "Inscripción $it" }
+    override val ctRoundN: (Int) -> String = { "$it.ª ronda" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -29464,6 +30533,93 @@ object FrStrings : Strings {
     override val chargeLate: (String) -> String = { "en retard : reste $it" }
     override val payReceiptNo: (String) -> String = { "Reçu n° $it" }
     override val issueFeeDue: (String) -> String = { "à payer : $it" }
+    override val ctTitle = "Tournois du club"
+    override val ctHint = "Internes et FITP : inscriptions, droits, tableau, poules et résultats"
+    override val ctNew = "Nouveau tournoi"
+    override val ctNone = "Aucun tournoi : créez-en un avec Nouveau tournoi."
+    override val ctOpen = "Inscriptions ouvertes"
+    override val ctRunning = "En cours"
+    override val ctDone = "Terminés"
+    override val ctSocial = "Interne"
+    override val ctDoubles = "Double"
+    override val ctSingles = "Simple"
+    override val ctFormatGroups = "Poules + tableau"
+    override val ctFormatKnockout = "Élimination directe"
+    override val ctDraw = "Tirage au sort"
+    override val ctMakeKnockout = "Tableau final"
+    override val ctTabEntries = "Inscrits"
+    override val ctTabDraw = "Tableau"
+    override val ctTabMatches = "Matchs"
+    override val ctUndoDraw = "Refaire le tirage"
+    override val ctDrawTooFew = "Il faut au moins deux inscrits en règle."
+    override val ctPaidOnlyShort = "payés seulement"
+    override val ctAddEntry = "Inscrire"
+    override val ctNoEntries = "Aucun inscrit."
+    override val ctInOrder = "en règle"
+    override val ctBye = "exempt"
+    override val ctWalkover = "forfait"
+    override val ctRetired = "abandon"
+    override val ctNotDrawn = "Le tableau se fait par tirage au sort, depuis l'onglet Inscrits."
+    override val ctColWon = "V"
+    override val ctColSets = "Manches"
+    override val ctColGames = "Jeux"
+    override val ctGroupsFirst = "Le tableau final se fait une fois les poules terminées."
+    override val ctToPlay = "À jouer"
+    override val ctPlayed = "Joués"
+    override val ctPlayLive = "Jouer avec le marqueur"
+    override val ctWinner = "Vainqueur"
+    override val ctScore = "Score (ex. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Gagné par forfait"
+    override val ctRetiredLong = "Abandon pendant le match"
+    override val ctWhere = "Où et quand"
+    override val ctCourt = "Terrain"
+    override val ctTime = "Heure"
+    override val ctClearResult = "Effacer le résultat"
+    override val ctSeedHint = "Tête de série : d'habitude d'après le classement FITP ; ici on la choisit à la main."
+    override val ctSeedAuto = "d'après le classement"
+    override val ctRemoveEntry = "Retirer l'inscription"
+    override val ctName = "Nom du tournoi"
+    override val ctFitpHint = "FITP : licence compétition de l'année, certificat compétition valable au début et classement dans la limite."
+    override val ctSocialHint = "Interne : certificat médical valable ; les non-adhérents sont signalés."
+    override val ctCategory = "Catégorie (ex. Simple messieurs, Plus de 45 ans)"
+    override val ctGroupsCount = "Poules"
+    override val ctQualify = "Qualifiés par poule"
+    override val ctStart = "Début"
+    override val ctEnd = "Fin"
+    override val ctFee = "Droit d'inscription (par joueur)"
+    override val ctPaidOnly = "Au tableau seulement ceux qui ont payé"
+    override val ctPaidOnlyHint = "Qui n'a pas payé reste inscrit mais n'est pas tiré au sort."
+    override val ctLimit = "Classement maximum (ex. 4.1 ; vide = open)"
+    override val ctFitpCode = "Code du tournoi FITP"
+    override val ctReferee = "Juge-arbitre"
+    override val ctDelete = "Supprimer le tournoi"
+    override val ctFinal = "Finale"
+    override val ctSemi = "Demi-finales"
+    override val ctQuarter = "Quarts de finale"
+    override val ctLast16 = "Huitièmes de finale"
+    override val ctLast32 = "Seizièmes de finale"
+    override val ctNotMember = "non adhérent"
+    override val ctNoMedical = "certificat non valable"
+    override val ctMedicalNotAgonistic = "certificat non compétition"
+    override val ctNoFitpCard = "pas de licence FITP de l'année"
+    override val ctNotAgonistCard = "licence loisir"
+    override val ctRankTooHigh = "classement au-dessus de la limite"
+    override val ctUnpaid = "inscription à payer"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "inscrit" else "inscrits"}" }
+    override val ctChampion: (String) -> String = { "Vainqueur : $it" }
+    override val ctLimitShort: (String) -> String = { "limité $it" }
+    override val ctDrawAsk: (Int) -> String = { "$it inscrits en règle entrent au tirage, têtes de série d'après le classement." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "reste" else "restent"} dehors : pas en règle (voir Inscrits)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "du $a au $b" }
+    override val ctFeeLine: (String) -> String = { "inscription $it" }
+    override val ctFitpCodeLine: (String) -> String = { "code FITP $it" }
+    override val ctRefereeLine: (String) -> String = { "juge-arbitre $it" }
+    override val ctGroup: (String) -> String = { "Poule $it" }
+    override val ctSeedN: (Int) -> String = { "tête de série n° $it" }
+    override val ctPickPartner: (String) -> String = { "Partenaire de $it" }
+    override val ctDeleteAsk: (String) -> String = { "Supprimer le tournoi $it ? Les inscriptions non payées sont effacées, les paiements restent dans le registre." }
+    override val ctFeeName: (String) -> String = { "Inscription $it" }
+    override val ctRoundN: (Int) -> String = { "${it}e tour" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -30885,6 +32041,93 @@ object PtStrings : Strings {
     override val chargeLate: (String) -> String = { "atrasado: faltam $it" }
     override val payReceiptNo: (String) -> String = { "Recibo n.º $it" }
     override val issueFeeDue: (String) -> String = { "a pagar: $it" }
+    override val ctTitle = "Torneios do clube"
+    override val ctHint = "Sociais e FITP: inscrições, taxas, chave, grupos e resultados"
+    override val ctNew = "Novo torneio"
+    override val ctNone = "Nenhum torneio: crie um com Novo torneio."
+    override val ctOpen = "Inscrições abertas"
+    override val ctRunning = "Em andamento"
+    override val ctDone = "Encerrados"
+    override val ctSocial = "Social"
+    override val ctDoubles = "Duplas"
+    override val ctSingles = "Simples"
+    override val ctFormatGroups = "Grupos + chave"
+    override val ctFormatKnockout = "Eliminação direta"
+    override val ctDraw = "Sorteio"
+    override val ctMakeKnockout = "Chave final"
+    override val ctTabEntries = "Inscritos"
+    override val ctTabDraw = "Chave"
+    override val ctTabMatches = "Partidas"
+    override val ctUndoDraw = "Refazer o sorteio"
+    override val ctDrawTooFew = "São necessários pelo menos dois inscritos em ordem."
+    override val ctPaidOnlyShort = "só pagos"
+    override val ctAddEntry = "Inscrever"
+    override val ctNoEntries = "Nenhum inscrito."
+    override val ctInOrder = "em ordem"
+    override val ctBye = "bye"
+    override val ctWalkover = "W.O."
+    override val ctRetired = "desist."
+    override val ctNotDrawn = "A chave sai do sorteio, na aba Inscritos."
+    override val ctColWon = "V"
+    override val ctColSets = "Sets"
+    override val ctColGames = "Games"
+    override val ctGroupsFirst = "A chave final é feita depois dos grupos."
+    override val ctToPlay = "A jogar"
+    override val ctPlayed = "Jogadas"
+    override val ctPlayLive = "Jogar com o marcador"
+    override val ctWinner = "Vencedor"
+    override val ctScore = "Placar (ex. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Vitória por W.O."
+    override val ctRetiredLong = "Desistência durante a partida"
+    override val ctWhere = "Onde e quando"
+    override val ctCourt = "Quadra"
+    override val ctTime = "Hora"
+    override val ctClearResult = "Apagar o resultado"
+    override val ctSeedHint = "Cabeça de chave: normalmente pelo ranking FITP; aqui se escolhe à mão."
+    override val ctSeedAuto = "pelo ranking"
+    override val ctRemoveEntry = "Retirar a inscrição"
+    override val ctName = "Nome do torneio"
+    override val ctFitpHint = "FITP: cartão de competição do ano, atestado de competição válido no início e ranking dentro do limite."
+    override val ctSocialHint = "Social: atestado médico válido; quem não é sócio é indicado."
+    override val ctCategory = "Categoria (ex. Simples masculino, 45+)"
+    override val ctGroupsCount = "Grupos"
+    override val ctQualify = "Passam de cada grupo"
+    override val ctStart = "Início"
+    override val ctEnd = "Fim"
+    override val ctFee = "Taxa de inscrição (por jogador)"
+    override val ctPaidOnly = "Na chave só quem pagou"
+    override val ctPaidOnlyHint = "Quem não pagou continua inscrito mas não entra no sorteio."
+    override val ctLimit = "Ranking máximo (ex. 4.1; vazio = open)"
+    override val ctFitpCode = "Código do torneio FITP"
+    override val ctReferee = "Árbitro geral"
+    override val ctDelete = "Excluir o torneio"
+    override val ctFinal = "Final"
+    override val ctSemi = "Semifinais"
+    override val ctQuarter = "Quartas de final"
+    override val ctLast16 = "Oitavas de final"
+    override val ctLast32 = "Dezesseis-avos de final"
+    override val ctNotMember = "não é sócio"
+    override val ctNoMedical = "atestado não válido"
+    override val ctMedicalNotAgonistic = "atestado não de competição"
+    override val ctNoFitpCard = "falta o cartão FITP do ano"
+    override val ctNotAgonistCard = "cartão não de competição"
+    override val ctRankTooHigh = "ranking acima do limite"
+    override val ctUnpaid = "inscrição a pagar"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "inscrito" else "inscritos"}" }
+    override val ctChampion: (String) -> String = { "Vence $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "Entram no sorteio $it inscritos em ordem, com cabeças de chave pelo ranking." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "fica" else "ficam"} de fora: não em ordem (ver Inscritos)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "de $a a $b" }
+    override val ctFeeLine: (String) -> String = { "inscrição $it" }
+    override val ctFitpCodeLine: (String) -> String = { "código FITP $it" }
+    override val ctRefereeLine: (String) -> String = { "árbitro geral $it" }
+    override val ctGroup: (String) -> String = { "Grupo $it" }
+    override val ctSeedN: (Int) -> String = { "cabeça de chave n.º $it" }
+    override val ctPickPartner: (String) -> String = { "Parceiro de $it" }
+    override val ctDeleteAsk: (String) -> String = { "Excluir o torneio $it? As inscrições não pagas são apagadas, os pagamentos ficam no registro." }
+    override val ctFeeName: (String) -> String = { "Inscrição $it" }
+    override val ctRoundN: (Int) -> String = { "${it}ª rodada" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -31453,6 +32696,560 @@ fun QrCode(text: String, size: Dp) {
         bitmap, null,
         filterQuality = FilterQuality.None,
         modifier = Modifier.size(size).clip(RoundedCornerShape(8.dp)).background(Color.White),
+    )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/ClubTournamentScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/ClubTournamentScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.TimePickerDialog
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.CTEntry
+import com.tennis.scoremanager.data.CTFormat
+import com.tennis.scoremanager.data.CTKind
+import com.tennis.scoremanager.data.CTMatch
+import com.tennis.scoremanager.data.ClubTournament
+import com.tennis.scoremanager.data.ClubTournaments
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Players
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerEditDialog
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.ctProblemText
+import com.tennis.scoremanager.ui.ctRoundName
+import com.tennis.scoremanager.ui.groupLetter
+import java.util.Calendar
+
+/** Il nome di un iscritto: i nomi di oggi dei giocatori ("Rossi / Bianchi" nel doppio). */
+private fun entryName(c: MatchController, e: CTEntry?): String =
+    e?.players?.mapIndexed { i, id -> c.playerById(id)?.name ?: e.names.getOrNull(i).orEmpty() }?.joinToString(" / ") ?: ""
+
+/** "Sociale · Singolare · Eliminazione diretta" e simili. */
+private fun kindLine(s: com.tennis.scoremanager.ui.Strings, t: ClubTournament): String = listOfNotNull(
+    if (t.kind == CTKind.FITP) "FITP" else s.ctSocial,
+    if (t.doubles) s.ctDoubles else s.ctSingles,
+    if (t.format == CTFormat.GROUPS) s.ctFormatGroups else s.ctFormatKnockout,
+    t.category.ifBlank { null },
+    t.rankLimit.ifBlank { null }?.let { s.ctLimitShort(it) },
+).joinToString(" · ")
+
+/** Circolo › Tornei del circolo: in preparazione, in corso e conclusi. */
+@Composable
+fun ClubTournamentsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.clubTournaments.collectAsState()
+    val lang = c.options.value.lang
+    var creating by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = s.ctTitle,
+        subtitle = s.ctHint,
+        icon = Icons.Filled.EmojiEvents,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.ctNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (list.isEmpty()) Text(s.ctNone, color = TsmColors.TextDim)
+        val groups = listOf(
+            s.ctOpen to list.filter { !it.drawn },
+            s.ctRunning to list.filter { it.drawn && it.champion == null },
+            s.ctDone to list.filter { it.champion != null },
+        )
+        for ((title, items) in groups) {
+            if (items.isEmpty()) continue
+            SectionCard(title, Icons.Filled.EmojiEvents) {
+                for (t in items.sortedByDescending { it.start ?: it.createdAt }) {
+                    Row(Modifier.fillMaxWidth().clickable { c.openClubTournament(t.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text(kindLine(s, t), color = TsmColors.TextDim, fontSize = 13.sp)
+                            Text(
+                                listOfNotNull(t.start?.let { shortDate(it, lang) }, s.ctEntriesCount(t.entries.size),
+                                    t.champion?.let { ch -> s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })) }).joinToString(" · "),
+                                color = if (t.champion != null) TsmColors.Ball else TsmColors.TextDim, fontSize = 13.sp,
+                            )
+                        }
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+                    }
+                }
+            }
+        }
+    }
+    if (creating) TournamentEditDialog(c, null) { id -> creating = false; id?.let { c.openClubTournament(it) } }
+}
+
+/** Un torneo: iscritti, tabellone (con i gironi) e partite. */
+@Composable
+fun ClubTournamentScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.clubTournaments.collectAsState()
+    val id by c.openClubTournamentId.collectAsState()
+    val t = list.firstOrNull { it.id == id } ?: return
+    val players by c.players.collectAsState()
+    val book by c.clubBook.collectAsState()
+    var tab by rememberSaveable { mutableStateOf(0) }
+    var edit by remember { mutableStateOf(false) }
+    var adding by remember { mutableStateOf(false) }
+    var askDraw by remember { mutableStateOf(false) }
+    var openMatch by remember { mutableStateOf<String?>(null) }
+    var openEntry by remember { mutableStateOf<String?>(null) }
+    val now = remember { System.currentTimeMillis() }
+    val hasResults = t.matches.any { it.played && !it.bye }
+    val hasKnockout = t.matches.any { it.round > 0 }
+    ScreenScaffold(
+        title = t.name,
+        subtitle = kindLine(s, t),
+        icon = Icons.Filled.EmojiEvents,
+        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            when {
+                !t.drawn -> BigButton(s.ctDraw, Icons.Filled.Casino, { askDraw = true }, Modifier.weight(1f))
+                t.format == CTFormat.GROUPS && t.groupsDone && !hasKnockout -> BigButton(s.ctMakeKnockout, Icons.Filled.EmojiEvents, { c.clubKnockoutFromGroups(t); tab = 1 }, Modifier.weight(1f))
+                else -> Unit
+            }
+        },
+    ) {
+        t.champion?.let { ch -> Text(s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
+        Segmented(listOf(SegOption(s.ctTabEntries), SegOption(s.ctTabDraw), SegOption(s.ctTabMatches)), tab, { tab = it })
+        when (tab) {
+            0 -> EntriesTab(c, t, players, book, now, onAdd = { adding = true }, onOpen = { openEntry = it })
+            1 -> DrawTab(c, t) { openMatch = it }
+            else -> MatchesTab(c, t) { openMatch = it }
+        }
+        if (t.drawn && !hasResults) GhostButton(s.ctUndoDraw, Icons.Filled.Undo, { c.undoClubDraw(t) }, Modifier.fillMaxWidth())
+    }
+    if (edit) TournamentEditDialog(c, t) { edit = false }
+    if (adding) EntryPickDialog(c, t) { adding = false }
+    if (askDraw) {
+        val ok = ClubTournaments.eligible(t, players, book, now)
+        val out = t.entries.size - ok.size
+        AlertDialog(
+            onDismissRequest = { askDraw = false },
+            title = { Text(s.ctDraw) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(s.ctDrawAsk(ok.size), color = TsmColors.TextMain)
+                    if (out > 0) Text(s.ctDrawExcluded(out), color = TsmColors.Orange)
+                    if (ok.size < 2) Text(s.ctDrawTooFew, color = TsmColors.Danger)
+                }
+            },
+            confirmButton = { TextButton(enabled = ok.size >= 2, onClick = { askDraw = false; if (c.drawClubTournament(t)) tab = 1 }) { Text(s.ctDraw) } },
+            dismissButton = { TextButton(onClick = { askDraw = false }) { Text(s.back) } },
+        )
+    }
+    openMatch?.let { mid -> t.matches.firstOrNull { it.id == mid }?.let { m -> MatchDialog(c, t, m) { openMatch = null } } }
+    openEntry?.let { eid -> t.entries.firstOrNull { it.id == eid }?.let { e -> EntryDialog(c, t, e) { openEntry = null } } }
+}
+
+@Composable
+private fun EntriesTab(
+    c: MatchController, t: ClubTournament, players: List<PlayerProfile>, book: com.tennis.scoremanager.data.ClubBook, now: Long,
+    onAdd: () -> Unit, onOpen: (String) -> Unit,
+) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    // Le informazioni del torneo.
+    val info = listOfNotNull(
+        t.start?.let { st -> s.ctDates(shortDate(st, lang), t.end?.let { shortDate(it, lang) } ?: shortDate(st, lang)) },
+        t.feeCents.takeIf { it > 0 }?.let { s.ctFeeLine(Fees.money(it, lang.locale)) + if (t.requirePaid) " · " + s.ctPaidOnlyShort else "" },
+        t.fitpCode.ifBlank { null }?.let { s.ctFitpCodeLine(it) },
+        t.referee.ifBlank { null }?.let { s.ctRefereeLine(it) },
+    )
+    for (l in info) Text(l, color = TsmColors.TextDim, fontSize = 13.sp)
+    if (!t.drawn) BigButton(s.ctAddEntry, Icons.Filled.PersonAdd, onAdd, Modifier.fillMaxWidth())
+    if (t.entries.isEmpty()) Text(s.ctNoEntries, color = TsmColors.TextDim)
+    val ordered = ClubTournaments.ordered(t.entries, players)
+    val okIds = ClubTournaments.eligible(t, players, book, now).map { it.id }.toSet()
+    val seeds = ClubTournaments.seedCount(ClubTournaments.drawSize(okIds.size))
+    val seedOf = ordered.filter { it.id in okIds }.take(seeds).mapIndexed { i, e -> e.id to i + 1 }.toMap()
+    for (e in ordered) {
+        val people = e.players.mapNotNull { Players.byId(players, it) }
+        val problems = people.flatMap { p -> ClubTournaments.problems(t, p, book, now).map { p to it } }
+        Row(Modifier.fillMaxWidth().clickable { onOpen(e.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    (seedOf[e.id]?.let { "[$it] " } ?: "") + entryName(c, e),
+                    color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                )
+                val ranks = people.map { it.member?.ranking?.ifBlank { null } ?: "NC" }.joinToString(" / ")
+                Text(ranks, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (problems.isEmpty()) Text(s.ctInOrder, color = TsmColors.Ok, fontSize = 13.sp)
+                else Text(
+                    problems.joinToString(" · ") { (p, pr) -> (if (people.size > 1) "${p.name}: " else "") + ctProblemText(s, pr) },
+                    color = if (problems.any { ClubTournaments.blocking(it.second) }) TsmColors.Danger else TsmColors.Orange, fontSize = 13.sp,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+        }
+    }
+}
+
+/** Altezza di una casella del tabellone (dp). */
+private const val BOX_H = 96
+
+/** Una casella del tabellone: due righe (in grassetto chi ha vinto) e il punteggio. */
+@Composable
+private fun MatchBox(c: MatchController, t: ClubTournament, m: CTMatch, onOpen: (String) -> Unit) {
+    val s = LocalStrings.current
+    Column(
+        Modifier.width(190.dp).height(BOX_H.dp).clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh)
+            .clickable(enabled = m.a != null && m.b != null) { onOpen(m.id) }.padding(8.dp),
+    ) {
+        for ((side, e) in listOf(m.a to "a", m.b to "b")) {
+            val name = side?.let { entryName(c, t.entries.firstOrNull { x -> x.id == it }) } ?: if (m.bye) s.ctBye else "—"
+            Text(
+                name, color = if (m.winner != null && m.winner == side) TsmColors.Ball else TsmColors.TextMain,
+                fontWeight = if (m.winner != null && m.winner == side) FontWeight.Bold else FontWeight.Normal, fontSize = 13.sp,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+        }
+        val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+        if (extra.isNotBlank()) Text(extra, color = TsmColors.TextDim, fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun DrawTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
+    val s = LocalStrings.current
+    if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
+    // Gironi: la classifica (in evidenza chi passa) e le partite.
+    val groups = ClubTournaments.groupMembers(t)
+    for (g in groups.indices) {
+        SectionCard(s.ctGroup(groupLetter(g)), Icons.Filled.EmojiEvents) {
+            Row(Modifier.fillMaxWidth()) {
+                Text("", Modifier.weight(1f))
+                for (h in listOf(s.ctColWon, s.ctColSets, s.ctColGames)) Text(h, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.width(52.dp))
+            }
+            for ((i, st) in ClubTournaments.standings(t, g).withIndex()) {
+                val q = i < t.qualify
+                Row(Modifier.fillMaxWidth()) {
+                    Text("${i + 1}. " + entryName(c, t.entries.firstOrNull { it.id == st.entry }), color = if (q) TsmColors.Ball else TsmColors.TextMain,
+                        fontWeight = if (q) FontWeight.Bold else FontWeight.Normal, fontSize = 13.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("${st.won}/${st.played}", color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.width(52.dp))
+                    Text("%+d".format(st.setsWon - st.setsLost), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.width(52.dp))
+                    Text("%+d".format(st.gamesWon - st.gamesLost), color = TsmColors.TextMain, fontSize = 13.sp, modifier = Modifier.width(52.dp))
+                }
+            }
+        }
+    }
+    // Il tabellone a eliminazione: un turno per colonna, si scorre di lato.
+    val rounds = t.rounds
+    if (rounds == 0) { if (groups.isNotEmpty() && !t.groupsDone) Text(s.ctGroupsFirst, color = TsmColors.TextDim, fontSize = 13.sp); return }
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        for (r in 1..rounds) {
+            val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(ctRoundName(s, t, ms.first()), color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                // Caselle tutte alte uguali: nei turni dopo si lascia lo spazio giusto perché ogni partita stia a metà
+                // tra le due da cui viene.
+                val gap = ((1 shl (r - 1)) - 1) * (BOX_H + 8)
+                for ((i, m) in ms.withIndex()) {
+                    Spacer(Modifier.height((if (i == 0) gap / 2 else gap).dp))
+                    MatchBox(c, t, m, onOpen)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MatchesTab(c: MatchController, t: ClubTournament, onOpen: (String) -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    if (!t.drawn) { Text(s.ctNotDrawn, color = TsmColors.TextDim); return }
+    // Prima quelle da giocare (in ordine di orario), poi le giocate; i bye non contano.
+    val ms = t.matches.filter { !it.bye }
+    val todo = ms.filter { !it.played && it.a != null && it.b != null }.sortedWith(compareBy({ it.at ?: Long.MAX_VALUE }, { it.round }, { it.group ?: 0 }, { it.slot }))
+    val done = ms.filter { it.played }.sortedWith(compareByDescending<CTMatch> { it.round }.thenBy { it.slot })
+    for ((title, list) in listOf(s.ctToPlay to todo, s.ctPlayed to done)) {
+        if (list.isEmpty()) continue
+        Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        for (m in list) {
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { onOpen(m.id) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(ctRoundName(s, t, m), color = TsmColors.TextDim, fontSize = 12.sp)
+                    Text("${entryName(c, t.entries.firstOrNull { it.id == m.a })} – ${entryName(c, t.entries.firstOrNull { it.id == m.b })}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    val when_ = listOfNotNull(m.at?.let { shortDate(it, lang) + " " + com.tennis.scoremanager.data.Reports.time(it, lang) }, m.court.ifBlank { null }).joinToString(" · ")
+                    if (when_.isNotBlank()) Text(when_, color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+                if (m.played) Text(m.score.ifBlank { if (m.walkover) s.ctWalkover else "✓" }, color = TsmColors.Ball, fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+/** Una partita: gioca col segnapunti, risultato a mano (anche w.o. e ritiro), campo e orario. */
+@Composable
+private fun MatchDialog(c: MatchController, t: ClubTournament, m: CTMatch, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val a = entryName(c, t.entries.firstOrNull { it.id == m.a })
+    val b = entryName(c, t.entries.firstOrNull { it.id == m.b })
+    var winner by remember { mutableStateOf(m.winner) }
+    var score by remember { mutableStateOf(m.score) }
+    var walkover by remember { mutableStateOf(m.walkover) }
+    var retired by remember { mutableStateOf(m.retired) }
+    var court by remember { mutableStateOf(m.court) }
+    var at by remember { mutableStateOf(m.at) }
+    val courts = c.storage.clubCourts
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(ctRoundName(s, t, m)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("$a – $b", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                if (!m.played && m.a != null && m.b != null) BigButton(s.ctPlayLive, Icons.Filled.PlayArrow, { onDone(); c.playClubMatch(t, m.copy(court = court)) }, Modifier.fillMaxWidth())
+                Text(s.ctWinner, color = TsmColors.TextDim, fontSize = 13.sp)
+                val sides = listOf(m.a, m.b)
+                Segmented(listOf(SegOption(a), SegOption(b)), sides.indexOf(winner).takeIf { winner != null } ?: -1, { winner = sides[it] }, columns = 1)
+                OutlinedTextField(score, {
+                    score = it.take(40)
+                    // Dal punteggio si capisce chi ha vinto.
+                    ClubTournaments.winnerFromScore(it)?.let { w -> winner = if (w == "a") m.a else m.b }
+                }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctScore) })
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctWalkoverLong, null, walkover) { walkover = it; if (it) retired = false }
+                SwitchRow(Icons.Filled.EmojiEvents, s.ctRetiredLong, null, retired) { retired = it; if (it) walkover = false }
+                Text(s.ctWhere, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (courts.isNotEmpty()) Segmented(courts.map { SegOption(it) }, courts.indexOf(court), { court = courts[it] }, columns = minOf(3, courts.size))
+                else OutlinedTextField(court, { court = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.ctCourt) })
+                DateButton(s.payDate, at, lang) { d ->
+                    // Il giorno scelto, con l'ora di prima (o le 9).
+                    val old = Calendar.getInstance().apply { timeInMillis = at ?: d }
+                    at = Calendar.getInstance().apply { timeInMillis = d; set(Calendar.HOUR_OF_DAY, if (at == null) 9 else old.get(Calendar.HOUR_OF_DAY)); set(Calendar.MINUTE, if (at == null) 0 else old.get(Calendar.MINUTE)) }.timeInMillis
+                }
+                if (at != null) GhostButton("${s.ctTime}: ${com.tennis.scoremanager.data.Reports.time(at, lang)}", Icons.Filled.Schedule, {
+                    val cal = Calendar.getInstance().apply { timeInMillis = at!! }
+                    TimePickerDialog(context, { _, h, min -> at = Calendar.getInstance().apply { timeInMillis = at!!; set(Calendar.HOUR_OF_DAY, h); set(Calendar.MINUTE, min) }.timeInMillis },
+                        cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+                }, Modifier.fillMaxWidth())
+                if (m.played) TextButton(onClick = { c.setClubResult(t, m.id, null, "", false, false); onDone() }) { Text(s.ctClearResult, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                var cur = c.clubTournament(t.id) ?: t
+                if (court != m.court || at != m.at) { c.setClubSchedule(cur, m.id, court, at); cur = c.clubTournament(t.id) ?: cur }
+                if (winner != m.winner || score != m.score || walkover != m.walkover || retired != m.retired) c.setClubResult(cur, m.id, winner, score, walkover, retired)
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Un iscritto: testa di serie a mano e ritiro (prima del sorteggio). */
+@Composable
+private fun EntryDialog(c: MatchController, t: ClubTournament, e: CTEntry, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    var seed by remember { mutableStateOf(e.seed) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(entryName(c, e)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (id in e.players) c.playerById(id)?.let { p -> GhostButton(p.name, Icons.AutoMirrored.Filled.ArrowForward, { onDone(); c.openStudent(p.id) }, Modifier.fillMaxWidth()) }
+                if (!t.drawn) {
+                    Text(s.ctSeedHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { seed = seed?.let { if (it <= 1) null else it - 1 } }) { Icon(Icons.Filled.Remove, null) }
+                        Text(seed?.let { s.ctSeedN(it) } ?: s.ctSeedAuto, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { seed = (seed ?: 0) + 1 }) { Icon(Icons.Filled.Add, null) }
+                    }
+                    TextButton(onClick = { c.removeClubEntry(t, e.id); onDone() }) { Text(s.ctRemoveEntry, color = TsmColors.Danger) }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (seed != e.seed) c.saveClubTournament(t.copy(entries = t.entries.map { if (it.id == e.id) it.copy(seed = seed) else it }))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Iscrive un giocatore (o, nel doppio, due): dal database, o uno nuovo. */
+@Composable
+private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    var query by remember { mutableStateOf("") }
+    var first by remember { mutableStateOf<PlayerProfile?>(null) }
+    var creating by remember { mutableStateOf(false) }
+    val inside = t.entries.flatMap { it.players }.toSet()
+    val free = players.filter { it.id !in inside && it.id != first?.id }
+    // Prima i soci, poi gli altri.
+    val list = (if (query.isBlank()) free else Players.search(free, query)).sortedBy { if (it.member != null) 0 else 1 }
+    fun pick(p: PlayerProfile) {
+        if (t.doubles && first == null) { first = p; query = ""; return }
+        c.addClubEntry(c.clubTournament(t.id) ?: t, listOfNotNull(first, p))
+        onDone()
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (t.doubles && first != null) s.ctPickPartner(first!!.name) else s.ctAddEntry) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                GhostButton(s.membersNewPlayer, Icons.Filled.PersonAdd, { creating = true }, Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+                for (p in list.take(50)) {
+                    Row(Modifier.fillMaxWidth().clickable { pick(p) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text(listOfNotNull(p.member?.ranking?.ifBlank { null }, s.membersTitle.takeIf { p.member != null }).joinToString(" · "), color = TsmColors.TextDim, fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) pick(p) }
+}
+
+/** Torneo nuovo o da cambiare. [onDone] riceve l'id del torneo salvato (null = annullato o eliminato). */
+@Composable
+private fun TournamentEditDialog(c: MatchController, t: ClubTournament?, onDone: (String?) -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var name by remember { mutableStateOf(t?.name.orEmpty()) }
+    var kind by remember { mutableStateOf(t?.kind ?: CTKind.SOCIAL) }
+    var doubles by remember { mutableStateOf(t?.doubles ?: false) }
+    var category by remember { mutableStateOf(t?.category.orEmpty()) }
+    var format by remember { mutableStateOf(t?.format ?: CTFormat.KNOCKOUT) }
+    var groups by remember { mutableStateOf(t?.groups ?: 2) }
+    var qualify by remember { mutableStateOf(t?.qualify ?: 2) }
+    var start by remember { mutableStateOf(t?.start) }
+    var end by remember { mutableStateOf(t?.end) }
+    var fee by remember { mutableStateOf(t?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
+    var requirePaid by remember { mutableStateOf(t?.requirePaid ?: true) }
+    var limit by remember { mutableStateOf(t?.rankLimit.orEmpty()) }
+    var code by remember { mutableStateOf(t?.fitpCode.orEmpty()) }
+    var referee by remember { mutableStateOf(t?.referee.orEmpty()) }
+    var askDelete by remember { mutableStateOf(false) }
+    val drawn = t?.drawn == true
+    val feeOk = fee.isBlank() || Fees.parse(fee) != null
+    @Composable fun field(v: String, label: String, onChange: (String) -> Unit) =
+        OutlinedTextField(v, { onChange(it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(label) })
+    @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+        IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
+        Text("$v", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        IconButton(onClick = { onChange((v + 1).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
+    }
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (t == null) s.ctNew else t.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                field(name, s.ctName) { name = it }
+                Segmented(listOf(SegOption(s.ctSocial), SegOption("FITP")), if (kind == CTKind.FITP) 1 else 0, { kind = if (it == 1) CTKind.FITP else CTKind.SOCIAL }, enabled = !drawn)
+                Text(if (kind == CTKind.FITP) s.ctFitpHint else s.ctSocialHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                Segmented(listOf(SegOption(s.ctSingles), SegOption(s.ctDoubles)), if (doubles) 1 else 0, { doubles = it == 1 }, enabled = !drawn && t?.entries.isNullOrEmpty())
+                field(category, s.ctCategory) { category = it }
+                Segmented(listOf(SegOption(s.ctFormatKnockout), SegOption(s.ctFormatGroups)), if (format == CTFormat.GROUPS) 1 else 0, { format = if (it == 1) CTFormat.GROUPS else CTFormat.KNOCKOUT }, enabled = !drawn)
+                if (format == CTFormat.GROUPS && !drawn) {
+                    stepper(s.ctGroupsCount, groups, 1, 8) { groups = it }
+                    stepper(s.ctQualify, qualify, 1, 4) { qualify = it }
+                }
+                DateButton(s.ctStart, start, lang) { start = it; if (end == null || end!! < it) end = it }
+                DateButton(s.ctEnd, end, lang) { end = it }
+                MoneyField(fee, s.ctFee) { fee = it }
+                if ((Fees.parse(fee) ?: 0) > 0) SwitchRow(Icons.Filled.EmojiEvents, s.ctPaidOnly, s.ctPaidOnlyHint, requirePaid) { requirePaid = it }
+                field(limit, s.ctLimit) { limit = it.trim().uppercase() }
+                if (kind == CTKind.FITP) {
+                    field(code, s.ctFitpCode) { code = it }
+                    field(referee, s.ctReferee) { referee = it }
+                }
+                if (t != null) TextButton(onClick = { askDelete = true }) { Text(s.ctDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank() && feeOk, onClick = {
+                val base = t ?: ClubTournament(ClubTournaments.newId("t"), "", createdAt = System.currentTimeMillis())
+                val saved = base.copy(
+                    name = name.trim(), kind = kind, doubles = doubles, category = category.trim(), format = format, groups = groups, qualify = qualify,
+                    start = start, end = end, feeCents = Fees.parse(fee) ?: 0, requirePaid = requirePaid, rankLimit = limit,
+                    fitpCode = if (kind == CTKind.FITP) code.trim() else "", referee = if (kind == CTKind.FITP) referee.trim() else "",
+                )
+                c.saveClubTournament(saved)
+                onDone(saved.id)
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (askDelete && t != null) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.ctDeleteAsk(t.name)) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteClubTournament(t.id); onDone(null); c.back() }) { Text(s.ctDelete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
 }
 TSM_EOF
@@ -32502,7 +34299,8 @@ private fun CoachTab(c: MatchController) {
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint, main = true) { c.openTournaments() }
+    Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
+    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
 }
@@ -35325,7 +37123,7 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-private fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
@@ -35335,7 +37133,7 @@ private fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanage
 }
 
 @Composable
-private fun MoneyField(text: String, label: String, onChange: (String) -> Unit) {
+internal fun MoneyField(text: String, label: String, onChange: (String) -> Unit) {
     val s = LocalStrings.current
     val bad = text.isNotBlank() && Fees.parse(text) == null
     OutlinedTextField(
@@ -35346,7 +37144,7 @@ private fun MoneyField(text: String, label: String, onChange: (String) -> Unit) 
 }
 
 /** "150,00" per riempire un campo importo. */
-private fun plain(cents: Int, lang: com.tennis.scoremanager.model.Lang): String {
+internal fun plain(cents: Int, lang: com.tennis.scoremanager.model.Lang): String {
     val sep = java.text.DecimalFormatSymbols.getInstance(lang.locale).decimalSeparator
     return "%d%c%02d".format(cents / 100, sep, cents % 100)
 }
@@ -56990,6 +58788,142 @@ class ClubBookTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+import kotlin.random.Random
+
+class ClubTournamentTest {
+    private fun day(y: Int, m: Int, d: Int): Long = Calendar.getInstance().apply { set(y, m - 1, d, 12, 0, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val start = day(2026, 11, 14)
+
+    @Test
+    fun seedOrderIsTheClassicBracket() {
+        assertEquals(listOf(1, 2), ClubTournaments.seedOrder(2))
+        assertEquals(listOf(1, 4, 3, 2), ClubTournaments.seedOrder(4))
+        assertEquals(listOf(1, 8, 5, 4, 3, 6, 7, 2), ClubTournaments.seedOrder(8))
+        assertEquals(8, ClubTournaments.drawSize(5))
+        assertEquals(4, ClubTournaments.seedCount(16))
+        assertEquals(2, ClubTournaments.seedCount(8))
+    }
+
+    @Test
+    fun knockoutSeedsByesAndAdvance() {
+        val ids = (1..6).map { "e$it" }   // e1 la più forte
+        for (seed in 0 until 20) {
+            val ms = ClubTournaments.knockout(ids, Random(seed), 0)
+            assertEquals(4 + 2 + 1, ms.size)
+            val r1 = ms.filter { it.round == 1 }.sortedBy { it.slot }
+            val slots = r1.flatMap { listOf(it.a, it.b) }
+            // La 1 in cima, la 2 in fondo; i due bye contro di loro e passano da soli al turno dopo.
+            assertEquals("e1", slots[0]); assertNull(slots[1])
+            assertEquals("e2", slots[7]); assertNull(slots[6])
+            assertEquals(ids.toSet(), slots.filterNotNull().toSet())
+            val r2 = ms.filter { it.round == 2 }.sortedBy { it.slot }
+            assertEquals("e1", r2[0].a)
+            assertEquals("e2", r2[1].b)
+        }
+    }
+
+    @Test
+    fun resultsMoveUpAndCorrectionsClearLaterRounds() {
+        var t = ClubTournament("t", "Sociale", entries = (1..4).map { CTEntry("e$it", listOf("p$it"), listOf("P$it")) })
+        t = t.copy(matches = ClubTournaments.knockout(listOf("e1", "e2", "e3", "e4"), Random(1), 0), drawnAt = 1)
+        val semis = t.matches.filter { it.round == 1 }.sortedBy { it.slot }
+        // 1 contro 4 in alto, 3 contro 2 in basso.
+        assertEquals(setOf("e1", "e4"), setOf(semis[0].a, semis[0].b))
+        t = ClubTournaments.setResult(t, semis[0].id, "e1", "6-3 6-2")
+        t = ClubTournaments.setResult(t, semis[1].id, "e3", "4-6 7-5 10-8")
+        val final = t.matches.single { it.round == 2 }
+        assertEquals("e1", final.a); assertEquals("e3", final.b)
+        t = ClubTournaments.setResult(t, final.id, "e3", "6-4 6-4")
+        assertEquals("e3", t.champion)
+        // Corretto il risultato di una semifinale: la finale perde il suo.
+        t = ClubTournaments.setResult(t, semis[1].id, "e2", "6-4 6-4")
+        val f2 = t.matches.single { it.round == 2 }
+        assertEquals("e2", f2.b); assertNull(f2.winner); assertNull(t.champion)
+    }
+
+    @Test
+    fun groupsSnakeRoundRobinStandingsAndKnockout() {
+        val ids = (1..8).map { "e$it" }
+        val ms = ClubTournaments.groupsDraw(ids, 2)
+        var t = ClubTournament("t", "Gironi", format = CTFormat.GROUPS, groups = 2, qualify = 2, matches = ms, drawnAt = 1)
+        val groups = ClubTournaments.groupMembers(t)
+        assertEquals(listOf(listOf("e1", "e4", "e5", "e8"), listOf("e2", "e3", "e6", "e7")).map { it.toSet() }, groups.map { it.toSet() })
+        // Quattro per girone: sei partite, ognuno ne gioca tre.
+        assertEquals(12, ms.size)
+        assertTrue(groups.all { g -> g.all { e -> ms.count { it.a == e || it.b == e } == 3 } })
+        // Vince sempre chi ha il numero più basso.
+        for (m in t.matches) {
+            val w = listOf(m.a!!, m.b!!).minBy { it.drop(1).toInt() }
+            t = ClubTournaments.setResult(t, m.id, w, if (w == m.a) "6-1 6-1" else "1-6 1-6")
+        }
+        assertTrue(t.groupsDone)
+        assertEquals(listOf("e1", "e4", "e5", "e8"), ClubTournaments.standings(t, 0).map { it.entry })
+        val ko = ClubTournaments.knockoutFromGroups(t, Random(3), 0).filter { it.round == 1 }.sortedBy { it.slot }
+        // A1 contro B2, B1 contro A2: quelli dello stesso girone si ritrovano solo in finale.
+        assertEquals(setOf("e1", "e3"), setOf(ko[0].a, ko[0].b))
+        assertEquals(setOf("e2", "e4"), setOf(ko[1].a, ko[1].b))
+    }
+
+    @Test
+    fun scoreParsing() {
+        assertEquals(listOf(6 to 4, 3 to 6, 10 to 8), ClubTournaments.sets("6-4 3-6 10-8"))
+        assertEquals(listOf(7 to 6, 6 to 3), ClubTournaments.sets("7-6(5) 6/3"))
+        assertEquals("b", ClubTournaments.winnerFromScore("4-6 6-3 8-10"))
+        assertNull(ClubTournaments.winnerFromScore(""))
+    }
+
+    @Test
+    fun entryRulesForFitpAndSocial() {
+        val ok = Membership(fitpNumber = "1", fitpCard = FitpCard.AGONIST, fitpYear = 2026, ranking = "4.2", medical = MedicalKind.AGONISTIC, medicalUntil = day(2027, 3, 1))
+        val p = PlayerProfile("p", "Rossi", "Mario", "Rossi", member = ok)
+        val fitp = ClubTournament("t", "Open", kind = CTKind.FITP, rankLimit = "4.1", start = start)
+        val book = ClubBook()
+        assertEquals(emptyList<ClubTournaments.Problem>(), ClubTournaments.problems(fitp, p, book, 0))
+        // Più forte del limite, certificato non agonistico, tessera non agonista.
+        val strong = p.copy(member = ok.copy(ranking = "3.5", medical = MedicalKind.NON_AGONISTIC, fitpCard = FitpCard.NON_AGONIST))
+        assertEquals(
+            listOf(ClubTournaments.Problem.MEDICAL_NOT_AGONISTIC, ClubTournaments.Problem.NOT_AGONIST_CARD, ClubTournaments.Problem.RANK_TOO_HIGH),
+            ClubTournaments.problems(fitp, strong, book, 0),
+        )
+        // Certificato scaduto prima dell'inizio del torneo.
+        assertTrue(ClubTournaments.Problem.NO_MEDICAL in ClubTournaments.problems(fitp, p.copy(member = ok.copy(medicalUntil = day(2026, 11, 10))), book, 0))
+        // Sociale: chi non è socio si segnala ma non blocca; senza certificato sì.
+        val social = ClubTournament("s", "Sociale", start = start)
+        val guest = PlayerProfile("g", "Ospite")
+        val pr = ClubTournaments.problems(social, guest, book, 0)
+        assertEquals(listOf(ClubTournaments.Problem.NOT_MEMBER, ClubTournaments.Problem.NO_MEDICAL), pr)
+        assertFalse(ClubTournaments.blocking(ClubTournaments.Problem.NOT_MEMBER))
+    }
+
+    @Test
+    fun entryFeeMustBePaid() {
+        val p = PlayerProfile("p", "Rossi", member = Membership(medicalUntil = day(2027, 3, 1)))
+        val fee = Fee("f", "Iscrizione Sociale", 1_500, FeeKind.TOURNAMENT, tournament = "t")
+        val t = ClubTournament("t", "Sociale", start = start, feeCents = 1_500, feeId = "f", entries = listOf(CTEntry("e", listOf("p"), listOf("Rossi"))))
+        var book = Fees.charge(ClubBook(fees = listOf(fee)), p, fee.name, fee.cents, 0, fee)
+        assertEquals(listOf(ClubTournaments.Problem.UNPAID), ClubTournaments.problems(t, p, book, 0))
+        assertTrue(ClubTournaments.eligible(t, listOf(p), book, 0).isEmpty())
+        book = Fees.pay(book, book.charges.single().id, 1_500, 0, PayMethod.CASH, "")!!.first
+        assertEquals(listOf("e"), ClubTournaments.eligible(t, listOf(p), book, 0).map { it.id })
+        // Senza obbligo di pagamento entra lo stesso.
+        assertTrue(ClubTournaments.problems(t.copy(requirePaid = false), p, ClubBook(), 0).isEmpty())
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/DataTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/DataTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -65263,6 +67197,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 205 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 209 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

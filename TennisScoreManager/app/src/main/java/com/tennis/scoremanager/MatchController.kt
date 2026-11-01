@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -656,6 +656,8 @@ class MatchController(
             Screen.DRILLS -> Screen.HOME
             Screen.MEMBERS -> Screen.HOME
             Screen.PAYMENTS -> Screen.HOME
+            Screen.CLUB_TOURNAMENTS -> Screen.HOME
+            Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1181,7 +1183,8 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; Screen.PAYMENTS -> Screen.PAYMENTS; else -> Screen.STUDENTS }
+        // Indietro torna da dove si è aperta la scheda.
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -1247,6 +1250,151 @@ class MatchController(
     fun saveClubBook(book: com.tennis.scoremanager.data.ClubBook) {
         clubBook.value = book
         scope.launch(io) { storage.saveClubBook(book) }
+    }
+
+    // ---- Tornei del circolo (sociali e FITP) ----
+
+    val clubTournaments = MutableStateFlow(storage.loadClubTournaments())
+    val openClubTournamentId = MutableStateFlow<String?>(null)
+    /** Partita del tabellone che si sta per giocare col segnapunti: (torneo, partita). */
+    private var pendingClubMatch: Pair<String, String>? = null
+
+    fun openClubTournaments() {
+        refreshPlayers()
+        screen.value = Screen.CLUB_TOURNAMENTS
+    }
+
+    fun openClubTournament(id: String) {
+        openClubTournamentId.value = id
+        screen.value = Screen.CLUB_TOURNAMENT
+    }
+
+    fun clubTournament(id: String?): com.tennis.scoremanager.data.ClubTournament? = id?.let { i -> clubTournaments.value.firstOrNull { it.id == i } }
+
+    fun saveClubTournament(t: com.tennis.scoremanager.data.ClubTournament) {
+        val list = clubTournaments.value.filter { it.id != t.id } + t
+        clubTournaments.value = list
+        // La quota d'iscrizione è una quota del registro: nome e importo seguono il torneo.
+        if (t.feeCents > 0) {
+            val book = clubBook.value
+            val fee = book.fees.firstOrNull { it.id == t.feeId }
+            val name = strings.ctFeeName(t.name)
+            val want = (fee ?: com.tennis.scoremanager.data.Fee(t.feeId ?: com.tennis.scoremanager.data.Fees.newId("f"), name, t.feeCents, com.tennis.scoremanager.data.FeeKind.TOURNAMENT, createdAt = System.currentTimeMillis(), tournament = t.id))
+                .copy(name = name, cents = t.feeCents, due = t.start)
+            if (want != fee) saveClubBook(book.copy(fees = book.fees.filter { it.id != want.id } + want))
+            if (t.feeId != want.id) return saveClubTournament(t.copy(feeId = want.id))
+        }
+        scope.launch(io) { storage.saveClubTournaments(list) }
+    }
+
+    /** Toglie il torneo; dal registro spariscono le iscrizioni non pagate (quelle pagate restano: contabilità). */
+    fun deleteClubTournament(id: String) {
+        val t = clubTournament(id) ?: return
+        val list = clubTournaments.value.filter { it.id != id }
+        clubTournaments.value = list
+        t.feeId?.let { f -> dropUnpaidFees(f, null) }
+        scope.launch(io) { storage.saveClubTournaments(list) }
+    }
+
+    private fun dropUnpaidFees(feeId: String, players: Set<String>?) {
+        var book = clubBook.value
+        for (ch in book.charges.filter { it.fee == feeId && (players == null || it.player in players) && it.payments.isEmpty() }) book = com.tennis.scoremanager.data.Fees.cancel(book, ch.id)
+        saveClubBook(book)
+    }
+
+    /** Iscrive un giocatore (o una coppia); con la quota, l'iscrizione si addebita a ciascuno. */
+    fun addClubEntry(t: com.tennis.scoremanager.data.ClubTournament, people: List<com.tennis.scoremanager.data.PlayerProfile>) {
+        val now = System.currentTimeMillis()
+        val e = com.tennis.scoremanager.data.CTEntry(com.tennis.scoremanager.data.ClubTournaments.newId("e"), people.map { it.id }, people.map { it.name }, at = now)
+        val saved = t.copy(entries = t.entries + e)
+        saveClubTournament(saved)
+        val cur = clubTournament(t.id) ?: return
+        val fee = clubBook.value.fees.firstOrNull { it.id == cur.feeId } ?: return
+        var book = clubBook.value
+        for (p in people) if (book.charges.none { it.fee == fee.id && it.player == p.id && !it.cancelled }) book = com.tennis.scoremanager.data.Fees.charge(book, p, fee.name, fee.cents, now, fee)
+        saveClubBook(book)
+    }
+
+    fun removeClubEntry(t: com.tennis.scoremanager.data.ClubTournament, entryId: String) {
+        val e = t.entries.firstOrNull { it.id == entryId } ?: return
+        saveClubTournament(t.copy(entries = t.entries - e))
+        t.feeId?.let { dropUnpaidFees(it, e.players.toSet()) }
+    }
+
+    /** Il sorteggio: entrano gli iscritti in regola, in ordine di classifica; gironi o tabellone. */
+    fun drawClubTournament(t: com.tennis.scoremanager.data.ClubTournament): Boolean {
+        val now = System.currentTimeMillis()
+        val ok = com.tennis.scoremanager.data.ClubTournaments.eligible(t, players.value, clubBook.value, now)
+        if (ok.size < 2) return false
+        val ids = com.tennis.scoremanager.data.ClubTournaments.ordered(ok, players.value).map { it.id }
+        val ms = if (t.format == com.tennis.scoremanager.data.CTFormat.GROUPS) com.tennis.scoremanager.data.ClubTournaments.groupsDraw(ids, t.groups)
+        else com.tennis.scoremanager.data.ClubTournaments.knockout(ids, kotlin.random.Random(now), now)
+        saveClubTournament(t.copy(matches = ms, drawnAt = now))
+        return true
+    }
+
+    /** Finiti i gironi: il tabellone con chi passa. */
+    fun clubKnockoutFromGroups(t: com.tennis.scoremanager.data.ClubTournament) {
+        val ko = com.tennis.scoremanager.data.ClubTournaments.knockoutFromGroups(t, kotlin.random.Random(System.currentTimeMillis()), System.currentTimeMillis())
+        saveClubTournament(t.copy(matches = t.matches.filter { it.round == 0 } + ko))
+    }
+
+    /** Rifà il sorteggio da capo (si può finché non c'è un risultato). */
+    fun undoClubDraw(t: com.tennis.scoremanager.data.ClubTournament) = saveClubTournament(t.copy(matches = emptyList(), drawnAt = null))
+
+    fun setClubResult(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, winner: String?, score: String, walkover: Boolean, retired: Boolean) =
+        saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, matchId, winner, score, walkover, retired))
+
+    fun setClubSchedule(t: com.tennis.scoremanager.data.ClubTournament, matchId: String, court: String, at: Long?) =
+        saveClubTournament(t.copy(matches = t.matches.map { if (it.id == matchId) it.copy(court = court, at = at) else it }))
+
+    /** Nome del turno: finale, semifinali, quarti, ottavi… o "Girone A". */
+    fun clubRoundName(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch): String = com.tennis.scoremanager.ui.ctRoundName(strings, t, m)
+
+    /**
+     * Gioca una partita del tabellone col segnapunti: Nuova partita si apre con giocatori, torneo, turno e campo già
+     * scritti; a partita finita il risultato torna da solo nel tabellone.
+     */
+    fun playClubMatch(t: com.tennis.scoremanager.data.ClubTournament, m: com.tennis.scoremanager.data.CTMatch) {
+        val a = t.entries.firstOrNull { it.id == m.a } ?: return
+        val b = t.entries.firstOrNull { it.id == m.b } ?: return
+        fun p(e: com.tennis.scoremanager.data.CTEntry, i: Int) = e.players.getOrNull(i)?.let { playerById(it) }
+        fun name(e: com.tennis.scoremanager.data.CTEntry, i: Int) = p(e, i)?.name ?: e.names.getOrNull(i).orEmpty()
+        fun rank(e: com.tennis.scoremanager.data.CTEntry, i: Int) = p(e, i)?.member?.ranking.orEmpty()
+        updateSetup {
+            it.copy(
+                club = storage.clubName.ifBlank { it.club }, court = m.court.ifBlank { it.court }, doubles = t.doubles,
+                p1a = name(a, 0), p1b = if (t.doubles) name(a, 1) else "", p2a = name(b, 0), p2b = if (t.doubles) name(b, 1) else "",
+                p1aId = a.players.getOrNull(0).orEmpty(), p1bId = if (t.doubles) a.players.getOrNull(1).orEmpty() else "",
+                p2aId = b.players.getOrNull(0).orEmpty(), p2bId = if (t.doubles) b.players.getOrNull(1).orEmpty() else "",
+                p1aRank = rank(a, 0), p1bRank = if (t.doubles) rank(a, 1) else "", p2aRank = rank(b, 0), p2bRank = if (t.doubles) rank(b, 1) else "",
+                event = t.name, category = t.category, round = clubRoundName(t, m),
+            )
+        }
+        pendingClubMatch = t.id to m.id
+        go(Screen.SETUP)
+    }
+
+    /** La partita appena iniziata è quella del tabellone scelta con [playClubMatch]. */
+    private fun linkClubMatch(recordId: String, su: SetupData) {
+        val (tid, mid) = pendingClubMatch ?: return
+        pendingClubMatch = null
+        val t = clubTournament(tid) ?: return
+        val m = t.matches.firstOrNull { it.id == mid } ?: return
+        // Solo se in campo ci sono proprio loro: chi è tornato indietro e ha iniziato un'altra partita non la lega al torneo.
+        val a = t.entries.firstOrNull { it.id == m.a }?.players?.firstOrNull()
+        val b = t.entries.firstOrNull { it.id == m.b }?.players?.firstOrNull()
+        if (a == null || b == null || su.p1aId != a || su.p2aId != b) return
+        saveClubTournament(t.copy(matches = t.matches.map { if (it.id == mid) it.copy(record = recordId) else it }))
+    }
+
+    /** A partita finita, il risultato va nel tabellone (Giocatore 1 = il primo iscritto della partita). */
+    private fun clubMatchFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        for (t in clubTournaments.value) {
+            val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
+            val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
+            saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+        }
     }
 
     /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
@@ -1611,6 +1759,7 @@ class MatchController(
             scope.launch(io) { storage.savePlayers(list) }
         }
         val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
+        linkClubMatch(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -1870,6 +2019,7 @@ class MatchController(
             batteryEnd = endBattery, heart = heartMap,
         )
         runningSince = null
+        clubMatchFinished(rec, lm.state)
         scope.launch(io) {
             storage.deleteMatch(rec.id)
             storage.saveFinished(rec)

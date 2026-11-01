@@ -203,7 +203,8 @@ private fun CoachTab(c: MatchController) {
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint, main = true) { c.openTournaments() }
+    Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
+    Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
 }

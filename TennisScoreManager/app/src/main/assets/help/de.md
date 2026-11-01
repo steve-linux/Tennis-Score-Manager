@@ -359,6 +359,18 @@ Unter **Spieler › Beiträge und Zahlungen** (Rolle Verein) wird das Register d
 - **Zahlungen exportieren (CSV)**: alle Zahlungen des Jahres mit Datum, Quittung, Name, Beschreibung, Zahlungsart, Referenz und Betrag, für die Tabelle des Steuerberaters.
 - Wird ein Spieler gelöscht, verschwinden seine unbezahlten Forderungen; geleistete Zahlungen bleiben mit dem Namen, denn sie sind Buchhaltung. Das Register ist in der Sicherung unter *Profil und Daten*.
 
+### 7.13 Vereinsturniere
+
+Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne** und **FITP**-Turniere verwaltet: Meldungen, Gebühren, Auslosung, Tableau, Gruppen und Ergebnisse. Bei FITP-Turnieren hilft die App Verein und Oberschiedsrichter, ersetzt aber nicht die offiziellen Systeme des Verbands.
+
+- **Neues Turnier**: Name, intern oder FITP, Einzel oder Doppel, Kategorie, **K.-o.-System** oder **Gruppen + Tableau** (wie viele Gruppen und wie viele pro Gruppe weiterkommen), Daten, **Meldegebühr** pro Spieler (sie wird ein Beitrag unter *Beiträge und Zahlungen*), *ins Tableau nur, wer bezahlt hat*, **höchste Rangliste** (z. B. *4.1*: 4.1 und darunter; leer = offen). Bei FITP auch Turniercode und Oberschiedsrichter.
+- **Anmelden**: aus der Datenbank wählen (zuerst die Mitglieder) oder einen Spieler anlegen; im Doppel beide wählen. Mit Gebühr wird die Meldung jedem berechnet und in seiner Karte kassiert (auch mit Quittung).
+- Unter jeder Meldung steht, ob sie **in Ordnung** ist. **FITP**: Wettkampfausweis des Jahres, Wettkampfattest gültig am ersten Turniertag, Rangliste im Limit. **Intern**: gültiges Attest (Nichtmitglieder werden angezeigt, dürfen aber spielen). Für alle: Meldegebühr bezahlt, wenn verlangt. Rot, wer nicht ausgelost wird.
+- **Setzliste**: nach FITP-Rangliste (die Stärksten zuerst); eine Meldung antippen, um von Hand zu setzen. Zwei Gesetzte bis 8 Plätze, danach einer je vier.
+- **Auslosung**: nur gültige Meldungen. Im Tableau steht die Nummer 1 oben, die 2 unten, 3 und 4 (dann 5-8) werden auf ihre Plätze gelost; **Freilose** gehen an die ersten Gesetzten, die von selbst weiterkommen. Mit Gruppen: Verteilung in Schlangenlinie nach Rangliste, jeder gegen jeden; danach **Finaltableau** mit den Gruppensiegern gesetzt und den Zweiten in der Hälfte gegenüber ihrem Gruppensieger. Solange es kein Ergebnis gibt: **Auslosung wiederholen**.
+- **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
+- Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

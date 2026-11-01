@@ -359,6 +359,18 @@ In **Giocatori › Quote e pagamenti** (ruolo Circolo) si tiene il registro del 
 - **Esporta i pagamenti (CSV)**: tutti i pagamenti dell'anno con data, ricevuta, nome, descrizione, metodo, riferimento e importo, per il foglio di calcolo del commercialista.
 - Cancellando un giocatore spariscono i suoi addebiti non pagati; i pagamenti fatti restano col nome, perché sono contabilità. Il registro è nel backup di *Profilo e dati*.
 
+### 7.13 Tornei del circolo
+
+Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i tornei **sociali** e quelli **FITP**: iscrizioni, quote, sorteggio, tabellone, gironi e risultati. Per i tornei FITP l'app aiuta il circolo e il giudice arbitro, ma non sostituisce i sistemi ufficiali della Federazione.
+
+- **Nuovo torneo**: nome, sociale o FITP, singolare o doppio, categoria, **eliminazione diretta** o **gironi + tabellone** (quanti gironi e quanti passano da ciascuno), date, **quota d'iscrizione** per giocatore (diventa una quota in *Quote e pagamenti*), *nel tabellone solo chi ha pagato*, **classifica massima** (es. *4.1*: entrano i 4.1 e chi è sotto; vuoto = open). Per i FITP anche il codice del torneo e il giudice arbitro.
+- **Iscrivi**: si sceglie dal database (prima i soci) o si crea un giocatore; nel doppio si scelgono i due. Con la quota, l'iscrizione si addebita a ciascuno e si incassa dalla sua scheda (anche con la ricevuta).
+- Sotto ogni iscritto l'app dice se è **in regola**. **FITP**: tessera agonistica dell'anno, certificato agonistico valido il giorno d'inizio, classifica nel limite. **Sociale**: certificato valido (chi non è socio si segnala, ma può giocare). Per tutti: l'iscrizione pagata, se la si chiede. In rosso chi non entra nel sorteggio.
+- **Teste di serie**: dalla classifica FITP (più forte = prima); toccando un iscritto la si sceglie anche a mano. Due teste di serie fino a 8 posti, poi una ogni quattro.
+- **Sorteggio**: entrano solo gli iscritti in regola. Nel tabellone la testa di serie 1 va in cima, la 2 in fondo, la 3 e la 4 (e poi le 5-8) sorteggiate tra i loro posti; i **bye** vanno alle prime teste di serie e passano da soli. Con i gironi: distribuzione a serpentina per classifica e tutti contro tutti; a gironi finiti, **Tabellone finale** con i primi come teste di serie e i secondi nella metà opposta al primo del loro girone. Finché non c'è un risultato, **Rifai il sorteggio**.
+- **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
+- Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

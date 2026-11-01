@@ -359,6 +359,18 @@ En **Jugadores › Cuotas y pagos** (rol Club) se lleva el registro del club. La
 - **Exportar los pagos (CSV)**: todos los pagos del año con fecha, recibo, nombre, descripción, método, referencia e importe, para la hoja de cálculo del gestor.
 - Al borrar un jugador desaparecen sus cargos sin pagar; los pagos hechos se quedan con el nombre, porque son contabilidad. El registro está en la copia de seguridad de *Perfil y datos*.
 
+### 7.13 Torneos del club
+
+Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneos **sociales** y los **FITP**: inscripciones, cuotas, sorteo, cuadro, grupos y resultados. En los torneos FITP la app ayuda al club y al juez árbitro, pero no sustituye los sistemas oficiales de la Federación.
+
+- **Nuevo torneo**: nombre, social o FITP, individual o dobles, categoría, **eliminación directa** o **grupos + cuadro** (cuántos grupos y cuántos pasan de cada uno), fechas, **cuota de inscripción** por jugador (se convierte en una cuota en *Cuotas y pagos*), *en el cuadro solo quien ha pagado*, **clasificación máxima** (p. ej. *4.1*: entran los 4.1 y los de abajo; vacío = open). En los FITP también el código del torneo y el juez árbitro.
+- **Inscribir**: se elige de la base de datos (primero los socios) o se crea un jugador; en dobles se eligen los dos. Con cuota, la inscripción se carga a cada uno y se cobra desde su ficha (también con recibo).
+- Debajo de cada inscrito la app dice si está **en regla**. **FITP**: licencia de competición del año, certificado de competición válido el día del inicio, clasificación dentro del límite. **Social**: certificado válido (quien no es socio se señala, pero puede jugar). Para todos: la inscripción pagada, si se exige. En rojo quien no entra en el sorteo.
+- **Cabezas de serie**: por la clasificación FITP (el más fuerte primero); tocando un inscrito se elige también a mano. Dos cabezas de serie hasta 8 plazas, luego una cada cuatro.
+- **Sorteo**: entran solo los inscritos en regla. En el cuadro el cabeza de serie 1 va arriba, el 2 abajo, el 3 y el 4 (y luego 5-8) sorteados entre sus puestos; los **byes** van a los primeros cabezas de serie, que pasan solos. Con grupos: reparto en serpentina por clasificación y todos contra todos; terminados los grupos, **Cuadro final** con los primeros como cabezas de serie y los segundos en la mitad opuesta al primero de su grupo. Mientras no haya resultados, **Repetir el sorteo**.
+- **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
+- Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

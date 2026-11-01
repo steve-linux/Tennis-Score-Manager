@@ -472,6 +472,18 @@ With the **Club** role, **Players › Members** lists the people enrolled, meant
 - **Export payments (CSV)**: all the year's payments with date, receipt, name, description, method, reference and amount, for the accountant's spreadsheet.
 - Deleting a player removes their unpaid charges; payments made stay with the name, because they are accounts. The register is in the *Profile and data* backup.
 
+### 7.13 Club tournaments (app 2.6)
+
+With the **Club** role, **Tournaments › Club tournaments** manages **social** and **FITP** tournaments: entries, fees, draw, draw sheet, groups and results. For FITP tournaments the app helps the club and the referee, but it doesn't replace the Federation's official systems.
+
+- **New tournament**: name, social or FITP, singles or doubles, category, **knockout** or **groups + draw** (how many groups and how many go through from each), dates, **entry fee** per player (it becomes a fee in *Fees and payments*), *only paid entries in the draw*, **maximum ranking** (e.g. *4.1*: 4.1 and below may enter; empty = open). For FITP also the tournament code and the referee.
+- **Enter**: pick from the database (members first) or create a player; for doubles pick both. With a fee, the entry is charged to each player and collected from their card (with a receipt too).
+- Under each entry the app says whether it is **in order**. **FITP**: this year's competitive card, competitive certificate valid on the start date, ranking within the limit. **Social**: valid certificate (non-members are flagged, but may play). For all: entry paid, if required. In red whoever won't be drawn.
+- **Seeds**: from the FITP ranking (strongest first); tap an entry to set one by hand. Two seeds up to 8 places, then one every four.
+- **Draw**: only entries in order go in. In the draw sheet seed 1 goes at the top, seed 2 at the bottom, 3 and 4 (then 5-8) drawn among their places; **byes** go to the top seeds and move on by themselves. With groups: snake distribution by ranking and round robin; once the groups are over, **Final draw** with the group winners seeded and the runners-up in the half opposite their group winner. Until there's a result, **Redo the draw**.
+- **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
+- Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

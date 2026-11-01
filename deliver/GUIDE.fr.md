@@ -472,6 +472,18 @@ Dans **Joueurs › Cotisations et paiements** (rôle Club), on tient le registre
 - **Exporter les paiements (CSV)** : tous les paiements de l'année avec date, reçu, nom, libellé, mode, référence et montant, pour le tableur du comptable.
 - En supprimant un joueur, ses facturations non payées disparaissent ; les paiements faits restent avec le nom, car c'est de la comptabilité. Le registre est dans la sauvegarde de *Profil et données*.
 
+### 7.13 Tournois du club (app 2.6)
+
+Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **internes** et **FITP** : inscriptions, droits, tirage, tableau, poules et résultats. Pour les tournois FITP l'appli aide le club et le juge-arbitre, mais ne remplace pas les systèmes officiels de la Fédération.
+
+- **Nouveau tournoi** : nom, interne ou FITP, simple ou double, catégorie, **élimination directe** ou **poules + tableau** (combien de poules et combien de qualifiés par poule), dates, **droit d'inscription** par joueur (il devient une cotisation dans *Cotisations et paiements*), *au tableau seulement ceux qui ont payé*, **classement maximum** (ex. *4.1* : les 4.1 et en dessous ; vide = open). Pour les FITP aussi le code du tournoi et le juge-arbitre.
+- **Inscrire** : on choisit dans la base (d'abord les adhérents) ou on crée un joueur ; en double on choisit les deux. Avec un droit, l'inscription est facturée à chacun et s'encaisse depuis sa fiche (avec reçu).
+- Sous chaque inscrit, l'appli dit s'il est **en règle**. **FITP** : licence compétition de l'année, certificat compétition valable le jour du début, classement dans la limite. **Interne** : certificat valable (les non-adhérents sont signalés, mais peuvent jouer). Pour tous : l'inscription payée, si on l'exige. En rouge ceux qui ne seront pas tirés.
+- **Têtes de série** : d'après le classement FITP (le plus fort d'abord) ; en touchant un inscrit on la choisit aussi à la main. Deux têtes de série jusqu'à 8 places, puis une toutes les quatre.
+- **Tirage au sort** : seuls les inscrits en règle entrent. Au tableau la tête de série 1 va en haut, la 2 en bas, la 3 et la 4 (puis 5-8) tirées entre leurs places ; les **exempts** vont aux premières têtes de série, qui passent toutes seules. Avec les poules : répartition en serpentin par classement et chacun contre tous ; poules terminées, **Tableau final** avec les premiers en têtes de série et les deuxièmes dans la moitié opposée au premier de leur poule. Tant qu'il n'y a pas de résultat, **Refaire le tirage**.
+- **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
+- En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

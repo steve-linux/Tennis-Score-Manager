@@ -257,6 +257,24 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
+    /** I tornei del circolo (sociali e FITP), in un file solo. */
+    private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
+
+    fun loadClubTournaments(): List<ClubTournament> =
+        runCatching { json.decodeFromString(ListSerializer(ClubTournament.serializer()), clubTournamentsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveClubTournaments(list: List<ClubTournament>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_tournaments.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(ClubTournament.serializer()), list))
+            if (!tmp.renameTo(clubTournamentsFile)) {
+                clubTournamentsFile.delete()
+                tmp.renameTo(clubTournamentsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio dei tornei del circolo fallito", it) }
+    }
+
     /** Il registro del circolo: quote, addebiti, pagamenti e numerazione delle ricevute. */
     private val clubBookFile: File get() = File(app.filesDir, "club_book.json")
 

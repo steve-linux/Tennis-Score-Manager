@@ -359,6 +359,18 @@ Em **Jogadores › Mensalidades e pagamentos** (papel Clube) fica o registro do 
 - **Exportar os pagamentos (CSV)**: todos os pagamentos do ano com data, recibo, nome, descrição, método, referência e valor, para a planilha do contador.
 - Ao excluir um jogador somem as cobranças não pagas; os pagamentos feitos ficam com o nome, porque são contabilidade. O registro está no backup de *Perfil e dados*.
 
+### 7.13 Torneios do clube
+
+Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os torneios **sociais** e os **FITP**: inscrições, taxas, sorteio, chave, grupos e resultados. Nos torneios FITP o app ajuda o clube e o árbitro geral, mas não substitui os sistemas oficiais da Federação.
+
+- **Novo torneio**: nome, social ou FITP, simples ou duplas, categoria, **eliminação direta** ou **grupos + chave** (quantos grupos e quantos passam de cada um), datas, **taxa de inscrição** por jogador (vira uma mensalidade em *Mensalidades e pagamentos*), *na chave só quem pagou*, **ranking máximo** (ex. *4.1*: entram os 4.1 e os abaixo; vazio = open). Nos FITP também o código do torneio e o árbitro geral.
+- **Inscrever**: escolha no banco de dados (primeiro os sócios) ou crie um jogador; nas duplas escolha os dois. Com taxa, a inscrição é cobrada de cada um e recebida na ficha dele (também com recibo).
+- Embaixo de cada inscrito o app diz se está **em ordem**. **FITP**: cartão de competição do ano, atestado de competição válido no dia do início, ranking dentro do limite. **Social**: atestado válido (quem não é sócio é indicado, mas pode jogar). Para todos: a inscrição paga, se exigida. Em vermelho quem não entra no sorteio.
+- **Cabeças de chave**: pelo ranking FITP (o mais forte primeiro); tocando num inscrito dá para escolher à mão. Dois cabeças de chave até 8 posições, depois um a cada quatro.
+- **Sorteio**: entram só os inscritos em ordem. Na chave o cabeça 1 vai no topo, o 2 no fim, o 3 e o 4 (depois 5-8) sorteados entre as suas posições; os **byes** vão para os primeiros cabeças, que passam sozinhos. Com grupos: distribuição em serpentina pelo ranking e todos contra todos; terminados os grupos, **Chave final** com os primeiros como cabeças e os segundos na metade oposta ao primeiro do seu grupo. Enquanto não houver resultado, **Refazer o sorteio**.
+- **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
+- Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

@@ -76,7 +76,7 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-private fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
@@ -86,7 +86,7 @@ private fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanage
 }
 
 @Composable
-private fun MoneyField(text: String, label: String, onChange: (String) -> Unit) {
+internal fun MoneyField(text: String, label: String, onChange: (String) -> Unit) {
     val s = LocalStrings.current
     val bad = text.isNotBlank() && Fees.parse(text) == null
     OutlinedTextField(
@@ -97,7 +97,7 @@ private fun MoneyField(text: String, label: String, onChange: (String) -> Unit) 
 }
 
 /** "150,00" per riempire un campo importo. */
-private fun plain(cents: Int, lang: com.tennis.scoremanager.model.Lang): String {
+internal fun plain(cents: Int, lang: com.tennis.scoremanager.model.Lang): String {
     val sep = java.text.DecimalFormatSymbols.getInstance(lang.locale).decimalSeparator
     return "%d%c%02d".format(cents / 100, sep, cents % 100)
 }

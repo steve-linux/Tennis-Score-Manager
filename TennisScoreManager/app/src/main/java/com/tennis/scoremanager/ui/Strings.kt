@@ -1160,6 +1160,93 @@ interface Strings {
     val chargeLate: (String) -> String
     val payReceiptNo: (String) -> String
     val issueFeeDue: (String) -> String
+    val ctTitle: String
+    val ctHint: String
+    val ctNew: String
+    val ctNone: String
+    val ctOpen: String
+    val ctRunning: String
+    val ctDone: String
+    val ctSocial: String
+    val ctDoubles: String
+    val ctSingles: String
+    val ctFormatGroups: String
+    val ctFormatKnockout: String
+    val ctDraw: String
+    val ctMakeKnockout: String
+    val ctTabEntries: String
+    val ctTabDraw: String
+    val ctTabMatches: String
+    val ctUndoDraw: String
+    val ctDrawTooFew: String
+    val ctPaidOnlyShort: String
+    val ctAddEntry: String
+    val ctNoEntries: String
+    val ctInOrder: String
+    val ctBye: String
+    val ctWalkover: String
+    val ctRetired: String
+    val ctNotDrawn: String
+    val ctColWon: String
+    val ctColSets: String
+    val ctColGames: String
+    val ctGroupsFirst: String
+    val ctToPlay: String
+    val ctPlayed: String
+    val ctPlayLive: String
+    val ctWinner: String
+    val ctScore: String
+    val ctWalkoverLong: String
+    val ctRetiredLong: String
+    val ctWhere: String
+    val ctCourt: String
+    val ctTime: String
+    val ctClearResult: String
+    val ctSeedHint: String
+    val ctSeedAuto: String
+    val ctRemoveEntry: String
+    val ctName: String
+    val ctFitpHint: String
+    val ctSocialHint: String
+    val ctCategory: String
+    val ctGroupsCount: String
+    val ctQualify: String
+    val ctStart: String
+    val ctEnd: String
+    val ctFee: String
+    val ctPaidOnly: String
+    val ctPaidOnlyHint: String
+    val ctLimit: String
+    val ctFitpCode: String
+    val ctReferee: String
+    val ctDelete: String
+    val ctFinal: String
+    val ctSemi: String
+    val ctQuarter: String
+    val ctLast16: String
+    val ctLast32: String
+    val ctNotMember: String
+    val ctNoMedical: String
+    val ctMedicalNotAgonistic: String
+    val ctNoFitpCard: String
+    val ctNotAgonistCard: String
+    val ctRankTooHigh: String
+    val ctUnpaid: String
+    val ctEntriesCount: (Int) -> String
+    val ctChampion: (String) -> String
+    val ctLimitShort: (String) -> String
+    val ctDrawAsk: (Int) -> String
+    val ctDrawExcluded: (Int) -> String
+    val ctDates: (String, String) -> String
+    val ctFeeLine: (String) -> String
+    val ctFitpCodeLine: (String) -> String
+    val ctRefereeLine: (String) -> String
+    val ctGroup: (String) -> String
+    val ctSeedN: (Int) -> String
+    val ctPickPartner: (String) -> String
+    val ctDeleteAsk: (String) -> String
+    val ctFeeName: (String) -> String
+    val ctRoundN: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2579,6 +2666,93 @@ object ItStrings : Strings {
     override val chargeLate: (String) -> String = { "in ritardo: mancano $it" }
     override val payReceiptNo: (String) -> String = { "Ricevuta n. $it" }
     override val issueFeeDue: (String) -> String = { "da pagare: $it" }
+    override val ctTitle = "Tornei del circolo"
+    override val ctHint = "Sociali e FITP: iscrizioni, quote, tabellone, gironi e risultati"
+    override val ctNew = "Nuovo torneo"
+    override val ctNone = "Nessun torneo: crealo con Nuovo torneo."
+    override val ctOpen = "Iscrizioni aperte"
+    override val ctRunning = "In corso"
+    override val ctDone = "Conclusi"
+    override val ctSocial = "Sociale"
+    override val ctDoubles = "Doppio"
+    override val ctSingles = "Singolare"
+    override val ctFormatGroups = "Gironi + tabellone"
+    override val ctFormatKnockout = "Eliminazione diretta"
+    override val ctDraw = "Sorteggio"
+    override val ctMakeKnockout = "Tabellone finale"
+    override val ctTabEntries = "Iscritti"
+    override val ctTabDraw = "Tabellone"
+    override val ctTabMatches = "Partite"
+    override val ctUndoDraw = "Rifai il sorteggio"
+    override val ctDrawTooFew = "Servono almeno due iscritti in regola."
+    override val ctPaidOnlyShort = "solo chi ha pagato"
+    override val ctAddEntry = "Iscrivi"
+    override val ctNoEntries = "Nessun iscritto."
+    override val ctInOrder = "in regola"
+    override val ctBye = "bye"
+    override val ctWalkover = "w.o."
+    override val ctRetired = "rit."
+    override val ctNotDrawn = "Il tabellone si fa col sorteggio, dalla scheda Iscritti."
+    override val ctColWon = "V"
+    override val ctColSets = "Set"
+    override val ctColGames = "Game"
+    override val ctGroupsFirst = "Il tabellone finale si fa a gironi finiti."
+    override val ctToPlay = "Da giocare"
+    override val ctPlayed = "Giocate"
+    override val ctPlayLive = "Gioca col segnapunti"
+    override val ctWinner = "Chi ha vinto"
+    override val ctScore = "Punteggio (es. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Vinta a tavolino (w.o.)"
+    override val ctRetiredLong = "Ritiro durante la partita"
+    override val ctWhere = "Dove e quando"
+    override val ctCourt = "Campo"
+    override val ctTime = "Ora"
+    override val ctClearResult = "Cancella il risultato"
+    override val ctSeedHint = "Testa di serie: di solito dalla classifica FITP; qui la si sceglie a mano."
+    override val ctSeedAuto = "dalla classifica"
+    override val ctRemoveEntry = "Ritira l'iscrizione"
+    override val ctName = "Nome del torneo"
+    override val ctFitpHint = "FITP: tessera agonistica dell'anno, certificato agonistico valido all'inizio e classifica nel limite."
+    override val ctSocialHint = "Sociale: certificato medico valido; chi non è socio si segnala."
+    override val ctCategory = "Categoria (es. Singolare maschile, Over 45)"
+    override val ctGroupsCount = "Gironi"
+    override val ctQualify = "Passano da ogni girone"
+    override val ctStart = "Inizio"
+    override val ctEnd = "Fine"
+    override val ctFee = "Quota d'iscrizione (per giocatore)"
+    override val ctPaidOnly = "Nel tabellone solo chi ha pagato"
+    override val ctPaidOnlyHint = "Chi non ha pagato resta tra gli iscritti ma non entra nel sorteggio."
+    override val ctLimit = "Classifica massima (es. 4.1; vuoto = open)"
+    override val ctFitpCode = "Codice del torneo FITP"
+    override val ctReferee = "Giudice arbitro"
+    override val ctDelete = "Elimina il torneo"
+    override val ctFinal = "Finale"
+    override val ctSemi = "Semifinali"
+    override val ctQuarter = "Quarti di finale"
+    override val ctLast16 = "Ottavi di finale"
+    override val ctLast32 = "Sedicesimi di finale"
+    override val ctNotMember = "non socio"
+    override val ctNoMedical = "certificato non valido"
+    override val ctMedicalNotAgonistic = "certificato non agonistico"
+    override val ctNoFitpCard = "manca la tessera FITP dell'anno"
+    override val ctNotAgonistCard = "tessera non agonista"
+    override val ctRankTooHigh = "classifica oltre il limite"
+    override val ctUnpaid = "iscrizione da pagare"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "iscritto" else "iscritti"}" }
+    override val ctChampion: (String) -> String = { "Vince $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "Entrano nel sorteggio $it iscritti in regola, in ordine di classifica per le teste di serie." }
+    override val ctDrawExcluded: (Int) -> String = { "$it non ${if (it == 1) "entra" else "entrano"}: non in regola (vedi Iscritti)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "dal $a al $b" }
+    override val ctFeeLine: (String) -> String = { "iscrizione $it" }
+    override val ctFitpCodeLine: (String) -> String = { "codice FITP $it" }
+    override val ctRefereeLine: (String) -> String = { "giudice arbitro $it" }
+    override val ctGroup: (String) -> String = { "Girone $it" }
+    override val ctSeedN: (Int) -> String = { "testa di serie n. $it" }
+    override val ctPickPartner: (String) -> String = { "Il compagno di $it" }
+    override val ctDeleteAsk: (String) -> String = { "Eliminare il torneo $it? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro." }
+    override val ctFeeName: (String) -> String = { "Iscrizione $it" }
+    override val ctRoundN: (Int) -> String = { "$it° turno" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3981,6 +4155,93 @@ object EnStrings : Strings {
     override val chargeLate: (String) -> String = { "late: $it left" }
     override val payReceiptNo: (String) -> String = { "Receipt no. $it" }
     override val issueFeeDue: (String) -> String = { "to pay: $it" }
+    override val ctTitle = "Club tournaments"
+    override val ctHint = "Social and FITP: entries, fees, draw, groups and results"
+    override val ctNew = "New tournament"
+    override val ctNone = "No tournaments: create one with New tournament."
+    override val ctOpen = "Entries open"
+    override val ctRunning = "In progress"
+    override val ctDone = "Finished"
+    override val ctSocial = "Social"
+    override val ctDoubles = "Doubles"
+    override val ctSingles = "Singles"
+    override val ctFormatGroups = "Groups + draw"
+    override val ctFormatKnockout = "Knockout"
+    override val ctDraw = "Draw"
+    override val ctMakeKnockout = "Final draw"
+    override val ctTabEntries = "Entries"
+    override val ctTabDraw = "Draw sheet"
+    override val ctTabMatches = "Matches"
+    override val ctUndoDraw = "Redo the draw"
+    override val ctDrawTooFew = "At least two entries in order are needed."
+    override val ctPaidOnlyShort = "paid only"
+    override val ctAddEntry = "Enter"
+    override val ctNoEntries = "No entries."
+    override val ctInOrder = "in order"
+    override val ctBye = "bye"
+    override val ctWalkover = "w/o"
+    override val ctRetired = "ret."
+    override val ctNotDrawn = "The draw sheet comes from the draw, on the Entries tab."
+    override val ctColWon = "W"
+    override val ctColSets = "Sets"
+    override val ctColGames = "Games"
+    override val ctGroupsFirst = "The final draw is made once the groups are over."
+    override val ctToPlay = "To play"
+    override val ctPlayed = "Played"
+    override val ctPlayLive = "Play with the scorer"
+    override val ctWinner = "Winner"
+    override val ctScore = "Score (e.g. 6-4 3-6 10-8)"
+    override val ctWalkoverLong = "Won by walkover (w/o)"
+    override val ctRetiredLong = "Retired during the match"
+    override val ctWhere = "Where and when"
+    override val ctCourt = "Court"
+    override val ctTime = "Time"
+    override val ctClearResult = "Clear the result"
+    override val ctSeedHint = "Seed: usually from the FITP ranking; here you choose it by hand."
+    override val ctSeedAuto = "from the ranking"
+    override val ctRemoveEntry = "Withdraw the entry"
+    override val ctName = "Tournament name"
+    override val ctFitpHint = "FITP: this year's competitive card, competitive certificate valid at the start and ranking within the limit."
+    override val ctSocialHint = "Social: valid medical certificate; non-members are flagged."
+    override val ctCategory = "Category (e.g. Men's singles, Over 45)"
+    override val ctGroupsCount = "Groups"
+    override val ctQualify = "Qualify from each group"
+    override val ctStart = "Start"
+    override val ctEnd = "End"
+    override val ctFee = "Entry fee (per player)"
+    override val ctPaidOnly = "Only paid entries in the draw"
+    override val ctPaidOnlyHint = "Who hasn't paid stays among the entries but is not drawn."
+    override val ctLimit = "Maximum ranking (e.g. 4.1; empty = open)"
+    override val ctFitpCode = "FITP tournament code"
+    override val ctReferee = "Referee"
+    override val ctDelete = "Delete the tournament"
+    override val ctFinal = "Final"
+    override val ctSemi = "Semi-finals"
+    override val ctQuarter = "Quarter-finals"
+    override val ctLast16 = "Round of 16"
+    override val ctLast32 = "Round of 32"
+    override val ctNotMember = "not a member"
+    override val ctNoMedical = "certificate not valid"
+    override val ctMedicalNotAgonistic = "certificate not competitive"
+    override val ctNoFitpCard = "no FITP card for this year"
+    override val ctNotAgonistCard = "non-competitive card"
+    override val ctRankTooHigh = "ranking above the limit"
+    override val ctUnpaid = "entry fee to pay"
+    override val ctEntriesCount: (Int) -> String = { "$it ${if (it == 1) "entry" else "entries"}" }
+    override val ctChampion: (String) -> String = { "Winner: $it" }
+    override val ctLimitShort: (String) -> String = { "lim. $it" }
+    override val ctDrawAsk: (Int) -> String = { "$it entries in order go into the draw, seeded by ranking." }
+    override val ctDrawExcluded: (Int) -> String = { "$it ${if (it == 1) "is" else "are"} left out: not in order (see Entries)." }
+    override val ctDates: (String, String) -> String = { a, b -> if (a == b) a else "$a to $b" }
+    override val ctFeeLine: (String) -> String = { "entry fee $it" }
+    override val ctFitpCodeLine: (String) -> String = { "FITP code $it" }
+    override val ctRefereeLine: (String) -> String = { "referee $it" }
+    override val ctGroup: (String) -> String = { "Group $it" }
+    override val ctSeedN: (Int) -> String = { "seed no. $it" }
+    override val ctPickPartner: (String) -> String = { "$it's partner" }
+    override val ctDeleteAsk: (String) -> String = { "Delete the tournament $it? Unpaid entry fees are removed, payments stay in the register." }
+    override val ctFeeName: (String) -> String = { "Entry $it" }
+    override val ctRoundN: (Int) -> String = { "Round $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
