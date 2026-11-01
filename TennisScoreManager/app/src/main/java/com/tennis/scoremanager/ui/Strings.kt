@@ -1247,6 +1247,44 @@ interface Strings {
     val ctDeleteAsk: (String) -> String
     val ctFeeName: (String) -> String
     val ctRoundN: (Int) -> String
+    val ntWhenTbd: String
+    val ntDues: String
+    val ntMemberTodo: String
+    val ntMemberHow: String
+    val ntKindEntries: String
+    val ntKindNext: String
+    val ntKindOrder: String
+    val ntKindDraw: String
+    val ntKindFree: String
+    val ntDuesButton: String
+    val ntMembersButton: String
+    val ntMembersTodo: String
+    val ntMembersAll: String
+    val ntAll: String
+    val ntShare: String
+    val ntNoContact: String
+    val ntNoApp: String
+    val ntNobody: String
+    val ntText: String
+    val ntHint: String
+    val ntPickDay: String
+    val ntChoose: String
+    val ntButton: String
+    val ntSent: String
+    val ntHello: (String) -> String
+    val ntHelloParent: (String) -> String
+    val ntEntered: (String) -> String
+    val ntFeePaid: (String) -> String
+    val ntFeeDue: (String) -> String
+    val ntMatch: (String, String) -> String
+    val ntTotal: (String) -> String
+    val ntOrderTitle: (String, String) -> String
+    val ntOrderAll: (String) -> String
+    val ntDrawText: (String) -> String
+    val ntEntriesList: (String) -> String
+    val ntEmailAll: (Int) -> String
+    val ntSmsAll: (Int) -> String
+    val ntOneByOne: (Int, Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2753,6 +2791,44 @@ object ItStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Eliminare il torneo $it? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro." }
     override val ctFeeName: (String) -> String = { "Iscrizione $it" }
     override val ctRoundN: (Int) -> String = { "$it° turno" }
+    override val ntWhenTbd = "orario da definire"
+    override val ntDues = "risulta ancora da pagare:"
+    override val ntMemberTodo = "per essere in regola col circolo manca:"
+    override val ntMemberHow = "Passa in segreteria quando puoi. Grazie!"
+    override val ntKindEntries = "Iscrizione e quota"
+    override val ntKindNext = "Prossima partita (a ciascuno)"
+    override val ntKindOrder = "Ordine di gioco di un giorno"
+    override val ntKindDraw = "Tabellone (immagine)"
+    override val ntKindFree = "Messaggio libero"
+    override val ntDuesButton = "Sollecita chi deve"
+    override val ntMembersButton = "Avvisa i soci"
+    override val ntMembersTodo = "A chi deve sistemare qualcosa"
+    override val ntMembersAll = "Messaggio a tutti i soci"
+    override val ntAll = "A tutti"
+    override val ntShare = "Condividi (gruppo WhatsApp, Telegram, social)"
+    override val ntNoContact = "nessun contatto"
+    override val ntNoApp = "Nessuna app per questo invio."
+    override val ntNobody = "Nessuno da avvisare."
+    override val ntText = "Testo del messaggio"
+    override val ntHint = "Si apre l'app con il messaggio già scritto: controllalo e premi Invia. La spunta ricorda chi hai già avvisato."
+    override val ntPickDay = "Quale giorno?"
+    override val ntChoose = "Che avviso?"
+    override val ntButton = "Avvisi ai partecipanti"
+    override val ntSent = "avvisato"
+    override val ntHello: (String) -> String = { "Ciao $it," }
+    override val ntHelloParent: (String) -> String = { "Buongiorno, un avviso per $it:" }
+    override val ntEntered: (String) -> String = { "l'iscrizione al torneo $it è confermata." }
+    override val ntFeePaid: (String) -> String = { "Iscrizione pagata: $it." }
+    override val ntFeeDue: (String) -> String = { "Iscrizione da pagare: $it, in segreteria." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r di $t:" }
+    override val ntTotal: (String) -> String = { "Totale: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Ordine di gioco – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Partite in programma – $it" }
+    override val ntDrawText: (String) -> String = { "Il tabellone di $it" }
+    override val ntEntriesList: (String) -> String = { "Iscritti al torneo $it:" }
+    override val ntEmailAll: (Int) -> String = { "Email a tutti in copia nascosta ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS a tutti ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno per uno ($done su $n)" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -4242,6 +4318,44 @@ object EnStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Delete the tournament $it? Unpaid entry fees are removed, payments stay in the register." }
     override val ctFeeName: (String) -> String = { "Entry $it" }
     override val ctRoundN: (Int) -> String = { "Round $it" }
+    override val ntWhenTbd = "time to be confirmed"
+    override val ntDues = "still to pay:"
+    override val ntMemberTodo = "to be in order with the club you still need:"
+    override val ntMemberHow = "Drop by the club office when you can. Thanks!"
+    override val ntKindEntries = "Entry and fee"
+    override val ntKindNext = "Next match (to each)"
+    override val ntKindOrder = "Order of play for a day"
+    override val ntKindDraw = "Draw sheet (image)"
+    override val ntKindFree = "Free message"
+    override val ntDuesButton = "Remind who owes"
+    override val ntMembersButton = "Notify members"
+    override val ntMembersTodo = "Those with something to sort out"
+    override val ntMembersAll = "Message to all members"
+    override val ntAll = "To everyone"
+    override val ntShare = "Share (WhatsApp group, Telegram, social)"
+    override val ntNoContact = "no contact"
+    override val ntNoApp = "No app for this."
+    override val ntNobody = "Nobody to notify."
+    override val ntText = "Message text"
+    override val ntHint = "The app opens with the message already written: check it and press Send. The tick remembers who you've already notified."
+    override val ntPickDay = "Which day?"
+    override val ntChoose = "Which notice?"
+    override val ntButton = "Notify participants"
+    override val ntSent = "notified"
+    override val ntHello: (String) -> String = { "Hi $it," }
+    override val ntHelloParent: (String) -> String = { "Hello, a notice about $it:" }
+    override val ntEntered: (String) -> String = { "your entry to the $it tournament is confirmed." }
+    override val ntFeePaid: (String) -> String = { "Entry fee paid: $it." }
+    override val ntFeeDue: (String) -> String = { "Entry fee to pay: $it, at the club office." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r of $t:" }
+    override val ntTotal: (String) -> String = { "Total: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Order of play – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Scheduled matches – $it" }
+    override val ntDrawText: (String) -> String = { "The $it draw" }
+    override val ntEntriesList: (String) -> String = { "Entries for $it:" }
+    override val ntEmailAll: (Int) -> String = { "Email to all in BCC ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS to all ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "One by one ($done of $n)" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

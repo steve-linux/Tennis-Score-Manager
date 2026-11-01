@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PersonAdd
@@ -152,6 +153,7 @@ fun ClubTournamentScreen(c: MatchController) {
     var askDraw by remember { mutableStateOf(false) }
     var openMatch by remember { mutableStateOf<String?>(null) }
     var openEntry by remember { mutableStateOf<String?>(null) }
+    var notify by remember { mutableStateOf(false) }
     val now = remember { System.currentTimeMillis() }
     val hasResults = t.matches.any { it.played && !it.bye }
     val hasKnockout = t.matches.any { it.round > 0 }
@@ -171,6 +173,7 @@ fun ClubTournamentScreen(c: MatchController) {
     ) {
         t.champion?.let { ch -> Text(s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
         Segmented(listOf(SegOption(s.ctTabEntries), SegOption(s.ctTabDraw), SegOption(s.ctTabMatches)), tab, { tab = it })
+        if (t.entries.isNotEmpty()) GhostButton(s.ntButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
         when (tab) {
             0 -> EntriesTab(c, t, players, book, now, onAdd = { adding = true }, onOpen = { openEntry = it })
             1 -> DrawTab(c, t) { openMatch = it }
@@ -179,6 +182,7 @@ fun ClubTournamentScreen(c: MatchController) {
         if (t.drawn && !hasResults) GhostButton(s.ctUndoDraw, Icons.Filled.Undo, { c.undoClubDraw(t) }, Modifier.fillMaxWidth())
     }
     if (edit) TournamentEditDialog(c, t) { edit = false }
+    if (notify) NoticeChoiceDialog(c, t) { notify = false }
     if (adding) EntryPickDialog(c, t) { adding = false }
     if (askDraw) {
         val ok = ClubTournaments.eligible(t, players, book, now)
@@ -468,6 +472,36 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) pick(p) }
+}
+
+/** Che avviso mandare agli iscritti: iscrizione, partite, ordine di gioco di un giorno, tabellone, messaggio libero. */
+@Composable
+private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var pickDay by remember { mutableStateOf(false) }
+    val open = t.matches.filter { !it.played && it.a != null && it.b != null }
+    // I giorni con partite in programma (a mezzanotte, uno per giorno).
+    val days = open.mapNotNull { it.at }.map { at -> Calendar.getInstance().apply { timeInMillis = at; set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis }.distinct().sorted()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (pickDay) s.ntPickDay else s.ntChoose) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (!pickDay) {
+                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.noticeEntries(t) }, Modifier.fillMaxWidth())
+                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.noticeMatches(t, null) }, Modifier.fillMaxWidth())
+                    if (days.isNotEmpty()) GhostButton(s.ntKindOrder, Icons.Filled.Schedule, { pickDay = true }, Modifier.fillMaxWidth())
+                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.noticeDraw(t) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
+                } else for (d in days) {
+                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.noticeMatches(t, d) }, Modifier.fillMaxWidth())
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 
 /** Torneo nuovo o da cambiare. [onDone] riceve l'id del torneo salvato (null = annullato o eliminato). */

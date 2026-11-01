@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.GroupAdd
@@ -155,6 +156,7 @@ fun PaymentsScreen(c: MatchController) {
             val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
                 .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
             if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.noticeDues() }, Modifier.fillMaxWidth())
             for ((key, list, left) in open) {
                 val p = players.firstOrNull { it.id == key || key in it.aliases }
                 Row(

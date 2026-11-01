@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PersonAdd
@@ -98,6 +99,7 @@ fun MembersScreen(c: MatchController) {
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     var adding by remember { mutableStateOf(false) }
+    var notify by remember { mutableStateOf(false) }
     val book by c.clubBook.collectAsState()
     val members = players.filter { it.member != null }
     val issues = remember(members) { members.associate { it.id to Members.issues(it, now) } }
@@ -121,6 +123,7 @@ fun MembersScreen(c: MatchController) {
         } else {
             Text(s.membersCount(members.size, todo), color = if (todo > 0) TsmColors.Orange else TsmColors.Ok, fontWeight = FontWeight.Bold)
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
+            GhostButton(s.ntMembersButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
         }
         for (p in shown) {
@@ -147,6 +150,18 @@ fun MembersScreen(c: MatchController) {
             }
         }
     }
+    if (notify) AlertDialog(
+        onDismissRequest = { notify = false },
+        title = { Text(s.ntChoose) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.noticeMembersTodo() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.noticeMembersAll() }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = { notify = false }) { Text(s.back) } },
+    )
     if (adding) MemberPickDialog(c) { picked ->
         adding = false
         picked?.let { p ->

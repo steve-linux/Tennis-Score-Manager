@@ -695,6 +695,15 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 
+### 7.14 Nachrichten an Teilnehmer und Mitglieder
+
+Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hallo Mario, …“), und öffnet die passende App: **senden tust du**, mit Senden. Keine externen Dienste oder Abos: es werden WhatsApp, SMS, E-Mail und das Teilen des Telefons genutzt.
+
+- **Wo**: im Turnier **Teilnehmer benachrichtigen**: *Meldung und Gebühr* (Bestätigung und Gebühr bezahlt oder offen), *Nächstes Match* (an jeden: Runde, Gegner, Tag, Uhrzeit und Platz), *Spielplan eines Tages*, *Tableau* (ein Bild mit Tableau und Gruppen), *Freie Nachricht*. Unter **Beiträge und Zahlungen** **An offene Beträge erinnern** (Posten für Posten, mit Fälligkeit). Unter **Mitglieder** **Mitglieder benachrichtigen**: wer etwas zu erledigen hat (Attest, Ausweis, Einwilligungen) oder eine Nachricht an alle.
+- **An alle**: der Text für alle (Spielplan, Meldeliste, Tableau). **Teilen** schickt ihn in eine WhatsApp-Gruppe, zu Telegram, Instagram, Facebook… mit dem Bild, falls vorhanden; **E-Mail an alle** setzt alle in Blindkopie; **SMS an alle** öffnet eine SMS mit allen Nummern.
+- **Einzeln**: für jeden seine Nachricht (antippen, um alles zu lesen) und die Tasten **WhatsApp** (öffnet den Chat mit der Nummer und dem fertigen Text), **SMS** und **E-Mail**. Der Haken merkt sich, wen du schon benachrichtigt hast.
+- Nummern ohne Vorwahl gelten als italienisch (+39). Bei **Minderjährigen** geht die Nachricht an das Telefon des Elternteils (*Mitgliedsdaten*), als „eine Nachricht zu Luca“. Wer weder Telefon noch E-Mail hat, wird angezeigt: in seiner Karte ergänzen.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1147,6 +1156,15 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 
+### 7.14 Notices to participants and members
+
+The app prepares the messages, already written and personal ("Hi Mario, …"), and opens the right app: **you do the sending**, by pressing Send. No outside services or subscriptions: it uses WhatsApp, SMS, email and the phone's sharing.
+
+- **Where**: in the tournament, **Notify participants**: *Entry and fee* (confirmation and fee paid or to pay), *Next match* (to each: round, opponent, day, time and court), *Order of play for a day*, *Draw sheet* (an image with the draw and the groups), *Free message*. In **Fees and payments**, **Remind who owes** (item by item, with due dates). In **Members**, **Notify members**: those with something to sort out (certificate, card, consents) or a message to everyone.
+- **To everyone**: the text for all (order of play, list of entries, draw). **Share** sends it to a WhatsApp group, Telegram, Instagram, Facebook… with the image if there is one; **Email to all** puts them in BCC; **SMS to all** opens an SMS with every number.
+- **One by one**: each person's own message (tap it to read it all) and the **WhatsApp** (opens the chat with that number and the text ready), **SMS** and **Email** buttons. The tick remembers who you've already notified.
+- Numbers without a prefix count as Italian (+39). For **under-18s** the message goes to the parent's phone (*Member details*), as "a notice about Luca". Whoever has neither phone nor email is flagged: add them on their card.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1597,6 +1615,15 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - **Sorteo**: entran solo los inscritos en regla. En el cuadro el cabeza de serie 1 va arriba, el 2 abajo, el 3 y el 4 (y luego 5-8) sorteados entre sus puestos; los **byes** van a los primeros cabezas de serie, que pasan solos. Con grupos: reparto en serpentina por clasificación y todos contra todos; terminados los grupos, **Cuadro final** con los primeros como cabezas de serie y los segundos en la mitad opuesta al primero de su grupo. Mientras no haya resultados, **Repetir el sorteo**.
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
+
+### 7.14 Avisos a participantes y socios
+
+La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y abre la app adecuada: **el envío lo haces tú**, pulsando Enviar. Sin servicios externos ni suscripciones: se usan WhatsApp, SMS, correo y el compartir del teléfono.
+
+- **Dónde**: en el torneo, **Avisar a los participantes**: *Inscripción y cuota* (confirmación y cuota pagada o por pagar), *Próximo partido* (a cada uno: ronda, rival, día, hora y pista), *Orden de juego de un día*, *Cuadro* (una imagen con el cuadro y los grupos), *Mensaje libre*. En **Cuotas y pagos**, **Recordar a quien debe** (partida por partida, con vencimientos). En **Socios**, **Avisar a los socios**: a quien tiene algo pendiente (certificado, licencia, consentimientos) o un mensaje a todos.
+- **A todos**: el texto para todos (orden de juego, lista de inscritos, cuadro). **Compartir** lo manda a un grupo de WhatsApp, a Telegram, Instagram, Facebook… con la imagen si la hay; **Correo a todos** los pone en copia oculta; **SMS a todos** abre un SMS con todos los números.
+- **Uno a uno**: el mensaje de cada uno (tócalo para leerlo entero) y los botones **WhatsApp** (abre el chat con ese número y el texto listo), **SMS** y **Correo**. La marca recuerda a quién ya has avisado.
+- Los números sin prefijo cuentan como italianos (+39). Para los **menores** se escribe al teléfono del padre o la madre (*Datos del socio*), con «un aviso sobre Luca». Quien no tiene ni teléfono ni correo se señala: añádelos en su ficha.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2049,6 +2076,15 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 
+### 7.14 Avis aux participants et aux adhérents
+
+L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, … »), et ouvre la bonne appli : **c'est vous qui envoyez**, en appuyant sur Envoyer. Aucun service extérieur ni abonnement : on utilise WhatsApp, les SMS, l'e-mail et le partage du téléphone.
+
+- **Où** : dans le tournoi, **Prévenir les participants** : *Inscription et droit* (confirmation et droit payé ou à payer), *Prochain match* (à chacun : tour, adversaire, jour, heure et terrain), *Ordre des matchs d'une journée*, *Tableau* (une image avec le tableau et les poules), *Message libre*. Dans **Cotisations et paiements**, **Relancer ceux qui doivent** (poste par poste, avec les échéances). Dans **Adhérents**, **Prévenir les adhérents** : ceux qui ont quelque chose à régler (certificat, licence, consentements) ou un message à tous.
+- **À tous** : le texte pour tous (ordre des matchs, liste des inscrits, tableau). **Partager** l'envoie dans un groupe WhatsApp, sur Telegram, Instagram, Facebook… avec l'image s'il y en a une ; **E-mail à tous** les met en copie cachée ; **SMS à tous** ouvre un SMS avec tous les numéros.
+- **Un par un** : le message de chacun (touchez-le pour tout lire) et les boutons **WhatsApp** (ouvre la discussion avec ce numéro et le texte prêt), **SMS** et **E-mail**. La coche rappelle qui a déjà été prévenu.
+- Les numéros sans indicatif comptent comme italiens (+39). Pour les **mineurs**, on écrit au téléphone du parent (*Données de l'adhérent*), avec « un avis pour Luca ». Qui n'a ni téléphone ni e-mail est signalé : ajoutez-les dans sa fiche.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2500,6 +2536,15 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
 
+### 7.14 Avvisi ai partecipanti e ai soci
+
+L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l'app giusta: **l'invio lo fai tu**, premendo Invia. Niente servizi esterni né abbonamenti: si usano WhatsApp, SMS, email e la condivisione del telefono.
+
+- **Dove**: nel torneo, **Avvisi ai partecipanti**: *Iscrizione e quota* (conferma e quota pagata o da pagare), *Prossima partita* (a ciascuno turno, avversario, giorno, ora e campo), *Ordine di gioco di un giorno*, *Tabellone* (un'immagine col tabellone e i gironi), *Messaggio libero*. In **Quote e pagamenti**, **Sollecita chi deve** (voce per voce, con le scadenze). In **Soci**, **Avvisa i soci**: a chi deve sistemare qualcosa (certificato, tessera, consensi) o un messaggio a tutti.
+- **A tutti**: il testo per tutti (l'ordine di gioco, l'elenco degli iscritti, il tabellone). **Condividi** lo manda in un gruppo WhatsApp, su Telegram, Instagram, Facebook… con l'immagine se c'è; **Email a tutti** li mette in copia nascosta; **SMS a tutti** apre un SMS con tutti i numeri.
+- **Uno per uno**: per ciascuno il suo messaggio (toccandolo si legge tutto) e i tasti **WhatsApp** (si apre la chat con quel numero e il testo già scritto), **SMS** ed **Email**. La spunta ricorda chi hai già avvisato.
+- I numeri senza prefisso valgono come italiani (+39). Per i **minorenni** si scrive al telefono del genitore (*Dati del socio*), con "un avviso per Luca". Chi non ha né telefono né email è segnalato: aggiungili nella sua scheda.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2950,6 +2995,15 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - **Sorteio**: entram só os inscritos em ordem. Na chave o cabeça 1 vai no topo, o 2 no fim, o 3 e o 4 (depois 5-8) sorteados entre as suas posições; os **byes** vão para os primeiros cabeças, que passam sozinhos. Com grupos: distribuição em serpentina pelo ranking e todos contra todos; terminados os grupos, **Chave final** com os primeiros como cabeças e os segundos na metade oposta ao primeiro do seu grupo. Enquanto não houver resultado, **Refazer o sorteio**.
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
+
+### 7.14 Avisos aos participantes e aos sócios
+
+O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre o app certo: **quem envia é você**, tocando em Enviar. Sem serviços externos nem assinaturas: usam-se WhatsApp, SMS, e-mail e o compartilhamento do telefone.
+
+- **Onde**: no torneio, **Avisar os participantes**: *Inscrição e taxa* (confirmação e taxa paga ou a pagar), *Próxima partida* (a cada um: rodada, adversário, dia, hora e quadra), *Ordem de jogos de um dia*, *Chave* (uma imagem com a chave e os grupos), *Mensagem livre*. Em **Mensalidades e pagamentos**, **Lembrar quem deve** (item por item, com os vencimentos). Em **Sócios**, **Avisar os sócios**: quem tem algo a resolver (atestado, cartão, consentimentos) ou uma mensagem a todos.
+- **A todos**: o texto para todos (ordem de jogos, lista de inscritos, chave). **Compartilhar** envia num grupo do WhatsApp, no Telegram, Instagram, Facebook… com a imagem se houver; **E-mail a todos** coloca todos em cópia oculta; **SMS a todos** abre um SMS com todos os números.
+- **Um por um**: a mensagem de cada um (toque para ler tudo) e os botões **WhatsApp** (abre a conversa com aquele número e o texto pronto), **SMS** e **E-mail**. A marca lembra quem você já avisou.
+- Números sem prefixo valem como italianos (+39). Para os **menores** escreve-se ao telefone do responsável (*Dados do sócio*), com "um aviso sobre Luca". Quem não tem telefone nem e-mail é indicado: adicione na ficha dele.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3766,7 +3820,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4298,6 +4352,7 @@ class MatchController(
             Screen.PAYMENTS -> Screen.HOME
             Screen.CLUB_TOURNAMENTS -> Screen.HOME
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
+            Screen.NOTICE -> noticeBack
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -5035,6 +5090,106 @@ class MatchController(
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
         }
+    }
+
+    // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
+
+    val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
+    private var noticeBack = Screen.HOME
+
+    private fun openNotice(plan: com.tennis.scoremanager.data.NoticePlan) {
+        notice.value = plan
+        noticeBack = screen.value
+        screen.value = Screen.NOTICE
+    }
+
+    private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
+        t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString(" / ") } ?: "—"
+
+    private fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
+        t.entries.filter { it.id in entryIds }.flatMap { it.players }.distinct().mapNotNull { playerById(it) }
+
+    private val clubSign: String get() = storage.clubName
+
+    /** A ogni iscritto: iscrizione confermata e quota pagata o da pagare. */
+    fun noticeEntries(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val people = peopleOf(t, t.entries.map { it.id })
+        val rec = people.map { p -> com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.entryText(s, t, p, clubBook.value, clubSign, lang, now), now) }
+        // Per il gruppo: l'elenco degli iscritti.
+        val common = (listOf(s.ntEntriesList(t.name)) + t.entries.map { "• " + entryNameOf(t, it.id) } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindEntries, t.name, common, rec))
+    }
+
+    /**
+     * Le partite da giocare: a ciascun giocatore la sua (turno, avversario, giorno, ora, campo); per il gruppo
+     * l'ordine di gioco. [day] = solo quel giorno, null = tutte quelle già con i due giocatori.
+     */
+    fun noticeMatches(t: com.tennis.scoremanager.data.ClubTournament, day: Long?) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val open = t.matches.filter { !it.played && it.a != null && it.b != null }
+        val ms = if (day != null) com.tennis.scoremanager.data.Notices.onDay(open, day) else open
+        val names = { id: String? -> entryNameOf(t, id) }
+        val rec = ms.flatMap { m ->
+            peopleOf(t, listOf(m.a, m.b)).map { p ->
+                com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.matchText(s, t, m, clubRoundName(t, m), names, p, clubSign, lang, now), now)
+            }
+        }
+        val title = if (day != null) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(day, lang)) else s.ntOrderAll(t.name)
+        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(s, t, ms, { clubRoundName(t, it) }, names, title, lang, clubSign)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, rec))
+    }
+
+    /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
+    fun noticeDraw(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val now = System.currentTimeMillis()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.ctTabDraw} ${t.name}.png".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        val sub = listOfNotNull(clubSign.ifBlank { null }, t.category.ifBlank { null }, if (t.kind == com.tennis.scoremanager.data.CTKind.FITP) "FITP" else s.ctSocial).joinToString(" · ")
+        val ok = runCatching {
+            val b = com.tennis.scoremanager.data.ClubDrawImage.render(t, { entryNameOf(t, it) }, s, sub, s.generatedWith)
+            f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+            b.recycle()
+        }.isSuccess
+        val common = (listOf(s.ntDrawText(t.name)) + t.champion?.let { listOf(s.ctChampion(entryNameOf(t, it))) }.orEmpty() + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, common, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindDraw, t.name, common, rec, image = f.takeIf { ok }))
+    }
+
+    /** Messaggio libero agli iscritti: il testo si scrive nella schermata degli avvisi. */
+    fun noticeFreeTournament(t: com.tennis.scoremanager.data.ClubTournament) {
+        val now = System.currentTimeMillis()
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
+    }
+
+    /** Sollecito a chi deve qualcosa al circolo, voce per voce. */
+    fun noticeDues() {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val book = clubBook.value
+        val rec = players.value.mapNotNull { p ->
+            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 }
+            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntDuesButton, s.paymentsTitle, "", rec))
+    }
+
+    /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */
+    fun noticeMembersTodo() {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.mapNotNull { p ->
+            val issues = com.tennis.scoremanager.data.Members.issues(p, now).filter { it != com.tennis.scoremanager.data.Members.Issue.NO_CONTACT }
+            if (issues.isEmpty()) null
+            else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.memberText(s, p, issues.map { com.tennis.scoremanager.ui.screens.issueText(s, p, it, now, lang) }, clubSign, now), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntMembersTodo, s.membersTitle, "", rec))
+    }
+
+    /** Messaggio libero a tutti i soci. */
+    fun noticeMembersAll() {
+        val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntMembersAll, clubSign.ifBlank { strings.membersTitle }, clubSign.ifBlank { "" }.let { if (it.isBlank()) "" else "$it\n\n" }, rec, editable = true))
     }
 
     /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
@@ -5966,12 +6121,14 @@ class MatchController(
         }.getOrNull()
     }
 
-    fun shareFileIntent(file: File, mime: String): Intent {
+    /** Condivide un file; [text] va con il file (la didascalia su WhatsApp, il testo del post). */
+    fun shareFileIntent(file: File, mime: String, text: String? = null): Intent {
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
             type = mime
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_SUBJECT, file.nameWithoutExtension)
+            text?.let { putExtra(Intent.EXTRA_TEXT, it) }
             clipData = ClipData.newRawUri("", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -9205,6 +9362,100 @@ object Fees {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubDrawImage.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubDrawImage.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.ctRoundName
+import com.tennis.scoremanager.ui.groupLetter
+
+/**
+ * Il tabellone di un torneo in un'immagine da mandare al gruppo o sui social: in alto nome e circolo, poi i gironi
+ * con la classifica e il tabellone, un turno per colonna, con i vincitori in evidenza.
+ */
+object ClubDrawImage {
+    private const val COL_W = 380f
+    private const val BOX_W = 340f
+    private const val BOX_H = 112f
+    private const val GAP = 18f
+    private const val M = 40f
+
+    fun render(t: ClubTournament, name: (String?) -> String, s: Strings, subtitle: String, footer: String): Bitmap {
+        val groups = ClubTournaments.groupMembers(t)
+        val rounds = t.rounds
+        val first = t.matches.count { it.round == 1 }
+        val groupRows = groups.sumOf { it.size + 2 }
+        val drawH = if (rounds > 0) 70f + first * (BOX_H + GAP) else 0f
+        val w = maxOf(1080f, M * 2 + rounds * COL_W).toInt()
+        val h = (190f + groupRows * 46f + groups.size * 20f + drawH + 90f).toInt().coerceAtMost(8000)
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        val bg = 0xFF0B1220.toInt(); val surface = 0xFF151D2E.toInt(); val main = 0xFFF1F5FB.toInt(); val dim = 0xFF9AA8BD.toInt(); val ball = 0xFFC6F432.toInt()
+        c.drawColor(bg)
+        fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+            isAntiAlias = true; textSize = size; this.color = color; textAlign = align
+            typeface = Typeface.create(Typeface.SANS_SERIF, if (bold) Typeface.BOLD else Typeface.NORMAL)
+        }
+        fun fit(text: String, paint: Paint, max: Float): String {
+            if (paint.measureText(text) <= max) return text
+            var t2 = text
+            while (t2.isNotEmpty() && paint.measureText("$t2…") > max) t2 = t2.dropLast(1)
+            return "$t2…"
+        }
+        var y = 90f
+        c.drawText(fit(t.name, p(56f, main, true), w - 2 * M), M, y, p(56f, main, true))
+        y += 50f
+        c.drawText(fit(subtitle, p(30f, dim), w - 2 * M), M, y, p(30f, dim))
+        y += 50f
+        // Gironi: posizione, nome, vittorie su partite giocate; in giallo chi passa.
+        for ((g, _) in groups.withIndex()) {
+            y += 20f
+            c.drawText(s.ctGroup(groupLetter(g)), M, y + 34f, p(32f, ball, true))
+            y += 46f
+            for ((i, st) in ClubTournaments.standings(t, g).withIndex()) {
+                val q = i < t.qualify
+                c.drawText(fit("${i + 1}. ${name(st.entry)}", p(30f, if (q) ball else main, q), 700f), M, y + 34f, p(30f, if (q) ball else main, q))
+                c.drawText("${st.won}/${st.played}   ${"%+d".format(st.setsWon - st.setsLost)}", w - M, y + 34f, p(30f, dim, align = Paint.Align.RIGHT))
+                y += 46f
+            }
+            y += 46f
+        }
+        if (rounds > 0) {
+            val top = y + 50f
+            for (r in 1..rounds) {
+                val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
+                val x = M + (r - 1) * COL_W
+                c.drawText(ctRoundName(s, t, ms.first()), x, top - 14f, p(28f, dim, true))
+                // Ogni partita a metà tra le due da cui viene.
+                val step = (BOX_H + GAP) * (1 shl (r - 1))
+                for ((i, m) in ms.withIndex()) {
+                    val by = top + i * step + (step - BOX_H - GAP) / 2
+                    c.drawRoundRect(RectF(x, by, x + BOX_W, by + BOX_H), 18f, 18f, Paint().apply { color = surface; isAntiAlias = true })
+                    for ((k, e) in listOf(m.a, m.b).withIndex()) {
+                        val win = m.winner != null && m.winner == e
+                        val label = e?.let(name) ?: if (m.bye) s.ctBye else "—"
+                        c.drawText(fit(label, p(28f, if (win) ball else main, win), BOX_W - 30f), x + 16f, by + 40f + k * 36f, p(28f, if (win) ball else main, win))
+                    }
+                    val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                    if (extra.isNotBlank()) c.drawText(fit(extra, p(22f, dim), BOX_W - 30f), x + 16f, by + BOX_H - 10f, p(22f, dim))
+                }
+            }
+        }
+        c.drawText(footer, w / 2f, h - 36f, p(26f, dim, align = Paint.Align.CENTER))
+        return bmp
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -10692,6 +10943,125 @@ class Names(private val setup: SetupData, private val strings: Strings) : CallNa
     fun short(side: Side): String = if (setup.doubles) players(side).joinToString(" / ") else side(side)
 
     override fun player(side: Side, index: Int): String = players(side).getOrElse(index) { side(side) }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Notices.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Notices.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import java.io.File
+import java.util.Calendar
+
+/** Chi riceve un avviso: il suo testo (personale o quello di tutti) e i contatti. */
+data class NoticeRecipient(val id: String, val name: String, val phone: String, val email: String, val text: String)
+
+/**
+ * Un avviso da mandare: [common] è il testo per tutti (email in copia nascosta, SMS a tutti, gruppo), i destinatari
+ * hanno ciascuno il suo (WhatsApp o SMS uno per uno). [image] va con la condivisione (il tabellone).
+ */
+data class NoticePlan(
+    val title: String,
+    val subject: String,
+    val common: String,
+    val recipients: List<NoticeRecipient>,
+    val image: File? = null,
+    /** Il testo si può cambiare prima di mandarlo (messaggio libero): vale per tutti. */
+    val editable: Boolean = false,
+)
+
+object Notices {
+    /**
+     * Il numero per WhatsApp (wa.me): solo cifre col prefisso internazionale. "+39 333…" e "0039 333…" restano;
+     * un numero italiano senza prefisso (cellulare 3…, fisso 0…) prende il 39. null se non è un numero.
+     */
+    fun waNumber(raw: String): String? {
+        val t = raw.trim()
+        val digits = t.filter(Char::isDigit)
+        if (digits.length < 6) return null
+        return when {
+            t.startsWith("+") -> digits
+            digits.startsWith("00") -> digits.drop(2)
+            (digits.startsWith("3") && digits.length in 9..10) || (digits.startsWith("0") && digits.length in 6..11) -> "39$digits"
+            else -> digits
+        }.takeIf { it.length >= 8 }
+    }
+
+    /** Il telefono a cui scrivere: il suo, o quello del genitore per un minorenne (o se lui non ne ha). */
+    fun phoneOf(p: PlayerProfile, now: Long): String {
+        val guardian = p.member?.guardianPhone.orEmpty()
+        return if (guardian.isNotBlank() && (Members.minor(p, now) || p.phone.isBlank())) guardian else p.phone
+    }
+
+    private fun firstName(p: PlayerProfile): String = p.firstName.ifBlank { p.name }
+
+    /** Il saluto: al genitore di un minorenne si scrive del figlio. */
+    private fun hello(s: Strings, p: PlayerProfile, now: Long): String =
+        if (Members.minor(p, now) && p.member?.guardianPhone?.isNotBlank() == true && p.phone.isBlank()) s.ntHelloParent(firstName(p)) else s.ntHello(firstName(p))
+
+    private fun sign(club: String): List<String> = if (club.isBlank()) emptyList() else listOf("", club)
+
+    fun recipient(p: PlayerProfile, text: String, now: Long) = NoticeRecipient(p.id, p.name, phoneOf(p, now), p.email, text)
+
+    /** "sabato 14 novembre" (in tedesco "Samstag, 14. November", in inglese "Saturday 14 November"). */
+    fun day(t: Long, lang: Lang): String {
+        val pattern = if (lang == Lang.DE) "EEEE, d. MMMM" else "EEEE d MMMM"
+        return java.text.SimpleDateFormat(pattern, Reports.locale(lang)).format(java.util.Date(t))
+    }
+
+    /** "sabato 14 novembre, 9:00 · Campo 2" (o "orario da definire"). */
+    fun whenText(s: Strings, m: CTMatch, lang: Lang): String =
+        listOfNotNull(m.at?.let { "${day(it, lang)}, ${Reports.time(it, lang)}" } ?: s.ntWhenTbd, m.court.ifBlank { null }).joinToString(" · ")
+
+    /** Iscrizione al torneo: date, quota pagata o da pagare. */
+    fun entryText(s: Strings, t: ClubTournament, p: PlayerProfile, book: ClubBook, club: String, lang: Lang, now: Long): String {
+        val lines = mutableListOf(hello(s, p, now), s.ntEntered(t.name))
+        t.start?.let { st -> lines += s.ctDates(day(st, lang), day(t.end ?: st, lang)) }
+        if (t.feeCents > 0) {
+            val fee = Fees.money(t.feeCents, lang.locale)
+            lines += if (ClubTournaments.paid(t, p, book)) s.ntFeePaid(fee) else s.ntFeeDue(fee)
+        }
+        return (lines + sign(club)).joinToString("\n")
+    }
+
+    /** La prossima partita di [p] nel torneo. */
+    fun matchText(s: Strings, t: ClubTournament, m: CTMatch, round: String, names: (String?) -> String, p: PlayerProfile, club: String, lang: Lang, now: Long): String =
+        (listOf(hello(s, p, now), s.ntMatch(round, t.name), "${names(m.a)} – ${names(m.b)}", whenText(s, m, lang)) + sign(club)).joinToString("\n")
+
+    /** L'ordine di gioco di un giorno (o tutte le partite in programma), per il gruppo. */
+    fun orderOfPlay(s: Strings, t: ClubTournament, ms: List<CTMatch>, round: (CTMatch) -> String, names: (String?) -> String, title: String, lang: Lang, club: String): String {
+        val lines = mutableListOf(title)
+        for (m in ms.sortedWith(compareBy({ it.at ?: Long.MAX_VALUE }, { it.court }))) {
+            val time = m.at?.let { Reports.time(it, lang) } ?: "--:--"
+            lines += listOf(time, m.court.ifBlank { null }, "${names(m.a)} – ${names(m.b)}", "(${round(m)})").filterNotNull().joinToString(" ")
+        }
+        return (lines + sign(club)).joinToString("\n")
+    }
+
+    /** Il sollecito: cosa resta da pagare, voce per voce, e il totale. */
+    fun duesText(s: Strings, p: PlayerProfile, open: List<Charge>, club: String, lang: Lang, now: Long): String {
+        val lines = mutableListOf(hello(s, p, now), s.ntDues)
+        for (c in open) lines += "• ${c.label}: ${Fees.money(c.left, lang.locale)}" + (c.due?.let { " (" + s.feeDueShort(day(it, lang)) + ")" } ?: "")
+        if (open.size > 1) lines += s.ntTotal(Fees.money(open.sumOf { it.left }, lang.locale))
+        return (lines + sign(club)).joinToString("\n")
+    }
+
+    /** Cosa manca al socio per essere in regola. */
+    fun memberText(s: Strings, p: PlayerProfile, issues: List<String>, club: String, now: Long): String =
+        (listOf(hello(s, p, now), s.ntMemberTodo) + issues.map { "• $it" } + listOf(s.ntMemberHow) + sign(club)).joinToString("\n")
+
+    /** Le partite con l'orario in quel giorno. */
+    fun onDay(ms: List<CTMatch>, dayMs: Long): List<CTMatch> {
+        val d = Calendar.getInstance().apply { timeInMillis = dayMs }
+        return ms.filter { m ->
+            m.at?.let { Calendar.getInstance().apply { timeInMillis = it } }?.let { c -> c.get(Calendar.YEAR) == d.get(Calendar.YEAR) && c.get(Calendar.DAY_OF_YEAR) == d.get(Calendar.DAY_OF_YEAR) } == true
+        }
+    }
 }
 TSM_EOF
 
@@ -19304,6 +19674,7 @@ fun AppRoot(c: MatchController) {
                 Screen.PAYMENTS -> com.tennis.scoremanager.ui.screens.PaymentsScreen(c)
                 Screen.CLUB_TOURNAMENTS -> com.tennis.scoremanager.ui.screens.ClubTournamentsScreen(c)
                 Screen.CLUB_TOURNAMENT -> com.tennis.scoremanager.ui.screens.ClubTournamentScreen(c)
+                Screen.NOTICE -> com.tennis.scoremanager.ui.screens.NoticeScreen(c)
             }
         }
     }
@@ -23101,6 +23472,44 @@ interface Strings {
     val ctDeleteAsk: (String) -> String
     val ctFeeName: (String) -> String
     val ctRoundN: (Int) -> String
+    val ntWhenTbd: String
+    val ntDues: String
+    val ntMemberTodo: String
+    val ntMemberHow: String
+    val ntKindEntries: String
+    val ntKindNext: String
+    val ntKindOrder: String
+    val ntKindDraw: String
+    val ntKindFree: String
+    val ntDuesButton: String
+    val ntMembersButton: String
+    val ntMembersTodo: String
+    val ntMembersAll: String
+    val ntAll: String
+    val ntShare: String
+    val ntNoContact: String
+    val ntNoApp: String
+    val ntNobody: String
+    val ntText: String
+    val ntHint: String
+    val ntPickDay: String
+    val ntChoose: String
+    val ntButton: String
+    val ntSent: String
+    val ntHello: (String) -> String
+    val ntHelloParent: (String) -> String
+    val ntEntered: (String) -> String
+    val ntFeePaid: (String) -> String
+    val ntFeeDue: (String) -> String
+    val ntMatch: (String, String) -> String
+    val ntTotal: (String) -> String
+    val ntOrderTitle: (String, String) -> String
+    val ntOrderAll: (String) -> String
+    val ntDrawText: (String) -> String
+    val ntEntriesList: (String) -> String
+    val ntEmailAll: (Int) -> String
+    val ntSmsAll: (Int) -> String
+    val ntOneByOne: (Int, Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -24607,6 +25016,44 @@ object ItStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Eliminare il torneo $it? Le iscrizioni non pagate si cancellano, i pagamenti restano nel registro." }
     override val ctFeeName: (String) -> String = { "Iscrizione $it" }
     override val ctRoundN: (Int) -> String = { "$it° turno" }
+    override val ntWhenTbd = "orario da definire"
+    override val ntDues = "risulta ancora da pagare:"
+    override val ntMemberTodo = "per essere in regola col circolo manca:"
+    override val ntMemberHow = "Passa in segreteria quando puoi. Grazie!"
+    override val ntKindEntries = "Iscrizione e quota"
+    override val ntKindNext = "Prossima partita (a ciascuno)"
+    override val ntKindOrder = "Ordine di gioco di un giorno"
+    override val ntKindDraw = "Tabellone (immagine)"
+    override val ntKindFree = "Messaggio libero"
+    override val ntDuesButton = "Sollecita chi deve"
+    override val ntMembersButton = "Avvisa i soci"
+    override val ntMembersTodo = "A chi deve sistemare qualcosa"
+    override val ntMembersAll = "Messaggio a tutti i soci"
+    override val ntAll = "A tutti"
+    override val ntShare = "Condividi (gruppo WhatsApp, Telegram, social)"
+    override val ntNoContact = "nessun contatto"
+    override val ntNoApp = "Nessuna app per questo invio."
+    override val ntNobody = "Nessuno da avvisare."
+    override val ntText = "Testo del messaggio"
+    override val ntHint = "Si apre l'app con il messaggio già scritto: controllalo e premi Invia. La spunta ricorda chi hai già avvisato."
+    override val ntPickDay = "Quale giorno?"
+    override val ntChoose = "Che avviso?"
+    override val ntButton = "Avvisi ai partecipanti"
+    override val ntSent = "avvisato"
+    override val ntHello: (String) -> String = { "Ciao $it," }
+    override val ntHelloParent: (String) -> String = { "Buongiorno, un avviso per $it:" }
+    override val ntEntered: (String) -> String = { "l'iscrizione al torneo $it è confermata." }
+    override val ntFeePaid: (String) -> String = { "Iscrizione pagata: $it." }
+    override val ntFeeDue: (String) -> String = { "Iscrizione da pagare: $it, in segreteria." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r di $t:" }
+    override val ntTotal: (String) -> String = { "Totale: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Ordine di gioco – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Partite in programma – $it" }
+    override val ntDrawText: (String) -> String = { "Il tabellone di $it" }
+    override val ntEntriesList: (String) -> String = { "Iscritti al torneo $it:" }
+    override val ntEmailAll: (Int) -> String = { "Email a tutti in copia nascosta ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS a tutti ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno per uno ($done su $n)" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -26096,6 +26543,44 @@ object EnStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Delete the tournament $it? Unpaid entry fees are removed, payments stay in the register." }
     override val ctFeeName: (String) -> String = { "Entry $it" }
     override val ctRoundN: (Int) -> String = { "Round $it" }
+    override val ntWhenTbd = "time to be confirmed"
+    override val ntDues = "still to pay:"
+    override val ntMemberTodo = "to be in order with the club you still need:"
+    override val ntMemberHow = "Drop by the club office when you can. Thanks!"
+    override val ntKindEntries = "Entry and fee"
+    override val ntKindNext = "Next match (to each)"
+    override val ntKindOrder = "Order of play for a day"
+    override val ntKindDraw = "Draw sheet (image)"
+    override val ntKindFree = "Free message"
+    override val ntDuesButton = "Remind who owes"
+    override val ntMembersButton = "Notify members"
+    override val ntMembersTodo = "Those with something to sort out"
+    override val ntMembersAll = "Message to all members"
+    override val ntAll = "To everyone"
+    override val ntShare = "Share (WhatsApp group, Telegram, social)"
+    override val ntNoContact = "no contact"
+    override val ntNoApp = "No app for this."
+    override val ntNobody = "Nobody to notify."
+    override val ntText = "Message text"
+    override val ntHint = "The app opens with the message already written: check it and press Send. The tick remembers who you've already notified."
+    override val ntPickDay = "Which day?"
+    override val ntChoose = "Which notice?"
+    override val ntButton = "Notify participants"
+    override val ntSent = "notified"
+    override val ntHello: (String) -> String = { "Hi $it," }
+    override val ntHelloParent: (String) -> String = { "Hello, a notice about $it:" }
+    override val ntEntered: (String) -> String = { "your entry to the $it tournament is confirmed." }
+    override val ntFeePaid: (String) -> String = { "Entry fee paid: $it." }
+    override val ntFeeDue: (String) -> String = { "Entry fee to pay: $it, at the club office." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r of $t:" }
+    override val ntTotal: (String) -> String = { "Total: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Order of play – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Scheduled matches – $it" }
+    override val ntDrawText: (String) -> String = { "The $it draw" }
+    override val ntEntriesList: (String) -> String = { "Entries for $it:" }
+    override val ntEmailAll: (Int) -> String = { "Email to all in BCC ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS to all ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "One by one ($done of $n)" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -27608,6 +28093,44 @@ object DeStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Turnier $it löschen? Unbezahlte Meldegebühren werden entfernt, Zahlungen bleiben im Register." }
     override val ctFeeName: (String) -> String = { "Meldung $it" }
     override val ctRoundN: (Int) -> String = { "$it. Runde" }
+    override val ntWhenTbd = "Uhrzeit folgt"
+    override val ntDues = "noch zu zahlen:"
+    override val ntMemberTodo = "um beim Verein in Ordnung zu sein, fehlt noch:"
+    override val ntMemberHow = "Komm bitte bei der Geschäftsstelle vorbei. Danke!"
+    override val ntKindEntries = "Meldung und Gebühr"
+    override val ntKindNext = "Nächstes Match (an jeden)"
+    override val ntKindOrder = "Spielplan eines Tages"
+    override val ntKindDraw = "Tableau (Bild)"
+    override val ntKindFree = "Freie Nachricht"
+    override val ntDuesButton = "An offene Beträge erinnern"
+    override val ntMembersButton = "Mitglieder benachrichtigen"
+    override val ntMembersTodo = "Wer etwas zu erledigen hat"
+    override val ntMembersAll = "Nachricht an alle Mitglieder"
+    override val ntAll = "An alle"
+    override val ntShare = "Teilen (WhatsApp-Gruppe, Telegram, soziale Netze)"
+    override val ntNoContact = "kein Kontakt"
+    override val ntNoApp = "Keine App dafür."
+    override val ntNobody = "Niemand zu benachrichtigen."
+    override val ntText = "Nachrichtentext"
+    override val ntHint = "Die App öffnet sich mit der fertigen Nachricht: prüfen und Senden drücken. Der Haken merkt sich, wen du schon benachrichtigt hast."
+    override val ntPickDay = "Welcher Tag?"
+    override val ntChoose = "Welche Nachricht?"
+    override val ntButton = "Teilnehmer benachrichtigen"
+    override val ntSent = "benachrichtigt"
+    override val ntHello: (String) -> String = { "Hallo $it," }
+    override val ntHelloParent: (String) -> String = { "Guten Tag, eine Nachricht zu $it:" }
+    override val ntEntered: (String) -> String = { "deine Meldung zum Turnier $it ist bestätigt." }
+    override val ntFeePaid: (String) -> String = { "Meldegebühr bezahlt: $it." }
+    override val ntFeeDue: (String) -> String = { "Meldegebühr offen: $it, in der Geschäftsstelle." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r von $t:" }
+    override val ntTotal: (String) -> String = { "Gesamt: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Spielplan – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Angesetzte Matches – $it" }
+    override val ntDrawText: (String) -> String = { "Das Tableau von $it" }
+    override val ntEntriesList: (String) -> String = { "Meldungen zum Turnier $it:" }
+    override val ntEmailAll: (Int) -> String = { "E-Mail an alle in Blindkopie ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS an alle ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Einzeln ($done von $n)" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -29113,6 +29636,44 @@ object EsStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "¿Eliminar el torneo $it? Las inscripciones sin pagar se borran, los pagos quedan en el registro." }
     override val ctFeeName: (String) -> String = { "Inscripción $it" }
     override val ctRoundN: (Int) -> String = { "$it.ª ronda" }
+    override val ntWhenTbd = "horario por confirmar"
+    override val ntDues = "queda por pagar:"
+    override val ntMemberTodo = "para estar en regla con el club falta:"
+    override val ntMemberHow = "Pásate por la secretaría cuando puedas. ¡Gracias!"
+    override val ntKindEntries = "Inscripción y cuota"
+    override val ntKindNext = "Próximo partido (a cada uno)"
+    override val ntKindOrder = "Orden de juego de un día"
+    override val ntKindDraw = "Cuadro (imagen)"
+    override val ntKindFree = "Mensaje libre"
+    override val ntDuesButton = "Recordar a quien debe"
+    override val ntMembersButton = "Avisar a los socios"
+    override val ntMembersTodo = "A quien tiene algo pendiente"
+    override val ntMembersAll = "Mensaje a todos los socios"
+    override val ntAll = "A todos"
+    override val ntShare = "Compartir (grupo de WhatsApp, Telegram, redes)"
+    override val ntNoContact = "ningún contacto"
+    override val ntNoApp = "No hay ninguna app para esto."
+    override val ntNobody = "Nadie a quien avisar."
+    override val ntText = "Texto del mensaje"
+    override val ntHint = "La app se abre con el mensaje ya escrito: revísalo y pulsa Enviar. La marca recuerda a quién ya has avisado."
+    override val ntPickDay = "¿Qué día?"
+    override val ntChoose = "¿Qué aviso?"
+    override val ntButton = "Avisar a los participantes"
+    override val ntSent = "avisado"
+    override val ntHello: (String) -> String = { "Hola $it," }
+    override val ntHelloParent: (String) -> String = { "Buenos días, un aviso sobre $it:" }
+    override val ntEntered: (String) -> String = { "tu inscripción al torneo $it está confirmada." }
+    override val ntFeePaid: (String) -> String = { "Inscripción pagada: $it." }
+    override val ntFeeDue: (String) -> String = { "Inscripción por pagar: $it, en secretaría." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r de $t:" }
+    override val ntTotal: (String) -> String = { "Total: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Orden de juego – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Partidos programados – $it" }
+    override val ntDrawText: (String) -> String = { "El cuadro de $it" }
+    override val ntEntriesList: (String) -> String = { "Inscritos en el torneo $it:" }
+    override val ntEmailAll: (Int) -> String = { "Correo a todos con copia oculta ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS a todos ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Uno a uno ($done de $n)" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -30620,6 +31181,44 @@ object FrStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Supprimer le tournoi $it ? Les inscriptions non payées sont effacées, les paiements restent dans le registre." }
     override val ctFeeName: (String) -> String = { "Inscription $it" }
     override val ctRoundN: (Int) -> String = { "${it}e tour" }
+    override val ntWhenTbd = "horaire à confirmer"
+    override val ntDues = "reste à payer :"
+    override val ntMemberTodo = "pour être en règle avec le club il manque :"
+    override val ntMemberHow = "Passez au secrétariat quand vous pouvez. Merci !"
+    override val ntKindEntries = "Inscription et droit"
+    override val ntKindNext = "Prochain match (à chacun)"
+    override val ntKindOrder = "Ordre des matchs d'une journée"
+    override val ntKindDraw = "Tableau (image)"
+    override val ntKindFree = "Message libre"
+    override val ntDuesButton = "Relancer ceux qui doivent"
+    override val ntMembersButton = "Prévenir les adhérents"
+    override val ntMembersTodo = "Ceux qui ont quelque chose à régler"
+    override val ntMembersAll = "Message à tous les adhérents"
+    override val ntAll = "À tous"
+    override val ntShare = "Partager (groupe WhatsApp, Telegram, réseaux)"
+    override val ntNoContact = "aucun contact"
+    override val ntNoApp = "Aucune appli pour cet envoi."
+    override val ntNobody = "Personne à prévenir."
+    override val ntText = "Texte du message"
+    override val ntHint = "L'appli s'ouvre avec le message déjà écrit : vérifiez-le et appuyez sur Envoyer. La coche rappelle qui a déjà été prévenu."
+    override val ntPickDay = "Quel jour ?"
+    override val ntChoose = "Quel avis ?"
+    override val ntButton = "Prévenir les participants"
+    override val ntSent = "prévenu"
+    override val ntHello: (String) -> String = { "Bonjour $it," }
+    override val ntHelloParent: (String) -> String = { "Bonjour, un avis pour $it :" }
+    override val ntEntered: (String) -> String = { "votre inscription au tournoi $it est confirmée." }
+    override val ntFeePaid: (String) -> String = { "Inscription payée : $it." }
+    override val ntFeeDue: (String) -> String = { "Inscription à payer : $it, au secrétariat." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r de $t :" }
+    override val ntTotal: (String) -> String = { "Total : $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Ordre des matchs – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Matchs programmés – $it" }
+    override val ntDrawText: (String) -> String = { "Le tableau de $it" }
+    override val ntEntriesList: (String) -> String = { "Inscrits au tournoi $it :" }
+    override val ntEmailAll: (Int) -> String = { "E-mail à tous en copie cachée ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS à tous ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Un par un ($done sur $n)" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -32128,6 +32727,44 @@ object PtStrings : Strings {
     override val ctDeleteAsk: (String) -> String = { "Excluir o torneio $it? As inscrições não pagas são apagadas, os pagamentos ficam no registro." }
     override val ctFeeName: (String) -> String = { "Inscrição $it" }
     override val ctRoundN: (Int) -> String = { "${it}ª rodada" }
+    override val ntWhenTbd = "horário a definir"
+    override val ntDues = "ainda falta pagar:"
+    override val ntMemberTodo = "para ficar em ordem com o clube falta:"
+    override val ntMemberHow = "Passe na secretaria quando puder. Obrigado!"
+    override val ntKindEntries = "Inscrição e taxa"
+    override val ntKindNext = "Próxima partida (a cada um)"
+    override val ntKindOrder = "Ordem de jogos de um dia"
+    override val ntKindDraw = "Chave (imagem)"
+    override val ntKindFree = "Mensagem livre"
+    override val ntDuesButton = "Lembrar quem deve"
+    override val ntMembersButton = "Avisar os sócios"
+    override val ntMembersTodo = "Quem tem algo a resolver"
+    override val ntMembersAll = "Mensagem a todos os sócios"
+    override val ntAll = "A todos"
+    override val ntShare = "Compartilhar (grupo do WhatsApp, Telegram, redes)"
+    override val ntNoContact = "nenhum contato"
+    override val ntNoApp = "Nenhum app para este envio."
+    override val ntNobody = "Ninguém para avisar."
+    override val ntText = "Texto da mensagem"
+    override val ntHint = "O app abre com a mensagem já escrita: confira e toque em Enviar. A marca lembra quem você já avisou."
+    override val ntPickDay = "Qual dia?"
+    override val ntChoose = "Qual aviso?"
+    override val ntButton = "Avisar os participantes"
+    override val ntSent = "avisado"
+    override val ntHello: (String) -> String = { "Olá $it," }
+    override val ntHelloParent: (String) -> String = { "Bom dia, um aviso sobre $it:" }
+    override val ntEntered: (String) -> String = { "a sua inscrição no torneio $it está confirmada." }
+    override val ntFeePaid: (String) -> String = { "Inscrição paga: $it." }
+    override val ntFeeDue: (String) -> String = { "Inscrição a pagar: $it, na secretaria." }
+    override val ntMatch: (String, String) -> String = { r, t -> "$r de $t:" }
+    override val ntTotal: (String) -> String = { "Total: $it" }
+    override val ntOrderTitle: (String, String) -> String = { t, d -> "Ordem de jogos – $t, $d" }
+    override val ntOrderAll: (String) -> String = { "Partidas programadas – $it" }
+    override val ntDrawText: (String) -> String = { "A chave de $it" }
+    override val ntEntriesList: (String) -> String = { "Inscritos no torneio $it:" }
+    override val ntEmailAll: (Int) -> String = { "E-mail a todos com cópia oculta ($it)" }
+    override val ntSmsAll: (Int) -> String = { "SMS a todos ($it)" }
+    override val ntOneByOne: (Int, Int) -> String = { done, n -> "Um por um ($done de $n)" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -32727,6 +33364,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PersonAdd
@@ -32856,6 +33494,7 @@ fun ClubTournamentScreen(c: MatchController) {
     var askDraw by remember { mutableStateOf(false) }
     var openMatch by remember { mutableStateOf<String?>(null) }
     var openEntry by remember { mutableStateOf<String?>(null) }
+    var notify by remember { mutableStateOf(false) }
     val now = remember { System.currentTimeMillis() }
     val hasResults = t.matches.any { it.played && !it.bye }
     val hasKnockout = t.matches.any { it.round > 0 }
@@ -32875,6 +33514,7 @@ fun ClubTournamentScreen(c: MatchController) {
     ) {
         t.champion?.let { ch -> Text(s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
         Segmented(listOf(SegOption(s.ctTabEntries), SegOption(s.ctTabDraw), SegOption(s.ctTabMatches)), tab, { tab = it })
+        if (t.entries.isNotEmpty()) GhostButton(s.ntButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
         when (tab) {
             0 -> EntriesTab(c, t, players, book, now, onAdd = { adding = true }, onOpen = { openEntry = it })
             1 -> DrawTab(c, t) { openMatch = it }
@@ -32883,6 +33523,7 @@ fun ClubTournamentScreen(c: MatchController) {
         if (t.drawn && !hasResults) GhostButton(s.ctUndoDraw, Icons.Filled.Undo, { c.undoClubDraw(t) }, Modifier.fillMaxWidth())
     }
     if (edit) TournamentEditDialog(c, t) { edit = false }
+    if (notify) NoticeChoiceDialog(c, t) { notify = false }
     if (adding) EntryPickDialog(c, t) { adding = false }
     if (askDraw) {
         val ok = ClubTournaments.eligible(t, players, book, now)
@@ -33172,6 +33813,36 @@ private fun EntryPickDialog(c: MatchController, t: ClubTournament, onDone: () ->
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) pick(p) }
+}
+
+/** Che avviso mandare agli iscritti: iscrizione, partite, ordine di gioco di un giorno, tabellone, messaggio libero. */
+@Composable
+private fun NoticeChoiceDialog(c: MatchController, t: ClubTournament, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var pickDay by remember { mutableStateOf(false) }
+    val open = t.matches.filter { !it.played && it.a != null && it.b != null }
+    // I giorni con partite in programma (a mezzanotte, uno per giorno).
+    val days = open.mapNotNull { it.at }.map { at -> Calendar.getInstance().apply { timeInMillis = at; set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis }.distinct().sorted()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (pickDay) s.ntPickDay else s.ntChoose) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (!pickDay) {
+                    GhostButton(s.ntKindEntries, Icons.Filled.PersonAdd, { onDone(); c.noticeEntries(t) }, Modifier.fillMaxWidth())
+                    if (open.isNotEmpty()) GhostButton(s.ntKindNext, Icons.Filled.PlayArrow, { onDone(); c.noticeMatches(t, null) }, Modifier.fillMaxWidth())
+                    if (days.isNotEmpty()) GhostButton(s.ntKindOrder, Icons.Filled.Schedule, { pickDay = true }, Modifier.fillMaxWidth())
+                    if (t.drawn) GhostButton(s.ntKindDraw, Icons.Filled.EmojiEvents, { onDone(); c.noticeDraw(t) }, Modifier.fillMaxWidth())
+                    GhostButton(s.ntKindFree, Icons.Filled.Campaign, { onDone(); c.noticeFreeTournament(t) }, Modifier.fillMaxWidth())
+                } else for (d in days) {
+                    GhostButton(com.tennis.scoremanager.data.Notices.day(d, lang), Icons.Filled.Schedule, { onDone(); c.noticeMatches(t, d) }, Modifier.fillMaxWidth())
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 
 /** Torneo nuovo o da cambiare. [onDone] riceve l'id del torneo salvato (null = annullato o eliminato). */
@@ -35761,6 +36432,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PersonAdd
@@ -35841,6 +36513,7 @@ fun MembersScreen(c: MatchController) {
     var todoOnly by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
     var adding by remember { mutableStateOf(false) }
+    var notify by remember { mutableStateOf(false) }
     val book by c.clubBook.collectAsState()
     val members = players.filter { it.member != null }
     val issues = remember(members) { members.associate { it.id to Members.issues(it, now) } }
@@ -35864,6 +36537,7 @@ fun MembersScreen(c: MatchController) {
         } else {
             Text(s.membersCount(members.size, todo), color = if (todo > 0) TsmColors.Orange else TsmColors.Ok, fontWeight = FontWeight.Bold)
             Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
+            GhostButton(s.ntMembersButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
         }
         for (p in shown) {
@@ -35890,6 +36564,18 @@ fun MembersScreen(c: MatchController) {
             }
         }
     }
+    if (notify) AlertDialog(
+        onDismissRequest = { notify = false },
+        title = { Text(s.ntChoose) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                GhostButton(s.ntMembersTodo, Icons.Filled.VerifiedUser, { notify = false; c.noticeMembersTodo() }, Modifier.fillMaxWidth())
+                GhostButton(s.ntMembersAll, Icons.Filled.Campaign, { notify = false; c.noticeMembersAll() }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = { notify = false }) { Text(s.back) } },
+    )
     if (adding) MemberPickDialog(c) { picked ->
         adding = false
         picked?.let { p ->
@@ -36075,6 +36761,162 @@ private fun MemberEditDialog(c: MatchController, p: PlayerProfile, onDone: () ->
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/NoticeScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/NoticeScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Sms
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.NoticeRecipient
+import com.tennis.scoremanager.data.Notices
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Apre l'app giusta; se non c'è, lo dice. */
+private fun launch(context: Context, intent: Intent, noApp: String) {
+    runCatching { context.startActivity(intent) }.onFailure { Toast.makeText(context, noApp, Toast.LENGTH_LONG).show() }
+}
+
+/** WhatsApp con la chat di quel numero e il messaggio già scritto (si preme Invia). */
+private fun whatsApp(number: String, text: String) = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$number?text=" + Uri.encode(text)))
+
+private fun sms(numbers: List<String>, text: String) =
+    Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + numbers.joinToString(";") { Uri.encode(it) })).putExtra("sms_body", text)
+
+private fun email(to: List<String>, bcc: List<String>, subject: String, text: String) = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+    if (to.isNotEmpty()) putExtra(Intent.EXTRA_EMAIL, to.toTypedArray())
+    if (bcc.isNotEmpty()) putExtra(Intent.EXTRA_BCC, bcc.toTypedArray())
+    putExtra(Intent.EXTRA_SUBJECT, subject)
+    putExtra(Intent.EXTRA_TEXT, text)
+}
+
+/**
+ * Avvisi: il testo per tutti (email in copia nascosta, SMS a tutti, condivisione con l'immagine nel gruppo o sui
+ * social) e uno per uno, ciascuno col suo messaggio, su WhatsApp, SMS o email. La spunta ricorda chi è già stato
+ * avvisato; l'invio lo fa sempre chi usa il telefono, nell'app che si apre.
+ */
+@Composable
+fun NoticeScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    BackHandler { c.back() }
+    val plan by c.notice.collectAsState()
+    val p = plan ?: return
+    var common by remember(p) { mutableStateOf(p.common) }
+    val sent = remember(p) { mutableStateOf(setOf<String>()) }
+    fun textOf(r: NoticeRecipient) = if (p.editable || r.text.isBlank()) common else r.text
+    fun mark(r: NoticeRecipient) { sent.value = sent.value + r.id }
+    ScreenScaffold(
+        title = p.title,
+        subtitle = p.subject,
+        icon = Icons.Filled.Campaign,
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        if (p.recipients.isEmpty() && common.isBlank()) { Text(s.ntNobody, color = TsmColors.TextDim); return@ScreenScaffold }
+        Text(s.ntHint, color = TsmColors.TextDim, fontSize = 13.sp)
+        // Il testo per tutti: si può scrivere (messaggio libero) o è quello preparato dall'app.
+        if (p.editable || common.isNotBlank()) {
+            SectionCard(s.ntAll, Icons.Filled.Campaign) {
+                OutlinedTextField(common, { common = it }, Modifier.fillMaxWidth(), minLines = 4, label = { Text(s.ntText) }, readOnly = !p.editable)
+                val phones = p.recipients.mapNotNull { r -> r.phone.ifBlank { null } }.distinct()
+                val mails = p.recipients.mapNotNull { r -> r.email.ifBlank { null } }.distinct()
+                GhostButton(s.ntShare, Icons.Filled.Share, {
+                    val img = p.image?.takeIf { it.exists() }
+                    val send = if (img != null) c.shareFileIntent(img, "image/png", common) else Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, common).putExtra(Intent.EXTRA_SUBJECT, p.subject), null)
+                    launch(context, send, s.ntNoApp)
+                }, Modifier.fillMaxWidth())
+                if (mails.isNotEmpty()) GhostButton(s.ntEmailAll(mails.size), Icons.Filled.Email, { launch(context, email(emptyList(), mails, p.subject, common), s.ntNoApp) }, Modifier.fillMaxWidth())
+                if (phones.isNotEmpty()) GhostButton(s.ntSmsAll(phones.size), Icons.Filled.Sms, { launch(context, sms(phones, common), s.ntNoApp) }, Modifier.fillMaxWidth())
+            }
+        }
+        if (p.recipients.isNotEmpty()) {
+            SectionCard(s.ntOneByOne(sent.value.size, p.recipients.size), Icons.AutoMirrored.Filled.Send) {
+                for (r in p.recipients) {
+                    val done = r.id in sent.value
+                    val wa = Notices.waNumber(r.phone)
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.SurfaceHigh).padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(r.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            if (done) Icon(Icons.Filled.CheckCircle, s.ntSent, tint = TsmColors.Ok)
+                        }
+                        val contacts = listOf(r.phone, r.email).filter { it.isNotBlank() }.joinToString(" · ")
+                        Text(contacts.ifBlank { s.ntNoContact }, color = if (contacts.isBlank()) TsmColors.Orange else TsmColors.TextDim, fontSize = 12.sp)
+                        // Il messaggio personale, per controllarlo prima di mandarlo.
+                        if (!p.editable && r.text.isNotBlank() && r.text != common) {
+                            var open by remember { mutableStateOf(false) }
+                            // Chiuso: le righe dopo il saluto (partita, giorno, campo); toccando, tutto il messaggio.
+                            val short = r.text.lines().drop(1).filter { it.isNotBlank() }.take(3).joinToString("\n")
+                            Text(if (open) r.text else short, color = TsmColors.TextMain, fontSize = 13.sp,
+                                modifier = Modifier.clickable { open = !open }, maxLines = if (open) 30 else 3)
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { mark(r); launch(context, whatsApp(wa, textOf(r)), s.ntNoApp) }
+                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS") { mark(r); launch(context, sms(listOf(r.phone), textOf(r)), s.ntNoApp) }
+                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail) { mark(r); launch(context, email(listOf(r.email), emptyList(), p.subject, textOf(r)), s.ntNoApp) }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Chip(icon: ImageVector, label: String, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(10.dp), color = TsmColors.Surface) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = TsmColors.Ball)
+            Text(" $label", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
 }
 TSM_EOF
 
@@ -37069,6 +37911,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.GroupAdd
@@ -37202,6 +38045,7 @@ fun PaymentsScreen(c: MatchController) {
             val open = book.charges.filter { it.left > 0 }.groupBy { it.player.ifEmpty { "#" + it.name } }
                 .map { (key, list) -> Triple(key, list, list.sumOf { it.left }) }.sortedByDescending { it.third }
             if (open.isEmpty()) Text(s.dueNone, color = TsmColors.TextDim, fontSize = 13.sp)
+            else GhostButton(s.ntDuesButton, Icons.Filled.Campaign, { c.noticeDues() }, Modifier.fillMaxWidth())
             for ((key, list, left) in open) {
                 val p = players.firstOrNull { it.id == key || key in it.aliases }
                 Row(
@@ -59564,6 +60408,78 @@ class MembersTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/NoticesTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/NoticesTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.stringsFor
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class NoticesTest {
+    private fun day(y: Int, m: Int, d: Int, h: Int = 12, min: Int = 0): Long = Calendar.getInstance().apply { set(y, m - 1, d, h, min, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val now = day(2026, 11, 1)
+    private val s = stringsFor(Lang.IT)
+
+    @Test
+    fun whatsAppNumbers() {
+        assertEquals("393331234567", Notices.waNumber("333 123 4567"))
+        assertEquals("393331234567", Notices.waNumber("+39 333-1234567"))
+        assertEquals("393331234567", Notices.waNumber("0039 333 1234567"))
+        assertEquals("41791234567", Notices.waNumber("+41 79 123 45 67"))
+        assertEquals("39021234567", Notices.waNumber("02 1234567"))
+        assertNull(Notices.waNumber("123"))
+        assertNull(Notices.waNumber(""))
+    }
+
+    @Test
+    fun minorsGetTheParentsPhone() {
+        val kid = PlayerProfile("k", "Luca", "Luca", "Rossi", phone = "333 1111111", birth = day(2014, 5, 1),
+            member = Membership(guardian = "Anna Rossi", guardianPhone = "333 2222222"))
+        assertEquals("333 2222222", Notices.phoneOf(kid, now))
+        val adult = kid.copy(birth = day(1990, 5, 1))
+        assertEquals("333 1111111", Notices.phoneOf(adult, now))
+        // Senza telefono suo vale quello del genitore.
+        assertEquals("333 2222222", Notices.phoneOf(adult.copy(phone = ""), now))
+        // Al genitore si scrive "un avviso per Luca".
+        val t = ClubTournament("t", "Sociale")
+        assertTrue(Notices.entryText(s, t, kid.copy(phone = ""), ClubBook(), "", Lang.IT, now).startsWith("Buongiorno, un avviso per Luca:"))
+    }
+
+    @Test
+    fun entryAndDuesTexts() {
+        val p = PlayerProfile("p", "Mario Rossi", "Mario", "Rossi")
+        val fee = Fee("f", "Iscrizione Sociale", 1_000, FeeKind.TOURNAMENT)
+        val t = ClubTournament("t", "Sociale", start = day(2026, 11, 14), feeCents = 1_000, feeId = "f")
+        val book = Fees.charge(ClubBook(fees = listOf(fee)), p, fee.name, fee.cents, now, fee)
+        val text = Notices.entryText(s, t, p, book, "TC Prova", Lang.IT, now)
+        assertTrue(text, text.startsWith("Ciao Mario,\nl'iscrizione al torneo Sociale è confermata.\nsabato 14 novembre"))
+        assertTrue(text, text.contains("Iscrizione da pagare: 10,00"))
+        assertTrue(text, text.endsWith("\n\nTC Prova"))
+        val dues = Notices.duesText(s, p, book.charges, "", Lang.IT, now)
+        assertEquals("Ciao Mario,\nrisulta ancora da pagare:\n• Iscrizione Sociale: 10,00 €", dues)
+    }
+
+    @Test
+    fun matchTextAndDay() {
+        val p = PlayerProfile("p", "Mario Rossi", "Mario", "Rossi")
+        val m = CTMatch("m", 2, 0, a = "e1", b = "e2", court = "Campo 2", at = day(2026, 11, 14, 9, 30))
+        val t = ClubTournament("t", "Sociale")
+        val text = Notices.matchText(s, t, m, "Finale", { if (it == "e1") "Rossi" else "Bianchi" }, p, "", Lang.IT, now)
+        assertEquals("Ciao Mario,\nFinale di Sociale:\nRossi – Bianchi\nsabato 14 novembre, 09:30 · Campo 2", text)
+        assertEquals(listOf(m), Notices.onDay(listOf(m, m.copy(id = "x", at = day(2026, 11, 15))), day(2026, 11, 14)))
+        assertEquals("orario da definire", Notices.whenText(s, m.copy(at = null, court = ""), Lang.IT))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -67197,6 +68113,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 209 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 213 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

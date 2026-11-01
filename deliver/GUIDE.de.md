@@ -484,6 +484,15 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 
+### 7.14 Nachrichten an Teilnehmer und Mitglieder (app 2.6)
+
+Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hallo Mario, …“), und öffnet die passende App: **senden tust du**, mit Senden. Keine externen Dienste oder Abos: es werden WhatsApp, SMS, E-Mail und das Teilen des Telefons genutzt.
+
+- **Wo**: im Turnier **Teilnehmer benachrichtigen**: *Meldung und Gebühr* (Bestätigung und Gebühr bezahlt oder offen), *Nächstes Match* (an jeden: Runde, Gegner, Tag, Uhrzeit und Platz), *Spielplan eines Tages*, *Tableau* (ein Bild mit Tableau und Gruppen), *Freie Nachricht*. Unter **Beiträge und Zahlungen** **An offene Beträge erinnern** (Posten für Posten, mit Fälligkeit). Unter **Mitglieder** **Mitglieder benachrichtigen**: wer etwas zu erledigen hat (Attest, Ausweis, Einwilligungen) oder eine Nachricht an alle.
+- **An alle**: der Text für alle (Spielplan, Meldeliste, Tableau). **Teilen** schickt ihn in eine WhatsApp-Gruppe, zu Telegram, Instagram, Facebook… mit dem Bild, falls vorhanden; **E-Mail an alle** setzt alle in Blindkopie; **SMS an alle** öffnet eine SMS mit allen Nummern.
+- **Einzeln**: für jeden seine Nachricht (antippen, um alles zu lesen) und die Tasten **WhatsApp** (öffnet den Chat mit der Nummer und dem fertigen Text), **SMS** und **E-Mail**. Der Haken merkt sich, wen du schon benachrichtigt hast.
+- Nummern ohne Vorwahl gelten als italienisch (+39). Bei **Minderjährigen** geht die Nachricht an das Telefon des Elternteils (*Mitgliedsdaten*), als „eine Nachricht zu Luca“. Wer weder Telefon noch E-Mail hat, wird angezeigt: in seiner Karte ergänzen.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

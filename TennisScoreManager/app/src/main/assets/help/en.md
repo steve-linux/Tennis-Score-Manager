@@ -371,6 +371,15 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 
+### 7.14 Notices to participants and members
+
+The app prepares the messages, already written and personal ("Hi Mario, …"), and opens the right app: **you do the sending**, by pressing Send. No outside services or subscriptions: it uses WhatsApp, SMS, email and the phone's sharing.
+
+- **Where**: in the tournament, **Notify participants**: *Entry and fee* (confirmation and fee paid or to pay), *Next match* (to each: round, opponent, day, time and court), *Order of play for a day*, *Draw sheet* (an image with the draw and the groups), *Free message*. In **Fees and payments**, **Remind who owes** (item by item, with due dates). In **Members**, **Notify members**: those with something to sort out (certificate, card, consents) or a message to everyone.
+- **To everyone**: the text for all (order of play, list of entries, draw). **Share** sends it to a WhatsApp group, Telegram, Instagram, Facebook… with the image if there is one; **Email to all** puts them in BCC; **SMS to all** opens an SMS with every number.
+- **One by one**: each person's own message (tap it to read it all) and the **WhatsApp** (opens the chat with that number and the text ready), **SMS** and **Email** buttons. The tick remembers who you've already notified.
+- Numbers without a prefix count as Italian (+39). For **under-18s** the message goes to the parent's phone (*Member details*), as "a notice about Luca". Whoever has neither phone nor email is flagged: add them on their card.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

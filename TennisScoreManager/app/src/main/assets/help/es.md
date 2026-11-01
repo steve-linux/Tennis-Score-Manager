@@ -371,6 +371,15 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
 
+### 7.14 Avisos a participantes y socios
+
+La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y abre la app adecuada: **el envío lo haces tú**, pulsando Enviar. Sin servicios externos ni suscripciones: se usan WhatsApp, SMS, correo y el compartir del teléfono.
+
+- **Dónde**: en el torneo, **Avisar a los participantes**: *Inscripción y cuota* (confirmación y cuota pagada o por pagar), *Próximo partido* (a cada uno: ronda, rival, día, hora y pista), *Orden de juego de un día*, *Cuadro* (una imagen con el cuadro y los grupos), *Mensaje libre*. En **Cuotas y pagos**, **Recordar a quien debe** (partida por partida, con vencimientos). En **Socios**, **Avisar a los socios**: a quien tiene algo pendiente (certificado, licencia, consentimientos) o un mensaje a todos.
+- **A todos**: el texto para todos (orden de juego, lista de inscritos, cuadro). **Compartir** lo manda a un grupo de WhatsApp, a Telegram, Instagram, Facebook… con la imagen si la hay; **Correo a todos** los pone en copia oculta; **SMS a todos** abre un SMS con todos los números.
+- **Uno a uno**: el mensaje de cada uno (tócalo para leerlo entero) y los botones **WhatsApp** (abre el chat con ese número y el texto listo), **SMS** y **Correo**. La marca recuerda a quién ya has avisado.
+- Los números sin prefijo cuentan como italianos (+39). Para los **menores** se escribe al teléfono del padre o la madre (*Datos del socio*), con «un aviso sobre Luca». Quien no tiene ni teléfono ni correo se señala: añádelos en su ficha.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

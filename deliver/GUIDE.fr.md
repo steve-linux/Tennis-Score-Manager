@@ -484,6 +484,15 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 
+### 7.14 Avis aux participants et aux adhérents (app 2.6)
+
+L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, … »), et ouvre la bonne appli : **c'est vous qui envoyez**, en appuyant sur Envoyer. Aucun service extérieur ni abonnement : on utilise WhatsApp, les SMS, l'e-mail et le partage du téléphone.
+
+- **Où** : dans le tournoi, **Prévenir les participants** : *Inscription et droit* (confirmation et droit payé ou à payer), *Prochain match* (à chacun : tour, adversaire, jour, heure et terrain), *Ordre des matchs d'une journée*, *Tableau* (une image avec le tableau et les poules), *Message libre*. Dans **Cotisations et paiements**, **Relancer ceux qui doivent** (poste par poste, avec les échéances). Dans **Adhérents**, **Prévenir les adhérents** : ceux qui ont quelque chose à régler (certificat, licence, consentements) ou un message à tous.
+- **À tous** : le texte pour tous (ordre des matchs, liste des inscrits, tableau). **Partager** l'envoie dans un groupe WhatsApp, sur Telegram, Instagram, Facebook… avec l'image s'il y en a une ; **E-mail à tous** les met en copie cachée ; **SMS à tous** ouvre un SMS avec tous les numéros.
+- **Un par un** : le message de chacun (touchez-le pour tout lire) et les boutons **WhatsApp** (ouvre la discussion avec ce numéro et le texte prêt), **SMS** et **E-mail**. La coche rappelle qui a déjà été prévenu.
+- Les numéros sans indicatif comptent comme italiens (+39). Pour les **mineurs**, on écrit au téléphone du parent (*Données de l'adhérent*), avec « un avis pour Luca ». Qui n'a ni téléphone ni e-mail est signalé : ajoutez-les dans sa fiche.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

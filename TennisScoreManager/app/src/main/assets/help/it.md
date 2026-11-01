@@ -371,6 +371,15 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
 
+### 7.14 Avvisi ai partecipanti e ai soci
+
+L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l'app giusta: **l'invio lo fai tu**, premendo Invia. Niente servizi esterni né abbonamenti: si usano WhatsApp, SMS, email e la condivisione del telefono.
+
+- **Dove**: nel torneo, **Avvisi ai partecipanti**: *Iscrizione e quota* (conferma e quota pagata o da pagare), *Prossima partita* (a ciascuno turno, avversario, giorno, ora e campo), *Ordine di gioco di un giorno*, *Tabellone* (un'immagine col tabellone e i gironi), *Messaggio libero*. In **Quote e pagamenti**, **Sollecita chi deve** (voce per voce, con le scadenze). In **Soci**, **Avvisa i soci**: a chi deve sistemare qualcosa (certificato, tessera, consensi) o un messaggio a tutti.
+- **A tutti**: il testo per tutti (l'ordine di gioco, l'elenco degli iscritti, il tabellone). **Condividi** lo manda in un gruppo WhatsApp, su Telegram, Instagram, Facebook… con l'immagine se c'è; **Email a tutti** li mette in copia nascosta; **SMS a tutti** apre un SMS con tutti i numeri.
+- **Uno per uno**: per ciascuno il suo messaggio (toccandolo si legge tutto) e i tasti **WhatsApp** (si apre la chat con quel numero e il testo già scritto), **SMS** ed **Email**. La spunta ricorda chi hai già avvisato.
+- I numeri senza prefisso valgono come italiani (+39). Per i **minorenni** si scrive al telefono del genitore (*Dati del socio*), con "un avviso per Luca". Chi non ha né telefono né email è segnalato: aggiungili nella sua scheda.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

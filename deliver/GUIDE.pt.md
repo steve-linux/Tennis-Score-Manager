@@ -484,6 +484,15 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 
+### 7.14 Avisos aos participantes e aos sócios (app 2.6)
+
+O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre o app certo: **quem envia é você**, tocando em Enviar. Sem serviços externos nem assinaturas: usam-se WhatsApp, SMS, e-mail e o compartilhamento do telefone.
+
+- **Onde**: no torneio, **Avisar os participantes**: *Inscrição e taxa* (confirmação e taxa paga ou a pagar), *Próxima partida* (a cada um: rodada, adversário, dia, hora e quadra), *Ordem de jogos de um dia*, *Chave* (uma imagem com a chave e os grupos), *Mensagem livre*. Em **Mensalidades e pagamentos**, **Lembrar quem deve** (item por item, com os vencimentos). Em **Sócios**, **Avisar os sócios**: quem tem algo a resolver (atestado, cartão, consentimentos) ou uma mensagem a todos.
+- **A todos**: o texto para todos (ordem de jogos, lista de inscritos, chave). **Compartilhar** envia num grupo do WhatsApp, no Telegram, Instagram, Facebook… com a imagem se houver; **E-mail a todos** coloca todos em cópia oculta; **SMS a todos** abre um SMS com todos os números.
+- **Um por um**: a mensagem de cada um (toque para ler tudo) e os botões **WhatsApp** (abre a conversa com aquele número e o texto pronto), **SMS** e **E-mail**. A marca lembra quem você já avisou.
+- Números sem prefixo valem como italianos (+39). Para os **menores** escreve-se ao telefone do responsável (*Dados do sócio*), com "um aviso sobre Luca". Quem não tem telefone nem e-mail é indicado: adicione na ficha dele.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

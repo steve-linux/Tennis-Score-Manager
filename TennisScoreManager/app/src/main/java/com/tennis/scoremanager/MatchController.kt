@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -658,6 +658,7 @@ class MatchController(
             Screen.PAYMENTS -> Screen.HOME
             Screen.CLUB_TOURNAMENTS -> Screen.HOME
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
+            Screen.NOTICE -> noticeBack
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1395,6 +1396,106 @@ class MatchController(
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
         }
+    }
+
+    // ---- Avvisi (WhatsApp, SMS, email, condivisione) ----
+
+    val notice = MutableStateFlow<com.tennis.scoremanager.data.NoticePlan?>(null)
+    private var noticeBack = Screen.HOME
+
+    private fun openNotice(plan: com.tennis.scoremanager.data.NoticePlan) {
+        notice.value = plan
+        noticeBack = screen.value
+        screen.value = Screen.NOTICE
+    }
+
+    private fun entryNameOf(t: com.tennis.scoremanager.data.ClubTournament, id: String?): String =
+        t.entries.firstOrNull { it.id == id }?.let { e -> e.players.mapIndexed { i, p -> playerById(p)?.name ?: e.names.getOrNull(i).orEmpty() }.joinToString(" / ") } ?: "—"
+
+    private fun peopleOf(t: com.tennis.scoremanager.data.ClubTournament, entryIds: Collection<String?>): List<com.tennis.scoremanager.data.PlayerProfile> =
+        t.entries.filter { it.id in entryIds }.flatMap { it.players }.distinct().mapNotNull { playerById(it) }
+
+    private val clubSign: String get() = storage.clubName
+
+    /** A ogni iscritto: iscrizione confermata e quota pagata o da pagare. */
+    fun noticeEntries(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val people = peopleOf(t, t.entries.map { it.id })
+        val rec = people.map { p -> com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.entryText(s, t, p, clubBook.value, clubSign, lang, now), now) }
+        // Per il gruppo: l'elenco degli iscritti.
+        val common = (listOf(s.ntEntriesList(t.name)) + t.entries.map { "• " + entryNameOf(t, it.id) } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindEntries, t.name, common, rec))
+    }
+
+    /**
+     * Le partite da giocare: a ciascun giocatore la sua (turno, avversario, giorno, ora, campo); per il gruppo
+     * l'ordine di gioco. [day] = solo quel giorno, null = tutte quelle già con i due giocatori.
+     */
+    fun noticeMatches(t: com.tennis.scoremanager.data.ClubTournament, day: Long?) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val open = t.matches.filter { !it.played && it.a != null && it.b != null }
+        val ms = if (day != null) com.tennis.scoremanager.data.Notices.onDay(open, day) else open
+        val names = { id: String? -> entryNameOf(t, id) }
+        val rec = ms.flatMap { m ->
+            peopleOf(t, listOf(m.a, m.b)).map { p ->
+                com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.matchText(s, t, m, clubRoundName(t, m), names, p, clubSign, lang, now), now)
+            }
+        }
+        val title = if (day != null) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(day, lang)) else s.ntOrderAll(t.name)
+        val common = com.tennis.scoremanager.data.Notices.orderOfPlay(s, t, ms, { clubRoundName(t, it) }, names, title, lang, clubSign)
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (day != null) s.ntKindOrder else s.ntKindNext, title, common, rec))
+    }
+
+    /** Il tabellone in un'immagine, per il gruppo e i social; a ciascuno lo stesso testo. */
+    fun noticeDraw(t: com.tennis.scoremanager.data.ClubTournament) {
+        val s = strings; val now = System.currentTimeMillis()
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, "${s.ctTabDraw} ${t.name}.png".replace(Regex("[\\\\/:*?\"<>|]"), "_"))
+        val sub = listOfNotNull(clubSign.ifBlank { null }, t.category.ifBlank { null }, if (t.kind == com.tennis.scoremanager.data.CTKind.FITP) "FITP" else s.ctSocial).joinToString(" · ")
+        val ok = runCatching {
+            val b = com.tennis.scoremanager.data.ClubDrawImage.render(t, { entryNameOf(t, it) }, s, sub, s.generatedWith)
+            f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+            b.recycle()
+        }.isSuccess
+        val common = (listOf(s.ntDrawText(t.name)) + t.champion?.let { listOf(s.ctChampion(entryNameOf(t, it))) }.orEmpty() + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, common, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntKindDraw, t.name, common, rec, image = f.takeIf { ok }))
+    }
+
+    /** Messaggio libero agli iscritti: il testo si scrive nella schermata degli avvisi. */
+    fun noticeFreeTournament(t: com.tennis.scoremanager.data.ClubTournament) {
+        val now = System.currentTimeMillis()
+        val rec = peopleOf(t, t.entries.map { it.id }).map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntKindFree, t.name, "${t.name}\n\n", rec, editable = true))
+    }
+
+    /** Sollecito a chi deve qualcosa al circolo, voce per voce. */
+    fun noticeDues() {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val book = clubBook.value
+        val rec = players.value.mapNotNull { p ->
+            val open = com.tennis.scoremanager.data.Fees.of(book, p).filter { it.left > 0 }
+            if (open.isEmpty()) null else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.duesText(s, p, open, clubSign, lang, now), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntDuesButton, s.paymentsTitle, "", rec))
+    }
+
+    /** Ai soci che hanno qualcosa da sistemare (certificato, tessera, consensi…), a ciascuno il suo. */
+    fun noticeMembersTodo() {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.mapNotNull { p ->
+            val issues = com.tennis.scoremanager.data.Members.issues(p, now).filter { it != com.tennis.scoremanager.data.Members.Issue.NO_CONTACT }
+            if (issues.isEmpty()) null
+            else com.tennis.scoremanager.data.Notices.recipient(p, com.tennis.scoremanager.data.Notices.memberText(s, p, issues.map { com.tennis.scoremanager.ui.screens.issueText(s, p, it, now, lang) }, clubSign, now), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ntMembersTodo, s.membersTitle, "", rec))
+    }
+
+    /** Messaggio libero a tutti i soci. */
+    fun noticeMembersAll() {
+        val now = System.currentTimeMillis()
+        val rec = players.value.filter { it.member != null }.map { com.tennis.scoremanager.data.Notices.recipient(it, "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.ntMembersAll, clubSign.ifBlank { strings.membersTitle }, clubSign.ifBlank { "" }.let { if (it.isBlank()) "" else "$it\n\n" }, rec, editable = true))
     }
 
     /** Ricevuta (non fiscale) di un pagamento, in PDF da condividere o stampare. */
@@ -2326,12 +2427,14 @@ class MatchController(
         }.getOrNull()
     }
 
-    fun shareFileIntent(file: File, mime: String): Intent {
+    /** Condivide un file; [text] va con il file (la didascalia su WhatsApp, il testo del post). */
+    fun shareFileIntent(file: File, mime: String, text: String? = null): Intent {
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
             type = mime
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_SUBJECT, file.nameWithoutExtension)
+            text?.let { putExtra(Intent.EXTRA_TEXT, it) }
             clipData = ClipData.newRawUri("", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
