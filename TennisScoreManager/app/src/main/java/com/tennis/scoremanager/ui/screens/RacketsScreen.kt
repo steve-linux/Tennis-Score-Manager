@@ -256,7 +256,7 @@ private fun String.toDoubleOrNullComma(): Double? = trim().replace(',', '.').toD
 private fun Double?.field(lang: Lang): String = this?.let { num(it, lang) } ?: ""
 
 @Composable
-private fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () -> Unit) {
+fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     var name by remember { mutableStateOf(start.name) }

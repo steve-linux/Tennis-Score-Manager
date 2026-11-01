@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -250,6 +251,7 @@ fun PlayerEditDialog(
     var nick by remember { mutableStateOf(player?.nickname ?: if (words.size == 1) words[0] else "") }
     var hand by remember { mutableStateOf(player?.hand) }
     var racket by remember { mutableStateOf(player?.racket) }
+    var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
     val rackets by c.rackets.collectAsState()
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
@@ -304,13 +306,15 @@ fun PlayerEditDialog(
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
-                if (choices.isNotEmpty()) {
-                    Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
-                    Segmented(
-                        listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
-                        (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
-                    )
-                }
+                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (choices.isNotEmpty()) Segmented(
+                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                )
+                // Una racchetta che non c'è ancora si crea da qui, senza passare da Le mie racchette.
+                GhostButton(s.racketNew, androidx.compose.material.icons.Icons.Filled.SportsTennis, {
+                    newRacket = com.tennis.scoremanager.data.Racket(c.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
+                }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -330,6 +334,20 @@ fun PlayerEditDialog(
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
+    newRacket?.let { r ->
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { newRacket = null },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+        ) {
+            androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = TsmColors.Background) {
+                com.tennis.scoremanager.ui.screens.RacketEditor(c, r, isNew = true) {
+                    newRacket = null
+                    // Salvata: è la sua.
+                    if (c.racketById(r.id) != null) racket = r.id
+                }
+            }
+        }
+    }
 }
 
 /** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */

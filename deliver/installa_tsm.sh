@@ -620,7 +620,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Bewegung**: die Messwerte der Analyse (6.4 und 7.5) der letzten analysierten Einheit neben der davor, um zu sehen, was sich ändert.
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
   - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
-  - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
+  - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen. Gibt es den Schläger noch nicht, legt **Neuer Schläger** ihn dort an (mit dem Spieler als Besitzer) und wählt ihn.
   - **Bericht für den Schüler**: *Letzte 30 Tage* oder *Alles* wählen, dann **Vollständiges PDF** (Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, für jeden Schlag einer im Feld und einer daneben mit den drei Bildern der Schlüsselmomente, Matches, Rating und deine Notizen) oder **Bild für WhatsApp** (eine Seite mit den Zahlen der Schläge und dem Treffpunkt eines Schlags). Das Teilen öffnet sich sofort: WhatsApp, E-Mail oder anders. Der Bericht trägt deinen Namen als Trainer (aus *Du*) und den Verein (aus *Verein › Plätze*).
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 
@@ -1113,7 +1113,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Movement**: the analysis measurements (6.4 and 7.5) of the last analysed session next to the one before, to see what changes.
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
   - **Coach's notes**: what to work on, goals; they save by themselves.
-  - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
+  - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches. If the racket isn't there yet, **New racket** creates it from there (with the player as owner) and picks it.
   - **Report for the student**: pick *Last 30 days* or *Everything*, then **Full PDF** (strokes with the percentage in and its trend, movement, for each stroke one shot in and one out with the three key-moment pictures, matches, rating and your notes) or **Image for WhatsApp** (a single page with the stroke numbers and the contact of one shot). Sharing opens straight away: WhatsApp, email or wherever you like. The report carries your name as coach (from *You*) and the club (from *Club › Courts*).
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 
@@ -1605,7 +1605,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Movimiento**: las medidas del análisis (6.4 y 7.5) de la última sesión analizada junto a la anterior, para ver qué cambia.
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
   - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
-  - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
+  - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos. Si la raqueta aún no existe, **Nueva raqueta** la crea desde ahí (con el jugador como dueño) y la elige.
   - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 
@@ -2097,7 +2097,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Mouvement** : les mesures de l'analyse (6.4 et 7.5) de la dernière séance analysée à côté de la précédente, pour voir ce qui change.
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
   - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
-  - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
+  - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs. Si la raquette n'existe pas encore, **Nouvelle raquette** la crée depuis là (avec le joueur comme propriétaire) et la choisit.
   - **Bilan pour l'élève** : choisissez *30 derniers jours* ou *Tout*, puis **PDF complet** (coups avec le pourcentage dedans et son évolution, mouvement, pour chaque coup un dedans et un dehors avec les trois images des moments clés, matchs, classement et vos notes) ou **Image pour WhatsApp** (une seule page avec les chiffres des coups et l'impact d'un coup). Le partage s'ouvre tout de suite : WhatsApp, e-mail ou ailleurs. Le bilan porte votre nom comme entraîneur (depuis *Vous*) et le club (depuis *Club › Terrains*).
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 
@@ -2589,7 +2589,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Movimento**: le misure dell'analisi (6.4 e 7.5) dell'ultima sessione analizzata accanto a quella prima, per vedere cosa cambia.
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
   - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
-  - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
+  - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite. Se la racchetta non c'è ancora, **Nuova racchetta** la crea da lì (con il giocatore come proprietario) e la sceglie.
   - **Report per l'allievo**: scegli *Ultimi 30 giorni* o *Tutto*, poi **PDF completo** (colpi con la percentuale dentro e l'andamento, il movimento, per ogni colpo uno dentro e uno fuori con le tre immagini dei momenti chiave, partite, rating e le tue note) o **Immagine per WhatsApp** (una pagina sola con i numeri dei colpi e l'impatto di un colpo). Si apre subito la condivisione: WhatsApp, email o dove vuoi. Il report porta il tuo nome come allenatore (da *Tu*) e il circolo (da *Circolo › Campi*).
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 
@@ -3081,7 +3081,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Movimento**: as medidas da análise (6.4 e 7.5) da última sessão analisada ao lado da anterior, para ver o que muda.
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
   - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
-  - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele.
+  - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele. Se a raquete ainda não existe, **Nova raquete** cria-a dali (com o jogador como dono) e a escolhe.
   - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 
@@ -23140,6 +23140,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -23375,6 +23376,7 @@ fun PlayerEditDialog(
     var nick by remember { mutableStateOf(player?.nickname ?: if (words.size == 1) words[0] else "") }
     var hand by remember { mutableStateOf(player?.hand) }
     var racket by remember { mutableStateOf(player?.racket) }
+    var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
     val rackets by c.rackets.collectAsState()
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
@@ -23429,13 +23431,15 @@ fun PlayerEditDialog(
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
-                if (choices.isNotEmpty()) {
-                    Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
-                    Segmented(
-                        listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
-                        (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
-                    )
-                }
+                Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
+                if (choices.isNotEmpty()) Segmented(
+                    listOf(SegOption("—")) + choices.map { SegOption(it.label.ifBlank { "?" }) },
+                    (choices.indexOfFirst { it.id == racket } + 1).coerceAtLeast(0), { i -> racket = if (i == 0) null else choices[i - 1].id }, columns = 1,
+                )
+                // Una racchetta che non c'è ancora si crea da qui, senza passare da Le mie racchette.
+                GhostButton(s.racketNew, androidx.compose.material.icons.Icons.Filled.SportsTennis, {
+                    newRacket = com.tennis.scoremanager.data.Racket(c.newRacketId(), owner = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick))
+                }, Modifier.fillMaxWidth())
             }
         },
         confirmButton = {
@@ -23455,6 +23459,20 @@ fun PlayerEditDialog(
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
+    newRacket?.let { r ->
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { newRacket = null },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+        ) {
+            androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = TsmColors.Background) {
+                com.tennis.scoremanager.ui.screens.RacketEditor(c, r, isNew = true) {
+                    newRacket = null
+                    // Salvata: è la sua.
+                    if (c.racketById(r.id) != null) racket = r.id
+                }
+            }
+        }
+    }
 }
 
 /** Sotto "Inizia" le ultime sessioni del colpo scelto; le altre nella pagina di tutte le sessioni. */
@@ -42852,7 +42870,7 @@ private fun String.toDoubleOrNullComma(): Double? = trim().replace(',', '.').toD
 private fun Double?.field(lang: Lang): String = this?.let { num(it, lang) } ?: ""
 
 @Composable
-private fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () -> Unit) {
+fun RacketEditor(c: MatchController, start: Racket, isNew: Boolean, onClose: () -> Unit) {
     val s = LocalStrings.current
     val lang = c.options.collectAsState().value.lang
     var name by remember { mutableStateOf(start.name) }
