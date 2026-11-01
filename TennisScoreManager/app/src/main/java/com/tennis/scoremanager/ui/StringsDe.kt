@@ -1349,6 +1349,11 @@ object DeStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Bezahlt: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "$name löschen?" + if (n > 0) " Auch die $n Buchungen ab heute werden gelöscht." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "Foto" else "Fotos"}" }
+    override val tvGroupsTitle = "Gruppen"
+    override val ctTvShow = "Auf der TV-Anzeigetafel zeigen"
+    override val ctTvHide = "Von der TV-Anzeigetafel nehmen"
+    override val ctTvOff = "TV-Anzeigetafel aus: unter Geräte einschalten"
+    override val tvNoMatches = "Keine Matches angesetzt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

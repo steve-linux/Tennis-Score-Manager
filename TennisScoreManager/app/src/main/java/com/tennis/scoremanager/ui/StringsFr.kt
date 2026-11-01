@@ -1352,6 +1352,11 @@ object FrStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Payé : $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Supprimer $name ?" + if (n > 0) " Les $n réservations à partir d'aujourd'hui sont aussi effacées." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it image${if (it == 1) "" else "s"}" }
+    override val tvGroupsTitle = "Poules"
+    override val ctTvShow = "Afficher sur le tableau TV"
+    override val ctTvHide = "Retirer du tableau TV"
+    override val ctTvOff = "Tableau TV éteint : allumez-le dans Appareils"
+    override val tvNoMatches = "Aucun match programmé"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

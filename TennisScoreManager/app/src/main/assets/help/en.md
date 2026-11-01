@@ -371,6 +371,8 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 
+- **On the TV scoreboard**: with the TV scoreboard on (*Devices*), **Show on the TV scoreboard** in the tournament covers the score with the tournament, in pages that alternate every 15 seconds: **draw** (winners in yellow), **groups** with their standings (those going through highlighted) and today's **order of play** (or the next scheduled matches), with court, time and results. Every result, including those from the scorer, shows at once. **Remove from the TV scoreboard** goes back to the score.
+
 ### 7.14 Notices to participants and members
 
 The app prepares the messages, already written and personal ("Hi Mario, …"), and opens the right app: **you do the sending**, by pressing Send. No outside services or subscriptions: it uses WhatsApp, SMS, email and the phone's sharing.

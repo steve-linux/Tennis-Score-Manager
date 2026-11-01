@@ -104,6 +104,37 @@
   #replay video { width: 100%; height: 100%; object-fit: contain; }
   #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
         background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
+  /* Torneo del circolo: sopra il punteggio (sotto la moviola), pagine che si alternano. */
+  #club { display: none; position: fixed; inset: 0; z-index: 40; background: #05070B; color: #F1F5FB; font-family: sans-serif;
+          padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
+  #club.on { display: flex; }
+  #ch { display: flex; align-items: baseline; gap: calc(2 * var(--vw)); border-bottom: 2px solid var(--line); padding-bottom: calc(1.2 * var(--vh)); }
+  #ct { font: 900 calc(6 * var(--vh)) sans-serif; color: var(--ball); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cs { font: 600 calc(3 * var(--vh)) sans-serif; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  #cp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
+  #cdots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
+  #cb { flex: 1; min-height: 0; display: flex; padding-top: calc(2 * var(--vh)); }
+  /* Tabellone: un turno per colonna; space-around mette ogni partita a metà tra le due da cui viene. */
+  .rnd { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-right: calc(1.2 * var(--vw)); }
+  .rnd h3 { margin: 0 0 calc(.8 * var(--vh)); font: 800 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); text-transform: uppercase; }
+  .rm { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+  .bx { background: #111826; border-radius: calc(.8 * var(--vh)); padding: calc(.5 * var(--vh)) calc(.8 * var(--vw)); margin: calc(.3 * var(--vh)) 0; }
+  .bx div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bx .w { color: var(--ball); font-weight: 800; }
+  .bx .sc { color: var(--dim); }
+  /* Gironi e ordine di gioco: tabelle grandi. */
+  .grps { display: flex; flex-wrap: wrap; gap: calc(2 * var(--vw)); align-content: flex-start; width: 100%; }
+  .grp { flex: 1 1 40%; min-width: 0; }
+  .grp h3 { margin: 0 0 calc(.6 * var(--vh)); font: 800 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); }
+  table.ct { width: 100%; border-collapse: collapse; font-size: calc(3.8 * var(--vh)); align-self: flex-start; }
+  #cb > table.ct { font-size: calc(4.2 * var(--vh)); }
+  table.ct td, table.ct th { padding: calc(.5 * var(--vh)) calc(.6 * var(--vw)); text-align: left; white-space: nowrap; }
+  table.ct th { color: var(--dim); font-weight: 700; font-size: .75em; }
+  table.ct td.n { overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
+  table.ct tr.q td { color: var(--ball); font-weight: 800; }
+  table.ct tr.dn td { color: var(--dim); }
+  table.ct td .w { color: var(--ball); font-weight: 800; }
+  #cempty { font: 700 calc(4 * var(--vh)) sans-serif; color: var(--dim); margin: auto; }
 </style>
 </head>
 <body>
@@ -133,6 +164,7 @@
   </div>
 </div>
 <div id="banner"></div>
+<div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
@@ -373,6 +405,64 @@ function onState(json) {
   recvAt = lastMsg = performance.now();
   render();
   replayUpdate(S.replay);
+  clubUpdate(S.club);
+}
+// ------------------------------------------------------------------ torneo del circolo
+// Le pagine (tabellone, gironi, ordine di gioco) si alternano ogni club.seconds secondi; un torneo nuovo riparte
+// dalla prima. Il testo arriva dall'app: qui solo il disegno (con escape, i nomi li scrive chi usa l'app).
+let clId = "", clPage = 0, clTimer = null;
+function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function clubUpdate(c) {
+  const box = $("club");
+  if (!c || !c.pages || !c.pages.length) {
+    box.classList.remove("on"); clId = ""; if (clTimer) { clearInterval(clTimer); clTimer = null; }
+    return;
+  }
+  if (c.id !== clId) { clId = c.id; clPage = 0; }
+  if (!clTimer) clTimer = setInterval(() => { if (S && S.club) { clPage = (clPage + 1) % S.club.pages.length; clubDraw(S.club); } }, Math.max(5, c.seconds || 15) * 1000);
+  box.classList.add("on");
+  clubDraw(c);
+}
+function clubDraw(c) {
+  clPage = clPage % c.pages.length;
+  const p = c.pages[clPage];
+  setText($("ct"), c.title); setText($("cs"), c.subtitle); setText($("cp"), p.title);
+  $("cdots").textContent = c.pages.length > 1 ? c.pages.map((_, i) => i === clPage ? "●" : "○").join("") : "";
+  const b = $("cb");
+  let h = "";
+  if (p.kind === "draw") {
+    // Con tanti turni si mostrano gli ultimi che stanno nello schermo (al massimo 5 colonne).
+    const rounds = p.rounds.slice(Math.max(0, p.rounds.length - 5));
+    for (const r of rounds) {
+      h += `<div class="rnd"><h3>${esc(r.name)}</h3><div class="rm">`;
+      const fs = Math.max(1.6, Math.min(3.4, 44 / Math.max(1, r.matches.length * 2.6)));
+      for (const m of r.matches) {
+        h += `<div class="bx" style="font-size:calc(${fs.toFixed(2)} * var(--vh))"><div class="${m.win === 0 ? "w" : ""}">${esc(m.a) || "&mdash;"}</div>` +
+             `<div class="${m.win === 1 ? "w" : ""}">${esc(m.b) || "&mdash;"}</div><div class="sc">${esc(m.score) || "&nbsp;"}</div></div>`;
+      }
+      h += `</div></div>`;
+    }
+  } else if (p.kind === "groups") {
+    h += `<div class="grps">`;
+    for (const g of p.groups) {
+      h += `<div class="grp"><h3>${esc(g.name)}</h3><table class="ct"><tr><th></th><th></th><th>${esc(c.labels.won)}</th><th>${esc(c.labels.sets)}</th><th>${esc(c.labels.games)}</th></tr>`;
+      for (const r of g.rows) h += `<tr class="${r.q ? "q" : ""}"><td>${r.pos}.</td><td class="n">${esc(r.name)}</td><td>${r.won}/${r.played}</td><td>${esc(r.sets)}</td><td>${esc(r.games)}</td></tr>`;
+      h += `</table></div>`;
+    }
+    h += `</div>`;
+  } else if (p.kind === "order") {
+    if (!p.rows.length) h = `<div id="cempty">${esc(c.labels.noMatches)}</div>`;
+    else {
+      h += `<table class="ct">`;
+      for (const r of p.rows) {
+        h += `<tr class="${r.done ? "dn" : ""}"><td>${esc(r.time)}</td><td>${esc(r.court)}</td>` +
+             `<td class="n"><span class="${r.win === 0 ? "w" : ""}">${esc(r.a)}</span> – <span class="${r.win === 1 ? "w" : ""}">${esc(r.b)}</span></td>` +
+             `<td>${esc(r.round)}</td><td>${esc(r.score)}</td></tr>`;
+      }
+      h += `</table>`;
+    }
+  }
+  b.innerHTML = h;
 }
 // ------------------------------------------------------------------ moviola
 // L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il
@@ -510,8 +600,23 @@ if (isDemo) {
     long: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["0", "0"], games: [0, 0], sets: [1, 1], done: [{ g1: 6, g2: 4 }, { g1: 6, g2: 7, tb1: 5, tb2: 7 }], tiebreak: "match", message: `Rossi / Bianchi · ${labels.matchTiebreak} · ${demo.changeover}`, countdown: { label: demo.changeover, leftMs: 90000, shot: false } },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
+    // torneo del circolo (&page=0, 1, 2 per fermarsi su una pagina)
+    club: { club: { id: "demo", title: "Torneo sociale", subtitle: "Tennis Club · Singolare", seconds: 15, labels: { won: "V", sets: "Set", games: "Game", noMatches: "—" }, pages: [
+      { kind: "draw", title: "Tabellone", rounds: [
+        { name: "Quarti", matches: [{ a: "Rossi", b: "Bianchi", score: "6-3 6-4", win: 0 }, { a: "Verdi", b: "Neri", score: "4-6 6-3 10-8", win: 1 }, { a: "Gallo", b: "Conti", score: "6-1 6-0", win: 0 }, { a: "Ferri", b: "Riva", score: "w.o.", win: 1 }] },
+        { name: "Semifinali", matches: [{ a: "Rossi", b: "Neri", score: "7-6(5) 6-4", win: 0 }, { a: "Gallo", b: "Riva" }] },
+        { name: "Finale", matches: [{ a: "Rossi", b: "" }] }] },
+      { kind: "groups", title: "Gironi", groups: [
+        { name: "Girone A", rows: [{ pos: 1, name: "Rossi", won: 3, played: 3, sets: "+5", games: "+18", q: true }, { pos: 2, name: "Neri", won: 2, played: 3, sets: "+1", games: "+4", q: true }, { pos: 3, name: "Bianchi", won: 1, played: 3, sets: "-2", games: "-7", q: false }, { pos: 4, name: "Esposito", won: 0, played: 3, sets: "-4", games: "-15", q: false }] },
+        { name: "Girone B", rows: [{ pos: 1, name: "Gallo", won: 3, played: 3, sets: "+6", games: "+20", q: true }, { pos: 2, name: "Riva", won: 2, played: 3, sets: "+2", games: "+3", q: true }, { pos: 3, name: "Conti", won: 1, played: 3, sets: "-3", games: "-9", q: false }, { pos: 4, name: "Ferri", won: 0, played: 3, sets: "-5", games: "-14", q: false }] }] },
+      { kind: "order", title: "Ordine di gioco – sabato 14 novembre", rows: [
+        { time: "09:00", court: "Campo 1", a: "Rossi", b: "Neri", round: "Semifinali", score: "7-6(5) 6-4", done: true, win: 0 },
+        { time: "10:30", court: "Campo 2", a: "Gallo", b: "Riva", round: "Semifinali" },
+        { time: "16:00", court: "Centrale", a: "", b: "", round: "Finale" }] }] } },
   };
   onState(Object.assign({}, base, variants[(m && m[1]) || "play"] || {}));
+  const pg = location.search.match(/[?&]page=(\d)/);
+  if (pg && S.club) { clPage = +pg[1]; clubDraw(S.club); if (clTimer) { clearInterval(clTimer); clTimer = null; } }
   setInterval(() => { lastMsg = performance.now(); }, 1000);
 } else {
   connect();

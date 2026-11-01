@@ -484,6 +484,8 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 
+- **Sur le tableau TV** : avec le tableau TV allumé (*Appareils*), **Afficher sur le tableau TV** dans le tournoi couvre le score avec le tournoi, en pages qui alternent toutes les 15 secondes : **tableau** (vainqueurs en jaune), **poules** avec leur classement (les qualifiés en évidence) et **ordre des matchs** du jour (ou les prochains matchs programmés), avec terrain, heure et résultats. Chaque résultat, même celui du marqueur, s'affiche tout de suite. **Retirer du tableau TV** revient au score.
+
 ### 7.14 Avis aux participants et aux adhérents (app 2.6)
 
 L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, … »), et ouvre la bonne appli : **c'est vous qui envoyez**, en appuyant sur Envoyer. Aucun service extérieur ni abonnement : on utilise WhatsApp, les SMS, l'e-mail et le partage du téléphone.

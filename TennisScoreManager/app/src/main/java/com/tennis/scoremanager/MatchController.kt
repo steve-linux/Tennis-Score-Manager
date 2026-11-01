@@ -246,6 +246,8 @@ class MatchController(
      * del blocco init, che la ascolta per aggiornare il tabellone.
      */
     val tvReplay = MutableStateFlow<TvReplay?>(null)
+    /** Il torneo del circolo mostrato sul tabellone (ClubTournament.id), null = nessuno. */
+    val tvClubTournament = MutableStateFlow<String?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -526,6 +528,7 @@ class MatchController(
                 seq = ++tvSeq,
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
+                club = tvClubSnapshot(),
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -539,6 +542,49 @@ class MatchController(
         tvServer.replayFiles = files
         tvServer.replayId = id
         tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    fun showClubOnTv(id: String?) {
+        tvClubTournament.value = id
+        publishTv()
+    }
+
+    /** Il torneo sul tabellone, rifatto a ogni invio: così i risultati nuovi si vedono subito. */
+    private fun tvClubSnapshot(): com.tennis.scoremanager.tv.TvClub? {
+        val t = clubTournament(tvClubTournament.value) ?: return null
+        val s = strings; val lang = options.value.lang
+        fun n(id: String?) = if (id == null) "" else entryNameOf(t, id)
+        val pages = mutableListOf<com.tennis.scoremanager.tv.TvClubPage>()
+        val groups = com.tennis.scoremanager.data.ClubTournaments.groupMembers(t)
+        if (groups.isNotEmpty()) pages += com.tennis.scoremanager.tv.TvClubPage("groups", s.tvGroupsTitle, groups = groups.indices.map { g ->
+            com.tennis.scoremanager.tv.TvGroup(s.ctGroup(com.tennis.scoremanager.ui.groupLetter(g)), com.tennis.scoremanager.data.ClubTournaments.standings(t, g).mapIndexed { i, st ->
+                com.tennis.scoremanager.tv.TvStanding(i + 1, n(st.entry), st.won, st.played, "%+d".format(st.setsWon - st.setsLost), "%+d".format(st.gamesWon - st.gamesLost), i < t.qualify)
+            })
+        })
+        if (t.rounds > 0) pages += com.tennis.scoremanager.tv.TvClubPage("draw", s.ctTabDraw, rounds = (1..t.rounds).map { r ->
+            val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
+            com.tennis.scoremanager.tv.TvRound(clubRoundName(t, ms.first()), ms.map { m ->
+                val a = if (m.a == null && m.bye) s.ctBye else n(m.a); val b = if (m.b == null && m.bye) s.ctBye else n(m.b)
+                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                com.tennis.scoremanager.tv.TvDrawMatch(a, b, if (m.bye) "" else extra, when (m.winner) { null -> null; m.a -> 0; else -> 1 })
+            })
+        })
+        // Ordine di gioco: le partite di oggi (con l'orario), o se oggi non ce ne sono le prossime in programma.
+        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
+        val scheduled = t.matches.filter { !it.bye && it.at != null && it.a != null && it.b != null }
+        val todays = com.tennis.scoremanager.data.Notices.onDay(scheduled, today)
+        val show = todays.ifEmpty { scheduled.filter { !it.played && it.at!! >= today }.sortedBy { it.at }.take(12) }
+        if (show.isNotEmpty() || t.drawn) pages += com.tennis.scoremanager.tv.TvClubPage(
+            "order", if (todays.isNotEmpty()) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(today, lang)) else s.ntOrderAll(t.name),
+            rows = show.sortedWith(compareBy({ it.at }, { it.court })).map { m ->
+                com.tennis.scoremanager.tv.TvOrderRow(
+                    (if (todays.isEmpty()) com.tennis.scoremanager.data.Notices.day(m.at!!, lang) + " " else "") + com.tennis.scoremanager.data.Reports.time(m.at, lang),
+                    m.court, n(m.a), n(m.b), clubRoundName(t, m), m.score, m.played, when (m.winner) { null -> null; m.a -> 0; else -> 1 },
+                )
+            },
+        )
+        val sub = listOfNotNull(storage.clubName.ifBlank { null }, t.category.ifBlank { null }, t.champion?.let { s.ctChampion(n(it)) }).joinToString(" · ")
+        return com.tennis.scoremanager.tv.TvClub(t.id, t.name, sub, 15, pages, com.tennis.scoremanager.tv.TvClubLabels(s.ctColWon, s.ctColSets, s.ctColGames, s.tvNoMatches))
     }
 
     fun setTvReplaySpeed(speed: Float) {
@@ -1276,6 +1322,8 @@ class MatchController(
     fun saveClubTournament(t: com.tennis.scoremanager.data.ClubTournament) {
         val list = clubTournaments.value.filter { it.id != t.id } + t
         clubTournaments.value = list
+        // Il torneo sul tabellone si aggiorna subito.
+        if (tvClubTournament.value == t.id) publishTv()
         // La quota d'iscrizione è una quota del registro: nome e importo seguono il torneo.
         if (t.feeCents > 0) {
             val book = clubBook.value
@@ -1294,6 +1342,7 @@ class MatchController(
         val t = clubTournament(id) ?: return
         val list = clubTournaments.value.filter { it.id != id }
         clubTournaments.value = list
+        if (tvClubTournament.value == id) showClubOnTv(null)
         t.feeId?.let { f -> dropUnpaidFees(f, null) }
         scope.launch(io) { storage.saveClubTournaments(list) }
     }

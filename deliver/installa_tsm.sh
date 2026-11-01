@@ -695,6 +695,8 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 
+- **Auf der TV-Anzeigetafel**: Bei eingeschalteter TV-Anzeigetafel (*Geräte*) legt **Auf der TV-Anzeigetafel zeigen** im Turnier das Turnier über den Spielstand, in Seiten, die alle 15 Sekunden wechseln: **Tableau** (Sieger gelb), **Gruppen** mit Tabelle (wer weiterkommt, hervorgehoben) und **Spielplan** von heute (oder die nächsten angesetzten Matches) mit Platz, Uhrzeit und Ergebnis. Jedes Ergebnis, auch vom Zähler, erscheint sofort. **Von der TV-Anzeigetafel nehmen** zeigt wieder den Spielstand.
+
 ### 7.14 Nachrichten an Teilnehmer und Mitglieder
 
 Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hallo Mario, …“), und öffnet die passende App: **senden tust du**, mit Senden. Keine externen Dienste oder Abos: es werden WhatsApp, SMS, E-Mail und das Teilen des Telefons genutzt.
@@ -1167,6 +1169,8 @@ With the **Club** role, **Tournaments › Club tournaments** manages **social** 
 - **Draw sheet**: the groups with their standings (wins, set and game difference, then head-to-head; those going through highlighted) and the draw, one round per column (scroll sideways). **Matches**: first those to play by time, then those played.
 - Tap a match: **Play with the scorer** opens New match with players, rankings, tournament, round and court already filled in; when it ends the result goes into the draw by itself. Or enter the result by hand (the app works out the winner from the score), **w/o** or **retired**; then court and time. Correcting a result updates the next round.
 
+- **On the TV scoreboard**: with the TV scoreboard on (*Devices*), **Show on the TV scoreboard** in the tournament covers the score with the tournament, in pages that alternate every 15 seconds: **draw** (winners in yellow), **groups** with their standings (those going through highlighted) and today's **order of play** (or the next scheduled matches), with court, time and results. Every result, including those from the scorer, shows at once. **Remove from the TV scoreboard** goes back to the score.
+
 ### 7.14 Notices to participants and members
 
 The app prepares the messages, already written and personal ("Hi Mario, …"), and opens the right app: **you do the sending**, by pressing Send. No outside services or subscriptions: it uses WhatsApp, SMS, email and the phone's sharing.
@@ -1637,6 +1641,8 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - **Sorteo**: entran solo los inscritos en regla. En el cuadro el cabeza de serie 1 va arriba, el 2 abajo, el 3 y el 4 (y luego 5-8) sorteados entre sus puestos; los **byes** van a los primeros cabezas de serie, que pasan solos. Con grupos: reparto en serpentina por clasificación y todos contra todos; terminados los grupos, **Cuadro final** con los primeros como cabezas de serie y los segundos en la mitad opuesta al primero de su grupo. Mientras no haya resultados, **Repetir el sorteo**.
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
+
+- **En el marcador de la TV**: con el marcador de la TV encendido (*Dispositivos*), **Mostrar en el marcador de la TV** en el torneo cubre el marcador con el torneo, en páginas que se alternan cada 15 segundos: **cuadro** (ganadores en amarillo), **grupos** con su clasificación (destacados quienes pasan) y **orden de juego** de hoy (o los próximos partidos programados), con pista, hora y resultados. Cada resultado, también el del marcador, se ve al momento. **Quitar del marcador de la TV** vuelve al marcador.
 
 ### 7.14 Avisos a participantes y socios
 
@@ -2109,6 +2115,8 @@ Avec le rôle **Club**, **Tournois › Tournois du club** gère les tournois **i
 - **Tableau** : les poules avec leur classement (victoires, différence de manches et de jeux, puis la confrontation directe ; les qualifiés en évidence) et le tableau, un tour par colonne (on fait défiler de côté). **Matchs** : d'abord ceux à jouer par horaire, puis les joués.
 - En touchant un match : **Jouer avec le marqueur** ouvre Nouveau match avec joueurs, classements, tournoi, tour et terrain déjà remplis ; à la fin, le résultat entre tout seul au tableau. Ou bien le résultat à la main (l'appli déduit le vainqueur du score), **forfait** ou **abandon** ; puis terrain et heure. Corriger un résultat met à jour le tour suivant.
 
+- **Sur le tableau TV** : avec le tableau TV allumé (*Appareils*), **Afficher sur le tableau TV** dans le tournoi couvre le score avec le tournoi, en pages qui alternent toutes les 15 secondes : **tableau** (vainqueurs en jaune), **poules** avec leur classement (les qualifiés en évidence) et **ordre des matchs** du jour (ou les prochains matchs programmés), avec terrain, heure et résultats. Chaque résultat, même celui du marqueur, s'affiche tout de suite. **Retirer du tableau TV** revient au score.
+
 ### 7.14 Avis aux participants et aux adhérents
 
 L'appli prépare les messages, déjà écrits et personnels (« Bonjour Mario, … »), et ouvre la bonne appli : **c'est vous qui envoyez**, en appuyant sur Envoyer. Aucun service extérieur ni abonnement : on utilise WhatsApp, les SMS, l'e-mail et le partage du téléphone.
@@ -2579,6 +2587,8 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - **Sorteggio**: entrano solo gli iscritti in regola. Nel tabellone la testa di serie 1 va in cima, la 2 in fondo, la 3 e la 4 (e poi le 5-8) sorteggiate tra i loro posti; i **bye** vanno alle prime teste di serie e passano da soli. Con i gironi: distribuzione a serpentina per classifica e tutti contro tutti; a gironi finiti, **Tabellone finale** con i primi come teste di serie e i secondi nella metà opposta al primo del loro girone. Finché non c'è un risultato, **Rifai il sorteggio**.
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
+
+- **Sul tabellone TV**: con il tabellone TV acceso (*Dispositivi*), nel torneo **Mostra sul tabellone TV** copre il punteggio con il torneo, in pagine che si alternano ogni 15 secondi: **tabellone** (in giallo chi ha vinto), **gironi** con la classifica (in evidenza chi passa) e **ordine di gioco** di oggi (o le prossime partite in programma), con campo, ora e risultati. Ogni risultato, anche quello che arriva dal segnapunti, si vede subito. **Togli dal tabellone TV** torna al punteggio.
 
 ### 7.14 Avvisi ai partecipanti e ai soci
 
@@ -3051,6 +3061,8 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 
+- **No placar da TV**: com o placar da TV ligado (*Dispositivos*), **Mostrar no placar da TV** no torneio cobre o placar com o torneio, em páginas que se alternam a cada 15 segundos: **chave** (vencedores em amarelo), **grupos** com a classificação (em destaque quem passa) e **ordem de jogos** de hoje (ou as próximas partidas programadas), com quadra, hora e resultados. Cada resultado, também o do marcador, aparece na hora. **Tirar do placar da TV** volta ao placar.
+
 ### 7.14 Avisos aos participantes e aos sócios
 
 O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre o app certo: **quem envia é você**, tocando em Enviar. Sem serviços externos nem assinaturas: usam-se WhatsApp, SMS, e-mail e o compartilhamento do telefone.
@@ -3255,6 +3267,37 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   #replay video { width: 100%; height: 100%; object-fit: contain; }
   #rl { position: absolute; top: calc(3 * var(--vh)); left: calc(3 * var(--vw)); padding: .3em .7em; border-radius: .3em;
         background: var(--orange); color: #111; font: 900 calc(4 * var(--vh)) sans-serif; letter-spacing: .08em; }
+  /* Torneo del circolo: sopra il punteggio (sotto la moviola), pagine che si alternano. */
+  #club { display: none; position: fixed; inset: 0; z-index: 40; background: #05070B; color: #F1F5FB; font-family: sans-serif;
+          padding: calc(3 * var(--vh)) calc(3 * var(--vw)); flex-direction: column; overflow: hidden; }
+  #club.on { display: flex; }
+  #ch { display: flex; align-items: baseline; gap: calc(2 * var(--vw)); border-bottom: 2px solid var(--line); padding-bottom: calc(1.2 * var(--vh)); }
+  #ct { font: 900 calc(6 * var(--vh)) sans-serif; color: var(--ball); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #cs { font: 600 calc(3 * var(--vh)) sans-serif; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  #cp { font: 700 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); white-space: nowrap; }
+  #cdots { font: 700 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); letter-spacing: .3em; }
+  #cb { flex: 1; min-height: 0; display: flex; padding-top: calc(2 * var(--vh)); }
+  /* Tabellone: un turno per colonna; space-around mette ogni partita a metà tra le due da cui viene. */
+  .rnd { flex: 1; min-width: 0; display: flex; flex-direction: column; margin-right: calc(1.2 * var(--vw)); }
+  .rnd h3 { margin: 0 0 calc(.8 * var(--vh)); font: 800 calc(2.6 * var(--vh)) sans-serif; color: var(--dim); text-transform: uppercase; }
+  .rm { flex: 1; display: flex; flex-direction: column; justify-content: space-around; }
+  .bx { background: #111826; border-radius: calc(.8 * var(--vh)); padding: calc(.5 * var(--vh)) calc(.8 * var(--vw)); margin: calc(.3 * var(--vh)) 0; }
+  .bx div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bx .w { color: var(--ball); font-weight: 800; }
+  .bx .sc { color: var(--dim); }
+  /* Gironi e ordine di gioco: tabelle grandi. */
+  .grps { display: flex; flex-wrap: wrap; gap: calc(2 * var(--vw)); align-content: flex-start; width: 100%; }
+  .grp { flex: 1 1 40%; min-width: 0; }
+  .grp h3 { margin: 0 0 calc(.6 * var(--vh)); font: 800 calc(3.4 * var(--vh)) sans-serif; color: var(--cyan); }
+  table.ct { width: 100%; border-collapse: collapse; font-size: calc(3.8 * var(--vh)); align-self: flex-start; }
+  #cb > table.ct { font-size: calc(4.2 * var(--vh)); }
+  table.ct td, table.ct th { padding: calc(.5 * var(--vh)) calc(.6 * var(--vw)); text-align: left; white-space: nowrap; }
+  table.ct th { color: var(--dim); font-weight: 700; font-size: .75em; }
+  table.ct td.n { overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
+  table.ct tr.q td { color: var(--ball); font-weight: 800; }
+  table.ct tr.dn td { color: var(--dim); }
+  table.ct td .w { color: var(--ball); font-weight: 800; }
+  #cempty { font: 700 calc(4 * var(--vh)) sans-serif; color: var(--dim); margin: auto; }
 </style>
 </head>
 <body>
@@ -3284,6 +3327,7 @@ cat > "$DEST/app/src/main/assets/scoreboard.html" << 'TSM_EOF'
   </div>
 </div>
 <div id="banner"></div>
+<div id="club"><div id="ch"><div id="ct"></div><div id="cs"></div><div id="cp"></div><div id="cdots"></div></div><div id="cb"></div></div>
 <div id="replay"><video id="rv" muted playsinline></video><div id="rl"></div></div>
 <button id="fs" type="button"></button>
 
@@ -3524,6 +3568,64 @@ function onState(json) {
   recvAt = lastMsg = performance.now();
   render();
   replayUpdate(S.replay);
+  clubUpdate(S.club);
+}
+// ------------------------------------------------------------------ torneo del circolo
+// Le pagine (tabellone, gironi, ordine di gioco) si alternano ogni club.seconds secondi; un torneo nuovo riparte
+// dalla prima. Il testo arriva dall'app: qui solo il disegno (con escape, i nomi li scrive chi usa l'app).
+let clId = "", clPage = 0, clTimer = null;
+function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function clubUpdate(c) {
+  const box = $("club");
+  if (!c || !c.pages || !c.pages.length) {
+    box.classList.remove("on"); clId = ""; if (clTimer) { clearInterval(clTimer); clTimer = null; }
+    return;
+  }
+  if (c.id !== clId) { clId = c.id; clPage = 0; }
+  if (!clTimer) clTimer = setInterval(() => { if (S && S.club) { clPage = (clPage + 1) % S.club.pages.length; clubDraw(S.club); } }, Math.max(5, c.seconds || 15) * 1000);
+  box.classList.add("on");
+  clubDraw(c);
+}
+function clubDraw(c) {
+  clPage = clPage % c.pages.length;
+  const p = c.pages[clPage];
+  setText($("ct"), c.title); setText($("cs"), c.subtitle); setText($("cp"), p.title);
+  $("cdots").textContent = c.pages.length > 1 ? c.pages.map((_, i) => i === clPage ? "●" : "○").join("") : "";
+  const b = $("cb");
+  let h = "";
+  if (p.kind === "draw") {
+    // Con tanti turni si mostrano gli ultimi che stanno nello schermo (al massimo 5 colonne).
+    const rounds = p.rounds.slice(Math.max(0, p.rounds.length - 5));
+    for (const r of rounds) {
+      h += `<div class="rnd"><h3>${esc(r.name)}</h3><div class="rm">`;
+      const fs = Math.max(1.6, Math.min(3.4, 44 / Math.max(1, r.matches.length * 2.6)));
+      for (const m of r.matches) {
+        h += `<div class="bx" style="font-size:calc(${fs.toFixed(2)} * var(--vh))"><div class="${m.win === 0 ? "w" : ""}">${esc(m.a) || "&mdash;"}</div>` +
+             `<div class="${m.win === 1 ? "w" : ""}">${esc(m.b) || "&mdash;"}</div><div class="sc">${esc(m.score) || "&nbsp;"}</div></div>`;
+      }
+      h += `</div></div>`;
+    }
+  } else if (p.kind === "groups") {
+    h += `<div class="grps">`;
+    for (const g of p.groups) {
+      h += `<div class="grp"><h3>${esc(g.name)}</h3><table class="ct"><tr><th></th><th></th><th>${esc(c.labels.won)}</th><th>${esc(c.labels.sets)}</th><th>${esc(c.labels.games)}</th></tr>`;
+      for (const r of g.rows) h += `<tr class="${r.q ? "q" : ""}"><td>${r.pos}.</td><td class="n">${esc(r.name)}</td><td>${r.won}/${r.played}</td><td>${esc(r.sets)}</td><td>${esc(r.games)}</td></tr>`;
+      h += `</table></div>`;
+    }
+    h += `</div>`;
+  } else if (p.kind === "order") {
+    if (!p.rows.length) h = `<div id="cempty">${esc(c.labels.noMatches)}</div>`;
+    else {
+      h += `<table class="ct">`;
+      for (const r of p.rows) {
+        h += `<tr class="${r.done ? "dn" : ""}"><td>${esc(r.time)}</td><td>${esc(r.court)}</td>` +
+             `<td class="n"><span class="${r.win === 0 ? "w" : ""}">${esc(r.a)}</span> – <span class="${r.win === 1 ? "w" : ""}">${esc(r.b)}</span></td>` +
+             `<td>${esc(r.round)}</td><td>${esc(r.score)}</td></tr>`;
+      }
+      h += `</table>`;
+    }
+  }
+  b.innerHTML = h;
 }
 // ------------------------------------------------------------------ moviola
 // L'arbitro manda la moviola: i pezzi /replay/<id>/<n>.mp4 uno dopo l'altro, in loop, alla sua velocità, sopra il
@@ -3661,8 +3763,23 @@ if (isDemo) {
     long: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["0", "0"], games: [0, 0], sets: [1, 1], done: [{ g1: 6, g2: 4 }, { g1: 6, g2: 7, tb1: 5, tb2: 7 }], tiebreak: "match", message: `Rossi / Bianchi · ${labels.matchTiebreak} · ${demo.changeover}`, countdown: { label: demo.changeover, leftMs: 90000, shot: false } },
     idle: { phase: "idle", points: ["", ""], server: null, done: [], sets: [0, 0], clockMs: 0, clockRunning: false, countdown: null },
     doubles: { players: [{ name: "Rossi / Bianchi", color: "#FFD600" }, { name: "Verdi / Esposito", color: "#FF3030" }], points: ["30", "40"], games: [3, 2] },
+    // torneo del circolo (&page=0, 1, 2 per fermarsi su una pagina)
+    club: { club: { id: "demo", title: "Torneo sociale", subtitle: "Tennis Club · Singolare", seconds: 15, labels: { won: "V", sets: "Set", games: "Game", noMatches: "—" }, pages: [
+      { kind: "draw", title: "Tabellone", rounds: [
+        { name: "Quarti", matches: [{ a: "Rossi", b: "Bianchi", score: "6-3 6-4", win: 0 }, { a: "Verdi", b: "Neri", score: "4-6 6-3 10-8", win: 1 }, { a: "Gallo", b: "Conti", score: "6-1 6-0", win: 0 }, { a: "Ferri", b: "Riva", score: "w.o.", win: 1 }] },
+        { name: "Semifinali", matches: [{ a: "Rossi", b: "Neri", score: "7-6(5) 6-4", win: 0 }, { a: "Gallo", b: "Riva" }] },
+        { name: "Finale", matches: [{ a: "Rossi", b: "" }] }] },
+      { kind: "groups", title: "Gironi", groups: [
+        { name: "Girone A", rows: [{ pos: 1, name: "Rossi", won: 3, played: 3, sets: "+5", games: "+18", q: true }, { pos: 2, name: "Neri", won: 2, played: 3, sets: "+1", games: "+4", q: true }, { pos: 3, name: "Bianchi", won: 1, played: 3, sets: "-2", games: "-7", q: false }, { pos: 4, name: "Esposito", won: 0, played: 3, sets: "-4", games: "-15", q: false }] },
+        { name: "Girone B", rows: [{ pos: 1, name: "Gallo", won: 3, played: 3, sets: "+6", games: "+20", q: true }, { pos: 2, name: "Riva", won: 2, played: 3, sets: "+2", games: "+3", q: true }, { pos: 3, name: "Conti", won: 1, played: 3, sets: "-3", games: "-9", q: false }, { pos: 4, name: "Ferri", won: 0, played: 3, sets: "-5", games: "-14", q: false }] }] },
+      { kind: "order", title: "Ordine di gioco – sabato 14 novembre", rows: [
+        { time: "09:00", court: "Campo 1", a: "Rossi", b: "Neri", round: "Semifinali", score: "7-6(5) 6-4", done: true, win: 0 },
+        { time: "10:30", court: "Campo 2", a: "Gallo", b: "Riva", round: "Semifinali" },
+        { time: "16:00", court: "Centrale", a: "", b: "", round: "Finale" }] }] } },
   };
   onState(Object.assign({}, base, variants[(m && m[1]) || "play"] || {}));
+  const pg = location.search.match(/[?&]page=(\d)/);
+  if (pg && S.club) { clPage = +pg[1]; clubDraw(S.club); if (clTimer) { clearInterval(clTimer); clTimer = null; } }
   setInterval(() => { lastMsg = performance.now(); }, 1000);
 } else {
   connect();
@@ -4006,6 +4123,8 @@ class MatchController(
      * del blocco init, che la ascolta per aggiornare il tabellone.
      */
     val tvReplay = MutableStateFlow<TvReplay?>(null)
+    /** Il torneo del circolo mostrato sul tabellone (ClubTournament.id), null = nessuno. */
+    val tvClubTournament = MutableStateFlow<String?>(null)
     /** Storico: partite finite salvate sul telefono, dalla più recente. */
     val history = MutableStateFlow<List<LiveMatch>>(emptyList())
     /** Il riepilogo a schermo è stato aperto dallo storico: in fondo "Indietro" ed "Elimina" invece di nuova partita/esci. */
@@ -4286,6 +4405,7 @@ class MatchController(
                 seq = ++tvSeq,
                 photos = tvPhotos(match?.record?.setup ?: setup.value),
                 replay = tvReplay.value,
+                club = tvClubSnapshot(),
             ),
         )
         tvServer.publish(tvJson.encodeToString(TvSnapshot.serializer(), snap))
@@ -4299,6 +4419,49 @@ class MatchController(
         tvServer.replayFiles = files
         tvServer.replayId = id
         tvReplay.value = TvReplay(id, files.size, speed, strings.replayTitle.uppercase())
+    }
+
+    fun showClubOnTv(id: String?) {
+        tvClubTournament.value = id
+        publishTv()
+    }
+
+    /** Il torneo sul tabellone, rifatto a ogni invio: così i risultati nuovi si vedono subito. */
+    private fun tvClubSnapshot(): com.tennis.scoremanager.tv.TvClub? {
+        val t = clubTournament(tvClubTournament.value) ?: return null
+        val s = strings; val lang = options.value.lang
+        fun n(id: String?) = if (id == null) "" else entryNameOf(t, id)
+        val pages = mutableListOf<com.tennis.scoremanager.tv.TvClubPage>()
+        val groups = com.tennis.scoremanager.data.ClubTournaments.groupMembers(t)
+        if (groups.isNotEmpty()) pages += com.tennis.scoremanager.tv.TvClubPage("groups", s.tvGroupsTitle, groups = groups.indices.map { g ->
+            com.tennis.scoremanager.tv.TvGroup(s.ctGroup(com.tennis.scoremanager.ui.groupLetter(g)), com.tennis.scoremanager.data.ClubTournaments.standings(t, g).mapIndexed { i, st ->
+                com.tennis.scoremanager.tv.TvStanding(i + 1, n(st.entry), st.won, st.played, "%+d".format(st.setsWon - st.setsLost), "%+d".format(st.gamesWon - st.gamesLost), i < t.qualify)
+            })
+        })
+        if (t.rounds > 0) pages += com.tennis.scoremanager.tv.TvClubPage("draw", s.ctTabDraw, rounds = (1..t.rounds).map { r ->
+            val ms = t.matches.filter { it.round == r }.sortedBy { it.slot }
+            com.tennis.scoremanager.tv.TvRound(clubRoundName(t, ms.first()), ms.map { m ->
+                val a = if (m.a == null && m.bye) s.ctBye else n(m.a); val b = if (m.b == null && m.bye) s.ctBye else n(m.b)
+                val extra = listOfNotNull(m.score.ifBlank { null }, s.ctWalkover.takeIf { m.walkover }, s.ctRetired.takeIf { m.retired }).joinToString(" ")
+                com.tennis.scoremanager.tv.TvDrawMatch(a, b, if (m.bye) "" else extra, when (m.winner) { null -> null; m.a -> 0; else -> 1 })
+            })
+        })
+        // Ordine di gioco: le partite di oggi (con l'orario), o se oggi non ce ne sono le prossime in programma.
+        val today = com.tennis.scoremanager.data.CourtPlans.dayStart(System.currentTimeMillis())
+        val scheduled = t.matches.filter { !it.bye && it.at != null && it.a != null && it.b != null }
+        val todays = com.tennis.scoremanager.data.Notices.onDay(scheduled, today)
+        val show = todays.ifEmpty { scheduled.filter { !it.played && it.at!! >= today }.sortedBy { it.at }.take(12) }
+        if (show.isNotEmpty() || t.drawn) pages += com.tennis.scoremanager.tv.TvClubPage(
+            "order", if (todays.isNotEmpty()) s.ntOrderTitle(t.name, com.tennis.scoremanager.data.Notices.day(today, lang)) else s.ntOrderAll(t.name),
+            rows = show.sortedWith(compareBy({ it.at }, { it.court })).map { m ->
+                com.tennis.scoremanager.tv.TvOrderRow(
+                    (if (todays.isEmpty()) com.tennis.scoremanager.data.Notices.day(m.at!!, lang) + " " else "") + com.tennis.scoremanager.data.Reports.time(m.at, lang),
+                    m.court, n(m.a), n(m.b), clubRoundName(t, m), m.score, m.played, when (m.winner) { null -> null; m.a -> 0; else -> 1 },
+                )
+            },
+        )
+        val sub = listOfNotNull(storage.clubName.ifBlank { null }, t.category.ifBlank { null }, t.champion?.let { s.ctChampion(n(it)) }).joinToString(" · ")
+        return com.tennis.scoremanager.tv.TvClub(t.id, t.name, sub, 15, pages, com.tennis.scoremanager.tv.TvClubLabels(s.ctColWon, s.ctColSets, s.ctColGames, s.tvNoMatches))
     }
 
     fun setTvReplaySpeed(speed: Float) {
@@ -5036,6 +5199,8 @@ class MatchController(
     fun saveClubTournament(t: com.tennis.scoremanager.data.ClubTournament) {
         val list = clubTournaments.value.filter { it.id != t.id } + t
         clubTournaments.value = list
+        // Il torneo sul tabellone si aggiorna subito.
+        if (tvClubTournament.value == t.id) publishTv()
         // La quota d'iscrizione è una quota del registro: nome e importo seguono il torneo.
         if (t.feeCents > 0) {
             val book = clubBook.value
@@ -5054,6 +5219,7 @@ class MatchController(
         val t = clubTournament(id) ?: return
         val list = clubTournaments.value.filter { it.id != id }
         clubTournaments.value = list
+        if (tvClubTournament.value == id) showClubOnTv(null)
         t.feeId?.let { f -> dropUnpaidFees(f, null) }
         scope.launch(io) { storage.saveClubTournaments(list) }
     }
@@ -18760,7 +18926,46 @@ data class TvSnapshot(
     val labels: TvLabels,
     /** Moviola mandata al tabellone dall'arbitro (null = niente): copre il punteggio finché non la si toglie. */
     val replay: TvReplay? = null,
+    /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
+    val club: TvClub? = null,
 )
+
+/**
+ * Il torneo sul tabellone: [pages] che si alternano ogni [seconds] secondi (tabellone, gironi, ordine di gioco).
+ * [id] cambia quando si manda un altro torneo, così la pagina riparte dalla prima.
+ */
+@Serializable
+data class TvClub(val id: String, val title: String, val subtitle: String, val seconds: Int, val pages: List<TvClubPage>, val labels: TvClubLabels)
+
+/** Una pagina: "draw" ([rounds]), "groups" ([groups]) o "order" ([rows]). */
+@Serializable
+data class TvClubPage(
+    val kind: String,
+    val title: String,
+    val rounds: List<TvRound> = emptyList(),
+    val groups: List<TvGroup> = emptyList(),
+    val rows: List<TvOrderRow> = emptyList(),
+)
+
+@Serializable
+data class TvRound(val name: String, val matches: List<TvDrawMatch>)
+
+/** [win] = 0 (vince a), 1 (vince b), null = da giocare. */
+@Serializable
+data class TvDrawMatch(val a: String, val b: String, val score: String = "", val win: Int? = null)
+
+@Serializable
+data class TvGroup(val name: String, val rows: List<TvStanding>)
+
+@Serializable
+data class TvStanding(val pos: Int, val name: String, val won: Int, val played: Int, val sets: String, val games: String, val q: Boolean)
+
+/** Una riga dell'ordine di gioco: ora, campo, i due, turno, punteggio; [done] = giocata. */
+@Serializable
+data class TvOrderRow(val time: String, val court: String, val a: String, val b: String, val round: String, val score: String = "", val done: Boolean = false, val win: Int? = null)
+
+@Serializable
+data class TvClubLabels(val won: String, val sets: String, val games: String, val noMatches: String)
 
 /**
  * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
@@ -18834,6 +19039,7 @@ data class TvInput(
     /** Indirizzi delle foto dei giocatori di ogni lato. */
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
+    val club: TvClub? = null,
 )
 
 object TvSnapshots {
@@ -18907,6 +19113,7 @@ object TvSnapshots {
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
             labels = labels(s),
             replay = i.replay,
+            club = i.club,
         )
     }
 
@@ -24193,6 +24400,11 @@ interface Strings {
     val bkPaidWith: (String) -> String
     val crtDeleteAsk: (String, Int) -> String
     val crtPhotosCount: (Int) -> String
+    val tvGroupsTitle: String
+    val ctTvShow: String
+    val ctTvHide: String
+    val ctTvOff: String
+    val tvNoMatches: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -25840,6 +26052,11 @@ object ItStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pagato: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Eliminare $name?" + if (n > 0) " Si cancellano anche le $n prenotazioni da oggi in poi." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it foto" }
+    override val tvGroupsTitle = "Gironi"
+    override val ctTvShow = "Mostra sul tabellone TV"
+    override val ctTvHide = "Togli dal tabellone TV"
+    override val ctTvOff = "Tabellone TV spento: accendilo in Dispositivi"
+    override val tvNoMatches = "Nessuna partita in programma"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -27470,6 +27687,11 @@ object EnStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Paid: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Delete $name?" + if (n > 0) " The $n bookings from today on are deleted too." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "photo" else "photos"}" }
+    override val tvGroupsTitle = "Groups"
+    override val ctTvShow = "Show on the TV scoreboard"
+    override val ctTvHide = "Remove from the TV scoreboard"
+    override val ctTvOff = "TV scoreboard off: turn it on in Devices"
+    override val tvNoMatches = "No matches scheduled"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -29123,6 +29345,11 @@ object DeStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Bezahlt: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "$name löschen?" + if (n > 0) " Auch die $n Buchungen ab heute werden gelöscht." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "Foto" else "Fotos"}" }
+    override val tvGroupsTitle = "Gruppen"
+    override val ctTvShow = "Auf der TV-Anzeigetafel zeigen"
+    override val ctTvHide = "Von der TV-Anzeigetafel nehmen"
+    override val ctTvOff = "TV-Anzeigetafel aus: unter Geräte einschalten"
+    override val tvNoMatches = "Keine Matches angesetzt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -30769,6 +30996,11 @@ object EsStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pagado: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "¿Eliminar $name?" + if (n > 0) " También se borran las $n reservas desde hoy." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
+    override val tvGroupsTitle = "Grupos"
+    override val ctTvShow = "Mostrar en el marcador de la TV"
+    override val ctTvHide = "Quitar del marcador de la TV"
+    override val ctTvOff = "Marcador de la TV apagado: enciéndelo en Dispositivos"
+    override val tvNoMatches = "Ningún partido programado"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -32417,6 +32649,11 @@ object FrStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Payé : $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Supprimer $name ?" + if (n > 0) " Les $n réservations à partir d'aujourd'hui sont aussi effacées." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it image${if (it == 1) "" else "s"}" }
+    override val tvGroupsTitle = "Poules"
+    override val ctTvShow = "Afficher sur le tableau TV"
+    override val ctTvHide = "Retirer du tableau TV"
+    override val ctTvOff = "Tableau TV éteint : allumez-le dans Appareils"
+    override val tvNoMatches = "Aucun match programmé"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -34066,6 +34303,11 @@ object PtStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pago: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Excluir $name?" + if (n > 0) " As $n reservas a partir de hoje também são apagadas." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
+    override val tvGroupsTitle = "Grupos"
+    override val ctTvShow = "Mostrar no placar da TV"
+    override val ctTvHide = "Tirar do placar da TV"
+    override val ctTvOff = "Placar da TV desligado: ligue em Dispositivos"
+    override val tvNoMatches = "Nenhuma partida programada"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -34674,6 +34916,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34816,6 +35059,14 @@ fun ClubTournamentScreen(c: MatchController) {
         t.champion?.let { ch -> Text(s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
         Segmented(listOf(SegOption(s.ctTabEntries), SegOption(s.ctTabDraw), SegOption(s.ctTabMatches)), tab, { tab = it })
         if (t.entries.isNotEmpty()) GhostButton(s.ntButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
+        // Sul tabellone TV: tabellone, gironi e ordine di gioco che si alternano, aggiornati a ogni risultato.
+        if (t.drawn) {
+            val onTv by c.tvClubTournament.collectAsState()
+            val tvRunning by c.tvServer.running.collectAsState()
+            if (onTv == t.id) GhostButton(s.ctTvHide, Icons.Filled.Tv, { c.showClubOnTv(null) }, Modifier.fillMaxWidth())
+            else if (tvRunning) GhostButton(s.ctTvShow, Icons.Filled.Tv, { c.showClubOnTv(t.id) }, Modifier.fillMaxWidth())
+            else GhostButton(s.ctTvOff, Icons.Filled.Tv, { c.go(com.tennis.scoremanager.Screen.DEVICES) }, Modifier.fillMaxWidth())
+        }
         when (tab) {
             0 -> EntriesTab(c, t, players, book, now, onAdd = { adding = true }, onOpen = { openEntry = it })
             1 -> DrawTab(c, t) { openMatch = it }

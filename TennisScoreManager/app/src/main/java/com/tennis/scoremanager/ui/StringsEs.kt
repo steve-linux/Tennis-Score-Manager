@@ -1350,6 +1350,11 @@ object EsStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pagado: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "¿Eliminar $name?" + if (n > 0) " También se borran las $n reservas desde hoy." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
+    override val tvGroupsTitle = "Grupos"
+    override val ctTvShow = "Mostrar en el marcador de la TV"
+    override val ctTvHide = "Quitar del marcador de la TV"
+    override val ctTvOff = "Marcador de la TV apagado: enciéndelo en Dispositivos"
+    override val tvNoMatches = "Ningún partido programado"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

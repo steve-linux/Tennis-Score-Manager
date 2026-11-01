@@ -371,6 +371,8 @@ Com o papel **Clube**, em **Torneios › Torneios do clube** se gerenciam os tor
 - **Chave**: os grupos com a classificação (vitórias, saldo de sets e games, depois o confronto direto; em destaque quem passa) e a chave, uma rodada por coluna (rola para o lado). **Partidas**: primeiro as a jogar por horário, depois as jogadas.
 - Tocando numa partida: **Jogar com o marcador** abre Nova partida com jogadores, rankings, torneio, rodada e quadra já preenchidos; no fim, o resultado entra sozinho na chave. Ou o resultado à mão (o app entende o vencedor pelo placar), **W.O.** ou **desistência**; depois quadra e hora. Corrigindo um resultado, a rodada seguinte se atualiza.
 
+- **No placar da TV**: com o placar da TV ligado (*Dispositivos*), **Mostrar no placar da TV** no torneio cobre o placar com o torneio, em páginas que se alternam a cada 15 segundos: **chave** (vencedores em amarelo), **grupos** com a classificação (em destaque quem passa) e **ordem de jogos** de hoje (ou as próximas partidas programadas), com quadra, hora e resultados. Cada resultado, também o do marcador, aparece na hora. **Tirar do placar da TV** volta ao placar.
+
 ### 7.14 Avisos aos participantes e aos sócios
 
 O app prepara as mensagens, já escritas e pessoais ("Olá Mario, …"), e abre o app certo: **quem envia é você**, tocando em Enviar. Sem serviços externos nem assinaturas: usam-se WhatsApp, SMS, e-mail e o compartilhamento do telefone.

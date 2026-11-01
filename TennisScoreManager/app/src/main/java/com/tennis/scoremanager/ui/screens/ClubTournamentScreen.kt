@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -174,6 +175,14 @@ fun ClubTournamentScreen(c: MatchController) {
         t.champion?.let { ch -> Text(s.ctChampion(entryName(c, t.entries.firstOrNull { it.id == ch })), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
         Segmented(listOf(SegOption(s.ctTabEntries), SegOption(s.ctTabDraw), SegOption(s.ctTabMatches)), tab, { tab = it })
         if (t.entries.isNotEmpty()) GhostButton(s.ntButton, Icons.Filled.Campaign, { notify = true }, Modifier.fillMaxWidth())
+        // Sul tabellone TV: tabellone, gironi e ordine di gioco che si alternano, aggiornati a ogni risultato.
+        if (t.drawn) {
+            val onTv by c.tvClubTournament.collectAsState()
+            val tvRunning by c.tvServer.running.collectAsState()
+            if (onTv == t.id) GhostButton(s.ctTvHide, Icons.Filled.Tv, { c.showClubOnTv(null) }, Modifier.fillMaxWidth())
+            else if (tvRunning) GhostButton(s.ctTvShow, Icons.Filled.Tv, { c.showClubOnTv(t.id) }, Modifier.fillMaxWidth())
+            else GhostButton(s.ctTvOff, Icons.Filled.Tv, { c.go(com.tennis.scoremanager.Screen.DEVICES) }, Modifier.fillMaxWidth())
+        }
         when (tab) {
             0 -> EntriesTab(c, t, players, book, now, onAdd = { adding = true }, onOpen = { openEntry = it })
             1 -> DrawTab(c, t) { openMatch = it }

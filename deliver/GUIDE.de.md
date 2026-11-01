@@ -484,6 +484,8 @@ Mit der Rolle **Verein** werden unter **Turniere › Vereinsturniere** **interne
 - **Tableau**: die Gruppen mit Tabelle (Siege, Satz- und Spieldifferenz, dann direkter Vergleich; wer weiterkommt, hervorgehoben) und das Tableau, eine Runde pro Spalte (seitlich scrollen). **Matches**: zuerst die offenen nach Uhrzeit, dann die gespielten.
 - Ein Match antippen: **Mit dem Zähler spielen** öffnet Neues Match mit Spielern, Ranglisten, Turnier, Runde und Platz schon ausgefüllt; am Ende kommt das Ergebnis von selbst ins Tableau. Oder das Ergebnis von Hand (die App erkennt den Sieger am Ergebnis), **kampflos** oder **Aufgabe**; dann Platz und Uhrzeit. Wird ein Ergebnis korrigiert, aktualisiert sich die nächste Runde.
 
+- **Auf der TV-Anzeigetafel**: Bei eingeschalteter TV-Anzeigetafel (*Geräte*) legt **Auf der TV-Anzeigetafel zeigen** im Turnier das Turnier über den Spielstand, in Seiten, die alle 15 Sekunden wechseln: **Tableau** (Sieger gelb), **Gruppen** mit Tabelle (wer weiterkommt, hervorgehoben) und **Spielplan** von heute (oder die nächsten angesetzten Matches) mit Platz, Uhrzeit und Ergebnis. Jedes Ergebnis, auch vom Zähler, erscheint sofort. **Von der TV-Anzeigetafel nehmen** zeigt wieder den Spielstand.
+
 ### 7.14 Nachrichten an Teilnehmer und Mitglieder (app 2.6)
 
 Die App bereitet die Nachrichten vor, fertig formuliert und persönlich („Hallo Mario, …“), und öffnet die passende App: **senden tust du**, mit Senden. Keine externen Dienste oder Abos: es werden WhatsApp, SMS, E-Mail und das Teilen des Telefons genutzt.

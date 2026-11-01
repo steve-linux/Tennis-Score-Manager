@@ -484,6 +484,8 @@ Col ruolo **Circolo**, in **Tornei › Tornei del circolo** si gestiscono i torn
 - **Tabellone**: i gironi con la classifica (vittorie, differenza set e game, poi lo scontro diretto; in evidenza chi passa) e il tabellone, un turno per colonna (si scorre di lato). **Partite**: prima quelle da giocare in ordine di orario, poi le giocate.
 - Toccando una partita: **Gioca col segnapunti** apre Nuova partita con giocatori, classifiche, torneo, turno e campo già scritti; a partita finita il risultato entra da solo nel tabellone. Oppure il risultato a mano (dal punteggio l'app capisce chi ha vinto), **w.o.** o **ritiro**; poi campo e orario. Correggendo un risultato, il turno dopo si aggiorna.
 
+- **Sul tabellone TV**: con il tabellone TV acceso (*Dispositivi*), nel torneo **Mostra sul tabellone TV** copre il punteggio con il torneo, in pagine che si alternano ogni 15 secondi: **tabellone** (in giallo chi ha vinto), **gironi** con la classifica (in evidenza chi passa) e **ordine di gioco** di oggi (o le prossime partite in programma), con campo, ora e risultati. Ogni risultato, anche quello che arriva dal segnapunti, si vede subito. **Togli dal tabellone TV** torna al punteggio.
+
 ### 7.14 Avvisi ai partecipanti e ai soci (app 2.6)
 
 L'app prepara i messaggi, già scritti e personali ("Ciao Mario, …"), e apre l'app giusta: **l'invio lo fai tu**, premendo Invia. Niente servizi esterni né abbonamenti: si usano WhatsApp, SMS, email e la condivisione del telefono.

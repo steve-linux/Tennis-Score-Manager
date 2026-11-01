@@ -1388,6 +1388,11 @@ interface Strings {
     val bkPaidWith: (String) -> String
     val crtDeleteAsk: (String, Int) -> String
     val crtPhotosCount: (Int) -> String
+    val tvGroupsTitle: String
+    val ctTvShow: String
+    val ctTvHide: String
+    val ctTvOff: String
+    val tvNoMatches: String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3035,6 +3040,11 @@ object ItStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pagato: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Eliminare $name?" + if (n > 0) " Si cancellano anche le $n prenotazioni da oggi in poi." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it foto" }
+    override val tvGroupsTitle = "Gironi"
+    override val ctTvShow = "Mostra sul tabellone TV"
+    override val ctTvHide = "Togli dal tabellone TV"
+    override val ctTvOff = "Tabellone TV spento: accendilo in Dispositivi"
+    override val tvNoMatches = "Nessuna partita in programma"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -4665,6 +4675,11 @@ object EnStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Paid: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Delete $name?" + if (n > 0) " The $n bookings from today on are deleted too." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "photo" else "photos"}" }
+    override val tvGroupsTitle = "Groups"
+    override val ctTvShow = "Show on the TV scoreboard"
+    override val ctTvHide = "Remove from the TV scoreboard"
+    override val ctTvOff = "TV scoreboard off: turn it on in Devices"
+    override val tvNoMatches = "No matches scheduled"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

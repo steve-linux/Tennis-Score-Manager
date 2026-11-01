@@ -1353,6 +1353,11 @@ object PtStrings : Strings {
     override val bkPaidWith: (String) -> String = { "Pago: $it" }
     override val crtDeleteAsk: (String, Int) -> String = { name, n -> "Excluir $name?" + if (n > 0) " As $n reservas a partir de hoje também são apagadas." else "" }
     override val crtPhotosCount: (Int) -> String = { "$it ${if (it == 1) "foto" else "fotos"}" }
+    override val tvGroupsTitle = "Grupos"
+    override val ctTvShow = "Mostrar no placar da TV"
+    override val ctTvHide = "Tirar do placar da TV"
+    override val ctTvOff = "Placar da TV desligado: ligue em Dispositivos"
+    override val tvNoMatches = "Nenhuma partida programada"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

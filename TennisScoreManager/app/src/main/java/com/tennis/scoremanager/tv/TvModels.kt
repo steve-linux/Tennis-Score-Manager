@@ -75,7 +75,46 @@ data class TvSnapshot(
     val labels: TvLabels,
     /** Moviola mandata al tabellone dall'arbitro (null = niente): copre il punteggio finché non la si toglie. */
     val replay: TvReplay? = null,
+    /** Torneo del circolo mandato al tabellone (null = niente): pagine che girano da sole sopra il punteggio. */
+    val club: TvClub? = null,
 )
+
+/**
+ * Il torneo sul tabellone: [pages] che si alternano ogni [seconds] secondi (tabellone, gironi, ordine di gioco).
+ * [id] cambia quando si manda un altro torneo, così la pagina riparte dalla prima.
+ */
+@Serializable
+data class TvClub(val id: String, val title: String, val subtitle: String, val seconds: Int, val pages: List<TvClubPage>, val labels: TvClubLabels)
+
+/** Una pagina: "draw" ([rounds]), "groups" ([groups]) o "order" ([rows]). */
+@Serializable
+data class TvClubPage(
+    val kind: String,
+    val title: String,
+    val rounds: List<TvRound> = emptyList(),
+    val groups: List<TvGroup> = emptyList(),
+    val rows: List<TvOrderRow> = emptyList(),
+)
+
+@Serializable
+data class TvRound(val name: String, val matches: List<TvDrawMatch>)
+
+/** [win] = 0 (vince a), 1 (vince b), null = da giocare. */
+@Serializable
+data class TvDrawMatch(val a: String, val b: String, val score: String = "", val win: Int? = null)
+
+@Serializable
+data class TvGroup(val name: String, val rows: List<TvStanding>)
+
+@Serializable
+data class TvStanding(val pos: Int, val name: String, val won: Int, val played: Int, val sets: String, val games: String, val q: Boolean)
+
+/** Una riga dell'ordine di gioco: ora, campo, i due, turno, punteggio; [done] = giocata. */
+@Serializable
+data class TvOrderRow(val time: String, val court: String, val a: String, val b: String, val round: String, val score: String = "", val done: Boolean = false, val win: Int? = null)
+
+@Serializable
+data class TvClubLabels(val won: String, val sets: String, val games: String, val noMatches: String)
 
 /**
  * Moviola sul tabellone: i pezzi /replay/[id]/0.mp4 ... ([parts]), in loop, a [speed] (1, 0,5, 0,25), con la scritta
@@ -149,6 +188,7 @@ data class TvInput(
     /** Indirizzi delle foto dei giocatori di ogni lato. */
     val photos: Map<Side, List<String>> = emptyMap(),
     val replay: TvReplay? = null,
+    val club: TvClub? = null,
 )
 
 object TvSnapshots {
@@ -222,6 +262,7 @@ object TvSnapshots {
             show = TvShow(i.tv.showClock, i.tv.showTimers, i.tv.showSets, i.tv.showMessages, i.tv.showServe, i.tv.ghostSegments),
             labels = labels(s),
             replay = i.replay,
+            club = i.club,
         )
     }
 

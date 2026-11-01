@@ -484,6 +484,8 @@ Con el rol **Club**, en **Torneos › Torneos del club** se gestionan los torneo
 - **Cuadro**: los grupos con su clasificación (victorias, diferencia de sets y juegos, luego el enfrentamiento directo; destacados quienes pasan) y el cuadro, una ronda por columna (se desliza de lado). **Partidos**: primero los por jugar por horario, luego los jugados.
 - Tocando un partido: **Jugar con el marcador** abre Nuevo partido con jugadores, clasificaciones, torneo, ronda y pista ya escritos; al terminar, el resultado entra solo en el cuadro. O el resultado a mano (la app deduce el ganador del marcador), **w.o.** o **retirada**; luego pista y hora. Al corregir un resultado, la ronda siguiente se actualiza.
 
+- **En el marcador de la TV**: con el marcador de la TV encendido (*Dispositivos*), **Mostrar en el marcador de la TV** en el torneo cubre el marcador con el torneo, en páginas que se alternan cada 15 segundos: **cuadro** (ganadores en amarillo), **grupos** con su clasificación (destacados quienes pasan) y **orden de juego** de hoy (o los próximos partidos programados), con pista, hora y resultados. Cada resultado, también el del marcador, se ve al momento. **Quitar del marcador de la TV** vuelve al marcador.
+
 ### 7.14 Avisos a participantes y socios (app 2.6)
 
 La app prepara los mensajes, ya escritos y personales («Hola Mario, …»), y abre la app adecuada: **el envío lo haces tú**, pulsando Enviar. Sin servicios externos ni suscripciones: se usan WhatsApp, SMS, correo y el compartir del teléfono.
