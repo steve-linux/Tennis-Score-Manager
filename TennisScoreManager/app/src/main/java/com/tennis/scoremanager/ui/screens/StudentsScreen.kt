@@ -171,6 +171,16 @@ fun StudentScreen(c: MatchController) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
         ChargesSection(c, st)
+        // I corsi della scuola tennis che frequenta.
+        val courses by c.courses.collectAsState()
+        val mineC = courses.filter { co -> co.students.any { it == st.id || it in st.aliases } }
+        if (mineC.isNotEmpty()) SectionCard(s.scTitle, Icons.Filled.School) {
+            for (co in mineC) {
+                val (pres, tot) = com.tennis.scoremanager.data.Courses.attendanceOf(co, st.id, System.currentTimeMillis())
+                Text(co.name + if (tot > 0) " · " + s.scAttendance(pres, tot) else "", color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth().clickable { c.openCourse(co.id) }.padding(vertical = 6.dp))
+            }
+        }
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
             if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
             c.savePlayer(st.copy(student = on))

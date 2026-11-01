@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -706,6 +706,8 @@ class MatchController(
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
+            Screen.SCHOOL -> Screen.HOME
+            Screen.COURSE -> Screen.SCHOOL
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1232,7 +1234,7 @@ class MatchController(
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN) } ?: Screen.STUDENTS
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -1446,6 +1448,77 @@ class MatchController(
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
         }
+    }
+
+    // ---- Scuola tennis ----
+
+    val courses = MutableStateFlow(storage.loadCourses())
+    val openCourseId = MutableStateFlow<String?>(null)
+
+    fun openSchool() {
+        refreshPlayers()
+        screen.value = Screen.SCHOOL
+    }
+
+    fun openCourse(id: String) {
+        openCourseId.value = id
+        screen.value = Screen.COURSE
+    }
+
+    fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
+
+    /** Salva il corso e rifà i suoi periodi non prenotabili nel planning (uno per orario). */
+    fun saveCourse(c: com.tennis.scoremanager.data.Course) {
+        val list = courses.value.filter { it.id != c.id } + c
+        courses.value = list
+        scope.launch(io) { storage.saveCourses(list) }
+        val p = courtPlan.value
+        val np = p.copy(blocks = p.blocks.filter { it.course != c.id } + com.tennis.scoremanager.data.Courses.blocks(c))
+        if (np != p) {
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
+    }
+
+    /** Toglie il corso e i suoi periodi non prenotabili; le quote già addebitate restano nel registro. */
+    fun deleteCourse(id: String) {
+        val list = courses.value.filter { it.id != id }
+        courses.value = list
+        scope.launch(io) { storage.saveCourses(list) }
+        val p = courtPlan.value.let { it.copy(blocks = it.blocks.filter { b -> b.course != id }) }
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    /** I corsi di un giocatore (come allievo). */
+    fun coursesOf(p: com.tennis.scoremanager.data.PlayerProfile): List<com.tennis.scoremanager.data.Course> {
+        val keys = setOf(p.id) + p.aliases
+        return courses.value.filter { c -> c.students.any { it in keys } }
+    }
+
+    /** "SAT Under 10 · novembre 2026" o "SAT Under 10 · stagione": la voce della quota nel registro. */
+    fun courseFeeLabel(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): String {
+        if (month == null) return "${c.name} · ${strings.scSeason}"
+        val cal = java.util.Calendar.getInstance().apply { set(month.first, month.second, 1) }
+        return "${c.name} · " + java.text.SimpleDateFormat("LLLL yyyy", options.value.lang.locale).format(cal.time)
+    }
+
+    /** Addebita la quota del mese (o della stagione) a chi non l'ha ancora; restituisce quanti addebiti nuovi. */
+    fun chargeCourse(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): Int {
+        val due = month?.let { (y, m) -> java.util.Calendar.getInstance().apply { set(y, m, 10, 12, 0, 0) }.timeInMillis } ?: c.from
+        val (book, n) = com.tennis.scoremanager.data.Courses.charge(clubBook.value, c, players.value, courseFeeLabel(c, month), System.currentTimeMillis(), due)
+        if (n > 0) saveClubBook(book)
+        return n
+    }
+
+    /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val people = c.students.mapNotNull { playerById(it) }
+        val text = if (lesson != null) (listOf(s.scCancelledNotice(c.name), com.tennis.scoremanager.data.Notices.day(lesson.start, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lesson.start, lang) + listOf(lesson.court).filter { it.isNotBlank() }.joinToString { " · $it" })
+            + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n") else "${c.name}\n\n"
+        val rec = people.map { com.tennis.scoremanager.data.Notices.recipient(it, if (lesson != null) text else "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (lesson != null) s.scCancelledTitle else s.ntKindFree, c.name, text, rec, editable = lesson == null))
     }
 
     // ---- Planning dei campi ----

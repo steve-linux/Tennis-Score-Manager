@@ -506,6 +506,15 @@ Mit der Rolle **Verein**, im Reiter **Plätze**.
 - **Zeiten und Preise**: Öffnung und Schließung, Länge eines Feldes (30, 60, 90 Minuten), allgemeiner Preis pro Stunde und mit Licht, ab wann Licht nötig ist, wie lange ein Turniermatch in der Belegung dauert.
 - **Zahlungsarten** (unter *Beiträge und Zahlungen*): legt die Vereinsverwaltung fest. Vorgegeben sind bar, Karte, Überweisung und Satispay; weitere lassen sich hinzufügen (PayPal, Revolut, Bancomat Pay, ein SumUp-Link…): Name, Link/IBAN/Nummer und ob es eine Fernzahlung ist. Man wählt eine beim Erfassen einer Zahlung (der Name steht auf Quittung und CSV); Fernzahlungen mit ihren Angaben stehen in Nachrichten und Erinnerungen. Die App kassiert nicht: sie erfasst und verschickt die Hinweise.
 
+### 7.16 Tennisschule (app 2.6)
+
+Mit der Rolle **Verein**, unter **Spieler › Tennisschule**.
+
+- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung.
+- **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
+- **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
+- **Beiträge**: Für jeden Monat der Saison (oder die Saison) gibt **Den Schülern berechnen** den Beitrag allen, die ihn noch nicht haben; man sieht, wie viele bezahlt haben, und kassiert wie bei den anderen Beiträgen, mit Quittung.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

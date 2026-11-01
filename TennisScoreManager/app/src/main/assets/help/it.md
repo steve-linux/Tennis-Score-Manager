@@ -393,6 +393,15 @@ Col ruolo **Circolo**, nella scheda **Campi**.
 - **Orari e prezzi**: apertura e chiusura, durata di una casella (30, 60, 90 minuti), prezzo all'ora generale e con le luci, da che ora servono le luci, quanto dura nel planning una partita di torneo.
 - **Modi di pagamento** (in *Quote e pagamenti*): li decide chi gestisce il circolo. Si parte da contanti, POS, bonifico e Satispay e se ne aggiungono altri (PayPal, Revolut, Bancomat Pay, un link SumUp…): nome, link/IBAN/numero e se si paga a distanza. Si scelgono quando si registra un pagamento (il nome va su ricevute e CSV); quelli a distanza, con i loro dettagli, vanno negli avvisi e nei solleciti. L'app non incassa: registra e manda le istruzioni.
 
+### 7.16 Scuola tennis
+
+Col ruolo **Circolo**, in **Giocatori › Scuola tennis**.
+
+- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna.
+- **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
+- **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
+- **Quote**: per ogni mese della stagione (o per la stagione) **Addebita agli allievi** mette la quota a chi non l'ha ancora; si vede quanti hanno pagato e si incassa come le altre quote, con la ricevuta.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

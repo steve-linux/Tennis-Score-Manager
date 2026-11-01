@@ -717,6 +717,15 @@ Mit der Rolle **Verein**, im Reiter **Plätze**.
 - **Zeiten und Preise**: Öffnung und Schließung, Länge eines Feldes (30, 60, 90 Minuten), allgemeiner Preis pro Stunde und mit Licht, ab wann Licht nötig ist, wie lange ein Turniermatch in der Belegung dauert.
 - **Zahlungsarten** (unter *Beiträge und Zahlungen*): legt die Vereinsverwaltung fest. Vorgegeben sind bar, Karte, Überweisung und Satispay; weitere lassen sich hinzufügen (PayPal, Revolut, Bancomat Pay, ein SumUp-Link…): Name, Link/IBAN/Nummer und ob es eine Fernzahlung ist. Man wählt eine beim Erfassen einer Zahlung (der Name steht auf Quittung und CSV); Fernzahlungen mit ihren Angaben stehen in Nachrichten und Erinnerungen. Die App kassiert nicht: sie erfasst und verschickt die Hinweise.
 
+### 7.16 Tennisschule
+
+Mit der Rolle **Verein**, unter **Spieler › Tennisschule**.
+
+- **Neuer Kurs**: Name (z. B. *Kinder U10 · Gruppe A*), Niveau, Trainer (aus der Datenbank oder geschrieben), Saison (von… bis…), wöchentliche **Zeiten** (Tag, Uhrzeit, Dauer, Platz; auch mehrere), höchstens Plätze, **Beitrag** pro Monat oder für die Saison, Notizen. Bei Zeiten mit Platz wird **dieser Platz** in der Belegung die ganze Saison **nicht buchbar** (Kursstunden schon); Ändern oder Löschen des Kurses aktualisiert die Belegung.
+- **Schüler**: aus der Datenbank hinzufügen (Mitglieder oder nicht) bis zur Platzzahl; für jeden die **Anwesenheit** (anwesend 3 von 4, unter 75 % orange) und was offen ist. Die Spielerkarte zeigt seine Kurse.
+- **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
+- **Beiträge**: Für jeden Monat der Saison (oder die Saison) gibt **Den Schülern berechnen** den Beitrag allen, die ihn noch nicht haben; man sieht, wie viele bezahlt haben, und kassiert wie bei den anderen Beiträgen, mit Quittung.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1191,6 +1200,15 @@ With the **Club** role, on the **Courts** tab.
 - **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
 - **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
 
+### 7.16 Tennis school
+
+With the **Club** role, under **Players › Tennis school**.
+
+- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner.
+- **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
+- **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
+- **Fees**: for each month of the season (or the season) **Charge the students** gives the fee to whoever doesn't have it yet; you see how many paid and collect it like the other fees, with a receipt.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1663,6 +1681,15 @@ Con el rol **Club**, en la pestaña **Pistas**.
 - **No reservables**: periodos en que las pistas no se reservan, por **cursos**, **torneos**, **mantenimiento** u otro: pistas (o todas), de un día a otro, días de la semana, franja horaria o todo el día; para un torneo, nombre y fechas vienen del torneo. En los periodos de los cursos van sus clases (tocando la casilla se abre una clase ya preparada).
 - **Horarios y precios**: apertura y cierre, duración de una casilla (30, 60, 90 minutos), precio por hora general y con luz, desde qué hora hace falta la luz, cuánto dura un partido de torneo en el planning.
 - **Medios de pago** (en *Cuotas y pagos*): los decide quien gestiona el club. Se parte de efectivo, tarjeta, transferencia y Satispay y se añaden otros (PayPal, Revolut, Bancomat Pay, un enlace SumUp…): nombre, enlace/IBAN/número y si se paga a distancia. Se elige uno al registrar un pago (el nombre va en recibos y CSV); los de pago a distancia, con sus datos, van en avisos y recordatorios. La app no cobra: registra y envía las instrucciones.
+
+### 7.16 Escuela de tenis
+
+Con el rol **Club**, en **Jugadores › Escuela de tenis**.
+
+- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza.
+- **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
+- **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
+- **Cuotas**: para cada mes de la temporada (o la temporada) **Cargar a los alumnos** asigna la cuota a quien aún no la tiene; se ve cuántos han pagado y se cobra como las demás cuotas, con recibo.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2137,6 +2164,15 @@ Avec le rôle **Club**, dans l'onglet **Terrains**.
 - **Horaires et tarifs** : ouverture et fermeture, durée d'une case (30, 60, 90 minutes), tarif horaire général et avec éclairage, heure à partir de laquelle il faut l'éclairage, durée d'un match de tournoi dans le planning.
 - **Moyens de paiement** (dans *Cotisations et paiements*) : c'est qui gère le club qui les choisit. On part d'espèces, carte, virement et Satispay et on en ajoute d'autres (PayPal, Revolut, Bancomat Pay, un lien SumUp…) : nom, lien/IBAN/numéro et s'il se paie à distance. On en choisit un en enregistrant un paiement (le nom figure sur les reçus et le CSV) ; ceux à distance, avec leurs détails, vont dans les avis et les relances. L'appli n'encaisse pas : elle enregistre et envoie les instructions.
 
+### 7.16 École de tennis
+
+Avec le rôle **Club**, dans **Joueurs › École de tennis**.
+
+- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour.
+- **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
+- **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
+- **Cotisations** : pour chaque mois de la saison (ou la saison) **Facturer aux élèves** attribue la cotisation à qui ne l'a pas encore ; on voit combien ont payé et on encaisse comme les autres cotisations, avec reçu.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2610,6 +2646,15 @@ Col ruolo **Circolo**, nella scheda **Campi**.
 - **Orari e prezzi**: apertura e chiusura, durata di una casella (30, 60, 90 minuti), prezzo all'ora generale e con le luci, da che ora servono le luci, quanto dura nel planning una partita di torneo.
 - **Modi di pagamento** (in *Quote e pagamenti*): li decide chi gestisce il circolo. Si parte da contanti, POS, bonifico e Satispay e se ne aggiungono altri (PayPal, Revolut, Bancomat Pay, un link SumUp…): nome, link/IBAN/numero e se si paga a distanza. Si scelgono quando si registra un pagamento (il nome va su ricevute e CSV); quelli a distanza, con i loro dettagli, vanno negli avvisi e nei solleciti. L'app non incassa: registra e manda le istruzioni.
 
+### 7.16 Scuola tennis
+
+Col ruolo **Circolo**, in **Giocatori › Scuola tennis**.
+
+- **Nuovo corso**: nome (es. *SAT Under 10 · Gruppo A*), livello, istruttore (dal database o scritto), stagione (dal… al…), **orari** settimanali (giorno, ora, durata, campo: anche più di uno), posti massimi, **quota** al mese o per la stagione, note. Negli orari con un campo, **quel campo diventa non prenotabile** nel planning per tutta la stagione (le lezioni del corso sì); cambiando o eliminando il corso, il planning si aggiorna.
+- **Allievi**: si aggiungono dal database (soci o no) fino ai posti; per ciascuno la **presenza** (presente 3 su 4, in arancione sotto il 75 %) e cosa deve pagare. Nella scheda del giocatore ci sono i suoi corsi.
+- **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
+- **Quote**: per ogni mese della stagione (o per la stagione) **Addebita agli allievi** mette la quota a chi non l'ha ancora; si vede quanti hanno pagato e si incassa come le altre quote, con la ricevuta.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -3082,6 +3127,15 @@ Com o papel **Clube**, na aba **Quadras**.
 - **Não reserváveis**: períodos em que as quadras não se reservam, para **cursos**, **torneios**, **manutenção** ou outro: quadras (ou todas), de um dia a outro, dias da semana, faixa de horário ou o dia todo; para um torneio, nome e datas vêm do torneio. Nos períodos dos cursos entram as aulas deles (tocando o horário abre uma aula já pronta).
 - **Horários e preços**: abertura e fechamento, duração de um horário (30, 60, 90 minutos), preço por hora geral e com iluminação, a partir de que hora precisa de iluminação, quanto dura uma partida de torneio na agenda.
 - **Meios de pagamento** (em *Mensalidades e pagamentos*): quem administra o clube decide. Começa com dinheiro, cartão, transferência e Satispay e dá para adicionar outros (PayPal, Revolut, Bancomat Pay, um link SumUp…): nome, link/IBAN/número e se é pago a distância. Escolhe-se um ao registrar um pagamento (o nome vai nos recibos e no CSV); os a distância, com os dados, vão nos avisos e lembretes. O app não recebe: registra e envia as instruções.
+
+### 7.16 Escola de tênis
+
+Com o papel **Clube**, em **Jogadores › Escola de tênis**.
+
+- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza.
+- **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
+- **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
+- **Mensalidades**: para cada mês da temporada (ou a temporada) **Cobrar dos alunos** atribui a mensalidade a quem ainda não tem; vê-se quantos pagaram e recebe-se como as outras mensalidades, com recibo.
 
 ## 8. Placar na TV ou no monitor
 
@@ -4003,7 +4057,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4583,6 +4637,8 @@ class MatchController(
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
+            Screen.SCHOOL -> Screen.HOME
+            Screen.COURSE -> Screen.SCHOOL
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -5109,7 +5165,7 @@ class MatchController(
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN) } ?: Screen.STUDENTS
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -5323,6 +5379,77 @@ class MatchController(
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
         }
+    }
+
+    // ---- Scuola tennis ----
+
+    val courses = MutableStateFlow(storage.loadCourses())
+    val openCourseId = MutableStateFlow<String?>(null)
+
+    fun openSchool() {
+        refreshPlayers()
+        screen.value = Screen.SCHOOL
+    }
+
+    fun openCourse(id: String) {
+        openCourseId.value = id
+        screen.value = Screen.COURSE
+    }
+
+    fun course(id: String?): com.tennis.scoremanager.data.Course? = id?.let { i -> courses.value.firstOrNull { it.id == i } }
+
+    /** Salva il corso e rifà i suoi periodi non prenotabili nel planning (uno per orario). */
+    fun saveCourse(c: com.tennis.scoremanager.data.Course) {
+        val list = courses.value.filter { it.id != c.id } + c
+        courses.value = list
+        scope.launch(io) { storage.saveCourses(list) }
+        val p = courtPlan.value
+        val np = p.copy(blocks = p.blocks.filter { it.course != c.id } + com.tennis.scoremanager.data.Courses.blocks(c))
+        if (np != p) {
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
+    }
+
+    /** Toglie il corso e i suoi periodi non prenotabili; le quote già addebitate restano nel registro. */
+    fun deleteCourse(id: String) {
+        val list = courses.value.filter { it.id != id }
+        courses.value = list
+        scope.launch(io) { storage.saveCourses(list) }
+        val p = courtPlan.value.let { it.copy(blocks = it.blocks.filter { b -> b.course != id }) }
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    /** I corsi di un giocatore (come allievo). */
+    fun coursesOf(p: com.tennis.scoremanager.data.PlayerProfile): List<com.tennis.scoremanager.data.Course> {
+        val keys = setOf(p.id) + p.aliases
+        return courses.value.filter { c -> c.students.any { it in keys } }
+    }
+
+    /** "SAT Under 10 · novembre 2026" o "SAT Under 10 · stagione": la voce della quota nel registro. */
+    fun courseFeeLabel(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): String {
+        if (month == null) return "${c.name} · ${strings.scSeason}"
+        val cal = java.util.Calendar.getInstance().apply { set(month.first, month.second, 1) }
+        return "${c.name} · " + java.text.SimpleDateFormat("LLLL yyyy", options.value.lang.locale).format(cal.time)
+    }
+
+    /** Addebita la quota del mese (o della stagione) a chi non l'ha ancora; restituisce quanti addebiti nuovi. */
+    fun chargeCourse(c: com.tennis.scoremanager.data.Course, month: Pair<Int, Int>?): Int {
+        val due = month?.let { (y, m) -> java.util.Calendar.getInstance().apply { set(y, m, 10, 12, 0, 0) }.timeInMillis } ?: c.from
+        val (book, n) = com.tennis.scoremanager.data.Courses.charge(clubBook.value, c, players.value, courseFeeLabel(c, month), System.currentTimeMillis(), due)
+        if (n > 0) saveClubBook(book)
+        return n
+    }
+
+    /** Avvisa gli allievi del corso: lezione annullata ([lesson]) o un messaggio libero. Ai minorenni scrive al genitore. */
+    fun noticeCourse(c: com.tennis.scoremanager.data.Course, lesson: com.tennis.scoremanager.data.Lesson?) {
+        val s = strings; val lang = options.value.lang; val now = System.currentTimeMillis()
+        val people = c.students.mapNotNull { playerById(it) }
+        val text = if (lesson != null) (listOf(s.scCancelledNotice(c.name), com.tennis.scoremanager.data.Notices.day(lesson.start, lang) + ", " + com.tennis.scoremanager.data.Reports.time(lesson.start, lang) + listOf(lesson.court).filter { it.isNotBlank() }.joinToString { " · $it" })
+            + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n") else "${c.name}\n\n"
+        val rec = people.map { com.tennis.scoremanager.data.Notices.recipient(it, if (lesson != null) text else "", now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(if (lesson != null) s.scCancelledTitle else s.ntKindFree, c.name, text, rec, editable = lesson == null))
     }
 
     // ---- Planning dei campi ----
@@ -10395,6 +10522,8 @@ data class CourtBlock(
     val startMin: Int = 0,
     val endMin: Int = 24 * 60,
     val tournament: String? = null,
+    /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
+    val course: String? = null,
 )
 
 @Serializable
@@ -13395,6 +13524,145 @@ object Reports {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/School.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/School.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+
+/** Un orario settimanale del corso: giorno (1 = lunedì … 7 = domenica), inizio, durata e campo. */
+@Serializable
+data class CourseSlot(val weekday: Int, val startMin: Int, val minutes: Int = 60, val court: String = "")
+
+/** Come si paga il corso: una quota per la stagione o una al mese. */
+@Serializable
+enum class CourseFee { SEASON, MONTHLY }
+
+/**
+ * Un corso della scuola tennis: allievi (giocatori del database), istruttore, orari settimanali nella stagione
+ * [from]–[to], quota. [attendance]: per ogni lezione (chiave [Courses.key]) chi c'era; [cancelled]: le lezioni
+ * annullate (pioggia, festa…).
+ */
+@Serializable
+data class Course(
+    val id: String,
+    val name: String,
+    val level: String = "",
+    /** L'istruttore: un giocatore del database, o solo il nome. */
+    val coach: String? = null,
+    val coachName: String = "",
+    val students: List<String> = emptyList(),
+    val slots: List<CourseSlot> = emptyList(),
+    val from: Long,
+    val to: Long,
+    val maxStudents: Int = 0,
+    val feeCents: Int = 0,
+    val feeKind: CourseFee = CourseFee.MONTHLY,
+    val note: String = "",
+    val attendance: Map<String, Set<String>> = emptyMap(),
+    val cancelled: Set<String> = emptySet(),
+    val createdAt: Long = 0,
+)
+
+/** Una lezione del calendario del corso. */
+data class Lesson(val key: String, val start: Long, val minutes: Int, val court: String) {
+    val end: Long get() = start + minutes * 60_000L
+}
+
+object Courses {
+    fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
+
+    /** "2026-11-16@1700@Campo 2": la stessa lezione resta riconoscibile anche se si cambia un altro orario. */
+    fun key(start: Long, court: String): String {
+        val c = Calendar.getInstance().apply { timeInMillis = start }
+        return "%04d-%02d-%02d@%02d%02d@%s".format(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), court)
+    }
+
+    /** Tutte le lezioni della stagione, in ordine, dagli orari settimanali. */
+    fun lessons(c: Course): List<Lesson> {
+        val out = mutableListOf<Lesson>()
+        var day = CourtPlans.dayStart(c.from)
+        val last = CourtPlans.dayStart(c.to)
+        var guard = 0
+        while (day <= last && guard++ < 800) {
+            val wd = CourtPlans.weekday(day)
+            for (s in c.slots.filter { it.weekday == wd }) {
+                val start = CourtPlans.at(day, s.startMin / 60, s.startMin % 60)
+                out += Lesson(key(start, s.court), start, s.minutes, s.court)
+            }
+            day = CourtPlans.addDays(day, 1)
+        }
+        return out.sortedBy { it.start }
+    }
+
+    /** Le lezioni fatte (non annullate) fino a [now]. */
+    fun held(c: Course, now: Long): List<Lesson> = lessons(c).filter { it.start <= now && it.key !in c.cancelled }
+
+    /** La presenza di un allievo: lezioni a cui c'era su quelle fatte (solo quelle con l'appello). */
+    fun attendanceOf(c: Course, student: String, now: Long): Pair<Int, Int> {
+        val marked = held(c, now).filter { it.key in c.attendance }
+        return marked.count { student in c.attendance[it.key].orEmpty() } to marked.size
+    }
+
+    /** Segna chi c'era a una lezione (sostituisce l'appello di prima). */
+    fun mark(c: Course, key: String, present: Set<String>): Course = c.copy(attendance = c.attendance + (key to present))
+
+    fun setCancelled(c: Course, key: String, cancelled: Boolean): Course = c.copy(cancelled = if (cancelled) c.cancelled + key else c.cancelled - key)
+
+    /** La prossima lezione (non annullata) da [now] in poi. */
+    fun next(c: Course, now: Long): Lesson? = lessons(c).firstOrNull { it.end > now && it.key !in c.cancelled }
+
+    /** I mesi della stagione: (anno, mese 0-11), per la quota mensile. */
+    fun months(c: Course): List<Pair<Int, Int>> {
+        val out = mutableListOf<Pair<Int, Int>>()
+        val cal = Calendar.getInstance().apply { timeInMillis = CourtPlans.dayStart(c.from); set(Calendar.DAY_OF_MONTH, 1) }
+        val end = Calendar.getInstance().apply { timeInMillis = c.to }
+        var guard = 0
+        while ((cal.get(Calendar.YEAR) < end.get(Calendar.YEAR) || (cal.get(Calendar.YEAR) == end.get(Calendar.YEAR) && cal.get(Calendar.MONTH) <= end.get(Calendar.MONTH))) && guard++ < 36) {
+            out += cal.get(Calendar.YEAR) to cal.get(Calendar.MONTH)
+            cal.add(Calendar.MONTH, 1)
+        }
+        return out
+    }
+
+    /**
+     * Addebita la quota agli allievi che non l'hanno ancora per quel periodo ([label]: "Corso SAT · novembre 2026"
+     * o "Corso SAT · stagione"). Restituisce il registro e quanti addebiti nuovi.
+     */
+    fun charge(book: ClubBook, c: Course, people: List<PlayerProfile>, label: String, now: Long, due: Long? = null): Pair<ClubBook, Int> {
+        if (c.feeCents <= 0) return book to 0
+        var b = book
+        var n = 0
+        for (p in people.filter { it.id in c.students }) {
+            val keys = setOf(p.id) + p.aliases
+            if (b.charges.any { it.player in keys && it.label == label && !it.cancelled }) continue
+            b = b.copy(charges = b.charges + Charge(Fees.newId("c"), p.id, p.name, null, label, c.feeCents, now, due))
+            n++
+        }
+        return b to n
+    }
+
+    /**
+     * I periodi non prenotabili del corso, uno per orario: il campo, il giorno della settimana e le ore, per tutta
+     * la stagione. Così nel planning nessuno prenota sopra il corso (le sue lezioni sì).
+     */
+    fun blocks(c: Course): List<CourtBlock> = c.slots.filter { it.court.isNotBlank() }.mapIndexed { i, s ->
+        CourtBlock(
+            id = "course-${c.id}-$i", label = c.name, reason = BlockReason.COURSE, courts = listOf(s.court),
+            from = CourtPlans.dayStart(c.from), to = CourtPlans.dayStart(c.to), weekdays = setOf(s.weekday),
+            startMin = s.startMin, endMin = (s.startMin + s.minutes).coerceAtMost(24 * 60), course = c.id,
+        )
+    }
+
+    /** Il corso è pieno (con un massimo di allievi). */
+    fun full(c: Course): Boolean = c.maxStudents > 0 && c.students.size >= c.maxStudents
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ServePose.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ServePose.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -14305,6 +14573,24 @@ class Storage(context: Context) {
                 tmp.renameTo(drillsFile)
             }
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
+    }
+
+    /** I corsi della scuola tennis, in un file solo. */
+    private val schoolFile: File get() = File(app.filesDir, "club_school.json")
+
+    fun loadCourses(): List<Course> =
+        runCatching { json.decodeFromString(ListSerializer(Course.serializer()), schoolFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveCourses(list: List<Course>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_school.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Course.serializer()), list))
+            if (!tmp.renameTo(schoolFile)) {
+                schoolFile.delete()
+                tmp.renameTo(schoolFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio dei corsi fallito", it) }
     }
 
     /** Il planning dei campi: orari, prezzi e prenotazioni. */
@@ -20459,6 +20745,8 @@ fun AppRoot(c: MatchController) {
                 Screen.CLUB_TOURNAMENT -> com.tennis.scoremanager.ui.screens.ClubTournamentScreen(c)
                 Screen.NOTICE -> com.tennis.scoremanager.ui.screens.NoticeScreen(c)
                 Screen.COURTS_PLAN -> com.tennis.scoremanager.ui.screens.CourtsPlanScreen(c)
+                Screen.SCHOOL -> com.tennis.scoremanager.ui.screens.SchoolScreen(c)
+                Screen.COURSE -> com.tennis.scoremanager.ui.screens.CourseScreen(c)
             }
         }
     }
@@ -24405,6 +24693,51 @@ interface Strings {
     val ctTvHide: String
     val ctTvOff: String
     val tvNoMatches: String
+    val scTitle: String
+    val scHint: String
+    val scNew: String
+    val scNone: String
+    val scSoon: String
+    val scNotify: String
+    val scTabStudents: String
+    val scTabLessons: String
+    val scTabFees: String
+    val scAddStudent: String
+    val scRemoveStudent: String
+    val scNoLessons: String
+    val scCancelled: String
+    val scToMark: String
+    val scPast: String
+    val scUpcoming: String
+    val scNoFee: String
+    val scMonthly: String
+    val scSeasonFee: String
+    val scChargeStudents: String
+    val scCancelLesson: String
+    val scWhoWasThere: String
+    val scNotifyCancelled: String
+    val scName: String
+    val scLevel: String
+    val scCoach: String
+    val scCoachPick: String
+    val scSchedule: String
+    val scAddSlot: String
+    val scScheduleHint: String
+    val scNoMax: String
+    val scFee: String
+    val scDelete: String
+    val scSeason: String
+    val scCancelledTitle: String
+    val scStudentsCount: (Int, Int) -> String
+    val scNext: (String) -> String
+    val scCoachLine: (String) -> String
+    val scAttendance: (Int, Int) -> String
+    val scPresent: (Int, Int) -> String
+    val scShowAll: (Int) -> String
+    val scCharged: (Int) -> String
+    val scMax: (Int) -> String
+    val scDeleteAsk: (String) -> String
+    val scCancelledNotice: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -26057,6 +26390,51 @@ object ItStrings : Strings {
     override val ctTvHide = "Togli dal tabellone TV"
     override val ctTvOff = "Tabellone TV spento: accendilo in Dispositivi"
     override val tvNoMatches = "Nessuna partita in programma"
+    override val scTitle = "Scuola tennis"
+    override val scHint = "Corsi, allievi, orari, presenze e quote; i campi dei corsi non si prenotano"
+    override val scNew = "Nuovo corso"
+    override val scNone = "Nessun corso: crealo con Nuovo corso."
+    override val scSoon = "Da iniziare"
+    override val scNotify = "Avvisa gli allievi"
+    override val scTabStudents = "Allievi"
+    override val scTabLessons = "Lezioni"
+    override val scTabFees = "Quote"
+    override val scAddStudent = "Aggiungi allievo"
+    override val scRemoveStudent = "Togli dal corso"
+    override val scNoLessons = "Nessuna lezione: aggiungi gli orari al corso."
+    override val scCancelled = "annullata"
+    override val scToMark = "da segnare"
+    override val scPast = "Fatte"
+    override val scUpcoming = "Prossime"
+    override val scNoFee = "Nessuna quota per questo corso: impostala in Modifica."
+    override val scMonthly = "al mese"
+    override val scSeasonFee = "per la stagione"
+    override val scChargeStudents = "Addebita agli allievi"
+    override val scCancelLesson = "Lezione annullata"
+    override val scWhoWasThere = "Chi c'era"
+    override val scNotifyCancelled = "Annulla e avvisa gli allievi"
+    override val scName = "Nome del corso (es. SAT Under 10 · Gruppo A)"
+    override val scLevel = "Livello (es. Principianti, Agonisti)"
+    override val scCoach = "Istruttore"
+    override val scCoachPick = "Scegli l'istruttore dal database"
+    override val scSchedule = "Orari"
+    override val scAddSlot = "Aggiungi un orario"
+    override val scScheduleHint = "Negli orari con un campo, quel campo diventa non prenotabile nel planning per tutta la stagione."
+    override val scNoMax = "Nessun limite di posti"
+    override val scFee = "Quota"
+    override val scDelete = "Elimina il corso"
+    override val scSeason = "stagione"
+    override val scCancelledTitle = "Lezione annullata"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "allievo" else "allievi"}" + if (max > 0) " su $max" else "" }
+    override val scNext: (String) -> String = { "prossima: $it" }
+    override val scCoachLine: (String) -> String = { "istruttore $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "presente $p su $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p su $t" }
+    override val scShowAll: (Int) -> String = { "Mostra tutte ($it)" }
+    override val scCharged: (Int) -> String = { "$it addebiti nuovi" }
+    override val scMax: (Int) -> String = { "Al massimo $it allievi" }
+    override val scDeleteAsk: (String) -> String = { "Eliminare il corso $it? I campi tornano prenotabili; le quote già addebitate restano nel registro." }
+    override val scCancelledNotice: (String) -> String = { "La lezione del corso $it è annullata:" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -27692,6 +28070,51 @@ object EnStrings : Strings {
     override val ctTvHide = "Remove from the TV scoreboard"
     override val ctTvOff = "TV scoreboard off: turn it on in Devices"
     override val tvNoMatches = "No matches scheduled"
+    override val scTitle = "Tennis school"
+    override val scHint = "Courses, students, times, attendance and fees; course courts can't be booked"
+    override val scNew = "New course"
+    override val scNone = "No courses: create one with New course."
+    override val scSoon = "Starting soon"
+    override val scNotify = "Notify the students"
+    override val scTabStudents = "Students"
+    override val scTabLessons = "Lessons"
+    override val scTabFees = "Fees"
+    override val scAddStudent = "Add student"
+    override val scRemoveStudent = "Remove from the course"
+    override val scNoLessons = "No lessons: add times to the course."
+    override val scCancelled = "cancelled"
+    override val scToMark = "to mark"
+    override val scPast = "Held"
+    override val scUpcoming = "Upcoming"
+    override val scNoFee = "No fee for this course: set it in Edit."
+    override val scMonthly = "per month"
+    override val scSeasonFee = "for the season"
+    override val scChargeStudents = "Charge the students"
+    override val scCancelLesson = "Lesson cancelled"
+    override val scWhoWasThere = "Who was there"
+    override val scNotifyCancelled = "Cancel and notify the students"
+    override val scName = "Course name (e.g. Juniors U10 · Group A)"
+    override val scLevel = "Level (e.g. Beginners, Competitive)"
+    override val scCoach = "Coach"
+    override val scCoachPick = "Pick the coach from the database"
+    override val scSchedule = "Times"
+    override val scAddSlot = "Add a time"
+    override val scScheduleHint = "For times with a court, that court becomes not bookable in the planner for the whole season."
+    override val scNoMax = "No limit on places"
+    override val scFee = "Fee"
+    override val scDelete = "Delete the course"
+    override val scSeason = "season"
+    override val scCancelledTitle = "Lesson cancelled"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "student" else "students"}" + if (max > 0) " of $max" else "" }
+    override val scNext: (String) -> String = { "next: $it" }
+    override val scCoachLine: (String) -> String = { "coach $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "attended $p of $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p of $t" }
+    override val scShowAll: (Int) -> String = { "Show all ($it)" }
+    override val scCharged: (Int) -> String = { "$it new charges" }
+    override val scMax: (Int) -> String = { "At most $it students" }
+    override val scDeleteAsk: (String) -> String = { "Delete the course $it? Courts become bookable again; fees already charged stay in the register." }
+    override val scCancelledNotice: (String) -> String = { "The $it lesson is cancelled:" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -29350,6 +29773,51 @@ object DeStrings : Strings {
     override val ctTvHide = "Von der TV-Anzeigetafel nehmen"
     override val ctTvOff = "TV-Anzeigetafel aus: unter Geräte einschalten"
     override val tvNoMatches = "Keine Matches angesetzt"
+    override val scTitle = "Tennisschule"
+    override val scHint = "Kurse, Schüler, Zeiten, Anwesenheit und Beiträge; Kursplätze sind nicht buchbar"
+    override val scNew = "Neuer Kurs"
+    override val scNone = "Keine Kurse: mit Neuer Kurs anlegen."
+    override val scSoon = "Demnächst"
+    override val scNotify = "Schüler benachrichtigen"
+    override val scTabStudents = "Schüler"
+    override val scTabLessons = "Stunden"
+    override val scTabFees = "Beiträge"
+    override val scAddStudent = "Schüler hinzufügen"
+    override val scRemoveStudent = "Aus dem Kurs nehmen"
+    override val scNoLessons = "Keine Stunden: dem Kurs Zeiten hinzufügen."
+    override val scCancelled = "abgesagt"
+    override val scToMark = "einzutragen"
+    override val scPast = "Gehalten"
+    override val scUpcoming = "Kommende"
+    override val scNoFee = "Kein Beitrag für diesen Kurs: unter Bearbeiten einstellen."
+    override val scMonthly = "pro Monat"
+    override val scSeasonFee = "für die Saison"
+    override val scChargeStudents = "Den Schülern berechnen"
+    override val scCancelLesson = "Stunde abgesagt"
+    override val scWhoWasThere = "Wer da war"
+    override val scNotifyCancelled = "Absagen und Schüler benachrichtigen"
+    override val scName = "Kursname (z. B. Kinder U10 · Gruppe A)"
+    override val scLevel = "Niveau (z. B. Anfänger, Wettkampf)"
+    override val scCoach = "Trainer"
+    override val scCoachPick = "Trainer aus der Datenbank wählen"
+    override val scSchedule = "Zeiten"
+    override val scAddSlot = "Zeit hinzufügen"
+    override val scScheduleHint = "Bei Zeiten mit Platz wird dieser Platz in der Belegung die ganze Saison nicht buchbar."
+    override val scNoMax = "Keine Platzbegrenzung"
+    override val scFee = "Beitrag"
+    override val scDelete = "Kurs löschen"
+    override val scSeason = "Saison"
+    override val scCancelledTitle = "Stunde abgesagt"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "Schüler" else "Schüler"}" + if (max > 0) " von $max" else "" }
+    override val scNext: (String) -> String = { "nächste: $it" }
+    override val scCoachLine: (String) -> String = { "Trainer $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "anwesend $p von $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p von $t" }
+    override val scShowAll: (Int) -> String = { "Alle zeigen ($it)" }
+    override val scCharged: (Int) -> String = { "$it neue Forderungen" }
+    override val scMax: (Int) -> String = { "Höchstens $it Schüler" }
+    override val scDeleteAsk: (String) -> String = { "Kurs $it löschen? Die Plätze sind wieder buchbar; berechnete Beiträge bleiben im Register." }
+    override val scCancelledNotice: (String) -> String = { "Die Stunde des Kurses $it ist abgesagt:" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -31001,6 +31469,51 @@ object EsStrings : Strings {
     override val ctTvHide = "Quitar del marcador de la TV"
     override val ctTvOff = "Marcador de la TV apagado: enciéndelo en Dispositivos"
     override val tvNoMatches = "Ningún partido programado"
+    override val scTitle = "Escuela de tenis"
+    override val scHint = "Cursos, alumnos, horarios, asistencia y cuotas; las pistas de los cursos no se reservan"
+    override val scNew = "Nuevo curso"
+    override val scNone = "Ningún curso: crea uno con Nuevo curso."
+    override val scSoon = "Por empezar"
+    override val scNotify = "Avisar a los alumnos"
+    override val scTabStudents = "Alumnos"
+    override val scTabLessons = "Clases"
+    override val scTabFees = "Cuotas"
+    override val scAddStudent = "Añadir alumno"
+    override val scRemoveStudent = "Quitar del curso"
+    override val scNoLessons = "Ninguna clase: añade los horarios al curso."
+    override val scCancelled = "anulada"
+    override val scToMark = "por pasar lista"
+    override val scPast = "Hechas"
+    override val scUpcoming = "Próximas"
+    override val scNoFee = "Sin cuota para este curso: ponla en Editar."
+    override val scMonthly = "al mes"
+    override val scSeasonFee = "por temporada"
+    override val scChargeStudents = "Cargar a los alumnos"
+    override val scCancelLesson = "Clase anulada"
+    override val scWhoWasThere = "Quién estuvo"
+    override val scNotifyCancelled = "Anular y avisar a los alumnos"
+    override val scName = "Nombre del curso (p. ej. Escuela Sub-10 · Grupo A)"
+    override val scLevel = "Nivel (p. ej. Iniciación, Competición)"
+    override val scCoach = "Monitor"
+    override val scCoachPick = "Elegir el monitor de la base de datos"
+    override val scSchedule = "Horarios"
+    override val scAddSlot = "Añadir un horario"
+    override val scScheduleHint = "En los horarios con pista, esa pista pasa a no reservable en el planning toda la temporada."
+    override val scNoMax = "Sin límite de plazas"
+    override val scFee = "Cuota"
+    override val scDelete = "Eliminar el curso"
+    override val scSeason = "temporada"
+    override val scCancelledTitle = "Clase anulada"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "alumno" else "alumnos"}" + if (max > 0) " de $max" else "" }
+    override val scNext: (String) -> String = { "próxima: $it" }
+    override val scCoachLine: (String) -> String = { "monitor $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "asistió a $p de $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p de $t" }
+    override val scShowAll: (Int) -> String = { "Mostrar todas ($it)" }
+    override val scCharged: (Int) -> String = { "$it cargos nuevos" }
+    override val scMax: (Int) -> String = { "Como máximo $it alumnos" }
+    override val scDeleteAsk: (String) -> String = { "¿Eliminar el curso $it? Las pistas vuelven a ser reservables; las cuotas ya cargadas quedan en el registro." }
+    override val scCancelledNotice: (String) -> String = { "La clase del curso $it está anulada:" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -32654,6 +33167,51 @@ object FrStrings : Strings {
     override val ctTvHide = "Retirer du tableau TV"
     override val ctTvOff = "Tableau TV éteint : allumez-le dans Appareils"
     override val tvNoMatches = "Aucun match programmé"
+    override val scTitle = "École de tennis"
+    override val scHint = "Cours, élèves, horaires, présences et cotisations ; les terrains des cours ne se réservent pas"
+    override val scNew = "Nouveau cours"
+    override val scNone = "Aucun cours : créez-en un avec Nouveau cours."
+    override val scSoon = "Bientôt"
+    override val scNotify = "Prévenir les élèves"
+    override val scTabStudents = "Élèves"
+    override val scTabLessons = "Leçons"
+    override val scTabFees = "Cotisations"
+    override val scAddStudent = "Ajouter un élève"
+    override val scRemoveStudent = "Retirer du cours"
+    override val scNoLessons = "Aucune leçon : ajoutez les horaires au cours."
+    override val scCancelled = "annulée"
+    override val scToMark = "à pointer"
+    override val scPast = "Faites"
+    override val scUpcoming = "À venir"
+    override val scNoFee = "Pas de cotisation pour ce cours : réglez-la dans Modifier."
+    override val scMonthly = "par mois"
+    override val scSeasonFee = "pour la saison"
+    override val scChargeStudents = "Facturer aux élèves"
+    override val scCancelLesson = "Leçon annulée"
+    override val scWhoWasThere = "Qui était là"
+    override val scNotifyCancelled = "Annuler et prévenir les élèves"
+    override val scName = "Nom du cours (ex. Mini-tennis · Groupe A)"
+    override val scLevel = "Niveau (ex. Débutants, Compétition)"
+    override val scCoach = "Moniteur"
+    override val scCoachPick = "Choisir le moniteur dans la base"
+    override val scSchedule = "Horaires"
+    override val scAddSlot = "Ajouter un horaire"
+    override val scScheduleHint = "Pour les horaires avec un terrain, ce terrain devient non réservable dans le planning pour toute la saison."
+    override val scNoMax = "Pas de limite de places"
+    override val scFee = "Cotisation"
+    override val scDelete = "Supprimer le cours"
+    override val scSeason = "saison"
+    override val scCancelledTitle = "Leçon annulée"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "élève" else "élèves"}" + if (max > 0) " sur $max" else "" }
+    override val scNext: (String) -> String = { "prochaine : $it" }
+    override val scCoachLine: (String) -> String = { "moniteur $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "présent $p sur $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p sur $t" }
+    override val scShowAll: (Int) -> String = { "Tout afficher ($it)" }
+    override val scCharged: (Int) -> String = { "$it nouvelles facturations" }
+    override val scMax: (Int) -> String = { "Au plus $it élèves" }
+    override val scDeleteAsk: (String) -> String = { "Supprimer le cours $it ? Les terrains redeviennent réservables ; les cotisations déjà facturées restent dans le registre." }
+    override val scCancelledNotice: (String) -> String = { "La leçon du cours $it est annulée :" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -34308,6 +34866,51 @@ object PtStrings : Strings {
     override val ctTvHide = "Tirar do placar da TV"
     override val ctTvOff = "Placar da TV desligado: ligue em Dispositivos"
     override val tvNoMatches = "Nenhuma partida programada"
+    override val scTitle = "Escola de tênis"
+    override val scHint = "Cursos, alunos, horários, presenças e mensalidades; as quadras dos cursos não se reservam"
+    override val scNew = "Novo curso"
+    override val scNone = "Nenhum curso: crie um com Novo curso."
+    override val scSoon = "A começar"
+    override val scNotify = "Avisar os alunos"
+    override val scTabStudents = "Alunos"
+    override val scTabLessons = "Aulas"
+    override val scTabFees = "Mensalidades"
+    override val scAddStudent = "Adicionar aluno"
+    override val scRemoveStudent = "Tirar do curso"
+    override val scNoLessons = "Nenhuma aula: adicione os horários ao curso."
+    override val scCancelled = "cancelada"
+    override val scToMark = "a marcar"
+    override val scPast = "Feitas"
+    override val scUpcoming = "Próximas"
+    override val scNoFee = "Sem mensalidade para este curso: defina em Editar."
+    override val scMonthly = "por mês"
+    override val scSeasonFee = "pela temporada"
+    override val scChargeStudents = "Cobrar dos alunos"
+    override val scCancelLesson = "Aula cancelada"
+    override val scWhoWasThere = "Quem estava"
+    override val scNotifyCancelled = "Cancelar e avisar os alunos"
+    override val scName = "Nome do curso (ex. Escolinha Sub-10 · Turma A)"
+    override val scLevel = "Nível (ex. Iniciantes, Competição)"
+    override val scCoach = "Professor"
+    override val scCoachPick = "Escolher o professor no banco de dados"
+    override val scSchedule = "Horários"
+    override val scAddSlot = "Adicionar um horário"
+    override val scScheduleHint = "Nos horários com quadra, essa quadra fica não reservável na agenda a temporada toda."
+    override val scNoMax = "Sem limite de vagas"
+    override val scFee = "Mensalidade"
+    override val scDelete = "Excluir o curso"
+    override val scSeason = "temporada"
+    override val scCancelledTitle = "Aula cancelada"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "aluno" else "alunos"}" + if (max > 0) " de $max" else "" }
+    override val scNext: (String) -> String = { "próxima: $it" }
+    override val scCoachLine: (String) -> String = { "professor $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "presente em $p de $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p de $t" }
+    override val scShowAll: (Int) -> String = { "Mostrar todas ($it)" }
+    override val scCharged: (Int) -> String = { "$it novas cobranças" }
+    override val scMax: (Int) -> String = { "No máximo $it alunos" }
+    override val scDeleteAsk: (String) -> String = { "Excluir o curso $it? As quadras voltam a ser reserváveis; as mensalidades já cobradas ficam no registro." }
+    override val scCancelledNotice: (String) -> String = { "A aula do curso $it está cancelada:" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -35821,7 +36424,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
 
 /** Sceglie un giocatore dal database (o ne crea uno), esclusi quelli già scelti. */
 @Composable
-private fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
+fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
     val s = LocalStrings.current
     val players by c.players.collectAsState()
     var query by remember { mutableStateOf("") }
@@ -37222,6 +37825,7 @@ private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
     Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
     Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
+    Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
@@ -41556,6 +42160,380 @@ private fun FeelRow(label: String, value: Int, accent: Color, onChange: (Int) ->
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SchoolScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SchoolScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.TimePickerDialog
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.Euro
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Course
+import com.tennis.scoremanager.data.CourseFee
+import com.tennis.scoremanager.data.CourseSlot
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.Lesson
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import java.util.Calendar
+
+/** "Lun 17:00 · 1 h 30' · Campo 2". */
+private fun slotLine(s: Strings, x: CourseSlot, lang: Lang): String {
+    val cal = Calendar.getInstance().apply { set(Calendar.DAY_OF_WEEK, if (x.weekday == 7) Calendar.SUNDAY else x.weekday + 1) }
+    val day = java.text.SimpleDateFormat("EEE", lang.locale).format(cal.time)
+    return listOf("$day %02d:%02d".format(x.startMin / 60, x.startMin % 60), s.bkMinutes(x.minutes), x.court).filter { it.isNotBlank() }.joinToString(" · ")
+}
+
+private fun lessonLine(l: Lesson, lang: Lang): String =
+    "${com.tennis.scoremanager.data.Notices.day(l.start, lang)} · ${Reports.time(l.start, lang)}" + (if (l.court.isNotBlank()) " · ${l.court}" else "")
+
+/** Circolo › Scuola tennis: i corsi in corso, quelli che devono iniziare e quelli finiti. */
+@Composable
+fun SchoolScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.courses.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    var creating by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = s.scTitle,
+        subtitle = s.scHint,
+        icon = Icons.Filled.School,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.scNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (list.isEmpty()) Text(s.scNone, color = TsmColors.TextDim)
+        val groups = listOf(
+            s.ctRunning to list.filter { it.from <= now && CourtPlans.addDays(CourtPlans.dayStart(it.to), 1) > now },
+            s.scSoon to list.filter { it.from > now },
+            s.ctDone to list.filter { CourtPlans.addDays(CourtPlans.dayStart(it.to), 1) <= now },
+        )
+        for ((title, items) in groups) {
+            if (items.isEmpty()) continue
+            SectionCard(title, Icons.Filled.School) {
+                for (co in items.sortedBy { it.name.lowercase() }) {
+                    Row(Modifier.fillMaxWidth().clickable { c.openCourse(co.id) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(co.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            Text(
+                                listOfNotNull(co.level.ifBlank { null }, co.slots.joinToString(", ") { slotLine(s, it, lang) }.ifBlank { null },
+                                    s.scStudentsCount(co.students.size, co.maxStudents)).joinToString(" · "),
+                                color = TsmColors.TextDim, fontSize = 13.sp,
+                            )
+                            Courses.next(co, now)?.let { Text(s.scNext(lessonLine(it, lang)), color = TsmColors.Ball, fontSize = 13.sp) }
+                        }
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+                    }
+                }
+            }
+        }
+    }
+    if (creating) CourseEditDialog(c, null) { id -> creating = false; id?.let { c.openCourse(it) } }
+}
+
+/** Un corso: allievi con le presenze, lezioni con l'appello, quote. */
+@Composable
+fun CourseScreen(c: MatchController) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    BackHandler { c.back() }
+    val list by c.courses.collectAsState()
+    val id by c.openCourseId.collectAsState()
+    val co = list.firstOrNull { it.id == id } ?: return
+    val players by c.players.collectAsState()
+    val book by c.clubBook.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    var tab by rememberSaveable { mutableStateOf(0) }
+    var edit by remember { mutableStateOf(false) }
+    var adding by remember { mutableStateOf(false) }
+    var openLesson by remember { mutableStateOf<Lesson?>(null) }
+    var showPast by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = co.name,
+        subtitle = listOfNotNull(co.level.ifBlank { null }, (co.coach?.let { c.playerById(it)?.name } ?: co.coachName).ifBlank { null }?.let { s.scCoachLine(it) },
+            "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
+        icon = Icons.Filled.School,
+        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            if (co.students.isNotEmpty()) BigButton(s.scNotify, Icons.Filled.Campaign, { c.noticeCourse(co, null) }, Modifier.weight(1f))
+        },
+    ) {
+        if (co.slots.isNotEmpty()) Text(co.slots.joinToString("\n") { slotLine(s, it, lang) }, color = TsmColors.TextDim, fontSize = 13.sp)
+        Segmented(listOf(SegOption(s.scTabStudents), SegOption(s.scTabLessons), SegOption(s.scTabFees)), tab, { tab = it })
+        when (tab) {
+            0 -> {
+                Text(s.scStudentsCount(co.students.size, co.maxStudents), color = if (Courses.full(co)) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+                if (!Courses.full(co)) BigButton(s.scAddStudent, Icons.Filled.PersonAdd, { adding = true }, Modifier.fillMaxWidth())
+                for (sid in co.students) {
+                    val p = c.playerById(sid)
+                    val (pres, tot) = Courses.attendanceOf(co, sid, now)
+                    Row(Modifier.fillMaxWidth().clickable(enabled = p != null) { p?.let { c.openStudent(it.id) } }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        PlayerAvatar(c, p?.name.orEmpty(), TsmColors.Ball, 40.dp)
+                        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                            Text(p?.name ?: "—", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            if (tot > 0) Text(s.scAttendance(pres, tot), color = if (pres * 4 < tot * 3) TsmColors.Orange else TsmColors.TextDim, fontSize = 13.sp)
+                            p?.let { Fees.owed(book, it) }?.takeIf { it > 0 }?.let { Text(s.issueFeeDue(Fees.money(it, lang.locale)), color = TsmColors.Orange, fontSize = 13.sp) }
+                        }
+                        IconButton(onClick = { c.saveCourse(co.copy(students = co.students - sid)) }) { Icon(Icons.Filled.Close, s.scRemoveStudent, tint = TsmColors.TextDim) }
+                    }
+                }
+            }
+            1 -> {
+                // Le prossime lezioni; quelle passate a richiesta, dalla più recente.
+                val all = Courses.lessons(co)
+                val past = all.filter { it.start <= now }.reversed()
+                val next = all.filter { it.start > now }
+                if (all.isEmpty()) Text(s.scNoLessons, color = TsmColors.TextDim)
+                @Composable fun row(l: Lesson) {
+                    val cancelled = l.key in co.cancelled
+                    val marked = co.attendance[l.key]
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { openLesson = l }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(lessonLine(l, lang), color = if (cancelled) TsmColors.TextDim else TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                        Text(
+                            when { cancelled -> s.scCancelled; marked != null -> s.scPresent(marked.size, co.students.size); l.start <= now -> s.scToMark; else -> "" },
+                            color = when { cancelled -> TsmColors.Danger; marked != null -> TsmColors.Ok; l.start <= now -> TsmColors.Orange; else -> TsmColors.TextDim }, fontSize = 13.sp,
+                        )
+                    }
+                }
+                if (past.isNotEmpty()) {
+                    Text(s.scPast, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    for (l in if (showPast) past else past.take(3)) row(l)
+                    if (past.size > 3 && !showPast) TextButton(onClick = { showPast = true }) { Text(s.scShowAll(past.size), color = TsmColors.Ball) }
+                }
+                if (next.isNotEmpty()) {
+                    Text(s.scUpcoming, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    for (l in next.take(12)) row(l)
+                }
+            }
+            else -> {
+                if (co.feeCents <= 0) Text(s.scNoFee, color = TsmColors.TextDim)
+                else {
+                    Text("${Fees.money(co.feeCents, lang.locale)} · ${if (co.feeKind == CourseFee.MONTHLY) s.scMonthly else s.scSeasonFee}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    val periods: List<Pair<Int, Int>?> = if (co.feeKind == CourseFee.MONTHLY) Courses.months(co) else listOf(null)
+                    for (m in periods) {
+                        val label = c.courseFeeLabel(co, m)
+                        val charged = book.charges.filter { it.label == label && !it.cancelled }
+                        val paid = charged.count { it.settled }
+                        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).padding(10.dp)) {
+                            Text(label.substringAfter(" · "), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            if (charged.isNotEmpty()) Text(s.feeChargedLine(paid, charged.size), color = if (paid == charged.size) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp)
+                            if (charged.size < co.students.size) GhostButton(s.scChargeStudents, Icons.Filled.Euro, {
+                                val n = c.chargeCourse(co, m)
+                                Toast.makeText(context, s.scCharged(n), Toast.LENGTH_SHORT).show()
+                            }, Modifier.fillMaxWidth())
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (edit) CourseEditDialog(c, co) { edit = false }
+    if (adding) PlayerPickDialog(c, co.students.toSet()) { p -> adding = false; p?.let { c.saveCourse(co.copy(students = co.students + it.id)) } }
+    openLesson?.let { l -> LessonDialog(c, co, l) { openLesson = null } }
+}
+
+/** L'appello di una lezione: chi c'era; oppure lezione annullata (e si avvisano gli allievi). */
+@Composable
+private fun LessonDialog(c: MatchController, co: Course, l: Lesson, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    var present by remember { mutableStateOf(co.attendance[l.key] ?: co.students.toSet()) }
+    var cancelled by remember { mutableStateOf(l.key in co.cancelled) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(lessonLine(l, lang)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                SwitchRow(Icons.Filled.EventBusy, s.scCancelLesson, null, cancelled) { cancelled = it }
+                if (!cancelled) {
+                    Text(s.scWhoWasThere, color = TsmColors.TextDim, fontSize = 13.sp)
+                    for (sid in co.students) {
+                        val name = c.playerById(sid)?.name ?: continue
+                        SwitchRow(Icons.Filled.School, name, null, sid in present) { on -> present = if (on) present + sid else present - sid }
+                    }
+                } else if (co.students.isNotEmpty()) GhostButton(s.scNotifyCancelled, Icons.Filled.Campaign, {
+                    var x = Courses.setCancelled(c.course(co.id) ?: co, l.key, true)
+                    c.saveCourse(x)
+                    onDone()
+                    c.noticeCourse(x, l)
+                }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                var x = Courses.setCancelled(c.course(co.id) ?: co, l.key, cancelled)
+                if (!cancelled && l.start <= System.currentTimeMillis() + 3_600_000L) x = Courses.mark(x, l.key, present)
+                c.saveCourse(x)
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** Corso nuovo o da cambiare: nome, livello, istruttore, stagione, orari settimanali, posti, quota. */
+@Composable
+private fun CourseEditDialog(c: MatchController, co: Course?, onDone: (String?) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val courts by c.clubCourts.collectAsState()
+    val today = CourtPlans.dayStart(System.currentTimeMillis())
+    var x by remember { mutableStateOf(co ?: Course(Courses.newId("k"), "", from = today, to = CourtPlans.addDays(today, 180), createdAt = System.currentTimeMillis())) }
+    var fee by remember { mutableStateOf(co?.feeCents?.takeIf { it > 0 }?.let { plain(it, lang) }.orEmpty()) }
+    var pickCoach by remember { mutableStateOf(false) }
+    var newSlot by remember { mutableStateOf<CourseSlot?>(null) }
+    var askDelete by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (co == null) s.scNew else co.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(x.name, { x = x.copy(name = it.take(50)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scName) })
+                OutlinedTextField(x.level, { x = x.copy(level = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scLevel) })
+                // L'istruttore: dal database o scritto a mano.
+                val coach = x.coach?.let { c.playerById(it)?.name }
+                if (coach != null) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(s.scCoachLine(coach), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { x = x.copy(coach = null) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                } else {
+                    OutlinedTextField(x.coachName, { x = x.copy(coachName = it.take(40)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.scCoach) })
+                    GhostButton(s.scCoachPick, Icons.Filled.PersonAdd, { pickCoach = true }, Modifier.fillMaxWidth())
+                }
+                DateButton(s.blkFrom, x.from, lang) { d -> x = x.copy(from = CourtPlans.dayStart(d), to = maxOf(x.to, CourtPlans.dayStart(d))) }
+                DateButton(s.blkTo, x.to, lang) { d -> x = x.copy(to = maxOf(CourtPlans.dayStart(d), x.from)) }
+                Text(s.scSchedule, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                for (sl in x.slots) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(slotLine(s, sl, lang), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { x = x.copy(slots = x.slots - sl) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                }
+                GhostButton(s.scAddSlot, Icons.Filled.Schedule, { newSlot = CourseSlot(1, 17 * 60, 60, courts.firstOrNull().orEmpty()) }, Modifier.fillMaxWidth())
+                Text(s.scScheduleHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (x.maxStudents == 0) s.scNoMax else s.scMax(x.maxStudents), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                    IconButton(onClick = { x = x.copy(maxStudents = (x.maxStudents - 1).coerceAtLeast(0)) }) { Icon(Icons.Filled.Remove, null) }
+                    IconButton(onClick = { x = x.copy(maxStudents = (x.maxStudents + 1).coerceAtMost(40)) }) { Icon(Icons.Filled.Add, null) }
+                }
+                MoneyField(fee, s.scFee) { fee = it }
+                Segmented(listOf(SegOption(s.scMonthly), SegOption(s.scSeasonFee)), if (x.feeKind == CourseFee.MONTHLY) 0 else 1, { x = x.copy(feeKind = if (it == 0) CourseFee.MONTHLY else CourseFee.SEASON) })
+                OutlinedTextField(x.note, { x = x.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.bkNote) })
+                if (co != null) TextButton(onClick = { askDelete = true }) { Text(s.scDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = x.name.isNotBlank() && (fee.isBlank() || Fees.parse(fee) != null), onClick = {
+                val saved = x.copy(name = x.name.trim(), feeCents = Fees.parse(fee.ifBlank { "0" }) ?: 0)
+                c.saveCourse(saved)
+                onDone(saved.id)
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (pickCoach) PlayerPickDialog(c, emptySet()) { p -> pickCoach = false; p?.let { x = x.copy(coach = it.id, coachName = it.name) } }
+    newSlot?.let { sl0 ->
+        var sl by remember { mutableStateOf(sl0) }
+        AlertDialog(
+            onDismissRequest = { newSlot = null },
+            title = { Text(s.scAddSlot) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        for (d in 1..7) {
+                            val on = sl.weekday == d
+                            val cal = Calendar.getInstance().apply { set(Calendar.DAY_OF_WEEK, if (d == 7) Calendar.SUNDAY else d + 1) }
+                            Text(java.text.SimpleDateFormat("EEE", lang.locale).format(cal.time).take(3), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 12.sp,
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh).clickable { sl = sl.copy(weekday = d) }.padding(horizontal = 6.dp, vertical = 8.dp))
+                        }
+                    }
+                    GhostButton("${s.ctTime}: %02d:%02d".format(sl.startMin / 60, sl.startMin % 60), Icons.Filled.Schedule, {
+                        TimePickerDialog(context, { _, h, m -> sl = sl.copy(startMin = h * 60 + m) }, sl.startMin / 60, sl.startMin % 60, true).show()
+                    }, Modifier.fillMaxWidth())
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(s.bkDuration, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { sl = sl.copy(minutes = (sl.minutes - 30).coerceAtLeast(30)) }) { Icon(Icons.Filled.Remove, null) }
+                        Text(s.bkMinutes(sl.minutes), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        IconButton(onClick = { sl = sl.copy(minutes = (sl.minutes + 30).coerceAtMost(300)) }) { Icon(Icons.Filled.Add, null) }
+                    }
+                    val opts = listOf("") + courts
+                    Segmented(opts.map { SegOption(it.ifBlank { "—" }) }, opts.indexOf(sl.court).coerceAtLeast(0), { sl = sl.copy(court = opts[it]) }, columns = minOf(3, opts.size))
+                }
+            },
+            confirmButton = { TextButton(onClick = { x = x.copy(slots = (x.slots + sl).sortedWith(compareBy({ it.weekday }, { it.startMin }))); newSlot = null }) { Text(s.ok) } },
+            dismissButton = { TextButton(onClick = { newSlot = null }) { Text(s.back) } },
+        )
+    }
+    if (askDelete && co != null) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.scDeleteAsk(co.name)) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteCourse(co.id); onDone(null); c.back() }) { Text(s.scDelete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SetupScreen.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -42566,6 +43544,16 @@ fun StudentScreen(c: MatchController) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
         ChargesSection(c, st)
+        // I corsi della scuola tennis che frequenta.
+        val courses by c.courses.collectAsState()
+        val mineC = courses.filter { co -> co.students.any { it == st.id || it in st.aliases } }
+        if (mineC.isNotEmpty()) SectionCard(s.scTitle, Icons.Filled.School) {
+            for (co in mineC) {
+                val (pres, tot) = com.tennis.scoremanager.data.Courses.attendanceOf(co, st.id, System.currentTimeMillis())
+                Text(co.name + if (tot > 0) " · " + s.scAttendance(pres, tot) else "", color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth().clickable { c.openCourse(co.id) }.padding(vertical = 6.dp))
+            }
+        }
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
             if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
             c.savePlayer(st.copy(student = on))
@@ -63473,6 +64461,82 @@ class RematchTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/SchoolTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/SchoolTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class SchoolTest {
+    private fun at(y: Int, m: Int, d: Int, h: Int = 12, min: Int = 0): Long = Calendar.getInstance().apply { set(y, m - 1, d, h, min, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+
+    // Lunedì e mercoledì 17:00 per 90 minuti sul Campo 2, dal 2 al 30 novembre 2026.
+    private val course = Course(
+        "c", "SAT Under 10", students = listOf("a", "b"), from = at(2026, 11, 2), to = at(2026, 11, 30),
+        slots = listOf(CourseSlot(1, 17 * 60, 90, "Campo 2"), CourseSlot(3, 17 * 60, 90, "Campo 2")), feeCents = 6_000,
+    )
+
+    @Test
+    fun lessonsFromTheWeeklySchedule() {
+        val l = Courses.lessons(course)
+        // Lunedì 2, 9, 16, 23, 30 e mercoledì 4, 11, 18, 25.
+        assertEquals(9, l.size)
+        assertEquals(at(2026, 11, 2, 17), l.first().start)
+        assertEquals(at(2026, 11, 30, 17), l.last().start)
+        assertEquals("2026-11-04@1700@Campo 2", l[1].key)
+        assertEquals(at(2026, 11, 4, 18, 30), l[1].end)
+    }
+
+    @Test
+    fun attendanceAndCancelledLessons() {
+        val l = Courses.lessons(course)
+        var c = Courses.mark(course, l[0].key, setOf("a", "b"))
+        c = Courses.mark(c, l[1].key, setOf("a"))
+        c = Courses.setCancelled(c, l[2].key, true)
+        val now = at(2026, 11, 12)
+        // Fatte: 2, 4 e 11 (annullata la 9); con l'appello solo 2 e 4.
+        assertEquals(2 to 2, Courses.attendanceOf(c, "a", now))
+        assertEquals(1 to 2, Courses.attendanceOf(c, "b", now))
+        assertEquals(3, Courses.held(c, now).size)
+        // La prossima salta quella annullata del 9: è l'11.
+        assertEquals(at(2026, 11, 11, 17), Courses.next(c, at(2026, 11, 5))?.start)
+        assertEquals(course.cancelled, Courses.setCancelled(c, l[2].key, false).cancelled)
+    }
+
+    @Test
+    fun monthlyFeeChargedOncePerStudent() {
+        val a = PlayerProfile("a", "Luca"); val b = PlayerProfile("b", "Anna"); val x = PlayerProfile("x", "Altro")
+        val (b1, n1) = Courses.charge(ClubBook(), course, listOf(a, b, x), "SAT Under 10 · novembre 2026", 0)
+        assertEquals(2, n1)
+        val (b2, n2) = Courses.charge(b1, course, listOf(a, b, x), "SAT Under 10 · novembre 2026", 0)
+        assertEquals(0, n2); assertEquals(2, b2.charges.size)
+        assertEquals(6_000, Fees.owed(b2, a))
+        assertEquals(listOf(2026 to 10), Courses.months(course))
+        assertEquals(listOf(2026 to 8, 2026 to 9, 2026 to 10, 2026 to 11, 2027 to 0), Courses.months(course.copy(from = at(2026, 9, 15), to = at(2027, 1, 10))))
+    }
+
+    @Test
+    fun courseBlocksTheCourtsInThePlanner() {
+        val blocks = Courses.blocks(course)
+        assertEquals(2, blocks.size)
+        val plan = CourtPlan(blocks = blocks)
+        // Il lunedì alle 17:30 il Campo 2 non si prenota per giocare, ma la lezione sì; il Campo 1 è libero.
+        assertEquals(1, CourtPlans.blockedBy(plan, "Campo 2", at(2026, 11, 16, 17, 30), at(2026, 11, 16, 18, 30), BookingKind.PLAY).size)
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 2", at(2026, 11, 16, 17, 30), at(2026, 11, 16, 18, 30), BookingKind.LESSON).isEmpty())
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 1", at(2026, 11, 16, 17, 30), at(2026, 11, 16, 18, 30), BookingKind.PLAY).isEmpty())
+        assertEquals("c", blocks.first().course)
+        assertFalse(Courses.full(course)); assertTrue(Courses.full(course.copy(maxStudents = 2)))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ServePoseTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ServePoseTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -70520,6 +71584,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 216 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 219 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

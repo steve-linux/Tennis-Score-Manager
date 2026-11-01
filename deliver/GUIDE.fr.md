@@ -506,6 +506,15 @@ Avec le rôle **Club**, dans l'onglet **Terrains**.
 - **Horaires et tarifs** : ouverture et fermeture, durée d'une case (30, 60, 90 minutes), tarif horaire général et avec éclairage, heure à partir de laquelle il faut l'éclairage, durée d'un match de tournoi dans le planning.
 - **Moyens de paiement** (dans *Cotisations et paiements*) : c'est qui gère le club qui les choisit. On part d'espèces, carte, virement et Satispay et on en ajoute d'autres (PayPal, Revolut, Bancomat Pay, un lien SumUp…) : nom, lien/IBAN/numéro et s'il se paie à distance. On en choisit un en enregistrant un paiement (le nom figure sur les reçus et le CSV) ; ceux à distance, avec leurs détails, vont dans les avis et les relances. L'appli n'encaisse pas : elle enregistre et envoie les instructions.
 
+### 7.16 École de tennis (app 2.6)
+
+Avec le rôle **Club**, dans **Joueurs › École de tennis**.
+
+- **Nouveau cours** : nom (ex. *Mini-tennis · Groupe A*), niveau, moniteur (de la base ou écrit), saison (du… au…), **horaires** hebdomadaires (jour, heure, durée, terrain : plusieurs si besoin), places maximum, **cotisation** au mois ou pour la saison, notes. Pour les horaires avec un terrain, **ce terrain devient non réservable** dans le planning toute la saison (les leçons du cours si) ; en modifiant ou supprimant le cours, le planning se met à jour.
+- **Élèves** : on les ajoute depuis la base (adhérents ou non) jusqu'aux places ; pour chacun la **présence** (présent 3 sur 4, en orange sous 75 %) et ce qu'il doit. La fiche du joueur montre ses cours.
+- **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
+- **Cotisations** : pour chaque mois de la saison (ou la saison) **Facturer aux élèves** attribue la cotisation à qui ne l'a pas encore ; on voit combien ont payé et on encaisse comme les autres cotisations, avec reçu.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

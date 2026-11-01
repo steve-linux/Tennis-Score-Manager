@@ -232,6 +232,7 @@ private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
     Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
     Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
+    Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
     Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }

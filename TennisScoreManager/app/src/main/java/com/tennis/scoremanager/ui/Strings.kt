@@ -1393,6 +1393,51 @@ interface Strings {
     val ctTvHide: String
     val ctTvOff: String
     val tvNoMatches: String
+    val scTitle: String
+    val scHint: String
+    val scNew: String
+    val scNone: String
+    val scSoon: String
+    val scNotify: String
+    val scTabStudents: String
+    val scTabLessons: String
+    val scTabFees: String
+    val scAddStudent: String
+    val scRemoveStudent: String
+    val scNoLessons: String
+    val scCancelled: String
+    val scToMark: String
+    val scPast: String
+    val scUpcoming: String
+    val scNoFee: String
+    val scMonthly: String
+    val scSeasonFee: String
+    val scChargeStudents: String
+    val scCancelLesson: String
+    val scWhoWasThere: String
+    val scNotifyCancelled: String
+    val scName: String
+    val scLevel: String
+    val scCoach: String
+    val scCoachPick: String
+    val scSchedule: String
+    val scAddSlot: String
+    val scScheduleHint: String
+    val scNoMax: String
+    val scFee: String
+    val scDelete: String
+    val scSeason: String
+    val scCancelledTitle: String
+    val scStudentsCount: (Int, Int) -> String
+    val scNext: (String) -> String
+    val scCoachLine: (String) -> String
+    val scAttendance: (Int, Int) -> String
+    val scPresent: (Int, Int) -> String
+    val scShowAll: (Int) -> String
+    val scCharged: (Int) -> String
+    val scMax: (Int) -> String
+    val scDeleteAsk: (String) -> String
+    val scCancelledNotice: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3045,6 +3090,51 @@ object ItStrings : Strings {
     override val ctTvHide = "Togli dal tabellone TV"
     override val ctTvOff = "Tabellone TV spento: accendilo in Dispositivi"
     override val tvNoMatches = "Nessuna partita in programma"
+    override val scTitle = "Scuola tennis"
+    override val scHint = "Corsi, allievi, orari, presenze e quote; i campi dei corsi non si prenotano"
+    override val scNew = "Nuovo corso"
+    override val scNone = "Nessun corso: crealo con Nuovo corso."
+    override val scSoon = "Da iniziare"
+    override val scNotify = "Avvisa gli allievi"
+    override val scTabStudents = "Allievi"
+    override val scTabLessons = "Lezioni"
+    override val scTabFees = "Quote"
+    override val scAddStudent = "Aggiungi allievo"
+    override val scRemoveStudent = "Togli dal corso"
+    override val scNoLessons = "Nessuna lezione: aggiungi gli orari al corso."
+    override val scCancelled = "annullata"
+    override val scToMark = "da segnare"
+    override val scPast = "Fatte"
+    override val scUpcoming = "Prossime"
+    override val scNoFee = "Nessuna quota per questo corso: impostala in Modifica."
+    override val scMonthly = "al mese"
+    override val scSeasonFee = "per la stagione"
+    override val scChargeStudents = "Addebita agli allievi"
+    override val scCancelLesson = "Lezione annullata"
+    override val scWhoWasThere = "Chi c'era"
+    override val scNotifyCancelled = "Annulla e avvisa gli allievi"
+    override val scName = "Nome del corso (es. SAT Under 10 · Gruppo A)"
+    override val scLevel = "Livello (es. Principianti, Agonisti)"
+    override val scCoach = "Istruttore"
+    override val scCoachPick = "Scegli l'istruttore dal database"
+    override val scSchedule = "Orari"
+    override val scAddSlot = "Aggiungi un orario"
+    override val scScheduleHint = "Negli orari con un campo, quel campo diventa non prenotabile nel planning per tutta la stagione."
+    override val scNoMax = "Nessun limite di posti"
+    override val scFee = "Quota"
+    override val scDelete = "Elimina il corso"
+    override val scSeason = "stagione"
+    override val scCancelledTitle = "Lezione annullata"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "allievo" else "allievi"}" + if (max > 0) " su $max" else "" }
+    override val scNext: (String) -> String = { "prossima: $it" }
+    override val scCoachLine: (String) -> String = { "istruttore $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "presente $p su $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p su $t" }
+    override val scShowAll: (Int) -> String = { "Mostra tutte ($it)" }
+    override val scCharged: (Int) -> String = { "$it addebiti nuovi" }
+    override val scMax: (Int) -> String = { "Al massimo $it allievi" }
+    override val scDeleteAsk: (String) -> String = { "Eliminare il corso $it? I campi tornano prenotabili; le quote già addebitate restano nel registro." }
+    override val scCancelledNotice: (String) -> String = { "La lezione del corso $it è annullata:" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -4680,6 +4770,51 @@ object EnStrings : Strings {
     override val ctTvHide = "Remove from the TV scoreboard"
     override val ctTvOff = "TV scoreboard off: turn it on in Devices"
     override val tvNoMatches = "No matches scheduled"
+    override val scTitle = "Tennis school"
+    override val scHint = "Courses, students, times, attendance and fees; course courts can't be booked"
+    override val scNew = "New course"
+    override val scNone = "No courses: create one with New course."
+    override val scSoon = "Starting soon"
+    override val scNotify = "Notify the students"
+    override val scTabStudents = "Students"
+    override val scTabLessons = "Lessons"
+    override val scTabFees = "Fees"
+    override val scAddStudent = "Add student"
+    override val scRemoveStudent = "Remove from the course"
+    override val scNoLessons = "No lessons: add times to the course."
+    override val scCancelled = "cancelled"
+    override val scToMark = "to mark"
+    override val scPast = "Held"
+    override val scUpcoming = "Upcoming"
+    override val scNoFee = "No fee for this course: set it in Edit."
+    override val scMonthly = "per month"
+    override val scSeasonFee = "for the season"
+    override val scChargeStudents = "Charge the students"
+    override val scCancelLesson = "Lesson cancelled"
+    override val scWhoWasThere = "Who was there"
+    override val scNotifyCancelled = "Cancel and notify the students"
+    override val scName = "Course name (e.g. Juniors U10 · Group A)"
+    override val scLevel = "Level (e.g. Beginners, Competitive)"
+    override val scCoach = "Coach"
+    override val scCoachPick = "Pick the coach from the database"
+    override val scSchedule = "Times"
+    override val scAddSlot = "Add a time"
+    override val scScheduleHint = "For times with a court, that court becomes not bookable in the planner for the whole season."
+    override val scNoMax = "No limit on places"
+    override val scFee = "Fee"
+    override val scDelete = "Delete the course"
+    override val scSeason = "season"
+    override val scCancelledTitle = "Lesson cancelled"
+    override val scStudentsCount: (Int, Int) -> String = { n, max -> "$n ${if (n == 1) "student" else "students"}" + if (max > 0) " of $max" else "" }
+    override val scNext: (String) -> String = { "next: $it" }
+    override val scCoachLine: (String) -> String = { "coach $it" }
+    override val scAttendance: (Int, Int) -> String = { p, t -> "attended $p of $t" }
+    override val scPresent: (Int, Int) -> String = { p, t -> "$p of $t" }
+    override val scShowAll: (Int) -> String = { "Show all ($it)" }
+    override val scCharged: (Int) -> String = { "$it new charges" }
+    override val scMax: (Int) -> String = { "At most $it students" }
+    override val scDeleteAsk: (String) -> String = { "Delete the course $it? Courts become bookable again; fees already charged stay in the register." }
+    override val scCancelledNotice: (String) -> String = { "The $it lesson is cancelled:" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

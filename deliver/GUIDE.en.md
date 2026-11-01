@@ -506,6 +506,15 @@ With the **Club** role, on the **Courts** tab.
 - **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
 - **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
 
+### 7.16 Tennis school (app 2.6)
+
+With the **Club** role, under **Players › Tennis school**.
+
+- **New course**: name (e.g. *Juniors U10 · Group A*), level, coach (from the database or typed), season (from… to…), weekly **times** (day, time, length, court: more than one if needed), maximum places, **fee** per month or for the season, notes. For times with a court, **that court becomes not bookable** in the planner for the whole season (course lessons yes); changing or deleting the course updates the planner.
+- **Students**: added from the database (members or not) up to the places; for each, **attendance** (attended 3 of 4, orange under 75 %) and what they owe. A player's card shows their courses.
+- **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
+- **Fees**: for each month of the season (or the season) **Charge the students** gives the fee to whoever doesn't have it yet; you see how many paid and collect it like the other fees, with a receipt.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

@@ -340,7 +340,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
 
 /** Sceglie un giocatore dal database (o ne crea uno), esclusi quelli già scelti. */
 @Composable
-private fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
+fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
     val s = LocalStrings.current
     val players by c.players.collectAsState()
     var query by remember { mutableStateOf("") }

@@ -506,6 +506,15 @@ Com o papel **Clube**, na aba **Quadras**.
 - **Horários e preços**: abertura e fechamento, duração de um horário (30, 60, 90 minutos), preço por hora geral e com iluminação, a partir de que hora precisa de iluminação, quanto dura uma partida de torneio na agenda.
 - **Meios de pagamento** (em *Mensalidades e pagamentos*): quem administra o clube decide. Começa com dinheiro, cartão, transferência e Satispay e dá para adicionar outros (PayPal, Revolut, Bancomat Pay, um link SumUp…): nome, link/IBAN/número e se é pago a distância. Escolhe-se um ao registrar um pagamento (o nome vai nos recibos e no CSV); os a distância, com os dados, vão nos avisos e lembretes. O app não recebe: registra e envia as instruções.
 
+### 7.16 Escola de tênis (app 2.6)
+
+Com o papel **Clube**, em **Jogadores › Escola de tênis**.
+
+- **Novo curso**: nome (ex. *Escolinha Sub-10 · Turma A*), nível, professor (do banco de dados ou escrito), temporada (de… até…), **horários** semanais (dia, hora, duração, quadra; mais de um se precisar), vagas máximas, **mensalidade** por mês ou pela temporada, notas. Nos horários com quadra, **essa quadra fica não reservável** na agenda a temporada toda (as aulas do curso sim); mudando ou excluindo o curso, a agenda se atualiza.
+- **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
+- **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
+- **Mensalidades**: para cada mês da temporada (ou a temporada) **Cobrar dos alunos** atribui a mensalidade a quem ainda não tem; vê-se quantos pagaram e recebe-se como as outras mensalidades, com recibo.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

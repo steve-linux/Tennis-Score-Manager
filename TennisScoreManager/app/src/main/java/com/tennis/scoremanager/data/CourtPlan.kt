@@ -99,6 +99,8 @@ data class CourtBlock(
     val startMin: Int = 0,
     val endMin: Int = 24 * 60,
     val tournament: String? = null,
+    /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
+    val course: String? = null,
 )
 
 @Serializable

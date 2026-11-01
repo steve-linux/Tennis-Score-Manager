@@ -393,6 +393,15 @@ Con el rol **Club**, en la pestaña **Pistas**.
 - **Horarios y precios**: apertura y cierre, duración de una casilla (30, 60, 90 minutos), precio por hora general y con luz, desde qué hora hace falta la luz, cuánto dura un partido de torneo en el planning.
 - **Medios de pago** (en *Cuotas y pagos*): los decide quien gestiona el club. Se parte de efectivo, tarjeta, transferencia y Satispay y se añaden otros (PayPal, Revolut, Bancomat Pay, un enlace SumUp…): nombre, enlace/IBAN/número y si se paga a distancia. Se elige uno al registrar un pago (el nombre va en recibos y CSV); los de pago a distancia, con sus datos, van en avisos y recordatorios. La app no cobra: registra y envía las instrucciones.
 
+### 7.16 Escuela de tenis
+
+Con el rol **Club**, en **Jugadores › Escuela de tenis**.
+
+- **Nuevo curso**: nombre (p. ej. *Escuela Sub-10 · Grupo A*), nivel, monitor (de la base de datos o escrito), temporada (del… al…), **horarios** semanales (día, hora, duración, pista; varios si hace falta), plazas máximas, **cuota** al mes o por temporada, notas. En los horarios con pista, **esa pista pasa a no reservable** en el planning toda la temporada (las clases del curso sí); al cambiar o eliminar el curso, el planning se actualiza.
+- **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
+- **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
+- **Cuotas**: para cada mes de la temporada (o la temporada) **Cargar a los alumnos** asigna la cuota a quien aún no la tiene; se ve cuántos han pagado y se cobra como las demás cuotas, con recibo.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.
