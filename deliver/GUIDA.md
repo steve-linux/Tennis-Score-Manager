@@ -104,7 +104,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
 - **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Profilo e dati** (backup, ripristino, cancellazione: 7.8), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
-**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
+**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i giocatori scelti dal database, con i recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 
 ## 4. La voce (funziona senza internet)
 
@@ -319,7 +319,7 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
 
-**Salvataggi**: la partita si salva da sola a ogni punto. *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
+**Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
 ### 7.1 Allenamento con la fascia (app 2.5)
 
@@ -417,10 +417,10 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 
 Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
 
-- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. Un nome scritto in Nuova partita che nel database non c'è chiede nome e cognome toccando *Avanti* (il soprannome è quello scritto). I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
-- **Nuova partita**: mentre scrivi il nome compaiono i giocatori che corrispondono (un tocco e la partita è sua); se il nome è di un solo giocatore si collega da solo (*✓ … dal database*; **Non è lui** crea un'altra persona con lo stesso nome). Con due giocatori dello stesso nome l'app chiede quale; un nome nuovo diventa un giocatore all'inizio della partita.
+- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **Nuova partita**: in campo vanno i giocatori del database. Ogni posto ha **Scegli il giocatore**, che apre l'elenco con la ricerca (prima soci e allievi; chi è già in campo non c'è) e in cima **Giocatore nuovo**, che chiede nome, cognome e il resto e poi lo mette in campo; sotto, i giocatori recenti da toccare al volo. Scelto, il posto mostra foto e nome con **Cambia** e la **X**; la classifica di un socio si scrive da sola. Un nome di prima senza scheda (rivincite, partite vecchie) va scelto dall'elenco o creato prima di *Avanti*.
 - **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
-- **Altro › Giocatori**: tutti, con la ricerca; *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
+- **Altro › Giocatori**: tutti, con la ricerca; **Nuovo giocatore** ne crea uno coi suoi dati (anche un allievo: poi nella scheda si accende *Allievo*); *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
   - **Allievo**: lo mette (o lo toglie) tra gli allievi.
   - **Unisci con un altro giocatore**: la stessa persona scritta in due modi ("Rossi" e "Mario Rossi") o creata due volte; partite e sessioni passano a lui.
   - **Separa un omonimo** (in *Partite*): spunti le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo.

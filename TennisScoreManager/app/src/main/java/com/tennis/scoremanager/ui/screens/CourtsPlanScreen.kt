@@ -340,27 +340,36 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
 
 /** Sceglie un giocatore dal database (o ne crea uno), esclusi quelli già scelti. */
 @Composable
-fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
+fun PlayerPickDialog(c: MatchController, except: Set<String>, title: String? = null, query0: String = "", onDone: (PlayerProfile?) -> Unit) {
     val s = LocalStrings.current
     val players by c.players.collectAsState()
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(query0) }
     var creating by remember { mutableStateOf(false) }
     val free = players.filter { it.id !in except }
-    val list = (if (query.isBlank()) free else Players.search(free, query)).sortedBy { if (it.member != null) 0 else 1 }
+    // Prima soci e allievi, poi gli altri; con la ricerca, chi corrisponde meglio.
+    val list = if (query.isBlank()) free.sortedWith(compareBy({ if (it.member != null || it.student) 0 else 1 }, { it.name.lowercase() })) else Players.search(free, query)
     AlertDialog(
         onDismissRequest = { onDone(null) },
-        title = { Text(s.bkAddPlayer) },
+        title = { Text(title ?: s.bkAddPlayer) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 GhostButton(s.membersNewPlayer, Icons.Filled.PersonAdd, { creating = true }, Modifier.fillMaxWidth())
                 OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
-                for (p in list.take(50)) Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 8.dp))
+                if (list.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (p in list.take(60)) Row(Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 36.dp)
+                    Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                        Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        val info = listOfNotNull(p.fullName.takeIf { it.isNotBlank() && it != p.name }, p.member?.ranking?.ifBlank { null }, s.studentsTitle.takeIf { p.student }, s.membersTitle.takeIf { p.member != null }).joinToString(" · ")
+                        if (info.isNotBlank()) Text(info, color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                }
             }
         },
         confirmButton = {},
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
-    if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) onDone(p) }
+    if (creating) PlayerEditDialog(c, null, prefill = query) { p -> creating = false; if (p != null) onDone(p) }
 }
 
 /** Orari, caselle, prezzi e luci del planning. */

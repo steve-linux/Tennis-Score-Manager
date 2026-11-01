@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Payments
@@ -262,8 +263,11 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 
 /** Una voce della prima schermata: icona, titolo, una riga di spiegazione; [main] = l'azione principale della scheda. */
 @Composable
-private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+    // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
+    Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = if (main) TsmColors.OnBall else TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
             Spacer(Modifier.width(14.dp))
@@ -323,6 +327,7 @@ private fun PlayTab(c: MatchController) {
         c.refreshSaved()
         c.refreshHistory()
     }
+    var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -330,7 +335,19 @@ private fun PlayTab(c: MatchController) {
         val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
         val lang = c.options.value.lang
         val at = rec.startedAt ?: rec.updatedAt
-        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}") { c.resumeSaved(rec) }
+        // Tenendo premuto si elimina (con conferma), senza passare da Nuova partita.
+        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}",
+            onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
+    }
+    toDelete?.let { rec ->
+        val n = Side.entries.joinToString(" ${s.vs} ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { toDelete = null },
+            title = { Text(s.deleteSavedTitle) },
+            text = { Text(s.deleteSavedText(n)) },
+            confirmButton = { androidx.compose.material3.TextButton(onClick = { c.deleteSaved(rec); toDelete = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { toDelete = null }) { Text(s.back) } },
+        )
     }
     history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
         val su = last.record.setup

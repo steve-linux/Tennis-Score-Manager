@@ -38,6 +38,7 @@ import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.compose.material.icons.filled.PersonAdd
 
 /**
  * Altro › Giocatori: il database di tutti, chi ha giocato e gli allievi, con la ricerca. Dalla scheda di ciascuno si
@@ -54,11 +55,15 @@ fun PlayersScreen(c: MatchController) {
     // Gli omonimi si vedono subito: stesso nome, più giocatori.
     val twins = remember(players) { players.groupBy { com.tennis.scoremanager.data.PlayerStats.key(it.name) }.filterValues { it.size > 1 }.keys }
     val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
+    var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         title = s.playersTitle,
         subtitle = s.playersHint,
         icon = Icons.Filled.Groups,
-        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            com.tennis.scoremanager.ui.BigButton(s.playerNewTitle, Icons.Filled.PersonAdd, { creating = true }, Modifier.weight(1f))
+        },
     ) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
         if (players.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim)
@@ -82,4 +87,6 @@ fun PlayersScreen(c: MatchController) {
             }
         }
     }
+    // Il giocatore nuovo, con i suoi dati: poi si apre la sua scheda.
+    if (creating) com.tennis.scoremanager.ui.PlayerEditDialog(c, null) { p -> creating = false; p?.let { c.openStudent(it.id) } }
 }

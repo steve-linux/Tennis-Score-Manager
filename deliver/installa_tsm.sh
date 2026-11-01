@@ -530,7 +530,7 @@ Gurte und Armbänder nehmen **jeweils nur ein Telefon** an und reichen ein paar 
 
 **App verlassen**: **Beenden** (im Match mit Rückfrage, auch in der Zusammenfassung vorhanden) schließt die App wirklich; ebenso, wenn du sie aus den zuletzt verwendeten Apps entfernst. Beim nächsten Öffnen startet sie im Reiter **Spielen**.
 
-**Speichern**: Das Match speichert sich bei jedem Punkt von selbst. *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
+**Speichern**: Das Match speichert sich bei jedem Punkt von selbst. Im Reiter **Spielen** löscht man ein unterbrochenes Match, indem man sein *Fortsetzen* **gedrückt hält**; alle unterbrochenen Matches stehen unter **Fortschritt › Verlauf › Unterbrochen**, zum Fortsetzen oder Löschen (mehrere angehakt auch zusammen). *Unterbrechen* hält die Zeiten an; wenn du die App verlässt, das Telefon ausgeht oder die App geschlossen wird, findest du das Match unter **Fortsetzen** (Reiter **Spielen**, oder *Unterbrochenes Match fortsetzen* auf dem Bildschirm MATCHBEGINN) wieder und setzt es mit *Fortsetzen* fort. *Punkt zurück* berechnet alles von Anfang an neu und funktioniert daher auch nach dem Ende eines Spiels, eines Satzes oder des Matches. Der Papierkorb eines unterbrochenen Matches fragt nach. Wurde das Match bei gesperrtem Bildschirm über ein Armband gestartet (dann liefert Android keinen Standort), wird der Ort ermittelt, sobald du die App wieder öffnest.
 
 ### 7.1 Training mit dem Gurt
 
@@ -628,10 +628,10 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 
 Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit einer Kennung, die auf jedem Telefon gleich bleibt: Statistik, Rating und Verlauf gehören dieser Person auch bei einem Namensvetter, auch nachdem Matches von einem Telefon aufs andere gewandert sind.
 
-- **Vorname, Nachname und Spitzname**: Vor- und Nachname sind Pflicht und kennzeichnen die Person; der **Spitzname** (freiwillig) ist, wie man sie auf dem Platz nennt: Match, Anzeigetafel, Ansage und Statistik verwenden den Spitznamen, wenn es einen gibt, sonst Vor- und Nachname. Ein in Neues Match getippter Name, der nicht in der Datenbank ist, fragt beim Tippen auf *Weiter* nach Vor- und Nachname (der Spitzname ist das Getippte). Aus dem Verlauf entstandene Spieler haben nur einen Namen, der zum Spitznamen wird: unter *Spieler* sind sie *unvollständig*, und die Karte bietet **Vor- und Nachname ergänzen**.
-- **Neues Match**: beim Tippen des Namens erscheinen die passenden Spieler (ein Tipp und das Match gehört ihm); gehört der Name nur einem Spieler, wird er von selbst verknüpft (*✓ … aus der Spielerdatenbank*; **Nicht er** legt eine andere Person mit demselben Namen an). Bei zwei Spielern mit gleichem Namen fragt die App, welcher; ein neuer Name wird beim Matchbeginn zum Spieler.
+- **Vorname, Nachname und Spitzname**: Vor- und Nachname sind Pflicht und kennzeichnen die Person; der **Spitzname** (freiwillig) ist, wie man sie auf dem Platz nennt: Match, Anzeigetafel, Ansage und Statistik verwenden den Spitznamen, wenn es einen gibt, sonst Vor- und Nachname. Aus dem Verlauf entstandene Spieler haben nur einen Namen, der zum Spitznamen wird: unter *Spieler* sind sie *unvollständig*, und die Karte bietet **Vor- und Nachname ergänzen**.
+- **Neues Match**: auf den Platz kommen Spieler aus der Datenbank. Jeder Platz hat **Spieler wählen**, das die Liste mit Suche öffnet (zuerst Mitglieder und Schüler; wer schon auf dem Platz ist, fehlt) und oben **Neuer Spieler**, das Vorname, Nachname und den Rest abfragt und ihn dann aufstellt; darunter die letzten Spieler zum Antippen. Gewählt zeigt der Platz Foto und Namen mit **Ändern** und dem **X**; die Rangliste eines Mitglieds trägt sich selbst ein. Ein alter Name ohne Karte (Revanchen, alte Matches) muss vor *Weiter* aus der Liste gewählt oder angelegt werden.
 - **Beim ersten Start** legt die App für jeden Namen der bisherigen Matches einen Spieler an.
-- **Mehr › Spieler**: alle, mit Suche; *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
+- **Mehr › Spieler**: alle, mit Suche; **Neuer Spieler** legt einen mit seinen Daten an (auch einen Schüler: dann in der Karte *Schüler* einschalten); *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
   - **Schüler**: nimmt ihn unter die Schüler auf (oder wieder heraus).
   - **Mit einem anderen Spieler zusammenführen**: dieselbe Person auf zwei Arten geschrieben („Rossi“ und „Mario Rossi“) oder zweimal angelegt; Matches und Einheiten gehen auf ihn über.
   - **Namensvetter trennen** (unter *Matches*): die Matches einer anderen Person mit demselben Namen anhaken, sie wird ein neuer Spieler.
@@ -1023,7 +1023,7 @@ Straps and bands accept **one phone at a time** and reach a few metres less than
 
 **Exiting**: **Exit** (it asks for confirmation during a match, and it is also on the summary) really closes the app; so does swiping it away from the recent apps. When reopened, it starts again from the **Play** tab.
 
-**Saving**: the match saves itself at every point. *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
+**Saving**: the match saves itself at every point. On the **Play** tab a suspended match is deleted by **long-pressing** its *Resume*; all suspended matches are in **Progress › History › Suspended**, to resume or delete (ticking several, also together). *Suspend* stops the timers; if you exit, the phone switches off or the app is closed, the match can be found under **Resume** (**Play** tab, or *Resume suspended match* on the MATCH START screen) and restarts with *Resume*. *Undo point* recalculates everything from the beginning, so it works even after the end of a game, a set or the match. The bin icon of a suspended match asks for confirmation. If the match was started from a wristband with the screen locked (Android gives no location then), the place is taken as soon as you open the app again.
 
 ### 7.1 Workout with the strap
 
@@ -1121,10 +1121,10 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 
 Everyone who plays or practises is a **player** in the database, with an ID that stays the same on every phone: statistics, rating and history belong to that person even with a namesake, also after matches have moved from one phone to another.
 
-- **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. A name typed in New match that is not in the database asks for first and last name when you tap *Next* (the nickname is what you typed). Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
-- **New match**: while you type the name, the matching players appear (one tap and the match is theirs); if the name belongs to a single player it links by itself (*✓ … from the players database*; **Not them** creates another person with the same name). With two players of the same name the app asks which one; a new name becomes a player when the match starts.
+- **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
+- **New match**: the players on court come from the database. Each place has **Pick the player**, which opens the list with search (members and students first; whoever is already on court isn't there) and at the top **New player**, which asks for first name, last name and the rest and then puts them on court; below, recent players to tap. Once picked, the place shows photo and name with **Change** and the **X**; a member's ranking fills itself in. An old name without a card (rematches, old matches) must be picked from the list or created before *Next*.
 - **At the first start** the app creates a player for every name in the matches already played.
-- **More › Players**: everyone, with search; *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
+- **More › Players**: everyone, with search; **New player** creates one with their details (a student too: then switch on *Student* on the card); *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
   - **Student**: puts them among the students (or takes them off).
   - **Merge with another player**: the same person written two ways ("Rossi" and "Mario Rossi") or created twice; matches and sessions move to them.
   - **Split a homonym** (in *Matches*): tick the matches of another person with the same name, who becomes a new player.
@@ -1515,7 +1515,7 @@ Bandas y pulseras aceptan **un teléfono a la vez** y llegan a unos metros menos
 
 **Para salir**: **Salir** (durante el partido pide confirmación, y también está en el resumen) cierra la app de verdad; lo mismo ocurre si la quitas de las aplicaciones recientes. Al volver a abrirla empieza desde la pestaña **Jugar**.
 
-**Guardado**: el partido se guarda solo en cada punto. *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
+**Guardado**: el partido se guarda solo en cada punto. En la pestaña **Jugar** un partido suspendido se elimina **manteniendo pulsado** su *Reanudar*; todos los suspendidos están en **Progresos › Historial › Suspendidos**, para reanudar o eliminar (marcando varios, también a la vez). *Suspender* detiene los tiempos; si sales, si el teléfono se apaga o si la app se cierra, el partido aparece en **Reanudar** (pestaña **Jugar**, o *Reanudar partido suspendido* en la pantalla INICIO DEL PARTIDO) y continúa con *Reanudar*. *Anular punto* recalcula todo desde el principio, así que funciona también después del final de un juego, de un set o del partido. La papelera de un partido suspendido pide confirmación. Si el partido se inició desde una pulsera con la pantalla bloqueada (Android no da entonces la ubicación), el lugar se toma en cuanto vuelves a abrir la app.
 
 ### 7.1 Entrenamiento con la banda
 
@@ -1613,10 +1613,10 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 
 Cada persona que juega o entrena es un **jugador** de la base, con un identificador que sigue siendo el mismo en cada teléfono: estadísticas, rating e historial son de esa persona aunque haya un homónimo, también después de pasar partidos de un teléfono a otro.
 
-- **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Un nombre escrito en Nuevo partido que no está en la base pide nombre y apellido al tocar *Siguiente* (el apodo es lo escrito). Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
-- **Nuevo partido**: mientras escribes el nombre aparecen los jugadores que coinciden (un toque y el partido es suyo); si el nombre es de un solo jugador se enlaza solo (*✓ … de la base de jugadores*; **No es él** crea otra persona con el mismo nombre). Con dos jugadores del mismo nombre la app pregunta cuál; un nombre nuevo se convierte en jugador al empezar el partido.
+- **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
+- **Nuevo partido**: en la pista van jugadores de la base de datos. Cada puesto tiene **Elegir el jugador**, que abre la lista con búsqueda (primero socios y alumnos; quien ya está en pista no aparece) y arriba **Jugador nuevo**, que pide nombre, apellido y lo demás y luego lo pone en pista; debajo, los jugadores recientes para tocar. Elegido, el puesto muestra foto y nombre con **Cambiar** y la **X**; la clasificación de un socio se rellena sola. Un nombre antiguo sin ficha (revanchas, partidos viejos) hay que elegirlo de la lista o crearlo antes de *Siguiente*.
 - **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
-- **Más › Jugadores**: todos, con búsqueda; *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
+- **Más › Jugadores**: todos, con búsqueda; **Nuevo jugador** crea uno con sus datos (también un alumno: luego activa *Alumno* en la ficha); *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
   - **Alumno**: lo pone (o lo quita) entre los alumnos.
   - **Unir con otro jugador**: la misma persona escrita de dos formas («Rossi» y «Mario Rossi») o creada dos veces; partidos y sesiones pasan a él.
   - **Separar un homónimo** (en *Partidos*): marca los partidos de otra persona con el mismo nombre, que pasa a ser un jugador nuevo.
@@ -2007,7 +2007,7 @@ Ceintures et bracelets acceptent **un téléphone à la fois** et portent quelqu
 
 **Quitter l'application** : le bouton **Quitter** (pendant le match, il demande confirmation ; il existe aussi dans le récapitulatif) ferme vraiment l'application ; même chose si vous la retirez des applications récentes. À la réouverture, elle repart de l'onglet **Jouer**.
 
-**Sauvegardes** : le match s'enregistre tout seul à chaque point. *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
+**Sauvegardes** : le match s'enregistre tout seul à chaque point. Dans l'onglet **Jouer**, un match suspendu se supprime en **appuyant longuement** sur son *Reprendre* ; tous les matchs suspendus sont dans **Progrès › Historique › Suspendus**, à reprendre ou supprimer (en en cochant plusieurs, aussi ensemble). *Suspendre* arrête les temps ; si vous quittez, si le téléphone s'éteint ou si l'application est fermée, le match se retrouve dans **Reprendre** (onglet **Jouer**, ou *Reprendre un match suspendu* sur l'écran DÉBUT DU MATCH) et repart avec *Reprendre*. *Annuler le point* recalcule tout depuis le début, et fonctionne donc même après la fin d'un jeu, d'une manche ou du match. La corbeille d'un match suspendu demande une confirmation. Si le match a été lancé depuis un bracelet écran verrouillé (Android ne donne alors pas la position), le lieu est pris dès que vous rouvrez l'application.
 
 ### 7.1 Entraînement avec la ceinture
 
@@ -2105,10 +2105,10 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 
 Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un identifiant qui reste le même sur chaque téléphone : statistiques, classement et historique sont à cette personne même avec un homonyme, y compris après avoir passé des matchs d'un téléphone à l'autre.
 
-- **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Un nom écrit dans Nouveau match qui n'est pas dans la base demande prénom et nom en touchant *Suivant* (le surnom est ce qui a été écrit). Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
-- **Nouveau match** : pendant que vous écrivez le nom, les joueurs qui correspondent apparaissent (un toucher et le match est à lui) ; si le nom n'appartient qu'à un joueur il se relie tout seul (*✓ … de la base des joueurs* ; **Ce n'est pas lui** crée une autre personne du même nom). Avec deux joueurs du même nom l'appli demande lequel ; un nom nouveau devient un joueur au début du match.
+- **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
+- **Nouveau match** : sur le terrain vont les joueurs de la base. Chaque place a **Choisir le joueur**, qui ouvre la liste avec la recherche (d'abord adhérents et élèves ; ceux déjà sur le terrain n'y sont pas) et en haut **Nouveau joueur**, qui demande prénom, nom et le reste puis le met sur le terrain ; dessous, les joueurs récents à toucher. Une fois choisi, la place montre photo et nom avec **Changer** et la **X** ; le classement d'un adhérent se remplit tout seul. Un ancien nom sans fiche (revanches, vieux matchs) doit être choisi dans la liste ou créé avant *Suivant*.
 - **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
-- **Plus › Joueurs** : tous, avec la recherche ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
+- **Plus › Joueurs** : tous, avec la recherche ; **Nouveau joueur** en crée un avec ses données (un élève aussi : activez ensuite *Élève* dans la fiche) ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
   - **Élève** : le met (ou le retire) parmi les élèves.
   - **Fusionner avec un autre joueur** : la même personne écrite de deux façons (« Rossi » et « Mario Rossi ») ou créée deux fois ; matchs et séances passent à lui.
   - **Séparer un homonyme** (dans *Matchs*) : cochez les matchs d'une autre personne du même nom, qui devient un nouveau joueur.
@@ -2301,7 +2301,7 @@ Alla **prima accensione** l'app fa tre domande: la lingua, come la userai (segna
 - **Progressi**: **Rating TSM · Progressi** (col tuo nome mostra subito il tuo rating), **Storico**, **Le mie racchette**.
 - **Altro**: **Tu** (il tuo nome), **Giocatori** (il database: 7.7), **Profilo e dati** (backup, ripristino, cancellazione: 7.8), **Dispositivi** (braccialetti, telecomandi, fasce, secondo telefono, tabellone TV), **Lingua e voce**, **Aiuto** (questa guida, con la ricerca e i rimandi tra le sezioni da toccare), racchette, trasferimento delle partite, presentazione, versione e licenza.
 
-**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i nomi, con i giocatori recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
+**Nuova partita** sono due passi: **chi gioca** (singolo o doppio, i giocatori scelti dal database, con i recenti da toccare, e lo sport; circolo, campo e torneo in *Altri dettagli*) e **come segni il punteggio e le regole**. Tutto è facoltativo: si può andare avanti anche senza nomi. Da ogni schermata **Indietro** torna alla scheda da cui si era partiti.
 
 ## 4. La voce (funziona senza internet)
 
@@ -2499,7 +2499,7 @@ Fasce e braccialetti accettano **un telefono alla volta** e arrivano a pochi met
 
 **Uscire**: **Esci** (dalla partita chiede conferma, e c'è anche nel riepilogo) chiude davvero l'app; lo stesso se la togli dalle app recenti. Alla riapertura riparte dalla scheda **Gioca**.
 
-**Salvataggi**: la partita si salva da sola a ogni punto. *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
+**Salvataggi**: la partita si salva da sola a ogni punto. Nella scheda **Gioca** una partita sospesa si elimina **tenendo premuto** il suo *Riprendi*; tutte le sospese sono in **Progressi › Storico › Sospese**, da riprendere o eliminare (spuntandone più d'una, anche insieme). *Sospendi* ferma i tempi; se esci, se il telefono si spegne o l'app viene chiusa, la partita si ritrova in **Riprendi** (scheda **Gioca**, o *Riprendi partita sospesa* sulla schermata INIZIO PARTITA) e riparte con *Riprendi*. *Annulla punto* ricalcola tutto dall'inizio, quindi funziona anche dopo la fine di un game, di un set o della partita. Il cestino di una partita sospesa chiede conferma. Se la partita è iniziata da un braccialetto a schermo bloccato (lì Android non dà la posizione), il luogo si prende appena riapri l'app.
 
 ### 7.1 Allenamento con la fascia
 
@@ -2597,10 +2597,10 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 
 Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
 
-- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. Un nome scritto in Nuova partita che nel database non c'è chiede nome e cognome toccando *Avanti* (il soprannome è quello scritto). I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
-- **Nuova partita**: mentre scrivi il nome compaiono i giocatori che corrispondono (un tocco e la partita è sua); se il nome è di un solo giocatore si collega da solo (*✓ … dal database*; **Non è lui** crea un'altra persona con lo stesso nome). Con due giocatori dello stesso nome l'app chiede quale; un nome nuovo diventa un giocatore all'inizio della partita.
+- **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **Nuova partita**: in campo vanno i giocatori del database. Ogni posto ha **Scegli il giocatore**, che apre l'elenco con la ricerca (prima soci e allievi; chi è già in campo non c'è) e in cima **Giocatore nuovo**, che chiede nome, cognome e il resto e poi lo mette in campo; sotto, i giocatori recenti da toccare al volo. Scelto, il posto mostra foto e nome con **Cambia** e la **X**; la classifica di un socio si scrive da sola. Un nome di prima senza scheda (rivincite, partite vecchie) va scelto dall'elenco o creato prima di *Avanti*.
 - **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
-- **Altro › Giocatori**: tutti, con la ricerca; *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
+- **Altro › Giocatori**: tutti, con la ricerca; **Nuovo giocatore** ne crea uno coi suoi dati (anche un allievo: poi nella scheda si accende *Allievo*); *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
   - **Allievo**: lo mette (o lo toglie) tra gli allievi.
   - **Unisci con un altro giocatore**: la stessa persona scritta in due modi ("Rossi" e "Mario Rossi") o creata due volte; partite e sessioni passano a lui.
   - **Separa un omonimo** (in *Partite*): spunti le partite di un'altra persona con lo stesso nome, che diventa un giocatore nuovo.
@@ -2991,7 +2991,7 @@ Cintas e pulseiras aceitam **um telefone de cada vez** e alcançam alguns metros
 
 **Sair**: **Sair** (na partida pede confirmação, e também está no resumo) fecha de verdade o app; o mesmo acontece se você o remover dos apps recentes. Ao reabrir, ele começa pela aba **Jogar**.
 
-**Salvamento**: a partida é salva sozinha a cada ponto. *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
+**Salvamento**: a partida é salva sozinha a cada ponto. Na aba **Jogar** uma partida suspensa se exclui **mantendo pressionado** o seu *Retomar*; todas as suspensas estão em **Progresso › Histórico › Suspensas**, para retomar ou excluir (marcando várias, também juntas). *Suspender* para os tempos; se você sair, se o telefone desligar ou se o app for fechado, a partida fica em **Retomar** (aba **Jogar**, ou *Retomar partida suspensa* na tela INÍCIO DA PARTIDA) e continua com *Retomar*. *Anular ponto* recalcula tudo desde o início, então funciona também depois do fim de um jogo, de um set ou da partida. A lixeira de uma partida suspensa pede confirmação. Se a partida foi iniciada por uma pulseira com a tela bloqueada (o Android não fornece a localização nesse caso), o local é obtido assim que você abrir o app de novo.
 
 ### 7.1 Treino com a cinta
 
@@ -3089,10 +3089,10 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 
 Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador que continua o mesmo em cada telefone: estatísticas, rating e histórico são dessa pessoa mesmo com um homônimo, também depois de passar partidas de um telefone para outro.
 
-- **Nome, sobrenome e apelido**: nome e sobrenome são obrigatórios e identificam a pessoa; o **apelido** (opcional) é como ela é chamada em quadra: partida, placar, voz e estatísticas usam o apelido se houver, senão nome e sobrenome. Um nome escrito em Nova partida que não está no banco pede nome e sobrenome ao tocar em *Avançar* (o apelido é o que foi escrito). Os jogadores nascidos do histórico têm um nome só, que vira o apelido: em *Jogadores* aparecem *a completar* e a ficha oferece **Completar nome e sobrenome**.
-- **Nova partida**: enquanto você escreve o nome aparecem os jogadores que combinam (um toque e a partida é dele); se o nome é de um só jogador ele se liga sozinho (*✓ … do banco de jogadores*; **Não é ele** cria outra pessoa com o mesmo nome). Com dois jogadores do mesmo nome o app pergunta qual; um nome novo vira jogador no início da partida.
+- **Nome, sobrenome e apelido**: nome e sobrenome são obrigatórios e identificam a pessoa; o **apelido** (opcional) é como ela é chamada em quadra: partida, placar, voz e estatísticas usam o apelido se houver, senão nome e sobrenome. Os jogadores nascidos do histórico têm um nome só, que vira o apelido: em *Jogadores* aparecem *a completar* e a ficha oferece **Completar nome e sobrenome**.
+- **Nova partida**: em quadra vão jogadores do banco de dados. Cada posição tem **Escolher o jogador**, que abre a lista com pesquisa (primeiro sócios e alunos; quem já está em quadra não aparece) e no alto **Jogador novo**, que pede nome, sobrenome e o resto e depois o coloca em quadra; embaixo, os jogadores recentes para tocar. Escolhido, a posição mostra foto e nome com **Trocar** e o **X**; o ranking de um sócio se preenche sozinho. Um nome antigo sem ficha (revanches, partidas velhas) precisa ser escolhido na lista ou criado antes de *Avançar*.
 - **Na primeira abertura** o app cria um jogador para cada nome das partidas já jogadas.
-- **Mais › Jogadores**: todos, com pesquisa; *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
+- **Mais › Jogadores**: todos, com pesquisa; **Novo jogador** cria um com os dados dele (também um aluno: depois ative *Aluno* na ficha); *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
   - **Aluno**: coloca (ou tira) entre os alunos.
   - **Juntar com outro jogador**: a mesma pessoa escrita de dois jeitos ("Rossi" e "Mario Rossi") ou criada duas vezes; partidas e sessões passam para ele.
   - **Separar um homônimo** (em *Partidas*): marque as partidas de outra pessoa com o mesmo nome, que vira um jogador novo.
@@ -6683,6 +6683,14 @@ class MatchController(
     fun deleteSaved(rec: MatchRecord) {
         scope.launch {
             withContext(io) { storage.deleteMatch(rec.id) }
+            refreshSaved()
+        }
+    }
+
+    /** Elimina più partite sospese insieme (dall'elenco delle sospese). */
+    fun deleteSaved(ids: Set<String>) {
+        scope.launch {
+            withContext(io) { ids.forEach { storage.deleteMatch(it) } }
             refreshSaved()
         }
     }
@@ -25182,6 +25190,14 @@ interface Strings {
     val transferPickPlayer: String
     val transferSuspended: String
     val transferSendN: (Int) -> String
+    val susNone: String
+    val historySuspended: (Int) -> String
+    val historySuspendedTab: String
+    val susDeleteN: (Int) -> String
+    val susDeleteAsk: (Int) -> String
+    val setupPickPlayer: String
+    val setupChange: String
+    val setupNotInDb: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -26951,6 +26967,14 @@ object ItStrings : Strings {
     override val transferPickPlayer = "Di un giocatore…"
     override val transferSuspended = "sospesa"
     override val transferSendN: (Int) -> String = { "Invia ($it)" }
+    override val susNone = "Nessuna partita sospesa."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partita sospesa" else "partite sospese"}" }
+    override val historySuspendedTab = "Sospese"
+    override val susDeleteN: (Int) -> String = { "Elimina ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Eliminare $it partite sospese? Non si potranno più riprendere." }
+    override val setupPickPlayer = "Scegli il giocatore"
+    override val setupChange = "Cambia"
+    override val setupNotInDb: (String) -> String = { "$it non è nel database: sceglilo dall'elenco o crealo." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -28703,6 +28727,14 @@ object EnStrings : Strings {
     override val transferPickPlayer = "Of a player…"
     override val transferSuspended = "suspended"
     override val transferSendN: (Int) -> String = { "Send ($it)" }
+    override val susNone = "No suspended matches."
+    override val historySuspended: (Int) -> String = { "$it suspended ${if (it == 1) "match" else "matches"}" }
+    override val historySuspendedTab = "Suspended"
+    override val susDeleteN: (Int) -> String = { "Delete ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Delete $it suspended matches? They can't be resumed any more." }
+    override val setupPickPlayer = "Pick the player"
+    override val setupChange = "Change"
+    override val setupNotInDb: (String) -> String = { "$it is not in the database: pick them from the list or create them." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -30478,6 +30510,14 @@ object DeStrings : Strings {
     override val transferPickPlayer = "Eines Spielers…"
     override val transferSuspended = "unterbrochen"
     override val transferSendN: (Int) -> String = { "Senden ($it)" }
+    override val susNone = "Keine unterbrochenen Matches."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "unterbrochenes Match" else "unterbrochene Matches"}" }
+    override val historySuspendedTab = "Unterbrochen"
+    override val susDeleteN: (Int) -> String = { "Löschen ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "$it unterbrochene Matches löschen? Sie lassen sich nicht mehr fortsetzen." }
+    override val setupPickPlayer = "Spieler wählen"
+    override val setupChange = "Ändern"
+    override val setupNotInDb: (String) -> String = { "$it ist nicht in der Datenbank: aus der Liste wählen oder anlegen." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -32246,6 +32286,14 @@ object EsStrings : Strings {
     override val transferPickPlayer = "De un jugador…"
     override val transferSuspended = "suspendido"
     override val transferSendN: (Int) -> String = { "Enviar ($it)" }
+    override val susNone = "Ningún partido suspendido."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partido suspendido" else "partidos suspendidos"}" }
+    override val historySuspendedTab = "Suspendidos"
+    override val susDeleteN: (Int) -> String = { "Eliminar ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "¿Eliminar $it partidos suspendidos? Ya no se podrán reanudar." }
+    override val setupPickPlayer = "Elegir el jugador"
+    override val setupChange = "Cambiar"
+    override val setupNotInDb: (String) -> String = { "$it no está en la base de datos: elígelo de la lista o créalo." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -34016,6 +34064,14 @@ object FrStrings : Strings {
     override val transferPickPlayer = "D'un joueur…"
     override val transferSuspended = "suspendu"
     override val transferSendN: (Int) -> String = { "Envoyer ($it)" }
+    override val susNone = "Aucun match suspendu."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "match suspendu" else "matchs suspendus"}" }
+    override val historySuspendedTab = "Suspendus"
+    override val susDeleteN: (Int) -> String = { "Supprimer ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Supprimer $it matchs suspendus ? On ne pourra plus les reprendre." }
+    override val setupPickPlayer = "Choisir le joueur"
+    override val setupChange = "Changer"
+    override val setupNotInDb: (String) -> String = { "$it n'est pas dans la base : choisissez-le dans la liste ou créez-le." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -35787,6 +35843,14 @@ object PtStrings : Strings {
     override val transferPickPlayer = "De um jogador…"
     override val transferSuspended = "suspensa"
     override val transferSendN: (Int) -> String = { "Enviar ($it)" }
+    override val susNone = "Nenhuma partida suspensa."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partida suspensa" else "partidas suspensas"}" }
+    override val historySuspendedTab = "Suspensas"
+    override val susDeleteN: (Int) -> String = { "Excluir ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Excluir $it partidas suspensas? Não poderão mais ser retomadas." }
+    override val setupPickPlayer = "Escolher o jogador"
+    override val setupChange = "Trocar"
+    override val setupNotInDb: (String) -> String = { "$it não está no banco de dados: escolha na lista ou crie." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -37300,27 +37364,36 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
 
 /** Sceglie un giocatore dal database (o ne crea uno), esclusi quelli già scelti. */
 @Composable
-fun PlayerPickDialog(c: MatchController, except: Set<String>, onDone: (PlayerProfile?) -> Unit) {
+fun PlayerPickDialog(c: MatchController, except: Set<String>, title: String? = null, query0: String = "", onDone: (PlayerProfile?) -> Unit) {
     val s = LocalStrings.current
     val players by c.players.collectAsState()
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(query0) }
     var creating by remember { mutableStateOf(false) }
     val free = players.filter { it.id !in except }
-    val list = (if (query.isBlank()) free else Players.search(free, query)).sortedBy { if (it.member != null) 0 else 1 }
+    // Prima soci e allievi, poi gli altri; con la ricerca, chi corrisponde meglio.
+    val list = if (query.isBlank()) free.sortedWith(compareBy({ if (it.member != null || it.student) 0 else 1 }, { it.name.lowercase() })) else Players.search(free, query)
     AlertDialog(
         onDismissRequest = { onDone(null) },
-        title = { Text(s.bkAddPlayer) },
+        title = { Text(title ?: s.bkAddPlayer) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 GhostButton(s.membersNewPlayer, Icons.Filled.PersonAdd, { creating = true }, Modifier.fillMaxWidth())
                 OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
-                for (p in list.take(50)) Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 8.dp))
+                if (list.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (p in list.take(60)) Row(Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    com.tennis.scoremanager.ui.PlayerAvatar(c, p.name, TsmColors.Ball, 36.dp)
+                    Column(Modifier.weight(1f).padding(start = 10.dp)) {
+                        Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        val info = listOfNotNull(p.fullName.takeIf { it.isNotBlank() && it != p.name }, p.member?.ranking?.ifBlank { null }, s.studentsTitle.takeIf { p.student }, s.membersTitle.takeIf { p.member != null }).joinToString(" · ")
+                        if (info.isNotBlank()) Text(info, color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                }
             }
         },
         confirmButton = {},
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
     )
-    if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) onDone(p) }
+    if (creating) PlayerEditDialog(c, null, prefill = query) { p -> creating = false; if (p != null) onDone(p) }
 }
 
 /** Orari, caselle, prezzi e luci del planning. */
@@ -38280,8 +38353,12 @@ fun HistoryScreen(c: MatchController) {
             PlayerDetail(c, played, matches, open)
             return@ScreenScaffold
         }
-        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers)), selected = tab, onSelect = { tab = it })
-        if (tab == 0) {
+        val saved by c.saved.collectAsState()
+        LaunchedEffect(Unit) { c.refreshSaved() }
+        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers), SegOption(s.historySuspendedTab)), selected = tab, onSelect = { tab = it })
+        if (tab == 2) {
+            SuspendedList(c)
+        } else if (tab == 0) {
             if (matches.isEmpty()) Text(s.historyEmpty, color = TsmColors.TextDim)
             matches.forEach { MatchRow(it) { c.openFromHistory(it) } }
         } else {
@@ -38554,6 +38631,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Payments
@@ -38796,8 +38874,11 @@ private fun RowScope.TabBar(tabs: List<HomeTab>, current: HomeTab, onSelect: (Ho
 
 /** Una voce della prima schermata: icona, titolo, una riga di spiegazione; [main] = l'azione principale della scheda. */
 @Composable
-private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface, modifier = Modifier.fillMaxWidth()) {
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+private fun Entry(icon: ImageVector, title: String, hint: String?, main: Boolean = false, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
+    // Con [onLongClick] la voce si tiene premuta per un'altra azione (eliminare la partita sospesa).
+    Surface(shape = RoundedCornerShape(18.dp), color = if (main) TsmColors.Ball else TsmColors.Surface,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = if (main) 18.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = if (main) TsmColors.OnBall else TsmColors.Ball, modifier = Modifier.size(if (main) 30.dp else 24.dp))
             Spacer(Modifier.width(14.dp))
@@ -38857,6 +38938,7 @@ private fun PlayTab(c: MatchController) {
         c.refreshSaved()
         c.refreshHistory()
     }
+    var toDelete by remember { mutableStateOf<com.tennis.scoremanager.data.MatchRecord?>(null) }
     DeviceStatus(c)
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = true) { c.go(Screen.SETUP) }
     // La partita lasciata a metà e la rivincita dell'ultima: quello che di solito si vuole fare subito.
@@ -38864,7 +38946,19 @@ private fun PlayTab(c: MatchController) {
         val names = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
         val lang = c.options.value.lang
         val at = rec.startedAt ?: rec.updatedAt
-        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}") { c.resumeSaved(rec) }
+        // Tenendo premuto si elimina (con conferma), senza passare da Nuova partita.
+        Entry(Icons.Filled.History, s.playResume(names), "${com.tennis.scoremanager.data.Reports.date(at, lang)} ${com.tennis.scoremanager.data.Reports.time(at, lang)}",
+            onLongClick = { toDelete = rec }) { c.resumeSaved(rec) }
+    }
+    toDelete?.let { rec ->
+        val n = Side.entries.joinToString(" ${s.vs} ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { toDelete = null },
+            title = { Text(s.deleteSavedTitle) },
+            text = { Text(s.deleteSavedText(n)) },
+            confirmButton = { androidx.compose.material3.TextButton(onClick = { c.deleteSaved(rec); toDelete = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { toDelete = null }) { Text(s.back) } },
+        )
     }
     history.maxByOrNull { it.record.endedAt ?: it.record.updatedAt }?.takeIf { it.record.finished }?.let { last ->
         val su = last.record.setup
@@ -42192,6 +42286,7 @@ import com.tennis.scoremanager.ui.LocalStrings
 import com.tennis.scoremanager.ui.PlayerAvatar
 import com.tennis.scoremanager.ui.ScreenScaffold
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.compose.material.icons.filled.PersonAdd
 
 /**
  * Altro › Giocatori: il database di tutti, chi ha giocato e gli allievi, con la ricerca. Dalla scheda di ciascuno si
@@ -42208,11 +42303,15 @@ fun PlayersScreen(c: MatchController) {
     // Gli omonimi si vedono subito: stesso nome, più giocatori.
     val twins = remember(players) { players.groupBy { com.tennis.scoremanager.data.PlayerStats.key(it.name) }.filterValues { it.size > 1 }.keys }
     val hints = remember(players, history) { players.associate { it.id to c.playerHint(it) } }
+    var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
         title = s.playersTitle,
         subtitle = s.playersHint,
         icon = Icons.Filled.Groups,
-        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            com.tennis.scoremanager.ui.BigButton(s.playerNewTitle, Icons.Filled.PersonAdd, { creating = true }, Modifier.weight(1f))
+        },
     ) {
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
         if (players.isEmpty()) Text(s.playersNone, color = TsmColors.TextDim)
@@ -42236,6 +42335,8 @@ fun PlayersScreen(c: MatchController) {
             }
         }
     }
+    // Il giocatore nuovo, con i suoi dati: poi si apre la sua scheda.
+    if (creating) com.tennis.scoremanager.ui.PlayerEditDialog(c, null) { p -> creating = false; p?.let { c.openStudent(it.id) } }
 }
 TSM_EOF
 
@@ -43564,6 +43665,7 @@ import com.tennis.scoremanager.ui.SegOption
 import com.tennis.scoremanager.ui.Segmented
 import com.tennis.scoremanager.ui.SwitchRow
 import com.tennis.scoremanager.ui.TsmColors
+import androidx.compose.material.icons.filled.Close
 
 /** Pagina 1: circolo, campo, singolare/doppio e nomi. Tutto facoltativo. */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -43576,16 +43678,17 @@ fun SetupScreen(c: MatchController) {
     val context = LocalContext.current
     // Pagina 1 è il primo passo di una nuova partita: "Indietro" torna alla prima schermata.
     androidx.activity.compose.BackHandler { c.back() }
-    // Un nome che nel database non c'è: prima di andare avanti si chiedono nome e cognome (il soprannome è quello scritto).
+    // In campo vanno giocatori del database: un nome senza scheda (partite di prima, rivincite) si sceglie dall'elenco
+    // o si crea, prima di andare avanti.
     val creating by c.playerToCreate.collectAsState()
-    fun missing(setup: SetupData) = com.tennis.scoremanager.data.Players.slots(setup)
-        .firstOrNull { it.name.isNotBlank() && it.id.isEmpty() && com.tennis.scoremanager.data.Players.byName(c.players.value, it.name).isEmpty() }
+    fun missing(setup: SetupData) = com.tennis.scoremanager.data.Players.slots(setup).firstOrNull { it.name.isNotBlank() && c.playerById(it.id) == null }
     creating?.let { slot ->
-        com.tennis.scoremanager.ui.PlayerEditDialog(c, null, prefill = slot.name) { p ->
+        val taken = com.tennis.scoremanager.data.Players.slots(su).filter { it.side != slot.side || it.second != slot.second }.map { it.id }.filter { it.isNotEmpty() }.toSet()
+        PlayerPickDialog(c, taken, title = s.setupPickPlayer, query0 = slot.name) { p ->
             c.playerToCreate.value = null
             if (p != null) {
                 c.updateSetup { it.withPlayer(c, slot.side, slot.second, p.name, p.id) }
-                // Il prossimo nome nuovo, o avanti.
+                // Il prossimo da sistemare, o avanti.
                 if (slot.fromNext) missing(c.setup.value)?.let { c.playerToCreate.value = it.copy(fromNext = true) } ?: c.go(Screen.OPTIONS)
             }
         }
@@ -43693,15 +43796,7 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
         val a = if (side == Side.P1) su.p1a else su.p2a
         val b = if (side == Side.P1) su.p1b else su.p2b
         // A sinistra di ogni nome la sua foto: si tocca per metterla o cambiarla.
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            EditablePlayerAvatar(c, a, accent, 52.dp)
-            Box(Modifier.weight(1f)) {
-                Field(a, if (su.doubles) "${s.playerName} A" else s.playerName, Icons.Filled.Person, accent = accent) { v ->
-                    c.updateSetup { it.withPlayer(c, side, false, v, null) }
-                }
-            }
-        }
-        PlayerChoices(c, su, side, false, recent, accent)
+        PlayerSlot(c, su, side, false, recent, accent)
         Field(if (side == Side.P1) su.p1aRank else su.p2aRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
             c.updateSetup { if (side == Side.P1) it.copy(p1aRank = v) else it.copy(p2aRank = v) }
         }
@@ -43715,15 +43810,7 @@ private fun PlayerCard(c: MatchController, su: SetupData, side: Side, recent: Li
             }
         }
         if (su.doubles) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                EditablePlayerAvatar(c, b, accent, 52.dp)
-                Box(Modifier.weight(1f)) {
-                    Field(b, "${s.playerName} B", Icons.Filled.Person, accent = accent) { v ->
-                        c.updateSetup { it.withPlayer(c, side, true, v, null) }
-                    }
-                }
-            }
-            PlayerChoices(c, su, side, true, recent, accent)
+            PlayerSlot(c, su, side, true, recent, accent)
             Field(if (side == Side.P1) su.p1bRank else su.p2bRank, s.playerRank, Icons.Filled.Leaderboard, accent = accent) { v ->
                 c.updateSetup { if (side == Side.P1) it.copy(p1bRank = v) else it.copy(p2bRank = v) }
             }
@@ -43750,74 +43837,64 @@ private fun SetupData.withPlayer(c: MatchController, side: Side, second: Boolean
 }
 
 /**
- * Sotto il nome: mentre si scrive, i giocatori del database che corrispondono (un tocco e la partita è di quella
- * persona); a campo vuoto, i giocatori recenti. Se ci sono più giocatori con quel nome (omonimi) bisogna sceglierne
- * uno o crearne uno nuovo; se il nome non c'è, il giocatore si crea da solo all'inizio della partita.
+ * Un posto in campo: il giocatore del database scelto (foto, nome, classifica) con Cambia e la X; vuoto, il tasto per
+ * sceglierlo dall'elenco (dove si può anche crearne uno nuovo) e i giocatori recenti da toccare al volo. Un nome senza
+ * scheda (partite di prima) va scelto dall'elenco.
  */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun PlayerChoices(c: MatchController, su: SetupData, side: Side, second: Boolean, recent: List<Pair<String, String>>, accent: Color) {
+private fun PlayerSlot(c: MatchController, su: SetupData, side: Side, second: Boolean, recent: List<Pair<String, String>>, accent: Color) {
     val s = LocalStrings.current
-    val players by c.players.collectAsState()
     val name = when { side == Side.P1 && !second -> su.p1a; side == Side.P1 -> su.p1b; !second -> su.p2a; else -> su.p2b }
     val id = when { side == Side.P1 && !second -> su.p1aId; side == Side.P1 -> su.p1bId; !second -> su.p2aId; else -> su.p2bId }
     // Chi è già negli altri posti non si propone.
     val others = com.tennis.scoremanager.data.Players.slots(su).filter { it.side != side || it.second != second }
     val takenIds = others.map { it.id }.filter { it.isNotEmpty() }.toSet()
-    val takenNames = others.map { PlayerStats.key(it.name) }.filter { it.isNotEmpty() }.toSet()
     val linked = c.playerById(id)
-    @Composable fun chip(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector?, onClick: () -> Unit) = Row(
-        Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (icon != null) Icon(icon, null, tint = accent, modifier = Modifier.size(14.dp))
-        Text((if (icon != null) " " else "") + label, color = accent, fontSize = 13.sp)
+    var picking by remember { mutableStateOf(false) }
+    fun choose(p: com.tennis.scoremanager.data.PlayerProfile) = c.updateSetup { cur ->
+        val x = cur.withPlayer(c, side, second, p.name, p.id)
+        // La classifica di un socio entra da sola, se non è già scritta.
+        val rank = p.member?.ranking.orEmpty()
+        if (rank.isBlank()) x else when {
+            side == Side.P1 && !second -> x.copy(p1aRank = x.p1aRank.ifBlank { rank })
+            side == Side.P1 -> x.copy(p1bRank = x.p1bRank.ifBlank { rank })
+            !second -> x.copy(p2aRank = x.p2aRank.ifBlank { rank })
+            else -> x.copy(p2bRank = x.p2bRank.ifBlank { rank })
+        }
     }
-    val same = com.tennis.scoremanager.data.Players.byName(players, name).filter { it.id !in takenIds }
-    // Un solo giocatore con quel nome: è lui, lo si collega da solo (chi è un omonimo tocca "Non è lui").
-    LaunchedEffect(name, id, same.size) {
-        if (id.isEmpty() && same.size == 1) c.updateSetup { it.withPlayer(c, side, second, name, same[0].id) }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        EditablePlayerAvatar(c, name, accent, 52.dp)
+        if (linked != null) {
+            Column(Modifier.weight(1f)) {
+                Text(linked.name, color = TsmColors.TextMain, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 18.sp)
+                val info = listOfNotNull(linked.fullName.takeIf { it.isNotBlank() && it != linked.name }, linked.member?.ranking?.ifBlank { null }).joinToString(" · ")
+                if (info.isNotBlank()) Text(info, color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+            TextButton(onClick = { picking = true }) { Text(s.setupChange, color = accent) }
+            androidx.compose.material3.IconButton(onClick = { c.updateSetup { it.withPlayer(c, side, second, "", "") } }) {
+                Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim)
+            }
+        } else {
+            Column(Modifier.weight(1f)) {
+                if (name.isNotBlank()) Text(s.setupNotInDb(name.trim()), color = TsmColors.Orange, fontSize = 13.sp)
+                GhostButton(if (su.doubles) "${s.setupPickPlayer} ${if (second) "B" else "A"}" else s.setupPickPlayer, Icons.Filled.PersonAdd, { picking = true }, Modifier.fillMaxWidth())
+            }
+        }
     }
-    val flow: @Composable (@Composable () -> Unit) -> Unit = { content ->
-        androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { content() }
+    // Vuoto: i giocatori recenti (del database), un tocco e sono in campo.
+    if (linked == null && name.isBlank()) {
+        val picks = recent.mapNotNull { (k, _) -> c.playerById(k) }.filter { it.id !in takenIds }.distinctBy { it.id }.take(6)
+        if (picks.isNotEmpty()) androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (p in picks) Text(
+                p.name, color = accent, fontSize = 13.sp,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { choose(p) }.padding(horizontal = 10.dp, vertical = 6.dp),
+            )
+        }
     }
-    when {
-        linked != null -> {
-            Text(s.playerLinked(linked.name), color = TsmColors.TextDim, fontSize = 12.sp)
-            flow {
-                chip(s.playerNotHim, Icons.Filled.PersonAdd) {
-                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
-                }
-            }
-        }
-        name.isBlank() -> {
-            val picks = recent.filter { (k, n) -> k !in takenIds && PlayerStats.key(n) !in takenNames }.take(6)
-            if (picks.isNotEmpty()) flow {
-                for ((k, n) in picks) chip(n, null) { c.updateSetup { it.withPlayer(c, side, second, n, c.playerById(k)?.id) } }
-            }
-        }
-        same.size > 1 -> {
-            // Omonimi: si distinguono da quante partite hanno e dall'ultima volta.
-            Text(s.playerHomonyms(same.size, name.trim()), color = TsmColors.Orange, fontSize = 12.sp)
-            flow {
-                for (p in same) chip(p.name + (c.playerHint(p)?.let { " · $it" } ?: ""), if (p.student) Icons.Filled.School else Icons.Filled.Person) {
-                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
-                }
-                chip(s.playerCreate(name.trim()), Icons.Filled.PersonAdd) {
-                    c.playerToCreate.value = com.tennis.scoremanager.data.Players.Slot(side, second, name, "")
-                }
-            }
-        }
-        else -> {
-            // Nome nuovo: i giocatori che gli somigliano (forse è uno di loro), sennò si crea all'inizio della partita.
-            val hits = com.tennis.scoremanager.data.Players.search(players, name).filter { it.id !in takenIds }.take(6)
-            if (hits.isNotEmpty()) flow {
-                for (p in hits) chip(p.name, if (p.student) Icons.Filled.School else Icons.Filled.Person) {
-                    c.updateSetup { it.withPlayer(c, side, second, p.name, p.id) }
-                }
-            }
-            Text(s.playerNew(name.trim()), color = TsmColors.TextDim, fontSize = 12.sp)
-        }
+    if (picking) PlayerPickDialog(c, takenIds, title = s.setupPickPlayer, query0 = if (linked == null) name.trim() else "") { p ->
+        picking = false
+        p?.let(::choose)
     }
 }
 
@@ -45260,6 +45337,111 @@ private fun thumb(f: java.io.File): androidx.compose.ui.graphics.ImageBitmap {
     val sample = (maxOf(o.outWidth, o.outHeight) / 256).coerceAtLeast(1)
     return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample }).asImageBitmap()
 }
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/SuspendedList.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/SuspendedList.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.MatchRecord
+import com.tennis.scoremanager.data.PlayerStats
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.model.ScoreEngine
+import com.tennis.scoremanager.model.Side
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.TsmColors
+
+/**
+ * Storico › Sospese: tutte le partite sospese, dalla più recente, con il punteggio a cui ci si è fermati. Si riprende
+ * una partita o la si elimina; spuntandone più d'una si eliminano insieme (sempre con la conferma).
+ */
+@Composable
+fun SuspendedList(c: MatchController) {
+    val s = LocalStrings.current
+    val saved by c.saved.collectAsState()
+    val lang = c.options.value.lang
+    val list = saved.sortedByDescending { it.updatedAt }
+    var picked by remember { mutableStateOf(setOf<String>()) }
+    var ask by remember { mutableStateOf<Set<String>?>(null) }
+    // Le spunte di partite che non ci sono più (eliminate) si tolgono.
+    val ids = list.map { it.id }.toSet()
+    if (!ids.containsAll(picked)) picked = picked intersect ids
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (list.isEmpty()) { Text(s.susNone, color = TsmColors.TextDim); return@Column }
+        Text(s.historySuspended(list.size), color = TsmColors.TextDim, fontSize = 13.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { picked = ids }) { Text(s.transferPickAll, color = TsmColors.Ball) }
+            TextButton(onClick = { picked = emptySet() }) { Text(s.transferPickNone, color = TsmColors.Ball) }
+        }
+        if (picked.isNotEmpty()) GhostButton(s.susDeleteN(picked.size), Icons.Filled.Delete, { ask = picked }, Modifier.fillMaxWidth())
+        for (rec in list) {
+            val on = rec.id in picked
+            val score = remember(rec.id, rec.updatedAt) {
+                runCatching { Reports.scoreLine(ScoreEngine.replay(rec.rules, rec.events), Side.P1) }.getOrDefault("")
+            }
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface).clickable { picked = if (on) picked - rec.id else picked + rec.id }.padding(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(checked = on, onCheckedChange = { picked = if (it) picked + rec.id else picked - rec.id })
+                Column(Modifier.weight(1f)) {
+                    Text(names(rec), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    val at = rec.startedAt ?: rec.updatedAt
+                    Text(listOfNotNull("${Reports.date(at, lang)} ${Reports.time(at, lang)}", score.ifBlank { null }, rec.setup.event.ifBlank { null }).joinToString(" · "),
+                        color = TsmColors.TextDim, fontSize = 12.sp)
+                }
+                IconButton(onClick = { c.resumeSaved(rec) }) { Icon(Icons.Filled.PlayArrow, s.resume, tint = TsmColors.Ball) }
+                IconButton(onClick = { ask = setOf(rec.id) }) { Icon(Icons.Filled.Delete, s.delete, tint = TsmColors.TextDim) }
+            }
+        }
+    }
+    ask?.let { set ->
+        val one = list.firstOrNull { it.id == set.singleOrNull() }
+        AlertDialog(
+            onDismissRequest = { ask = null },
+            title = { Text(s.deleteSavedTitle) },
+            text = { Text(if (one != null) s.deleteSavedText(names(one)) else s.susDeleteAsk(set.size)) },
+            confirmButton = { TextButton(onClick = { c.deleteSaved(set); picked = picked - set; ask = null }) { Text(s.delete, color = TsmColors.Danger) } },
+            dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
+        )
+    }
+}
+
+private fun names(rec: MatchRecord): String = Side.entries.joinToString(" – ") { PlayerStats.names(rec.setup, it).joinToString(" / ").ifEmpty { "?" } }
 TSM_EOF
 
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/TeamsScreen.kt
@@ -73028,6 +73210,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 222 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 223 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

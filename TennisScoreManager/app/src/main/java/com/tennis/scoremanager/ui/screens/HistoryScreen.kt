@@ -119,8 +119,12 @@ fun HistoryScreen(c: MatchController) {
             PlayerDetail(c, played, matches, open)
             return@ScreenScaffold
         }
-        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers)), selected = tab, onSelect = { tab = it })
-        if (tab == 0) {
+        val saved by c.saved.collectAsState()
+        LaunchedEffect(Unit) { c.refreshSaved() }
+        Segmented(listOf(SegOption(s.historyMatches), SegOption(s.historyPlayers), SegOption(s.historySuspendedTab)), selected = tab, onSelect = { tab = it })
+        if (tab == 2) {
+            SuspendedList(c)
+        } else if (tab == 0) {
             if (matches.isEmpty()) Text(s.historyEmpty, color = TsmColors.TextDim)
             matches.forEach { MatchRow(it) { c.openFromHistory(it) } }
         } else {

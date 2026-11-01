@@ -1471,6 +1471,14 @@ object DeStrings : Strings {
     override val transferPickPlayer = "Eines Spielers…"
     override val transferSuspended = "unterbrochen"
     override val transferSendN: (Int) -> String = { "Senden ($it)" }
+    override val susNone = "Keine unterbrochenen Matches."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "unterbrochenes Match" else "unterbrochene Matches"}" }
+    override val historySuspendedTab = "Unterbrochen"
+    override val susDeleteN: (Int) -> String = { "Löschen ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "$it unterbrochene Matches löschen? Sie lassen sich nicht mehr fortsetzen." }
+    override val setupPickPlayer = "Spieler wählen"
+    override val setupChange = "Ändern"
+    override val setupNotInDb: (String) -> String = { "$it ist nicht in der Datenbank: aus der Liste wählen oder anlegen." }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

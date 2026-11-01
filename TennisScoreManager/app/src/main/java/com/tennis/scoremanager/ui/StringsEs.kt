@@ -1472,6 +1472,14 @@ object EsStrings : Strings {
     override val transferPickPlayer = "De un jugador…"
     override val transferSuspended = "suspendido"
     override val transferSendN: (Int) -> String = { "Enviar ($it)" }
+    override val susNone = "Ningún partido suspendido."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partido suspendido" else "partidos suspendidos"}" }
+    override val historySuspendedTab = "Suspendidos"
+    override val susDeleteN: (Int) -> String = { "Eliminar ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "¿Eliminar $it partidos suspendidos? Ya no se podrán reanudar." }
+    override val setupPickPlayer = "Elegir el jugador"
+    override val setupChange = "Cambiar"
+    override val setupNotInDb: (String) -> String = { "$it no está en la base de datos: elígelo de la lista o créalo." }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

@@ -2696,6 +2696,14 @@ class MatchController(
         }
     }
 
+    /** Elimina più partite sospese insieme (dall'elenco delle sospese). */
+    fun deleteSaved(ids: Set<String>) {
+        scope.launch {
+            withContext(io) { ids.forEach { storage.deleteMatch(it) } }
+            refreshSaved()
+        }
+    }
+
     fun refreshSaved() {
         scope.launch { saved.value = withContext(io) { storage.loadUnfinished() } }
     }

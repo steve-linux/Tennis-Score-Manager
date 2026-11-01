@@ -1475,6 +1475,14 @@ object PtStrings : Strings {
     override val transferPickPlayer = "De um jogador…"
     override val transferSuspended = "suspensa"
     override val transferSendN: (Int) -> String = { "Enviar ($it)" }
+    override val susNone = "Nenhuma partida suspensa."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partida suspensa" else "partidas suspensas"}" }
+    override val historySuspendedTab = "Suspensas"
+    override val susDeleteN: (Int) -> String = { "Excluir ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Excluir $it partidas suspensas? Não poderão mais ser retomadas." }
+    override val setupPickPlayer = "Escolher o jogador"
+    override val setupChange = "Trocar"
+    override val setupNotInDb: (String) -> String = { "$it não está no banco de dados: escolha na lista ou crie." }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

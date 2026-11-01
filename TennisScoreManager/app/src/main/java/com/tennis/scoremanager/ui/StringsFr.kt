@@ -1474,6 +1474,14 @@ object FrStrings : Strings {
     override val transferPickPlayer = "D'un joueur…"
     override val transferSuspended = "suspendu"
     override val transferSendN: (Int) -> String = { "Envoyer ($it)" }
+    override val susNone = "Aucun match suspendu."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "match suspendu" else "matchs suspendus"}" }
+    override val historySuspendedTab = "Suspendus"
+    override val susDeleteN: (Int) -> String = { "Supprimer ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Supprimer $it matchs suspendus ? On ne pourra plus les reprendre." }
+    override val setupPickPlayer = "Choisir le joueur"
+    override val setupChange = "Changer"
+    override val setupNotInDb: (String) -> String = { "$it n'est pas dans la base : choisissez-le dans la liste ou créez-le." }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

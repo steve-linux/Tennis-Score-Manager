@@ -1510,6 +1510,14 @@ interface Strings {
     val transferPickPlayer: String
     val transferSuspended: String
     val transferSendN: (Int) -> String
+    val susNone: String
+    val historySuspended: (Int) -> String
+    val historySuspendedTab: String
+    val susDeleteN: (Int) -> String
+    val susDeleteAsk: (Int) -> String
+    val setupPickPlayer: String
+    val setupChange: String
+    val setupNotInDb: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3279,6 +3287,14 @@ object ItStrings : Strings {
     override val transferPickPlayer = "Di un giocatore…"
     override val transferSuspended = "sospesa"
     override val transferSendN: (Int) -> String = { "Invia ($it)" }
+    override val susNone = "Nessuna partita sospesa."
+    override val historySuspended: (Int) -> String = { "$it ${if (it == 1) "partita sospesa" else "partite sospese"}" }
+    override val historySuspendedTab = "Sospese"
+    override val susDeleteN: (Int) -> String = { "Elimina ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Eliminare $it partite sospese? Non si potranno più riprendere." }
+    override val setupPickPlayer = "Scegli il giocatore"
+    override val setupChange = "Cambia"
+    override val setupNotInDb: (String) -> String = { "$it non è nel database: sceglilo dall'elenco o crealo." }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5031,6 +5047,14 @@ object EnStrings : Strings {
     override val transferPickPlayer = "Of a player…"
     override val transferSuspended = "suspended"
     override val transferSendN: (Int) -> String = { "Send ($it)" }
+    override val susNone = "No suspended matches."
+    override val historySuspended: (Int) -> String = { "$it suspended ${if (it == 1) "match" else "matches"}" }
+    override val historySuspendedTab = "Suspended"
+    override val susDeleteN: (Int) -> String = { "Delete ($it)" }
+    override val susDeleteAsk: (Int) -> String = { "Delete $it suspended matches? They can't be resumed any more." }
+    override val setupPickPlayer = "Pick the player"
+    override val setupChange = "Change"
+    override val setupNotInDb: (String) -> String = { "$it is not in the database: pick them from the list or create them." }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
