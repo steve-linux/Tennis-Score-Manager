@@ -337,6 +337,16 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - **Ejercicios** (desde la pestaña *Alumnos* del entrenador, o desde la elección bajo *Empezar*): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
 
+### 7.11 Socios del club
+
+Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pensada para el dispositivo de la secretaría.
+
+- **Nuevo socio**: elige un jugador que ya esté (quien jugó partidos o un alumno) o crea uno nuevo. Desde la ficha de un jugador también se puede tocar **Inscribir como socio**.
+- **Datos del socio**: teléfono y correo (sirven para los avisos), fecha de nacimiento, socio desde, carné del club; **licencia FITP** con número, tipo (competición, no competición, otra), año y clasificación; **certificado médico** con tipo y caducidad; consentimiento al tratamiento de datos y a fotos y vídeos. Para los **menores**, también el padre, la madre o el tutor y su teléfono.
+- Del certificado se guardan **solo el tipo y la caducidad**, no el documento: es un dato de salud y queda en el expediente del club.
+- Debajo de cada socio la app dice qué falta: consentimiento de privacidad, licencia FITP del año, certificado que falta, caducado o que caduca en menos de un mes, datos del padre o madre, un contacto. En rojo lo que impide jugar (licencia y certificado), en naranja el resto. **Por resolver** muestra solo a quien tiene algo pendiente.
+- Los datos de socio se quedan en el teléfono: cuando los partidos pasan a otro teléfono solo viajan nombre, apellido, apodo y mano. **Quitar de los socios** borra licencias, certificado y consentimientos; el jugador y sus partidos se quedan.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

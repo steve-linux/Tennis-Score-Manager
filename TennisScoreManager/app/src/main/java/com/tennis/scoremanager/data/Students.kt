@@ -32,6 +32,13 @@ data class PlayerProfile(
     val student: Boolean = false,
     /** Altri identificativi che sono lui: lo stesso giocatore creato su un altro telefono, o unito a questo. */
     val aliases: Set<String> = emptySet(),
+    /** Contatti per gli avvisi (tornei, quote): restano sul telefono, non passano con le partite. */
+    val phone: String = "",
+    val email: String = "",
+    /** Data di nascita (mezzogiorno), per i minorenni e le categorie dei tornei. */
+    val birth: Long? = null,
+    /** Socio del circolo (null = non è socio). */
+    val member: Membership? = null,
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")

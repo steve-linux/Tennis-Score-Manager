@@ -1049,6 +1049,54 @@ interface Strings {
     val compareNone: String
     val compareOverlay: String
     val compareThisSession: String
+    val membersTitle: String
+    val membersHint: String
+    val membersNone: String
+    val membersNew: String
+    val membersAll: String
+    val membersTodo: String
+    val membersPickTitle: String
+    val membersPickHint: String
+    val membersNewPlayer: String
+    val memberSection: String
+    val memberEnroll: String
+    val memberEdit: String
+    val memberRemove: String
+    val memberPhone: String
+    val memberEmail: String
+    val memberBirth: String
+    val memberSince: String
+    val memberNumber: String
+    val memberFitpNumber: String
+    val memberFitpYear: String
+    val memberFitpAgonist: String
+    val memberFitpNonAgonist: String
+    val memberFitpOther: String
+    val memberRanking: String
+    val memberRankingLabel: String
+    val memberMedical: String
+    val memberMedicalAgonistic: String
+    val memberMedicalNon: String
+    val memberMedicalUntil: String
+    val memberMedicalNote: String
+    val memberPrivacy: String
+    val memberPhotos: String
+    val memberGuardian: String
+    val memberGuardianPhone: String
+    val memberMinor: String
+    val memberNotSet: String
+    val memberOk: String
+    val memberYes: String
+    val issueNoPrivacy: String
+    val issueNoMedical: String
+    val issueMedicalExpired: String
+    val issueNoGuardian: String
+    val issueNoContact: String
+    val membersCount: (Int, Int) -> String
+    val memberRemoveAsk: (String) -> String
+    val issueNoFitp: (Int) -> String
+    val issueMedicalSoon: (String) -> String
+    val memberMedicalShort: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2357,6 +2405,54 @@ object ItStrings : Strings {
     override val compareNone = "Nessun altro colpo di questo tipo analizzato e con il video."
     override val compareOverlay = "Sovrapponi"
     override val compareThisSession = "questa sessione"
+    override val membersTitle = "Soci"
+    override val membersHint = "Iscritti al circolo: tessera FITP, certificato medico, consensi e contatti"
+    override val membersNone = "Ancora nessun socio: aggiungilo con Nuovo socio."
+    override val membersNew = "Nuovo socio"
+    override val membersAll = "Tutti"
+    override val membersTodo = "Da sistemare"
+    override val membersPickTitle = "Chi si iscrive?"
+    override val membersPickHint = "Scegli un giocatore che c'è già o creane uno nuovo."
+    override val membersNewPlayer = "Giocatore nuovo"
+    override val memberSection = "Socio del circolo"
+    override val memberEnroll = "Iscrivi come socio"
+    override val memberEdit = "Dati del socio"
+    override val memberRemove = "Togli dai soci"
+    override val memberPhone = "Telefono"
+    override val memberEmail = "Email"
+    override val memberBirth = "Data di nascita"
+    override val memberSince = "Socio dal"
+    override val memberNumber = "Tessera del circolo"
+    override val memberFitpNumber = "Tessera FITP"
+    override val memberFitpYear = "Anno della tessera FITP"
+    override val memberFitpAgonist = "Agonista"
+    override val memberFitpNonAgonist = "Non agonista"
+    override val memberFitpOther = "Altro"
+    override val memberRankingLabel = "Classifica FITP"
+    override val memberRanking = "Classifica FITP (es. 4.1)"
+    override val memberMedical = "Certificato medico"
+    override val memberMedicalAgonistic = "Agonistico"
+    override val memberMedicalNon = "Non agonistico"
+    override val memberMedicalUntil = "Scade il"
+    override val memberMedicalNote = "Si tengono solo il tipo e la scadenza: il certificato resta nel suo fascicolo."
+    override val memberPrivacy = "Consenso al trattamento dei dati"
+    override val memberPhotos = "Consenso a foto e video"
+    override val memberGuardian = "Genitore o tutore"
+    override val memberGuardianPhone = "Telefono del genitore"
+    override val memberMinor = "Minorenne: servono il genitore e il suo telefono."
+    override val memberNotSet = "non impostata"
+    override val memberOk = "in regola"
+    override val memberYes = "Sì"
+    override val issueNoPrivacy = "manca il consenso privacy"
+    override val issueNoMedical = "manca il certificato medico"
+    override val issueMedicalExpired = "certificato scaduto"
+    override val issueNoGuardian = "mancano i dati del genitore"
+    override val issueNoContact = "nessun contatto"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "socio" else "soci"} · $todo da sistemare" }
+    override val memberRemoveAsk: (String) -> String = { "Togliere $it dai soci? Tessere, certificato e consensi si cancellano; il giocatore e le sue partite restano." }
+    override val issueNoFitp: (Int) -> String = { "manca la tessera FITP $it" }
+    override val issueMedicalSoon: (String) -> String = { "certificato in scadenza il $it" }
+    override val memberMedicalShort: (String) -> String = { "certificato fino al $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3648,6 +3744,54 @@ object EnStrings : Strings {
     override val compareNone = "No other shot of this kind analysed and with its video."
     override val compareOverlay = "Overlay"
     override val compareThisSession = "this session"
+    override val membersTitle = "Members"
+    override val membersHint = "Club members: FITP card, medical certificate, consents and contacts"
+    override val membersNone = "No members yet: add one with New member."
+    override val membersNew = "New member"
+    override val membersAll = "All"
+    override val membersTodo = "To sort out"
+    override val membersPickTitle = "Who is joining?"
+    override val membersPickHint = "Pick a player who is already there or create a new one."
+    override val membersNewPlayer = "New player"
+    override val memberSection = "Club member"
+    override val memberEnroll = "Enrol as member"
+    override val memberEdit = "Member details"
+    override val memberRemove = "Remove from members"
+    override val memberPhone = "Phone"
+    override val memberEmail = "Email"
+    override val memberBirth = "Date of birth"
+    override val memberSince = "Member since"
+    override val memberNumber = "Club card"
+    override val memberFitpNumber = "FITP card"
+    override val memberFitpYear = "FITP card year"
+    override val memberFitpAgonist = "Competitive"
+    override val memberFitpNonAgonist = "Non-competitive"
+    override val memberFitpOther = "Other"
+    override val memberRankingLabel = "FITP ranking"
+    override val memberRanking = "FITP ranking (e.g. 4.1)"
+    override val memberMedical = "Medical certificate"
+    override val memberMedicalAgonistic = "Competitive"
+    override val memberMedicalNon = "Non-competitive"
+    override val memberMedicalUntil = "Expires on"
+    override val memberMedicalNote = "Only the type and expiry are kept: the certificate stays in its file."
+    override val memberPrivacy = "Consent to data processing"
+    override val memberPhotos = "Consent to photos and videos"
+    override val memberGuardian = "Parent or guardian"
+    override val memberGuardianPhone = "Parent's phone"
+    override val memberMinor = "Under 18: the parent and their phone are needed."
+    override val memberNotSet = "not set"
+    override val memberOk = "all in order"
+    override val memberYes = "Yes"
+    override val issueNoPrivacy = "privacy consent missing"
+    override val issueNoMedical = "medical certificate missing"
+    override val issueMedicalExpired = "certificate expired"
+    override val issueNoGuardian = "parent details missing"
+    override val issueNoContact = "no contact"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "member" else "members"} · $todo to sort out" }
+    override val memberRemoveAsk: (String) -> String = { "Remove $it from members? Cards, certificate and consents are deleted; the player and their matches stay." }
+    override val issueNoFitp: (Int) -> String = { "FITP card $it missing" }
+    override val issueMedicalSoon: (String) -> String = { "certificate expires on $it" }
+    override val memberMedicalShort: (String) -> String = { "certificate until $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

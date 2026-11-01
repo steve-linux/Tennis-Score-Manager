@@ -450,6 +450,16 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **Drills** (from the coach's *Students* tab, or from the choice under *Start*): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
 
+### 7.11 Club members (app 2.6)
+
+With the **Club** role, **Players › Members** lists the people enrolled, meant for the club office's device.
+
+- **New member**: pick a player who is already there (someone who played matches or a student) or create a new one. From a player's card you can also tap **Enrol as member**.
+- **Member details**: phone and email (used for notices), date of birth, member since, club card; **FITP card** with number, type (competitive, non-competitive, other), year and ranking; **medical certificate** with type and expiry; consent to data processing and to photos and videos. For **under-18s** also the parent or guardian and their phone.
+- Only the certificate's **type and expiry** are saved, not the document: it is health data and stays in the club's file.
+- Under each member the app says what is missing: privacy consent, this year's FITP card, certificate missing, expired or expiring within a month, parent details, a contact. In red what stops them playing (card and certificate), in orange the rest. **To sort out** shows only those with something to do.
+- Member data stays on the phone: when matches go to another phone only first name, last name, nickname and hand travel. **Remove from members** deletes cards, certificate and consents; the player and their matches stay.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

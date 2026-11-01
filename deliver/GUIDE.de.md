@@ -450,6 +450,16 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Übungen** (im Reiter *Schüler* des Trainers oder über die Auswahl unter *Starten*): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
 
+### 7.11 Vereinsmitglieder (app 2.6)
+
+Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschriebenen, gedacht für das Gerät der Geschäftsstelle.
+
+- **Neues Mitglied**: einen vorhandenen Spieler wählen (wer Matches gespielt hat oder ein Schüler) oder einen neuen anlegen. In der Karte eines Spielers geht auch **Als Mitglied aufnehmen**.
+- **Mitgliedsdaten**: Telefon und E-Mail (für Benachrichtigungen), Geburtsdatum, Mitglied seit, Vereinsausweis; **FITP-Ausweis** mit Nummer, Art (Wettkampf, Freizeit, sonstige), Jahr und Rangliste; **ärztliches Attest** mit Art und Ablaufdatum; Einwilligung zur Datenverarbeitung und zu Fotos und Videos. Für **Minderjährige** auch Elternteil oder Vormund und dessen Telefon.
+- Vom Attest werden **nur Art und Ablaufdatum** gespeichert, nicht das Dokument: Es sind Gesundheitsdaten und sie bleiben in der Akte des Vereins.
+- Unter jedem Mitglied steht, was fehlt: Datenschutz-Einwilligung, FITP-Ausweis des Jahres, Attest fehlt, abgelaufen oder läuft innerhalb eines Monats ab, Daten des Elternteils, ein Kontakt. Rot, was am Spielen hindert (Ausweis und Attest), orange der Rest. **Zu erledigen** zeigt nur, wer etwas zu tun hat.
+- Die Mitgliedsdaten bleiben auf dem Telefon: Gehen Matches auf ein anderes Telefon, reisen nur Vorname, Nachname, Spitzname und Hand mit. **Aus den Mitgliedern entfernen** löscht Ausweise, Attest und Einwilligungen; der Spieler und seine Matches bleiben.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

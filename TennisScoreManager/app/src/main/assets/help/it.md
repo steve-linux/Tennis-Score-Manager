@@ -337,6 +337,16 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Esercizi** (dalla scheda *Allievi* dell'allenatore, o dalla scelta sotto *Inizia*): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
 
+### 7.11 Soci del circolo
+
+Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, pensato per il dispositivo della segreteria.
+
+- **Nuovo socio**: scegli un giocatore che c'è già (chi ha giocato partite o è un allievo) o creane uno nuovo. Dalla scheda di un giocatore si può anche toccare **Iscrivi come socio**.
+- **Dati del socio**: telefono ed email (servono per gli avvisi), data di nascita, socio dal, tessera del circolo; **tessera FITP** con numero, tipo (agonista, non agonista, altro), anno e classifica; **certificato medico** con tipo e scadenza; consenso al trattamento dei dati e a foto e video. Per i **minorenni** anche il genitore o tutore e il suo telefono.
+- Del certificato si salvano **solo il tipo e la scadenza**, non il documento: è un dato sanitario e resta nel fascicolo del circolo.
+- Sotto ogni socio l'app dice cosa manca: consenso privacy, tessera FITP dell'anno, certificato mancante, scaduto o in scadenza entro un mese, dati del genitore, un contatto. In rosso quello che impedisce di giocare (tessera e certificato), in arancione il resto. **Da sistemare** mostra solo chi ha qualcosa da fare.
+- I dati da socio restano sul telefono: quando le partite passano a un altro telefono viaggiano solo nome, cognome, soprannome e mano. **Togli dai soci** cancella tessere, certificato e consensi; il giocatore e le sue partite restano.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

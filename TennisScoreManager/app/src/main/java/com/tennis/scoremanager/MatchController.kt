@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -654,6 +654,7 @@ class MatchController(
             Screen.PLAYERS -> Screen.HOME
             Screen.DATA -> Screen.HOME
             Screen.DRILLS -> Screen.HOME
+            Screen.MEMBERS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1086,6 +1087,7 @@ class MatchController(
         val merged = a.copy(
             aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
             hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
+            phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
@@ -1175,11 +1177,17 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = if (screen.value == Screen.PLAYERS) Screen.PLAYERS else Screen.STUDENTS
+        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; else -> Screen.STUDENTS }
         screen.value = Screen.STUDENT
     }
 
     private var studentBack = Screen.STUDENTS
+
+    /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
+    fun openMembers() {
+        refreshPlayers()
+        screen.value = Screen.MEMBERS
+    }
 
     /** Altro › Giocatori: tutto il database. */
     fun openPlayers() {

@@ -450,6 +450,16 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Exercices** (depuis l'onglet *Élèves* de l'entraîneur, ou depuis le choix sous *Commencer*) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
 
+### 7.11 Adhérents du club (app 2.6)
+
+Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'appareil du secrétariat.
+
+- **Nouvel adhérent** : choisissez un joueur déjà présent (qui a joué des matchs ou un élève) ou créez-en un nouveau. Depuis la fiche d'un joueur, on peut aussi toucher **Inscrire comme adhérent**.
+- **Données de l'adhérent** : téléphone et e-mail (pour les avis), date de naissance, adhérent depuis, carte du club ; **licence FITP** avec numéro, type (compétition, loisir, autre), année et classement ; **certificat médical** avec type et échéance ; consentement au traitement des données et aux photos et vidéos. Pour les **mineurs**, aussi le parent ou tuteur et son téléphone.
+- Du certificat on garde **seulement le type et l'échéance**, pas le document : c'est une donnée de santé, elle reste dans le dossier du club.
+- Sous chaque adhérent, l'appli indique ce qui manque : consentement RGPD, licence FITP de l'année, certificat manquant, expiré ou qui expire dans le mois, coordonnées du parent, un contact. En rouge ce qui empêche de jouer (licence et certificat), en orange le reste. **À régler** ne montre que ceux qui ont quelque chose à faire.
+- Les données d'adhérent restent sur le téléphone : quand les matchs passent à un autre téléphone, seuls prénom, nom, surnom et main voyagent. **Retirer des adhérents** efface licences, certificat et consentements ; le joueur et ses matchs restent.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

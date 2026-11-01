@@ -450,6 +450,16 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - **Exercícios** (na aba *Alunos* do treinador, ou na escolha embaixo de *Começar*): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
 
+### 7.11 Sócios do clube (app 2.6)
+
+Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, pensada para o aparelho da secretaria.
+
+- **Novo sócio**: escolha um jogador que já existe (quem jogou partidas ou um aluno) ou crie um novo. Na ficha de um jogador também dá para tocar em **Inscrever como sócio**.
+- **Dados do sócio**: telefone e e-mail (servem para os avisos), data de nascimento, sócio desde, cartão do clube; **cartão FITP** com número, tipo (competição, não competição, outro), ano e ranking; **atestado médico** com tipo e vencimento; consentimento ao tratamento de dados e a fotos e vídeos. Para os **menores**, também o responsável e o telefone dele.
+- Do atestado se guardam **só o tipo e o vencimento**, não o documento: é um dado de saúde e fica no arquivo do clube.
+- Embaixo de cada sócio o app diz o que falta: consentimento de privacidade, cartão FITP do ano, atestado que falta, vencido ou que vence em menos de um mês, dados do responsável, um contato. Em vermelho o que impede de jogar (cartão e atestado), em laranja o resto. **A resolver** mostra só quem tem algo pendente.
+- Os dados de sócio ficam no telefone: quando as partidas passam para outro telefone só viajam nome, sobrenome, apelido e mão. **Tirar dos sócios** apaga cartões, atestado e consentimentos; o jogador e as partidas dele ficam.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

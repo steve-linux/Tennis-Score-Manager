@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
@@ -222,7 +223,8 @@ private fun CourtsTab(c: MatchController) {
 @Composable
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = true) { c.openPlayers() }
+    Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
 

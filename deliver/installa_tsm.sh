@@ -661,6 +661,16 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - **Übungen** (im Reiter *Schüler* des Trainers oder über die Auswahl unter *Starten*): **Neue Übung**, Name, Schlag und Schritte; für jeden Schritt wie viele Schläge (− und + in Fünferschritten) und je nach Schlag Seite, erster oder zweiter Aufschlag und Ziel, Richtung, Volley mit Vorhand oder Rückhand (*—* = so lassen). Eine Übung antippen, um sie zu ändern oder zu löschen.
 - Unter **Trainieren**, unter den Schlägen, wählt **Übung** die zu folgende (oder *Frei*). Im Training stellt die App die Auswahl des Schritts selbst ein, zeigt oben *Schritt 1 von 2 · 7/20*, am Ende eines Schritts sagt die Stimme den nächsten an (und das Armband zeigt ihn) und am Ende *Übung beendet*. Wird ein Schlag rückgängig gemacht, geht es zum richtigen Schritt zurück. Die Übersicht zählt nach Richtung und Ziel, und die Einheit merkt sich den Namen der Übung.
 
+### 7.11 Vereinsmitglieder
+
+Mit der Rolle **Verein** stehen unter **Spieler › Mitglieder** die Eingeschriebenen, gedacht für das Gerät der Geschäftsstelle.
+
+- **Neues Mitglied**: einen vorhandenen Spieler wählen (wer Matches gespielt hat oder ein Schüler) oder einen neuen anlegen. In der Karte eines Spielers geht auch **Als Mitglied aufnehmen**.
+- **Mitgliedsdaten**: Telefon und E-Mail (für Benachrichtigungen), Geburtsdatum, Mitglied seit, Vereinsausweis; **FITP-Ausweis** mit Nummer, Art (Wettkampf, Freizeit, sonstige), Jahr und Rangliste; **ärztliches Attest** mit Art und Ablaufdatum; Einwilligung zur Datenverarbeitung und zu Fotos und Videos. Für **Minderjährige** auch Elternteil oder Vormund und dessen Telefon.
+- Vom Attest werden **nur Art und Ablaufdatum** gespeichert, nicht das Dokument: Es sind Gesundheitsdaten und sie bleiben in der Akte des Vereins.
+- Unter jedem Mitglied steht, was fehlt: Datenschutz-Einwilligung, FITP-Ausweis des Jahres, Attest fehlt, abgelaufen oder läuft innerhalb eines Monats ab, Daten des Elternteils, ein Kontakt. Rot, was am Spielen hindert (Ausweis und Attest), orange der Rest. **Zu erledigen** zeigt nur, wer etwas zu tun hat.
+- Die Mitgliedsdaten bleiben auf dem Telefon: Gehen Matches auf ein anderes Telefon, reisen nur Vorname, Nachname, Spitzname und Hand mit. **Aus den Mitgliedern entfernen** löscht Ausweise, Attest und Einwilligungen; der Spieler und seine Matches bleiben.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1079,6 +1089,16 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - **Drills** (from the coach's *Students* tab, or from the choice under *Start*): **New drill**, name, stroke and steps; for each step how many shots (− and + by 5) and, depending on the stroke, side, first or second and target, direction, forehand or backhand volley (*—* = leave as it is). Tap a drill to change or delete it.
 - In **Practice**, under the strokes, **Drill** picks the one to follow (or *Free*). During practice the app sets the step's choices by itself, shows *Step 1 of 2 · 7/20* at the top, at the end of a step the voice says the next one (and the wristband shows it) and at the end *Drill finished*. Undoing a shot goes back to the right step. The summary counts by direction and target, and the session remembers the drill's name.
 
+### 7.11 Club members
+
+With the **Club** role, **Players › Members** lists the people enrolled, meant for the club office's device.
+
+- **New member**: pick a player who is already there (someone who played matches or a student) or create a new one. From a player's card you can also tap **Enrol as member**.
+- **Member details**: phone and email (used for notices), date of birth, member since, club card; **FITP card** with number, type (competitive, non-competitive, other), year and ranking; **medical certificate** with type and expiry; consent to data processing and to photos and videos. For **under-18s** also the parent or guardian and their phone.
+- Only the certificate's **type and expiry** are saved, not the document: it is health data and stays in the club's file.
+- Under each member the app says what is missing: privacy consent, this year's FITP card, certificate missing, expired or expiring within a month, parent details, a contact. In red what stops them playing (card and certificate), in orange the rest. **To sort out** shows only those with something to do.
+- Member data stays on the phone: when matches go to another phone only first name, last name, nickname and hand travel. **Remove from members** deletes cards, certificate and consents; the player and their matches stay.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1495,6 +1515,16 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - Un **ejercicio** es un golpe y unos pasos seguidos: por ejemplo *20 derechas cruzadas, luego 20 paralelas*, o en el saque *10 primeros desde el lado de iguales a la T, luego 10 abiertos…*. Hay cuatro ejemplos listos, uno por golpe.
 - **Ejercicios** (desde la pestaña *Alumnos* del entrenador, o desde la elección bajo *Empezar*): **Ejercicio nuevo**, nombre, golpe y pasos; para cada paso cuántos golpes (− y + de 5 en 5) y, según el golpe, lado, primero o segundo y objetivo, dirección, volea de derecha o de revés (*—* = dejar como está). Toca un ejercicio para cambiarlo o borrarlo.
 - En **Entrenar**, bajo los golpes, **Ejercicio** elige el que seguir (o *Libre*). Durante el entrenamiento la app pone sola las opciones del paso, arriba muestra *Paso 1 de 2 · 7/20*, al acabar un paso la voz dice el siguiente (y la pulsera lo muestra) y al final *Ejercicio terminado*. Anulando un golpe se vuelve al paso correcto. El resumen cuenta por dirección y objetivo, y la sesión recuerda el nombre del ejercicio.
+
+### 7.11 Socios del club
+
+Con el rol **Club**, en **Jugadores › Socios** está la lista de inscritos, pensada para el dispositivo de la secretaría.
+
+- **Nuevo socio**: elige un jugador que ya esté (quien jugó partidos o un alumno) o crea uno nuevo. Desde la ficha de un jugador también se puede tocar **Inscribir como socio**.
+- **Datos del socio**: teléfono y correo (sirven para los avisos), fecha de nacimiento, socio desde, carné del club; **licencia FITP** con número, tipo (competición, no competición, otra), año y clasificación; **certificado médico** con tipo y caducidad; consentimiento al tratamiento de datos y a fotos y vídeos. Para los **menores**, también el padre, la madre o el tutor y su teléfono.
+- Del certificado se guardan **solo el tipo y la caducidad**, no el documento: es un dato de salud y queda en el expediente del club.
+- Debajo de cada socio la app dice qué falta: consentimiento de privacidad, licencia FITP del año, certificado que falta, caducado o que caduca en menos de un mes, datos del padre o madre, un contacto. En rojo lo que impide jugar (licencia y certificado), en naranja el resto. **Por resolver** muestra solo a quien tiene algo pendiente.
+- Los datos de socio se quedan en el teléfono: cuando los partidos pasan a otro teléfono solo viajan nombre, apellido, apodo y mano. **Quitar de los socios** borra licencias, certificado y consentimientos; el jugador y sus partidos se quedan.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -1913,6 +1943,16 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - **Exercices** (depuis l'onglet *Élèves* de l'entraîneur, ou depuis le choix sous *Commencer*) : **Nouvel exercice**, nom, coup et étapes ; pour chaque étape combien de coups (− et + de 5 en 5) et, selon le coup, côté, première ou seconde et cible, direction, volée de coup droit ou de revers (*—* = laisser tel quel). Touchez un exercice pour le modifier ou le supprimer.
 - Dans **S'entraîner**, sous les coups, **Exercice** choisit celui à suivre (ou *Libre*). Pendant l'entraînement l'appli règle toute seule les choix de l'étape, affiche en haut *Étape 1 sur 2 · 7/20*, à la fin d'une étape la voix annonce la suivante (et le bracelet l'affiche) et à la fin *Exercice terminé*. En annulant un coup on revient à la bonne étape. Le bilan compte par direction et par cible, et la séance garde le nom de l'exercice.
 
+### 7.11 Adhérents du club
+
+Avec le rôle **Club**, **Joueurs › Adhérents** liste les inscrits, pour l'appareil du secrétariat.
+
+- **Nouvel adhérent** : choisissez un joueur déjà présent (qui a joué des matchs ou un élève) ou créez-en un nouveau. Depuis la fiche d'un joueur, on peut aussi toucher **Inscrire comme adhérent**.
+- **Données de l'adhérent** : téléphone et e-mail (pour les avis), date de naissance, adhérent depuis, carte du club ; **licence FITP** avec numéro, type (compétition, loisir, autre), année et classement ; **certificat médical** avec type et échéance ; consentement au traitement des données et aux photos et vidéos. Pour les **mineurs**, aussi le parent ou tuteur et son téléphone.
+- Du certificat on garde **seulement le type et l'échéance**, pas le document : c'est une donnée de santé, elle reste dans le dossier du club.
+- Sous chaque adhérent, l'appli indique ce qui manque : consentement RGPD, licence FITP de l'année, certificat manquant, expiré ou qui expire dans le mois, coordonnées du parent, un contact. En rouge ce qui empêche de jouer (licence et certificat), en orange le reste. **À régler** ne montre que ceux qui ont quelque chose à faire.
+- Les données d'adhérent restent sur le téléphone : quand les matchs passent à un autre téléphone, seuls prénom, nom, surnom et main voyagent. **Retirer des adhérents** efface licences, certificat et consentements ; le joueur et ses matchs restent.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2330,6 +2370,16 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - **Esercizi** (dalla scheda *Allievi* dell'allenatore, o dalla scelta sotto *Inizia*): **Nuovo esercizio**, nome, colpo e passi; per ogni passo quanti colpi (− e + di 5 in 5) e, secondo il colpo, lato, prima o seconda e bersaglio, direzione, volée di dritto o di rovescio (*—* = lascia com'è). Toccando un esercizio lo cambi o lo elimini.
 - In **Allenati**, sotto i colpi, **Esercizio** sceglie quello da seguire (o *Libero*). Durante l'allenamento l'app imposta da sola le scelte del passo, in alto mostra *Passo 1 di 2 · 7/20*, a fine passo la voce dice il prossimo (e il braccialetto lo mostra) e alla fine *Esercizio finito*. Annullando un colpo si torna al passo giusto. Il riepilogo conta per direzione e bersaglio, e la sessione ricorda il nome dell'esercizio.
 
+### 7.11 Soci del circolo
+
+Col ruolo **Circolo**, in **Giocatori › Soci** c'è l'elenco degli iscritti, pensato per il dispositivo della segreteria.
+
+- **Nuovo socio**: scegli un giocatore che c'è già (chi ha giocato partite o è un allievo) o creane uno nuovo. Dalla scheda di un giocatore si può anche toccare **Iscrivi come socio**.
+- **Dati del socio**: telefono ed email (servono per gli avvisi), data di nascita, socio dal, tessera del circolo; **tessera FITP** con numero, tipo (agonista, non agonista, altro), anno e classifica; **certificato medico** con tipo e scadenza; consenso al trattamento dei dati e a foto e video. Per i **minorenni** anche il genitore o tutore e il suo telefono.
+- Del certificato si salvano **solo il tipo e la scadenza**, non il documento: è un dato sanitario e resta nel fascicolo del circolo.
+- Sotto ogni socio l'app dice cosa manca: consenso privacy, tessera FITP dell'anno, certificato mancante, scaduto o in scadenza entro un mese, dati del genitore, un contatto. In rosso quello che impedisce di giocare (tessera e certificato), in arancione il resto. **Da sistemare** mostra solo chi ha qualcosa da fare.
+- I dati da socio restano sul telefono: quando le partite passano a un altro telefono viaggiano solo nome, cognome, soprannome e mano. **Togli dai soci** cancella tessere, certificato e consensi; il giocatore e le sue partite restano.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -2746,6 +2796,16 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Um **exercício** é um golpe e passos em sequência: por exemplo *20 forehands cruzados, depois 20 na paralela*, ou no saque *10 primeiros do lado de iguais no T, depois 10 abertos…*. Há quatro exemplos prontos, um por golpe.
 - **Exercícios** (na aba *Alunos* do treinador, ou na escolha embaixo de *Começar*): **Novo exercício**, nome, golpe e passos; para cada passo quantos golpes (− e + de 5 em 5) e, conforme o golpe, lado, primeiro ou segundo e alvo, direção, voleio de forehand ou de backhand (*—* = deixar como está). Toque num exercício para mudar ou apagar.
 - Em **Treinar**, embaixo dos golpes, **Exercício** escolhe o que seguir (ou *Livre*). Durante o treino o app ajusta sozinho as escolhas do passo, no alto mostra *Passo 1 de 2 · 7/20*, no fim de um passo a voz diz o próximo (e a pulseira mostra) e no fim *Exercício terminado*. Desfazendo um golpe volta-se ao passo certo. O resumo conta por direção e alvo, e a sessão lembra o nome do exercício.
+
+### 7.11 Sócios do clube
+
+Com o papel **Clube**, em **Jogadores › Sócios** fica a lista dos inscritos, pensada para o aparelho da secretaria.
+
+- **Novo sócio**: escolha um jogador que já existe (quem jogou partidas ou um aluno) ou crie um novo. Na ficha de um jogador também dá para tocar em **Inscrever como sócio**.
+- **Dados do sócio**: telefone e e-mail (servem para os avisos), data de nascimento, sócio desde, cartão do clube; **cartão FITP** com número, tipo (competição, não competição, outro), ano e ranking; **atestado médico** com tipo e vencimento; consentimento ao tratamento de dados e a fotos e vídeos. Para os **menores**, também o responsável e o telefone dele.
+- Do atestado se guardam **só o tipo e o vencimento**, não o documento: é um dado de saúde e fica no arquivo do clube.
+- Embaixo de cada sócio o app diz o que falta: consentimento de privacidade, cartão FITP do ano, atestado que falta, vencido ou que vence em menos de um mês, dados do responsável, um contato. Em vermelho o que impede de jogar (cartão e atestado), em laranja o resto. **A resolver** mostra só quem tem algo pendente.
+- Os dados de sócio ficam no telefone: quando as partidas passam para outro telefone só viajam nome, sobrenome, apelido e mão. **Tirar dos sócios** apaga cartões, atestado e consentimentos; o jogador e as partidas dele ficam.
 
 ## 8. Placar na TV ou no monitor
 
@@ -3562,7 +3622,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4090,6 +4150,7 @@ class MatchController(
             Screen.PLAYERS -> Screen.HOME
             Screen.DATA -> Screen.HOME
             Screen.DRILLS -> Screen.HOME
+            Screen.MEMBERS -> Screen.HOME
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -4522,6 +4583,7 @@ class MatchController(
         val merged = a.copy(
             aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
             hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
+            phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
@@ -4611,11 +4673,17 @@ class MatchController(
 
     fun openStudent(id: String) {
         openStudentId.value = id
-        studentBack = if (screen.value == Screen.PLAYERS) Screen.PLAYERS else Screen.STUDENTS
+        studentBack = when (screen.value) { Screen.PLAYERS -> Screen.PLAYERS; Screen.MEMBERS -> Screen.MEMBERS; else -> Screen.STUDENTS }
         screen.value = Screen.STUDENT
     }
 
     private var studentBack = Screen.STUDENTS
+
+    /** Circolo › Soci: i giocatori iscritti al circolo, con tessere, certificati e consensi. */
+    fun openMembers() {
+        refreshPlayers()
+        screen.value = Screen.MEMBERS
+    }
 
     /** Altro › Giocatori: tutto il database. */
     fun openPlayers() {
@@ -9371,6 +9439,116 @@ object MatchStats {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Members.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Members.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import java.util.Calendar
+
+/** Tessera FITP: atleta agonista, atleta non agonista, altro (socio, dirigente, tecnico…). */
+@Serializable
+enum class FitpCard { AGONIST, NON_AGONIST, OTHER }
+
+/** Certificato medico sportivo. */
+@Serializable
+enum class MedicalKind { AGONISTIC, NON_AGONISTIC }
+
+/**
+ * Il giocatore come socio del circolo (sul dispositivo della segreteria). Del certificato medico si tengono solo tipo
+ * e scadenza, mai il documento: è un dato sanitario. Le date sono a mezzogiorno, così non cambiano col fuso orario.
+ * Non passa mai ad altri telefoni con le partite.
+ */
+@Serializable
+data class Membership(
+    /** Socio dal (data dell'iscrizione). */
+    val since: Long? = null,
+    /** Numero della tessera del circolo. */
+    val number: String = "",
+    val fitpNumber: String = "",
+    val fitpCard: FitpCard? = null,
+    /** Anno della tessera FITP (vale per l'anno solare). */
+    val fitpYear: Int? = null,
+    /** Classifica FITP com'è scritta ("4.1", "3.3", "4.NC"). */
+    val ranking: String = "",
+    val medical: MedicalKind? = null,
+    val medicalUntil: Long? = null,
+    /** Quando ha dato il consenso al trattamento dei dati (null = non ancora). */
+    val privacyAt: Long? = null,
+    /** Consenso a foto e video (riprese degli allenamenti, foto dei tornei). */
+    val photosOk: Boolean = false,
+    /** Per i minorenni: il genitore o tutore e il suo telefono. */
+    val guardian: String = "",
+    val guardianPhone: String = "",
+)
+
+object Members {
+    /** Cosa manca a un socio per essere in regola. */
+    enum class Issue { NO_PRIVACY, NO_FITP, NO_MEDICAL, MEDICAL_EXPIRED, MEDICAL_SOON, NO_GUARDIAN, NO_CONTACT }
+
+    /** Avviso di certificato in scadenza: un mese prima. */
+    const val SOON_DAYS = 30
+
+    fun year(now: Long): Int = Calendar.getInstance().apply { timeInMillis = now }.get(Calendar.YEAR)
+
+    /** Gli anni compiuti al giorno [now] (null senza data di nascita). */
+    fun age(birth: Long?, now: Long): Int? {
+        birth ?: return null
+        val b = Calendar.getInstance().apply { timeInMillis = birth }
+        val n = Calendar.getInstance().apply { timeInMillis = now }
+        var a = n.get(Calendar.YEAR) - b.get(Calendar.YEAR)
+        if (n.get(Calendar.DAY_OF_YEAR) < b.get(Calendar.DAY_OF_YEAR)) a--
+        return a
+    }
+
+    fun minor(p: PlayerProfile, now: Long): Boolean = (age(p.birth, now) ?: 99) < 18
+
+    /** Il certificato vale ancora il giorno [now] (vale fino a fine giornata della scadenza). */
+    fun medicalValid(m: Membership, now: Long): Boolean = m.medicalUntil?.let { endOfDay(it) >= now } == true
+
+    private fun endOfDay(t: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = t
+        set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59)
+    }.timeInMillis
+
+    /** Cosa c'è da sistemare per [p] il giorno [now]; vuoto se è in regola (o se non è socio). */
+    fun issues(p: PlayerProfile, now: Long): List<Issue> {
+        val m = p.member ?: return emptyList()
+        val out = mutableListOf<Issue>()
+        if (m.privacyAt == null) out += Issue.NO_PRIVACY
+        if (m.fitpYear != year(now) || m.fitpNumber.isBlank()) out += Issue.NO_FITP
+        when {
+            m.medicalUntil == null -> out += Issue.NO_MEDICAL
+            !medicalValid(m, now) -> out += Issue.MEDICAL_EXPIRED
+            endOfDay(m.medicalUntil) - now < SOON_DAYS * 86_400_000L -> out += Issue.MEDICAL_SOON
+        }
+        if (minor(p, now) && (m.guardian.isBlank() || m.guardianPhone.isBlank())) out += Issue.NO_GUARDIAN
+        if (p.phone.isBlank() && p.email.isBlank() && m.guardianPhone.isBlank()) out += Issue.NO_CONTACT
+        return out
+    }
+
+    /** I problemi gravi (non si gioca): certificato mancante o scaduto, tessera dell'anno mancante. */
+    fun blocking(i: Issue): Boolean = i == Issue.NO_MEDICAL || i == Issue.MEDICAL_EXPIRED || i == Issue.NO_FITP
+
+    /**
+     * La classifica come numero, per le teste di serie: più basso = più forte ("2.8" → 2.8; "4.NC" → 4.9; vuota o
+     * illeggibile = null).
+     */
+    fun rankingValue(r: String): Double? {
+        val t = r.trim().uppercase().replace(',', '.')
+        if (t.isEmpty()) return null
+        Regex("^([1-4])\\.NC$").find(t)?.let { return it.groupValues[1].toDouble() + 0.9 }
+        if (t == "NC") return 4.9
+        return Regex("^([1-4])(?:\\.(\\d))?$").find(t)?.let { m ->
+            m.groupValues[1].toDouble() + (m.groupValues[2].toIntOrNull() ?: 0) / 10.0
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Models.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Models.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -12898,6 +13076,13 @@ data class PlayerProfile(
     val student: Boolean = false,
     /** Altri identificativi che sono lui: lo stesso giocatore creato su un altro telefono, o unito a questo. */
     val aliases: Set<String> = emptySet(),
+    /** Contatti per gli avvisi (tornei, quote): restano sul telefono, non passano con le partite. */
+    val phone: String = "",
+    val email: String = "",
+    /** Data di nascita (mezzogiorno), per i minorenni e le categorie dei tornei. */
+    val birth: Long? = null,
+    /** Socio del circolo (null = non è socio). */
+    val member: Membership? = null,
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")
@@ -18024,6 +18209,7 @@ fun AppRoot(c: MatchController) {
                 Screen.PLAYERS -> com.tennis.scoremanager.ui.screens.PlayersScreen(c)
                 Screen.DATA -> com.tennis.scoremanager.ui.screens.DataScreen(c)
                 Screen.DRILLS -> com.tennis.scoremanager.ui.screens.DrillsScreen(c)
+                Screen.MEMBERS -> com.tennis.scoremanager.ui.screens.MembersScreen(c)
             }
         }
     }
@@ -21623,6 +21809,54 @@ interface Strings {
     val compareNone: String
     val compareOverlay: String
     val compareThisSession: String
+    val membersTitle: String
+    val membersHint: String
+    val membersNone: String
+    val membersNew: String
+    val membersAll: String
+    val membersTodo: String
+    val membersPickTitle: String
+    val membersPickHint: String
+    val membersNewPlayer: String
+    val memberSection: String
+    val memberEnroll: String
+    val memberEdit: String
+    val memberRemove: String
+    val memberPhone: String
+    val memberEmail: String
+    val memberBirth: String
+    val memberSince: String
+    val memberNumber: String
+    val memberFitpNumber: String
+    val memberFitpYear: String
+    val memberFitpAgonist: String
+    val memberFitpNonAgonist: String
+    val memberFitpOther: String
+    val memberRanking: String
+    val memberRankingLabel: String
+    val memberMedical: String
+    val memberMedicalAgonistic: String
+    val memberMedicalNon: String
+    val memberMedicalUntil: String
+    val memberMedicalNote: String
+    val memberPrivacy: String
+    val memberPhotos: String
+    val memberGuardian: String
+    val memberGuardianPhone: String
+    val memberMinor: String
+    val memberNotSet: String
+    val memberOk: String
+    val memberYes: String
+    val issueNoPrivacy: String
+    val issueNoMedical: String
+    val issueMedicalExpired: String
+    val issueNoGuardian: String
+    val issueNoContact: String
+    val membersCount: (Int, Int) -> String
+    val memberRemoveAsk: (String) -> String
+    val issueNoFitp: (Int) -> String
+    val issueMedicalSoon: (String) -> String
+    val memberMedicalShort: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -22931,6 +23165,54 @@ object ItStrings : Strings {
     override val compareNone = "Nessun altro colpo di questo tipo analizzato e con il video."
     override val compareOverlay = "Sovrapponi"
     override val compareThisSession = "questa sessione"
+    override val membersTitle = "Soci"
+    override val membersHint = "Iscritti al circolo: tessera FITP, certificato medico, consensi e contatti"
+    override val membersNone = "Ancora nessun socio: aggiungilo con Nuovo socio."
+    override val membersNew = "Nuovo socio"
+    override val membersAll = "Tutti"
+    override val membersTodo = "Da sistemare"
+    override val membersPickTitle = "Chi si iscrive?"
+    override val membersPickHint = "Scegli un giocatore che c'è già o creane uno nuovo."
+    override val membersNewPlayer = "Giocatore nuovo"
+    override val memberSection = "Socio del circolo"
+    override val memberEnroll = "Iscrivi come socio"
+    override val memberEdit = "Dati del socio"
+    override val memberRemove = "Togli dai soci"
+    override val memberPhone = "Telefono"
+    override val memberEmail = "Email"
+    override val memberBirth = "Data di nascita"
+    override val memberSince = "Socio dal"
+    override val memberNumber = "Tessera del circolo"
+    override val memberFitpNumber = "Tessera FITP"
+    override val memberFitpYear = "Anno della tessera FITP"
+    override val memberFitpAgonist = "Agonista"
+    override val memberFitpNonAgonist = "Non agonista"
+    override val memberFitpOther = "Altro"
+    override val memberRankingLabel = "Classifica FITP"
+    override val memberRanking = "Classifica FITP (es. 4.1)"
+    override val memberMedical = "Certificato medico"
+    override val memberMedicalAgonistic = "Agonistico"
+    override val memberMedicalNon = "Non agonistico"
+    override val memberMedicalUntil = "Scade il"
+    override val memberMedicalNote = "Si tengono solo il tipo e la scadenza: il certificato resta nel suo fascicolo."
+    override val memberPrivacy = "Consenso al trattamento dei dati"
+    override val memberPhotos = "Consenso a foto e video"
+    override val memberGuardian = "Genitore o tutore"
+    override val memberGuardianPhone = "Telefono del genitore"
+    override val memberMinor = "Minorenne: servono il genitore e il suo telefono."
+    override val memberNotSet = "non impostata"
+    override val memberOk = "in regola"
+    override val memberYes = "Sì"
+    override val issueNoPrivacy = "manca il consenso privacy"
+    override val issueNoMedical = "manca il certificato medico"
+    override val issueMedicalExpired = "certificato scaduto"
+    override val issueNoGuardian = "mancano i dati del genitore"
+    override val issueNoContact = "nessun contatto"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "socio" else "soci"} · $todo da sistemare" }
+    override val memberRemoveAsk: (String) -> String = { "Togliere $it dai soci? Tessere, certificato e consensi si cancellano; il giocatore e le sue partite restano." }
+    override val issueNoFitp: (Int) -> String = { "manca la tessera FITP $it" }
+    override val issueMedicalSoon: (String) -> String = { "certificato in scadenza il $it" }
+    override val memberMedicalShort: (String) -> String = { "certificato fino al $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -24222,6 +24504,54 @@ object EnStrings : Strings {
     override val compareNone = "No other shot of this kind analysed and with its video."
     override val compareOverlay = "Overlay"
     override val compareThisSession = "this session"
+    override val membersTitle = "Members"
+    override val membersHint = "Club members: FITP card, medical certificate, consents and contacts"
+    override val membersNone = "No members yet: add one with New member."
+    override val membersNew = "New member"
+    override val membersAll = "All"
+    override val membersTodo = "To sort out"
+    override val membersPickTitle = "Who is joining?"
+    override val membersPickHint = "Pick a player who is already there or create a new one."
+    override val membersNewPlayer = "New player"
+    override val memberSection = "Club member"
+    override val memberEnroll = "Enrol as member"
+    override val memberEdit = "Member details"
+    override val memberRemove = "Remove from members"
+    override val memberPhone = "Phone"
+    override val memberEmail = "Email"
+    override val memberBirth = "Date of birth"
+    override val memberSince = "Member since"
+    override val memberNumber = "Club card"
+    override val memberFitpNumber = "FITP card"
+    override val memberFitpYear = "FITP card year"
+    override val memberFitpAgonist = "Competitive"
+    override val memberFitpNonAgonist = "Non-competitive"
+    override val memberFitpOther = "Other"
+    override val memberRankingLabel = "FITP ranking"
+    override val memberRanking = "FITP ranking (e.g. 4.1)"
+    override val memberMedical = "Medical certificate"
+    override val memberMedicalAgonistic = "Competitive"
+    override val memberMedicalNon = "Non-competitive"
+    override val memberMedicalUntil = "Expires on"
+    override val memberMedicalNote = "Only the type and expiry are kept: the certificate stays in its file."
+    override val memberPrivacy = "Consent to data processing"
+    override val memberPhotos = "Consent to photos and videos"
+    override val memberGuardian = "Parent or guardian"
+    override val memberGuardianPhone = "Parent's phone"
+    override val memberMinor = "Under 18: the parent and their phone are needed."
+    override val memberNotSet = "not set"
+    override val memberOk = "all in order"
+    override val memberYes = "Yes"
+    override val issueNoPrivacy = "privacy consent missing"
+    override val issueNoMedical = "medical certificate missing"
+    override val issueMedicalExpired = "certificate expired"
+    override val issueNoGuardian = "parent details missing"
+    override val issueNoContact = "no contact"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "member" else "members"} · $todo to sort out" }
+    override val memberRemoveAsk: (String) -> String = { "Remove $it from members? Cards, certificate and consents are deleted; the player and their matches stay." }
+    override val issueNoFitp: (Int) -> String = { "FITP card $it missing" }
+    override val issueMedicalSoon: (String) -> String = { "certificate expires on $it" }
+    override val memberMedicalShort: (String) -> String = { "certificate until $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -25536,6 +25866,54 @@ object DeStrings : Strings {
     override val compareNone = "Kein anderer Schlag dieser Art analysiert und mit Video."
     override val compareOverlay = "Überlagern"
     override val compareThisSession = "diese Einheit"
+    override val membersTitle = "Mitglieder"
+    override val membersHint = "Vereinsmitglieder: FITP-Ausweis, ärztliches Attest, Einwilligungen und Kontakte"
+    override val membersNone = "Noch keine Mitglieder: mit Neues Mitglied hinzufügen."
+    override val membersNew = "Neues Mitglied"
+    override val membersAll = "Alle"
+    override val membersTodo = "Zu erledigen"
+    override val membersPickTitle = "Wer tritt bei?"
+    override val membersPickHint = "Einen vorhandenen Spieler wählen oder einen neuen anlegen."
+    override val membersNewPlayer = "Neuer Spieler"
+    override val memberSection = "Vereinsmitglied"
+    override val memberEnroll = "Als Mitglied aufnehmen"
+    override val memberEdit = "Mitgliedsdaten"
+    override val memberRemove = "Aus den Mitgliedern entfernen"
+    override val memberPhone = "Telefon"
+    override val memberEmail = "E-Mail"
+    override val memberBirth = "Geburtsdatum"
+    override val memberSince = "Mitglied seit"
+    override val memberNumber = "Vereinsausweis"
+    override val memberFitpNumber = "FITP-Ausweis"
+    override val memberFitpYear = "Jahr des FITP-Ausweises"
+    override val memberFitpAgonist = "Wettkampf"
+    override val memberFitpNonAgonist = "Freizeit"
+    override val memberFitpOther = "Sonstige"
+    override val memberRankingLabel = "FITP-Rangliste"
+    override val memberRanking = "FITP-Rangliste (z. B. 4.1)"
+    override val memberMedical = "Ärztliches Attest"
+    override val memberMedicalAgonistic = "Wettkampf"
+    override val memberMedicalNon = "Freizeit"
+    override val memberMedicalUntil = "Gültig bis"
+    override val memberMedicalNote = "Nur Art und Ablaufdatum werden gespeichert: das Attest bleibt in seiner Akte."
+    override val memberPrivacy = "Einwilligung zur Datenverarbeitung"
+    override val memberPhotos = "Einwilligung zu Fotos und Videos"
+    override val memberGuardian = "Elternteil oder Vormund"
+    override val memberGuardianPhone = "Telefon des Elternteils"
+    override val memberMinor = "Minderjährig: Elternteil und Telefon sind nötig."
+    override val memberNotSet = "nicht gesetzt"
+    override val memberOk = "in Ordnung"
+    override val memberYes = "Ja"
+    override val issueNoPrivacy = "Datenschutz-Einwilligung fehlt"
+    override val issueNoMedical = "ärztliches Attest fehlt"
+    override val issueMedicalExpired = "Attest abgelaufen"
+    override val issueNoGuardian = "Daten des Elternteils fehlen"
+    override val issueNoContact = "kein Kontakt"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "Mitglied" else "Mitglieder"} · $todo zu erledigen" }
+    override val memberRemoveAsk: (String) -> String = { "$it aus den Mitgliedern entfernen? Ausweise, Attest und Einwilligungen werden gelöscht; der Spieler und seine Matches bleiben." }
+    override val issueNoFitp: (Int) -> String = { "FITP-Ausweis $it fehlt" }
+    override val issueMedicalSoon: (String) -> String = { "Attest läuft am $it ab" }
+    override val memberMedicalShort: (String) -> String = { "Attest bis $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -26843,6 +27221,54 @@ object EsStrings : Strings {
     override val compareNone = "Ningún otro golpe de este tipo analizado y con su vídeo."
     override val compareOverlay = "Superponer"
     override val compareThisSession = "esta sesión"
+    override val membersTitle = "Socios"
+    override val membersHint = "Inscritos en el club: licencia FITP, certificado médico, consentimientos y contactos"
+    override val membersNone = "Todavía no hay socios: añade uno con Nuevo socio."
+    override val membersNew = "Nuevo socio"
+    override val membersAll = "Todos"
+    override val membersTodo = "Por resolver"
+    override val membersPickTitle = "¿Quién se inscribe?"
+    override val membersPickHint = "Elige un jugador que ya esté o crea uno nuevo."
+    override val membersNewPlayer = "Jugador nuevo"
+    override val memberSection = "Socio del club"
+    override val memberEnroll = "Inscribir como socio"
+    override val memberEdit = "Datos del socio"
+    override val memberRemove = "Quitar de los socios"
+    override val memberPhone = "Teléfono"
+    override val memberEmail = "Correo"
+    override val memberBirth = "Fecha de nacimiento"
+    override val memberSince = "Socio desde"
+    override val memberNumber = "Carné del club"
+    override val memberFitpNumber = "Licencia FITP"
+    override val memberFitpYear = "Año de la licencia FITP"
+    override val memberFitpAgonist = "Competición"
+    override val memberFitpNonAgonist = "No competición"
+    override val memberFitpOther = "Otra"
+    override val memberRankingLabel = "Clasificación FITP"
+    override val memberRanking = "Clasificación FITP (p. ej. 4.1)"
+    override val memberMedical = "Certificado médico"
+    override val memberMedicalAgonistic = "Competición"
+    override val memberMedicalNon = "No competición"
+    override val memberMedicalUntil = "Caduca el"
+    override val memberMedicalNote = "Solo se guardan el tipo y la caducidad: el certificado queda en su expediente."
+    override val memberPrivacy = "Consentimiento al tratamiento de datos"
+    override val memberPhotos = "Consentimiento a fotos y vídeos"
+    override val memberGuardian = "Padre, madre o tutor"
+    override val memberGuardianPhone = "Teléfono del padre o madre"
+    override val memberMinor = "Menor de edad: hacen falta el padre o la madre y su teléfono."
+    override val memberNotSet = "sin fijar"
+    override val memberOk = "en regla"
+    override val memberYes = "Sí"
+    override val issueNoPrivacy = "falta el consentimiento de privacidad"
+    override val issueNoMedical = "falta el certificado médico"
+    override val issueMedicalExpired = "certificado caducado"
+    override val issueNoGuardian = "faltan los datos del padre o madre"
+    override val issueNoContact = "ningún contacto"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "socio" else "socios"} · $todo por resolver" }
+    override val memberRemoveAsk: (String) -> String = { "¿Quitar a $it de los socios? Licencias, certificado y consentimientos se borran; el jugador y sus partidos se quedan." }
+    override val issueNoFitp: (Int) -> String = { "falta la licencia FITP $it" }
+    override val issueMedicalSoon: (String) -> String = { "certificado caduca el $it" }
+    override val memberMedicalShort: (String) -> String = { "certificado hasta el $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -28152,6 +28578,54 @@ object FrStrings : Strings {
     override val compareNone = "Aucun autre coup de ce type analysé et avec sa vidéo."
     override val compareOverlay = "Superposer"
     override val compareThisSession = "cette séance"
+    override val membersTitle = "Adhérents"
+    override val membersHint = "Inscrits au club : licence FITP, certificat médical, consentements et contacts"
+    override val membersNone = "Aucun adhérent pour l'instant : ajoutez-en un avec Nouvel adhérent."
+    override val membersNew = "Nouvel adhérent"
+    override val membersAll = "Tous"
+    override val membersTodo = "À régler"
+    override val membersPickTitle = "Qui s'inscrit ?"
+    override val membersPickHint = "Choisissez un joueur déjà présent ou créez-en un nouveau."
+    override val membersNewPlayer = "Nouveau joueur"
+    override val memberSection = "Adhérent du club"
+    override val memberEnroll = "Inscrire comme adhérent"
+    override val memberEdit = "Données de l'adhérent"
+    override val memberRemove = "Retirer des adhérents"
+    override val memberPhone = "Téléphone"
+    override val memberEmail = "E-mail"
+    override val memberBirth = "Date de naissance"
+    override val memberSince = "Adhérent depuis"
+    override val memberNumber = "Carte du club"
+    override val memberFitpNumber = "Licence FITP"
+    override val memberFitpYear = "Année de la licence FITP"
+    override val memberFitpAgonist = "Compétition"
+    override val memberFitpNonAgonist = "Loisir"
+    override val memberFitpOther = "Autre"
+    override val memberRankingLabel = "Classement FITP"
+    override val memberRanking = "Classement FITP (ex. 4.1)"
+    override val memberMedical = "Certificat médical"
+    override val memberMedicalAgonistic = "Compétition"
+    override val memberMedicalNon = "Loisir"
+    override val memberMedicalUntil = "Expire le"
+    override val memberMedicalNote = "Seuls le type et l'échéance sont gardés : le certificat reste dans son dossier."
+    override val memberPrivacy = "Consentement au traitement des données"
+    override val memberPhotos = "Consentement aux photos et vidéos"
+    override val memberGuardian = "Parent ou tuteur"
+    override val memberGuardianPhone = "Téléphone du parent"
+    override val memberMinor = "Mineur : il faut le parent et son téléphone."
+    override val memberNotSet = "non renseignée"
+    override val memberOk = "en règle"
+    override val memberYes = "Oui"
+    override val issueNoPrivacy = "consentement RGPD manquant"
+    override val issueNoMedical = "certificat médical manquant"
+    override val issueMedicalExpired = "certificat expiré"
+    override val issueNoGuardian = "coordonnées du parent manquantes"
+    override val issueNoContact = "aucun contact"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "adhérent" else "adhérents"} · $todo à régler" }
+    override val memberRemoveAsk: (String) -> String = { "Retirer $it des adhérents ? Licences, certificat et consentements sont effacés ; le joueur et ses matchs restent." }
+    override val issueNoFitp: (Int) -> String = { "licence FITP $it manquante" }
+    override val issueMedicalSoon: (String) -> String = { "certificat expire le $it" }
+    override val memberMedicalShort: (String) -> String = { "certificat jusqu'au $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -29462,6 +29936,54 @@ object PtStrings : Strings {
     override val compareNone = "Nenhum outro golpe deste tipo analisado e com o vídeo."
     override val compareOverlay = "Sobrepor"
     override val compareThisSession = "esta sessão"
+    override val membersTitle = "Sócios"
+    override val membersHint = "Inscritos no clube: cartão FITP, atestado médico, consentimentos e contatos"
+    override val membersNone = "Ainda nenhum sócio: adicione um com Novo sócio."
+    override val membersNew = "Novo sócio"
+    override val membersAll = "Todos"
+    override val membersTodo = "A resolver"
+    override val membersPickTitle = "Quem se inscreve?"
+    override val membersPickHint = "Escolha um jogador que já existe ou crie um novo."
+    override val membersNewPlayer = "Jogador novo"
+    override val memberSection = "Sócio do clube"
+    override val memberEnroll = "Inscrever como sócio"
+    override val memberEdit = "Dados do sócio"
+    override val memberRemove = "Tirar dos sócios"
+    override val memberPhone = "Telefone"
+    override val memberEmail = "E-mail"
+    override val memberBirth = "Data de nascimento"
+    override val memberSince = "Sócio desde"
+    override val memberNumber = "Cartão do clube"
+    override val memberFitpNumber = "Cartão FITP"
+    override val memberFitpYear = "Ano do cartão FITP"
+    override val memberFitpAgonist = "Competição"
+    override val memberFitpNonAgonist = "Não competição"
+    override val memberFitpOther = "Outro"
+    override val memberRankingLabel = "Ranking FITP"
+    override val memberRanking = "Ranking FITP (ex. 4.1)"
+    override val memberMedical = "Atestado médico"
+    override val memberMedicalAgonistic = "Competição"
+    override val memberMedicalNon = "Não competição"
+    override val memberMedicalUntil = "Vence em"
+    override val memberMedicalNote = "Só se guardam o tipo e o vencimento: o atestado fica no seu arquivo."
+    override val memberPrivacy = "Consentimento ao tratamento de dados"
+    override val memberPhotos = "Consentimento a fotos e vídeos"
+    override val memberGuardian = "Pai, mãe ou responsável"
+    override val memberGuardianPhone = "Telefone do responsável"
+    override val memberMinor = "Menor de idade: são necessários o responsável e o telefone dele."
+    override val memberNotSet = "não definida"
+    override val memberOk = "em ordem"
+    override val memberYes = "Sim"
+    override val issueNoPrivacy = "falta o consentimento de privacidade"
+    override val issueNoMedical = "falta o atestado médico"
+    override val issueMedicalExpired = "atestado vencido"
+    override val issueNoGuardian = "faltam os dados do responsável"
+    override val issueNoContact = "nenhum contato"
+    override val membersCount: (Int, Int) -> String = { n, todo -> "$n ${if (n == 1) "sócio" else "sócios"} · $todo a resolver" }
+    override val memberRemoveAsk: (String) -> String = { "Tirar $it dos sócios? Cartões, atestado e consentimentos são apagados; o jogador e as partidas dele ficam." }
+    override val issueNoFitp: (Int) -> String = { "falta o cartão FITP $it" }
+    override val issueMedicalSoon: (String) -> String = { "atestado vence em $it" }
+    override val memberMedicalShort: (String) -> String = { "atestado até $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -30897,6 +31419,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CardMembership
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Backup
@@ -31098,7 +31621,8 @@ private fun CourtsTab(c: MatchController) {
 @Composable
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = true) { c.openPlayers() }
+    Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
 }
 
@@ -32510,6 +33034,340 @@ private fun Badge(text: String) {
     Text(
         text.uppercase(), color = TsmColors.TextMain, fontSize = 9.sp, fontWeight = FontWeight.Bold,
         modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(TsmColors.Danger).padding(horizontal = 5.dp, vertical = 1.dp),
+    )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/MembersScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/MembersScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.DatePickerDialog
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CardMembership
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.FitpCard
+import com.tennis.scoremanager.data.MedicalKind
+import com.tennis.scoremanager.data.Members
+import com.tennis.scoremanager.data.Membership
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Players
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.PlayerEditDialog
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import java.util.Calendar
+
+/** Il testo di un problema del socio ("certificato scaduto"). */
+fun issueText(s: Strings, p: PlayerProfile, i: Members.Issue, now: Long, lang: com.tennis.scoremanager.model.Lang): String = when (i) {
+    Members.Issue.NO_PRIVACY -> s.issueNoPrivacy
+    Members.Issue.NO_FITP -> s.issueNoFitp(Members.year(now))
+    Members.Issue.NO_MEDICAL -> s.issueNoMedical
+    Members.Issue.MEDICAL_EXPIRED -> s.issueMedicalExpired
+    Members.Issue.MEDICAL_SOON -> s.issueMedicalSoon(shortDate(p.member?.medicalUntil, lang))
+    Members.Issue.NO_GUARDIAN -> s.issueNoGuardian
+    Members.Issue.NO_CONTACT -> s.issueNoContact
+}
+
+/** "20 nov 2026": le date dei soci, senza il giorno della settimana. */
+fun shortDate(t: Long?, lang: com.tennis.scoremanager.model.Lang): String {
+    t ?: return ""
+    val loc = Reports.locale(lang)
+    return java.text.SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(loc, "dMMMyyyy"), loc).format(java.util.Date(t))
+}
+
+/**
+ * Circolo › Soci: chi è iscritto, con quello che manca per essere in regola (tessera FITP dell'anno, certificato,
+ * consenso privacy, genitore per i minorenni, un contatto). "Da sistemare" mostra solo chi ha qualcosa da fare.
+ */
+@Composable
+fun MembersScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val players by c.players.collectAsState()
+    val lang = c.options.value.lang
+    val now = remember { System.currentTimeMillis() }
+    var todoOnly by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
+    var adding by remember { mutableStateOf(false) }
+    val members = players.filter { it.member != null }
+    val issues = remember(members) { members.associate { it.id to Members.issues(it, now) } }
+    val todo = members.count { issues[it.id].orEmpty().isNotEmpty() }
+    val shown = (if (query.isBlank()) members else Players.search(members, query))
+        .filter { !todoOnly || issues[it.id].orEmpty().isNotEmpty() }
+    ScreenScaffold(
+        title = s.membersTitle,
+        subtitle = s.membersHint,
+        icon = Icons.Filled.CardMembership,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.membersNew, Icons.Filled.PersonAdd, { adding = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (members.isEmpty()) {
+            Text(s.membersNone, color = TsmColors.TextDim)
+        } else {
+            Text(s.membersCount(members.size, todo), color = if (todo > 0) TsmColors.Orange else TsmColors.Ok, fontWeight = FontWeight.Bold)
+            Segmented(listOf(SegOption(s.membersAll), SegOption(s.membersTodo)), if (todoOnly) 1 else 0, { todoOnly = it == 1 })
+            OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+        }
+        for (p in shown) {
+            val m = p.member ?: continue
+            val list = issues[p.id].orEmpty()
+            Row(Modifier.fillMaxWidth().clickable { c.openStudent(p.id) }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                PlayerAvatar(c, p.name, TsmColors.Ball, 44.dp)
+                Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                    Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    val line = listOfNotNull(
+                        m.fitpYear?.let { "FITP $it" }, m.ranking.takeIf { it.isNotBlank() },
+                        // Il certificato con un problema lo dice già la riga sotto.
+                        m.medicalUntil?.takeIf { list.none { i -> i == Members.Issue.MEDICAL_SOON || i == Members.Issue.MEDICAL_EXPIRED } }?.let { s.memberMedicalShort(shortDate(it, lang)) },
+                    ).joinToString(" · ")
+                    if (line.isNotEmpty()) Text(line, color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (list.isEmpty()) Text(s.memberOk, color = TsmColors.Ok, fontSize = 13.sp)
+                    else Text(
+                        list.joinToString(" · ") { issueText(s, p, it, now, lang) },
+                        color = if (list.any(Members::blocking)) TsmColors.Danger else TsmColors.Orange, fontSize = 13.sp,
+                    )
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+            }
+        }
+    }
+    if (adding) MemberPickDialog(c) { picked ->
+        adding = false
+        picked?.let { p ->
+            c.savePlayer(p.copy(member = p.member ?: Membership(since = noon(System.currentTimeMillis()))))
+            c.openStudent(p.id)
+        }
+    }
+}
+
+/** Mezzogiorno di quel giorno: la data non cambia col fuso orario. */
+private fun noon(t: Long): Long = Calendar.getInstance().apply {
+    timeInMillis = t
+    set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+}.timeInMillis
+
+/** Chi si iscrive: un giocatore che c'è già (non socio) o uno nuovo. */
+@Composable
+private fun MemberPickDialog(c: MatchController, onDone: (PlayerProfile?) -> Unit) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    var query by remember { mutableStateOf("") }
+    var creating by remember { mutableStateOf(false) }
+    val free = players.filter { it.member == null }
+    val list = if (query.isBlank()) free else Players.search(free, query)
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(s.membersPickTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.membersPickHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(s.membersNewPlayer, Icons.Filled.PersonAdd, { creating = true }, Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.playersSearch) }, leadingIcon = { Icon(Icons.Filled.Search, null) })
+                for (p in list.take(40)) {
+                    Row(Modifier.fillMaxWidth().clickable { onDone(p) }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        PlayerAvatar(c, p.name, TsmColors.Ball, 36.dp)
+                        Column(Modifier.padding(start = 10.dp)) {
+                            Text(p.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            p.fullName.takeIf { it.isNotBlank() && it != p.name }?.let { Text(it, color = TsmColors.TextDim, fontSize = 12.sp) }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (creating) PlayerEditDialog(c, null) { p -> creating = false; if (p != null) onDone(p) }
+}
+
+/** Nella scheda del giocatore: i dati da socio, o il tasto per iscriverlo (col ruolo Circolo). */
+@Composable
+fun MemberSection(c: MatchController, p: PlayerProfile) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val roles by c.roles.collectAsState()
+    var edit by remember { mutableStateOf(false) }
+    var remove by remember { mutableStateOf(false) }
+    val m = p.member
+    if (m == null) {
+        if (com.tennis.scoremanager.Role.CLUB in roles) GhostButton(s.memberEnroll, Icons.Filled.CardMembership, {
+            c.savePlayer(p.copy(member = Membership(since = noon(System.currentTimeMillis()))))
+            edit = true
+        }, Modifier.fillMaxWidth())
+    } else {
+        val now = System.currentTimeMillis()
+        SectionCard(s.memberSection, Icons.Filled.CardMembership) {
+            @Composable fun row(label: String, value: String?) {
+                if (value.isNullOrBlank()) return
+                Row(Modifier.fillMaxWidth()) {
+                    Text(label, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    Text(value, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            val issues = Members.issues(p, now)
+            if (issues.isEmpty()) Text(s.memberOk, color = TsmColors.Ok, fontWeight = FontWeight.Bold)
+            for (i in issues) Text(issueText(s, p, i, now, lang), color = if (Members.blocking(i)) TsmColors.Danger else TsmColors.Orange, fontSize = 13.sp)
+            row(s.memberSince, m.since?.let { shortDate(it, lang) })
+            row(s.memberNumber, m.number)
+            row(s.memberFitpNumber, listOfNotNull(m.fitpNumber.ifBlank { null }, m.fitpCard?.let { fitpName(s, it) }, m.fitpYear?.toString()).joinToString(" · "))
+            row(s.memberRankingLabel, m.ranking)
+            row(s.memberMedical, listOfNotNull(m.medical?.let { medicalName(s, it) }, m.medicalUntil?.let { s.memberMedicalShort(shortDate(it, lang)) }).joinToString(" · "))
+            row(s.memberPrivacy, m.privacyAt?.let { shortDate(it, lang) })
+            row(s.memberPhotos, if (m.photosOk) s.memberYes else s.off)
+            row(s.memberBirth, p.birth?.let { b -> shortDate(b, lang) + (Members.age(b, now)?.let { " ($it)" } ?: "") })
+            row(s.memberPhone, p.phone)
+            row(s.memberEmail, p.email)
+            row(s.memberGuardian, listOf(m.guardian, m.guardianPhone).filter { it.isNotBlank() }.joinToString(" · "))
+            GhostButton(s.memberEdit, Icons.Filled.VerifiedUser, { edit = true }, Modifier.fillMaxWidth())
+            TextButton(onClick = { remove = true }) { Text(s.memberRemove, color = TsmColors.Danger) }
+        }
+    }
+    if (edit) c.playerById(p.id)?.let { cur -> MemberEditDialog(c, cur) { edit = false } }
+    if (remove) AlertDialog(
+        onDismissRequest = { remove = false },
+        text = { Text(s.memberRemoveAsk(p.name)) },
+        confirmButton = { TextButton(onClick = { remove = false; c.savePlayer(p.copy(member = null)) }) { Text(s.memberRemove, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { remove = false }) { Text(s.back) } },
+    )
+}
+
+fun fitpName(s: Strings, k: FitpCard) = when (k) {
+    FitpCard.AGONIST -> s.memberFitpAgonist
+    FitpCard.NON_AGONIST -> s.memberFitpNonAgonist
+    FitpCard.OTHER -> s.memberFitpOther
+}
+
+fun medicalName(s: Strings, k: MedicalKind) = when (k) {
+    MedicalKind.AGONISTIC -> s.memberMedicalAgonistic
+    MedicalKind.NON_AGONISTIC -> s.memberMedicalNon
+}
+
+/** Una data da scegliere col calendario; la X la toglie. [startYearsAgo]: da dove parte il calendario se è vuota. */
+@Composable
+private fun DateField(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, startYearsAgo: Int = 0, onPick: (Long?) -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
+            val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis(); if (value == null) add(Calendar.YEAR, -startYearsAgo) }
+            DatePickerDialog(context, { _, y, mo, d -> onPick(Calendar.getInstance().apply { set(y, mo, d, 12, 0, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis) },
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }, Modifier.weight(1f))
+        if (value != null) IconButton(onClick = { onPick(null) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+    }
+}
+
+/** I dati del socio: contatti, tessere, certificato, consensi; per i minorenni il genitore. */
+@Composable
+private fun MemberEditDialog(c: MatchController, p: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val m0 = p.member ?: Membership()
+    var phone by remember { mutableStateOf(p.phone) }
+    var email by remember { mutableStateOf(p.email) }
+    var birth by remember { mutableStateOf(p.birth) }
+    var m by remember { mutableStateOf(m0) }
+    val now = System.currentTimeMillis()
+    val year = Members.year(now)
+    @Composable fun field(v: String, label: String, type: KeyboardType = KeyboardType.Text, onChange: (String) -> Unit) = OutlinedTextField(
+        v, { onChange(it.take(60)) }, label = { Text(label) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = type),
+    )
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.memberEdit) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                field(phone, s.memberPhone, KeyboardType.Phone) { phone = it }
+                field(email, s.memberEmail, KeyboardType.Email) { email = it.trim() }
+                DateField(s.memberBirth, birth, lang, startYearsAgo = 30) { birth = it }
+                if ((Members.age(birth, now) ?: 99) < 18) {
+                    Text(s.memberMinor, color = TsmColors.Orange, fontSize = 13.sp)
+                    field(m.guardian, s.memberGuardian) { m = m.copy(guardian = it) }
+                    field(m.guardianPhone, s.memberGuardianPhone, KeyboardType.Phone) { m = m.copy(guardianPhone = it) }
+                }
+                DateField(s.memberSince, m.since, lang) { m = m.copy(since = it) }
+                field(m.number, s.memberNumber) { m = m.copy(number = it) }
+                Text("FITP", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                field(m.fitpNumber, s.memberFitpNumber, KeyboardType.Number) { m = m.copy(fitpNumber = it.trim()) }
+                val cards = listOf(null) + FitpCard.entries
+                Segmented(cards.map { SegOption(it?.let { k -> fitpName(s, k) } ?: "—") }, cards.indexOf(m.fitpCard), { m = m.copy(fitpCard = cards[it]) }, columns = 2)
+                // L'anno della tessera: quest'anno o il prossimo (i rinnovi si fanno a fine anno); un anno vecchio resta visibile.
+                val years = (listOf(null, year, year + 1) + listOfNotNull(m.fitpYear)).distinct()
+                Text(s.memberFitpYear, color = TsmColors.TextDim, fontSize = 13.sp)
+                Segmented(years.map { SegOption(it?.toString() ?: "—") }, years.indexOf(m.fitpYear), { m = m.copy(fitpYear = years[it]) })
+                field(m.ranking, s.memberRanking) { m = m.copy(ranking = it.trim().uppercase()) }
+                Text(s.memberMedical, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                val kinds = listOf(null) + MedicalKind.entries
+                Segmented(kinds.map { SegOption(it?.let { k -> medicalName(s, k) } ?: "—") }, kinds.indexOf(m.medical), { m = m.copy(medical = kinds[it]) })
+                DateField(s.memberMedicalUntil, m.medicalUntil, lang) { m = m.copy(medicalUntil = it) }
+                Text(s.memberMedicalNote, color = TsmColors.TextDim, fontSize = 12.sp)
+                SwitchRow(Icons.Filled.VerifiedUser, s.memberPrivacy, m.privacyAt?.let { shortDate(it, lang) }, m.privacyAt != null) { on ->
+                    m = m.copy(privacyAt = if (on) noon(System.currentTimeMillis()) else null)
+                }
+                SwitchRow(Icons.Filled.PhotoCamera, s.memberPhotos, null, m.photosOk) { m = m.copy(photosOk = it) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                c.savePlayer(p.copy(phone = phone.trim(), email = email.trim(), birth = birth, member = m))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
 }
 TSM_EOF
@@ -35438,6 +36296,8 @@ fun StudentScreen(c: MatchController) {
         else GhostButton(s.meThisIsMe, Icons.Filled.Person, { c.setMe(st) }, Modifier.fillMaxWidth())
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
+        // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
+        MemberSection(c, st)
         com.tennis.scoremanager.ui.SwitchRow(Icons.Filled.School, s.playerStudentToggle, s.playerStudentToggleHint, st.student) { on ->
             if (!on && c.trainStudent.value == st.id) c.setTrainStudent(null)
             c.savePlayer(st.copy(student = on))
@@ -55241,6 +56101,78 @@ class MatchStatsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/MembersTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/MembersTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class MembersTest {
+    private fun day(y: Int, m: Int, d: Int): Long = Calendar.getInstance().apply { set(y, m - 1, d, 12, 0, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val now = day(2026, 11, 1)
+
+    private fun member(m: Membership, birth: Long? = day(1990, 5, 10), phone: String = "333 1234567") =
+        PlayerProfile("p", "Rossi", "Mario", "Rossi", phone = phone, birth = birth, member = m)
+
+    private val ok = Membership(fitpNumber = "123456", fitpYear = 2026, medicalUntil = day(2027, 6, 1), privacyAt = day(2026, 1, 10))
+
+    @Test
+    fun inOrderHasNoIssues() {
+        assertEquals(emptyList<Members.Issue>(), Members.issues(member(ok), now))
+        // Chi non è socio non ha niente da sistemare.
+        assertEquals(emptyList<Members.Issue>(), Members.issues(member(ok).copy(member = null), now))
+    }
+
+    @Test
+    fun medicalExpiredSoonAndMissing() {
+        assertEquals(listOf(Members.Issue.MEDICAL_EXPIRED), Members.issues(member(ok.copy(medicalUntil = day(2026, 10, 31))), now))
+        assertEquals(listOf(Members.Issue.MEDICAL_SOON), Members.issues(member(ok.copy(medicalUntil = day(2026, 11, 20))), now))
+        // Vale fino a fine giornata della scadenza.
+        assertTrue(Members.medicalValid(ok.copy(medicalUntil = day(2026, 11, 1)), day(2026, 11, 1) + 6 * 3_600_000L))
+        assertEquals(listOf(Members.Issue.NO_MEDICAL), Members.issues(member(ok.copy(medicalUntil = null)), now))
+    }
+
+    @Test
+    fun fitpOfAnotherYearPrivacyAndContact() {
+        val i = Members.issues(member(ok.copy(fitpYear = 2025, privacyAt = null), phone = ""), now)
+        assertEquals(listOf(Members.Issue.NO_PRIVACY, Members.Issue.NO_FITP, Members.Issue.NO_CONTACT), i)
+        assertTrue(Members.blocking(Members.Issue.NO_FITP))
+        assertFalse(Members.blocking(Members.Issue.NO_PRIVACY))
+    }
+
+    @Test
+    fun minorsNeedTheParent() {
+        val kid = member(ok, birth = day(2012, 3, 1), phone = "")
+        assertEquals(14, Members.age(kid.birth, now))
+        assertTrue(Members.issues(kid, now).contains(Members.Issue.NO_GUARDIAN))
+        val withParent = kid.copy(member = ok.copy(guardian = "Anna Rossi", guardianPhone = "333 7654321"))
+        // Il telefono del genitore vale come contatto.
+        assertEquals(emptyList<Members.Issue>(), Members.issues(withParent, now))
+        // Il compleanno non ancora arrivato quest'anno non conta.
+        assertEquals(17, Members.age(day(2008, 12, 25), now))
+    }
+
+    @Test
+    fun rankingValue() {
+        assertEquals(2.8, Members.rankingValue("2.8")!!, 1e-9)
+        assertEquals(4.1, Members.rankingValue("4,1")!!, 1e-9)
+        assertEquals(4.9, Members.rankingValue("4.nc")!!, 1e-9)
+        assertEquals(1.0, Members.rankingValue("1")!!, 1e-9)
+        assertTrue(Members.rankingValue("2.8")!! < Members.rankingValue("3.1")!!)
+        assertNull(Members.rankingValue(""))
+        assertNull(Members.rankingValue("forte"))
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -62874,6 +63806,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 197 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 200 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
