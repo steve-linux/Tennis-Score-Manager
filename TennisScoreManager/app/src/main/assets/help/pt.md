@@ -297,6 +297,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
   - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele.
+  - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 
 ### 7.7 Jogadores: o banco

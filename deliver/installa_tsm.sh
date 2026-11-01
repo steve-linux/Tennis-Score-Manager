@@ -614,6 +614,7 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
   - **Matches**: Siege und Niederlagen, TSM-Rating und die letzten Matches aus dem Verlauf mit seinem Namen.
   - **Notizen des Trainers**: woran arbeiten, Ziele; sie speichern sich von selbst.
   - **Schläger**: in der Karte (und unter *Bearbeiten*) seinen Schläger aus *Meine Schläger* wählen: er gehört zu jeder Einheit, wie er an dem Tag war, mit Saiten und Spannung, und die Karte zeigt die aktuelle Besaitung. Ein Schläger, der niemandem gehörte, wird seiner und wird auch in seinen Matches vorgeschlagen.
+  - **Bericht für den Schüler**: *Letzte 30 Tage* oder *Alles* wählen, dann **Vollständiges PDF** (Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, für jeden Schlag einer im Feld und einer daneben mit den drei Bildern der Schlüsselmomente, Matches, Rating und deine Notizen) oder **Bild für WhatsApp** (eine Seite mit den Zahlen der Schläge und dem Treffpunkt eines Schlags). Das Teilen öffnet sich sofort: WhatsApp, E-Mail oder anders. Der Bericht trägt deinen Namen als Trainer (aus *Du*) und den Verein (aus *Verein › Plätze*).
   - **Jetzt trainieren** wählt ihn und geht zurück zu Trainieren, bereit für *Starten*. **Schüler entfernen** nimmt ihn aus der Liste: seine Einheiten bleiben, ohne Schüler. **Schüler und seine Daten löschen** entfernt dagegen alles, was das Telefon von ihm hat: Einheiten mit Videos und Analyse, Notizen und Foto (der Schläger bleibt, ohne Besitzer; die Matches im Verlauf bleiben, weil auch die Gegner darin sind).
 
 ### 7.7 Spieler: die Datenbank
@@ -1031,6 +1032,7 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
   - **Matches**: wins and losses, TSM rating and the last matches from the history with their name.
   - **Coach's notes**: what to work on, goals; they save by themselves.
   - **Racket**: on the card (and in *Edit*) pick their racket from *My rackets*: it goes with each session as it was that day, strings and tension included, and the card shows the current stringing. A racket that belonged to nobody becomes theirs, so it is also suggested in their matches.
+  - **Report for the student**: pick *Last 30 days* or *Everything*, then **Full PDF** (strokes with the percentage in and its trend, movement, for each stroke one shot in and one out with the three key-moment pictures, matches, rating and your notes) or **Image for WhatsApp** (a single page with the stroke numbers and the contact of one shot). Sharing opens straight away: WhatsApp, email or wherever you like. The report carries your name as coach (from *You*) and the club (from *Club › Courts*).
   - **Practise now** picks them and goes back to Practice, ready for *Start*. **Remove student** takes them off the list: their sessions stay, without a student. **Delete student and their data** instead removes everything the phone has of theirs: sessions with videos and analysis, notes and photo (the racket stays, no longer theirs; matches in the history stay, because the opponents are in them too).
 
 ### 7.7 Players: the database
@@ -1447,6 +1449,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
   - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
+  - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 
 ### 7.7 Jugadores: la base
@@ -1863,6 +1866,7 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
   - **Matchs** : victoires et défaites, classement TSM et les derniers matchs de l'historique avec son nom.
   - **Notes de l'entraîneur** : ce qu'il faut travailler, objectifs ; elles s'enregistrent toutes seules.
   - **Raquette** : dans la fiche (et dans *Modifier*) on choisit sa raquette parmi *Mes raquettes* : elle accompagne chaque séance telle qu'elle était ce jour-là, cordage et tension compris, et la fiche montre le cordage monté. Une raquette qui n'était à personne devient la sienne, et elle est aussi proposée dans ses matchs.
+  - **Bilan pour l'élève** : choisissez *30 derniers jours* ou *Tout*, puis **PDF complet** (coups avec le pourcentage dedans et son évolution, mouvement, pour chaque coup un dedans et un dehors avec les trois images des moments clés, matchs, classement et vos notes) ou **Image pour WhatsApp** (une seule page avec les chiffres des coups et l'impact d'un coup). Le partage s'ouvre tout de suite : WhatsApp, e-mail ou ailleurs. Le bilan porte votre nom comme entraîneur (depuis *Vous*) et le club (depuis *Club › Terrains*).
   - **S'entraîner maintenant** le choisit et revient à S'entraîner, prêt pour *Commencer*. **Retirer l'élève** le retire de la liste : ses séances restent, sans élève. **Supprimer l'élève et ses données** retire au contraire tout ce que le téléphone a de lui : séances avec vidéos et analyse, notes et photo (la raquette reste, sans propriétaire ; les matchs de l'historique restent, car les adversaires y sont aussi).
 
 ### 7.7 Joueurs : la base
@@ -2279,6 +2283,7 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
   - **Partite**: vittorie e sconfitte, rating TSM e le ultime partite dallo storico col suo nome.
   - **Note dell'allenatore**: cosa lavorare, obiettivi; si salvano da sole.
   - **Racchetta**: nella scheda (e in *Modifica*) si sceglie la sua racchetta tra *Le mie racchette*: va con ogni sessione com'era quel giorno, corde e tensione comprese, e la scheda mostra l'incordatura montata. Una racchetta di nessuno diventa sua, così la si propone anche nelle sue partite.
+  - **Report per l'allievo**: scegli *Ultimi 30 giorni* o *Tutto*, poi **PDF completo** (colpi con la percentuale dentro e l'andamento, il movimento, per ogni colpo uno dentro e uno fuori con le tre immagini dei momenti chiave, partite, rating e le tue note) o **Immagine per WhatsApp** (una pagina sola con i numeri dei colpi e l'impatto di un colpo). Si apre subito la condivisione: WhatsApp, email o dove vuoi. Il report porta il tuo nome come allenatore (da *Tu*) e il circolo (da *Circolo › Campi*).
   - **Allena ora** lo sceglie e torna in Allenati, pronto per *Inizia*. **Togli l'allievo** lo toglie dall'elenco: le sue sessioni restano, senza allievo. **Cancella l'allievo e i suoi dati** toglie invece tutto quello che il telefono ha di suo: sessioni con video e analisi, note e foto (la racchetta resta, non più sua; le partite dello storico restano, perché ci sono anche gli avversari).
 
 ### 7.7 Giocatori: il database
@@ -2695,6 +2700,7 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
   - **Partidas**: vitórias e derrotas, rating TSM e as últimas partidas do histórico com o nome dele.
   - **Notas do treinador**: o que trabalhar, objetivos; salvam-se sozinhas.
   - **Raquete**: na ficha (e em *Editar*) escolhe-se a raquete dele em *As minhas raquetes*: vai com cada sessão como estava naquele dia, cordas e tensão incluídas, e a ficha mostra o encordoamento montado. Uma raquete que não era de ninguém passa a ser dele, e é proposta também nas partidas dele.
+  - **Relatório para o aluno**: escolha *Últimos 30 dias* ou *Tudo*, depois **PDF completo** (golpes com a porcentagem dentro e a evolução, movimento, de cada golpe um dentro e um fora com as três imagens dos momentos-chave, partidas, rating e suas notas) ou **Imagem para WhatsApp** (uma página só com os números dos golpes e o impacto de um golpe). O compartilhamento abre na hora: WhatsApp, e-mail ou onde quiser. O relatório leva seu nome como treinador (de *Você*) e o clube (de *Clube › Quadras*).
   - **Treinar agora** escolhe o aluno e volta para Treinar, pronto para *Começar*. **Remover aluno** tira-o da lista: as sessões ficam, sem aluno. **Apagar aluno e os dados dele** remove tudo o que o telefone tem dele: sessões com vídeos e análise, notas e foto (a raquete fica, sem dono; as partidas do histórico ficam, porque os adversários também estão nelas).
 
 ### 7.7 Jogadores: o banco
@@ -5516,6 +5522,31 @@ class MatchController(
         return runCatching {
             file.outputStream().use { ProgressPdf.write(r, s, "Tennis Score Manager · ${Reports.date(System.currentTimeMillis(), options.value.lang)}", it) }
             file
+        }.getOrNull()
+    }
+
+    /**
+     * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
+     * tutto). L'allenatore è il tuo giocatore, il circolo quello di Circolo › Campi. null se non si è potuto fare.
+     */
+    fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
+        val s = strings
+        val now = System.currentTimeMillis()
+        val r = com.tennis.scoremanager.data.StudentReport.build(
+            storage, s, p, storage.loadServeSessions(), studentMatches(p), studentRating(p)?.rating,
+            coach = me()?.takeIf { it.id != p.id }?.name, club = storage.clubName.ifBlank { null },
+            from = days?.let { now - it * 24L * 3600 * 1000 }, now = now,
+        )
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\/:*?\"<>|]"), "_")
+        return runCatching {
+            if (pdf) File(dir, "$base.pdf").also { f ->
+                f.outputStream().use { com.tennis.scoremanager.data.StudentReportPdf.write(r, s, options.value.lang, "${s.generatedWith} · ${Reports.date(now, options.value.lang)}", it) }
+            } else File(dir, "$base.png").also { f ->
+                val b = com.tennis.scoremanager.data.StudentReportImage.render(r, s, options.value.lang)
+                f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+                b.recycle()
+            }
         }.getOrNull()
     }
 
@@ -12383,6 +12414,410 @@ class Storage(context: Context) {
     /** Cartella predefinita dello storico se l'utente non ne sceglie una. */
     val defaultHistoryDir: File
         get() = File(app.getExternalFilesDir(null) ?: app.filesDir, "Storico").apply { mkdirs() }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/StudentAnalysis.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/StudentAnalysis.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.video.ServeClipAnalysis
+import kotlinx.serialization.json.Json
+import java.io.File
+
+/** Le misure dell'analisi del movimento di un allievo: per la sua scheda e per il report. */
+object StudentAnalysis {
+    /** Una sessione analizzata: le medie delle misure dei colpi affidabili. */
+    sealed interface Means {
+        data class Serve(val m: ServePose.Mean) : Means
+        data class Ground(val m: ServePose.GroundMean) : Means
+    }
+
+    private val json = Json { ignoreUnknownKeys = true }
+
+    /** Le medie dell'analisi di una sessione (null se non è analizzata o nessun colpo è affidabile). */
+    fun means(storage: Storage, sess: ServeSession): Means? {
+        val dir = storage.serveClipsDir(sess)
+        val results = sess.serves.mapNotNull { a ->
+            val f = a.clip?.let { File(File(dir, it), ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
+            runCatching { json.decodeFromString(ServePoseResult.serializer(), f.readText()) }.getOrNull()
+        }
+        return if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(results.mapNotNull { it.metrics })?.let { Means.Serve(it) }
+        else ServePose.groundMean(results.mapNotNull { it.ground })?.let { Means.Ground(it) }
+    }
+
+
+    /** Le righe del confronto: per il servizio e per gli altri colpi le misure dell'analisi. */
+    fun changes(s: com.tennis.scoremanager.ui.Strings, now: Means, before: Means?): List<Students.Change> = when (now) {
+        is Means.Serve -> {
+            val b = (before as? Means.Serve)?.m
+            val m = now.m
+            listOf(
+                Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
+                Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
+                Students.Change(s.poseHeightMetric, b?.contactHeight, m.contactHeight, "", 0),
+                Students.Change(s.poseTossMetric, b?.tossArmDeg, m.tossArmDeg, "°", 0),
+                Students.Change(s.poseTimingMetric, b?.trophyToContactMs?.toFloat(), m.trophyToContactMs.toFloat(), "ms", 0),
+            )
+        }
+        is Means.Ground -> {
+            val b = (before as? Means.Ground)?.m
+            val m = now.m
+            listOf(
+                Students.Change(s.poseInFrontMetric, b?.contactInFront, m.contactInFront, "", 0),
+                Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
+                Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
+                Students.Change(s.poseBackswingMetric, b?.backswing, m.backswing, "", 0),
+                Students.Change(s.poseFinishMetric, b?.finishHeight, m.finishHeight, "", 0),
+                Students.Change(s.poseTimingGround, b?.prepToContactMs?.toFloat(), m.prepToContactMs.toFloat(), "ms", 0),
+            )
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/StudentReport.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/StudentReport.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.directionName
+import com.tennis.scoremanager.ui.serveSideName
+import com.tennis.scoremanager.ui.serveTargetName
+import com.tennis.scoremanager.ui.strokeLabel
+import com.tennis.scoremanager.ui.wingName
+import com.tennis.scoremanager.video.ServeClipAnalysis
+import java.io.File
+
+/**
+ * Il report da dare all'allievo (PDF o immagine): colpi con la percentuale dentro e il suo andamento, movimento
+ * (ultima sessione analizzata contro quella prima), un colpo dentro e uno fuori con le immagini dei momenti chiave,
+ * partite e note. Qui solo i dati; il disegno è in [StudentReportPdf] e [StudentReportImage].
+ */
+object StudentReport {
+    /** Un colpo nel periodo: sessioni, colpi, percentuale dentro, andamento (% per sessione) e righe per direzione o bersaglio. */
+    data class StrokeBlock(
+        val stroke: TrainedStroke, val sessions: Int, val shots: Int, val pct: Int?, val trend: List<Int>,
+        val rows: List<Pair<String, ServeTraining.Count>>,
+    )
+
+    /** Un colpo d'esempio: le tre immagini dei momenti chiave (etichetta, file). */
+    data class Example(val stroke: TrainedStroke, val inPlay: Boolean, val at: Long, val images: List<Pair<String, File>>)
+
+    data class Match(val at: Long, val won: Boolean, val pointsPct: Int, val opponents: String)
+
+    data class Report(
+        val name: String, val fullName: String, val coach: String?, val club: String?, val from: Long?, val to: Long,
+        val strokes: List<StrokeBlock>, val movement: List<Pair<TrainedStroke, List<Students.Change>>>,
+        val examples: List<Example>, val won: Int, val lost: Int, val rating: Int?, val matches: List<Match>, val note: String,
+    ) {
+        val empty: Boolean get() = strokes.isEmpty() && matches.isEmpty() && note.isBlank()
+    }
+
+    /** Le righe del riepilogo di un colpo: bersaglio e lato col servizio, direzione con gli altri, dritto/rovescio con la volée. */
+    fun rows(s: Strings, stroke: TrainedStroke, serves: List<ServeAttempt>): List<Pair<String, ServeTraining.Count>> {
+        val b = ServeTraining.breakdown(serves, stroke)
+        return b.bySide.map { serveSideName(s, it.key) to it.value } + b.byTarget.map { serveTargetName(s, it.key) to it.value } +
+            b.byDirection.map { directionName(s, it.key) to it.value } + b.byWing.map { wingName(s, it.key) to it.value }
+    }
+
+    /**
+     * Raccoglie il report di [p]: sessioni dal giorno [from] (null = tutte), partite dello stesso periodo. [labels]: le
+     * etichette delle tre immagini per colpo.
+     */
+    fun build(
+        storage: Storage, s: Strings, p: PlayerProfile, sessions: List<ServeSession>, matches: List<PlayerStats.MatchLine>,
+        rating: Int?, coach: String?, club: String?, from: Long?, now: Long,
+    ): Report {
+        val mine = sessions.filter { it.student == p.id && (from == null || it.startedAt >= from) && it.serves.isNotEmpty() }.sortedBy { it.startedAt }
+        val strokes = TrainedStroke.entries.mapNotNull { t ->
+            val list = mine.filter { it.stroke == t }
+            if (list.isEmpty()) return@mapNotNull null
+            val all = list.flatMap { it.serves }
+            StrokeBlock(t, list.size, all.size, ServeTraining.count(all).pct, list.mapNotNull { ServeTraining.count(it.serves).pct }, rows(s, t, all))
+        }
+        val movement = TrainedStroke.entries.mapNotNull { t ->
+            val analysed = mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.mapNotNull { StudentAnalysis.means(storage, it) }.take(2)
+            val last = analysed.getOrNull(0) ?: return@mapNotNull null
+            t to StudentAnalysis.changes(s, last, analysed.getOrNull(1))
+        }
+        // Per colpo l'ultimo colpo dentro e l'ultimo fuori che hanno le immagini dell'analisi.
+        val examples = TrainedStroke.entries.flatMap { t ->
+            val names = if (t == TrainedStroke.SERVE) listOf(s.poseTrophy to ServeClipAnalysis.TROPHY, s.poseKnee to ServeClipAnalysis.KNEE, s.poseContact to ServeClipAnalysis.CONTACT)
+            else listOf(s.posePrep to ServeClipAnalysis.PREP, s.poseContact to ServeClipAnalysis.CONTACT, s.poseFinish to ServeClipAnalysis.FINISH)
+            listOf(true, false).mapNotNull { inPlay ->
+                mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.asSequence().flatMap { sess ->
+                    val dir = storage.serveClipsDir(sess)
+                    sess.serves.reversed().asSequence().filter { it.inPlay == inPlay && it.clip != null }.map { a -> a to File(dir, a.clip!!) }
+                }.mapNotNull { (a, d) ->
+                    val imgs = names.map { (label, file) -> label to File(d, file) }.filter { it.second.exists() }
+                    if (imgs.size == names.size) Example(t, inPlay, a.at, imgs) else null
+                }.firstOrNull()
+            }
+        }
+        val inPeriod = matches.filter { from == null || (it.rec.endedAt ?: it.rec.updatedAt) >= from }
+        val keys = setOf(p.id) + p.aliases
+        val list = inPeriod.reversed().take(5).map { m ->
+            val side = com.tennis.scoremanager.model.Side.entries.firstOrNull { side -> PlayerStats.whos(m.rec.setup, side).any { it.key in keys } }
+            Match(m.rec.endedAt ?: m.rec.updatedAt, m.won, m.pointsWonPct, side?.let { PlayerStats.names(m.rec.setup, it.other).joinToString(" / ") }.orEmpty())
+        }
+        return Report(
+            // Con "tutto" il periodo parte dalla prima sessione o partita.
+            name = p.name, fullName = p.fullName, coach = coach, club = club,
+            from = from ?: (mine.map { it.startedAt } + inPeriod.map { it.rec.endedAt ?: it.rec.updatedAt }).minOrNull(), to = now,
+            strokes = strokes, movement = movement, examples = examples,
+            won = inPeriod.count { it.won }, lost = inPeriod.count { !it.won }, rating = rating, matches = list, note = p.note,
+        )
+    }
+
+    /** "Dritto · 3 sessioni · 42 colpi · 71%". */
+    fun strokeLine(s: Strings, b: StrokeBlock): String =
+        listOfNotNull(strokeLabel(s, b.stroke), s.studentSessions(b.sessions), s.studentShots(b.shots), b.pct?.let { "$it%" }).joinToString(" · ")
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/StudentReportPdf.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/StudentReportPdf.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
+import com.tennis.scoremanager.model.Lang
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.strokeLabel
+import java.io.OutputStream
+
+/** Il report dell'allievo in PDF (A4, più pagine se serve), coi colori di stampa. */
+object StudentReportPdf {
+    private const val W = 595
+    private const val H = 842
+    private const val M = 40f
+    private val dark = Color.rgb(20, 28, 44)
+    private val grey = Color.rgb(110, 120, 135)
+    private val rule = Color.rgb(220, 224, 230)
+    private val accent = Color.rgb(98, 140, 20)
+    private val green = Color.rgb(46, 125, 50)
+    private val red = Color.rgb(205, 45, 42)
+
+    private fun paint(size: Float, color: Int = dark, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+        textSize = size; this.color = color; typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT; textAlign = align; isAntiAlias = true
+    }
+
+    /** "dal 1 ottobre al 31 ottobre" o "tutto"; con l'allenatore e il circolo. */
+    fun period(r: StudentReport.Report, s: Strings, lang: Lang): String = listOfNotNull(
+        r.from?.let { s.reportPeriod(Reports.date(it, lang), Reports.date(r.to, lang)) } ?: s.reportAll,
+        r.coach?.takeIf { it.isNotBlank() }?.let { s.reportCoach(it) }, r.club?.takeIf { it.isNotBlank() },
+    ).joinToString(" · ")
+
+    fun write(r: StudentReport.Report, s: Strings, lang: Lang, footer: String, out: OutputStream) {
+        val doc = PdfDocument()
+        var pageNo = 0
+        var page: PdfDocument.Page? = null
+        var y = 0f
+        fun newPage() {
+            page?.let { doc.finishPage(it) }
+            pageNo++
+            page = doc.startPage(PdfDocument.PageInfo.Builder(W, H, pageNo).create())
+            page!!.canvas.drawText("$footer · $pageNo", W / 2f, H - 20f, paint(8f, grey, align = Paint.Align.CENTER))
+            y = M + 10f
+        }
+        fun ensure(h: Float) { if (y + h > H - 40f) newPage() }
+        val c = { page!!.canvas }
+        fun section(title: String) {
+            ensure(40f)
+            y += 10f
+            c().drawText(title, M, y, paint(14f, accent, bold = true))
+            y += 6f
+            c().drawLine(M, y, W - M, y, Paint().apply { color = rule })
+            y += 16f
+        }
+        fun wrap(text: String, p: Paint, width: Float, lineH: Float) {
+            for (para in text.split('\n')) {
+                var line = ""
+                for (w in para.split(' ')) {
+                    val t = if (line.isEmpty()) w else "$line $w"
+                    if (p.measureText(t) > width && line.isNotEmpty()) { ensure(lineH); c().drawText(line, M, y, p); y += lineH; line = w } else line = t
+                }
+                ensure(lineH); c().drawText(line, M, y, p); y += lineH
+            }
+        }
+        newPage()
+        c().drawText(r.name, M, y, paint(22f, bold = true))
+        y += 18f
+        if (r.fullName.isNotBlank() && r.fullName != r.name) { c().drawText(r.fullName, M, y, paint(11f, grey)); y += 16f }
+        c().drawText(period(r, s, lang), M, y, paint(10f, grey))
+        y += 14f
+        if (r.empty) { y += 10f; c().drawText(s.reportEmpty, M, y, paint(11f)); y += 16f }
+
+        if (r.strokes.isNotEmpty()) {
+            section(s.studentStrokes)
+            for (b in r.strokes) {
+                ensure(70f)
+                c().drawText(StudentReport.strokeLine(s, b), M, y, paint(11f, bold = true))
+                // Andamento: la percentuale dentro di ogni sessione, da sinistra (la più vecchia) a destra.
+                if (b.trend.size >= 2) sparkline(c(), b.trend, RectF(W - M - 150f, y - 12f, W - M, y + 18f))
+                y += if (b.trend.size >= 2) 26f else 15f
+                for (row in b.rows.chunked(2)) {
+                    ensure(14f)
+                    row.forEachIndexed { i, (label, n) -> c().drawText("$label: ${s.serveCountLine(n.inPlay, n.total)}" + (n.pct?.let { " · $it%" } ?: ""), M + i * 250f, y, paint(9.5f)) }
+                    y += 13f
+                }
+                y += 10f
+            }
+        }
+        if (r.movement.isNotEmpty()) {
+            section(s.studentMovement)
+            for ((t, rows) in r.movement) {
+                ensure(20f)
+                c().drawText(strokeLabel(s, t), M, y, paint(11f, bold = true))
+                y += 15f
+                for (ch in rows) {
+                    ensure(13f)
+                    val fmt = { v: Float? -> v?.let { if (ch.unit == "°") "%.0f°".format(it) else if (ch.unit == "ms") "%.0f ms".format(it) else "%.2f".format(it) } ?: "—" }
+                    c().drawText(ch.label, M, y, paint(9.5f, grey))
+                    c().drawText(if (ch.before != null) "${fmt(ch.before)} → ${fmt(ch.now)}" else fmt(ch.now), W - M, y, paint(9.5f, bold = true, align = Paint.Align.RIGHT))
+                    y += 13f
+                }
+                y += 6f
+            }
+        }
+        if (r.examples.isNotEmpty()) {
+            section(s.reportExamples)
+            val gap = 8f
+            val iw = (W - 2 * M - 2 * gap) / 3
+            for (e in r.examples) {
+                val bmps = e.images.map { (label, f) -> label to runCatching { decodeSmall(f, (iw * 2).toInt()) }.getOrNull() }
+                val ratio = bmps.firstNotNullOfOrNull { it.second }?.let { it.height.toFloat() / it.width } ?: 0.56f
+                val ih = iw * ratio
+                ensure(ih + 40f)
+                c().drawText("${strokeLabel(s, e.stroke)} · ${if (e.inPlay) s.reportShotIn else s.reportShotOut} · ${Reports.date(e.at, lang)}", M, y, paint(10f, if (e.inPlay) green else red, bold = true))
+                y += 8f
+                bmps.forEachIndexed { i, (label, b) ->
+                    val x = M + i * (iw + gap)
+                    if (b != null) {
+                        // Ridotte prima di metterle nel PDF (non comprime le immagini).
+                        val small = Bitmap.createScaledBitmap(b, (iw * 2).toInt(), (ih * 2).toInt(), true)
+                        c().drawBitmap(small, null, RectF(x, y, x + iw, y + ih), Paint(Paint.FILTER_BITMAP_FLAG))
+                        if (small !== b) small.recycle()
+                        b.recycle()
+                    }
+                    c().drawText(label, x, y + ih + 11f, paint(8.5f, grey))
+                }
+                y += ih + 24f
+            }
+        }
+        if (r.matches.isNotEmpty()) {
+            section(s.studentMatches)
+            c().drawText(s.studentWonLost(r.won, r.lost) + (r.rating?.let { " · ${s.ratingTitle}: $it" } ?: ""), M, y, paint(11f, bold = true))
+            y += 16f
+            for (m in r.matches) {
+                ensure(13f)
+                c().drawText("${Reports.date(m.at, lang)} · ${m.opponents}", M, y, paint(9.5f))
+                c().drawText((if (m.won) s.studentWon else s.studentLost) + " · ${m.pointsPct}%", W - M, y, paint(9.5f, if (m.won) green else red, bold = true, align = Paint.Align.RIGHT))
+                y += 13f
+            }
+        }
+        if (r.note.isNotBlank()) {
+            section(s.studentNotes)
+            wrap(r.note, paint(10.5f), W - 2 * M, 14f)
+        }
+        page?.let { doc.finishPage(it) }
+        doc.writeTo(out)
+        doc.close()
+    }
+
+    /** La percentuale dentro sessione per sessione come una linea nel riquadro [box] (scala sui valori, almeno 20 punti). */
+    /** L'immagine ridotta già in lettura (le clip possono essere grandi): almeno [minWidth] pixel di larghezza. */
+    internal fun decodeSmall(f: java.io.File, minWidth: Int): Bitmap? {
+        val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(f.absolutePath, o)
+        var sample = 1
+        while (o.outWidth / (sample * 2) >= minWidth) sample *= 2
+        return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample })
+    }
+
+    fun sparkline(c: Canvas, values: List<Int>, box: RectF, line: Int = accent, guide: Int = rule) {
+        val lo = minOf(values.min(), values.max() - 20).coerceAtLeast(0).toFloat()
+        val hi = maxOf(values.max(), values.min() + 20).coerceAtMost(100).toFloat().coerceAtLeast(lo + 1)
+        c.drawLine(box.left, box.bottom, box.right, box.bottom, Paint().apply { color = guide })
+        val dx = box.width() / (values.size - 1)
+        val path = Path()
+        values.forEachIndexed { i, v ->
+            val x = box.left + i * dx
+            val yy = box.bottom - box.height() * (v - lo) / (hi - lo)
+            if (i == 0) path.moveTo(x, yy) else path.lineTo(x, yy)
+        }
+        c.drawPath(path, Paint().apply { color = line; style = Paint.Style.STROKE; strokeWidth = 2f; isAntiAlias = true })
+    }
+}
+
+/** L'immagine del report per WhatsApp e i social (1080×1350): nome, colpi coi numeri e l'andamento, un'immagine dell'impatto. */
+object StudentReportImage {
+    private val bg = Color.rgb(13, 20, 33)
+    private val surface = Color.rgb(25, 35, 54)
+    private val ball = Color.rgb(198, 244, 50)
+    private val main = Color.WHITE
+    private val dim = Color.rgb(150, 162, 180)
+
+    fun render(r: StudentReport.Report, s: Strings, lang: Lang): Bitmap {
+        val w = 1080; val h = 1350
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        c.drawColor(bg)
+        fun p(size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.LEFT) = Paint().apply {
+            textSize = size; this.color = color; typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT; isAntiAlias = true; textAlign = align
+        }
+        var y = 120f
+        c.drawText(r.name, 70f, y, p(78f, main, true))
+        y += 60f
+        c.drawText(StudentReportPdf.period(r, s, lang), 70f, y, p(32f, dim))
+        y += 50f
+        for (b in r.strokes.take(4)) {
+            val box = RectF(60f, y, w - 60f, y + 170f)
+            c.drawRoundRect(box, 32f, 32f, Paint().apply { color = surface; isAntiAlias = true })
+            c.drawText(strokeLabel(s, b.stroke), 100f, y + 62f, p(44f, main, true))
+            c.drawText(listOf(s.studentSessions(b.sessions), s.studentShots(b.shots)).joinToString(" · "), 100f, y + 120f, p(32f, dim))
+            b.pct?.let { c.drawText("$it%", w - 100f, y + 100f, p(84f, ball, true, Paint.Align.RIGHT)) }
+            if (b.trend.size >= 2) StudentReportPdf.sparkline(c, b.trend, RectF(520f, y + 40f, 760f, y + 130f), ball, dim)
+            y += 195f
+        }
+        // L'impatto di un colpo dentro, se c'è, riempie il resto.
+        val img = r.examples.firstOrNull { it.inPlay } ?: r.examples.firstOrNull()
+        val contact = img?.images?.getOrNull(if (img.stroke == TrainedStroke.SERVE) 2 else 1)?.second
+        val b = contact?.let { runCatching { StudentReportPdf.decodeSmall(it, 960) }.getOrNull() }
+        val bottom = h - 110f
+        if (b != null && bottom - y > 200f) {
+            val avail = RectF(60f, y + 10f, w - 60f, bottom)
+            val scale = minOf(avail.width() / b.width, avail.height() / b.height)
+            val dw = b.width * scale; val dh = b.height * scale
+            val dst = RectF(avail.centerX() - dw / 2, avail.top, avail.centerX() + dw / 2, avail.top + dh)
+            c.drawBitmap(b, null, dst, Paint(Paint.FILTER_BITMAP_FLAG))
+            // La didascalia su una fascia scura, sopra le scritte che la clip ha già in basso.
+            c.drawRect(RectF(dst.left, dst.bottom - 70f, dst.right, dst.bottom), Paint().apply { color = 0xCC000000.toInt() })
+            c.drawText("${strokeLabel(s, img.stroke)} · ${s.poseContact}", dst.left + 20f, dst.bottom - 24f, p(32f, main, true))
+            b.recycle()
+        } else if (r.strokes.isEmpty()) {
+            c.drawText(s.reportEmpty, 70f, y + 60f, p(36f, dim))
+        }
+        c.drawText(s.generatedWith, w / 2f, h - 50f, p(30f, dim, align = Paint.Align.CENTER))
+        return bmp
+    }
 }
 TSM_EOF
 
@@ -21129,6 +21564,19 @@ interface Strings {
     val drillStepOf: (Int, Int) -> String
     val drillTemplateName: (Int) -> String
     val drillSession: (String) -> String
+    val reportTitle: String
+    val reportHint: String
+    val report30: String
+    val reportAll: String
+    val reportEmpty: String
+    val reportExamples: String
+    val reportShotIn: String
+    val reportShotOut: String
+    val reportPdf: String
+    val reportImage: String
+    val reportFailed: String
+    val reportPeriod: (String, String) -> String
+    val reportCoach: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -22419,6 +22867,19 @@ object ItStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i di $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Dritto: incrociati e lungolinea", "Rovescio: incrociati e lungolinea", "Servizio: al T ed esterno, da destra e da sinistra", "Volée: di dritto e di rovescio").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Esercizio: $it" }
+    override val reportTitle = "Report per l'allievo"
+    override val reportHint = "Colpi con la percentuale dentro e l'andamento, il movimento, un colpo dentro e uno fuori con le immagini, le partite e le tue note. Lo mandi su WhatsApp o dove vuoi."
+    override val report30 = "Ultimi 30 giorni"
+    override val reportAll = "Tutto"
+    override val reportEmpty = "Ancora niente da raccontare in questo periodo."
+    override val reportExamples = "Colpi d'esempio"
+    override val reportShotIn = "colpo dentro"
+    override val reportShotOut = "colpo fuori"
+    override val reportPdf = "PDF completo"
+    override val reportImage = "Immagine per WhatsApp"
+    override val reportFailed = "Il report non è riuscito: riprova."
+    override val reportPeriod: (String, String) -> String = { a, b -> "dal $a al $b" }
+    override val reportCoach: (String) -> String = { "allenatore: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -23692,6 +24153,19 @@ object EnStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Step $i of $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Forehand: cross-court and down the line", "Backhand: cross-court and down the line", "Serve: T and wide, deuce and ad side", "Volley: forehand and backhand").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Drill: $it" }
+    override val reportTitle = "Report for the student"
+    override val reportHint = "Strokes with the percentage in and its trend, movement, one shot in and one out with the pictures, matches and your notes. Send it on WhatsApp or wherever you like."
+    override val report30 = "Last 30 days"
+    override val reportAll = "Everything"
+    override val reportEmpty = "Nothing to report in this period yet."
+    override val reportExamples = "Example shots"
+    override val reportShotIn = "shot in"
+    override val reportShotOut = "shot out"
+    override val reportPdf = "Full PDF"
+    override val reportImage = "Image for WhatsApp"
+    override val reportFailed = "The report did not work: try again."
+    override val reportPeriod: (String, String) -> String = { a, b -> "from $a to $b" }
+    override val reportCoach: (String) -> String = { "coach: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -24988,6 +25462,19 @@ object DeStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Schritt $i von $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Vorhand: cross und longline", "Rückhand: cross und longline", "Aufschlag: durch die Mitte und nach außen, Einstand- und Vorteilseite", "Volley: Vorhand und Rückhand").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Übung: $it" }
+    override val reportTitle = "Bericht für den Schüler"
+    override val reportHint = "Schläge mit dem Anteil im Feld und dem Verlauf, Bewegung, ein Schlag im Feld und einer daneben mit den Bildern, Matches und deine Notizen. Über WhatsApp oder anders verschicken."
+    override val report30 = "Letzte 30 Tage"
+    override val reportAll = "Alles"
+    override val reportEmpty = "In diesem Zeitraum gibt es noch nichts zu berichten."
+    override val reportExamples = "Beispielschläge"
+    override val reportShotIn = "Schlag im Feld"
+    override val reportShotOut = "Schlag daneben"
+    override val reportPdf = "Vollständiges PDF"
+    override val reportImage = "Bild für WhatsApp"
+    override val reportFailed = "Der Bericht hat nicht geklappt: versuche es nochmal."
+    override val reportPeriod: (String, String) -> String = { a, b -> "vom $a bis $b" }
+    override val reportCoach: (String) -> String = { "Trainer: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -26277,6 +26764,19 @@ object EsStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Paso $i de $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Derecha: cruzadas y paralelas", "Revés: cruzados y paralelos", "Saque: a la T y abierto, lado iguales y ventaja", "Volea: de derecha y de revés").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Ejercicio: $it" }
+    override val reportTitle = "Informe para el alumno"
+    override val reportHint = "Golpes con el porcentaje dentro y su evolución, movimiento, un golpe dentro y uno fuera con las imágenes, partidos y tus notas. Mándalo por WhatsApp o donde quieras."
+    override val report30 = "Últimos 30 días"
+    override val reportAll = "Todo"
+    override val reportEmpty = "Todavía nada que contar en este periodo."
+    override val reportExamples = "Golpes de ejemplo"
+    override val reportShotIn = "golpe dentro"
+    override val reportShotOut = "golpe fuera"
+    override val reportPdf = "PDF completo"
+    override val reportImage = "Imagen para WhatsApp"
+    override val reportFailed = "El informe no ha salido bien: vuelve a intentarlo."
+    override val reportPeriod: (String, String) -> String = { a, b -> "del $a al $b" }
+    override val reportCoach: (String) -> String = { "entrenador: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -27568,6 +28068,19 @@ object FrStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Étape $i sur $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Coup droit : croisés et long de ligne", "Revers : croisés et long de ligne", "Service : au T et extérieur, côté égalité et avantage", "Volée : coup droit et revers").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Exercice : $it" }
+    override val reportTitle = "Bilan pour l'élève"
+    override val reportHint = "Coups avec le pourcentage dedans et son évolution, mouvement, un coup dedans et un dehors avec les images, matchs et vos notes. Envoyez-le sur WhatsApp ou ailleurs."
+    override val report30 = "30 derniers jours"
+    override val reportAll = "Tout"
+    override val reportEmpty = "Rien à raconter sur cette période pour l'instant."
+    override val reportExamples = "Coups en exemple"
+    override val reportShotIn = "coup dedans"
+    override val reportShotOut = "coup dehors"
+    override val reportPdf = "PDF complet"
+    override val reportImage = "Image pour WhatsApp"
+    override val reportFailed = "Le bilan n'a pas réussi : réessayez."
+    override val reportPeriod: (String, String) -> String = { a, b -> "du $a au $b" }
+    override val reportCoach: (String) -> String = { "entraîneur : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -28860,6 +29373,19 @@ object PtStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i de $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Forehand: cruzado e paralela", "Backhand: cruzado e paralela", "Saque: no T e aberto, lado de iguais e de vantagem", "Voleio: de forehand e de backhand").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Exercício: $it" }
+    override val reportTitle = "Relatório para o aluno"
+    override val reportHint = "Golpes com a porcentagem dentro e a evolução, movimento, um golpe dentro e um fora com as imagens, partidas e suas notas. Mande pelo WhatsApp ou onde quiser."
+    override val report30 = "Últimos 30 dias"
+    override val reportAll = "Tudo"
+    override val reportEmpty = "Ainda nada para contar neste período."
+    override val reportExamples = "Golpes de exemplo"
+    override val reportShotIn = "golpe dentro"
+    override val reportShotOut = "golpe fora"
+    override val reportPdf = "PDF completo"
+    override val reportImage = "Imagem para WhatsApp"
+    override val reportFailed = "O relatório não deu certo: tente de novo."
+    override val reportPeriod: (String, String) -> String = { a, b -> "de $a a $b" }
+    override val reportCoach: (String) -> String = { "treinador: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -34677,6 +35203,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CallSplit
@@ -34735,6 +35264,7 @@ import com.tennis.scoremanager.ui.strokeLabel
 import com.tennis.scoremanager.video.ServeClipAnalysis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -34782,25 +35312,6 @@ fun StudentsScreen(c: MatchController) {
     if (create) StudentEditDialog(c, null) { saved -> create = false; saved?.let { c.openStudent(it.id) } }
 }
 
-/** Una sessione analizzata: le medie delle misure dei colpi affidabili. */
-private sealed interface Means {
-    data class Serve(val m: ServePose.Mean) : Means
-    data class Ground(val m: ServePose.GroundMean) : Means
-}
-
-private val json = Json { ignoreUnknownKeys = true }
-
-/** Le medie dell'analisi di una sessione (null se non è analizzata o nessun colpo è affidabile). */
-private fun means(c: MatchController, sess: ServeSession): Means? {
-    val dir = c.storage.serveClipsDir(sess)
-    val results = sess.serves.mapNotNull { a ->
-        val f = a.clip?.let { File(File(dir, it), ServeClipAnalysis.RESULT) }?.takeIf { it.exists() } ?: return@mapNotNull null
-        runCatching { json.decodeFromString(ServePoseResult.serializer(), f.readText()) }.getOrNull()
-    }
-    return if (sess.stroke == TrainedStroke.SERVE) ServePose.mean(results.mapNotNull { it.metrics })?.let { Means.Serve(it) }
-    else ServePose.groundMean(results.mapNotNull { it.ground })?.let { Means.Ground(it) }
-}
-
 /**
  * Scheda dell'allievo: colpi (percentuale dentro nel tempo), movimento (misure dell'ultima sessione analizzata contro
  * quella prima), partite dallo storico col suo nome, note dell'allenatore.
@@ -34825,6 +35336,7 @@ fun StudentScreen(c: MatchController) {
     var delete by remember { mutableStateOf(false) }
     var purge by remember { mutableStateOf(false) }
     var merge by remember { mutableStateOf(false) }
+    var report by remember { mutableStateOf(false) }
     var split by remember { mutableStateOf(false) }
     ScreenScaffold(
         title = st.name,
@@ -34893,9 +35405,9 @@ fun StudentScreen(c: MatchController) {
         val changes by produceState(emptyList<Pair<TrainedStroke, List<Students.Change>>>(), mine) {
             value = withContext(Dispatchers.IO) {
                 TrainedStroke.entries.mapNotNull { t ->
-                    val analysed = mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.mapNotNull { means(c, it) }.take(2)
+                    val analysed = mine.filter { it.stroke == t }.sortedByDescending { it.startedAt }.mapNotNull { com.tennis.scoremanager.data.StudentAnalysis.means(c.storage, it) }.take(2)
                     val now = analysed.getOrNull(0) ?: return@mapNotNull null
-                    t to changesOf(s, now, analysed.getOrNull(1))
+                    t to com.tennis.scoremanager.data.StudentAnalysis.changes(s, now, analysed.getOrNull(1))
                 }
             }
         }
@@ -34948,6 +35460,8 @@ fun StudentScreen(c: MatchController) {
             }
             OutlinedTextField(note, { note = it.take(4000) }, Modifier.fillMaxWidth(), minLines = 4, placeholder = { Text(s.studentNotesHint) })
         }
+        // Il report da dare all'allievo (PDF o immagine per WhatsApp).
+        if (st.student) BigButton(s.reportTitle, Icons.Filled.Share, { report = true }, Modifier.fillMaxWidth())
         GhostButton(s.playerMerge, Icons.Filled.MergeType, { merge = true }, Modifier.fillMaxWidth())
         if (st.student) GhostButton(s.studentDelete, Icons.Filled.PersonRemove, { delete = true }, Modifier.fillMaxWidth())
         // Tutto quello che il telefono ha di suo, per chi smette o chiede di cancellare i propri dati.
@@ -34969,6 +35483,7 @@ fun StudentScreen(c: MatchController) {
     }
     if (edit) StudentEditDialog(c, st) { edit = false }
     if (merge) MergeDialog(c, st) { merge = false }
+    if (report) ReportDialog(c, st) { report = false }
     if (split) SplitDialog(c, st) { split = false }
     if (delete) {
         AlertDialog(
@@ -34978,6 +35493,42 @@ fun StudentScreen(c: MatchController) {
             dismissButton = { TextButton(onClick = { delete = false }) { Text(s.back) } },
         )
     }
+}
+
+/** Report per l'allievo: periodo (ultimi 30 giorni o tutto) e formato; si condivide subito. */
+@Composable
+private fun ReportDialog(c: MatchController, st: PlayerProfile, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var all by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }
+    fun make(pdf: Boolean) {
+        busy = true
+        scope.launch {
+            val f = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.studentReportFile(st, if (all) null else 30, pdf) }
+            busy = false
+            if (f == null) android.widget.Toast.makeText(context, s.reportFailed, android.widget.Toast.LENGTH_LONG).show()
+            else { context.startActivity(c.shareFileIntent(f, if (pdf) "application/pdf" else "image/png")); onDone() }
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.reportTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(s.reportHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                com.tennis.scoremanager.ui.Segmented(
+                    listOf(com.tennis.scoremanager.ui.SegOption(s.report30), com.tennis.scoremanager.ui.SegOption(s.reportAll)), if (all) 1 else 0, { all = it == 1 },
+                )
+                if (busy) Text(s.dataBusy, color = TsmColors.TextDim)
+                GhostButton(s.reportPdf, Icons.Filled.PictureAsPdf, { if (!busy) make(true) }, Modifier.fillMaxWidth())
+                GhostButton(s.reportImage, Icons.Filled.Image, { if (!busy) make(false) }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
 }
 
 /**
@@ -35047,33 +35598,6 @@ private fun SplitDialog(c: MatchController, st: PlayerProfile, onDone: () -> Uni
         },
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
-}
-
-/** Le righe del confronto: per il servizio e per gli altri colpi le misure dell'analisi. */
-private fun changesOf(s: com.tennis.scoremanager.ui.Strings, now: Means, before: Means?): List<Students.Change> = when (now) {
-    is Means.Serve -> {
-        val b = (before as? Means.Serve)?.m
-        val m = now.m
-        listOf(
-            Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
-            Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
-            Students.Change(s.poseHeightMetric, b?.contactHeight, m.contactHeight, "", 0),
-            Students.Change(s.poseTossMetric, b?.tossArmDeg, m.tossArmDeg, "°", 0),
-            Students.Change(s.poseTimingMetric, b?.trophyToContactMs?.toFloat(), m.trophyToContactMs.toFloat(), "ms", 0),
-        )
-    }
-    is Means.Ground -> {
-        val b = (before as? Means.Ground)?.m
-        val m = now.m
-        listOf(
-            Students.Change(s.poseInFrontMetric, b?.contactInFront, m.contactInFront, "", 0),
-            Students.Change(s.poseElbowMetric, b?.elbowContactDeg, m.elbowContactDeg, "°", 0),
-            Students.Change(s.poseKneeMetric, b?.kneeMinDeg, m.kneeMinDeg, "°", 0),
-            Students.Change(s.poseBackswingMetric, b?.backswing, m.backswing, "", 0),
-            Students.Change(s.poseFinishMetric, b?.finishHeight, m.finishHeight, "", 0),
-            Students.Change(s.poseTimingGround, b?.prepToContactMs?.toFloat(), m.prepToContactMs.toFloat(), "ms", 0),
-        )
-    }
 }
 TSM_EOF
 
@@ -61884,6 +62408,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 192 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 195 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

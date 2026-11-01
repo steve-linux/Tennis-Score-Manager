@@ -410,6 +410,7 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
   - **Partidos**: victorias y derrotas, rating TSM y los últimos partidos del historial con su nombre.
   - **Notas del entrenador**: qué trabajar, objetivos; se guardan solas.
   - **Raqueta**: en la ficha (y en *Editar*) se elige su raqueta entre *Mis raquetas*: va con cada sesión tal como estaba ese día, cuerdas y tensión incluidas, y la ficha muestra el encordado montado. Una raqueta que no era de nadie pasa a ser suya, y se propone también en sus partidos.
+  - **Informe para el alumno**: elige *Últimos 30 días* o *Todo*, luego **PDF completo** (golpes con el porcentaje dentro y su evolución, movimiento, de cada golpe uno dentro y uno fuera con las tres imágenes de los momentos clave, partidos, rating y tus notas) o **Imagen para WhatsApp** (una sola página con los números de los golpes y el impacto de un golpe). Se abre enseguida el compartir: WhatsApp, correo o donde quieras. El informe lleva tu nombre como entrenador (de *Tú*) y el club (de *Club › Pistas*).
   - **Entrenar ahora** lo elige y vuelve a Entrenar, listo para *Empezar*. **Quitar alumno** lo quita de la lista: sus sesiones se quedan, sin alumno. **Borrar alumno y sus datos** en cambio quita todo lo que el teléfono tiene de él: sesiones con vídeos y análisis, notas y foto (la raqueta se queda, sin dueño; los partidos del historial se quedan, porque también están los rivales).
 
 ### 7.7 Jugadores: la base (app 2.5)

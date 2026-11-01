@@ -2096,6 +2096,31 @@ class MatchController(
         }.getOrNull()
     }
 
+    /**
+     * Il report di [p] come file da condividere: PDF completo ([pdf]) o immagine; [days] = gli ultimi giorni (null =
+     * tutto). L'allenatore è il tuo giocatore, il circolo quello di Circolo › Campi. null se non si è potuto fare.
+     */
+    fun studentReportFile(p: com.tennis.scoremanager.data.PlayerProfile, days: Int?, pdf: Boolean): File? {
+        val s = strings
+        val now = System.currentTimeMillis()
+        val r = com.tennis.scoremanager.data.StudentReport.build(
+            storage, s, p, storage.loadServeSessions(), studentMatches(p), studentRating(p)?.rating,
+            coach = me()?.takeIf { it.id != p.id }?.name, club = storage.clubName.ifBlank { null },
+            from = days?.let { now - it * 24L * 3600 * 1000 }, now = now,
+        )
+        val dir = File(app.cacheDir, "share").apply { mkdirs() }
+        val base = "${s.reportTitle} ${p.name}".replace(Regex("[\\/:*?\"<>|]"), "_")
+        return runCatching {
+            if (pdf) File(dir, "$base.pdf").also { f ->
+                f.outputStream().use { com.tennis.scoremanager.data.StudentReportPdf.write(r, s, options.value.lang, "${s.generatedWith} · ${Reports.date(now, options.value.lang)}", it) }
+            } else File(dir, "$base.png").also { f ->
+                val b = com.tennis.scoremanager.data.StudentReportImage.render(r, s, options.value.lang)
+                f.outputStream().use { b.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+                b.recycle()
+            }
+        }.getOrNull()
+    }
+
     fun shareFileIntent(file: File, mime: String): Intent {
         val uri = FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {

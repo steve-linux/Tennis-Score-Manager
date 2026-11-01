@@ -1031,6 +1031,19 @@ interface Strings {
     val drillStepOf: (Int, Int) -> String
     val drillTemplateName: (Int) -> String
     val drillSession: (String) -> String
+    val reportTitle: String
+    val reportHint: String
+    val report30: String
+    val reportAll: String
+    val reportEmpty: String
+    val reportExamples: String
+    val reportShotIn: String
+    val reportShotOut: String
+    val reportPdf: String
+    val reportImage: String
+    val reportFailed: String
+    val reportPeriod: (String, String) -> String
+    val reportCoach: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -2321,6 +2334,19 @@ object ItStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Passo $i di $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Dritto: incrociati e lungolinea", "Rovescio: incrociati e lungolinea", "Servizio: al T ed esterno, da destra e da sinistra", "Volée: di dritto e di rovescio").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Esercizio: $it" }
+    override val reportTitle = "Report per l'allievo"
+    override val reportHint = "Colpi con la percentuale dentro e l'andamento, il movimento, un colpo dentro e uno fuori con le immagini, le partite e le tue note. Lo mandi su WhatsApp o dove vuoi."
+    override val report30 = "Ultimi 30 giorni"
+    override val reportAll = "Tutto"
+    override val reportEmpty = "Ancora niente da raccontare in questo periodo."
+    override val reportExamples = "Colpi d'esempio"
+    override val reportShotIn = "colpo dentro"
+    override val reportShotOut = "colpo fuori"
+    override val reportPdf = "PDF completo"
+    override val reportImage = "Immagine per WhatsApp"
+    override val reportFailed = "Il report non è riuscito: riprova."
+    override val reportPeriod: (String, String) -> String = { a, b -> "dal $a al $b" }
+    override val reportCoach: (String) -> String = { "allenatore: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -3594,6 +3620,19 @@ object EnStrings : Strings {
     override val drillStepOf: (Int, Int) -> String = { i, n -> "Step $i of $n" }
     override val drillTemplateName: (Int) -> String = { listOf("Forehand: cross-court and down the line", "Backhand: cross-court and down the line", "Serve: T and wide, deuce and ad side", "Volley: forehand and backhand").getOrElse(it) { "?" } }
     override val drillSession: (String) -> String = { "Drill: $it" }
+    override val reportTitle = "Report for the student"
+    override val reportHint = "Strokes with the percentage in and its trend, movement, one shot in and one out with the pictures, matches and your notes. Send it on WhatsApp or wherever you like."
+    override val report30 = "Last 30 days"
+    override val reportAll = "Everything"
+    override val reportEmpty = "Nothing to report in this period yet."
+    override val reportExamples = "Example shots"
+    override val reportShotIn = "shot in"
+    override val reportShotOut = "shot out"
+    override val reportPdf = "Full PDF"
+    override val reportImage = "Image for WhatsApp"
+    override val reportFailed = "The report did not work: try again."
+    override val reportPeriod: (String, String) -> String = { a, b -> "from $a to $b" }
+    override val reportCoach: (String) -> String = { "coach: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
