@@ -515,6 +515,16 @@ Avec le rôle **Club**, dans **Joueurs › École de tennis**.
 - **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
 - **Cotisations** : pour chaque mois de la saison (ou la saison) **Facturer aux élèves** attribue la cotisation à qui ne l'a pas encore ; on voit combien ont payé et on encaisse comme les autres cotisations, avec reçu.
 
+### 7.17 Équipes et championnats (app 2.6)
+
+Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
+
+- **Nouvelle équipe** : nom, championnat, saison, **championnat FITP** (licence et certificat compétition du jour de la rencontre sont vérifiés), formule (combien de simples et de doubles par rencontre), capitaine. Dans **Effectif** on ajoute les joueurs dans l'ordre de la liste ; en rouge ceux qui ne sont pas en règle pour la prochaine rencontre. Le bilan (gagnées, perdues, nuls) est à côté du nom.
+- **Nouvelle rencontre** : adversaire, jour et heure, à domicile ou à l'extérieur, lieu, **rendez-vous**, notes. À domicile on peut **réserver des terrains** pour quelques heures : dans le planning ils deviennent non réservables.
+- **Disponibilités** : *Demander la disponibilité à tous* envoie le message (réponses OUI, NON ou PEUT-ÊTRE) ; on note les réponses d'un toucher, et *Relancer ceux qui n'ont pas répondu* n'écrit qu'à eux.
+- **Convoqués** : d'abord ceux qui ont dit oui, puis les peut-être ; en rouge ceux qui ne sont pas en règle ce jour-là. **Envoyer la convocation** écrit à chacun jour, heure, lieu et rendez-vous, et prépare pour le groupe la liste des convoqués.
+- **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ou **Jouer avec le marqueur**, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

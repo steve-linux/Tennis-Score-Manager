@@ -726,6 +726,16 @@ Mit der Rolle **Verein**, unter **Spieler › Tennisschule**.
 - **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
 - **Beiträge**: Für jeden Monat der Saison (oder die Saison) gibt **Den Schülern berechnen** den Beitrag allen, die ihn noch nicht haben; man sieht, wie viele bezahlt haben, und kassiert wie bei den anderen Beiträgen, mit Quittung.
 
+### 7.17 Mannschaften und Ligen
+
+Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
+
+- **Neue Mannschaft**: Name, Meisterschaft, Saison, **FITP-Meisterschaft** (Wettkampfausweis und Wettkampfattest zum Spieltag werden geprüft), Format (wie viele Einzel und Doppel pro Begegnung), Kapitän. Im **Kader** fügt man Spieler hinzu und ordnet sie nach der Meldeliste; rot, wer für die nächste Begegnung nicht in Ordnung ist. Die Bilanz (Siege, Niederlagen, Unentschieden) steht neben dem Namen.
+- **Neue Begegnung**: Gegner, Tag und Uhrzeit, Heim oder auswärts, Spielort, **Treffpunkt**, Notizen. Bei Heimspielen lassen sich **Plätze reservieren** für ein paar Stunden: in der Belegung werden sie nicht buchbar.
+- **Verfügbarkeit**: *Alle nach Verfügbarkeit fragen* schickt die Nachricht (Antwort JA, NEIN oder VIELLEICHT); die Antworten trägt man mit einem Tipp ein, und *Wer nicht geantwortet hat* erinnert nur diese.
+- **Aufgestellt**: zuerst wer ja gesagt hat, dann die Vielleicht; rot, wer an dem Tag nicht in Ordnung ist. **Aufstellung senden** schreibt jedem Tag, Uhrzeit, Ort und Treffpunkt und bereitet für die Gruppe die Liste vor.
+- **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger) oder **Mit dem Zähler spielen**, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1209,6 +1219,16 @@ With the **Club** role, under **Players › Tennis school**.
 - **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
 - **Fees**: for each month of the season (or the season) **Charge the students** gives the fee to whoever doesn't have it yet; you see how many paid and collect it like the other fees, with a receipt.
 
+### 7.17 Teams and leagues
+
+With the **Club** role, under **Tournaments › Teams and leagues**.
+
+- **New team**: name, championship, season, **FITP championship** (competitive card and competitive certificate for the match day are checked), format (how many singles and doubles per fixture), captain. In **Roster** you add players and put them in list order; in red whoever isn't in order for the next fixture. The record (won, lost, drawn) is next to the name.
+- **New fixture**: opponent, day and time, home or away, where it's played, **meeting point**, notes. At home you can **hold courts** for some hours: they become not bookable in the planner.
+- **Availability**: *Ask everyone's availability* sends the message (they reply YES, NO or MAYBE); you mark answers with a tap, and *Ask those who haven't replied* reminds only them.
+- **Called up**: first those who said yes, then the maybes; in red whoever isn't in order that day. **Send the call-up** writes to each player day, time, place and meeting point, and prepares the call-up list for the group.
+- **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won) or **Play with the scorer**, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1690,6 +1710,16 @@ Con el rol **Club**, en **Jugadores › Escuela de tenis**.
 - **Alumnos**: se añaden de la base de datos (socios o no) hasta las plazas; de cada uno la **asistencia** (asistió a 3 de 4, en naranja por debajo del 75 %) y lo que debe. La ficha del jugador muestra sus cursos.
 - **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
 - **Cuotas**: para cada mes de la temporada (o la temporada) **Cargar a los alumnos** asigna la cuota a quien aún no la tiene; se ve cuántos han pagado y se cobra como las demás cuotas, con recibo.
+
+### 7.17 Equipos y ligas
+
+Con el rol **Club**, en **Torneos › Equipos y ligas**.
+
+- **Nuevo equipo**: nombre, campeonato, temporada, **campeonato FITP** (se comprueban licencia y certificado de competición del día del encuentro), formato (cuántos individuales y dobles por encuentro), capitán. En **Plantilla** se añaden los jugadores en el orden de la lista; en rojo quien no está en regla para el próximo encuentro. El balance (ganados, perdidos, empates) va junto al nombre.
+- **Nuevo encuentro**: rival, día y hora, en casa o fuera, dónde se juega, **punto de encuentro**, notas. En casa se pueden **reservar pistas** unas horas: en el planning pasan a no reservables.
+- **Disponibilidad**: *Pedir disponibilidad a todos* envía el mensaje (responden SÍ, NO o QUIZÁ); las respuestas se marcan con un toque, y *Pedir a quien no ha respondido* insiste solo con ellos.
+- **Convocados**: primero quien dijo sí, luego los quizá; en rojo quien no está en regla ese día. **Enviar la convocatoria** escribe a cada uno día, hora, lugar y punto de encuentro, y prepara para el grupo la lista de convocados.
+- **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó) o **Jugar con el marcador**, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2173,6 +2203,16 @@ Avec le rôle **Club**, dans **Joueurs › École de tennis**.
 - **Leçons** : le calendrier vient des horaires. Touchez une leçon pour faire l'**appel** (qui était là) ou la marquer **annulée** (pluie, fête…) ; **Annuler et prévenir les élèves** prépare le message avec jour et heure. *Prévenir les élèves* envoie un message libre. Pour les mineurs on écrit au parent.
 - **Cotisations** : pour chaque mois de la saison (ou la saison) **Facturer aux élèves** attribue la cotisation à qui ne l'a pas encore ; on voit combien ont payé et on encaisse comme les autres cotisations, avec reçu.
 
+### 7.17 Équipes et championnats
+
+Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
+
+- **Nouvelle équipe** : nom, championnat, saison, **championnat FITP** (licence et certificat compétition du jour de la rencontre sont vérifiés), formule (combien de simples et de doubles par rencontre), capitaine. Dans **Effectif** on ajoute les joueurs dans l'ordre de la liste ; en rouge ceux qui ne sont pas en règle pour la prochaine rencontre. Le bilan (gagnées, perdues, nuls) est à côté du nom.
+- **Nouvelle rencontre** : adversaire, jour et heure, à domicile ou à l'extérieur, lieu, **rendez-vous**, notes. À domicile on peut **réserver des terrains** pour quelques heures : dans le planning ils deviennent non réservables.
+- **Disponibilités** : *Demander la disponibilité à tous* envoie le message (réponses OUI, NON ou PEUT-ÊTRE) ; on note les réponses d'un toucher, et *Relancer ceux qui n'ont pas répondu* n'écrit qu'à eux.
+- **Convoqués** : d'abord ceux qui ont dit oui, puis les peut-être ; en rouge ceux qui ne sont pas en règle ce jour-là. **Envoyer la convocation** écrit à chacun jour, heure, lieu et rendez-vous, et prépare pour le groupe la liste des convoqués.
+- **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ou **Jouer avec le marqueur**, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2655,6 +2695,16 @@ Col ruolo **Circolo**, in **Giocatori › Scuola tennis**.
 - **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
 - **Quote**: per ogni mese della stagione (o per la stagione) **Addebita agli allievi** mette la quota a chi non l'ha ancora; si vede quanti hanno pagato e si incassa come le altre quote, con la ricevuta.
 
+### 7.17 Squadre e campionati
+
+Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
+
+- **Nuova squadra**: nome, campionato, stagione, **campionato FITP** (si controllano tessera agonistica e certificato agonistico del giorno dell'incontro), formula (quanti singolari e doppi per incontro), capitano. In **Rosa** si aggiungono i giocatori e si mettono nell'ordine della lista; in rosso chi non è in regola per il prossimo incontro. Il bilancio (vinti, persi, pari) è accanto al nome.
+- **Nuovo incontro**: avversario, giorno e ora, in casa o in trasferta, dove si gioca, **ritrovo**, note. In casa si possono **tenere dei campi** per qualche ora: nel planning diventano non prenotabili.
+- **Disponibilità**: *Chiedi la disponibilità a tutti* manda il messaggio (rispondono SÌ, NO o FORSE); le risposte si segnano con un tocco, e *Richiedi a chi non ha risposto* insiste solo con loro.
+- **Convocati**: prima chi ha detto sì, poi i forse; in rosso chi non è in regola quel giorno. **Manda la convocazione** scrive a ciascuno giorno, ora, dove e ritrovo, e prepara per il gruppo l'elenco dei convocati.
+- **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto) o **Gioca col segnapunti**, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -3136,6 +3186,16 @@ Com o papel **Clube**, em **Jogadores › Escola de tênis**.
 - **Alunos**: adicionados do banco de dados (sócios ou não) até as vagas; de cada um a **presença** (presente em 3 de 4, em laranja abaixo de 75 %) e o que deve. A ficha do jogador mostra os cursos dele.
 - **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
 - **Mensalidades**: para cada mês da temporada (ou a temporada) **Cobrar dos alunos** atribui a mensalidade a quem ainda não tem; vê-se quantos pagaram e recebe-se como as outras mensalidades, com recibo.
+
+### 7.17 Equipes e campeonatos
+
+Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
+
+- **Nova equipe**: nome, campeonato, temporada, **campeonato FITP** (verificam-se cartão e atestado de competição do dia do confronto), formato (quantas simples e duplas por confronto), capitão. No **Elenco** adicionam-se os jogadores na ordem da lista; em vermelho quem não está em ordem para o próximo confronto. O retrospecto (vitórias, derrotas, empates) fica ao lado do nome.
+- **Novo confronto**: adversário, dia e hora, em casa ou fora, onde se joga, **ponto de encontro**, notas. Em casa dá para **reservar quadras** por algumas horas: na agenda ficam não reserváveis.
+- **Disponibilidade**: *Pedir disponibilidade a todos* envia a mensagem (respondem SIM, NÃO ou TALVEZ); as respostas se marcam com um toque, e *Pedir a quem não respondeu* insiste só com eles.
+- **Convocados**: primeiro quem disse sim, depois os talvez; em vermelho quem não está em ordem naquele dia. **Enviar a convocação** escreve a cada um dia, hora, local e ponto de encontro, e prepara para o grupo a lista dos convocados.
+- **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu) ou **Jogar com o marcador**, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida.
 
 ## 8. Placar na TV ou no monitor
 
@@ -4057,7 +4117,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -4639,6 +4699,9 @@ class MatchController(
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.SCHOOL -> Screen.HOME
             Screen.COURSE -> Screen.SCHOOL
+            Screen.TEAMS -> Screen.HOME
+            Screen.TEAM -> Screen.TEAMS
+            Screen.FIXTURE -> Screen.TEAM
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -5165,7 +5228,7 @@ class MatchController(
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE) } ?: Screen.STUDENTS
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE, Screen.TEAM, Screen.FIXTURE) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -5378,6 +5441,149 @@ class MatchController(
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+        }
+    }
+
+    // ---- Squadre e campionati ----
+
+    val teams = MutableStateFlow(storage.loadTeams())
+    val openTeamId = MutableStateFlow<String?>(null)
+    val openFixtureId = MutableStateFlow<String?>(null)
+    /** Partita di un incontro da giocare col segnapunti: (squadra, incontro, partita). */
+    private var pendingTeamRubber: Triple<String, String, Int>? = null
+
+    fun openTeams() {
+        refreshPlayers()
+        screen.value = Screen.TEAMS
+    }
+
+    fun openTeam(id: String) {
+        openTeamId.value = id
+        screen.value = Screen.TEAM
+    }
+
+    fun openFixture(teamId: String, fixtureId: String) {
+        openTeamId.value = teamId
+        openFixtureId.value = fixtureId
+        screen.value = Screen.FIXTURE
+    }
+
+    fun team(id: String?): com.tennis.scoremanager.data.Team? = id?.let { i -> teams.value.firstOrNull { it.id == i } }
+
+    /** Salva la squadra e rifà i campi tenuti per gli incontri in casa nel planning. */
+    fun saveTeam(t: com.tennis.scoremanager.data.Team) {
+        val list = teams.value.filter { it.id != t.id } + t
+        teams.value = list
+        scope.launch(io) { storage.saveTeams(list) }
+        val p = courtPlan.value
+        val np = p.copy(blocks = p.blocks.filter { it.team != t.id } + com.tennis.scoremanager.data.Teams.blocks(t))
+        if (np != p) {
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
+    }
+
+    fun saveFixture(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) =
+        saveTeam(t.copy(fixtures = (t.fixtures.filter { it.id != f.id } + f).sortedBy { it.at }))
+
+    fun deleteTeam(id: String) {
+        val list = teams.value.filter { it.id != id }
+        teams.value = list
+        scope.launch(io) { storage.saveTeams(list) }
+        val p = courtPlan.value.let { it.copy(blocks = it.blocks.filter { b -> b.team != id }) }
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    fun teamsOf(p: com.tennis.scoremanager.data.PlayerProfile): List<com.tennis.scoremanager.data.Team> {
+        val keys = setOf(p.id) + p.aliases
+        return teams.value.filter { t -> t.roster.any { it in keys } || t.captain in keys }
+    }
+
+    /** "domenica 11 aprile, 09:00 · in casa" o "· trasferta: TC Altro, via…". */
+    fun fixtureWhen(f: com.tennis.scoremanager.data.Fixture): String {
+        val s = strings; val lang = options.value.lang
+        return "${com.tennis.scoremanager.data.Notices.day(f.at, lang)}, ${com.tennis.scoremanager.data.Reports.time(f.at, lang)} · " +
+            (if (f.home) s.tmHome else s.tmAway) + (f.place.ifBlank { null }?.let { ": $it" } ?: "")
+    }
+
+    private fun teamNotice(title: String, t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, who: List<String>, body: (com.tennis.scoremanager.data.PlayerProfile) -> List<String>, common: String) {
+        val now = System.currentTimeMillis()
+        val rec = who.mapNotNull { playerById(it) }.map { p ->
+            val hello = strings.ntHello(p.firstName.ifBlank { p.name })
+            com.tennis.scoremanager.data.Notices.recipient(p, (listOf(hello) + body(p) + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n"), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(title, "${t.name} – ${f.opponent}", common, rec))
+    }
+
+    /** Chiede la disponibilità a tutta la rosa (o a chi non ha ancora risposto, con [missingOnly]). */
+    fun noticeAvailability(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, missingOnly: Boolean) {
+        val s = strings
+        val who = if (missingOnly) com.tennis.scoremanager.data.Teams.noAnswer(t, f) else t.roster
+        val lines = listOf(s.tmAskAvailability("${t.name} – ${f.opponent}"), fixtureWhen(f), s.tmReplyYesNo)
+        teamNotice(s.tmAvailabilityTitle, t, f, who, { lines }, (listOf("${t.name} – ${f.opponent}", fixtureWhen(f), s.tmReplyYesNo)).joinToString("\n"))
+    }
+
+    /** La convocazione ai convocati: incontro, giorno, ora, dove e il ritrovo. */
+    fun noticeCallUp(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) {
+        val s = strings
+        val names = f.callUp.mapNotNull { playerById(it)?.name }
+        val lines = listOfNotNull(s.tmCalledUp("${t.name} – ${f.opponent}"), fixtureWhen(f), f.meeting.ifBlank { null }?.let { s.tmMeetingLine(it) }, f.note.ifBlank { null })
+        val common = (listOf(s.tmCallUpTitle + ": ${t.name} – ${f.opponent}", fixtureWhen(f)) + listOfNotNull(f.meeting.ifBlank { null }?.let { s.tmMeetingLine(it) }) + names.map { "• $it" }).joinToString("\n")
+        teamNotice(s.tmCallUpTitle, t, f, f.callUp, { lines }, common)
+    }
+
+    /** Il risultato dell'incontro, partita per partita, per il gruppo della squadra. */
+    fun noticeResult(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) {
+        val (w, l) = com.tennis.scoremanager.data.Teams.result(f)
+        val text = (listOf("${t.name} – ${f.opponent} $w-$l") + f.rubbers.mapIndexed { i, r ->
+            val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ").ifBlank { "—" }
+            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}".trim()
+        } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        val now = System.currentTimeMillis()
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.tmResultTitle, "${t.name} – ${f.opponent}", text, t.roster.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }))
+    }
+
+    /** "Singolare 1", "Doppio 2". */
+    fun rubberName(t: com.tennis.scoremanager.data.Team, i: Int): String = if (i < t.singles) strings.tmSingleN(i + 1) else strings.tmDoubleN(i - t.singles + 1)
+
+    /** Gioca una partita dell'incontro col segnapunti: i nostri come Giocatore 1, gli avversari come Giocatore 2. */
+    fun playTeamRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
+        val r = f.rubbers.getOrNull(index) ?: return
+        val ours = r.ours.map { playerById(it) }
+        fun n(i: Int) = ours.getOrNull(i)?.name.orEmpty()
+        fun id(i: Int) = r.ours.getOrNull(i).orEmpty()
+        updateSetup {
+            it.copy(
+                club = storage.clubName.ifBlank { it.club }, doubles = r.doubles,
+                p1a = n(0), p1b = if (r.doubles) n(1) else "", p2a = r.theirs.getOrNull(0).orEmpty(), p2b = if (r.doubles) r.theirs.getOrNull(1).orEmpty() else "",
+                p1aId = id(0), p1bId = if (r.doubles) id(1) else "", p2aId = "", p2bId = "",
+                p1aRank = ours.getOrNull(0)?.member?.ranking.orEmpty(), p1bRank = if (r.doubles) ours.getOrNull(1)?.member?.ranking.orEmpty() else "", p2aRank = "", p2bRank = "",
+                event = t.championship.ifBlank { t.name }, category = "${t.name} – ${f.opponent}", round = rubberName(t, index),
+            )
+        }
+        pendingTeamRubber = Triple(t.id, f.id, index)
+        go(Screen.SETUP)
+    }
+
+    private fun linkTeamRubber(recordId: String, su: SetupData) {
+        val (tid, fid, i) = pendingTeamRubber ?: return
+        pendingTeamRubber = null
+        val t = team(tid) ?: return
+        val f = t.fixtures.firstOrNull { it.id == fid } ?: return
+        val r = f.rubbers.getOrNull(i) ?: return
+        // Solo se in campo c'è proprio il nostro giocatore di quella partita.
+        if (r.ours.firstOrNull() != su.p1aId) return
+        saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == i) x.copy(record = recordId) else x }))
+    }
+
+    private fun teamRubberFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        for (t in teams.value) for (f in t.fixtures) {
+            val i = f.rubbers.indexOfFirst { it.record == rec.id }
+            if (i < 0) continue
+            val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
+            return
         }
     }
 
@@ -6137,6 +6343,7 @@ class MatchController(
         }
         val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         linkClubMatch(rec.id, withIds)
+        linkTeamRubber(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -6397,6 +6604,7 @@ class MatchController(
         )
         runningSince = null
         clubMatchFinished(rec, lm.state)
+        teamRubberFinished(rec, lm.state)
         scope.launch(io) {
             storage.deleteMatch(rec.id)
             storage.saveFinished(rec)
@@ -10524,6 +10732,8 @@ data class CourtBlock(
     val tournament: String? = null,
     /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
     val course: String? = null,
+    /** La squadra il cui incontro in casa l'ha creato. */
+    val team: String? = null,
 )
 
 @Serializable
@@ -14575,6 +14785,24 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
+    /** Le squadre del circolo, coi loro incontri, in un file solo. */
+    private val teamsFile: File get() = File(app.filesDir, "club_teams.json")
+
+    fun loadTeams(): List<Team> =
+        runCatching { json.decodeFromString(ListSerializer(Team.serializer()), teamsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveTeams(list: List<Team>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_teams.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Team.serializer()), list))
+            if (!tmp.renameTo(teamsFile)) {
+                teamsFile.delete()
+                tmp.renameTo(teamsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
+    }
+
     /** I corsi della scuola tennis, in un file solo. */
     private val schoolFile: File get() = File(app.filesDir, "club_school.json")
 
@@ -15658,6 +15886,140 @@ object Students {
 
     /** Una misura dell'analisi in due sessioni: [unit] "°" o "" (frazioni di statura), [better] il verso buono (+1, -1, 0 = nessuno). */
     data class Change(val label: String, val before: Float?, val now: Float?, val unit: String, val better: Int)
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/Teams.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/Teams.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/** La risposta di un giocatore alla richiesta di disponibilità per un incontro. */
+@Serializable
+enum class Availability { YES, NO, MAYBE }
+
+/**
+ * Una partita dell'incontro: singolare o doppio, i nostri ([ours], giocatori del database) contro i loro (nomi
+ * scritti), il punteggio dal nostro lato e chi ha vinto ([won] true = noi; null = da giocare).
+ */
+@Serializable
+data class Rubber(
+    val doubles: Boolean = false,
+    val ours: List<String> = emptyList(),
+    val theirs: List<String> = emptyList(),
+    val score: String = "",
+    val won: Boolean? = null,
+    /** La partita segnata col segnapunti (MatchRecord.id). */
+    val record: String? = null,
+)
+
+/**
+ * Un incontro del campionato: avversario, giorno e ora, in casa o in trasferta, dove e il ritrovo, le partite
+ * ([rubbers], tanti singolari e doppi quanti ne prevede la formula), le disponibilità e i convocati. In casa si
+ * possono tenere dei campi ([courts]): nel planning diventano non prenotabili per l'incontro.
+ */
+@Serializable
+data class Fixture(
+    val id: String,
+    val opponent: String,
+    val at: Long,
+    val home: Boolean = true,
+    val place: String = "",
+    val meeting: String = "",
+    val rubbers: List<Rubber> = emptyList(),
+    val availability: Map<String, Availability> = emptyMap(),
+    val callUp: List<String> = emptyList(),
+    val courts: List<String> = emptyList(),
+    /** Ore per cui i campi restano occupati in casa. */
+    val hours: Int = 6,
+    val note: String = "",
+)
+
+/** Una squadra del circolo: campionato, capitano, rosa (nell'ordine della lista) e incontri. */
+@Serializable
+data class Team(
+    val id: String,
+    val name: String,
+    val championship: String = "",
+    val season: String = "",
+    val captain: String? = null,
+    val roster: List<String> = emptyList(),
+    /** La formula degli incontri: quanti singolari e quanti doppi. */
+    val singles: Int = 4,
+    val doubles: Int = 2,
+    /** Campionato FITP: in rosa e tra i convocati si controllano tessera agonistica e certificato. */
+    val fitp: Boolean = true,
+    val fixtures: List<Fixture> = emptyList(),
+    val createdAt: Long = 0,
+)
+
+object Teams {
+    fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
+
+    /** Le partite vuote secondo la formula: prima i singolari, poi i doppi. */
+    fun emptyRubbers(t: Team): List<Rubber> = List(t.singles.coerceAtLeast(0)) { Rubber(false) } + List(t.doubles.coerceAtLeast(0)) { Rubber(true) }
+
+    /** Il risultato dell'incontro: partite vinte e perse da noi (quelle da giocare non contano). */
+    fun result(f: Fixture): Pair<Int, Int> = f.rubbers.count { it.won == true } to f.rubbers.count { it.won == false }
+
+    /** Incontro finito: tutte le partite hanno un vincitore (o una squadra ha già vinto la maggioranza). */
+    fun decided(f: Fixture): Boolean {
+        if (f.rubbers.isEmpty()) return false
+        val (w, l) = result(f)
+        val half = f.rubbers.size / 2
+        return f.rubbers.all { it.won != null } || w > half || l > half
+    }
+
+    /** Vinto (true), perso (false), pari o ancora aperto (null). */
+    fun outcome(f: Fixture): Boolean? {
+        if (!decided(f)) return null
+        val (w, l) = result(f)
+        return if (w == l) null else w > l
+    }
+
+    /** Il bilancio della squadra: incontri vinti, persi, pareggiati. */
+    data class Record(val won: Int, val lost: Int, val drawn: Int)
+
+    fun record(t: Team): Record {
+        val done = t.fixtures.filter { decided(it) }
+        return Record(done.count { outcome(it) == true }, done.count { outcome(it) == false }, done.count { outcome(it) == null })
+    }
+
+    /**
+     * Perché un giocatore non può giocare l'incontro del giorno [day] in un campionato FITP: tessera agonistica
+     * dell'anno e certificato agonistico valido quel giorno (gli stessi controlli dei tornei FITP).
+     */
+    fun problems(t: Team, p: PlayerProfile, day: Long): List<ClubTournaments.Problem> {
+        if (!t.fitp) return if (p.member?.let { Members.medicalValid(it, day) } == true) emptyList() else listOf(ClubTournaments.Problem.NO_MEDICAL)
+        val fake = ClubTournament("", "", kind = CTKind.FITP, start = day, requirePaid = false)
+        return ClubTournaments.problems(fake, p, ClubBook(), day)
+    }
+
+    /** Chi ha detto di sì (prima) o forse, nell'ordine della rosa: i candidati per la convocazione. */
+    fun candidates(t: Team, f: Fixture): List<String> =
+        t.roster.filter { f.availability[it] == Availability.YES } + t.roster.filter { f.availability[it] == Availability.MAYBE }
+
+    /** Chi non ha ancora risposto alla disponibilità. */
+    fun noAnswer(t: Team, f: Fixture): List<String> = t.roster.filter { it !in f.availability }
+
+    /** Il risultato di una partita, dal punteggio se non lo si dice (dal nostro lato). */
+    fun setRubber(f: Fixture, index: Int, score: String, won: Boolean?, record: String? = null): Fixture {
+        val w = won ?: ClubTournaments.winnerFromScore(score)?.let { it == "a" }
+        return f.copy(rubbers = f.rubbers.mapIndexed { i, r -> if (i == index) r.copy(score = score.trim(), won = w, record = record ?: r.record) else r })
+    }
+
+    /** I periodi non prenotabili degli incontri in casa con dei campi tenuti. */
+    fun blocks(t: Team): List<CourtBlock> = t.fixtures.filter { it.home && it.courts.isNotEmpty() }.map { f ->
+        val startMin = java.util.Calendar.getInstance().apply { timeInMillis = f.at }.let { it.get(java.util.Calendar.HOUR_OF_DAY) * 60 + it.get(java.util.Calendar.MINUTE) }
+        CourtBlock(
+            id = "team-${t.id}-${f.id}", label = "${t.name} – ${f.opponent}", reason = BlockReason.TOURNAMENT, courts = f.courts,
+            from = CourtPlans.dayStart(f.at), to = CourtPlans.dayStart(f.at), startMin = startMin, endMin = (startMin + f.hours * 60).coerceAtMost(24 * 60), team = t.id,
+        )
+    }
 }
 TSM_EOF
 
@@ -20747,6 +21109,9 @@ fun AppRoot(c: MatchController) {
                 Screen.COURTS_PLAN -> com.tennis.scoremanager.ui.screens.CourtsPlanScreen(c)
                 Screen.SCHOOL -> com.tennis.scoremanager.ui.screens.SchoolScreen(c)
                 Screen.COURSE -> com.tennis.scoremanager.ui.screens.CourseScreen(c)
+                Screen.TEAMS -> com.tennis.scoremanager.ui.screens.TeamsScreen(c)
+                Screen.TEAM -> com.tennis.scoremanager.ui.screens.TeamScreen(c)
+                Screen.FIXTURE -> com.tennis.scoremanager.ui.screens.FixtureScreen(c)
             }
         }
     }
@@ -24738,6 +25103,70 @@ interface Strings {
     val scMax: (Int) -> String
     val scDeleteAsk: (String) -> String
     val scCancelledNotice: (String) -> String
+    val tmTitle: String
+    val tmHint: String
+    val tmNew: String
+    val tmNone: String
+    val tmNewFixture: String
+    val tmTabRoster: String
+    val tmTabFixtures: String
+    val tmAddPlayer: String
+    val tmRosterEmpty: String
+    val tmCaptain: String
+    val tmNoFixtures: String
+    val tmAvailability: String
+    val tmYes: String
+    val tmMaybe: String
+    val tmNo: String
+    val tmAskAll: String
+    val tmCallUp: String
+    val tmRubbers: String
+    val tmSendResult: String
+    val tmTheirs: String
+    val tmTheirs2: String
+    val tmScoreOurs: String
+    val tmWeWon: String
+    val tmTheyWon: String
+    val tmOpponent: String
+    val tmHome: String
+    val tmAway: String
+    val tmPlace: String
+    val tmMeeting: String
+    val tmHoldCourts: String
+    val tmDeleteFixture: String
+    val tmDeleteFixtureAsk: String
+    val tmName: String
+    val tmChampionship: String
+    val tmSeason: String
+    val tmFitp: String
+    val tmFitpHint: String
+    val tmSingles: String
+    val tmDoubles: String
+    val tmPickCaptain: String
+    val tmDelete: String
+    val tmOngoing: String
+    val tmWon: String
+    val tmLost: String
+    val tmDraw: String
+    val tmReplyYesNo: String
+    val tmAvailabilityTitle: String
+    val tmCallUpTitle: String
+    val tmResultTitle: String
+    val tmRecord: (Int, Int) -> String
+    val tmDrawn: (Int) -> String
+    val tmPlayers: (Int) -> String
+    val tmMeetingLine: (String) -> String
+    val tmCourtsHeld: (String) -> String
+    val tmAskMissing: (Int) -> String
+    val tmSendCallUp: (Int) -> String
+    val tmOurs: (Int) -> String
+    val tmHours: (Int) -> String
+    val tmCaptainLine: (String) -> String
+    val tmDeleteAsk: (String) -> String
+    val tmAskAvailability: (String) -> String
+    val tmCalledUp: (String) -> String
+    val tmSingleN: (Int) -> String
+    val tmDoubleN: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -26435,6 +26864,70 @@ object ItStrings : Strings {
     override val scMax: (Int) -> String = { "Al massimo $it allievi" }
     override val scDeleteAsk: (String) -> String = { "Eliminare il corso $it? I campi tornano prenotabili; le quote già addebitate restano nel registro." }
     override val scCancelledNotice: (String) -> String = { "La lezione del corso $it è annullata:" }
+    override val tmTitle = "Squadre e campionati"
+    override val tmHint = "Rosa, incontri, disponibilità, convocazioni e risultati dei campionati a squadre"
+    override val tmNew = "Nuova squadra"
+    override val tmNone = "Nessuna squadra: creala con Nuova squadra."
+    override val tmNewFixture = "Nuovo incontro"
+    override val tmTabRoster = "Rosa"
+    override val tmTabFixtures = "Incontri"
+    override val tmAddPlayer = "Aggiungi giocatore"
+    override val tmRosterEmpty = "Nessun giocatore in rosa."
+    override val tmCaptain = "capitano"
+    override val tmNoFixtures = "Nessun incontro: aggiungilo con Nuovo incontro."
+    override val tmAvailability = "Disponibilità"
+    override val tmYes = "Sì"
+    override val tmMaybe = "Forse"
+    override val tmNo = "No"
+    override val tmAskAll = "Chiedi la disponibilità a tutti"
+    override val tmCallUp = "Convocati"
+    override val tmRubbers = "Partite"
+    override val tmSendResult = "Manda il risultato"
+    override val tmTheirs = "Avversario"
+    override val tmTheirs2 = "Secondo avversario"
+    override val tmScoreOurs = "Punteggio dal nostro lato (es. 6-4 3-6 10-8)"
+    override val tmWeWon = "Vinta"
+    override val tmTheyWon = "Persa"
+    override val tmOpponent = "Squadra avversaria (es. TC Altro)"
+    override val tmHome = "in casa"
+    override val tmAway = "trasferta"
+    override val tmPlace = "Dove si gioca"
+    override val tmMeeting = "Ritrovo (ora e luogo)"
+    override val tmHoldCourts = "Campi tenuti per l'incontro (non prenotabili nel planning)"
+    override val tmDeleteFixture = "Elimina l'incontro"
+    override val tmDeleteFixtureAsk = "Eliminare questo incontro? I campi tenuti tornano prenotabili."
+    override val tmName = "Nome della squadra (es. TC Prova D1)"
+    override val tmChampionship = "Campionato (es. Serie D1 maschile)"
+    override val tmSeason = "Stagione"
+    override val tmFitp = "Campionato FITP"
+    override val tmFitpHint = "In rosa e tra i convocati si controllano tessera agonistica e certificato agonistico del giorno dell'incontro."
+    override val tmSingles = "Singolari per incontro"
+    override val tmDoubles = "Doppi per incontro"
+    override val tmPickCaptain = "Scegli il capitano"
+    override val tmDelete = "Elimina la squadra"
+    override val tmOngoing = "in corso"
+    override val tmWon = "vinto"
+    override val tmLost = "perso"
+    override val tmDraw = "pari"
+    override val tmReplyYesNo = "Rispondi a questo messaggio con SÌ, NO o FORSE."
+    override val tmAvailabilityTitle = "Disponibilità"
+    override val tmCallUpTitle = "Convocazione"
+    override val tmResultTitle = "Risultato"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "V $w · P $l" }
+    override val tmDrawn: (Int) -> String = { "N $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "giocatore" else "giocatori"}" }
+    override val tmMeetingLine: (String) -> String = { "Ritrovo: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Campi tenuti: $it" }
+    override val tmAskMissing: (Int) -> String = { "Richiedi a chi non ha risposto ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Manda la convocazione ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Il nostro giocatore" else "I nostri due giocatori" }
+    override val tmHours: (Int) -> String = { "Per $it ore" }
+    override val tmCaptainLine: (String) -> String = { "Capitano: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Eliminare la squadra $it con i suoi incontri? I campi tenuti tornano prenotabili." }
+    override val tmAskAvailability: (String) -> String = { "sei disponibile per $it?" }
+    override val tmCalledUp: (String) -> String = { "sei convocato per $it." }
+    override val tmSingleN: (Int) -> String = { "Singolare $it" }
+    override val tmDoubleN: (Int) -> String = { "Doppio $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -28115,6 +28608,70 @@ object EnStrings : Strings {
     override val scMax: (Int) -> String = { "At most $it students" }
     override val scDeleteAsk: (String) -> String = { "Delete the course $it? Courts become bookable again; fees already charged stay in the register." }
     override val scCancelledNotice: (String) -> String = { "The $it lesson is cancelled:" }
+    override val tmTitle = "Teams and leagues"
+    override val tmHint = "Roster, fixtures, availability, call-ups and results for team championships"
+    override val tmNew = "New team"
+    override val tmNone = "No teams: create one with New team."
+    override val tmNewFixture = "New fixture"
+    override val tmTabRoster = "Roster"
+    override val tmTabFixtures = "Fixtures"
+    override val tmAddPlayer = "Add player"
+    override val tmRosterEmpty = "No players in the roster."
+    override val tmCaptain = "captain"
+    override val tmNoFixtures = "No fixtures: add one with New fixture."
+    override val tmAvailability = "Availability"
+    override val tmYes = "Yes"
+    override val tmMaybe = "Maybe"
+    override val tmNo = "No"
+    override val tmAskAll = "Ask everyone's availability"
+    override val tmCallUp = "Called up"
+    override val tmRubbers = "Rubbers"
+    override val tmSendResult = "Send the result"
+    override val tmTheirs = "Opponent"
+    override val tmTheirs2 = "Second opponent"
+    override val tmScoreOurs = "Score from our side (e.g. 6-4 3-6 10-8)"
+    override val tmWeWon = "Won"
+    override val tmTheyWon = "Lost"
+    override val tmOpponent = "Opposing team (e.g. TC Other)"
+    override val tmHome = "home"
+    override val tmAway = "away"
+    override val tmPlace = "Where it's played"
+    override val tmMeeting = "Meeting point (time and place)"
+    override val tmHoldCourts = "Courts held for the fixture (not bookable in the planner)"
+    override val tmDeleteFixture = "Delete the fixture"
+    override val tmDeleteFixtureAsk = "Delete this fixture? Held courts become bookable again."
+    override val tmName = "Team name (e.g. TC Test D1)"
+    override val tmChampionship = "Championship (e.g. Men's Series D1)"
+    override val tmSeason = "Season"
+    override val tmFitp = "FITP championship"
+    override val tmFitpHint = "In the roster and call-up, the competitive card and competitive certificate for the match day are checked."
+    override val tmSingles = "Singles per fixture"
+    override val tmDoubles = "Doubles per fixture"
+    override val tmPickCaptain = "Pick the captain"
+    override val tmDelete = "Delete the team"
+    override val tmOngoing = "in progress"
+    override val tmWon = "won"
+    override val tmLost = "lost"
+    override val tmDraw = "draw"
+    override val tmReplyYesNo = "Reply to this message with YES, NO or MAYBE."
+    override val tmAvailabilityTitle = "Availability"
+    override val tmCallUpTitle = "Call-up"
+    override val tmResultTitle = "Result"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "W $w · L $l" }
+    override val tmDrawn: (Int) -> String = { "D $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "player" else "players"}" }
+    override val tmMeetingLine: (String) -> String = { "Meeting: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Courts held: $it" }
+    override val tmAskMissing: (Int) -> String = { "Ask those who haven't replied ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Send the call-up ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Our player" else "Our two players" }
+    override val tmHours: (Int) -> String = { "For $it hours" }
+    override val tmCaptainLine: (String) -> String = { "Captain: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Delete the team $it with its fixtures? Held courts become bookable again." }
+    override val tmAskAvailability: (String) -> String = { "are you available for $it?" }
+    override val tmCalledUp: (String) -> String = { "you're called up for $it." }
+    override val tmSingleN: (Int) -> String = { "Singles $it" }
+    override val tmDoubleN: (Int) -> String = { "Doubles $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -29818,6 +30375,70 @@ object DeStrings : Strings {
     override val scMax: (Int) -> String = { "Höchstens $it Schüler" }
     override val scDeleteAsk: (String) -> String = { "Kurs $it löschen? Die Plätze sind wieder buchbar; berechnete Beiträge bleiben im Register." }
     override val scCancelledNotice: (String) -> String = { "Die Stunde des Kurses $it ist abgesagt:" }
+    override val tmTitle = "Mannschaften und Ligen"
+    override val tmHint = "Kader, Begegnungen, Verfügbarkeit, Aufstellungen und Ergebnisse der Mannschaftsmeisterschaften"
+    override val tmNew = "Neue Mannschaft"
+    override val tmNone = "Keine Mannschaften: mit Neue Mannschaft anlegen."
+    override val tmNewFixture = "Neue Begegnung"
+    override val tmTabRoster = "Kader"
+    override val tmTabFixtures = "Begegnungen"
+    override val tmAddPlayer = "Spieler hinzufügen"
+    override val tmRosterEmpty = "Keine Spieler im Kader."
+    override val tmCaptain = "Kapitän"
+    override val tmNoFixtures = "Keine Begegnungen: mit Neue Begegnung hinzufügen."
+    override val tmAvailability = "Verfügbarkeit"
+    override val tmYes = "Ja"
+    override val tmMaybe = "Vielleicht"
+    override val tmNo = "Nein"
+    override val tmAskAll = "Alle nach Verfügbarkeit fragen"
+    override val tmCallUp = "Aufgestellt"
+    override val tmRubbers = "Spiele"
+    override val tmSendResult = "Ergebnis senden"
+    override val tmTheirs = "Gegner"
+    override val tmTheirs2 = "Zweiter Gegner"
+    override val tmScoreOurs = "Ergebnis aus unserer Sicht (z. B. 6-4 3-6 10-8)"
+    override val tmWeWon = "Gewonnen"
+    override val tmTheyWon = "Verloren"
+    override val tmOpponent = "Gegnerische Mannschaft (z. B. TC Andere)"
+    override val tmHome = "Heimspiel"
+    override val tmAway = "Auswärts"
+    override val tmPlace = "Spielort"
+    override val tmMeeting = "Treffpunkt (Zeit und Ort)"
+    override val tmHoldCourts = "Für die Begegnung reservierte Plätze (in der Belegung nicht buchbar)"
+    override val tmDeleteFixture = "Begegnung löschen"
+    override val tmDeleteFixtureAsk = "Diese Begegnung löschen? Reservierte Plätze werden wieder buchbar."
+    override val tmName = "Name der Mannschaft (z. B. TC Test D1)"
+    override val tmChampionship = "Meisterschaft (z. B. Herren Serie D1)"
+    override val tmSeason = "Saison"
+    override val tmFitp = "FITP-Meisterschaft"
+    override val tmFitpHint = "Im Kader und bei der Aufstellung werden Wettkampfausweis und Wettkampfattest zum Spieltag geprüft."
+    override val tmSingles = "Einzel pro Begegnung"
+    override val tmDoubles = "Doppel pro Begegnung"
+    override val tmPickCaptain = "Kapitän wählen"
+    override val tmDelete = "Mannschaft löschen"
+    override val tmOngoing = "läuft"
+    override val tmWon = "gewonnen"
+    override val tmLost = "verloren"
+    override val tmDraw = "unentschieden"
+    override val tmReplyYesNo = "Antworte auf diese Nachricht mit JA, NEIN oder VIELLEICHT."
+    override val tmAvailabilityTitle = "Verfügbarkeit"
+    override val tmCallUpTitle = "Aufstellung"
+    override val tmResultTitle = "Ergebnis"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "S $w · N $l" }
+    override val tmDrawn: (Int) -> String = { "U $it" }
+    override val tmPlayers: (Int) -> String = { "$it Spieler" }
+    override val tmMeetingLine: (String) -> String = { "Treffpunkt: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Reservierte Plätze: $it" }
+    override val tmAskMissing: (Int) -> String = { "Wer nicht geantwortet hat ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Aufstellung senden ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Unser Spieler" else "Unsere zwei Spieler" }
+    override val tmHours: (Int) -> String = { "Für $it Stunden" }
+    override val tmCaptainLine: (String) -> String = { "Kapitän: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Mannschaft $it mit ihren Begegnungen löschen? Reservierte Plätze werden wieder buchbar." }
+    override val tmAskAvailability: (String) -> String = { "bist du verfügbar für $it?" }
+    override val tmCalledUp: (String) -> String = { "du bist aufgestellt für $it." }
+    override val tmSingleN: (Int) -> String = { "Einzel $it" }
+    override val tmDoubleN: (Int) -> String = { "Doppel $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -31514,6 +32135,70 @@ object EsStrings : Strings {
     override val scMax: (Int) -> String = { "Como máximo $it alumnos" }
     override val scDeleteAsk: (String) -> String = { "¿Eliminar el curso $it? Las pistas vuelven a ser reservables; las cuotas ya cargadas quedan en el registro." }
     override val scCancelledNotice: (String) -> String = { "La clase del curso $it está anulada:" }
+    override val tmTitle = "Equipos y ligas"
+    override val tmHint = "Plantilla, encuentros, disponibilidad, convocatorias y resultados de los campeonatos por equipos"
+    override val tmNew = "Nuevo equipo"
+    override val tmNone = "Ningún equipo: crea uno con Nuevo equipo."
+    override val tmNewFixture = "Nuevo encuentro"
+    override val tmTabRoster = "Plantilla"
+    override val tmTabFixtures = "Encuentros"
+    override val tmAddPlayer = "Añadir jugador"
+    override val tmRosterEmpty = "Ningún jugador en la plantilla."
+    override val tmCaptain = "capitán"
+    override val tmNoFixtures = "Ningún encuentro: añádelo con Nuevo encuentro."
+    override val tmAvailability = "Disponibilidad"
+    override val tmYes = "Sí"
+    override val tmMaybe = "Quizá"
+    override val tmNo = "No"
+    override val tmAskAll = "Pedir disponibilidad a todos"
+    override val tmCallUp = "Convocados"
+    override val tmRubbers = "Partidos"
+    override val tmSendResult = "Enviar el resultado"
+    override val tmTheirs = "Rival"
+    override val tmTheirs2 = "Segundo rival"
+    override val tmScoreOurs = "Resultado desde nuestro lado (p. ej. 6-4 3-6 10-8)"
+    override val tmWeWon = "Ganado"
+    override val tmTheyWon = "Perdido"
+    override val tmOpponent = "Equipo rival (p. ej. CT Otro)"
+    override val tmHome = "en casa"
+    override val tmAway = "fuera"
+    override val tmPlace = "Dónde se juega"
+    override val tmMeeting = "Punto de encuentro (hora y lugar)"
+    override val tmHoldCourts = "Pistas reservadas para el encuentro (no reservables en el planning)"
+    override val tmDeleteFixture = "Eliminar el encuentro"
+    override val tmDeleteFixtureAsk = "¿Eliminar este encuentro? Las pistas reservadas vuelven a estar libres."
+    override val tmName = "Nombre del equipo (p. ej. CT Prueba D1)"
+    override val tmChampionship = "Campeonato (p. ej. Serie D1 masculina)"
+    override val tmSeason = "Temporada"
+    override val tmFitp = "Campeonato FITP"
+    override val tmFitpHint = "En la plantilla y los convocados se comprueban licencia y certificado de competición del día del encuentro."
+    override val tmSingles = "Individuales por encuentro"
+    override val tmDoubles = "Dobles por encuentro"
+    override val tmPickCaptain = "Elegir el capitán"
+    override val tmDelete = "Eliminar el equipo"
+    override val tmOngoing = "en curso"
+    override val tmWon = "ganado"
+    override val tmLost = "perdido"
+    override val tmDraw = "empate"
+    override val tmReplyYesNo = "Responde a este mensaje con SÍ, NO o QUIZÁ."
+    override val tmAvailabilityTitle = "Disponibilidad"
+    override val tmCallUpTitle = "Convocatoria"
+    override val tmResultTitle = "Resultado"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "G $w · P $l" }
+    override val tmDrawn: (Int) -> String = { "E $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "jugador" else "jugadores"}" }
+    override val tmMeetingLine: (String) -> String = { "Punto de encuentro: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Pistas reservadas: $it" }
+    override val tmAskMissing: (Int) -> String = { "Pedir a quien no ha respondido ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Enviar la convocatoria ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Nuestro jugador" else "Nuestros dos jugadores" }
+    override val tmHours: (Int) -> String = { "Durante $it horas" }
+    override val tmCaptainLine: (String) -> String = { "Capitán: $it" }
+    override val tmDeleteAsk: (String) -> String = { "¿Eliminar el equipo $it con sus encuentros? Las pistas reservadas vuelven a estar libres." }
+    override val tmAskAvailability: (String) -> String = { "¿estás disponible para $it?" }
+    override val tmCalledUp: (String) -> String = { "estás convocado para $it." }
+    override val tmSingleN: (Int) -> String = { "Individual $it" }
+    override val tmDoubleN: (Int) -> String = { "Dobles $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -33212,6 +33897,70 @@ object FrStrings : Strings {
     override val scMax: (Int) -> String = { "Au plus $it élèves" }
     override val scDeleteAsk: (String) -> String = { "Supprimer le cours $it ? Les terrains redeviennent réservables ; les cotisations déjà facturées restent dans le registre." }
     override val scCancelledNotice: (String) -> String = { "La leçon du cours $it est annulée :" }
+    override val tmTitle = "Équipes et championnats"
+    override val tmHint = "Effectif, rencontres, disponibilités, convocations et résultats des championnats par équipes"
+    override val tmNew = "Nouvelle équipe"
+    override val tmNone = "Aucune équipe : créez-en une avec Nouvelle équipe."
+    override val tmNewFixture = "Nouvelle rencontre"
+    override val tmTabRoster = "Effectif"
+    override val tmTabFixtures = "Rencontres"
+    override val tmAddPlayer = "Ajouter un joueur"
+    override val tmRosterEmpty = "Aucun joueur dans l'effectif."
+    override val tmCaptain = "capitaine"
+    override val tmNoFixtures = "Aucune rencontre : ajoutez-en une avec Nouvelle rencontre."
+    override val tmAvailability = "Disponibilités"
+    override val tmYes = "Oui"
+    override val tmMaybe = "Peut-être"
+    override val tmNo = "Non"
+    override val tmAskAll = "Demander la disponibilité à tous"
+    override val tmCallUp = "Convoqués"
+    override val tmRubbers = "Matchs"
+    override val tmSendResult = "Envoyer le résultat"
+    override val tmTheirs = "Adversaire"
+    override val tmTheirs2 = "Second adversaire"
+    override val tmScoreOurs = "Score de notre côté (ex. 6-4 3-6 10-8)"
+    override val tmWeWon = "Gagné"
+    override val tmTheyWon = "Perdu"
+    override val tmOpponent = "Équipe adverse (ex. TC Autre)"
+    override val tmHome = "à domicile"
+    override val tmAway = "à l'extérieur"
+    override val tmPlace = "Lieu"
+    override val tmMeeting = "Rendez-vous (heure et lieu)"
+    override val tmHoldCourts = "Terrains réservés pour la rencontre (non réservables dans le planning)"
+    override val tmDeleteFixture = "Supprimer la rencontre"
+    override val tmDeleteFixtureAsk = "Supprimer cette rencontre ? Les terrains réservés redeviennent disponibles."
+    override val tmName = "Nom de l'équipe (ex. TC Essai D1)"
+    override val tmChampionship = "Championnat (ex. Division D1 messieurs)"
+    override val tmSeason = "Saison"
+    override val tmFitp = "Championnat FITP"
+    override val tmFitpHint = "Dans l'effectif et les convoqués, on vérifie licence et certificat compétition du jour de la rencontre."
+    override val tmSingles = "Simples par rencontre"
+    override val tmDoubles = "Doubles par rencontre"
+    override val tmPickCaptain = "Choisir le capitaine"
+    override val tmDelete = "Supprimer l'équipe"
+    override val tmOngoing = "en cours"
+    override val tmWon = "gagnée"
+    override val tmLost = "perdue"
+    override val tmDraw = "nul"
+    override val tmReplyYesNo = "Répondez à ce message par OUI, NON ou PEUT-ÊTRE."
+    override val tmAvailabilityTitle = "Disponibilité"
+    override val tmCallUpTitle = "Convocation"
+    override val tmResultTitle = "Résultat"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "V $w · D $l" }
+    override val tmDrawn: (Int) -> String = { "N $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "joueur" else "joueurs"}" }
+    override val tmMeetingLine: (String) -> String = { "Rendez-vous : $it" }
+    override val tmCourtsHeld: (String) -> String = { "Terrains réservés : $it" }
+    override val tmAskMissing: (Int) -> String = { "Relancer ceux qui n'ont pas répondu ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Envoyer la convocation ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Notre joueur" else "Nos deux joueurs" }
+    override val tmHours: (Int) -> String = { "Pendant $it heures" }
+    override val tmCaptainLine: (String) -> String = { "Capitaine : $it" }
+    override val tmDeleteAsk: (String) -> String = { "Supprimer l'équipe $it avec ses rencontres ? Les terrains réservés redeviennent disponibles." }
+    override val tmAskAvailability: (String) -> String = { "êtes-vous disponible pour $it ?" }
+    override val tmCalledUp: (String) -> String = { "vous êtes convoqué pour $it." }
+    override val tmSingleN: (Int) -> String = { "Simple $it" }
+    override val tmDoubleN: (Int) -> String = { "Double $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -34911,6 +35660,70 @@ object PtStrings : Strings {
     override val scMax: (Int) -> String = { "No máximo $it alunos" }
     override val scDeleteAsk: (String) -> String = { "Excluir o curso $it? As quadras voltam a ser reserváveis; as mensalidades já cobradas ficam no registro." }
     override val scCancelledNotice: (String) -> String = { "A aula do curso $it está cancelada:" }
+    override val tmTitle = "Equipes e campeonatos"
+    override val tmHint = "Elenco, confrontos, disponibilidade, convocações e resultados dos campeonatos por equipes"
+    override val tmNew = "Nova equipe"
+    override val tmNone = "Nenhuma equipe: crie uma com Nova equipe."
+    override val tmNewFixture = "Novo confronto"
+    override val tmTabRoster = "Elenco"
+    override val tmTabFixtures = "Confrontos"
+    override val tmAddPlayer = "Adicionar jogador"
+    override val tmRosterEmpty = "Nenhum jogador no elenco."
+    override val tmCaptain = "capitão"
+    override val tmNoFixtures = "Nenhum confronto: adicione com Novo confronto."
+    override val tmAvailability = "Disponibilidade"
+    override val tmYes = "Sim"
+    override val tmMaybe = "Talvez"
+    override val tmNo = "Não"
+    override val tmAskAll = "Pedir disponibilidade a todos"
+    override val tmCallUp = "Convocados"
+    override val tmRubbers = "Partidas"
+    override val tmSendResult = "Enviar o resultado"
+    override val tmTheirs = "Adversário"
+    override val tmTheirs2 = "Segundo adversário"
+    override val tmScoreOurs = "Placar do nosso lado (ex. 6-4 3-6 10-8)"
+    override val tmWeWon = "Vencida"
+    override val tmTheyWon = "Perdida"
+    override val tmOpponent = "Equipe adversária (ex. TC Outro)"
+    override val tmHome = "em casa"
+    override val tmAway = "fora"
+    override val tmPlace = "Onde se joga"
+    override val tmMeeting = "Ponto de encontro (hora e local)"
+    override val tmHoldCourts = "Quadras reservadas para o confronto (não reserváveis na agenda)"
+    override val tmDeleteFixture = "Excluir o confronto"
+    override val tmDeleteFixtureAsk = "Excluir este confronto? As quadras reservadas voltam a ficar livres."
+    override val tmName = "Nome da equipe (ex. TC Teste D1)"
+    override val tmChampionship = "Campeonato (ex. Série D1 masculina)"
+    override val tmSeason = "Temporada"
+    override val tmFitp = "Campeonato FITP"
+    override val tmFitpHint = "No elenco e nos convocados se verificam cartão e atestado de competição do dia do confronto."
+    override val tmSingles = "Simples por confronto"
+    override val tmDoubles = "Duplas por confronto"
+    override val tmPickCaptain = "Escolher o capitão"
+    override val tmDelete = "Excluir a equipe"
+    override val tmOngoing = "em andamento"
+    override val tmWon = "vencido"
+    override val tmLost = "perdido"
+    override val tmDraw = "empate"
+    override val tmReplyYesNo = "Responda a esta mensagem com SIM, NÃO ou TALVEZ."
+    override val tmAvailabilityTitle = "Disponibilidade"
+    override val tmCallUpTitle = "Convocação"
+    override val tmResultTitle = "Resultado"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "V $w · D $l" }
+    override val tmDrawn: (Int) -> String = { "E $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "jogador" else "jogadores"}" }
+    override val tmMeetingLine: (String) -> String = { "Ponto de encontro: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Quadras reservadas: $it" }
+    override val tmAskMissing: (Int) -> String = { "Pedir a quem não respondeu ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Enviar a convocação ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Nosso jogador" else "Nossos dois jogadores" }
+    override val tmHours: (Int) -> String = { "Por $it horas" }
+    override val tmCaptainLine: (String) -> String = { "Capitão: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Excluir a equipe $it com os confrontos dela? As quadras reservadas voltam a ficar livres." }
+    override val tmAskAvailability: (String) -> String = { "você está disponível para $it?" }
+    override val tmCalledUp: (String) -> String = { "você está convocado para $it." }
+    override val tmSingleN: (Int) -> String = { "Simples $it" }
+    override val tmDoubleN: (Int) -> String = { "Duplas $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -37798,6 +38611,7 @@ private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
+    Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
     Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
@@ -43544,6 +44358,13 @@ fun StudentScreen(c: MatchController) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
         ChargesSection(c, st)
+        // Le squadre in cui gioca.
+        val teamsAll by c.teams.collectAsState()
+        val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }
+        if (mineT.isNotEmpty()) SectionCard(s.tmTitle, Icons.Filled.Groups) {
+            for (tm in mineT) Text(tm.name + (tm.championship.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth().clickable { c.openTeam(tm.id) }.padding(vertical = 6.dp))
+        }
         // I corsi della scuola tennis che frequenta.
         val courses by c.courses.collectAsState()
         val mineC = courses.filter { co -> co.students.any { it == st.id || it in st.aliases } }
@@ -44310,6 +45131,424 @@ private fun thumb(f: java.io.File): androidx.compose.ui.graphics.ImageBitmap {
     BitmapFactory.decodeFile(f.absolutePath, o)
     val sample = (maxOf(o.outWidth, o.outHeight) / 256).coerceAtLeast(1)
     return BitmapFactory.decodeFile(f.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample }).asImageBitmap()
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/TeamsScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/TeamsScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.app.TimePickerDialog
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.HowToReg
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Availability
+import com.tennis.scoremanager.data.ClubTournaments
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Fixture
+import com.tennis.scoremanager.data.Rubber
+import com.tennis.scoremanager.data.Team
+import com.tennis.scoremanager.data.Teams
+import com.tennis.scoremanager.ui.BigButton
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.PlayerAvatar
+import com.tennis.scoremanager.ui.ScreenScaffold
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.SegOption
+import com.tennis.scoremanager.ui.Segmented
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import com.tennis.scoremanager.ui.ctProblemText
+import java.util.Calendar
+
+/** "V 3 · P 1 · N 0". */
+private fun recordLine(s: Strings, t: Team): String = Teams.record(t).let { r -> s.tmRecord(r.won, r.lost) + if (r.drawn > 0) " · " + s.tmDrawn(r.drawn) else "" }
+
+/** "4-2 vinto", "2-4 perso", "3-3", "2-1 in corso". */
+private fun resultLine(s: Strings, f: Fixture): String {
+    if (f.rubbers.none { it.won != null }) return ""
+    val (w, l) = Teams.result(f)
+    return "$w-$l " + when { !Teams.decided(f) -> s.tmOngoing; Teams.outcome(f) == true -> s.tmWon; Teams.outcome(f) == false -> s.tmLost; else -> s.tmDraw }
+}
+
+/** Circolo › Tornei › Squadre e campionati. */
+@Composable
+fun TeamsScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.teams.collectAsState()
+    var creating by remember { mutableStateOf(false) }
+    ScreenScaffold(
+        title = s.tmTitle,
+        subtitle = s.tmHint,
+        icon = Icons.Filled.Groups,
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            BigButton(s.tmNew, Icons.Filled.Add, { creating = true }, Modifier.weight(1f))
+        },
+    ) {
+        if (list.isEmpty()) Text(s.tmNone, color = TsmColors.TextDim)
+        val now = System.currentTimeMillis()
+        for (t in list.sortedBy { it.name.lowercase() }) {
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(TsmColors.Surface).clickable { c.openTeam(t.id) }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(t.name, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    Text(listOfNotNull(t.championship.ifBlank { null }, t.season.ifBlank { null }, s.tmPlayers(t.roster.size), recordLine(s, t)).joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+                    t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L && !Teams.decided(it) }?.let { f -> Text(s.scNext("${f.opponent} · ${c.fixtureWhen(f)}"), color = TsmColors.Ball, fontSize = 13.sp) }
+                }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = TsmColors.TextDim)
+            }
+        }
+    }
+    if (creating) TeamEditDialog(c, null) { id -> creating = false; id?.let { c.openTeam(it) } }
+}
+
+/** Una squadra: la rosa (nell'ordine della lista) e gli incontri. */
+@Composable
+fun TeamScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.teams.collectAsState()
+    val id by c.openTeamId.collectAsState()
+    val t = list.firstOrNull { it.id == id } ?: return
+    val players by c.players.collectAsState()
+    var tab by rememberSaveable { mutableStateOf(0) }
+    var edit by remember { mutableStateOf(false) }
+    var adding by remember { mutableStateOf(false) }
+    val now = System.currentTimeMillis()
+    // I controlli FITP valgono per il prossimo incontro (o per oggi).
+    val day = t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L }?.at ?: now
+    ScreenScaffold(
+        title = t.name,
+        subtitle = listOfNotNull(t.championship.ifBlank { null }, t.season.ifBlank { null }, recordLine(s, t)).joinToString(" · "),
+        icon = Icons.Filled.Groups,
+        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        bottomBar = {
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
+            if (tab == 1) BigButton(s.tmNewFixture, Icons.Filled.Add, {
+                val f = Fixture(Teams.newId("f"), "", CourtPlans.at(CourtPlans.addDays(now, 7), 9), rubbers = Teams.emptyRubbers(t))
+                c.saveFixture(t, f); c.openFixture(t.id, f.id)
+            }, Modifier.weight(1f))
+        },
+    ) {
+        Segmented(listOf(SegOption(s.tmTabRoster), SegOption(s.tmTabFixtures)), tab, { tab = it })
+        if (tab == 0) {
+            BigButton(s.tmAddPlayer, Icons.Filled.PersonAdd, { adding = true }, Modifier.fillMaxWidth())
+            if (t.roster.isEmpty()) Text(s.tmRosterEmpty, color = TsmColors.TextDim)
+            for ((i, pid) in t.roster.withIndex()) {
+                val p = players.firstOrNull { it.id == pid || pid in it.aliases }
+                val problems = p?.let { Teams.problems(t, it, day) }.orEmpty()
+                Row(Modifier.fillMaxWidth().clickable(enabled = p != null) { p?.let { c.openStudent(it.id) } }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("${i + 1}.", color = TsmColors.TextDim, modifier = Modifier.padding(end = 6.dp))
+                    PlayerAvatar(c, p?.name.orEmpty(), TsmColors.Ball, 36.dp)
+                    Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(p?.name ?: "—", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                            if (t.captain == pid) Icon(Icons.Filled.Star, s.tmCaptain, tint = TsmColors.Ball, modifier = Modifier.padding(start = 4.dp))
+                        }
+                        Text(p?.member?.ranking?.ifBlank { null } ?: "NC", color = TsmColors.TextDim, fontSize = 12.sp)
+                        if (problems.isNotEmpty()) Text(problems.joinToString(" · ") { ctProblemText(s, it) }, color = TsmColors.Danger, fontSize = 12.sp)
+                    }
+                    if (i > 0) IconButton(onClick = { c.saveTeam(t.copy(roster = t.roster.toMutableList().also { l -> l[i] = l[i - 1].also { l[i - 1] = l[i] } })) }) {
+                        Icon(Icons.Filled.KeyboardArrowUp, null, tint = TsmColors.TextDim)
+                    }
+                    IconButton(onClick = { c.saveTeam(t.copy(roster = t.roster - pid, captain = t.captain.takeIf { it != pid })) }) { Icon(Icons.Filled.Close, null, tint = TsmColors.TextDim) }
+                }
+            }
+        } else {
+            if (t.fixtures.isEmpty()) Text(s.tmNoFixtures, color = TsmColors.TextDim)
+            for (f in t.fixtures.sortedBy { it.at }) {
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.Surface).clickable { c.openFixture(t.id, f.id) }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(f.opponent.ifBlank { "—" }, color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(c.fixtureWhen(f), color = TsmColors.TextDim, fontSize = 12.sp)
+                    }
+                    val r = resultLine(s, f)
+                    if (r.isNotBlank()) Text(r, color = when (Teams.outcome(f)) { true -> TsmColors.Ok; false -> TsmColors.Danger; else -> TsmColors.TextMain }, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            }
+        }
+    }
+    if (edit) TeamEditDialog(c, t) { edit = false }
+    if (adding) PlayerPickDialog(c, t.roster.toSet()) { p -> adding = false; p?.let { c.saveTeam(t.copy(roster = t.roster + it.id)) } }
+}
+
+/** Un incontro: disponibilità, convocati, partite e risultato. */
+@Composable
+fun FixtureScreen(c: MatchController) {
+    val s = LocalStrings.current
+    BackHandler { c.back() }
+    val list by c.teams.collectAsState()
+    val tid by c.openTeamId.collectAsState()
+    val fid by c.openFixtureId.collectAsState()
+    val t = list.firstOrNull { it.id == tid } ?: return
+    val f = t.fixtures.firstOrNull { it.id == fid } ?: return
+    val players by c.players.collectAsState()
+    var edit by remember { mutableStateOf(f.opponent.isBlank()) }
+    var rubber by remember { mutableStateOf<Int?>(null) }
+    fun save(x: Fixture) = c.saveFixture(c.team(t.id) ?: t, x)
+    fun name(id: String) = players.firstOrNull { it.id == id || id in it.aliases }?.name ?: "—"
+    ScreenScaffold(
+        title = "${t.name} – ${f.opponent.ifBlank { "?" }}",
+        subtitle = c.fixtureWhen(f),
+        icon = Icons.Filled.EmojiEvents,
+        action = { TextButton(onClick = { edit = true }) { Text(s.studentEdit, color = TsmColors.Ball) } },
+        bottomBar = { GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f)) },
+    ) {
+        if (f.meeting.isNotBlank()) Text(s.tmMeetingLine(f.meeting), color = TsmColors.TextDim, fontSize = 13.sp)
+        if (f.home && f.courts.isNotEmpty()) Text(s.tmCourtsHeld(f.courts.joinToString(", ")), color = TsmColors.TextDim, fontSize = 13.sp)
+        val res = resultLine(s, f)
+        if (res.isNotBlank()) Text(res, color = when (Teams.outcome(f)) { true -> TsmColors.Ok; false -> TsmColors.Danger; else -> TsmColors.TextMain }, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        // Disponibilità: un tocco per Sì / No / Forse (come hanno risposto al messaggio).
+        SectionCard(s.tmAvailability, Icons.Filled.HowToReg) {
+            val answers = listOf(null, Availability.YES, Availability.MAYBE, Availability.NO)
+            for (pid in t.roster) {
+                Text(name(pid), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Segmented(answers.map { SegOption(when (it) { null -> "—"; Availability.YES -> s.tmYes; Availability.MAYBE -> s.tmMaybe; Availability.NO -> s.tmNo }) },
+                    answers.indexOf(f.availability[pid]), { i -> val a = answers[i]; save(f.copy(availability = if (a == null) f.availability - pid else f.availability + (pid to a))) })
+            }
+            if (t.roster.isEmpty()) Text(s.tmRosterEmpty, color = TsmColors.TextDim, fontSize = 13.sp)
+            else {
+                GhostButton(s.tmAskAll, Icons.Filled.Campaign, { c.noticeAvailability(t, f, false) }, Modifier.fillMaxWidth())
+                if (Teams.noAnswer(t, f).isNotEmpty() && f.availability.isNotEmpty()) GhostButton(s.tmAskMissing(Teams.noAnswer(t, f).size), Icons.Filled.Campaign, { c.noticeAvailability(t, f, true) }, Modifier.fillMaxWidth())
+            }
+        }
+
+        // Convocati: prima chi ha detto sì, poi forse, poi gli altri; in rosso chi non è in regola quel giorno.
+        SectionCard(s.tmCallUp, Icons.Filled.Groups) {
+            val order = Teams.candidates(t, f) + t.roster.filter { it !in Teams.candidates(t, f) }
+            for (pid in order) {
+                val p = players.firstOrNull { it.id == pid } ?: continue
+                val probs = Teams.problems(t, p, f.at)
+                SwitchRow(Icons.Filled.HowToReg, p.name + (f.availability[pid]?.let { " · " + when (it) { Availability.YES -> s.tmYes; Availability.MAYBE -> s.tmMaybe; Availability.NO -> s.tmNo } } ?: ""),
+                    probs.takeIf { it.isNotEmpty() }?.joinToString(" · ") { ctProblemText(s, it) }, pid in f.callUp) { on ->
+                    save(f.copy(callUp = if (on) f.callUp + pid else f.callUp - pid))
+                }
+            }
+            if (f.callUp.isNotEmpty()) BigButton(s.tmSendCallUp(f.callUp.size), Icons.Filled.Campaign, { c.noticeCallUp(t, f) }, Modifier.fillMaxWidth())
+        }
+
+        // Le partite: i nostri contro i loro, punteggio; si giocano anche col segnapunti.
+        SectionCard(s.tmRubbers, Icons.Filled.EmojiEvents) {
+            for ((i, r) in f.rubbers.withIndex()) {
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { rubber = i }.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(c.rubberName(t, i), color = TsmColors.TextDim, fontSize = 12.sp)
+                        Text("${r.ours.map(::name).joinToString(" / ").ifBlank { "—" }} – ${r.theirs.joinToString(" / ").ifBlank { "—" }}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                    Text(r.score.ifBlank { when (r.won) { true -> s.tmWon; false -> s.tmLost; null -> "" } }, color = when (r.won) { true -> TsmColors.Ok; false -> TsmColors.Danger; null -> TsmColors.TextDim }, fontSize = 13.sp)
+                }
+            }
+            if (f.rubbers.any { it.won != null }) GhostButton(s.tmSendResult, Icons.Filled.Campaign, { c.noticeResult(t, f) }, Modifier.fillMaxWidth())
+        }
+    }
+    if (edit) FixtureEditDialog(c, t, f) { edit = false }
+    rubber?.let { i -> f.rubbers.getOrNull(i)?.let { r -> RubberDialog(c, t, f, i, r) { rubber = null } } }
+}
+
+/** Una partita dell'incontro: i nostri (dai convocati), i loro, punteggio e chi ha vinto. */
+@Composable
+private fun RubberDialog(c: MatchController, t: Team, f: Fixture, index: Int, r0: Rubber, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val players by c.players.collectAsState()
+    var r by remember { mutableStateOf(r0) }
+    var theirs1 by remember { mutableStateOf(r0.theirs.getOrNull(0).orEmpty()) }
+    var theirs2 by remember { mutableStateOf(r0.theirs.getOrNull(1).orEmpty()) }
+    val need = if (r.doubles) 2 else 1
+    val pool = f.callUp.ifEmpty { t.roster }
+    fun current() = r.copy(theirs = listOf(theirs1, theirs2).take(need).map { it.trim() }.filter { it.isNotEmpty() })
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(c.rubberName(t, index)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(s.tmOurs(need), color = TsmColors.TextDim, fontSize = 13.sp)
+                for (pid in pool) {
+                    val p = players.firstOrNull { it.id == pid } ?: continue
+                    SwitchRow(Icons.Filled.HowToReg, p.name, null, pid in r.ours) { on ->
+                        r = r.copy(ours = if (on) (r.ours + pid).takeLast(need) else r.ours - pid)
+                    }
+                }
+                OutlinedTextField(theirs1, { theirs1 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs) })
+                if (r.doubles) OutlinedTextField(theirs2, { theirs2 = it.take(40) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmTheirs2) })
+                if (r.ours.size == need && r.won == null) GhostButton(s.ctPlayLive, Icons.Filled.PlayArrow, {
+                    val x = current()
+                    c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                    onDone()
+                    c.playTeamRubber(c.team(t.id) ?: t, (c.team(t.id) ?: t).fixtures.first { it.id == f.id }, index)
+                }, Modifier.fillMaxWidth())
+                OutlinedTextField(r.score, { v -> r = r.copy(score = v.take(40)); ClubTournaments.winnerFromScore(v)?.let { w -> r = r.copy(won = w == "a") } }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmScoreOurs) })
+                val outs = listOf(null, true, false)
+                Segmented(outs.map { SegOption(when (it) { null -> "—"; true -> s.tmWeWon; false -> s.tmTheyWon }) }, outs.indexOf(r.won), { r = r.copy(won = outs[it]) })
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val x = current()
+                c.saveFixture(c.team(t.id) ?: t, f.copy(rubbers = f.rubbers.mapIndexed { k, y -> if (k == index) x else y }))
+                onDone()
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+}
+
+/** L'incontro: avversario, giorno e ora, casa o trasferta, dove, ritrovo, campi tenuti in casa, note. */
+@Composable
+private fun FixtureEditDialog(c: MatchController, t: Team, f0: Fixture, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val lang = c.options.value.lang
+    val courts by c.clubCourts.collectAsState()
+    var f by remember { mutableStateOf(f0) }
+    var askDelete by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(if (f0.opponent.isBlank()) s.tmNewFixture else f0.opponent) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(f.opponent, { f = f.copy(opponent = it.take(50)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmOpponent) })
+                DateButton(s.planDay, f.at, lang) { d ->
+                    val old = Calendar.getInstance().apply { timeInMillis = f.at }
+                    f = f.copy(at = CourtPlans.at(d, old.get(Calendar.HOUR_OF_DAY), old.get(Calendar.MINUTE)))
+                }
+                GhostButton("${s.ctTime}: ${com.tennis.scoremanager.data.Reports.time(f.at, lang)}", Icons.Filled.Schedule, {
+                    val cal = Calendar.getInstance().apply { timeInMillis = f.at }
+                    TimePickerDialog(context, { _, h, m -> f = f.copy(at = CourtPlans.at(f.at, h, m)) }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+                }, Modifier.fillMaxWidth())
+                Segmented(listOf(SegOption(s.tmHome), SegOption(s.tmAway)), if (f.home) 0 else 1, { f = f.copy(home = it == 0) })
+                OutlinedTextField(f.place, { f = f.copy(place = it.take(80)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmPlace) })
+                OutlinedTextField(f.meeting, { f = f.copy(meeting = it.take(80)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmMeeting) })
+                if (f.home && courts.isNotEmpty()) {
+                    Text(s.tmHoldCourts, color = TsmColors.TextDim, fontSize = 13.sp)
+                    for (ct in courts) SwitchRow(Icons.Filled.Block, ct, null, ct in f.courts) { on -> f = f.copy(courts = if (on) f.courts + ct else f.courts - ct) }
+                    if (f.courts.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(s.tmHours(f.hours), color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { f = f.copy(hours = (f.hours - 1).coerceAtLeast(1)) }) { Icon(Icons.Filled.Remove, null) }
+                        IconButton(onClick = { f = f.copy(hours = (f.hours + 1).coerceAtMost(14)) }) { Icon(Icons.Filled.Add, null) }
+                    }
+                }
+                OutlinedTextField(f.note, { f = f.copy(note = it.take(200)) }, Modifier.fillMaxWidth(), label = { Text(s.bkNote) })
+                TextButton(onClick = { askDelete = true }) { Text(s.tmDeleteFixture, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = { TextButton(enabled = f.opponent.isNotBlank(), onClick = { c.saveFixture(c.team(t.id) ?: t, f.copy(opponent = f.opponent.trim())); onDone() }) { Text(s.ok) } },
+        dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
+    )
+    if (askDelete) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.tmDeleteFixtureAsk) },
+        confirmButton = {
+            TextButton(onClick = {
+                askDelete = false
+                val cur = c.team(t.id) ?: t
+                c.saveTeam(cur.copy(fixtures = cur.fixtures.filter { it.id != f0.id }))
+                onDone(); c.back()
+            }) { Text(s.tmDeleteFixture, color = TsmColors.Danger) }
+        },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
+}
+
+/** Squadra nuova o da cambiare: nome, campionato, stagione, FITP, formula, capitano. */
+@Composable
+private fun TeamEditDialog(c: MatchController, t0: Team?, onDone: (String?) -> Unit) {
+    val s = LocalStrings.current
+    var t by remember { mutableStateOf(t0 ?: Team(Teams.newId("t"), "", season = Calendar.getInstance().get(Calendar.YEAR).toString(), createdAt = System.currentTimeMillis())) }
+    var pickCaptain by remember { mutableStateOf(false) }
+    var askDelete by remember { mutableStateOf(false) }
+    @Composable fun stepper(label: String, v: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+        IconButton(onClick = { onChange((v - 1).coerceAtLeast(0)) }) { Icon(Icons.Filled.Remove, null) }
+        Text("$v", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        IconButton(onClick = { onChange((v + 1).coerceAtMost(9)) }) { Icon(Icons.Filled.Add, null) }
+    }
+    AlertDialog(
+        onDismissRequest = { onDone(null) },
+        title = { Text(if (t0 == null) s.tmNew else t0.name) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(t.name, { t = t.copy(name = it.take(50)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmName) })
+                OutlinedTextField(t.championship, { t = t.copy(championship = it.take(60)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmChampionship) })
+                OutlinedTextField(t.season, { t = t.copy(season = it.take(12)) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.tmSeason) })
+                SwitchRow(Icons.Filled.EmojiEvents, s.tmFitp, s.tmFitpHint, t.fitp) { t = t.copy(fitp = it) }
+                stepper(s.tmSingles, t.singles) { t = t.copy(singles = it) }
+                stepper(s.tmDoubles, t.doubles) { t = t.copy(doubles = it) }
+                val cap = t.captain?.let { c.playerById(it)?.name }
+                GhostButton(cap?.let { s.tmCaptainLine(it) } ?: s.tmPickCaptain, Icons.Filled.Star, { pickCaptain = true }, Modifier.fillMaxWidth())
+                if (t0 != null) TextButton(onClick = { askDelete = true }) { Text(s.tmDelete, color = TsmColors.Danger) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = t.name.isNotBlank(), onClick = {
+                // Cambiando la formula, gli incontri ancora senza risultati prendono le partite nuove.
+                val formula = t0 == null || t0.singles != t.singles || t0.doubles != t.doubles
+                val fixed = if (!formula) t.fixtures else t.fixtures.map { f -> if (f.rubbers.none { it.won != null || it.ours.isNotEmpty() }) f.copy(rubbers = Teams.emptyRubbers(t)) else f }
+                val saved = t.copy(name = t.name.trim(), fixtures = fixed, roster = (t.roster + listOfNotNull(t.captain)).distinct())
+                c.saveTeam(saved)
+                onDone(saved.id)
+            }) { Text(s.ok) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
+    )
+    if (pickCaptain) PlayerPickDialog(c, emptySet()) { p -> pickCaptain = false; p?.let { t = t.copy(captain = it.id) } }
+    if (askDelete && t0 != null) AlertDialog(
+        onDismissRequest = { askDelete = false },
+        text = { Text(s.tmDeleteAsk(t0.name)) },
+        confirmButton = { TextButton(onClick = { askDelete = false; c.deleteTeam(t0.id); onDone(null); c.back() }) { Text(s.tmDelete, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
+    )
 }
 TSM_EOF
 
@@ -64941,6 +66180,83 @@ class StudentsTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/TeamsTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/TeamsTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.util.Calendar
+
+class TeamsTest {
+    private fun at(y: Int, m: Int, d: Int, h: Int = 12, min: Int = 0): Long = Calendar.getInstance().apply { set(y, m - 1, d, h, min, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+    private val team = Team("t", "TC Prova D1", "Serie D1 maschile", "2027", roster = listOf("a", "b", "c", "d", "e"), singles = 4, doubles = 2)
+
+    @Test
+    fun resultAndOutcome() {
+        var f = Fixture("f", "TC Altro", at(2027, 4, 11, 9), rubbers = Teams.emptyRubbers(team))
+        assertEquals(6, f.rubbers.size)
+        assertEquals(listOf(false, false, false, false, true, true), f.rubbers.map { it.doubles })
+        assertFalse(Teams.decided(f))
+        // Il vincitore dal punteggio, dal nostro lato.
+        f = Teams.setRubber(f, 0, "6-4 6-3", null)
+        f = Teams.setRubber(f, 1, "3-6 4-6", null)
+        f = Teams.setRubber(f, 2, "6-1 6-1", null)
+        assertEquals(2 to 1, Teams.result(f))
+        assertNull(Teams.outcome(f))
+        f = Teams.setRubber(f, 3, "7-5 6-4", null)
+        assertFalse(Teams.decided(f))
+        f = Teams.setRubber(f, 4, "6-3 6-3", null)
+        // 4 su 6: incontro vinto anche senza giocare l'ultimo doppio.
+        assertTrue(Teams.decided(f))
+        assertEquals(true, Teams.outcome(f))
+        assertEquals(Teams.Record(1, 0, 0), Teams.record(team.copy(fixtures = listOf(f))))
+        // Pareggio 3-3: deciso, ma né vinto né perso.
+        var g = Fixture("g", "TC Terzo", at(2027, 4, 18, 9), rubbers = Teams.emptyRubbers(team))
+        listOf(true, true, true, false, false, false).forEachIndexed { i, w -> g = Teams.setRubber(g, i, "", w) }
+        assertTrue(Teams.decided(g)); assertNull(Teams.outcome(g))
+        assertEquals(Teams.Record(1, 0, 1), Teams.record(team.copy(fixtures = listOf(f, g))))
+    }
+
+    @Test
+    fun availabilityAndCandidates() {
+        val f = Fixture("f", "TC Altro", at(2027, 4, 11, 9), availability = mapOf("c" to Availability.YES, "a" to Availability.MAYBE, "b" to Availability.YES, "d" to Availability.NO))
+        // Prima chi ha detto sì (nell'ordine della rosa), poi i forse.
+        assertEquals(listOf("b", "c", "a"), Teams.candidates(team, f))
+        assertEquals(listOf("e"), Teams.noAnswer(team, f))
+    }
+
+    @Test
+    fun fitpEligibilityOnTheMatchDay() {
+        val ok = Membership(fitpNumber = "1", fitpCard = FitpCard.AGONIST, fitpYear = 2027, medical = MedicalKind.AGONISTIC, medicalUntil = at(2027, 6, 1))
+        val p = PlayerProfile("a", "Rossi", member = ok)
+        val day = at(2027, 4, 11)
+        assertTrue(Teams.problems(team, p, day).isEmpty())
+        assertEquals(listOf(ClubTournaments.Problem.NO_MEDICAL), Teams.problems(team, p.copy(member = ok.copy(medicalUntil = at(2027, 4, 1))), day))
+        // Non FITP: basta il certificato.
+        assertTrue(Teams.problems(team.copy(fitp = false), p.copy(member = ok.copy(fitpYear = 2026)), day).isEmpty())
+    }
+
+    @Test
+    fun homeFixturesBlockTheirCourts() {
+        val home = Fixture("f", "TC Altro", at(2027, 4, 11, 9), home = true, courts = listOf("Campo 1", "Campo 2"), hours = 5)
+        val away = Fixture("g", "TC Terzo", at(2027, 4, 18, 9), home = false, courts = listOf("Campo 1"))
+        val blocks = Teams.blocks(team.copy(fixtures = listOf(home, away)))
+        assertEquals(1, blocks.size)
+        val plan = CourtPlan(blocks = blocks)
+        assertEquals(1, CourtPlans.blockedBy(plan, "Campo 2", at(2027, 4, 11, 13), at(2027, 4, 11, 14), BookingKind.LESSON).size)
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 2", at(2027, 4, 11, 14), at(2027, 4, 11, 15), BookingKind.PLAY).isEmpty())
+        assertTrue(CourtPlans.blockedBy(plan, "Campo 3", at(2027, 4, 11, 10), at(2027, 4, 11, 11), BookingKind.PLAY).isEmpty())
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/TournamentTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -71584,6 +72900,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 219 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 222 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

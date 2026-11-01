@@ -1438,6 +1438,70 @@ interface Strings {
     val scMax: (Int) -> String
     val scDeleteAsk: (String) -> String
     val scCancelledNotice: (String) -> String
+    val tmTitle: String
+    val tmHint: String
+    val tmNew: String
+    val tmNone: String
+    val tmNewFixture: String
+    val tmTabRoster: String
+    val tmTabFixtures: String
+    val tmAddPlayer: String
+    val tmRosterEmpty: String
+    val tmCaptain: String
+    val tmNoFixtures: String
+    val tmAvailability: String
+    val tmYes: String
+    val tmMaybe: String
+    val tmNo: String
+    val tmAskAll: String
+    val tmCallUp: String
+    val tmRubbers: String
+    val tmSendResult: String
+    val tmTheirs: String
+    val tmTheirs2: String
+    val tmScoreOurs: String
+    val tmWeWon: String
+    val tmTheyWon: String
+    val tmOpponent: String
+    val tmHome: String
+    val tmAway: String
+    val tmPlace: String
+    val tmMeeting: String
+    val tmHoldCourts: String
+    val tmDeleteFixture: String
+    val tmDeleteFixtureAsk: String
+    val tmName: String
+    val tmChampionship: String
+    val tmSeason: String
+    val tmFitp: String
+    val tmFitpHint: String
+    val tmSingles: String
+    val tmDoubles: String
+    val tmPickCaptain: String
+    val tmDelete: String
+    val tmOngoing: String
+    val tmWon: String
+    val tmLost: String
+    val tmDraw: String
+    val tmReplyYesNo: String
+    val tmAvailabilityTitle: String
+    val tmCallUpTitle: String
+    val tmResultTitle: String
+    val tmRecord: (Int, Int) -> String
+    val tmDrawn: (Int) -> String
+    val tmPlayers: (Int) -> String
+    val tmMeetingLine: (String) -> String
+    val tmCourtsHeld: (String) -> String
+    val tmAskMissing: (Int) -> String
+    val tmSendCallUp: (Int) -> String
+    val tmOurs: (Int) -> String
+    val tmHours: (Int) -> String
+    val tmCaptainLine: (String) -> String
+    val tmDeleteAsk: (String) -> String
+    val tmAskAvailability: (String) -> String
+    val tmCalledUp: (String) -> String
+    val tmSingleN: (Int) -> String
+    val tmDoubleN: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3135,6 +3199,70 @@ object ItStrings : Strings {
     override val scMax: (Int) -> String = { "Al massimo $it allievi" }
     override val scDeleteAsk: (String) -> String = { "Eliminare il corso $it? I campi tornano prenotabili; le quote già addebitate restano nel registro." }
     override val scCancelledNotice: (String) -> String = { "La lezione del corso $it è annullata:" }
+    override val tmTitle = "Squadre e campionati"
+    override val tmHint = "Rosa, incontri, disponibilità, convocazioni e risultati dei campionati a squadre"
+    override val tmNew = "Nuova squadra"
+    override val tmNone = "Nessuna squadra: creala con Nuova squadra."
+    override val tmNewFixture = "Nuovo incontro"
+    override val tmTabRoster = "Rosa"
+    override val tmTabFixtures = "Incontri"
+    override val tmAddPlayer = "Aggiungi giocatore"
+    override val tmRosterEmpty = "Nessun giocatore in rosa."
+    override val tmCaptain = "capitano"
+    override val tmNoFixtures = "Nessun incontro: aggiungilo con Nuovo incontro."
+    override val tmAvailability = "Disponibilità"
+    override val tmYes = "Sì"
+    override val tmMaybe = "Forse"
+    override val tmNo = "No"
+    override val tmAskAll = "Chiedi la disponibilità a tutti"
+    override val tmCallUp = "Convocati"
+    override val tmRubbers = "Partite"
+    override val tmSendResult = "Manda il risultato"
+    override val tmTheirs = "Avversario"
+    override val tmTheirs2 = "Secondo avversario"
+    override val tmScoreOurs = "Punteggio dal nostro lato (es. 6-4 3-6 10-8)"
+    override val tmWeWon = "Vinta"
+    override val tmTheyWon = "Persa"
+    override val tmOpponent = "Squadra avversaria (es. TC Altro)"
+    override val tmHome = "in casa"
+    override val tmAway = "trasferta"
+    override val tmPlace = "Dove si gioca"
+    override val tmMeeting = "Ritrovo (ora e luogo)"
+    override val tmHoldCourts = "Campi tenuti per l'incontro (non prenotabili nel planning)"
+    override val tmDeleteFixture = "Elimina l'incontro"
+    override val tmDeleteFixtureAsk = "Eliminare questo incontro? I campi tenuti tornano prenotabili."
+    override val tmName = "Nome della squadra (es. TC Prova D1)"
+    override val tmChampionship = "Campionato (es. Serie D1 maschile)"
+    override val tmSeason = "Stagione"
+    override val tmFitp = "Campionato FITP"
+    override val tmFitpHint = "In rosa e tra i convocati si controllano tessera agonistica e certificato agonistico del giorno dell'incontro."
+    override val tmSingles = "Singolari per incontro"
+    override val tmDoubles = "Doppi per incontro"
+    override val tmPickCaptain = "Scegli il capitano"
+    override val tmDelete = "Elimina la squadra"
+    override val tmOngoing = "in corso"
+    override val tmWon = "vinto"
+    override val tmLost = "perso"
+    override val tmDraw = "pari"
+    override val tmReplyYesNo = "Rispondi a questo messaggio con SÌ, NO o FORSE."
+    override val tmAvailabilityTitle = "Disponibilità"
+    override val tmCallUpTitle = "Convocazione"
+    override val tmResultTitle = "Risultato"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "V $w · P $l" }
+    override val tmDrawn: (Int) -> String = { "N $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "giocatore" else "giocatori"}" }
+    override val tmMeetingLine: (String) -> String = { "Ritrovo: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Campi tenuti: $it" }
+    override val tmAskMissing: (Int) -> String = { "Richiedi a chi non ha risposto ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Manda la convocazione ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Il nostro giocatore" else "I nostri due giocatori" }
+    override val tmHours: (Int) -> String = { "Per $it ore" }
+    override val tmCaptainLine: (String) -> String = { "Capitano: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Eliminare la squadra $it con i suoi incontri? I campi tenuti tornano prenotabili." }
+    override val tmAskAvailability: (String) -> String = { "sei disponibile per $it?" }
+    override val tmCalledUp: (String) -> String = { "sei convocato per $it." }
+    override val tmSingleN: (Int) -> String = { "Singolare $it" }
+    override val tmDoubleN: (Int) -> String = { "Doppio $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -4815,6 +4943,70 @@ object EnStrings : Strings {
     override val scMax: (Int) -> String = { "At most $it students" }
     override val scDeleteAsk: (String) -> String = { "Delete the course $it? Courts become bookable again; fees already charged stay in the register." }
     override val scCancelledNotice: (String) -> String = { "The $it lesson is cancelled:" }
+    override val tmTitle = "Teams and leagues"
+    override val tmHint = "Roster, fixtures, availability, call-ups and results for team championships"
+    override val tmNew = "New team"
+    override val tmNone = "No teams: create one with New team."
+    override val tmNewFixture = "New fixture"
+    override val tmTabRoster = "Roster"
+    override val tmTabFixtures = "Fixtures"
+    override val tmAddPlayer = "Add player"
+    override val tmRosterEmpty = "No players in the roster."
+    override val tmCaptain = "captain"
+    override val tmNoFixtures = "No fixtures: add one with New fixture."
+    override val tmAvailability = "Availability"
+    override val tmYes = "Yes"
+    override val tmMaybe = "Maybe"
+    override val tmNo = "No"
+    override val tmAskAll = "Ask everyone's availability"
+    override val tmCallUp = "Called up"
+    override val tmRubbers = "Rubbers"
+    override val tmSendResult = "Send the result"
+    override val tmTheirs = "Opponent"
+    override val tmTheirs2 = "Second opponent"
+    override val tmScoreOurs = "Score from our side (e.g. 6-4 3-6 10-8)"
+    override val tmWeWon = "Won"
+    override val tmTheyWon = "Lost"
+    override val tmOpponent = "Opposing team (e.g. TC Other)"
+    override val tmHome = "home"
+    override val tmAway = "away"
+    override val tmPlace = "Where it's played"
+    override val tmMeeting = "Meeting point (time and place)"
+    override val tmHoldCourts = "Courts held for the fixture (not bookable in the planner)"
+    override val tmDeleteFixture = "Delete the fixture"
+    override val tmDeleteFixtureAsk = "Delete this fixture? Held courts become bookable again."
+    override val tmName = "Team name (e.g. TC Test D1)"
+    override val tmChampionship = "Championship (e.g. Men's Series D1)"
+    override val tmSeason = "Season"
+    override val tmFitp = "FITP championship"
+    override val tmFitpHint = "In the roster and call-up, the competitive card and competitive certificate for the match day are checked."
+    override val tmSingles = "Singles per fixture"
+    override val tmDoubles = "Doubles per fixture"
+    override val tmPickCaptain = "Pick the captain"
+    override val tmDelete = "Delete the team"
+    override val tmOngoing = "in progress"
+    override val tmWon = "won"
+    override val tmLost = "lost"
+    override val tmDraw = "draw"
+    override val tmReplyYesNo = "Reply to this message with YES, NO or MAYBE."
+    override val tmAvailabilityTitle = "Availability"
+    override val tmCallUpTitle = "Call-up"
+    override val tmResultTitle = "Result"
+    override val tmRecord: (Int, Int) -> String = { w, l -> "W $w · L $l" }
+    override val tmDrawn: (Int) -> String = { "D $it" }
+    override val tmPlayers: (Int) -> String = { "$it ${if (it == 1) "player" else "players"}" }
+    override val tmMeetingLine: (String) -> String = { "Meeting: $it" }
+    override val tmCourtsHeld: (String) -> String = { "Courts held: $it" }
+    override val tmAskMissing: (Int) -> String = { "Ask those who haven't replied ($it)" }
+    override val tmSendCallUp: (Int) -> String = { "Send the call-up ($it)" }
+    override val tmOurs: (Int) -> String = { if (it == 1) "Our player" else "Our two players" }
+    override val tmHours: (Int) -> String = { "For $it hours" }
+    override val tmCaptainLine: (String) -> String = { "Captain: $it" }
+    override val tmDeleteAsk: (String) -> String = { "Delete the team $it with its fixtures? Held courts become bookable again." }
+    override val tmAskAvailability: (String) -> String = { "are you available for $it?" }
+    override val tmCalledUp: (String) -> String = { "you're called up for $it." }
+    override val tmSingleN: (Int) -> String = { "Singles $it" }
+    override val tmDoubleN: (Int) -> String = { "Doubles $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

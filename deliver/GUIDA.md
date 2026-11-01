@@ -515,6 +515,16 @@ Col ruolo **Circolo**, in **Giocatori › Scuola tennis**.
 - **Lezioni**: il calendario nasce dagli orari. Tocca una lezione per l'**appello** (chi c'era) o per segnarla **annullata** (pioggia, festa…); **Annulla e avvisa gli allievi** prepara il messaggio con giorno e ora. *Avvisa gli allievi* manda un messaggio libero. Ai minorenni si scrive al genitore.
 - **Quote**: per ogni mese della stagione (o per la stagione) **Addebita agli allievi** mette la quota a chi non l'ha ancora; si vede quanti hanno pagato e si incassa come le altre quote, con la ricevuta.
 
+### 7.17 Squadre e campionati (app 2.6)
+
+Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
+
+- **Nuova squadra**: nome, campionato, stagione, **campionato FITP** (si controllano tessera agonistica e certificato agonistico del giorno dell'incontro), formula (quanti singolari e doppi per incontro), capitano. In **Rosa** si aggiungono i giocatori e si mettono nell'ordine della lista; in rosso chi non è in regola per il prossimo incontro. Il bilancio (vinti, persi, pari) è accanto al nome.
+- **Nuovo incontro**: avversario, giorno e ora, in casa o in trasferta, dove si gioca, **ritrovo**, note. In casa si possono **tenere dei campi** per qualche ora: nel planning diventano non prenotabili.
+- **Disponibilità**: *Chiedi la disponibilità a tutti* manda il messaggio (rispondono SÌ, NO o FORSE); le risposte si segnano con un tocco, e *Richiedi a chi non ha risposto* insiste solo con loro.
+- **Convocati**: prima chi ha detto sì, poi i forse; in rosso chi non è in regola quel giorno. **Manda la convocazione** scrive a ciascuno giorno, ora, dove e ritrovo, e prepara per il gruppo l'elenco dei convocati.
+- **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto) o **Gioca col segnapunti**, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

@@ -402,6 +402,16 @@ Con el rol **Club**, en **Jugadores › Escuela de tenis**.
 - **Clases**: el calendario sale de los horarios. Toca una clase para **pasar lista** (quién estuvo) o marcarla **anulada** (lluvia, fiesta…); **Anular y avisar a los alumnos** prepara el mensaje con día y hora. *Avisar a los alumnos* envía un mensaje libre. A los menores se escribe al padre o la madre.
 - **Cuotas**: para cada mes de la temporada (o la temporada) **Cargar a los alumnos** asigna la cuota a quien aún no la tiene; se ve cuántos han pagado y se cobra como las demás cuotas, con recibo.
 
+### 7.17 Equipos y ligas
+
+Con el rol **Club**, en **Torneos › Equipos y ligas**.
+
+- **Nuevo equipo**: nombre, campeonato, temporada, **campeonato FITP** (se comprueban licencia y certificado de competición del día del encuentro), formato (cuántos individuales y dobles por encuentro), capitán. En **Plantilla** se añaden los jugadores en el orden de la lista; en rojo quien no está en regla para el próximo encuentro. El balance (ganados, perdidos, empates) va junto al nombre.
+- **Nuevo encuentro**: rival, día y hora, en casa o fuera, dónde se juega, **punto de encuentro**, notas. En casa se pueden **reservar pistas** unas horas: en el planning pasan a no reservables.
+- **Disponibilidad**: *Pedir disponibilidad a todos* envía el mensaje (responden SÍ, NO o QUIZÁ); las respuestas se marcan con un toque, y *Pedir a quien no ha respondido* insiste solo con ellos.
+- **Convocados**: primero quien dijo sí, luego los quizá; en rojo quien no está en regla ese día. **Enviar la convocatoria** escribe a cada uno día, hora, lugar y punto de encuentro, y prepara para el grupo la lista de convocados.
+- **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó) o **Jugar con el marcador**, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

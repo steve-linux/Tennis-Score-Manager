@@ -126,7 +126,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -708,6 +708,9 @@ class MatchController(
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.SCHOOL -> Screen.HOME
             Screen.COURSE -> Screen.SCHOOL
+            Screen.TEAMS -> Screen.HOME
+            Screen.TEAM -> Screen.TEAMS
+            Screen.FIXTURE -> Screen.TEAM
             // L'allenamento in corso continua anche uscendo dalla sua schermata (si ritrova riaprendola).
             Screen.WORKOUT -> if (workoutDetail.value != null) {
                 workoutDetail.value = null
@@ -1234,7 +1237,7 @@ class MatchController(
     fun openStudent(id: String) {
         openStudentId.value = id
         // Indietro torna da dove si è aperta la scheda.
-        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE) } ?: Screen.STUDENTS
+        studentBack = screen.value.takeIf { it in setOf(Screen.PLAYERS, Screen.MEMBERS, Screen.PAYMENTS, Screen.CLUB_TOURNAMENT, Screen.COURTS_PLAN, Screen.COURSE, Screen.TEAM, Screen.FIXTURE) } ?: Screen.STUDENTS
         screen.value = Screen.STUDENT
     }
 
@@ -1447,6 +1450,149 @@ class MatchController(
             val m = t.matches.firstOrNull { it.record == rec.id } ?: continue
             val w = when (state.winner) { Side.P1 -> m.a; Side.P2 -> m.b; else -> null }
             saveClubTournament(com.tennis.scoremanager.data.ClubTournaments.setResult(t, m.id, w, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), record = rec.id))
+        }
+    }
+
+    // ---- Squadre e campionati ----
+
+    val teams = MutableStateFlow(storage.loadTeams())
+    val openTeamId = MutableStateFlow<String?>(null)
+    val openFixtureId = MutableStateFlow<String?>(null)
+    /** Partita di un incontro da giocare col segnapunti: (squadra, incontro, partita). */
+    private var pendingTeamRubber: Triple<String, String, Int>? = null
+
+    fun openTeams() {
+        refreshPlayers()
+        screen.value = Screen.TEAMS
+    }
+
+    fun openTeam(id: String) {
+        openTeamId.value = id
+        screen.value = Screen.TEAM
+    }
+
+    fun openFixture(teamId: String, fixtureId: String) {
+        openTeamId.value = teamId
+        openFixtureId.value = fixtureId
+        screen.value = Screen.FIXTURE
+    }
+
+    fun team(id: String?): com.tennis.scoremanager.data.Team? = id?.let { i -> teams.value.firstOrNull { it.id == i } }
+
+    /** Salva la squadra e rifà i campi tenuti per gli incontri in casa nel planning. */
+    fun saveTeam(t: com.tennis.scoremanager.data.Team) {
+        val list = teams.value.filter { it.id != t.id } + t
+        teams.value = list
+        scope.launch(io) { storage.saveTeams(list) }
+        val p = courtPlan.value
+        val np = p.copy(blocks = p.blocks.filter { it.team != t.id } + com.tennis.scoremanager.data.Teams.blocks(t))
+        if (np != p) {
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
+    }
+
+    fun saveFixture(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) =
+        saveTeam(t.copy(fixtures = (t.fixtures.filter { it.id != f.id } + f).sortedBy { it.at }))
+
+    fun deleteTeam(id: String) {
+        val list = teams.value.filter { it.id != id }
+        teams.value = list
+        scope.launch(io) { storage.saveTeams(list) }
+        val p = courtPlan.value.let { it.copy(blocks = it.blocks.filter { b -> b.team != id }) }
+        courtPlan.value = p
+        scope.launch(io) { storage.saveCourtPlan(p) }
+    }
+
+    fun teamsOf(p: com.tennis.scoremanager.data.PlayerProfile): List<com.tennis.scoremanager.data.Team> {
+        val keys = setOf(p.id) + p.aliases
+        return teams.value.filter { t -> t.roster.any { it in keys } || t.captain in keys }
+    }
+
+    /** "domenica 11 aprile, 09:00 · in casa" o "· trasferta: TC Altro, via…". */
+    fun fixtureWhen(f: com.tennis.scoremanager.data.Fixture): String {
+        val s = strings; val lang = options.value.lang
+        return "${com.tennis.scoremanager.data.Notices.day(f.at, lang)}, ${com.tennis.scoremanager.data.Reports.time(f.at, lang)} · " +
+            (if (f.home) s.tmHome else s.tmAway) + (f.place.ifBlank { null }?.let { ": $it" } ?: "")
+    }
+
+    private fun teamNotice(title: String, t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, who: List<String>, body: (com.tennis.scoremanager.data.PlayerProfile) -> List<String>, common: String) {
+        val now = System.currentTimeMillis()
+        val rec = who.mapNotNull { playerById(it) }.map { p ->
+            val hello = strings.ntHello(p.firstName.ifBlank { p.name })
+            com.tennis.scoremanager.data.Notices.recipient(p, (listOf(hello) + body(p) + listOfNotNull(clubSign.ifBlank { null }?.let { "\n$it" })).joinToString("\n"), now)
+        }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(title, "${t.name} – ${f.opponent}", common, rec))
+    }
+
+    /** Chiede la disponibilità a tutta la rosa (o a chi non ha ancora risposto, con [missingOnly]). */
+    fun noticeAvailability(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, missingOnly: Boolean) {
+        val s = strings
+        val who = if (missingOnly) com.tennis.scoremanager.data.Teams.noAnswer(t, f) else t.roster
+        val lines = listOf(s.tmAskAvailability("${t.name} – ${f.opponent}"), fixtureWhen(f), s.tmReplyYesNo)
+        teamNotice(s.tmAvailabilityTitle, t, f, who, { lines }, (listOf("${t.name} – ${f.opponent}", fixtureWhen(f), s.tmReplyYesNo)).joinToString("\n"))
+    }
+
+    /** La convocazione ai convocati: incontro, giorno, ora, dove e il ritrovo. */
+    fun noticeCallUp(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) {
+        val s = strings
+        val names = f.callUp.mapNotNull { playerById(it)?.name }
+        val lines = listOfNotNull(s.tmCalledUp("${t.name} – ${f.opponent}"), fixtureWhen(f), f.meeting.ifBlank { null }?.let { s.tmMeetingLine(it) }, f.note.ifBlank { null })
+        val common = (listOf(s.tmCallUpTitle + ": ${t.name} – ${f.opponent}", fixtureWhen(f)) + listOfNotNull(f.meeting.ifBlank { null }?.let { s.tmMeetingLine(it) }) + names.map { "• $it" }).joinToString("\n")
+        teamNotice(s.tmCallUpTitle, t, f, f.callUp, { lines }, common)
+    }
+
+    /** Il risultato dell'incontro, partita per partita, per il gruppo della squadra. */
+    fun noticeResult(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture) {
+        val (w, l) = com.tennis.scoremanager.data.Teams.result(f)
+        val text = (listOf("${t.name} – ${f.opponent} $w-$l") + f.rubbers.mapIndexed { i, r ->
+            val ours = r.ours.mapNotNull { playerById(it)?.name }.joinToString(" / ").ifBlank { "—" }
+            "${rubberName(t, i)}: $ours – ${r.theirs.joinToString(" / ").ifBlank { "—" }} ${r.score}".trim()
+        } + listOfNotNull(clubSign.ifBlank { null })).joinToString("\n")
+        val now = System.currentTimeMillis()
+        openNotice(com.tennis.scoremanager.data.NoticePlan(strings.tmResultTitle, "${t.name} – ${f.opponent}", text, t.roster.mapNotNull { playerById(it) }.map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }))
+    }
+
+    /** "Singolare 1", "Doppio 2". */
+    fun rubberName(t: com.tennis.scoremanager.data.Team, i: Int): String = if (i < t.singles) strings.tmSingleN(i + 1) else strings.tmDoubleN(i - t.singles + 1)
+
+    /** Gioca una partita dell'incontro col segnapunti: i nostri come Giocatore 1, gli avversari come Giocatore 2. */
+    fun playTeamRubber(t: com.tennis.scoremanager.data.Team, f: com.tennis.scoremanager.data.Fixture, index: Int) {
+        val r = f.rubbers.getOrNull(index) ?: return
+        val ours = r.ours.map { playerById(it) }
+        fun n(i: Int) = ours.getOrNull(i)?.name.orEmpty()
+        fun id(i: Int) = r.ours.getOrNull(i).orEmpty()
+        updateSetup {
+            it.copy(
+                club = storage.clubName.ifBlank { it.club }, doubles = r.doubles,
+                p1a = n(0), p1b = if (r.doubles) n(1) else "", p2a = r.theirs.getOrNull(0).orEmpty(), p2b = if (r.doubles) r.theirs.getOrNull(1).orEmpty() else "",
+                p1aId = id(0), p1bId = if (r.doubles) id(1) else "", p2aId = "", p2bId = "",
+                p1aRank = ours.getOrNull(0)?.member?.ranking.orEmpty(), p1bRank = if (r.doubles) ours.getOrNull(1)?.member?.ranking.orEmpty() else "", p2aRank = "", p2bRank = "",
+                event = t.championship.ifBlank { t.name }, category = "${t.name} – ${f.opponent}", round = rubberName(t, index),
+            )
+        }
+        pendingTeamRubber = Triple(t.id, f.id, index)
+        go(Screen.SETUP)
+    }
+
+    private fun linkTeamRubber(recordId: String, su: SetupData) {
+        val (tid, fid, i) = pendingTeamRubber ?: return
+        pendingTeamRubber = null
+        val t = team(tid) ?: return
+        val f = t.fixtures.firstOrNull { it.id == fid } ?: return
+        val r = f.rubbers.getOrNull(i) ?: return
+        // Solo se in campo c'è proprio il nostro giocatore di quella partita.
+        if (r.ours.firstOrNull() != su.p1aId) return
+        saveFixture(t, f.copy(rubbers = f.rubbers.mapIndexed { k, x -> if (k == i) x.copy(record = recordId) else x }))
+    }
+
+    private fun teamRubberFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        for (t in teams.value) for (f in t.fixtures) {
+            val i = f.rubbers.indexOfFirst { it.record == rec.id }
+            if (i < 0) continue
+            val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> null }
+            saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
+            return
         }
     }
 
@@ -2206,6 +2352,7 @@ class MatchController(
         }
         val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         linkClubMatch(rec.id, withIds)
+        linkTeamRubber(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -2466,6 +2613,7 @@ class MatchController(
         )
         runningSince = null
         clubMatchFinished(rec, lm.state)
+        teamRubberFinished(rec, lm.state)
         scope.launch(io) {
             storage.deleteMatch(rec.id)
             storage.saveFinished(rec)

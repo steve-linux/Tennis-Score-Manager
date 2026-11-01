@@ -171,6 +171,13 @@ fun StudentScreen(c: MatchController) {
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
         ChargesSection(c, st)
+        // Le squadre in cui gioca.
+        val teamsAll by c.teams.collectAsState()
+        val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }
+        if (mineT.isNotEmpty()) SectionCard(s.tmTitle, Icons.Filled.Groups) {
+            for (tm in mineT) Text(tm.name + (tm.championship.ifBlank { null }?.let { " · $it" } ?: ""), color = TsmColors.TextMain, fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth().clickable { c.openTeam(tm.id) }.padding(vertical = 6.dp))
+        }
         // I corsi della scuola tennis che frequenta.
         val courses by c.courses.collectAsState()
         val mineC = courses.filter { co -> co.students.any { it == st.id || it in st.aliases } }

@@ -402,6 +402,16 @@ Mit der Rolle **Verein**, unter **Spieler › Tennisschule**.
 - **Stunden**: Der Kalender entsteht aus den Zeiten. Eine Stunde antippen für die **Anwesenheit** (wer da war) oder um sie **abzusagen** (Regen, Feiertag…); **Absagen und Schüler benachrichtigen** bereitet die Nachricht mit Tag und Uhrzeit vor. *Schüler benachrichtigen* schickt eine freie Nachricht. Bei Minderjährigen geht sie an die Eltern.
 - **Beiträge**: Für jeden Monat der Saison (oder die Saison) gibt **Den Schülern berechnen** den Beitrag allen, die ihn noch nicht haben; man sieht, wie viele bezahlt haben, und kassiert wie bei den anderen Beiträgen, mit Quittung.
 
+### 7.17 Mannschaften und Ligen
+
+Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
+
+- **Neue Mannschaft**: Name, Meisterschaft, Saison, **FITP-Meisterschaft** (Wettkampfausweis und Wettkampfattest zum Spieltag werden geprüft), Format (wie viele Einzel und Doppel pro Begegnung), Kapitän. Im **Kader** fügt man Spieler hinzu und ordnet sie nach der Meldeliste; rot, wer für die nächste Begegnung nicht in Ordnung ist. Die Bilanz (Siege, Niederlagen, Unentschieden) steht neben dem Namen.
+- **Neue Begegnung**: Gegner, Tag und Uhrzeit, Heim oder auswärts, Spielort, **Treffpunkt**, Notizen. Bei Heimspielen lassen sich **Plätze reservieren** für ein paar Stunden: in der Belegung werden sie nicht buchbar.
+- **Verfügbarkeit**: *Alle nach Verfügbarkeit fragen* schickt die Nachricht (Antwort JA, NEIN oder VIELLEICHT); die Antworten trägt man mit einem Tipp ein, und *Wer nicht geantwortet hat* erinnert nur diese.
+- **Aufgestellt**: zuerst wer ja gesagt hat, dann die Vielleicht; rot, wer an dem Tag nicht in Ordnung ist. **Aufstellung senden** schreibt jedem Tag, Uhrzeit, Ort und Treffpunkt und bereitet für die Gruppe die Liste vor.
+- **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger) oder **Mit dem Zähler spielen**, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

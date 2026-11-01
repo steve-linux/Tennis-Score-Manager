@@ -257,6 +257,24 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio esercizi fallito", it) }
     }
 
+    /** Le squadre del circolo, coi loro incontri, in un file solo. */
+    private val teamsFile: File get() = File(app.filesDir, "club_teams.json")
+
+    fun loadTeams(): List<Team> =
+        runCatching { json.decodeFromString(ListSerializer(Team.serializer()), teamsFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveTeams(list: List<Team>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_teams.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Team.serializer()), list))
+            if (!tmp.renameTo(teamsFile)) {
+                teamsFile.delete()
+                tmp.renameTo(teamsFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio delle squadre fallito", it) }
+    }
+
     /** I corsi della scuola tennis, in un file solo. */
     private val schoolFile: File get() = File(app.filesDir, "club_school.json")
 

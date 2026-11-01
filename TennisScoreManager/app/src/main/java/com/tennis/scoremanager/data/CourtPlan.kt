@@ -101,6 +101,8 @@ data class CourtBlock(
     val tournament: String? = null,
     /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
     val course: String? = null,
+    /** La squadra il cui incontro in casa l'ha creato. */
+    val team: String? = null,
 )
 
 @Serializable

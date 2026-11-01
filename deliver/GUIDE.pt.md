@@ -515,6 +515,16 @@ Com o papel **Clube**, em **Jogadores › Escola de tênis**.
 - **Aulas**: o calendário vem dos horários. Toque numa aula para a **chamada** (quem estava) ou para marcá-la **cancelada** (chuva, feriado…); **Cancelar e avisar os alunos** prepara a mensagem com dia e hora. *Avisar os alunos* envia uma mensagem livre. Aos menores se escreve ao responsável.
 - **Mensalidades**: para cada mês da temporada (ou a temporada) **Cobrar dos alunos** atribui a mensalidade a quem ainda não tem; vê-se quantos pagaram e recebe-se como as outras mensalidades, com recibo.
 
+### 7.17 Equipes e campeonatos (app 2.6)
+
+Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
+
+- **Nova equipe**: nome, campeonato, temporada, **campeonato FITP** (verificam-se cartão e atestado de competição do dia do confronto), formato (quantas simples e duplas por confronto), capitão. No **Elenco** adicionam-se os jogadores na ordem da lista; em vermelho quem não está em ordem para o próximo confronto. O retrospecto (vitórias, derrotas, empates) fica ao lado do nome.
+- **Novo confronto**: adversário, dia e hora, em casa ou fora, onde se joga, **ponto de encontro**, notas. Em casa dá para **reservar quadras** por algumas horas: na agenda ficam não reserváveis.
+- **Disponibilidade**: *Pedir disponibilidade a todos* envia a mensagem (respondem SIM, NÃO ou TALVEZ); as respostas se marcam com um toque, e *Pedir a quem não respondeu* insiste só com eles.
+- **Convocados**: primeiro quem disse sim, depois os talvez; em vermelho quem não está em ordem naquele dia. **Enviar a convocação** escreve a cada um dia, hora, local e ponto de encontro, e prepara para o grupo a lista dos convocados.
+- **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu) ou **Jogar com o marcador**, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

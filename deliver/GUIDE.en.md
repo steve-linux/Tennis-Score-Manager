@@ -515,6 +515,16 @@ With the **Club** role, under **Players › Tennis school**.
 - **Lessons**: the calendar comes from the times. Tap a lesson to take the **register** (who was there) or mark it **cancelled** (rain, holiday…); **Cancel and notify the students** prepares the message with day and time. *Notify the students* sends a free message. Under-18s are written to via the parent.
 - **Fees**: for each month of the season (or the season) **Charge the students** gives the fee to whoever doesn't have it yet; you see how many paid and collect it like the other fees, with a receipt.
 
+### 7.17 Teams and leagues (app 2.6)
+
+With the **Club** role, under **Tournaments › Teams and leagues**.
+
+- **New team**: name, championship, season, **FITP championship** (competitive card and competitive certificate for the match day are checked), format (how many singles and doubles per fixture), captain. In **Roster** you add players and put them in list order; in red whoever isn't in order for the next fixture. The record (won, lost, drawn) is next to the name.
+- **New fixture**: opponent, day and time, home or away, where it's played, **meeting point**, notes. At home you can **hold courts** for some hours: they become not bookable in the planner.
+- **Availability**: *Ask everyone's availability* sends the message (they reply YES, NO or MAYBE); you mark answers with a tap, and *Ask those who haven't replied* reminds only them.
+- **Called up**: first those who said yes, then the maybes; in red whoever isn't in order that day. **Send the call-up** writes to each player day, time, place and meeting point, and prepares the call-up list for the group.
+- **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won) or **Play with the scorer**, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
