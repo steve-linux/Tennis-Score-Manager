@@ -1479,6 +1479,14 @@ object DeStrings : Strings {
     override val setupPickPlayer = "Spieler wählen"
     override val setupChange = "Ändern"
     override val setupNotInDb: (String) -> String = { "$it ist nicht in der Datenbank: aus der Liste wählen oder anlegen." }
+    override val playerHeight = "Größe (cm)"
+    override val playerWeight = "Gewicht (kg)"
+    override val playerBodyHint = "Mit Geburtsdatum und Geschlecht dienen sie den Kalorien des Brustgurts."
+    override val playerClub = "Heimatverein"
+    override val playerBackhand = "Rückhand"
+    override val backhandOne = "1 Hand"
+    override val backhandTwo = "2 Hände"
+    override val playerAge: (Int) -> String = { "$it Jahre" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

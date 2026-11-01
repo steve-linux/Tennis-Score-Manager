@@ -8,6 +8,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class Hand { RIGHT, LEFT }
 
+/** Il rovescio: a una mano o a due. */
+@Serializable
+enum class Backhand { ONE, TWO }
+
 /**
  * Un giocatore del database: chi gioca le partite e chi si allena. Ha un identificativo casuale (UUID) che resta lo
  * stesso su ogni telefono, così le partite passate da un telefono all'altro restano sue anche con un omonimo. Gli
@@ -39,6 +43,14 @@ data class PlayerProfile(
     val birth: Long? = null,
     /** Socio del circolo (null = non è socio). */
     val member: Membership? = null,
+    /** "M", "F" o "" (non detto): il ritratto quando manca la foto. */
+    val sex: String = "",
+    /** Altezza e peso: con la data di nascita servono alle calorie della fascia cardio. */
+    val heightCm: Int? = null,
+    val weightKg: Int? = null,
+    /** Il circolo in cui gioca (anche un altro dal nostro). */
+    val club: String = "",
+    val backhand: Backhand? = null,
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")

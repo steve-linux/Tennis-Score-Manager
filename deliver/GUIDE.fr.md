@@ -418,6 +418,17 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un identifiant qui reste le même sur chaque téléphone : statistiques, classement et historique sont à cette personne même avec un homonyme, y compris après avoir passé des matchs d'un téléphone à l'autre.
 
 - **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
+- **La fiche** (*Nouveau joueur* ou *Modifier*) : seuls **prénom et nom** sont obligatoires ; le reste est facultatif, mais chaque donnée a sa raison :
+  - **Surnom** : c'est le nom qu'on voit et qu'on entend pendant le match, sur le tableau et dans la voix (« Rossi » au lieu de « Mario Rossi »).
+  - **Photo** et **homme/femme** : la photo apparaît dans Nouveau match, l'Historique, le résumé et sur le tableau TV ; sans photo, homme/femme choisit le portrait. Homme/femme sert aussi aux calories.
+  - **Date de naissance** : l'âge s'affiche dans la fiche et sert aux calories ; pour les adhérents, elle dit s'il est mineur (avis au parent, consentements).
+  - **Taille et poids** : avec l'âge et le sexe, ils font calculer tout seuls les **calories de la ceinture cardio** quand le joueur joue ou, si c'est le vôtre, s'entraîne (sans eux, l'appli les demande à part ou ne les calcule pas).
+  - **Club d'appartenance** : visible dans la fiche ; utile pour les invités et les adversaires d'autres clubs, pour savoir qui ils sont.
+  - **Main et revers** (à une ou deux mains) : décrivent le joueur dans sa fiche, utile à l'entraîneur ; l'analyse du mouvement reconnaît toute seule le bras qui frappe.
+  - **Élève** : le met parmi les élèves de l'entraîneur (S'entraîner › Élèves, *Qui s'entraîne*), avec séances, mouvement et bilan.
+  - **Téléphone et e-mail** : servent aux **avis** (WhatsApp, SMS, e-mail : tournois, cotisations, convocations) même s'il n'est pas adhérent.
+  - **Raquette** : accompagne chaque séance et match tels qu'ils étaient ce jour-là (cordage et tension) et on en compare les statistiques ; si elle n'existe pas, *Nouvelle raquette* la crée depuis là.
+  - Classement, licences et certificat ne sont pas ici : ils sont dans les *Données de l'adhérent*, car ils servent aux tournois et aux cotisations.
 - **Nouveau match** : sur le terrain vont les joueurs de la base. Chaque place a **Choisir le joueur**, qui ouvre la liste avec la recherche (d'abord adhérents et élèves ; ceux déjà sur le terrain n'y sont pas) et en haut **Nouveau joueur**, qui demande prénom, nom et le reste puis le met sur le terrain ; dessous, les joueurs récents à toucher. Une fois choisi, la place montre photo et nom avec **Changer** et la **X** ; le classement d'un adhérent se remplit tout seul. Un ancien nom sans fiche (revanches, vieux matchs) doit être choisi dans la liste ou créé avant *Suivant*.
 - **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
 - **Plus › Joueurs** : tous, avec la recherche ; **Nouveau joueur** en crée un avec ses données (un élève aussi : activez ensuite *Élève* dans la fiche) ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :

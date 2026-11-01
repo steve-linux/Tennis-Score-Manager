@@ -629,6 +629,17 @@ Ein Telefon auf dem Stativ filmt den Aufschläger; das Armband am Handgelenk erk
 Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit einer Kennung, die auf jedem Telefon gleich bleibt: Statistik, Rating und Verlauf gehören dieser Person auch bei einem Namensvetter, auch nachdem Matches von einem Telefon aufs andere gewandert sind.
 
 - **Vorname, Nachname und Spitzname**: Vor- und Nachname sind Pflicht und kennzeichnen die Person; der **Spitzname** (freiwillig) ist, wie man sie auf dem Platz nennt: Match, Anzeigetafel, Ansage und Statistik verwenden den Spitznamen, wenn es einen gibt, sonst Vor- und Nachname. Aus dem Verlauf entstandene Spieler haben nur einen Namen, der zum Spitznamen wird: unter *Spieler* sind sie *unvollständig*, und die Karte bietet **Vor- und Nachname ergänzen**.
+- **Die Karte** (*Neuer Spieler* oder *Bearbeiten*): Pflicht sind nur **Vor- und Nachname**; der Rest ist freiwillig, aber jedes Feld hat seinen Zweck:
+  - **Spitzname**: der Name, den man im Match, auf der Anzeigetafel und in der Ansage sieht und hört („Rossi“ statt „Mario Rossi“).
+  - **Foto** und **Mann/Frau**: Das Foto erscheint in Neues Match, im Verlauf, in der Zusammenfassung und auf der TV-Anzeigetafel; ohne Foto wählt Mann/Frau das Porträt. Mann/Frau dient auch den Kalorien.
+  - **Geburtsdatum**: Das Alter steht in der Karte und dient den Kalorien; bei Mitgliedern entscheidet es, ob jemand minderjährig ist (Nachrichten an die Eltern, Einwilligungen).
+  - **Größe und Gewicht**: Mit Alter und Geschlecht rechnen sie die **Kalorien des Brustgurts** von selbst, wenn der Spieler spielt oder, wenn es deiner ist, trainiert (ohne fragt die App getrennt danach oder rechnet sie nicht).
+  - **Heimatverein**: steht in der Karte; nützlich bei Gästen und Gegnern aus anderen Vereinen, um zu wissen, wer sie sind.
+  - **Hand und Rückhand** (ein- oder beidhändig): beschreiben den Spieler in seiner Karte, nützlich für den Trainer; die Bewegungsanalyse erkennt den Schlagarm von selbst.
+  - **Schüler**: nimmt ihn unter die Schüler des Trainers auf (Trainieren › Schüler, *Wer trainiert*), mit Einheiten, Bewegung und Bericht.
+  - **Telefon und E-Mail**: für die **Nachrichten** (WhatsApp, SMS, E-Mail: Turniere, Beiträge, Aufstellungen), auch wenn er kein Mitglied ist.
+  - **Schläger**: geht mit jeder Einheit und jedem Match so mit, wie er an dem Tag war (Saiten und Spannung), und seine Statistiken werden verglichen; gibt es ihn noch nicht, legt *Neuer Schläger* ihn dort an.
+  - Rangliste, Ausweise und Attest stehen nicht hier, sondern in den *Mitgliedsdaten*, weil sie für Turniere und Beiträge gebraucht werden.
 - **Neues Match**: auf den Platz kommen Spieler aus der Datenbank. Jeder Platz hat **Spieler wählen**, das die Liste mit Suche öffnet (zuerst Mitglieder und Schüler; wer schon auf dem Platz ist, fehlt) und oben **Neuer Spieler**, das Vorname, Nachname und den Rest abfragt und ihn dann aufstellt; darunter die letzten Spieler zum Antippen. Gewählt zeigt der Platz Foto und Namen mit **Ändern** und dem **X**; die Rangliste eines Mitglieds trägt sich selbst ein. Ein alter Name ohne Karte (Revanchen, alte Matches) muss vor *Weiter* aus der Liste gewählt oder angelegt werden.
 - **Beim ersten Start** legt die App für jeden Namen der bisherigen Matches einen Spieler an.
 - **Mehr › Spieler**: alle, mit Suche; **Neuer Spieler** legt einen mit seinen Daten an (auch einen Schüler: dann in der Karte *Schüler* einschalten); *gleicher Name* in Orange, wo zwei Spieler denselben Namen haben. Die Karte ist die der Schüler (7.6), dazu:
@@ -1122,6 +1133,17 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 Everyone who plays or practises is a **player** in the database, with an ID that stays the same on every phone: statistics, rating and history belong to that person even with a namesake, also after matches have moved from one phone to another.
 
 - **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
+- **The card** (*New player* or *Edit*): only **first and last name** are required; the rest is optional, but each has its reason:
+  - **Nickname**: it's the name seen and heard in the match, on the scoreboard and in the voice ("Rossi" instead of "Mario Rossi").
+  - **Photo** and **man/woman**: the photo shows in New match, History, the summary and on the TV scoreboard; without a photo, man/woman picks the portrait. Man/woman is also used for calories.
+  - **Date of birth**: the age shows on the card and is used for calories; for members it decides whether they're under 18 (notices to the parent, consents).
+  - **Height and weight**: with age and sex they let the **heart strap's calories** be worked out by themselves when the player plays or, if it's yours, trains (without them the app asks separately or doesn't calculate them).
+  - **Home club**: shown on the card; useful for guests and opponents from other clubs, to know who they are.
+  - **Hand and backhand** (one or two hands): describe the player on their card, useful to the coach; the movement analysis recognises the hitting arm by itself.
+  - **Student**: puts them among the coach's students (Practice › Students, *Who's practising*), with sessions, movement and report.
+  - **Phone and email**: used for **notices** (WhatsApp, SMS, email: tournaments, fees, call-ups) even if they're not a member.
+  - **Racket**: goes with every session and match as it was that day (strings and tension) and its statistics are compared; if it isn't there, *New racket* creates it from there.
+  - Ranking, cards and certificate aren't here: they're in the *Member details*, because they're used for tournaments and fees.
 - **New match**: the players on court come from the database. Each place has **Pick the player**, which opens the list with search (members and students first; whoever is already on court isn't there) and at the top **New player**, which asks for first name, last name and the rest and then puts them on court; below, recent players to tap. Once picked, the place shows photo and name with **Change** and the **X**; a member's ranking fills itself in. An old name without a card (rematches, old matches) must be picked from the list or created before *Next*.
 - **At the first start** the app creates a player for every name in the matches already played.
 - **More › Players**: everyone, with search; **New player** creates one with their details (a student too: then switch on *Student* on the card); *same name* in orange where two players share a name. The card is the students' one (7.6) plus:
@@ -1614,6 +1636,17 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 Cada persona que juega o entrena es un **jugador** de la base, con un identificador que sigue siendo el mismo en cada teléfono: estadísticas, rating e historial son de esa persona aunque haya un homónimo, también después de pasar partidos de un teléfono a otro.
 
 - **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
+- **La ficha** (*Nuevo jugador* o *Editar*): solo **nombre y apellido** son obligatorios; el resto es opcional, pero cada dato tiene su porqué:
+  - **Apodo**: es el nombre que se ve y se oye en el partido, en el marcador y en la voz («Rossi» en vez de «Mario Rossi»).
+  - **Foto** y **hombre/mujer**: la foto aparece en Nuevo partido, en el Historial, en el resumen y en el marcador de la TV; sin foto, hombre/mujer elige el retrato. Hombre/mujer sirve también para las calorías.
+  - **Fecha de nacimiento**: la edad se ve en la ficha y sirve para las calorías; en los socios decide si es menor (avisos al padre o la madre, consentimientos).
+  - **Altura y peso**: con edad y sexo hacen que las **calorías de la banda cardio** se calculen solas cuando el jugador juega o, si eres tú, entrena (sin ellos la app las pide aparte o no las calcula).
+  - **Club de pertenencia**: se ve en la ficha; útil para invitados y rivales de otros clubes, para saber quiénes son.
+  - **Mano y revés** (a una o dos manos): describen al jugador en su ficha, útil para el entrenador; el análisis del movimiento reconoce solo el brazo que golpea.
+  - **Alumno**: lo pone entre los alumnos del entrenador (Entrenar › Alumnos, *Quién entrena*), con sesiones, movimiento e informe.
+  - **Teléfono y correo**: sirven para los **avisos** (WhatsApp, SMS, correo: torneos, cuotas, convocatorias) aunque no sea socio.
+  - **Raqueta**: va con cada sesión y partido tal como estaba ese día (cuerdas y tensión) y se comparan sus estadísticas; si no existe, *Nueva raqueta* la crea desde ahí.
+  - Clasificación, licencias y certificado no están aquí: están en los *Datos del socio*, porque sirven para torneos y cuotas.
 - **Nuevo partido**: en la pista van jugadores de la base de datos. Cada puesto tiene **Elegir el jugador**, que abre la lista con búsqueda (primero socios y alumnos; quien ya está en pista no aparece) y arriba **Jugador nuevo**, que pide nombre, apellido y lo demás y luego lo pone en pista; debajo, los jugadores recientes para tocar. Elegido, el puesto muestra foto y nombre con **Cambiar** y la **X**; la clasificación de un socio se rellena sola. Un nombre antiguo sin ficha (revanchas, partidos viejos) hay que elegirlo de la lista o crearlo antes de *Siguiente*.
 - **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
 - **Más › Jugadores**: todos, con búsqueda; **Nuevo jugador** crea uno con sus datos (también un alumno: luego activa *Alumno* en la ficha); *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:
@@ -2106,6 +2139,17 @@ Un téléphone sur trépied filme le serveur ; le bracelet au poignet reconnaît
 Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un identifiant qui reste le même sur chaque téléphone : statistiques, classement et historique sont à cette personne même avec un homonyme, y compris après avoir passé des matchs d'un téléphone à l'autre.
 
 - **Prénom, nom et surnom** : prénom et nom sont obligatoires et identifient la personne ; le **surnom** (facultatif) est la façon de l'appeler sur le court : match, tableau, voix et statistiques utilisent le surnom s'il y en a un, sinon prénom et nom. Les joueurs nés de l'historique n'ont qu'un nom, qui devient le surnom : dans *Joueurs* ils sont *à compléter* et la fiche propose **Compléter prénom et nom**.
+- **La fiche** (*Nouveau joueur* ou *Modifier*) : seuls **prénom et nom** sont obligatoires ; le reste est facultatif, mais chaque donnée a sa raison :
+  - **Surnom** : c'est le nom qu'on voit et qu'on entend pendant le match, sur le tableau et dans la voix (« Rossi » au lieu de « Mario Rossi »).
+  - **Photo** et **homme/femme** : la photo apparaît dans Nouveau match, l'Historique, le résumé et sur le tableau TV ; sans photo, homme/femme choisit le portrait. Homme/femme sert aussi aux calories.
+  - **Date de naissance** : l'âge s'affiche dans la fiche et sert aux calories ; pour les adhérents, elle dit s'il est mineur (avis au parent, consentements).
+  - **Taille et poids** : avec l'âge et le sexe, ils font calculer tout seuls les **calories de la ceinture cardio** quand le joueur joue ou, si c'est le vôtre, s'entraîne (sans eux, l'appli les demande à part ou ne les calcule pas).
+  - **Club d'appartenance** : visible dans la fiche ; utile pour les invités et les adversaires d'autres clubs, pour savoir qui ils sont.
+  - **Main et revers** (à une ou deux mains) : décrivent le joueur dans sa fiche, utile à l'entraîneur ; l'analyse du mouvement reconnaît toute seule le bras qui frappe.
+  - **Élève** : le met parmi les élèves de l'entraîneur (S'entraîner › Élèves, *Qui s'entraîne*), avec séances, mouvement et bilan.
+  - **Téléphone et e-mail** : servent aux **avis** (WhatsApp, SMS, e-mail : tournois, cotisations, convocations) même s'il n'est pas adhérent.
+  - **Raquette** : accompagne chaque séance et match tels qu'ils étaient ce jour-là (cordage et tension) et on en compare les statistiques ; si elle n'existe pas, *Nouvelle raquette* la crée depuis là.
+  - Classement, licences et certificat ne sont pas ici : ils sont dans les *Données de l'adhérent*, car ils servent aux tournois et aux cotisations.
 - **Nouveau match** : sur le terrain vont les joueurs de la base. Chaque place a **Choisir le joueur**, qui ouvre la liste avec la recherche (d'abord adhérents et élèves ; ceux déjà sur le terrain n'y sont pas) et en haut **Nouveau joueur**, qui demande prénom, nom et le reste puis le met sur le terrain ; dessous, les joueurs récents à toucher. Une fois choisi, la place montre photo et nom avec **Changer** et la **X** ; le classement d'un adhérent se remplit tout seul. Un ancien nom sans fiche (revanches, vieux matchs) doit être choisi dans la liste ou créé avant *Suivant*.
 - **Au premier démarrage** l'appli crée un joueur pour chaque nom des matchs déjà joués.
 - **Plus › Joueurs** : tous, avec la recherche ; **Nouveau joueur** en crée un avec ses données (un élève aussi : activez ensuite *Élève* dans la fiche) ; *homonyme* en orange quand deux joueurs ont le même nom. La fiche est celle des élèves (7.6) avec en plus :
@@ -2598,6 +2642,17 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
 
 - **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **La scheda** (*Nuovo giocatore* o *Modifica*): obbligatori solo **nome e cognome**; il resto è facoltativo, ma ognuno ha il suo perché:
+  - **Soprannome**: è il nome che si vede e si sente in partita, sul tabellone e nella voce ("Rossi" invece di "Mario Rossi").
+  - **Foto** e **uomo/donna**: la foto compare in Nuova partita, nello Storico, nel riepilogo e sul tabellone TV; senza foto, uomo/donna sceglie il ritratto. Uomo/donna serve anche alle calorie.
+  - **Data di nascita**: l'età si vede nella scheda e serve alle calorie; per i soci decide se è minorenne (avvisi al genitore, consensi).
+  - **Altezza e peso**: con età e sesso fanno calcolare da sole le **calorie della fascia cardio** quando il giocatore gioca o, se è il tuo, si allena (senza, l'app le chiede a parte o non le calcola).
+  - **Circolo di appartenenza**: si vede nella scheda; utile per gli ospiti e per gli avversari di altri circoli, per sapere chi sono.
+  - **Mano e rovescio** (a una o due mani): descrivono il giocatore nella sua scheda, utile all'allenatore; l'analisi del movimento riconosce da sola il braccio che colpisce.
+  - **Allievo**: lo mette tra gli allievi dell'allenatore (Allenati › Allievi, *Chi si allena*), con sessioni, movimento e report.
+  - **Telefono ed email**: servono agli **avvisi** (WhatsApp, SMS, email: tornei, quote, convocazioni) anche se non è socio.
+  - **Racchetta**: va con ogni sua sessione e partita com'era quel giorno (corde e tensione) e se ne confrontano le statistiche; se non c'è, *Nuova racchetta* la crea da lì.
+  - Classifica, tessere e certificato non sono qui: sono nei *Dati del socio*, perché servono ai tornei e alle quote.
 - **Nuova partita**: in campo vanno i giocatori del database. Ogni posto ha **Scegli il giocatore**, che apre l'elenco con la ricerca (prima soci e allievi; chi è già in campo non c'è) e in cima **Giocatore nuovo**, che chiede nome, cognome e il resto e poi lo mette in campo; sotto, i giocatori recenti da toccare al volo. Scelto, il posto mostra foto e nome con **Cambia** e la **X**; la classifica di un socio si scrive da sola. Un nome di prima senza scheda (rivincite, partite vecchie) va scelto dall'elenco o creato prima di *Avanti*.
 - **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
 - **Altro › Giocatori**: tutti, con la ricerca; **Nuovo giocatore** ne crea uno coi suoi dati (anche un allievo: poi nella scheda si accende *Allievo*); *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:
@@ -3090,6 +3145,17 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador que continua o mesmo em cada telefone: estatísticas, rating e histórico são dessa pessoa mesmo com um homônimo, também depois de passar partidas de um telefone para outro.
 
 - **Nome, sobrenome e apelido**: nome e sobrenome são obrigatórios e identificam a pessoa; o **apelido** (opcional) é como ela é chamada em quadra: partida, placar, voz e estatísticas usam o apelido se houver, senão nome e sobrenome. Os jogadores nascidos do histórico têm um nome só, que vira o apelido: em *Jogadores* aparecem *a completar* e a ficha oferece **Completar nome e sobrenome**.
+- **A ficha** (*Novo jogador* ou *Editar*): só **nome e sobrenome** são obrigatórios; o resto é opcional, mas cada dado tem o seu motivo:
+  - **Apelido**: é o nome que se vê e se ouve na partida, no placar e na voz ("Rossi" em vez de "Mario Rossi").
+  - **Foto** e **homem/mulher**: a foto aparece em Nova partida, no Histórico, no resumo e no placar da TV; sem foto, homem/mulher escolhe o retrato. Homem/mulher também serve para as calorias.
+  - **Data de nascimento**: a idade aparece na ficha e serve para as calorias; para os sócios, decide se é menor (avisos ao responsável, consentimentos).
+  - **Altura e peso**: com idade e sexo fazem as **calorias da cinta cardíaca** se calcularem sozinhas quando o jogador joga ou, se é você, treina (sem eles o app pede à parte ou não calcula).
+  - **Clube de origem**: aparece na ficha; útil para convidados e adversários de outros clubes, para saber quem são.
+  - **Mão e backhand** (com uma ou duas mãos): descrevem o jogador na ficha, útil para o treinador; a análise do movimento reconhece sozinha o braço que bate.
+  - **Aluno**: coloca-o entre os alunos do treinador (Treinar › Alunos, *Quem treina*), com sessões, movimento e relatório.
+  - **Telefone e e-mail**: servem para os **avisos** (WhatsApp, SMS, e-mail: torneios, mensalidades, convocações) mesmo que não seja sócio.
+  - **Raquete**: vai com cada sessão e partida como estava naquele dia (cordas e tensão) e comparam-se as estatísticas; se não existe, *Nova raquete* cria-a dali.
+  - Ranking, cartões e atestado não ficam aqui: ficam nos *Dados do sócio*, porque servem para torneios e mensalidades.
 - **Nova partida**: em quadra vão jogadores do banco de dados. Cada posição tem **Escolher o jogador**, que abre a lista com pesquisa (primeiro sócios e alunos; quem já está em quadra não aparece) e no alto **Jogador novo**, que pede nome, sobrenome e o resto e depois o coloca em quadra; embaixo, os jogadores recentes para tocar. Escolhido, a posição mostra foto e nome com **Trocar** e o **X**; o ranking de um sócio se preenche sozinho. Um nome antigo sem ficha (revanches, partidas velhas) precisa ser escolhido na lista ou criado antes de *Avançar*.
 - **Na primeira abertura** o app cria um jogador para cada nome das partidas já jogadas.
 - **Mais › Jogadores**: todos, com pesquisa; **Novo jogador** cria um com os dados dele (também um aluno: depois ative *Aluno* na ficha); *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
@@ -5135,6 +5201,7 @@ class MatchController(
             aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
             hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
             phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
+            sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
@@ -6197,6 +6264,14 @@ class MatchController(
         setHeartProfile(Side.P2, prof[Side.P1])
     }
 
+    /** I dati per le calorie dalla scheda del giocatore (età, peso, sesso); null se ne manca uno. */
+    fun heartProfileOf(p: com.tennis.scoremanager.data.PlayerProfile?): HeartProfile? {
+        p ?: return null
+        val age = com.tennis.scoremanager.data.Members.age(p.birth, System.currentTimeMillis()) ?: return null
+        val kg = p.weightKg ?: return null
+        return HeartProfile(age, kg, female = p.sex == "F")
+    }
+
     fun setHeartProfile(side: Side, p: HeartProfile?) {
         storage.setHeartProfile(side == Side.P1, p)
         heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
@@ -6336,6 +6411,9 @@ class MatchController(
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
         // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
         val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
+        // Chi ha età e peso nella scheda: le calorie della fascia cardio li prendono da lì.
+        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(Side.P1, it) }
+        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(Side.P2, it) }
         if (created.isNotEmpty()) {
             val list = players.value + created
             players.value = list.sortedBy { it.name.lowercase() }
@@ -6950,6 +7028,8 @@ class MatchController(
         val straps = heart.straps.value
         val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
+        // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
+        heartProfileOf(me())?.let { setHeartProfile(side, it) }
         workoutUse = racketById(workoutRacket.value)?.use()
         workout.start(side, straps[side]?.name)
         MatchService.start(app)
@@ -15700,6 +15780,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class Hand { RIGHT, LEFT }
 
+/** Il rovescio: a una mano o a due. */
+@Serializable
+enum class Backhand { ONE, TWO }
+
 /**
  * Un giocatore del database: chi gioca le partite e chi si allena. Ha un identificativo casuale (UUID) che resta lo
  * stesso su ogni telefono, così le partite passate da un telefono all'altro restano sue anche con un omonimo. Gli
@@ -15731,6 +15815,14 @@ data class PlayerProfile(
     val birth: Long? = null,
     /** Socio del circolo (null = non è socio). */
     val member: Membership? = null,
+    /** "M", "F" o "" (non detto): il ritratto quando manca la foto. */
+    val sex: String = "",
+    /** Altezza e peso: con la data di nascita servono alle calorie della fascia cardio. */
+    val heightCm: Int? = null,
+    val weightKg: Int? = null,
+    /** Il circolo in cui gioca (anche un altro dal nostro). */
+    val club: String = "",
+    val backhand: Backhand? = null,
 ) {
     /** Nome e cognome, per esteso. */
     val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")
@@ -23378,6 +23470,17 @@ fun PlayerEditDialog(
     var racket by remember { mutableStateOf(player?.racket) }
     var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
     val rackets by c.rackets.collectAsState()
+    // Il resto della scheda: sesso (prima era solo per nome), nascita, fisico, circolo, rovescio, allievo, contatti.
+    var sex by remember { mutableStateOf(player?.sex?.ifBlank { null } ?: player?.let { c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(it.name)) }.orEmpty()) }
+    var birth by remember { mutableStateOf(player?.birth) }
+    var height by remember { mutableStateOf(player?.heightCm?.toString().orEmpty()) }
+    var weight by remember { mutableStateOf(player?.weightKg?.toString().orEmpty()) }
+    var club by remember { mutableStateOf(player?.club.orEmpty()) }
+    var backhand by remember { mutableStateOf(player?.backhand) }
+    var student by remember { mutableStateOf(player?.student ?: asStudent) }
+    var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
+    var email by remember { mutableStateOf(player?.email.orEmpty()) }
+    val lang = c.options.value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
     val players by c.players.collectAsState()
@@ -23390,6 +23493,12 @@ fun PlayerEditDialog(
         title = { Text(if (player != null) s.studentEdit else if (asStudent) s.studentNew else s.playerNewTitle) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // La foto (la stessa di partite, Storico e tabellone): si tocca per metterla.
+                val shown = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick)
+                if (shown.isNotBlank()) Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    EditablePlayerAvatar(c, shown, TsmColors.Ball, 64.dp)
+                    Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(start = 10.dp))
+                }
                 field(first, s.playerFirstName) { first = it }
                 field(last, s.playerLastName) { last = it }
                 field(nick, s.playerNickname) { nick = it }
@@ -23426,9 +23535,31 @@ fun PlayerEditDialog(
                 // Un altro con lo stesso nome e cognome: si può (omonimo), ma lo si dice.
                 val twins = com.tennis.scoremanager.data.Players.sameFullName(players, first, last, except = player?.id ?: existing?.id)
                 if (first.isNotBlank() && last.isNotBlank() && twins.isNotEmpty()) Text(s.playerTwinWarning("${first.trim()} ${last.trim()}"), color = TsmColors.Orange, fontSize = 12.sp)
+                Segmented(listOf(SegOption("—"), SegOption(s.heartMale), SegOption(s.heartFemale)), listOf("", "M", "F").indexOf(sex).coerceAtLeast(0), { sex = listOf("", "M", "F")[it] })
+                com.tennis.scoremanager.ui.screens.DateButton(s.memberBirth + (com.tennis.scoremanager.data.Members.age(birth, System.currentTimeMillis())?.let { " (${s.playerAge(it)})" } ?: ""), birth, lang) { birth = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    androidx.compose.material3.OutlinedTextField(height, { v -> height = v.filter(Char::isDigit).take(3) }, Modifier.weight(1f), singleLine = true, label = { Text(s.playerHeight) },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                    androidx.compose.material3.OutlinedTextField(weight, { v -> weight = v.filter(Char::isDigit).take(3) }, Modifier.weight(1f), singleLine = true, label = { Text(s.playerWeight) },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                }
+                Text(s.playerBodyHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                field(club, s.playerClub) { club = it }
+                // Il nostro circolo, con un tocco.
+                val ours = c.storage.clubName
+                if (ours.isNotBlank() && club != ours) Text(ours, color = TsmColors.Ball, fontSize = 13.sp,
+                    modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { club = ours }.padding(horizontal = 10.dp, vertical = 6.dp))
                 Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
                 val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
+                Text(s.playerBackhand, color = TsmColors.TextDim, fontSize = 13.sp)
+                val bhs = listOf(null, com.tennis.scoremanager.data.Backhand.ONE, com.tennis.scoremanager.data.Backhand.TWO)
+                Segmented(listOf(SegOption("—"), SegOption(s.backhandOne), SegOption(s.backhandTwo)), bhs.indexOf(backhand), { backhand = bhs[it] })
+                SwitchRow(androidx.compose.material.icons.Icons.Filled.SportsTennis, s.playerStudentToggle, s.playerStudentToggleHint, student) { student = it }
+                androidx.compose.material3.OutlinedTextField(phone, { phone = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberPhone) },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
+                androidx.compose.material3.OutlinedTextField(email, { email = it.trim().take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberEmail) },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email))
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
                 Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -23449,9 +23580,13 @@ fun PlayerEditDialog(
                 val p = base.copy(
                     firstName = first.trim(), lastName = last.trim(), nickname = nick.trim(),
                     name = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
-                    hand = hand, racket = racket, student = base.student || asStudent && player == null,
+                    hand = hand, racket = racket, student = student,
+                    sex = sex, birth = birth, heightCm = height.toIntOrNull(), weightKg = weight.toIntOrNull(), club = club.trim(), backhand = backhand,
+                    phone = phone.trim(), email = email.trim(),
                 )
                 c.savePlayer(p)
+                // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
+                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.setPlayerSex(p.name, sex)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
                 racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
                 onDone(p)
@@ -25216,6 +25351,14 @@ interface Strings {
     val setupPickPlayer: String
     val setupChange: String
     val setupNotInDb: (String) -> String
+    val playerHeight: String
+    val playerWeight: String
+    val playerBodyHint: String
+    val playerClub: String
+    val playerBackhand: String
+    val backhandOne: String
+    val backhandTwo: String
+    val playerAge: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -26993,6 +27136,14 @@ object ItStrings : Strings {
     override val setupPickPlayer = "Scegli il giocatore"
     override val setupChange = "Cambia"
     override val setupNotInDb: (String) -> String = { "$it non è nel database: sceglilo dall'elenco o crealo." }
+    override val playerHeight = "Altezza (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Con data di nascita e sesso servono alle calorie della fascia cardio."
+    override val playerClub = "Circolo di appartenenza"
+    override val playerBackhand = "Rovescio"
+    override val backhandOne = "1 mano"
+    override val backhandTwo = "2 mani"
+    override val playerAge: (Int) -> String = { "$it anni" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -28753,6 +28904,14 @@ object EnStrings : Strings {
     override val setupPickPlayer = "Pick the player"
     override val setupChange = "Change"
     override val setupNotInDb: (String) -> String = { "$it is not in the database: pick them from the list or create them." }
+    override val playerHeight = "Height (cm)"
+    override val playerWeight = "Weight (kg)"
+    override val playerBodyHint = "With date of birth and sex they're used for the heart strap's calories."
+    override val playerClub = "Home club"
+    override val playerBackhand = "Backhand"
+    override val backhandOne = "1 hand"
+    override val backhandTwo = "2 hands"
+    override val playerAge: (Int) -> String = { "$it years old" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -30536,6 +30695,14 @@ object DeStrings : Strings {
     override val setupPickPlayer = "Spieler wählen"
     override val setupChange = "Ändern"
     override val setupNotInDb: (String) -> String = { "$it ist nicht in der Datenbank: aus der Liste wählen oder anlegen." }
+    override val playerHeight = "Größe (cm)"
+    override val playerWeight = "Gewicht (kg)"
+    override val playerBodyHint = "Mit Geburtsdatum und Geschlecht dienen sie den Kalorien des Brustgurts."
+    override val playerClub = "Heimatverein"
+    override val playerBackhand = "Rückhand"
+    override val backhandOne = "1 Hand"
+    override val backhandTwo = "2 Hände"
+    override val playerAge: (Int) -> String = { "$it Jahre" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -32312,6 +32479,14 @@ object EsStrings : Strings {
     override val setupPickPlayer = "Elegir el jugador"
     override val setupChange = "Cambiar"
     override val setupNotInDb: (String) -> String = { "$it no está en la base de datos: elígelo de la lista o créalo." }
+    override val playerHeight = "Altura (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Con la fecha de nacimiento y el sexo sirven para las calorías de la banda cardio."
+    override val playerClub = "Club de pertenencia"
+    override val playerBackhand = "Revés"
+    override val backhandOne = "1 mano"
+    override val backhandTwo = "2 manos"
+    override val playerAge: (Int) -> String = { "$it años" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -34090,6 +34265,14 @@ object FrStrings : Strings {
     override val setupPickPlayer = "Choisir le joueur"
     override val setupChange = "Changer"
     override val setupNotInDb: (String) -> String = { "$it n'est pas dans la base : choisissez-le dans la liste ou créez-le." }
+    override val playerHeight = "Taille (cm)"
+    override val playerWeight = "Poids (kg)"
+    override val playerBodyHint = "Avec la date de naissance et le sexe, ils servent aux calories de la ceinture cardio."
+    override val playerClub = "Club d'appartenance"
+    override val playerBackhand = "Revers"
+    override val backhandOne = "1 main"
+    override val backhandTwo = "2 mains"
+    override val playerAge: (Int) -> String = { "$it ans" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -35869,6 +36052,14 @@ object PtStrings : Strings {
     override val setupPickPlayer = "Escolher o jogador"
     override val setupChange = "Trocar"
     override val setupNotInDb: (String) -> String = { "$it não está no banco de dados: escolha na lista ou crie." }
+    override val playerHeight = "Altura (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Com a data de nascimento e o sexo servem para as calorias da cinta cardíaca."
+    override val playerClub = "Clube de origem"
+    override val playerBackhand = "Backhand"
+    override val backhandOne = "1 mão"
+    override val backhandTwo = "2 mãos"
+    override val playerAge: (Int) -> String = { "$it anos" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -44571,7 +44762,17 @@ fun StudentScreen(c: MatchController) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
-            Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
+            Column(Modifier.padding(start = 12.dp)) {
+                // Età, fisico, circolo, rovescio: quello che c'è nella scheda.
+                val info = listOfNotNull(
+                    com.tennis.scoremanager.data.Members.age(st.birth, System.currentTimeMillis())?.let { s.playerAge(it) },
+                    listOfNotNull(st.heightCm?.let { "$it cm" }, st.weightKg?.let { "$it kg" }).joinToString(" · ").ifBlank { null },
+                    st.club.ifBlank { null },
+                    st.backhand?.let { s.playerBackhand + " " + if (it == com.tennis.scoremanager.data.Backhand.ONE) s.backhandOne else s.backhandTwo },
+                )
+                for (l in info) Text(l, color = TsmColors.TextMain, fontSize = 14.sp)
+                Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
         }
         // Sei tu? Il tuo giocatore è quello di Progressi, del rating e di Altro › Tu.
         if (c.me()?.id == st.id) Text(s.meIsYou, color = TsmColors.Ball, fontWeight = FontWeight.Bold)

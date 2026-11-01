@@ -1483,6 +1483,14 @@ object PtStrings : Strings {
     override val setupPickPlayer = "Escolher o jogador"
     override val setupChange = "Trocar"
     override val setupNotInDb: (String) -> String = { "$it não está no banco de dados: escolha na lista ou crie." }
+    override val playerHeight = "Altura (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Com a data de nascimento e o sexo servem para as calorias da cinta cardíaca."
+    override val playerClub = "Clube de origem"
+    override val playerBackhand = "Backhand"
+    override val backhandOne = "1 mão"
+    override val backhandTwo = "2 mãos"
+    override val playerAge: (Int) -> String = { "$it anos" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

@@ -418,6 +418,17 @@ Un teléfono en un trípode graba a quien saca; la pulsera en la muñeca reconoc
 Cada persona que juega o entrena es un **jugador** de la base, con un identificador que sigue siendo el mismo en cada teléfono: estadísticas, rating e historial son de esa persona aunque haya un homónimo, también después de pasar partidos de un teléfono a otro.
 
 - **Nombre, apellido y apodo**: nombre y apellido son obligatorios e identifican a la persona; el **apodo** (opcional) es como se la llama en la pista: partido, marcador, voz y estadísticas usan el apodo si lo hay, si no nombre y apellido. Los jugadores nacidos del historial tienen un solo nombre, que pasa a ser el apodo: en *Jugadores* están *por completar* y la ficha ofrece **Completar nombre y apellido**.
+- **La ficha** (*Nuevo jugador* o *Editar*): solo **nombre y apellido** son obligatorios; el resto es opcional, pero cada dato tiene su porqué:
+  - **Apodo**: es el nombre que se ve y se oye en el partido, en el marcador y en la voz («Rossi» en vez de «Mario Rossi»).
+  - **Foto** y **hombre/mujer**: la foto aparece en Nuevo partido, en el Historial, en el resumen y en el marcador de la TV; sin foto, hombre/mujer elige el retrato. Hombre/mujer sirve también para las calorías.
+  - **Fecha de nacimiento**: la edad se ve en la ficha y sirve para las calorías; en los socios decide si es menor (avisos al padre o la madre, consentimientos).
+  - **Altura y peso**: con edad y sexo hacen que las **calorías de la banda cardio** se calculen solas cuando el jugador juega o, si eres tú, entrena (sin ellos la app las pide aparte o no las calcula).
+  - **Club de pertenencia**: se ve en la ficha; útil para invitados y rivales de otros clubes, para saber quiénes son.
+  - **Mano y revés** (a una o dos manos): describen al jugador en su ficha, útil para el entrenador; el análisis del movimiento reconoce solo el brazo que golpea.
+  - **Alumno**: lo pone entre los alumnos del entrenador (Entrenar › Alumnos, *Quién entrena*), con sesiones, movimiento e informe.
+  - **Teléfono y correo**: sirven para los **avisos** (WhatsApp, SMS, correo: torneos, cuotas, convocatorias) aunque no sea socio.
+  - **Raqueta**: va con cada sesión y partido tal como estaba ese día (cuerdas y tensión) y se comparan sus estadísticas; si no existe, *Nueva raqueta* la crea desde ahí.
+  - Clasificación, licencias y certificado no están aquí: están en los *Datos del socio*, porque sirven para torneos y cuotas.
 - **Nuevo partido**: en la pista van jugadores de la base de datos. Cada puesto tiene **Elegir el jugador**, que abre la lista con búsqueda (primero socios y alumnos; quien ya está en pista no aparece) y arriba **Jugador nuevo**, que pide nombre, apellido y lo demás y luego lo pone en pista; debajo, los jugadores recientes para tocar. Elegido, el puesto muestra foto y nombre con **Cambiar** y la **X**; la clasificación de un socio se rellena sola. Un nombre antiguo sin ficha (revanchas, partidos viejos) hay que elegirlo de la lista o crearlo antes de *Siguiente*.
 - **En el primer arranque** la app crea un jugador por cada nombre de los partidos ya jugados.
 - **Más › Jugadores**: todos, con búsqueda; **Nuevo jugador** crea uno con sus datos (también un alumno: luego activa *Alumno* en la ficha); *homónimo* en naranja donde dos jugadores tienen el mismo nombre. La ficha es la de los alumnos (7.6) y además:

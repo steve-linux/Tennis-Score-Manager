@@ -161,7 +161,17 @@ fun StudentScreen(c: MatchController) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             EditablePlayerAvatar(c, st.name, TsmColors.Ball, 72.dp)
-            Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
+            Column(Modifier.padding(start = 12.dp)) {
+                // Età, fisico, circolo, rovescio: quello che c'è nella scheda.
+                val info = listOfNotNull(
+                    com.tennis.scoremanager.data.Members.age(st.birth, System.currentTimeMillis())?.let { s.playerAge(it) },
+                    listOfNotNull(st.heightCm?.let { "$it cm" }, st.weightKg?.let { "$it kg" }).joinToString(" · ").ifBlank { null },
+                    st.club.ifBlank { null },
+                    st.backhand?.let { s.playerBackhand + " " + if (it == com.tennis.scoremanager.data.Backhand.ONE) s.backhandOne else s.backhandTwo },
+                )
+                for (l in info) Text(l, color = TsmColors.TextMain, fontSize = 14.sp)
+                Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 13.sp)
+            }
         }
         // Sei tu? Il tuo giocatore è quello di Progressi, del rating e di Altro › Tu.
         if (c.me()?.id == st.id) Text(s.meIsYou, color = TsmColors.Ball, fontWeight = FontWeight.Bold)

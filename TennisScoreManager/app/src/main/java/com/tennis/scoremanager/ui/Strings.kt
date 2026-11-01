@@ -1518,6 +1518,14 @@ interface Strings {
     val setupPickPlayer: String
     val setupChange: String
     val setupNotInDb: (String) -> String
+    val playerHeight: String
+    val playerWeight: String
+    val playerBodyHint: String
+    val playerClub: String
+    val playerBackhand: String
+    val backhandOne: String
+    val backhandTwo: String
+    val playerAge: (Int) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3295,6 +3303,14 @@ object ItStrings : Strings {
     override val setupPickPlayer = "Scegli il giocatore"
     override val setupChange = "Cambia"
     override val setupNotInDb: (String) -> String = { "$it non è nel database: sceglilo dall'elenco o crealo." }
+    override val playerHeight = "Altezza (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Con data di nascita e sesso servono alle calorie della fascia cardio."
+    override val playerClub = "Circolo di appartenenza"
+    override val playerBackhand = "Rovescio"
+    override val backhandOne = "1 mano"
+    override val backhandTwo = "2 mani"
+    override val playerAge: (Int) -> String = { "$it anni" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5055,6 +5071,14 @@ object EnStrings : Strings {
     override val setupPickPlayer = "Pick the player"
     override val setupChange = "Change"
     override val setupNotInDb: (String) -> String = { "$it is not in the database: pick them from the list or create them." }
+    override val playerHeight = "Height (cm)"
+    override val playerWeight = "Weight (kg)"
+    override val playerBodyHint = "With date of birth and sex they're used for the heart strap's calories."
+    override val playerClub = "Home club"
+    override val playerBackhand = "Backhand"
+    override val backhandOne = "1 hand"
+    override val backhandTwo = "2 hands"
+    override val playerAge: (Int) -> String = { "$it years old" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

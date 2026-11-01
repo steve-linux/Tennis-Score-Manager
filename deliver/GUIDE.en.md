@@ -418,6 +418,17 @@ A phone on a tripod films the server; the wristband on the wrist recognises the 
 Everyone who plays or practises is a **player** in the database, with an ID that stays the same on every phone: statistics, rating and history belong to that person even with a namesake, also after matches have moved from one phone to another.
 
 - **First name, last name and nickname**: first and last name are required and identify the person; the **nickname** (optional) is what they are called on court: match, scoreboard, voice and statistics use the nickname if there is one, otherwise first and last name. Players born from the history have a single name, which becomes the nickname: in *Players* they are *to complete* and the card has **Complete first and last name**.
+- **The card** (*New player* or *Edit*): only **first and last name** are required; the rest is optional, but each has its reason:
+  - **Nickname**: it's the name seen and heard in the match, on the scoreboard and in the voice ("Rossi" instead of "Mario Rossi").
+  - **Photo** and **man/woman**: the photo shows in New match, History, the summary and on the TV scoreboard; without a photo, man/woman picks the portrait. Man/woman is also used for calories.
+  - **Date of birth**: the age shows on the card and is used for calories; for members it decides whether they're under 18 (notices to the parent, consents).
+  - **Height and weight**: with age and sex they let the **heart strap's calories** be worked out by themselves when the player plays or, if it's yours, trains (without them the app asks separately or doesn't calculate them).
+  - **Home club**: shown on the card; useful for guests and opponents from other clubs, to know who they are.
+  - **Hand and backhand** (one or two hands): describe the player on their card, useful to the coach; the movement analysis recognises the hitting arm by itself.
+  - **Student**: puts them among the coach's students (Practice › Students, *Who's practising*), with sessions, movement and report.
+  - **Phone and email**: used for **notices** (WhatsApp, SMS, email: tournaments, fees, call-ups) even if they're not a member.
+  - **Racket**: goes with every session and match as it was that day (strings and tension) and its statistics are compared; if it isn't there, *New racket* creates it from there.
+  - Ranking, cards and certificate aren't here: they're in the *Member details*, because they're used for tournaments and fees.
 - **New match**: the players on court come from the database. Each place has **Pick the player**, which opens the list with search (members and students first; whoever is already on court isn't there) and at the top **New player**, which asks for first name, last name and the rest and then puts them on court; below, recent players to tap. Once picked, the place shows photo and name with **Change** and the **X**; a member's ranking fills itself in. An old name without a card (rematches, old matches) must be picked from the list or created before *Next*.
 - **At the first start** the app creates a player for every name in the matches already played.
 - **More › Players**: everyone, with search; **New player** creates one with their details (a student too: then switch on *Student* on the card); *same name* in orange where two players share a name. The card is the students' one (7.6) plus:

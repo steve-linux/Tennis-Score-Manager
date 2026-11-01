@@ -1480,6 +1480,14 @@ object EsStrings : Strings {
     override val setupPickPlayer = "Elegir el jugador"
     override val setupChange = "Cambiar"
     override val setupNotInDb: (String) -> String = { "$it no está en la base de datos: elígelo de la lista o créalo." }
+    override val playerHeight = "Altura (cm)"
+    override val playerWeight = "Peso (kg)"
+    override val playerBodyHint = "Con la fecha de nacimiento y el sexo sirven para las calorías de la banda cardio."
+    override val playerClub = "Club de pertenencia"
+    override val playerBackhand = "Revés"
+    override val backhandOne = "1 mano"
+    override val backhandTwo = "2 manos"
+    override val playerAge: (Int) -> String = { "$it años" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

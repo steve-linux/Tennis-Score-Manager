@@ -1144,6 +1144,7 @@ class MatchController(
             aliases = a.aliases + b.aliases + b.id, student = a.student || b.student,
             hand = a.hand ?: b.hand, racket = a.racket ?: b.racket,
             phone = a.phone.ifBlank { b.phone }, email = a.email.ifBlank { b.email }, birth = a.birth ?: b.birth, member = a.member ?: b.member,
+            sex = a.sex.ifBlank { b.sex }, heightCm = a.heightCm ?: b.heightCm, weightKg = a.weightKg ?: b.weightKg, club = a.club.ifBlank { b.club }, backhand = a.backhand ?: b.backhand,
             note = listOf(a.note, b.note).filter { it.isNotBlank() }.joinToString("\n"),
         )
         val list = players.value.filter { it.id != b.id && it.id != a.id } + merged
@@ -2206,6 +2207,14 @@ class MatchController(
         setHeartProfile(Side.P2, prof[Side.P1])
     }
 
+    /** I dati per le calorie dalla scheda del giocatore (età, peso, sesso); null se ne manca uno. */
+    fun heartProfileOf(p: com.tennis.scoremanager.data.PlayerProfile?): HeartProfile? {
+        p ?: return null
+        val age = com.tennis.scoremanager.data.Members.age(p.birth, System.currentTimeMillis()) ?: return null
+        val kg = p.weightKg ?: return null
+        return HeartProfile(age, kg, female = p.sex == "F")
+    }
+
     fun setHeartProfile(side: Side, p: HeartProfile?) {
         storage.setHeartProfile(side == Side.P1, p)
         heartProfiles.value = if (p == null) heartProfiles.value - side else heartProfiles.value + (side to p)
@@ -2345,6 +2354,9 @@ class MatchController(
         val suffix = ByteArray(3).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
         // Ogni nome scritto diventa un giocatore del database (quello che c'è già, o uno nuovo): la partita è di persone.
         val (withIds, created) = com.tennis.scoremanager.data.Players.assign(su, players.value, now)
+        // Chi ha età e peso nella scheda: le calorie della fascia cardio li prendono da lì.
+        heartProfileOf(playerById(withIds.p1aId))?.let { setHeartProfile(Side.P1, it) }
+        heartProfileOf(playerById(withIds.p2aId))?.let { setHeartProfile(Side.P2, it) }
         if (created.isNotEmpty()) {
             val list = players.value + created
             players.value = list.sortedBy { it.name.lowercase() }
@@ -2959,6 +2971,8 @@ class MatchController(
         val straps = heart.straps.value
         val side = Side.entries.firstOrNull { straps[it] != null } ?: return false
         workoutSide = side
+        // Ti alleni tu: età, peso e sesso dalla tua scheda, se ci sono.
+        heartProfileOf(me())?.let { setHeartProfile(side, it) }
         workoutUse = racketById(workoutRacket.value)?.use()
         workout.start(side, straps[side]?.name)
         MatchService.start(app)

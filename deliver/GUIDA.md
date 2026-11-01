@@ -418,6 +418,17 @@ Un telefono sul cavalletto riprende chi serve; il braccialetto al polso riconosc
 Ogni persona che gioca o si allena è un **giocatore** del database, con un identificativo che resta lo stesso su ogni telefono: così le statistiche, il rating e lo storico sono di quella persona anche se c'è un omonimo, e anche dopo aver passato partite da un telefono all'altro.
 
 - **Nome, cognome e soprannome**: nome e cognome sono obbligatori e identificano la persona; il **soprannome** (facoltativo) è come la si chiama in campo: partita, tabellone, voce e statistiche usano il soprannome se c'è, sennò nome e cognome. I giocatori nati dallo storico hanno un nome solo, che diventa il soprannome: in *Giocatori* sono *da completare* e nella scheda c'è **Completa nome e cognome**.
+- **La scheda** (*Nuovo giocatore* o *Modifica*): obbligatori solo **nome e cognome**; il resto è facoltativo, ma ognuno ha il suo perché:
+  - **Soprannome**: è il nome che si vede e si sente in partita, sul tabellone e nella voce ("Rossi" invece di "Mario Rossi").
+  - **Foto** e **uomo/donna**: la foto compare in Nuova partita, nello Storico, nel riepilogo e sul tabellone TV; senza foto, uomo/donna sceglie il ritratto. Uomo/donna serve anche alle calorie.
+  - **Data di nascita**: l'età si vede nella scheda e serve alle calorie; per i soci decide se è minorenne (avvisi al genitore, consensi).
+  - **Altezza e peso**: con età e sesso fanno calcolare da sole le **calorie della fascia cardio** quando il giocatore gioca o, se è il tuo, si allena (senza, l'app le chiede a parte o non le calcola).
+  - **Circolo di appartenenza**: si vede nella scheda; utile per gli ospiti e per gli avversari di altri circoli, per sapere chi sono.
+  - **Mano e rovescio** (a una o due mani): descrivono il giocatore nella sua scheda, utile all'allenatore; l'analisi del movimento riconosce da sola il braccio che colpisce.
+  - **Allievo**: lo mette tra gli allievi dell'allenatore (Allenati › Allievi, *Chi si allena*), con sessioni, movimento e report.
+  - **Telefono ed email**: servono agli **avvisi** (WhatsApp, SMS, email: tornei, quote, convocazioni) anche se non è socio.
+  - **Racchetta**: va con ogni sua sessione e partita com'era quel giorno (corde e tensione) e se ne confrontano le statistiche; se non c'è, *Nuova racchetta* la crea da lì.
+  - Classifica, tessere e certificato non sono qui: sono nei *Dati del socio*, perché servono ai tornei e alle quote.
 - **Nuova partita**: in campo vanno i giocatori del database. Ogni posto ha **Scegli il giocatore**, che apre l'elenco con la ricerca (prima soci e allievi; chi è già in campo non c'è) e in cima **Giocatore nuovo**, che chiede nome, cognome e il resto e poi lo mette in campo; sotto, i giocatori recenti da toccare al volo. Scelto, il posto mostra foto e nome con **Cambia** e la **X**; la classifica di un socio si scrive da sola. Un nome di prima senza scheda (rivincite, partite vecchie) va scelto dall'elenco o creato prima di *Avanti*.
 - **Al primo avvio** l'app crea un giocatore per ogni nome delle partite già giocate.
 - **Altro › Giocatori**: tutti, con la ricerca; **Nuovo giocatore** ne crea uno coi suoi dati (anche un allievo: poi nella scheda si accende *Allievo*); *omonimo* in arancione dove due giocatori hanno lo stesso nome. La scheda è quella degli allievi (7.6) con in più:

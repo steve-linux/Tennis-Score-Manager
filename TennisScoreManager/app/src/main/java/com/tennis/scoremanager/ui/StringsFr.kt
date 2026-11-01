@@ -1482,6 +1482,14 @@ object FrStrings : Strings {
     override val setupPickPlayer = "Choisir le joueur"
     override val setupChange = "Changer"
     override val setupNotInDb: (String) -> String = { "$it n'est pas dans la base : choisissez-le dans la liste ou créez-le." }
+    override val playerHeight = "Taille (cm)"
+    override val playerWeight = "Poids (kg)"
+    override val playerBodyHint = "Avec la date de naissance et le sexe, ils servent aux calories de la ceinture cardio."
+    override val playerClub = "Club d'appartenance"
+    override val playerBackhand = "Revers"
+    override val backhandOne = "1 main"
+    override val backhandTwo = "2 mains"
+    override val playerAge: (Int) -> String = { "$it ans" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

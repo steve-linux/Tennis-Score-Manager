@@ -253,6 +253,17 @@ fun PlayerEditDialog(
     var racket by remember { mutableStateOf(player?.racket) }
     var newRacket by remember { mutableStateOf<com.tennis.scoremanager.data.Racket?>(null) }
     val rackets by c.rackets.collectAsState()
+    // Il resto della scheda: sesso (prima era solo per nome), nascita, fisico, circolo, rovescio, allievo, contatti.
+    var sex by remember { mutableStateOf(player?.sex?.ifBlank { null } ?: player?.let { c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(it.name)) }.orEmpty()) }
+    var birth by remember { mutableStateOf(player?.birth) }
+    var height by remember { mutableStateOf(player?.heightCm?.toString().orEmpty()) }
+    var weight by remember { mutableStateOf(player?.weightKg?.toString().orEmpty()) }
+    var club by remember { mutableStateOf(player?.club.orEmpty()) }
+    var backhand by remember { mutableStateOf(player?.backhand) }
+    var student by remember { mutableStateOf(player?.student ?: asStudent) }
+    var phone by remember { mutableStateOf(player?.phone.orEmpty()) }
+    var email by remember { mutableStateOf(player?.email.orEmpty()) }
+    val lang = c.options.value.lang
     // Un giocatore nuovo può essere uno che c'è già (ha giocato partite): lo si sceglie invece di rifarlo.
     var existing by remember { mutableStateOf<com.tennis.scoremanager.data.PlayerProfile?>(null) }
     val players by c.players.collectAsState()
@@ -265,6 +276,12 @@ fun PlayerEditDialog(
         title = { Text(if (player != null) s.studentEdit else if (asStudent) s.studentNew else s.playerNewTitle) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // La foto (la stessa di partite, Storico e tabellone): si tocca per metterla.
+                val shown = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick)
+                if (shown.isNotBlank()) Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    EditablePlayerAvatar(c, shown, TsmColors.Ball, 64.dp)
+                    Text(s.studentPhotoHint, color = TsmColors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(start = 10.dp))
+                }
                 field(first, s.playerFirstName) { first = it }
                 field(last, s.playerLastName) { last = it }
                 field(nick, s.playerNickname) { nick = it }
@@ -301,9 +318,31 @@ fun PlayerEditDialog(
                 // Un altro con lo stesso nome e cognome: si può (omonimo), ma lo si dice.
                 val twins = com.tennis.scoremanager.data.Players.sameFullName(players, first, last, except = player?.id ?: existing?.id)
                 if (first.isNotBlank() && last.isNotBlank() && twins.isNotEmpty()) Text(s.playerTwinWarning("${first.trim()} ${last.trim()}"), color = TsmColors.Orange, fontSize = 12.sp)
+                Segmented(listOf(SegOption("—"), SegOption(s.heartMale), SegOption(s.heartFemale)), listOf("", "M", "F").indexOf(sex).coerceAtLeast(0), { sex = listOf("", "M", "F")[it] })
+                com.tennis.scoremanager.ui.screens.DateButton(s.memberBirth + (com.tennis.scoremanager.data.Members.age(birth, System.currentTimeMillis())?.let { " (${s.playerAge(it)})" } ?: ""), birth, lang) { birth = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    androidx.compose.material3.OutlinedTextField(height, { v -> height = v.filter(Char::isDigit).take(3) }, Modifier.weight(1f), singleLine = true, label = { Text(s.playerHeight) },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                    androidx.compose.material3.OutlinedTextField(weight, { v -> weight = v.filter(Char::isDigit).take(3) }, Modifier.weight(1f), singleLine = true, label = { Text(s.playerWeight) },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number))
+                }
+                Text(s.playerBodyHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                field(club, s.playerClub) { club = it }
+                // Il nostro circolo, con un tocco.
+                val ours = c.storage.clubName
+                if (ours.isNotBlank() && club != ours) Text(ours, color = TsmColors.Ball, fontSize = 13.sp,
+                    modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(TsmColors.SurfaceHigh).clickable { club = ours }.padding(horizontal = 10.dp, vertical = 6.dp))
                 Text(s.studentHand, color = TsmColors.TextDim, fontSize = 13.sp)
                 val hands = listOf(null, com.tennis.scoremanager.data.Hand.RIGHT, com.tennis.scoremanager.data.Hand.LEFT)
                 Segmented(listOf(SegOption("—"), SegOption(s.handRight), SegOption(s.handLeft)), hands.indexOf(hand), { hand = hands[it] })
+                Text(s.playerBackhand, color = TsmColors.TextDim, fontSize = 13.sp)
+                val bhs = listOf(null, com.tennis.scoremanager.data.Backhand.ONE, com.tennis.scoremanager.data.Backhand.TWO)
+                Segmented(listOf(SegOption("—"), SegOption(s.backhandOne), SegOption(s.backhandTwo)), bhs.indexOf(backhand), { backhand = bhs[it] })
+                SwitchRow(androidx.compose.material.icons.Icons.Filled.SportsTennis, s.playerStudentToggle, s.playerStudentToggleHint, student) { student = it }
+                androidx.compose.material3.OutlinedTextField(phone, { phone = it.take(30) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberPhone) },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
+                androidx.compose.material3.OutlinedTextField(email, { email = it.trim().take(80) }, Modifier.fillMaxWidth(), singleLine = true, label = { Text(s.memberEmail) },
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email))
                 // La sua racchetta, tra quelle di Le mie racchette (le messe da parte no, tranne quella già sua).
                 val choices = rackets.filter { !it.retired || it.id == racket }
                 Text(s.studentRacket, color = TsmColors.TextDim, fontSize = 13.sp)
@@ -324,9 +363,13 @@ fun PlayerEditDialog(
                 val p = base.copy(
                     firstName = first.trim(), lastName = last.trim(), nickname = nick.trim(),
                     name = com.tennis.scoremanager.data.PlayerProfile.display(first, last, nick),
-                    hand = hand, racket = racket, student = base.student || asStudent && player == null,
+                    hand = hand, racket = racket, student = student,
+                    sex = sex, birth = birth, heightCm = height.toIntOrNull(), weightKg = weight.toIntOrNull(), club = club.trim(), backhand = backhand,
+                    phone = phone.trim(), email = email.trim(),
                 )
                 c.savePlayer(p)
+                // Il ritratto (uomo/donna) vale ancora per il nome in tutta l'app: lo si tiene allineato.
+                if (sex != c.storage.playerSex(com.tennis.scoremanager.data.PlayerStats.key(p.name))) c.setPlayerSex(p.name, sex)
                 // Una racchetta di nessuno diventa sua: così la si propone anche nelle sue partite.
                 racket?.let { c.racketById(it) }?.takeIf { it.owner.isBlank() }?.let { c.saveRacket(it.copy(owner = p.name)) }
                 onDone(p)

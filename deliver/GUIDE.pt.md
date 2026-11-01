@@ -418,6 +418,17 @@ Um telefone no tripé filma quem saca; a pulseira no pulso reconhece o saque e c
 Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador que continua o mesmo em cada telefone: estatísticas, rating e histórico são dessa pessoa mesmo com um homônimo, também depois de passar partidas de um telefone para outro.
 
 - **Nome, sobrenome e apelido**: nome e sobrenome são obrigatórios e identificam a pessoa; o **apelido** (opcional) é como ela é chamada em quadra: partida, placar, voz e estatísticas usam o apelido se houver, senão nome e sobrenome. Os jogadores nascidos do histórico têm um nome só, que vira o apelido: em *Jogadores* aparecem *a completar* e a ficha oferece **Completar nome e sobrenome**.
+- **A ficha** (*Novo jogador* ou *Editar*): só **nome e sobrenome** são obrigatórios; o resto é opcional, mas cada dado tem o seu motivo:
+  - **Apelido**: é o nome que se vê e se ouve na partida, no placar e na voz ("Rossi" em vez de "Mario Rossi").
+  - **Foto** e **homem/mulher**: a foto aparece em Nova partida, no Histórico, no resumo e no placar da TV; sem foto, homem/mulher escolhe o retrato. Homem/mulher também serve para as calorias.
+  - **Data de nascimento**: a idade aparece na ficha e serve para as calorias; para os sócios, decide se é menor (avisos ao responsável, consentimentos).
+  - **Altura e peso**: com idade e sexo fazem as **calorias da cinta cardíaca** se calcularem sozinhas quando o jogador joga ou, se é você, treina (sem eles o app pede à parte ou não calcula).
+  - **Clube de origem**: aparece na ficha; útil para convidados e adversários de outros clubes, para saber quem são.
+  - **Mão e backhand** (com uma ou duas mãos): descrevem o jogador na ficha, útil para o treinador; a análise do movimento reconhece sozinha o braço que bate.
+  - **Aluno**: coloca-o entre os alunos do treinador (Treinar › Alunos, *Quem treina*), com sessões, movimento e relatório.
+  - **Telefone e e-mail**: servem para os **avisos** (WhatsApp, SMS, e-mail: torneios, mensalidades, convocações) mesmo que não seja sócio.
+  - **Raquete**: vai com cada sessão e partida como estava naquele dia (cordas e tensão) e comparam-se as estatísticas; se não existe, *Nova raquete* cria-a dali.
+  - Ranking, cartões e atestado não ficam aqui: ficam nos *Dados do sócio*, porque servem para torneios e mensalidades.
 - **Nova partida**: em quadra vão jogadores do banco de dados. Cada posição tem **Escolher o jogador**, que abre a lista com pesquisa (primeiro sócios e alunos; quem já está em quadra não aparece) e no alto **Jogador novo**, que pede nome, sobrenome e o resto e depois o coloca em quadra; embaixo, os jogadores recentes para tocar. Escolhido, a posição mostra foto e nome com **Trocar** e o **X**; o ranking de um sócio se preenche sozinho. Um nome antigo sem ficha (revanches, partidas velhas) precisa ser escolhido na lista ou criado antes de *Avançar*.
 - **Na primeira abertura** o app cria um jogador para cada nome das partidas já jogadas.
 - **Mais › Jogadores**: todos, com pesquisa; **Novo jogador** cria um com os dados dele (também um aluno: depois ative *Aluno* na ficha); *homônimo* em laranja onde dois jogadores têm o mesmo nome. A ficha é a dos alunos (7.6) com mais:
