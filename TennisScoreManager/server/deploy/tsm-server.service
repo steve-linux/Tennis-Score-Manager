@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Il server del circolo TSM (prenotazioni dei campi). Impostazioni in /etc/default/tsm-server.
+[Unit]
+Description=TSM club server (court bookings)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tsm
+Group=tsm
+Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 "JAVA_OPTS=-Xmx64m"
+EnvironmentFile=-/etc/default/tsm-server
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --data /var/lib/tsm-server
+StateDirectory=tsm-server
+StateDirectoryMode=0700
+Restart=on-failure
+RestartSec=5
+# Java fermato da systemd esce con 143: è uno stop normale, non un guasto.
+SuccessExitStatus=143
+# Il server non ha bisogno d'altro che della sua cartella dei dati.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

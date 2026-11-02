@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Ogni minuto, gli indirizzi e il codice sullo schermo tornano giusti.
+[Unit]
+Description=TSM club server: refresh address and code on the console
+
+[Timer]
+OnBootSec=15
+OnUnitActiveSec=60
+
+[Install]
+WantedBy=timers.target

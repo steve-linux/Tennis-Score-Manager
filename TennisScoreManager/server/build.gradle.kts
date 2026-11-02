@@ -43,3 +43,20 @@ val fatJar by tasks.registering(Jar::class) {
     }
 }
 tasks.named("assemble") { dependsOn(fatJar) }
+
+// Il kit per il Raspberry Pi (o un PC con Debian/Ubuntu): jar, script d'installazione e servizio systemd.
+// Si copia sul Pi, si scompatta e si lancia "sudo ./install.sh".
+val serverKit by tasks.registering(Tar::class) {
+    archiveFileName.set("tsm-server-kit.tar.gz")
+    compression = Compression.GZIP
+    destinationDirectory.set(layout.buildDirectory.dir("kit"))
+    into("tsm-server") {
+        from(fatJar)
+        from("deploy") {
+            include("install.sh", "reset-admin.sh")
+            filePermissions { unix("rwxr-xr-x") }
+        }
+        from("deploy") { include("tsm-server.service", "tsm-server.default") }
+    }
+}
+tasks.named("assemble") { dependsOn(serverKit) }

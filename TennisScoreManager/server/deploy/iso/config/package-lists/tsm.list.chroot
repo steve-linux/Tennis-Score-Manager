@@ -1,0 +1,8 @@
+# Java per il server, il nome tsm-circolo.local in rete, la rete (anche Wi-Fi con nmtui), Caddy per l'HTTPS.
+default-jre-headless
+avahi-daemon
+libnss-mdns
+network-manager
+curl
+ca-certificates
+caddy

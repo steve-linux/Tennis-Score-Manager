@@ -153,4 +153,12 @@ class ApiTest {
         pairAndSync()
         assertEquals("TC Prova", obj(call("GET", "/info"))["club"]!!.jsonPrimitive.content)
     }
+
+    @Test fun setupCodeStaysUntilPairedAndChangesOnReset() {
+        val a = store.ensureSetupCode()!!
+        assertEquals(a, Store(dir) { now }.ensureSetupCode())
+        val b = Store(dir) { now }.ensureSetupCode(reset = true)!!
+        assertTrue(a != b)
+        assertEquals(b, File(dir, Store.SETUP_FILE).readText().trim())
+    }
 }

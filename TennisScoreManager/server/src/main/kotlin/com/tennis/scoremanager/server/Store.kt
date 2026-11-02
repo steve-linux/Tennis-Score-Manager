@@ -78,8 +78,10 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
         val (next, out) = f(state)
         if (next != state) {
             val tmp = File(dir, "state.json.tmp")
-            tmp.writeText(json.encodeToString(State.serializer(), next))
+            // Scritto davvero sul disco prima di rispondere: al circolo può mancare la corrente.
+            java.io.FileOutputStream(tmp).use { out -> out.write(json.encodeToString(State.serializer(), next).toByteArray()); out.fd.sync() }
             if (!tmp.renameTo(file)) { file.delete(); check(tmp.renameTo(file)) { "non riesco a scrivere ${file.path}" } }
+            syncDir()
             state = next
         }
         return out
@@ -88,6 +90,9 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
     /** Il codice per abbinare la segreteria: nuovo se la segreteria non c'è, scritto in setup-code.txt. */
     fun ensureSetupCode(reset: Boolean = false): String? {
         if (state.admin != null && !reset) return null
+        // Finché non si abbina resta lo stesso codice, anche se il server riparte.
+        val old = File(dir, SETUP_FILE).takeIf { it.exists() }?.readText()?.trim()
+        if (!reset && old != null && state.setup == Secrets.hash(old)) return old
         val code = Secrets.code()
         update { it.copy(admin = null, setup = Secrets.hash(code)) to Unit }
         File(dir, SETUP_FILE).apply {
@@ -97,7 +102,12 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
         return code
     }
 
-    fun forgetSetupCode() { File(dir, SETUP_FILE).delete() }
+    fun forgetSetupCode() { File(dir, SETUP_FILE).delete(); syncDir() }
+
+    /** Anche la cartella, perché la rinomina e le cancellazioni restino dopo uno spegnimento brusco. */
+    private fun syncDir() {
+        runCatching { java.nio.channels.FileChannel.open(dir.toPath(), java.nio.file.StandardOpenOption.READ).use { it.force(true) } }
+    }
 
     companion object {
         const val SETUP_FILE = "setup-code.txt"

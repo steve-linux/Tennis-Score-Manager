@@ -64,6 +64,12 @@ mkdir -p "$DEST/courtcore/src/test/kotlin/com/tennis/scoremanager/data"
 mkdir -p "$DEST/gradle"
 mkdir -p "$DEST/gradle/wrapper"
 mkdir -p "$DEST/server"
+mkdir -p "$DEST/server/deploy"
+mkdir -p "$DEST/server/deploy/iso"
+mkdir -p "$DEST/server/deploy/iso/config/hooks/normal"
+mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system"
+mkdir -p "$DEST/server/deploy/iso/config/includes.chroot/usr/local/sbin"
+mkdir -p "$DEST/server/deploy/iso/config/package-lists"
 mkdir -p "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server"
 mkdir -p "$DEST/server/src/main/resources/web"
 mkdir -p "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server"
@@ -764,6 +770,9 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
 - **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code; am iPhone *Teilen › Zum Home-Bildschirm*. Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
 - **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
+- **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
+- **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
+- **Datensicherung**: Alles steckt in einer Datei, `/var/lib/tsm-server/state.json`; ab und zu kopieren, und vor dem Neuschreiben des Sticks.
 - **Von zu Hause** (Internet) braucht es eine https-Adresse und einen offenen Port am Vereinsrouter: Das geht mit kostenlosen Diensten (DuckDNS und Let's Encrypt), wenn die Leitung eine öffentliche IP hat.
 
 ## 8. Anzeigetafel auf TV oder Monitor
@@ -1279,6 +1288,9 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
 - **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR; on iPhone, *Share › Add to Home Screen*. The card shows who books online; **Remove online access** disconnects them.
 - **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
+- **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
+- **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
+- **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
 - **From home** (internet) you need an https address and an open port on the club router: free services do it (DuckDNS and Let's Encrypt), as long as the line has a public IP.
 
 ## 8. Scoreboard on a TV or monitor
@@ -1793,6 +1805,9 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
 - **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR; en iPhone, *Compartir › Añadir a pantalla de inicio*. En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
 - **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
+- **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
+- **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
+- **Copia de los datos**: todo está en un solo archivo, `/var/lib/tsm-server/state.json`; conviene copiarlo de vez en cuando y antes de reescribir la memoria.
 - **Desde casa** (internet) hacen falta una dirección https y un puerto abierto en el router del club: se consigue con servicios gratuitos (DuckDNS y Let's Encrypt), si la línea tiene IP pública.
 
 ## 8. Marcador en un televisor o monitor
@@ -2307,6 +2322,9 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
 - **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR ; sur iPhone, *Partager › Sur l'écran d'accueil*. La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
 - **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
+- **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
+- **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
+- **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
 - **Depuis chez soi** (internet) il faut une adresse https et un port ouvert sur la box du club : des services gratuits le permettent (DuckDNS et Let's Encrypt), si la ligne a une IP publique.
 
 ## 8. Tableau d'affichage sur TV ou écran
@@ -2821,6 +2839,9 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
 - **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR, e su iPhone fa *Condividi › Aggiungi alla schermata Home*. Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
 - **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
+- **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
+- **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
+- **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
 - **Da casa** (internet) servono un indirizzo https e la porta aperta sul router del circolo: si fa con servizi gratuiti (DuckDNS e Let's Encrypt), purché la linea abbia un IP pubblico.
 
 ## 8. Tabellone su TV o monitor
@@ -3335,6 +3356,9 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
 - **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR; no iPhone, *Partilhar › Adicionar ao ecrã principal*. Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
 - **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
+- **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
+- **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
+- **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
 - **De casa** (internet) é preciso um endereço https e uma porta aberta no router do clube: faz-se com serviços gratuitos (DuckDNS e Let's Encrypt), desde que a linha tenha IP público.
 
 ## 8. Placar na TV ou no monitor
@@ -71902,6 +71926,480 @@ val fatJar by tasks.registering(Jar::class) {
     }
 }
 tasks.named("assemble") { dependsOn(fatJar) }
+
+// Il kit per il Raspberry Pi (o un PC con Debian/Ubuntu): jar, script d'installazione e servizio systemd.
+// Si copia sul Pi, si scompatta e si lancia "sudo ./install.sh".
+val serverKit by tasks.registering(Tar::class) {
+    archiveFileName.set("tsm-server-kit.tar.gz")
+    compression = Compression.GZIP
+    destinationDirectory.set(layout.buildDirectory.dir("kit"))
+    into("tsm-server") {
+        from(fatJar)
+        from("deploy") {
+            include("install.sh", "reset-admin.sh")
+            filePermissions { unix("rwxr-xr-x") }
+        }
+        from("deploy") { include("tsm-server.service", "tsm-server.default") }
+    }
+}
+tasks.named("assemble") { dependsOn(serverKit) }
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/install.sh
+cat > "$DEST/server/deploy/install.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Installa (o aggiorna) il server del circolo TSM su Raspberry Pi OS, Debian o Ubuntu:
+#   sudo ./install.sh            installa o aggiorna (i dati restano)
+#   sudo ./install.sh --port N   con un'altra porta (8080 di solito)
+#   sudo ./install.sh --remove   lo toglie (i dati in /var/lib/tsm-server restano)
+# Va lanciato dalla cartella del kit, accanto a tsm-server.jar.
+set -eu
+
+DIR=$(cd "$(dirname "$0")" && pwd)
+DATA=/var/lib/tsm-server
+PORT=""
+REMOVE=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --port) PORT="${2:-}"; shift 2 ;;
+        --remove) REMOVE=1; shift ;;
+        *) shift ;;
+    esac
+done
+
+# I messaggi nella lingua del sistema (italiano, inglese, francese, tedesco, spagnolo, portoghese).
+L=$(printf '%s' "${LC_ALL:-${LC_MESSAGES:-${LANG:-en}}}" | cut -c1-2)
+msg() {
+    case "$L:$1" in
+        it:root) echo "Serve sudo: sudo $0" ;;
+        fr:root) echo "Il faut sudo : sudo $0" ;;
+        de:root) echo "Bitte mit sudo starten: sudo $0" ;;
+        es:root) echo "Hace falta sudo: sudo $0" ;;
+        pt:root) echo "É preciso sudo: sudo $0" ;;
+        *:root) echo "Run it with sudo: sudo $0" ;;
+        it:jar) echo "Manca tsm-server.jar accanto allo script." ;;
+        fr:jar) echo "tsm-server.jar manque à côté du script." ;;
+        de:jar) echo "tsm-server.jar fehlt neben dem Skript." ;;
+        es:jar) echo "Falta tsm-server.jar junto al script." ;;
+        pt:jar) echo "Falta o tsm-server.jar ao lado do script." ;;
+        *:jar) echo "tsm-server.jar is missing next to the script." ;;
+        it:java) echo "Installo Java (può volerci qualche minuto)…" ;;
+        fr:java) echo "Installation de Java (quelques minutes)…" ;;
+        de:java) echo "Java wird installiert (das kann ein paar Minuten dauern)…" ;;
+        es:java) echo "Instalando Java (puede tardar unos minutos)…" ;;
+        pt:java) echo "A instalar o Java (pode demorar alguns minutos)…" ;;
+        *:java) echo "Installing Java (this can take a few minutes)…" ;;
+        it:start) echo "Avvio il server…" ;;
+        fr:start) echo "Démarrage du serveur…" ;;
+        de:start) echo "Server wird gestartet…" ;;
+        es:start) echo "Arrancando el servidor…" ;;
+        pt:start) echo "A arrancar o servidor…" ;;
+        *:start) echo "Starting the server…" ;;
+        it:ok) echo "Server del circolo pronto. Nell'app: Planning dei campi › Orari e prezzi › Server del circolo." ;;
+        fr:ok) echo "Serveur du club prêt. Dans l'app : Planning des terrains › Horaires et tarifs › Serveur du club." ;;
+        de:ok) echo "Vereinsserver bereit. In der App: Platzbelegung › Zeiten und Preise › Vereinsserver." ;;
+        es:ok) echo "Servidor del club listo. En la app: Planning de pistas › Horarios y precios › Servidor del club." ;;
+        pt:ok) echo "Servidor do clube pronto. Na app: Agenda das quadras › Horários e preços › Servidor do clube." ;;
+        *:ok) echo "Club server ready. In the app: Court planner › Hours and prices › Club server." ;;
+        it:addr) echo "Indirizzo del server:" ;;
+        fr:addr) echo "Adresse du serveur :" ;;
+        de:addr) echo "Serveradresse:" ;;
+        es:addr) echo "Dirección del servidor:" ;;
+        pt:addr) echo "Endereço do servidor:" ;;
+        *:addr) echo "Server address:" ;;
+        it:code) echo "Codice di abbinamento:" ;;
+        fr:code) echo "Code d'appairage :" ;;
+        de:code) echo "Kopplungscode:" ;;
+        es:code) echo "Código de emparejamiento:" ;;
+        pt:code) echo "Código de emparelhamento:" ;;
+        *:code) echo "Pairing code:" ;;
+        it:paired) echo "La segreteria è già abbinata (nuovo codice: sudo ./reset-admin.sh)." ;;
+        fr:paired) echo "Le secrétariat est déjà appairé (nouveau code : sudo ./reset-admin.sh)." ;;
+        de:paired) echo "Das Büro ist schon gekoppelt (neuer Code: sudo ./reset-admin.sh)." ;;
+        es:paired) echo "La secretaría ya está emparejada (código nuevo: sudo ./reset-admin.sh)." ;;
+        pt:paired) echo "A secretaria já está emparelhada (novo código: sudo ./reset-admin.sh)." ;;
+        *:paired) echo "The office is already paired (new code: sudo ./reset-admin.sh)." ;;
+        it:fail) echo "Il server non è partito: guarda con  journalctl -u tsm-server -n 50" ;;
+        fr:fail) echo "Le serveur n'a pas démarré : voir  journalctl -u tsm-server -n 50" ;;
+        de:fail) echo "Der Server ist nicht gestartet: siehe  journalctl -u tsm-server -n 50" ;;
+        es:fail) echo "El servidor no ha arrancado: mira  journalctl -u tsm-server -n 50" ;;
+        pt:fail) echo "O servidor não arrancou: vê  journalctl -u tsm-server -n 50" ;;
+        *:fail) echo "The server did not start: see  journalctl -u tsm-server -n 50" ;;
+        it:removed) echo "Server tolto. I dati restano in $DATA (per toglierli: sudo rm -r $DATA)." ;;
+        fr:removed) echo "Serveur retiré. Les données restent dans $DATA (pour les effacer : sudo rm -r $DATA)." ;;
+        de:removed) echo "Server entfernt. Die Daten bleiben in $DATA (löschen: sudo rm -r $DATA)." ;;
+        es:removed) echo "Servidor quitado. Los datos quedan en $DATA (para borrarlos: sudo rm -r $DATA)." ;;
+        pt:removed) echo "Servidor removido. Os dados ficam em $DATA (para os apagar: sudo rm -r $DATA)." ;;
+        *:removed) echo "Server removed. The data stays in $DATA (to delete it: sudo rm -r $DATA)." ;;
+    esac
+}
+
+[ "$(id -u)" -eq 0 ] || { msg root; exit 1; }
+
+if [ "$REMOVE" -eq 1 ]; then
+    systemctl disable --now tsm-server 2>/dev/null || true
+    rm -f /etc/systemd/system/tsm-server.service
+    rm -rf /opt/tsm-server
+    systemctl daemon-reload
+    msg removed
+    exit 0
+fi
+
+[ -f "$DIR/tsm-server.jar" ] || { msg jar; exit 1; }
+
+# Java: Debian 12 (bookworm) ha la 17, Debian 13 (trixie) la 21; il server va con entrambe.
+if ! command -v java >/dev/null 2>&1; then
+    msg java
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends default-jre-headless
+fi
+
+id tsm >/dev/null 2>&1 || useradd --system --home-dir "$DATA" --no-create-home --shell /usr/sbin/nologin tsm
+install -d -m 755 /opt/tsm-server
+install -m 644 "$DIR/tsm-server.jar" /opt/tsm-server/tsm-server.jar
+install -m 644 "$DIR/tsm-server.service" /etc/systemd/system/tsm-server.service
+[ -f /etc/default/tsm-server ] || install -m 644 "$DIR/tsm-server.default" /etc/default/tsm-server
+if [ -n "$PORT" ]; then sed -i "s/^TSM_PORT=.*/TSM_PORT=$PORT/" /etc/default/tsm-server; fi
+PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server)
+
+msg start
+systemctl daemon-reload
+systemctl enable tsm-server >/dev/null 2>&1
+systemctl restart tsm-server
+
+# Sul Pi Zero Java parte in una ventina di secondi: si aspetta che il server risponda.
+i=0
+until wget -q -O /dev/null "http://127.0.0.1:$PORT/api/v1/info" 2>/dev/null || curl -fs -o /dev/null "http://127.0.0.1:$PORT/api/v1/info" 2>/dev/null; do
+    i=$((i + 1))
+    if [ $i -gt 90 ] || ! systemctl is-active --quiet tsm-server; then msg fail; exit 1; fi
+    sleep 1
+done
+
+echo
+msg ok
+msg addr
+for a in $(hostname -I 2>/dev/null); do
+    case "$a" in *:*) ;; *) echo "  http://$a:$PORT" ;; esac
+done
+echo "  http://$(hostname).local:$PORT"
+if [ -f "$DATA/setup-code.txt" ]; then
+    msg code
+    echo "  $(cat "$DATA/setup-code.txt")"
+else
+    msg paired
+fi
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/.gitignore
+cat > "$DEST/server/deploy/iso/.gitignore" << 'TSM_EOF'
+/out
+/cache
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/build-iso.sh
+cat > "$DEST/server/deploy/iso/build-iso.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Costruisce out/tsm-server.iso (Debian 12 live, PC a 64 bit) con dentro il server del circolo TSM.
+# Serve podman; prima il kit:  ./gradlew :server:serverKit  (dalla cartella TennisScoreManager).
+# Scarica Debian e i pacchetti (circa 1 GB la prima volta). Non serve root: basta podman.
+set -eu
+HERE=$(cd "$(dirname "$0")" && pwd)
+KIT="$HERE/../../build/kit/tsm-server-kit.tar.gz"
+[ -f "$KIT" ] || { echo "Manca il kit / kit missing: ./gradlew :server:serverKit"; exit 1; }
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+tar xzf "$KIT" -C "$WORK"
+podman run --rm --privileged \
+    -v "$HERE:/iso:Z" -v "$WORK/tsm-server:/kit:ro,Z" \
+    docker.io/library/debian:bookworm sh /iso/make-iso.sh
+echo "ISO: $HERE/out/tsm-server.iso"
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/hooks/normal/9000-tsm.hook.chroot
+cat > "$DEST/server/deploy/iso/config/hooks/normal/9000-tsm.hook.chroot" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Dentro l'immagine: l'utente del server, i servizi accesi all'avvio, Caddy spento (si accende per l'HTTPS).
+set -e
+id tsm >/dev/null 2>&1 || useradd --system --home-dir /var/lib/tsm-server --no-create-home --shell /usr/sbin/nologin tsm
+chmod 755 /usr/local/sbin/tsm-issue /usr/local/sbin/tsm-reset-admin
+systemctl enable tsm-server.service tsm-issue.service tsm-issue.timer avahi-daemon.service NetworkManager.service
+systemctl disable caddy.service || true
+echo tsm-circolo > /etc/hostname
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.service
+cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.service" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Sullo schermo del PC, sopra il login: l'indirizzo del server e il codice per la segreteria.
+[Unit]
+Description=TSM club server: address and pairing code on the console
+After=tsm-server.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/tsm-issue
+
+[Install]
+WantedBy=multi-user.target
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.timer
+cat > "$DEST/server/deploy/iso/config/includes.chroot/etc/systemd/system/tsm-issue.timer" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Ogni minuto, gli indirizzi e il codice sullo schermo tornano giusti.
+[Unit]
+Description=TSM club server: refresh address and code on the console
+
+[Timer]
+OnBootSec=15
+OnUnitActiveSec=60
+
+[Install]
+WantedBy=timers.target
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/includes.chroot/usr/local/sbin/tsm-issue
+cat > "$DEST/server/deploy/iso/config/includes.chroot/usr/local/sbin/tsm-issue" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Scrive sopra il login gli indirizzi del server e il codice di abbinamento (lo rilancia tsm-issue.timer ogni
+# minuto: la rete arriva dopo, e l'indirizzo può cambiare).
+DATA=/var/lib/tsm-server
+PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server 2>/dev/null); PORT=${PORT:-8080}
+mkdir -p /etc/issue.d
+NEW=$(
+    echo
+    echo "  TSM – Server del circolo / Club server"
+    for a in $(hostname -I 2>/dev/null); do
+        case "$a" in *:*) ;; *) echo "  http://$a:$PORT" ;; esac
+    done
+    echo "  http://$(hostname).local:$PORT"
+    if [ -f "$DATA/setup-code.txt" ]; then
+        echo "  Codice di abbinamento / Pairing code: $(cat "$DATA/setup-code.txt")"
+    elif [ -f "$DATA/state.json" ]; then
+        echo "  Segreteria abbinata / Office paired"
+    fi
+    # Senza la partizione "persistence" sulla chiavetta, al prossimo avvio il server dimentica tutto.
+    if ! grep -qs " /run/live/persistence/" /proc/mounts; then
+        echo "  ATTENZIONE: nessuna partizione persistence, i dati si perdono allo spegnimento!"
+        echo "  WARNING: no persistence partition, data is lost at shutdown!"
+    fi
+    echo "  (Invio per aggiornare / press Enter to refresh)"
+)
+# Si riscrive (e si rinfresca lo schermo) solo se è cambiato qualcosa.
+if [ "$NEW" != "$(cat /etc/issue.d/tsm.issue 2>/dev/null)" ]; then
+    printf '%s\n\n' "$NEW" > /etc/issue.d/tsm.issue
+    command -v agetty >/dev/null && agetty --reload 2>/dev/null
+fi
+exit 0
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/config/package-lists/tsm.list.chroot
+cat > "$DEST/server/deploy/iso/config/package-lists/tsm.list.chroot" << 'TSM_EOF'
+# Java per il server, il nome tsm-circolo.local in rete, la rete (anche Wi-Fi con nmtui), Caddy per l'HTTPS.
+default-jre-headless
+avahi-daemon
+libnss-mdns
+network-manager
+curl
+ca-certificates
+caddy
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/make-iso.sh
+cat > "$DEST/server/deploy/iso/make-iso.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Dentro il contenitore Debian (lo lancia build-iso.sh): il sistema con mmdebstrap (senza root), il kernel con
+# live-boot, e un'ISO ibrida (BIOS e UEFI, da CD o da chiavetta) fatta da grub-mkrescue.
+set -eu
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    mmdebstrap squashfs-tools-ng uidmap xorriso mtools grub-common grub-pc-bin grub-efi-amd64-bin ca-certificates
+W=/work
+rm -rf "$W" && mkdir -p "$W/iso/live" "$W/iso/boot/grub"
+PKGS=$(grep -v '^#' /iso/config/package-lists/tsm.list.chroot | tr '\n' ',' | sed 's/,*$//')
+
+# Il server dentro il sistema: gli stessi file del kit per il Raspberry Pi.
+mkdir -p "$W/root/opt/tsm-server" "$W/root/etc/default" "$W/root/etc/systemd/system" "$W/root/usr/local/sbin"
+cp -a /iso/config/includes.chroot/. "$W/root/"
+cp /kit/tsm-server.jar "$W/root/opt/tsm-server/"
+cp /kit/tsm-server.service "$W/root/etc/systemd/system/"
+cp /kit/tsm-server.default "$W/root/etc/default/tsm-server"
+sed 's#^cat /var/lib/tsm-server/setup-code.txt$#cat /var/lib/tsm-server/setup-code.txt; /usr/local/sbin/tsm-issue#' /kit/reset-admin.sh > "$W/root/usr/local/sbin/tsm-reset-admin"
+cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
+
+mmdebstrap --mode=unshare --variant=apt --components=main \
+    --include="linux-image-amd64,live-boot,live-config,live-config-systemd,systemd-sysv,locales,keyboard-configuration,console-setup,sudo,user-setup,$PKGS" \
+    --customize-hook="sync-in $W/root /" \
+    --customize-hook="upload $W/hook.sh /tmp/hook.sh" \
+    --customize-hook='chroot "$1" sh /tmp/hook.sh' \
+    --customize-hook='rm -f "$1/tmp/hook.sh"' \
+    --customize-hook="sync-out /boot $W/boot" \
+    bookworm "$W/iso/live/filesystem.squashfs"
+
+cp "$(ls $W/boot/vmlinuz-* | tail -1)" "$W/iso/live/vmlinuz"
+cp "$(ls $W/boot/initrd.img-* | tail -1)" "$W/iso/live/initrd.img"
+cat > "$W/iso/boot/grub/grub.cfg" <<'GRUB'
+set timeout=3
+set default=0
+menuentry "TSM - Server del circolo / Club server" {
+    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=it_IT.UTF-8 keyboard-layouts=it timezone=Europe/Rome live-config.noautologin
+    initrd /live/initrd.img
+}
+menuentry "TSM - English keyboard" {
+    linux /live/vmlinuz boot=live components persistence quiet hostname=tsm-circolo locales=en_US.UTF-8 keyboard-layouts=us timezone=Europe/Rome live-config.noautologin
+    initrd /live/initrd.img
+}
+GRUB
+mkdir -p /iso/out
+grub-mkrescue -o /iso/out/tsm-server.iso "$W/iso" -- -volid TSM-SERVER
+ls -l /iso/out/tsm-server.iso
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/iso/make-usb.sh
+cat > "$DEST/server/deploy/iso/make-usb.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Scrive tsm-server.iso su una chiavetta USB e aggiunge la partizione "persistence" dove il server tiene i dati
+# (senza, a ogni spegnimento si perde tutto). CANCELLA TUTTA LA CHIAVETTA.
+#   sudo ./make-usb.sh /dev/sdX [out/tsm-server.iso]
+# Su Windows lo stesso si fa con Rufus: immagine tsm-server.iso, "Dimensione partizione persistente" > 0.
+set -eu
+DEV="${1:-}"
+HERE=$(cd "$(dirname "$0")" && pwd)
+ISO="${2:-$HERE/out/tsm-server.iso}"
+
+[ "$(id -u)" -eq 0 ] || { echo "sudo $0 /dev/sdX"; exit 1; }
+[ -n "$DEV" ] && [ -b "$DEV" ] || { echo "Uso / usage: sudo $0 /dev/sdX   (lsblk per vedere i dischi / to list disks)"; lsblk -d -o NAME,SIZE,TRAN,RM,MODEL; exit 1; }
+[ -f "$ISO" ] || { echo "Manca / missing: $ISO"; exit 1; }
+
+# Solo dischi rimovibili o USB, mai quello del sistema.
+NAME=$(basename "$DEV")
+RM=$(cat "/sys/block/$NAME/removable" 2>/dev/null || echo 0)
+TRAN=$(lsblk -dno TRAN "$DEV" 2>/dev/null || true)
+if [ "$RM" != 1 ] && [ "$TRAN" != usb ]; then
+    echo "$DEV non sembra una chiavetta USB: mi fermo. / $DEV does not look like a USB stick: stopping."
+    exit 1
+fi
+if lsblk -no MOUNTPOINT "$DEV" | grep -qE '^/(boot|home)?$'; then
+    echo "$DEV contiene il sistema: mi fermo. / $DEV holds the system: stopping."
+    exit 1
+fi
+
+lsblk -o NAME,SIZE,MODEL,LABEL,MOUNTPOINT "$DEV"
+echo
+echo "Tutto quello che c'è su $DEV verrà CANCELLATO. Scrivi SI per continuare."
+echo "Everything on $DEV will be ERASED. Type YES to go on."
+read -r ANSWER
+case "$ANSWER" in SI|SÌ|YES|OUI|JA|SÍ|SIM) ;; *) echo "Annullato / cancelled"; exit 1 ;; esac
+
+for p in $(lsblk -lno NAME "$DEV" | tail -n +2); do umount "/dev/$p" 2>/dev/null || true; done
+dd if="$ISO" of="$DEV" bs=4M conv=fsync status=progress
+sync
+
+# La partizione dei dati nello spazio che resta, col nome che Debian live cerca.
+printf ',,L\n' | sfdisk --append --no-reread "$DEV"
+partprobe "$DEV" 2>/dev/null || blockdev --rereadpt "$DEV" 2>/dev/null || true
+sleep 2
+PART=$(lsblk -lnpo NAME "$DEV" | tail -n 1)
+[ "$PART" != "$DEV" ] || { echo "Non trovo la partizione nuova / new partition not found"; exit 1; }
+mkfs.ext4 -F -q -L persistence "$PART"
+MNT=$(mktemp -d)
+mount "$PART" "$MNT"
+echo "/ union" > "$MNT/persistence.conf"
+umount "$MNT"
+rmdir "$MNT"
+sync
+echo
+echo "Chiavetta pronta: avvia il PC del circolo da USB. / Stick ready: boot the club PC from USB."
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/reset-admin.sh
+cat > "$DEST/server/deploy/reset-admin.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Un nuovo codice di abbinamento per la segreteria (telefono nuovo, o "Scollega" nell'app): quella vecchia non
+# entra più. Inviti, giocatori e prenotazioni restano.
+set -eu
+[ "$(id -u)" -eq 0 ] || { echo "sudo $0"; exit 1; }
+systemctl stop tsm-server
+runuser -u tsm -- /usr/bin/java -Xmx64m -cp /opt/tsm-server/tsm-server.jar com.tennis.scoremanager.server.MainKt --data /var/lib/tsm-server --reset-admin --no-serve
+systemctl start tsm-server
+echo
+cat /var/lib/tsm-server/setup-code.txt
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-server.default
+cat > "$DEST/server/deploy/tsm-server.default" << 'TSM_EOF'
+# Impostazioni del server del circolo TSM. Dopo una modifica: sudo systemctl restart tsm-server
+# Dove ascolta: 0.0.0.0 = tutta la rete del circolo; 127.0.0.1 se davanti c'è Caddy per l'HTTPS.
+TSM_HOST=0.0.0.0
+TSM_PORT=8080
+# Memoria di Java: basta poco anche su un Raspberry Pi Zero 2 W (512 MB).
+JAVA_OPTS="-Xmx64m -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -XX:MaxMetaspaceSize=48m -XX:ReservedCodeCacheSize=24m"
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-server.service
+cat > "$DEST/server/deploy/tsm-server.service" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Il server del circolo TSM (prenotazioni dei campi). Impostazioni in /etc/default/tsm-server.
+[Unit]
+Description=TSM club server (court bookings)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tsm
+Group=tsm
+Environment=TSM_HOST=0.0.0.0 TSM_PORT=8080 "JAVA_OPTS=-Xmx64m"
+EnvironmentFile=-/etc/default/tsm-server
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/tsm-server/tsm-server.jar --host ${TSM_HOST} --port ${TSM_PORT} --data /var/lib/tsm-server
+StateDirectory=tsm-server
+StateDirectoryMode=0700
+Restart=on-failure
+RestartSec=5
+# Java fermato da systemd esce con 143: è uno stop normale, non un guasto.
+SuccessExitStatus=143
+# Il server non ha bisogno d'altro che della sua cartella dei dati.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Api.kt
@@ -72206,6 +72704,7 @@ private val USAGE = """
       --port         la porta (8080)
       --data         la cartella dei dati: state.json e setup-code.txt
       --reset-admin  nuovo codice di abbinamento per la segreteria (quella vecchia non entra più)
+      --no-serve     non avviare il server (con --reset-admin: solo il codice nuovo)
 """.trimIndent()
 
 fun main(args: Array<String>) {
@@ -72217,13 +72716,26 @@ fun main(args: Array<String>) {
     val data = File(opt("--data", System.getenv("TSM_DATA") ?: "tsm-data"))
 
     val store = Store(data)
+    val t = Texts.forSystem()
     store.ensureSetupCode(reset = "--reset-admin" in opts)?.let { code ->
-        println("Codice per abbinare la segreteria: $code (anche in ${File(data, Store.SETUP_FILE).path})")
-        println("Nell'app: Planning campi › Server del circolo › Abbina.")
+        println(t.code(code, File(data, Store.SETUP_FILE).path))
+        println(t.app)
     }
+    // Solo il codice nuovo (reset-admin.sh), senza avviare il server.
+    if ("--no-serve" in opts) return
     val server = start(store, host, port)
-    println("Server del circolo su http://$host:$port (dati in ${data.absolutePath})")
+    println(t.listening("$host:$port", data.absolutePath))
+    for (a in addresses(host)) println("  http://$a:$port")
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(1) })
+}
+
+/** Gli indirizzi da scrivere nell'app: quelli di rete del computer, se ascolta su tutti (0.0.0.0). */
+fun addresses(host: String): List<String> {
+    if (host != "0.0.0.0") return listOf(host)
+    return runCatching {
+        java.net.NetworkInterface.getNetworkInterfaces().toList().filter { it.isUp && !it.isLoopback && !it.isVirtual }
+            .flatMap { it.inetAddresses.toList() }.filterIsInstance<java.net.Inet4Address>().map { it.hostAddress }
+    }.getOrDefault(emptyList()).ifEmpty { listOf("127.0.0.1") }
 }
 
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
@@ -72290,6 +72802,26 @@ private fun send(ex: HttpExchange, status: Int, bytes: ByteArray, type: String) 
     if (ex.requestMethod == "HEAD") { ex.sendResponseHeaders(status, -1); return }
     ex.sendResponseHeaders(status, if (bytes.isEmpty()) -1 else bytes.size.toLong())
     if (bytes.isNotEmpty()) ex.responseBody.use { it.write(bytes) }
+}
+
+/** I messaggi del server nella lingua del sistema (LANG), come lo script d'installazione. */
+private class Texts(val code: (String, String) -> String, val app: String, val listening: (String, String) -> String) {
+    companion object {
+        fun forSystem(): Texts = when ((System.getenv("LC_ALL") ?: System.getenv("LC_MESSAGES") ?: System.getenv("LANG") ?: "en").take(2)) {
+            "it" -> Texts({ c, f -> "Codice di abbinamento della segreteria: $c (anche in $f)" }, "Nell'app: Planning dei campi › Orari e prezzi › Server del circolo › Abbina.",
+                { a, d -> "Server del circolo in ascolto su $a (dati in $d)" })
+            "fr" -> Texts({ c, f -> "Code d'appairage du secrétariat : $c (aussi dans $f)" }, "Dans l'app : Planning des terrains › Horaires et tarifs › Serveur du club › Appairer.",
+                { a, d -> "Serveur du club à l'écoute sur $a (données dans $d)" })
+            "de" -> Texts({ c, f -> "Kopplungscode für das Büro: $c (auch in $f)" }, "In der App: Platzbelegung › Zeiten und Preise › Vereinsserver › Koppeln.",
+                { a, d -> "Vereinsserver hört auf $a (Daten in $d)" })
+            "es" -> Texts({ c, f -> "Código de emparejamiento de la secretaría: $c (también en $f)" }, "En la app: Planning de pistas › Horarios y precios › Servidor del club › Emparejar.",
+                { a, d -> "Servidor del club escuchando en $a (datos en $d)" })
+            "pt" -> Texts({ c, f -> "Código de emparelhamento da secretaria: $c (também em $f)" }, "Na app: Agenda das quadras › Horários e preços › Servidor do clube › Emparelhar.",
+                { a, d -> "Servidor do clube à escuta em $a (dados em $d)" })
+            else -> Texts({ c, f -> "Office pairing code: $c (also in $f)" }, "In the app: Court planner › Hours and prices › Club server › Pair.",
+                { a, d -> "Club server listening on $a (data in $d)" })
+        }
+    }
 }
 TSM_EOF
 
@@ -72375,8 +72907,10 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
         val (next, out) = f(state)
         if (next != state) {
             val tmp = File(dir, "state.json.tmp")
-            tmp.writeText(json.encodeToString(State.serializer(), next))
+            // Scritto davvero sul disco prima di rispondere: al circolo può mancare la corrente.
+            java.io.FileOutputStream(tmp).use { out -> out.write(json.encodeToString(State.serializer(), next).toByteArray()); out.fd.sync() }
             if (!tmp.renameTo(file)) { file.delete(); check(tmp.renameTo(file)) { "non riesco a scrivere ${file.path}" } }
+            syncDir()
             state = next
         }
         return out
@@ -72385,6 +72919,9 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
     /** Il codice per abbinare la segreteria: nuovo se la segreteria non c'è, scritto in setup-code.txt. */
     fun ensureSetupCode(reset: Boolean = false): String? {
         if (state.admin != null && !reset) return null
+        // Finché non si abbina resta lo stesso codice, anche se il server riparte.
+        val old = File(dir, SETUP_FILE).takeIf { it.exists() }?.readText()?.trim()
+        if (!reset && old != null && state.setup == Secrets.hash(old)) return old
         val code = Secrets.code()
         update { it.copy(admin = null, setup = Secrets.hash(code)) to Unit }
         File(dir, SETUP_FILE).apply {
@@ -72394,7 +72931,12 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
         return code
     }
 
-    fun forgetSetupCode() { File(dir, SETUP_FILE).delete() }
+    fun forgetSetupCode() { File(dir, SETUP_FILE).delete(); syncDir() }
+
+    /** Anche la cartella, perché la rinomina e le cancellazioni restino dopo uno spegnimento brusco. */
+    private fun syncDir() {
+        runCatching { java.nio.channels.FileChannel.open(dir.toPath(), java.nio.file.StandardOpenOption.READ).use { it.force(true) } }
+    }
 
     companion object {
         const val SETUP_FILE = "setup-code.txt"
@@ -73753,6 +74295,14 @@ class ApiTest {
         assertTrue(obj(call("GET", "/info"))["paired"].toString() == "false")
         pairAndSync()
         assertEquals("TC Prova", obj(call("GET", "/info"))["club"]!!.jsonPrimitive.content)
+    }
+
+    @Test fun setupCodeStaysUntilPairedAndChangesOnReset() {
+        val a = store.ensureSetupCode()!!
+        assertEquals(a, Store(dir) { now }.ensureSetupCode())
+        val b = Store(dir) { now }.ensureSetupCode(reset = true)!!
+        assertTrue(a != b)
+        assertEquals(b, File(dir, Store.SETUP_FILE).readText().trim())
     }
 }
 TSM_EOF
@@ -76650,6 +77200,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 248 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 261 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

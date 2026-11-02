@@ -21,6 +21,7 @@ private val USAGE = """
       --port         la porta (8080)
       --data         la cartella dei dati: state.json e setup-code.txt
       --reset-admin  nuovo codice di abbinamento per la segreteria (quella vecchia non entra più)
+      --no-serve     non avviare il server (con --reset-admin: solo il codice nuovo)
 """.trimIndent()
 
 fun main(args: Array<String>) {
@@ -32,13 +33,26 @@ fun main(args: Array<String>) {
     val data = File(opt("--data", System.getenv("TSM_DATA") ?: "tsm-data"))
 
     val store = Store(data)
+    val t = Texts.forSystem()
     store.ensureSetupCode(reset = "--reset-admin" in opts)?.let { code ->
-        println("Codice per abbinare la segreteria: $code (anche in ${File(data, Store.SETUP_FILE).path})")
-        println("Nell'app: Planning campi › Server del circolo › Abbina.")
+        println(t.code(code, File(data, Store.SETUP_FILE).path))
+        println(t.app)
     }
+    // Solo il codice nuovo (reset-admin.sh), senza avviare il server.
+    if ("--no-serve" in opts) return
     val server = start(store, host, port)
-    println("Server del circolo su http://$host:$port (dati in ${data.absolutePath})")
+    println(t.listening("$host:$port", data.absolutePath))
+    for (a in addresses(host)) println("  http://$a:$port")
     Runtime.getRuntime().addShutdownHook(Thread { server.stop(1) })
+}
+
+/** Gli indirizzi da scrivere nell'app: quelli di rete del computer, se ascolta su tutti (0.0.0.0). */
+fun addresses(host: String): List<String> {
+    if (host != "0.0.0.0") return listOf(host)
+    return runCatching {
+        java.net.NetworkInterface.getNetworkInterfaces().toList().filter { it.isUp && !it.isLoopback && !it.isVirtual }
+            .flatMap { it.inetAddresses.toList() }.filterIsInstance<java.net.Inet4Address>().map { it.hostAddress }
+    }.getOrDefault(emptyList()).ifEmpty { listOf("127.0.0.1") }
 }
 
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
@@ -105,4 +119,24 @@ private fun send(ex: HttpExchange, status: Int, bytes: ByteArray, type: String) 
     if (ex.requestMethod == "HEAD") { ex.sendResponseHeaders(status, -1); return }
     ex.sendResponseHeaders(status, if (bytes.isEmpty()) -1 else bytes.size.toLong())
     if (bytes.isNotEmpty()) ex.responseBody.use { it.write(bytes) }
+}
+
+/** I messaggi del server nella lingua del sistema (LANG), come lo script d'installazione. */
+private class Texts(val code: (String, String) -> String, val app: String, val listening: (String, String) -> String) {
+    companion object {
+        fun forSystem(): Texts = when ((System.getenv("LC_ALL") ?: System.getenv("LC_MESSAGES") ?: System.getenv("LANG") ?: "en").take(2)) {
+            "it" -> Texts({ c, f -> "Codice di abbinamento della segreteria: $c (anche in $f)" }, "Nell'app: Planning dei campi › Orari e prezzi › Server del circolo › Abbina.",
+                { a, d -> "Server del circolo in ascolto su $a (dati in $d)" })
+            "fr" -> Texts({ c, f -> "Code d'appairage du secrétariat : $c (aussi dans $f)" }, "Dans l'app : Planning des terrains › Horaires et tarifs › Serveur du club › Appairer.",
+                { a, d -> "Serveur du club à l'écoute sur $a (données dans $d)" })
+            "de" -> Texts({ c, f -> "Kopplungscode für das Büro: $c (auch in $f)" }, "In der App: Platzbelegung › Zeiten und Preise › Vereinsserver › Koppeln.",
+                { a, d -> "Vereinsserver hört auf $a (Daten in $d)" })
+            "es" -> Texts({ c, f -> "Código de emparejamiento de la secretaría: $c (también en $f)" }, "En la app: Planning de pistas › Horarios y precios › Servidor del club › Emparejar.",
+                { a, d -> "Servidor del club escuchando en $a (datos en $d)" })
+            "pt" -> Texts({ c, f -> "Código de emparelhamento da secretaria: $c (também em $f)" }, "Na app: Agenda das quadras › Horários e preços › Servidor do clube › Emparelhar.",
+                { a, d -> "Servidor do clube à escuta em $a (dados em $d)" })
+            else -> Texts({ c, f -> "Office pairing code: $c (also in $f)" }, "In the app: Court planner › Hours and prices › Club server › Pair.",
+                { a, d -> "Club server listening on $a (data in $d)" })
+        }
+    }
 }
