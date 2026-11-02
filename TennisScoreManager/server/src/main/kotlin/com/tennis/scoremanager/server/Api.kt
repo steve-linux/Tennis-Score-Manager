@@ -9,6 +9,15 @@ import com.tennis.scoremanager.data.ClubSync
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
+import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvCode
+import com.tennis.scoremanager.data.SrvError
+import com.tennis.scoremanager.data.SrvInfo
+import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.SrvInviteIn
+import com.tennis.scoremanager.data.SrvOk
+import com.tennis.scoremanager.data.SrvPlayer
+import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -18,12 +27,6 @@ import java.time.ZoneId
 
 const val API_VERSION = 1
 
-@Serializable data class ErrorOut(val error: String)
-@Serializable data class InfoOut(val club: String, val api: Int, val paired: Boolean, val synced: Boolean, val timeZone: String, val payInfo: String)
-@Serializable data class CodeIn(val code: String)
-@Serializable data class TokenOut(val token: String, val name: String = "", val player: String = "")
-@Serializable data class InviteIn(val player: String, val name: String, val days: Int = 14)
-@Serializable data class InviteOut(val code: String, val expires: Long)
 @Serializable data class MyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)
 @Serializable data class MeOut(
     val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
@@ -32,10 +35,7 @@ const val API_VERSION = 1
 )
 @Serializable data class DayOut(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
 @Serializable data class BookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
-@Serializable data class PlayerOut(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
-@Serializable data class AdminOut(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<PlayerOut>)
 @Serializable data class QuoteOut(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
-@Serializable data class OkOut(val ok: Boolean = true)
 
 /** Una risposta: codice HTTP e corpo JSON. */
 data class Resp(val status: Int, val body: String)
@@ -59,7 +59,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
     fun handle(r: Req): Resp = try {
         route(r)
     } catch (e: ApiError) {
-        Resp(e.status, json.encodeToString(ErrorOut.serializer(), ErrorOut(e.code)))
+        Resp(e.status, json.encodeToString(SrvError.serializer(), SrvError(e.code)))
     }
 
     private fun route(r: Req): Resp {
@@ -108,12 +108,12 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun info(): Resp {
         val s = store.state
-        return ok(InfoOut.serializer(), InfoOut(s.sync.club, API_VERSION, s.admin != null, s.syncedAt > 0, s.sync.timeZone, s.sync.payInfo))
+        return ok(SrvInfo.serializer(), SrvInfo(s.sync.club, API_VERSION, s.admin != null, s.syncedAt > 0, s.sync.timeZone, s.sync.payInfo))
     }
 
     private fun pair(r: Req): Resp {
         guard(r)
-        val code = Secrets.normalize(read(CodeIn.serializer(), r).code)
+        val code = Secrets.normalize(read(SrvCode.serializer(), r).code)
         val token = Secrets.token()
         val done = store.update { s ->
             if (s.setup == null || Secrets.hash(code) != s.setup) s to false
@@ -121,7 +121,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
         }
         if (!done) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
         store.forgetSetupCode()
-        return ok(TokenOut.serializer(), TokenOut(token))
+        return ok(SrvToken.serializer(), SrvToken(token))
     }
 
     private fun sync(r: Req): Resp {
@@ -142,11 +142,11 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun adminState(): Resp {
         val s = store.state
-        return ok(AdminOut.serializer(), AdminOut(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { PlayerOut(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
+        return ok(SrvAdmin.serializer(), SrvAdmin(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
     }
 
     private fun invite(r: Req): Resp {
-        val i = read(InviteIn.serializer(), r)
+        val i = read(SrvInviteIn.serializer(), r)
         if (i.player.isBlank() || i.name.isBlank()) throw ApiError(400, "BAD_REQUEST")
         val code = Secrets.code()
         val expires = store.now() + i.days.coerceIn(1, 90) * 86_400_000L
@@ -154,26 +154,26 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             // Un nuovo invito per lo stesso giocatore sostituisce il vecchio.
             s.copy(invites = s.invites.filter { it.player != i.player } + Invite(Secrets.hash(code), i.player, i.name.trim().take(60), expires)) to Unit
         }
-        return ok(InviteOut.serializer(), InviteOut(code, expires))
+        return ok(SrvInvite.serializer(), SrvInvite(code, expires))
     }
 
     private fun adminCancel(id: String): Resp {
         val found = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.any { it.id == id } }
         if (!found) throw ApiError(404, "NOT_FOUND")
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
         store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }) to Unit }
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     // --- Giocatori ---
 
     private fun claim(r: Req): Resp {
         guard(r)
-        val h = Secrets.hash(Secrets.normalize(read(CodeIn.serializer(), r).code))
+        val h = Secrets.hash(Secrets.normalize(read(SrvCode.serializer(), r).code))
         val token = Secrets.token()
         val now = store.now()
         val inv = store.update { s ->
@@ -184,7 +184,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             s.copy(players = s.players.filter { it.id != pl.id } + pl, invites = s.invites - inv) to inv
         }
         if (inv == null) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
-        return ok(TokenOut.serializer(), TokenOut(token, inv.name, inv.player))
+        return ok(SrvToken.serializer(), SrvToken(token, inv.name, inv.player))
     }
 
     private fun zone(): ZoneId = ZoneId.of(store.state.sync.timeZone)
@@ -247,13 +247,13 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             (if (p == null) s.copy(bookings = s.bookings.filter { it.id != id }) else s) to p
         }
         if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     private fun logout(pl: Player, token: String): Resp {
         val h = Secrets.hash(token)
         store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(tokens = it.tokens - h) else it }) to Unit }
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 }
 

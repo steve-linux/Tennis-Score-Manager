@@ -423,6 +423,17 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Convocados**: primero quien dijo sí, luego los quizá; en rojo quien no está en regla ese día. **Enviar la convocatoria** escribe a cada uno día, hora, lugar y punto de encuentro, y prepara para el grupo la lista de convocados.
 - **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó) o **Jugar con el marcador**, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido.
 
+### 7.18 Servidor del club para las reservas (opcional, app 2.6)
+
+**Opcional**: sin servidor no cambia nada, se reserva en secretaría como siempre. Con un pequeño servidor en el club (una Raspberry Pi Zero 2 W o un PC viejo) los jugadores invitados **reservan las pistas solos** desde el teléfono, **también iPhone**, en una página web del club que se añade a la pantalla de inicio como una app.
+
+- **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
+- **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
+- **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
+- **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR; en iPhone, *Compartir › Añadir a pantalla de inicio*. En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
+- **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
+- **Desde casa** (internet) hacen falta una dirección https y un puerto abierto en el router del club: se consigue con servicios gratuitos (DuckDNS y Let's Encrypt), si la línea tiene IP pública.
+
 ## 8. Marcador en un televisor o monitor
 
 El teléfono del juez hace de **pequeño servidor** en la red Wi-Fi: el marcador es una página web de estilo LED (cifras de 7 segmentos, amarillo contra rojo, juegos y sets en el centro, sets terminados y tiempo de partido abajo a la izquierda, **SAQUE: 25 SEG** abajo a la derecha) que se actualiza sola en cada punto. El monitor no tiene que ser «smart» y no hace falta la red del club: basta con el **punto de acceso** (hotspot) de uno de los dos teléfonos.

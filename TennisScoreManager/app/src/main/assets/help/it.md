@@ -423,6 +423,17 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Convocati**: prima chi ha detto sì, poi i forse; in rosso chi non è in regola quel giorno. **Manda la convocazione** scrive a ciascuno giorno, ora, dove e ritrovo, e prepara per il gruppo l'elenco dei convocati.
 - **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto) o **Gioca col segnapunti**, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita.
 
+### 7.18 Server del circolo per le prenotazioni (facoltativo, app 2.6)
+
+**Facoltativo**: senza server non cambia niente, si prenota in segreteria come sempre. Con un piccolo server al circolo (un Raspberry Pi Zero 2 W o un vecchio PC) i giocatori invitati **prenotano i campi da soli**, dal telefono, **anche da iPhone**, da una pagina web del circolo che si aggiunge alla schermata Home come un'app.
+
+- **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
+- **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
+- **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
+- **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR, e su iPhone fa *Condividi › Aggiungi alla schermata Home*. Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
+- **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
+- **Da casa** (internet) servono un indirizzo https e la porta aperta sul router del circolo: si fa con servizi gratuiti (DuckDNS e Let's Encrypt), purché la linea abbia un IP pubblico.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.

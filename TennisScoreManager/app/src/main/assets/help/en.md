@@ -423,6 +423,17 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Called up**: first those who said yes, then the maybes; in red whoever isn't in order that day. **Send the call-up** writes to each player day, time, place and meeting point, and prepares the call-up list for the group.
 - **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won) or **Play with the scorer**, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber.
 
+### 7.18 Club server for bookings (optional, app 2.6)
+
+**Optional**: without a server nothing changes, bookings go through the club office as always. With a small server at the club (a Raspberry Pi Zero 2 W or an old PC), invited players **book courts by themselves** from their phone, **iPhone too**, on a club web page they can add to the Home screen like an app.
+
+- **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
+- **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
+- **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
+- **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR; on iPhone, *Share › Add to Home Screen*. The card shows who books online; **Remove online access** disconnects them.
+- **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
+- **From home** (internet) you need an https address and an open port on the club router: free services do it (DuckDNS and Let's Encrypt), as long as the line has a public IP.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.

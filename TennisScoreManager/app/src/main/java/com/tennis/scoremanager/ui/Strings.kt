@@ -1526,6 +1526,49 @@ interface Strings {
     val backhandOne: String
     val backhandTwo: String
     val playerAge: (Int) -> String
+    // Server del circolo (facoltativo).
+    val srvTitle: String
+    val srvButtonHint: String
+    val srvIntro: String
+    val srvAddress: String
+    val srvAddressHint: String
+    val srvSetupCode: String
+    val srvSetupHint: String
+    val srvPair: String
+    val srvConnected: (String) -> String
+    val srvLastSync: (String) -> String
+    val srvNeverSynced: String
+    val srvSyncNow: String
+    val srvSynced: String
+    val srvUnpair: String
+    val srvUnpairAsk: String
+    val srvOpen: String
+    val srvOpenHint: String
+    val srvDaysAhead: String
+    val srvMaxFuture: String
+    val srvMaxMinutes: String
+    val srvCancelHours: String
+    val srvNotice: String
+    val srvCourts: String
+    val srvPayInfo: String
+    val srvPlayers: (Int) -> String
+    val srvInviteHow: String
+    val srvInvite: String
+    val srvInviteHint: String
+    val srvInviteCode: (String) -> String
+    val srvInviteUntil: (String) -> String
+    val srvShare: String
+    val srvShareText: (String, String) -> String
+    val srvLinked: (String) -> String
+    val srvRevoke: String
+    val srvOnlineTag: String
+    val srvErrNet: String
+    val srvErrCode: String
+    val srvErrAuth: String
+    val srvErrNotTsm: String
+    val srvErrOther: (String) -> String
+    /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
+    val memberValidUntil: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -3311,6 +3354,47 @@ object ItStrings : Strings {
     override val backhandOne = "1 mano"
     override val backhandTwo = "2 mani"
     override val playerAge: (Int) -> String = { "$it anni" }
+    override val memberValidUntil: (String) -> String = { "fino al $it" }
+    override val srvTitle = "Server del circolo"
+    override val srvButtonHint = "Facoltativo: i giocatori prenotano da soli"
+    override val srvIntro = "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria."
+    override val srvAddress = "Indirizzo del server"
+    override val srvAddressHint = "Come lo scrive il server all'avvio, es. http://192.168.1.50:8080 (o https://… da internet)"
+    override val srvSetupCode = "Codice di abbinamento"
+    override val srvSetupHint = "Lo scrive il server all'avvio e nel file setup-code.txt. Vale una volta sola."
+    override val srvPair = "Abbina"
+    override val srvConnected: (String) -> String = { "Collegato a $it" }
+    override val srvLastSync: (String) -> String = { "Planning inviato: $it" }
+    override val srvNeverSynced = "Planning non ancora inviato"
+    override val srvSyncNow = "Invia ora"
+    override val srvSynced = "Planning inviato"
+    override val srvUnpair = "Scollega il server"
+    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano."
+    override val srvOpen = "Prenotazioni online aperte"
+    override val srvOpenHint = "Spente: i giocatori vedono il planning ma non prenotano"
+    override val srvDaysAhead = "Fin quanti giorni avanti"
+    override val srvMaxFuture = "Prenotazioni per giocatore"
+    override val srvMaxMinutes = "Durata massima"
+    override val srvCancelHours = "Disdetta da soli fino a (ore prima)"
+    override val srvNotice = "Prenota fino a (minuti prima)"
+    override val srvCourts = "Campi prenotabili online"
+    override val srvPayInfo = "Come si paga (lo leggono i giocatori)"
+    override val srvPlayers: (Int) -> String = { "Giocatori collegati: $it" }
+    override val srvInviteHow = "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online."
+    override val srvInvite = "Invito per prenotare online"
+    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home."
+    override val srvInviteCode: (String) -> String = { "Codice: $it" }
+    override val srvInviteUntil: (String) -> String = { "Vale una volta, fino al $it" }
+    override val srvShare = "Condividi il link"
+    override val srvShareText: (String, String) -> String = { a, b -> "Prenota i campi di $a da qui: $b" }
+    override val srvLinked: (String) -> String = { "Prenota online · ultimo accesso $it" }
+    override val srvRevoke = "Togli l'accesso online"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "Il server non risponde: controlla l'indirizzo e che il telefono sia sulla stessa rete (o su internet)."
+    override val srvErrCode = "Codice sbagliato o già usato."
+    override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
+    override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
+    override val srvErrOther: (String) -> String = { "Errore del server: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5079,6 +5163,47 @@ object EnStrings : Strings {
     override val backhandOne = "1 hand"
     override val backhandTwo = "2 hands"
     override val playerAge: (Int) -> String = { "$it years old" }
+    override val memberValidUntil: (String) -> String = { "until $it" }
+    override val srvTitle = "Club server"
+    override val srvButtonHint = "Optional: players book by themselves"
+    override val srvIntro = "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office."
+    override val srvAddress = "Server address"
+    override val srvAddressHint = "As the server prints it at start-up, e.g. http://192.168.1.50:8080 (or https://… from the internet)"
+    override val srvSetupCode = "Pairing code"
+    override val srvSetupHint = "The server prints it at start-up and in the file setup-code.txt. It works only once."
+    override val srvPair = "Pair"
+    override val srvConnected: (String) -> String = { "Connected to $it" }
+    override val srvLastSync: (String) -> String = { "Schedule sent: $it" }
+    override val srvNeverSynced = "Schedule not sent yet"
+    override val srvSyncNow = "Send now"
+    override val srvSynced = "Schedule sent"
+    override val srvUnpair = "Disconnect the server"
+    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay."
+    override val srvOpen = "Online booking open"
+    override val srvOpenHint = "Off: players see the schedule but cannot book"
+    override val srvDaysAhead = "How many days ahead"
+    override val srvMaxFuture = "Bookings per player"
+    override val srvMaxMinutes = "Longest booking"
+    override val srvCancelHours = "Self-cancel up to (hours before)"
+    override val srvNotice = "Book up to (minutes before)"
+    override val srvCourts = "Courts bookable online"
+    override val srvPayInfo = "How to pay (players read this)"
+    override val srvPlayers: (Int) -> String = { "Connected players: $it" }
+    override val srvInviteHow = "To invite a player: open their card and tap Invite to book online."
+    override val srvInvite = "Invite to book online"
+    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen."
+    override val srvInviteCode: (String) -> String = { "Code: $it" }
+    override val srvInviteUntil: (String) -> String = { "Works once, until $it" }
+    override val srvShare = "Share the link"
+    override val srvShareText: (String, String) -> String = { a, b -> "Book the courts at $a here: $b" }
+    override val srvLinked: (String) -> String = { "Books online · last seen $it" }
+    override val srvRevoke = "Remove online access"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "The server does not answer: check the address and that the phone is on the same network (or online)."
+    override val srvErrCode = "Wrong or already used code."
+    override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
+    override val srvErrNotTsm = "There is no TSM club server at that address."
+    override val srvErrOther: (String) -> String = { "Server error: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

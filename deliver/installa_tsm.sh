@@ -755,6 +755,17 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Aufgestellt**: zuerst wer ja gesagt hat, dann die Vielleicht; rot, wer an dem Tag nicht in Ordnung ist. **Aufstellung senden** schreibt jedem Tag, Uhrzeit, Ort und Treffpunkt und bereitet für die Gruppe die Liste vor.
 - **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger) oder **Mit dem Zähler spielen**, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor.
 
+### 7.18 Vereinsserver für Buchungen (optional, app 2.6)
+
+**Optional**: Ohne Server ändert sich nichts, gebucht wird wie immer im Vereinsbüro. Mit einem kleinen Server im Verein (ein Raspberry Pi Zero 2 W oder ein alter PC) **buchen eingeladene Spieler die Plätze selbst** am Handy, **auch am iPhone**, auf einer Webseite des Vereins, die man wie eine App zum Home-Bildschirm hinzufügt.
+
+- **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
+- **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
+- **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
+- **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code; am iPhone *Teilen › Zum Home-Bildschirm*. Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
+- **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
+- **Von zu Hause** (Internet) braucht es eine https-Adresse und einen offenen Port am Vereinsrouter: Das geht mit kostenlosen Diensten (DuckDNS und Let's Encrypt), wenn die Leitung eine öffentliche IP hat.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.
@@ -1259,6 +1270,17 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Called up**: first those who said yes, then the maybes; in red whoever isn't in order that day. **Send the call-up** writes to each player day, time, place and meeting point, and prepares the call-up list for the group.
 - **Rubbers**: for each singles and doubles our players (from those called up) and theirs, then the score (from our side: the app works out who won) or **Play with the scorer**, and when it ends the result comes back by itself. At the top the fixture result (e.g. *4-2 won*); **Send the result** prepares it rubber by rubber.
 
+### 7.18 Club server for bookings (optional, app 2.6)
+
+**Optional**: without a server nothing changes, bookings go through the club office as always. With a small server at the club (a Raspberry Pi Zero 2 W or an old PC), invited players **book courts by themselves** from their phone, **iPhone too**, on a club web page they can add to the Home screen like an app.
+
+- **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
+- **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
+- **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
+- **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR; on iPhone, *Share › Add to Home Screen*. The card shows who books online; **Remove online access** disconnects them.
+- **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
+- **From home** (internet) you need an https address and an open port on the club router: free services do it (DuckDNS and Let's Encrypt), as long as the line has a public IP.
+
 ## 8. Scoreboard on a TV or monitor
 
 The umpire's phone acts as a **small server** on the Wi-Fi network: the scoreboard is an LED-style web page (7-segment digits, yellow against red, games and sets in the centre, finished sets and match time bottom left, **SERVE: 25 SEC** bottom right) that updates by itself at every point. The monitor doesn't need to be "smart" and no club network is needed: the **hotspot** of one of the two phones is enough.
@@ -1761,6 +1783,17 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Disponibilidad**: *Pedir disponibilidad a todos* envía el mensaje (responden SÍ, NO o QUIZÁ); las respuestas se marcan con un toque, y *Pedir a quien no ha respondido* insiste solo con ellos.
 - **Convocados**: primero quien dijo sí, luego los quizá; en rojo quien no está en regla ese día. **Enviar la convocatoria** escribe a cada uno día, hora, lugar y punto de encuentro, y prepara para el grupo la lista de convocados.
 - **Partidos**: para cada individual y doble los nuestros (de los convocados) y los suyos, luego el resultado (desde nuestro lado: la app sabe quién ganó) o **Jugar con el marcador**, y al terminar el resultado vuelve solo. Arriba el resultado del encuentro (p. ej. *4-2 ganado*); **Enviar el resultado** lo prepara partido por partido.
+
+### 7.18 Servidor del club para las reservas (opcional, app 2.6)
+
+**Opcional**: sin servidor no cambia nada, se reserva en secretaría como siempre. Con un pequeño servidor en el club (una Raspberry Pi Zero 2 W o un PC viejo) los jugadores invitados **reservan las pistas solos** desde el teléfono, **también iPhone**, en una página web del club que se añade a la pantalla de inicio como una app.
+
+- **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
+- **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
+- **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
+- **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR; en iPhone, *Compartir › Añadir a pantalla de inicio*. En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
+- **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
+- **Desde casa** (internet) hacen falta una dirección https y un puerto abierto en el router del club: se consigue con servicios gratuitos (DuckDNS y Let's Encrypt), si la línea tiene IP pública.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2265,6 +2298,17 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Convoqués** : d'abord ceux qui ont dit oui, puis les peut-être ; en rouge ceux qui ne sont pas en règle ce jour-là. **Envoyer la convocation** écrit à chacun jour, heure, lieu et rendez-vous, et prépare pour le groupe la liste des convoqués.
 - **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ou **Jouer avec le marqueur**, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match.
 
+### 7.18 Serveur du club pour les réservations (facultatif, app 2.6)
+
+**Facultatif** : sans serveur rien ne change, on réserve au secrétariat comme toujours. Avec un petit serveur au club (un Raspberry Pi Zero 2 W ou un vieux PC), les joueurs invités **réservent eux-mêmes les terrains** depuis leur téléphone, **iPhone compris**, sur une page web du club qu'on ajoute à l'écran d'accueil comme une app.
+
+- **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
+- **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
+- **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
+- **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR ; sur iPhone, *Partager › Sur l'écran d'accueil*. La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
+- **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
+- **Depuis chez soi** (internet) il faut une adresse https et un port ouvert sur la box du club : des services gratuits le permettent (DuckDNS et Let's Encrypt), si la ligne a une IP publique.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.
@@ -2768,6 +2812,17 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Convocati**: prima chi ha detto sì, poi i forse; in rosso chi non è in regola quel giorno. **Manda la convocazione** scrive a ciascuno giorno, ora, dove e ritrovo, e prepara per il gruppo l'elenco dei convocati.
 - **Partite**: per ogni singolare e doppio i nostri (dai convocati) e i loro, poi il punteggio (dal nostro lato: l'app capisce chi ha vinto) o **Gioca col segnapunti**, e a partita finita il risultato torna da solo. In alto il risultato dell'incontro (es. *4-2 vinto*); **Manda il risultato** lo prepara partita per partita.
 
+### 7.18 Server del circolo per le prenotazioni (facoltativo, app 2.6)
+
+**Facoltativo**: senza server non cambia niente, si prenota in segreteria come sempre. Con un piccolo server al circolo (un Raspberry Pi Zero 2 W o un vecchio PC) i giocatori invitati **prenotano i campi da soli**, dal telefono, **anche da iPhone**, da una pagina web del circolo che si aggiunge alla schermata Home come un'app.
+
+- **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
+- **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
+- **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
+- **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR, e su iPhone fa *Condividi › Aggiungi alla schermata Home*. Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
+- **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
+- **Da casa** (internet) servono un indirizzo https e la porta aperta sul router del circolo: si fa con servizi gratuiti (DuckDNS e Let's Encrypt), purché la linea abbia un IP pubblico.
+
 ## 8. Tabellone su TV o monitor
 
 Il telefono dell'arbitro fa da **piccolo server** sulla rete Wi-Fi: il tabellone è una pagina web in stile LED (cifre a 7 segmenti, giallo contro rosso, game e set al centro, set conclusi e tempo partita in basso a sinistra, **SERVIZIO: 25 SEC** in basso a destra) che si aggiorna da sola a ogni punto. Il monitor non deve essere "smart" e non serve una rete del circolo: basta l'**hotspot** di uno dei due telefoni.
@@ -3270,6 +3325,17 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Disponibilidade**: *Pedir disponibilidade a todos* envia a mensagem (respondem SIM, NÃO ou TALVEZ); as respostas se marcam com um toque, e *Pedir a quem não respondeu* insiste só com eles.
 - **Convocados**: primeiro quem disse sim, depois os talvez; em vermelho quem não está em ordem naquele dia. **Enviar a convocação** escreve a cada um dia, hora, local e ponto de encontro, e prepara para o grupo a lista dos convocados.
 - **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu) ou **Jogar com o marcador**, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida.
+
+### 7.18 Servidor do clube para as reservas (opcional, app 2.6)
+
+**Opcional**: sem servidor nada muda, reserva-se na secretaria como sempre. Com um pequeno servidor no clube (um Raspberry Pi Zero 2 W ou um PC antigo) os jogadores convidados **reservam as quadras sozinhos** no telemóvel, **também iPhone**, numa página web do clube que se adiciona ao ecrã principal como uma app.
+
+- **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
+- **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
+- **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
+- **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR; no iPhone, *Partilhar › Adicionar ao ecrã principal*. Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
+- **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
+- **De casa** (internet) é preciso um endereço https e uma porta aberta no router do clube: faz-se com serviços gratuitos (DuckDNS e Let's Encrypt), desde que a linha tenha IP público.
 
 ## 8. Placar na TV ou no monitor
 
@@ -4181,12 +4247,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
@@ -5770,6 +5838,9 @@ class MatchController(
     fun saveBooking(b: com.tennis.scoremanager.data.CourtBooking, weeks: Int, charge: Boolean): List<Long> {
         val (list, skipped) = if (weeks > 1) com.tennis.scoremanager.data.CourtPlans.weekly(courtPlan.value, clubTournaments.value, b, weeks) else listOf(b) to emptyList()
         val old = courtPlan.value.bookings.firstOrNull { it.id == b.id }
+        // Una prenotazione online spostata (campo, ora, durata) diventa della segreteria: sul server si toglie.
+        val keepOnline = old?.online?.takeIf { old.court == b.court && old.start == b.start && old.minutes == b.minutes }
+        old?.online?.let { id -> if (keepOnline == null) saveServer { it.copy(cancel = (it.cancel + id).distinct()) } }
         var book = clubBook.value
         // Cambiando una prenotazione, gli addebiti di prima non pagati si tolgono e si rifanno.
         old?.charges?.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
@@ -5785,7 +5856,7 @@ class MatchController(
             }
         }
         saveClubBook(book)
-        putBookings(saved)
+        putBookings(saved.map { it.copy(online = if (it.id == b.id) keepOnline else null) })
         return skipped
     }
 
@@ -5915,13 +5986,108 @@ class MatchController(
         scope.launch(io) { storage.saveCourtPlan(p) }
     }
 
-    /** Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. */
-    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean) {
+    /**
+     * Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. Quelle fatte
+     * online si tolgono anche dal server ([fromServer]: le ha già tolte lui).
+     */
+    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean, fromServer: Boolean = false) {
         val gone = if (wholeSeries && b.series != null) courtPlan.value.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
+        if (!fromServer) gone.mapNotNull { it.online }.takeIf { it.isNotEmpty() }?.let { ids -> saveServer { it.copy(cancel = (it.cancel + ids).distinct()) } }
         var book = clubBook.value
         gone.flatMap { it.charges }.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
         saveClubBook(book)
         putBookings(emptyList(), gone.map { it.id }.toSet())
+    }
+
+    // ---- Server del circolo (facoltativo) ----
+
+    /** Il server del circolo per le prenotazioni dei giocatori; non abbinato = si prenota solo in segreteria. */
+    val clubServer = MutableStateFlow(storage.loadClubServer())
+    private val serverLock = kotlinx.coroutines.sync.Mutex()
+
+    private fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
+        val n = synchronized(clubServer) { f(clubServer.value).also { clubServer.value = it } }
+        scope.launch(io) { storage.saveClubServer(n) }
+    }
+
+    init {
+        // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
+        scope.launch {
+            combine(courtPlan, clubTournaments, clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
+                .collectLatest { delay(3_000); if (clubServer.value.paired) syncServerNow() }
+        }
+    }
+
+    /** Abbina la segreteria al server con il codice che il server ha scritto all'avvio. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun pairServer(url: String, code: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(url)
+        if (u.isEmpty()) return "BAD_URL"
+        return try {
+            val token = withContext(Dispatchers.IO) {
+                com.tennis.scoremanager.data.ClubServerClient(u, null).info()
+                com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
+            }
+            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList()) }
+            syncServerNow()
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /**
+     * Manda il planning al server e prende le prenotazioni online: le nuove entrano nel planning, quelle disdette
+     * escono. Prima toglie dal server quelle tolte in segreteria. null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun syncServerNow(): String? = serverLock.withLock {
+        val conf = clubServer.value
+        if (!conf.paired) return@withLock null
+        val cl = com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token)
+        try {
+            for (id in conf.cancel) {
+                withContext(Dispatchers.IO) { try { cl.cancel(id) } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
+                saveServer { it.copy(cancel = it.cancel - id) }
+            }
+            val sync = com.tennis.scoremanager.data.ClubServers.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
+            val st = withContext(Dispatchers.IO) { cl.sync(sync) }
+            val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
+            gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
+            if (added.isNotEmpty()) putBookings(added)
+            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            saveServer { it.copy(error = e.code) }
+            e.code
+        }
+    }
+
+    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String) = saveServer { it.copy(rules = rules, payInfo = payInfo.trim()) }
+
+    /** L'invito per un giocatore: codice e scadenza (il link lo fa [com.tennis.scoremanager.data.ClubServers.inviteLink]). */
+    suspend fun serverInvite(p: com.tennis.scoremanager.data.PlayerProfile): Result<com.tennis.scoremanager.data.SrvInvite> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).invite(p.id, p.name) })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
+    /** Il giocatore non prenota più online (le sue prenotazioni restano nel planning). */
+    suspend fun serverRemovePlayer(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).removePlayer(id) }
+            saveServer { it.copy(players = it.players.filter { p -> p.id != id }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
+    fun unpairServer() {
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo) }
+        val p = courtPlan.value
+        if (p.bookings.any { it.online != null }) {
+            val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
     }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */
@@ -10375,6 +10541,132 @@ object ClubDrawImage {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubServer.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubServer.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.net.HttpURLConnection
+import java.net.URL
+
+/**
+ * Il server del circolo visto dalla segreteria (facoltativo: [url] vuoto = nessun server, si prenota in
+ * segreteria come sempre). [token] è la chiave della segreteria; [cancel] le prenotazioni online tolte dal
+ * planning ma non ancora tolte dal server.
+ */
+@Serializable
+data class ClubServerConf(
+    val url: String = "",
+    val token: String = "",
+    val club: String = "",
+    val rules: BookingRules = BookingRules(),
+    val payInfo: String = "",
+    val lastSync: Long = 0,
+    /** L'ultimo errore (codice del server, o NET se non risponde); null = tutto bene. */
+    val error: String? = null,
+    val players: List<SrvPlayer> = emptyList(),
+    val cancel: List<String> = emptyList(),
+) {
+    val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
+}
+
+object ClubServers {
+    /** L'indirizzo come lo si scrive: senza / in fondo, http:// se manca. */
+    fun cleanUrl(u: String): String {
+        val t = u.trim().trimEnd('/')
+        return if (t.isEmpty() || t.startsWith("http://") || t.startsWith("https://")) t else "http://$t"
+    }
+
+    /** Il link dell'invito: la pagina del circolo col codice dopo il # (non arriva nei log del server). */
+    fun inviteLink(conf: ClubServerConf, code: String): String = conf.url + "/#i=" + code
+
+    /**
+     * Quello che si manda al server: i campi, gli orari, i blocchi e tutto l'occupato della segreteria
+     * (prenotazioni e partite di torneo), senza nomi; le prenotazioni online il server le conosce già.
+     */
+    fun buildSync(conf: ClubServerConf, plan: CourtPlan, tournaments: List<ClubTournament>, courts: List<String>, club: String, timeZone: String): ClubSync {
+        val busy = plan.bookings.filter { it.online == null }.map { Busy(it.court, it.start, it.end) } +
+            tournaments.flatMap { t ->
+                t.matches.filter { m -> m.court.isNotBlank() && m.at != null && !m.bye }.map { m -> Busy(m.court, m.at!!, m.at + plan.settings.tournamentMinutes * 60_000L) }
+            }
+        val now = System.currentTimeMillis()
+        return ClubSync(
+            club = club, timeZone = timeZone, courts = courts,
+            settings = plan.settings.copy(courts = plan.settings.courts.map { it.copy(photos = emptyList()) }),
+            // Solo quello che conta da ieri in poi: il passato al server non serve.
+            blocks = plan.blocks.filter { it.to >= now - 86_400_000L },
+            busy = busy.filter { it.end >= now - 86_400_000L },
+            rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
+        )
+    }
+
+    /**
+     * Le prenotazioni online nel planning: quelle nuove entrano (col giocatore del database se c'è), quelle già
+     * entrate restano come le ha sistemate la segreteria. Restituisce anche quelle sparite dal server (disdette dal
+     * giocatore), da togliere dal planning; le vecchie che il server ha già dimenticato restano.
+     */
+    fun merge(plan: CourtPlan, online: List<OnlineBooking>, known: (String) -> Boolean, now: Long): Pair<List<CourtBooking>, List<CourtBooking>> {
+        val have = plan.bookings.mapNotNull { b -> b.online?.let { it to b } }.toMap()
+        val ids = online.map { it.id }.toSet()
+        val added = online.filter { it.id !in have }.map { o ->
+            CourtBooking(
+                id = "o" + o.id, court = o.court, start = o.start, minutes = o.minutes, kind = BookingKind.PLAY,
+                players = if (known(o.player)) listOf(o.player) else emptyList(), names = if (known(o.player)) emptyList() else listOf(o.name),
+                lights = o.lights, cents = o.cents, heating = o.heating, online = o.id,
+            )
+        }
+        val gone = plan.bookings.filter { it.online != null && it.online !in ids && it.end > now - 30L * 86_400_000L }
+        return added to gone
+    }
+}
+
+/** Una risposta sbagliata del server: il codice (BAD_CODE, UNAUTHORIZED…) o NET se non risponde. */
+class ClubServerError(val code: String) : Exception(code)
+
+/** Le chiamate della segreteria al server, in HTTP semplice (rete del circolo) o HTTPS (da internet). */
+class ClubServerClient(private val url: String, private val token: String?) {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+
+    private fun <I, O> call(method: String, path: String, inSer: KSerializer<I>?, body: I?, outSer: KSerializer<O>): O {
+        val c = try { URL("$url/api/v1$path").openConnection() as HttpURLConnection } catch (_: Exception) { throw ClubServerError("BAD_URL") }
+        try {
+            c.requestMethod = method
+            c.connectTimeout = 8_000; c.readTimeout = 15_000
+            c.setRequestProperty("Accept", "application/json")
+            token?.let { c.setRequestProperty("Authorization", "Bearer $it") }
+            if (inSer != null && body != null) {
+                c.doOutput = true
+                c.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                c.outputStream.use { it.write(json.encodeToString(inSer, body).toByteArray()) }
+            }
+            val code = c.responseCode
+            val text = (if (code in 200..299) c.inputStream else c.errorStream)?.use { it.readBytes().toString(Charsets.UTF_8) }.orEmpty()
+            if (code !in 200..299) throw ClubServerError(runCatching { json.decodeFromString(SrvError.serializer(), text).error }.getOrDefault("HTTP_$code"))
+            return try { json.decodeFromString(outSer, text) } catch (_: Exception) { throw ClubServerError("NOT_TSM") }
+        } catch (e: ClubServerError) {
+            throw e
+        } catch (_: Exception) {
+            throw ClubServerError("NET")
+        } finally {
+            c.disconnect()
+        }
+    }
+
+    fun info(): SrvInfo = call<Unit, SrvInfo>("GET", "/info", null, null, SrvInfo.serializer())
+    fun pair(code: String): SrvToken = call("POST", "/admin/pair", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
+    fun sync(s: ClubSync): SrvAdmin = call("PUT", "/admin/sync", ClubSync.serializer(), s, SrvAdmin.serializer())
+    fun state(): SrvAdmin = call<Unit, SrvAdmin>("GET", "/admin/state", null, null, SrvAdmin.serializer())
+    fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
+    fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
+    fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/ClubTournament.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -14796,6 +15088,25 @@ class Storage(context: Context) {
                 tmp.renameTo(courtPlanFile)
             }
         }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
+    }
+
+    /** Il server del circolo (facoltativo): indirizzo, chiave della segreteria, regole online. */
+    private val clubServerFile: File get() = File(app.filesDir, "club_server.json")
+
+    fun loadClubServer(): ClubServerConf =
+        runCatching { json.decodeFromString(ClubServerConf.serializer(), clubServerFile.readText()) }.getOrDefault(ClubServerConf())
+
+    @Synchronized
+    fun saveClubServer(conf: ClubServerConf) {
+        runCatching {
+            if (!conf.paired && conf == ClubServerConf()) { clubServerFile.delete(); return }
+            val tmp = File(app.filesDir, "club_server.tmp")
+            tmp.writeText(json.encodeToString(ClubServerConf.serializer(), conf))
+            if (!tmp.renameTo(clubServerFile)) {
+                clubServerFile.delete()
+                tmp.renameTo(clubServerFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del server del circolo fallito", it) }
     }
 
     /** I tornei del circolo (sociali e FITP), in un file solo. */
@@ -25223,6 +25534,49 @@ interface Strings {
     val backhandOne: String
     val backhandTwo: String
     val playerAge: (Int) -> String
+    // Server del circolo (facoltativo).
+    val srvTitle: String
+    val srvButtonHint: String
+    val srvIntro: String
+    val srvAddress: String
+    val srvAddressHint: String
+    val srvSetupCode: String
+    val srvSetupHint: String
+    val srvPair: String
+    val srvConnected: (String) -> String
+    val srvLastSync: (String) -> String
+    val srvNeverSynced: String
+    val srvSyncNow: String
+    val srvSynced: String
+    val srvUnpair: String
+    val srvUnpairAsk: String
+    val srvOpen: String
+    val srvOpenHint: String
+    val srvDaysAhead: String
+    val srvMaxFuture: String
+    val srvMaxMinutes: String
+    val srvCancelHours: String
+    val srvNotice: String
+    val srvCourts: String
+    val srvPayInfo: String
+    val srvPlayers: (Int) -> String
+    val srvInviteHow: String
+    val srvInvite: String
+    val srvInviteHint: String
+    val srvInviteCode: (String) -> String
+    val srvInviteUntil: (String) -> String
+    val srvShare: String
+    val srvShareText: (String, String) -> String
+    val srvLinked: (String) -> String
+    val srvRevoke: String
+    val srvOnlineTag: String
+    val srvErrNet: String
+    val srvErrCode: String
+    val srvErrAuth: String
+    val srvErrNotTsm: String
+    val srvErrOther: (String) -> String
+    /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
+    val memberValidUntil: (String) -> String
     val strokeFolderName: String
     /** Nome della cartella Documenti come la mostra il telefono. */
     val documentsFolder: String
@@ -27008,6 +27362,47 @@ object ItStrings : Strings {
     override val backhandOne = "1 mano"
     override val backhandTwo = "2 mani"
     override val playerAge: (Int) -> String = { "$it anni" }
+    override val memberValidUntil: (String) -> String = { "fino al $it" }
+    override val srvTitle = "Server del circolo"
+    override val srvButtonHint = "Facoltativo: i giocatori prenotano da soli"
+    override val srvIntro = "Facoltativo. Con un piccolo server al circolo (un Raspberry Pi o un vecchio PC) i giocatori invitati prenotano i campi da soli dal telefono, anche da iPhone, con le regole decise qui. Senza server tutto resta com'è: si prenota in segreteria."
+    override val srvAddress = "Indirizzo del server"
+    override val srvAddressHint = "Come lo scrive il server all'avvio, es. http://192.168.1.50:8080 (o https://… da internet)"
+    override val srvSetupCode = "Codice di abbinamento"
+    override val srvSetupHint = "Lo scrive il server all'avvio e nel file setup-code.txt. Vale una volta sola."
+    override val srvPair = "Abbina"
+    override val srvConnected: (String) -> String = { "Collegato a $it" }
+    override val srvLastSync: (String) -> String = { "Planning inviato: $it" }
+    override val srvNeverSynced = "Planning non ancora inviato"
+    override val srvSyncNow = "Invia ora"
+    override val srvSynced = "Planning inviato"
+    override val srvUnpair = "Scollega il server"
+    override val srvUnpairAsk = "Scollegare il server? I giocatori non potranno prenotare finché non lo abbini di nuovo (servirà un nuovo codice: java -jar tsm-server.jar --reset-admin). Le prenotazioni già nel planning restano."
+    override val srvOpen = "Prenotazioni online aperte"
+    override val srvOpenHint = "Spente: i giocatori vedono il planning ma non prenotano"
+    override val srvDaysAhead = "Fin quanti giorni avanti"
+    override val srvMaxFuture = "Prenotazioni per giocatore"
+    override val srvMaxMinutes = "Durata massima"
+    override val srvCancelHours = "Disdetta da soli fino a (ore prima)"
+    override val srvNotice = "Prenota fino a (minuti prima)"
+    override val srvCourts = "Campi prenotabili online"
+    override val srvPayInfo = "Come si paga (lo leggono i giocatori)"
+    override val srvPlayers: (Int) -> String = { "Giocatori collegati: $it" }
+    override val srvInviteHow = "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online."
+    override val srvInvite = "Invito per prenotare online"
+    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home."
+    override val srvInviteCode: (String) -> String = { "Codice: $it" }
+    override val srvInviteUntil: (String) -> String = { "Vale una volta, fino al $it" }
+    override val srvShare = "Condividi il link"
+    override val srvShareText: (String, String) -> String = { a, b -> "Prenota i campi di $a da qui: $b" }
+    override val srvLinked: (String) -> String = { "Prenota online · ultimo accesso $it" }
+    override val srvRevoke = "Togli l'accesso online"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "Il server non risponde: controlla l'indirizzo e che il telefono sia sulla stessa rete (o su internet)."
+    override val srvErrCode = "Codice sbagliato o già usato."
+    override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
+    override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
+    override val srvErrOther: (String) -> String = { "Errore del server: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -28776,6 +29171,47 @@ object EnStrings : Strings {
     override val backhandOne = "1 hand"
     override val backhandTwo = "2 hands"
     override val playerAge: (Int) -> String = { "$it years old" }
+    override val memberValidUntil: (String) -> String = { "until $it" }
+    override val srvTitle = "Club server"
+    override val srvButtonHint = "Optional: players book by themselves"
+    override val srvIntro = "Optional. With a small server at the club (a Raspberry Pi or an old PC) invited players book courts by themselves from their phone, iPhone too, with the rules set here. Without a server nothing changes: bookings go through the club office."
+    override val srvAddress = "Server address"
+    override val srvAddressHint = "As the server prints it at start-up, e.g. http://192.168.1.50:8080 (or https://… from the internet)"
+    override val srvSetupCode = "Pairing code"
+    override val srvSetupHint = "The server prints it at start-up and in the file setup-code.txt. It works only once."
+    override val srvPair = "Pair"
+    override val srvConnected: (String) -> String = { "Connected to $it" }
+    override val srvLastSync: (String) -> String = { "Schedule sent: $it" }
+    override val srvNeverSynced = "Schedule not sent yet"
+    override val srvSyncNow = "Send now"
+    override val srvSynced = "Schedule sent"
+    override val srvUnpair = "Disconnect the server"
+    override val srvUnpairAsk = "Disconnect the server? Players cannot book until you pair it again (it will need a new code: java -jar tsm-server.jar --reset-admin). Bookings already in the schedule stay."
+    override val srvOpen = "Online booking open"
+    override val srvOpenHint = "Off: players see the schedule but cannot book"
+    override val srvDaysAhead = "How many days ahead"
+    override val srvMaxFuture = "Bookings per player"
+    override val srvMaxMinutes = "Longest booking"
+    override val srvCancelHours = "Self-cancel up to (hours before)"
+    override val srvNotice = "Book up to (minutes before)"
+    override val srvCourts = "Courts bookable online"
+    override val srvPayInfo = "How to pay (players read this)"
+    override val srvPlayers: (Int) -> String = { "Connected players: $it" }
+    override val srvInviteHow = "To invite a player: open their card and tap Invite to book online."
+    override val srvInvite = "Invite to book online"
+    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen."
+    override val srvInviteCode: (String) -> String = { "Code: $it" }
+    override val srvInviteUntil: (String) -> String = { "Works once, until $it" }
+    override val srvShare = "Share the link"
+    override val srvShareText: (String, String) -> String = { a, b -> "Book the courts at $a here: $b" }
+    override val srvLinked: (String) -> String = { "Books online · last seen $it" }
+    override val srvRevoke = "Remove online access"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "The server does not answer: check the address and that the phone is on the same network (or online)."
+    override val srvErrCode = "Wrong or already used code."
+    override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
+    override val srvErrNotTsm = "There is no TSM club server at that address."
+    override val srvErrOther: (String) -> String = { "Server error: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -30567,6 +31003,47 @@ object DeStrings : Strings {
     override val backhandOne = "1 Hand"
     override val backhandTwo = "2 Hände"
     override val playerAge: (Int) -> String = { "$it Jahre" }
+    override val memberValidUntil: (String) -> String = { "bis $it" }
+    override val srvTitle = "Vereinsserver"
+    override val srvButtonHint = "Optional: Spieler buchen selbst"
+    override val srvIntro = "Optional. Mit einem kleinen Server im Verein (ein Raspberry Pi oder ein alter PC) buchen eingeladene Spieler die Plätze selbst am Handy, auch am iPhone, nach den hier festgelegten Regeln. Ohne Server bleibt alles wie gehabt: gebucht wird im Vereinsbüro."
+    override val srvAddress = "Serveradresse"
+    override val srvAddressHint = "Wie der Server sie beim Start anzeigt, z. B. http://192.168.1.50:8080 (oder https://… aus dem Internet)"
+    override val srvSetupCode = "Kopplungscode"
+    override val srvSetupHint = "Der Server zeigt ihn beim Start und in der Datei setup-code.txt. Er gilt nur einmal."
+    override val srvPair = "Koppeln"
+    override val srvConnected: (String) -> String = { "Verbunden mit $it" }
+    override val srvLastSync: (String) -> String = { "Plan gesendet: $it" }
+    override val srvNeverSynced = "Plan noch nicht gesendet"
+    override val srvSyncNow = "Jetzt senden"
+    override val srvSynced = "Plan gesendet"
+    override val srvUnpair = "Server trennen"
+    override val srvUnpairAsk = "Server trennen? Spieler können erst wieder buchen, wenn du ihn neu koppelst (dafür braucht es einen neuen Code: java -jar tsm-server.jar --reset-admin). Buchungen im Plan bleiben."
+    override val srvOpen = "Online-Buchung offen"
+    override val srvOpenHint = "Aus: Spieler sehen den Plan, buchen aber nicht"
+    override val srvDaysAhead = "Wie viele Tage im Voraus"
+    override val srvMaxFuture = "Buchungen pro Spieler"
+    override val srvMaxMinutes = "Längste Buchung"
+    override val srvCancelHours = "Selbst stornieren bis (Stunden vorher)"
+    override val srvNotice = "Buchen bis (Minuten vorher)"
+    override val srvCourts = "Online buchbare Plätze"
+    override val srvPayInfo = "Wie bezahlt wird (lesen die Spieler)"
+    override val srvPlayers: (Int) -> String = { "Verbundene Spieler: $it" }
+    override val srvInviteHow = "Um einen Spieler einzuladen: Öffne seine Karte und tippe auf Einladung zum Online-Buchen."
+    override val srvInvite = "Einladung zum Online-Buchen"
+    override val srvInviteHint = "Der Spieler scannt den QR-Code mit der Kamera (oder öffnet den Link) und bucht auf der Vereinsseite. Auf dem iPhone: Teilen › Zum Home-Bildschirm."
+    override val srvInviteCode: (String) -> String = { "Code: $it" }
+    override val srvInviteUntil: (String) -> String = { "Gilt einmal, bis $it" }
+    override val srvShare = "Link teilen"
+    override val srvShareText: (String, String) -> String = { a, b -> "Buche die Plätze von $a hier: $b" }
+    override val srvLinked: (String) -> String = { "Bucht online · zuletzt $it" }
+    override val srvRevoke = "Online-Zugang entfernen"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "Der Server antwortet nicht: Prüfe die Adresse und ob das Handy im selben Netz (oder online) ist."
+    override val srvErrCode = "Falscher oder schon benutzter Code."
+    override val srvErrAuth = "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln."
+    override val srvErrNotTsm = "Unter dieser Adresse ist kein TSM-Vereinsserver."
+    override val srvErrOther: (String) -> String = { "Serverfehler: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -32351,6 +32828,47 @@ object EsStrings : Strings {
     override val backhandOne = "1 mano"
     override val backhandTwo = "2 manos"
     override val playerAge: (Int) -> String = { "$it años" }
+    override val memberValidUntil: (String) -> String = { "hasta el $it" }
+    override val srvTitle = "Servidor del club"
+    override val srvButtonHint = "Opcional: los jugadores reservan solos"
+    override val srvIntro = "Opcional. Con un pequeño servidor en el club (una Raspberry Pi o un PC viejo) los jugadores invitados reservan las pistas solos desde el teléfono, también iPhone, con las reglas fijadas aquí. Sin servidor todo sigue igual: se reserva en secretaría."
+    override val srvAddress = "Dirección del servidor"
+    override val srvAddressHint = "Como la muestra el servidor al arrancar, p. ej. http://192.168.1.50:8080 (o https://… desde internet)"
+    override val srvSetupCode = "Código de emparejamiento"
+    override val srvSetupHint = "El servidor lo muestra al arrancar y en el archivo setup-code.txt. Vale una sola vez."
+    override val srvPair = "Emparejar"
+    override val srvConnected: (String) -> String = { "Conectado a $it" }
+    override val srvLastSync: (String) -> String = { "Planning enviado: $it" }
+    override val srvNeverSynced = "Planning aún no enviado"
+    override val srvSyncNow = "Enviar ahora"
+    override val srvSynced = "Planning enviado"
+    override val srvUnpair = "Desconectar el servidor"
+    override val srvUnpairAsk = "¿Desconectar el servidor? Los jugadores no podrán reservar hasta que lo emparejes de nuevo (hará falta un código nuevo: java -jar tsm-server.jar --reset-admin). Las reservas ya en el planning se quedan."
+    override val srvOpen = "Reservas en línea abiertas"
+    override val srvOpenHint = "Apagadas: los jugadores ven el planning pero no reservan"
+    override val srvDaysAhead = "Cuántos días antes"
+    override val srvMaxFuture = "Reservas por jugador"
+    override val srvMaxMinutes = "Duración máxima"
+    override val srvCancelHours = "Anular solo hasta (horas antes)"
+    override val srvNotice = "Reservar hasta (minutos antes)"
+    override val srvCourts = "Pistas reservables en línea"
+    override val srvPayInfo = "Cómo se paga (lo leen los jugadores)"
+    override val srvPlayers: (Int) -> String = { "Jugadores conectados: $it" }
+    override val srvInviteHow = "Para invitar a un jugador: abre su ficha y toca Invitación para reservar en línea."
+    override val srvInvite = "Invitación para reservar en línea"
+    override val srvInviteHint = "El jugador escanea el QR con la cámara (o abre el enlace) y reserva desde la página del club. En iPhone: Compartir › Añadir a pantalla de inicio."
+    override val srvInviteCode: (String) -> String = { "Código: $it" }
+    override val srvInviteUntil: (String) -> String = { "Vale una vez, hasta el $it" }
+    override val srvShare = "Compartir el enlace"
+    override val srvShareText: (String, String) -> String = { a, b -> "Reserva las pistas de $a aquí: $b" }
+    override val srvLinked: (String) -> String = { "Reserva en línea · último acceso $it" }
+    override val srvRevoke = "Quitar el acceso en línea"
+    override val srvOnlineTag = "en línea"
+    override val srvErrNet = "El servidor no responde: revisa la dirección y que el teléfono esté en la misma red (o en internet)."
+    override val srvErrCode = "Código erróneo o ya usado."
+    override val srvErrAuth = "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo."
+    override val srvErrNotTsm = "En esa dirección no hay un servidor de club TSM."
+    override val srvErrOther: (String) -> String = { "Error del servidor: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -34137,6 +34655,47 @@ object FrStrings : Strings {
     override val backhandOne = "1 main"
     override val backhandTwo = "2 mains"
     override val playerAge: (Int) -> String = { "$it ans" }
+    override val memberValidUntil: (String) -> String = { "jusqu'au $it" }
+    override val srvTitle = "Serveur du club"
+    override val srvButtonHint = "Facultatif : les joueurs réservent eux-mêmes"
+    override val srvIntro = "Facultatif. Avec un petit serveur au club (un Raspberry Pi ou un vieux PC), les joueurs invités réservent eux-mêmes depuis leur téléphone, iPhone compris, avec les règles fixées ici. Sans serveur rien ne change : on réserve au secrétariat."
+    override val srvAddress = "Adresse du serveur"
+    override val srvAddressHint = "Comme l'affiche le serveur au démarrage, ex. http://192.168.1.50:8080 (ou https://… depuis internet)"
+    override val srvSetupCode = "Code d'appairage"
+    override val srvSetupHint = "Le serveur l'affiche au démarrage et dans le fichier setup-code.txt. Il ne sert qu'une fois."
+    override val srvPair = "Appairer"
+    override val srvConnected: (String) -> String = { "Connecté à $it" }
+    override val srvLastSync: (String) -> String = { "Planning envoyé : $it" }
+    override val srvNeverSynced = "Planning pas encore envoyé"
+    override val srvSyncNow = "Envoyer maintenant"
+    override val srvSynced = "Planning envoyé"
+    override val srvUnpair = "Déconnecter le serveur"
+    override val srvUnpairAsk = "Déconnecter le serveur ? Les joueurs ne pourront plus réserver jusqu'à un nouvel appairage (il faudra un nouveau code : java -jar tsm-server.jar --reset-admin). Les réservations déjà au planning restent."
+    override val srvOpen = "Réservations en ligne ouvertes"
+    override val srvOpenHint = "Désactivées : les joueurs voient le planning sans réserver"
+    override val srvDaysAhead = "Combien de jours à l'avance"
+    override val srvMaxFuture = "Réservations par joueur"
+    override val srvMaxMinutes = "Durée maximale"
+    override val srvCancelHours = "Annulation seul jusqu'à (heures avant)"
+    override val srvNotice = "Réserver jusqu'à (minutes avant)"
+    override val srvCourts = "Terrains réservables en ligne"
+    override val srvPayInfo = "Comment payer (les joueurs le lisent)"
+    override val srvPlayers: (Int) -> String = { "Joueurs connectés : $it" }
+    override val srvInviteHow = "Pour inviter un joueur : ouvrez sa fiche et touchez Invitation à réserver en ligne."
+    override val srvInvite = "Invitation à réserver en ligne"
+    override val srvInviteHint = "Le joueur scanne le QR avec l'appareil photo (ou ouvre le lien) et réserve depuis la page du club. Sur iPhone : Partager › Sur l'écran d'accueil."
+    override val srvInviteCode: (String) -> String = { "Code : $it" }
+    override val srvInviteUntil: (String) -> String = { "Valable une fois, jusqu'au $it" }
+    override val srvShare = "Partager le lien"
+    override val srvShareText: (String, String) -> String = { a, b -> "Réservez les terrains de $a ici : $b" }
+    override val srvLinked: (String) -> String = { "Réserve en ligne · vu le $it" }
+    override val srvRevoke = "Retirer l'accès en ligne"
+    override val srvOnlineTag = "en ligne"
+    override val srvErrNet = "Le serveur ne répond pas : vérifiez l'adresse et que le téléphone est sur le même réseau (ou sur internet)."
+    override val srvErrCode = "Code erroné ou déjà utilisé."
+    override val srvErrAuth = "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau."
+    override val srvErrNotTsm = "Il n'y a pas de serveur de club TSM à cette adresse."
+    override val srvErrOther: (String) -> String = { "Erreur du serveur : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -35924,6 +36483,47 @@ object PtStrings : Strings {
     override val backhandOne = "1 mão"
     override val backhandTwo = "2 mãos"
     override val playerAge: (Int) -> String = { "$it anos" }
+    override val memberValidUntil: (String) -> String = { "até $it" }
+    override val srvTitle = "Servidor do clube"
+    override val srvButtonHint = "Opcional: os jogadores reservam sozinhos"
+    override val srvIntro = "Opcional. Com um pequeno servidor no clube (um Raspberry Pi ou um PC antigo) os jogadores convidados reservam as quadras sozinhos no telemóvel, também iPhone, com as regras definidas aqui. Sem servidor tudo fica igual: reserva-se na secretaria."
+    override val srvAddress = "Endereço do servidor"
+    override val srvAddressHint = "Como o servidor o mostra ao arrancar, ex. http://192.168.1.50:8080 (ou https://… pela internet)"
+    override val srvSetupCode = "Código de emparelhamento"
+    override val srvSetupHint = "O servidor mostra-o ao arrancar e no ficheiro setup-code.txt. Só vale uma vez."
+    override val srvPair = "Emparelhar"
+    override val srvConnected: (String) -> String = { "Ligado a $it" }
+    override val srvLastSync: (String) -> String = { "Agenda enviada: $it" }
+    override val srvNeverSynced = "Agenda ainda não enviada"
+    override val srvSyncNow = "Enviar agora"
+    override val srvSynced = "Agenda enviada"
+    override val srvUnpair = "Desligar o servidor"
+    override val srvUnpairAsk = "Desligar o servidor? Os jogadores não poderão reservar até o emparelhares de novo (será preciso um novo código: java -jar tsm-server.jar --reset-admin). As reservas já na agenda ficam."
+    override val srvOpen = "Reservas online abertas"
+    override val srvOpenHint = "Desligadas: os jogadores veem a agenda mas não reservam"
+    override val srvDaysAhead = "Quantos dias antes"
+    override val srvMaxFuture = "Reservas por jogador"
+    override val srvMaxMinutes = "Duração máxima"
+    override val srvCancelHours = "Cancelar sozinho até (horas antes)"
+    override val srvNotice = "Reservar até (minutos antes)"
+    override val srvCourts = "Quadras reserváveis online"
+    override val srvPayInfo = "Como se paga (os jogadores leem)"
+    override val srvPlayers: (Int) -> String = { "Jogadores ligados: $it" }
+    override val srvInviteHow = "Para convidar um jogador: abre a sua ficha e toca em Convite para reservar online."
+    override val srvInvite = "Convite para reservar online"
+    override val srvInviteHint = "O jogador lê o QR com a câmara (ou abre a ligação) e reserva na página do clube. No iPhone: Partilhar › Adicionar ao ecrã principal."
+    override val srvInviteCode: (String) -> String = { "Código: $it" }
+    override val srvInviteUntil: (String) -> String = { "Vale uma vez, até $it" }
+    override val srvShare = "Partilhar a ligação"
+    override val srvShareText: (String, String) -> String = { a, b -> "Reserva as quadras de $a aqui: $b" }
+    override val srvLinked: (String) -> String = { "Reserva online · último acesso $it" }
+    override val srvRevoke = "Retirar o acesso online"
+    override val srvOnlineTag = "online"
+    override val srvErrNet = "O servidor não responde: verifica o endereço e se o telemóvel está na mesma rede (ou na internet)."
+    override val srvErrCode = "Código errado ou já usado."
+    override val srvErrAuth = "O servidor já não reconhece este telemóvel: desliga e emparelha de novo."
+    override val srvErrNotTsm = "Nesse endereço não há um servidor de clube TSM."
+    override val srvErrOther: (String) -> String = { "Erro do servidor: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -36492,6 +37092,244 @@ fun QrCode(text: String, size: Dp) {
         bitmap, null,
         filterQuality = FilterQuality.None,
         modifier = Modifier.size(size).clip(RoundedCornerShape(8.dp)).background(Color.White),
+    )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/ClubServerScreen.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/ClubServerScreen.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import android.content.Intent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material.icons.filled.QrCode2
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.ClubServers
+import com.tennis.scoremanager.data.PlayerProfile
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.ui.GhostButton
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.QrCode
+import com.tennis.scoremanager.ui.SectionCard
+import com.tennis.scoremanager.ui.Strings
+import com.tennis.scoremanager.ui.SwitchRow
+import com.tennis.scoremanager.ui.TsmColors
+import kotlinx.coroutines.launch
+
+/** L'errore del server detto in parole. */
+fun srvErrorText(s: Strings, code: String): String = when (code) {
+    "NET", "BAD_URL" -> s.srvErrNet
+    "BAD_CODE" -> s.srvErrCode
+    "UNAUTHORIZED" -> s.srvErrAuth
+    "NOT_TSM" -> s.srvErrNotTsm
+    else -> s.srvErrOther(code)
+}
+
+private fun whenText(t: Long, lang: com.tennis.scoremanager.model.Lang): String = shortDate(t, lang) + " " + Reports.time(t, lang)
+
+/**
+ * Nel planning, sotto i tasti: lo stato del server (solo se abbinato), che si tocca per aprirne le impostazioni.
+ * Mentre il planning è aperto, ogni minuto si manda e si riprende tutto, così le prenotazioni online arrivano da sole.
+ */
+@Composable
+fun ServerStatusLine(c: MatchController, onClick: () -> Unit) {
+    val s = LocalStrings.current
+    val conf by c.clubServer.collectAsState()
+    val lang = c.options.value.lang
+    if (!conf.paired) return
+    LaunchedEffect(conf.url) {
+        while (true) { c.syncServerNow(); kotlinx.coroutines.delay(60_000) }
+    }
+    val err = conf.error
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Icon(if (err == null) Icons.Filled.Cloud else Icons.Filled.CloudOff, null, tint = if (err == null) TsmColors.Ball else TsmColors.Orange)
+        Text(
+            if (err != null) srvErrorText(s, err) else if (conf.lastSync > 0) s.srvLastSync(whenText(conf.lastSync, lang)) else s.srvNeverSynced,
+            color = if (err == null) TsmColors.TextDim else TsmColors.Orange, fontSize = 12.sp,
+        )
+    }
+}
+
+/** Abbinare il server, oppure (abbinato) lo stato, le regole per i giocatori e lo scollegamento. */
+@Composable
+fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val conf by c.clubServer.collectAsState()
+    val courts by c.clubCourts.collectAsState()
+    val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
+    var msg by remember { mutableStateOf<String?>(null) }
+    var url by remember { mutableStateOf(conf.url) }
+    var code by remember { mutableStateOf("") }
+    var rules by remember(conf.paired) { mutableStateOf(conf.rules) }
+    var pay by remember(conf.paired) { mutableStateOf(conf.payInfo) }
+    var unpair by remember { mutableStateOf(false) }
+
+    @Composable fun stepper(label: String, v: Int, min: Int, max: Int, step: Int = 1, fmt: (Int) -> String = { it.toString() }, onChange: (Int) -> Unit) =
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, color = TsmColors.TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
+            IconButton(onClick = { onChange((v - step).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
+            Text(fmt(v), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            IconButton(onClick = { onChange((v + step).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
+        }
+
+    fun save() { if (conf.paired) c.saveServerRules(rules, pay) }
+
+    AlertDialog(
+        onDismissRequest = { save(); onDone() },
+        title = { Text(s.srvTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (!conf.paired) {
+                    Text(s.srvIntro, color = TsmColors.TextDim, fontSize = 13.sp)
+                    OutlinedTextField(url, { url = it }, label = { Text(s.srvAddress) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvAddressHint, fontSize = 11.sp) })
+                    OutlinedTextField(code, { code = it }, label = { Text(s.srvSetupCode) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters), supportingText = { Text(s.srvSetupHint, fontSize = 11.sp) })
+                    GhostButton(s.srvPair, Icons.Filled.Link, {
+                        busy = true; msg = null
+                        scope.launch { msg = c.pairServer(url, code)?.let { srvErrorText(s, it) }; busy = false }
+                    }, Modifier.fillMaxWidth(), enabled = !busy && url.isNotBlank() && code.isNotBlank())
+                } else {
+                    Text(s.srvConnected(conf.club.ifBlank { conf.url }), color = TsmColors.Ball, fontWeight = FontWeight.Bold)
+                    Text(conf.url, color = TsmColors.TextDim, fontSize = 12.sp)
+                    val err = conf.error
+                    Text(
+                        if (err != null) srvErrorText(s, err) else if (conf.lastSync > 0) s.srvLastSync(whenText(conf.lastSync, lang)) else s.srvNeverSynced,
+                        color = if (err == null) TsmColors.TextDim else TsmColors.Orange, fontSize = 13.sp,
+                    )
+                    GhostButton(s.srvSyncNow, Icons.Filled.Sync, {
+                        busy = true; msg = null
+                        scope.launch { c.saveServerRules(rules, pay); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
+                    }, Modifier.fillMaxWidth(), enabled = !busy)
+                    Text(s.srvPlayers(conf.players.size), color = TsmColors.TextMain, fontSize = 14.sp)
+                    Text(s.srvInviteHow, color = TsmColors.TextDim, fontSize = 12.sp)
+
+                    SwitchRow(Icons.Filled.SportsTennis, s.srvOpen, s.srvOpenHint, rules.open) { rules = rules.copy(open = it) }
+                    stepper(s.srvDaysAhead, rules.daysAhead, 0, 60) { rules = rules.copy(daysAhead = it) }
+                    stepper(s.srvMaxFuture, rules.maxFuture, 1, 10) { rules = rules.copy(maxFuture = it) }
+                    stepper(s.srvMaxMinutes, rules.maxMinutes, 30, 240, 30, { s.bkMinutes(it) }) { rules = rules.copy(maxMinutes = it) }
+                    stepper(s.srvCancelHours, rules.cancelHours, 0, 72) { rules = rules.copy(cancelHours = it) }
+                    stepper(s.srvNotice, rules.noticeMinutes, 0, 240, 15) { rules = rules.copy(noticeMinutes = it) }
+                    if (courts.size > 1) {
+                        Text(s.srvCourts, color = TsmColors.TextDim, fontSize = 13.sp)
+                        val on = rules.courts.ifEmpty { courts }
+                        for (ct in courts) SwitchRow(Icons.Filled.SportsTennis, ct, null, ct in on) { yes ->
+                            val list = (if (yes) on + ct else on - ct).distinct().ifEmpty { listOf(ct) }
+                            // Tutti i campi = lista vuota, così un campo nuovo è subito prenotabile.
+                            rules = rules.copy(courts = if (courts.all { it in list }) emptyList() else courts.filter { it in list })
+                        }
+                    }
+                    OutlinedTextField(pay, { pay = it }, label = { Text(s.srvPayInfo) }, modifier = Modifier.fillMaxWidth())
+                    GhostButton(s.srvUnpair, Icons.Filled.LinkOff, { unpair = true }, Modifier.fillMaxWidth(), enabled = !busy)
+                }
+                msg?.let { Text(it, color = if (it == s.srvSynced) TsmColors.Ok else TsmColors.Orange, fontSize = 13.sp) }
+            }
+        },
+        confirmButton = { TextButton(onClick = { save(); onDone() }) { Text(s.ok) } },
+    )
+    if (unpair) AlertDialog(
+        onDismissRequest = { unpair = false },
+        text = { Text(s.srvUnpairAsk) },
+        confirmButton = { TextButton(onClick = { unpair = false; c.unpairServer() }) { Text(s.srvUnpair, color = TsmColors.Danger) } },
+        dismissButton = { TextButton(onClick = { unpair = false }) { Text(s.back) } },
+    )
+}
+
+/** Nella scheda del giocatore, se il circolo ha il server: l'invito con il QR, o chi prenota già online. */
+@Composable
+fun PlayerOnlineSection(c: MatchController, p: PlayerProfile) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val conf by c.clubServer.collectAsState()
+    if (!conf.paired) return
+    val scope = rememberCoroutineScope()
+    var invite by remember { mutableStateOf<SrvInvite?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var msg by remember { mutableStateOf<String?>(null) }
+    val linked = conf.players.firstOrNull { it.id == p.id }
+    SectionCard(s.srvTitle, Icons.Filled.Cloud) {
+        linked?.let { Text(s.srvLinked(whenText(maxOf(it.lastSeen, it.since), lang)), color = TsmColors.Ok, fontSize = 13.sp) }
+        GhostButton(s.srvInvite, Icons.Filled.QrCode2, {
+            busy = true; msg = null
+            scope.launch { c.serverInvite(p).onSuccess { invite = it }.onFailure { msg = srvErrorText(s, (it as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }; busy = false }
+        }, Modifier.fillMaxWidth(), enabled = !busy)
+        if (linked != null) GhostButton(s.srvRevoke, Icons.Filled.LinkOff, {
+            busy = true; msg = null
+            scope.launch { msg = c.serverRemovePlayer(p.id)?.let { srvErrorText(s, it) }; busy = false }
+        }, Modifier.fillMaxWidth(), enabled = !busy)
+        msg?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+    }
+    invite?.let { inv -> InviteDialog(c, inv) { invite = null } }
+}
+
+@Composable
+private fun InviteDialog(c: MatchController, inv: SrvInvite, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val context = LocalContext.current
+    val conf by c.clubServer.collectAsState()
+    val link = ClubServers.inviteLink(conf, inv.code)
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.srvInvite) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                QrCode(link, 220.dp)
+                Text(s.srvInviteCode(inv.code.chunked(5).joinToString("-")), color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(s.srvInviteUntil(shortDate(inv.expires, lang)), color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(s.srvInviteHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(s.srvShare, Icons.Filled.Share, {
+                    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, s.srvShareText(conf.club.ifBlank { s.srvTitle }, link))
+                    context.startActivity(Intent.createChooser(send, s.srvShare))
+                }, Modifier.fillMaxWidth())
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
     )
 }
 TSM_EOF
@@ -37133,6 +37971,7 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Remove
@@ -37215,7 +38054,7 @@ private fun occupiedLabel(c: MatchController, s: Strings, o: Occupied): String {
     o.block?.let { k -> return s.blkCell(k.label.ifBlank { blockReasonName(s, k.reason) }) }
     val b = o.booking ?: return ""
     val who = (b.players.mapNotNull { c.playerById(it)?.name } + b.names).joinToString(" · ")
-    return listOf(if (b.kind == BookingKind.PLAY) "" else bookingKindName(s, b.kind), who, b.note).filter { it.isNotBlank() }.joinToString("\n")
+    return listOf(if (b.kind == BookingKind.PLAY) "" else bookingKindName(s, b.kind), who + if (b.online != null) " · " + s.srvOnlineTag else "", b.note).filter { it.isNotBlank() }.joinToString("\n")
 }
 
 /**
@@ -37236,6 +38075,7 @@ fun CourtsPlanScreen(c: MatchController) {
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(false) }
     var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
@@ -37250,7 +38090,8 @@ fun CourtsPlanScreen(c: MatchController) {
         // Il giorno: indietro, oggi, il calendario, avanti.
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { day = CourtPlans.addDays(day, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
-            DateButton(s.planDay, day, lang) { day = CourtPlans.dayStart(it) }
+            // Il giorno prende lo spazio che resta: le due frecce restano a vista.
+            DateButton(s.planDay, day, lang, Modifier.weight(1f)) { day = CourtPlans.dayStart(it) }
             IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
         }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
@@ -37258,6 +38099,8 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
+        // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
+        ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -37307,6 +38150,7 @@ fun CourtsPlanScreen(c: MatchController) {
     }
     if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
     if (manage) CourtsManageDialog(c) { manage = false }
+    if (server) ClubServerDialog(c) { server = false }
     if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
     editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
 }
@@ -37478,6 +38322,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
     var courtsOpen by remember { mutableStateOf(false) }
+    var serverOpen by remember { mutableStateOf(false) }
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
@@ -37498,6 +38343,8 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
                 GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
+                GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
+                Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -37513,6 +38360,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
+    if (serverOpen) ClubServerDialog(c) { serverOpen = false }
 }
 
 fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {
@@ -40599,7 +41447,7 @@ fun MemberSection(c: MatchController, p: PlayerProfile) {
             row(s.memberNumber, m.number)
             row(s.memberFitpNumber, listOfNotNull(m.fitpNumber.ifBlank { null }, m.fitpCard?.let { fitpName(s, it) }, m.fitpYear?.toString()).joinToString(" · "))
             row(s.memberRankingLabel, m.ranking)
-            row(s.memberMedical, listOfNotNull(m.medical?.let { medicalName(s, it) }, m.medicalUntil?.let { s.memberMedicalShort(shortDate(it, lang)) }).joinToString(" · "))
+            row(s.memberMedical, listOfNotNull(m.medical?.let { medicalName(s, it) }, m.medicalUntil?.let { s.memberValidUntil(shortDate(it, lang)) }).joinToString(" · "))
             row(s.memberPrivacy, m.privacyAt?.let { shortDate(it, lang) })
             row(s.memberPhotos, if (m.photosOk) s.memberYes else s.off)
             row(s.memberBirth, p.birth?.let { b -> shortDate(b, lang) + (Members.age(b, now)?.let { " ($it)" } ?: "") })
@@ -41910,13 +42758,13 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier.fillMaxWidth(), onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
         val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
         DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-    }, Modifier.fillMaxWidth())
+    }, modifier)
 }
 
 @Composable
@@ -44647,6 +45495,8 @@ fun StudentScreen(c: MatchController) {
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
+        // Con il server del circolo: l'invito per prenotare online.
+        PlayerOnlineSection(c, st)
         ChargesSection(c, st)
         // Le squadre in cui gioca.
         val teamsAll by c.teams.collectAsState()
@@ -64549,6 +65399,68 @@ class ClubBookTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubServersTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubServersTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class ClubServersTest {
+    private val now = System.currentTimeMillis()
+    private val h = 3_600_000L
+
+    @Test fun addressIsCleaned() {
+        assertEquals("http://192.168.1.5:8080", ClubServers.cleanUrl(" 192.168.1.5:8080/ "))
+        assertEquals("https://tc.example.org", ClubServers.cleanUrl("https://tc.example.org/"))
+        assertEquals("http://x:8080/#i=ABC", ClubServers.inviteLink(ClubServerConf(url = "http://x:8080"), "ABC"))
+    }
+
+    @Test fun syncSendsOfficeBusyButNotOnlineOnes() {
+        val plan = CourtPlan(
+            settings = CourtSettings(courts = listOf(CourtInfo("Campo 1", photos = listOf("a.jpg")))),
+            bookings = listOf(
+                CourtBooking("b1", "Campo 1", now + h, names = listOf("Rossi")),
+                CourtBooking("o1", "Campo 1", now + 3 * h, online = "w1"),
+                CourtBooking("old", "Campo 1", now - 5 * 24 * h),
+            ),
+            blocks = listOf(CourtBlock("k", "Corso", from = now - 30 * 24 * h, to = now - 10 * 24 * h)),
+        )
+        val conf = ClubServerConf(url = "http://x", token = "t", rules = BookingRules(courts = listOf("Campo 1", "Sparito")), payInfo = "al campo")
+        val sync = ClubServers.buildSync(conf, plan, emptyList(), listOf("Campo 1", "Campo 2"), "TC Prova", "Europe/Rome")
+        assertEquals(listOf(Busy("Campo 1", now + h, now + 2 * h)), sync.busy)
+        assertTrue(sync.blocks.isEmpty())
+        assertTrue(sync.settings.courts.single().photos.isEmpty())
+        assertEquals(listOf("Campo 1"), sync.rules.courts)
+        assertEquals("al campo", sync.payInfo)
+        // Nessun nome della segreteria va al server.
+        assertTrue("Rossi" !in sync.toString())
+    }
+
+    @Test fun onlineBookingsComeInAndCancelledGoOut() {
+        val kept = CourtBooking("o-w1", "Campo 1", now + h, online = "w1", note = "sistemata")
+        val cancelled = CourtBooking("o-w2", "Campo 1", now + 2 * h, online = "w2")
+        val forgotten = CourtBooking("o-w0", "Campo 1", now - 90 * 24 * h, online = "w0")
+        val plan = CourtPlan(bookings = listOf(kept, cancelled, forgotten, CourtBooking("b", "Campo 2", now + h)))
+        val online = listOf(
+            OnlineBooking("w1", "Campo 1", now + h, 60, "p1", "Mario"),
+            OnlineBooking("w3", "Campo 2", now + 4 * h, 60, "p1", "Mario", cents = 1200, lights = true),
+            OnlineBooking("w4", "Campo 2", now + 5 * h, 60, "ignoto", "Luca"),
+        )
+        val (added, gone) = ClubServers.merge(plan, online, { it == "p1" }, now)
+        assertEquals(listOf("w3", "w4"), added.map { it.online })
+        assertEquals(listOf("p1"), added[0].players)
+        assertEquals(1200, added[0].cents)
+        assertEquals(listOf("Luca"), added[1].names)
+        assertEquals(listOf(cancelled), gone)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/ClubTournamentTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -69241,6 +70153,28 @@ dependencies {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/ClubApi.kt
+cat > "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data/ClubApi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/** I messaggi tra la segreteria (l'app) e il server del circolo, /api/v1/…: li usano entrambi. */
+
+@Serializable data class SrvError(val error: String)
+@Serializable data class SrvInfo(val club: String, val api: Int, val paired: Boolean, val synced: Boolean, val timeZone: String, val payInfo: String)
+@Serializable data class SrvCode(val code: String)
+@Serializable data class SrvToken(val token: String, val name: String = "", val player: String = "")
+@Serializable data class SrvInviteIn(val player: String, val name: String, val days: Int = 14)
+@Serializable data class SrvInvite(val code: String, val expires: Long)
+@Serializable data class SrvPlayer(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
+@Serializable data class SrvAdmin(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<SrvPlayer>)
+@Serializable data class SrvOk(val ok: Boolean = true)
+TSM_EOF
+
 # ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtOnline.kt
 cat > "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtOnline.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -69555,6 +70489,8 @@ data class CourtBooking(
     val series: String? = null,
     val heating: Boolean = false,
     val payWhere: PayWhere = PayWhere.COURT,
+    /** Fatta online dal giocatore: l'id della prenotazione sul server del circolo. */
+    val online: String? = null,
 ) {
     val end: Long get() = start + minutes * 60_000L
 }
@@ -70981,6 +71917,15 @@ import com.tennis.scoremanager.data.ClubSync
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
+import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvCode
+import com.tennis.scoremanager.data.SrvError
+import com.tennis.scoremanager.data.SrvInfo
+import com.tennis.scoremanager.data.SrvInvite
+import com.tennis.scoremanager.data.SrvInviteIn
+import com.tennis.scoremanager.data.SrvOk
+import com.tennis.scoremanager.data.SrvPlayer
+import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -70990,12 +71935,6 @@ import java.time.ZoneId
 
 const val API_VERSION = 1
 
-@Serializable data class ErrorOut(val error: String)
-@Serializable data class InfoOut(val club: String, val api: Int, val paired: Boolean, val synced: Boolean, val timeZone: String, val payInfo: String)
-@Serializable data class CodeIn(val code: String)
-@Serializable data class TokenOut(val token: String, val name: String = "", val player: String = "")
-@Serializable data class InviteIn(val player: String, val name: String, val days: Int = 14)
-@Serializable data class InviteOut(val code: String, val expires: Long)
 @Serializable data class MyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)
 @Serializable data class MeOut(
     val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
@@ -71004,10 +71943,7 @@ const val API_VERSION = 1
 )
 @Serializable data class DayOut(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
 @Serializable data class BookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
-@Serializable data class PlayerOut(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
-@Serializable data class AdminOut(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<PlayerOut>)
 @Serializable data class QuoteOut(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
-@Serializable data class OkOut(val ok: Boolean = true)
 
 /** Una risposta: codice HTTP e corpo JSON. */
 data class Resp(val status: Int, val body: String)
@@ -71031,7 +71967,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
     fun handle(r: Req): Resp = try {
         route(r)
     } catch (e: ApiError) {
-        Resp(e.status, json.encodeToString(ErrorOut.serializer(), ErrorOut(e.code)))
+        Resp(e.status, json.encodeToString(SrvError.serializer(), SrvError(e.code)))
     }
 
     private fun route(r: Req): Resp {
@@ -71080,12 +72016,12 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun info(): Resp {
         val s = store.state
-        return ok(InfoOut.serializer(), InfoOut(s.sync.club, API_VERSION, s.admin != null, s.syncedAt > 0, s.sync.timeZone, s.sync.payInfo))
+        return ok(SrvInfo.serializer(), SrvInfo(s.sync.club, API_VERSION, s.admin != null, s.syncedAt > 0, s.sync.timeZone, s.sync.payInfo))
     }
 
     private fun pair(r: Req): Resp {
         guard(r)
-        val code = Secrets.normalize(read(CodeIn.serializer(), r).code)
+        val code = Secrets.normalize(read(SrvCode.serializer(), r).code)
         val token = Secrets.token()
         val done = store.update { s ->
             if (s.setup == null || Secrets.hash(code) != s.setup) s to false
@@ -71093,7 +72029,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
         }
         if (!done) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
         store.forgetSetupCode()
-        return ok(TokenOut.serializer(), TokenOut(token))
+        return ok(SrvToken.serializer(), SrvToken(token))
     }
 
     private fun sync(r: Req): Resp {
@@ -71114,11 +72050,11 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun adminState(): Resp {
         val s = store.state
-        return ok(AdminOut.serializer(), AdminOut(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { PlayerOut(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
+        return ok(SrvAdmin.serializer(), SrvAdmin(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
     }
 
     private fun invite(r: Req): Resp {
-        val i = read(InviteIn.serializer(), r)
+        val i = read(SrvInviteIn.serializer(), r)
         if (i.player.isBlank() || i.name.isBlank()) throw ApiError(400, "BAD_REQUEST")
         val code = Secrets.code()
         val expires = store.now() + i.days.coerceIn(1, 90) * 86_400_000L
@@ -71126,26 +72062,26 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             // Un nuovo invito per lo stesso giocatore sostituisce il vecchio.
             s.copy(invites = s.invites.filter { it.player != i.player } + Invite(Secrets.hash(code), i.player, i.name.trim().take(60), expires)) to Unit
         }
-        return ok(InviteOut.serializer(), InviteOut(code, expires))
+        return ok(SrvInvite.serializer(), SrvInvite(code, expires))
     }
 
     private fun adminCancel(id: String): Resp {
         val found = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.any { it.id == id } }
         if (!found) throw ApiError(404, "NOT_FOUND")
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
         store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }) to Unit }
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     // --- Giocatori ---
 
     private fun claim(r: Req): Resp {
         guard(r)
-        val h = Secrets.hash(Secrets.normalize(read(CodeIn.serializer(), r).code))
+        val h = Secrets.hash(Secrets.normalize(read(SrvCode.serializer(), r).code))
         val token = Secrets.token()
         val now = store.now()
         val inv = store.update { s ->
@@ -71156,7 +72092,7 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             s.copy(players = s.players.filter { it.id != pl.id } + pl, invites = s.invites - inv) to inv
         }
         if (inv == null) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
-        return ok(TokenOut.serializer(), TokenOut(token, inv.name, inv.player))
+        return ok(SrvToken.serializer(), SrvToken(token, inv.name, inv.player))
     }
 
     private fun zone(): ZoneId = ZoneId.of(store.state.sync.timeZone)
@@ -71219,13 +72155,13 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
             (if (p == null) s.copy(bookings = s.bookings.filter { it.id != id }) else s) to p
         }
         if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 
     private fun logout(pl: Player, token: String): Resp {
         val h = Secrets.hash(token)
         store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(tokens = it.tokens - h) else it }) to Unit }
-        return ok(OkOut.serializer(), OkOut())
+        return ok(SrvOk.serializer(), SrvOk())
     }
 }
 
@@ -71855,26 +72791,26 @@ const I18N = {
     },
   },
   pt: {
-    title: 'Reservar campo', welcome: 'Bem-vindo', inviteText: 'Escreve o código de convite que a secretaria do clube te deu (ou abre a ligação do QR).',
+    title: 'Reservar quadra', welcome: 'Bem-vindo', inviteText: 'Escreve o código de convite que a secretaria do clube te deu (ou abre a ligação do QR).',
     code: 'Código de convite', enter: 'Entrar', logout: 'Sair', logoutAsk: 'Sair neste telemóvel? Para voltar é preciso um novo convite.',
     mine: 'As tuas reservas', none: 'Nenhuma reserva', cancel: 'Cancelar', cancelAsk: 'Cancelar esta reserva?', cancelled: 'Reserva cancelada',
-    callOffice: 'Para a cancelar agora liga para a secretaria.', day: 'Escolhe o dia', courts: 'Campos',
+    callOffice: 'Para a cancelar agora liga para a secretaria.', day: 'Escolhe o dia', courts: 'Quadras',
     FREE: 'Livre', BUSY: 'Ocupado', MINE: 'Teu', BLOCKED: 'Não reservável', PAST: '',
     book: 'Reservar', confirm: 'Confirmar', close: 'Fechar', duration: 'Duração', heating: 'Aquecimento', lights: 'Com luz', price: 'Preço',
-    pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se o planeamento mas não se reserva.',
-    notSynced: 'O clube ainda não publicou o planeamento.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
+    pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
+    notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
     rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
     err: {
-      CLOSED: 'As reservas online estão fechadas.', UNKNOWN_COURT: 'Este campo não se reserva online.', PAST: 'Esta hora já passou.',
+      CLOSED: 'As reservas online estão fechadas.', UNKNOWN_COURT: 'Esta quadra não se reserva online.', PAST: 'Esta hora já passou.',
       TOO_SOON: 'É tarde demais para reservar esta hora: liga para a secretaria.', TOO_FAR: 'Este dia ainda não se pode reservar.',
-      NOT_SLOT: 'Escolhe um horário do planeamento.', TOO_LONG: 'A reserva é demasiado longa.', BLOCKED: 'O campo não se pode reservar a esta hora.',
+      NOT_SLOT: 'Escolhe um horário da agenda.', TOO_LONG: 'A reserva é demasiado longa.', BLOCKED: 'A quadra não se pode reservar a esta hora.',
       TAKEN: 'Alguém acabou de reservar esta hora.', TOO_MANY: 'Já tens o máximo de reservas: joga ou cancela uma primeiro.',
       BAD_CODE: 'Código errado ou expirado: pede um novo à secretaria.', TOO_MANY_TRIES: 'Demasiadas tentativas: tenta de novo daqui a um quarto de hora.',
       UNAUTHORIZED: 'Este telemóvel já não está ligado: pede um novo convite à secretaria.', TOO_LATE: 'É tarde para cancelares sozinho: liga para a secretaria.',
-      NOT_YOURS: 'Esta reserva não é tua.', NOT_FOUND: 'Reserva não encontrada.', NOT_SYNCED: 'O clube ainda não publicou o planeamento.',
+      NOT_YOURS: 'Esta reserva não é tua.', NOT_FOUND: 'Reserva não encontrada.', NOT_SYNCED: 'O clube ainda não publicou a agenda.',
       generic: 'Algo correu mal. Tenta de novo.',
     },
   },
@@ -75714,6 +76650,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 244 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 248 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

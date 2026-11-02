@@ -244,7 +244,7 @@ fun MemberSection(c: MatchController, p: PlayerProfile) {
             row(s.memberNumber, m.number)
             row(s.memberFitpNumber, listOfNotNull(m.fitpNumber.ifBlank { null }, m.fitpCard?.let { fitpName(s, it) }, m.fitpYear?.toString()).joinToString(" · "))
             row(s.memberRankingLabel, m.ranking)
-            row(s.memberMedical, listOfNotNull(m.medical?.let { medicalName(s, it) }, m.medicalUntil?.let { s.memberMedicalShort(shortDate(it, lang)) }).joinToString(" · "))
+            row(s.memberMedical, listOfNotNull(m.medical?.let { medicalName(s, it) }, m.medicalUntil?.let { s.memberValidUntil(shortDate(it, lang)) }).joinToString(" · "))
             row(s.memberPrivacy, m.privacyAt?.let { shortDate(it, lang) })
             row(s.memberPhotos, if (m.photosOk) s.memberYes else s.off)
             row(s.memberBirth, p.birth?.let { b -> shortDate(b, lang) + (Members.age(b, now)?.let { " ($it)" } ?: "") })

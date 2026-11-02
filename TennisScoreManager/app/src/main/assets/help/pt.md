@@ -423,6 +423,17 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Convocados**: primeiro quem disse sim, depois os talvez; em vermelho quem não está em ordem naquele dia. **Enviar a convocação** escreve a cada um dia, hora, local e ponto de encontro, e prepara para o grupo a lista dos convocados.
 - **Partidas**: para cada simples e dupla os nossos (dos convocados) e os deles, depois o placar (do nosso lado: o app entende quem venceu) ou **Jogar com o marcador**, e no fim o resultado volta sozinho. No alto o resultado do confronto (ex. *4-2 vencido*); **Enviar o resultado** prepara partida por partida.
 
+### 7.18 Servidor do clube para as reservas (opcional, app 2.6)
+
+**Opcional**: sem servidor nada muda, reserva-se na secretaria como sempre. Com um pequeno servidor no clube (um Raspberry Pi Zero 2 W ou um PC antigo) os jogadores convidados **reservam as quadras sozinhos** no telemóvel, **também iPhone**, numa página web do clube que se adiciona ao ecrã principal como uma app.
+
+- **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
+- **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
+- **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
+- **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR; no iPhone, *Partilhar › Adicionar ao ecrã principal*. Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
+- **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
+- **De casa** (internet) é preciso um endereço https e uma porta aberta no router do clube: faz-se com serviços gratuitos (DuckDNS e Let's Encrypt), desde que a linha tenha IP público.
+
 ## 8. Placar na TV ou no monitor
 
 O telefone do árbitro funciona como um **pequeno servidor** na rede Wi-Fi: o placar é uma página web em estilo LED (dígitos de 7 segmentos, amarelo contra vermelho, jogos e sets no centro, sets terminados e tempo de partida embaixo à esquerda, **SERVIÇO: 25 SEG** embaixo à direita) que se atualiza sozinha a cada ponto. O monitor não precisa ser "smart" e não é preciso uma rede do clube: basta o **hotspot** de um dos dois telefones.

@@ -311,6 +311,25 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
     }
 
+    /** Il server del circolo (facoltativo): indirizzo, chiave della segreteria, regole online. */
+    private val clubServerFile: File get() = File(app.filesDir, "club_server.json")
+
+    fun loadClubServer(): ClubServerConf =
+        runCatching { json.decodeFromString(ClubServerConf.serializer(), clubServerFile.readText()) }.getOrDefault(ClubServerConf())
+
+    @Synchronized
+    fun saveClubServer(conf: ClubServerConf) {
+        runCatching {
+            if (!conf.paired && conf == ClubServerConf()) { clubServerFile.delete(); return }
+            val tmp = File(app.filesDir, "club_server.tmp")
+            tmp.writeText(json.encodeToString(ClubServerConf.serializer(), conf))
+            if (!tmp.renameTo(clubServerFile)) {
+                clubServerFile.delete()
+                tmp.renameTo(clubServerFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio del server del circolo fallito", it) }
+    }
+
     /** I tornei del circolo (sociali e FITP), in un file solo. */
     private val clubTournamentsFile: File get() = File(app.filesDir, "club_tournaments.json")
 

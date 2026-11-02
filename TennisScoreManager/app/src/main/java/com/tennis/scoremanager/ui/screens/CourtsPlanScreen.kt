@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Remove
@@ -118,7 +119,7 @@ private fun occupiedLabel(c: MatchController, s: Strings, o: Occupied): String {
     o.block?.let { k -> return s.blkCell(k.label.ifBlank { blockReasonName(s, k.reason) }) }
     val b = o.booking ?: return ""
     val who = (b.players.mapNotNull { c.playerById(it)?.name } + b.names).joinToString(" · ")
-    return listOf(if (b.kind == BookingKind.PLAY) "" else bookingKindName(s, b.kind), who, b.note).filter { it.isNotBlank() }.joinToString("\n")
+    return listOf(if (b.kind == BookingKind.PLAY) "" else bookingKindName(s, b.kind), who + if (b.online != null) " · " + s.srvOnlineTag else "", b.note).filter { it.isNotBlank() }.joinToString("\n")
 }
 
 /**
@@ -139,6 +140,7 @@ fun CourtsPlanScreen(c: MatchController) {
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(false) }
     var editBlock by remember { mutableStateOf<com.tennis.scoremanager.data.CourtBlock?>(null) }
     val occ = CourtPlans.occupied(plan, tournaments, day)
     val slots = CourtPlans.slots(day, plan.settings)
@@ -153,7 +155,8 @@ fun CourtsPlanScreen(c: MatchController) {
         // Il giorno: indietro, oggi, il calendario, avanti.
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { day = CourtPlans.addDays(day, -1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null, tint = TsmColors.TextMain) }
-            DateButton(s.planDay, day, lang) { day = CourtPlans.dayStart(it) }
+            // Il giorno prende lo spazio che resta: le due frecce restano a vista.
+            DateButton(s.planDay, day, lang, Modifier.weight(1f)) { day = CourtPlans.dayStart(it) }
             IconButton(onClick = { day = CourtPlans.addDays(day, 1) }) { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextMain) }
         }
         if (day != CourtPlans.dayStart(System.currentTimeMillis())) GhostButton(s.planToday, Icons.Filled.Today, { day = CourtPlans.dayStart(System.currentTimeMillis()) }, Modifier.fillMaxWidth())
@@ -161,6 +164,8 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
+        // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
+        ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -210,6 +215,7 @@ fun CourtsPlanScreen(c: MatchController) {
     }
     if (settings) PlanSettingsDialog(c, plan.settings) { settings = false }
     if (manage) CourtsManageDialog(c) { manage = false }
+    if (server) ClubServerDialog(c) { server = false }
     if (blocks) BlocksDialog(c, onEdit = { blocks = false; editBlock = it }) { blocks = false }
     editBlock?.let { b -> BlockEditDialog(c, b, isNew = plan.blocks.none { it.id == b.id }) { editBlock = null } }
 }
@@ -381,6 +387,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
     var price by remember { mutableStateOf(plain(st0.centsPerHour, lang)) }
     var priceL by remember { mutableStateOf(plain(st0.centsPerHourLights, lang)) }
     var courtsOpen by remember { mutableStateOf(false) }
+    var serverOpen by remember { mutableStateOf(false) }
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((v - 1).coerceAtLeast(min)) }) { Icon(Icons.Filled.Remove, null) }
@@ -401,6 +408,8 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
                 GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
+                GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
+                Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -416,6 +425,7 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
         dismissButton = { TextButton(onClick = onDone) { Text(s.back) } },
     )
     if (courtsOpen) CourtsManageDialog(c) { courtsOpen = false }
+    if (serverOpen) ClubServerDialog(c) { serverOpen = false }
 }
 
 fun surfaceName(s: Strings, x: com.tennis.scoremanager.data.Surface): String = when (x) {

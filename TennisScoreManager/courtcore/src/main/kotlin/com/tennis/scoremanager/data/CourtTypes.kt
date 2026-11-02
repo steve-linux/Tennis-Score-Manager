@@ -56,6 +56,8 @@ data class CourtBooking(
     val series: String? = null,
     val heating: Boolean = false,
     val payWhere: PayWhere = PayWhere.COURT,
+    /** Fatta online dal giocatore: l'id della prenotazione sul server del circolo. */
+    val online: String? = null,
 ) {
     val end: Long get() = start + minutes * 60_000L
 }

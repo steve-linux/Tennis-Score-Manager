@@ -536,6 +536,17 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Aufgestellt**: zuerst wer ja gesagt hat, dann die Vielleicht; rot, wer an dem Tag nicht in Ordnung ist. **Aufstellung senden** schreibt jedem Tag, Uhrzeit, Ort und Treffpunkt und bereitet für die Gruppe die Liste vor.
 - **Spiele**: für jedes Einzel und Doppel unsere Spieler (aus den Aufgestellten) und ihre, dann das Ergebnis (aus unserer Sicht: die App erkennt den Sieger) oder **Mit dem Zähler spielen**, und am Ende kommt das Ergebnis von selbst zurück. Oben das Ergebnis der Begegnung (z. B. *4-2 gewonnen*); **Ergebnis senden** bereitet es Spiel für Spiel vor.
 
+### 7.18 Vereinsserver für Buchungen (optional, app 2.6)
+
+**Optional**: Ohne Server ändert sich nichts, gebucht wird wie immer im Vereinsbüro. Mit einem kleinen Server im Verein (ein Raspberry Pi Zero 2 W oder ein alter PC) **buchen eingeladene Spieler die Plätze selbst** am Handy, **auch am iPhone**, auf einer Webseite des Vereins, die man wie eine App zum Home-Bildschirm hinzufügt.
+
+- **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
+- **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
+- **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
+- **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code; am iPhone *Teilen › Zum Home-Bildschirm*. Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
+- **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
+- **Von zu Hause** (Internet) braucht es eine https-Adresse und einen offenen Port am Vereinsrouter: Das geht mit kostenlosen Diensten (DuckDNS und Let's Encrypt), wenn die Leitung eine öffentliche IP hat.
+
 ## 8. Anzeigetafel auf TV oder Monitor
 
 Das Telefon des Schiedsrichters arbeitet als **kleiner Server** im WLAN: Die Anzeigetafel ist eine Webseite im LED-Stil (7-Segment-Ziffern, Gelb gegen Rot, Spiele und Sätze in der Mitte, beendete Sätze und Matchdauer unten links, **AUFSCHLAG: 25 SEK** unten rechts), die sich bei jedem Punkt von selbst aktualisiert. Der Monitor muss nicht „smart“ sein, und ein Vereinsnetz ist nicht nötig: Der **Hotspot** eines der beiden Telefone genügt.

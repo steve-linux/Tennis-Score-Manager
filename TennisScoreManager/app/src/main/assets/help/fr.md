@@ -423,6 +423,17 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Convoqués** : d'abord ceux qui ont dit oui, puis les peut-être ; en rouge ceux qui ne sont pas en règle ce jour-là. **Envoyer la convocation** écrit à chacun jour, heure, lieu et rendez-vous, et prépare pour le groupe la liste des convoqués.
 - **Matchs** : pour chaque simple et double nos joueurs (parmi les convoqués) et les leurs, puis le score (de notre côté : l'appli comprend qui a gagné) ou **Jouer avec le marqueur**, et à la fin le résultat revient tout seul. En haut le résultat de la rencontre (ex. *4-2 gagnée*) ; **Envoyer le résultat** le prépare match par match.
 
+### 7.18 Serveur du club pour les réservations (facultatif, app 2.6)
+
+**Facultatif** : sans serveur rien ne change, on réserve au secrétariat comme toujours. Avec un petit serveur au club (un Raspberry Pi Zero 2 W ou un vieux PC), les joueurs invités **réservent eux-mêmes les terrains** depuis leur téléphone, **iPhone compris**, sur une page web du club qu'on ajoute à l'écran d'accueil comme une app.
+
+- **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
+- **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
+- **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
+- **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR ; sur iPhone, *Partager › Sur l'écran d'accueil*. La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
+- **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
+- **Depuis chez soi** (internet) il faut une adresse https et un port ouvert sur la box du club : des services gratuits le permettent (DuckDNS et Let's Encrypt), si la ligne a une IP publique.
+
 ## 8. Tableau d'affichage sur TV ou écran
 
 Le téléphone de l'arbitre fait office de **petit serveur** sur le réseau Wi-Fi : le tableau d'affichage est une page web façon LED (chiffres à 7 segments, jaune contre rouge, jeux et manches au centre, manches terminées et durée du match en bas à gauche, **SERVICE: 25 SEC** en bas à droite) qui se met à jour toute seule à chaque point. L'écran n'a pas besoin d'être « smart » et aucun réseau du club n'est nécessaire : le **point d'accès** (partage de connexion) de l'un des deux téléphones suffit.

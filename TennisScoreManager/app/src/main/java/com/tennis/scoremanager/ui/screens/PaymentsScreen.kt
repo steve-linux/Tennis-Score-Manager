@@ -78,13 +78,13 @@ private fun today(): Long = Calendar.getInstance().run { noonOf(get(Calendar.YEA
 
 /** Un bottone con la data; toccandolo si sceglie dal calendario. */
 @Composable
-internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, onPick: (Long) -> Unit) {
+internal fun DateButton(label: String, value: Long?, lang: com.tennis.scoremanager.model.Lang, modifier: Modifier = Modifier.fillMaxWidth(), onPick: (Long) -> Unit) {
     val s = LocalStrings.current
     val context = LocalContext.current
     GhostButton("$label: ${value?.let { shortDate(it, lang) } ?: s.memberNotSet}", Icons.Filled.CalendarMonth, {
         val cal = Calendar.getInstance().apply { timeInMillis = value ?: System.currentTimeMillis() }
         DatePickerDialog(context, { _, y, m, d -> onPick(noonOf(y, m, d)) }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-    }, Modifier.fillMaxWidth())
+    }, modifier)
 }
 
 @Composable

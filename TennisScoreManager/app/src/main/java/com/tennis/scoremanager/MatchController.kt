@@ -116,12 +116,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
@@ -1705,6 +1707,9 @@ class MatchController(
     fun saveBooking(b: com.tennis.scoremanager.data.CourtBooking, weeks: Int, charge: Boolean): List<Long> {
         val (list, skipped) = if (weeks > 1) com.tennis.scoremanager.data.CourtPlans.weekly(courtPlan.value, clubTournaments.value, b, weeks) else listOf(b) to emptyList()
         val old = courtPlan.value.bookings.firstOrNull { it.id == b.id }
+        // Una prenotazione online spostata (campo, ora, durata) diventa della segreteria: sul server si toglie.
+        val keepOnline = old?.online?.takeIf { old.court == b.court && old.start == b.start && old.minutes == b.minutes }
+        old?.online?.let { id -> if (keepOnline == null) saveServer { it.copy(cancel = (it.cancel + id).distinct()) } }
         var book = clubBook.value
         // Cambiando una prenotazione, gli addebiti di prima non pagati si tolgono e si rifanno.
         old?.charges?.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
@@ -1720,7 +1725,7 @@ class MatchController(
             }
         }
         saveClubBook(book)
-        putBookings(saved)
+        putBookings(saved.map { it.copy(online = if (it.id == b.id) keepOnline else null) })
         return skipped
     }
 
@@ -1850,13 +1855,108 @@ class MatchController(
         scope.launch(io) { storage.saveCourtPlan(p) }
     }
 
-    /** Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. */
-    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean) {
+    /**
+     * Toglie la prenotazione (o tutta la serie da quella in poi); gli addebiti non pagati spariscono. Quelle fatte
+     * online si tolgono anche dal server ([fromServer]: le ha già tolte lui).
+     */
+    fun deleteBooking(b: com.tennis.scoremanager.data.CourtBooking, wholeSeries: Boolean, fromServer: Boolean = false) {
         val gone = if (wholeSeries && b.series != null) courtPlan.value.bookings.filter { it.series == b.series && it.start >= b.start } else listOf(b)
+        if (!fromServer) gone.mapNotNull { it.online }.takeIf { it.isNotEmpty() }?.let { ids -> saveServer { it.copy(cancel = (it.cancel + ids).distinct()) } }
         var book = clubBook.value
         gone.flatMap { it.charges }.forEach { id -> if (book.charges.firstOrNull { it.id == id }?.payments.isNullOrEmpty()) book = com.tennis.scoremanager.data.Fees.cancel(book, id) }
         saveClubBook(book)
         putBookings(emptyList(), gone.map { it.id }.toSet())
+    }
+
+    // ---- Server del circolo (facoltativo) ----
+
+    /** Il server del circolo per le prenotazioni dei giocatori; non abbinato = si prenota solo in segreteria. */
+    val clubServer = MutableStateFlow(storage.loadClubServer())
+    private val serverLock = kotlinx.coroutines.sync.Mutex()
+
+    private fun saveServer(f: (com.tennis.scoremanager.data.ClubServerConf) -> com.tennis.scoremanager.data.ClubServerConf) {
+        val n = synchronized(clubServer) { f(clubServer.value).also { clubServer.value = it } }
+        scope.launch(io) { storage.saveClubServer(n) }
+    }
+
+    init {
+        // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
+        scope.launch {
+            combine(courtPlan, clubTournaments, clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
+                .collectLatest { delay(3_000); if (clubServer.value.paired) syncServerNow() }
+        }
+    }
+
+    /** Abbina la segreteria al server con il codice che il server ha scritto all'avvio. null = fatto, altrimenti il codice dell'errore. */
+    suspend fun pairServer(url: String, code: String): String? {
+        val u = com.tennis.scoremanager.data.ClubServers.cleanUrl(url)
+        if (u.isEmpty()) return "BAD_URL"
+        return try {
+            val token = withContext(Dispatchers.IO) {
+                com.tennis.scoremanager.data.ClubServerClient(u, null).info()
+                com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
+            }
+            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList()) }
+            syncServerNow()
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /**
+     * Manda il planning al server e prende le prenotazioni online: le nuove entrano nel planning, quelle disdette
+     * escono. Prima toglie dal server quelle tolte in segreteria. null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun syncServerNow(): String? = serverLock.withLock {
+        val conf = clubServer.value
+        if (!conf.paired) return@withLock null
+        val cl = com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token)
+        try {
+            for (id in conf.cancel) {
+                withContext(Dispatchers.IO) { try { cl.cancel(id) } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
+                saveServer { it.copy(cancel = it.cancel - id) }
+            }
+            val sync = com.tennis.scoremanager.data.ClubServers.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
+            val st = withContext(Dispatchers.IO) { cl.sync(sync) }
+            val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
+            gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
+            if (added.isNotEmpty()) putBookings(added)
+            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            saveServer { it.copy(error = e.code) }
+            e.code
+        }
+    }
+
+    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String) = saveServer { it.copy(rules = rules, payInfo = payInfo.trim()) }
+
+    /** L'invito per un giocatore: codice e scadenza (il link lo fa [com.tennis.scoremanager.data.ClubServers.inviteLink]). */
+    suspend fun serverInvite(p: com.tennis.scoremanager.data.PlayerProfile): Result<com.tennis.scoremanager.data.SrvInvite> {
+        val conf = clubServer.value
+        if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).invite(p.id, p.name) })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
+    }
+
+    /** Il giocatore non prenota più online (le sue prenotazioni restano nel planning). */
+    suspend fun serverRemovePlayer(id: String): String? {
+        val conf = clubServer.value
+        return try {
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).removePlayer(id) }
+            saveServer { it.copy(players = it.players.filter { p -> p.id != id }) }
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
+    fun unpairServer() {
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo) }
+        val p = courtPlan.value
+        if (p.bookings.any { it.online != null }) {
+            val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
+            courtPlan.value = np
+            scope.launch(io) { storage.saveCourtPlan(np) }
+        }
     }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */

@@ -180,6 +180,8 @@ fun StudentScreen(c: MatchController) {
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
         MemberSection(c, st)
+        // Con il server del circolo: l'invito per prenotare online.
+        PlayerOnlineSection(c, st)
         ChargesSection(c, st)
         // Le squadre in cui gioca.
         val teamsAll by c.teams.collectAsState()
