@@ -776,7 +776,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Der Server**: Start mit `java -jar tsm-server.jar` (Java 17 oder neuer). Beim Start zeigt er seine Adresse und einen **Kopplungscode** (auch in der Datei *setup-code.txt* im Datenordner).
 - **Das Büro koppeln**: *Platzbelegung › Zeiten und Preise › Vereinsserver*: Serveradresse (z. B. `http://192.168.1.50:8080`) und Code, dann **Koppeln**. Danach geht die Platzbelegung (Plätze, Zeiten, Preise, nicht buchbare Zeiten, Buchungen des Büros und Turnierspiele, ohne Namen) nach jeder Änderung von selbst an den Server; bei offenem Plan kommen die Online-Buchungen jede Minute.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
-- **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code; am iPhone *Teilen › Zum Home-Bildschirm*. Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
+- **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code. Am iPhone führt ihn die **TSM**-Seite durch: *Teilen › Zum Home-Bildschirm*, dann TSM vom Home-Bildschirm öffnen und den Code einfügen (Safari und die App auf dem Home-Bildschirm teilen keine Daten, deshalb wird die Einladung in der installierten App benutzt). Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
 - **Mit der TSM-App auf Android** bucht der Spieler auch unter *Spielen › Platz buchen*: den Einladungs-QR-Code scannen (oder den Link einfügen), dann die eigenen Buchungen sehen, den Tag wählen und ein freies Feld antippen; Dauer, Heizung und Preis vor dem Bestätigen, **Stornieren**, solange es noch geht, **Diesen Verein verlassen**, um das Handy zu trennen. Es gelten dieselben Regeln wie auf der Webseite.
 - **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
@@ -1303,7 +1303,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **The server**: start it with `java -jar tsm-server.jar` (Java 17 or later). At start-up it prints its address and a **pairing code** (also in the file *setup-code.txt* in its data folder).
 - **Pairing the office**: *Court planner › Hours and prices › Club server*: server address (e.g. `http://192.168.1.50:8080`) and code, then **Pair**. From then on the schedule (courts, hours, prices, non-bookable periods, office bookings and tournament matches, without names) goes to the server by itself after every change; while the planner is open, online bookings arrive every minute.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
-- **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR; on iPhone, *Share › Add to Home Screen*. The card shows who books online; **Remove online access** disconnects them.
+- **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR. On iPhone the **TSM** page walks them through it: *Share › Add to Home Screen*, then open TSM from the Home Screen and paste the code (Safari and the Home Screen app do not share data, so the invitation is used in the installed app). The card shows who books online; **Remove online access** disconnects them.
 - **With the TSM app on Android** a player can also book from *Play › Book a court*: scan the invitation QR (or paste the link), then see your bookings, pick the day and tap a free slot; length, heating and price before confirming, **Cancel** while still in time, **Leave this club** to disconnect the phone. The rules are the same as on the web page.
 - **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
@@ -1829,7 +1829,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **El servidor**: se arranca con `java -jar tsm-server.jar` (Java 17 o superior). Al arrancar muestra su dirección y un **código de emparejamiento** (también en el archivo *setup-code.txt* de su carpeta de datos).
 - **Emparejar la secretaría**: *Planning de pistas › Horarios y precios › Servidor del club*: dirección del servidor (p. ej. `http://192.168.1.50:8080`) y código, luego **Emparejar**. Desde entonces el planning (pistas, horarios, precios, periodos no reservables, reservas de secretaría y partidos de torneos, sin nombres) va solo al servidor tras cada cambio; con el planning abierto, las reservas en línea llegan cada minuto.
 - **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
-- **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR; en iPhone, *Compartir › Añadir a pantalla de inicio*. En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
+- **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR. En iPhone la página **TSM** le guía: *Compartir › Añadir a pantalla de inicio*, luego abre TSM desde la pantalla de inicio y pega el código (Safari y la app de la pantalla de inicio no comparten datos, así que la invitación se usa en la app instalada). En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
 - **Con la app TSM en Android** el jugador también reserva desde *Jugar › Reservar pista*: escanea el QR de la invitación (o pega el enlace), luego ve sus reservas, elige el día y toca una casilla libre; duración, calefacción y precio antes de confirmar, **Anular** mientras haya tiempo, **Salir de este club** para desconectar el teléfono. Las reglas son las mismas que en la página web.
 - **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
@@ -2355,7 +2355,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Le serveur** : il se lance avec `java -jar tsm-server.jar` (Java 17 ou plus). Au démarrage il affiche son adresse et un **code d'appairage** (aussi dans le fichier *setup-code.txt* de son dossier de données).
 - **Appairer le secrétariat** : *Planning des terrains › Horaires et tarifs › Serveur du club* : adresse du serveur (ex. `http://192.168.1.50:8080`) et code, puis **Appairer**. Ensuite le planning (terrains, horaires, prix, périodes non réservables, réservations du secrétariat et matchs des tournois, sans noms) part tout seul vers le serveur après chaque modification ; planning ouvert, les réservations en ligne arrivent chaque minute.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
-- **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR ; sur iPhone, *Partager › Sur l'écran d'accueil*. La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
+- **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR. Sur iPhone, la page **TSM** le guide : *Partager › Sur l'écran d'accueil*, puis il ouvre TSM depuis l'écran d'accueil et colle le code (Safari et l'app de l'écran d'accueil ne partagent pas leurs données, l'invitation s'utilise donc dans l'app installée). La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
 - **Avec l'app TSM sur Android**, le joueur réserve aussi depuis *Jouer › Réserver un terrain* : il scanne le QR de l'invitation (ou colle le lien), puis voit ses réservations, choisit le jour et touche un créneau libre ; durée, chauffage et prix avant de confirmer, **Annuler** tant qu'il est temps, **Quitter ce club** pour déconnecter le téléphone. Les règles sont les mêmes que sur la page web.
 - **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
@@ -2881,7 +2881,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Il server**: si avvia con `java -jar tsm-server.jar` (serve Java 17 o più). All'avvio scrive l'indirizzo e un **codice di abbinamento** (anche nel file *setup-code.txt* nella cartella dei dati).
 - **Abbinare la segreteria**: *Planning dei campi › Orari e prezzi › Server del circolo*: indirizzo del server (es. `http://192.168.1.50:8080`) e codice, poi **Abbina**. Da lì il planning (campi, orari, prezzi, non prenotabili, prenotazioni della segreteria e partite dei tornei, senza nomi) va al server da solo dopo ogni modifica; con il planning aperto, ogni minuto arrivano le prenotazioni online.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
-- **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR, e su iPhone fa *Condividi › Aggiungi alla schermata Home*. Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
+- **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR. Su iPhone la pagina **TSM** lo guida: *Condividi › Aggiungi alla schermata Home*, poi apre TSM dalla Home e incolla il codice (Safari e l'app sulla Home non condividono i dati, quindi l'invito si usa nell'app installata). Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
 - **Con l'app TSM su Android** il giocatore prenota anche da *Gioca › Prenota un campo*: inquadra il QR dell'invito (o incolla il link), poi vede le sue prenotazioni, sceglie il giorno e tocca una casella libera; durata, riscaldamento e prezzo prima di confermare, **Disdici** finché si è in tempo, **Esci da questo circolo** per scollegare il telefono. Le regole sono le stesse della pagina web.
 - **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
@@ -3407,7 +3407,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **O servidor**: arranca com `java -jar tsm-server.jar` (Java 17 ou superior). Ao arrancar mostra o endereço e um **código de emparelhamento** (também no ficheiro *setup-code.txt* da pasta de dados).
 - **Emparelhar a secretaria**: *Agenda das quadras › Horários e preços › Servidor do clube*: endereço do servidor (ex. `http://192.168.1.50:8080`) e código, depois **Emparelhar**. A partir daí a agenda (quadras, horários, preços, períodos não reserváveis, reservas da secretaria e jogos dos torneios, sem nomes) vai sozinho para o servidor depois de cada alteração; com a agenda aberta, as reservas online chegam a cada minuto.
 - **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
-- **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR; no iPhone, *Partilhar › Adicionar ao ecrã principal*. Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
+- **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR. No iPhone a página **TSM** guia-o: *Partilhar › Adicionar ao ecrã principal*, depois abre o TSM a partir do ecrã principal e cola o código (o Safari e a app do ecrã principal não partilham dados, por isso o convite usa-se na app instalada). Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
 - **Com a app TSM no Android** o jogador também reserva em *Jogar › Reservar quadra*: lê o QR do convite (ou cola a ligação), depois vê as suas reservas, escolhe o dia e toca numa casa livre; duração, aquecimento e preço antes de confirmar, **Cancelar** enquanto há tempo, **Sair deste clube** para desligar o telemóvel. As regras são as mesmas da página web.
 - **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
@@ -74401,6 +74401,11 @@ cat > "$DEST/server/src/main/resources/web/app.js" << 'TSM_EOF'
 const KEY = 'tsm.token';
 const state = { token: null, me: null, date: null, day: null };
 
+// Su iPhone (e iPad) Safari e l'app messa sulla schermata Home non condividono i dati: l'invito va usato
+// nell'app installata, altrimenti la chiave resta in Safari e l'app chiede un codice già usato.
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const STANDALONE = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
 function load(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
 function save(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (_) { /* senza memoria resta per questa visita */ } }
 
@@ -74460,10 +74465,43 @@ function money(c) { return c > 0 ? new Intl.NumberFormat(LANG, { style: 'currenc
 // --- Schermate ---
 
 function setHeader() {
-  document.title = T.title;
-  $('club').textContent = (state.me && state.me.club) || T.title;
-  $('who').textContent = state.me ? state.me.name : '';
+  document.title = state.me && state.me.club ? 'TSM · ' + state.me.club : 'TSM · ' + T.title;
+  $('club').textContent = (state.me && state.me.club) || 'Tennis Score Manager';
+  $('who').textContent = state.me ? state.me.name : T.title;
   const lo = $('logout'); lo.textContent = T.logout; lo.hidden = !state.token;
+  const rf = $('refresh'); rf.title = T.refresh; rf.setAttribute('aria-label', T.refresh); rf.hidden = !state.me;
+}
+
+/** Il suggerimento per averla come un'app, solo se non lo è già. */
+function installTip() {
+  if (STANDALONE) return null;
+  return el('p', { class: 'tip' }, IOS ? T.install : T.installOther);
+}
+
+/**
+ * Su iPhone, dal link dell'invito in Safari: prima si installa, poi il codice si usa nell'app installata
+ * (copiato negli appunti, che Safari e l'app condividono). Chi preferisce resta nel browser.
+ */
+function showIosInstall(code) {
+  state.me = null; setHeader();
+  const shown = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase().replace(/(.{5})(?=.)/g, '$1-');
+  const msg = el('p', { class: 'dim center' }, '');
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(shown); msg.textContent = T.copied; } catch (_) { msg.textContent = shown; }
+  };
+  const here = async () => {
+    try { await claim(code); } catch (e) { msg.className = 'error center'; msg.textContent = errText(e); }
+  };
+  $('app').replaceChildren(
+    el('div', { class: 'card' },
+      el('h3', null, T.iosTitle),
+      el('ol', { class: 'steps' },
+        el('li', null, T.iosStep1, ' ', el('span', { class: 'share', 'aria-hidden': 'true' }, '⬆︎')),
+        el('li', null, T.iosStep2),
+        el('li', null, T.iosStep3)),
+      el('div', { class: 'bigcode' }, shown),
+      el('div', { class: 'actions' }, el('button', { onclick: copy }, T.copy)), msg),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: here }, T.useBrowser)));
 }
 
 function showInvite(error) {
@@ -74482,7 +74520,7 @@ function showInvite(error) {
       el('p', { class: 'dim' }, T.inviteText),
       el('label', { for: 'code' }, T.code), input, msg,
       el('div', { class: 'actions' }, el('button', { onclick: go }, T.enter))),
-    el('p', { class: 'tip' }, T.install));
+    installTip());
   input.focus();
 }
 
@@ -74541,6 +74579,8 @@ function render(dayError) {
     el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
+  const tip = installTip();
+  if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
 }
 
@@ -74625,6 +74665,7 @@ function askCancel(b) {
 // --- Avvio ---
 
 $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+$('refresh').addEventListener('click', () => { if (state.me) refresh(); });
 $('logout').addEventListener('click', async () => {
   if (!confirm(T.logoutAsk)) return;
   try { await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
@@ -74641,6 +74682,7 @@ if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWor
   const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
   if (m) {
     history.replaceState(null, '', location.pathname);
+    if (IOS && !STANDALONE && !state.token) { showIosInstall(m[1]); return; }
     try { await claim(m[1]); return; } catch (e) { showInvite(errText(e)); return; }
   }
   if (state.token) await refresh(); else showInvite();
@@ -74664,6 +74706,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
     notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
     install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
+    refresh: 'Aggiorna', installOther: 'Per averla come un\'app: menu del browser › Aggiungi alla schermata Home.', iosTitle: 'Installa TSM sull\'iPhone', iosStep1: 'Tocca Condividi in basso', iosStep2: 'Scegli «Aggiungi alla schermata Home», poi Aggiungi.', iosStep3: 'Apri TSM dalla schermata Home e incolla questo codice d\'invito:', copy: 'Copia il codice', copied: 'Codice copiato: incollalo nell\'app TSM.', useBrowser: 'Usa nel browser, senza installare',
     rules: (d, n) => `Prenoti fino a ${d} giorni avanti, al massimo ${n} prenotazioni per volta.`,
     cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
     covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
@@ -74688,6 +74731,7 @@ const I18N = {
     pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
     notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
     install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
+    refresh: 'Refresh', installOther: 'To use it like an app: browser menu › Add to Home Screen.', iosTitle: 'Install TSM on your iPhone', iosStep1: 'Tap Share at the bottom', iosStep2: 'Choose “Add to Home Screen”, then Add.', iosStep3: 'Open TSM from the Home Screen and paste this invitation code:', copy: 'Copy the code', copied: 'Code copied: paste it in the TSM app.', useBrowser: 'Use it in the browser, without installing',
     rules: (d, n) => `You can book up to ${d} days ahead, at most ${n} bookings at a time.`,
     cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
     covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
@@ -74712,6 +74756,7 @@ const I18N = {
     pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
     notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
     install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
+    refresh: 'Actualiser', installOther: 'Pour l\'avoir comme une app : menu du navigateur › Ajouter à l\'écran d\'accueil.', iosTitle: 'Installer TSM sur l\'iPhone', iosStep1: 'Touchez Partager en bas', iosStep2: 'Choisissez « Sur l\'écran d\'accueil », puis Ajouter.', iosStep3: 'Ouvrez TSM depuis l\'écran d\'accueil et collez ce code d\'invitation :', copy: 'Copier le code', copied: 'Code copié : collez-le dans l\'app TSM.', useBrowser: 'Utiliser dans le navigateur, sans installer',
     rules: (d, n) => `Réservation jusqu'à ${d} jours à l'avance, ${n} réservations au maximum à la fois.`,
     cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
     covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
@@ -74736,6 +74781,7 @@ const I18N = {
     pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
     notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
     install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
+    refresh: 'Aktualisieren', installOther: 'Um sie wie eine App zu nutzen: Browsermenü › Zum Startbildschirm hinzufügen.', iosTitle: 'TSM auf dem iPhone installieren', iosStep1: 'Unten auf Teilen tippen', iosStep2: '„Zum Home-Bildschirm“ wählen, dann Hinzufügen.', iosStep3: 'TSM vom Home-Bildschirm öffnen und diesen Einladungscode einfügen:', copy: 'Code kopieren', copied: 'Code kopiert: In der TSM-App einfügen.', useBrowser: 'Im Browser nutzen, ohne Installation',
     rules: (d, n) => `Buchbar bis ${d} Tage im Voraus, höchstens ${n} Buchungen gleichzeitig.`,
     cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
     covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
@@ -74760,6 +74806,7 @@ const I18N = {
     pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
     notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
     install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
+    refresh: 'Actualizar', installOther: 'Para tenerla como una app: menú del navegador › Añadir a pantalla de inicio.', iosTitle: 'Instala TSM en el iPhone', iosStep1: 'Toca Compartir abajo', iosStep2: 'Elige «Añadir a pantalla de inicio» y luego Añadir.', iosStep3: 'Abre TSM desde la pantalla de inicio y pega este código de invitación:', copy: 'Copiar el código', copied: 'Código copiado: pégalo en la app TSM.', useBrowser: 'Usar en el navegador, sin instalar',
     rules: (d, n) => `Reservas hasta ${d} días antes, como mucho ${n} reservas a la vez.`,
     cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
     covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
@@ -74784,6 +74831,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
     notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
+    refresh: 'Atualizar', installOther: 'Para a ter como uma app: menu do navegador › Adicionar ao ecrã principal.', iosTitle: 'Instala o TSM no iPhone', iosStep1: 'Toca em Partilhar em baixo', iosStep2: 'Escolhe «Adicionar ao ecrã principal» e depois Adicionar.', iosStep3: 'Abre o TSM a partir do ecrã principal e cola este código de convite:', copy: 'Copiar o código', copied: 'Código copiado: cola-o na app TSM.', useBrowser: 'Usar no navegador, sem instalar',
     rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
@@ -75448,8 +75496,8 @@ cat > "$DEST/server/src/main/resources/web/index.html" << 'TSM_EOF'
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Campi">
-<title>Prenota un campo</title>
+<meta name="apple-mobile-web-app-title" content="TSM">
+<title>TSM</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -75459,6 +75507,7 @@ cat > "$DEST/server/src/main/resources/web/index.html" << 'TSM_EOF'
 <header>
   <img src="icon-192.png" alt="" class="logo">
   <div class="head-text"><div id="club" class="club"></div><div id="who" class="who"></div></div>
+  <button id="refresh" class="ghost small icon" hidden>↻</button>
   <button id="logout" class="ghost small" hidden></button>
 </header>
 <main id="app"><p class="dim center" id="loading">…</p></main>
@@ -75473,8 +75522,8 @@ TSM_EOF
 # ---------------------------------------------------------------- server/src/main/resources/web/manifest.webmanifest
 cat > "$DEST/server/src/main/resources/web/manifest.webmanifest" << 'TSM_EOF'
 {
-  "name": "Prenota un campo",
-  "short_name": "Campi",
+  "name": "Tennis Score Manager",
+  "short_name": "TSM",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -75555,6 +75604,11 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .toast[hidden] { display: none; }
 .tip { font-size: 13px; color: var(--dim); border-left: 3px solid var(--ball); padding-left: 10px; margin-top: 16px; }
 .cell:disabled { opacity: 1; cursor: default; }
+.icon { font-size: 18px; padding: 6px 10px; }
+.steps { margin: 12px 0; padding-left: 22px; }
+.steps li { margin: 8px 0; }
+.share { display: inline-block; border: 1px solid var(--outline); border-radius: 6px; padding: 0 6px; color: var(--ball); }
+.bigcode { font-size: 26px; font-weight: 700; letter-spacing: .12em; text-align: center; color: var(--ball); background: var(--high); border-radius: 12px; padding: 14px; margin-top: 8px; }
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/resources/web/sw.js

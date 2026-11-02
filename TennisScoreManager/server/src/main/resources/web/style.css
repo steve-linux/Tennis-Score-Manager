@@ -64,3 +64,8 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .toast[hidden] { display: none; }
 .tip { font-size: 13px; color: var(--dim); border-left: 3px solid var(--ball); padding-left: 10px; margin-top: 16px; }
 .cell:disabled { opacity: 1; cursor: default; }
+.icon { font-size: 18px; padding: 6px 10px; }
+.steps { margin: 12px 0; padding-left: 22px; }
+.steps li { margin: 8px 0; }
+.share { display: inline-block; border: 1px solid var(--outline); border-radius: 6px; padding: 0 6px; color: var(--ball); }
+.bigcode { font-size: 26px; font-weight: 700; letter-spacing: .12em; text-align: center; color: var(--ball); background: var(--high); border-radius: 12px; padding: 14px; margin-top: 8px; }

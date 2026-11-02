@@ -1,6 +1,6 @@
 {
-  "name": "Prenota un campo",
-  "short_name": "Campi",
+  "name": "Tennis Score Manager",
+  "short_name": "TSM",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

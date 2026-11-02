@@ -7,6 +7,11 @@
 const KEY = 'tsm.token';
 const state = { token: null, me: null, date: null, day: null };
 
+// Su iPhone (e iPad) Safari e l'app messa sulla schermata Home non condividono i dati: l'invito va usato
+// nell'app installata, altrimenti la chiave resta in Safari e l'app chiede un codice già usato.
+const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const STANDALONE = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
 function load(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
 function save(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (_) { /* senza memoria resta per questa visita */ } }
 
@@ -66,10 +71,43 @@ function money(c) { return c > 0 ? new Intl.NumberFormat(LANG, { style: 'currenc
 // --- Schermate ---
 
 function setHeader() {
-  document.title = T.title;
-  $('club').textContent = (state.me && state.me.club) || T.title;
-  $('who').textContent = state.me ? state.me.name : '';
+  document.title = state.me && state.me.club ? 'TSM · ' + state.me.club : 'TSM · ' + T.title;
+  $('club').textContent = (state.me && state.me.club) || 'Tennis Score Manager';
+  $('who').textContent = state.me ? state.me.name : T.title;
   const lo = $('logout'); lo.textContent = T.logout; lo.hidden = !state.token;
+  const rf = $('refresh'); rf.title = T.refresh; rf.setAttribute('aria-label', T.refresh); rf.hidden = !state.me;
+}
+
+/** Il suggerimento per averla come un'app, solo se non lo è già. */
+function installTip() {
+  if (STANDALONE) return null;
+  return el('p', { class: 'tip' }, IOS ? T.install : T.installOther);
+}
+
+/**
+ * Su iPhone, dal link dell'invito in Safari: prima si installa, poi il codice si usa nell'app installata
+ * (copiato negli appunti, che Safari e l'app condividono). Chi preferisce resta nel browser.
+ */
+function showIosInstall(code) {
+  state.me = null; setHeader();
+  const shown = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase().replace(/(.{5})(?=.)/g, '$1-');
+  const msg = el('p', { class: 'dim center' }, '');
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(shown); msg.textContent = T.copied; } catch (_) { msg.textContent = shown; }
+  };
+  const here = async () => {
+    try { await claim(code); } catch (e) { msg.className = 'error center'; msg.textContent = errText(e); }
+  };
+  $('app').replaceChildren(
+    el('div', { class: 'card' },
+      el('h3', null, T.iosTitle),
+      el('ol', { class: 'steps' },
+        el('li', null, T.iosStep1, ' ', el('span', { class: 'share', 'aria-hidden': 'true' }, '⬆︎')),
+        el('li', null, T.iosStep2),
+        el('li', null, T.iosStep3)),
+      el('div', { class: 'bigcode' }, shown),
+      el('div', { class: 'actions' }, el('button', { onclick: copy }, T.copy)), msg),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: here }, T.useBrowser)));
 }
 
 function showInvite(error) {
@@ -88,7 +126,7 @@ function showInvite(error) {
       el('p', { class: 'dim' }, T.inviteText),
       el('label', { for: 'code' }, T.code), input, msg,
       el('div', { class: 'actions' }, el('button', { onclick: go }, T.enter))),
-    el('p', { class: 'tip' }, T.install));
+    installTip());
   input.focus();
 }
 
@@ -147,6 +185,8 @@ function render(dayError) {
     el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
+  const tip = installTip();
+  if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
 }
 
@@ -231,6 +271,7 @@ function askCancel(b) {
 // --- Avvio ---
 
 $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+$('refresh').addEventListener('click', () => { if (state.me) refresh(); });
 $('logout').addEventListener('click', async () => {
   if (!confirm(T.logoutAsk)) return;
   try { await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
@@ -247,6 +288,7 @@ if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWor
   const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
   if (m) {
     history.replaceState(null, '', location.pathname);
+    if (IOS && !STANDALONE && !state.token) { showIosInstall(m[1]); return; }
     try { await claim(m[1]); return; } catch (e) { showInvite(errText(e)); return; }
   }
   if (state.token) await refresh(); else showInvite();
