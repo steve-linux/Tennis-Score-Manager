@@ -215,6 +215,8 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Il controllo delle prenotazioni online (server del circolo) riparte dopo il riavvio del telefono. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Tabellone TV: server web locale, ricerca del telefono dell'arbitro, rete Wi-Fi anche senza internet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -315,6 +317,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
             android:launchMode="singleTask" />
+
+        <!-- Ogni 15 minuti, con un server del circolo abbinato: prenotazioni online nuove e disdette. -->
+        <service
+            android:name=".service.ServerCheckJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
             android:name=".service.MatchService"
@@ -774,6 +782,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
 - **Datensicherung**: Alles steckt in einer Datei, `/var/lib/tsm-server/state.json`; ab und zu kopieren, und vor dem Neuschreiben des Sticks.
+- **Hinweise für das Büro**: Mit *Bei Online-Buchungen benachrichtigen* (normalerweise an) bekommt das Büro-Handy eine Benachrichtigung, wenn ein Spieler bucht oder storniert, auch bei geschlossener App: etwa alle 15 Minuten, wenn Netz da ist. Antippen öffnet die Platzbelegung am Tag der Buchung. Was das Büro selbst entfernt, löst keine Benachrichtigung aus.
 - **Von zu Hause** (Internet, per HTTPS: das braucht es auch, um die Seite auf den Home-Bildschirm des iPhones zu legen). Alles kostenlos:
   1. Auf **duckdns.org** (Anmeldung mit einem GitHub-, Google-… Konto) einen Namen anlegen, z. B. `tcprova.duckdns.org`, und den **Token** kopieren.
   2. Am **Vereinsrouter** dem Pi eine feste Adresse geben und die **TCP-Ports 80 und 443** an ihn weiterleiten.
@@ -1300,6 +1309,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
+- **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
 - **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
   1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
   2. On the **club router** give the Pi a fixed address and forward **TCP ports 80 and 443** to it.
@@ -1825,6 +1835,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
 - **Copia de los datos**: todo está en un solo archivo, `/var/lib/tsm-server/state.json`; conviene copiarlo de vez en cuando y antes de reescribir la memoria.
+- **Avisos para la secretaría**: con *Avisarme de las reservas en línea* (encendido por defecto) el teléfono de la secretaría recibe una notificación cuando un jugador reserva o anula, también con la app cerrada: cada 15 minutos más o menos, cuando hay red. Al tocarla se abre el planning en el día de la reserva. Las que quita la propia secretaría no avisan.
 - **Desde casa** (internet, en HTTPS: también hace falta para poner la página en la pantalla de inicio del iPhone). Todo gratis:
   1. En **duckdns.org** (se entra con una cuenta de GitHub, Google…) se crea un nombre, p. ej. `tcprova.duckdns.org`, y se copia el **token**.
   2. En el **router del club** se da a la Pi una dirección fija y se redirigen a ella los puertos **TCP 80 y 443**.
@@ -2350,6 +2361,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
 - **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
+- **Alertes pour le secrétariat** : avec *Me prévenir des réservations en ligne* (activé par défaut), le téléphone du secrétariat reçoit une notification quand un joueur réserve ou annule, même app fermée : environ toutes les 15 minutes, quand il y a du réseau. En la touchant, le planning s'ouvre sur le jour de la réservation. Celles que le secrétariat retire lui-même ne donnent pas de notification.
 - **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
   1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
   2. Sur la **box du club**, donnez au Pi une adresse fixe et redirigez vers elle les ports **TCP 80 et 443**.
@@ -2875,6 +2887,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
 - **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
+- **Avvisi alla segreteria**: con *Avvisami delle prenotazioni online* (acceso di solito) il telefono della segreteria riceve una notifica quando un giocatore prenota o disdice, anche ad app chiusa: ogni 15 minuti circa, quando c'è rete. Toccandola si apre il planning sul giorno della prenotazione. Quelle tolte dalla segreteria stessa non danno notifica.
 - **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
   1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
   2. Sul **router del circolo** si dà al Pi un indirizzo fisso e si inoltrano a quell'indirizzo le porte **TCP 80 e 443**.
@@ -3400,6 +3413,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
 - **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
+- **Avisos para a secretaria**: com *Avisar-me das reservas online* (ligado por omissão) o telemóvel da secretaria recebe uma notificação quando um jogador reserva ou cancela, mesmo com a app fechada: mais ou menos a cada 15 minutos, quando há rede. Ao tocá-la abre-se a agenda no dia da reserva. As que a própria secretaria tira não dão notificação.
 - **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
   1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
   2. No **router do clube** dá-se ao Pi um endereço fixo e reencaminham-se para ele as portas **TCP 80 e 443**.
@@ -4148,9 +4162,25 @@ class MainActivity : ComponentActivity() {
 
     private val controller: MatchController get() = (application as TsmApp).controller
 
+    /** La notifica di una prenotazione online apre il planning sul suo giorno. */
+    private fun openFromNotification(i: android.content.Intent?) {
+        val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
+        if (day > 0) {
+            i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
+            controller.openPlanAt(day)
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openFromNotification(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         controller.onActivityCreated()
+        if (savedInstanceState == null) openFromNotification(intent)
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -6084,6 +6114,10 @@ class MatchController(
     }
 
     init {
+        // Il controllo in background (notifiche delle prenotazioni online) solo con un server abbinato e gli avvisi accesi.
+        scope.launch {
+            clubServer.map { it.paired && it.alerts }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedule(app, it) }
+        }
         // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
         scope.launch {
             combine(courtPlan, clubTournaments, clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
@@ -6100,7 +6134,7 @@ class MatchController(
                 com.tennis.scoremanager.data.ClubServerClient(u, null).info()
                 com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
             }
-            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList()) }
+            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList(), seen = null) }
             syncServerNow()
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
@@ -6123,12 +6157,27 @@ class MatchController(
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
             gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
             if (added.isNotEmpty()) putBookings(added)
-            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club) }
+            // Le novità per la segreteria: chi ha prenotato o disdetto online da quando si è guardato l'ultima volta.
+            val news = com.tennis.scoremanager.data.ClubServers.onlineNews(clubServer.value.seen, st.bookings, System.currentTimeMillis(), conf.cancel.toSet()) { b ->
+                listOf(b.name, b.court, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
+            }
+            if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
+            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen) }
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
             saveServer { it.copy(error = e.code) }
             e.code
         }
+    }
+
+    fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
+
+    /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
+    val planDayRequest = MutableStateFlow<Long?>(null)
+
+    fun openPlanAt(day: Long) {
+        planDayRequest.value = day
+        openCourtsPlan()
     }
 
     fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
@@ -6155,7 +6204,7 @@ class MatchController(
 
     /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
     fun unpairServer() {
-        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl) }
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
         val p = courtPlan.value
         if (p.bookings.any { it.online != null }) {
             val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
@@ -10683,6 +10732,10 @@ import java.net.URL
  * segreteria come sempre). [token] è la chiave della segreteria; [cancel] le prenotazioni online tolte dal
  * planning ma non ancora tolte dal server.
  */
+/** Una prenotazione online già vista: come la si descrive nella notifica e quando comincia. */
+@Serializable
+data class SeenBooking(val label: String, val start: Long)
+
 @Serializable
 data class ClubServerConf(
     val url: String = "",
@@ -10697,6 +10750,10 @@ data class ClubServerConf(
     val error: String? = null,
     val players: List<SrvPlayer> = emptyList(),
     val cancel: List<String> = emptyList(),
+    /** Notifica alla segreteria le prenotazioni online nuove e disdette (anche ad app chiusa). */
+    val alerts: Boolean = true,
+    /** Le prenotazioni online già viste, per notificare solo le novità; null = mai guardato. */
+    val seen: Map<String, SeenBooking>? = null,
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -10772,6 +10829,25 @@ object ClubServers {
             busy = busy.filter { it.end >= now - 86_400_000L },
             rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
         )
+    }
+
+    /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
+    data class OnlineNews(val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?)
+
+    /**
+     * Le novità per la notifica. La prima volta (dopo l'abbinamento) non c'è niente da dire: si ricorda solo cosa
+     * c'è. Le disdette contano solo se la prenotazione non era ancora cominciata (quelle giocate escono da sole).
+     * [firstDay] è l'inizio della prima novità, per aprire il planning su quel giorno; [officeCancelled] sono quelle
+     * appena tolte dalla segreteria.
+     */
+    fun onlineNews(seen: Map<String, SeenBooking>?, online: List<OnlineBooking>, now: Long, officeCancelled: Set<String> = emptySet(), label: (OnlineBooking) -> String): OnlineNews {
+        val current = online.filter { it.end > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        if (seen == null) return OnlineNews(emptyList(), emptyList(), current, null)
+        val added = current.filterKeys { it !in seen }.values.sortedBy { it.start }
+        val ids = online.map { it.id }.toSet()
+        // Quelle tolte dalla segreteria stessa non sono una notizia per lei.
+        val cancelled = seen.filterKeys { it !in ids && it !in officeCancelled }.values.filter { it.start > now }.sortedBy { it.start }
+        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start })
     }
 
     /**
@@ -19135,6 +19211,110 @@ class MatchService : Service() {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/OnlineAlerts.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/OnlineAlerts.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.service
+
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobScheduler
+import android.app.job.JobService
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.tennis.scoremanager.MainActivity
+import com.tennis.scoremanager.R
+import com.tennis.scoremanager.TsmApp
+import com.tennis.scoremanager.ui.Strings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
+/** La notifica alla segreteria: prenotazioni online arrivate e disdette. Toccandola si apre il planning su quel giorno. */
+object OnlineAlerts {
+    private const val CHANNEL = "online_bookings"
+    private const val ID = 7301
+    /** Il giorno da aprire nel planning (millisecondi), nell'intent della notifica. */
+    const val EXTRA_PLAN_DAY = "tsm.planDay"
+
+    fun allowed(context: Context): Boolean =
+        Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+    fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
+        if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, s.srvAlertChannel, NotificationManager.IMPORTANCE_DEFAULT))
+        val lines = added.map { s.srvAlertNew(it) } + cancelled.map { s.srvAlertGone(it) }
+        val open = PendingIntent.getActivity(
+            context, ID,
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                .apply { day?.let { putExtra(EXTRA_PLAN_DAY, it) } },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val n = NotificationCompat.Builder(context, CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_tennis)
+            // Chiusa si legge subito cosa è successo; aperta, tutte le righe.
+            .setContentTitle(if (lines.size == 1) s.srvAlertChannel else s.srvAlertMany(lines.size))
+            .setContentText(lines.first())
+            .setStyle(if (lines.size == 1) NotificationCompat.BigTextStyle().bigText(lines.first()) else NotificationCompat.InboxStyle().also { st -> lines.take(6).forEach { st.addLine(it) } })
+            .setContentIntent(open)
+            .setAutoCancel(true)
+            .build()
+        nm.notify(ID, n)
+    }
+}
+
+/**
+ * Ogni 15 minuti circa (quando c'è rete), anche ad app chiusa: manda il planning al server e prende le
+ * prenotazioni online, come fa l'app aperta; le novità arrivano come notifica. Solo con un server abbinato e le
+ * notifiche accese nel dialogo del server.
+ */
+class ServerCheckJob : JobService() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onStartJob(params: JobParameters): Boolean {
+        val c = (application as TsmApp).controller
+        scope.launch {
+            c.syncServerNow()
+            jobFinished(params, false)
+        }
+        return true
+    }
+
+    override fun onStopJob(params: JobParameters): Boolean = true
+
+    companion object {
+        private const val JOB = 7302
+
+        /** Accende o spegne il controllo periodico. */
+        fun schedule(context: Context, on: Boolean) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!on) { js.cancel(JOB); return }
+            if (js.getPendingJob(JOB) != null) return
+            js.schedule(
+                JobInfo.Builder(JOB, ComponentName(context, ServerCheckJob::class.java))
+                    .setPeriodic(15 * 60_000L)
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setPersisted(true)
+                    .build(),
+            )
+        }
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/transfer/Transfer.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -25830,6 +26010,13 @@ interface Strings {
     val pbErrMany: String
     val pbErrLate: String
     val pbErrSynced: String
+    val srvAlerts: String
+    val srvAlertsHint: String
+    val srvAlertsOff: String
+    val srvAlertChannel: String
+    val srvAlertNew: (String) -> String
+    val srvAlertGone: (String) -> String
+    val srvAlertMany: (Int) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -27712,6 +27899,13 @@ object ItStrings : Strings {
     override val pbErrMany = "Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una."
     override val pbErrLate = "È tardi per disdire da solo: chiama la segreteria."
     override val pbErrSynced = "Il circolo non ha ancora pubblicato il planning."
+    override val srvAlerts = "Avvisami delle prenotazioni online"
+    override val srvAlertsHint = "Una notifica quando un giocatore prenota o disdice: ogni 15 minuti circa, anche ad app chiusa"
+    override val srvAlertsOff = "Le notifiche di TSM sono spente nelle impostazioni del telefono: accendile per ricevere gli avvisi."
+    override val srvAlertChannel = "Prenotazioni online"
+    override val srvAlertNew: (String) -> String = { "Nuova prenotazione: $it" }
+    override val srvAlertGone: (String) -> String = { "Disdetta: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it novità nelle prenotazioni online" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -29575,6 +29769,13 @@ object EnStrings : Strings {
     override val pbErrMany = "You already have the most bookings allowed: play one or cancel one first."
     override val pbErrLate = "It is too late to cancel yourself: call the club office."
     override val pbErrSynced = "The club has not published the schedule yet."
+    override val srvAlerts = "Notify me of online bookings"
+    override val srvAlertsHint = "A notification when a player books or cancels: about every 15 minutes, even with the app closed"
+    override val srvAlertsOff = "TSM notifications are off in the phone settings: turn them on to get the alerts."
+    override val srvAlertChannel = "Online bookings"
+    override val srvAlertNew: (String) -> String = { "New booking: $it" }
+    override val srvAlertGone: (String) -> String = { "Cancelled: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it changes in online bookings" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -31461,6 +31662,13 @@ object DeStrings : Strings {
     override val pbErrMany = "Du hast schon die meisten erlaubten Buchungen: Spiel oder storniere zuerst eine."
     override val pbErrLate = "Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an."
     override val pbErrSynced = "Der Verein hat den Plan noch nicht veröffentlicht."
+    override val srvAlerts = "Bei Online-Buchungen benachrichtigen"
+    override val srvAlertsHint = "Eine Benachrichtigung, wenn ein Spieler bucht oder storniert: etwa alle 15 Minuten, auch bei geschlossener App"
+    override val srvAlertsOff = "TSM-Benachrichtigungen sind in den Handy-Einstellungen aus: Schalte sie ein, um die Hinweise zu bekommen."
+    override val srvAlertChannel = "Online-Buchungen"
+    override val srvAlertNew: (String) -> String = { "Neue Buchung: $it" }
+    override val srvAlertGone: (String) -> String = { "Storniert: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it Änderungen bei den Online-Buchungen" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -33340,6 +33548,13 @@ object EsStrings : Strings {
     override val pbErrMany = "Ya tienes el máximo de reservas: juega o anula una primero."
     override val pbErrLate = "Es tarde para anular tú mismo: llama a la secretaría."
     override val pbErrSynced = "El club aún no ha publicado el planning."
+    override val srvAlerts = "Avisarme de las reservas en línea"
+    override val srvAlertsHint = "Una notificación cuando un jugador reserva o anula: cada 15 minutos más o menos, también con la app cerrada"
+    override val srvAlertsOff = "Las notificaciones de TSM están apagadas en los ajustes del teléfono: enciéndelas para recibir los avisos."
+    override val srvAlertChannel = "Reservas en línea"
+    override val srvAlertNew: (String) -> String = { "Nueva reserva: $it" }
+    override val srvAlertGone: (String) -> String = { "Anulada: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it novedades en las reservas en línea" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -35221,6 +35436,13 @@ object FrStrings : Strings {
     override val pbErrMany = "Vous avez déjà le maximum de réservations : jouez-en ou annulez-en une d'abord."
     override val pbErrLate = "Il est trop tard pour annuler vous-même : appelez le secrétariat."
     override val pbErrSynced = "Le club n'a pas encore publié le planning."
+    override val srvAlerts = "Me prévenir des réservations en ligne"
+    override val srvAlertsHint = "Une notification quand un joueur réserve ou annule : environ toutes les 15 minutes, même app fermée"
+    override val srvAlertsOff = "Les notifications de TSM sont désactivées dans les réglages du téléphone : activez-les pour recevoir les alertes."
+    override val srvAlertChannel = "Réservations en ligne"
+    override val srvAlertNew: (String) -> String = { "Nouvelle réservation : $it" }
+    override val srvAlertGone: (String) -> String = { "Annulée : $it" }
+    override val srvAlertMany: (Int) -> String = { "$it nouveautés dans les réservations en ligne" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -37103,6 +37325,13 @@ object PtStrings : Strings {
     override val pbErrMany = "Já tens o máximo de reservas: joga ou cancela uma primeiro."
     override val pbErrLate = "É tarde para cancelares sozinho: liga para a secretaria."
     override val pbErrSynced = "O clube ainda não publicou a agenda."
+    override val srvAlerts = "Avisar-me das reservas online"
+    override val srvAlertsHint = "Uma notificação quando um jogador reserva ou cancela: mais ou menos a cada 15 minutos, mesmo com a app fechada"
+    override val srvAlertsOff = "As notificações do TSM estão desligadas nas definições do telemóvel: liga-as para receber os avisos."
+    override val srvAlertChannel = "Reservas online"
+    override val srvAlertNew: (String) -> String = { "Nova reserva: $it" }
+    override val srvAlertGone: (String) -> String = { "Cancelada: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it novidades nas reservas online" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -38074,6 +38303,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Remove
@@ -38167,6 +38397,9 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     var pay by remember(conf.paired) { mutableStateOf(conf.payInfo) }
     var publicUrl by remember(conf.paired) { mutableStateOf(conf.publicUrl) }
     var unpair by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var notifOk by remember { mutableStateOf(com.tennis.scoremanager.service.OnlineAlerts.allowed(context)) }
+    val notifPerm = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { notifOk = it }
 
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, step: Int = 1, fmt: (Int) -> String = { it.toString() }, onChange: (Int) -> Unit) =
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -38207,6 +38440,12 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     }, Modifier.fillMaxWidth(), enabled = !busy)
                     OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
+                    SwitchRow(Icons.Filled.NotificationsActive, s.srvAlerts, s.srvAlertsHint, conf.alerts) { on ->
+                        c.setServerAlerts(on)
+                        if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33)
+                            notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    if (conf.alerts && !notifOk) Text(s.srvAlertsOff, color = TsmColors.Orange, fontSize = 12.sp)
                     Text(s.srvPlayers(conf.players.size), color = TsmColors.TextMain, fontSize = 14.sp)
                     Text(s.srvInviteHow, color = TsmColors.TextDim, fontSize = 12.sp)
 
@@ -39032,6 +39271,9 @@ fun CourtsPlanScreen(c: MatchController) {
     val lang = c.options.value.lang
     val courts by c.clubCourts.collectAsState()
     var day by rememberSaveable { mutableStateOf(CourtPlans.dayStart(System.currentTimeMillis())) }
+    // Dalla notifica di una prenotazione online: il planning si apre sul suo giorno.
+    val askedDay by c.planDayRequest.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(askedDay) { askedDay?.let { day = CourtPlans.dayStart(it); c.planDayRequest.value = null } }
     var editing by remember { mutableStateOf<CourtBooking?>(null) }
     var settings by remember { mutableStateOf(false) }
     var blocks by remember { mutableStateOf(false) }
@@ -66437,6 +66679,27 @@ class ClubServersTest {
         assertEquals(null, ClubServers.parseInvite("ciao come va"))
         assertEquals(null, ClubServers.parseInvite("https://tc.duckdns.org/"))
     }
+
+    @Test fun onlineNewsOnlyWhatChanged() {
+        fun ob(id: String, start: Long) = OnlineBooking(id, "Campo 1", start, 60, "p1", "Mario")
+        val label = { b: OnlineBooking -> "${b.name} ${b.id}" }
+        // La prima volta si ricorda e basta.
+        val first = ClubServers.onlineNews(null, listOf(ob("a", now + h), ob("b", now + 2 * h)), now, label = label)
+        assertTrue(first.added.isEmpty() && first.cancelled.isEmpty())
+        assertEquals(setOf("a", "b"), first.seen.keys)
+        // Arriva c, sparisce b (disdetta), a resta.
+        val next = ClubServers.onlineNews(first.seen, listOf(ob("a", now + h), ob("c", now + 5 * h)), now, label = label)
+        assertEquals(listOf("Mario c"), next.added)
+        assertEquals(listOf("Mario b"), next.cancelled)
+        assertEquals(now + 2 * h, next.firstDay)
+        // Tolta dalla segreteria stessa: niente notifica.
+        assertTrue(ClubServers.onlineNews(first.seen, listOf(ob("a", now + h)), now, setOf("b"), label).cancelled.isEmpty())
+        // Una già giocata che il server dimentica non è una disdetta.
+        val later = now + 3 * h
+        val gone = ClubServers.onlineNews(next.seen, listOf(ob("c", now + 5 * h)), later, label = label)
+        assertTrue(gone.cancelled.isEmpty())
+        assertTrue(gone.added.isEmpty())
+    }
 }
 TSM_EOF
 
@@ -78395,6 +78658,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 266 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 267 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

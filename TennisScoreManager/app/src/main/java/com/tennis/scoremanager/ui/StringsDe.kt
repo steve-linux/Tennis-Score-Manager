@@ -1582,6 +1582,13 @@ object DeStrings : Strings {
     override val pbErrMany = "Du hast schon die meisten erlaubten Buchungen: Spiel oder storniere zuerst eine."
     override val pbErrLate = "Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an."
     override val pbErrSynced = "Der Verein hat den Plan noch nicht veröffentlicht."
+    override val srvAlerts = "Bei Online-Buchungen benachrichtigen"
+    override val srvAlertsHint = "Eine Benachrichtigung, wenn ein Spieler bucht oder storniert: etwa alle 15 Minuten, auch bei geschlossener App"
+    override val srvAlertsOff = "TSM-Benachrichtigungen sind in den Handy-Einstellungen aus: Schalte sie ein, um die Hinweise zu bekommen."
+    override val srvAlertChannel = "Online-Buchungen"
+    override val srvAlertNew: (String) -> String = { "Neue Buchung: $it" }
+    override val srvAlertGone: (String) -> String = { "Storniert: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it Änderungen bei den Online-Buchungen" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

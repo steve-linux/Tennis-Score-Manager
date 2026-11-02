@@ -1622,6 +1622,13 @@ interface Strings {
     val pbErrMany: String
     val pbErrLate: String
     val pbErrSynced: String
+    val srvAlerts: String
+    val srvAlertsHint: String
+    val srvAlertsOff: String
+    val srvAlertChannel: String
+    val srvAlertNew: (String) -> String
+    val srvAlertGone: (String) -> String
+    val srvAlertMany: (Int) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3504,6 +3511,13 @@ object ItStrings : Strings {
     override val pbErrMany = "Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una."
     override val pbErrLate = "È tardi per disdire da solo: chiama la segreteria."
     override val pbErrSynced = "Il circolo non ha ancora pubblicato il planning."
+    override val srvAlerts = "Avvisami delle prenotazioni online"
+    override val srvAlertsHint = "Una notifica quando un giocatore prenota o disdice: ogni 15 minuti circa, anche ad app chiusa"
+    override val srvAlertsOff = "Le notifiche di TSM sono spente nelle impostazioni del telefono: accendile per ricevere gli avvisi."
+    override val srvAlertChannel = "Prenotazioni online"
+    override val srvAlertNew: (String) -> String = { "Nuova prenotazione: $it" }
+    override val srvAlertGone: (String) -> String = { "Disdetta: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it novità nelle prenotazioni online" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5367,6 +5381,13 @@ object EnStrings : Strings {
     override val pbErrMany = "You already have the most bookings allowed: play one or cancel one first."
     override val pbErrLate = "It is too late to cancel yourself: call the club office."
     override val pbErrSynced = "The club has not published the schedule yet."
+    override val srvAlerts = "Notify me of online bookings"
+    override val srvAlertsHint = "A notification when a player books or cancels: about every 15 minutes, even with the app closed"
+    override val srvAlertsOff = "TSM notifications are off in the phone settings: turn them on to get the alerts."
+    override val srvAlertChannel = "Online bookings"
+    override val srvAlertNew: (String) -> String = { "New booking: $it" }
+    override val srvAlertGone: (String) -> String = { "Cancelled: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it changes in online bookings" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

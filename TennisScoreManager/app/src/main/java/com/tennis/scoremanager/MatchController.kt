@@ -1881,6 +1881,10 @@ class MatchController(
     }
 
     init {
+        // Il controllo in background (notifiche delle prenotazioni online) solo con un server abbinato e gli avvisi accesi.
+        scope.launch {
+            clubServer.map { it.paired && it.alerts }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedule(app, it) }
+        }
         // Ogni cambio del planning, dei tornei, dei campi o delle regole va al server (dopo qualche secondo di calma).
         scope.launch {
             combine(courtPlan, clubTournaments, clubCourts, clubServer.map { Triple(it.paired, it.rules, it.payInfo) }.distinctUntilChanged()) { _, _, _, _ -> Unit }
@@ -1897,7 +1901,7 @@ class MatchController(
                 com.tennis.scoremanager.data.ClubServerClient(u, null).info()
                 com.tennis.scoremanager.data.ClubServerClient(u, null).pair(code).token
             }
-            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList()) }
+            saveServer { it.copy(url = u, token = token, error = null, lastSync = 0, players = emptyList(), cancel = emptyList(), seen = null) }
             syncServerNow()
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
     }
@@ -1920,12 +1924,27 @@ class MatchController(
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
             gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
             if (added.isNotEmpty()) putBookings(added)
-            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club) }
+            // Le novità per la segreteria: chi ha prenotato o disdetto online da quando si è guardato l'ultima volta.
+            val news = com.tennis.scoremanager.data.ClubServers.onlineNews(clubServer.value.seen, st.bookings, System.currentTimeMillis(), conf.cancel.toSet()) { b ->
+                listOf(b.name, b.court, bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start)).substringAfter(" · ")).joinToString(" · ")
+            }
+            if (clubServer.value.alerts) com.tennis.scoremanager.service.OnlineAlerts.post(app, strings, news.added, news.cancelled, news.firstDay)
+            saveServer { it.copy(lastSync = System.currentTimeMillis(), error = null, players = st.players, club = sync.club, seen = news.seen) }
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) {
             saveServer { it.copy(error = e.code) }
             e.code
         }
+    }
+
+    fun setServerAlerts(on: Boolean) = saveServer { it.copy(alerts = on) }
+
+    /** Il giorno su cui aprire il planning (dalla notifica di una prenotazione online). */
+    val planDayRequest = MutableStateFlow<Long?>(null)
+
+    fun openPlanAt(day: Long) {
+        planDayRequest.value = day
+        openCourtsPlan()
     }
 
     fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
@@ -1952,7 +1971,7 @@ class MatchController(
 
     /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
     fun unpairServer() {
-        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl) }
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl, alerts = it.alerts) }
         val p = courtPlan.value
         if (p.bookings.any { it.online != null }) {
             val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })

@@ -66,4 +66,25 @@ class ClubServersTest {
         assertEquals(null, ClubServers.parseInvite("ciao come va"))
         assertEquals(null, ClubServers.parseInvite("https://tc.duckdns.org/"))
     }
+
+    @Test fun onlineNewsOnlyWhatChanged() {
+        fun ob(id: String, start: Long) = OnlineBooking(id, "Campo 1", start, 60, "p1", "Mario")
+        val label = { b: OnlineBooking -> "${b.name} ${b.id}" }
+        // La prima volta si ricorda e basta.
+        val first = ClubServers.onlineNews(null, listOf(ob("a", now + h), ob("b", now + 2 * h)), now, label = label)
+        assertTrue(first.added.isEmpty() && first.cancelled.isEmpty())
+        assertEquals(setOf("a", "b"), first.seen.keys)
+        // Arriva c, sparisce b (disdetta), a resta.
+        val next = ClubServers.onlineNews(first.seen, listOf(ob("a", now + h), ob("c", now + 5 * h)), now, label = label)
+        assertEquals(listOf("Mario c"), next.added)
+        assertEquals(listOf("Mario b"), next.cancelled)
+        assertEquals(now + 2 * h, next.firstDay)
+        // Tolta dalla segreteria stessa: niente notifica.
+        assertTrue(ClubServers.onlineNews(first.seen, listOf(ob("a", now + h)), now, setOf("b"), label).cancelled.isEmpty())
+        // Una già giocata che il server dimentica non è una disdetta.
+        val later = now + 3 * h
+        val gone = ClubServers.onlineNews(next.seen, listOf(ob("c", now + 5 * h)), later, label = label)
+        assertTrue(gone.cancelled.isEmpty())
+        assertTrue(gone.added.isEmpty())
+    }
 }

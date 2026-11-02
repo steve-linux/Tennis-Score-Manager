@@ -29,9 +29,25 @@ class MainActivity : ComponentActivity() {
 
     private val controller: MatchController get() = (application as TsmApp).controller
 
+    /** La notifica di una prenotazione online apre il planning sul suo giorno. */
+    private fun openFromNotification(i: android.content.Intent?) {
+        val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
+        if (day > 0) {
+            i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
+            controller.openPlanAt(day)
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openFromNotification(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         controller.onActivityCreated()
+        if (savedInstanceState == null) openFromNotification(intent)
         // Tema sempre scuro: icone chiare nelle barre di sistema.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),

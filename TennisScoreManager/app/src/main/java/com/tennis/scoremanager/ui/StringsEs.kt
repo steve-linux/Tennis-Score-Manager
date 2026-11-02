@@ -1583,6 +1583,13 @@ object EsStrings : Strings {
     override val pbErrMany = "Ya tienes el máximo de reservas: juega o anula una primero."
     override val pbErrLate = "Es tarde para anular tú mismo: llama a la secretaría."
     override val pbErrSynced = "El club aún no ha publicado el planning."
+    override val srvAlerts = "Avisarme de las reservas en línea"
+    override val srvAlertsHint = "Una notificación cuando un jugador reserva o anula: cada 15 minutos más o menos, también con la app cerrada"
+    override val srvAlertsOff = "Las notificaciones de TSM están apagadas en los ajustes del teléfono: enciéndelas para recibir los avisos."
+    override val srvAlertChannel = "Reservas en línea"
+    override val srvAlertNew: (String) -> String = { "Nueva reserva: $it" }
+    override val srvAlertGone: (String) -> String = { "Anulada: $it" }
+    override val srvAlertMany: (Int) -> String = { "$it novedades en las reservas en línea" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

@@ -14,6 +14,10 @@ import java.net.URL
  * segreteria come sempre). [token] è la chiave della segreteria; [cancel] le prenotazioni online tolte dal
  * planning ma non ancora tolte dal server.
  */
+/** Una prenotazione online già vista: come la si descrive nella notifica e quando comincia. */
+@Serializable
+data class SeenBooking(val label: String, val start: Long)
+
 @Serializable
 data class ClubServerConf(
     val url: String = "",
@@ -28,6 +32,10 @@ data class ClubServerConf(
     val error: String? = null,
     val players: List<SrvPlayer> = emptyList(),
     val cancel: List<String> = emptyList(),
+    /** Notifica alla segreteria le prenotazioni online nuove e disdette (anche ad app chiusa). */
+    val alerts: Boolean = true,
+    /** Le prenotazioni online già viste, per notificare solo le novità; null = mai guardato. */
+    val seen: Map<String, SeenBooking>? = null,
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
 
@@ -103,6 +111,25 @@ object ClubServers {
             busy = busy.filter { it.end >= now - 86_400_000L },
             rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
         )
+    }
+
+    /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
+    data class OnlineNews(val added: List<String>, val cancelled: List<String>, val seen: Map<String, SeenBooking>, val firstDay: Long?)
+
+    /**
+     * Le novità per la notifica. La prima volta (dopo l'abbinamento) non c'è niente da dire: si ricorda solo cosa
+     * c'è. Le disdette contano solo se la prenotazione non era ancora cominciata (quelle giocate escono da sole).
+     * [firstDay] è l'inizio della prima novità, per aprire il planning su quel giorno; [officeCancelled] sono quelle
+     * appena tolte dalla segreteria.
+     */
+    fun onlineNews(seen: Map<String, SeenBooking>?, online: List<OnlineBooking>, now: Long, officeCancelled: Set<String> = emptySet(), label: (OnlineBooking) -> String): OnlineNews {
+        val current = online.filter { it.end > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        if (seen == null) return OnlineNews(emptyList(), emptyList(), current, null)
+        val added = current.filterKeys { it !in seen }.values.sortedBy { it.start }
+        val ids = online.map { it.id }.toSet()
+        // Quelle tolte dalla segreteria stessa non sono una notizia per lei.
+        val cancelled = seen.filterKeys { it !in ids && it !in officeCancelled }.values.filter { it.start > now }.sortedBy { it.start }
+        return OnlineNews(added.map { it.label }, cancelled.map { it.label }, current, (added + cancelled).minOfOrNull { it.start })
     }
 
     /**
