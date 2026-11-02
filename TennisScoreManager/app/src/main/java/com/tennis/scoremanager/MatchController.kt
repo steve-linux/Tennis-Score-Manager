@@ -128,7 +128,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -708,6 +708,7 @@ class MatchController(
             Screen.CLUB_TOURNAMENT -> Screen.CLUB_TOURNAMENTS
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
+            Screen.BOOK_COURT -> Screen.HOME
             Screen.SCHOOL -> Screen.HOME
             Screen.COURSE -> Screen.SCHOOL
             Screen.TEAMS -> Screen.HOME
@@ -1958,6 +1959,56 @@ class MatchController(
             courtPlan.value = np
             scope.launch(io) { storage.saveCourtPlan(np) }
         }
+    }
+
+    // ---- Prenota un campo (il giocatore, col server del suo circolo) ----
+
+    val bookingAccount = MutableStateFlow(storage.loadBookingAccount())
+
+    private fun saveBookingAccount(a: com.tennis.scoremanager.data.BookingAccount) {
+        bookingAccount.value = a
+        scope.launch(io) { storage.saveBookingAccount(a) }
+    }
+
+    /**
+     * Entra nel circolo con l'invito: il link o il QR (con dentro l'indirizzo), oppure il codice e [url].
+     * null = fatto, altrimenti il codice dell'errore.
+     */
+    suspend fun joinBooking(invite: String, url: String): String? {
+        val (u0, code) = com.tennis.scoremanager.data.ClubServers.parseInvite(invite) ?: return "BAD_CODE"
+        val u = u0 ?: com.tennis.scoremanager.data.ClubServers.cleanUrl(url).ifEmpty { return "NEED_URL" }
+        return try {
+            val (t, me) = withContext(Dispatchers.IO) {
+                val t = com.tennis.scoremanager.data.ClubServerClient(u, null).claim(code)
+                t to com.tennis.scoremanager.data.ClubServerClient(u, t.token).me()
+            }
+            saveBookingAccount(com.tennis.scoremanager.data.BookingAccount(u, t.token, t.name, t.player, me.club))
+            null
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+    }
+
+    /**
+     * Una chiamata del giocatore al server del suo circolo. Se il server non riconosce più la chiave (accesso
+     * tolto dalla segreteria) si esce dal circolo: serve un nuovo invito.
+     */
+    suspend fun <T> booking(f: (com.tennis.scoremanager.data.ClubServerClient) -> T): Result<T> {
+        val a = bookingAccount.value
+        if (!a.joined) return Result.failure(com.tennis.scoremanager.data.ClubServerError("UNAUTHORIZED"))
+        return try {
+            Result.success(withContext(Dispatchers.IO) { f(com.tennis.scoremanager.data.ClubServerClient(a.url, a.token)) })
+        } catch (e: com.tennis.scoremanager.data.ClubServerError) {
+            if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
+            Result.failure(e)
+        }
+    }
+
+    /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
+    fun leaveBooking() {
+        val a = bookingAccount.value
+        scope.launch {
+            if (a.joined) runCatching { withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(a.url, a.token).logout() } }
+        }
+        saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
     }
 
     /** Il campo e com'è fatto: "Campo 1 · terra · coperto". */

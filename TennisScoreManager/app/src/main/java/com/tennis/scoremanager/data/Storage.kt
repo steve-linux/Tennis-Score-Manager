@@ -311,6 +311,25 @@ class Storage(context: Context) {
         }.onFailure { Log.e("Storage", "Salvataggio del planning dei campi fallito", it) }
     }
 
+    /** Il giocatore che prenota dall'app: il server del suo circolo e la sua chiave. */
+    private val bookingFile: File get() = File(app.filesDir, "club_booking.json")
+
+    fun loadBookingAccount(): BookingAccount =
+        runCatching { json.decodeFromString(BookingAccount.serializer(), bookingFile.readText()) }.getOrDefault(BookingAccount())
+
+    @Synchronized
+    fun saveBookingAccount(a: BookingAccount) {
+        runCatching {
+            if (!a.joined) { bookingFile.delete(); return }
+            val tmp = File(app.filesDir, "club_booking.tmp")
+            tmp.writeText(json.encodeToString(BookingAccount.serializer(), a))
+            if (!tmp.renameTo(bookingFile)) {
+                bookingFile.delete()
+                tmp.renameTo(bookingFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio della prenotazione online fallito", it) }
+    }
+
     /** Il server del circolo (facoltativo): indirizzo, chiave della segreteria, regole online. */
     private val clubServerFile: File get() = File(app.filesDir, "club_server.json")
 

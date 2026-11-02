@@ -1570,6 +1570,58 @@ interface Strings {
     val srvPublicUrl: String
     val srvPublicUrlHint: String
     val srvErrPairLocal: String
+    // Prenota un campo (il giocatore).
+    val pbTitle: String
+    val pbEntryHint: String
+    val pbEntryJoined: (String) -> String
+    val pbJoinIntro: String
+    val pbScan: String
+    val pbScanPrompt: String
+    val pbInvite: String
+    val pbServer: String
+    val pbJoin: String
+    val pbMine: String
+    val pbNone: String
+    val pbCancel: String
+    val pbCancelAsk: String
+    val pbCancelled: String
+    val pbCallOffice: String
+    val pbDay: String
+    val pbToday: String
+    val pbFree: String
+    val pbBusy: String
+    val pbMineCell: String
+    val pbBlocked: String
+    val pbConfirm: String
+    val pbDuration: String
+    val pbHeating: String
+    val pbLights: String
+    val pbPrice: String
+    val pbFreePrice: String
+    val pbPay: (String) -> String
+    val pbBooked: String
+    val pbClosed: String
+    val pbRules: (Int, Int) -> String
+    val pbCancelRule: (Int) -> String
+    val pbLeave: String
+    val pbLeaveAsk: String
+    val pbErrNet: String
+    val pbErrInvite: String
+    val pbErrUrl: String
+    val pbErrTries: String
+    val pbErrAuth: String
+    val pbErrClosed: String
+    val pbErrCourt: String
+    val pbErrPast: String
+    val pbErrSoon: String
+    val pbErrFar: String
+    val pbErrSlot: String
+    val pbErrLong: String
+    val pbErrBlocked: String
+    val pbErrTaken: String
+    val pbErrMany: String
+    val pbErrLate: String
+    val pbErrSynced: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3385,7 +3437,7 @@ object ItStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Giocatori collegati: $it" }
     override val srvInviteHow = "Per invitare un giocatore: apri la sua scheda e tocca Invito per prenotare online."
     override val srvInvite = "Invito per prenotare online"
-    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home."
+    override val srvInviteHint = "Il giocatore inquadra il QR con la fotocamera (o apre il link) e prenota dalla pagina del circolo. Su iPhone: Condividi › Aggiungi alla schermata Home. Con l'app TSM: Gioca › Prenota un campo › Inquadra il QR."
     override val srvInviteCode: (String) -> String = { "Codice: $it" }
     override val srvInviteUntil: (String) -> String = { "Vale una volta, fino al $it" }
     override val srvShare = "Condividi il link"
@@ -3401,6 +3453,57 @@ object ItStrings : Strings {
     override val srvPublicUrl = "Indirizzo da internet (facoltativo)"
     override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
     override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
+    override val pbTitle = "Prenota un campo"
+    override val pbEntryHint = "Se il tuo circolo ha il server TSM: entri con l'invito della segreteria"
+    override val pbEntryJoined: (String) -> String = { "$it: campi liberi e le tue prenotazioni" }
+    override val pbJoinIntro = "Inquadra il QR d'invito che ti ha dato la segreteria del circolo, oppure incolla il link dell'invito (o scrivi il codice e l'indirizzo del circolo)."
+    override val pbScan = "Inquadra il QR"
+    override val pbScanPrompt = "Inquadra il QR d'invito del circolo"
+    override val pbInvite = "Link o codice d'invito"
+    override val pbServer = "Indirizzo del circolo (solo col codice)"
+    override val pbJoin = "Entra"
+    override val pbMine = "Le tue prenotazioni"
+    override val pbNone = "Nessuna prenotazione"
+    override val pbCancel = "Disdici"
+    override val pbCancelAsk = "Disdire questa prenotazione?"
+    override val pbCancelled = "Prenotazione disdetta"
+    override val pbCallOffice = "Per disdirla ora chiama la segreteria."
+    override val pbDay = "Scegli il giorno"
+    override val pbToday = "Oggi"
+    override val pbFree = "Libero"
+    override val pbBusy = "Occupato"
+    override val pbMineCell = "Tuo"
+    override val pbBlocked = "Non prenotabile"
+    override val pbConfirm = "Conferma"
+    override val pbDuration = "Durata"
+    override val pbHeating = "Riscaldamento"
+    override val pbLights = "Con le luci"
+    override val pbPrice = "Prezzo"
+    override val pbFreePrice = "gratis"
+    override val pbPay: (String) -> String = { "Pagamento: $it" }
+    override val pbBooked = "Prenotato!"
+    override val pbClosed = "Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota."
+    override val pbRules: (Int, Int) -> String = { a, b -> "Prenoti fino a $a giorni avanti, al massimo $b prenotazioni per volta." }
+    override val pbCancelRule: (Int) -> String = { "Disdici da solo fino a $it ore prima." }
+    override val pbLeave = "Esci da questo circolo"
+    override val pbLeaveAsk = "Uscire su questo telefono? Per rientrare serve un nuovo invito della segreteria."
+    override val pbErrNet = "Il server del circolo non risponde. Riprova tra poco."
+    override val pbErrInvite = "Invito sbagliato o scaduto: chiedine uno nuovo alla segreteria."
+    override val pbErrUrl = "Col codice serve anche l'indirizzo del circolo (o usa il link dell'invito)."
+    override val pbErrTries = "Troppi tentativi: riprova tra un quarto d'ora."
+    override val pbErrAuth = "Questo telefono non è più collegato al circolo: chiedi un nuovo invito alla segreteria."
+    override val pbErrClosed = "Le prenotazioni online sono chiuse."
+    override val pbErrCourt = "Questo campo non si prenota online."
+    override val pbErrPast = "Quest'ora è già passata."
+    override val pbErrSoon = "È troppo tardi per prenotare quest'ora: chiama la segreteria."
+    override val pbErrFar = "Non si può ancora prenotare questo giorno."
+    override val pbErrSlot = "Scegli un orario del planning."
+    override val pbErrLong = "La prenotazione è troppo lunga."
+    override val pbErrBlocked = "In quest'ora il campo non è prenotabile."
+    override val pbErrTaken = "Qualcuno ha appena prenotato quest'ora."
+    override val pbErrMany = "Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una."
+    override val pbErrLate = "È tardi per disdire da solo: chiama la segreteria."
+    override val pbErrSynced = "Il circolo non ha ancora pubblicato il planning."
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5197,7 +5300,7 @@ object EnStrings : Strings {
     override val srvPlayers: (Int) -> String = { "Connected players: $it" }
     override val srvInviteHow = "To invite a player: open their card and tap Invite to book online."
     override val srvInvite = "Invite to book online"
-    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen."
+    override val srvInviteHint = "The player scans the QR with the camera (or opens the link) and books from the club page. On iPhone: Share › Add to Home Screen. With the TSM app: Play › Book a court › Scan the QR."
     override val srvInviteCode: (String) -> String = { "Code: $it" }
     override val srvInviteUntil: (String) -> String = { "Works once, until $it" }
     override val srvShare = "Share the link"
@@ -5213,6 +5316,57 @@ object EnStrings : Strings {
     override val srvPublicUrl = "Address from the internet (optional)"
     override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
     override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."
+    override val pbTitle = "Book a court"
+    override val pbEntryHint = "If your club has the TSM server: join with the office invitation"
+    override val pbEntryJoined: (String) -> String = { "$it: free courts and your bookings" }
+    override val pbJoinIntro = "Scan the invitation QR the club office gave you, or paste the invitation link (or type the code and the club address)."
+    override val pbScan = "Scan the QR"
+    override val pbScanPrompt = "Scan the club invitation QR"
+    override val pbInvite = "Invitation link or code"
+    override val pbServer = "Club address (code only)"
+    override val pbJoin = "Join"
+    override val pbMine = "Your bookings"
+    override val pbNone = "No bookings"
+    override val pbCancel = "Cancel"
+    override val pbCancelAsk = "Cancel this booking?"
+    override val pbCancelled = "Booking cancelled"
+    override val pbCallOffice = "To cancel it now, call the club office."
+    override val pbDay = "Pick the day"
+    override val pbToday = "Today"
+    override val pbFree = "Free"
+    override val pbBusy = "Taken"
+    override val pbMineCell = "Yours"
+    override val pbBlocked = "Not bookable"
+    override val pbConfirm = "Confirm"
+    override val pbDuration = "Length"
+    override val pbHeating = "Heating"
+    override val pbLights = "With lights"
+    override val pbPrice = "Price"
+    override val pbFreePrice = "free"
+    override val pbPay: (String) -> String = { "Payment: $it" }
+    override val pbBooked = "Booked!"
+    override val pbClosed = "Online booking is closed right now: you can see the schedule but not book."
+    override val pbRules: (Int, Int) -> String = { a, b -> "You can book up to $a days ahead, at most $b bookings at a time." }
+    override val pbCancelRule: (Int) -> String = { "You can cancel yourself up to $it hours before." }
+    override val pbLeave = "Leave this club"
+    override val pbLeaveAsk = "Sign out on this phone? You will need a new invitation from the office to come back."
+    override val pbErrNet = "The club server is not answering. Try again shortly."
+    override val pbErrInvite = "Wrong or expired invitation: ask the club office for a new one."
+    override val pbErrUrl = "With the code you also need the club address (or use the invitation link)."
+    override val pbErrTries = "Too many attempts: try again in fifteen minutes."
+    override val pbErrAuth = "This phone is no longer connected to the club: ask the office for a new invitation."
+    override val pbErrClosed = "Online booking is closed."
+    override val pbErrCourt = "This court cannot be booked online."
+    override val pbErrPast = "This time has already passed."
+    override val pbErrSoon = "It is too late to book this time: call the club office."
+    override val pbErrFar = "This day cannot be booked yet."
+    override val pbErrSlot = "Pick a time from the schedule."
+    override val pbErrLong = "The booking is too long."
+    override val pbErrBlocked = "The court cannot be booked at this time."
+    override val pbErrTaken = "Someone has just booked this time."
+    override val pbErrMany = "You already have the most bookings allowed: play one or cancel one first."
+    override val pbErrLate = "It is too late to cancel yourself: call the club office."
+    override val pbErrSynced = "The club has not published the schedule yet."
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

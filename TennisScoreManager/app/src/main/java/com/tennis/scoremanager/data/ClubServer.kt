@@ -35,7 +35,32 @@ data class ClubServerConf(
     val addresses: List<String> get() = listOf(url, publicUrl).filter { it.isNotBlank() }.distinct()
 }
 
+/**
+ * Il giocatore che prenota dall'app (non la segreteria): il server del suo circolo e la chiave che gli ha dato
+ * l'invito. Vuoto = non è entrato in nessun circolo.
+ */
+@Serializable
+data class BookingAccount(val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "") {
+    val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
+}
+
 object ClubServers {
+    /**
+     * Il link dell'invito (https://circolo/#i=CODICE, anche col QR) diviso in indirizzo e codice; un codice da
+     * solo dà indirizzo null. null = non è un invito.
+     */
+    fun parseInvite(text: String): Pair<String?, String>? {
+        val t = text.trim()
+        val i = t.indexOf("#i=")
+        if (i >= 0) {
+            val code = t.substring(i + 3).takeWhile { it.isLetterOrDigit() || it == '-' }.filter { it.isLetterOrDigit() }.uppercase()
+            val url = cleanUrl(t.substring(0, i).substringBefore('?').trimEnd('/'))
+            return if (code.length >= 6 && url.isNotEmpty()) url to code else null
+        }
+        val code = t.filter { it.isLetterOrDigit() }.uppercase()
+        return if (t.all { it.isLetterOrDigit() || it == '-' } && code.length in 6..16) null to code else null
+    }
+
     /** L'indirizzo come lo si scrive: senza / in fondo, http:// se manca. */
     fun cleanUrl(u: String): String {
         val t = u.trim().trimEnd('/')
@@ -139,4 +164,15 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+
+    // Il giocatore (con la chiave avuta dall'invito).
+    private fun enc(v: String) = java.net.URLEncoder.encode(v, "UTF-8")
+    fun claim(code: String): SrvToken = call("POST", "/claim", SrvCode.serializer(), SrvCode(code), SrvToken.serializer())
+    fun me(): SrvMe = call<Unit, SrvMe>("GET", "/me", null, null, SrvMe.serializer())
+    fun day(date: String): SrvDay = call<Unit, SrvDay>("GET", "/day?date=${enc(date)}", null, null, SrvDay.serializer())
+    fun quote(court: String, start: Long, minutes: Int, heating: Boolean): SrvQuote =
+        call<Unit, SrvQuote>("GET", "/quote?court=${enc(court)}&start=$start&minutes=$minutes&heating=$heating", null, null, SrvQuote.serializer())
+    fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
+    fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
+    fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
 }

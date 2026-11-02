@@ -58,4 +58,12 @@ class ClubServersTest {
         assertEquals(listOf("Luca"), added[1].names)
         assertEquals(listOf(cancelled), gone)
     }
+
+    @Test fun invitationLinkOrCode() {
+        assertEquals("https://tc.duckdns.org" to "GGGKZZ4WK6", ClubServers.parseInvite(" https://tc.duckdns.org/#i=GGGKZ-Z4WK6 "))
+        assertEquals("http://192.168.1.5:8080" to "ABCDEF2345", ClubServers.parseInvite("http://192.168.1.5:8080/?x=1#i=ABCDEF2345"))
+        assertEquals(null to "GGGKZZ4WK6", ClubServers.parseInvite("gggkz-z4wk6"))
+        assertEquals(null, ClubServers.parseInvite("ciao come va"))
+        assertEquals(null, ClubServers.parseInvite("https://tc.duckdns.org/"))
+    }
 }

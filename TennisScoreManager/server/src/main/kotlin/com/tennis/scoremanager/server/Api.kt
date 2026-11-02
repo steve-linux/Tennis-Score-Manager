@@ -10,6 +10,11 @@ import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBookIn
+import com.tennis.scoremanager.data.SrvDay
+import com.tennis.scoremanager.data.SrvMe
+import com.tennis.scoremanager.data.SrvMyBooking
+import com.tennis.scoremanager.data.SrvQuote
 import com.tennis.scoremanager.data.SrvCode
 import com.tennis.scoremanager.data.SrvError
 import com.tennis.scoremanager.data.SrvInfo
@@ -26,16 +31,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 const val API_VERSION = 1
-
-@Serializable data class MyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)
-@Serializable data class MeOut(
-    val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
-    /** I giorni prenotabili (yyyy-MM-dd nel fuso del circolo), da oggi. */
-    val days: List<String>, val bookings: List<MyBooking>,
-)
-@Serializable data class DayOut(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
-@Serializable data class BookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
-@Serializable data class QuoteOut(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
 
 /** Una risposta: codice HTTP e corpo JSON. */
 data class Resp(val status: Int, val body: String)
@@ -199,7 +194,7 @@ class Api(
 
     private fun zone(): ZoneId = ZoneId.of(store.state.sync.timeZone)
 
-    private fun mine(pl: Player, b: OnlineBooking, now: Long) = MyBooking(
+    private fun mine(pl: Player, b: OnlineBooking, now: Long) = SrvMyBooking(
         b.id, b.court, b.start, b.minutes, b.cents, b.lights, b.heating,
         canCancel = CourtOnline.checkCancel(store.state.sync, store.state.bookings, pl.id, b.id, now) == null,
     )
@@ -209,7 +204,7 @@ class Api(
         val now = store.now()
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
         val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
-        return ok(MeOut.serializer(), MeOut(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }))
+        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }))
     }
 
     private fun day(pl: Player, date: String?): Resp {
@@ -218,7 +213,7 @@ class Api(
         val d = try { LocalDate.parse(date ?: "") } catch (_: Exception) { throw ApiError(400, "BAD_DATE") }
         val day = d.atStartOfDay(zone()).toInstant().toEpochMilli()
         val courts = CourtOnline.bookableCourts(s.sync).map { s.sync.settings.info(it).copy(photos = emptyList()) }
-        return ok(DayOut.serializer(), DayOut(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now())))
+        return ok(SrvDay.serializer(), SrvDay(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now())))
     }
 
     /** Quanto costerebbe e se si può fare, prima di confermare. */
@@ -230,11 +225,11 @@ class Api(
         val minutes = q["minutes"]?.toIntOrNull() ?: throw ApiError(400, "BAD_REQUEST")
         val now = store.now()
         val b = CourtOnline.make(s.sync, "", pl.id, pl.name, court, start, minutes, q["heating"] == "true", now)
-        return ok(QuoteOut.serializer(), QuoteOut(b.cents, b.lights, b.heating, CourtOnline.check(s.sync, s.bookings, pl.id, court, start, minutes, now)?.name))
+        return ok(SrvQuote.serializer(), SrvQuote(b.cents, b.lights, b.heating, CourtOnline.check(s.sync, s.bookings, pl.id, court, start, minutes, now)?.name))
     }
 
     private fun book(pl: Player, r: Req): Resp {
-        val b = read(BookIn.serializer(), r)
+        val b = read(SrvBookIn.serializer(), r)
         if (store.state.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
         val now = store.now()
         // Controllo e salvataggio insieme: due giocatori sulla stessa casella, uno solo la prende.
@@ -247,7 +242,7 @@ class Api(
             }
         }
         val nb = res.getOrElse { throw it }
-        return ok(MyBooking.serializer(), mine(pl, nb, now), 201)
+        return ok(SrvMyBooking.serializer(), mine(pl, nb, now), 201)
     }
 
     private fun cancel(pl: Player, id: String): Resp {
