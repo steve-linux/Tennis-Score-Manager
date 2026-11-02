@@ -773,7 +773,14 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
 - **Datensicherung**: Alles steckt in einer Datei, `/var/lib/tsm-server/state.json`; ab und zu kopieren, und vor dem Neuschreiben des Sticks.
-- **Von zu Hause** (Internet) braucht es eine https-Adresse und einen offenen Port am Vereinsrouter: Das geht mit kostenlosen Diensten (DuckDNS und Let's Encrypt), wenn die Leitung eine öffentliche IP hat.
+- **Von zu Hause** (Internet, per HTTPS: das braucht es auch, um die Seite auf den Home-Bildschirm des iPhones zu legen). Alles kostenlos:
+  1. Auf **duckdns.org** (Anmeldung mit einem GitHub-, Google-… Konto) einen Namen anlegen, z. B. `tcprova.duckdns.org`, und den **Token** kopieren.
+  2. Am **Vereinsrouter** dem Pi eine feste Adresse geben und die **TCP-Ports 80 und 443** an ihn weiterleiten.
+  3. Auf dem Pi, im Ordner des Kits: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns DEIN-TOKEN` (vom USB-Stick: `sudo /opt/tsm-server/kit/setup-https.sh …`). Es installiert **Caddy**, das sich das **Let's-Encrypt**-Zertifikat selbst holt und erneuert; alle 5 Minuten meldet es DuckDNS die Adresse des Vereins, falls der Anbieter sie ändert. Mit eigener Domain diese eintragen, ohne `--duckdns`.
+  4. In der App, *Vereinsserver › Adresse aus dem Internet*: `https://tcprova.duckdns.org`. Ab dann nutzen die Einladungen diese Adresse, und das Büro erreicht den Server darüber, wenn es nicht im Verein ist.
+  - Das **Koppeln** des Büros geht nur aus dem Vereinsnetz (mit der Adresse `http://…:8080`), nie aus dem Internet.
+  - Kommt ein Handy über 4G/5G nicht durch, hängt die Vereinsleitung wohl hinter **CGNAT** (häufig bei LTE-/5G-Anschlüssen): Die Internetadresse im Router unterscheidet sich von der, die eine *Wie ist meine IP*-Seite zeigt. Dann beim Anbieter eine **öffentliche IP** verlangen (oft kostenlos), oder einen Tunnel (Tailscale Funnel, Cloudflare Tunnel: Dienste Dritter) oder einen kleinen Mietserver nutzen.
+  - `sudo ./setup-https.sh --remove` schaltet den Zugang aus dem Internet ab.
 
 ## 8. Anzeigetafel auf TV oder Monitor
 
@@ -1291,7 +1298,14 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
-- **From home** (internet) you need an https address and an open port on the club router: free services do it (DuckDNS and Let's Encrypt), as long as the line has a public IP.
+- **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
+  1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
+  2. On the **club router** give the Pi a fixed address and forward **TCP ports 80 and 443** to it.
+  3. On the Pi, from the kit folder: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns YOUR-TOKEN` (from the USB stick: `sudo /opt/tsm-server/kit/setup-https.sh …`). It installs **Caddy**, which gets the **Let's Encrypt** certificate by itself and renews it; every 5 minutes it tells DuckDNS the club's address, in case the provider changes it. With your own domain, write that one, without `--duckdns`.
+  4. In the app, *Club server › Address from the internet*: `https://tcprova.duckdns.org`. From then on invitations use this address, and the office reaches the server through it when away from the club.
+  - **Pairing** the office works only from the club network (with the `http://…:8080` address), never from the internet.
+  - If a phone on 4G/5G cannot get through, the club line is probably behind **CGNAT** (common with fixed-wireless and mobile lines): the internet address shown by the router differs from the one a *what is my IP* website gives. Then ask the provider for a **public IP** (often free), or use a tunnel (Tailscale Funnel, Cloudflare Tunnel: third-party services) or a small rented server.
+  - `sudo ./setup-https.sh --remove` turns internet access off.
 
 ## 8. Scoreboard on a TV or monitor
 
@@ -1808,7 +1822,14 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
 - **Copia de los datos**: todo está en un solo archivo, `/var/lib/tsm-server/state.json`; conviene copiarlo de vez en cuando y antes de reescribir la memoria.
-- **Desde casa** (internet) hacen falta una dirección https y un puerto abierto en el router del club: se consigue con servicios gratuitos (DuckDNS y Let's Encrypt), si la línea tiene IP pública.
+- **Desde casa** (internet, en HTTPS: también hace falta para poner la página en la pantalla de inicio del iPhone). Todo gratis:
+  1. En **duckdns.org** (se entra con una cuenta de GitHub, Google…) se crea un nombre, p. ej. `tcprova.duckdns.org`, y se copia el **token**.
+  2. En el **router del club** se da a la Pi una dirección fija y se redirigen a ella los puertos **TCP 80 y 443**.
+  3. En la Pi, desde la carpeta del kit: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns TU-TOKEN` (desde la memoria USB: `sudo /opt/tsm-server/kit/setup-https.sh …`). Instala **Caddy**, que obtiene solo el certificado de **Let's Encrypt** y lo renueva; cada 5 minutos le dice a DuckDNS la dirección del club, por si el proveedor la cambia. Con un dominio propio se escribe ese, sin `--duckdns`.
+  4. En la app, *Servidor del club › Dirección desde internet*: `https://tcprova.duckdns.org`. Desde entonces las invitaciones usan esta dirección, y la secretaría fuera del club llega al servidor por ella.
+  - El **emparejamiento** de la secretaría solo se hace desde la red del club (con la dirección `http://…:8080`), nunca desde internet.
+  - Si un teléfono con 4G/5G no llega, la línea del club está probablemente tras un **CGNAT** (pasa con muchas líneas inalámbricas y móviles): la dirección de internet que muestra el router no coincide con la que da una web de *cuál es mi IP*. Entonces se pide al proveedor una **IP pública** (a menudo gratis), o se usa un túnel (Tailscale Funnel, Cloudflare Tunnel: servicios de terceros) o un pequeño servidor alquilado.
+  - `sudo ./setup-https.sh --remove` quita el acceso desde internet.
 
 ## 8. Marcador en un televisor o monitor
 
@@ -2325,7 +2346,14 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
 - **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
-- **Depuis chez soi** (internet) il faut une adresse https et un port ouvert sur la box du club : des services gratuits le permettent (DuckDNS et Let's Encrypt), si la ligne a une IP publique.
+- **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
+  1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
+  2. Sur la **box du club**, donnez au Pi une adresse fixe et redirigez vers elle les ports **TCP 80 et 443**.
+  3. Sur le Pi, depuis le dossier du kit : `sudo ./setup-https.sh tcprova.duckdns.org --duckdns VOTRE-JETON` (depuis la clé : `sudo /opt/tsm-server/kit/setup-https.sh …`). Il installe **Caddy**, qui obtient tout seul le certificat **Let's Encrypt** et le renouvelle ; toutes les 5 minutes il donne à DuckDNS l'adresse du club, au cas où le fournisseur la change. Avec votre propre domaine, écrivez-le, sans `--duckdns`.
+  4. Dans l'app, *Serveur du club › Adresse depuis internet* : `https://tcprova.duckdns.org`. Dès lors les invitations utilisent cette adresse, et le secrétariat hors du club passe par elle.
+  - L'**appairage** du secrétariat se fait seulement depuis le réseau du club (avec l'adresse `http://…:8080`), jamais depuis internet.
+  - Si un téléphone en 4G/5G n'arrive pas au serveur, la ligne du club est sans doute derrière un **CGNAT** (fréquent avec les box 4G/5G) : l'adresse internet affichée par la box diffère de celle qu'indique un site *quelle est mon IP*. Demandez alors au fournisseur une **IP publique** (souvent gratuite), ou utilisez un tunnel (Tailscale Funnel, Cloudflare Tunnel : services tiers) ou un petit serveur loué.
+  - `sudo ./setup-https.sh --remove` coupe l'accès depuis internet.
 
 ## 8. Tableau d'affichage sur TV ou écran
 
@@ -2842,7 +2870,14 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
 - **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
-- **Da casa** (internet) servono un indirizzo https e la porta aperta sul router del circolo: si fa con servizi gratuiti (DuckDNS e Let's Encrypt), purché la linea abbia un IP pubblico.
+- **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
+  1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
+  2. Sul **router del circolo** si dà al Pi un indirizzo fisso e si inoltrano a quell'indirizzo le porte **TCP 80 e 443**.
+  3. Sul Pi, dalla cartella del kit: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns IL-TOKEN` (dalla chiavetta: `sudo /opt/tsm-server/kit/setup-https.sh …`). Installa **Caddy**, che prende da solo il certificato **Let's Encrypt** e lo rinnova; ogni 5 minuti dice a DuckDNS l'indirizzo di casa, se il provider lo cambia. Con un dominio proprio si scrive quello, senza `--duckdns`.
+  4. Nell'app, *Server del circolo › Indirizzo da internet*: `https://tcprova.duckdns.org`. Da lì gli inviti usano questo indirizzo, e la segreteria fuori dal circolo arriva al server da lì.
+  - L'**abbinamento** della segreteria si fa solo dalla rete del circolo (con l'indirizzo `http://…:8080`), mai da internet.
+  - Se dal telefono col 4G/5G non si arriva, la linea del circolo è probabilmente dietro **CGNAT** (succede con molte linee FWA e mobili): l'indirizzo internet che mostra il router è diverso da quello che dà un sito come *mio-ip* in rete. Allora si chiede al provider un **IP pubblico** (spesso gratis), oppure si usa un tunnel (Tailscale Funnel, Cloudflare Tunnel: servizi di terzi) o un piccolo server in affitto.
+  - `sudo ./setup-https.sh --remove` toglie l'accesso da internet.
 
 ## 8. Tabellone su TV o monitor
 
@@ -3359,7 +3394,14 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
 - **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
-- **De casa** (internet) é preciso um endereço https e uma porta aberta no router do clube: faz-se com serviços gratuitos (DuckDNS e Let's Encrypt), desde que a linha tenha IP público.
+- **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
+  1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
+  2. No **router do clube** dá-se ao Pi um endereço fixo e reencaminham-se para ele as portas **TCP 80 e 443**.
+  3. No Pi, a partir da pasta do kit: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns O-TEU-TOKEN` (a partir da pen: `sudo /opt/tsm-server/kit/setup-https.sh …`). Instala o **Caddy**, que obtém sozinho o certificado **Let's Encrypt** e o renova; a cada 5 minutos diz ao DuckDNS o endereço do clube, caso o fornecedor o mude. Com um domínio próprio escreve-se esse, sem `--duckdns`.
+  4. Na app, *Servidor do clube › Endereço pela internet*: `https://tcprova.duckdns.org`. A partir daí os convites usam este endereço, e a secretaria fora do clube chega ao servidor por ele.
+  - O **emparelhamento** da secretaria só se faz a partir da rede do clube (com o endereço `http://…:8080`), nunca pela internet.
+  - Se um telemóvel em 4G/5G não chega, a linha do clube está provavelmente atrás de **CGNAT** (acontece com muitas linhas sem fios e móveis): o endereço de internet que o router mostra é diferente do que um site *qual é o meu IP* indica. Então pede-se ao fornecedor um **IP público** (muitas vezes grátis), ou usa-se um túnel (Tailscale Funnel, Cloudflare Tunnel: serviços de terceiros) ou um pequeno servidor alugado.
+  - `sudo ./setup-https.sh --remove` tira o acesso pela internet.
 
 ## 8. Placar na TV ou no monitor
 
@@ -6063,14 +6105,14 @@ class MatchController(
     suspend fun syncServerNow(): String? = serverLock.withLock {
         val conf = clubServer.value
         if (!conf.paired) return@withLock null
-        val cl = com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token)
+        val srv = com.tennis.scoremanager.data.ClubServers
         try {
             for (id in conf.cancel) {
-                withContext(Dispatchers.IO) { try { cl.cancel(id) } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
+                withContext(Dispatchers.IO) { try { srv.withServer(conf) { it.cancel(id) } } catch (e: com.tennis.scoremanager.data.ClubServerError) { if (e.code != "NOT_FOUND") throw e } }
                 saveServer { it.copy(cancel = it.cancel - id) }
             }
-            val sync = com.tennis.scoremanager.data.ClubServers.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
-            val st = withContext(Dispatchers.IO) { cl.sync(sync) }
+            val sync = srv.buildSync(conf, courtPlan.value, clubTournaments.value, clubCourts.value, storage.clubName, java.util.TimeZone.getDefault().id)
+            val st = withContext(Dispatchers.IO) { srv.withServer(conf) { it.sync(sync) } }
             val (added, gone) = com.tennis.scoremanager.data.ClubServers.merge(courtPlan.value, st.bookings, { playerById(it) != null }, System.currentTimeMillis())
             gone.forEach { deleteBooking(it, wholeSeries = false, fromServer = true) }
             if (added.isNotEmpty()) putBookings(added)
@@ -6082,14 +6124,15 @@ class MatchController(
         }
     }
 
-    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String) = saveServer { it.copy(rules = rules, payInfo = payInfo.trim()) }
+    fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
+        saveServer { it.copy(rules = rules, payInfo = payInfo.trim(), publicUrl = com.tennis.scoremanager.data.ClubServers.cleanUrl(publicUrl)) }
 
     /** L'invito per un giocatore: codice e scadenza (il link lo fa [com.tennis.scoremanager.data.ClubServers.inviteLink]). */
     suspend fun serverInvite(p: com.tennis.scoremanager.data.PlayerProfile): Result<com.tennis.scoremanager.data.SrvInvite> {
         val conf = clubServer.value
         if (!conf.paired) return Result.failure(com.tennis.scoremanager.data.ClubServerError("NOT_PAIRED"))
         return try {
-            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).invite(p.id, p.name) })
+            Result.success(withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.invite(p.id, p.name) } })
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { Result.failure(e) }
     }
 
@@ -6097,7 +6140,7 @@ class MatchController(
     suspend fun serverRemovePlayer(id: String): String? {
         val conf = clubServer.value
         return try {
-            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServerClient(conf.url, conf.token).removePlayer(id) }
+            withContext(Dispatchers.IO) { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.removePlayer(id) } }
             saveServer { it.copy(players = it.players.filter { p -> p.id != id }) }
             null
         } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
@@ -6105,7 +6148,7 @@ class MatchController(
 
     /** Scollega il server: le prenotazioni online già nel planning restano, come quelle della segreteria. */
     fun unpairServer() {
-        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo) }
+        saveServer { com.tennis.scoremanager.data.ClubServerConf(rules = it.rules, payInfo = it.payInfo, publicUrl = it.publicUrl) }
         val p = courtPlan.value
         if (p.bookings.any { it.online != null }) {
             val np = p.copy(bookings = p.bookings.map { it.copy(online = null) })
@@ -10587,6 +10630,8 @@ import java.net.URL
 data class ClubServerConf(
     val url: String = "",
     val token: String = "",
+    /** L'indirizzo da internet (https://…, con Caddy): per gli inviti e per la segreteria fuori dal circolo. */
+    val publicUrl: String = "",
     val club: String = "",
     val rules: BookingRules = BookingRules(),
     val payInfo: String = "",
@@ -10597,6 +10642,9 @@ data class ClubServerConf(
     val cancel: List<String> = emptyList(),
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Dove cercare il server: prima nella rete del circolo, poi da internet. */
+    val addresses: List<String> get() = listOf(url, publicUrl).filter { it.isNotBlank() }.distinct()
 }
 
 object ClubServers {
@@ -10607,7 +10655,22 @@ object ClubServers {
     }
 
     /** Il link dell'invito: la pagina del circolo col codice dopo il # (non arriva nei log del server). */
-    fun inviteLink(conf: ClubServerConf, code: String): String = conf.url + "/#i=" + code
+    fun inviteLink(conf: ClubServerConf, code: String): String = conf.publicUrl.ifBlank { conf.url } + "/#i=" + code
+
+    /**
+     * La chiamata [f] al primo indirizzo che risponde: quello del circolo e, se non c'è rete per arrivarci (la
+     * segreteria è a casa), quello da internet. Gli altri errori (chiave, regole) non cambiano indirizzo.
+     */
+    fun <T> withServer(conf: ClubServerConf, f: (ClubServerClient) -> T): T {
+        var last: ClubServerError? = null
+        for (u in conf.addresses) {
+            try { return f(ClubServerClient(u, conf.token)) } catch (e: ClubServerError) {
+                if (e.code != "NET") throw e
+                last = e
+            }
+        }
+        throw last ?: ClubServerError("NET")
+    }
 
     /**
      * Quello che si manda al server: i campi, gli orari, i blocchi e tutto l'occupato della segreteria
@@ -25599,6 +25662,9 @@ interface Strings {
     val srvErrAuth: String
     val srvErrNotTsm: String
     val srvErrOther: (String) -> String
+    val srvPublicUrl: String
+    val srvPublicUrlHint: String
+    val srvErrPairLocal: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -27427,6 +27493,9 @@ object ItStrings : Strings {
     override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
     override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
     override val srvErrOther: (String) -> String = { "Errore del server: $it" }
+    override val srvPublicUrl = "Indirizzo da internet (facoltativo)"
+    override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
+    override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -29236,6 +29305,9 @@ object EnStrings : Strings {
     override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
     override val srvErrNotTsm = "There is no TSM club server at that address."
     override val srvErrOther: (String) -> String = { "Server error: $it" }
+    override val srvPublicUrl = "Address from the internet (optional)"
+    override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
+    override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -31068,6 +31140,9 @@ object DeStrings : Strings {
     override val srvErrAuth = "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln."
     override val srvErrNotTsm = "Unter dieser Adresse ist kein TSM-Vereinsserver."
     override val srvErrOther: (String) -> String = { "Serverfehler: $it" }
+    override val srvPublicUrl = "Adresse aus dem Internet (optional)"
+    override val srvPublicUrlHint = "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins"
+    override val srvErrPairLocal = "Koppeln geht nur aus dem Vereinsnetz: Nutze die lokale Adresse (http://…:8080)."
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -32893,6 +32968,9 @@ object EsStrings : Strings {
     override val srvErrAuth = "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo."
     override val srvErrNotTsm = "En esa dirección no hay un servidor de club TSM."
     override val srvErrOther: (String) -> String = { "Error del servidor: $it" }
+    override val srvPublicUrl = "Dirección desde internet (opcional)"
+    override val srvPublicUrlHint = "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club"
+    override val srvErrPairLocal = "El emparejamiento solo se hace desde la red del club: usa la dirección local (http://…:8080)."
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -34720,6 +34798,9 @@ object FrStrings : Strings {
     override val srvErrAuth = "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau."
     override val srvErrNotTsm = "Il n'y a pas de serveur de club TSM à cette adresse."
     override val srvErrOther: (String) -> String = { "Erreur du serveur : $it" }
+    override val srvPublicUrl = "Adresse depuis internet (facultatif)"
+    override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club"
+    override val srvErrPairLocal = "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080)."
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -36548,6 +36629,9 @@ object PtStrings : Strings {
     override val srvErrAuth = "O servidor já não reconhece este telemóvel: desliga e emparelha de novo."
     override val srvErrNotTsm = "Nesse endereço não há um servidor de clube TSM."
     override val srvErrOther: (String) -> String = { "Erro do servidor: $it" }
+    override val srvPublicUrl = "Endereço pela internet (opcional)"
+    override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube"
+    override val srvErrPairLocal = "O emparelhamento só se faz a partir da rede do clube: usa o endereço local (http://…:8080)."
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -37189,6 +37273,7 @@ fun srvErrorText(s: Strings, code: String): String = when (code) {
     "BAD_CODE" -> s.srvErrCode
     "UNAUTHORIZED" -> s.srvErrAuth
     "NOT_TSM" -> s.srvErrNotTsm
+    "PAIR_LOCAL_ONLY" -> s.srvErrPairLocal
     else -> s.srvErrOther(code)
 }
 
@@ -37231,6 +37316,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     var code by remember { mutableStateOf("") }
     var rules by remember(conf.paired) { mutableStateOf(conf.rules) }
     var pay by remember(conf.paired) { mutableStateOf(conf.payInfo) }
+    var publicUrl by remember(conf.paired) { mutableStateOf(conf.publicUrl) }
     var unpair by remember { mutableStateOf(false) }
 
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, step: Int = 1, fmt: (Int) -> String = { it.toString() }, onChange: (Int) -> Unit) =
@@ -37241,7 +37327,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
             IconButton(onClick = { onChange((v + step).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
         }
 
-    fun save() { if (conf.paired) c.saveServerRules(rules, pay) }
+    fun save() { if (conf.paired) c.saveServerRules(rules, pay, publicUrl) }
 
     AlertDialog(
         onDismissRequest = { save(); onDone() },
@@ -37268,8 +37354,10 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     )
                     GhostButton(s.srvSyncNow, Icons.Filled.Sync, {
                         busy = true; msg = null
-                        scope.launch { c.saveServerRules(rules, pay); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
+                        scope.launch { c.saveServerRules(rules, pay, publicUrl); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy)
+                    OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
                     Text(s.srvPlayers(conf.players.size), color = TsmColors.TextMain, fontSize = 14.sp)
                     Text(s.srvInviteHow, color = TsmColors.TextDim, fontSize = 12.sp)
 
@@ -65442,6 +65530,9 @@ class ClubServersTest {
         assertEquals("http://192.168.1.5:8080", ClubServers.cleanUrl(" 192.168.1.5:8080/ "))
         assertEquals("https://tc.example.org", ClubServers.cleanUrl("https://tc.example.org/"))
         assertEquals("http://x:8080/#i=ABC", ClubServers.inviteLink(ClubServerConf(url = "http://x:8080"), "ABC"))
+        // Con l'indirizzo da internet, gli inviti vanno lì (da casa e su iPhone serve l'https).
+        assertEquals("https://tc.duckdns.org/#i=ABC", ClubServers.inviteLink(ClubServerConf(url = "http://x:8080", publicUrl = "https://tc.duckdns.org"), "ABC"))
+        assertEquals(listOf("http://x:8080", "https://tc.duckdns.org"), ClubServerConf(url = "http://x:8080", publicUrl = "https://tc.duckdns.org").addresses)
     }
 
     @Test fun syncSendsOfficeBusyButNotOnlineOnes() {
@@ -71936,10 +72027,10 @@ val serverKit by tasks.registering(Tar::class) {
     into("tsm-server") {
         from(fatJar)
         from("deploy") {
-            include("install.sh", "reset-admin.sh")
+            include("install.sh", "reset-admin.sh", "setup-https.sh", "tsm-duckdns")
             filePermissions { unix("rwxr-xr-x") }
         }
-        from("deploy") { include("tsm-server.service", "tsm-server.default") }
+        from("deploy") { include("tsm-server.service", "tsm-server.default", "tsm-duckdns.service", "tsm-duckdns.timer") }
     }
 }
 tasks.named("assemble") { dependsOn(serverKit) }
@@ -72245,6 +72336,9 @@ cp /kit/tsm-server.jar "$W/root/opt/tsm-server/"
 cp /kit/tsm-server.service "$W/root/etc/systemd/system/"
 cp /kit/tsm-server.default "$W/root/etc/default/tsm-server"
 sed 's#^cat /var/lib/tsm-server/setup-code.txt$#cat /var/lib/tsm-server/setup-code.txt; /usr/local/sbin/tsm-issue#' /kit/reset-admin.sh > "$W/root/usr/local/sbin/tsm-reset-admin"
+# Tutto il kit, per l'HTTPS da internet: sudo /opt/tsm-server/kit/setup-https.sh nome.duckdns.org --duckdns TOKEN
+mkdir -p "$W/root/opt/tsm-server/kit"
+cp -a /kit/. "$W/root/opt/tsm-server/kit/"
 cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
 
 mmdebstrap --mode=unshare --variant=apt --components=main \
@@ -72352,6 +72446,211 @@ echo
 cat /var/lib/tsm-server/setup-code.txt
 TSM_EOF
 
+# ---------------------------------------------------------------- server/deploy/setup-https.sh
+cat > "$DEST/server/deploy/setup-https.sh" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Il server del circolo anche da internet, in HTTPS (serve anche per installare la pagina su iPhone):
+#   sudo ./setup-https.sh tcprova.duckdns.org --duckdns IL-TUO-TOKEN [--email tu@esempio.it]
+#   sudo ./setup-https.sh prenota.tcprova.it [--email …]     (un dominio tuo, già puntato all'IP del circolo)
+#   sudo ./setup-https.sh --remove
+# Caddy prende da solo il certificato gratuito di Let's Encrypt e lo rinnova. Sul router del circolo vanno
+# inoltrate al Pi le porte TCP 80 e 443. Dalla rete del circolo il server resta anche su http://…:8080.
+set -eu
+
+DIR=$(cd "$(dirname "$0")" && pwd)
+DOMAIN=""; TOKEN=""; EMAIL=""; REMOVE=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --duckdns) TOKEN="${2:-}"; shift 2 ;;
+        --email) EMAIL="${2:-}"; shift 2 ;;
+        --remove) REMOVE=1; shift ;;
+        -*) shift ;;
+        *) DOMAIN="$1"; shift ;;
+    esac
+done
+
+L=$(printf '%s' "${LC_ALL:-${LC_MESSAGES:-${LANG:-en}}}" | cut -c1-2)
+msg() {
+    case "$L:$1" in
+        it:usage) echo "Uso: sudo $0 nome.duckdns.org --duckdns TOKEN   (oppure il tuo dominio)" ;;
+        fr:usage) echo "Usage : sudo $0 nom.duckdns.org --duckdns JETON   (ou votre domaine)" ;;
+        de:usage) echo "Aufruf: sudo $0 name.duckdns.org --duckdns TOKEN   (oder deine Domain)" ;;
+        es:usage) echo "Uso: sudo $0 nombre.duckdns.org --duckdns TOKEN   (o tu dominio)" ;;
+        pt:usage) echo "Uso: sudo $0 nome.duckdns.org --duckdns TOKEN   (ou o teu domínio)" ;;
+        *:usage) echo "Usage: sudo $0 name.duckdns.org --duckdns TOKEN   (or your own domain)" ;;
+        it:server) echo "Prima installa il server: sudo ./install.sh" ;;
+        fr:server) echo "Installez d'abord le serveur : sudo ./install.sh" ;;
+        de:server) echo "Zuerst den Server installieren: sudo ./install.sh" ;;
+        es:server) echo "Primero instala el servidor: sudo ./install.sh" ;;
+        pt:server) echo "Primeiro instala o servidor: sudo ./install.sh" ;;
+        *:server) echo "Install the server first: sudo ./install.sh" ;;
+        it:token) echo "Con un nome .duckdns.org serve il token di DuckDNS: --duckdns TOKEN" ;;
+        fr:token) echo "Avec un nom .duckdns.org il faut le jeton DuckDNS : --duckdns JETON" ;;
+        de:token) echo "Mit einem .duckdns.org-Namen braucht es den DuckDNS-Token: --duckdns TOKEN" ;;
+        es:token) echo "Con un nombre .duckdns.org hace falta el token de DuckDNS: --duckdns TOKEN" ;;
+        pt:token) echo "Com um nome .duckdns.org é preciso o token do DuckDNS: --duckdns TOKEN" ;;
+        *:token) echo "A .duckdns.org name needs the DuckDNS token: --duckdns TOKEN" ;;
+        it:duckok) echo "DuckDNS aggiornato: $DOMAIN punta all'indirizzo internet del circolo." ;;
+        fr:duckok) echo "DuckDNS mis à jour : $DOMAIN pointe vers l'adresse internet du club." ;;
+        de:duckok) echo "DuckDNS aktualisiert: $DOMAIN zeigt auf die Internetadresse des Vereins." ;;
+        es:duckok) echo "DuckDNS actualizado: $DOMAIN apunta a la dirección de internet del club." ;;
+        pt:duckok) echo "DuckDNS atualizado: $DOMAIN aponta para o endereço de internet do clube." ;;
+        *:duckok) echo "DuckDNS updated: $DOMAIN points to the club's internet address." ;;
+        it:duckko) echo "DuckDNS ha detto di no: controlla nome e token su duckdns.org." ;;
+        fr:duckko) echo "DuckDNS a refusé : vérifiez le nom et le jeton sur duckdns.org." ;;
+        de:duckko) echo "DuckDNS hat abgelehnt: Name und Token auf duckdns.org prüfen." ;;
+        es:duckko) echo "DuckDNS ha dicho que no: revisa nombre y token en duckdns.org." ;;
+        pt:duckko) echo "O DuckDNS recusou: verifica o nome e o token em duckdns.org." ;;
+        *:duckko) echo "DuckDNS refused: check the name and token on duckdns.org." ;;
+        it:caddy) echo "Installo e configuro Caddy (HTTPS)…" ;;
+        fr:caddy) echo "Installation et configuration de Caddy (HTTPS)…" ;;
+        de:caddy) echo "Caddy (HTTPS) wird installiert und eingerichtet…" ;;
+        es:caddy) echo "Instalando y configurando Caddy (HTTPS)…" ;;
+        pt:caddy) echo "A instalar e configurar o Caddy (HTTPS)…" ;;
+        *:caddy) echo "Installing and setting up Caddy (HTTPS)…" ;;
+        it:router) echo "Sul router del circolo inoltra le porte TCP 80 e 443 a questo indirizzo (meglio fisso):" ;;
+        fr:router) echo "Sur la box du club, redirigez les ports TCP 80 et 443 vers cette adresse (fixe, de préférence) :" ;;
+        de:router) echo "Am Vereinsrouter die TCP-Ports 80 und 443 an diese Adresse weiterleiten (am besten fest):" ;;
+        es:router) echo "En el router del club redirige los puertos TCP 80 y 443 a esta dirección (mejor fija):" ;;
+        pt:router) echo "No router do clube reencaminha as portas TCP 80 e 443 para este endereço (de preferência fixo):" ;;
+        *:router) echo "On the club router forward TCP ports 80 and 443 to this address (ideally a fixed one):" ;;
+        it:certok) echo "Certificato HTTPS pronto. Nell'app, Server del circolo › Indirizzo da internet:" ;;
+        fr:certok) echo "Certificat HTTPS prêt. Dans l'app, Serveur du club › Adresse depuis internet :" ;;
+        de:certok) echo "HTTPS-Zertifikat bereit. In der App, Vereinsserver › Adresse aus dem Internet:" ;;
+        es:certok) echo "Certificado HTTPS listo. En la app, Servidor del club › Dirección desde internet:" ;;
+        pt:certok) echo "Certificado HTTPS pronto. Na app, Servidor do clube › Endereço pela internet:" ;;
+        *:certok) echo "HTTPS certificate ready. In the app, Club server › Address from the internet:" ;;
+        it:certwait) echo "Il certificato non c'è ancora: arriva da solo appena le porte 80 e 443 sono aperte (Caddy riprova). Controlla con: journalctl -u caddy -n 30" ;;
+        fr:certwait) echo "Pas encore de certificat : il arrive tout seul dès que les ports 80 et 443 sont ouverts (Caddy réessaie). Vérifiez avec : journalctl -u caddy -n 30" ;;
+        de:certwait) echo "Noch kein Zertifikat: Es kommt von selbst, sobald die Ports 80 und 443 offen sind (Caddy versucht es weiter). Prüfen mit: journalctl -u caddy -n 30" ;;
+        es:certwait) echo "Aún no hay certificado: llega solo en cuanto los puertos 80 y 443 estén abiertos (Caddy reintenta). Revisa con: journalctl -u caddy -n 30" ;;
+        pt:certwait) echo "Ainda não há certificado: chega sozinho quando as portas 80 e 443 estiverem abertas (o Caddy volta a tentar). Verifica com: journalctl -u caddy -n 30" ;;
+        *:certwait) echo "No certificate yet: it arrives by itself once ports 80 and 443 are open (Caddy keeps trying). Check with: journalctl -u caddy -n 30" ;;
+        it:removed) echo "HTTPS tolto: il server resta solo sulla rete del circolo." ;;
+        fr:removed) echo "HTTPS retiré : le serveur reste seulement sur le réseau du club." ;;
+        de:removed) echo "HTTPS entfernt: Der Server bleibt nur im Vereinsnetz." ;;
+        es:removed) echo "HTTPS quitado: el servidor queda solo en la red del club." ;;
+        pt:removed) echo "HTTPS removido: o servidor fica só na rede do clube." ;;
+        *:removed) echo "HTTPS removed: the server stays on the club network only." ;;
+    esac
+}
+
+[ "$(id -u)" -eq 0 ] || { echo "sudo $0"; exit 1; }
+
+if [ "$REMOVE" -eq 1 ]; then
+    systemctl disable --now tsm-duckdns.timer 2>/dev/null || true
+    rm -f /etc/systemd/system/tsm-duckdns.service /etc/systemd/system/tsm-duckdns.timer /usr/local/sbin/tsm-duckdns /etc/default/tsm-duckdns
+    if grep -qs "TSM club server" /etc/caddy/Caddyfile; then systemctl disable --now caddy 2>/dev/null || true; fi
+    systemctl daemon-reload
+    msg removed
+    exit 0
+fi
+
+[ -n "$DOMAIN" ] || { msg usage; exit 1; }
+[ -f /etc/default/tsm-server ] || { msg server; exit 1; }
+PORT=$(sed -n 's/^TSM_PORT=//p' /etc/default/tsm-server); PORT=${PORT:-8080}
+
+# DuckDNS: il nome segue l'indirizzo di casa, che il provider può cambiare.
+case "$DOMAIN" in
+    *.duckdns.org)
+        [ -n "$TOKEN" ] || { msg token; exit 1; }
+        command -v curl >/dev/null 2>&1 || { apt-get update; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates; }
+        umask 077
+        printf 'DUCKDNS_DOMAIN=%s\nDUCKDNS_TOKEN=%s\n' "${DOMAIN%.duckdns.org}" "$TOKEN" > /etc/default/tsm-duckdns
+        umask 022
+        install -m 755 "$DIR/tsm-duckdns" /usr/local/sbin/tsm-duckdns
+        install -m 644 "$DIR/tsm-duckdns.service" "$DIR/tsm-duckdns.timer" /etc/systemd/system/
+        systemctl daemon-reload
+        systemctl enable tsm-duckdns.timer >/dev/null 2>&1
+        if /usr/local/sbin/tsm-duckdns >/dev/null 2>&1; then msg duckok; else msg duckko; exit 1; fi
+        systemctl start tsm-duckdns.timer
+        ;;
+esac
+
+msg caddy
+command -v caddy >/dev/null 2>&1 || { apt-get update; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends caddy; }
+if [ -f /etc/caddy/Caddyfile ] && ! grep -qs "TSM club server" /etc/caddy/Caddyfile; then cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.before-tsm; fi
+{
+    echo "# TSM club server: HTTPS from the internet (setup-https.sh)."
+    if [ -n "$EMAIL" ]; then printf '{\n\temail %s\n}\n\n' "$EMAIL"; fi
+    printf '%s {\n' "$DOMAIN"
+    printf '\tencode gzip\n'
+    printf '\theader Strict-Transport-Security "max-age=31536000"\n'
+    printf '\treverse_proxy 127.0.0.1:%s\n' "$PORT"
+    printf '}\n'
+} > /etc/caddy/Caddyfile
+# Il controllo parla solo se c'è un errore.
+caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1 || { caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile; exit 1; }
+systemctl enable caddy >/dev/null 2>&1
+systemctl restart caddy
+
+echo
+msg router
+for a in $(hostname -I 2>/dev/null); do case "$a" in *:*) ;; *) echo "  $a" ;; esac; done
+echo
+# Caddy chiede il certificato appena parte: se le porte sono già aperte, arriva in pochi secondi.
+i=0
+until curl -fs -o /dev/null --max-time 5 --resolve "$DOMAIN:443:127.0.0.1" "https://$DOMAIN/api/v1/info" 2>/dev/null; do
+    i=$((i + 1))
+    if [ $i -gt 30 ]; then msg certwait; exit 0; fi
+    sleep 2
+done
+msg certok
+echo "  https://$DOMAIN"
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-duckdns
+cat > "$DEST/server/deploy/tsm-duckdns" << 'TSM_EOF'
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Dice a DuckDNS l'indirizzo internet di adesso del circolo (lo lancia tsm-duckdns.timer ogni 5 minuti).
+# Dominio e token in /etc/default/tsm-duckdns (leggibile solo da root).
+set -eu
+. /etc/default/tsm-duckdns
+URL="${DUCKDNS_URL:-https://www.duckdns.org/update}"
+# La richiesta che DuckDNS si aspetta (GET); ip vuoto = DuckDNS usa l'indirizzo da cui arriva.
+ANSWER=$(curl -fsS --max-time 30 -G --data-urlencode "domains=$DUCKDNS_DOMAIN" --data-urlencode "token=$DUCKDNS_TOKEN" --data "ip=" "$URL" || echo ERR)
+echo "DuckDNS $DUCKDNS_DOMAIN: $ANSWER"
+[ "$ANSWER" = OK ]
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-duckdns.service
+cat > "$DEST/server/deploy/tsm-duckdns.service" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=TSM club server: update the DuckDNS address
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/tsm-duckdns
+TSM_EOF
+
+# ---------------------------------------------------------------- server/deploy/tsm-duckdns.timer
+cat > "$DEST/server/deploy/tsm-duckdns.timer" << 'TSM_EOF'
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Ogni 5 minuti: se il provider cambia l'indirizzo di casa, il nome del circolo lo segue.
+[Unit]
+Description=TSM club server: update the DuckDNS address every 5 minutes
+
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+TSM_EOF
+
 # ---------------------------------------------------------------- server/deploy/tsm-server.default
 cat > "$DEST/server/deploy/tsm-server.default" << 'TSM_EOF'
 # Impostazioni del server del circolo TSM. Dopo una modifica: sudo systemctl restart tsm-server
@@ -72447,7 +72746,11 @@ const val API_VERSION = 1
 data class Resp(val status: Int, val body: String)
 
 /** Una richiesta già letta: metodo, percorso, parametri, corpo, chiave (Authorization: Bearer) e indirizzo. */
-data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
+data class Req(
+    val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "",
+    /** Arrivata da internet, attraverso Caddy (HTTPS), e non dalla rete del circolo. */
+    val viaProxy: Boolean = false,
+)
 
 class ApiError(val status: Int, val code: String) : Exception(code)
 
@@ -72455,7 +72758,11 @@ class ApiError(val status: Int, val code: String) : Exception(code)
  * Le chiamate del server, /api/v1/…: la segreteria si abbina col codice di setup, manda il planning e crea gli
  * inviti; i giocatori usano l'invito, guardano i giorni e prenotano o disdicono.
  */
-class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
+class Api(
+    private val store: Store, private val limiter: Limiter = Limiter(),
+    /** Abbinare la segreteria anche da internet (TSM_PAIR_REMOTE=1); di solito solo dalla rete del circolo. */
+    private val pairRemote: Boolean = System.getenv("TSM_PAIR_REMOTE") == "1",
+) {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     private fun <T> ok(ser: KSerializer<T>, v: T, status: Int = 200) = Resp(status, json.encodeToString(ser, v))
@@ -72519,6 +72826,8 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun pair(r: Req): Resp {
         guard(r)
+        // Il codice di abbinamento non si prova da internet: si abbina dal circolo, con l'indirizzo di casa.
+        if (r.viaProxy && !pairRemote) throw ApiError(403, "PAIR_LOCAL_ONLY")
         val code = Secrets.normalize(read(SrvCode.serializer(), r).code)
         val token = Secrets.token()
         val done = store.update { s ->
@@ -72757,12 +73066,12 @@ fun start(store: Store, host: String, port: Int): HttpServer {
     return server
 }
 
-/** L'indirizzo di chi chiama; dietro Caddy (che chiama da 127.0.0.1) quello che Caddy dice in X-Forwarded-For. */
-private fun clientIp(ex: HttpExchange): String {
-    val direct = ex.remoteAddress.address
-    val fwd = ex.requestHeaders.getFirst("X-Forwarded-For")?.split(',')?.lastOrNull()?.trim()
-    return if (direct.isLoopbackAddress && !fwd.isNullOrBlank()) fwd else direct.hostAddress
-}
+/** Dietro Caddy, che chiama da 127.0.0.1, l'indirizzo vero è quello che Caddy scrive in X-Forwarded-For. */
+private fun forwardedFor(ex: HttpExchange): String? =
+    ex.requestHeaders.getFirst("X-Forwarded-For")?.split(',')?.lastOrNull()?.trim()?.takeIf { it.isNotEmpty() && ex.remoteAddress.address.isLoopbackAddress }
+
+/** L'indirizzo di chi chiama. */
+private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
 private fun serveApi(api: Api, ex: HttpExchange) {
     val body = ex.requestBody.use { it.readNBytes(MAX_BODY + 1) }
@@ -72771,7 +73080,7 @@ private fun serveApi(api: Api, ex: HttpExchange) {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }
     val token = ex.requestHeaders.getFirst("Authorization")?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
-    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex)))
+    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = forwardedFor(ex) != null))
     ex.responseHeaders.add("Cache-Control", "no-store")
     send(ex, r.status, r.body.toByteArray(), "application/json; charset=utf-8")
 }
@@ -74303,6 +74612,22 @@ class ApiTest {
         val b = Store(dir) { now }.ensureSetupCode(reset = true)!!
         assertTrue(a != b)
         assertEquals(b, File(dir, Store.SETUP_FILE).readText().trim())
+    }
+
+    @Test fun pairingOnlyFromTheClubNetwork() {
+        val code = store.ensureSetupCode()!!
+        val far = api.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", ip = "5.6.7.8", viaProxy = true))
+        assertEquals(403, far.status)
+        assertTrue(far.body.contains("PAIR_LOCAL_ONLY"))
+        assertEquals(200, call("POST", "/admin/pair", """{"code":"$code"}""").status)
+        // Con la chiave, la segreteria lavora anche da casa.
+        assertEquals(200, Api(store, pairRemote = true).handle(Req("GET", "/api/v1/info", viaProxy = true)).status)
+    }
+
+    @Test fun pairingFromInternetWhenAllowed() {
+        val code = store.ensureSetupCode()!!
+        val open = Api(store, Limiter { now }, pairRemote = true)
+        assertEquals(200, open.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", viaProxy = true)).status)
     }
 }
 TSM_EOF
@@ -77200,6 +77525,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 261 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 265 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

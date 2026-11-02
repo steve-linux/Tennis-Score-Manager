@@ -19,6 +19,9 @@ cp /kit/tsm-server.jar "$W/root/opt/tsm-server/"
 cp /kit/tsm-server.service "$W/root/etc/systemd/system/"
 cp /kit/tsm-server.default "$W/root/etc/default/tsm-server"
 sed 's#^cat /var/lib/tsm-server/setup-code.txt$#cat /var/lib/tsm-server/setup-code.txt; /usr/local/sbin/tsm-issue#' /kit/reset-admin.sh > "$W/root/usr/local/sbin/tsm-reset-admin"
+# Tutto il kit, per l'HTTPS da internet: sudo /opt/tsm-server/kit/setup-https.sh nome.duckdns.org --duckdns TOKEN
+mkdir -p "$W/root/opt/tsm-server/kit"
+cp -a /kit/. "$W/root/opt/tsm-server/kit/"
 cp /iso/config/hooks/normal/9000-tsm.hook.chroot "$W/hook.sh"
 
 mmdebstrap --mode=unshare --variant=apt --components=main \

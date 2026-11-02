@@ -435,7 +435,14 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
 - **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
-- **Da casa** (internet) servono un indirizzo https e la porta aperta sul router del circolo: si fa con servizi gratuiti (DuckDNS e Let's Encrypt), purché la linea abbia un IP pubblico.
+- **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
+  1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
+  2. Sul **router del circolo** si dà al Pi un indirizzo fisso e si inoltrano a quell'indirizzo le porte **TCP 80 e 443**.
+  3. Sul Pi, dalla cartella del kit: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns IL-TOKEN` (dalla chiavetta: `sudo /opt/tsm-server/kit/setup-https.sh …`). Installa **Caddy**, che prende da solo il certificato **Let's Encrypt** e lo rinnova; ogni 5 minuti dice a DuckDNS l'indirizzo di casa, se il provider lo cambia. Con un dominio proprio si scrive quello, senza `--duckdns`.
+  4. Nell'app, *Server del circolo › Indirizzo da internet*: `https://tcprova.duckdns.org`. Da lì gli inviti usano questo indirizzo, e la segreteria fuori dal circolo arriva al server da lì.
+  - L'**abbinamento** della segreteria si fa solo dalla rete del circolo (con l'indirizzo `http://…:8080`), mai da internet.
+  - Se dal telefono col 4G/5G non si arriva, la linea del circolo è probabilmente dietro **CGNAT** (succede con molte linee FWA e mobili): l'indirizzo internet che mostra il router è diverso da quello che dà un sito come *mio-ip* in rete. Allora si chiede al provider un **IP pubblico** (spesso gratis), oppure si usa un tunnel (Tailscale Funnel, Cloudflare Tunnel: servizi di terzi) o un piccolo server in affitto.
+  - `sudo ./setup-https.sh --remove` toglie l'accesso da internet.
 
 ## 8. Tabellone su TV o monitor
 

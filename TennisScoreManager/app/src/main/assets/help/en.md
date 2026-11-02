@@ -435,7 +435,14 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
-- **From home** (internet) you need an https address and an open port on the club router: free services do it (DuckDNS and Let's Encrypt), as long as the line has a public IP.
+- **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
+  1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
+  2. On the **club router** give the Pi a fixed address and forward **TCP ports 80 and 443** to it.
+  3. On the Pi, from the kit folder: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns YOUR-TOKEN` (from the USB stick: `sudo /opt/tsm-server/kit/setup-https.sh …`). It installs **Caddy**, which gets the **Let's Encrypt** certificate by itself and renews it; every 5 minutes it tells DuckDNS the club's address, in case the provider changes it. With your own domain, write that one, without `--duckdns`.
+  4. In the app, *Club server › Address from the internet*: `https://tcprova.duckdns.org`. From then on invitations use this address, and the office reaches the server through it when away from the club.
+  - **Pairing** the office works only from the club network (with the `http://…:8080` address), never from the internet.
+  - If a phone on 4G/5G cannot get through, the club line is probably behind **CGNAT** (common with fixed-wireless and mobile lines): the internet address shown by the router differs from the one a *what is my IP* website gives. Then ask the provider for a **public IP** (often free), or use a tunnel (Tailscale Funnel, Cloudflare Tunnel: third-party services) or a small rented server.
+  - `sudo ./setup-https.sh --remove` turns internet access off.
 
 ## 8. Scoreboard on a TV or monitor
 

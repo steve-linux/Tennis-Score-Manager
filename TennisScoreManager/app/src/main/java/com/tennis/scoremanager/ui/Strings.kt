@@ -1567,6 +1567,9 @@ interface Strings {
     val srvErrAuth: String
     val srvErrNotTsm: String
     val srvErrOther: (String) -> String
+    val srvPublicUrl: String
+    val srvPublicUrlHint: String
+    val srvErrPairLocal: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3395,6 +3398,9 @@ object ItStrings : Strings {
     override val srvErrAuth = "Il server non riconosce più questo telefono: scollega e abbina di nuovo."
     override val srvErrNotTsm = "A quell'indirizzo non c'è un server del circolo TSM."
     override val srvErrOther: (String) -> String = { "Errore del server: $it" }
+    override val srvPublicUrl = "Indirizzo da internet (facoltativo)"
+    override val srvPublicUrlHint = "es. https://tcprova.duckdns.org: lo usano gli inviti (da casa e su iPhone) e la segreteria fuori dal circolo"
+    override val srvErrPairLocal = "L'abbinamento si fa solo dalla rete del circolo: usa l'indirizzo locale (http://…:8080)."
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5204,6 +5210,9 @@ object EnStrings : Strings {
     override val srvErrAuth = "The server no longer knows this phone: disconnect and pair again."
     override val srvErrNotTsm = "There is no TSM club server at that address."
     override val srvErrOther: (String) -> String = { "Server error: $it" }
+    override val srvPublicUrl = "Address from the internet (optional)"
+    override val srvPublicUrlHint = "e.g. https://tcprova.duckdns.org: used by invitations (from home and on iPhone) and by the office away from the club"
+    override val srvErrPairLocal = "Pairing works only from the club network: use the local address (http://…:8080)."
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

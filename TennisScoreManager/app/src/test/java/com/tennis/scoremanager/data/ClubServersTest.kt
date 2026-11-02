@@ -15,6 +15,9 @@ class ClubServersTest {
         assertEquals("http://192.168.1.5:8080", ClubServers.cleanUrl(" 192.168.1.5:8080/ "))
         assertEquals("https://tc.example.org", ClubServers.cleanUrl("https://tc.example.org/"))
         assertEquals("http://x:8080/#i=ABC", ClubServers.inviteLink(ClubServerConf(url = "http://x:8080"), "ABC"))
+        // Con l'indirizzo da internet, gli inviti vanno lì (da casa e su iPhone serve l'https).
+        assertEquals("https://tc.duckdns.org/#i=ABC", ClubServers.inviteLink(ClubServerConf(url = "http://x:8080", publicUrl = "https://tc.duckdns.org"), "ABC"))
+        assertEquals(listOf("http://x:8080", "https://tc.duckdns.org"), ClubServerConf(url = "http://x:8080", publicUrl = "https://tc.duckdns.org").addresses)
     }
 
     @Test fun syncSendsOfficeBusyButNotOnlineOnes() {

@@ -1531,6 +1531,9 @@ object FrStrings : Strings {
     override val srvErrAuth = "Le serveur ne reconnaît plus ce téléphone : déconnectez et appairez à nouveau."
     override val srvErrNotTsm = "Il n'y a pas de serveur de club TSM à cette adresse."
     override val srvErrOther: (String) -> String = { "Erreur du serveur : $it" }
+    override val srvPublicUrl = "Adresse depuis internet (facultatif)"
+    override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org : utilisée par les invitations (depuis chez soi et sur iPhone) et par le secrétariat hors du club"
+    override val srvErrPairLocal = "L'appairage se fait seulement depuis le réseau du club : utilisez l'adresse locale (http://…:8080)."
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

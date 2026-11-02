@@ -1532,6 +1532,9 @@ object PtStrings : Strings {
     override val srvErrAuth = "O servidor já não reconhece este telemóvel: desliga e emparelha de novo."
     override val srvErrNotTsm = "Nesse endereço não há um servidor de clube TSM."
     override val srvErrOther: (String) -> String = { "Erro do servidor: $it" }
+    override val srvPublicUrl = "Endereço pela internet (opcional)"
+    override val srvPublicUrlHint = "ex. https://tcprova.duckdns.org: usado pelos convites (de casa e no iPhone) e pela secretaria fora do clube"
+    override val srvErrPairLocal = "O emparelhamento só se faz a partir da rede do clube: usa o endereço local (http://…:8080)."
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

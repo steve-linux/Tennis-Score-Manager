@@ -1528,6 +1528,9 @@ object DeStrings : Strings {
     override val srvErrAuth = "Der Server kennt dieses Handy nicht mehr: Trennen und neu koppeln."
     override val srvErrNotTsm = "Unter dieser Adresse ist kein TSM-Vereinsserver."
     override val srvErrOther: (String) -> String = { "Serverfehler: $it" }
+    override val srvPublicUrl = "Adresse aus dem Internet (optional)"
+    override val srvPublicUrlHint = "z. B. https://tcprova.duckdns.org: für Einladungen (von zu Hause und am iPhone) und für das Büro außerhalb des Vereins"
+    override val srvErrPairLocal = "Koppeln geht nur aus dem Vereinsnetz: Nutze die lokale Adresse (http://…:8080)."
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

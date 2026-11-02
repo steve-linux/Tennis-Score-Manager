@@ -435,7 +435,14 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
 - **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
-- **De casa** (internet) é preciso um endereço https e uma porta aberta no router do clube: faz-se com serviços gratuitos (DuckDNS e Let's Encrypt), desde que a linha tenha IP público.
+- **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
+  1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
+  2. No **router do clube** dá-se ao Pi um endereço fixo e reencaminham-se para ele as portas **TCP 80 e 443**.
+  3. No Pi, a partir da pasta do kit: `sudo ./setup-https.sh tcprova.duckdns.org --duckdns O-TEU-TOKEN` (a partir da pen: `sudo /opt/tsm-server/kit/setup-https.sh …`). Instala o **Caddy**, que obtém sozinho o certificado **Let's Encrypt** e o renova; a cada 5 minutos diz ao DuckDNS o endereço do clube, caso o fornecedor o mude. Com um domínio próprio escreve-se esse, sem `--duckdns`.
+  4. Na app, *Servidor do clube › Endereço pela internet*: `https://tcprova.duckdns.org`. A partir daí os convites usam este endereço, e a secretaria fora do clube chega ao servidor por ele.
+  - O **emparelhamento** da secretaria só se faz a partir da rede do clube (com o endereço `http://…:8080`), nunca pela internet.
+  - Se um telemóvel em 4G/5G não chega, a linha do clube está provavelmente atrás de **CGNAT** (acontece com muitas linhas sem fios e móveis): o endereço de internet que o router mostra é diferente do que um site *qual é o meu IP* indica. Então pede-se ao fornecedor um **IP público** (muitas vezes grátis), ou usa-se um túnel (Tailscale Funnel, Cloudflare Tunnel: serviços de terceiros) ou um pequeno servidor alugado.
+  - `sudo ./setup-https.sh --remove` tira o acesso pela internet.
 
 ## 8. Placar na TV ou no monitor
 

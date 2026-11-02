@@ -18,6 +18,8 @@ import java.net.URL
 data class ClubServerConf(
     val url: String = "",
     val token: String = "",
+    /** L'indirizzo da internet (https://…, con Caddy): per gli inviti e per la segreteria fuori dal circolo. */
+    val publicUrl: String = "",
     val club: String = "",
     val rules: BookingRules = BookingRules(),
     val payInfo: String = "",
@@ -28,6 +30,9 @@ data class ClubServerConf(
     val cancel: List<String> = emptyList(),
 ) {
     val paired: Boolean get() = url.isNotBlank() && token.isNotBlank()
+
+    /** Dove cercare il server: prima nella rete del circolo, poi da internet. */
+    val addresses: List<String> get() = listOf(url, publicUrl).filter { it.isNotBlank() }.distinct()
 }
 
 object ClubServers {
@@ -38,7 +43,22 @@ object ClubServers {
     }
 
     /** Il link dell'invito: la pagina del circolo col codice dopo il # (non arriva nei log del server). */
-    fun inviteLink(conf: ClubServerConf, code: String): String = conf.url + "/#i=" + code
+    fun inviteLink(conf: ClubServerConf, code: String): String = conf.publicUrl.ifBlank { conf.url } + "/#i=" + code
+
+    /**
+     * La chiamata [f] al primo indirizzo che risponde: quello del circolo e, se non c'è rete per arrivarci (la
+     * segreteria è a casa), quello da internet. Gli altri errori (chiave, regole) non cambiano indirizzo.
+     */
+    fun <T> withServer(conf: ClubServerConf, f: (ClubServerClient) -> T): T {
+        var last: ClubServerError? = null
+        for (u in conf.addresses) {
+            try { return f(ClubServerClient(u, conf.token)) } catch (e: ClubServerError) {
+                if (e.code != "NET") throw e
+                last = e
+            }
+        }
+        throw last ?: ClubServerError("NET")
+    }
 
     /**
      * Quello che si manda al server: i campi, gli orari, i blocchi e tutto l'occupato della segreteria

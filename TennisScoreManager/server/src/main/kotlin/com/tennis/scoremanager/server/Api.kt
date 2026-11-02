@@ -41,7 +41,11 @@ const val API_VERSION = 1
 data class Resp(val status: Int, val body: String)
 
 /** Una richiesta già letta: metodo, percorso, parametri, corpo, chiave (Authorization: Bearer) e indirizzo. */
-data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
+data class Req(
+    val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "",
+    /** Arrivata da internet, attraverso Caddy (HTTPS), e non dalla rete del circolo. */
+    val viaProxy: Boolean = false,
+)
 
 class ApiError(val status: Int, val code: String) : Exception(code)
 
@@ -49,7 +53,11 @@ class ApiError(val status: Int, val code: String) : Exception(code)
  * Le chiamate del server, /api/v1/…: la segreteria si abbina col codice di setup, manda il planning e crea gli
  * inviti; i giocatori usano l'invito, guardano i giorni e prenotano o disdicono.
  */
-class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
+class Api(
+    private val store: Store, private val limiter: Limiter = Limiter(),
+    /** Abbinare la segreteria anche da internet (TSM_PAIR_REMOTE=1); di solito solo dalla rete del circolo. */
+    private val pairRemote: Boolean = System.getenv("TSM_PAIR_REMOTE") == "1",
+) {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     private fun <T> ok(ser: KSerializer<T>, v: T, status: Int = 200) = Resp(status, json.encodeToString(ser, v))
@@ -113,6 +121,8 @@ class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
 
     private fun pair(r: Req): Resp {
         guard(r)
+        // Il codice di abbinamento non si prova da internet: si abbina dal circolo, con l'indirizzo di casa.
+        if (r.viaProxy && !pairRemote) throw ApiError(403, "PAIR_LOCAL_ONLY")
         val code = Secrets.normalize(read(SrvCode.serializer(), r).code)
         val token = Secrets.token()
         val done = store.update { s ->

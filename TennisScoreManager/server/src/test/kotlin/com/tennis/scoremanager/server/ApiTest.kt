@@ -161,4 +161,20 @@ class ApiTest {
         assertTrue(a != b)
         assertEquals(b, File(dir, Store.SETUP_FILE).readText().trim())
     }
+
+    @Test fun pairingOnlyFromTheClubNetwork() {
+        val code = store.ensureSetupCode()!!
+        val far = api.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", ip = "5.6.7.8", viaProxy = true))
+        assertEquals(403, far.status)
+        assertTrue(far.body.contains("PAIR_LOCAL_ONLY"))
+        assertEquals(200, call("POST", "/admin/pair", """{"code":"$code"}""").status)
+        // Con la chiave, la segreteria lavora anche da casa.
+        assertEquals(200, Api(store, pairRemote = true).handle(Req("GET", "/api/v1/info", viaProxy = true)).status)
+    }
+
+    @Test fun pairingFromInternetWhenAllowed() {
+        val code = store.ensureSetupCode()!!
+        val open = Api(store, Limiter { now }, pairRemote = true)
+        assertEquals(200, open.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", viaProxy = true)).status)
+    }
 }

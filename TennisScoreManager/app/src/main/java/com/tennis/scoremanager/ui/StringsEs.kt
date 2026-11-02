@@ -1529,6 +1529,9 @@ object EsStrings : Strings {
     override val srvErrAuth = "El servidor ya no reconoce este teléfono: desconecta y empareja de nuevo."
     override val srvErrNotTsm = "En esa dirección no hay un servidor de club TSM."
     override val srvErrOther: (String) -> String = { "Error del servidor: $it" }
+    override val srvPublicUrl = "Dirección desde internet (opcional)"
+    override val srvPublicUrlHint = "p. ej. https://tcprova.duckdns.org: la usan las invitaciones (desde casa y en iPhone) y la secretaría fuera del club"
+    override val srvErrPairLocal = "El emparejamiento solo se hace desde la red del club: usa la dirección local (http://…:8080)."
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

@@ -74,12 +74,12 @@ fun start(store: Store, host: String, port: Int): HttpServer {
     return server
 }
 
-/** L'indirizzo di chi chiama; dietro Caddy (che chiama da 127.0.0.1) quello che Caddy dice in X-Forwarded-For. */
-private fun clientIp(ex: HttpExchange): String {
-    val direct = ex.remoteAddress.address
-    val fwd = ex.requestHeaders.getFirst("X-Forwarded-For")?.split(',')?.lastOrNull()?.trim()
-    return if (direct.isLoopbackAddress && !fwd.isNullOrBlank()) fwd else direct.hostAddress
-}
+/** Dietro Caddy, che chiama da 127.0.0.1, l'indirizzo vero è quello che Caddy scrive in X-Forwarded-For. */
+private fun forwardedFor(ex: HttpExchange): String? =
+    ex.requestHeaders.getFirst("X-Forwarded-For")?.split(',')?.lastOrNull()?.trim()?.takeIf { it.isNotEmpty() && ex.remoteAddress.address.isLoopbackAddress }
+
+/** L'indirizzo di chi chiama. */
+private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
 private fun serveApi(api: Api, ex: HttpExchange) {
     val body = ex.requestBody.use { it.readNBytes(MAX_BODY + 1) }
@@ -88,7 +88,7 @@ private fun serveApi(api: Api, ex: HttpExchange) {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }
     val token = ex.requestHeaders.getFirst("Authorization")?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
-    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex)))
+    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex), viaProxy = forwardedFor(ex) != null))
     ex.responseHeaders.add("Cache-Control", "no-store")
     send(ex, r.status, r.body.toByteArray(), "application/json; charset=utf-8")
 }

@@ -435,7 +435,14 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
 - **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
-- **Depuis chez soi** (internet) il faut une adresse https et un port ouvert sur la box du club : des services gratuits le permettent (DuckDNS et Let's Encrypt), si la ligne a une IP publique.
+- **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
+  1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
+  2. Sur la **box du club**, donnez au Pi une adresse fixe et redirigez vers elle les ports **TCP 80 et 443**.
+  3. Sur le Pi, depuis le dossier du kit : `sudo ./setup-https.sh tcprova.duckdns.org --duckdns VOTRE-JETON` (depuis la clé : `sudo /opt/tsm-server/kit/setup-https.sh …`). Il installe **Caddy**, qui obtient tout seul le certificat **Let's Encrypt** et le renouvelle ; toutes les 5 minutes il donne à DuckDNS l'adresse du club, au cas où le fournisseur la change. Avec votre propre domaine, écrivez-le, sans `--duckdns`.
+  4. Dans l'app, *Serveur du club › Adresse depuis internet* : `https://tcprova.duckdns.org`. Dès lors les invitations utilisent cette adresse, et le secrétariat hors du club passe par elle.
+  - L'**appairage** du secrétariat se fait seulement depuis le réseau du club (avec l'adresse `http://…:8080`), jamais depuis internet.
+  - Si un téléphone en 4G/5G n'arrive pas au serveur, la ligne du club est sans doute derrière un **CGNAT** (fréquent avec les box 4G/5G) : l'adresse internet affichée par la box diffère de celle qu'indique un site *quelle est mon IP*. Demandez alors au fournisseur une **IP publique** (souvent gratuite), ou utilisez un tunnel (Tailscale Funnel, Cloudflare Tunnel : services tiers) ou un petit serveur loué.
+  - `sudo ./setup-https.sh --remove` coupe l'accès depuis internet.
 
 ## 8. Tableau d'affichage sur TV ou écran
 

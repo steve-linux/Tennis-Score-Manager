@@ -65,6 +65,7 @@ fun srvErrorText(s: Strings, code: String): String = when (code) {
     "BAD_CODE" -> s.srvErrCode
     "UNAUTHORIZED" -> s.srvErrAuth
     "NOT_TSM" -> s.srvErrNotTsm
+    "PAIR_LOCAL_ONLY" -> s.srvErrPairLocal
     else -> s.srvErrOther(code)
 }
 
@@ -107,6 +108,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
     var code by remember { mutableStateOf("") }
     var rules by remember(conf.paired) { mutableStateOf(conf.rules) }
     var pay by remember(conf.paired) { mutableStateOf(conf.payInfo) }
+    var publicUrl by remember(conf.paired) { mutableStateOf(conf.publicUrl) }
     var unpair by remember { mutableStateOf(false) }
 
     @Composable fun stepper(label: String, v: Int, min: Int, max: Int, step: Int = 1, fmt: (Int) -> String = { it.toString() }, onChange: (Int) -> Unit) =
@@ -117,7 +119,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
             IconButton(onClick = { onChange((v + step).coerceAtMost(max)) }) { Icon(Icons.Filled.Add, null) }
         }
 
-    fun save() { if (conf.paired) c.saveServerRules(rules, pay) }
+    fun save() { if (conf.paired) c.saveServerRules(rules, pay, publicUrl) }
 
     AlertDialog(
         onDismissRequest = { save(); onDone() },
@@ -144,8 +146,10 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     )
                     GhostButton(s.srvSyncNow, Icons.Filled.Sync, {
                         busy = true; msg = null
-                        scope.launch { c.saveServerRules(rules, pay); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
+                        scope.launch { c.saveServerRules(rules, pay, publicUrl); msg = c.syncServerNow()?.let { srvErrorText(s, it) } ?: s.srvSynced; busy = false }
                     }, Modifier.fillMaxWidth(), enabled = !busy)
+                    OutlinedTextField(publicUrl, { publicUrl = it }, label = { Text(s.srvPublicUrl) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), supportingText = { Text(s.srvPublicUrlHint, fontSize = 11.sp) })
                     Text(s.srvPlayers(conf.players.size), color = TsmColors.TextMain, fontSize = 14.sp)
                     Text(s.srvInviteHow, color = TsmColors.TextDim, fontSize = 12.sp)
 

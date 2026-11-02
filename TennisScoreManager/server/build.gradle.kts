@@ -53,10 +53,10 @@ val serverKit by tasks.registering(Tar::class) {
     into("tsm-server") {
         from(fatJar)
         from("deploy") {
-            include("install.sh", "reset-admin.sh")
+            include("install.sh", "reset-admin.sh", "setup-https.sh", "tsm-duckdns")
             filePermissions { unix("rwxr-xr-x") }
         }
-        from("deploy") { include("tsm-server.service", "tsm-server.default") }
+        from("deploy") { include("tsm-server.service", "tsm-server.default", "tsm-duckdns.service", "tsm-duckdns.timer") }
     }
 }
 tasks.named("assemble") { dependsOn(serverKit) }

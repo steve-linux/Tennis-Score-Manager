@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Dice a DuckDNS l'indirizzo internet di adesso del circolo (lo lancia tsm-duckdns.timer ogni 5 minuti).
+# Dominio e token in /etc/default/tsm-duckdns (leggibile solo da root).
+set -eu
+. /etc/default/tsm-duckdns
+URL="${DUCKDNS_URL:-https://www.duckdns.org/update}"
+# La richiesta che DuckDNS si aspetta (GET); ip vuoto = DuckDNS usa l'indirizzo da cui arriva.
+ANSWER=$(curl -fsS --max-time 30 -G --data-urlencode "domains=$DUCKDNS_DOMAIN" --data-urlencode "token=$DUCKDNS_TOKEN" --data "ip=" "$URL" || echo ERR)
+echo "DuckDNS $DUCKDNS_DOMAIN: $ANSWER"
+[ "$ANSWER" = OK ]
