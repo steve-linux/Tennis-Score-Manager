@@ -42609,6 +42609,10 @@ fun NoticeScreen(c: MatchController) {
     val sent = remember(p) { mutableStateOf(setOf<String>()) }
     fun textOf(r: NoticeRecipient) = if (p.editable || r.text.isBlank()) common else r.text
     fun mark(r: NoticeRecipient) { sent.value = sent.value + r.id }
+    // Prima di passare a WhatsApp, SMS o email il testo lascia il fuoco: tornando, la tastiera non si riapre da sola
+    // sopra l'elenco di chi resta da avvisare.
+    val focus = androidx.compose.ui.platform.LocalFocusManager.current
+    fun open(i: Intent) { focus.clearFocus(); launch(context, i, s.ntNoApp) }
     ScreenScaffold(
         title = p.title,
         subtitle = p.subject,
@@ -42626,10 +42630,10 @@ fun NoticeScreen(c: MatchController) {
                 GhostButton(s.ntShare, Icons.Filled.Share, {
                     val img = p.image?.takeIf { it.exists() }
                     val send = if (img != null) c.shareFileIntent(img, "image/png", common) else Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, common).putExtra(Intent.EXTRA_SUBJECT, p.subject), null)
-                    launch(context, send, s.ntNoApp)
+                    open(send)
                 }, Modifier.fillMaxWidth())
-                if (mails.isNotEmpty()) GhostButton(s.ntEmailAll(mails.size), Icons.Filled.Email, { launch(context, email(emptyList(), mails, p.subject, common), s.ntNoApp) }, Modifier.fillMaxWidth())
-                if (phones.isNotEmpty()) GhostButton(s.ntSmsAll(phones.size), Icons.Filled.Sms, { launch(context, sms(phones, common), s.ntNoApp) }, Modifier.fillMaxWidth())
+                if (mails.isNotEmpty()) GhostButton(s.ntEmailAll(mails.size), Icons.Filled.Email, { open(email(emptyList(), mails, p.subject, common)) }, Modifier.fillMaxWidth())
+                if (phones.isNotEmpty()) GhostButton(s.ntSmsAll(phones.size), Icons.Filled.Sms, { open(sms(phones, common)) }, Modifier.fillMaxWidth())
             }
         }
         if (p.recipients.isNotEmpty()) {
@@ -42653,9 +42657,9 @@ fun NoticeScreen(c: MatchController) {
                                 modifier = Modifier.clickable { open = !open }, maxLines = if (open) 30 else 3)
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { mark(r); launch(context, whatsApp(wa, textOf(r)), s.ntNoApp) }
-                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS") { mark(r); launch(context, sms(listOf(r.phone), textOf(r)), s.ntNoApp) }
-                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail) { mark(r); launch(context, email(listOf(r.email), emptyList(), p.subject, textOf(r)), s.ntNoApp) }
+                            if (wa != null) Chip(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { mark(r); open(whatsApp(wa, textOf(r))) }
+                            if (r.phone.isNotBlank()) Chip(Icons.Filled.Sms, "SMS") { mark(r); open(sms(listOf(r.phone), textOf(r))) }
+                            if (r.email.isNotBlank()) Chip(Icons.Filled.Email, s.memberEmail) { mark(r); open(email(listOf(r.email), emptyList(), p.subject, textOf(r))) }
                         }
                     }
                 }
