@@ -230,9 +230,11 @@ fun MemberSection(c: MatchController, p: PlayerProfile) {
         SectionCard(s.memberSection, Icons.Filled.CardMembership) {
             @Composable fun row(label: String, value: String?) {
                 if (value.isNullOrBlank()) return
-                Row(Modifier.fillMaxWidth()) {
+                // Etichetta e valore si dividono la riga: un valore lungo va a capo a destra, l'etichetta non si schiaccia.
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(label, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                    Text(value, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(value, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.2f),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.End)
                 }
             }
             val issues = Members.issues(p, now)

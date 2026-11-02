@@ -58,8 +58,15 @@ mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/ui"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/video"
 mkdir -p "$DEST/app/src/test/java/com/tennis/scoremanager/voice"
 mkdir -p "$DEST/app/src/test/resources/pose"
+mkdir -p "$DEST/courtcore"
+mkdir -p "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data"
+mkdir -p "$DEST/courtcore/src/test/kotlin/com/tennis/scoremanager/data"
 mkdir -p "$DEST/gradle"
 mkdir -p "$DEST/gradle/wrapper"
+mkdir -p "$DEST/server"
+mkdir -p "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server"
+mkdir -p "$DEST/server/src/main/resources/web"
+mkdir -p "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server"
 
 # ---------------------------------------------------------------- app/build.gradle.kts
 cat > "$DEST/app/build.gradle.kts" << 'TSM_EOF'
@@ -128,6 +135,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":courtcore"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -10729,110 +10737,7 @@ cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/CourtPlan.kt" << 'TS
 
 package com.tennis.scoremanager.data
 
-import kotlinx.serialization.Serializable
-import java.util.Calendar
-
-/** La superficie del campo. */
-@Serializable
-enum class Surface { CLAY, GRASS, HARD, OTHER }
-
-/**
- * Com'è fatto un campo e quanto costa: coperto o scoperto, luci, riscaldamento; i prezzi all'ora (null = quelli
- * generali del planning) e il supplemento all'ora per il riscaldamento.
- */
-@Serializable
-data class CourtInfo(
-    val name: String,
-    val surface: Surface? = null,
-    val covered: Boolean = false,
-    val lights: Boolean = true,
-    val heating: Boolean = false,
-    val centsPerHour: Int? = null,
-    val centsPerHourLights: Int? = null,
-    val heatingCentsPerHour: Int = 0,
-    /** Le foto del campo (file nella cartella dell'app, files/court_photos). */
-    val photos: List<String> = emptyList(),
-)
-
-/** Come si paga la prenotazione: al campo (contanti o POS in segreteria) o online (Satispay, PayPal, bonifico…). */
-@Serializable
-enum class PayWhere { COURT, ONLINE }
-
-/** Per cosa è occupato il campo: gioco, lezione, chiuso (manutenzione), altro. Le partite dei tornei si aggiungono da sole. */
-@Serializable
-enum class BookingKind { PLAY, LESSON, CLOSED, OTHER }
-
-/**
- * Una prenotazione: campo, inizio e durata, chi gioca (giocatori del database e/o nomi scritti), prezzo e, se
- * addebitato, gli addebiti nel registro. [series] lega le prenotazioni ripetute ogni settimana.
- */
-@Serializable
-data class CourtBooking(
-    val id: String,
-    val court: String,
-    val start: Long,
-    val minutes: Int = 60,
-    val kind: BookingKind = BookingKind.PLAY,
-    val players: List<String> = emptyList(),
-    val names: List<String> = emptyList(),
-    val note: String = "",
-    val lights: Boolean = false,
-    val cents: Int = 0,
-    val charges: List<String> = emptyList(),
-    val series: String? = null,
-    val heating: Boolean = false,
-    val payWhere: PayWhere = PayWhere.COURT,
-) {
-    val end: Long get() = start + minutes * 60_000L
-}
-
-/** Orari del circolo e prezzi: dalle [openHour] alle [closeHour], caselle da [slotMinutes]; prezzi all'ora. */
-@Serializable
-data class CourtSettings(
-    val openHour: Int = 8,
-    val closeHour: Int = 23,
-    val slotMinutes: Int = 60,
-    val centsPerHour: Int = 0,
-    val centsPerHourLights: Int = 0,
-    /** Da quest'ora servono le luci (e vale il prezzo con le luci). */
-    val lightsFrom: Int = 18,
-    /** Quanto dura di solito una partita di torneo nel planning. */
-    val tournamentMinutes: Int = 90,
-    /** Com'è fatto ogni campo (per nome); quelli che mancano hanno i valori generali. */
-    val courts: List<CourtInfo> = emptyList(),
-) {
-    fun info(court: String): CourtInfo = courts.firstOrNull { it.name == court } ?: CourtInfo(court)
-}
-
-/** Perché i campi non si possono prenotare: un corso (scuola tennis), un torneo, la manutenzione, altro. */
-@Serializable
-enum class BlockReason { COURSE, TOURNAMENT, MAINTENANCE, OTHER }
-
-/**
- * Campi non prenotabili: [courts] (vuoto = tutti) dal giorno [from] al giorno [to], nei giorni della settimana
- * [weekdays] (1 = lunedì … 7 = domenica; vuoto = tutti), dalle [startMin] alle [endMin] (minuti dalla mezzanotte).
- * Nei blocchi di un corso si possono mettere le sue lezioni; in quelli di un torneo si vedono le sue partite.
- */
-@Serializable
-data class CourtBlock(
-    val id: String,
-    val label: String,
-    val reason: BlockReason = BlockReason.OTHER,
-    val courts: List<String> = emptyList(),
-    val from: Long,
-    val to: Long,
-    val weekdays: Set<Int> = emptySet(),
-    val startMin: Int = 0,
-    val endMin: Int = 24 * 60,
-    val tournament: String? = null,
-    /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
-    val course: String? = null,
-    /** La squadra il cui incontro in casa l'ha creato. */
-    val team: String? = null,
-)
-
-@Serializable
-data class CourtPlan(val settings: CourtSettings = CourtSettings(), val bookings: List<CourtBooking> = emptyList(), val blocks: List<CourtBlock> = emptyList())
+// I campi, le prenotazioni e i blocchi sono nel modulo courtcore (CourtTypes.kt), con orari e prezzi (CourtTime).
 
 /** Una casella occupata nel planning: una prenotazione, una partita di torneo o un blocco (non si cambiano da qui). */
 data class Occupied(
@@ -10843,25 +10748,11 @@ data class Occupied(
 object CourtPlans {
     fun newId(prefix: String): String = prefix + java.util.UUID.randomUUID().toString().take(12)
 
-    /** Mezzanotte del giorno di [t]. */
-    fun dayStart(t: Long): Long = Calendar.getInstance().apply {
-        timeInMillis = t; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-    }.timeInMillis
+    fun dayStart(t: Long): Long = CourtTime.dayStart(t)
+    fun at(day: Long, hour: Int, minute: Int = 0): Long = CourtTime.at(day, hour, minute)
+    fun addDays(t: Long, days: Int): Long = CourtTime.addDays(t, days)
 
-    fun at(day: Long, hour: Int, minute: Int = 0): Long = Calendar.getInstance().apply {
-        timeInMillis = dayStart(day); set(Calendar.HOUR_OF_DAY, hour); set(Calendar.MINUTE, minute)
-    }.timeInMillis
-
-    fun addDays(t: Long, days: Int): Long = Calendar.getInstance().apply { timeInMillis = t; add(Calendar.DAY_OF_YEAR, days) }.timeInMillis
-
-    /** Gli inizi delle caselle del giorno, dall'apertura alla chiusura. */
-    fun slots(day: Long, s: CourtSettings): List<Long> {
-        val step = s.slotMinutes.coerceIn(15, 180)
-        val out = mutableListOf<Long>()
-        var m = s.openHour * 60
-        while (m + step <= s.closeHour * 60) { out += at(day, m / 60, m % 60); m += step }
-        return out
-    }
+    fun slots(day: Long, s: CourtSettings): List<Long> = CourtTime.slots(day, s)
 
     /** Tutto ciò che occupa i campi in quel giorno: prenotazioni e partite di torneo con campo e orario. */
     fun occupied(plan: CourtPlan, tournaments: List<ClubTournament>, day: Long): List<Occupied> {
@@ -10875,19 +10766,13 @@ object CourtPlans {
         return (b + t + k).sortedBy { it.start }
     }
 
-    /** 1 = lunedì … 7 = domenica. */
-    fun weekday(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.DAY_OF_WEEK).let { if (it == Calendar.SUNDAY) 7 else it - 1 }
+    fun weekday(t: Long): Int = CourtTime.weekday(t)
 
-    /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
-    fun blockActive(b: CourtBlock, day: Long): Boolean {
-        val d = dayStart(day)
-        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
-    }
+    fun blockActive(b: CourtBlock, day: Long): Boolean = CourtTime.blockActive(b, day)
 
     /** I blocchi del giorno, campo per campo ([courts] = i campi del circolo, per i blocchi "tutti i campi"). */
     fun blocksOn(plan: CourtPlan, day: Long, courts: List<String>?): List<Occupied> = plan.blocks.filter { blockActive(it, day) }.flatMap { b ->
-        val start = at(day, b.startMin / 60, b.startMin % 60)
-        val end = at(day, 0) + b.endMin * 60_000L
+        val (start, end) = CourtTime.blockSpan(b, day)
         val list = if (b.courts.isEmpty()) courts ?: listOf(ALL) else b.courts
         list.map { Occupied(it, start, end, block = b) }
     }
@@ -10910,26 +10795,10 @@ object CourtPlans {
     fun conflicts(plan: CourtPlan, tournaments: List<ClubTournament>, court: String, start: Long, end: Long, except: String? = null): List<Occupied> =
         occupied(plan, tournaments, start).filter { it.block == null && it.court == court && (except == null || it.booking?.id != except) && it.start < end && it.end > start }
 
-    /**
-     * Il prezzo: le ore prima delle luci al prezzo normale, quelle dopo al prezzo con le luci (un campo senza luci
-     * resta al prezzo normale), più il riscaldamento se lo si chiede. Prezzi del campo, o quelli generali. Chiuso e
-     * altro: 0.
-     */
-    fun price(s: CourtSettings, start: Long, minutes: Int, kind: BookingKind, court: String = "", heating: Boolean = false): Int {
-        if (kind == BookingKind.CLOSED || kind == BookingKind.OTHER) return 0
-        val info = s.info(court)
-        val base = info.centsPerHour ?: s.centsPerHour
-        val dark = if (info.lights) info.centsPerHourLights ?: s.centsPerHourLights else base
-        val lightsAt = at(start, s.lightsFrom)
-        val end = start + minutes * 60_000L
-        val darkMs = (end - maxOf(start, lightsAt)).coerceAtLeast(0)
-        val dayMs = (minutes * 60_000L - darkMs).coerceAtLeast(0)
-        val heat = if (heating && info.heating) minutes * 60_000L * info.heatingCentsPerHour else 0L
-        return Math.round((dayMs * base + darkMs * dark + heat) / 3_600_000.0).toInt()
-    }
+    fun price(s: CourtSettings, start: Long, minutes: Int, kind: BookingKind, court: String = "", heating: Boolean = false): Int =
+        CourtTime.price(s, start, minutes, kind, court, heating)
 
-    /** Servono le luci se la prenotazione arriva oltre l'ora delle luci. */
-    fun needsLights(s: CourtSettings, start: Long, minutes: Int): Boolean = start + minutes * 60_000L > at(start, s.lightsFrom)
+    fun needsLights(s: CourtSettings, start: Long, minutes: Int): Boolean = CourtTime.needsLights(s, start, minutes)
 
     /**
      * La stessa prenotazione ogni settimana per [weeks] settimane (lei compresa): restituisce quelle che si possono
@@ -10949,12 +10818,7 @@ object CourtPlans {
         return ok to skipped
     }
 
-    /** Divide [cents] tra [n] persone; i centesimi in più ai primi (10 € in 3: 3,34 + 3,33 + 3,33). */
-    fun split(cents: Int, n: Int): List<Int> {
-        if (n <= 0) return emptyList()
-        val base = cents / n; val extra = cents % n
-        return List(n) { base + if (it < extra) 1 else 0 }
-    }
+    fun split(cents: Int, n: Int): List<Int> = CourtTime.split(cents, n)
 
     /** Quanto è occupato ogni campo nel giorno (minuti), per vedere a colpo d'occhio i campi liberi. */
     fun busyMinutes(occ: List<Occupied>, court: String): Int = occ.filter { it.court == court && it.block == null }.sumOf { ((it.end - it.start) / 60_000L).toInt() }
@@ -40721,9 +40585,11 @@ fun MemberSection(c: MatchController, p: PlayerProfile) {
         SectionCard(s.memberSection, Icons.Filled.CardMembership) {
             @Composable fun row(label: String, value: String?) {
                 if (value.isNullOrBlank()) return
-                Row(Modifier.fillMaxWidth()) {
+                // Etichetta e valore si dividono la riga: un valore lungo va a capo a destra, l'etichetta non si schiaccia.
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(label, color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                    Text(value, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(value, color = TsmColors.TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.2f),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.End)
                 }
             }
             val issues = Members.issues(p, now)
@@ -69335,8 +69201,515 @@ cat > "$DEST/build.gradle.kts" << 'TSM_EOF'
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/.gitignore
+cat > "$DEST/courtcore/.gitignore" << 'TSM_EOF'
+/build
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/build.gradle.kts
+cat > "$DEST/courtcore/build.gradle.kts" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// I campi del circolo in Kotlin puro: come sono fatti, gli orari, i prezzi e le regole delle prenotazioni
+// online. Li usano l'app e il server del circolo, così le regole sono le stesse da entrambe le parti.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+}
+
+dependencies {
+    api(libs.kotlinx.serialization.json)
+    testImplementation(libs.junit)
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtOnline.kt
+cat > "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtOnline.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+/**
+ * Le prenotazioni online dei giocatori, col server del circolo (facoltativo: senza server si prenota in
+ * segreteria come sempre). La segreteria manda al server il planning ([ClubSync]); il server accetta le
+ * prenotazioni dei giocatori invitati con queste regole, le stesse che l'app usa per mostrarle.
+ */
+
+/** Un periodo già occupato in segreteria (prenotazione, lezione, partita di torneo): il server non sa da chi. */
+@Serializable
+data class Busy(val court: String, val start: Long, val end: Long)
+
+/** Le regole per i giocatori, decise dal circolo. */
+@Serializable
+data class BookingRules(
+    /** Le prenotazioni online sono aperte (spente = si vede il planning ma non si prenota). */
+    val open: Boolean = true,
+    /** Fin quanti giorni avanti si prenota (0 = solo oggi). */
+    val daysAhead: Int = 7,
+    /** Quante prenotazioni ancora da giocare può avere ogni giocatore. */
+    val maxFuture: Int = 2,
+    /** La prenotazione più lunga. */
+    val maxMinutes: Int = 120,
+    /** Fino a quante ore prima si disdice da soli (dopo, si chiama la segreteria). */
+    val cancelHours: Int = 24,
+    /** Quanti minuti prima dell'inizio si può ancora prenotare. */
+    val noticeMinutes: Int = 30,
+    /** I campi prenotabili online (vuoto = tutti). */
+    val courts: List<String> = emptyList(),
+)
+
+/** Quello che la segreteria manda al server: il circolo, i campi, gli orari e prezzi, i blocchi, l'occupato e le regole. */
+@Serializable
+data class ClubSync(
+    val club: String = "",
+    /** Il fuso orario del circolo (es. Europe/Rome): giorni e orari si contano lì, anche se il giocatore è altrove. */
+    val timeZone: String = "Europe/Rome",
+    val courts: List<String> = emptyList(),
+    val settings: CourtSettings = CourtSettings(),
+    val blocks: List<CourtBlock> = emptyList(),
+    val busy: List<Busy> = emptyList(),
+    val rules: BookingRules = BookingRules(),
+    /** Come si paga (testo libero: "al campo, Satispay…"), da mostrare ai giocatori. */
+    val payInfo: String = "",
+)
+
+/** Una prenotazione fatta online da un giocatore: [player] è l'id del giocatore nel database dell'app. */
+@Serializable
+data class OnlineBooking(
+    val id: String,
+    val court: String,
+    val start: Long,
+    val minutes: Int,
+    val player: String,
+    val name: String,
+    val cents: Int = 0,
+    val lights: Boolean = false,
+    val heating: Boolean = false,
+    val createdAt: Long = 0,
+) {
+    val end: Long get() = start + minutes * 60_000L
+}
+
+/** Perché una prenotazione online non si può fare. */
+@Serializable
+enum class BookingProblem { CLOSED, UNKNOWN_COURT, PAST, TOO_SOON, TOO_FAR, NOT_SLOT, TOO_LONG, BLOCKED, TAKEN, TOO_MANY }
+
+/** Perché una prenotazione online non si può disdire. */
+@Serializable
+enum class CancelProblem { NOT_FOUND, NOT_YOURS, TOO_LATE }
+
+/** Lo stato di una casella per chi guarda: libera, occupata, sua, non prenotabile (blocco o campo non online), passata. */
+@Serializable
+enum class CellState { FREE, BUSY, MINE, BLOCKED, PAST }
+
+@Serializable
+data class Cell(val court: String, val start: Long, val state: CellState, val booking: String? = null)
+
+object CourtOnline {
+    /** I campi che si prenotano online. */
+    fun bookableCourts(sync: ClubSync): List<String> = if (sync.rules.courts.isEmpty()) sync.courts else sync.courts.filter { it in sync.rules.courts }
+
+    private fun overlaps(court: String, start: Long, end: Long, c: String, s: Long, e: Long) = court == c && s < end && e > start
+
+    /** Il campo è occupato tra [start] e [end] (in segreteria o online)? */
+    fun taken(sync: ClubSync, bookings: List<OnlineBooking>, court: String, start: Long, end: Long, except: String? = null): Boolean =
+        sync.busy.any { overlaps(court, start, end, it.court, it.start, it.end) } ||
+            bookings.any { it.id != except && overlaps(court, start, end, it.court, it.start, it.end) }
+
+    fun blocked(sync: ClubSync, court: String, start: Long, end: Long): Boolean =
+        sync.blocks.any { CourtTime.blocks(it, court, start, end, BookingKind.PLAY) }
+
+    /** Le prenotazioni del giocatore ancora da giocare. */
+    fun future(bookings: List<OnlineBooking>, player: String, now: Long): List<OnlineBooking> =
+        bookings.filter { it.player == player && it.end > now }.sortedBy { it.start }
+
+    /** Si può prenotare? null = sì, altrimenti il primo motivo per cui no. */
+    fun check(sync: ClubSync, bookings: List<OnlineBooking>, player: String, court: String, start: Long, minutes: Int, now: Long): BookingProblem? {
+        val r = sync.rules
+        val s = sync.settings
+        val end = start + minutes * 60_000L
+        return when {
+            !r.open -> BookingProblem.CLOSED
+            court !in bookableCourts(sync) -> BookingProblem.UNKNOWN_COURT
+            start < now -> BookingProblem.PAST
+            start < now + r.noticeMinutes * 60_000L -> BookingProblem.TOO_SOON
+            CourtTime.dayStart(start) > CourtTime.dayStart(CourtTime.addDays(now, r.daysAhead.coerceAtLeast(0))) -> BookingProblem.TOO_FAR
+            start !in CourtTime.slots(start, s) || minutes < s.slotMinutes || minutes % s.slotMinutes != 0 ||
+                end > CourtTime.at(start, s.closeHour) -> BookingProblem.NOT_SLOT
+            minutes > maxOf(r.maxMinutes, s.slotMinutes) -> BookingProblem.TOO_LONG
+            blocked(sync, court, start, end) -> BookingProblem.BLOCKED
+            taken(sync, bookings, court, start, end) -> BookingProblem.TAKEN
+            future(bookings, player, now).size >= r.maxFuture.coerceAtLeast(1) -> BookingProblem.TOO_MANY
+            else -> null
+        }
+    }
+
+    /** La prenotazione già fatta online, pronta da salvare (prezzo e luci come in segreteria). */
+    fun make(sync: ClubSync, id: String, player: String, name: String, court: String, start: Long, minutes: Int, heating: Boolean, now: Long): OnlineBooking {
+        val h = heating && sync.settings.info(court).heating
+        return OnlineBooking(
+            id = id, court = court, start = start, minutes = minutes, player = player, name = name,
+            cents = CourtTime.price(sync.settings, start, minutes, BookingKind.PLAY, court, h),
+            lights = CourtTime.needsLights(sync.settings, start, minutes) && sync.settings.info(court).lights, heating = h, createdAt = now,
+        )
+    }
+
+    /** Si può disdire da soli? null = sì. */
+    fun checkCancel(sync: ClubSync, bookings: List<OnlineBooking>, player: String, id: String, now: Long): CancelProblem? {
+        val b = bookings.firstOrNull { it.id == id } ?: return CancelProblem.NOT_FOUND
+        return when {
+            b.player != player -> CancelProblem.NOT_YOURS
+            b.start - now < sync.rules.cancelHours * 3_600_000L -> CancelProblem.TOO_LATE
+            else -> null
+        }
+    }
+
+    /** Il giorno per il giocatore: ogni casella di ogni campo prenotabile, senza dire chi ha prenotato le altre. */
+    fun grid(sync: ClubSync, bookings: List<OnlineBooking>, player: String, day: Long, now: Long): List<Cell> {
+        val step = sync.settings.slotMinutes.coerceIn(15, 180) * 60_000L
+        val slots = CourtTime.slots(day, sync.settings)
+        return bookableCourts(sync).flatMap { court ->
+            slots.map { start ->
+                val end = start + step
+                val mine = bookings.firstOrNull { it.player == player && overlaps(court, start, end, it.court, it.start, it.end) }
+                val state = when {
+                    mine != null -> CellState.MINE
+                    taken(sync, bookings, court, start, end) -> CellState.BUSY
+                    blocked(sync, court, start, end) -> CellState.BLOCKED
+                    start < now -> CellState.PAST
+                    else -> CellState.FREE
+                }
+                Cell(court, start, state, mine?.id)
+            }
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtTime.kt
+cat > "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtTime.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import java.util.Calendar
+
+/**
+ * Giorni, caselle e prezzi dei campi, nel fuso orario predefinito (quello del telefono nell'app, quello del
+ * circolo nel server).
+ */
+object CourtTime {
+    /** Mezzanotte del giorno di [t]. */
+    fun dayStart(t: Long): Long = Calendar.getInstance().apply {
+        timeInMillis = t; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    fun at(day: Long, hour: Int, minute: Int = 0): Long = Calendar.getInstance().apply {
+        timeInMillis = dayStart(day); set(Calendar.HOUR_OF_DAY, hour); set(Calendar.MINUTE, minute)
+    }.timeInMillis
+
+    fun addDays(t: Long, days: Int): Long = Calendar.getInstance().apply { timeInMillis = t; add(Calendar.DAY_OF_YEAR, days) }.timeInMillis
+
+    /** Gli inizi delle caselle del giorno, dall'apertura alla chiusura. */
+    fun slots(day: Long, s: CourtSettings): List<Long> {
+        val step = s.slotMinutes.coerceIn(15, 180)
+        val out = mutableListOf<Long>()
+        var m = s.openHour * 60
+        while (m + step <= s.closeHour * 60) { out += at(day, m / 60, m % 60); m += step }
+        return out
+    }
+
+    /** 1 = lunedì … 7 = domenica. */
+    fun weekday(t: Long): Int = Calendar.getInstance().apply { timeInMillis = t }.get(Calendar.DAY_OF_WEEK).let { if (it == Calendar.SUNDAY) 7 else it - 1 }
+
+    /** Il blocco vale quel giorno: dentro le date e in uno dei suoi giorni della settimana. */
+    fun blockActive(b: CourtBlock, day: Long): Boolean {
+        val d = dayStart(day)
+        return d >= dayStart(b.from) && d <= dayStart(b.to) && (b.weekdays.isEmpty() || weekday(d) in b.weekdays)
+    }
+
+    /** Inizio e fine del blocco nel giorno [day]. */
+    fun blockSpan(b: CourtBlock, day: Long): Pair<Long, Long> = at(day, b.startMin / 60, b.startMin % 60) to at(day, 0) + b.endMin * 60_000L
+
+    /**
+     * Il blocco ferma una prenotazione di tipo [kind] su [court] tra [start] e [end]? Le lezioni si possono mettere
+     * nei blocchi dei corsi e le chiusure (manutenzione) dappertutto.
+     */
+    fun blocks(b: CourtBlock, court: String, start: Long, end: Long, kind: BookingKind): Boolean {
+        if (kind == BookingKind.CLOSED || (kind == BookingKind.LESSON && b.reason == BlockReason.COURSE)) return false
+        if (b.courts.isNotEmpty() && court !in b.courts) return false
+        if (!blockActive(b, start)) return false
+        val (bs, be) = blockSpan(b, start)
+        return bs < end && be > start
+    }
+
+    /**
+     * Il prezzo: le ore prima delle luci al prezzo normale, quelle dopo al prezzo con le luci (un campo senza luci
+     * resta al prezzo normale), più il riscaldamento se lo si chiede. Prezzi del campo, o quelli generali. Chiuso e
+     * altro: 0.
+     */
+    fun price(s: CourtSettings, start: Long, minutes: Int, kind: BookingKind, court: String = "", heating: Boolean = false): Int {
+        if (kind == BookingKind.CLOSED || kind == BookingKind.OTHER) return 0
+        val info = s.info(court)
+        val base = info.centsPerHour ?: s.centsPerHour
+        val dark = if (info.lights) info.centsPerHourLights ?: s.centsPerHourLights else base
+        val lightsAt = at(start, s.lightsFrom)
+        val end = start + minutes * 60_000L
+        val darkMs = (end - maxOf(start, lightsAt)).coerceAtLeast(0)
+        val dayMs = (minutes * 60_000L - darkMs).coerceAtLeast(0)
+        val heat = if (heating && info.heating) minutes * 60_000L * info.heatingCentsPerHour else 0L
+        return Math.round((dayMs * base + darkMs * dark + heat) / 3_600_000.0).toInt()
+    }
+
+    /** Servono le luci se la prenotazione arriva oltre l'ora delle luci. */
+    fun needsLights(s: CourtSettings, start: Long, minutes: Int): Boolean = start + minutes * 60_000L > at(start, s.lightsFrom)
+
+    /** Divide [cents] tra [n] persone; i centesimi in più ai primi (10 € in 3: 3,34 + 3,33 + 3,33). */
+    fun split(cents: Int, n: Int): List<Int> {
+        if (n <= 0) return emptyList()
+        val base = cents / n; val extra = cents % n
+        return List(n) { base + if (it < extra) 1 else 0 }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtTypes.kt
+cat > "$DEST/courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtTypes.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+
+
+/** La superficie del campo. */
+@Serializable
+enum class Surface { CLAY, GRASS, HARD, OTHER }
+
+/**
+ * Com'è fatto un campo e quanto costa: coperto o scoperto, luci, riscaldamento; i prezzi all'ora (null = quelli
+ * generali del planning) e il supplemento all'ora per il riscaldamento.
+ */
+@Serializable
+data class CourtInfo(
+    val name: String,
+    val surface: Surface? = null,
+    val covered: Boolean = false,
+    val lights: Boolean = true,
+    val heating: Boolean = false,
+    val centsPerHour: Int? = null,
+    val centsPerHourLights: Int? = null,
+    val heatingCentsPerHour: Int = 0,
+    /** Le foto del campo (file nella cartella dell'app, files/court_photos). */
+    val photos: List<String> = emptyList(),
+)
+
+/** Come si paga la prenotazione: al campo (contanti o POS in segreteria) o online (Satispay, PayPal, bonifico…). */
+@Serializable
+enum class PayWhere { COURT, ONLINE }
+
+/** Per cosa è occupato il campo: gioco, lezione, chiuso (manutenzione), altro. Le partite dei tornei si aggiungono da sole. */
+@Serializable
+enum class BookingKind { PLAY, LESSON, CLOSED, OTHER }
+
+/**
+ * Una prenotazione: campo, inizio e durata, chi gioca (giocatori del database e/o nomi scritti), prezzo e, se
+ * addebitato, gli addebiti nel registro. [series] lega le prenotazioni ripetute ogni settimana.
+ */
+@Serializable
+data class CourtBooking(
+    val id: String,
+    val court: String,
+    val start: Long,
+    val minutes: Int = 60,
+    val kind: BookingKind = BookingKind.PLAY,
+    val players: List<String> = emptyList(),
+    val names: List<String> = emptyList(),
+    val note: String = "",
+    val lights: Boolean = false,
+    val cents: Int = 0,
+    val charges: List<String> = emptyList(),
+    val series: String? = null,
+    val heating: Boolean = false,
+    val payWhere: PayWhere = PayWhere.COURT,
+) {
+    val end: Long get() = start + minutes * 60_000L
+}
+
+/** Orari del circolo e prezzi: dalle [openHour] alle [closeHour], caselle da [slotMinutes]; prezzi all'ora. */
+@Serializable
+data class CourtSettings(
+    val openHour: Int = 8,
+    val closeHour: Int = 23,
+    val slotMinutes: Int = 60,
+    val centsPerHour: Int = 0,
+    val centsPerHourLights: Int = 0,
+    /** Da quest'ora servono le luci (e vale il prezzo con le luci). */
+    val lightsFrom: Int = 18,
+    /** Quanto dura di solito una partita di torneo nel planning. */
+    val tournamentMinutes: Int = 90,
+    /** Com'è fatto ogni campo (per nome); quelli che mancano hanno i valori generali. */
+    val courts: List<CourtInfo> = emptyList(),
+) {
+    fun info(court: String): CourtInfo = courts.firstOrNull { it.name == court } ?: CourtInfo(court)
+}
+
+/** Perché i campi non si possono prenotare: un corso (scuola tennis), un torneo, la manutenzione, altro. */
+@Serializable
+enum class BlockReason { COURSE, TOURNAMENT, MAINTENANCE, OTHER }
+
+/**
+ * Campi non prenotabili: [courts] (vuoto = tutti) dal giorno [from] al giorno [to], nei giorni della settimana
+ * [weekdays] (1 = lunedì … 7 = domenica; vuoto = tutti), dalle [startMin] alle [endMin] (minuti dalla mezzanotte).
+ * Nei blocchi di un corso si possono mettere le sue lezioni; in quelli di un torneo si vedono le sue partite.
+ */
+@Serializable
+data class CourtBlock(
+    val id: String,
+    val label: String,
+    val reason: BlockReason = BlockReason.OTHER,
+    val courts: List<String> = emptyList(),
+    val from: Long,
+    val to: Long,
+    val weekdays: Set<Int> = emptySet(),
+    val startMin: Int = 0,
+    val endMin: Int = 24 * 60,
+    val tournament: String? = null,
+    /** Il corso della scuola tennis che l'ha creato (si aggiorna e si toglie col corso). */
+    val course: String? = null,
+    /** La squadra il cui incontro in casa l'ha creato. */
+    val team: String? = null,
+)
+
+@Serializable
+data class CourtPlan(val settings: CourtSettings = CourtSettings(), val bookings: List<CourtBooking> = emptyList(), val blocks: List<CourtBlock> = emptyList())
+TSM_EOF
+
+# ---------------------------------------------------------------- courtcore/src/test/kotlin/com/tennis/scoremanager/data/CourtOnlineTest.kt
+cat > "$DEST/courtcore/src/test/kotlin/com/tennis/scoremanager/data/CourtOnlineTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Before
+import org.junit.Test
+import java.util.Calendar
+import java.util.TimeZone
+
+class CourtOnlineTest {
+    private var oldTz: TimeZone? = null
+
+    @Before fun tz() { oldTz = TimeZone.getDefault(); TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome")) }
+    @After fun restore() { TimeZone.setDefault(oldTz) }
+
+    /** Lunedì 9 novembre 2026 alle [h]. */
+    private fun mon(h: Int, m: Int = 0, plusDays: Int = 0): Long = Calendar.getInstance().apply {
+        clear(); set(2026, Calendar.NOVEMBER, 9 + plusDays, h, m)
+    }.timeInMillis
+
+    private val now = mon(10)
+    private val sync = ClubSync(
+        club = "TC Prova", courts = listOf("Campo 1", "Campo 2"),
+        settings = CourtSettings(openHour = 8, closeHour = 22, slotMinutes = 60, centsPerHour = 1000, centsPerHourLights = 1500, lightsFrom = 18),
+        rules = BookingRules(daysAhead = 7, maxFuture = 2, maxMinutes = 120, cancelHours = 24, noticeMinutes = 30),
+    )
+
+    private fun ok(court: String = "Campo 1", start: Long = mon(15), minutes: Int = 60, s: ClubSync = sync, b: List<OnlineBooking> = emptyList()) =
+        CourtOnline.check(s, b, "p1", court, start, minutes, now)
+
+    @Test fun freeSlotIsBookable() = assertNull(ok())
+
+    @Test fun rulesStopBadRequests() {
+        assertEquals(BookingProblem.CLOSED, ok(s = sync.copy(rules = sync.rules.copy(open = false))))
+        assertEquals(BookingProblem.UNKNOWN_COURT, ok(court = "Campo 9"))
+        assertEquals(BookingProblem.UNKNOWN_COURT, ok(s = sync.copy(rules = sync.rules.copy(courts = listOf("Campo 2")))))
+        assertEquals(BookingProblem.PAST, ok(start = mon(9)))
+        assertEquals(BookingProblem.TOO_SOON, ok(start = mon(10, 15)))
+        assertEquals(BookingProblem.TOO_FAR, ok(start = mon(15, plusDays = 8)))
+        assertNull(ok(start = mon(15, plusDays = 7)))
+        assertEquals(BookingProblem.NOT_SLOT, ok(start = mon(15, 30)))
+        assertEquals(BookingProblem.NOT_SLOT, ok(minutes = 90))
+        assertEquals(BookingProblem.NOT_SLOT, ok(start = mon(21), minutes = 120))
+        assertEquals(BookingProblem.TOO_LONG, ok(minutes = 180))
+    }
+
+    @Test fun busyBlocksAndOthersStopIt() {
+        val busy = sync.copy(busy = listOf(Busy("Campo 1", mon(14, 30), mon(15, 30))))
+        assertEquals(BookingProblem.TAKEN, ok(s = busy))
+        assertNull(ok(s = busy, court = "Campo 2"))
+        val other = listOf(OnlineBooking("x", "Campo 1", mon(15), 60, "p2", "Altro"))
+        assertEquals(BookingProblem.TAKEN, ok(b = other))
+        val course = CourtBlock("k", "Corso", BlockReason.COURSE, emptyList(), mon(0), mon(0, plusDays = 30), setOf(1), 14 * 60, 17 * 60)
+        assertEquals(BookingProblem.BLOCKED, ok(s = sync.copy(blocks = listOf(course))))
+        assertNull(ok(s = sync.copy(blocks = listOf(course)), start = mon(15, plusDays = 1)))
+    }
+
+    @Test fun tooManyFutureBookings() {
+        val mine = listOf(
+            OnlineBooking("a", "Campo 2", mon(11), 60, "p1", "Io"),
+            OnlineBooking("b", "Campo 2", mon(12), 60, "p1", "Io"),
+        )
+        assertEquals(BookingProblem.TOO_MANY, ok(b = mine))
+        // Una già giocata non conta.
+        assertNull(ok(b = mine.mapIndexed { i, x -> if (i == 0) x.copy(start = mon(8)) else x }))
+    }
+
+    @Test fun priceAndLightsLikeTheOffice() {
+        val b = CourtOnline.make(sync, "n", "p1", "Io", "Campo 1", mon(17), 120, heating = true, now = now)
+        assertEquals(1000 + 1500, b.cents)
+        assertEquals(true, b.lights)
+        assertEquals(false, b.heating)
+    }
+
+    @Test fun cancelOnlyYoursAndInTime() {
+        val list = listOf(OnlineBooking("a", "Campo 1", mon(15, plusDays = 2), 60, "p1", "Io"), OnlineBooking("b", "Campo 1", mon(15), 60, "p1", "Io"))
+        assertNull(CourtOnline.checkCancel(sync, list, "p1", "a", now))
+        assertEquals(CancelProblem.TOO_LATE, CourtOnline.checkCancel(sync, list, "p1", "b", now))
+        assertEquals(CancelProblem.NOT_YOURS, CourtOnline.checkCancel(sync, list, "p2", "a", now))
+        assertEquals(CancelProblem.NOT_FOUND, CourtOnline.checkCancel(sync, list, "p1", "z", now))
+    }
+
+    @Test fun gridHidesWhoBooked() {
+        val s = sync.copy(busy = listOf(Busy("Campo 2", mon(16), mon(17))))
+        val list = listOf(OnlineBooking("m", "Campo 1", mon(15), 60, "p1", "Io"), OnlineBooking("o", "Campo 1", mon(16), 60, "p2", "Altro"))
+        val g = CourtOnline.grid(s, list, "p1", mon(0), now)
+        assertEquals(2 * 14, g.size)
+        fun at(c: String, h: Int) = g.first { it.court == c && it.start == mon(h) }
+        assertEquals(CellState.PAST, at("Campo 1", 9).state)
+        assertEquals(CellState.MINE, at("Campo 1", 15).state)
+        assertEquals("m", at("Campo 1", 15).booking)
+        assertEquals(CellState.BUSY, at("Campo 1", 16).state)
+        assertNull(at("Campo 1", 16).booking)
+        assertEquals(CellState.BUSY, at("Campo 2", 16).state)
+        assertEquals(CellState.FREE, at("Campo 2", 15).state)
+    }
 }
 TSM_EOF
 
@@ -69400,6 +69773,7 @@ media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 TSM_EOF
@@ -70540,6 +70914,1913 @@ if "%OS%"=="Windows_NT" endlocal
 :omega
 TSM_EOF
 
+# ---------------------------------------------------------------- server/.gitignore
+cat > "$DEST/server/.gitignore" << 'TSM_EOF'
+/build
+TSM_EOF
+
+# ---------------------------------------------------------------- server/build.gradle.kts
+cat > "$DEST/server/build.gradle.kts" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// Il server del circolo (facoltativo): i giocatori invitati prenotano i campi dall'app o dalla pagina web
+// (anche da iPhone), la segreteria gli manda il planning. Usa solo il JDK (com.sun.net.httpserver) e
+// kotlinx.serialization: un solo file jar, leggero abbastanza per un Raspberry Pi Zero 2 W.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    application
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+}
+
+application {
+    mainClass.set("com.tennis.scoremanager.server.MainKt")
+    applicationName = "tsm-server"
+}
+
+dependencies {
+    implementation(project(":courtcore"))
+    testImplementation(libs.junit)
+}
+
+// tsm-server.jar con dentro tutto: si lancia con "java -jar tsm-server.jar".
+val fatJar by tasks.registering(Jar::class) {
+    archiveFileName.set("tsm-server.jar")
+    manifest { attributes["Main-Class"] = "com.tennis.scoremanager.server.MainKt" }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({ configurations.runtimeClasspath.get().filter { it.name.endsWith(".jar") }.map { zipTree(it) } }) {
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/versions/*/module-info.class", "module-info.class")
+    }
+}
+tasks.named("assemble") { dependsOn(fatJar) }
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Api.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/Api.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.Cell
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.CourtInfo
+import com.tennis.scoremanager.data.CourtOnline
+import com.tennis.scoremanager.data.OnlineBooking
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+
+const val API_VERSION = 1
+
+@Serializable data class ErrorOut(val error: String)
+@Serializable data class InfoOut(val club: String, val api: Int, val paired: Boolean, val synced: Boolean, val timeZone: String, val payInfo: String)
+@Serializable data class CodeIn(val code: String)
+@Serializable data class TokenOut(val token: String, val name: String = "", val player: String = "")
+@Serializable data class InviteIn(val player: String, val name: String, val days: Int = 14)
+@Serializable data class InviteOut(val code: String, val expires: Long)
+@Serializable data class MyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)
+@Serializable data class MeOut(
+    val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
+    /** I giorni prenotabili (yyyy-MM-dd nel fuso del circolo), da oggi. */
+    val days: List<String>, val bookings: List<MyBooking>,
+)
+@Serializable data class DayOut(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
+@Serializable data class BookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
+@Serializable data class PlayerOut(val id: String, val name: String, val since: Long, val lastSeen: Long, val devices: Int)
+@Serializable data class AdminOut(val syncedAt: Long, val bookings: List<OnlineBooking>, val players: List<PlayerOut>)
+@Serializable data class QuoteOut(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
+@Serializable data class OkOut(val ok: Boolean = true)
+
+/** Una risposta: codice HTTP e corpo JSON. */
+data class Resp(val status: Int, val body: String)
+
+/** Una richiesta già letta: metodo, percorso, parametri, corpo, chiave (Authorization: Bearer) e indirizzo. */
+data class Req(val method: String, val path: String, val query: Map<String, String> = emptyMap(), val body: String = "", val token: String? = null, val ip: String = "")
+
+class ApiError(val status: Int, val code: String) : Exception(code)
+
+/**
+ * Le chiamate del server, /api/v1/…: la segreteria si abbina col codice di setup, manda il planning e crea gli
+ * inviti; i giocatori usano l'invito, guardano i giorni e prenotano o disdicono.
+ */
+class Api(private val store: Store, private val limiter: Limiter = Limiter()) {
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
+
+    private fun <T> ok(ser: KSerializer<T>, v: T, status: Int = 200) = Resp(status, json.encodeToString(ser, v))
+    private fun <T> read(ser: KSerializer<T>, r: Req): T =
+        try { json.decodeFromString(ser, r.body) } catch (_: Exception) { throw ApiError(400, "BAD_REQUEST") }
+
+    fun handle(r: Req): Resp = try {
+        route(r)
+    } catch (e: ApiError) {
+        Resp(e.status, json.encodeToString(ErrorOut.serializer(), ErrorOut(e.code)))
+    }
+
+    private fun route(r: Req): Resp {
+        val p = r.path.removePrefix("/api/v1").trimEnd('/').split('/').filter { it.isNotEmpty() }
+        return when {
+            r.method == "GET" && p == listOf("info") -> info()
+            r.method == "POST" && p == listOf("admin", "pair") -> pair(r)
+            r.method == "PUT" && p == listOf("admin", "sync") -> { admin(r); sync(r) }
+            r.method == "GET" && p == listOf("admin", "state") -> { admin(r); adminState() }
+            r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
+            r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
+            r.method == "POST" && p == listOf("claim") -> claim(r)
+            r.method == "GET" && p == listOf("me") -> me(player(r))
+            r.method == "GET" && p == listOf("day") -> day(player(r), r.query["date"])
+            r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
+            r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
+            r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
+            r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
+            else -> throw ApiError(404, "NOT_FOUND")
+        }
+    }
+
+    // --- Chiavi ---
+
+    private fun guard(r: Req) { if (limiter.blocked(r.ip)) throw ApiError(429, "TOO_MANY_TRIES") }
+
+    private fun admin(r: Req) {
+        guard(r)
+        val a = store.state.admin
+        if (a == null || r.token == null || Secrets.hash(r.token) != a) { limiter.fail(r.ip); throw ApiError(401, "UNAUTHORIZED") }
+    }
+
+    private fun player(r: Req): Player {
+        guard(r)
+        val h = r.token?.let(Secrets::hash)
+        val pl = h?.let { t -> store.state.players.firstOrNull { t in it.tokens } }
+        if (pl == null) { limiter.fail(r.ip); throw ApiError(401, "UNAUTHORIZED") }
+        val now = store.now()
+        // L'ultimo accesso, al più una volta l'ora per non riscrivere il file a ogni pagina.
+        if (now - pl.lastSeen > 3_600_000L) store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(lastSeen = now) else it }) to Unit }
+        return pl
+    }
+
+    // --- Segreteria ---
+
+    private fun info(): Resp {
+        val s = store.state
+        return ok(InfoOut.serializer(), InfoOut(s.sync.club, API_VERSION, s.admin != null, s.syncedAt > 0, s.sync.timeZone, s.sync.payInfo))
+    }
+
+    private fun pair(r: Req): Resp {
+        guard(r)
+        val code = Secrets.normalize(read(CodeIn.serializer(), r).code)
+        val token = Secrets.token()
+        val done = store.update { s ->
+            if (s.setup == null || Secrets.hash(code) != s.setup) s to false
+            else s.copy(admin = Secrets.hash(token), setup = null) to true
+        }
+        if (!done) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
+        store.forgetSetupCode()
+        return ok(TokenOut.serializer(), TokenOut(token))
+    }
+
+    private fun sync(r: Req): Resp {
+        val sync = read(ClubSync.serializer(), r)
+        if (sync.timeZone !in java.util.TimeZone.getAvailableIDs()) throw ApiError(400, "BAD_TIME_ZONE")
+        Store.applyTimeZone(sync.timeZone)
+        val now = store.now()
+        store.update { s ->
+            s.copy(
+                sync = sync, syncedAt = now,
+                // Le prenotazioni finite da più di 60 giorni e gli inviti scaduti non servono più.
+                bookings = s.bookings.filter { it.end > now - 60L * 86_400_000L },
+                invites = s.invites.filter { it.expires > now },
+            ) to Unit
+        }
+        return adminState()
+    }
+
+    private fun adminState(): Resp {
+        val s = store.state
+        return ok(AdminOut.serializer(), AdminOut(s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { PlayerOut(it.id, it.name, it.since, it.lastSeen, it.tokens.size) }))
+    }
+
+    private fun invite(r: Req): Resp {
+        val i = read(InviteIn.serializer(), r)
+        if (i.player.isBlank() || i.name.isBlank()) throw ApiError(400, "BAD_REQUEST")
+        val code = Secrets.code()
+        val expires = store.now() + i.days.coerceIn(1, 90) * 86_400_000L
+        store.update { s ->
+            // Un nuovo invito per lo stesso giocatore sostituisce il vecchio.
+            s.copy(invites = s.invites.filter { it.player != i.player } + Invite(Secrets.hash(code), i.player, i.name.trim().take(60), expires)) to Unit
+        }
+        return ok(InviteOut.serializer(), InviteOut(code, expires))
+    }
+
+    private fun adminCancel(id: String): Resp {
+        val found = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.any { it.id == id } }
+        if (!found) throw ApiError(404, "NOT_FOUND")
+        return ok(OkOut.serializer(), OkOut())
+    }
+
+    /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
+    private fun removePlayer(id: String): Resp {
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }) to Unit }
+        return ok(OkOut.serializer(), OkOut())
+    }
+
+    // --- Giocatori ---
+
+    private fun claim(r: Req): Resp {
+        guard(r)
+        val h = Secrets.hash(Secrets.normalize(read(CodeIn.serializer(), r).code))
+        val token = Secrets.token()
+        val now = store.now()
+        val inv = store.update { s ->
+            val inv = s.invites.firstOrNull { it.code == h && it.expires > now } ?: return@update s to null
+            val old = s.players.firstOrNull { it.id == inv.player }
+            // Fino a tre telefoni per giocatore: il quarto manda fuori il più vecchio.
+            val pl = (old ?: Player(inv.player, inv.name, since = now)).let { it.copy(name = inv.name, tokens = (it.tokens + Secrets.hash(token)).takeLast(3), lastSeen = now) }
+            s.copy(players = s.players.filter { it.id != pl.id } + pl, invites = s.invites - inv) to inv
+        }
+        if (inv == null) { limiter.fail(r.ip); throw ApiError(403, "BAD_CODE") }
+        return ok(TokenOut.serializer(), TokenOut(token, inv.name, inv.player))
+    }
+
+    private fun zone(): ZoneId = ZoneId.of(store.state.sync.timeZone)
+
+    private fun mine(pl: Player, b: OnlineBooking, now: Long) = MyBooking(
+        b.id, b.court, b.start, b.minutes, b.cents, b.lights, b.heating,
+        canCancel = CourtOnline.checkCancel(store.state.sync, store.state.bookings, pl.id, b.id, now) == null,
+    )
+
+    private fun me(pl: Player): Resp {
+        val s = store.state
+        val now = store.now()
+        val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
+        val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
+        return ok(MeOut.serializer(), MeOut(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }))
+    }
+
+    private fun day(pl: Player, date: String?): Resp {
+        val s = store.state
+        if (s.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val d = try { LocalDate.parse(date ?: "") } catch (_: Exception) { throw ApiError(400, "BAD_DATE") }
+        val day = d.atStartOfDay(zone()).toInstant().toEpochMilli()
+        val courts = CourtOnline.bookableCourts(s.sync).map { s.sync.settings.info(it).copy(photos = emptyList()) }
+        return ok(DayOut.serializer(), DayOut(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now())))
+    }
+
+    /** Quanto costerebbe e se si può fare, prima di confermare. */
+    private fun quote(pl: Player, q: Map<String, String>): Resp {
+        val s = store.state
+        if (s.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val court = q["court"] ?: throw ApiError(400, "BAD_REQUEST")
+        val start = q["start"]?.toLongOrNull() ?: throw ApiError(400, "BAD_REQUEST")
+        val minutes = q["minutes"]?.toIntOrNull() ?: throw ApiError(400, "BAD_REQUEST")
+        val now = store.now()
+        val b = CourtOnline.make(s.sync, "", pl.id, pl.name, court, start, minutes, q["heating"] == "true", now)
+        return ok(QuoteOut.serializer(), QuoteOut(b.cents, b.lights, b.heating, CourtOnline.check(s.sync, s.bookings, pl.id, court, start, minutes, now)?.name))
+    }
+
+    private fun book(pl: Player, r: Req): Resp {
+        val b = read(BookIn.serializer(), r)
+        if (store.state.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val now = store.now()
+        // Controllo e salvataggio insieme: due giocatori sulla stessa casella, uno solo la prende.
+        val res = store.update { s ->
+            val problem = CourtOnline.check(s.sync, s.bookings, pl.id, b.court, b.start, b.minutes, now)
+            if (problem != null) s to Result.failure(ApiError(409, problem.name))
+            else {
+                val nb = CourtOnline.make(s.sync, Secrets.id("w"), pl.id, pl.name, b.court, b.start, b.minutes, b.heating, now)
+                s.copy(bookings = s.bookings + nb) to Result.success(nb)
+            }
+        }
+        val nb = res.getOrElse { throw it }
+        return ok(MyBooking.serializer(), mine(pl, nb, now), 201)
+    }
+
+    private fun cancel(pl: Player, id: String): Resp {
+        val now = store.now()
+        val problem = store.update { s ->
+            val p = CourtOnline.checkCancel(s.sync, s.bookings, pl.id, id, now)
+            (if (p == null) s.copy(bookings = s.bookings.filter { it.id != id }) else s) to p
+        }
+        if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
+        return ok(OkOut.serializer(), OkOut())
+    }
+
+    private fun logout(pl: Player, token: String): Resp {
+        val h = Secrets.hash(token)
+        store.update { s -> s.copy(players = s.players.map { if (it.id == pl.id) it.copy(tokens = it.tokens - h) else it }) to Unit }
+        return ok(OkOut.serializer(), OkOut())
+    }
+}
+
+/** Troppi tentativi sbagliati dallo stesso indirizzo: 20 in 15 minuti, poi si aspetta. */
+class Limiter(private val max: Int = 20, private val windowMs: Long = 15 * 60_000L, private val clock: () -> Long = System::currentTimeMillis) {
+    private val fails = HashMap<String, MutableList<Long>>()
+
+    @Synchronized fun fail(ip: String) { fails.getOrPut(ip) { mutableListOf() } += clock() }
+
+    @Synchronized fun blocked(ip: String): Boolean {
+        val now = clock()
+        val list = fails[ip] ?: return false
+        list.removeAll { now - it > windowMs }
+        if (list.isEmpty()) fails.remove(ip)
+        return list.size >= max
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Main.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/Main.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpServer
+import java.io.File
+import java.net.InetSocketAddress
+import java.net.URLDecoder
+import java.util.concurrent.Executors
+
+private const val MAX_BODY = 512 * 1024
+
+private val USAGE = """
+    TSM – server del circolo per le prenotazioni dei campi
+
+    java -jar tsm-server.jar [--host 0.0.0.0] [--port 8080] [--data /var/lib/tsm-server] [--reset-admin]
+
+      --host         l'indirizzo su cui ascoltare (127.0.0.1 se davanti c'è Caddy per l'HTTPS)
+      --port         la porta (8080)
+      --data         la cartella dei dati: state.json e setup-code.txt
+      --reset-admin  nuovo codice di abbinamento per la segreteria (quella vecchia non entra più)
+""".trimIndent()
+
+fun main(args: Array<String>) {
+    val opts = args.toList()
+    fun opt(name: String, def: String) = opts.indexOf(name).takeIf { it >= 0 && it + 1 < opts.size }?.let { opts[it + 1] } ?: def
+    if ("--help" in opts || "-h" in opts) { println(USAGE); return }
+    val host = opt("--host", "0.0.0.0")
+    val port = opt("--port", "8080").toInt()
+    val data = File(opt("--data", System.getenv("TSM_DATA") ?: "tsm-data"))
+
+    val store = Store(data)
+    store.ensureSetupCode(reset = "--reset-admin" in opts)?.let { code ->
+        println("Codice per abbinare la segreteria: $code (anche in ${File(data, Store.SETUP_FILE).path})")
+        println("Nell'app: Planning campi › Server del circolo › Abbina.")
+    }
+    val server = start(store, host, port)
+    println("Server del circolo su http://$host:$port (dati in ${data.absolutePath})")
+    Runtime.getRuntime().addShutdownHook(Thread { server.stop(1) })
+}
+
+/** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
+fun start(store: Store, host: String, port: Int): HttpServer {
+    val api = Api(store)
+    val server = HttpServer.create(InetSocketAddress(host, port), 0)
+    server.executor = Executors.newFixedThreadPool(4)
+    server.createContext("/") { ex ->
+        try {
+            if (ex.requestURI.path.startsWith("/api/")) serveApi(api, ex) else serveStatic(ex)
+        } catch (e: Exception) {
+            System.err.println("Errore su ${ex.requestURI}: $e")
+            runCatching { send(ex, 500, "{\"error\":\"SERVER\"}".toByteArray(), "application/json") }
+        } finally {
+            ex.close()
+        }
+    }
+    server.start()
+    return server
+}
+
+/** L'indirizzo di chi chiama; dietro Caddy (che chiama da 127.0.0.1) quello che Caddy dice in X-Forwarded-For. */
+private fun clientIp(ex: HttpExchange): String {
+    val direct = ex.remoteAddress.address
+    val fwd = ex.requestHeaders.getFirst("X-Forwarded-For")?.split(',')?.lastOrNull()?.trim()
+    return if (direct.isLoopbackAddress && !fwd.isNullOrBlank()) fwd else direct.hostAddress
+}
+
+private fun serveApi(api: Api, ex: HttpExchange) {
+    val body = ex.requestBody.use { it.readNBytes(MAX_BODY + 1) }
+    if (body.size > MAX_BODY) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
+    val query = ex.requestURI.rawQuery.orEmpty().split('&').filter { '=' in it }.associate {
+        val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
+    }
+    val token = ex.requestHeaders.getFirst("Authorization")?.takeIf { it.startsWith("Bearer ") }?.removePrefix("Bearer ")?.trim()
+    val r = api.handle(Req(ex.requestMethod, ex.requestURI.path, query, body.toString(Charsets.UTF_8), token, clientIp(ex)))
+    ex.responseHeaders.add("Cache-Control", "no-store")
+    send(ex, r.status, r.body.toByteArray(), "application/json; charset=utf-8")
+}
+
+private val TYPES = mapOf(
+    "html" to "text/html; charset=utf-8", "js" to "text/javascript; charset=utf-8", "css" to "text/css; charset=utf-8",
+    "webmanifest" to "application/manifest+json", "json" to "application/json", "svg" to "image/svg+xml", "png" to "image/png",
+)
+
+/** I file della pagina web, dentro il jar (cartella web). */
+private fun serveStatic(ex: HttpExchange) {
+    if (ex.requestMethod != "GET" && ex.requestMethod != "HEAD") { send(ex, 405, ByteArray(0), "text/plain"); return }
+    val path = ex.requestURI.path.trimStart('/').ifEmpty { "index.html" }
+    if (path.contains("..") || !path.matches(Regex("[A-Za-z0-9._/-]+"))) { send(ex, 404, ByteArray(0), "text/plain"); return }
+    val bytes = Api::class.java.getResourceAsStream("/web/$path")?.use { it.readBytes() }
+    if (bytes == null) { send(ex, 404, "Not found".toByteArray(), "text/plain"); return }
+    ex.responseHeaders.add("Cache-Control", "no-cache")
+    send(ex, 200, bytes, TYPES[path.substringAfterLast('.')] ?: "application/octet-stream")
+}
+
+private fun send(ex: HttpExchange, status: Int, bytes: ByteArray, type: String) {
+    ex.responseHeaders.apply {
+        set("Content-Type", type)
+        set("X-Content-Type-Options", "nosniff")
+        set("Referrer-Policy", "no-referrer")
+        set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; frame-ancestors 'none'")
+    }
+    if (ex.requestMethod == "HEAD") { ex.sendResponseHeaders(status, -1); return }
+    ex.sendResponseHeaders(status, if (bytes.isEmpty()) -1 else bytes.size.toLong())
+    if (bytes.isNotEmpty()) ex.responseBody.use { it.write(bytes) }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Store.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/Store.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.OnlineBooking
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.Base64
+import java.util.TimeZone
+
+/** Un giocatore invitato: [id] è il suo id nel database dell'app; [tokens] le impronte delle chiavi dei suoi telefoni. */
+@Serializable
+data class Player(val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0)
+
+/** Un invito non ancora usato: si salva solo l'impronta del codice. */
+@Serializable
+data class Invite(val code: String, val player: String, val name: String, val expires: Long)
+
+/**
+ * Tutto quello che il server ricorda, in un solo file JSON. Codici e chiavi non ci sono mai in chiaro: solo le
+ * loro impronte SHA-256.
+ */
+@Serializable
+data class State(
+    /** L'impronta della chiave della segreteria (null = non ancora abbinata). */
+    val admin: String? = null,
+    /** L'impronta del codice di abbinamento della segreteria, finché non la si abbina. */
+    val setup: String? = null,
+    val sync: ClubSync = ClubSync(),
+    val syncedAt: Long = 0,
+    val players: List<Player> = emptyList(),
+    val invites: List<Invite> = emptyList(),
+    val bookings: List<OnlineBooking> = emptyList(),
+)
+
+object Secrets {
+    private val rnd = SecureRandom()
+    /** Lettere e cifre che non si confondono (niente 0/O, 1/I/L). */
+    private const val ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
+    fun token(): String = ByteArray(32).also { rnd.nextBytes(it) }.let { Base64.getUrlEncoder().withoutPadding().encodeToString(it) }
+
+    fun code(len: Int = 10): String = buildString { repeat(len) { append(ALPHABET[rnd.nextInt(ALPHABET.length)]) } }
+
+    /** Il codice scritto dall'utente: maiuscolo, senza spazi né trattini. */
+    fun normalize(code: String): String = code.uppercase().filter { it.isLetterOrDigit() }
+
+    fun hash(s: String): String = MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString("") { "%02x".format(it) }
+
+    fun id(prefix: String): String = prefix + token().take(12)
+}
+
+/** Lo stato su disco, cambiato un passo alla volta e riscritto con file temporaneo e rinomina. */
+class Store(val dir: File, private val clock: () -> Long = System::currentTimeMillis) {
+    private val file = File(dir, "state.json")
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = true }
+
+    @Volatile var state: State = load()
+        private set
+
+    init { applyTimeZone(state.sync.timeZone) }
+
+    fun now(): Long = clock()
+
+    private fun load(): State {
+        dir.mkdirs()
+        if (!file.exists()) return State()
+        return json.decodeFromString(State.serializer(), file.readText())
+    }
+
+    @Synchronized
+    fun <T> update(f: (State) -> Pair<State, T>): T {
+        val (next, out) = f(state)
+        if (next != state) {
+            val tmp = File(dir, "state.json.tmp")
+            tmp.writeText(json.encodeToString(State.serializer(), next))
+            if (!tmp.renameTo(file)) { file.delete(); check(tmp.renameTo(file)) { "non riesco a scrivere ${file.path}" } }
+            state = next
+        }
+        return out
+    }
+
+    /** Il codice per abbinare la segreteria: nuovo se la segreteria non c'è, scritto in setup-code.txt. */
+    fun ensureSetupCode(reset: Boolean = false): String? {
+        if (state.admin != null && !reset) return null
+        val code = Secrets.code()
+        update { it.copy(admin = null, setup = Secrets.hash(code)) to Unit }
+        File(dir, SETUP_FILE).apply {
+            writeText("$code\n")
+            setReadable(false, false); setReadable(true, true)
+        }
+        return code
+    }
+
+    fun forgetSetupCode() { File(dir, SETUP_FILE).delete() }
+
+    companion object {
+        const val SETUP_FILE = "setup-code.txt"
+
+        fun applyTimeZone(id: String) {
+            if (id in TimeZone.getAvailableIDs()) TimeZone.setDefault(TimeZone.getTimeZone(id))
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/app.js
+cat > "$DEST/server/src/main/resources/web/app.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// La pagina per prenotare i campi dal telefono (anche iPhone): invito, giorni, caselle libere, prenota e disdici.
+// Parla solo col server del circolo che la serve (/api/v1); la chiave del telefono resta nel telefono.
+
+const KEY = 'tsm.token';
+const state = { token: null, me: null, date: null, day: null };
+
+function load(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+function save(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (_) { /* senza memoria resta per questa visita */ } }
+
+/** Un elemento: el('div', {class: 'x', onclick: f}, 'testo', figlio…). I testi non diventano mai HTML. */
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'class') e.className = v;
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) e.append(c instanceof Node ? c : String(c));
+  return e;
+}
+const $ = id => document.getElementById(id);
+
+class ApiErr extends Error { constructor(code, status) { super(code); this.code = code; this.status = status; } }
+
+async function api(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (state.token) headers.Authorization = 'Bearer ' + state.token;
+  let r;
+  try {
+    r = await fetch('/api/v1' + path, { method, headers, body: body ? JSON.stringify(body) : undefined, cache: 'no-store' });
+  } catch (_) { throw new ApiErr('OFFLINE', 0); }
+  let data = null;
+  try { data = await r.json(); } catch (_) { /* nessun corpo */ }
+  if (!r.ok) throw new ApiErr((data && data.error) || 'generic', r.status);
+  return data;
+}
+
+function errText(e) {
+  if (e && e.code === 'OFFLINE') return T.offline;
+  return (e && T.err[e.code]) || T.err.generic;
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+}
+
+// --- Date e soldi, sempre nel fuso del circolo ---
+
+function tz() { return (state.me && state.me.timeZone) || 'Europe/Rome'; }
+function fmtTime(ms) { return new Intl.DateTimeFormat(LANG, { hour: '2-digit', minute: '2-digit', timeZone: tz() }).format(new Date(ms)); }
+function fmtWhen(ms) { return new Intl.DateTimeFormat(LANG, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: tz() }).format(new Date(ms)); }
+/** "2026-11-09" → [lun, 9 nov]: la data è già quella del circolo, la si mostra così com'è. */
+function fmtDate(d) {
+  const [y, m, dd] = d.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, dd, 12));
+  return [new Intl.DateTimeFormat(LANG, { weekday: 'short', timeZone: 'UTC' }).format(dt), new Intl.DateTimeFormat(LANG, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(dt)];
+}
+function money(c) { return c > 0 ? new Intl.NumberFormat(LANG, { style: 'currency', currency: 'EUR' }).format(c / 100) : T.free; }
+
+// --- Schermate ---
+
+function setHeader() {
+  document.title = T.title;
+  $('club').textContent = (state.me && state.me.club) || T.title;
+  $('who').textContent = state.me ? state.me.name : '';
+  const lo = $('logout'); lo.textContent = T.logout; lo.hidden = !state.token;
+}
+
+function showInvite(error) {
+  state.me = null; setHeader();
+  const input = el('input', { class: 'code', id: 'code', autocomplete: 'one-time-code', autocapitalize: 'characters', spellcheck: 'false', maxlength: '16' });
+  const msg = el('p', { class: 'error' }, error || '');
+  const go = async () => {
+    const code = input.value.trim();
+    if (!code) return;
+    try { await claim(code); } catch (e) { msg.textContent = errText(e); }
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  $('app').replaceChildren(
+    el('div', { class: 'card' },
+      el('h3', null, T.welcome),
+      el('p', { class: 'dim' }, T.inviteText),
+      el('label', { for: 'code' }, T.code), input, msg,
+      el('div', { class: 'actions' }, el('button', { onclick: go }, T.enter))),
+    el('p', { class: 'tip' }, T.install));
+  input.focus();
+}
+
+async function claim(code) {
+  const r = await api('POST', '/claim', { code });
+  state.token = r.token; save(KEY, r.token);
+  await refresh();
+}
+
+async function refresh() {
+  try {
+    state.me = await api('GET', '/me');
+  } catch (e) {
+    if (e.status === 401) { state.token = null; save(KEY, null); showInvite(errText(e)); return; }
+    $('app').replaceChildren(el('p', { class: 'error center' }, errText(e)), el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: refresh }, '↻')));
+    return;
+  }
+  if (!state.date || !state.me.days.includes(state.date)) state.date = state.me.days[0];
+  setHeader();
+  await loadDay();
+}
+
+async function loadDay() {
+  try {
+    state.day = await api('GET', '/day?date=' + encodeURIComponent(state.date));
+  } catch (e) {
+    state.day = null;
+    render(errText(e));
+    return;
+  }
+  render();
+}
+
+function render(dayError) {
+  const me = state.me, r = me.rules;
+  const mine = me.bookings.length === 0 ? [el('p', { class: 'dim' }, T.none)] : me.bookings.map(b =>
+    el('div', { class: 'card row' },
+      el('div', { class: 'grow' },
+        el('div', null, el('b', null, b.court), ' · ', fmtWhen(b.start), '–', fmtTime(b.start + b.minutes * 60000)),
+        el('div', { class: 'dim' }, money(b.cents), b.lights ? ' · ' + T.lights : '', b.heating ? ' · ' + T.heating : '')),
+      el('button', { class: 'danger small', onclick: () => askCancel(b) }, T.cancel)));
+
+  const days = el('div', { class: 'days' }, me.days.map((d, i) => {
+    const [wd, dm] = fmtDate(d);
+    return el('button', { class: d === state.date ? 'on' : '', onclick: () => { state.date = d; loadDay(); } }, i === 0 ? T.today : wd, el('small', null, dm));
+  }));
+
+  const parts = [
+    el('h2', null, T.mine), ...mine,
+    el('h2', null, T.day), days,
+  ];
+  if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
+  if (dayError) parts.push(el('p', { class: 'error' }, dayError));
+  else if (state.day) parts.push(grid(state.day));
+  parts.push(
+    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
+    el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
+  );
+  $('app').replaceChildren(...parts);
+}
+
+function courtLine(c) {
+  return [c.surface ? T[c.surface] : '', c.covered ? T.covered : T.outdoor].filter(Boolean).join(' · ');
+}
+
+function grid(day) {
+  const starts = [...new Set(day.cells.map(c => c.start))].sort((a, b) => a - b);
+  const byKey = new Map(day.cells.map(c => [c.court + '|' + c.start, c]));
+  const head = el('tr', null, el('th', null, ''), day.courts.map(c => el('th', null, c.name, el('small', null, courtLine(c)))));
+  const rows = starts.map(s => el('tr', null,
+    el('td', { class: 'time' }, fmtTime(s)),
+    day.courts.map(c => {
+      const cell = byKey.get(c.name + '|' + s);
+      if (!cell) return el('td');
+      const click = cell.state === 'FREE' && day.open ? () => openBook(c, s)
+        : cell.state === 'MINE' ? () => { const b = state.me.bookings.find(x => x.id === cell.booking); if (b) askCancel(b); } : null;
+      return el('td', null, el('button', { class: 'cell ' + cell.state, onclick: click, disabled: !click, 'aria-label': c.name + ' ' + fmtTime(s) + ' ' + T[cell.state] }, T[cell.state]));
+    })));
+  return el('div', { class: 'grid-wrap' }, el('table', { class: 'grid' }, el('thead', null, head), el('tbody', null, rows)));
+}
+
+// --- Prenota e disdici ---
+
+function sheet(...kids) { $('sheet-box').replaceChildren(...kids); $('sheet').hidden = false; }
+function closeSheet() { $('sheet').hidden = true; }
+
+function openBook(court, start) {
+  const step = state.day.slotMinutes, max = Math.max(state.me.rules.maxMinutes, step);
+  const opts = []; for (let m = step; m <= max; m += step) opts.push(m);
+  const dur = el('select', { id: 'dur' }, opts.map(m => el('option', { value: m }, m % 60 === 0 ? (m / 60) + ' h' : m + ' min')));
+  const heat = court.heating ? el('input', { type: 'checkbox', id: 'heat' }) : null;
+  const price = el('div', { class: 'price' }, '…');
+  const info = el('p', { class: 'dim' });
+  const err = el('p', { class: 'error' });
+  const ok = el('button', { disabled: true }, T.confirm);
+  let seq = 0;
+  const quote = async () => {
+    const my = ++seq; ok.disabled = true; err.textContent = '';
+    const q = '/quote?court=' + encodeURIComponent(court.name) + '&start=' + start + '&minutes=' + dur.value + '&heating=' + (heat ? heat.checked : false);
+    try {
+      const r = await api('GET', q);
+      if (my !== seq) return;
+      price.textContent = money(r.cents);
+      info.textContent = r.lights ? T.lights : '';
+      if (r.problem) err.textContent = T.err[r.problem] || T.err.generic; else ok.disabled = false;
+    } catch (e) { if (my === seq) err.textContent = errText(e); }
+  };
+  dur.addEventListener('change', quote);
+  if (heat) heat.addEventListener('change', quote);
+  ok.addEventListener('click', async () => {
+    ok.disabled = true;
+    try {
+      await api('POST', '/bookings', { court: court.name, start, minutes: Number(dur.value), heating: heat ? heat.checked : false });
+      closeSheet(); toast(T.booked); await refresh();
+    } catch (e) { err.textContent = errText(e); if (e.code === 'TAKEN') loadDay(); }
+  });
+  sheet(
+    el('h3', null, court.name), el('div', { class: 'dim' }, fmtWhen(start)),
+    el('label', { for: 'dur' }, T.duration), dur,
+    heat ? el('label', { class: 'check' }, heat, T.heating) : null,
+    el('label', null, T.price), price, info, err,
+    state.me.payInfo ? el('p', { class: 'dim' }, T.pay + ': ' + state.me.payInfo) : null,
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), ok));
+  quote();
+}
+
+function askCancel(b) {
+  const err = el('p', { class: 'error' }, b.canCancel ? '' : T.callOffice);
+  const yes = el('button', { class: 'danger', disabled: !b.canCancel }, T.cancel);
+  yes.addEventListener('click', async () => {
+    yes.disabled = true;
+    try { await api('DELETE', '/bookings/' + encodeURIComponent(b.id)); closeSheet(); toast(T.cancelled); await refresh(); }
+    catch (e) { err.textContent = errText(e); }
+  });
+  sheet(
+    el('h3', null, T.cancelAsk), el('p', null, el('b', null, b.court), ' · ', fmtWhen(b.start)), err,
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), yes));
+}
+
+// --- Avvio ---
+
+$('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+$('logout').addEventListener('click', async () => {
+  if (!confirm(T.logoutAsk)) return;
+  try { await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
+  state.token = null; save(KEY, null); showInvite();
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(); });
+setInterval(() => { if (!document.hidden && state.me && $('sheet').hidden) loadDay(); }, 60000);
+if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+(async () => {
+  setHeader();
+  state.token = load(KEY);
+  // Il link del QR: https://circolo/#i=CODICE (dopo il # non arriva al server né nei log).
+  const m = location.hash.match(/[#&]i=([A-Za-z0-9-]+)/);
+  if (m) {
+    history.replaceState(null, '', location.pathname);
+    try { await claim(m[1]); return; } catch (e) { showInvite(errText(e)); return; }
+  }
+  if (state.token) await refresh(); else showInvite();
+})();
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/i18n.js
+cat > "$DEST/server/src/main/resources/web/i18n.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// I testi della pagina nelle lingue dell'app; si sceglie quella del telefono (italiano se manca).
+const I18N = {
+  it: {
+    title: 'Prenota un campo', welcome: 'Benvenuto', inviteText: 'Scrivi il codice d\'invito che ti ha dato la segreteria del circolo (o apri il link del QR).',
+    code: 'Codice d\'invito', enter: 'Entra', logout: 'Esci', logoutAsk: 'Uscire da questo telefono? Per rientrare serve un nuovo invito.',
+    mine: 'Le tue prenotazioni', none: 'Nessuna prenotazione', cancel: 'Disdici', cancelAsk: 'Disdire questa prenotazione?', cancelled: 'Prenotazione disdetta',
+    callOffice: 'Per disdirla ora chiama la segreteria.', day: 'Scegli il giorno', courts: 'Campi',
+    FREE: 'Libero', BUSY: 'Occupato', MINE: 'Tuo', BLOCKED: 'Non prenotabile', PAST: '',
+    book: 'Prenota', confirm: 'Conferma', close: 'Chiudi', duration: 'Durata', heating: 'Riscaldamento', lights: 'Con le luci', price: 'Prezzo',
+    pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
+    notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
+    install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
+    rules: (d, n) => `Prenoti fino a ${d} giorni avanti, al massimo ${n} prenotazioni per volta.`,
+    cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
+    covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
+    err: {
+      CLOSED: 'Le prenotazioni online sono chiuse.', UNKNOWN_COURT: 'Questo campo non si prenota online.', PAST: 'Quest\'ora è già passata.',
+      TOO_SOON: 'È troppo tardi per prenotare quest\'ora: chiama la segreteria.', TOO_FAR: 'Non si può ancora prenotare questo giorno.',
+      NOT_SLOT: 'Scegli un orario del planning.', TOO_LONG: 'La prenotazione è troppo lunga.', BLOCKED: 'In quest\'ora il campo non è prenotabile.',
+      TAKEN: 'Qualcuno ha appena prenotato quest\'ora.', TOO_MANY: 'Hai già il massimo di prenotazioni: aspetta di giocarne una o disdicine una.',
+      BAD_CODE: 'Codice sbagliato o scaduto: chiedine uno nuovo alla segreteria.', TOO_MANY_TRIES: 'Troppi tentativi: riprova tra un quarto d\'ora.',
+      UNAUTHORIZED: 'Questo telefono non è più collegato: chiedi un nuovo invito alla segreteria.', TOO_LATE: 'È tardi per disdire da solo: chiama la segreteria.',
+      NOT_YOURS: 'Questa prenotazione non è tua.', NOT_FOUND: 'Prenotazione non trovata.', NOT_SYNCED: 'Il circolo non ha ancora pubblicato il planning.',
+      generic: 'Qualcosa non ha funzionato. Riprova.',
+    },
+  },
+  en: {
+    title: 'Book a court', welcome: 'Welcome', inviteText: 'Type the invitation code the club office gave you (or open the QR link).',
+    code: 'Invitation code', enter: 'Enter', logout: 'Sign out', logoutAsk: 'Sign out on this phone? You will need a new invitation to come back.',
+    mine: 'Your bookings', none: 'No bookings', cancel: 'Cancel', cancelAsk: 'Cancel this booking?', cancelled: 'Booking cancelled',
+    callOffice: 'To cancel it now, call the club office.', day: 'Pick the day', courts: 'Courts',
+    FREE: 'Free', BUSY: 'Taken', MINE: 'Yours', BLOCKED: 'Not bookable', PAST: '',
+    book: 'Book', confirm: 'Confirm', close: 'Close', duration: 'Length', heating: 'Heating', lights: 'With lights', price: 'Price',
+    pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
+    notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
+    install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
+    rules: (d, n) => `You can book up to ${d} days ahead, at most ${n} bookings at a time.`,
+    cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
+    covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
+    err: {
+      CLOSED: 'Online booking is closed.', UNKNOWN_COURT: 'This court cannot be booked online.', PAST: 'This time has already passed.',
+      TOO_SOON: 'It is too late to book this time: call the club office.', TOO_FAR: 'This day cannot be booked yet.',
+      NOT_SLOT: 'Pick a time from the schedule.', TOO_LONG: 'The booking is too long.', BLOCKED: 'The court cannot be booked at this time.',
+      TAKEN: 'Someone has just booked this time.', TOO_MANY: 'You already have the most bookings allowed: play one or cancel one first.',
+      BAD_CODE: 'Wrong or expired code: ask the club office for a new one.', TOO_MANY_TRIES: 'Too many attempts: try again in fifteen minutes.',
+      UNAUTHORIZED: 'This phone is no longer connected: ask the club office for a new invitation.', TOO_LATE: 'It is too late to cancel yourself: call the club office.',
+      NOT_YOURS: 'This booking is not yours.', NOT_FOUND: 'Booking not found.', NOT_SYNCED: 'The club has not published the schedule yet.',
+      generic: 'Something went wrong. Try again.',
+    },
+  },
+  fr: {
+    title: 'Réserver un terrain', welcome: 'Bienvenue', inviteText: 'Saisissez le code d\'invitation donné par le secrétariat du club (ou ouvrez le lien du QR).',
+    code: 'Code d\'invitation', enter: 'Entrer', logout: 'Se déconnecter', logoutAsk: 'Se déconnecter sur ce téléphone ? Il faudra une nouvelle invitation pour revenir.',
+    mine: 'Vos réservations', none: 'Aucune réservation', cancel: 'Annuler', cancelAsk: 'Annuler cette réservation ?', cancelled: 'Réservation annulée',
+    callOffice: 'Pour l\'annuler maintenant, appelez le secrétariat.', day: 'Choisissez le jour', courts: 'Terrains',
+    FREE: 'Libre', BUSY: 'Occupé', MINE: 'À vous', BLOCKED: 'Non réservable', PAST: '',
+    book: 'Réserver', confirm: 'Confirmer', close: 'Fermer', duration: 'Durée', heating: 'Chauffage', lights: 'Avec éclairage', price: 'Prix',
+    pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
+    notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
+    install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
+    rules: (d, n) => `Réservation jusqu'à ${d} jours à l'avance, ${n} réservations au maximum à la fois.`,
+    cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
+    covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
+    err: {
+      CLOSED: 'Les réservations en ligne sont fermées.', UNKNOWN_COURT: 'Ce terrain ne se réserve pas en ligne.', PAST: 'Cette heure est déjà passée.',
+      TOO_SOON: 'Il est trop tard pour réserver cette heure : appelez le secrétariat.', TOO_FAR: 'Ce jour n\'est pas encore réservable.',
+      NOT_SLOT: 'Choisissez un horaire du planning.', TOO_LONG: 'La réservation est trop longue.', BLOCKED: 'Le terrain n\'est pas réservable à cette heure.',
+      TAKEN: 'Quelqu\'un vient de réserver cette heure.', TOO_MANY: 'Vous avez déjà le maximum de réservations : jouez-en ou annulez-en une d\'abord.',
+      BAD_CODE: 'Code erroné ou expiré : demandez-en un nouveau au secrétariat.', TOO_MANY_TRIES: 'Trop de tentatives : réessayez dans un quart d\'heure.',
+      UNAUTHORIZED: 'Ce téléphone n\'est plus connecté : demandez une nouvelle invitation au secrétariat.', TOO_LATE: 'Il est trop tard pour annuler vous-même : appelez le secrétariat.',
+      NOT_YOURS: 'Cette réservation n\'est pas la vôtre.', NOT_FOUND: 'Réservation introuvable.', NOT_SYNCED: 'Le club n\'a pas encore publié le planning.',
+      generic: 'Un problème est survenu. Réessayez.',
+    },
+  },
+  de: {
+    title: 'Platz buchen', welcome: 'Willkommen', inviteText: 'Gib den Einladungscode ein, den du vom Vereinsbüro bekommen hast (oder öffne den Link des QR-Codes).',
+    code: 'Einladungscode', enter: 'Weiter', logout: 'Abmelden', logoutAsk: 'Auf diesem Handy abmelden? Zum Zurückkommen brauchst du eine neue Einladung.',
+    mine: 'Deine Buchungen', none: 'Keine Buchungen', cancel: 'Stornieren', cancelAsk: 'Diese Buchung stornieren?', cancelled: 'Buchung storniert',
+    callOffice: 'Um sie jetzt zu stornieren, ruf das Vereinsbüro an.', day: 'Tag wählen', courts: 'Plätze',
+    FREE: 'Frei', BUSY: 'Belegt', MINE: 'Deine', BLOCKED: 'Nicht buchbar', PAST: '',
+    book: 'Buchen', confirm: 'Bestätigen', close: 'Schließen', duration: 'Dauer', heating: 'Heizung', lights: 'Mit Licht', price: 'Preis',
+    pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
+    notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
+    install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
+    rules: (d, n) => `Buchbar bis ${d} Tage im Voraus, höchstens ${n} Buchungen gleichzeitig.`,
+    cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
+    covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
+    err: {
+      CLOSED: 'Online-Buchungen sind geschlossen.', UNKNOWN_COURT: 'Dieser Platz ist online nicht buchbar.', PAST: 'Diese Uhrzeit ist schon vorbei.',
+      TOO_SOON: 'Für diese Uhrzeit ist es zu spät: Ruf das Vereinsbüro an.', TOO_FAR: 'Dieser Tag ist noch nicht buchbar.',
+      NOT_SLOT: 'Wähle eine Uhrzeit aus dem Plan.', TOO_LONG: 'Die Buchung ist zu lang.', BLOCKED: 'Der Platz ist zu dieser Zeit nicht buchbar.',
+      TAKEN: 'Jemand hat diese Uhrzeit gerade gebucht.', TOO_MANY: 'Du hast schon die meisten erlaubten Buchungen: Spiel oder storniere zuerst eine.',
+      BAD_CODE: 'Falscher oder abgelaufener Code: Frag im Vereinsbüro nach einem neuen.', TOO_MANY_TRIES: 'Zu viele Versuche: Versuch es in einer Viertelstunde wieder.',
+      UNAUTHORIZED: 'Dieses Handy ist nicht mehr verbunden: Frag im Vereinsbüro nach einer neuen Einladung.', TOO_LATE: 'Zum Selbst-Stornieren ist es zu spät: Ruf das Vereinsbüro an.',
+      NOT_YOURS: 'Diese Buchung gehört nicht dir.', NOT_FOUND: 'Buchung nicht gefunden.', NOT_SYNCED: 'Der Verein hat den Plan noch nicht veröffentlicht.',
+      generic: 'Etwas hat nicht geklappt. Versuch es noch einmal.',
+    },
+  },
+  es: {
+    title: 'Reservar pista', welcome: 'Bienvenido', inviteText: 'Escribe el código de invitación que te dio la secretaría del club (o abre el enlace del QR).',
+    code: 'Código de invitación', enter: 'Entrar', logout: 'Salir', logoutAsk: '¿Salir en este teléfono? Para volver hará falta una nueva invitación.',
+    mine: 'Tus reservas', none: 'Ninguna reserva', cancel: 'Anular', cancelAsk: '¿Anular esta reserva?', cancelled: 'Reserva anulada',
+    callOffice: 'Para anularla ahora llama a la secretaría.', day: 'Elige el día', courts: 'Pistas',
+    FREE: 'Libre', BUSY: 'Ocupada', MINE: 'Tuya', BLOCKED: 'No reservable', PAST: '',
+    book: 'Reservar', confirm: 'Confirmar', close: 'Cerrar', duration: 'Duración', heating: 'Calefacción', lights: 'Con luz', price: 'Precio',
+    pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
+    notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
+    install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
+    rules: (d, n) => `Reservas hasta ${d} días antes, como mucho ${n} reservas a la vez.`,
+    cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
+    covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
+    err: {
+      CLOSED: 'Las reservas en línea están cerradas.', UNKNOWN_COURT: 'Esta pista no se reserva en línea.', PAST: 'Esta hora ya ha pasado.',
+      TOO_SOON: 'Es demasiado tarde para reservar esta hora: llama a la secretaría.', TOO_FAR: 'Este día aún no se puede reservar.',
+      NOT_SLOT: 'Elige un horario del planning.', TOO_LONG: 'La reserva es demasiado larga.', BLOCKED: 'La pista no se puede reservar a esta hora.',
+      TAKEN: 'Alguien acaba de reservar esta hora.', TOO_MANY: 'Ya tienes el máximo de reservas: juega o anula una primero.',
+      BAD_CODE: 'Código erróneo o caducado: pide uno nuevo a la secretaría.', TOO_MANY_TRIES: 'Demasiados intentos: vuelve a probar en un cuarto de hora.',
+      UNAUTHORIZED: 'Este teléfono ya no está conectado: pide una nueva invitación a la secretaría.', TOO_LATE: 'Es tarde para anular tú mismo: llama a la secretaría.',
+      NOT_YOURS: 'Esta reserva no es tuya.', NOT_FOUND: 'Reserva no encontrada.', NOT_SYNCED: 'El club aún no ha publicado el planning.',
+      generic: 'Algo no ha funcionado. Inténtalo de nuevo.',
+    },
+  },
+  pt: {
+    title: 'Reservar campo', welcome: 'Bem-vindo', inviteText: 'Escreve o código de convite que a secretaria do clube te deu (ou abre a ligação do QR).',
+    code: 'Código de convite', enter: 'Entrar', logout: 'Sair', logoutAsk: 'Sair neste telemóvel? Para voltar é preciso um novo convite.',
+    mine: 'As tuas reservas', none: 'Nenhuma reserva', cancel: 'Cancelar', cancelAsk: 'Cancelar esta reserva?', cancelled: 'Reserva cancelada',
+    callOffice: 'Para a cancelar agora liga para a secretaria.', day: 'Escolhe o dia', courts: 'Campos',
+    FREE: 'Livre', BUSY: 'Ocupado', MINE: 'Teu', BLOCKED: 'Não reservável', PAST: '',
+    book: 'Reservar', confirm: 'Confirmar', close: 'Fechar', duration: 'Duração', heating: 'Aquecimento', lights: 'Com luz', price: 'Preço',
+    pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se o planeamento mas não se reserva.',
+    notSynced: 'O clube ainda não publicou o planeamento.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
+    install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
+    rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
+    cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
+    covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
+    err: {
+      CLOSED: 'As reservas online estão fechadas.', UNKNOWN_COURT: 'Este campo não se reserva online.', PAST: 'Esta hora já passou.',
+      TOO_SOON: 'É tarde demais para reservar esta hora: liga para a secretaria.', TOO_FAR: 'Este dia ainda não se pode reservar.',
+      NOT_SLOT: 'Escolhe um horário do planeamento.', TOO_LONG: 'A reserva é demasiado longa.', BLOCKED: 'O campo não se pode reservar a esta hora.',
+      TAKEN: 'Alguém acabou de reservar esta hora.', TOO_MANY: 'Já tens o máximo de reservas: joga ou cancela uma primeiro.',
+      BAD_CODE: 'Código errado ou expirado: pede um novo à secretaria.', TOO_MANY_TRIES: 'Demasiadas tentativas: tenta de novo daqui a um quarto de hora.',
+      UNAUTHORIZED: 'Este telemóvel já não está ligado: pede um novo convite à secretaria.', TOO_LATE: 'É tarde para cancelares sozinho: liga para a secretaria.',
+      NOT_YOURS: 'Esta reserva não é tua.', NOT_FOUND: 'Reserva não encontrada.', NOT_SYNCED: 'O clube ainda não publicou o planeamento.',
+      generic: 'Algo correu mal. Tenta de novo.',
+    },
+  },
+};
+
+const LANG = (navigator.languages || [navigator.language || 'it']).map(l => l.slice(0, 2).toLowerCase()).find(l => I18N[l]) || 'it';
+const T = I18N[LANG];
+document.documentElement.lang = LANG;
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/icon-180.png
+base64 -d > "$DEST/server/src/main/resources/web/icon-180.png" << 'TSM_EOF'
+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
+AElFTkSuQmCC
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/icon-192.png
+base64 -d > "$DEST/server/src/main/resources/web/icon-192.png" << 'TSM_EOF'
+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
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/icon-512.png
+base64 -d > "$DEST/server/src/main/resources/web/icon-512.png" << 'TSM_EOF'
+iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAABQT0lEQVR42u2debhcVZnu32+tvXfN
+55ycTGSeCBDmOUGhEVAUFRWnbscrbWvbtnaj7dhObSva6nW2va1exCs4tNqiiCLIICIS5ikQIBMJ
+CZmTM1Sdqtp7r/XdP+okBEig6mQ6Vef9/eHDEyvnqeyz9vd+6xul0DsbhBBCxh6Gj4AQQigAhBBC
+KACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigA
+hBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIBIIQQ
+QgEghBBCASCEEEIBIIQQQgEghBBCASCEEEIBIIQQQgEghBBCASCEEEIBIIQQQgEghBBCASCEEEIB
+IIQQQgEghBBCASCEEEIBIIQQQgEghBBCASCEEEIBIIQQQgEghBBCASCEEEIBIIQQQgEghBAKACGE
+EAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAK
+ACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAh
+hFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQ
+AAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAI
+IYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGE
+AkAIIYQCQAghhAJACCGEAkAIIYQCQAghZB8T8BGQzkZkl/9uwuFRv8t/K58foQAQMupNvAggO8y9
+Dttur0iTHdYciGvPbdGj7JOSYUOYXX74sCTs+OGUB0IBIORAm/udtr5hjtMU6pHE6j00BTxgYUN4
+j0xWeiZI42MmwOz5gQ1kT4ZbBC7Vx5Y5nw7//L4tOlRTY+ASwAEGEsAYhJGIQRA85WuoUhIIBYCQ
+/WDxZYcDnqZIYk0TIAUCGIOeCSYMMW1OkCvI3AW22CWFkhx6TJDGWuiS6XNtI6ojBr2TjDF4FgHw
+Hts2+Z2fX7vSVQY0iGT5A2llUMsDunKpq1Z03SqXJOjb4r0f/hpBiDCSIHjye1IPSBu8XIXe2XwK
+ZDQafQMRqEeaIq6pSwDAhih1y5TZ9pBpZs4RwazDzORp5pBZtlCUrnESZcUCFvCAAwB4RVJX7IgL
+pQme3SYLEITY+fkwI40QkAUM4AAHxDUd2K6Vsm5Y7Tau86sf9aseTjes8+sfc4P9T37PKCtBADFQ
+hXqKAaEAEPKcnr5pxHNQr6mmMCG6e2X2YcHsw+3hx9qZh9kpM+3k6SZfkADwgAeSRL2HS+B1OBrz
+ZO5XnpoEluf+Grta6p0/bfgPBSIwAhvCGIShGMAAKTBU0Y1r/fo1bs2j7pH73WOPuMceTfu3qU8g
+ATJZCaPhfxpvBoQCQMiTRtkYAEgS1KvqY9gsJh5i5h0VHLsoWHBCMHO+nTrLZCMRwAFJsiPc7wGB
+7Kjtaca47yuGk8AeCkAhZjgxEIawgAK1WJ9Y7dcsc0vvSe9fnK54MN28wbsaTIRMTsIQADyvBYQC
+QMYmxgx7xHEd9SGFoGeCzD8mOOXM8KhTgkOPDiZOMZHAAXGCuK7eA/rkLWEU8qR3LzAGUUaiEBaI
+FZvX++VL0gfvSO+4KVn2QNq3RaHI5CXKDD8E73kiCAWAjAV/38I71Kqa1mAiTJtlTz4zPP604ITT
+wykzTS6SFKjXNYmh/slkQNuxM/QvBmGETEYCoBrr+jX+nj8n996a3nlTsm618zGCLLI5aTwW3gkI
+BYB0ZpxHgbiGekWjHOYuCJ53bnjyC8LDjwsmTTIK1BON6/CujY3+c4qBsYgyyIQiwKZN/pH70jv/
+mPzl2mTl0jSuIlOQKAthdIhQAAg6JtQjSBJUyyoG0+facy6IzjgvWnBiUCqIA2o1TeInP9nxqA4H
+fMII2axYYLCiS+9Ob746vv6KeO1Kpx65ooThk58khAJA2s/l9x5DZfUpxk82zz8vPOsV0XGnhZMm
+mgSoVtSlHejsj+BaYAPkChICmzb7+25NbrwyvuXqZOtGbwLki9J4jLwQEAoAaYcjZWAMkhjVQY1y
+OPbU8CVvyJx2Tjh9jgVQrWoSD3+G7KRR1BRGyOUEwNpV7tbrk9//pH7/7UlcRa4kYTT8GUIoAASj
+NtpTHdKkhnGTzFmviM5/c+bohWE2RDXWem0MxXn2MjqUySIXSS3BktuS31xev/HKePsmH2aRywvj
+QoQCQEaZ6beAojKo3uHQo+25r8m87C2Z6bOsB4bK6j3t/kiUwBjki2KAtavdby+rX/s/9eVLnLEo
+lAQC7/icCAWAjALTX+7XIMSxi8KXvznz4tdmSiVpuPw7m7wIRhwa0uELweCgXvOL+lWX1+9fnKQJ
+it2UAUIBIAfX9A+oMVj0wuhN/5RdeHYUWlSGNE1gLF3+fXohcAhCFPKSONx2Q/yjb9QWXxd7j2IX
+ZYBQAMhBNf2LXhgZQWVQvcKaHcPUyD7WATgPIyiUxCsWX0cZIBQAcsDnNwz2q5GnmP7yoEJhLJ/Q
+gcA7QFB8mgwoSt3CqRKEAkD21wiHalmTGk57cfiW9+Vo+keVDFz21eqt1yRhFrmicKQEoQCQfYYN
+ENdQK+sRJwZ/84/Zl78pG4YYpOkfNTJQKkmS4Kof1X76n7WH706zRYmycCkfD6EAEOxVuF8V5W06
+aYZ5/buyb3xvrlSQgbJ6D0vTP2pwDsagqyiDFf3xN6s/+6/apsd9sVeEiQHy7L5dlOvhUyC7jfnY
+AEOD6lO88sLsZy8pnvPyTD1BtQpjWdw5KlvwqjAGzz87OvuCaGgIS+9K4zoyOQHDQYQCQFo4FhZp
+ispWPe554ae+U3rre3NhTsoVGGHMZ1TLABRDVZR65NxXZY45LVyz3K9+yNmMBAGzAoQCQJpz/Af6
+tNRt/u5juX/9VnH2YXagXxujjFnfOep/fzAGzqFaxdwF9iV/k8kWZendrn+b5gq8ChAKAHlOx3+7
+nv7S6AuXl17yqkwtRq0GG7Crq/1GsdZqEMHpZ0envyxat8ovu8/ZiFcBQgEge3D8B/u0UDIXfSH/
+gS8Vu3rNwKAaju1EO0eEgEoVEw4xL/2bzLhJcu8t6cB2zfIqQCgA5CmlPh7l7Xr6S6Iv/KR01nnR
+YEXTlHU+HSIDSYIkwamnh2ecH61d6Zfd78KMNOq7CAWAAjDWa/yrZRXIRV8ofPirxdI4MzColpN8
+Out6J4JKFRMmm5e9MVMaJ7ddl8Q1zeSECwYoABSAMRz2sRjYogtOCr70k64XvzpTLtPx7/CrQJpg
+4V+FC8+Jlt6Trn3U54rUeQoAGbP53n599Tuzn/tBadpcOzCgHOE5Fq4C1Sqmz7Uvfl2mr0/vvSW1
+ITPDFAAylghCVAY0k5WPfrP47o/nnaJWhQ34YMbKVaBeQxjhRa/KTJphbrs+GSprNi+cIkcBIJ1f
+J24DDGzRBScEX/7vrrPOi/oGdGfFCBk7GuA9ajWctChc9KLowTvStct9rii8B1AASEevaxcMbvav
+envuPy4vHTLT9g9owBr/MdwrUKliykx73t9ktm3W+25OsgWBgEWiFADSgUH/JEatov/y5eI/fbbg
+gVoVAcM+DAfVEUR44QWZ4jjzp6tiEQlDpgQoAKSzaj0rg1rqNp/+XvF1f5sdKKt6TvUhO8JBDnGM
+RX8Vzl5gb7shGexnhSgFgKCDUr79OuNQ+6WfdJ35omhrn3K0A8EzGwWGcPyJwfFnhHfdnGxZ77MF
+poW5D4C0v/Xv36jHnh58/YqunvFmsF+DkE+F7J40Qalb+rb6f75g4P4/p92TJU34VHgDIG0b+RnY
+qi9+Q+ZzPyiVus1Qmdaf4NmHgtSrKJTMOa+K1q/zD96R5oqMBVEASJt2+W7W1/5D9uJLSjCI66z0
+J801DMfI5OSlf53ZvNHf88eU3cIUANJm1h/A4Hb96/dkP/bNYqWizjHlS1ooF3YOSYJzXpXZvs3f
+/ac0ygqTRhQA0h5vryqqFf3Xbxb/4RP5coV9XmQkPoQCSYIXvjLTO9nceGUchCKGLQIUADLKrb9H
+tawf+3bxDe/I9g1oo8CDkJHdI2s1nPr8sHeKueEKagAFgLSJ9f+bt2e39bPck+yDbuGhKk45Leyd
+Sg2gAJDRbv3x8W93veHt+W39TPkS7KO0sAxV5dTTMr1T7Q1XxEEIagAFgIyy27qaahn/+u3M696u
+W/pqJkiNGEEAznYhe2H8BQZIVarlodpJz9PeqfbGK3wYGhEeKgoAGS1tnLY8OPiv347e+vaZSfnY
+YjQnIxNTHUh1OwQGETWAjGBurEfNayWQrpI9uhDOd7XpJy1yXVP7rr+inMnmeKg6AIYJ2t36C4DB
+Ldu/cMnLL/rbt2tybKY4rOh1Xd/nbn0i+UHZPRxKj8LxcZHmrX+ifUV7xNTwbT32tIxMGT5USd8n
+335/l1zy4bdfVRzfLQLl3DjeAMjBsv7qfbUy9K1v/8dFf/fvJp0VhFlAFSqQQEpFs2BS8IoU/f3u
+ditFgD2dpKkmwkS3TQnfcETmqyV7XCAlAAovQGBzJp11+kkXTJo64cpf/z4IAmGJMQWA4CBl56pD
+1f/73a+/82/fmqbOBCqQRkwIAKAKbyTTG5yVor/f/YUaQJ7b9QdS7Z8WvW1e5lNGIoXb5VAJoDDe
+pbrwlJNmzpxxxRVXRZmQdwAKADnQhGEwsHn7Re9/90c+8N4kScIwEBhAnlbF15CBXvuCFAM7NIDv
+K9m9RwF4h6HDshfPCN/VMP27PVTGmCRJTjrxuL7BwZv+8KdCV9FzcCingZIDOOVNyv3JCYsm/fGq
+G3PZorHyrK36jaCQWRF/Zl38/VDGA8KrAHmG9U8V7tDMpycFFyic4NmGh6iqd1qtlV/w8rPuWbyp
+2B26lI5FW/7WSfvt9hoaMFPn1X74y5cXi11i9bkGtYhAFH5e9In5mc8qUkX87K83GWNxH6NIBeEx
+ucuasf6N/JNYLRa7fvjLl0+dVxsaMJYHigJADkDDV1xHV6989tKumb0L1Wtzvb4iMAo/JXzTMdn/
+Z6XkUBXWgJFh6++9Ds3LfLJkjlOkTToHIlCvM3sXfvbSrq5eiesQmhMKANmvL6sAcU0/+o38yafm
+4vpkMY3UXAuOXsked1T2u4F0pTpADWC5p0fiUDks+4WJwcsVaStHQsRIXJ988qm5j34jH9dU0Pxh
+JBQA0iKBxeAWff+XCi99TWZzn7eBtv7CBwpXNEcel/vvLnt8otupAWPZ+jutBFI8OvuDScGrFG4E
+h8EGurnPv/Q1mfd/qTC4RQMGgigAZH8td9yir3xH9s3vzfUNwgZJVVcA2mo6V2AVLivTj8x+t9ue
+TA0Yw9a/HJlJR2a/22MXNRP3fwYe0KqusEHSN4g3vzf3yndk+7dw6xwFgGDfJ34r/brg5OBD/7tQ
+q6lABabfLQZaCAE9TQMCKR2Z/Q41YExa/yDRvpI94fjcL4rmyBFZ/0a4R/rdYoERaK2mH/rfhQUn
+B5V+ZUKYAkD2ZWtmmiBXlE99p5grSJIARq0Ut6U3V/2aRhJvRBrgqQFj1fpv77YnH5n9r1DGj8z6
+K7zAVP2abenNVoowmiTIFeRT3ynmipImnEPORjCy79z/cr9+9JvFs86L+gc1CHZe4Qfr+vjE4HzA
+S+tXgUZtqJXs+ODcQX/3kF9ppcD+gDFj/b8TSEnhR+T7e0AFZln9w0P+USs5wBuDWg2zZtvuiea6
+X8TZvLBDmAJA9r7nCwNb9NXvzL774/m+gWHr33DCrOQq/uEEfb32BTvGPu+VBlT96sbLzMfeqdY/
+1b5ue8ou1t+MzPcXmBX1z2xOrwyke+ecQWMwVMMJi8KN6/29N6e5kiiPEgWAjBhjUSvrEScFn/tB
+yfknF/XtqgH9bnGiW7rtQiORDl8FRqgB2/x1db/JSpbjIjoy65tqf9EesyD7n6GMG2nkxwlsoluX
+x5/akPzsmVNmReBSLDw7WvzHZOMaH2Z5D6AAkBEv5vYA5Es/7Zo229Zqu93trlaK/e62AX/3+OBc
+K1mFa9WtE4jCWcl22RO3uj941AwCakCH+f5Oy132xKOy3wtl3MgiPw3rX/YPLam9rd/dsdsZ4yJI
+HYolOeL44KrL61xJTQEgIw/+lLfrRV8svPiCzMCA7nnFo7dSGvIrBv1d3XZh47VsXQOMwkUyqccu
+3JD+XCCApQZ0TsUnhiIz8ZjcZaF0jzTy4wR2a3rdI7X3J7p118jPM4bUol7D7Lk2U5Sbfh1nCwwE
+UQBI69Z/cLuefl704a8Uy2U1z+GueSuFql+9xf2uy56UkSmKdEQakGbkkKyZusVdbRABdN46AKNI
+GuVeOTNjpJGfRBD0u9uX1N8OwEru2fcLGYN6HSc9P3zwrnT5EkcNoACQFus+UxRK8oUfd5V6TJo2
+c4/2VrIO1U3pLzPmkKI5asT3gKI5MmumbUl/ZyRDDWj/+f4K+GNyl+44EiOL/ARl/9DD9fcAMIia
+2S6nCmvlqFOC3/93PY7BtTEUANKC+1/Zrhd9sXDWS6LBcvNtNWoQANjq/iCw3fbUHTEcGYEGBDJu
+m7vOggnhdi/72T4v88nxwTktzvnZTeQnxYBF1GTTiQjiOqZNM1FB/nhFnC3yEkABIM0Hf14afeBL
+xcFKq02VChiDaKu71qE8zv7VSO8BaZc9PtGtfW5xwD1i7Wr9w0S3TA5fMzt6/0itfyoINqW/eqT2
+PohaZFpqOTQG1TqOXxQ+eDcDQRQA0pzf5FIUu81/XF7qGtdk8Gc3b24o3dvdTVYK3fYURdLqxb9R
+G9ptFw36u6p+DZsD2nPUz2DRHnt45ssi4TMWezVv/a94tP5RKyUDO4KG80Yg6MiTg2t/Hid1BoIo
+AOQ5K3+26t99PPeSV2UGyiOfqaLwgRS3uz9nzdSiOar1nLAAMBL12NM2uyudVoyEjAW1kf1XpEYy
+R2W/kzFTGl27I7f+KOzIJYzEoanXMWO6qad6y1VJlq1hFADyLG1f1UE99nnBv369WEtgZG9TsIJg
+i7s6a6aNQAMazQGBdJfMMdvcDR51YXNA++x4cVo5LPv5HrtwBInffWX9h0+1oJ7guFPDO/+crFvp
+I7aGUQDInl5cl+LfvluaNX9PbV8jWCAW7oUGGEWaNTPydu6m9NdMCLfPtJ+tM6N/mBr+rxGE/hs1
+PxvTK5btC+s/fKodCkWZOtv+7id1GwoPEQWA7C73u1VfeWH2re/NPWvb115qgBuBBuTNvFDGb05/
+E0iRGjDKrX+smw8JXzsv88nWrb8CKrDrkx+tiP/NIr8PrP+ObHCtivlH2HWP+/tvSXOsCKIAkKeF
+SpMYvZPNZ79fCrNQv28b6HdqwPSiOXJE9wBXssemKA+4O6zkqAGjN/KDoW570mGZL44g8dtwDlbG
+Fz8WfzmUnh2SsM/6ETxw5InhH35ZHyqDCwPAfQDkaUPfXv+u7IyZpl7b58u1FRCL4qO1D21zNwgC
+RTqCveHzoo8V7dFOKyMaIEwOQOLXGWQOy3wxkK5W+z8a14W1yffWxt+LZLJC963Mi0G9hhkzzevf
+la09d2c74Q1g7Fh/g1oF848NPvF/ivV9kfvdkxGH2O3u5h57WkYmtxgLkkYlSd7M3+yuHNkaMnIA
+Rj3PyXx0XHB6q4nfRtx/U/qrlfHndjvibd+cc0E9wTELwz9fk2xep2EEZoN5AyAQg6Smb3xPtlQQ
+l+4v06rwBmGqgw/W/q7sl0qLZd2NQFCXPWFO9JFUB3gJGIVrXiaHr54avnlE1t/2u9sfrX/EIKv7
+L74ncClKBXnje7JJTYW2hzcAYiwq/bro3OifLy4MVff31VgNIofKVnfNRHteIF0t7Q/YmQyo+KVl
+/5CVPJMBo2bcWz1jJi/IfstKtsXdcCqQRPserL1TEe/vMeDGoB5jwQnhA3emqx5ymRxLQnkDGOMo
+jMFb35cNQxyA0giFs8gnftsj9Q84raLlUK8AOjf6WGQmesQMBI2SM+R0aF7mE41B/y1Zf4Uq/CP1
+99X9etPipIcRflePMMRb35c1hv4DBYDu/4AufGG08KxocPAAZcYUaSBdfe62x+IvjSgQ5LNm+vzM
+ZzzqQgHAaKj8qczLfKLXnt3qmpfGYoDV8de3pzcH0rWfQv/PPPODg7rwrGjhC6PKALPBFIAx7/6/
+6Z8OtDekSCMZ/0Ry+cb0CoFt6c0XWEXaa8+eFl6Y6PYRjBgj+zT03z85eOXU8K2tVvfuCP3fsTb5
+Xii9rRaGteOxJxSA0ej+Lzo7Kh/wwjiFD6S0ov6psl8yIg1wM8P3FOwCpxXhKTpI9t+jljXTZkcf
+bn3FowKS6sCK+NOiwYE/+eWyLjqblwAKAN3/g+YHNQaEmQdr76r7J1qMBQkgVvLzok+qsKfzoAV/
+vNbmRh8LZVzDoLcU+heYh+vvHXLLreT0wI965SWAAsDin4Pl/u9SGBolftsj9X9JdbClzs9GRVC3
+PWVa+LZE+1gVelDqPieFF4wPXth63acXmBXxZ7enf3mW1b4H7hLQz0sABWDsuf9BePA9IIVrJIRX
+xp9pJHhbTQjPCN+VM7M86qwIOrBNv0lkJs4M39ui7z8c+l+f/GRdfMmBDv3v4RIQcNA4BWDMuf+D
+evSicOHZUblykN0fRRLJxI3J/6yOv9JiMkAADaRrVnSR0yFeAg7kspdE+6eFF2bNtIY735L13+Zu
+WBF/OpKJB9P6Ny4BFV14dnT0orAyyEsABWBMLep2OP/NmdBCHUbBbSQNpffx5Hv97o6WkgGND48P
+XlyyxzgtMxt8wHK/eTNncvC6lqx/I+uT6PYV9c8YRDoKvG51CC3Of3NGHe+PFIAxM/ihOoR5Rwfn
+vi5TGdLRMxZRNFgR/3ui21odA2kQzo4+pMJr/AHb9Tg0K7oolJ6W4j8Kr9BV8X/U/DqDUbHj01pU
+hvTc12XmHR1Uh8DhEBSAMTH6Lanpua+NuoqSJqMlcq7wVgplt2R9clkjwdtSNrjHLuq1Z3BG0AFZ
+9VUu2WPGBy9uqfSzEfzZkv5uQ/LzUMYd3ODPrv+eNEFXUc59bZTUlBuDKQBjYu7/uEnysjdnqvHo
+insq0lDGrU9/XvNrW68KxazoIisF5e74/V69q7OjDxmELZb8SqLbVsdfPWAdvy2sQY31ZW/OjJsk
+Sbxv12AQCsCo3Pp71isz02faem20HXcVBInfvDK+uKVVUI1LQMEsmBS8ItU+9gbvv+BPqgO99owe
+u6ilad4KD5jH4i9V/RqDzKiquRFBvYbpM+1Zr8xUmQqmAHQ23iHK4fy3ZLyOxqyXwgXSszX9w8b0
+561WBCn8tPDtkZmkHBK3/wb5SX5WdFFLy14awZ+t6XUbk/8ZRcGfpy0LU5z/lkyUg3f8PVMAOtj9
+L+sxp4ZHnxwODY1SZ0fhAimtir9c84833xkgMIBmzYxp4YWpDjITsJ/c/8nhqwtmQSvuvwIS69aV
+8cXmoHT8NvdeDA3p0SeHx5waVrksjALQwdWf3uG8N2Sy0Wj2dFQQJn77qvg/WnLkGxowOXhd1kxj
+X9h+atmbGFygcC1V/gjM4/G3av5xg+yobbjyDtkI570h41kPSgHo6PSvOe1F4WhL/z7T1oTSvdXd
+0OcWt9IeLAoNpWdScIHTIfYE7HP3f1LwirzMa37qZ6NMqOKXbkp/FUjPKAz+PC0VfNqLwnGTDFPB
+FIAOXfte0dPPi0Zl+ne3xSb2sfiLHkkrdkoAnRZemDVTuS5mn7v/U8O3WckZRK2M/MTq+GujX493
+poJPPy+qVRgFogB03jusEIOzXxmiHbaoNNoCBt0DW9NrWmkLEIUPpHtK+EanZWYC9qn7f37OzGo+
+/tNw//vc4m3u5tFW+rnHUmLB2a8MxXBZPAWg4+I/cQ3T5tpjF4XVNlmH3ag5WR1/LdG+5qtCd2QC
+Xp81M5gJ2Hfuf/fU8MJW5755JI/FXxSVtumQr+mxi8Jpc21cYxSIAtBZ8Z96Rc+5IJo40ST1djnc
+apAd8qs2pj9vMRPgQ+mZEv6N0wovAfti8MPgxOClOTOr+ck/jTKhrek1g+4BK8W26M4TQVLHxInm
+nAuiOqNAFAB0XPn/GedFqW8n10bhQulal1w6gpLQCfZlgXRrKykEsqeqrPHBua2u+km0b3X8NSv5
+0R/82VUDUo8zzovYEEAB6Kjpb7Uq5hwZLDgxqNbay7VRQRT7TeuSS1rpDZbG4vhJwfkpMwF793o6
+HSqZY7vNyQpt8kkqPCAb058N+VWjufRz97VANV1wYjDnyKBW5Ww4CkCnTH9La/r8c8NSQVzSdgHo
+NJDuTelvqn51S4EgAJPD1xnhso+9W/qI6uTgVUay2I0jr7t7tsPu//rkx4GU2sj9b+ASlAry/HPD
+lLPhKAAdcoX3sBFOPjN02paprUYVyhPJpS2lghW+YI4YZ/8q5Z6Avdr5PnNC8FLszv13qD6ztH+n
++1/za0fb2J8mo0BOcfKZoY2gnCtIAeiE+p86psyyhx0X1OrajrfaRhF665cAFZgp4ZsgnrVAI538
+PDQlfEMovQ2z/rQPWOTl6TNBn3T/rRTbzv0fjpfW9bDjgimzbFxnLRAFoAPqf4b0lDPDye3c4jii
+S4BVaLc5pWCOcDpEDRjZUKbx9rwdHXbNR///u03d/50N85MnmVPODOtDrAWiALT/eyyC458XKNo4
+GP7US0DzqwK8kczE4GUedUaBRuD+d9uFWTO9Mcy5ySuX09qG5BdWCu3o/u88bQoc/7xAhPkjCkCb
+x3/SBN0T5YTTw3rS3u7MLpcANH0JEADj7XltGo44uC+mIpkYvEyavnI13P9t7rra6Bv63/KlOdET
+Tg+7J0qaMApEAWjnAtB6VecfHRwyo+0DmjsuAVc19oU1Z1+MwufM9HH2eRwP12L6t541M3rs8xt+
+fdOa4Z5IfiAI2tpzbqTNDplh5x8d1KvKYlAKQBsfZRfjlDPDfNQJjS2CINX+ze63O/xNNDWPANIb
+nK2Iedhaif9UxgfnhDJut+nfPUz+kQF3V9kvtZJv98Wc3iEf4ZQzQ8fJoBSAti4ADbI46pQg1U44
+x43pQBuTX+xw57WZwBGAojk6a6ZzNFBL6d9Dgjc2n/5t/C7Wpz9STTvgIYsgVRx1ShBkWQxKAWjn
+BQATpphDjw7qcWfcZNUgU9O1A/6uRrtvc13BrmAO7w3OcVphFKg597/aZY/Pm7mtpH9trFv63Z0d
+4P4Px05jPfToYMIUrgegALTvIa7pvCODiYd01iFWvyn9ZUtraQEdZ89ga3/Tofy42y7aEUBr6sYA
+YEt6dew3CqIOKJ1pOE8TDzHzjgzqNaYBKADteYg1xXGLgtB0zjVW4Y3k+9ztsW5uOgpkACmaoyOZ
+4JEwCvRcOCO5brOwldfTKPw2d70gAnzHhE9Dg+MWBZryBkABaM8TbEIccULg0UknWA2i2G/c5q7f
+6Xs2Mxsukok99lTPWqDnKpx1qBXMYUV7VJP1P40Z0RX/SL+7O+iI+M9O/8kDR5wQmJBpAApAO9b/
+pOgeL7Pm2zjRznJhFDAV/0grUSAPoNue2mRNy5iO/2icN3MFQSt1Vhhwd3qtooMGr4ogTnTWfNs9
+XhwvARSAtju+9ZrOmh9MmW3jekdFvxXeSq4vvWXHqGdt8pgVzXFGcmBH2HPclrRkT9hDt51/1vhP
+2DHxn0YKLa5jymw7a35QrykFgALQZsfXJZhzhM2G8J12gVWDqKprK/7hHX37TbUE52RuTqY5LovH
+cyQASub43b6bToeeoQqN6W9bK/4RK1ntrMkJ3iMbYs4R1iUsIKAAtN0IIODwY62gI+eZiGrS725t
+ulJFFM5KtmCPUq0xDbCnp+QQZ2VaTubutgPASvFp2tkIE/W722O/td0bgMfeS0QB6GD7rzAhZs63
+Dh0YvlR4g8xWd73XetMLvxRAtz1JW9xsPqY6AFTrJXuMlazCNfeUROE3p79pOhbXbok0YOZ8a0Io
+BYAC0F4Z4GKPTJlpk6Qjw5dqJV/xS/v9bQ3vvsmTFskhIkEnhar3dQLAF8yCpsftNeI/Wwb8PVZy
+2okCkCQ6ZaYt9jAPTAForwKGGFNn2cnTTdKx4UtR9f3u9iatVSOgUZAFoXQ37d6ONbxIUDCHN/li
+NuI/Zf9gqv0dGP8BxCBJMHm6mTrLxuwHpgC00WXeJXrIdJsriHeda60QDrr7FL656kMBNDLjMzLV
+I+a7vNs0SSjjcjKv6RFACmDA3a3asYLqHXIFOWS6dYnSZ6AAtFMP8JwjTIiO7WFRqJXMkK5IdGuT
+M+sVXhCW7PFe6zx4u2kB01pe5mbMpKbTJFbhB929HVYA+vR+YGDOEYb9wBSAtsoAB5g133Z0qFsF
+Yey39LvFTU+HVgAFc1iLc4TGzg0gzZtDAdmdNdfdzn+u+EcH/f2d1AC82z63WfOtCZgHpgC0U6ss
+Jk83Hp3ttgjgd7QEN9sOVpCjrBQVKY/JM89Nlz1pz496N5JQ9cudVjv4LW4MhJg83TQ3d4pQAEbH
+GsieCeaQGZ1aArTLyl9Eg+5eRdpMGqAxPK5gjyiYQ7kl+BnmPA1MT9Ect+NBPYVEt+72bw24Ozp/
+pnqih8ywPRMM10NSANomBBSEKJTEd/TkG4WKRDV93Gm16TSAGoQZmaqa8Jw8PQOMnkgm7OEtze52
+AsSQX9WR9T+7eg3eo1CSgK0AFID2GWWu0+fY0jhJx0bmqpWF7x5A3s5TOJ69XTPAXuOsmW4lu9t5
+eVYKuwsBqUgH9n89/T6dojROps+xScyJQBSANvFZcgXJZKXTx9iqQRjr1ppf3eRQoIZpy8uh6HTL
+NYIbQM7MQbOhbhUYr3HdrzUSaUc/SfXIZCVX6PD7NAWgo2pA5y6wVsfCpVW8JjVd03QeuPEGG2FS
+7xnp9KxMa/oxAkCsG2Pd3uEhIEAVVjF3gWUlKAUA7VK5VuwSK2PBxAngqvpYS5YrkC7poMn1+7R6
+rNnsC4Cark1R7vxcusIKil3CASIUgDYZYWhRKIkfI9MLYIfc8ibPUqPBtWiOjmQ810M+dQhEVDDH
+NP1KegBVvxKajoVX2AOFkjBqSAFoky6wCIce05lzQHcTjJawpmu91pssBNpljg2t/9MH+7Ry8ULV
+r8QYiKQ1ZoIeeow1EQuBKABtkrZK47ESsxAEsW72Lax5UYNMRg5RJEINeHIKUCmSSU1PARIANV03
+dlIpaczNwBSANrH+UUYKXWOoaEEgTTuwolAjmVDGq7IZeJctm8hnZFKLozhk7JTVFbokygg1gALQ
+BmXLPRNkxtyObwN+shK0rluqfnnTlaDA8HIr3ud34i0KaDaGpgKTannILzcdtwZyT83AM+banglj
+pbGGAtD2aQDvx9q/uKWUHopmAXvBdu0Cy5nZVvKtrEszOpbKYrxnAoAC0InmsCM2w6RDLYyEa4hA
+zHPy1AeStFYD6h9LtK/jmwDG8GtFAWjfsuWgU7eA7bEVwKHc2kxQc6RIyN2QO5PABXNESwrqMORR
+HztZdDGwAaOGFIBRf0zrsc6eH/RONMlYWWKngHFabnrKvwLwWgW3w++yKy2UnuZXAQPYobhjZLgW
+eiea2fODeqxCi0UB4A1glG2GsWX/cNMCIBhOAgs9ul3HQbfUMFzxj6gmY+f95Q2AAsBg5Wh2Yk2L
+xy5H9/+5Vr7sywfO14pQAAhGU3s/IYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGEAkB48AghfA8x
+6noXwX0mePYi0Cq7eka2D3JkD5yvFaEAHKCGHpeOqeUVonDFFkbZKACnZY6CeOqpCVpqGSuYw8fU
+MCX1cCnPCwVg1B/TTCSPLUu3bfbhWNlgJ4C3UmxaAASAkRxHQey6Vy3RvtZmaaA4dhqAwwjbNvvH
+lqWZiDthKAC8AYw6+2V32CNpsge44h8aU6NsnnOYUqWFYUoAYJE3yOjYmQXNGwAFgMHK0boXPsib
+w1uyXwYRz8lTH0jY/AIZAFkzO5QexRgyiswBUADa5qQaQ8l7tiNX9ksFlhOBGgtejERV/5jTIWkh
+LObH1Dw4YygAFIB2iFcGAfq26OMrXRjKGMgBiEeSkQk5c+hO57QZnJZ5n9/1NXSoNJ0VF4UPpJg3
+h3qtdfxOGFWEoTy+0vVt0SDgTFAKwKgfXB7XtTKgxoyVHKdCm/ZGVSBe64luFQl4WnbOdnYYquum
+FouvxsrxMgaVAY3r3AZDAWgTDQiiMbPLCmkkEw2ipuVOPOp13SAIlVVAO5LAiQ7Gumnnyt9mSmmz
+Mk3hx8hFKohA608BaI9wuI+x/AFnx8QKC1FNsjLdSKMipVljJDCsAd2LBS8KIGfmYgwIgCossPwB
+52OmASgA7fAqq0NlUMfGkzUKl7eHAmgmo9twb8t+SaxbDUJqwJOPUeOKf6DpVTlmWAAkGAuJdANU
+BlUd00YUgDZ5qOUBdWOi0VUBm5PZLdWApjqgcDwmI94KOVwJKtMDFDt/JoTAKcoDSltFAWiPG6sE
+WLnUORkLN1Y1EmZlZtP2q+Hy+7ETvG5aR01N17UkA5FMjmRcx7cCiMAJVi51whIgCkC7FC1UK1qv
+dXzRgngkkYzPmllN14AqgCFdDt7nn5EHrvpVTcf0ReGNRBkz3Wvc2ZWgYlCvabUyhsrqKADtPrpE
+1q5yg9vHStmywLZ03obcCnaBPbMXrObXOq3tNj3utLK7eJF0fFy80VgzuF3XrnJhJLwBUADa49Ka
+JqgMdrjPIhDVOCszrOSaLAESiEdS1ydEQp6Tp1eCoi/WLdj9+KTabjuB82ZOh4eAGk0Ag5omLAGi
+ALSLzxKib4vf8HjHNwMbj7hkjxcEaCKp24j7V9zDFb/cIDMGJ9o/+zjo1PeV/X27nfUfyvjd/q0u
+e8pYaAPe8Ljr2+KDkDkACkDbDEjGxrXedHgrgAKm0MIYOA+gog86Lbcy/n4MnZsBd1fT62IEQM4c
+aiXXwcE0VRhg41rPogEKQFv1gqVYvcyZDt8Dk0RmQrdd1HQfkwCo+EdHsABrbESBgiG/vCGrz1kh
+KjAKLZjDSubYVIc6eDCcAVYvcz5lCIgC0FaVoKse9gk6tn9dIE7reZkXyvimEwBGkQy6e41kmAF+
+Zh7YSnZIV9b9pqZngjqBKdnjFR27WUEMEmDVw541oBSAdnqbbSgb1rpqRY3t4B7gpGSPExg01dWl
+gMR+a12fMIj4Lu9hItD2qq5oeiKQAOiyJ4rYTr1RGYtqRTesdTYUXhopAG1zA4giPLHabVzrw7BT
+t4OpiOm2pzaZAGhYtIouTbRfYBkC2sNAiLTiHwHQzA2pEfYpmqMC6e7IWiD1CENsXOufWO2iiDcA
+CkAbja8KUO7T9Ws6tRBInA4VzIJus7DhuqK5DHCsG1RTnro9XwJMxS9tfjmwwocyocuc4LTaee1g
+jRKg9WtcuU8tQ0AUgDbLAydYs6wzZ4IKjEd9vD3HSKbpqT4CoN/dJdwFv+cyWZHMoHvAaa3pS5IK
+zMTgfEUHdoQ15oCuWeY8mwAoAO03ExR45H6n6MjyNRUJu+1pTR8hFVintYp7UCTLDoA9PSWLqKbr
+qrpyt2kAp+WnqUIjCtRtT43M+A6MAnX4S0QB6OBX2cOGWPWwqyWdtx9YPOKcTC+YI9DcCKCGLavq
+yqqusy2sjhmDWK/VQX8vgGemAazkn2EIG1Gg8QVzuOu49ZDGoJZg1cPOdmwijQLQuWmATFZWL0vX
+P+aiTEcdX4FxWu0Jnh9IsenIgwdQ9vd5rQKWx+PZV2YOunv2kAYwe9oO32vP6bBiUPWIMlj/mFu9
+LM1kOQWIAtCGeeD+rbp6mYs6LQ8sgN/RAKzNH7N+dzsXgT2nUopEQ36lIm26t8sA6LInG8mhg7Ys
+qCIKZfUy17+VGWAKQHv2sPgED9+TdtZACPGIIzO5157T9BxQFZhYN/e5243kmQB4jnYwZCv+0bJ7
+sBHeaa69zhfM4d32xE5qCW4MgXj4ntQn3AZMAWjbfuD7FqeJ75wTLDBeh3rsqZFMbHKpi8IDWvZL
+Yt3CNZBoLg3Q729rej3krlGguGPeaDFIPO5bnLIHmALQrkHMTFZWPJRu3uDDTmpjETMpeHWL83xk
+u7uZibymrXnU7xY3/3o27mETgvMiM1kRd0DFjCrCCJs3+BUPpZms8OBQANr1EG9Z75cvSTNRZxxi
+8ahnZXqXOakR2GmyALTiH9mWXm+lwPhPMxcmK7kBd++QXykwzV0CROEimdBtT3YdEQVSj0wky5ek
+W9Z3lvNEAcAYSwOkNTx4RxpIJxxigXU6NDl8rR0O5TcT/3EAyn5Jza81yDD+0+RzTnVwQ/rjpocC
+DZcMTQneJBJ0wENWRSB48I40rTEBQAFo61qgCHfclAzF6ICpcIo0kO6J9mVNz39uHDDdlt4giDgB
+tJVLQGFren2i25usm2pMh+6yJxXNgg64BBiLoRh33JRYuv8UgPa+yeZk2ZJ0w+MuyrT3URbYVAcm
+BS/PmunNl/8LTNWv3e7+Yln/08rBMcjU/ON97pYma4F2PG07NXxbu7cEqyLKYMPjbtmSNJNjAoAC
+0ObrIfs36z1/TjKheNfWbqkLpGtqeGHTo8qGwxdb3dVOy8L+L7SaCg43p79tctfCjjuZ9toXZs1M
+j3r7aoB3yIRyz5+T/s3KNZAUALT9PBPFvX9JpZ3nmexw/8/PmVkK13z8x2t9c/pbbgAeURQo3+9u
+q/m1raSCvZXsIeFrnVbaWHEFAtz7l1SVI4AoAO3uyDlk8nLHTcnGTW1cz7CL+69Nu/9OIP3+jop/
+2Eqe6d+RpYK3uqubTwU3LgGTg7/Omulteglo1M5t3OTvuCnJ5Nv70kwBIMMBzfWr3aP3pdlMWwY0
+n+r++6bdf1H49cmPoBz/MPJLwPrkJ4lu220q2GFIkexuNlzPlPCNbRp2U49sRh69L12/uu3TZhQA
+MlwM6mLceVNi27MYdETuvxeYin94u/tTIEXGf0aaCs7W/Jot6e8alf5P+78tcoJgD5eA17fpJUAV
+VnDnTYmLWQBKAegIvEeQlVuuTQYrasO2c/+DVPtbd/8VwMbk514TxnH35hJgkNuY/sprbXdTVGV3
+z/bJS0Cqg213CbAhBit6y7VJkBVPt4EC0BnFoNkcVj2ULr07zWXbK6wpijgyk6aFb2/e/W80Cdf8
+2k3pb3aMjCYjdB6s5Af9/f3+TtndJeBZMwGvz5s5HrU2EmDvkMvK0rvTVQ+l2RxHh1AAOuYpW8RV
+3Hx1HJh2igIJbKID08ILs2ZG8+5/o0l4i/ttqv2CkL/9vRfhrem1Lf4NH0rPrOgip0NtdAlQRWBw
+89VxXO2ExkkKANmlFqgg118Rb97sw7ZJbYlHLW/mTA5e11LwR2AS7Vuf/NRKge7/3idgrJQ2p7+r
++tWNyc9NKrfCjw9eXLLHOC23RWOwKsIMNm/2118RZwqs/6EAdFgtUBbrVrr7Fye5Nplu2Jj8Myu6
+KJSeltK/gGxMf1bzj3P4z76rwup/IrkUkJaep0E4O/qQirZLpDSXlfsXJ+tWuijL+h8KQIe9xgL1
+uOHXSfPzvQ723sdKyR4zPnixwjcdRlCBSbV/ffJjy+j/Pq3C2pT+pupXCyya7glQuB67qNeekerA
+6A8EKQDFDb9O1ENYN0ABQMdFgbIF+fPV8do1LtMGDo6ouNnRh0wrQfzG3IJ1yaU1/4Th8vd93Yrx
+RPIDp1WPuJXlnZgVXTT6BzGpIpPF2jXuz1fHWcZ/KACduh5g+yZ/6x+SXDSqj7jAJto/3p7dYxe1
+GP2XRPs2pVdw9Nv+uQRcOaQrBEHTmQCjcAWzYFLwqlT7ntk0MLrqfyK59Q/J9k1cAEAB6NjXGMbi
+6p/Ua6N6OrQoktCMmxN9pCUXfkf0/+c1v47R//10CdicXtF8FGjnxuAZ0XuyZsZoLgk1FrUYV/+k
+bizPDQUAHRsFyhXlgduTJXcm+dE656QxgmZO9C8jKP2s+cfXJZcGUmL0fz9dAjYmv6z4pY0in6aj
+QBrJ+LnRx7xWR2c5kHfI52XJnckDtye5IuM/FIBObwj4zWV1I6PR0xHYVPvGBy+aHLxO4VrJHKrA
+rEsuif0mYfR/f9ZlrY6/1tJCZoFVuPHBCyeHr0l0+ygMBClgBL+5rM7yfwrAGLgElOTGX9dHZSpY
+FGloJs6NPtZK329j8o+t+KWb0isD6VGk/EXvv0vANndzn1vcyiWg0RvsZ0cfzI2+VQE70783/rqe
+K9H9pwCMiVSw/vby+mhLBQuCRLdPCV7X2PnVSrhAAayOv+a0IjxR+78867H4i/7pc0CfU9o1lN5Z
+0ftGW0loI/3728vr2zcp078UgDExGy7MyrW/iAfKGoSjJVjSKPwv2qOnhG9ppfB/2P3vc4u3uZsD
+6WL0f//PiC4Ouge2ptc0inxaCgRNCF56SPi6URQIUgQhBsp67S/ikNPfKABjZDZcLo8VS9Jrf14v
+5MWNGoOpks6LPhlKb/NLH4clDclj8RdF2b1zwIZD5FfHX0u0r6XeYIERyJzoI1kzzaM6Gt5951DI
+y7U/r69YkubynP5GARgz9aBi8ZvL64mD2FES/Nk2I3xHtz2lpeBP48Nb02sG3QOWc/8P4J6AIb9q
+Y/rz5qcD7TIkbty8zCc8EhkFmQCxSBx+c3ldWP1JAcBYSgUXSrJkcXLbDXHxYPc9Nqz/5PA1s6L3
+t1r5A0iqA6vjr1nJM/hzIC8BoXSvSy6t+XUtaUAjENRrz54WXhjrFnNQZ7V6h2JBbrshXrI4KTD9
+SwHAGKvpSxP86Bs17w9mUYbAOi0X7Py50ScU2lIKt9El8HjyX1W/mp1fBzpchzD2m9ck32x1Qlwj
+czAzfE+3PSnR/oOZEBZ4jx99o5ZyaRAFYCxeArrltuvixTfExYPW/CKKxEr+8MyXAymNoPSz392x
+LvlBKD10/w/4JSANZdym5Iqt6XUNv76VAUFiJT8/8/nQjPNIDkrhlncoFmXxDfFt18WFbrr/FIAx
+eQloeEAH6xIgMKkOzst8smAWtF73qU6HVsT/LsojdPAWRkp2ZXxxottbzQYrXN4cOj/zWadlbUX4
+O+bwEwrAKLgEdB20S0Cj6n9a9LcTg/MVaUuhgEaqYE3yrYpbaqXA3O9B3Rq/7rH4Cy2VhO6aDJiX
++ZTHkBxE97+L7v/BxEa5Hj6Fg3YHMIhr2L5Fz/vrTJIeuDHojVXv44LTDs98eUfVv7Ri/YNt7oaV
+8cWhdDP4c7CXBucG/QOBdHXZExS++doegVGkXfZ4j/p29ycrRRwoIVcgCOQL76s8vtxFWWHzFwVg
+7DYGZ7Ly2MPu2NOCQxcE9RrEHJiBP+W8nXNU9vsiGYG0GPo3Nb/uofq7Ac8b5Oi4B0Rb02tL9ui8
+mdtSKE9gFMk4e3pd1/W7OwMpHQAN8A6lLll8Q/y9i4fyJTZ/gSEgZgLww6/WkuQAWX+Hamh6Ds98
+OZAutBz/VUBWxhfHfjNXvoyeM2Qlv6L+mUS3CwxaKwoKFH5u9Ikeu9Bp+QAUBYlBkuCHX2X0nwJA
+GvHQHrn19/Fvf1zrKopL9/O8B1QDKR2VvaT1xO9w6H998pOt6XWhjGPwZ/QcokYyYFX8+Ua3V2uH
+AgikdHjmy1byHvF+tcouRVdRfvvj2q2/j4s9jP6DISACAVRl7Sp/3psyxmA/FWUIjEcSSPGo7P8t
+miNb7Pkarvsc9A88Un+/lRx9/9GXDCgMuLtD6e2yx7cYCBKFC6Q7Y6Ztdb/fjxc7hbGIE3z23ZWB
+7RoEHP1GASCAKqIsnljhc0V5/tnRUBXG7A+VgdfyEdmvdNtTFWmL48Aa6x63L6ld6DEkCCkAozEZ
+IFG/WzwxeGko3QptNSFcMEcYibakVwfSvT9+v86hpySXfqV69Y/qdP8pAOSpzlEgyx90Z786U+oR
+t48rggRQh8ph2S9MCM5r3foP534fqf9L2d1/IMtFSKvFXR7Vij48KXgVhgWgNQ3otic7VLa7mwMp
+7PMZiFEGG57Qi/+x7PyBK3gjFID2IIywbYMODem5r8pUa/vwErDD+mc+Pym4oFHE2erkGYFdHX9l
+Q/LTUHoZ+h/dFUGZIb/Modxrz2w1xyMQQMfZMyOZuM1dLwj2YSzSO5QK8r8/XLnrxiTfxeIfCgB5
+houUycvSu9JjnxfOPdzW9o0GPM36pyOz/tvcDSvq/86q/7Y4R1byfe4veTOn9Ty/AKJwJXtcxkzd
+4q42CPeJBjiHUpfc9sfkax+p5Nn5RQEgu8UYJHWsXuZe8vqM7INs8N5a/x2h/76ltX9UJIBl6L89
+DpKE293N44IzIpnUUnfYzlhQ0RyVNdP2jQYojIFL8Kl3DG5a68MMO78oAGRPfWE5Wf2Qz3bJ6WdF
+lb3LBguMR/WwzOdGav2H3f8V8af63R2BlED3H22TDHA61O9vmxicbySSFjf87FsNSB3GleT7X61e
+eUm92Ev3nwJAnn1JXkYeuss9/2XRhMkmSUaYLjMIY904J/PBKeGbFYm0Pvm9oRmPxV95Ivl/oYzn
+qvd2qwjK1v2GQb1/cvBqhe61BkSttphhxwLUXE5WLnOffXfFBPy9UADIcxGEGNim61b5l74hMyIB
+EIGJddP06B2zoosUbsTWf1P6q1XxFxn6R7t2BuSH/KMpBnrtmY06rlZvkDs0YPqW9LcQYxC0qgGq
+iCL55N+Vl92f5orM/VIASBPZ4GxBlt3nxk2WU58fttQWIDCA86jNjv5ldvT+HX8irUd+ggF3z8P1
+fzbIgA377dwd1uf+HMnkkj1WkY5IA1zRHFkwC/rcLQ4V00oLiEsxrkt+8p3qj79e6xq/f7vcyciQ
+Qu9sPoVR91sROIdMBpfe1DNjrq3VtBkNEFiPGPCHZj69o+LTjizuvym9Ynn9U4IQMKz6b/M2cyiS
+Y3M/Kpqj9+ZIlP1DD9XemWrFIGzmRug9sll5fKW78My+eh3Wsu8XnAVEmr04hxH6t+mXP1ixtikP
+XBCkOhhI8ZjcZTuyvnZEkR+7Kf3Vo/WP7igDp/Vv85wSBJAHa39f9g+1uDts1+UBSdEceXjmKw4V
+j7iZoyWAtfjyByv92zSMaP3BEBBpPRB0vyv1ysIzwuqzBoIEYaLbu+2JR2a/UzCHjaDba2fkp+yX
+PFT7R4ssiz47qDssdChvdzdOCl5lJd9qYejOBTJZM6PYiAXpoJHsszgHLkV3l1z2repPv1Xr6mXw
+hwJARuS9hRm57Q/JwhdG02fben33GiAIEt3SbU89MvvdyEzcm2t+xS99sPZORWoQ0PfvsN1hqW4f
+8HeND15kJTsiDRheJNkTnLbd3RTrJiv53boIzqFYkgfuTD/+v8qZvNCLoACQEWIskpo+dE/6ktdn
+whBen14UJLCJbpsSvumwzBcDKe5Y74XWR/3YVAcfqr+j7jdYyXHLIzpvZLRkq35Vn1/cG5wdSKHV
+QRE7NSAjkycF58fYMujue6YGqCKwqFfxoTcNblnvw6wojxIFgIx8UGhO1j7q+/r0RRdknjYfQmBT
+7Z8avfXQzL8ZCQGV1pM6jQLBVAcfqv192S0NpItFnx08JaLm1wz6+8cH5+7FPcBbKUwIzk21b8Dd
+8bTZ4N6jVJTPv6/yp1/HxXFs+6IAkL1OBuSKcu8t6aQZ5qRF4c72YIFNdaA3OOvwzJcUrqXRj7u1
+/v3uzlB62PA1BpoDVgz6u/dCAwTwCt8bvKDsH6z4R3ZqQJqit1t+cWntv/5tqGu8OFp/sAyU7Iuq
+UO9gA3zvD92HHRNUKmqtNAo8js/9Mmdm6F77/v3uzlDG0fqPkUERiW7vticfmf1OIKWRJo28QKr+
+8Xurr24cRee0UJBHH0jf8aJ+l8Kw7hMsAyX7KBAUhKiW9dN/X65WNAwBL07LvcEZOTNzBE2eO7K+
+tP5js7YgDWVcv7vzodq7Et060tpQo/A5M7M3OMNpGV7CENWKfvrvy9WyBiGtPwWAYF9uUyp0y9I7
+0y9+oJLNikIUvtsuAnQExZoNp4/Wf2xrQM+gu+fe6mtH3B/QOHvddpHCKySblS9+oLL0zrTQzeAP
+BYDsa9IE3RPk19+rXf7Nak8JLg1zMg+QVn+JDetf07UP1d5J6z+GNcBZKcZ+00O1d/a5xSPSAANI
+Tua5NOwp4fJvVn/9vVr3BEkTPl0KANkfGuBQmiBf+WDld/9Tn9hjXCoj6/Ut+4fuq/71gLuX1n/M
+a0Ah1fKS2ts2pb8S2BEcBpfKxB7zu/+pf+WDldIESen7UwDI/ntlFYiy8vl/Grrz9mqU2ai+hRCQ
+wguCQXffg7V3pjoQSBetPzXAILQoPFr78Ob0KkHQypFQ9RplNt55e/Xz/zQUZUUBMPRPASD7tSo0
+ymBgm378woE1224T0+R+JW3kitcnP3qg9r+cDlrkaP3JzmIwI/kV9X8f9PcJgiZjQaoQI2u23fbx
+CwcGtmmUAXu+KAAEByAhnO/yT6zIvvXVV5XLA+pEn0MEtFEnuiL+zLL6xwWBIGK3F3na1VCRPFB9
+y6b0imbyAaqqTsrlgbe++qonVmTzXZ6JX7ARjBywe0C+EK168Imac+e9+Ow0Ta21z+r72xXxZ56I
+fxDJxJEVDpExMDfUCmSLuyZjDtkxO3qP3YVpmgZh8JFPfO6XP76me0JXmtL5pwCQA4j3PlvI/fnm
+xTNmTj/pxOPS1InRp76xw2Gfhu//RPyDUCYw7EOeVQOMQbQ5/Z3DQK89E5BnyIAqvEs1DINLf/jT
+j3/i4mJPyTlafwoAOQhIENhf/vI3Eyf1LjzlJKRGjOwI+EhjN6TTysr4s+uTy2n9SZOHykquz93a
+GDFrJLNjq4yXRgdYamxgvv3dS/7h3R/M5XMjXFpNKABkH7ysxoRR9KufXZWf+dCpJ41Pk+7A5hrT
+Xeq6fqv7w/L4E9vSP4YyjkF/0srYuEK/u3O7v8lIJpSeQEoNl6Ke9Pnw9i9//5Pve8d/FnpKIs+Z
+fyKcBUT286QgETs4MPCxbxff+vY51fKcILBeh4b88kS3imQscrT+ZASLwByqqvVQxufNoUbyaepy
+xVU/vGTVxe8ul7q6VB2NPwWAjAoNgJqhsv7rt6PXv91s6/M2MFYyglChXO1CRooRiCJxWnep7+0x
+P7vEf+7dcb4oEE/rD4aAyKiJBWkQ4sYr3ISpuYXPK1aroTGNjb58TQn2Ii2sgFEXTezJ/ewSf/G7
+h3JFiGHghwJARtmrKgZBiBuuqI+bKqecFgxV1bDNg+w1LkVvN356SfXidw/miiKGDV8UADJ6NUBu
+uCLunWpOOS0cqjUyBHw0ZIRzyL1Hb7f89JLaxe8u0/pTAEibaMCv4p6J5qTnh3EMgBpARmL9AXSV
+5KffqX3uvbT+FADSLhogCCO5/pfxti3+7Fdk0mQ32+QJwbO1GcIICgX53D+X/8+nhwpdIsIdLxQA
+grapC8rm5e4b0y2b/YsuyHiFSyFMCZBmrL9DGKGQl8+8p/zz/6x1TRBVWn8KAGm3K3yuJPfcnK58
+xC06J8wXTVwH08IEz5XyzeVlaFA/+Y7yb/5fvWsi13uxD4C0LUGI/o167OnB16/o6hlvBvs1CPlU
+CPa0da7ULX1b/T9fMHD/n9PuyVzvBY6DJm2+SHKyPHhHeuEL+h+8I53Qw1ea7PGoTOh58qjQ+oMh
+IIKOSOhl8rJlg7/xynjyLHPsiUG1PpwrJgSAeqhiXLf87hf1j72tvOkJX+gWx8mBFADSMW94Jiu1
+Kq75WT3XJSefEXpFmjIlQOAcggj5vPzwG9XP/EPZe+TyjPtTAEjH5YRtgCgjf/xlfcM6Pe2FUb4o
+tRo1YEyTpiiWJK7ic++tfP9zQ8Vxxlh4FvtTAEin7pTPleS+W9LF1ydHnxLMmm3ZLTzGu3yX3pt+
+4K8Hb/5t3DXReM6OogCQzl8nWZL1a/zv/7vePdGcsCh0juEgjLmwT4BSUX5xae1f3zq44XHf1cug
+PwWAYMykhbOSprjuF/HG9X7hWVGxS+pVasBYqfQvdkl9CJ9/X+W//m3IhpLN0fpTAMgYiwAYg2xe
+7r05ve2PyeHHBrPn2XodyuqgjhZ+KLq75IE70g+/efBPv467xosIg/4UADKGu4U3rPFXXV7PFOSk
+00MbSJ0Nw+jMfG8uL5mMXPbN6sffVt683hfHsdqHAkABGPMpgSgrIrjpyvjBO9OjTgmmTzNVXgU6
+y/FXxbguWbXMfeJvyz/9z1omL1FWPK0/BYACQBq2PluQ5Uvc7/87jvI4/jReBTrK8Y8i+cl/VT9x
+YXnZkrSrV6Ac7EwoAOSpV4FsXuIYf/xV/ODd6VEnBTOmm3oC5ygDaNNSH2MwriSrHnWf/Lvyj79e
+kwC5AsM+hAJAniUzXJRlS9y1P4/riR53WlgoSq3KXoF2q/F3KHWLc/j+l6uffXfl0fvTrvEiYL6X
+UADIc10FcnmJ6/jLb5M7b06nzLLzF1ivSGIYASgDo7vXzzlEGZQKsviG5N/eUb7y+3UJkKfjT8Bx
+0KSVlTLGojKgxuDlb8m+86O5GbPsQEVdChvw8WB0FvjbAF0FeXy1++7nq1ddVvMehS7xjutcCG8A
+ZEQFQjaU+29J//DLuFrTYxaG3SWpx/CeiYHRFe4XQXeXxAku/Ur14vdU7roxyXdJlGGpD6EAkL3Z
+DK7IFWWojL/8PrnlmsRGOPKEMJ+Xeh3quWYSB319owJdXSIiv76sdvE/Vn73o7rzyNPxJwwBkX0b
+EaqWNanhtBeHb3lfbtELIyMoDyoUxvIJHQTTD0GxJF6x+Lr4sq9Wb70mCbPIFWn6CQWA7AeMgRgM
+9qsRLHph9KZ/ylIGDrrp/9E3aouvi72i1C3qWedDKABkv8qABRTlATXmKTJQGVSvsIaVQthfFT4e
+RlB4mun3KHYJBAz3EwoAOWgysPDsKLSoDGmawFj2Dezjuv4gRCEvicNtN9D0EwoAGT0y0K9BiGMX
+hS9/c+bFr82USlKNtV6DCIuFsPdjfDJZ5CIZHNRrflG/6vL6/YuTNEGxm6afUADIqJGByqB6h0OP
+tue+JvOyt2Smz7IeGCpro2aUF4JW13UZg3xRDLB2tfvtZfVr/6e+fIkzFoUSTT+hAJBRmCIWVIc0
+qWHcJHPWK6Lz35w5emGYDdG4EOz8DHkWuw8Mu/y1BEtuS35zef3GK+Ptm3yYRS4vOz9DCAWAjL4j
+ZWAMkhjVQY1yOPbU8CVvyJx2Tjh9jgVQrWoSD3+GYNdQj0cYIZcTAGtXuVuvT37/k/r9tydxFbmS
+hNHwZwihAJB26Bsw8B5DZfUpxk82zz8vPOsV0XGnhZMmmgSoVtSlEIGM1TuBKtRDFTZAriAhsGmz
+v+/W5MYr41uuTrZu9CZAviiNx8i6fkIBIGjTuFCSoFpWMZg+155zQXTGedGCE4NSQRxQq2kSj6Ho
+0M4YThghmxULDFZ06d3pzVfH118Rr13p1CNXlDAEoz2EAkA650KgQFxDvaJRDnMXBM87Nzz5BeHh
+xwWTJhkF6onGdXjXgdeCnc6+sYgyyIQiwKZN/pH70jv/mPzl2mTl0jSuIlOQKAsBXX5CASCdO1LC
+O9SqmtZgIkybZU8+Mzz+tOCE08MpM00ukhSo1zWJob6NxWCn0ReDMEImIwFQjXX9Gn/Pn5N7b03v
+vClZt9r5GEEW2Zw0HgvtPqEAEIyRqRLqEddRH1IIeibI/GOCU84MjzolOPToYOIUEwkcECeI6+o9
+oMN7aUbnBLqGuVcFBMYgykgUwgKxYvN6v3xJ+uAd6R03JcseSPu2KBSZvESZ4YfAUA+hAJCxGx0C
+kCSoV9XHsFlMPMTMOyo4dlGw4IRg5nw7dZbJRiKAA5IESazDJTECwbAeHMhbQsNPVw8FoMNFTWEk
+YQgLKFCL9YnVfs0yt/Se9P7F6YoH080bvKvBRMjkJAwBxnkIBYCQXZWg4d2rRxKjXlNNYUJ098rs
+w4LZh9vDj7UzD7NTZtrJ002+IAHgAQ8kiXoPl8Dr8PzqJ/XgqZssmxGJXY3yzp82/IcCERiBDWEM
+wlAMYIAUGKroxrV+/Rq35lH3yP3usUfcY4+m/dvUJ5AAmayE0fA/bfiWQAgFgJA9ioGBCNQjTRHX
+1CUAYEOUumXKbHvINDPniGDWYWbyNHPILFsoStc4ibJiAQt4oNEn6xVJXYeH0ynSBM9uewUIQuz8
+fJgRIwBgAQM4wAFxTQe2a6WsG1a7jev86kf9qofTDev8+sfcYP+T3zPKShBAzJPJAEIoAISM6GYg
+w554miKJNU2AFAhgDHommDDEtDk2V5C5C2yxSwolOfSYII210CXT59pG/5QY9E4yxuzRFovAe2zb
+5Hd+fu1KVxnQIJLlD6SVQS0P6MqlrlrRdatckqBvi/d++GsEIcJIguDJ70lPn1AACNkvetCIxjRC
+NGnaiBqp99AU8ICFDeE9MlnpmSCNj5kAs+dbG8izCIBL9bFlzqfDP79vi9ZragxcAjjAQILhcL8Y
+BMFTvgYtPqEAEHIQJGH4f3dG/HfYYq9oxGSARhfCc1voKCs7MwU2hNnlh+/MCgwngWnuSZsT8BEQ
+dMDi4j2b4yDcxbhnpJlqzqd07dLKEwoAIW0tD8P/zRHKhOwCRzISQggFgBBCCAWAEEIIBYAQQggF
+gBBCCAWAEEIIBYAQQggFgBBCCAWAEEIIBYAQQggFgBBCCAWAEEIIBYAQQggFgBBCCAWAEEIIBYAQ
+QggFgBBCCAWAEEIIBYAQQggFgBBCCAWAEEIIBYAQQggFgBBCCAWAEEIoAIQQQigAhBBCKACEEEIo
+AIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACE
+EEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCKACEEEIoAIQQQigAhBBCAeAjIIQQCgAhhBAKACGE
+EAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAK
+ACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEEAoAIYQQCgAhhBAKACGEUAAIIYRQAAgh
+hFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQ
+AAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhFAACCGEUAAIIYRQAAghhAJACCGEAkAI
+IYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGEAkAIIYQCQAghhAJACCGE
+AkAIIYQCQAghhAJACCFkX/P/ATAx7ylQMZbyAAAAAElFTkSuQmCC
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/index.html
+cat > "$DEST/server/src/main/resources/web/index.html" << 'TSM_EOF'
+<!doctype html>
+<!-- SPDX-FileCopyrightText: 2026 Stefano Spagnolo -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Campi">
+<title>Prenota un campo</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="icon-192.png" alt="" class="logo">
+  <div class="head-text"><div id="club" class="club"></div><div id="who" class="who"></div></div>
+  <button id="logout" class="ghost small" hidden></button>
+</header>
+<main id="app"><p class="dim center" id="loading">…</p></main>
+<div id="sheet" class="sheet" hidden><div class="sheet-box" id="sheet-box"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/manifest.webmanifest
+cat > "$DEST/server/src/main/resources/web/manifest.webmanifest" << 'TSM_EOF'
+{
+  "name": "Prenota un campo",
+  "short_name": "Campi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/style.css
+cat > "$DEST/server/src/main/resources/web/style.css" << 'TSM_EOF'
+/* SPDX-FileCopyrightText: 2026 Stefano Spagnolo */
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+
+:root {
+  --bg: #0B1220; --surface: #151D2E; --high: #1E2940; --outline: #33415C;
+  --ball: #C6F432; --on-ball: #15210A; --text: #F1F5FB; --dim: #9AA8BD; --danger: #FF3B30; --mine: #FFD600; --on-mine: #231C00;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); min-height: 100vh; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--outline); position: sticky; top: 0; background: var(--bg); z-index: 2; }
+.logo { width: 36px; height: 36px; border-radius: 10px; }
+.head-text { flex: 1; min-width: 0; }
+.club { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who { color: var(--dim); font-size: 13px; }
+main { max-width: 900px; margin: 0 auto; padding: 16px; }
+h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--dim); margin: 20px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+.dim { color: var(--dim); }
+.center { text-align: center; }
+.error { color: var(--danger); }
+button { font: inherit; border: 0; border-radius: 12px; padding: 12px 18px; background: var(--ball); color: var(--on-ball); font-weight: 700; cursor: pointer; min-height: 44px; }
+button.ghost { background: transparent; color: var(--text); border: 1px solid var(--outline); font-weight: 600; }
+button.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+button.small { padding: 6px 12px; min-height: 36px; font-size: 14px; }
+button:disabled { opacity: .45; cursor: default; }
+input, select { font: inherit; width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--outline); background: var(--high); color: var(--text); min-height: 44px; }
+input.code { text-transform: uppercase; letter-spacing: .15em; text-align: center; font-size: 20px; }
+label { display: block; margin: 12px 0 6px; color: var(--dim); font-size: 14px; }
+.row { display: flex; gap: 10px; align-items: center; }
+.row > .grow { flex: 1; min-width: 0; }
+.days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.days button { flex: 0 0 auto; background: var(--surface); color: var(--text); border: 1px solid var(--outline); font-weight: 600; padding: 8px 12px; text-align: center; line-height: 1.15; }
+.days button.on { background: var(--ball); color: var(--on-ball); border-color: var(--ball); }
+.days small { display: block; font-weight: 400; font-size: 12px; }
+.grid-wrap { overflow-x: auto; border: 1px solid var(--outline); border-radius: 14px; }
+table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
+.grid th, .grid td { border-bottom: 1px solid var(--outline); padding: 0; }
+.grid th { position: sticky; top: 0; background: var(--surface); font-size: 13px; padding: 8px 6px; text-align: center; min-width: 84px; }
+.grid th small { display: block; color: var(--dim); font-weight: 400; font-size: 11px; }
+.grid td.time { color: var(--dim); font-size: 13px; padding: 0 8px; white-space: nowrap; width: 1%; position: sticky; left: 0; background: var(--bg); }
+.cell { display: block; width: 100%; border-radius: 0; min-height: 44px; padding: 6px; font-size: 13px; font-weight: 600; border-left: 1px solid var(--outline); }
+.cell.FREE { background: rgba(198, 244, 50, .12); color: var(--ball); }
+.cell.BUSY { background: var(--high); color: var(--dim); font-weight: 400; }
+.cell.MINE { background: var(--mine); color: var(--on-mine); }
+.cell.BLOCKED { background: repeating-linear-gradient(45deg, var(--surface), var(--surface) 6px, var(--high) 6px, var(--high) 12px); color: var(--dim); font-weight: 400; }
+.cell.PAST { background: var(--bg); color: var(--outline); font-weight: 400; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--dim); margin: 10px 0; }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend .FREE::before { background: rgba(198, 244, 50, .5); } .legend .MINE::before { background: var(--mine); }
+.legend .BUSY::before { background: var(--high); border: 1px solid var(--outline); } .legend .BLOCKED::before { background: var(--surface); border: 1px dashed var(--dim); }
+.sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+.sheet[hidden] { display: none; }
+.sheet-box { background: var(--surface); border-radius: 18px 18px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; }
+@media (min-width: 600px) { .sheet { align-items: center; } .sheet-box { border-radius: 18px; } }
+.sheet-box h3 { margin: 0 0 4px; font-size: 19px; }
+.actions { display: flex; gap: 10px; margin-top: 18px; }
+.actions button { flex: 1; }
+.price { font-size: 22px; font-weight: 700; color: var(--ball); margin-top: 12px; }
+.check { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.check input { width: 22px; height: 22px; min-height: 0; }
+.toast { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); background: var(--high); border: 1px solid var(--outline); border-radius: 12px; padding: 12px 16px; text-align: center; z-index: 20; }
+.toast[hidden] { display: none; }
+.tip { font-size: 13px; color: var(--dim); border-left: 3px solid var(--ball); padding-left: 10px; margin-top: 16px; }
+.cell:disabled { opacity: 1; cursor: default; }
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/resources/web/sw.js
+cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
+const CACHE = 'tsm-campi-1';
+const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+
+self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
+self.addEventListener('activate', e => e.waitUntil(
+  caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.pathname.startsWith('/api/')) return;
+  // Prima la rete (così un aggiornamento del server arriva subito), la copia se manca.
+  e.respondWith(fetch(e.request).then(r => {
+    const copy = r.clone();
+    if (r.ok) caches.open(CACHE).then(c => c.put(e.request, copy));
+    return r;
+  }).catch(() => caches.match(e.request, { ignoreSearch: true })));
+});
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/ApiTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/ApiTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.Busy
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.CourtSettings
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.io.File
+import java.nio.file.Files
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
+class ApiTest {
+    private val zone = ZoneId.of("Europe/Rome")
+    /** Lunedì 9 novembre 2026 alle [h], ora del circolo. */
+    private fun mon(h: Int, plusDays: Long = 0) = ZonedDateTime.of(2026, 11, 9, h, 0, 0, 0, zone).plusDays(plusDays).toInstant().toEpochMilli()
+
+    private var now = mon(10)
+    private lateinit var dir: File
+    private lateinit var store: Store
+    private lateinit var api: Api
+    private val json = Json { encodeDefaults = true }
+
+    @Before fun setUp() {
+        dir = Files.createTempDirectory("tsm-server").toFile()
+        store = Store(dir) { now }
+        api = Api(store, Limiter(max = 5) { now })
+    }
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null, query: Map<String, String> = emptyMap(), ip: String = "1.2.3.4") =
+        api.handle(Req(method, "/api/v1$path", query, body, token, ip))
+
+    private fun obj(r: Resp): JsonObject = Json.parseToJsonElement(r.body).jsonObject
+
+    private fun pairAndSync(): String {
+        val code = store.ensureSetupCode()!!
+        val r = call("POST", "/admin/pair", """{"code":"${code.lowercase().chunked(5).joinToString("-")}"}""")
+        assertEquals(200, r.status)
+        val admin = obj(r)["token"]!!.jsonPrimitive.content
+        val sync = ClubSync(
+            club = "TC Prova", courts = listOf("Campo 1", "Campo 2"),
+            settings = CourtSettings(openHour = 8, closeHour = 22, centsPerHour = 1000, centsPerHourLights = 1500),
+            busy = listOf(Busy("Campo 2", mon(15), mon(16))), rules = BookingRules(maxFuture = 1),
+        )
+        assertEquals(200, call("PUT", "/admin/sync", json.encodeToString(ClubSync.serializer(), sync), admin).status)
+        return admin
+    }
+
+    private fun invite(admin: String, player: String = "p1", name: String = "Mario"): String {
+        val r = call("POST", "/admin/invites", """{"player":"$player","name":"$name"}""", admin)
+        assertEquals(200, r.status)
+        val code = obj(r)["code"]!!.jsonPrimitive.content
+        val c = call("POST", "/claim", """{"code":"$code"}""")
+        assertEquals(200, c.status)
+        return obj(c)["token"]!!.jsonPrimitive.content
+    }
+
+    @Test fun pairingOnlyOnceAndKeysAreHashed() {
+        val admin = pairAndSync()
+        assertFalse(File(dir, Store.SETUP_FILE).exists())
+        assertEquals(403, call("POST", "/admin/pair", """{"code":"AAAAAAAAAA"}""").status)
+        assertEquals(401, call("PUT", "/admin/sync", "{}", "sbagliata").status)
+        assertFalse(File(dir, "state.json").readText().contains(admin))
+        // Riparte dal file: la chiave vale ancora.
+        val again = Api(Store(dir) { now })
+        assertEquals(200, again.handle(Req("GET", "/api/v1/admin/state", token = admin)).status)
+    }
+
+    @Test fun inviteWorksOnce() {
+        val admin = pairAndSync()
+        val r = call("POST", "/admin/invites", """{"player":"p1","name":"Mario"}""", admin)
+        val code = obj(r)["code"]!!.jsonPrimitive.content
+        assertEquals(200, call("POST", "/claim", """{"code":"$code"}""").status)
+        assertEquals(403, call("POST", "/claim", """{"code":"$code"}""").status)
+    }
+
+    @Test fun inviteExpires() {
+        val admin = pairAndSync()
+        val code = obj(call("POST", "/admin/invites", """{"player":"p1","name":"Mario","days":1}""", admin))["code"]!!.jsonPrimitive.content
+        now += 2 * 86_400_000L
+        assertEquals(403, call("POST", "/claim", """{"code":"$code"}""").status)
+    }
+
+    @Test fun bookSeeAndCancel() {
+        val admin = pairAndSync()
+        val mario = invite(admin)
+        val luca = invite(admin, "p2", "Luca")
+
+        val me = obj(call("GET", "/me", token = mario))
+        assertEquals("Mario", me["name"]!!.jsonPrimitive.content)
+        assertEquals("2026-11-09", me["days"]!!.jsonArray.first().jsonPrimitive.content)
+
+        assertEquals(409, call("POST", "/bookings", """{"court":"Campo 2","start":${mon(15)},"minutes":60}""", mario).status)
+        val b = call("POST", "/bookings", """{"court":"Campo 1","start":${mon(15, 2)},"minutes":60}""", mario)
+        assertEquals(201, b.status)
+        val id = obj(b)["id"]!!.jsonPrimitive.content
+        assertEquals("1000", obj(b)["cents"]!!.jsonPrimitive.content)
+        // Una sola prenotazione per volta (maxFuture = 1).
+        assertEquals("TOO_MANY", obj(call("POST", "/bookings", """{"court":"Campo 1","start":${mon(16, 2)},"minutes":60}""", mario))["error"]!!.jsonPrimitive.content)
+        // Luca la vede occupata, senza nome.
+        val day = call("GET", "/day", token = luca, query = mapOf("date" to "2026-11-11"))
+        assertEquals(200, day.status)
+        val cell = obj(day)["cells"]!!.jsonArray.map { it.jsonObject }.first { it["court"]!!.jsonPrimitive.content == "Campo 1" && it["start"]!!.jsonPrimitive.content == mon(15, 2).toString() }
+        assertEquals("BUSY", cell["state"]!!.jsonPrimitive.content)
+        assertFalse(day.body.contains("Mario"))
+        assertEquals("TAKEN", obj(call("POST", "/bookings", """{"court":"Campo 1","start":${mon(15, 2)},"minutes":60}""", luca))["error"]!!.jsonPrimitive.content)
+        // Luca non la può disdire; Mario sì.
+        assertEquals(409, call("DELETE", "/bookings/$id", token = luca).status)
+        assertEquals(200, call("DELETE", "/bookings/$id", token = mario).status)
+        // La segreteria vede le prenotazioni coi nomi.
+        call("POST", "/bookings", """{"court":"Campo 1","start":${mon(18, 1)},"minutes":60}""", luca)
+        val st = obj(call("GET", "/admin/state", token = admin))
+        assertEquals("Luca", st["bookings"]!!.jsonArray.single().jsonObject["name"]!!.jsonPrimitive.content)
+        // Troppo tardi per disdire da soli (meno di 24 ore).
+        val late = obj(call("POST", "/bookings", """{"court":"Campo 2","start":${mon(18)},"minutes":60}""", mario))["id"]!!.jsonPrimitive.content
+        assertEquals("TOO_LATE", obj(call("DELETE", "/bookings/$late", token = mario))["error"]!!.jsonPrimitive.content)
+        assertEquals(200, call("DELETE", "/admin/bookings/$late", token = admin).status)
+    }
+
+    @Test fun removedPlayerAndLogout() {
+        val admin = pairAndSync()
+        val mario = invite(admin)
+        assertEquals(200, call("POST", "/logout", token = mario).status)
+        assertEquals(401, call("GET", "/me", token = mario).status)
+        val again = invite(admin)
+        assertEquals(200, call("DELETE", "/admin/players/p1", token = admin).status)
+        assertEquals(401, call("GET", "/me", token = again).status)
+    }
+
+    @Test fun tooManyWrongTriesWait() {
+        pairAndSync()
+        repeat(5) { assertEquals(403, call("POST", "/claim", """{"code":"ZZZZZZZZZZ"}""", ip = "9.9.9.9").status) }
+        assertEquals(429, call("POST", "/claim", """{"code":"ZZZZZZZZZZ"}""", ip = "9.9.9.9").status)
+        assertEquals(403, call("POST", "/claim", """{"code":"ZZZZZZZZZZ"}""", ip = "8.8.8.8").status)
+        now += 16 * 60_000L
+        assertEquals(403, call("POST", "/claim", """{"code":"ZZZZZZZZZZ"}""", ip = "9.9.9.9").status)
+    }
+
+    @Test fun infoBeforeAndAfterSync() {
+        assertTrue(obj(call("GET", "/info"))["paired"].toString() == "false")
+        pairAndSync()
+        assertEquals("TC Prova", obj(call("GET", "/info"))["club"]!!.jsonPrimitive.content)
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- settings.gradle.kts
 cat > "$DEST/settings.gradle.kts" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -70573,6 +72854,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "TennisScoreManager"
 include(":app")
+// Le regole dei campi (Kotlin puro), usate dall'app e dal server del circolo.
+include(":courtcore")
+// Il server del circolo per le prenotazioni dei giocatori: facoltativo, gira su un Raspberry Pi o su un PC.
+include(":server")
 TSM_EOF
 
 chmod +x "$DEST/gradlew"
@@ -73429,6 +75714,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 223 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 244 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

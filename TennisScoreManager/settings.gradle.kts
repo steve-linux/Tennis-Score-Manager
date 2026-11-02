@@ -29,3 +29,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "TennisScoreManager"
 include(":app")
+// Le regole dei campi (Kotlin puro), usate dall'app e dal server del circolo.
+include(":courtcore")
+// Il server del circolo per le prenotazioni dei giocatori: facoltativo, gira su un Raspberry Pi o su un PC.
+include(":server")
