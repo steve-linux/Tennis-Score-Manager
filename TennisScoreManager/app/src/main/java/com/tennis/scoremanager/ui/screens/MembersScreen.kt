@@ -110,6 +110,7 @@ fun MembersScreen(c: MatchController) {
     val shown = (if (query.isBlank()) members else Players.search(members, query))
         .filter { !todoOnly || todo(it) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.11") },
         title = s.membersTitle,
         subtitle = s.membersHint,
         icon = Icons.Filled.CardMembership,

@@ -67,6 +67,7 @@ fun LaddersScreen(c: MatchController) {
     val list by c.ladders.collectAsState()
     var create by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.19") },
         title = s.ldTitle, subtitle = s.ldHint, icon = Icons.Filled.EmojiEvents,
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
@@ -120,6 +121,7 @@ fun LadderScreen(c: MatchController) {
     var result by remember { mutableStateOf<Challenge?>(null) }
     val now = System.currentTimeMillis()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.19") },
         title = l.name, subtitle = s.ldPlayers(l.players.size), icon = Icons.Filled.EmojiEvents,
         action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.ldSettings, tint = TsmColors.Ball) } },
         bottomBar = {

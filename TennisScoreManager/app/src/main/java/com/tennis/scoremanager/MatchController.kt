@@ -134,7 +134,7 @@ enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNA
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
  * ([Role.tabs]).
  */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE }
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
  * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
@@ -145,8 +145,8 @@ enum class Role(val tabs: List<HomeTab>) {
     PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
     /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
     COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
-    /** Circolo: tornei, campi coi loro tabelloni, giocatori e allenatori. */
-    CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+    /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
+    CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
 
 /**
@@ -705,7 +705,7 @@ class MatchController(
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
             Screen.STROKE_SESSIONS -> strokeSessionsBack
-            Screen.HELP -> Screen.HOME
+            Screen.HELP -> helpBack.also { helpBack = Screen.HOME }
             Screen.STUDENTS -> Screen.HOME
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
@@ -718,7 +718,7 @@ class MatchController(
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
-            Screen.COURT_STATS -> Screen.COURTS_PLAN
+            Screen.COURT_STATS -> statsBack
             Screen.LADDERS -> Screen.HOME
             Screen.LADDER -> Screen.LADDERS
             Screen.SCHOOL -> Screen.HOME
@@ -1610,6 +1610,27 @@ class MatchController(
             saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
             return
         }
+    }
+
+    // ---- Statistiche dei campi (dal planning o dalla scheda Campi: Indietro torna lì) ----
+
+    private var statsBack = Screen.COURTS_PLAN
+
+    fun openCourtStats() {
+        statsBack = if (screen.value == Screen.COURTS_PLAN) Screen.COURTS_PLAN else Screen.HOME
+        screen.value = Screen.COURT_STATS
+    }
+
+    // ---- Aiuto al punto giusto ----
+
+    /** La sezione della guida da aprire (dal "?" di una schermata), e dove si torna. */
+    val helpSection = MutableStateFlow<String?>(null)
+    private var helpBack = Screen.HOME
+
+    fun openHelp(section: String) {
+        helpSection.value = section
+        helpBack = screen.value
+        screen.value = Screen.HELP
     }
 
     // ---- Classifica a sfida ----

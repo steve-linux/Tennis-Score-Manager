@@ -101,6 +101,7 @@ fun ClubTournamentsScreen(c: MatchController) {
     val lang = c.options.value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.13") },
         title = s.ctTitle,
         subtitle = s.ctHint,
         icon = Icons.Filled.EmojiEvents,
@@ -159,6 +160,7 @@ fun ClubTournamentScreen(c: MatchController) {
     val hasResults = t.matches.any { it.played && !it.bye }
     val hasKnockout = t.matches.any { it.round > 0 }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.13") },
         title = t.name,
         subtitle = kindLine(s, t),
         icon = Icons.Filled.EmojiEvents,

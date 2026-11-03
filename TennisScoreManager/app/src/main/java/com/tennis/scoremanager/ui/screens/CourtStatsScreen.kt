@@ -83,6 +83,7 @@ fun CourtStatsScreen(c: MatchController) {
     val (from, to) = period(kind, System.currentTimeMillis())
     val r = remember(plan, tournaments, courts, from, to) { CourtStats.report(plan, tournaments, courts, from, to) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
         title = s.stTitle,
         subtitle = shortDate(from, c.options.value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.value.lang),
         icon = Icons.Filled.BarChart,

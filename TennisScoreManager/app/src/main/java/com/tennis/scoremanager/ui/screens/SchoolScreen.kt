@@ -91,6 +91,7 @@ fun SchoolScreen(c: MatchController) {
     val now = remember { System.currentTimeMillis() }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.16") },
         title = s.scTitle,
         subtitle = s.scHint,
         icon = Icons.Filled.School,
@@ -147,6 +148,7 @@ fun CourseScreen(c: MatchController) {
     var openLesson by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.16") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, (co.coach?.let { c.playerById(it)?.name } ?: co.coachName).ifBlank { null }?.let { s.scCoachLine(it) },
             "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),

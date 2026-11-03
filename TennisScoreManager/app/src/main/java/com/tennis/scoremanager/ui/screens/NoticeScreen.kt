@@ -91,6 +91,7 @@ fun NoticeScreen(c: MatchController) {
     val focus = androidx.compose.ui.platform.LocalFocusManager.current
     fun open(i: Intent) { focus.clearFocus(); launch(context, i, s.ntNoApp) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.14") },
         title = p.title,
         subtitle = p.subject,
         icon = Icons.Filled.Campaign,

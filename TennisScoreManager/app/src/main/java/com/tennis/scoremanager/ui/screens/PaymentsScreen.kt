@@ -123,6 +123,7 @@ fun PaymentsScreen(c: MatchController) {
     var exportYear by remember { mutableStateOf(year) }
     var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.12") },
         title = s.paymentsTitle,
         subtitle = s.paymentsHint,
         icon = Icons.Filled.Payments,

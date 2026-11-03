@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -40,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -213,6 +215,8 @@ fun ScreenScaffold(
     bottomBar: @Composable RowScope.() -> Unit,
     /** Pulsante facoltativo a destra del titolo. */
     action: (@Composable () -> Unit)? = null,
+    /** Il "?" in alto: apre la guida alla sezione di questa schermata. */
+    onHelp: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
@@ -225,6 +229,9 @@ fun ScreenScaffold(
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = TsmColors.TextDim)
+            }
+            if (onHelp != null) IconButton(onClick = onHelp) {
+                Icon(Icons.AutoMirrored.Filled.HelpOutline, LocalStrings.current.moreHelp, tint = TsmColors.TextDim)
             }
             if (action != null) {
                 Spacer(Modifier.width(8.dp))

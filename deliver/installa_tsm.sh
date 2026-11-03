@@ -684,8 +684,9 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
 - Unter **Mehr › Profil und Daten › Rollen** (und beim ersten Start) wählst du, wer die App nutzt; du kannst mehrere haben. Rollen ändern die Reiter des ersten Bildschirms, **die Daten bleiben dieselben**; bei mehreren Rollen steht oben die aktive: antippen, um zu wechseln.
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
-  - **Verein**: **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
+  - **Verein**: **Heute** (die Buchungen des Tages, was offen ist, Mitglieder zu klären, Turnierspiele, Trainingsstunden, Mannschaftsspiele und Forderungen: Antippen führt dorthin), **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
   - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik und Vereinsserver. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
+  - Das **?** oben in vielen Bildschirmen öffnet die Anleitung genau beim Abschnitt dieses Bildschirms.
 - Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
 - **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
 
@@ -780,6 +781,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Regeln für die Spieler**, im selben Dialog: Online-Buchung offen oder zu, wie viele Tage im Voraus, Buchungen pro Spieler, längste Buchung, bis wie viele Stunden vorher man selbst storniert, bis wie viele Minuten vorher man noch bucht, welche Plätze online buchbar sind und wie bezahlt wird (diesen Text lesen die Spieler).
 - **Einen Spieler einladen**: auf seiner Karte **Einladung zum Online-Buchen**: ein QR-Code und ein Code, einmal gültig für 14 Tage (oder **Link teilen**). Der Spieler scannt den QR-Code. Am iPhone führt ihn die **TSM**-Seite durch: *Teilen › Zum Home-Bildschirm*, dann TSM vom Home-Bildschirm öffnen und den Code einfügen (Safari und die App auf dem Home-Bildschirm teilen keine Daten, deshalb wird die Einladung in der installierten App benutzt). Die Karte zeigt, wer online bucht; **Online-Zugang entfernen** trennt ihn.
 - **Mit der TSM-App auf Android** bucht der Spieler auch unter *Spielen › Platz buchen*: den Einladungs-QR-Code scannen (oder den Link einfügen), dann die eigenen Buchungen sehen, den Tag wählen und ein freies Feld antippen; Dauer, Heizung und Preis vor dem Bestätigen, **Stornieren**, solange es noch geht, **Diesen Verein verlassen**, um das Handy zu trennen. Es gelten dieselben Regeln wie auf der Webseite.
+- Seite und App haben **drei Reiter**: **Buchen** (Tage und Felder), **Meine** (Buchungen, Wartelisten, Erinnerungen) und **Partner** (Partner gesucht).
 - **Online-Buchungen** erscheinen im Plan mit dem Namen des Spielers und dem Hinweis *online*, zum Platzpreis; sie werden wie die anderen belastet und kassiert. Entfernt oder verschiebt das Büro eine, wird sie auf dem Server frei; storniert der Spieler, verschwindet sie aus dem Plan. Andere Spieler sehen nur *Belegt*, nie Namen.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
@@ -1225,8 +1227,9 @@ Everyone who plays or practises is a **player** in the database, with an ID that
 - In **More › Profile and data › Roles** (and at the first start) you choose who uses the app; you can have more than one. Roles change the tabs of the first screen, **the data is the same**; with several roles the active one is shown at the top: tap it to switch to another.
   - **You**: Play, Practice, Video, Progress, More (the app as always).
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
-  - **Club**: **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
+  - **Club**: **Today** (the day's bookings, what there is to collect, members to sort out, tournament matches, lessons, fixtures and challenges: tap a box to go there), **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
   - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics and Club server. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
+  - The **?** at the top of many screens opens the guide right at that screen's section.
 - The scoreboard is there in every role: nothing stops you from scoring a match.
 - **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
 
@@ -1321,6 +1324,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Rules for players**, in the same dialog: online booking open or closed, how many days ahead, bookings per player, longest booking, how many hours before players can cancel by themselves, how many minutes before they can still book, which courts are bookable online and how to pay (players read this text).
 - **Inviting a player**: on their card, **Invite to book online**: a QR and a code that work once, for 14 days (or **Share the link**). The player scans the QR. On iPhone the **TSM** page walks them through it: *Share › Add to Home Screen*, then open TSM from the Home Screen and paste the code (Safari and the Home Screen app do not share data, so the invitation is used in the installed app). The card shows who books online; **Remove online access** disconnects them.
 - **With the TSM app on Android** a player can also book from *Play › Book a court*: scan the invitation QR (or paste the link), then see your bookings, pick the day and tap a free slot; length, heating and price before confirming, **Cancel** while still in time, **Leave this club** to disconnect the phone. The rules are the same as on the web page.
+- The page and the app have **three tabs**: **Book** (days and slots), **Mine** (bookings, waiting lists, reminders) and **Partners** (Looking for a partner).
 - **Online bookings** appear in the planner with the player's name and the word *online*, at the court price; they are charged and collected like the others. If the office removes or moves one, it is freed on the server; if the player cancels, it disappears from the planner. Other players only see *Taken*, never names.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
@@ -1765,8 +1769,9 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
 - En **Más › Perfil y datos › Roles** (y en el primer arranque) eliges quién usa la app; puedes tener más de uno. Los roles cambian las pestañas de la primera pantalla, **los datos son los mismos**; con varios roles, arriba está el activo: tócalo para pasar a otro.
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
-  - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
+  - **Club**: **Hoy** (las reservas del día, lo que hay por cobrar, los socios por regularizar, los partidos de torneo, las clases, los encuentros y los desafíos: se toca un recuadro para ir), **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
   - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas y Servidor del club. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
+  - El **?** arriba en muchas pantallas abre la guía justo en la sección de esa pantalla.
 - El marcador está en todos los roles: nada te impide anotar un partido.
 - **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
 
@@ -1861,6 +1866,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **Las reglas para los jugadores**, en el mismo diálogo: reservas en línea abiertas o cerradas, cuántos días antes, reservas por jugador, duración máxima, hasta cuántas horas antes se anula solo, hasta cuántos minutos antes aún se reserva, qué pistas se reservan en línea y cómo se paga (este texto lo leen los jugadores).
 - **Invitar a un jugador**: en su ficha, **Invitación para reservar en línea**: un QR y un código que valen una vez durante 14 días (o **Compartir el enlace**). El jugador escanea el QR. En iPhone la página **TSM** le guía: *Compartir › Añadir a pantalla de inicio*, luego abre TSM desde la pantalla de inicio y pega el código (Safari y la app de la pantalla de inicio no comparten datos, así que la invitación se usa en la app instalada). En la ficha se ve quién reserva en línea; **Quitar el acceso en línea** lo desconecta.
 - **Con la app TSM en Android** el jugador también reserva desde *Jugar › Reservar pista*: escanea el QR de la invitación (o pega el enlace), luego ve sus reservas, elige el día y toca una casilla libre; duración, calefacción y precio antes de confirmar, **Anular** mientras haya tiempo, **Salir de este club** para desconectar el teléfono. Las reglas son las mismas que en la página web.
+- La página y la app tienen **tres pestañas**: **Reservar** (días y casillas), **Mías** (reservas, listas de espera, recordatorios) y **Compañeros** (Busco compañero).
 - **Las reservas en línea** entran en el planning con el nombre del jugador y la palabra *en línea*, al precio de la pista; se cargan y se cobran como las demás. Si la secretaría quita o mueve una, se libera en el servidor; si el jugador la anula, desaparece del planning. Los demás jugadores solo ven *Ocupada*, nunca nombres.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
@@ -2305,8 +2311,9 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
 - Dans **Plus › Profil et données › Rôles** (et au premier démarrage) vous choisissez qui utilise l'appli ; vous pouvez en avoir plusieurs. Les rôles changent les onglets du premier écran, **les données sont les mêmes** ; avec plusieurs rôles, le rôle actif est en haut : touchez-le pour passer à un autre.
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
-  - **Club** : **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
+  - **Club** : **Aujourd'hui** (les réservations du jour, ce qu'il y a à encaisser, les adhérents à régulariser, les matchs de tournoi, les leçons, les rencontres et les défis : on touche un encadré pour y aller), **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
   - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains et Serveur du club. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
+  - Le **?** en haut de nombreux écrans ouvre le guide à la section de cet écran.
 - Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
 - **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
 
@@ -2401,6 +2408,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Les règles pour les joueurs**, dans la même fenêtre : réservations en ligne ouvertes ou fermées, combien de jours à l'avance, réservations par joueur, durée maximale, jusqu'à combien d'heures avant on annule seul, jusqu'à combien de minutes avant on réserve encore, quels terrains se réservent en ligne et comment payer (les joueurs lisent ce texte).
 - **Inviter un joueur** : sur sa fiche, **Invitation à réserver en ligne** : un QR et un code valables une fois pendant 14 jours (ou **Partager le lien**). Le joueur scanne le QR. Sur iPhone, la page **TSM** le guide : *Partager › Sur l'écran d'accueil*, puis il ouvre TSM depuis l'écran d'accueil et colle le code (Safari et l'app de l'écran d'accueil ne partagent pas leurs données, l'invitation s'utilise donc dans l'app installée). La fiche montre qui réserve en ligne ; **Retirer l'accès en ligne** le déconnecte.
 - **Avec l'app TSM sur Android**, le joueur réserve aussi depuis *Jouer › Réserver un terrain* : il scanne le QR de l'invitation (ou colle le lien), puis voit ses réservations, choisit le jour et touche un créneau libre ; durée, chauffage et prix avant de confirmer, **Annuler** tant qu'il est temps, **Quitter ce club** pour déconnecter le téléphone. Les règles sont les mêmes que sur la page web.
+- La page et l'app ont **trois onglets** : **Réserver** (jours et créneaux), **Les miennes** (réservations, listes d'attente, rappels) et **Partenaires** (Je cherche un partenaire).
 - **Les réservations en ligne** entrent au planning avec le nom du joueur et la mention *en ligne*, au prix du terrain ; elles se facturent et s'encaissent comme les autres. Si le secrétariat en retire ou en déplace une, elle se libère sur le serveur ; si le joueur annule, elle disparaît du planning. Les autres joueurs voient seulement *Occupé*, jamais les noms.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
@@ -2845,8 +2853,9 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
 - In **Altro › Profilo e dati › Ruoli** (e alla prima apertura) scegli chi usa l'app; puoi averne più di uno. I ruoli cambiano le schede della prima schermata, **i dati sono gli stessi**; con più ruoli, in alto c'è il ruolo attivo: toccandolo passi a un altro.
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
-  - **Circolo**: **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
+  - **Circolo**: **Oggi** (le prenotazioni del giorno, cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri e le sfide: ogni riquadro si tocca per andarci), **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
   - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi e Server del circolo. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
+  - Il **?** in alto in molte schermate apre la guida proprio alla sezione di quella schermata.
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
 
@@ -2941,6 +2950,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Le regole per i giocatori**, nello stesso dialogo: prenotazioni aperte o chiuse, fin quanti giorni avanti, quante prenotazioni a testa, durata massima, fino a quante ore prima si disdice da soli, fino a quanti minuti prima si prenota, quali campi si prenotano online e come si paga (il testo lo leggono i giocatori).
 - **Invitare un giocatore**: nella sua scheda, **Invito per prenotare online**: un QR e un codice che valgono una volta per 14 giorni (o **Condividi il link**). Il giocatore inquadra il QR. Su iPhone la pagina **TSM** lo guida: *Condividi › Aggiungi alla schermata Home*, poi apre TSM dalla Home e incolla il codice (Safari e l'app sulla Home non condividono i dati, quindi l'invito si usa nell'app installata). Nella scheda si vede chi prenota online; **Togli l'accesso online** lo scollega.
 - **Con l'app TSM su Android** il giocatore prenota anche da *Gioca › Prenota un campo*: inquadra il QR dell'invito (o incolla il link), poi vede le sue prenotazioni, sceglie il giorno e tocca una casella libera; durata, riscaldamento e prezzo prima di confermare, **Disdici** finché si è in tempo, **Esci da questo circolo** per scollegare il telefono. Le regole sono le stesse della pagina web.
+- La pagina e l'app hanno **tre schede**: **Prenota** (giorni e caselle), **Le mie** (prenotazioni, liste d'attesa, promemoria) e **Compagni** (Cerco compagno).
 - **Le prenotazioni online** entrano nel planning col nome del giocatore e la scritta *online*, con il prezzo del campo; si addebitano e si incassano come le altre. Se la segreteria la toglie o la sposta, sul server si libera; se il giocatore la disdice, sparisce dal planning. Gli altri giocatori vedono solo *Occupato*, mai i nomi.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
@@ -3385,8 +3395,9 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
 - Em **Mais › Perfil e dados › Papéis** (e na primeira abertura) você escolhe quem usa o app; pode ter mais de um. Os papéis mudam as abas da primeira tela, **os dados são os mesmos**; com vários papéis, no alto aparece o ativo: toque para passar a outro.
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
-  - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
+  - **Clube**: **Hoje** (as reservas do dia, o que há por receber, os sócios por regularizar, os jogos de torneio, as aulas, os encontros e os desafios: toca-se num quadro para lá ir), **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
   - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras e Servidor do clube. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
+  - O **?** em cima em muitos ecrãs abre o guia logo na secção desse ecrã.
 - O placar está em todos os papéis: nada impede você de marcar uma partida.
 - **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
 
@@ -3481,6 +3492,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **As regras para os jogadores**, no mesmo diálogo: reservas online abertas ou fechadas, quantos dias antes, reservas por jogador, duração máxima, até quantas horas antes se cancela sozinho, até quantos minutos antes ainda se reserva, que quadras se reservam online e como se paga (este texto é lido pelos jogadores).
 - **Convidar um jogador**: na sua ficha, **Convite para reservar online**: um QR e um código que valem uma vez durante 14 dias (ou **Partilhar a ligação**). O jogador lê o QR. No iPhone a página **TSM** guia-o: *Partilhar › Adicionar ao ecrã principal*, depois abre o TSM a partir do ecrã principal e cola o código (o Safari e a app do ecrã principal não partilham dados, por isso o convite usa-se na app instalada). Na ficha vê-se quem reserva online; **Retirar o acesso online** desliga-o.
 - **Com a app TSM no Android** o jogador também reserva em *Jogar › Reservar quadra*: lê o QR do convite (ou cola a ligação), depois vê as suas reservas, escolhe o dia e toca numa casa livre; duração, aquecimento e preço antes de confirmar, **Cancelar** enquanto há tempo, **Sair deste clube** para desligar o telemóvel. As regras são as mesmas da página web.
+- A página e a app têm **três separadores**: **Reservar** (dias e casas), **Minhas** (reservas, listas de espera, lembretes) e **Parceiros** (Procuro parceiro).
 - **As reservas online** entram na agenda com o nome do jogador e a palavra *online*, ao preço da quadra; cobram-se e recebem-se como as outras. Se a secretaria tirar ou mudar uma, fica livre no servidor; se o jogador a cancelar, desaparece da agenda. Os outros jogadores só veem *Ocupado*, nunca nomes.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
@@ -4456,7 +4468,7 @@ enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNA
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
  * ([Role.tabs]).
  */
-enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE }
+enum class HomeTab { PLAY, TRAIN, VIDEO, PROGRESS, MORE, STUDENTS, TOURNAMENTS, COURTS, PEOPLE, TODAY }
 
 /**
  * Chi usa l'app: si possono avere più ruoli (chi gioca e allena) sugli stessi dati; il ruolo attivo sceglie le schede.
@@ -4467,8 +4479,8 @@ enum class Role(val tabs: List<HomeTab>) {
     PLAYER(listOf(HomeTab.PLAY, HomeTab.TRAIN, HomeTab.VIDEO, HomeTab.PROGRESS, HomeTab.MORE)),
     /** Allenatore: gli allievi e i loro allenamenti, partite tra allievi, video. */
     COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
-    /** Circolo: tornei, campi coi loro tabelloni, giocatori e allenatori. */
-    CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+    /** Circolo: oggi (cosa serve adesso), tornei, campi coi loro tabelloni, giocatori e allenatori. */
+    CLUB(listOf(HomeTab.TODAY, HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
 
 /**
@@ -5027,7 +5039,7 @@ class MatchController(
             Screen.DEVICES -> Screen.HOME
             Screen.VOICE -> Screen.HOME
             Screen.STROKE_SESSIONS -> strokeSessionsBack
-            Screen.HELP -> Screen.HOME
+            Screen.HELP -> helpBack.also { helpBack = Screen.HOME }
             Screen.STUDENTS -> Screen.HOME
             Screen.STUDENT -> studentBack
             Screen.PLAYERS -> Screen.HOME
@@ -5040,7 +5052,7 @@ class MatchController(
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
-            Screen.COURT_STATS -> Screen.COURTS_PLAN
+            Screen.COURT_STATS -> statsBack
             Screen.LADDERS -> Screen.HOME
             Screen.LADDER -> Screen.LADDERS
             Screen.SCHOOL -> Screen.HOME
@@ -5932,6 +5944,27 @@ class MatchController(
             saveFixture(t, com.tennis.scoremanager.data.Teams.setRubber(f, i, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, rec.id))
             return
         }
+    }
+
+    // ---- Statistiche dei campi (dal planning o dalla scheda Campi: Indietro torna lì) ----
+
+    private var statsBack = Screen.COURTS_PLAN
+
+    fun openCourtStats() {
+        statsBack = if (screen.value == Screen.COURTS_PLAN) Screen.COURTS_PLAN else Screen.HOME
+        screen.value = Screen.COURT_STATS
+    }
+
+    // ---- Aiuto al punto giusto ----
+
+    /** La sezione della guida da aprire (dal "?" di una schermata), e dove si torna. */
+    val helpSection = MutableStateFlow<String?>(null)
+    private var helpBack = Screen.HOME
+
+    fun openHelp(section: String) {
+        helpSection.value = section
+        helpBack = screen.value
+        screen.value = Screen.HELP
     }
 
     // ---- Classifica a sfida ----
@@ -22342,6 +22375,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -22351,6 +22385,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -22524,6 +22559,8 @@ fun ScreenScaffold(
     bottomBar: @Composable RowScope.() -> Unit,
     /** Pulsante facoltativo a destra del titolo. */
     action: (@Composable () -> Unit)? = null,
+    /** Il "?" in alto: apre la guida alla sezione di questa schermata. */
+    onHelp: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
@@ -22536,6 +22573,9 @@ fun ScreenScaffold(
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.headlineMedium, color = TsmColors.TextMain)
                 if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = TsmColors.TextDim)
+            }
+            if (onHelp != null) IconButton(onClick = onHelp) {
+                Icon(Icons.AutoMirrored.Filled.HelpOutline, LocalStrings.current.moreHelp, tint = TsmColors.TextDim)
             }
             if (action != null) {
                 Spacer(Modifier.width(8.dp))
@@ -26818,6 +26858,24 @@ interface Strings {
     val cfChoose: String
     val cfServerPaired: String
     val cfStatsHint: String
+    val pbTabBook: String
+    val pbTabMine: (Int) -> String
+    val pbTabSeek: String
+    // Circolo › Oggi.
+    val tdTitle: String
+    val tdCourts: (Int) -> String
+    val tdCourtsNone: String
+    val tdOnline: (Int) -> String
+    val tdToCollect: (String) -> String
+    val tdPeople: (Int) -> String
+    val tdMembers: (Int) -> String
+    val tdBlocking: (Int) -> String
+    val tdMatches: (Int) -> String
+    val tdLessons: (Int) -> String
+    val tdFixtures: (Int) -> String
+    val tdChallenges: (Int) -> String
+    val tdLate: (Int) -> String
+    val tdNothing: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -28736,7 +28794,7 @@ object ItStrings : Strings {
     override val stByCourt = "Campo per campo"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h su $b" }
     override val stBlocked: (String) -> String = { "non prenotabili $it h" }
-    override val stCount: (Int) -> String = { "$it prenotazioni" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 prenotazione" else "$it prenotazioni" }
     override val stHeat = "Quando si gioca"
     override val stHeatHint = "Occupazione per giorno e ora, tutti i campi insieme: più chiaro = più pieno."
     override val stTop = "Chi prenota di più"
@@ -28774,8 +28832,8 @@ object ItStrings : Strings {
     override val ldNew = "Nuova classifica"
     override val ldName = "Nome (es. Singolare maschile)"
     override val ldNone = "Nessuna classifica: creane una e aggiungi i giocatori."
-    override val ldPlayers: (Int) -> String = { "$it giocatori" }
-    override val ldOpenCount: (Int) -> String = { "$it sfide aperte" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 giocatore" else "$it giocatori" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 sfida aperta" else "$it sfide aperte" }
     override val ldRanking = "Classifica"
     override val ldEmpty = "Aggiungi i giocatori: il primo aggiunto è il numero 1, poi li sistemi a mano."
     override val ldAdd = "Aggiungi giocatori"
@@ -28815,6 +28873,23 @@ object ItStrings : Strings {
     override val cfChoose = "Scegli le funzioni"
     override val cfServerPaired = "Il server è collegato: per spegnerlo, prima Scollega in Server del circolo."
     override val cfStatsHint = "Occupazione dei campi, incassi, quando si gioca e chi prenota di più"
+    override val pbTabBook = "Prenota"
+    override val pbTabMine: (Int) -> String = { "Le mie ($it)" }
+    override val pbTabSeek = "Compagni"
+    override val tdTitle = "Oggi"
+    override val tdCourts: (Int) -> String = { "Oggi in campo: $it" }
+    override val tdCourtsNone = "Nessuna prenotazione oggi"
+    override val tdOnline: (Int) -> String = { "di cui online: $it" }
+    override val tdToCollect: (String) -> String = { "Da incassare: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "da 1 persona" else "da $it persone" }
+    override val tdMembers: (Int) -> String = { "Soci da sistemare: $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 non può giocare (certificato o tessera)" else "$it non possono giocare (certificato o tessera)" }
+    override val tdMatches: (Int) -> String = { "Partite dei tornei oggi: $it" }
+    override val tdLessons: (Int) -> String = { "Lezioni oggi: $it" }
+    override val tdFixtures: (Int) -> String = { "Incontri delle squadre in settimana: $it" }
+    override val tdChallenges: (Int) -> String = { "Sfide da giocare: $it" }
+    override val tdLate: (Int) -> String = { if (it == 1) "1 scaduta" else "$it scadute" }
+    override val tdNothing = "Niente in programma oggi."
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -30714,7 +30789,7 @@ object EnStrings : Strings {
     override val stByCourt = "Court by court"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h of $b" }
     override val stBlocked: (String) -> String = { "not bookable $it h" }
-    override val stCount: (Int) -> String = { "$it bookings" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 booking" else "$it bookings" }
     override val stHeat = "When people play"
     override val stHeatHint = "Occupancy by day and hour, all courts together: brighter = fuller."
     override val stTop = "Who books most"
@@ -30752,8 +30827,8 @@ object EnStrings : Strings {
     override val ldNew = "New ladder"
     override val ldName = "Name (e.g. Men's singles)"
     override val ldNone = "No ladders: create one and add the players."
-    override val ldPlayers: (Int) -> String = { "$it players" }
-    override val ldOpenCount: (Int) -> String = { "$it open challenges" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 player" else "$it players" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 open challenge" else "$it open challenges" }
     override val ldRanking = "Ranking"
     override val ldEmpty = "Add the players: the first one added is number 1, then arrange them by hand."
     override val ldAdd = "Add players"
@@ -30793,6 +30868,23 @@ object EnStrings : Strings {
     override val cfChoose = "Choose the features"
     override val cfServerPaired = "The server is connected: to turn it off, first Disconnect in Club server."
     override val cfStatsHint = "Court occupancy, revenue, when people play and who books most"
+    override val pbTabBook = "Book"
+    override val pbTabMine: (Int) -> String = { "Mine ($it)" }
+    override val pbTabSeek = "Partners"
+    override val tdTitle = "Today"
+    override val tdCourts: (Int) -> String = { "On court today: $it" }
+    override val tdCourtsNone = "No bookings today"
+    override val tdOnline: (Int) -> String = { "of which online: $it" }
+    override val tdToCollect: (String) -> String = { "To collect: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "from 1 person" else "from $it people" }
+    override val tdMembers: (Int) -> String = { "Members to sort out: $it" }
+    override val tdBlocking: (Int) -> String = { "$it cannot play (certificate or card)" }
+    override val tdMatches: (Int) -> String = { "Tournament matches today: $it" }
+    override val tdLessons: (Int) -> String = { "Lessons today: $it" }
+    override val tdFixtures: (Int) -> String = { "Team fixtures this week: $it" }
+    override val tdChallenges: (Int) -> String = { "Challenges to play: $it" }
+    override val tdLate: (Int) -> String = { "$it overdue" }
+    override val tdNothing = "Nothing planned today."
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -32715,7 +32807,7 @@ object DeStrings : Strings {
     override val stByCourt = "Platz für Platz"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a Std. von $b" }
     override val stBlocked: (String) -> String = { "nicht buchbar $it Std." }
-    override val stCount: (Int) -> String = { "$it Buchungen" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 Buchung" else "$it Buchungen" }
     override val stHeat = "Wann gespielt wird"
     override val stHeatHint = "Auslastung nach Tag und Stunde, alle Plätze zusammen: heller = voller."
     override val stTop = "Wer am meisten bucht"
@@ -32754,7 +32846,7 @@ object DeStrings : Strings {
     override val ldName = "Name (z. B. Herreneinzel)"
     override val ldNone = "Keine Rangliste: Leg eine an und füge die Spieler hinzu."
     override val ldPlayers: (Int) -> String = { "$it Spieler" }
-    override val ldOpenCount: (Int) -> String = { "$it offene Forderungen" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 offene Forderung" else "$it offene Forderungen" }
     override val ldRanking = "Rangliste"
     override val ldEmpty = "Füge die Spieler hinzu: Der erste ist die Nummer 1, danach ordnest du sie von Hand."
     override val ldAdd = "Spieler hinzufügen"
@@ -32794,6 +32886,23 @@ object DeStrings : Strings {
     override val cfChoose = "Funktionen wählen"
     override val cfServerPaired = "Der Server ist verbunden: Zum Ausschalten zuerst unter Vereinsserver trennen."
     override val cfStatsHint = "Platzauslastung, Einnahmen, wann gespielt wird und wer am meisten bucht"
+    override val pbTabBook = "Buchen"
+    override val pbTabMine: (Int) -> String = { "Meine ($it)" }
+    override val pbTabSeek = "Partner"
+    override val tdTitle = "Heute"
+    override val tdCourts: (Int) -> String = { "Heute auf den Plätzen: $it" }
+    override val tdCourtsNone = "Heute keine Buchungen"
+    override val tdOnline: (Int) -> String = { "davon online: $it" }
+    override val tdToCollect: (String) -> String = { "Offen: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "von 1 Person" else "von $it Personen" }
+    override val tdMembers: (Int) -> String = { "Mitglieder zu klären: $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 darf nicht spielen (Attest oder Ausweis)" else "$it dürfen nicht spielen (Attest oder Ausweis)" }
+    override val tdMatches: (Int) -> String = { "Turnierspiele heute: $it" }
+    override val tdLessons: (Int) -> String = { "Trainingsstunden heute: $it" }
+    override val tdFixtures: (Int) -> String = { "Mannschaftsspiele diese Woche: $it" }
+    override val tdChallenges: (Int) -> String = { "Offene Forderungen: $it" }
+    override val tdLate: (Int) -> String = { "$it überfällig" }
+    override val tdNothing = "Heute nichts geplant."
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -34709,7 +34818,7 @@ object EsStrings : Strings {
     override val stByCourt = "Pista por pista"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h de $b" }
     override val stBlocked: (String) -> String = { "no reservables $it h" }
-    override val stCount: (Int) -> String = { "$it reservas" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 reserva" else "$it reservas" }
     override val stHeat = "Cuándo se juega"
     override val stHeatHint = "Ocupación por día y hora, todas las pistas juntas: más claro = más lleno."
     override val stTop = "Quién reserva más"
@@ -34747,8 +34856,8 @@ object EsStrings : Strings {
     override val ldNew = "Nueva clasificación"
     override val ldName = "Nombre (p. ej. Individual masculino)"
     override val ldNone = "Ninguna clasificación: crea una y añade a los jugadores."
-    override val ldPlayers: (Int) -> String = { "$it jugadores" }
-    override val ldOpenCount: (Int) -> String = { "$it desafíos abiertos" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 jugador" else "$it jugadores" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 desafío abierto" else "$it desafíos abiertos" }
     override val ldRanking = "Clasificación"
     override val ldEmpty = "Añade a los jugadores: el primero es el número 1, luego los ordenas a mano."
     override val ldAdd = "Añadir jugadores"
@@ -34788,6 +34897,23 @@ object EsStrings : Strings {
     override val cfChoose = "Elegir las funciones"
     override val cfServerPaired = "El servidor está conectado: para apagarlo, primero Desconectar en Servidor del club."
     override val cfStatsHint = "Ocupación de las pistas, ingresos, cuándo se juega y quién reserva más"
+    override val pbTabBook = "Reservar"
+    override val pbTabMine: (Int) -> String = { "Mías ($it)" }
+    override val pbTabSeek = "Compañeros"
+    override val tdTitle = "Hoy"
+    override val tdCourts: (Int) -> String = { "Hoy en pista: $it" }
+    override val tdCourtsNone = "Ninguna reserva hoy"
+    override val tdOnline: (Int) -> String = { "de ellas en línea: $it" }
+    override val tdToCollect: (String) -> String = { "Por cobrar: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "de 1 persona" else "de $it personas" }
+    override val tdMembers: (Int) -> String = { "Socios por regularizar: $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 no puede jugar (certificado o licencia)" else "$it no pueden jugar (certificado o licencia)" }
+    override val tdMatches: (Int) -> String = { "Partidos de torneo hoy: $it" }
+    override val tdLessons: (Int) -> String = { "Clases hoy: $it" }
+    override val tdFixtures: (Int) -> String = { "Encuentros de equipo esta semana: $it" }
+    override val tdChallenges: (Int) -> String = { "Desafíos por jugar: $it" }
+    override val tdLate: (Int) -> String = { if (it == 1) "1 vencido" else "$it vencidos" }
+    override val tdNothing = "Nada previsto hoy."
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -36705,7 +36831,7 @@ object FrStrings : Strings {
     override val stByCourt = "Terrain par terrain"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h sur $b" }
     override val stBlocked: (String) -> String = { "non réservables $it h" }
-    override val stCount: (Int) -> String = { "$it réservations" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 réservation" else "$it réservations" }
     override val stHeat = "Quand on joue"
     override val stHeatHint = "Occupation par jour et heure, tous les terrains ensemble : plus clair = plus plein."
     override val stTop = "Qui réserve le plus"
@@ -36743,8 +36869,8 @@ object FrStrings : Strings {
     override val ldNew = "Nouveau classement"
     override val ldName = "Nom (ex. Simple messieurs)"
     override val ldNone = "Aucun classement : créez-en un et ajoutez les joueurs."
-    override val ldPlayers: (Int) -> String = { "$it joueurs" }
-    override val ldOpenCount: (Int) -> String = { "$it défis ouverts" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 joueur" else "$it joueurs" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 défi ouvert" else "$it défis ouverts" }
     override val ldRanking = "Classement"
     override val ldEmpty = "Ajoutez les joueurs : le premier ajouté est le numéro 1, puis rangez-les à la main."
     override val ldAdd = "Ajouter des joueurs"
@@ -36784,6 +36910,23 @@ object FrStrings : Strings {
     override val cfChoose = "Choisir les fonctions"
     override val cfServerPaired = "Le serveur est connecté : pour le désactiver, d'abord Déconnecter dans Serveur du club."
     override val cfStatsHint = "Occupation des terrains, recettes, quand on joue et qui réserve le plus"
+    override val pbTabBook = "Réserver"
+    override val pbTabMine: (Int) -> String = { "Les miennes ($it)" }
+    override val pbTabSeek = "Partenaires"
+    override val tdTitle = "Aujourd'hui"
+    override val tdCourts: (Int) -> String = { "Sur les terrains aujourd'hui : $it" }
+    override val tdCourtsNone = "Aucune réservation aujourd'hui"
+    override val tdOnline: (Int) -> String = { "dont en ligne : $it" }
+    override val tdToCollect: (String) -> String = { "À encaisser : $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "de 1 personne" else "de $it personnes" }
+    override val tdMembers: (Int) -> String = { "Adhérents à régulariser : $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 ne peut pas jouer (certificat ou licence)" else "$it ne peuvent pas jouer (certificat ou licence)" }
+    override val tdMatches: (Int) -> String = { "Matchs de tournoi aujourd'hui : $it" }
+    override val tdLessons: (Int) -> String = { "Leçons aujourd'hui : $it" }
+    override val tdFixtures: (Int) -> String = { "Rencontres d'équipe cette semaine : $it" }
+    override val tdChallenges: (Int) -> String = { "Défis à jouer : $it" }
+    override val tdLate: (Int) -> String = { "$it en retard" }
+    override val tdNothing = "Rien de prévu aujourd'hui."
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -38702,7 +38845,7 @@ object PtStrings : Strings {
     override val stByCourt = "Quadra a quadra"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h de $b" }
     override val stBlocked: (String) -> String = { "não reserváveis $it h" }
-    override val stCount: (Int) -> String = { "$it reservas" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 reserva" else "$it reservas" }
     override val stHeat = "Quando se joga"
     override val stHeatHint = "Ocupação por dia e hora, todas as quadras juntas: mais claro = mais cheio."
     override val stTop = "Quem reserva mais"
@@ -38740,8 +38883,8 @@ object PtStrings : Strings {
     override val ldNew = "Nova classificação"
     override val ldName = "Nome (ex. Singulares masculinos)"
     override val ldNone = "Nenhuma classificação: cria uma e adiciona os jogadores."
-    override val ldPlayers: (Int) -> String = { "$it jogadores" }
-    override val ldOpenCount: (Int) -> String = { "$it desafios abertos" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 jogador" else "$it jogadores" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 desafio aberto" else "$it desafios abertos" }
     override val ldRanking = "Classificação"
     override val ldEmpty = "Adiciona os jogadores: o primeiro é o número 1, depois ordena-os à mão."
     override val ldAdd = "Adicionar jogadores"
@@ -38781,6 +38924,23 @@ object PtStrings : Strings {
     override val cfChoose = "Escolher as funções"
     override val cfServerPaired = "O servidor está ligado: para o desligar, primeiro Desligar em Servidor do clube."
     override val cfStatsHint = "Ocupação das quadras, receitas, quando se joga e quem reserva mais"
+    override val pbTabBook = "Reservar"
+    override val pbTabMine: (Int) -> String = { "Minhas ($it)" }
+    override val pbTabSeek = "Parceiros"
+    override val tdTitle = "Hoje"
+    override val tdCourts: (Int) -> String = { "Hoje em quadra: $it" }
+    override val tdCourtsNone = "Nenhuma reserva hoje"
+    override val tdOnline: (Int) -> String = { "das quais online: $it" }
+    override val tdToCollect: (String) -> String = { "Por receber: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "de 1 pessoa" else "de $it pessoas" }
+    override val tdMembers: (Int) -> String = { "Sócios por regularizar: $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 não pode jogar (atestado ou cartão)" else "$it não podem jogar (atestado ou cartão)" }
+    override val tdMatches: (Int) -> String = { "Jogos de torneio hoje: $it" }
+    override val tdLessons: (Int) -> String = { "Aulas hoje: $it" }
+    override val tdFixtures: (Int) -> String = { "Encontros das equipes esta semana: $it" }
+    override val tdChallenges: (Int) -> String = { "Desafios por jogar: $it" }
+    override val tdLate: (Int) -> String = { "$it em atraso" }
+    override val tdNothing = "Nada previsto para hoje."
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -39500,6 +39660,7 @@ fun BookCourtScreen(c: MatchController) {
     BackHandler { c.back() }
     val account by c.bookingAccount.collectAsState()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.18") },
         title = s.pbTitle,
         subtitle = account.club.takeIf { account.joined && it.isNotBlank() }?.let { club -> account.name.ifBlank { null }?.let { "$club · $it" } ?: club },
         icon = Icons.Filled.CalendarMonth,
@@ -39548,6 +39709,7 @@ private fun BookingView(c: MatchController) {
     var booking by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var cancel by remember { mutableStateOf<SrvMyBooking?>(null) }
     var waitFor by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
+    var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
     var seeks by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvSeek>>(emptyList()) }
     var newSeek by remember { mutableStateOf(false) }
     var leave by remember { mutableStateOf(false) }
@@ -39576,92 +39738,106 @@ private fun BookingView(c: MatchController) {
         if (error != null) GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
-        Text(s.pbMine, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        if (m.bookings.isEmpty()) Text(s.pbNone, color = TsmColors.TextDim)
-        for (b in m.bookings) Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
-                    color = TsmColors.TextDim, fontSize = 13.sp)
-            }
-            TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
-        }
-
-        // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
-        for (w in m.waits) Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
-                .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
-            }
-            w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
-            TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
-        }
-
-        Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            m.days.forEachIndexed { i, d ->
-                val on = d == date
-                Column(
-                    Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
-                        .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
-                        .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(if (i == 0) s.pbToday else ct.weekday(d), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text(ct.dayMonth(d), color = if (on) TsmColors.OnBall else TsmColors.TextDim, fontSize = 12.sp)
-                }
-            }
-        }
-        if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
-        error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
-        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
-
-        Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
-            color = TsmColors.TextDim, fontSize = 12.sp)
-        // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
-        Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
-        for (k in seeks) Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
-                .border(1.dp, if (k.mine) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text("${if (k.mine) s.pbSeekYours else k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)} · ${ct.hhmm(k.fromMin)}–${ct.hhmm(k.toMin)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-            Text(listOf(if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level, k.note).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
-            Text(s.pbSeekWho(k.players.joinToString(", ")) + if (k.need > 0) " · " + s.pbSeekNeed(k.need) else "", color = TsmColors.TextDim, fontSize = 13.sp)
-            if (k.bookedCourt != null && k.bookedStart != null) Text(s.pbSeekBooked("${k.bookedCourt} · ${ct.whenText(k.bookedStart!!)}"), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            else if (k.noCourt) Text(s.pbSeekNoCourt, color = TsmColors.Orange, fontSize = 13.sp)
-            Row {
-                fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
-                    scope.launch {
-                        c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
-                            .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
-                        reload()
+        // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
+        val freed = m.waits.count { it.freedCourt != null }
+        Segmented(
+            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""), SegOption(s.pbTabSeek)),
+            tab, { tab = it },
+        )
+        when (tab) {
+            0 -> {
+                Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    m.days.forEachIndexed { i, d ->
+                        val on = d == date
+                        Column(
+                            Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
+                                .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
+                                .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(if (i == 0) s.pbToday else ct.weekday(d), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(ct.dayMonth(d), color = if (on) TsmColors.OnBall else TsmColors.TextDim, fontSize = 12.sp)
+                        }
                     }
                 }
-                if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
-                if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
-                if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+                if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
+                error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
+
+                Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
+                    color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+            1 -> {
+                Text(s.pbMine, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                if (m.bookings.isEmpty()) Text(s.pbNone, color = TsmColors.TextDim)
+                for (b in m.bookings) Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
+                            color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
+                }
+
+                // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
+                for (w in m.waits) Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                        .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
+                    TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+                }
+
+                // Promemoria e avvisi sul telefono (anche ad app chiusa).
+                val acc by c.bookingAccount.collectAsState()
+                val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
+                    c.setBookingReminders(on)
+                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+                GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
+            }
+            else -> {
+                // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
+                Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (k in seeks) Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                        .border(1.dp, if (k.mine) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text("${if (k.mine) s.pbSeekYours else k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)} · ${ct.hhmm(k.fromMin)}–${ct.hhmm(k.toMin)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    Text(listOf(if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level, k.note).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+                    Text(s.pbSeekWho(k.players.joinToString(", ")) + if (k.need > 0) " · " + s.pbSeekNeed(k.need) else "", color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (k.bookedCourt != null && k.bookedStart != null) Text(s.pbSeekBooked("${k.bookedCourt} · ${ct.whenText(k.bookedStart!!)}"), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    else if (k.noCourt) Text(s.pbSeekNoCourt, color = TsmColors.Orange, fontSize = 13.sp)
+                    Row {
+                        fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
+                            scope.launch {
+                                c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+                                    .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                                reload()
+                            }
+                        }
+                        if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
+                        if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
+                        if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+                    }
+                }
+                GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
+
             }
         }
-        GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
-
-        // Promemoria e avvisi sul telefono (anche ad app chiusa).
-        val acc by c.bookingAccount.collectAsState()
-        val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
-        SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
-            c.setBookingReminders(on)
-            if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-        GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
 
         booking?.let { (court, start) ->
             BookDialog(c, m, day?.slotMinutes ?: 60, court, start, ct) { done ->
@@ -40251,6 +40427,7 @@ fun ClubTournamentsScreen(c: MatchController) {
     val lang = c.options.value.lang
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.13") },
         title = s.ctTitle,
         subtitle = s.ctHint,
         icon = Icons.Filled.EmojiEvents,
@@ -40309,6 +40486,7 @@ fun ClubTournamentScreen(c: MatchController) {
     val hasResults = t.matches.any { it.played && !it.bye }
     val hasKnockout = t.matches.any { it.round > 0 }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.13") },
         title = t.name,
         subtitle = kindLine(s, t),
         icon = Icons.Filled.EmojiEvents,
@@ -40830,6 +41008,7 @@ fun CourtStatsScreen(c: MatchController) {
     val (from, to) = period(kind, System.currentTimeMillis())
     val r = remember(plan, tournaments, courts, from, to) { CourtStats.report(plan, tournaments, courts, from, to) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
         title = s.stTitle,
         subtitle = shortDate(from, c.options.value.lang) + " – " + shortDate(CourtPlans.addDays(to, -1), c.options.value.lang),
         icon = Icons.Filled.BarChart,
@@ -41069,6 +41248,7 @@ fun CourtsPlanScreen(c: MatchController) {
     val slots = CourtPlans.slots(day, plan.settings)
     val stepMs = plan.settings.slotMinutes * 60_000L
     ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
         title = s.planTitle,
         subtitle = com.tennis.scoremanager.data.Notices.day(day, lang),
         icon = Icons.Filled.CalendarMonth,
@@ -41088,7 +41268,7 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
         val features by c.clubFeatures.collectAsState()
-        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
+        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
         if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.
@@ -42036,17 +42216,21 @@ fun HelpScreen(c: MatchController) {
         HelpDoc.parse(text)
     }
     var query by rememberSaveable { mutableStateOf("") }
-    var openId by rememberSaveable { mutableStateOf<String?>(null) }
+    // Dal "?" di una schermata si apre direttamente la sua sezione, e Indietro torna lì.
+    val direct = remember { c.helpSection.value }
+    var openId by rememberSaveable { mutableStateOf(direct) }
+    androidx.compose.runtime.LaunchedEffect(Unit) { c.helpSection.value = null }
     val open = sections.firstOrNull { it.id == openId }
-    // Indietro: dalla sezione all'indice, dall'indice ad Altro.
-    BackHandler { if (open != null) openId = null else c.back() }
+    // Indietro: dalla sezione all'indice, dall'indice ad Altro (o alla schermata da cui si è venuti).
+    fun goBack() { if (open != null && direct == null) openId = null else c.back() }
+    BackHandler { goBack() }
     // Una sezione nuova parte dall'alto (la pagina ricorda lo scorrimento).
     androidx.compose.runtime.key(openId) { ScreenScaffold(
         title = open?.let { "${it.id} ${it.title}" } ?: s.moreHelp,
         subtitle = if (open == null) s.moreHelpHint else null,
         icon = Icons.AutoMirrored.Filled.Help,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (open != null) openId = null else c.back() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { goBack() }, Modifier.weight(1f))
             if (open != null) {
                 val next = sections.getOrNull(sections.indexOf(open) + 1)
                 if (next != null) GhostButton(s.helpNext, Icons.AutoMirrored.Filled.ArrowForward, { openId = next.id }, Modifier.weight(1f))
@@ -42559,6 +42743,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
@@ -42572,6 +42758,7 @@ import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Videocam
@@ -42660,6 +42847,7 @@ fun HomeScreen(c: MatchController) {
             HomeTab.TOURNAMENTS -> TournamentsTab(c)
             HomeTab.COURTS -> CourtsTab(c)
             HomeTab.PEOPLE -> PeopleTab(c)
+            HomeTab.TODAY -> TodayTab(c)
         }
     }
 }
@@ -42675,6 +42863,7 @@ private fun tabInfo(s: com.tennis.scoremanager.ui.Strings, t: HomeTab): Pair<Str
     HomeTab.TOURNAMENTS -> s.tabTournaments to Icons.Filled.EmojiEvents
     HomeTab.COURTS -> s.tabCourts to Icons.Filled.Tv
     HomeTab.PEOPLE -> s.playersTitle to Icons.Filled.Groups
+    HomeTab.TODAY -> s.tdTitle to Icons.Filled.Today
 }
 
 fun roleName(s: com.tennis.scoremanager.ui.Strings, r: com.tennis.scoremanager.Role) = when (r) {
@@ -42733,8 +42922,6 @@ private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val f by c.clubFeatures.collectAsState()
-    // La prima volta: l'invito a tenere solo le funzioni che il circolo usa.
-    com.tennis.scoremanager.ui.ClubFeaturesHint(c)
     if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
     if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
     if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint) { c.openLadders() }
@@ -42750,14 +42937,21 @@ private fun CourtsTab(c: MatchController) {
     val s = LocalStrings.current
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
     val f by c.clubFeatures.collectAsState()
     if (ClubFeature.PLANNING in f) Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
     Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
     Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
+    if (ClubFeature.STATS in f) Entry(Icons.Filled.BarChart, s.stTitle, s.cfStatsHint) { c.openCourtStats() }
+    if (ClubFeature.SERVER in f) {
+        val srv by c.clubServer.collectAsState()
+        Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
+    }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
+    if (server) ClubServerDialog(c) { server = false }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }
@@ -43082,6 +43276,7 @@ fun LaddersScreen(c: MatchController) {
     val list by c.ladders.collectAsState()
     var create by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.19") },
         title = s.ldTitle, subtitle = s.ldHint, icon = Icons.Filled.EmojiEvents,
         bottomBar = {
             GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { c.back() }, Modifier.weight(1f))
@@ -43135,6 +43330,7 @@ fun LadderScreen(c: MatchController) {
     var result by remember { mutableStateOf<Challenge?>(null) }
     val now = System.currentTimeMillis()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.19") },
         title = l.name, subtitle = s.ldPlayers(l.players.size), icon = Icons.Filled.EmojiEvents,
         action = { IconButton(onClick = { settings = true }) { Icon(Icons.Filled.Settings, s.ldSettings, tint = TsmColors.Ball) } },
         bottomBar = {
@@ -44581,6 +44777,7 @@ fun MembersScreen(c: MatchController) {
     val shown = (if (query.isBlank()) members else Players.search(members, query))
         .filter { !todoOnly || todo(it) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.11") },
         title = s.membersTitle,
         subtitle = s.membersHint,
         icon = Icons.Filled.CardMembership,
@@ -44918,6 +45115,7 @@ fun NoticeScreen(c: MatchController) {
     val focus = androidx.compose.ui.platform.LocalFocusManager.current
     fun open(i: Intent) { focus.clearFocus(); launch(context, i, s.ntNoApp) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.14") },
         title = p.title,
         subtitle = p.subject,
         icon = Icons.Filled.Campaign,
@@ -46075,6 +46273,7 @@ fun PaymentsScreen(c: MatchController) {
     var exportYear by remember { mutableStateOf(year) }
     var editType by remember { mutableStateOf<com.tennis.scoremanager.data.PayType?>(null) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.12") },
         title = s.paymentsTitle,
         subtitle = s.paymentsHint,
         icon = Icons.Filled.Payments,
@@ -47493,6 +47692,7 @@ fun SchoolScreen(c: MatchController) {
     val now = remember { System.currentTimeMillis() }
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.16") },
         title = s.scTitle,
         subtitle = s.scHint,
         icon = Icons.Filled.School,
@@ -47549,6 +47749,7 @@ fun CourseScreen(c: MatchController) {
     var openLesson by remember { mutableStateOf<Lesson?>(null) }
     var showPast by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.16") },
         title = co.name,
         subtitle = listOfNotNull(co.level.ifBlank { null }, (co.coach?.let { c.playerById(it)?.name } ?: co.coachName).ifBlank { null }?.let { s.scCoachLine(it) },
             "${shortDate(co.from, lang)} – ${shortDate(co.to, lang)}").joinToString(" · "),
@@ -49747,6 +49948,7 @@ fun TeamsScreen(c: MatchController) {
     val list by c.teams.collectAsState()
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = s.tmTitle,
         subtitle = s.tmHint,
         icon = Icons.Filled.Groups,
@@ -49787,6 +49989,7 @@ fun TeamScreen(c: MatchController) {
     // I controlli FITP valgono per il prossimo incontro (o per oggi).
     val day = t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L }?.at ?: now
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = t.name,
         subtitle = listOfNotNull(t.championship.ifBlank { null }, t.season.ifBlank { null }, recordLine(s, t)).joinToString(" · "),
         icon = Icons.Filled.Groups,
@@ -49857,6 +50060,7 @@ fun FixtureScreen(c: MatchController) {
     fun save(x: Fixture) = c.saveFixture(c.team(t.id) ?: t, x)
     fun name(id: String) = players.firstOrNull { it.id == id || id in it.aliases }?.name ?: "—"
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = "${t.name} – ${f.opponent.ifBlank { "?" }}",
         subtitle = c.fixtureWhen(f),
         icon = Icons.Filled.EmojiEvents,
@@ -50067,6 +50271,161 @@ private fun TeamEditDialog(c: MatchController, t0: Team?, onDone: (String?) -> U
         confirmButton = { TextButton(onClick = { askDelete = false; c.deleteTeam(t0.id); onDone(null); c.back() }) { Text(s.tmDelete, color = TsmColors.Danger) } },
         dismissButton = { TextButton(onClick = { askDelete = false }) { Text(s.back) } },
     )
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/screens/TodayTab.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/screens/TodayTab.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CardMembership
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.Courses
+import com.tennis.scoremanager.data.CourtPlans
+import com.tennis.scoremanager.data.Fees
+import com.tennis.scoremanager.data.Members
+import com.tennis.scoremanager.data.Reports
+import com.tennis.scoremanager.ui.LocalStrings
+import com.tennis.scoremanager.ui.TsmColors
+
+/** Un riquadro di Oggi: titolo, qualche riga, e toccandolo si va dove si sistema. */
+@Composable
+private fun TodayCard(icon: ImageVector, title: String, lines: List<String>, alert: Boolean = false, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(TsmColors.Surface).clickable(onClick = onClick).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = if (alert) TsmColors.Orange else TsmColors.Ball)
+        Column(Modifier.weight(1f).padding(start = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(title, color = TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            for (l in lines) Text(l, color = TsmColors.TextDim, fontSize = 13.sp, maxLines = 1)
+        }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = TsmColors.TextDim, modifier = Modifier.width(24.dp))
+    }
+}
+
+/**
+ * Circolo › Oggi: quello che serve oggi, a colpo d'occhio e solo per le funzioni accese. Chi gioca e quando,
+ * cosa c'è da incassare, i soci da sistemare, le partite dei tornei, le lezioni, gli incontri della settimana e le
+ * sfide scadute; ogni riquadro porta dove si sistema.
+ */
+@Composable
+fun TodayTab(c: MatchController) {
+    val s = LocalStrings.current
+    val lang = c.options.value.lang
+    val f by c.clubFeatures.collectAsState()
+    val plan by c.courtPlan.collectAsState()
+    val tournaments by c.clubTournaments.collectAsState()
+    val players by c.players.collectAsState()
+    val book by c.clubBook.collectAsState()
+    val courses by c.courses.collectAsState()
+    val teams by c.teams.collectAsState()
+    val ladders by c.ladders.collectAsState()
+    val now = remember { System.currentTimeMillis() }
+    val today = CourtPlans.dayStart(now)
+    val tomorrow = CourtPlans.addDays(today, 1)
+    fun hm(t: Long) = Reports.time(t, lang)
+    var shown = 0
+
+    com.tennis.scoremanager.ui.ClubFeaturesHint(c)
+    Text(com.tennis.scoremanager.data.Notices.day(now, lang), color = TsmColors.TextDim, fontSize = 13.sp)
+
+    if (ClubFeature.PLANNING in f) {
+        val occ = CourtPlans.occupied(plan, tournaments, today).filter { it.block == null }
+        val next = occ.filter { it.end > now }.sortedBy { it.start }.take(4).map { o ->
+            val who = o.booking?.let { b -> (b.players.mapNotNull { c.playerById(it)?.name } + b.names).joinToString(", ") } ?: o.tournament?.name.orEmpty()
+            listOf(hm(o.start), o.court, who).filter { it.isNotBlank() }.joinToString(" · ")
+        }
+        val online = occ.count { it.booking?.online != null }
+        TodayCard(Icons.Filled.CalendarMonth, if (occ.isEmpty()) s.tdCourtsNone else s.tdCourts(occ.size),
+            next + listOfNotNull(s.tdOnline(online).takeIf { online > 0 })) { c.openCourtsPlan() }
+        shown++
+    }
+    if (ClubFeature.PAYMENTS in f) {
+        val (cents, people) = Fees.open(book)
+        if (cents > 0) { TodayCard(Icons.Filled.Payments, s.tdToCollect(Fees.money(cents, lang.locale)), listOf(s.tdPeople(people))) { c.openPayments() }; shown++ }
+    }
+    if (ClubFeature.MEMBERS in f) {
+        val issues = players.filter { it.member != null }.map { it to Members.issues(it, now) }.filter { it.second.isNotEmpty() }
+        if (issues.isNotEmpty()) {
+            val blocking = issues.count { (_, l) -> l.any { Members.blocking(it) } }
+            TodayCard(Icons.Filled.CardMembership, s.tdMembers(issues.size), listOf(issues.take(3).joinToString(", ") { it.first.name }) + listOfNotNull(s.tdBlocking(blocking).takeIf { blocking > 0 }),
+                alert = blocking > 0) { c.openMembers() }
+            shown++
+        }
+    }
+    if (ClubFeature.TOURNAMENTS in f) {
+        val matches = tournaments.flatMap { t -> t.matches.filter { m -> m.at != null && m.at in today until tomorrow && m.winner == null && !m.bye }.map { t to it } }.sortedBy { it.second.at }
+        if (matches.isNotEmpty()) {
+            TodayCard(Icons.Filled.EmojiEvents, s.tdMatches(matches.size), matches.take(3).map { (t, m) -> listOf(hm(m.at!!), m.court, t.name).filter { it.isNotBlank() }.joinToString(" · ") }) {
+                if (matches.map { it.first.id }.distinct().size == 1) c.openClubTournament(matches.first().first.id) else c.openClubTournaments()
+            }
+            shown++
+        }
+    }
+    if (ClubFeature.SCHOOL in f) {
+        val lessons = courses.flatMap { co -> Courses.lessons(co).filter { it.start in today until tomorrow && it.key !in co.cancelled }.map { co to it } }.sortedBy { it.second.start }
+        if (lessons.isNotEmpty()) {
+            TodayCard(Icons.Filled.School, s.tdLessons(lessons.size), lessons.take(3).map { (co, l) -> listOf(hm(l.start), co.name, l.court).filter { it.isNotBlank() }.joinToString(" · ") }) {
+                if (lessons.map { it.first.id }.distinct().size == 1) c.openCourse(lessons.first().first.id) else c.openSchool()
+            }
+            shown++
+        }
+    }
+    if (ClubFeature.TEAMS in f) {
+        val week = teams.flatMap { t -> t.fixtures.filter { it.at in today until CourtPlans.addDays(today, 7) }.map { t to it } }.sortedBy { it.second.at }
+        if (week.isNotEmpty()) {
+            val (t0, f0) = week.first()
+            TodayCard(Icons.Filled.Groups, s.tdFixtures(week.size), week.take(3).map { (t, fx) -> "${shortDate(fx.at, lang)} · ${t.name} – ${fx.opponent}" }) { c.openFixture(t0.id, f0.id) }
+            shown++
+        }
+    }
+    if (ClubFeature.LADDER in f) {
+        val open = ladders.flatMap { l -> l.challenges.filter { it.open }.map { l to it } }
+        val late = open.count { it.second.deadline < now }
+        if (open.isNotEmpty()) {
+            TodayCard(Icons.Filled.Leaderboard, s.tdChallenges(open.size), listOfNotNull(s.tdLate(late).takeIf { late > 0 }), alert = late > 0) {
+                if (open.map { it.first.id }.distinct().size == 1) c.openLadder(open.first().first.id) else c.openLadders()
+            }
+            shown++
+        }
+    }
+    if (shown == 0) Text(s.tdNothing, color = TsmColors.TextDim)
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 TSM_EOF
 
@@ -77167,7 +77526,8 @@ cat > "$DEST/server/src/main/resources/web/app.js" << 'TSM_EOF'
 // Parla solo col server del circolo che la serve (/api/v1); la chiave del telefono resta nel telefono.
 
 const KEY = 'tsm.token';
-const state = { token: null, me: null, date: null, day: null, seeks: [] };
+const TAB = 'tsm.tab';
+const state = { token: null, me: null, date: null, day: null, seeks: [], tab: Number(load(TAB) || 0) || 0 };
 
 // Su iPhone (e iPad) Safari e l'app messa sulla schermata Home non condividono i dati: l'invito va usato
 // nell'app installata, altrimenti la chiave resta in Safari e l'app chiede un codice già usato.
@@ -77363,19 +77723,25 @@ function render(dayError) {
     return el('button', { class: d === state.date ? 'on' : '', onclick: () => { state.date = d; loadDay(); } }, i === 0 ? T.today : wd, el('small', null, dm));
   }));
 
-  const parts = [
-    el('h2', null, T.mine), ...mine, ...waits,
-    el('h2', null, T.day), days,
-  ];
-  if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
-  if (dayError) parts.push(el('p', { class: 'error' }, dayError));
-  else if (state.day) parts.push(grid(state.day));
-  parts.push(
-    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
-    el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
-  );
-  parts.push(...seekSection());
-  parts.push(el('div', { id: 'push' }));
+  // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
+  const freed = (me.waits || []).some(w => w.freedCourt);
+  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek];
+  const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
+  const parts = [bar];
+  if (state.tab === 1) {
+    parts.push(...mine, ...waits, el('div', { id: 'push' }));
+  } else if (state.tab === 2) {
+    parts.push(...seekSection());
+  } else {
+    parts.push(el('h2', null, T.day), days);
+    if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
+    if (dayError) parts.push(el('p', { class: 'error' }, dayError));
+    else if (state.day) parts.push(grid(state.day));
+    parts.push(
+      el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
+      el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
+    );
+  }
   const tip = installTip();
   if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
@@ -77529,7 +77895,6 @@ function seekSection() {
     return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
   });
   return [
-    el('h2', null, T.seekTitle),
     ...(cards.length ? cards : [el('p', { class: 'dim' }, T.seekNone)]),
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: openSeek, disabled: !state.me.rules.open }, T.seekNew)),
   ];
@@ -77663,6 +78028,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
     notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
     install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
+    tabBook: 'Prenota', tabMine: n => `Le mie (${n})`, tabSeek: 'Compagni',
     seekTitle: 'Cerco compagno', seekNew: 'Pubblica un annuncio', seekDay: 'Giorno', seekFrom: 'Dalle', seekTo: 'Alle', seekKind: 'Partita', seekSingles: 'Singolo', seekDoubles: 'Doppio', seekLevel: 'Livello', seekNote: 'Nota (facoltativa)', seekPublish: 'Pubblica', seekPublished: 'Annuncio pubblicato', seekJoin: 'Ci sto', seekJoined: 'Ci sei! Quando siete al completo il campo si prenota da solo.', seekLeave: 'Mi tolgo', seekRemove: 'Togli l\'annuncio', seekYours: 'Il tuo annuncio', seekNoCourt: 'Al completo, ma nessun campo libero: prenotatelo voi.', seekNone: 'Nessun annuncio: pubblicane uno, gli altri giocatori del circolo lo vedranno.', seekHint: 'Gli altri giocatori lo vedono e toccano Ci sto; quando siete al completo il server prenota il primo campo libero nella fascia scelta.',
     seekWho: s => `Ci sono: ${s}`, seekNeed: n => n === 1 ? 'ne manca 1' : `ne mancano ${n}`, seekBooked: s => `Campo prenotato: ${s}`,
     WAITING: 'In attesa', waitText: 'Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.', waitAny: 'Va bene un campo qualsiasi a quest\'ora', waitAsk: 'Avvisami se si libera', waitAdded: 'Sei in lista d\'attesa', waitList: 'In lista d\'attesa', waitFreed: 'Si è liberato!', waitAnyCourt: 'Un campo qualsiasi', waitRemove: 'Togli', bookNow: 'Prenota', waitNoPush: 'Per l\'avviso sul telefono attiva i promemoria; intanto lo vedi qui quando apri la pagina.',
@@ -77694,6 +78060,7 @@ const I18N = {
     pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
     notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
     install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
+    tabBook: 'Book', tabMine: n => `Mine (${n})`, tabSeek: 'Partners',
     seekTitle: 'Looking for a partner', seekNew: 'Post a request', seekDay: 'Day', seekFrom: 'From', seekTo: 'To', seekKind: 'Match', seekSingles: 'Singles', seekDoubles: 'Doubles', seekLevel: 'Level', seekNote: 'Note (optional)', seekPublish: 'Post', seekPublished: 'Request posted', seekJoin: 'I\'m in', seekJoined: 'You\'re in! When you are complete the court is booked by itself.', seekLeave: 'I\'m out', seekRemove: 'Remove the request', seekYours: 'Your request', seekNoCourt: 'Complete, but no free court: book one yourselves.', seekNone: 'No requests: post one, the other club players will see it.', seekHint: 'Other players see it and tap I\'m in; when you are complete the server books the first free court in the chosen time.',
     seekWho: s => `In: ${s}`, seekNeed: n => n === 1 ? '1 missing' : `${n} missing`, seekBooked: s => `Court booked: ${s}`,
     WAITING: 'Waiting', waitText: 'This slot is taken. If it becomes free we tell you right away: whoever books first gets it.', waitAny: 'Any court at this time is fine', waitAsk: 'Tell me if it frees up', waitAdded: 'You are on the waiting list', waitList: 'On the waiting list', waitFreed: 'It\'s free now!', waitAnyCourt: 'Any court', waitRemove: 'Remove', bookNow: 'Book', waitNoPush: 'For an alert on your phone turn reminders on; meanwhile you see it here when you open the page.',
@@ -77725,6 +78092,7 @@ const I18N = {
     pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
     notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
     install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
+    tabBook: 'Réserver', tabMine: n => `Les miennes (${n})`, tabSeek: 'Partenaires',
     seekTitle: 'Je cherche un partenaire', seekNew: 'Publier une annonce', seekDay: 'Jour', seekFrom: 'De', seekTo: 'À', seekKind: 'Match', seekSingles: 'Simple', seekDoubles: 'Double', seekLevel: 'Niveau', seekNote: 'Note (facultative)', seekPublish: 'Publier', seekPublished: 'Annonce publiée', seekJoin: 'Je viens', seekJoined: 'C\'est noté ! Quand vous êtes au complet, le terrain se réserve tout seul.', seekLeave: 'Je me retire', seekRemove: 'Retirer l\'annonce', seekYours: 'Votre annonce', seekNoCourt: 'Au complet, mais aucun terrain libre : réservez-en un vous-mêmes.', seekNone: 'Aucune annonce : publiez-en une, les autres joueurs du club la verront.', seekHint: 'Les autres joueurs la voient et touchent Je viens ; quand vous êtes au complet, le serveur réserve le premier terrain libre dans le créneau choisi.',
     seekWho: s => `Inscrits : ${s}`, seekNeed: n => n === 1 ? 'il en manque 1' : `il en manque ${n}`, seekBooked: s => `Terrain réservé : ${s}`,
     WAITING: 'En attente', waitText: 'Ce créneau est occupé. S\'il se libère, nous vous prévenons tout de suite : le premier qui réserve l\'obtient.', waitAny: 'N\'importe quel terrain à cette heure', waitAsk: 'Me prévenir s\'il se libère', waitAdded: 'Vous êtes sur liste d\'attente', waitList: 'Sur liste d\'attente', waitFreed: 'Il s\'est libéré !', waitAnyCourt: 'N\'importe quel terrain', waitRemove: 'Retirer', bookNow: 'Réserver', waitNoPush: 'Pour une alerte sur le téléphone, activez les rappels ; en attendant vous le voyez ici en ouvrant la page.',
@@ -77756,6 +78124,7 @@ const I18N = {
     pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
     notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
     install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
+    tabBook: 'Buchen', tabMine: n => `Meine (${n})`, tabSeek: 'Partner',
     seekTitle: 'Partner gesucht', seekNew: 'Anzeige aufgeben', seekDay: 'Tag', seekFrom: 'Von', seekTo: 'Bis', seekKind: 'Spiel', seekSingles: 'Einzel', seekDoubles: 'Doppel', seekLevel: 'Niveau', seekNote: 'Notiz (optional)', seekPublish: 'Veröffentlichen', seekPublished: 'Anzeige veröffentlicht', seekJoin: 'Bin dabei', seekJoined: 'Du bist dabei! Seid ihr vollständig, wird der Platz von selbst gebucht.', seekLeave: 'Doch nicht', seekRemove: 'Anzeige entfernen', seekYours: 'Deine Anzeige', seekNoCourt: 'Vollständig, aber kein Platz frei: Bucht selbst einen.', seekNone: 'Keine Anzeigen: Gib eine auf, die anderen Spieler des Vereins sehen sie.', seekHint: 'Die anderen Spieler sehen sie und tippen auf Bin dabei; seid ihr vollständig, bucht der Server den ersten freien Platz in der gewählten Zeit.',
     seekWho: s => `Dabei: ${s}`, seekNeed: n => n === 1 ? '1 fehlt' : `${n} fehlen`, seekBooked: s => `Platz gebucht: ${s}`,
     WAITING: 'Wartend', waitText: 'Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.', waitAny: 'Jeder Platz zu dieser Zeit ist recht', waitAsk: 'Benachrichtigen, wenn frei', waitAdded: 'Du stehst auf der Warteliste', waitList: 'Auf der Warteliste', waitFreed: 'Jetzt frei!', waitAnyCourt: 'Beliebiger Platz', waitRemove: 'Entfernen', bookNow: 'Buchen', waitNoPush: 'Für einen Hinweis aufs Handy schalte die Erinnerungen ein; bis dahin siehst du es hier, wenn du die Seite öffnest.',
@@ -77787,6 +78156,7 @@ const I18N = {
     pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
     notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
     install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
+    tabBook: 'Reservar', tabMine: n => `Mías (${n})`, tabSeek: 'Compañeros',
     seekTitle: 'Busco compañero', seekNew: 'Publicar un anuncio', seekDay: 'Día', seekFrom: 'Desde', seekTo: 'Hasta', seekKind: 'Partido', seekSingles: 'Individual', seekDoubles: 'Dobles', seekLevel: 'Nivel', seekNote: 'Nota (opcional)', seekPublish: 'Publicar', seekPublished: 'Anuncio publicado', seekJoin: 'Me apunto', seekJoined: '¡Estás dentro! Cuando estéis completos la pista se reserva sola.', seekLeave: 'Me borro', seekRemove: 'Quitar el anuncio', seekYours: 'Tu anuncio', seekNoCourt: 'Completos, pero ninguna pista libre: reservadla vosotros.', seekNone: 'Ningún anuncio: publica uno, los demás jugadores del club lo verán.', seekHint: 'Los demás jugadores lo ven y tocan Me apunto; cuando estéis completos el servidor reserva la primera pista libre en la franja elegida.',
     seekWho: s => `Apuntados: ${s}`, seekNeed: n => n === 1 ? 'falta 1' : `faltan ${n}`, seekBooked: s => `Pista reservada: ${s}`,
     WAITING: 'En espera', waitText: 'Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.', waitAny: 'Me vale cualquier pista a esta hora', waitAsk: 'Avísame si se libera', waitAdded: 'Estás en la lista de espera', waitList: 'En lista de espera', waitFreed: '¡Se ha liberado!', waitAnyCourt: 'Cualquier pista', waitRemove: 'Quitar', bookNow: 'Reservar', waitNoPush: 'Para un aviso en el teléfono activa los recordatorios; mientras tanto lo ves aquí al abrir la página.',
@@ -77818,6 +78188,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
     notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
+    tabBook: 'Reservar', tabMine: n => `Minhas (${n})`, tabSeek: 'Parceiros',
     seekTitle: 'Procuro parceiro', seekNew: 'Publicar um anúncio', seekDay: 'Dia', seekFrom: 'Das', seekTo: 'Às', seekKind: 'Jogo', seekSingles: 'Singulares', seekDoubles: 'Pares', seekLevel: 'Nível', seekNote: 'Nota (opcional)', seekPublish: 'Publicar', seekPublished: 'Anúncio publicado', seekJoin: 'Conta comigo', seekJoined: 'Estás dentro! Quando estiverem completos a quadra reserva-se sozinha.', seekLeave: 'Saio', seekRemove: 'Tirar o anúncio', seekYours: 'O teu anúncio', seekNoCourt: 'Completos, mas nenhuma quadra livre: reservem vocês.', seekNone: 'Nenhum anúncio: publica um, os outros jogadores do clube vão vê-lo.', seekHint: 'Os outros jogadores veem-no e tocam em Conta comigo; quando estiverem completos o servidor reserva a primeira quadra livre na faixa escolhida.',
     seekWho: s => `Já estão: ${s}`, seekNeed: n => n === 1 ? 'falta 1' : `faltam ${n}`, seekBooked: s => `Quadra reservada: ${s}`,
     WAITING: 'Em espera', waitText: 'Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.', waitAny: 'Serve qualquer quadra a esta hora', waitAsk: 'Avisa-me se ficar livre', waitAdded: 'Estás na lista de espera', waitList: 'Na lista de espera', waitFreed: 'Ficou livre!', waitAnyCourt: 'Qualquer quadra', waitRemove: 'Tirar', bookNow: 'Reservar', waitNoPush: 'Para um aviso no telemóvel ativa os lembretes; entretanto vês aqui ao abrir a página.',
@@ -78609,6 +78980,9 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .card.row .small + .small { margin-left: 6px; }
 .ok { color: var(--ball); font-weight: 600; }
 .card .actions { margin-top: 10px; }
+.tabs { display: flex; gap: 6px; margin: 4px 0 12px; background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; padding: 4px; }
+.tabs button { flex: 1; background: transparent; color: var(--text); font-weight: 600; padding: 8px 6px; min-height: 40px; font-size: 14px; }
+.tabs button.on { background: var(--ball); color: var(--on-ball); }
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/resources/web/sw.js
@@ -82132,6 +82506,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 280 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 281 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

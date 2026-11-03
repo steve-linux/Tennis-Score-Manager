@@ -143,6 +143,7 @@ fun BookCourtScreen(c: MatchController) {
     BackHandler { c.back() }
     val account by c.bookingAccount.collectAsState()
     ScreenScaffold(
+        onHelp = { c.openHelp("7.18") },
         title = s.pbTitle,
         subtitle = account.club.takeIf { account.joined && it.isNotBlank() }?.let { club -> account.name.ifBlank { null }?.let { "$club · $it" } ?: club },
         icon = Icons.Filled.CalendarMonth,
@@ -191,6 +192,7 @@ private fun BookingView(c: MatchController) {
     var booking by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var cancel by remember { mutableStateOf<SrvMyBooking?>(null) }
     var waitFor by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
+    var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
     var seeks by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvSeek>>(emptyList()) }
     var newSeek by remember { mutableStateOf(false) }
     var leave by remember { mutableStateOf(false) }
@@ -219,92 +221,106 @@ private fun BookingView(c: MatchController) {
         if (error != null) GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
     } else {
         val ct = remember(m.timeZone, locale) { ClubTime(m.timeZone, locale) }
-        Text(s.pbMine, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        if (m.bookings.isEmpty()) Text(s.pbNone, color = TsmColors.TextDim)
-        for (b in m.bookings) Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
-                    color = TsmColors.TextDim, fontSize = 13.sp)
-            }
-            TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
-        }
-
-        // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
-        for (w in m.waits) Row(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
-                .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
-                Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
-            }
-            w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
-            TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
-        }
-
-        Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            m.days.forEachIndexed { i, d ->
-                val on = d == date
-                Column(
-                    Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
-                        .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
-                        .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(if (i == 0) s.pbToday else ct.weekday(d), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text(ct.dayMonth(d), color = if (on) TsmColors.OnBall else TsmColors.TextDim, fontSize = 12.sp)
-                }
-            }
-        }
-        if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
-        error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
-        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
-
-        Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
-            color = TsmColors.TextDim, fontSize = 12.sp)
-        // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
-        Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
-        for (k in seeks) Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
-                .border(1.dp, if (k.mine) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text("${if (k.mine) s.pbSeekYours else k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)} · ${ct.hhmm(k.fromMin)}–${ct.hhmm(k.toMin)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
-            Text(listOf(if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level, k.note).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
-            Text(s.pbSeekWho(k.players.joinToString(", ")) + if (k.need > 0) " · " + s.pbSeekNeed(k.need) else "", color = TsmColors.TextDim, fontSize = 13.sp)
-            if (k.bookedCourt != null && k.bookedStart != null) Text(s.pbSeekBooked("${k.bookedCourt} · ${ct.whenText(k.bookedStart!!)}"), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            else if (k.noCourt) Text(s.pbSeekNoCourt, color = TsmColors.Orange, fontSize = 13.sp)
-            Row {
-                fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
-                    scope.launch {
-                        c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
-                            .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
-                        reload()
+        // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
+        val freed = m.waits.count { it.freedCourt != null }
+        Segmented(
+            listOf(SegOption(s.pbTabBook), SegOption(s.pbTabMine(m.bookings.size + m.waits.size) + if (freed > 0) " •" else ""), SegOption(s.pbTabSeek)),
+            tab, { tab = it },
+        )
+        when (tab) {
+            0 -> {
+                Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    m.days.forEachIndexed { i, d ->
+                        val on = d == date
+                        Column(
+                            Modifier.clip(RoundedCornerShape(12.dp)).background(if (on) TsmColors.Ball else TsmColors.Surface)
+                                .border(1.dp, if (on) TsmColors.Ball else TsmColors.Outline, RoundedCornerShape(12.dp))
+                                .clickable { date = d; day = null; scope.launch { c.booking { it.day(d) }.onSuccess { day = it }.onFailure { error = bookErrorText(s, errCode(it)) } } }
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(if (i == 0) s.pbToday else ct.weekday(d), color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(ct.dayMonth(d), color = if (on) TsmColors.OnBall else TsmColors.TextDim, fontSize = 12.sp)
+                        }
                     }
                 }
-                if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
-                if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
-                if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+                if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
+                error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
+
+                Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
+                    color = TsmColors.TextDim, fontSize = 12.sp)
+            }
+            1 -> {
+                Text(s.pbMine, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                if (m.bookings.isEmpty()) Text(s.pbNone, color = TsmColors.TextDim)
+                for (b in m.bookings) Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface).padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("${b.court} · ${ct.whenText(b.start)}–${ct.time(b.start + b.minutes * 60_000L)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(listOfNotNull(if (b.cents > 0) Fees.money(b.cents, locale) else s.pbFreePrice, s.pbLights.takeIf { b.lights }, s.pbHeating.takeIf { b.heating }).joinToString(" · "),
+                            color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
+                }
+
+                // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
+                for (w in m.waits) Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                        .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
+                    }
+                    w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
+                    TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+                }
+
+                // Promemoria e avvisi sul telefono (anche ad app chiusa).
+                val acc by c.bookingAccount.collectAsState()
+                val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+                SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
+                    c.setBookingReminders(on)
+                    if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+                GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
+            }
+            else -> {
+                // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
+                Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
+                for (k in seeks) Column(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                        .border(1.dp, if (k.mine) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text("${if (k.mine) s.pbSeekYours else k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)} · ${ct.hhmm(k.fromMin)}–${ct.hhmm(k.toMin)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                    Text(listOf(if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level, k.note).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+                    Text(s.pbSeekWho(k.players.joinToString(", ")) + if (k.need > 0) " · " + s.pbSeekNeed(k.need) else "", color = TsmColors.TextDim, fontSize = 13.sp)
+                    if (k.bookedCourt != null && k.bookedStart != null) Text(s.pbSeekBooked("${k.bookedCourt} · ${ct.whenText(k.bookedStart!!)}"), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    else if (k.noCourt) Text(s.pbSeekNoCourt, color = TsmColors.Orange, fontSize = 13.sp)
+                    Row {
+                        fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
+                            scope.launch {
+                                c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+                                    .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                                reload()
+                            }
+                        }
+                        if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
+                        if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
+                        if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+                    }
+                }
+                GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
+
             }
         }
-        GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
-
-        // Promemoria e avvisi sul telefono (anche ad app chiusa).
-        val acc by c.bookingAccount.collectAsState()
-        val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
-        SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
-            c.setBookingReminders(on)
-            if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
-        GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
 
         booking?.let { (court, start) ->
             BookDialog(c, m, day?.slotMinutes ?: 60, court, start, ct) { done ->

@@ -150,6 +150,7 @@ fun CourtsPlanScreen(c: MatchController) {
     val slots = CourtPlans.slots(day, plan.settings)
     val stepMs = plan.settings.slotMinutes * 60_000L
     ScreenScaffold(
+        onHelp = { c.openHelp("7.15") },
         title = s.planTitle,
         subtitle = com.tennis.scoremanager.data.Notices.day(day, lang),
         icon = Icons.Filled.CalendarMonth,
@@ -169,7 +170,7 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
         val features by c.clubFeatures.collectAsState()
-        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
+        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.openCourtStats() }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
         if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.

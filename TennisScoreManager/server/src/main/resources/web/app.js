@@ -5,7 +5,8 @@
 // Parla solo col server del circolo che la serve (/api/v1); la chiave del telefono resta nel telefono.
 
 const KEY = 'tsm.token';
-const state = { token: null, me: null, date: null, day: null, seeks: [] };
+const TAB = 'tsm.tab';
+const state = { token: null, me: null, date: null, day: null, seeks: [], tab: Number(load(TAB) || 0) || 0 };
 
 // Su iPhone (e iPad) Safari e l'app messa sulla schermata Home non condividono i dati: l'invito va usato
 // nell'app installata, altrimenti la chiave resta in Safari e l'app chiede un codice già usato.
@@ -201,19 +202,25 @@ function render(dayError) {
     return el('button', { class: d === state.date ? 'on' : '', onclick: () => { state.date = d; loadDay(); } }, i === 0 ? T.today : wd, el('small', null, dm));
   }));
 
-  const parts = [
-    el('h2', null, T.mine), ...mine, ...waits,
-    el('h2', null, T.day), days,
-  ];
-  if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
-  if (dayError) parts.push(el('p', { class: 'error' }, dayError));
-  else if (state.day) parts.push(grid(state.day));
-  parts.push(
-    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
-    el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
-  );
-  parts.push(...seekSection());
-  parts.push(el('div', { id: 'push' }));
+  // Tre schede: prenotare, le proprie prenotazioni (con le attese), Cerco compagno.
+  const freed = (me.waits || []).some(w => w.freedCourt);
+  const tabs = [T.tabBook, T.tabMine((me.bookings.length + (me.waits || []).length)) + (freed ? ' •' : ''), T.tabSeek];
+  const bar = el('div', { class: 'tabs' }, tabs.map((t, i) => el('button', { class: i === state.tab ? 'on' : '', onclick: () => { state.tab = i; save(TAB, String(i)); render(dayError); } }, t)));
+  const parts = [bar];
+  if (state.tab === 1) {
+    parts.push(...mine, ...waits, el('div', { id: 'push' }));
+  } else if (state.tab === 2) {
+    parts.push(...seekSection());
+  } else {
+    parts.push(el('h2', null, T.day), days);
+    if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
+    if (dayError) parts.push(el('p', { class: 'error' }, dayError));
+    else if (state.day) parts.push(grid(state.day));
+    parts.push(
+      el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
+      el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
+    );
+  }
   const tip = installTip();
   if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
@@ -367,7 +374,6 @@ function seekSection() {
     return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
   });
   return [
-    el('h2', null, T.seekTitle),
     ...(cards.length ? cards : [el('p', { class: 'dim' }, T.seekNone)]),
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: openSeek, disabled: !state.me.rules.open }, T.seekNew)),
   ];

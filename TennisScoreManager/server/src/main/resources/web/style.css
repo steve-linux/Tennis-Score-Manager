@@ -76,3 +76,6 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .card.row .small + .small { margin-left: 6px; }
 .ok { color: var(--ball); font-weight: 600; }
 .card .actions { margin-top: 10px; }
+.tabs { display: flex; gap: 6px; margin: 4px 0 12px; background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; padding: 4px; }
+.tabs button { flex: 1; background: transparent; color: var(--text); font-weight: 600; padding: 8px 6px; min-height: 40px; font-size: 14px; }
+.tabs button.on { background: var(--ball); color: var(--on-ball); }

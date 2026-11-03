@@ -34,6 +34,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
@@ -47,6 +49,7 @@ import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Videocam
@@ -135,6 +138,7 @@ fun HomeScreen(c: MatchController) {
             HomeTab.TOURNAMENTS -> TournamentsTab(c)
             HomeTab.COURTS -> CourtsTab(c)
             HomeTab.PEOPLE -> PeopleTab(c)
+            HomeTab.TODAY -> TodayTab(c)
         }
     }
 }
@@ -150,6 +154,7 @@ private fun tabInfo(s: com.tennis.scoremanager.ui.Strings, t: HomeTab): Pair<Str
     HomeTab.TOURNAMENTS -> s.tabTournaments to Icons.Filled.EmojiEvents
     HomeTab.COURTS -> s.tabCourts to Icons.Filled.Tv
     HomeTab.PEOPLE -> s.playersTitle to Icons.Filled.Groups
+    HomeTab.TODAY -> s.tdTitle to Icons.Filled.Today
 }
 
 fun roleName(s: com.tennis.scoremanager.ui.Strings, r: com.tennis.scoremanager.Role) = when (r) {
@@ -208,8 +213,6 @@ private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
     val f by c.clubFeatures.collectAsState()
-    // La prima volta: l'invito a tenere solo le funzioni che il circolo usa.
-    com.tennis.scoremanager.ui.ClubFeaturesHint(c)
     if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
     if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
     if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint) { c.openLadders() }
@@ -225,14 +228,21 @@ private fun CourtsTab(c: MatchController) {
     val s = LocalStrings.current
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
     val f by c.clubFeatures.collectAsState()
     if (ClubFeature.PLANNING in f) Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
     Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
     Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
+    if (ClubFeature.STATS in f) Entry(Icons.Filled.BarChart, s.stTitle, s.cfStatsHint) { c.openCourtStats() }
+    if (ClubFeature.SERVER in f) {
+        val srv by c.clubServer.collectAsState()
+        Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
+    }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
+    if (server) ClubServerDialog(c) { server = false }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }

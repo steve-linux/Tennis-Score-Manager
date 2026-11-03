@@ -71,17 +71,21 @@ fun HelpScreen(c: MatchController) {
         HelpDoc.parse(text)
     }
     var query by rememberSaveable { mutableStateOf("") }
-    var openId by rememberSaveable { mutableStateOf<String?>(null) }
+    // Dal "?" di una schermata si apre direttamente la sua sezione, e Indietro torna lì.
+    val direct = remember { c.helpSection.value }
+    var openId by rememberSaveable { mutableStateOf(direct) }
+    androidx.compose.runtime.LaunchedEffect(Unit) { c.helpSection.value = null }
     val open = sections.firstOrNull { it.id == openId }
-    // Indietro: dalla sezione all'indice, dall'indice ad Altro.
-    BackHandler { if (open != null) openId = null else c.back() }
+    // Indietro: dalla sezione all'indice, dall'indice ad Altro (o alla schermata da cui si è venuti).
+    fun goBack() { if (open != null && direct == null) openId = null else c.back() }
+    BackHandler { goBack() }
     // Una sezione nuova parte dall'alto (la pagina ricorda lo scorrimento).
     androidx.compose.runtime.key(openId) { ScreenScaffold(
         title = open?.let { "${it.id} ${it.title}" } ?: s.moreHelp,
         subtitle = if (open == null) s.moreHelpHint else null,
         icon = Icons.AutoMirrored.Filled.Help,
         bottomBar = {
-            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { if (open != null) openId = null else c.back() }, Modifier.weight(1f))
+            GhostButton(s.back, Icons.AutoMirrored.Filled.ArrowBack, { goBack() }, Modifier.weight(1f))
             if (open != null) {
                 val next = sections.getOrNull(sections.indexOf(open) + 1)
                 if (next != null) GhostButton(s.helpNext, Icons.AutoMirrored.Filled.ArrowForward, { openId = next.id }, Modifier.weight(1f))

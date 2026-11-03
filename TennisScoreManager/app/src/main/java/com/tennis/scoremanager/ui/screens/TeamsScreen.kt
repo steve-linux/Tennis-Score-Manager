@@ -91,6 +91,7 @@ fun TeamsScreen(c: MatchController) {
     val list by c.teams.collectAsState()
     var creating by remember { mutableStateOf(false) }
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = s.tmTitle,
         subtitle = s.tmHint,
         icon = Icons.Filled.Groups,
@@ -131,6 +132,7 @@ fun TeamScreen(c: MatchController) {
     // I controlli FITP valgono per il prossimo incontro (o per oggi).
     val day = t.fixtures.firstOrNull { it.at > now - 6 * 3_600_000L }?.at ?: now
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = t.name,
         subtitle = listOfNotNull(t.championship.ifBlank { null }, t.season.ifBlank { null }, recordLine(s, t)).joinToString(" · "),
         icon = Icons.Filled.Groups,
@@ -201,6 +203,7 @@ fun FixtureScreen(c: MatchController) {
     fun save(x: Fixture) = c.saveFixture(c.team(t.id) ?: t, x)
     fun name(id: String) = players.firstOrNull { it.id == id || id in it.aliases }?.name ?: "—"
     ScreenScaffold(
+        onHelp = { c.openHelp("7.17") },
         title = "${t.name} – ${f.opponent.ifBlank { "?" }}",
         subtitle = c.fixtureWhen(f),
         icon = Icons.Filled.EmojiEvents,

@@ -1622,7 +1622,7 @@ object PtStrings : Strings {
     override val stByCourt = "Quadra a quadra"
     override val stHoursOf: (String, String) -> String = { a, b -> "$a h de $b" }
     override val stBlocked: (String) -> String = { "não reserváveis $it h" }
-    override val stCount: (Int) -> String = { "$it reservas" }
+    override val stCount: (Int) -> String = { if (it == 1) "1 reserva" else "$it reservas" }
     override val stHeat = "Quando se joga"
     override val stHeatHint = "Ocupação por dia e hora, todas as quadras juntas: mais claro = mais cheio."
     override val stTop = "Quem reserva mais"
@@ -1660,8 +1660,8 @@ object PtStrings : Strings {
     override val ldNew = "Nova classificação"
     override val ldName = "Nome (ex. Singulares masculinos)"
     override val ldNone = "Nenhuma classificação: cria uma e adiciona os jogadores."
-    override val ldPlayers: (Int) -> String = { "$it jogadores" }
-    override val ldOpenCount: (Int) -> String = { "$it desafios abertos" }
+    override val ldPlayers: (Int) -> String = { if (it == 1) "1 jogador" else "$it jogadores" }
+    override val ldOpenCount: (Int) -> String = { if (it == 1) "1 desafio aberto" else "$it desafios abertos" }
     override val ldRanking = "Classificação"
     override val ldEmpty = "Adiciona os jogadores: o primeiro é o número 1, depois ordena-os à mão."
     override val ldAdd = "Adicionar jogadores"
@@ -1701,6 +1701,23 @@ object PtStrings : Strings {
     override val cfChoose = "Escolher as funções"
     override val cfServerPaired = "O servidor está ligado: para o desligar, primeiro Desligar em Servidor do clube."
     override val cfStatsHint = "Ocupação das quadras, receitas, quando se joga e quem reserva mais"
+    override val pbTabBook = "Reservar"
+    override val pbTabMine: (Int) -> String = { "Minhas ($it)" }
+    override val pbTabSeek = "Parceiros"
+    override val tdTitle = "Hoje"
+    override val tdCourts: (Int) -> String = { "Hoje em quadra: $it" }
+    override val tdCourtsNone = "Nenhuma reserva hoje"
+    override val tdOnline: (Int) -> String = { "das quais online: $it" }
+    override val tdToCollect: (String) -> String = { "Por receber: $it" }
+    override val tdPeople: (Int) -> String = { if (it == 1) "de 1 pessoa" else "de $it pessoas" }
+    override val tdMembers: (Int) -> String = { "Sócios por regularizar: $it" }
+    override val tdBlocking: (Int) -> String = { if (it == 1) "1 não pode jogar (atestado ou cartão)" else "$it não podem jogar (atestado ou cartão)" }
+    override val tdMatches: (Int) -> String = { "Jogos de torneio hoje: $it" }
+    override val tdLessons: (Int) -> String = { "Aulas hoje: $it" }
+    override val tdFixtures: (Int) -> String = { "Encontros das equipes esta semana: $it" }
+    override val tdChallenges: (Int) -> String = { "Desafios por jogar: $it" }
+    override val tdLate: (Int) -> String = { "$it em atraso" }
+    override val tdNothing = "Nada previsto para hoje."
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
