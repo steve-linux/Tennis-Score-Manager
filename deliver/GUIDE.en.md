@@ -514,6 +514,7 @@ With the **Club** role, on the **Courts** tab.
 - **Court planner**: the day with one court per column and one hour per row (◀ ▶ and the calendar to change day). Tap a free slot to book: court, day, time and length, type (play, lesson, closed, other), players from the database and guests, a note. The **price** is worked out by itself (lights from the set time, heating if asked) and can be changed; **Charge the players** splits it equally and puts it into *Fees and payments*. **How it's paid**: *at the court* or *online*; once charged, **Paid: …** marks it paid with one of the club's payment methods. **Every week for N weeks** repeats the booking (dates when the court is taken are skipped and the app tells you). **Notify the players** sends court, day, time and how to pay.
 - **Tournament matches** with a court and a time appear by themselves; the app won't let you book over another booking or a match.
 - **Not bookable**: periods when courts can't be booked, for **courses**, **tournaments**, **maintenance** or other: courts (or all), from day to day, days of the week, time slot or all day; for a tournament the name and dates come from it. Course lessons can go into course periods (tapping the slot opens a ready lesson).
+- **Court statistics** (in the planner): for the last 4 weeks, this month or last month, the **occupancy** of each court (hours booked out of bookable ones: non-bookable periods do not count), the **revenue** (price of play and lesson bookings, paid or not), how many bookings and how many came online, tournament hours, a **day × hour** map showing when people play most, and who books most.
 - **Hours and prices**: opening and closing, slot length (30, 60, 90 minutes), general price per hour and with lights, from what time lights are needed, how long a tournament match lasts in the planner.
 - **Payment methods** (in *Fees and payments*): chosen by whoever runs the club. It starts with cash, card, bank transfer and Satispay and you can add others (PayPal, Revolut, Bancomat Pay, a SumUp link…): name, link/IBAN/number and whether it's paid remotely. You pick one when recording a payment (the name goes on receipts and the CSV); remote ones, with their details, go into notices and reminders. The app doesn't collect money: it records and sends the instructions.
 
@@ -551,6 +552,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
 - **Reminders to players**: the club chooses how many hours before the match they arrive (*Reminder to players*, 0 = none; usually 2). On the TSM page the player taps **Turn reminders on** (on iPhone from the TSM app on the Home Screen, with iOS 16.4 or later and the club's https address) and gets a test notification right away; the TSM app on Android has **Reminders on the phone**. They are also told if the office removes or moves one of their bookings (not when they cancel it themselves).
 - **Waiting list**: tapping a **Taken** slot (on the TSM page or in *Book a court* in the app) the player chooses **Tell me if it frees up**, for that court or any court at the same time (3 waits at most). If the booking is cancelled or moved they get an alert right away and **Book** appears on the page: whoever books first gets it; if someone else is faster, they go back to waiting. Waits disappear by themselves once the time has passed.
+- **Looking for a partner**: on the TSM page and in *Book a court* a player posts a request (day, time window, singles or doubles, level, note; at most 3 open). Others see it and tap **I'm in**; the poster gets an alert. When complete (2 players in singles, 4 in doubles) the server **books by itself** the first free court in the window, with the online booking rules, and tells everyone; if no court is free it says so, and they book one themselves. Past requests disappear by themselves.
 - **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
 - **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
   1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
@@ -560,6 +562,15 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
   - **Pairing** the office works only from the club network (with the `http://…:8080` address), never from the internet.
   - If a phone on 4G/5G cannot get through, the club line is probably behind **CGNAT** (common with fixed-wireless and mobile lines): the internet address shown by the router differs from the one a *what is my IP* website gives. Then ask the provider for a **public IP** (often free), or use a tunnel (Tailscale Funnel, Cloudflare Tunnel: third-party services) or a small rented server.
   - `sudo ./setup-https.sh --remove` turns internet access off.
+
+### 7.19 Challenge ladder (app 2.6)
+
+With the **Club** role, in **Tournaments › Challenge ladder**.
+
+- **New ladder** (more than one if you like: men, women, juniors…), then **Add players**: the first one added is number 1; **Arrange the ranking** moves them by hand or removes them.
+- **New challenge**: choose who challenges and then who is challenged, at most *N* places above (**Rules**: how many places, usually 3, and within how many days it must be played, usually 14). Everyone has one open challenge at a time. **Notify** tells both who challenges whom and by when.
+- **Play with the scorer**: the challenger is Player 1; at the end the result comes back by itself. Or **Result** by hand (the score from the challenger's side: the app works out who won).
+- If the **challenger wins they take the place** of the challenged player and those in between move down one; if the challenged player wins nothing changes. **Challenges played** keeps the history, with the places before and after.
 
 ## 8. Scoreboard on a TV or monitor
 

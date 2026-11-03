@@ -74,3 +74,5 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .legend .WAITING::before { background: var(--high); border: 1px dashed var(--ball); }
 .card.freed { border-color: var(--ball); }
 .card.row .small + .small { margin-left: 6px; }
+.ok { color: var(--ball); font-weight: 600; }
+.card .actions { margin-top: 10px; }

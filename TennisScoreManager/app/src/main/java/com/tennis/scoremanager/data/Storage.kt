@@ -258,6 +258,24 @@ class Storage(context: Context) {
     }
 
     /** Le squadre del circolo, coi loro incontri, in un file solo. */
+    /** Le classifiche a sfida del circolo. */
+    private val laddersFile: File get() = File(app.filesDir, "club_ladders.json")
+
+    fun loadLadders(): List<Ladder> =
+        runCatching { json.decodeFromString(ListSerializer(Ladder.serializer()), laddersFile.readText()) }.getOrDefault(emptyList())
+
+    @Synchronized
+    fun saveLadders(list: List<Ladder>) {
+        runCatching {
+            val tmp = File(app.filesDir, "club_ladders.tmp")
+            tmp.writeText(json.encodeToString(ListSerializer(Ladder.serializer()), list))
+            if (!tmp.renameTo(laddersFile)) {
+                laddersFile.delete()
+                tmp.renameTo(laddersFile)
+            }
+        }.onFailure { Log.e("Storage", "Salvataggio delle classifiche a sfida fallito", it) }
+    }
+
     private val teamsFile: File get() = File(app.filesDir, "club_teams.json")
 
     fun loadTeams(): List<Team> =

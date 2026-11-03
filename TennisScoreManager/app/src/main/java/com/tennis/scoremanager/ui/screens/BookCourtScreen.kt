@@ -21,11 +21,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.SportsTennis
@@ -106,6 +110,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "NOT_SYNCED" -> s.pbErrSynced
     "FREE_NOW" -> s.pbErrFreeNow
     "TOO_MANY_WAITS" -> s.pbErrManyWaits
+    "FULL" -> s.pbErrFull
+    "TOO_MANY_SEEKS" -> s.pbErrManySeeks
     else -> s.srvErrOther(code)
 }
 
@@ -119,6 +125,9 @@ private class ClubTime(zone: String, private val locale: Locale) {
     private val dm = DateTimeFormatter.ofPattern("d MMM", locale)
     private val full = DateTimeFormatter.ofPattern("EEE d MMM, HH:mm", locale)
     fun time(t: Long): String = hm.format(Instant.ofEpochMilli(t).atZone(z))
+    /** Minuti dalla mezzanotte, ora del circolo. */
+    fun minutes(t: Long): Int = Instant.ofEpochMilli(t).atZone(z).let { it.hour * 60 + it.minute }
+    fun hhmm(min: Int): String = "%02d:%02d".format(min / 60, min % 60)
     fun whenText(t: Long): String = full.format(Instant.ofEpochMilli(t).atZone(z)).replaceFirstChar { it.titlecase(locale) }
     fun weekday(d: String): String = runCatching { wd.format(LocalDate.parse(d)) }.getOrDefault(d)
     fun dayMonth(d: String): String = runCatching { dm.format(LocalDate.parse(d)) }.getOrDefault(d)
@@ -182,6 +191,8 @@ private fun BookingView(c: MatchController) {
     var booking by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var cancel by remember { mutableStateOf<SrvMyBooking?>(null) }
     var waitFor by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
+    var seeks by remember { mutableStateOf<List<com.tennis.scoremanager.data.SrvSeek>>(emptyList()) }
+    var newSeek by remember { mutableStateOf(false) }
     var leave by remember { mutableStateOf(false) }
     var tick by remember { mutableStateOf(0) }
 
@@ -190,6 +201,7 @@ private fun BookingView(c: MatchController) {
         while (true) {
             c.booking { it.me() }.onSuccess { m ->
                 me = m
+                c.booking { it.seeks() }.onSuccess { seeks = it }
                 val d = date?.takeIf { it in m.days } ?: m.days.firstOrNull()
                 date = d
                 if (d != null) c.booking { it.day(d) }.onSuccess { day = it; error = null }.onFailure { error = bookErrorText(s, errCode(it)) }
@@ -257,6 +269,34 @@ private fun BookingView(c: MatchController) {
 
         Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
             color = TsmColors.TextDim, fontSize = 12.sp)
+        // Cerco compagno: gli annunci aperti degli altri e i propri; al completo il campo si prenota da solo.
+        Text(s.pbSeekTitle, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        if (seeks.isEmpty()) Text(s.pbSeekNone, color = TsmColors.TextDim, fontSize = 13.sp)
+        for (k in seeks) Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                .border(1.dp, if (k.mine) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text("${if (k.mine) s.pbSeekYours else k.owner} · ${ct.weekday(k.date)} ${ct.dayMonth(k.date)} · ${ct.hhmm(k.fromMin)}–${ct.hhmm(k.toMin)}", color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+            Text(listOf(if (k.doubles) s.pbSeekDoubles else s.pbSeekSingles, k.level, k.note).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextDim, fontSize = 13.sp)
+            Text(s.pbSeekWho(k.players.joinToString(", ")) + if (k.need > 0) " · " + s.pbSeekNeed(k.need) else "", color = TsmColors.TextDim, fontSize = 13.sp)
+            if (k.bookedCourt != null && k.bookedStart != null) Text(s.pbSeekBooked("${k.bookedCourt} · ${ct.whenText(k.bookedStart!!)}"), color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            else if (k.noCourt) Text(s.pbSeekNoCourt, color = TsmColors.Orange, fontSize = 13.sp)
+            Row {
+                fun act(f: (com.tennis.scoremanager.data.ClubServerClient) -> Any, done: String? = null) {
+                    scope.launch {
+                        c.booking { f(it) }.onSuccess { done?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() } }
+                            .onFailure { Toast.makeText(context, bookErrorText(s, errCode(it)), Toast.LENGTH_LONG).show() }
+                        reload()
+                    }
+                }
+                if (!k.mine && !k.joined && k.need > 0) TextButton(onClick = { act({ it.joinSeek(k.id) }, s.pbSeekJoined) }) { Text(s.pbSeekJoin, color = TsmColors.Ball) }
+                if (k.joined && k.bookedCourt == null) TextButton(onClick = { act({ it.leaveSeek(k.id) }) }) { Text(s.pbSeekLeave, color = TsmColors.TextDim) }
+                if (k.mine) TextButton(onClick = { act({ it.removeSeek(k.id) }) }) { Text(s.pbSeekRemove, color = TsmColors.TextDim) }
+            }
+        }
+        GhostButton(s.pbSeekNew, Icons.Filled.Groups, { newSeek = true }, Modifier.fillMaxWidth(), enabled = m.rules.open)
+
         // Promemoria e avvisi sul telefono (anche ad app chiusa).
         val acc by c.bookingAccount.collectAsState()
         val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
@@ -271,6 +311,10 @@ private fun BookingView(c: MatchController) {
                 booking = null
                 if (done) { Toast.makeText(context, s.pbBooked, Toast.LENGTH_SHORT).show(); reload() }
             }
+        }
+        if (newSeek) SeekDialog(c, m, day, date, ct) { done ->
+            newSeek = false
+            if (done) { Toast.makeText(context, s.pbSeekPublished, Toast.LENGTH_SHORT).show(); reload() }
         }
         waitFor?.let { (court, start) ->
             var any by remember(court.name, start) { mutableStateOf(false) }
@@ -429,6 +473,63 @@ private fun BookDialog(c: MatchController, me: SrvMe, slot: Int, court: CourtInf
                     busy = false
                 }
             }) { Text(s.pbConfirm) }
+        },
+        dismissButton = { TextButton(onClick = { onDone(false) }) { Text(s.back) } },
+    )
+}
+
+/** L'annuncio di Cerco compagno: giorno, fascia (orari del planning), singolo o doppio, livello e nota. */
+@Composable
+private fun SeekDialog(c: MatchController, me: SrvMe, day: SrvDay?, date: String?, ct: ClubTime, onDone: (Boolean) -> Unit) {
+    val s = LocalStrings.current
+    val scope = rememberCoroutineScope()
+    val step = day?.slotMinutes ?: 60
+    val mins = day?.cells?.map { ct.minutes(it.start) }?.distinct()?.sorted()?.ifEmpty { null } ?: (8 until 22).map { it * 60 }
+    var d by remember { mutableStateOf(date ?: me.days.first()) }
+    var from by remember { mutableStateOf(mins.getOrElse(1) { mins.first() }) }
+    var to by remember { mutableStateOf(minOf(from + 180, mins.last() + step)) }
+    var doubles by remember { mutableStateOf(false) }
+    var level by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
+    var err by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    @Composable fun stepper(label: String, v: Int, onChange: (Int) -> Unit) = Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TsmColors.TextMain, modifier = Modifier.weight(1f))
+        androidx.compose.material3.IconButton(onClick = { onChange(v - step) }) { androidx.compose.material3.Icon(Icons.Filled.Remove, null) }
+        Text(ct.hhmm(v), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+        androidx.compose.material3.IconButton(onClick = { onChange(v + step) }) { androidx.compose.material3.Icon(Icons.Filled.Add, null) }
+    }
+    AlertDialog(
+        onDismissRequest = { onDone(false) },
+        title = { Text(s.pbSeekTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.pbSeekHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                Text(s.pbSeekDay, color = TsmColors.TextDim, fontSize = 13.sp)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (x in me.days) {
+                        val on = x == d
+                        Text("${ct.weekday(x)} ${ct.dayMonth(x)}", color = if (on) TsmColors.OnBall else TsmColors.TextMain, fontSize = 13.sp,
+                            modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(if (on) TsmColors.Ball else TsmColors.SurfaceHigh).clickable { d = x }.padding(horizontal = 10.dp, vertical = 6.dp))
+                    }
+                }
+                stepper(s.pbSeekFrom, from) { v -> from = v.coerceIn(mins.first(), mins.last()); if (to < from + step) to = from + step }
+                stepper(s.pbSeekTo, to) { v -> to = v.coerceIn(from + step, mins.last() + step) }
+                Segmented(listOf(SegOption(s.pbSeekSingles), SegOption(s.pbSeekDoubles)), if (doubles) 1 else 0, { doubles = it == 1 })
+                OutlinedTextField(level, { level = it.take(30) }, label = { Text(s.pbSeekLevel) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(note, { note = it.take(140) }, label = { Text(s.pbSeekNote) }, modifier = Modifier.fillMaxWidth())
+                err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = !busy, onClick = {
+                busy = true
+                scope.launch {
+                    c.booking { it.addSeek(com.tennis.scoremanager.data.SrvSeekIn(d, from, to, doubles, level, note)) }
+                        .onSuccess { onDone(true) }.onFailure { err = bookErrorText(s, errCode(it)) }
+                    busy = false
+                }
+            }) { Text(s.pbSeekPublish) }
         },
         dismissButton = { TextButton(onClick = { onDone(false) }) { Text(s.back) } },
     )

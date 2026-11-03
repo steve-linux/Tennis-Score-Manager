@@ -58,6 +58,8 @@ data class BookingAccount(
     val cancelledHere: List<String> = emptyList(),
     /** Le liste d'attesa liberate di cui si è già dato l'avviso. */
     val freedSeen: List<String> = emptyList(),
+    /** Gli annunci di Cerco compagno (propri o a cui si partecipa) com'erano l'ultima volta; null = mai guardato. */
+    val seekSeen: Map<String, String>? = null,
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 }
@@ -125,6 +127,25 @@ object ClubServers {
 
     /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
     data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount, val freed: List<SrvWait> = emptyList())
+
+    /** Cosa è cambiato negli annunci del giocatore: qualcuno ha risposto, il campo è prenotato, nessun campo libero. */
+    data class SeekNews(val joined: List<SrvSeek>, val booked: List<SrvSeek>, val noCourt: List<SrvSeek>, val account: BookingAccount)
+
+    fun seekNews(a: BookingAccount, seeks: List<SrvSeek>): SeekNews {
+        val mine = seeks.filter { it.mine || it.joined }
+        fun sig(k: SrvSeek) = "${k.players.size}|${k.bookedCourt != null}|${k.noCourt}"
+        val now = mine.associate { it.id to sig(it) }
+        val before = a.seekSeen
+        val next = a.copy(seekSeen = now)
+        if (before == null) return SeekNews(emptyList(), emptyList(), emptyList(), next)
+        val changed = mine.filter { before[it.id] != null && before[it.id] != sig(it) }
+        return SeekNews(
+            joined = changed.filter { it.mine && it.bookedCourt == null && !it.noCourt },
+            booked = changed.filter { it.bookedCourt != null },
+            noCourt = changed.filter { it.noCourt && it.bookedCourt == null },
+            account = next,
+        )
+    }
 
     /** Le liste d'attesa appena liberate (avviso una volta sola). */
     fun freedNews(a: BookingAccount, waits: List<SrvWait>): Pair<List<SrvWait>, BookingAccount> {
@@ -242,4 +263,9 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
     fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
     fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
+    fun seeks(): List<SrvSeek> = call<Unit, List<SrvSeek>>("GET", "/seeks", null, null, kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()))
+    fun addSeek(k: SrvSeekIn): SrvSeek = call("POST", "/seeks", SrvSeekIn.serializer(), k, SrvSeek.serializer())
+    fun joinSeek(id: String): SrvSeek = call<Unit, SrvSeek>("POST", "/seeks/${enc(id)}/join", null, null, SrvSeek.serializer())
+    fun leaveSeek(id: String): SrvOk = call<Unit, SrvOk>("POST", "/seeks/${enc(id)}/leave", null, null, SrvOk.serializer())
+    fun removeSeek(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/seeks/${enc(id)}", null, null, SrvOk.serializer())
 }

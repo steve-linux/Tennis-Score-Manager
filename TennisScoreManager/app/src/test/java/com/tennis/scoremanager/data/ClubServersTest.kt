@@ -114,4 +114,16 @@ class ClubServersTest {
         assertEquals(listOf("w2"), fresh.map { it.id })
         assertTrue(ClubServers.freedNews(next, waits).first.isEmpty())
     }
+
+    @Test fun seekNewsOnlyChanges() {
+        fun k(players: List<String>, court: String? = null, noCourt: Boolean = false, mine: Boolean = true) =
+            SrvSeek("s1", mine, !mine, "Mario", "2026-11-14", 540, 720, false, "", "", players, 2 - players.size, court, court?.let { now + h }, noCourt)
+        val first = ClubServers.seekNews(BookingAccount("http://x", "t"), listOf(k(listOf("Mario"))))
+        assertTrue(first.joined.isEmpty() && first.booked.isEmpty())
+        val joined = ClubServers.seekNews(first.account, listOf(k(listOf("Mario", "Luca"))))
+        assertEquals(1, joined.joined.size)
+        val booked = ClubServers.seekNews(joined.account, listOf(k(listOf("Mario", "Luca"), court = "Campo 1")))
+        assertEquals(1, booked.booked.size)
+        assertTrue(ClubServers.seekNews(booked.account, listOf(k(listOf("Mario", "Luca"), court = "Campo 1"))).booked.isEmpty())
+    }
 }

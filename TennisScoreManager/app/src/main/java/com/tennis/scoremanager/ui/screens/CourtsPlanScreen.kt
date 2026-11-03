@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -167,6 +168,7 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
+        GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
         ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.

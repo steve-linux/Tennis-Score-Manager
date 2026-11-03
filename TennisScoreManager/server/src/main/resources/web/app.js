@@ -5,7 +5,7 @@
 // Parla solo col server del circolo che la serve (/api/v1); la chiave del telefono resta nel telefono.
 
 const KEY = 'tsm.token';
-const state = { token: null, me: null, date: null, day: null };
+const state = { token: null, me: null, date: null, day: null, seeks: [] };
 
 // Su iPhone (e iPad) Safari e l'app messa sulla schermata Home non condividono i dati: l'invito va usato
 // nell'app installata, altrimenti la chiave resta in Safari e l'app chiede un codice già usato.
@@ -159,6 +159,7 @@ async function refresh() {
     $('app').replaceChildren(el('p', { class: 'error center' }, errText(e)), el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: refresh }, '↻')));
     return;
   }
+  try { state.seeks = await api('GET', '/seeks'); } catch (_) { state.seeks = []; }
   if (!state.date || !state.me.days.includes(state.date)) state.date = state.me.days[0];
   setHeader();
   await loadDay();
@@ -211,6 +212,7 @@ function render(dayError) {
     el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
+  parts.push(...seekSection());
   parts.push(el('div', { id: 'push' }));
   const tip = installTip();
   if (tip) parts.push(tip);
@@ -336,6 +338,76 @@ function openBook(court, start) {
     state.me.payInfo ? el('p', { class: 'dim' }, T.pay + ': ' + state.me.payInfo) : null,
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), ok));
   quote();
+}
+
+// --- Cerco compagno ---
+
+/** Minuti dalla mezzanotte, nel fuso del circolo. */
+function clubMinutes(ms) {
+  const p = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: tz() }).formatToParts(new Date(ms));
+  return Number(p.find(x => x.type === 'hour').value) * 60 + Number(p.find(x => x.type === 'minute').value);
+}
+function hhmm(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
+
+function seekSection() {
+  const cards = (state.seeks || []).map(k => {
+    const [wd, dm] = fmtDate(k.date);
+    const who = k.mine ? T.seekYours : k.owner;
+    const lines = [
+      el('div', null, el('b', null, who), ' · ', wd + ' ' + dm, ' · ', hhmm(k.fromMin) + '–' + hhmm(k.toMin)),
+      el('div', { class: 'dim' }, [k.doubles ? T.seekDoubles : T.seekSingles, k.level, k.note].filter(Boolean).join(' · ')),
+      el('div', { class: 'dim' }, T.seekWho(k.players.join(', ')), k.need > 0 ? ' · ' + T.seekNeed(k.need) : ''),
+    ];
+    if (k.bookedCourt) lines.push(el('div', { class: 'ok' }, T.seekBooked(k.bookedCourt + ' · ' + fmtWhen(k.bookedStart))));
+    else if (k.noCourt) lines.push(el('div', { class: 'error' }, T.seekNoCourt));
+    const buttons = [];
+    if (!k.mine && !k.joined && k.need > 0) buttons.push(el('button', { class: 'small', onclick: () => seekAction('POST', '/seeks/' + k.id + '/join', T.seekJoined) }, T.seekJoin));
+    if (k.joined && !k.bookedCourt) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('POST', '/seeks/' + k.id + '/leave') }, T.seekLeave));
+    if (k.mine) buttons.push(el('button', { class: 'ghost small', onclick: () => seekAction('DELETE', '/seeks/' + k.id) }, T.seekRemove));
+    return el('div', { class: 'card' + (k.mine ? ' freed' : '') }, ...lines, buttons.length ? el('div', { class: 'actions' }, ...buttons) : null);
+  });
+  return [
+    el('h2', null, T.seekTitle),
+    ...(cards.length ? cards : [el('p', { class: 'dim' }, T.seekNone)]),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: openSeek, disabled: !state.me.rules.open }, T.seekNew)),
+  ];
+}
+
+async function seekAction(method, path, done) {
+  try { await api(method, path); if (done) toast(done); } catch (e) { toast(errText(e)); }
+  refresh();
+}
+
+/** L'annuncio: giorno, fascia (orari del planning), singolo o doppio, livello e nota. */
+function openSeek() {
+  const day = el('select', { id: 'sday' }, state.me.days.map((d, i) => { const [wd, dm] = fmtDate(d); return el('option', { value: d }, i === 0 ? T.today + ' ' + dm : wd + ' ' + dm); }));
+  day.value = state.date || state.me.days[0];
+  const starts = state.day ? [...new Set(state.day.cells.map(c => clubMinutes(c.start)))].sort((a, b) => a - b) : [];
+  const step = state.day ? state.day.slotMinutes : 60;
+  const mins = starts.length ? starts : Array.from({ length: 14 }, (_, i) => (8 + i) * 60);
+  const from = el('select', { id: 'sfrom' }, mins.map(m => el('option', { value: m }, hhmm(m))));
+  const to = el('select', { id: 'sto' }, mins.map(m => m + step).map(m => el('option', { value: m }, hhmm(m))));
+  from.value = String(mins[Math.min(1, mins.length - 1)]); to.value = String(Math.min(Number(from.value) + 3 * 60, mins[mins.length - 1] + step));
+  const kind = el('select', { id: 'skind' }, el('option', { value: 's' }, T.seekSingles), el('option', { value: 'd' }, T.seekDoubles));
+  const level = el('input', { id: 'slevel', maxlength: '30', placeholder: 'NC, 4.3…' });
+  const note = el('input', { id: 'snote', maxlength: '140' });
+  const err = el('p', { class: 'error' });
+  const go = el('button', null, T.seekPublish);
+  go.addEventListener('click', async () => {
+    go.disabled = true;
+    try {
+      await api('POST', '/seeks', { date: day.value, fromMin: Number(from.value), toMin: Number(to.value), doubles: kind.value === 'd', level: level.value, note: note.value });
+      closeSheet(); toast(T.seekPublished); refresh();
+    } catch (e) { go.disabled = false; err.textContent = errText(e); }
+  });
+  sheet(
+    el('h3', null, T.seekTitle), el('p', { class: 'dim' }, T.seekHint),
+    el('label', { for: 'sday' }, T.seekDay), day,
+    el('div', { class: 'row' }, el('div', { class: 'grow' }, el('label', { for: 'sfrom' }, T.seekFrom), from), el('div', { class: 'grow' }, el('label', { for: 'sto' }, T.seekTo), to)),
+    el('label', { for: 'skind' }, T.seekKind), kind,
+    el('label', { for: 'slevel' }, T.seekLevel), level,
+    el('label', { for: 'snote' }, T.seekNote), note, err,
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), go));
 }
 
 /** Il campo com'è fatto, se è nel giorno a schermo; altrimenti solo il nome. */

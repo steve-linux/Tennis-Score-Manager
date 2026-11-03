@@ -203,3 +203,45 @@ object CourtOnline {
         }
     }
 }
+
+/** Chi partecipa a un annuncio di Cerco compagno. */
+@Serializable
+data class SeekPlayer(val id: String, val name: String)
+
+/**
+ * Cerco compagno: [owner] cerca 1 avversario (singolo) o 3 giocatori (doppio) il giorno [date] tra [fromMin] e
+ * [toMin]. Al completo il server prenota da solo il primo campo libero nella fascia ([booking]); [noCourt] se non
+ * ce n'era nessuno.
+ */
+@Serializable
+data class Seek(
+    val id: String, val owner: SeekPlayer, val date: String, val fromMin: Int, val toMin: Int,
+    val doubles: Boolean = false, val level: String = "", val note: String = "",
+    val joined: List<SeekPlayer> = emptyList(), val createdAt: Long = 0,
+    val booking: String? = null, val noCourt: Boolean = false,
+) {
+    val need: Int get() = (if (doubles) 3 else 1) - joined.size
+    val full: Boolean get() = need <= 0
+    val everyone: List<SeekPlayer> get() = listOf(owner) + joined
+}
+
+object Seeks {
+    /** Quanto dura la partita prenotata da sola: almeno un'ora, in caselle intere del planning. */
+    fun minutes(s: CourtSettings): Int { val step = s.slotMinutes.coerceIn(15, 180); return ((60 + step - 1) / step) * step }
+
+    /**
+     * Il primo campo libero nella fascia, per uno dei giocatori (nell'ordine: chi ha messo l'annuncio, poi gli
+     * altri), con le regole delle prenotazioni online. [dayStart] è la mezzanotte del giorno nel fuso del circolo.
+     */
+    fun findCourt(sync: ClubSync, bookings: List<OnlineBooking>, seek: Seek, dayStart: Long, now: Long): Triple<SeekPlayer, String, Long>? {
+        val minutes = minutes(sync.settings)
+        val starts = CourtTime.slots(dayStart, sync.settings).filter { st ->
+            val m = ((st - dayStart) / 60_000L).toInt()
+            m >= seek.fromMin && m + minutes <= seek.toMin
+        }
+        for (st in starts) for (court in CourtOnline.bookableCourts(sync)) for (p in seek.everyone) {
+            if (CourtOnline.check(sync, bookings, p.id, court, st, minutes, now) == null) return Triple(p, court, st)
+        }
+        return null
+    }
+}

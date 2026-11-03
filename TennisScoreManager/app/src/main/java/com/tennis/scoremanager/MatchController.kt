@@ -128,7 +128,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 
-enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT }
+enum class Screen { HOME, SETUP, OPTIONS, START, MATCH, SUMMARY, HISTORY, TOURNAMENT, WORKOUT, PROGRESS, VIDEOS, RACKETS, DEVICES, VOICE, STROKE_SESSIONS, HELP, STUDENTS, STUDENT, PLAYERS, DATA, DRILLS, MEMBERS, PAYMENTS, CLUB_TOURNAMENTS, CLUB_TOURNAMENT, NOTICE, COURTS_PLAN, SCHOOL, COURSE, TEAMS, TEAM, FIXTURE, BOOK_COURT, COURT_STATS, LADDERS, LADDER }
 
 /**
  * Le schede della prima schermata, organizzate per cosa si vuole fare; quali si vedono dipende dal ruolo attivo
@@ -709,6 +709,9 @@ class MatchController(
             Screen.NOTICE -> noticeBack
             Screen.COURTS_PLAN -> Screen.HOME
             Screen.BOOK_COURT -> Screen.HOME
+            Screen.COURT_STATS -> Screen.COURTS_PLAN
+            Screen.LADDERS -> Screen.HOME
+            Screen.LADDER -> Screen.LADDERS
             Screen.SCHOOL -> Screen.HOME
             Screen.COURSE -> Screen.SCHOOL
             Screen.TEAMS -> Screen.HOME
@@ -1600,6 +1603,75 @@ class MatchController(
         }
     }
 
+    // ---- Classifica a sfida ----
+
+    val ladders = MutableStateFlow(storage.loadLadders())
+    val openLadderId = MutableStateFlow<String?>(null)
+    private var pendingLadder: Pair<String, String>? = null
+
+    fun openLadders() { refreshPlayers(); screen.value = Screen.LADDERS }
+
+    fun openLadder(id: String) { openLadderId.value = id; refreshPlayers(); screen.value = Screen.LADDER }
+
+    fun ladder(id: String?): com.tennis.scoremanager.data.Ladder? = ladders.value.firstOrNull { it.id == id }
+
+    fun saveLadder(l: com.tennis.scoremanager.data.Ladder) {
+        val list = ladders.value.filter { it.id != l.id } + l
+        ladders.value = list.sortedBy { it.createdAt }
+        scope.launch(io) { storage.saveLadders(list) }
+    }
+
+    fun deleteLadder(id: String) {
+        val list = ladders.value.filter { it.id != id }
+        ladders.value = list
+        scope.launch(io) { storage.saveLadders(list) }
+    }
+
+    /** La sfida col segnapunti: lo sfidante è il Giocatore 1, lo sfidato il Giocatore 2; il risultato torna da solo. */
+    fun playChallenge(l: com.tennis.scoremanager.data.Ladder, ch: com.tennis.scoremanager.data.Challenge) {
+        val a = playerById(ch.challenger); val b = playerById(ch.defender)
+        updateSetup {
+            it.copy(
+                club = storage.clubName.ifBlank { it.club }, doubles = false,
+                p1a = a?.name.orEmpty(), p1b = "", p2a = b?.name.orEmpty(), p2b = "",
+                p1aId = ch.challenger, p1bId = "", p2aId = ch.defender, p2bId = "",
+                p1aRank = a?.member?.ranking.orEmpty(), p1bRank = "", p2aRank = b?.member?.ranking.orEmpty(), p2bRank = "",
+                event = l.name, category = strings.ldTitle, round = strings.ldPositions(ch.challengerPos, ch.defenderPos),
+            )
+        }
+        pendingLadder = l.id to ch.id
+        go(Screen.SETUP)
+    }
+
+    private fun linkLadderMatch(recordId: String, su: SetupData) {
+        val (lid, cid) = pendingLadder ?: return
+        pendingLadder = null
+        val l = ladder(lid) ?: return
+        val ch = l.challenges.firstOrNull { it.id == cid && it.open } ?: return
+        // Solo se in campo ci sono proprio loro due.
+        if (su.p1aId != ch.challenger || su.p2aId != ch.defender) return
+        saveLadder(l.copy(challenges = l.challenges.map { if (it.id == cid) it.copy(record = recordId) else it }))
+    }
+
+    private fun ladderMatchFinished(rec: MatchRecord, state: com.tennis.scoremanager.model.MatchState) {
+        for (l in ladders.value) {
+            val ch = l.challenges.firstOrNull { it.open && it.record == rec.id } ?: continue
+            val won = when (state.winner) { Side.P1 -> true; Side.P2 -> false; else -> return }
+            saveLadder(com.tennis.scoremanager.data.Ladders.result(l, ch.id, com.tennis.scoremanager.data.Reports.scoreLine(state, Side.P1), won, System.currentTimeMillis(), rec.id))
+            return
+        }
+    }
+
+    /** L'avviso ai due giocatori: chi sfida chi e entro quando. */
+    fun notifyChallenge(l: com.tennis.scoremanager.data.Ladder, ch: com.tennis.scoremanager.data.Challenge) {
+        val s = strings
+        val now = System.currentTimeMillis()
+        val a = playerById(ch.challenger)?.name.orEmpty(); val b = playerById(ch.defender)?.name.orEmpty()
+        val text = listOf(l.name, s.ldVs(a, b), s.ldBy(com.tennis.scoremanager.ui.screens.shortDate(ch.deadline, options.value.lang)), storage.clubName).filter { it.isNotBlank() }.joinToString("\n")
+        val rec = listOfNotNull(playerById(ch.challenger), playerById(ch.defender)).map { com.tennis.scoremanager.data.Notices.recipient(it, text, now) }
+        openNotice(com.tennis.scoremanager.data.NoticePlan(s.ldNoticeTitle, l.name, text, rec))
+    }
+
     // ---- Scuola tennis ----
 
     val courses = MutableStateFlow(storage.loadCourses())
@@ -2043,11 +2115,21 @@ class MatchController(
             bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
         }
         val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
-        saveBookingAccount(acc)
-        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
-            app, strings, news.remind.map { it.label }, news.removed.map { it.label },
-            freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
-        )
+        val seeks = booking { it.seeks() }.getOrNull()
+        val sk = seeks?.let { com.tennis.scoremanager.data.ClubServers.seekNews(acc, it) }
+        saveBookingAccount(sk?.account ?: acc)
+        if (a.reminders) {
+            com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
+                app, strings, news.remind.map { it.label }, news.removed.map { it.label },
+                freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
+            )
+            if (sk != null) com.tennis.scoremanager.service.OnlineAlerts.postSeeks(
+                app, strings,
+                sk.joined.map { it.players.last() + " · " + it.date },
+                sk.booked.map { bookingLabel(com.tennis.scoremanager.data.CourtBooking("", it.bookedCourt!!, it.bookedStart!!)) + " · " + it.players.joinToString(", ") },
+                sk.noCourt.map { it.date + " · " + it.players.joinToString(", ") },
+            )
+        }
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
@@ -2565,6 +2647,7 @@ class MatchController(
         val rec = MatchRecord(id = "m$now-$suffix", setup = withIds, options = o, rules = rules, updatedAt = now, rackets = racketsFor(su))
         linkClubMatch(rec.id, withIds)
         linkTeamRubber(rec.id, withIds)
+        linkLadderMatch(rec.id, withIds)
         val state = ScoreEngine.initial(rules)
         live.value = LiveMatch(rec, state)
         summary.value = null
@@ -2826,6 +2909,7 @@ class MatchController(
         runningSince = null
         clubMatchFinished(rec, lm.state)
         teamRubberFinished(rec, lm.state)
+        ladderMatchFinished(rec, lm.state)
         scope.launch(io) {
             storage.deleteMatch(rec.id)
             storage.saveFinished(rec)

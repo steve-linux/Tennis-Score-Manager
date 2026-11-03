@@ -37,3 +37,15 @@ import kotlinx.serialization.Serializable
 /** Le notifiche push della pagina web: la chiave pubblica del server e l'abbonamento che dà il browser. */
 @Serializable data class SrvPushKey(val key: String)
 @Serializable data class SrvPushSub(val endpoint: String, val p256dh: String = "", val auth: String = "", val lang: String = "it")
+
+/** Cerco compagno: un annuncio come lo vede il giocatore. [players] sono i nomi di chi c'è già, [need] quanti mancano. */
+@Serializable data class SrvSeek(
+    val id: String, val mine: Boolean, val joined: Boolean, val owner: String,
+    /** Il giorno (yyyy-MM-dd, fuso del circolo) e la fascia in minuti dalla mezzanotte. */
+    val date: String, val fromMin: Int, val toMin: Int,
+    val doubles: Boolean, val level: String, val note: String,
+    val players: List<String>, val need: Int,
+    /** Al completo: il campo prenotato da solo (o [noCourt] se non ce n'era uno libero). */
+    val bookedCourt: String? = null, val bookedStart: Long? = null, val noCourt: Boolean = false,
+)
+@Serializable data class SrvSeekIn(val date: String, val fromMin: Int, val toMin: Int, val doubles: Boolean = false, val level: String = "", val note: String = "")

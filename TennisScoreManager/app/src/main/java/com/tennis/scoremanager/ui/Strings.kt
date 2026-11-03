@@ -1648,6 +1648,89 @@ interface Strings {
     val pbErrFreeNow: String
     val pbErrManyWaits: String
     val pbAlertFreed: String
+    // Statistiche dei campi.
+    val stTitle: String
+    val stLast4w: String
+    val stOccupancy: String
+    val stRevenue: String
+    val stBookings: String
+    val stOnline: (Int) -> String
+    val stTournaments: (String) -> String
+    val stByCourt: String
+    val stHoursOf: (String, String) -> String
+    val stBlocked: (String) -> String
+    val stCount: (Int) -> String
+    val stHeat: String
+    val stHeatHint: String
+    val stTop: String
+    val stNone: String
+    val stRevenueHint: String
+    val pbSeekTitle: String
+    val pbSeekNew: String
+    val pbSeekDay: String
+    val pbSeekFrom: String
+    val pbSeekTo: String
+    val pbSeekSingles: String
+    val pbSeekDoubles: String
+    val pbSeekLevel: String
+    val pbSeekNote: String
+    val pbSeekPublish: String
+    val pbSeekPublished: String
+    val pbSeekJoin: String
+    val pbSeekJoined: String
+    val pbSeekLeave: String
+    val pbSeekRemove: String
+    val pbSeekYours: String
+    val pbSeekNoCourt: String
+    val pbSeekNone: String
+    val pbSeekHint: String
+    val pbSeekWho: (String) -> String
+    val pbSeekNeed: (Int) -> String
+    val pbSeekBooked: (String) -> String
+    val pbErrFull: String
+    val pbErrManySeeks: String
+    val pbSeekAlertJoined: String
+    val pbSeekAlertFound: String
+    val pbSeekAlertNoCourt: String
+    // Classifica a sfida.
+    val ldTitle: String
+    val ldHint: String
+    val ldNew: String
+    val ldName: String
+    val ldNone: String
+    val ldPlayers: (Int) -> String
+    val ldOpenCount: (Int) -> String
+    val ldRanking: String
+    val ldEmpty: String
+    val ldAdd: String
+    val ldArrange: String
+    val ldDone: String
+    val ldRemove: String
+    val ldChallengeNew: String
+    val ldWho: String
+    val ldWhom: (Int) -> String
+    val ldNobody: String
+    val ldOpen: String
+    val ldHistory: String
+    val ldVs: (String, String) -> String
+    val ldBy: (String) -> String
+    val ldLate: String
+    val ldPlay: String
+    val ldResult: String
+    val ldScore: String
+    val ldWinner: String
+    val ldNotify: String
+    val ldCancel: String
+    val ldBeats: (String, String) -> String
+    val ldHolds: (String, String) -> String
+    val ldMoved: (Int, Int) -> String
+    val ldPositions: (Int, Int) -> String
+    val ldSettings: String
+    val ldReach: String
+    val ldDays: String
+    val ldDelete: String
+    val ldDeleteAsk: String
+    val ldNoticeTitle: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3556,6 +3639,87 @@ object ItStrings : Strings {
     override val pbErrFreeNow = "Si è appena liberata: prenotala subito!"
     override val pbErrManyWaits = "Sei già in attesa per 3 caselle: togline una prima."
     override val pbAlertFreed = "Si è liberato un campo: prenotalo!"
+    override val stTitle = "Statistiche dei campi"
+    override val stLast4w = "4 settimane"
+    override val stOccupancy = "Occupazione"
+    override val stRevenue = "Incassi"
+    override val stBookings = "Prenotazioni"
+    override val stOnline: (Int) -> String = { "Di cui online: $it" }
+    override val stTournaments: (String) -> String = { "Partite dei tornei: $it h" }
+    override val stByCourt = "Campo per campo"
+    override val stHoursOf: (String, String) -> String = { a, b -> "$a h su $b" }
+    override val stBlocked: (String) -> String = { "non prenotabili $it h" }
+    override val stCount: (Int) -> String = { "$it prenotazioni" }
+    override val stHeat = "Quando si gioca"
+    override val stHeatHint = "Occupazione per giorno e ora, tutti i campi insieme: più chiaro = più pieno."
+    override val stTop = "Chi prenota di più"
+    override val stNone = "Nessuna prenotazione in questo periodo."
+    override val stRevenueHint = "Incassi = prezzo delle prenotazioni di gioco e lezione, pagate o no."
+    override val pbSeekTitle = "Cerco compagno"
+    override val pbSeekNew = "Pubblica un annuncio"
+    override val pbSeekDay = "Giorno"
+    override val pbSeekFrom = "Dalle"
+    override val pbSeekTo = "Alle"
+    override val pbSeekSingles = "Singolo"
+    override val pbSeekDoubles = "Doppio"
+    override val pbSeekLevel = "Livello (es. NC, 4.3)"
+    override val pbSeekNote = "Nota (facoltativa)"
+    override val pbSeekPublish = "Pubblica"
+    override val pbSeekPublished = "Annuncio pubblicato"
+    override val pbSeekJoin = "Ci sto"
+    override val pbSeekJoined = "Ci sei! Quando siete al completo il campo si prenota da solo."
+    override val pbSeekLeave = "Mi tolgo"
+    override val pbSeekRemove = "Togli l'annuncio"
+    override val pbSeekYours = "Il tuo annuncio"
+    override val pbSeekNoCourt = "Al completo, ma nessun campo libero: prenotatelo voi."
+    override val pbSeekNone = "Nessun annuncio: pubblicane uno, gli altri giocatori del circolo lo vedranno."
+    override val pbSeekHint = "Gli altri giocatori lo vedono e toccano Ci sto; quando siete al completo il server prenota il primo campo libero nella fascia scelta."
+    override val pbSeekWho: (String) -> String = { "Ci sono: $it" }
+    override val pbSeekNeed: (Int) -> String = { if (it == 1) "ne manca 1" else "ne mancano $it" }
+    override val pbSeekBooked: (String) -> String = { "Campo prenotato: $it" }
+    override val pbErrFull = "L'annuncio è già al completo."
+    override val pbErrManySeeks = "Hai già 3 annunci aperti: togline uno prima."
+    override val pbSeekAlertJoined = "Qualcuno risponde al tuo annuncio"
+    override val pbSeekAlertFound = "Partita trovata: campo prenotato!"
+    override val pbSeekAlertNoCourt = "Giocatori trovati, ma nessun campo libero"
+    override val ldTitle = "Classifica a sfida"
+    override val ldHint = "Si sfida chi sta più su: chi vince prende il suo posto"
+    override val ldNew = "Nuova classifica"
+    override val ldName = "Nome (es. Singolare maschile)"
+    override val ldNone = "Nessuna classifica: creane una e aggiungi i giocatori."
+    override val ldPlayers: (Int) -> String = { "$it giocatori" }
+    override val ldOpenCount: (Int) -> String = { "$it sfide aperte" }
+    override val ldRanking = "Classifica"
+    override val ldEmpty = "Aggiungi i giocatori: il primo aggiunto è il numero 1, poi li sistemi a mano."
+    override val ldAdd = "Aggiungi giocatori"
+    override val ldArrange = "Sistema la classifica"
+    override val ldDone = "Fatto"
+    override val ldRemove = "Togli dalla classifica"
+    override val ldChallengeNew = "Nuova sfida"
+    override val ldWho = "Chi sfida?"
+    override val ldWhom: (Int) -> String = { "Chi è sfidato? (fino a $it posti più su)" }
+    override val ldNobody = "Nessuno da sfidare adesso: sono già impegnati in un'altra sfida o troppo lontani."
+    override val ldOpen = "Sfide da giocare"
+    override val ldHistory = "Sfide giocate"
+    override val ldVs: (String, String) -> String = { a, b -> "$a sfida $b" }
+    override val ldBy: (String) -> String = { "da giocare entro il $it" }
+    override val ldLate = "Scaduta: giocatela o annullatela"
+    override val ldPlay = "Gioca col segnapunti"
+    override val ldResult = "Risultato"
+    override val ldScore = "Punteggio (dal lato dello sfidante)"
+    override val ldWinner = "Chi ha vinto"
+    override val ldNotify = "Avvisa"
+    override val ldCancel = "Annulla la sfida"
+    override val ldBeats: (String, String) -> String = { a, b -> "$a batte $b" }
+    override val ldHolds: (String, String) -> String = { a, b -> "$a respinge $b" }
+    override val ldMoved: (Int, Int) -> String = { a, b -> "dal $a° al $b° posto" }
+    override val ldPositions: (Int, Int) -> String = { a, b -> "$a° contro $b°" }
+    override val ldSettings = "Regole"
+    override val ldReach = "Si sfida fino a quanti posti più su"
+    override val ldDays = "Giorni per giocare la sfida"
+    override val ldDelete = "Elimina la classifica"
+    override val ldDeleteAsk = "Eliminare la classifica? Le partite giocate restano nello storico."
+    override val ldNoticeTitle = "Sfida della classifica"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5445,6 +5609,87 @@ object EnStrings : Strings {
     override val pbErrFreeNow = "It has just become free: book it now!"
     override val pbErrManyWaits = "You are already waiting for 3 slots: remove one first."
     override val pbAlertFreed = "A court is free: book it!"
+    override val stTitle = "Court statistics"
+    override val stLast4w = "4 weeks"
+    override val stOccupancy = "Occupancy"
+    override val stRevenue = "Revenue"
+    override val stBookings = "Bookings"
+    override val stOnline: (Int) -> String = { "Of which online: $it" }
+    override val stTournaments: (String) -> String = { "Tournament matches: $it h" }
+    override val stByCourt = "Court by court"
+    override val stHoursOf: (String, String) -> String = { a, b -> "$a h of $b" }
+    override val stBlocked: (String) -> String = { "not bookable $it h" }
+    override val stCount: (Int) -> String = { "$it bookings" }
+    override val stHeat = "When people play"
+    override val stHeatHint = "Occupancy by day and hour, all courts together: brighter = fuller."
+    override val stTop = "Who books most"
+    override val stNone = "No bookings in this period."
+    override val stRevenueHint = "Revenue = price of play and lesson bookings, paid or not."
+    override val pbSeekTitle = "Looking for a partner"
+    override val pbSeekNew = "Post a request"
+    override val pbSeekDay = "Day"
+    override val pbSeekFrom = "From"
+    override val pbSeekTo = "To"
+    override val pbSeekSingles = "Singles"
+    override val pbSeekDoubles = "Doubles"
+    override val pbSeekLevel = "Level (e.g. NC, 4.3)"
+    override val pbSeekNote = "Note (optional)"
+    override val pbSeekPublish = "Post"
+    override val pbSeekPublished = "Request posted"
+    override val pbSeekJoin = "I'm in"
+    override val pbSeekJoined = "You're in! When you are complete the court is booked by itself."
+    override val pbSeekLeave = "I'm out"
+    override val pbSeekRemove = "Remove the request"
+    override val pbSeekYours = "Your request"
+    override val pbSeekNoCourt = "Complete, but no free court: book one yourselves."
+    override val pbSeekNone = "No requests: post one, the other club players will see it."
+    override val pbSeekHint = "Other players see it and tap I'm in; when you are complete the server books the first free court in the chosen time."
+    override val pbSeekWho: (String) -> String = { "In: $it" }
+    override val pbSeekNeed: (Int) -> String = { "$it missing" }
+    override val pbSeekBooked: (String) -> String = { "Court booked: $it" }
+    override val pbErrFull = "This request is already complete."
+    override val pbErrManySeeks = "You already have 3 open requests: remove one first."
+    override val pbSeekAlertJoined = "Someone answered your post"
+    override val pbSeekAlertFound = "Match found: court booked!"
+    override val pbSeekAlertNoCourt = "Players found, but no free court"
+    override val ldTitle = "Challenge ladder"
+    override val ldHint = "Challenge someone above you: the winner takes the place"
+    override val ldNew = "New ladder"
+    override val ldName = "Name (e.g. Men's singles)"
+    override val ldNone = "No ladders: create one and add the players."
+    override val ldPlayers: (Int) -> String = { "$it players" }
+    override val ldOpenCount: (Int) -> String = { "$it open challenges" }
+    override val ldRanking = "Ranking"
+    override val ldEmpty = "Add the players: the first one added is number 1, then arrange them by hand."
+    override val ldAdd = "Add players"
+    override val ldArrange = "Arrange the ranking"
+    override val ldDone = "Done"
+    override val ldRemove = "Remove from the ladder"
+    override val ldChallengeNew = "New challenge"
+    override val ldWho = "Who challenges?"
+    override val ldWhom: (Int) -> String = { "Who is challenged? (up to $it places above)" }
+    override val ldNobody = "Nobody to challenge right now: they are busy with another challenge or too far up."
+    override val ldOpen = "Challenges to play"
+    override val ldHistory = "Challenges played"
+    override val ldVs: (String, String) -> String = { a, b -> "$a challenges $b" }
+    override val ldBy: (String) -> String = { "to be played by $it" }
+    override val ldLate = "Overdue: play it or cancel it"
+    override val ldPlay = "Play with the scorer"
+    override val ldResult = "Result"
+    override val ldScore = "Score (challenger's side)"
+    override val ldWinner = "Who won"
+    override val ldNotify = "Notify"
+    override val ldCancel = "Cancel the challenge"
+    override val ldBeats: (String, String) -> String = { a, b -> "$a beats $b" }
+    override val ldHolds: (String, String) -> String = { a, b -> "$a holds off $b" }
+    override val ldMoved: (Int, Int) -> String = { a, b -> "from $a to $b" }
+    override val ldPositions: (Int, Int) -> String = { a, b -> "$a vs $b" }
+    override val ldSettings = "Rules"
+    override val ldReach = "How many places up one can challenge"
+    override val ldDays = "Days to play the challenge"
+    override val ldDelete = "Delete the ladder"
+    override val ldDeleteAsk = "Delete the ladder? Matches played stay in the history."
+    override val ldNoticeTitle = "Ladder challenge"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

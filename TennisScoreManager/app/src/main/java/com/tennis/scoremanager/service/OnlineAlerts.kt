@@ -43,8 +43,11 @@ object OnlineAlerts {
     const val EXTRA_BOOK = "tsm.bookCourt"
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
-    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) {
-        if (remind.isEmpty() && removed.isEmpty() && freed.isEmpty() || !allowed(context)) return
+    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) =
+        postPlayerLines(context, s, remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it } + freed.map { s.pbAlertFreed to it })
+
+    private fun postPlayerLines(context: Context, s: Strings, items: List<Pair<String, String>>) {
+        if (items.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
@@ -53,7 +56,7 @@ object OnlineAlerts {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         // Una notifica per ciascuna: il promemoria di una partita non deve coprire l'avviso di un'altra.
-        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it } + freed.map { s.pbAlertFreed to it }).forEachIndexed { i, (title, text) ->
+        items.forEachIndexed { i, (title, text) ->
             val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_tennis)
                 .setContentTitle(title).setContentText(text)
@@ -63,6 +66,10 @@ object OnlineAlerts {
             nm.notify(PLAYER_ID + 1 + (text.hashCode() and 0xffff) + i, n)
         }
     }
+
+    /** Cerco compagno: qualcuno ha risposto, partita trovata (campo prenotato), al completo ma senza campo. */
+    fun postSeeks(context: Context, s: Strings, joined: List<String>, booked: List<String>, noCourt: List<String>) =
+        postPlayerLines(context, s, joined.map { s.pbSeekAlertJoined to it } + booked.map { s.pbSeekAlertFound to it } + noCourt.map { s.pbSeekAlertNoCourt to it })
 
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return

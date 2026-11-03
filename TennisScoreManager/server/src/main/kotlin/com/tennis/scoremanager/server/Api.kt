@@ -23,6 +23,11 @@ import com.tennis.scoremanager.data.SrvInviteIn
 import com.tennis.scoremanager.data.SrvOk
 import com.tennis.scoremanager.data.SrvPlayer
 import com.tennis.scoremanager.data.SrvPushKey
+import com.tennis.scoremanager.data.Seek
+import com.tennis.scoremanager.data.SeekPlayer
+import com.tennis.scoremanager.data.Seeks
+import com.tennis.scoremanager.data.SrvSeek
+import com.tennis.scoremanager.data.SrvSeekIn
 import com.tennis.scoremanager.data.SrvWait
 import com.tennis.scoremanager.data.SrvWaitIn
 import com.tennis.scoremanager.data.Wait
@@ -99,6 +104,11 @@ class Api(
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
             r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
             r.method == "POST" && p == listOf("waits") -> addWait(player(r), r)
+            r.method == "GET" && p == listOf("seeks") -> seeks(player(r))
+            r.method == "POST" && p == listOf("seeks") -> addSeek(player(r), r)
+            r.method == "POST" && p.size == 3 && p[0] == "seeks" && p[2] == "join" -> joinSeek(player(r), p[1])
+            r.method == "POST" && p.size == 3 && p[0] == "seeks" && p[2] == "leave" -> leaveSeek(player(r), p[1])
+            r.method == "DELETE" && p.size == 2 && p[0] == "seeks" -> removeSeek(player(r), p[1])
             r.method == "DELETE" && p.size == 2 && p[0] == "waits" -> removeWait(player(r), p[1])
             r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
             r.method == "GET" && p == listOf("push", "key") -> { player(r); ok(SrvPushKey.serializer(), SrvPushKey(vapid().publicKey)) }
@@ -247,11 +257,13 @@ class Api(
         }
         for (b in due) push(b.player, ttl = ((b.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.reminder(it.lang, b, store.state.sync.timeZone) }
         checkWaits(now)
+        val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate().toString()
+        if (store.state.seeks.any { it.date < today }) store.update { s -> s.copy(seeks = s.seeks.filter { it.date >= today }) to Unit }
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
-        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }, waits = s.waits.filter { it.player != id }) to Unit }
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }, waits = s.waits.filter { it.player != id }, seeks = s.seeks.filter { it.owner.id != id }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -336,6 +348,93 @@ class Api(
         }
         if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
         checkWaits(now)
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Cerco compagno ---
+
+    private fun today(): LocalDate = Instant.ofEpochMilli(store.now()).atZone(zone()).toLocalDate()
+
+    private fun seekOut(pl: Player, k: Seek, s: State): SrvSeek {
+        val b = k.booking?.let { id -> s.bookings.firstOrNull { it.id == id } }
+        return SrvSeek(
+            k.id, k.owner.id == pl.id, k.joined.any { it.id == pl.id }, k.owner.name, k.date, k.fromMin, k.toMin, k.doubles, k.level, k.note,
+            k.everyone.map { it.name }, k.need.coerceAtLeast(0), b?.court, b?.start, k.noCourt,
+        )
+    }
+
+    /** Gli annunci da oggi in poi: quelli aperti degli altri e tutti i propri (anche al completo). */
+    private fun seeks(pl: Player): Resp {
+        val s = store.state
+        val from = today().toString()
+        val list = s.seeks.filter { it.date >= from && (!it.full || it.everyone.any { p -> p.id == pl.id }) }.sortedWith(compareBy({ it.date }, { it.fromMin }))
+        return ok(kotlinx.serialization.builtins.ListSerializer(SrvSeek.serializer()), list.map { seekOut(pl, it, s) })
+    }
+
+    private fun addSeek(pl: Player, r: Req): Resp {
+        val k = read(SrvSeekIn.serializer(), r)
+        val s0 = store.state
+        if (s0.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val d = try { LocalDate.parse(k.date) } catch (_: Exception) { throw ApiError(400, "BAD_DATE") }
+        val t = today()
+        val st = s0.sync.settings
+        when {
+            !s0.sync.rules.open -> throw ApiError(409, "CLOSED")
+            d.isBefore(t) -> throw ApiError(409, "PAST")
+            d.isAfter(t.plusDays(s0.sync.rules.daysAhead.toLong())) -> throw ApiError(409, "TOO_FAR")
+            k.fromMin < st.openHour * 60 || k.toMin > st.closeHour * 60 || k.toMin - k.fromMin < Seeks.minutes(st) -> throw ApiError(409, "NOT_SLOT")
+        }
+        val now = store.now()
+        val seek = Seek(Secrets.id("s"), SeekPlayer(pl.id, pl.name), d.toString(), k.fromMin, k.toMin, k.doubles, k.level.trim().take(30), k.note.trim().take(140), createdAt = now)
+        store.update { s ->
+            if (s.seeks.count { it.owner.id == pl.id && !it.full && it.date >= t.toString() } >= 3) s to Result.failure<Unit>(ApiError(409, "TOO_MANY_SEEKS"))
+            else s.copy(seeks = s.seeks + seek) to Result.success(Unit)
+        }.getOrElse { throw it }
+        return ok(SrvSeek.serializer(), seekOut(pl, seek, store.state), 201)
+    }
+
+    private fun joinSeek(pl: Player, id: String): Resp {
+        val now = store.now()
+        val (seek, booked) = store.update { s ->
+            val k = s.seeks.firstOrNull { it.id == id } ?: return@update s to Result.failure<Pair<Seek, OnlineBooking?>>(ApiError(404, "NOT_FOUND"))
+            when {
+                k.owner.id == pl.id || k.joined.any { it.id == pl.id } -> s to Result.success(k to null)
+                k.full -> s to Result.failure(ApiError(409, "FULL"))
+                else -> {
+                    var nk = k.copy(joined = k.joined + SeekPlayer(pl.id, pl.name))
+                    var nb: OnlineBooking? = null
+                    // Al completo: il primo campo libero nella fascia, prenotato da solo.
+                    if (nk.full) {
+                        val dayStart = LocalDate.parse(nk.date).atStartOfDay(zone()).toInstant().toEpochMilli()
+                        val found = Seeks.findCourt(s.sync, s.bookings, nk, dayStart, now)
+                        if (found != null) {
+                            val (who, court, start) = found
+                            nb = CourtOnline.make(s.sync, Secrets.id("w"), who.id, nk.everyone.joinToString(" + ") { it.name }, court, start, Seeks.minutes(s.sync.settings), false, now)
+                            nk = nk.copy(booking = nb.id)
+                        } else nk = nk.copy(noCourt = true)
+                    }
+                    s.copy(seeks = s.seeks.map { if (it.id == id) nk else it }, bookings = s.bookings + listOfNotNull(nb)) to Result.success(nk to nb)
+                }
+            }
+        }.getOrElse { throw it }
+        val zone = store.state.sync.timeZone
+        when {
+            booked != null -> seek.everyone.forEach { p -> push(p.id, ttl = 24 * 3600) { PushTexts.seekFound(it.lang, seek, booked.court, booked.start, zone) } }
+            seek.noCourt && seek.full -> seek.everyone.forEach { p -> push(p.id, ttl = 24 * 3600) { PushTexts.seekNoCourt(it.lang, seek) } }
+            seek.joined.any { it.id == pl.id } -> push(seek.owner.id, ttl = 24 * 3600) { PushTexts.seekJoined(it.lang, seek, pl.name) }
+        }
+        return ok(SrvSeek.serializer(), seekOut(pl, seek, store.state))
+    }
+
+    /** Chi aveva detto "ci sto" si toglie (finché il campo non è prenotato). */
+    private fun leaveSeek(pl: Player, id: String): Resp {
+        store.update { s -> s.copy(seeks = s.seeks.map { k -> if (k.id == id && k.booking == null) k.copy(joined = k.joined.filter { it.id != pl.id }, noCourt = false) else k }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /** Chi ha messo l'annuncio lo toglie (la prenotazione fatta da sola, se c'è, resta: si disdice a parte). */
+    private fun removeSeek(pl: Player, id: String): Resp {
+        store.update { s -> s.copy(seeks = s.seeks.filter { !(it.id == id && it.owner.id == pl.id) }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 

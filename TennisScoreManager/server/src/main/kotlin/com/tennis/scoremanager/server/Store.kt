@@ -47,6 +47,8 @@ data class State(
     val reminded: List<String> = emptyList(),
     /** Le liste d'attesa dei giocatori per le caselle occupate. */
     val waits: List<com.tennis.scoremanager.data.Wait> = emptyList(),
+    /** Gli annunci di Cerco compagno. */
+    val seeks: List<com.tennis.scoremanager.data.Seek> = emptyList(),
 )
 
 object Secrets {
