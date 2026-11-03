@@ -84,6 +84,17 @@ function installTip() {
   return el('p', { class: 'tip' }, IOS ? T.install : T.installOther);
 }
 
+/** Copia anche senza HTTPS (rete del circolo in http), dove Safari non dà navigator.clipboard. */
+function copyOld(text) {
+  const t = el('textarea', { readonly: true, style: 'position:fixed;top:0;left:0;opacity:0' });
+  t.value = text;
+  document.body.append(t);
+  t.focus(); t.setSelectionRange(0, text.length);
+  const ok = document.execCommand('copy');
+  t.remove();
+  if (!ok) throw new Error('copy');
+}
+
 /**
  * Su iPhone, dal link dell'invito in Safari: prima si installa, poi il codice si usa nell'app installata
  * (copiato negli appunti, che Safari e l'app condividono). Chi preferisce resta nel browser.
@@ -93,7 +104,11 @@ function showIosInstall(code) {
   const shown = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase().replace(/(.{5})(?=.)/g, '$1-');
   const msg = el('p', { class: 'dim center' }, '');
   const copy = async () => {
-    try { await navigator.clipboard.writeText(shown); msg.textContent = T.copied; } catch (_) { msg.textContent = shown; }
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(shown);
+      else copyOld(shown);
+      msg.textContent = T.copied;
+    } catch (_) { msg.textContent = shown; }
   };
   const here = async () => {
     try { await claim(code); } catch (e) { msg.className = 'error center'; msg.textContent = errText(e); }
