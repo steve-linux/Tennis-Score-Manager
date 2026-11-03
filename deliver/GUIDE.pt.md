@@ -452,6 +452,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
   - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
+  - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras e Servidor do clube. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
 - O placar está em todos os papéis: nada impede você de marcar uma partida.
 - **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
 

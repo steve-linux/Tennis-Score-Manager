@@ -452,6 +452,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
   - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
+  - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas y Servidor del club. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
 - El marcador está en todos los roles: nada te impide anotar un partido.
 - **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
 

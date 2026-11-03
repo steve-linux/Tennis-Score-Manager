@@ -339,6 +339,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **You**: Play, Practice, Video, Progress, More (the app as always).
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
   - **Club**: **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
+  - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics and Club server. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
 - The scoreboard is there in every role: nothing stops you from scoring a match.
 - **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
 

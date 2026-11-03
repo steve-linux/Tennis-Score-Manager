@@ -149,6 +149,15 @@ enum class Role(val tabs: List<HomeTab>) {
     CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
 }
 
+/**
+ * Le funzioni del ruolo Circolo, da accendere o spegnere: quelle spente non compaiono nei menu (i dati restano).
+ * [base] = accese all'inizio per tutti.
+ */
+enum class ClubFeature(val base: Boolean) {
+    MEMBERS(true), PAYMENTS(true), PLANNING(true), TOURNAMENTS(true),
+    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false),
+}
+
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
 enum class DetailAsk { OUTCOME, ERROR_TYPE }
 
@@ -2017,6 +2026,30 @@ class MatchController(
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
         openCourtsPlan()
+    }
+
+    // ---- Funzioni del circolo ----
+
+    /**
+     * Le funzioni accese. Finché il circolo non sceglie: quelle di base più quelle in cui ci sono già dati (squadre,
+     * corsi, classifiche, server abbinato), così a chi le usa non sparisce niente.
+     */
+    val clubFeatures = MutableStateFlow(
+        storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
+            ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
+                ClubFeature.TEAMS.takeIf { teams.value.isNotEmpty() },
+                ClubFeature.SCHOOL.takeIf { courses.value.isNotEmpty() },
+                ClubFeature.LADDER.takeIf { ladders.value.isNotEmpty() },
+                ClubFeature.SERVER.takeIf { clubServer.value.paired },
+            )).toSet(),
+    )
+
+    fun has(f: ClubFeature): Boolean = f in clubFeatures.value
+
+    fun setFeature(f: ClubFeature, on: Boolean) {
+        val n = if (on) clubFeatures.value + f else clubFeatures.value - f
+        clubFeatures.value = n
+        storage.clubFeatures = n.map { it.name }.toSet()
     }
 
     fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =

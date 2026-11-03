@@ -595,6 +595,16 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
+    var clubFeatures: Set<String>?
+        get() = prefs.getStringSet("club_features", null)?.toSet()
+        set(v) = prefs.edit().putStringSet("club_features", v).apply()
+
+    /** Il suggerimento "scegli le funzioni" è già stato visto. */
+    var clubFeaturesSeen: Boolean
+        get() = prefs.getBoolean("club_features_seen", false)
+        set(v) = prefs.edit().putBoolean("club_features_seen", v).apply()
+
     /** Ruoli scelti (Role.name) e quello attivo; di serie Tu, come prima dei ruoli. */
     var roles: Set<String>
         get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")

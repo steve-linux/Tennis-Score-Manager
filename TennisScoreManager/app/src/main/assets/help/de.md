@@ -339,6 +339,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
   - **Verein**: **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
+  - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik und Vereinsserver. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
 - Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
 - **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
 

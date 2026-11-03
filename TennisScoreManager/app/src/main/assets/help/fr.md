@@ -339,6 +339,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
   - **Club** : **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
+  - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains et Serveur du club. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
 - Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
 - **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
 

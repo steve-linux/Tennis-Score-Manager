@@ -339,6 +339,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
   - **Circolo**: **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
+  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi e Server del circolo. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
 

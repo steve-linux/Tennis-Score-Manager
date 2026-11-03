@@ -179,10 +179,11 @@ fun StudentScreen(c: MatchController) {
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
-        MemberSection(c, st)
+        val features by c.clubFeatures.collectAsState()
+        if (com.tennis.scoremanager.ClubFeature.MEMBERS in features) MemberSection(c, st)
         // Con il server del circolo: l'invito per prenotare online.
         PlayerOnlineSection(c, st)
-        ChargesSection(c, st)
+        if (com.tennis.scoremanager.ClubFeature.PAYMENTS in features) ChargesSection(c, st)
         // Le squadre in cui gioca.
         val teamsAll by c.teams.collectAsState()
         val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }

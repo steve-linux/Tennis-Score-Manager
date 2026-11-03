@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Language
@@ -70,6 +71,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.LinkState
@@ -205,12 +207,16 @@ private fun CoachTab(c: MatchController) {
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
-    Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
-    Entry(Icons.Filled.EmojiEvents, s.ldTitle, s.ldHint) { c.openLadders() }
+    val f by c.clubFeatures.collectAsState()
+    // La prima volta: l'invito a tenere solo le funzioni che il circolo usa.
+    com.tennis.scoremanager.ui.ClubFeaturesHint(c)
+    if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
+    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
+    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint) { c.openLadders() }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
-    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
+    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = ClubFeature.TOURNAMENTS !in f) { c.go(Screen.SETUP) }
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 /** Circolo: nome e campi (si usano in Nuova partita e per i tabelloni), il tabellone TV. */
@@ -221,10 +227,12 @@ private fun CourtsTab(c: MatchController) {
     var manage by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
-    Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
+    val f by c.clubFeatures.collectAsState()
+    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
     Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
     Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }
@@ -233,11 +241,13 @@ private fun CourtsTab(c: MatchController) {
 @Composable
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
-    Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
-    Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+    val f by c.clubFeatures.collectAsState()
+    if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
+    if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
+    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = ClubFeature.MEMBERS !in f) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 @Composable

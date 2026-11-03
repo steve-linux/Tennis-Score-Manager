@@ -168,9 +168,10 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
-        GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
+        val features by c.clubFeatures.collectAsState()
+        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
-        ServerStatusLine(c) { server = true }
+        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -310,7 +311,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                             for (t in c.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
                         }
                     }
-                    if (b.players.isNotEmpty() && cents > 0) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                    // L'addebito va in Quote e pagamenti: solo se il circolo le usa.
+                    if (b.players.isNotEmpty() && cents > 0 && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
                 }
                 if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
@@ -330,7 +332,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
                 )
-                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty()))
+                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -413,8 +415,10 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
                 GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
-                GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
+                    GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
+                    Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                }
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })

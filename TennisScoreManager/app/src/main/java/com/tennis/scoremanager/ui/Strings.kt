@@ -1731,6 +1731,15 @@ interface Strings {
     val ldDelete: String
     val ldDeleteAsk: String
     val ldNoticeTitle: String
+    // Funzioni del circolo.
+    val cfTitle: String
+    val cfHint: String
+    val cfBase: String
+    val cfExtra: String
+    val cfAsk: String
+    val cfChoose: String
+    val cfServerPaired: String
+    val cfStatsHint: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3720,6 +3729,14 @@ object ItStrings : Strings {
     override val ldDelete = "Elimina la classifica"
     override val ldDeleteAsk = "Eliminare la classifica? Le partite giocate restano nello storico."
     override val ldNoticeTitle = "Sfida della classifica"
+    override val cfTitle = "Funzioni del circolo"
+    override val cfHint = "Scegli cosa usa il tuo circolo: le funzioni spente non compaiono nei menu. Puoi cambiarle quando vuoi, i dati restano."
+    override val cfBase = "Di base"
+    override val cfExtra = "In più"
+    override val cfAsk = "Il tuo circolo non usa tutto? Scegli le funzioni che servono: l'app mostrerà solo quelle."
+    override val cfChoose = "Scegli le funzioni"
+    override val cfServerPaired = "Il server è collegato: per spegnerlo, prima Scollega in Server del circolo."
+    override val cfStatsHint = "Occupazione dei campi, incassi, quando si gioca e chi prenota di più"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5690,6 +5707,14 @@ object EnStrings : Strings {
     override val ldDelete = "Delete the ladder"
     override val ldDeleteAsk = "Delete the ladder? Matches played stay in the history."
     override val ldNoticeTitle = "Ladder challenge"
+    override val cfTitle = "Club features"
+    override val cfHint = "Choose what your club uses: features turned off do not appear in the menus. You can change them any time, the data stays."
+    override val cfBase = "Basics"
+    override val cfExtra = "Extras"
+    override val cfAsk = "Your club doesn't use everything? Choose the features you need: the app will show only those."
+    override val cfChoose = "Choose the features"
+    override val cfServerPaired = "The server is connected: to turn it off, first Disconnect in Club server."
+    override val cfStatsHint = "Court occupancy, revenue, when people play and who books most"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

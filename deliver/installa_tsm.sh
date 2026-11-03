@@ -685,6 +685,7 @@ Jede Person, die spielt oder trainiert, ist ein **Spieler** der Datenbank, mit e
   - **Du**: Spielen, Trainieren, Video, Fortschritt, Mehr (die App wie immer).
   - **Trainer**: **Schüler** (Liste, wer trainiert und Schlagtraining), **Spielen** (Matches zwischen Schülern, Turnier unter Freunden), Video, Mehr.
   - **Verein**: **Turniere**, **Plätze** (Vereinsname und Plätze, einer pro Zeile: in Neues Match unter dem Platz antippen, dann sind Verein und Platz eingetragen; die TV-Anzeigetafel), **Spieler**, Mehr.
+  - **Vereinsfunktionen** (unten in den Vereins-Reitern): Der Verein wählt, was er nutzt. Grundfunktionen: Mitglieder, Beiträge und Zahlungen, Platzbelegung und Vereinsturniere; zusätzlich: Mannschaften und Ligen, Tennisschule, Forderungsrangliste, Platzstatistik und Vereinsserver. Ausgeschaltete Funktionen erscheinen nicht in den Menüs, die Daten bleiben; anfangs sind auch die an, in denen schon Daten sind.
 - Die Anzeigetafel gibt es in jeder Rolle: nichts hindert dich, ein Match zu zählen.
 - **Erster Start**: Sprache, Rollen, dein Name (Vorname, Nachname, Spitzname), wie du die App nutzt (mit *Du*), der Verein (mit *Verein*), deine Daten mit der **Erinnerung an die Sicherung** (alle 30 Tage erinnert dich der erste Bildschirm; sie ist auch unter Profil und Daten).
 
@@ -1225,6 +1226,7 @@ Everyone who plays or practises is a **player** in the database, with an ID that
   - **You**: Play, Practice, Video, Progress, More (the app as always).
   - **Coach**: **Students** (list, who is practising and stroke practice), **Play** (matches between students, the friends tournament), Video, More.
   - **Club**: **Tournaments**, **Courts** (club name and courts, one per line: in New match, under the court, you tap them and club and court are filled in; the TV scoreboard), **Players**, More.
+  - **Club features** (at the bottom of the Club tabs): the club chooses what it uses. Basics: Members, Fees and payments, Court planner and Club tournaments; extras: Teams and leagues, Tennis school, Challenge ladder, Court statistics and Club server. Features turned off do not appear in the menus and the data stays; at first the ones that already have data are on too.
 - The scoreboard is there in every role: nothing stops you from scoring a match.
 - **First start**: language, roles, your name (first name, last name, nickname), how you use the app (with *You*), the club (with *Club*), your data with the **backup reminder** (every 30 days the first screen reminds you; it is also in Profile and data).
 
@@ -1764,6 +1766,7 @@ Cada persona que juega o entrena es un **jugador** de la base, con un identifica
   - **Tú**: Jugar, Entrenar, Vídeo, Progresos, Más (la app de siempre).
   - **Entrenador**: **Alumnos** (lista, quién entrena y entrenamiento de golpes), **Jugar** (partidos entre alumnos, torneo entre amigos), Vídeo, Más.
   - **Club**: **Torneos**, **Pistas** (nombre del club y pistas, una por línea: en Nuevo partido, debajo de la pista, se tocan y se escriben club y pista; el marcador de TV), **Jugadores**, Más.
+  - **Funciones del club** (al final de las pestañas del Club): el club elige lo que usa. Básicas: Socios, Cuotas y pagos, Planning de pistas y Torneos del club; adicionales: Equipos y ligas, Escuela de tenis, Clasificación por desafíos, Estadísticas de las pistas y Servidor del club. Las funciones apagadas no aparecen en los menús y los datos se quedan; al principio también están encendidas las que ya tienen datos.
 - El marcador está en todos los roles: nada te impide anotar un partido.
 - **Primer arranque**: idioma, roles, tu nombre (nombre, apellido, apodo), cómo usas la app (con *Tú*), el club (con *Club*), tus datos con el **recordatorio de copia** (cada 30 días la primera pantalla te lo recuerda; también está en Perfil y datos).
 
@@ -2303,6 +2306,7 @@ Chaque personne qui joue ou s'entraîne est un **joueur** de la base, avec un id
   - **Vous** : Jouer, S'entraîner, Vidéo, Progrès, Plus (l'appli de toujours).
   - **Entraîneur** : **Élèves** (liste, qui s'entraîne et entraînement des coups), **Jouer** (matchs entre élèves, tournoi entre amis), Vidéo, Plus.
   - **Club** : **Tournois**, **Terrains** (nom du club et terrains, un par ligne : dans Nouveau match, sous le terrain, on les touche et club et terrain sont écrits ; le tableau TV), **Joueurs**, Plus.
+  - **Fonctions du club** (en bas des onglets du Club) : le club choisit ce qu'il utilise. De base : Adhérents, Cotisations et paiements, Planning des terrains et Tournois du club ; en plus : Équipes et championnats, École de tennis, Classement à défis, Statistiques des terrains et Serveur du club. Les fonctions désactivées n'apparaissent pas dans les menus et les données restent ; au début, celles qui ont déjà des données sont aussi activées.
 - Le tableau est là dans chaque rôle : rien ne vous empêche de marquer un match.
 - **Premier démarrage** : langue, rôles, votre nom (prénom, nom, surnom), votre usage (avec *Vous*), le club (avec *Club*), vos données avec le **rappel de sauvegarde** (tous les 30 jours le premier écran vous le rappelle ; il est aussi dans Profil et données).
 
@@ -2842,6 +2846,7 @@ Ogni persona che gioca o si allena è un **giocatore** del database, con un iden
   - **Tu**: Gioca, Allenati, Video, Progressi, Altro (l'app di sempre).
   - **Allenatore**: **Allievi** (elenco, chi si allena e l'allenamento dei colpi), **Gioca** (le partite tra allievi, il torneo tra amici), Video, Altro.
   - **Circolo**: **Tornei**, **Campi** (nome del circolo e campi, uno per riga: in Nuova partita, sotto il campo, si toccano e scrivono circolo e campo; il tabellone TV), **Giocatori**, Altro.
+  - **Funzioni del circolo** (in fondo alle schede del Circolo): il circolo sceglie cosa usa. Di base Soci, Quote e pagamenti, Planning dei campi e Tornei del circolo; in più Squadre e campionati, Scuola tennis, Classifica a sfida, Statistiche dei campi e Server del circolo. Le funzioni spente non compaiono nei menu e i dati restano; all'inizio sono accese anche quelle in cui ci sono già dati.
 - Il tabellone c'è in ogni ruolo: nessuno ti vieta di segnare una partita.
 - **Prima apertura**: lingua, ruoli, il tuo nome (nome, cognome, soprannome), come usi l'app (con *Tu*), il circolo (con *Circolo*), i tuoi dati con il **promemoria del backup** (ogni 30 giorni la prima schermata ti ricorda di farlo; lo trovi anche in Profilo e dati).
 
@@ -3381,6 +3386,7 @@ Cada pessoa que joga ou treina é um **jogador** do banco, com um identificador 
   - **Você**: Jogar, Treinar, Vídeo, Progresso, Mais (o app de sempre).
   - **Treinador**: **Alunos** (lista, quem treina e treino de golpes), **Jogar** (partidas entre alunos, torneio entre amigos), Vídeo, Mais.
   - **Clube**: **Torneios**, **Quadras** (nome do clube e quadras, uma por linha: em Nova partida, embaixo da quadra, você toca e clube e quadra ficam escritos; o placar de TV), **Jogadores**, Mais.
+  - **Funções do clube** (no fundo dos separadores do Clube): o clube escolhe o que usa. Básicas: Sócios, Mensalidades e pagamentos, Agenda das quadras e Torneios do clube; adicionais: Equipes e campeonatos, Escola de tênis, Classificação por desafios, Estatísticas das quadras e Servidor do clube. As funções desligadas não aparecem nos menus e os dados ficam; no início também estão ligadas as que já têm dados.
 - O placar está em todos os papéis: nada impede você de marcar uma partida.
 - **Primeira abertura**: idioma, papéis, o seu nome (nome, sobrenome, apelido), como você usa o app (com *Você*), o clube (com *Clube*), os seus dados com o **lembrete de backup** (a cada 30 dias a primeira tela lembra você; também está em Perfil e dados).
 
@@ -4463,6 +4469,15 @@ enum class Role(val tabs: List<HomeTab>) {
     COACH(listOf(HomeTab.STUDENTS, HomeTab.PLAY, HomeTab.VIDEO, HomeTab.MORE)),
     /** Circolo: tornei, campi coi loro tabelloni, giocatori e allenatori. */
     CLUB(listOf(HomeTab.TOURNAMENTS, HomeTab.COURTS, HomeTab.PEOPLE, HomeTab.MORE)),
+}
+
+/**
+ * Le funzioni del ruolo Circolo, da accendere o spegnere: quelle spente non compaiono nei menu (i dati restano).
+ * [base] = accese all'inizio per tutti.
+ */
+enum class ClubFeature(val base: Boolean) {
+    MEMBERS(true), PAYMENTS(true), PLANNING(true), TOURNAMENTS(true),
+    TEAMS(false), SCHOOL(false), LADDER(false), STATS(false), SERVER(false),
 }
 
 /** Domanda sul punto appena segnato: come è finito (ace, vincente, errore) oppure, per un errore, di che tipo. */
@@ -6333,6 +6348,30 @@ class MatchController(
     fun openPlanAt(day: Long) {
         planDayRequest.value = day
         openCourtsPlan()
+    }
+
+    // ---- Funzioni del circolo ----
+
+    /**
+     * Le funzioni accese. Finché il circolo non sceglie: quelle di base più quelle in cui ci sono già dati (squadre,
+     * corsi, classifiche, server abbinato), così a chi le usa non sparisce niente.
+     */
+    val clubFeatures = MutableStateFlow(
+        storage.clubFeatures?.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }?.toSet()
+            ?: (ClubFeature.entries.filter { it.base } + listOfNotNull(
+                ClubFeature.TEAMS.takeIf { teams.value.isNotEmpty() },
+                ClubFeature.SCHOOL.takeIf { courses.value.isNotEmpty() },
+                ClubFeature.LADDER.takeIf { ladders.value.isNotEmpty() },
+                ClubFeature.SERVER.takeIf { clubServer.value.paired },
+            )).toSet(),
+    )
+
+    fun has(f: ClubFeature): Boolean = f in clubFeatures.value
+
+    fun setFeature(f: ClubFeature, on: Boolean) {
+        val n = if (on) clubFeatures.value + f else clubFeatures.value - f
+        clubFeatures.value = n
+        storage.clubFeatures = n.map { it.name }.toSet()
     }
 
     fun saveServerRules(rules: com.tennis.scoremanager.data.BookingRules, payInfo: String, publicUrl: String = clubServer.value.publicUrl) =
@@ -16090,6 +16129,16 @@ class Storage(context: Context) {
         get() = prefs.getString("my_name", null) ?: ""
         set(v) = prefs.edit().putString("my_name", v.trim()).apply()
 
+    /** Le funzioni del circolo scelte (ClubFeature.name); null = mai scelte (si decide dai dati che ci sono). */
+    var clubFeatures: Set<String>?
+        get() = prefs.getStringSet("club_features", null)?.toSet()
+        set(v) = prefs.edit().putStringSet("club_features", v).apply()
+
+    /** Il suggerimento "scegli le funzioni" è già stato visto. */
+    var clubFeaturesSeen: Boolean
+        get() = prefs.getBoolean("club_features_seen", false)
+        set(v) = prefs.edit().putBoolean("club_features_seen", v).apply()
+
     /** Ruoli scelti (Role.name) e quello attivo; di serie Tu, come prima dei ruoli. */
     var roles: Set<String>
         get() = prefs.getStringSet("roles", null)?.toSet()?.takeIf { it.isNotEmpty() } ?: setOf("PLAYER")
@@ -22061,6 +22110,119 @@ private fun Cmd(icon: ImageVector, label: String, color: Color, enabled: Boolean
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubFeaturesUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ClubFeaturesUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CardMembership
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.ClubFeature
+import com.tennis.scoremanager.MatchController
+
+/** Nome, spiegazione e icona di una funzione del circolo (gli stessi delle voci dei menu). */
+fun featureInfo(s: Strings, f: ClubFeature): Triple<String, String, ImageVector> = when (f) {
+    ClubFeature.MEMBERS -> Triple(s.membersTitle, s.membersHint, Icons.Filled.CardMembership)
+    ClubFeature.PAYMENTS -> Triple(s.paymentsTitle, s.paymentsHint, Icons.Filled.Payments)
+    ClubFeature.PLANNING -> Triple(s.planTitle, s.planHint, Icons.Filled.CalendarMonth)
+    ClubFeature.TOURNAMENTS -> Triple(s.ctTitle, s.ctHint, Icons.Filled.EmojiEvents)
+    ClubFeature.TEAMS -> Triple(s.tmTitle, s.tmHint, Icons.Filled.Groups)
+    ClubFeature.SCHOOL -> Triple(s.scTitle, s.scHint, Icons.Filled.School)
+    ClubFeature.LADDER -> Triple(s.ldTitle, s.ldHint, Icons.Filled.Leaderboard)
+    ClubFeature.STATS -> Triple(s.stTitle, s.cfStatsHint, Icons.Filled.BarChart)
+    ClubFeature.SERVER -> Triple(s.srvTitle, s.srvButtonHint, Icons.Filled.Cloud)
+}
+
+/** Le funzioni del circolo: un interruttore per ognuna, quelle di base prima. I dati delle funzioni spente restano. */
+@Composable
+fun ClubFeaturesDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val on by c.clubFeatures.collectAsState()
+    val paired by c.clubServer.collectAsState()
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.cfTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(s.cfHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                for ((title, list) in listOf(s.cfBase to ClubFeature.entries.filter { it.base }, s.cfExtra to ClubFeature.entries.filter { !it.base })) {
+                    Text(title, color = TsmColors.Ball, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
+                    for (f in list) {
+                        val (name, hint, icon) = featureInfo(s, f)
+                        // Il server abbinato non si spegne da qui: prima si scollega (se no continuerebbe a lavorare nascosto).
+                        val locked = f == ClubFeature.SERVER && paired.paired && f in on
+                        SwitchRow(icon, name, if (locked) s.cfServerPaired else hint, f in on, enabled = !locked) { c.setFeature(f, it) }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+}
+
+/**
+ * In cima alla prima scheda del Circolo, finché non si sono guardate le funzioni: un invito a scegliere solo quelle
+ * che servono. Sotto ogni scheda resta comunque il tasto per cambiarle.
+ */
+@Composable
+fun ClubFeaturesHint(c: MatchController) {
+    val s = LocalStrings.current
+    var seen by remember { mutableStateOf(c.storage.clubFeaturesSeen) }
+    var open by remember { mutableStateOf(false) }
+    if (!seen) Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(TsmColors.SurfaceHigh).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(s.cfAsk, color = TsmColors.TextMain, fontSize = 14.sp)
+        GhostButton(s.cfChoose, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
+    }
+    if (open) ClubFeaturesDialog(c) { open = false; seen = true; c.storage.clubFeaturesSeen = true }
+}
+
+/** In fondo alle schede del Circolo: cambia le funzioni. */
+@Composable
+fun ClubFeaturesButton(c: MatchController) {
+    val s = LocalStrings.current
+    var open by remember { mutableStateOf(false) }
+    GhostButton(s.cfTitle, Icons.Filled.Tune, { open = true }, Modifier.fillMaxWidth())
+    if (open) ClubFeaturesDialog(c) { open = false; c.storage.clubFeaturesSeen = true }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/ClubTournamentUi.kt
 cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/ClubTournamentUi.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -26647,6 +26809,15 @@ interface Strings {
     val ldDelete: String
     val ldDeleteAsk: String
     val ldNoticeTitle: String
+    // Funzioni del circolo.
+    val cfTitle: String
+    val cfHint: String
+    val cfBase: String
+    val cfExtra: String
+    val cfAsk: String
+    val cfChoose: String
+    val cfServerPaired: String
+    val cfStatsHint: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -28636,6 +28807,14 @@ object ItStrings : Strings {
     override val ldDelete = "Elimina la classifica"
     override val ldDeleteAsk = "Eliminare la classifica? Le partite giocate restano nello storico."
     override val ldNoticeTitle = "Sfida della classifica"
+    override val cfTitle = "Funzioni del circolo"
+    override val cfHint = "Scegli cosa usa il tuo circolo: le funzioni spente non compaiono nei menu. Puoi cambiarle quando vuoi, i dati restano."
+    override val cfBase = "Di base"
+    override val cfExtra = "In più"
+    override val cfAsk = "Il tuo circolo non usa tutto? Scegli le funzioni che servono: l'app mostrerà solo quelle."
+    override val cfChoose = "Scegli le funzioni"
+    override val cfServerPaired = "Il server è collegato: per spegnerlo, prima Scollega in Server del circolo."
+    override val cfStatsHint = "Occupazione dei campi, incassi, quando si gioca e chi prenota di più"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -30606,6 +30785,14 @@ object EnStrings : Strings {
     override val ldDelete = "Delete the ladder"
     override val ldDeleteAsk = "Delete the ladder? Matches played stay in the history."
     override val ldNoticeTitle = "Ladder challenge"
+    override val cfTitle = "Club features"
+    override val cfHint = "Choose what your club uses: features turned off do not appear in the menus. You can change them any time, the data stays."
+    override val cfBase = "Basics"
+    override val cfExtra = "Extras"
+    override val cfAsk = "Your club doesn't use everything? Choose the features you need: the app will show only those."
+    override val cfChoose = "Choose the features"
+    override val cfServerPaired = "The server is connected: to turn it off, first Disconnect in Club server."
+    override val cfStatsHint = "Court occupancy, revenue, when people play and who books most"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -32599,6 +32786,14 @@ object DeStrings : Strings {
     override val ldDelete = "Rangliste löschen"
     override val ldDeleteAsk = "Rangliste löschen? Gespielte Matches bleiben im Verlauf."
     override val ldNoticeTitle = "Forderung der Rangliste"
+    override val cfTitle = "Vereinsfunktionen"
+    override val cfHint = "Wähle, was dein Verein nutzt: Ausgeschaltete Funktionen erscheinen nicht in den Menüs. Du kannst sie jederzeit ändern, die Daten bleiben."
+    override val cfBase = "Grundfunktionen"
+    override val cfExtra = "Zusätzlich"
+    override val cfAsk = "Dein Verein braucht nicht alles? Wähle die Funktionen, die du nutzt: Die App zeigt nur diese."
+    override val cfChoose = "Funktionen wählen"
+    override val cfServerPaired = "Der Server ist verbunden: Zum Ausschalten zuerst unter Vereinsserver trennen."
+    override val cfStatsHint = "Platzauslastung, Einnahmen, wann gespielt wird und wer am meisten bucht"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -34585,6 +34780,14 @@ object EsStrings : Strings {
     override val ldDelete = "Eliminar la clasificación"
     override val ldDeleteAsk = "¿Eliminar la clasificación? Los partidos jugados quedan en el historial."
     override val ldNoticeTitle = "Desafío de la clasificación"
+    override val cfTitle = "Funciones del club"
+    override val cfHint = "Elige lo que usa tu club: las funciones apagadas no aparecen en los menús. Puedes cambiarlas cuando quieras, los datos se quedan."
+    override val cfBase = "Básicas"
+    override val cfExtra = "Adicionales"
+    override val cfAsk = "¿Tu club no lo usa todo? Elige las funciones que necesitas: la app solo mostrará esas."
+    override val cfChoose = "Elegir las funciones"
+    override val cfServerPaired = "El servidor está conectado: para apagarlo, primero Desconectar en Servidor del club."
+    override val cfStatsHint = "Ocupación de las pistas, ingresos, cuándo se juega y quién reserva más"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -36573,6 +36776,14 @@ object FrStrings : Strings {
     override val ldDelete = "Supprimer le classement"
     override val ldDeleteAsk = "Supprimer le classement ? Les matchs joués restent dans l'historique."
     override val ldNoticeTitle = "Défi du classement"
+    override val cfTitle = "Fonctions du club"
+    override val cfHint = "Choisissez ce que votre club utilise : les fonctions désactivées n'apparaissent pas dans les menus. Vous pouvez les changer quand vous voulez, les données restent."
+    override val cfBase = "De base"
+    override val cfExtra = "En plus"
+    override val cfAsk = "Votre club n'utilise pas tout ? Choisissez les fonctions utiles : l'app n'affichera que celles-là."
+    override val cfChoose = "Choisir les fonctions"
+    override val cfServerPaired = "Le serveur est connecté : pour le désactiver, d'abord Déconnecter dans Serveur du club."
+    override val cfStatsHint = "Occupation des terrains, recettes, quand on joue et qui réserve le plus"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -38562,6 +38773,14 @@ object PtStrings : Strings {
     override val ldDelete = "Eliminar a classificação"
     override val ldDeleteAsk = "Eliminar a classificação? Os jogos jogados ficam no histórico."
     override val ldNoticeTitle = "Desafio da classificação"
+    override val cfTitle = "Funções do clube"
+    override val cfHint = "Escolhe o que o teu clube usa: as funções desligadas não aparecem nos menus. Podes mudá-las quando quiseres, os dados ficam."
+    override val cfBase = "Básicas"
+    override val cfExtra = "Adicionais"
+    override val cfAsk = "O teu clube não usa tudo? Escolhe as funções de que precisas: a app só mostra essas."
+    override val cfChoose = "Escolher as funções"
+    override val cfServerPaired = "O servidor está ligado: para o desligar, primeiro Desligar em Servidor do clube."
+    override val cfStatsHint = "Ocupação das quadras, receitas, quando se joga e quem reserva mais"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -40868,9 +41087,10 @@ fun CourtsPlanScreen(c: MatchController) {
             GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { manage = true }, Modifier.weight(1f))
             GhostButton(s.blkShort, Icons.Filled.Block, { blocks = true }, Modifier.weight(1f))
         }
-        GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
+        val features by c.clubFeatures.collectAsState()
+        if (com.tennis.scoremanager.ClubFeature.STATS in features) GhostButton(s.stTitle, Icons.Filled.BarChart, { c.go(com.tennis.scoremanager.Screen.COURT_STATS) }, Modifier.fillMaxWidth())
         // Il server del circolo, se c'è: lo stato, e ogni minuto le prenotazioni online.
-        ServerStatusLine(c) { server = true }
+        if (com.tennis.scoremanager.ClubFeature.SERVER in features) ServerStatusLine(c) { server = true }
         // Quanto è libero ogni campo, a colpo d'occhio.
         Text(courts.joinToString(" · ") { ct -> "$ct ${s.planBusy(CourtPlans.busyMinutes(occ, ct) / 60)}" }, color = TsmColors.TextDim, fontSize = 12.sp)
         Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -41010,7 +41230,8 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                             for (t in c.payTypes()) GhostButton(s.bkPaidWith(t.name), Icons.Filled.Euro, { c.payBooking(b0, t) }, Modifier.fillMaxWidth())
                         }
                     }
-                    if (b.players.isNotEmpty() && cents > 0) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
+                    // L'addebito va in Quote e pagamenti: solo se il circolo le usa.
+                    if (b.players.isNotEmpty() && cents > 0 && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)) SwitchRow(Icons.Filled.Euro, s.bkCharge(b.players.size), null, charge) { charge = it }
                 }
                 if (isNew) Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Repeat, null, tint = TsmColors.TextDim)
@@ -41030,7 +41251,7 @@ private fun BookingDialog(c: MatchController, b0: CourtBooking, isNew: Boolean, 
                     names = guests.split(',').map { it.trim() }.filter { it.isNotEmpty() }, cents = if (b.kind == BookingKind.PLAY || b.kind == BookingKind.LESSON) cents else 0,
                     lights = CourtPlans.needsLights(plan.settings, b.start, b.minutes) && info.lights, heating = b.heating && info.heating,
                 )
-                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty()))
+                onDone(c.saveBooking(saved, weeks, charge && saved.cents > 0 && saved.players.isNotEmpty() && c.has(com.tennis.scoremanager.ClubFeature.PAYMENTS)))
             }) { Text(s.ok) }
         },
         dismissButton = { TextButton(onClick = { onDone(null) }) { Text(s.back) } },
@@ -41113,8 +41334,10 @@ private fun PlanSettingsDialog(c: MatchController, st0: CourtSettings, onDone: (
                 MoneyField(priceL, s.planPriceLights) { priceL = it }
                 stepper(s.planLightsFrom, st.lightsFrom, 0, 24) { st = st.copy(lightsFrom = it) }
                 GhostButton(s.crtTitle, Icons.Filled.SportsTennis, { courtsOpen = true }, Modifier.fillMaxWidth())
-                GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
-                Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                if (c.has(com.tennis.scoremanager.ClubFeature.SERVER)) {
+                    GhostButton(s.srvTitle, Icons.Filled.Cloud, { serverOpen = true }, Modifier.fillMaxWidth())
+                    Text(if (c.clubServer.value.paired) s.srvConnected(c.clubServer.value.club.ifBlank { c.clubServer.value.url }) else s.srvButtonHint, color = TsmColors.TextDim, fontSize = 12.sp)
+                }
                 Text(s.planTournamentMinutes, color = TsmColors.TextDim, fontSize = 13.sp)
                 val tm = listOf(60, 90, 120)
                 Segmented(tm.map { SegOption(s.bkMinutes(it)) }, tm.indexOf(st.tournamentMinutes), { st = st.copy(tournamentMinutes = tm[it]) })
@@ -42336,6 +42559,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Language
@@ -42372,6 +42596,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tennis.scoremanager.HomeTab
+import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.MatchController
 import com.tennis.scoremanager.Screen
 import com.tennis.scoremanager.ble.LinkState
@@ -42507,12 +42732,16 @@ private fun CoachTab(c: MatchController) {
 private fun TournamentsTab(c: MatchController) {
     val s = LocalStrings.current
     val context = LocalContext.current
-    Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
-    Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
-    Entry(Icons.Filled.EmojiEvents, s.ldTitle, s.ldHint) { c.openLadders() }
+    val f by c.clubFeatures.collectAsState()
+    // La prima volta: l'invito a tenere solo le funzioni che il circolo usa.
+    com.tennis.scoremanager.ui.ClubFeaturesHint(c)
+    if (ClubFeature.TOURNAMENTS in f) Entry(Icons.Filled.EmojiEvents, s.ctTitle, s.ctHint, main = true) { c.openClubTournaments() }
+    if (ClubFeature.TEAMS in f) Entry(Icons.Filled.Groups, s.tmTitle, s.tmHint) { c.openTeams() }
+    if (ClubFeature.LADDER in f) Entry(Icons.Filled.Leaderboard, s.ldTitle, s.ldHint) { c.openLadders() }
     Entry(Icons.Filled.EmojiEvents, s.playTournament, s.playTournamentHint) { c.openTournaments() }
-    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint) { c.go(Screen.SETUP) }
+    Entry(Icons.Filled.PlayArrow, s.newMatch, s.playNewMatchHint, main = ClubFeature.TOURNAMENTS !in f) { c.go(Screen.SETUP) }
     Entry(Icons.Filled.Tv, s.displayMode, s.playAsBoardHint) { context.startActivity(Intent(context, DisplayActivity::class.java)) }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 /** Circolo: nome e campi (si usano in Nuova partita e per i tabelloni), il tabellone TV. */
@@ -42523,10 +42752,12 @@ private fun CourtsTab(c: MatchController) {
     var manage by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
-    Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
+    val f by c.clubFeatures.collectAsState()
+    if (ClubFeature.PLANNING in f) Entry(Icons.Filled.CalendarMonth, s.planTitle, s.planHint, main = true) { if (courts.isEmpty()) edit = true else c.openCourtsPlan() }
     Entry(Icons.Filled.Business, name.ifBlank { s.clubNoName }, s.clubNameHint) { edit = true }
     Entry(Icons.Filled.SportsTennis, s.crtTitle, if (courts.isEmpty()) s.clubNoCourts else courts.joinToString(" · ")) { manage = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }
@@ -42535,11 +42766,13 @@ private fun CourtsTab(c: MatchController) {
 @Composable
 private fun PeopleTab(c: MatchController) {
     val s = LocalStrings.current
-    Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
-    Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
-    Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
-    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint) { c.openPlayers() }
+    val f by c.clubFeatures.collectAsState()
+    if (ClubFeature.MEMBERS in f) Entry(Icons.Filled.CardMembership, s.membersTitle, s.membersHint, main = true) { c.openMembers() }
+    if (ClubFeature.PAYMENTS in f) Entry(Icons.Filled.Payments, s.paymentsTitle, s.paymentsHint) { c.openPayments() }
+    if (ClubFeature.SCHOOL in f) Entry(Icons.Filled.School, s.scTitle, s.scHint) { c.openSchool() }
+    Entry(Icons.Filled.Groups, s.playersTitle, s.playersHint, main = ClubFeature.MEMBERS !in f) { c.openPlayers() }
     Entry(Icons.Filled.School, s.studentsTitle, s.studentsHint) { c.openStudents() }
+    com.tennis.scoremanager.ui.ClubFeaturesButton(c)
 }
 
 @Composable
@@ -48533,10 +48766,11 @@ fun StudentScreen(c: MatchController) {
         // Nato dallo storico con un nome solo: nome e cognome da aggiungere.
         if (!st.complete) GhostButton(s.playerComplete, Icons.Filled.EditNote, { edit = true }, Modifier.fillMaxWidth())
         // Socio del circolo: tessere, certificato e consensi (o il tasto per iscriverlo, col ruolo Circolo).
-        MemberSection(c, st)
+        val features by c.clubFeatures.collectAsState()
+        if (com.tennis.scoremanager.ClubFeature.MEMBERS in features) MemberSection(c, st)
         // Con il server del circolo: l'invito per prenotare online.
         PlayerOnlineSection(c, st)
-        ChargesSection(c, st)
+        if (com.tennis.scoremanager.ClubFeature.PAYMENTS in features) ChargesSection(c, st)
         // Le squadre in cui gioca.
         val teamsAll by c.teams.collectAsState()
         val mineT = teamsAll.filter { tm -> tm.roster.any { it == st.id || it in st.aliases } }
@@ -81898,6 +82132,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 279 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 280 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
