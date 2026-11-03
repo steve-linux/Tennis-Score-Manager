@@ -43,8 +43,8 @@ object OnlineAlerts {
     const val EXTRA_BOOK = "tsm.bookCourt"
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
-    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>) {
-        if (remind.isEmpty() && removed.isEmpty() || !allowed(context)) return
+    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) {
+        if (remind.isEmpty() && removed.isEmpty() && freed.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
@@ -53,7 +53,7 @@ object OnlineAlerts {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         // Una notifica per ciascuna: il promemoria di una partita non deve coprire l'avviso di un'altra.
-        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it }).forEachIndexed { i, (title, text) ->
+        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it } + freed.map { s.pbAlertFreed to it }).forEachIndexed { i, (title, text) ->
             val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_tennis)
                 .setContentTitle(title).setContentText(text)

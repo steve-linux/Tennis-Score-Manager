@@ -69,3 +69,8 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .steps li { margin: 8px 0; }
 .share { display: inline-block; border: 1px solid var(--outline); border-radius: 6px; padding: 0 6px; color: var(--ball); }
 .bigcode { font-size: 26px; font-weight: 700; letter-spacing: .12em; text-align: center; color: var(--ball); background: var(--high); border-radius: 12px; padding: 14px; margin-top: 8px; }
+.cell.BUSY:not(:disabled) { cursor: pointer; }
+.cell.waiting { background: var(--high); color: var(--ball); font-weight: 600; outline: 1px dashed var(--ball); outline-offset: -3px; }
+.legend .WAITING::before { background: var(--high); border: 1px dashed var(--ball); }
+.card.freed { border-color: var(--ball); }
+.card.row .small + .small { margin-left: 6px; }

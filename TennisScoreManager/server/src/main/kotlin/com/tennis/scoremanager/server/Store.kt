@@ -45,6 +45,8 @@ data class State(
     val pushSubs: List<PushSub> = emptyList(),
     /** Le prenotazioni di cui il promemoria è già partito. */
     val reminded: List<String> = emptyList(),
+    /** Le liste d'attesa dei giocatori per le caselle occupate. */
+    val waits: List<com.tennis.scoremanager.data.Wait> = emptyList(),
 )
 
 object Secrets {

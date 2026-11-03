@@ -23,6 +23,10 @@ import com.tennis.scoremanager.data.SrvInviteIn
 import com.tennis.scoremanager.data.SrvOk
 import com.tennis.scoremanager.data.SrvPlayer
 import com.tennis.scoremanager.data.SrvPushKey
+import com.tennis.scoremanager.data.SrvWait
+import com.tennis.scoremanager.data.SrvWaitIn
+import com.tennis.scoremanager.data.Wait
+import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
@@ -94,6 +98,8 @@ class Api(
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
             r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
+            r.method == "POST" && p == listOf("waits") -> addWait(player(r), r)
+            r.method == "DELETE" && p.size == 2 && p[0] == "waits" -> removeWait(player(r), p[1])
             r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
             r.method == "GET" && p == listOf("push", "key") -> { player(r); ok(SrvPushKey.serializer(), SrvPushKey(vapid().publicKey)) }
             r.method == "POST" && p == listOf("push", "subscribe") -> subscribe(player(r), r)
@@ -158,6 +164,8 @@ class Api(
                 invites = s.invites.filter { it.expires > now },
             ) to Unit
         }
+        // Il planning nuovo può aver liberato delle caselle.
+        checkWaits(now)
         return adminState()
     }
 
@@ -183,6 +191,7 @@ class Api(
             ?: throw ApiError(404, "NOT_FOUND")
         // Tolta (o spostata) dalla segreteria: il giocatore lo sa subito, se la partita non è già passata.
         if (gone.start > store.now()) push(gone.player, ttl = 24 * 3600) { PushTexts.removed(it.lang, gone, store.state.sync.timeZone) }
+        checkWaits(store.now())
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -237,11 +246,12 @@ class Api(
             s.copy(reminded = (s.reminded.filter { it in ids } + inWindow.map { it.id }).distinct()) to send
         }
         for (b in due) push(b.player, ttl = ((b.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.reminder(it.lang, b, store.state.sync.timeZone) }
+        checkWaits(now)
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
-        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }) to Unit }
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }, waits = s.waits.filter { it.player != id }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -275,7 +285,8 @@ class Api(
         val now = store.now()
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
         val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
-        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }))
+        val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
+        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits))
     }
 
     private fun day(pl: Player, date: String?): Resp {
@@ -284,7 +295,7 @@ class Api(
         val d = try { LocalDate.parse(date ?: "") } catch (_: Exception) { throw ApiError(400, "BAD_DATE") }
         val day = d.atStartOfDay(zone()).toInstant().toEpochMilli()
         val courts = CourtOnline.bookableCourts(s.sync).map { s.sync.settings.info(it).copy(photos = emptyList()) }
-        return ok(SrvDay.serializer(), SrvDay(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now())))
+        return ok(SrvDay.serializer(), SrvDay(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now(), s.waits)))
     }
 
     /** Quanto costerebbe e se si può fare, prima di confermare. */
@@ -309,7 +320,8 @@ class Api(
             if (problem != null) s to Result.failure(ApiError(409, problem.name))
             else {
                 val nb = CourtOnline.make(s.sync, Secrets.id("w"), pl.id, pl.name, b.court, b.start, b.minutes, b.heating, now)
-                s.copy(bookings = s.bookings + nb) to Result.success(nb)
+                // Prenotato: le sue attese per quell'ora non servono più.
+                s.copy(bookings = s.bookings + nb, waits = s.waits.filter { !(it.player == pl.id && it.start == b.start && (it.court == null || it.court == b.court)) }) to Result.success(nb)
             }
         }
         val nb = res.getOrElse { throw it }
@@ -323,7 +335,59 @@ class Api(
             (if (p == null) s.copy(bookings = s.bookings.filter { it.id != id }) else s) to p
         }
         if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
+        checkWaits(now)
         return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Liste d'attesa ---
+
+    private fun addWait(pl: Player, r: Req): Resp {
+        val w = read(SrvWaitIn.serializer(), r)
+        if (store.state.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val now = store.now()
+        val res = store.update { s ->
+            val problem = CourtOnline.checkWait(s.sync, s.bookings, pl.id, w.court, w.start, w.minutes, now)
+            val open = s.waits.filter { it.player == pl.id && it.freedAt == null && !(it.court == w.court && it.start == w.start) }
+            when {
+                problem != null -> s to Result.failure(ApiError(409, if (problem.first == WaitProblem.FREE_NOW) "FREE_NOW" else problem.second!!.name))
+                // Con il massimo di prenotazioni, liberarsi un campo non servirebbe: non si potrebbe prenotarlo.
+                CourtOnline.future(s.bookings, pl.id, now).size >= s.sync.rules.maxFuture.coerceAtLeast(1) -> s to Result.failure(ApiError(409, "TOO_MANY"))
+                open.size >= 3 -> s to Result.failure(ApiError(409, "TOO_MANY_WAITS"))
+                else -> {
+                    val nw = Wait(Secrets.id("a"), pl.id, w.court, w.start, w.minutes, now)
+                    s.copy(waits = s.waits.filter { !(it.player == pl.id && it.court == w.court && it.start == w.start) } + nw) to Result.success(nw)
+                }
+            }
+        }
+        val nw = res.getOrElse { throw it }
+        return ok(SrvWait.serializer(), SrvWait(nw.id, nw.court, nw.start, nw.minutes), 201)
+    }
+
+    private fun removeWait(pl: Player, id: String): Resp {
+        store.update { s -> s.copy(waits = s.waits.filter { !(it.id == id && it.player == pl.id) }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Le caselle che si sono liberate: a chi aspetta arriva l'avviso (una volta), e la sua attesa resta "liberata"
+     * finché non prenota o la casella passa. Le attese di caselle già cominciate si tolgono.
+     */
+    fun checkWaits(now: Long = store.now()) {
+        val freed = store.update { s ->
+            val alive = s.waits.filter { it.start > now }
+            val news = mutableListOf<Pair<Wait, String>>()
+            val next = alive.map { w ->
+                if (w.freedAt != null) {
+                    // Liberata ma ripresa da un altro: si torna ad aspettare.
+                    if (CourtOnline.freedCourt(s.sync, s.bookings, w, now) == null) w.copy(freedAt = null, freedCourt = null) else w
+                } else {
+                    val court = CourtOnline.freedCourt(s.sync, s.bookings, w, now)
+                    if (court == null) w else w.copy(freedAt = now, freedCourt = court).also { news += it to court }
+                }
+            }
+            s.copy(waits = next) to news.toList()
+        }
+        for ((w, court) in freed) push(w.player, ttl = ((w.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.freed(it.lang, w, court, store.state.sync.timeZone) }
     }
 
     private fun logout(pl: Player, token: String): Resp {

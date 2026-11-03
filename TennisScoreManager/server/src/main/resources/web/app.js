@@ -184,20 +184,31 @@ function render(dayError) {
         el('div', { class: 'dim' }, money(b.cents), b.lights ? ' · ' + T.lights : '', b.heating ? ' · ' + T.heating : '')),
       el('button', { class: 'danger small', onclick: () => askCancel(b) }, T.cancel)));
 
+  // Le liste d'attesa: aperte, o liberate (si prenota subito, prima di un altro).
+  const waits = (me.waits || []).map(w => {
+    const where = (w.freedCourt || w.court || T.waitAnyCourt) + ' · ' + fmtWhen(w.start);
+    const book = w.freedCourt ? el('button', { class: 'small', onclick: () => openBook(courtByName(w.freedCourt), w.start) }, T.bookNow) : null;
+    return el('div', { class: 'card row' + (w.freedCourt ? ' freed' : '') },
+      el('div', { class: 'grow' },
+        el('div', null, el('b', null, w.freedCourt ? T.waitFreed : T.waitList)),
+        el('div', { class: 'dim' }, where)),
+      book, el('button', { class: 'ghost small', onclick: () => removeWait(w) }, T.waitRemove));
+  });
+
   const days = el('div', { class: 'days' }, me.days.map((d, i) => {
     const [wd, dm] = fmtDate(d);
     return el('button', { class: d === state.date ? 'on' : '', onclick: () => { state.date = d; loadDay(); } }, i === 0 ? T.today : wd, el('small', null, dm));
   }));
 
   const parts = [
-    el('h2', null, T.mine), ...mine,
+    el('h2', null, T.mine), ...mine, ...waits,
     el('h2', null, T.day), days,
   ];
   if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
   if (dayError) parts.push(el('p', { class: 'error' }, dayError));
   else if (state.day) parts.push(grid(state.day));
   parts.push(
-    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
+    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
   parts.push(el('div', { id: 'push' }));
@@ -274,15 +285,17 @@ function grid(day) {
       const cell = byKey.get(c.name + '|' + s);
       if (!cell) return el('td');
       const click = cell.state === 'FREE' && day.open ? () => openBook(c, s)
-        : cell.state === 'MINE' ? () => { const b = state.me.bookings.find(x => x.id === cell.booking); if (b) askCancel(b); } : null;
-      return el('td', null, el('button', { class: 'cell ' + cell.state, onclick: click, disabled: !click, 'aria-label': c.name + ' ' + fmtTime(s) + ' ' + T[cell.state] }, T[cell.state]));
+        : cell.state === 'MINE' ? () => { const b = state.me.bookings.find(x => x.id === cell.booking); if (b) askCancel(b); }
+        : cell.state === 'BUSY' && day.open && !cell.waiting ? () => openWait(c, s) : null;
+      const label = cell.waiting ? T.WAITING : T[cell.state];
+      return el('td', null, el('button', { class: 'cell ' + cell.state + (cell.waiting ? ' waiting' : ''), onclick: click, disabled: !click, 'aria-label': c.name + ' ' + fmtTime(s) + ' ' + label }, label));
     })));
   return el('div', { class: 'grid-wrap' }, el('table', { class: 'grid' }, el('thead', null, head), el('tbody', null, rows)));
 }
 
 // --- Prenota e disdici ---
 
-function sheet(...kids) { $('sheet-box').replaceChildren(...kids); $('sheet').hidden = false; }
+function sheet(...kids) { $('sheet-box').replaceChildren(...kids.filter(k => k != null && k !== false)); $('sheet').hidden = false; }
 function closeSheet() { $('sheet').hidden = true; }
 
 function openBook(court, start) {
@@ -323,6 +336,40 @@ function openBook(court, start) {
     state.me.payInfo ? el('p', { class: 'dim' }, T.pay + ': ' + state.me.payInfo) : null,
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), ok));
   quote();
+}
+
+/** Il campo com'è fatto, se è nel giorno a schermo; altrimenti solo il nome. */
+function courtByName(name) {
+  return (state.day && state.day.courts.find(c => c.name === name)) || { name };
+}
+
+/** Casella occupata: avvisami se si libera (quel campo, o un campo qualsiasi alla stessa ora). */
+function openWait(court, start) {
+  const any = el('input', { type: 'checkbox', id: 'any' });
+  const err = el('p', { class: 'error' });
+  const go = el('button', null, T.waitAsk);
+  go.addEventListener('click', async () => {
+    go.disabled = true;
+    try {
+      await api('POST', '/waits', { court: any.checked ? null : court.name, start, minutes: state.day.slotMinutes });
+      closeSheet(); toast(T.waitAdded); await refresh();
+    } catch (e) {
+      go.disabled = false;
+      err.textContent = errText(e);
+      if (e.code === 'FREE_NOW') { closeSheet(); toast(T.err.FREE_NOW); loadDay(); }
+    }
+  });
+  sheet(
+    el('h3', null, court.name), el('div', { class: 'dim' }, fmtWhen(start)),
+    el('p', null, T.waitText),
+    el('label', { class: 'check' }, any, T.waitAny),
+    PUSH_OK ? null : el('p', { class: 'dim' }, T.waitNoPush), err,
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), go));
+}
+
+async function removeWait(w) {
+  try { await api('DELETE', '/waits/' + encodeURIComponent(w.id)); } catch (_) { /* si riprova aggiornando */ }
+  refresh();
 }
 
 function askCancel(b) {

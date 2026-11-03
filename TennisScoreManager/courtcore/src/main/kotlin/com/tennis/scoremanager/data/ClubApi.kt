@@ -23,7 +23,12 @@ import kotlinx.serialization.Serializable
     val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
     /** I giorni prenotabili (yyyy-MM-dd nel fuso del circolo), da oggi. */
     val days: List<String>, val bookings: List<SrvMyBooking>,
+    /** Le liste d'attesa del giocatore: aperte, o già liberate (si prenota). */
+    val waits: List<SrvWait> = emptyList(),
 )
+/** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
+@Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)
+@Serializable data class SrvWaitIn(val court: String? = null, val start: Long, val minutes: Int)
 @Serializable data class SrvDay(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
 @Serializable data class SrvBookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
 @Serializable data class SrvQuote(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)

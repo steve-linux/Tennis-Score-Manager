@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
@@ -103,6 +104,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY" -> s.pbErrMany
     "TOO_LATE" -> s.pbErrLate
     "NOT_SYNCED" -> s.pbErrSynced
+    "FREE_NOW" -> s.pbErrFreeNow
+    "TOO_MANY_WAITS" -> s.pbErrManyWaits
     else -> s.srvErrOther(code)
 }
 
@@ -178,6 +181,7 @@ private fun BookingView(c: MatchController) {
     var error by remember { mutableStateOf<String?>(null) }
     var booking by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var cancel by remember { mutableStateOf<SrvMyBooking?>(null) }
+    var waitFor by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var leave by remember { mutableStateOf(false) }
     var tick by remember { mutableStateOf(0) }
 
@@ -217,6 +221,20 @@ private fun BookingView(c: MatchController) {
             TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
         }
 
+        // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
+        for (w in m.waits) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+            w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
+            TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+        }
+
         Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             m.days.forEachIndexed { i, d ->
@@ -235,7 +253,7 @@ private fun BookingView(c: MatchController) {
         }
         if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
         error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
-        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct) { court, start -> booking = court to start } }
+        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
 
         Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
             color = TsmColors.TextDim, fontSize = 12.sp)
@@ -253,6 +271,39 @@ private fun BookingView(c: MatchController) {
                 booking = null
                 if (done) { Toast.makeText(context, s.pbBooked, Toast.LENGTH_SHORT).show(); reload() }
             }
+        }
+        waitFor?.let { (court, start) ->
+            var any by remember(court.name, start) { mutableStateOf(false) }
+            var err by remember(court.name, start) { mutableStateOf<String?>(null) }
+            var busy by remember(court.name, start) { mutableStateOf(false) }
+            AlertDialog(
+                onDismissRequest = { waitFor = null },
+                title = { Text(court.name) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(ct.whenText(start), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(s.pbWaitText, color = TsmColors.TextDim, fontSize = 13.sp)
+                        SwitchRow(Icons.Filled.SportsTennis, s.pbWaitAny, null, any) { any = it }
+                        err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                    }
+                },
+                confirmButton = {
+                    TextButton(enabled = !busy, onClick = {
+                        busy = true
+                        scope.launch {
+                            c.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
+                                .onSuccess { waitFor = null; Toast.makeText(context, s.pbWaitAdded, Toast.LENGTH_SHORT).show(); reload() }
+                                .onFailure { e ->
+                                    val code = errCode(e)
+                                    if (code == "FREE_NOW") { waitFor = null; Toast.makeText(context, s.pbErrFreeNow, Toast.LENGTH_LONG).show(); reload() }
+                                    else err = bookErrorText(s, code)
+                                }
+                            busy = false
+                        }
+                    }) { Text(s.pbWaitAsk) }
+                },
+                dismissButton = { TextButton(onClick = { waitFor = null }) { Text(s.back) } },
+            )
         }
         cancel?.let { b ->
             var err by remember(b.id) { mutableStateOf(if (b.canCancel) null else s.pbCallOffice) }
@@ -291,7 +342,7 @@ private fun BookingView(c: MatchController) {
 
 /** Il giorno: un campo per colonna, un'ora per riga; si tocca una casella libera per prenotarla. */
 @Composable
-private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onFree: (CourtInfo, Long) -> Unit) {
+private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onBusy: (CourtInfo, Long) -> Unit, onFree: (CourtInfo, Long) -> Unit) {
     val starts = d.cells.map { it.start }.distinct().sorted()
     val cells = d.cells.associateBy { it.court to it.start }
     Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -310,15 +361,17 @@ private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onFree: (CourtInfo, Lon
                 val (bg, fg, label) = when (state) {
                     CellState.FREE -> Triple(TsmColors.Ball.copy(alpha = 0.16f), TsmColors.Ball, s.pbFree)
                     CellState.MINE -> Triple(TsmColors.Player1, TsmColors.OnPlayer1, s.pbMineCell)
-                    CellState.BUSY -> Triple(TsmColors.SurfaceHigh, TsmColors.TextDim, s.pbBusy)
+                    CellState.BUSY -> if (cell?.waiting == true) Triple(TsmColors.SurfaceHigh, TsmColors.Ball, s.pbWaiting) else Triple(TsmColors.SurfaceHigh, TsmColors.TextDim, s.pbBusy)
                     CellState.BLOCKED -> Triple(TsmColors.Surface, TsmColors.TextDim, s.pbBlocked)
                     CellState.PAST -> Triple(Color.Transparent, TsmColors.Outline, "")
                 }
                 val canBook = state == CellState.FREE && d.open
+                // Occupata: ci si mette in lista d'attesa (se non ci si è già).
+                val canWait = state == CellState.BUSY && d.open && cell?.waiting != true
                 Box(
                     Modifier.width(B_CELL_W.dp).height(B_CELL_H.dp).padding(1.dp).clip(RoundedCornerShape(6.dp)).background(bg)
-                        .border(1.dp, TsmColors.Outline.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
-                        .then(if (canBook) Modifier.clickable { onFree(court, start) } else Modifier),
+                        .border(1.dp, if (cell?.waiting == true) TsmColors.Ball else TsmColors.Outline.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                        .then(if (canBook) Modifier.clickable { onFree(court, start) } else if (canWait) Modifier.clickable { onBusy(court, start) } else Modifier),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(label, color = fg, fontSize = 12.sp, fontWeight = if (state == CellState.FREE || state == CellState.MINE) FontWeight.Bold else FontWeight.Normal,

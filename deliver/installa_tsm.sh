@@ -783,6 +783,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
 - **Datensicherung**: Alles steckt in einer Datei, `/var/lib/tsm-server/state.json`; ab und zu kopieren, und vor dem Neuschreiben des Sticks.
 - **Erinnerungen an Spieler**: Der Verein wählt, wie viele Stunden vor dem Spiel sie kommen (*Erinnerung an Spieler*, 0 = keine; meist 2). Auf der TSM-Seite tippt der Spieler auf **Erinnerungen einschalten** (am iPhone in der TSM-App auf dem Home-Bildschirm, mit iOS 16.4 oder neuer und der https-Adresse des Vereins) und bekommt sofort eine Probe-Benachrichtigung; die TSM-App auf Android hat **Erinnerungen auf dem Handy**. Er erfährt auch, wenn das Büro eine seiner Buchungen entfernt oder verschiebt (nicht, wenn er selbst storniert).
+- **Warteliste**: Tippt der Spieler auf ein **Belegt**-Feld (auf der TSM-Seite oder unter *Platz buchen* in der App), wählt er **Benachrichtigen, wenn frei**, für diesen Platz oder einen beliebigen Platz zur selben Zeit (höchstens 3 Wartende). Wird die Buchung storniert oder verschoben, bekommt er sofort einen Hinweis und auf der Seite erscheint **Buchen**: Wer zuerst bucht, bekommt es; ist ein anderer schneller, wartet er weiter. Wartende verschwinden von selbst, wenn die Zeit vorbei ist.
 - **Hinweise für das Büro**: Mit *Bei Online-Buchungen benachrichtigen* (normalerweise an) bekommt das Büro-Handy eine Benachrichtigung, wenn ein Spieler bucht oder storniert, auch bei geschlossener App: etwa alle 15 Minuten, wenn Netz da ist. Antippen öffnet die Platzbelegung am Tag der Buchung. Was das Büro selbst entfernt, löst keine Benachrichtigung aus.
 - **Von zu Hause** (Internet, per HTTPS: das braucht es auch, um die Seite auf den Home-Bildschirm des iPhones zu legen). Alles kostenlos:
   1. Auf **duckdns.org** (Anmeldung mit einem GitHub-, Google-… Konto) einen Namen anlegen, z. B. `tcprova.duckdns.org`, und den **Token** kopieren.
@@ -1311,6 +1312,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
 - **Reminders to players**: the club chooses how many hours before the match they arrive (*Reminder to players*, 0 = none; usually 2). On the TSM page the player taps **Turn reminders on** (on iPhone from the TSM app on the Home Screen, with iOS 16.4 or later and the club's https address) and gets a test notification right away; the TSM app on Android has **Reminders on the phone**. They are also told if the office removes or moves one of their bookings (not when they cancel it themselves).
+- **Waiting list**: tapping a **Taken** slot (on the TSM page or in *Book a court* in the app) the player chooses **Tell me if it frees up**, for that court or any court at the same time (3 waits at most). If the booking is cancelled or moved they get an alert right away and **Book** appears on the page: whoever books first gets it; if someone else is faster, they go back to waiting. Waits disappear by themselves once the time has passed.
 - **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
 - **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
   1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
@@ -1838,6 +1840,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
 - **Copia de los datos**: todo está en un solo archivo, `/var/lib/tsm-server/state.json`; conviene copiarlo de vez en cuando y antes de reescribir la memoria.
 - **Recordatorios a los jugadores**: el club elige cuántas horas antes del partido llegan (*Recordatorio a los jugadores*, 0 = no; normalmente 2). En la página TSM el jugador toca **Activar los recordatorios** (en iPhone desde la app TSM de la pantalla de inicio, con iOS 16.4 o posterior y la dirección https del club) y recibe enseguida una notificación de prueba; la app TSM en Android tiene **Recordatorios en el teléfono**. También se le avisa si la secretaría quita o mueve una de sus reservas (no si la anula él).
+- **Lista de espera**: tocando una casilla **Ocupada** (en la página TSM o en *Reservar pista* en la app) el jugador elige **Avísame si se libera**, para esa pista o cualquier pista a la misma hora (como mucho 3 esperas). Si la reserva se anula o se mueve, recibe el aviso enseguida y en la página aparece **Reservar**: la consigue quien reserve primero; si otro es más rápido, vuelve a esperar. Las esperas desaparecen solas cuando pasa la hora.
 - **Avisos para la secretaría**: con *Avisarme de las reservas en línea* (encendido por defecto) el teléfono de la secretaría recibe una notificación cuando un jugador reserva o anula, también con la app cerrada: cada 15 minutos más o menos, cuando hay red. Al tocarla se abre el planning en el día de la reserva. Las que quita la propia secretaría no avisan.
 - **Desde casa** (internet, en HTTPS: también hace falta para poner la página en la pantalla de inicio del iPhone). Todo gratis:
   1. En **duckdns.org** (se entra con una cuenta de GitHub, Google…) se crea un nombre, p. ej. `tcprova.duckdns.org`, y se copia el **token**.
@@ -2365,6 +2368,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
 - **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
 - **Rappels aux joueurs** : le club choisit combien d'heures avant le match ils arrivent (*Rappel aux joueurs*, 0 = aucun ; en général 2). Sur la page TSM le joueur touche **Activer les rappels** (sur iPhone depuis l'app TSM de l'écran d'accueil, avec iOS 16.4 ou plus récent et l'adresse https du club) et reçoit tout de suite une notification d'essai ; l'app TSM sur Android a **Rappels sur le téléphone**. Il est aussi prévenu si le secrétariat retire ou déplace une de ses réservations (pas s'il l'annule lui-même).
+- **Liste d'attente** : en touchant un créneau **Occupé** (sur la page TSM ou dans *Réserver un terrain* dans l'app), le joueur choisit **Me prévenir s'il se libère**, pour ce terrain ou n'importe quel terrain à la même heure (3 attentes au maximum). Si la réservation est annulée ou déplacée, il est prévenu tout de suite et **Réserver** apparaît sur la page : le premier qui réserve l'obtient ; si un autre est plus rapide, il reprend l'attente. Les attentes disparaissent seules une fois l'heure passée.
 - **Alertes pour le secrétariat** : avec *Me prévenir des réservations en ligne* (activé par défaut), le téléphone du secrétariat reçoit une notification quand un joueur réserve ou annule, même app fermée : environ toutes les 15 minutes, quand il y a du réseau. En la touchant, le planning s'ouvre sur le jour de la réservation. Celles que le secrétariat retire lui-même ne donnent pas de notification.
 - **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
   1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
@@ -2892,6 +2896,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
 - **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
 - **Promemoria ai giocatori**: il circolo sceglie quante ore prima della partita arriva (*Promemoria ai giocatori*, 0 = nessuno; di solito 2). Nella pagina TSM il giocatore tocca **Attiva i promemoria** (su iPhone dall'app TSM sulla schermata Home, con iOS 16.4 o più recente e l'indirizzo https del circolo) e riceve subito una notifica di prova; nell'app TSM su Android c'è **Promemoria sul telefono**. Arriva anche un avviso se la segreteria toglie o sposta una sua prenotazione (non se la disdice lui).
+- **Lista d'attesa**: toccando una casella **Occupato** (nella pagina TSM o in *Prenota un campo* nell'app) il giocatore sceglie **Avvisami se si libera**, per quel campo o per un campo qualsiasi alla stessa ora (al massimo 3 attese). Se la prenotazione viene disdetta o spostata gli arriva subito l'avviso e nella pagina compare **Prenota**: vince chi prenota per primo; se un altro arriva prima, si torna ad aspettare. Le attese spariscono da sole quando l'ora passa.
 - **Avvisi alla segreteria**: con *Avvisami delle prenotazioni online* (acceso di solito) il telefono della segreteria riceve una notifica quando un giocatore prenota o disdice, anche ad app chiusa: ogni 15 minuti circa, quando c'è rete. Toccandola si apre il planning sul giorno della prenotazione. Quelle tolte dalla segreteria stessa non danno notifica.
 - **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
   1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
@@ -3419,6 +3424,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
 - **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
 - **Lembretes aos jogadores**: o clube escolhe quantas horas antes do jogo chegam (*Lembrete aos jogadores*, 0 = não; normalmente 2). Na página TSM o jogador toca em **Ativar os lembretes** (no iPhone a partir da app TSM do ecrã principal, com iOS 16.4 ou mais recente e o endereço https do clube) e recebe logo uma notificação de teste; a app TSM no Android tem **Lembretes no telemóvel**. Também é avisado se a secretaria retirar ou mudar uma das suas reservas (não se for ele a cancelar).
+- **Lista de espera**: ao tocar numa casa **Ocupada** (na página TSM ou em *Reservar quadra* na app) o jogador escolhe **Avisa-me se ficar livre**, para essa quadra ou qualquer quadra à mesma hora (no máximo 3 esperas). Se a reserva for cancelada ou mudada, recebe logo o aviso e na página aparece **Reservar**: fica com ela quem reservar primeiro; se outro for mais rápido, volta a esperar. As esperas desaparecem sozinhas quando a hora passa.
 - **Avisos para a secretaria**: com *Avisar-me das reservas online* (ligado por omissão) o telemóvel da secretaria recebe uma notificação quando um jogador reserva ou cancela, mesmo com a app fechada: mais ou menos a cada 15 minutos, quando há rede. Ao tocá-la abre-se a agenda no dia da reserva. As que a própria secretaria tira não dão notificação.
 - **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
   1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
@@ -6286,8 +6292,12 @@ class MatchController(
         val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
             bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
         }
-        saveBookingAccount(news.account)
-        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(app, strings, news.remind.map { it.label }, news.removed.map { it.label })
+        val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
+        saveBookingAccount(acc)
+        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
+            app, strings, news.remind.map { it.label }, news.removed.map { it.label },
+            freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
+        )
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
@@ -10810,6 +10820,8 @@ data class BookingAccount(
     val mine: Map<String, SeenBooking>? = null,
     val reminded: List<String> = emptyList(),
     val cancelledHere: List<String> = emptyList(),
+    /** Le liste d'attesa liberate di cui si è già dato l'avviso. */
+    val freedSeen: List<String> = emptyList(),
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 }
@@ -10876,7 +10888,14 @@ object ClubServers {
     }
 
     /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
-    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount)
+    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount, val freed: List<SrvWait> = emptyList())
+
+    /** Le liste d'attesa appena liberate (avviso una volta sola). */
+    fun freedNews(a: BookingAccount, waits: List<SrvWait>): Pair<List<SrvWait>, BookingAccount> {
+        val freed = waits.filter { it.freedCourt != null }
+        val fresh = freed.filter { it.id !in a.freedSeen }
+        return fresh to a.copy(freedSeen = freed.map { it.id })
+    }
 
     /**
      * Le notifiche del giocatore: il promemoria entro [remindHours] dall'inizio (una volta; la prima volta che si
@@ -10985,6 +11004,8 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
     fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
     fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
+    fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
+    fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
 }
 TSM_EOF
 
@@ -19323,8 +19344,8 @@ object OnlineAlerts {
     const val EXTRA_BOOK = "tsm.bookCourt"
 
     /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
-    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>) {
-        if (remind.isEmpty() && removed.isEmpty() || !allowed(context)) return
+    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>, freed: List<String> = emptyList()) {
+        if (remind.isEmpty() && removed.isEmpty() && freed.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
         val open = PendingIntent.getActivity(
@@ -19333,7 +19354,7 @@ object OnlineAlerts {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         // Una notifica per ciascuna: il promemoria di una partita non deve coprire l'avviso di un'altra.
-        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it }).forEachIndexed { i, (title, text) ->
+        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it } + freed.map { s.pbAlertFreed to it }).forEachIndexed { i, (title, text) ->
             val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_tennis)
                 .setContentTitle(title).setContentText(text)
@@ -26128,6 +26149,19 @@ interface Strings {
     val pbAlertChannel: String
     val pbAlertReminder: String
     val pbAlertRemoved: String
+    val pbWaiting: String
+    val pbWaitText: String
+    val pbWaitAny: String
+    val pbWaitAsk: String
+    val pbWaitAdded: String
+    val pbWaitList: String
+    val pbWaitFreed: String
+    val pbWaitAnyCourt: String
+    val pbWaitRemove: String
+    val pbBookNow: String
+    val pbErrFreeNow: String
+    val pbErrManyWaits: String
+    val pbAlertFreed: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -28023,6 +28057,19 @@ object ItStrings : Strings {
     override val pbAlertChannel = "Le tue prenotazioni"
     override val pbAlertReminder = "Promemoria della partita"
     override val pbAlertRemoved = "Prenotazione tolta dalla segreteria"
+    override val pbWaiting = "In attesa"
+    override val pbWaitText = "Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo."
+    override val pbWaitAny = "Va bene un campo qualsiasi a quest'ora"
+    override val pbWaitAsk = "Avvisami se si libera"
+    override val pbWaitAdded = "Sei in lista d'attesa"
+    override val pbWaitList = "In lista d'attesa"
+    override val pbWaitFreed = "Si è liberato!"
+    override val pbWaitAnyCourt = "Un campo qualsiasi"
+    override val pbWaitRemove = "Togli"
+    override val pbBookNow = "Prenota"
+    override val pbErrFreeNow = "Si è appena liberata: prenotala subito!"
+    override val pbErrManyWaits = "Sei già in attesa per 3 caselle: togline una prima."
+    override val pbAlertFreed = "Si è liberato un campo: prenotalo!"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -29899,6 +29946,19 @@ object EnStrings : Strings {
     override val pbAlertChannel = "Your bookings"
     override val pbAlertReminder = "Match reminder"
     override val pbAlertRemoved = "Booking removed by the club office"
+    override val pbWaiting = "Waiting"
+    override val pbWaitText = "This slot is taken. If it becomes free we tell you right away: whoever books first gets it."
+    override val pbWaitAny = "Any court at this time is fine"
+    override val pbWaitAsk = "Tell me if it frees up"
+    override val pbWaitAdded = "You are on the waiting list"
+    override val pbWaitList = "On the waiting list"
+    override val pbWaitFreed = "It's free now!"
+    override val pbWaitAnyCourt = "Any court"
+    override val pbWaitRemove = "Remove"
+    override val pbBookNow = "Book"
+    override val pbErrFreeNow = "It has just become free: book it now!"
+    override val pbErrManyWaits = "You are already waiting for 3 slots: remove one first."
+    override val pbAlertFreed = "A court is free: book it!"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -31798,6 +31858,19 @@ object DeStrings : Strings {
     override val pbAlertChannel = "Deine Buchungen"
     override val pbAlertReminder = "Erinnerung an dein Spiel"
     override val pbAlertRemoved = "Buchung vom Vereinsbüro entfernt"
+    override val pbWaiting = "Wartend"
+    override val pbWaitText = "Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es."
+    override val pbWaitAny = "Jeder Platz zu dieser Zeit ist recht"
+    override val pbWaitAsk = "Benachrichtigen, wenn frei"
+    override val pbWaitAdded = "Du stehst auf der Warteliste"
+    override val pbWaitList = "Auf der Warteliste"
+    override val pbWaitFreed = "Jetzt frei!"
+    override val pbWaitAnyCourt = "Beliebiger Platz"
+    override val pbWaitRemove = "Entfernen"
+    override val pbBookNow = "Buchen"
+    override val pbErrFreeNow = "Gerade frei geworden: Buch es jetzt!"
+    override val pbErrManyWaits = "Du wartest schon auf 3 Felder: Entferne zuerst eins."
+    override val pbAlertFreed = "Ein Platz ist frei geworden: Buch ihn!"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -33690,6 +33763,19 @@ object EsStrings : Strings {
     override val pbAlertChannel = "Tus reservas"
     override val pbAlertReminder = "Recordatorio del partido"
     override val pbAlertRemoved = "Reserva quitada por la secretaría"
+    override val pbWaiting = "En espera"
+    override val pbWaitText = "Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero."
+    override val pbWaitAny = "Me vale cualquier pista a esta hora"
+    override val pbWaitAsk = "Avísame si se libera"
+    override val pbWaitAdded = "Estás en la lista de espera"
+    override val pbWaitList = "En lista de espera"
+    override val pbWaitFreed = "¡Se ha liberado!"
+    override val pbWaitAnyCourt = "Cualquier pista"
+    override val pbWaitRemove = "Quitar"
+    override val pbBookNow = "Reservar"
+    override val pbErrFreeNow = "Se acaba de liberar: ¡resérvala ya!"
+    override val pbErrManyWaits = "Ya esperas 3 casillas: quita una primero."
+    override val pbAlertFreed = "Se ha liberado una pista: ¡resérvala!"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -35584,6 +35670,19 @@ object FrStrings : Strings {
     override val pbAlertChannel = "Vos réservations"
     override val pbAlertReminder = "Rappel du match"
     override val pbAlertRemoved = "Réservation retirée par le secrétariat"
+    override val pbWaiting = "En attente"
+    override val pbWaitText = "Ce créneau est occupé. S'il se libère, nous vous prévenons tout de suite : le premier qui réserve l'obtient."
+    override val pbWaitAny = "N'importe quel terrain à cette heure"
+    override val pbWaitAsk = "Me prévenir s'il se libère"
+    override val pbWaitAdded = "Vous êtes sur liste d'attente"
+    override val pbWaitList = "Sur liste d'attente"
+    override val pbWaitFreed = "Il s'est libéré !"
+    override val pbWaitAnyCourt = "N'importe quel terrain"
+    override val pbWaitRemove = "Retirer"
+    override val pbBookNow = "Réserver"
+    override val pbErrFreeNow = "Il vient de se libérer : réservez-le vite !"
+    override val pbErrManyWaits = "Vous attendez déjà 3 créneaux : retirez-en un d'abord."
+    override val pbAlertFreed = "Un terrain s'est libéré : réservez-le !"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -37479,6 +37578,19 @@ object PtStrings : Strings {
     override val pbAlertChannel = "As tuas reservas"
     override val pbAlertReminder = "Lembrete do jogo"
     override val pbAlertRemoved = "Reserva retirada pela secretaria"
+    override val pbWaiting = "Em espera"
+    override val pbWaitText = "Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro."
+    override val pbWaitAny = "Serve qualquer quadra a esta hora"
+    override val pbWaitAsk = "Avisa-me se ficar livre"
+    override val pbWaitAdded = "Estás na lista de espera"
+    override val pbWaitList = "Na lista de espera"
+    override val pbWaitFreed = "Ficou livre!"
+    override val pbWaitAnyCourt = "Qualquer quadra"
+    override val pbWaitRemove = "Tirar"
+    override val pbBookNow = "Reservar"
+    override val pbErrFreeNow = "Acabou de ficar livre: reserva-a já!"
+    override val pbErrManyWaits = "Já esperas por 3 casas: tira uma primeiro."
+    override val pbAlertFreed = "Ficou livre uma quadra: reserva-a!"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -38083,6 +38195,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
@@ -38158,6 +38271,8 @@ fun bookErrorText(s: Strings, code: String): String = when (code) {
     "TOO_MANY" -> s.pbErrMany
     "TOO_LATE" -> s.pbErrLate
     "NOT_SYNCED" -> s.pbErrSynced
+    "FREE_NOW" -> s.pbErrFreeNow
+    "TOO_MANY_WAITS" -> s.pbErrManyWaits
     else -> s.srvErrOther(code)
 }
 
@@ -38233,6 +38348,7 @@ private fun BookingView(c: MatchController) {
     var error by remember { mutableStateOf<String?>(null) }
     var booking by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var cancel by remember { mutableStateOf<SrvMyBooking?>(null) }
+    var waitFor by remember { mutableStateOf<Pair<CourtInfo, Long>?>(null) }
     var leave by remember { mutableStateOf(false) }
     var tick by remember { mutableStateOf(0) }
 
@@ -38272,6 +38388,20 @@ private fun BookingView(c: MatchController) {
             TextButton(onClick = { cancel = b }) { Text(s.pbCancel, color = TsmColors.Danger) }
         }
 
+        // Le liste d'attesa: aperte, o liberate (Prenota, prima di un altro).
+        for (w in m.waits) Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(TsmColors.Surface)
+                .border(1.dp, if (w.freedCourt != null) TsmColors.Ball else Color.Transparent, RoundedCornerShape(14.dp)).padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(if (w.freedCourt != null) s.pbWaitFreed else s.pbWaitList, color = if (w.freedCourt != null) TsmColors.Ball else TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                Text("${w.freedCourt ?: w.court ?: s.pbWaitAnyCourt} · ${ct.whenText(w.start)}", color = TsmColors.TextDim, fontSize = 13.sp)
+            }
+            w.freedCourt?.let { fc -> TextButton(onClick = { booking = (day?.courts?.firstOrNull { it.name == fc } ?: CourtInfo(fc)) to w.start }) { Text(s.pbBookNow, color = TsmColors.Ball) } }
+            TextButton(onClick = { scope.launch { c.booking { it.removeWait(w.id) }; reload() } }) { Text(s.pbWaitRemove, color = TsmColors.TextDim) }
+        }
+
         Text(s.pbDay, color = TsmColors.TextDim, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             m.days.forEachIndexed { i, d ->
@@ -38290,7 +38420,7 @@ private fun BookingView(c: MatchController) {
         }
         if (!m.rules.open) Text(s.pbClosed, color = TsmColors.Orange, fontSize = 13.sp)
         error?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
-        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct) { court, start -> booking = court to start } }
+        day?.takeIf { it.date == date }?.let { d -> DayGrid(s, d, ct, onBusy = { court, start -> waitFor = court to start }) { court, start -> booking = court to start } }
 
         Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
             color = TsmColors.TextDim, fontSize = 12.sp)
@@ -38308,6 +38438,39 @@ private fun BookingView(c: MatchController) {
                 booking = null
                 if (done) { Toast.makeText(context, s.pbBooked, Toast.LENGTH_SHORT).show(); reload() }
             }
+        }
+        waitFor?.let { (court, start) ->
+            var any by remember(court.name, start) { mutableStateOf(false) }
+            var err by remember(court.name, start) { mutableStateOf<String?>(null) }
+            var busy by remember(court.name, start) { mutableStateOf(false) }
+            AlertDialog(
+                onDismissRequest = { waitFor = null },
+                title = { Text(court.name) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(ct.whenText(start), color = TsmColors.TextMain, fontWeight = FontWeight.Bold)
+                        Text(s.pbWaitText, color = TsmColors.TextDim, fontSize = 13.sp)
+                        SwitchRow(Icons.Filled.SportsTennis, s.pbWaitAny, null, any) { any = it }
+                        err?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                    }
+                },
+                confirmButton = {
+                    TextButton(enabled = !busy, onClick = {
+                        busy = true
+                        scope.launch {
+                            c.booking { it.addWait(com.tennis.scoremanager.data.SrvWaitIn(if (any) null else court.name, start, day?.slotMinutes ?: 60)) }
+                                .onSuccess { waitFor = null; Toast.makeText(context, s.pbWaitAdded, Toast.LENGTH_SHORT).show(); reload() }
+                                .onFailure { e ->
+                                    val code = errCode(e)
+                                    if (code == "FREE_NOW") { waitFor = null; Toast.makeText(context, s.pbErrFreeNow, Toast.LENGTH_LONG).show(); reload() }
+                                    else err = bookErrorText(s, code)
+                                }
+                            busy = false
+                        }
+                    }) { Text(s.pbWaitAsk) }
+                },
+                dismissButton = { TextButton(onClick = { waitFor = null }) { Text(s.back) } },
+            )
         }
         cancel?.let { b ->
             var err by remember(b.id) { mutableStateOf(if (b.canCancel) null else s.pbCallOffice) }
@@ -38346,7 +38509,7 @@ private fun BookingView(c: MatchController) {
 
 /** Il giorno: un campo per colonna, un'ora per riga; si tocca una casella libera per prenotarla. */
 @Composable
-private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onFree: (CourtInfo, Long) -> Unit) {
+private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onBusy: (CourtInfo, Long) -> Unit, onFree: (CourtInfo, Long) -> Unit) {
     val starts = d.cells.map { it.start }.distinct().sorted()
     val cells = d.cells.associateBy { it.court to it.start }
     Column(Modifier.horizontalScroll(rememberScrollState())) {
@@ -38365,15 +38528,17 @@ private fun DayGrid(s: Strings, d: SrvDay, ct: ClubTime, onFree: (CourtInfo, Lon
                 val (bg, fg, label) = when (state) {
                     CellState.FREE -> Triple(TsmColors.Ball.copy(alpha = 0.16f), TsmColors.Ball, s.pbFree)
                     CellState.MINE -> Triple(TsmColors.Player1, TsmColors.OnPlayer1, s.pbMineCell)
-                    CellState.BUSY -> Triple(TsmColors.SurfaceHigh, TsmColors.TextDim, s.pbBusy)
+                    CellState.BUSY -> if (cell?.waiting == true) Triple(TsmColors.SurfaceHigh, TsmColors.Ball, s.pbWaiting) else Triple(TsmColors.SurfaceHigh, TsmColors.TextDim, s.pbBusy)
                     CellState.BLOCKED -> Triple(TsmColors.Surface, TsmColors.TextDim, s.pbBlocked)
                     CellState.PAST -> Triple(Color.Transparent, TsmColors.Outline, "")
                 }
                 val canBook = state == CellState.FREE && d.open
+                // Occupata: ci si mette in lista d'attesa (se non ci si è già).
+                val canWait = state == CellState.BUSY && d.open && cell?.waiting != true
                 Box(
                     Modifier.width(B_CELL_W.dp).height(B_CELL_H.dp).padding(1.dp).clip(RoundedCornerShape(6.dp)).background(bg)
-                        .border(1.dp, TsmColors.Outline.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
-                        .then(if (canBook) Modifier.clickable { onFree(court, start) } else Modifier),
+                        .border(1.dp, if (cell?.waiting == true) TsmColors.Ball else TsmColors.Outline.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                        .then(if (canBook) Modifier.clickable { onFree(court, start) } else if (canWait) Modifier.clickable { onBusy(court, start) } else Modifier),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(label, color = fg, fontSize = 12.sp, fontWeight = if (state == CellState.FREE || state == CellState.MINE) FontWeight.Bold else FontWeight.Normal,
@@ -66875,6 +67040,14 @@ class ClubServersTest {
         val gone = ClubServers.myNews(withCd.account.copy(cancelledHere = listOf("d")), listOf(mb("b", now + 10 * h)), 2, later, label)
         assertEquals(listOf("c"), gone.removed.map { it.label })
     }
+
+    @Test fun freedWaitsAlertOnce() {
+        val a = BookingAccount("http://x", "t")
+        val waits = listOf(SrvWait("w1", "Campo 1", now + 5 * h, 60), SrvWait("w2", null, now + 6 * h, 60, freedCourt = "Campo 2"))
+        val (fresh, next) = ClubServers.freedNews(a, waits)
+        assertEquals(listOf("w2"), fresh.map { it.id })
+        assertTrue(ClubServers.freedNews(next, waits).first.isEmpty())
+    }
 }
 TSM_EOF
 
@@ -71597,7 +71770,12 @@ import kotlinx.serialization.Serializable
     val name: String, val club: String, val timeZone: String, val rules: BookingRules, val payInfo: String,
     /** I giorni prenotabili (yyyy-MM-dd nel fuso del circolo), da oggi. */
     val days: List<String>, val bookings: List<SrvMyBooking>,
+    /** Le liste d'attesa del giocatore: aperte, o già liberate (si prenota). */
+    val waits: List<SrvWait> = emptyList(),
 )
+/** Una lista d'attesa vista dal giocatore: [freedCourt] non null = si è liberato quel campo. */
+@Serializable data class SrvWait(val id: String, val court: String? = null, val start: Long, val minutes: Int, val freedCourt: String? = null)
+@Serializable data class SrvWaitIn(val court: String? = null, val start: Long, val minutes: Int)
 @Serializable data class SrvDay(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
 @Serializable data class SrvBookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
 @Serializable data class SrvQuote(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
@@ -71693,7 +71871,25 @@ enum class CancelProblem { NOT_FOUND, NOT_YOURS, TOO_LATE }
 enum class CellState { FREE, BUSY, MINE, BLOCKED, PAST }
 
 @Serializable
-data class Cell(val court: String, val start: Long, val state: CellState, val booking: String? = null)
+data class Cell(
+    val court: String, val start: Long, val state: CellState, val booking: String? = null,
+    /** Il giocatore aspetta che questa casella si liberi (lista d'attesa). */
+    val waiting: Boolean = false,
+)
+
+/**
+ * Un giocatore in lista d'attesa per una casella occupata: quel campo, o qualsiasi campo ([court] null) alla stessa
+ * ora. Quando si libera ([freedAt], [freedCourt]) gli arriva l'avviso; vince chi prenota per primo.
+ */
+@Serializable
+data class Wait(
+    val id: String, val player: String, val court: String? = null, val start: Long, val minutes: Int,
+    val createdAt: Long = 0, val freedAt: Long? = null, val freedCourt: String? = null,
+)
+
+/** Perché non si può mettersi in lista d'attesa: oltre ai motivi della prenotazione, la casella è libera (si prenota). */
+@Serializable
+enum class WaitProblem { FREE_NOW, TOO_MANY_WAITS, BOOKING }
 
 object CourtOnline {
     /** I campi che si prenotano online. */
@@ -71734,6 +71930,28 @@ object CourtOnline {
         }
     }
 
+    /** I campi a cui guarda una lista d'attesa: il suo, o tutti quelli prenotabili online. */
+    fun waitCourts(sync: ClubSync, court: String?): List<String> = if (court != null) listOf(court) else bookableCourts(sync)
+
+    /**
+     * Ci si può mettere in lista d'attesa? Solo se la casella è occupata (su almeno uno dei campi guardati) e per il
+     * resto si potrebbe prenotare: null = sì; [BookingProblem] = il motivo della prenotazione che vale anche qui.
+     */
+    fun checkWait(sync: ClubSync, bookings: List<OnlineBooking>, player: String, court: String?, start: Long, minutes: Int, now: Long): Pair<WaitProblem, BookingProblem?>? {
+        val courts = waitCourts(sync, court)
+        if (courts.isEmpty()) return WaitProblem.BOOKING to BookingProblem.UNKNOWN_COURT
+        val problems = courts.map { check(sync, bookings, player, it, start, minutes, now) }
+        if (problems.any { it == null }) return WaitProblem.FREE_NOW to null
+        if (problems.none { it == BookingProblem.TAKEN }) return WaitProblem.BOOKING to problems.first()
+        // Occupato su qualche campo: va bene, a meno che il motivo vero sia un altro (troppo lontano, chiuso…).
+        val other = problems.firstOrNull { it != BookingProblem.TAKEN && it != BookingProblem.BLOCKED && it != BookingProblem.UNKNOWN_COURT }
+        return other?.let { WaitProblem.BOOKING to it }
+    }
+
+    /** Il campo che si è liberato per [w] (si può prenotare adesso), o null. */
+    fun freedCourt(sync: ClubSync, bookings: List<OnlineBooking>, w: Wait, now: Long): String? =
+        waitCourts(sync, w.court).firstOrNull { check(sync, bookings, w.player, it, w.start, w.minutes, now) == null }
+
     /** La prenotazione già fatta online, pronta da salvare (prezzo e luci come in segreteria). */
     fun make(sync: ClubSync, id: String, player: String, name: String, court: String, start: Long, minutes: Int, heating: Boolean, now: Long): OnlineBooking {
         val h = heating && sync.settings.info(court).heating
@@ -71755,7 +71973,7 @@ object CourtOnline {
     }
 
     /** Il giorno per il giocatore: ogni casella di ogni campo prenotabile, senza dire chi ha prenotato le altre. */
-    fun grid(sync: ClubSync, bookings: List<OnlineBooking>, player: String, day: Long, now: Long): List<Cell> {
+    fun grid(sync: ClubSync, bookings: List<OnlineBooking>, player: String, day: Long, now: Long, waits: List<Wait> = emptyList()): List<Cell> {
         val step = sync.settings.slotMinutes.coerceIn(15, 180) * 60_000L
         val slots = CourtTime.slots(day, sync.settings)
         return bookableCourts(sync).flatMap { court ->
@@ -71769,7 +71987,8 @@ object CourtOnline {
                     start < now -> CellState.PAST
                     else -> CellState.FREE
                 }
-                Cell(court, start, state, mine?.id)
+                val waiting = state == CellState.BUSY && waits.any { w -> w.player == player && w.freedAt == null && (w.court == null || w.court == court) && w.start < end && w.start + w.minutes * 60_000L > start }
+                Cell(court, start, state, mine?.id, waiting)
             }
         }
     }
@@ -74048,6 +74267,10 @@ import com.tennis.scoremanager.data.SrvInviteIn
 import com.tennis.scoremanager.data.SrvOk
 import com.tennis.scoremanager.data.SrvPlayer
 import com.tennis.scoremanager.data.SrvPushKey
+import com.tennis.scoremanager.data.SrvWait
+import com.tennis.scoremanager.data.SrvWaitIn
+import com.tennis.scoremanager.data.Wait
+import com.tennis.scoremanager.data.WaitProblem
 import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
@@ -74119,6 +74342,8 @@ class Api(
             r.method == "GET" && p == listOf("quote") -> quote(player(r), r.query)
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
             r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
+            r.method == "POST" && p == listOf("waits") -> addWait(player(r), r)
+            r.method == "DELETE" && p.size == 2 && p[0] == "waits" -> removeWait(player(r), p[1])
             r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
             r.method == "GET" && p == listOf("push", "key") -> { player(r); ok(SrvPushKey.serializer(), SrvPushKey(vapid().publicKey)) }
             r.method == "POST" && p == listOf("push", "subscribe") -> subscribe(player(r), r)
@@ -74183,6 +74408,8 @@ class Api(
                 invites = s.invites.filter { it.expires > now },
             ) to Unit
         }
+        // Il planning nuovo può aver liberato delle caselle.
+        checkWaits(now)
         return adminState()
     }
 
@@ -74208,6 +74435,7 @@ class Api(
             ?: throw ApiError(404, "NOT_FOUND")
         // Tolta (o spostata) dalla segreteria: il giocatore lo sa subito, se la partita non è già passata.
         if (gone.start > store.now()) push(gone.player, ttl = 24 * 3600) { PushTexts.removed(it.lang, gone, store.state.sync.timeZone) }
+        checkWaits(store.now())
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -74262,11 +74490,12 @@ class Api(
             s.copy(reminded = (s.reminded.filter { it in ids } + inWindow.map { it.id }).distinct()) to send
         }
         for (b in due) push(b.player, ttl = ((b.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.reminder(it.lang, b, store.state.sync.timeZone) }
+        checkWaits(now)
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
-        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }) to Unit }
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }, waits = s.waits.filter { it.player != id }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -74300,7 +74529,8 @@ class Api(
         val now = store.now()
         val today = Instant.ofEpochMilli(now).atZone(zone()).toLocalDate()
         val days = (0..s.sync.rules.daysAhead.coerceIn(0, 60)).map { today.plusDays(it.toLong()).toString() }
-        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }))
+        val waits = s.waits.filter { it.player == pl.id && it.start > now }.sortedBy { it.start }.map { SrvWait(it.id, it.court, it.start, it.minutes, it.freedCourt) }
+        return ok(SrvMe.serializer(), SrvMe(pl.name, s.sync.club, s.sync.timeZone, s.sync.rules, s.sync.payInfo, days, CourtOnline.future(s.bookings, pl.id, now).map { mine(pl, it, now) }, waits))
     }
 
     private fun day(pl: Player, date: String?): Resp {
@@ -74309,7 +74539,7 @@ class Api(
         val d = try { LocalDate.parse(date ?: "") } catch (_: Exception) { throw ApiError(400, "BAD_DATE") }
         val day = d.atStartOfDay(zone()).toInstant().toEpochMilli()
         val courts = CourtOnline.bookableCourts(s.sync).map { s.sync.settings.info(it).copy(photos = emptyList()) }
-        return ok(SrvDay.serializer(), SrvDay(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now())))
+        return ok(SrvDay.serializer(), SrvDay(d.toString(), s.sync.timeZone, s.sync.settings.slotMinutes, s.sync.rules.open, courts, CourtOnline.grid(s.sync, s.bookings, pl.id, day, store.now(), s.waits)))
     }
 
     /** Quanto costerebbe e se si può fare, prima di confermare. */
@@ -74334,7 +74564,8 @@ class Api(
             if (problem != null) s to Result.failure(ApiError(409, problem.name))
             else {
                 val nb = CourtOnline.make(s.sync, Secrets.id("w"), pl.id, pl.name, b.court, b.start, b.minutes, b.heating, now)
-                s.copy(bookings = s.bookings + nb) to Result.success(nb)
+                // Prenotato: le sue attese per quell'ora non servono più.
+                s.copy(bookings = s.bookings + nb, waits = s.waits.filter { !(it.player == pl.id && it.start == b.start && (it.court == null || it.court == b.court)) }) to Result.success(nb)
             }
         }
         val nb = res.getOrElse { throw it }
@@ -74348,7 +74579,59 @@ class Api(
             (if (p == null) s.copy(bookings = s.bookings.filter { it.id != id }) else s) to p
         }
         if (problem != null) throw ApiError(if (problem.name == "NOT_FOUND") 404 else 409, problem.name)
+        checkWaits(now)
         return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Liste d'attesa ---
+
+    private fun addWait(pl: Player, r: Req): Resp {
+        val w = read(SrvWaitIn.serializer(), r)
+        if (store.state.syncedAt == 0L) throw ApiError(503, "NOT_SYNCED")
+        val now = store.now()
+        val res = store.update { s ->
+            val problem = CourtOnline.checkWait(s.sync, s.bookings, pl.id, w.court, w.start, w.minutes, now)
+            val open = s.waits.filter { it.player == pl.id && it.freedAt == null && !(it.court == w.court && it.start == w.start) }
+            when {
+                problem != null -> s to Result.failure(ApiError(409, if (problem.first == WaitProblem.FREE_NOW) "FREE_NOW" else problem.second!!.name))
+                // Con il massimo di prenotazioni, liberarsi un campo non servirebbe: non si potrebbe prenotarlo.
+                CourtOnline.future(s.bookings, pl.id, now).size >= s.sync.rules.maxFuture.coerceAtLeast(1) -> s to Result.failure(ApiError(409, "TOO_MANY"))
+                open.size >= 3 -> s to Result.failure(ApiError(409, "TOO_MANY_WAITS"))
+                else -> {
+                    val nw = Wait(Secrets.id("a"), pl.id, w.court, w.start, w.minutes, now)
+                    s.copy(waits = s.waits.filter { !(it.player == pl.id && it.court == w.court && it.start == w.start) } + nw) to Result.success(nw)
+                }
+            }
+        }
+        val nw = res.getOrElse { throw it }
+        return ok(SrvWait.serializer(), SrvWait(nw.id, nw.court, nw.start, nw.minutes), 201)
+    }
+
+    private fun removeWait(pl: Player, id: String): Resp {
+        store.update { s -> s.copy(waits = s.waits.filter { !(it.id == id && it.player == pl.id) }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Le caselle che si sono liberate: a chi aspetta arriva l'avviso (una volta), e la sua attesa resta "liberata"
+     * finché non prenota o la casella passa. Le attese di caselle già cominciate si tolgono.
+     */
+    fun checkWaits(now: Long = store.now()) {
+        val freed = store.update { s ->
+            val alive = s.waits.filter { it.start > now }
+            val news = mutableListOf<Pair<Wait, String>>()
+            val next = alive.map { w ->
+                if (w.freedAt != null) {
+                    // Liberata ma ripresa da un altro: si torna ad aspettare.
+                    if (CourtOnline.freedCourt(s.sync, s.bookings, w, now) == null) w.copy(freedAt = null, freedCourt = null) else w
+                } else {
+                    val court = CourtOnline.freedCourt(s.sync, s.bookings, w, now)
+                    if (court == null) w else w.copy(freedAt = now, freedCourt = court).also { news += it to court }
+                }
+            }
+            s.copy(waits = next) to news.toList()
+        }
+        for ((w, court) in freed) push(w.player, ttl = ((w.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.freed(it.lang, w, court, store.state.sync.timeZone) }
     }
 
     private fun logout(pl: Player, token: String): Resp {
@@ -74538,15 +74821,15 @@ import java.util.Locale
 
 /** I testi delle notifiche ai giocatori, nella lingua del loro telefono (quella della pagina quando si sono abbonati). */
 object PushTexts {
-    private data class T(val welcome: String, val welcomeBody: String, val reminder: String, val removed: String)
+    private data class T(val welcome: String, val welcomeBody: String, val reminder: String, val removed: String, val freed: String)
 
     private val texts = mapOf(
-        "it" to T("Promemoria attivi", "Ti avviseremo prima delle partite e se la segreteria cambia una prenotazione.", "Promemoria della partita", "Prenotazione tolta dalla segreteria"),
-        "en" to T("Reminders on", "We will remind you before your matches and tell you if the office changes a booking.", "Match reminder", "Booking removed by the club office"),
-        "fr" to T("Rappels activés", "Nous vous préviendrons avant vos matchs et si le secrétariat modifie une réservation.", "Rappel du match", "Réservation retirée par le secrétariat"),
-        "de" to T("Erinnerungen an", "Wir erinnern dich vor deinen Spielen und melden, wenn das Büro eine Buchung ändert.", "Erinnerung an dein Spiel", "Buchung vom Vereinsbüro entfernt"),
-        "es" to T("Recordatorios activados", "Te avisaremos antes de tus partidos y si la secretaría cambia una reserva.", "Recordatorio del partido", "Reserva quitada por la secretaría"),
-        "pt" to T("Lembretes ativos", "Vamos avisar-te antes dos jogos e se a secretaria mudar uma reserva.", "Lembrete do jogo", "Reserva retirada pela secretaria"),
+        "it" to T("Promemoria attivi", "Ti avviseremo prima delle partite e se la segreteria cambia una prenotazione.", "Promemoria della partita", "Prenotazione tolta dalla segreteria", "Si è liberato un campo: prenotalo!"),
+        "en" to T("Reminders on", "We will remind you before your matches and tell you if the office changes a booking.", "Match reminder", "Booking removed by the club office", "A court is free: book it!"),
+        "fr" to T("Rappels activés", "Nous vous préviendrons avant vos matchs et si le secrétariat modifie une réservation.", "Rappel du match", "Réservation retirée par le secrétariat", "Un terrain s'est libéré : réservez-le !"),
+        "de" to T("Erinnerungen an", "Wir erinnern dich vor deinen Spielen und melden, wenn das Büro eine Buchung ändert.", "Erinnerung an dein Spiel", "Buchung vom Vereinsbüro entfernt", "Ein Platz ist frei geworden: Buch ihn!"),
+        "es" to T("Recordatorios activados", "Te avisaremos antes de tus partidos y si la secretaría cambia una reserva.", "Recordatorio del partido", "Reserva quitada por la secretaría", "Se ha liberado una pista: ¡resérvala!"),
+        "pt" to T("Lembretes ativos", "Vamos avisar-te antes dos jogos e se a secretaria mudar uma reserva.", "Lembrete do jogo", "Reserva retirada pela secretaria", "Ficou livre uma quadra: reserva-a!"),
     )
 
     private fun t(lang: String) = texts[lang] ?: texts.getValue("en")
@@ -74566,6 +74849,8 @@ object PushTexts {
 
     fun welcome(lang: String, club: String) = json(t(lang).welcome, (club.ifBlank { "TSM" }) + ": " + t(lang).welcomeBody, "welcome", null)
     fun reminder(lang: String, b: OnlineBooking, zone: String) = json(t(lang).reminder, label(b, zone, lang), "r-${b.id}", b.start)
+    fun freed(lang: String, w: com.tennis.scoremanager.data.Wait, court: String, zone: String) =
+        json(t(lang).freed, label(OnlineBooking("", court, w.start, w.minutes, w.player, ""), zone, lang), "w-${w.id}", w.start)
     fun removed(lang: String, b: OnlineBooking, zone: String) = json(t(lang).removed, label(b, zone, lang), "x-${b.id}", b.start)
 }
 TSM_EOF
@@ -74619,6 +74904,8 @@ data class State(
     val pushSubs: List<PushSub> = emptyList(),
     /** Le prenotazioni di cui il promemoria è già partito. */
     val reminded: List<String> = emptyList(),
+    /** Le liste d'attesa dei giocatori per le caselle occupate. */
+    val waits: List<com.tennis.scoremanager.data.Wait> = emptyList(),
 )
 
 object Secrets {
@@ -75035,20 +75322,31 @@ function render(dayError) {
         el('div', { class: 'dim' }, money(b.cents), b.lights ? ' · ' + T.lights : '', b.heating ? ' · ' + T.heating : '')),
       el('button', { class: 'danger small', onclick: () => askCancel(b) }, T.cancel)));
 
+  // Le liste d'attesa: aperte, o liberate (si prenota subito, prima di un altro).
+  const waits = (me.waits || []).map(w => {
+    const where = (w.freedCourt || w.court || T.waitAnyCourt) + ' · ' + fmtWhen(w.start);
+    const book = w.freedCourt ? el('button', { class: 'small', onclick: () => openBook(courtByName(w.freedCourt), w.start) }, T.bookNow) : null;
+    return el('div', { class: 'card row' + (w.freedCourt ? ' freed' : '') },
+      el('div', { class: 'grow' },
+        el('div', null, el('b', null, w.freedCourt ? T.waitFreed : T.waitList)),
+        el('div', { class: 'dim' }, where)),
+      book, el('button', { class: 'ghost small', onclick: () => removeWait(w) }, T.waitRemove));
+  });
+
   const days = el('div', { class: 'days' }, me.days.map((d, i) => {
     const [wd, dm] = fmtDate(d);
     return el('button', { class: d === state.date ? 'on' : '', onclick: () => { state.date = d; loadDay(); } }, i === 0 ? T.today : wd, el('small', null, dm));
   }));
 
   const parts = [
-    el('h2', null, T.mine), ...mine,
+    el('h2', null, T.mine), ...mine, ...waits,
     el('h2', null, T.day), days,
   ];
   if (!r.open) parts.push(el('p', { class: 'error' }, T.closedNow));
   if (dayError) parts.push(el('p', { class: 'error' }, dayError));
   else if (state.day) parts.push(grid(state.day));
   parts.push(
-    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
+    el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'WAITING', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
   parts.push(el('div', { id: 'push' }));
@@ -75125,15 +75423,17 @@ function grid(day) {
       const cell = byKey.get(c.name + '|' + s);
       if (!cell) return el('td');
       const click = cell.state === 'FREE' && day.open ? () => openBook(c, s)
-        : cell.state === 'MINE' ? () => { const b = state.me.bookings.find(x => x.id === cell.booking); if (b) askCancel(b); } : null;
-      return el('td', null, el('button', { class: 'cell ' + cell.state, onclick: click, disabled: !click, 'aria-label': c.name + ' ' + fmtTime(s) + ' ' + T[cell.state] }, T[cell.state]));
+        : cell.state === 'MINE' ? () => { const b = state.me.bookings.find(x => x.id === cell.booking); if (b) askCancel(b); }
+        : cell.state === 'BUSY' && day.open && !cell.waiting ? () => openWait(c, s) : null;
+      const label = cell.waiting ? T.WAITING : T[cell.state];
+      return el('td', null, el('button', { class: 'cell ' + cell.state + (cell.waiting ? ' waiting' : ''), onclick: click, disabled: !click, 'aria-label': c.name + ' ' + fmtTime(s) + ' ' + label }, label));
     })));
   return el('div', { class: 'grid-wrap' }, el('table', { class: 'grid' }, el('thead', null, head), el('tbody', null, rows)));
 }
 
 // --- Prenota e disdici ---
 
-function sheet(...kids) { $('sheet-box').replaceChildren(...kids); $('sheet').hidden = false; }
+function sheet(...kids) { $('sheet-box').replaceChildren(...kids.filter(k => k != null && k !== false)); $('sheet').hidden = false; }
 function closeSheet() { $('sheet').hidden = true; }
 
 function openBook(court, start) {
@@ -75174,6 +75474,40 @@ function openBook(court, start) {
     state.me.payInfo ? el('p', { class: 'dim' }, T.pay + ': ' + state.me.payInfo) : null,
     el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), ok));
   quote();
+}
+
+/** Il campo com'è fatto, se è nel giorno a schermo; altrimenti solo il nome. */
+function courtByName(name) {
+  return (state.day && state.day.courts.find(c => c.name === name)) || { name };
+}
+
+/** Casella occupata: avvisami se si libera (quel campo, o un campo qualsiasi alla stessa ora). */
+function openWait(court, start) {
+  const any = el('input', { type: 'checkbox', id: 'any' });
+  const err = el('p', { class: 'error' });
+  const go = el('button', null, T.waitAsk);
+  go.addEventListener('click', async () => {
+    go.disabled = true;
+    try {
+      await api('POST', '/waits', { court: any.checked ? null : court.name, start, minutes: state.day.slotMinutes });
+      closeSheet(); toast(T.waitAdded); await refresh();
+    } catch (e) {
+      go.disabled = false;
+      err.textContent = errText(e);
+      if (e.code === 'FREE_NOW') { closeSheet(); toast(T.err.FREE_NOW); loadDay(); }
+    }
+  });
+  sheet(
+    el('h3', null, court.name), el('div', { class: 'dim' }, fmtWhen(start)),
+    el('p', null, T.waitText),
+    el('label', { class: 'check' }, any, T.waitAny),
+    PUSH_OK ? null : el('p', { class: 'dim' }, T.waitNoPush), err,
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: closeSheet }, T.close), go));
+}
+
+async function removeWait(w) {
+  try { await api('DELETE', '/waits/' + encodeURIComponent(w.id)); } catch (_) { /* si riprova aggiornando */ }
+  refresh();
 }
 
 function askCancel(b) {
@@ -75233,12 +75567,14 @@ const I18N = {
     pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
     notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
     install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
+    WAITING: 'In attesa', waitText: 'Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo.', waitAny: 'Va bene un campo qualsiasi a quest\'ora', waitAsk: 'Avvisami se si libera', waitAdded: 'Sei in lista d\'attesa', waitList: 'In lista d\'attesa', waitFreed: 'Si è liberato!', waitAnyCourt: 'Un campo qualsiasi', waitRemove: 'Togli', bookNow: 'Prenota', waitNoPush: 'Per l\'avviso sul telefono attiva i promemoria; intanto lo vedi qui quando apri la pagina.',
     pushTitle: 'Promemoria', pushHint: 'Una notifica sul telefono prima della partita e se la segreteria toglie una tua prenotazione.', pushOn: 'Attiva i promemoria', pushActive: 'Promemoria attivi su questo telefono.', pushOff: 'Spegni', pushDenied: 'Le notifiche per questa pagina sono bloccate: permettile nelle impostazioni del telefono.', pushIos: 'Su iPhone i promemoria arrivano nell\'app TSM sulla schermata Home (iOS 16.4 o più recente).', pushHttps: 'Per i promemoria serve l\'indirizzo https del circolo.', pushFail: 'Non sono riuscito ad attivare i promemoria: riprova.',
     refresh: 'Aggiorna', installOther: 'Per averla come un\'app: menu del browser › Aggiungi alla schermata Home.', iosTitle: 'Installa TSM sull\'iPhone', iosStep1: 'Tocca Condividi in basso', iosStep2: 'Scegli «Aggiungi alla schermata Home», poi Aggiungi.', iosStep3: 'Apri TSM dalla schermata Home e incolla questo codice d\'invito:', copy: 'Copia il codice', copied: 'Codice copiato: incollalo nell\'app TSM.', useBrowser: 'Usa nel browser, senza installare',
     rules: (d, n) => `Prenoti fino a ${d} giorni avanti, al massimo ${n} prenotazioni per volta.`,
     cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
     covered: 'coperto', outdoor: 'scoperto', CLAY: 'terra', GRASS: 'erba', HARD: 'cemento', OTHER: '', free: 'gratis', today: 'Oggi',
     err: {
+      FREE_NOW: 'Si è appena liberata: prenotala subito!', TOO_MANY_WAITS: 'Sei già in attesa per 3 caselle: togline una prima.',
       CLOSED: 'Le prenotazioni online sono chiuse.', UNKNOWN_COURT: 'Questo campo non si prenota online.', PAST: 'Quest\'ora è già passata.',
       TOO_SOON: 'È troppo tardi per prenotare quest\'ora: chiama la segreteria.', TOO_FAR: 'Non si può ancora prenotare questo giorno.',
       NOT_SLOT: 'Scegli un orario del planning.', TOO_LONG: 'La prenotazione è troppo lunga.', BLOCKED: 'In quest\'ora il campo non è prenotabile.',
@@ -75259,12 +75595,14 @@ const I18N = {
     pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
     notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
     install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
+    WAITING: 'Waiting', waitText: 'This slot is taken. If it becomes free we tell you right away: whoever books first gets it.', waitAny: 'Any court at this time is fine', waitAsk: 'Tell me if it frees up', waitAdded: 'You are on the waiting list', waitList: 'On the waiting list', waitFreed: 'It\'s free now!', waitAnyCourt: 'Any court', waitRemove: 'Remove', bookNow: 'Book', waitNoPush: 'For an alert on your phone turn reminders on; meanwhile you see it here when you open the page.',
     pushTitle: 'Reminders', pushHint: 'A notification on your phone before the match and if the office removes one of your bookings.', pushOn: 'Turn reminders on', pushActive: 'Reminders are on for this phone.', pushOff: 'Turn off', pushDenied: 'Notifications for this page are blocked: allow them in the phone settings.', pushIos: 'On iPhone, reminders arrive in the TSM app on the Home Screen (iOS 16.4 or later).', pushHttps: 'Reminders need the club\'s https address.', pushFail: 'Could not turn reminders on: try again.',
     refresh: 'Refresh', installOther: 'To use it like an app: browser menu › Add to Home Screen.', iosTitle: 'Install TSM on your iPhone', iosStep1: 'Tap Share at the bottom', iosStep2: 'Choose “Add to Home Screen”, then Add.', iosStep3: 'Open TSM from the Home Screen and paste this invitation code:', copy: 'Copy the code', copied: 'Code copied: paste it in the TSM app.', useBrowser: 'Use it in the browser, without installing',
     rules: (d, n) => `You can book up to ${d} days ahead, at most ${n} bookings at a time.`,
     cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
     covered: 'indoor', outdoor: 'outdoor', CLAY: 'clay', GRASS: 'grass', HARD: 'hard', OTHER: '', free: 'free', today: 'Today',
     err: {
+      FREE_NOW: 'It has just become free: book it now!', TOO_MANY_WAITS: 'You are already waiting for 3 slots: remove one first.',
       CLOSED: 'Online booking is closed.', UNKNOWN_COURT: 'This court cannot be booked online.', PAST: 'This time has already passed.',
       TOO_SOON: 'It is too late to book this time: call the club office.', TOO_FAR: 'This day cannot be booked yet.',
       NOT_SLOT: 'Pick a time from the schedule.', TOO_LONG: 'The booking is too long.', BLOCKED: 'The court cannot be booked at this time.',
@@ -75285,12 +75623,14 @@ const I18N = {
     pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
     notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
     install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
+    WAITING: 'En attente', waitText: 'Ce créneau est occupé. S\'il se libère, nous vous prévenons tout de suite : le premier qui réserve l\'obtient.', waitAny: 'N\'importe quel terrain à cette heure', waitAsk: 'Me prévenir s\'il se libère', waitAdded: 'Vous êtes sur liste d\'attente', waitList: 'Sur liste d\'attente', waitFreed: 'Il s\'est libéré !', waitAnyCourt: 'N\'importe quel terrain', waitRemove: 'Retirer', bookNow: 'Réserver', waitNoPush: 'Pour une alerte sur le téléphone, activez les rappels ; en attendant vous le voyez ici en ouvrant la page.',
     pushTitle: 'Rappels', pushHint: 'Une notification sur le téléphone avant le match et si le secrétariat retire une de vos réservations.', pushOn: 'Activer les rappels', pushActive: 'Rappels activés sur ce téléphone.', pushOff: 'Désactiver', pushDenied: 'Les notifications de cette page sont bloquées : autorisez-les dans les réglages du téléphone.', pushIos: 'Sur iPhone, les rappels arrivent dans l\'app TSM de l\'écran d\'accueil (iOS 16.4 ou plus récent).', pushHttps: 'Les rappels demandent l\'adresse https du club.', pushFail: 'Impossible d\'activer les rappels : réessayez.',
     refresh: 'Actualiser', installOther: 'Pour l\'avoir comme une app : menu du navigateur › Ajouter à l\'écran d\'accueil.', iosTitle: 'Installer TSM sur l\'iPhone', iosStep1: 'Touchez Partager en bas', iosStep2: 'Choisissez « Sur l\'écran d\'accueil », puis Ajouter.', iosStep3: 'Ouvrez TSM depuis l\'écran d\'accueil et collez ce code d\'invitation :', copy: 'Copier le code', copied: 'Code copié : collez-le dans l\'app TSM.', useBrowser: 'Utiliser dans le navigateur, sans installer',
     rules: (d, n) => `Réservation jusqu'à ${d} jours à l'avance, ${n} réservations au maximum à la fois.`,
     cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
     covered: 'couvert', outdoor: 'extérieur', CLAY: 'terre battue', GRASS: 'gazon', HARD: 'dur', OTHER: '', free: 'gratuit', today: 'Aujourd\'hui',
     err: {
+      FREE_NOW: 'Il vient de se libérer : réservez-le vite !', TOO_MANY_WAITS: 'Vous attendez déjà 3 créneaux : retirez-en un d\'abord.',
       CLOSED: 'Les réservations en ligne sont fermées.', UNKNOWN_COURT: 'Ce terrain ne se réserve pas en ligne.', PAST: 'Cette heure est déjà passée.',
       TOO_SOON: 'Il est trop tard pour réserver cette heure : appelez le secrétariat.', TOO_FAR: 'Ce jour n\'est pas encore réservable.',
       NOT_SLOT: 'Choisissez un horaire du planning.', TOO_LONG: 'La réservation est trop longue.', BLOCKED: 'Le terrain n\'est pas réservable à cette heure.',
@@ -75311,12 +75651,14 @@ const I18N = {
     pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
     notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
     install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
+    WAITING: 'Wartend', waitText: 'Dieses Feld ist belegt. Wird es frei, sagen wir es dir sofort: Wer zuerst bucht, bekommt es.', waitAny: 'Jeder Platz zu dieser Zeit ist recht', waitAsk: 'Benachrichtigen, wenn frei', waitAdded: 'Du stehst auf der Warteliste', waitList: 'Auf der Warteliste', waitFreed: 'Jetzt frei!', waitAnyCourt: 'Beliebiger Platz', waitRemove: 'Entfernen', bookNow: 'Buchen', waitNoPush: 'Für einen Hinweis aufs Handy schalte die Erinnerungen ein; bis dahin siehst du es hier, wenn du die Seite öffnest.',
     pushTitle: 'Erinnerungen', pushHint: 'Eine Benachrichtigung auf dem Handy vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt.', pushOn: 'Erinnerungen einschalten', pushActive: 'Erinnerungen sind auf diesem Handy an.', pushOff: 'Ausschalten', pushDenied: 'Benachrichtigungen für diese Seite sind blockiert: Erlaube sie in den Handy-Einstellungen.', pushIos: 'Auf dem iPhone kommen die Erinnerungen in der TSM-App auf dem Home-Bildschirm an (iOS 16.4 oder neuer).', pushHttps: 'Für Erinnerungen braucht es die https-Adresse des Vereins.', pushFail: 'Erinnerungen ließen sich nicht einschalten: Versuch es noch einmal.',
     refresh: 'Aktualisieren', installOther: 'Um sie wie eine App zu nutzen: Browsermenü › Zum Startbildschirm hinzufügen.', iosTitle: 'TSM auf dem iPhone installieren', iosStep1: 'Unten auf Teilen tippen', iosStep2: '„Zum Home-Bildschirm“ wählen, dann Hinzufügen.', iosStep3: 'TSM vom Home-Bildschirm öffnen und diesen Einladungscode einfügen:', copy: 'Code kopieren', copied: 'Code kopiert: In der TSM-App einfügen.', useBrowser: 'Im Browser nutzen, ohne Installation',
     rules: (d, n) => `Buchbar bis ${d} Tage im Voraus, höchstens ${n} Buchungen gleichzeitig.`,
     cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
     covered: 'Halle', outdoor: 'Freiplatz', CLAY: 'Sand', GRASS: 'Rasen', HARD: 'Hartplatz', OTHER: '', free: 'kostenlos', today: 'Heute',
     err: {
+      FREE_NOW: 'Gerade frei geworden: Buch es jetzt!', TOO_MANY_WAITS: 'Du wartest schon auf 3 Felder: Entferne zuerst eins.',
       CLOSED: 'Online-Buchungen sind geschlossen.', UNKNOWN_COURT: 'Dieser Platz ist online nicht buchbar.', PAST: 'Diese Uhrzeit ist schon vorbei.',
       TOO_SOON: 'Für diese Uhrzeit ist es zu spät: Ruf das Vereinsbüro an.', TOO_FAR: 'Dieser Tag ist noch nicht buchbar.',
       NOT_SLOT: 'Wähle eine Uhrzeit aus dem Plan.', TOO_LONG: 'Die Buchung ist zu lang.', BLOCKED: 'Der Platz ist zu dieser Zeit nicht buchbar.',
@@ -75337,12 +75679,14 @@ const I18N = {
     pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
     notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
     install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
+    WAITING: 'En espera', waitText: 'Esta casilla está ocupada. Si se libera te avisamos enseguida: la consigue quien reserve primero.', waitAny: 'Me vale cualquier pista a esta hora', waitAsk: 'Avísame si se libera', waitAdded: 'Estás en la lista de espera', waitList: 'En lista de espera', waitFreed: '¡Se ha liberado!', waitAnyCourt: 'Cualquier pista', waitRemove: 'Quitar', bookNow: 'Reservar', waitNoPush: 'Para un aviso en el teléfono activa los recordatorios; mientras tanto lo ves aquí al abrir la página.',
     pushTitle: 'Recordatorios', pushHint: 'Una notificación en el teléfono antes del partido y si la secretaría quita una de tus reservas.', pushOn: 'Activar los recordatorios', pushActive: 'Recordatorios activados en este teléfono.', pushOff: 'Apagar', pushDenied: 'Las notificaciones de esta página están bloqueadas: permítelas en los ajustes del teléfono.', pushIos: 'En iPhone los recordatorios llegan en la app TSM de la pantalla de inicio (iOS 16.4 o posterior).', pushHttps: 'Para los recordatorios hace falta la dirección https del club.', pushFail: 'No se han podido activar los recordatorios: inténtalo de nuevo.',
     refresh: 'Actualizar', installOther: 'Para tenerla como una app: menú del navegador › Añadir a pantalla de inicio.', iosTitle: 'Instala TSM en el iPhone', iosStep1: 'Toca Compartir abajo', iosStep2: 'Elige «Añadir a pantalla de inicio» y luego Añadir.', iosStep3: 'Abre TSM desde la pantalla de inicio y pega este código de invitación:', copy: 'Copiar el código', copied: 'Código copiado: pégalo en la app TSM.', useBrowser: 'Usar en el navegador, sin instalar',
     rules: (d, n) => `Reservas hasta ${d} días antes, como mucho ${n} reservas a la vez.`,
     cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
     covered: 'cubierta', outdoor: 'descubierta', CLAY: 'tierra batida', GRASS: 'hierba', HARD: 'dura', OTHER: '', free: 'gratis', today: 'Hoy',
     err: {
+      FREE_NOW: 'Se acaba de liberar: ¡resérvala ya!', TOO_MANY_WAITS: 'Ya esperas 3 casillas: quita una primero.',
       CLOSED: 'Las reservas en línea están cerradas.', UNKNOWN_COURT: 'Esta pista no se reserva en línea.', PAST: 'Esta hora ya ha pasado.',
       TOO_SOON: 'Es demasiado tarde para reservar esta hora: llama a la secretaría.', TOO_FAR: 'Este día aún no se puede reservar.',
       NOT_SLOT: 'Elige un horario del planning.', TOO_LONG: 'La reserva es demasiado larga.', BLOCKED: 'La pista no se puede reservar a esta hora.',
@@ -75363,12 +75707,14 @@ const I18N = {
     pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
     notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
+    WAITING: 'Em espera', waitText: 'Esta casa está ocupada. Se ficar livre avisamos logo: fica com ela quem reservar primeiro.', waitAny: 'Serve qualquer quadra a esta hora', waitAsk: 'Avisa-me se ficar livre', waitAdded: 'Estás na lista de espera', waitList: 'Na lista de espera', waitFreed: 'Ficou livre!', waitAnyCourt: 'Qualquer quadra', waitRemove: 'Tirar', bookNow: 'Reservar', waitNoPush: 'Para um aviso no telemóvel ativa os lembretes; entretanto vês aqui ao abrir a página.',
     pushTitle: 'Lembretes', pushHint: 'Uma notificação no telemóvel antes do jogo e se a secretaria retirar uma das tuas reservas.', pushOn: 'Ativar os lembretes', pushActive: 'Lembretes ativos neste telemóvel.', pushOff: 'Desligar', pushDenied: 'As notificações desta página estão bloqueadas: permite-as nas definições do telemóvel.', pushIos: 'No iPhone os lembretes chegam na app TSM do ecrã principal (iOS 16.4 ou mais recente).', pushHttps: 'Para os lembretes é preciso o endereço https do clube.', pushFail: 'Não foi possível ativar os lembretes: tenta de novo.',
     refresh: 'Atualizar', installOther: 'Para a ter como uma app: menu do navegador › Adicionar ao ecrã principal.', iosTitle: 'Instala o TSM no iPhone', iosStep1: 'Toca em Partilhar em baixo', iosStep2: 'Escolhe «Adicionar ao ecrã principal» e depois Adicionar.', iosStep3: 'Abre o TSM a partir do ecrã principal e cola este código de convite:', copy: 'Copiar o código', copied: 'Código copiado: cola-o na app TSM.', useBrowser: 'Usar no navegador, sem instalar',
     rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
     covered: 'coberto', outdoor: 'descoberto', CLAY: 'terra batida', GRASS: 'relva', HARD: 'piso duro', OTHER: '', free: 'grátis', today: 'Hoje',
     err: {
+      FREE_NOW: 'Acabou de ficar livre: reserva-a já!', TOO_MANY_WAITS: 'Já esperas por 3 casas: tira uma primeiro.',
       CLOSED: 'As reservas online estão fechadas.', UNKNOWN_COURT: 'Esta quadra não se reserva online.', PAST: 'Esta hora já passou.',
       TOO_SOON: 'É tarde demais para reservar esta hora: liga para a secretaria.', TOO_FAR: 'Este dia ainda não se pode reservar.',
       NOT_SLOT: 'Escolhe um horário da agenda.', TOO_LONG: 'A reserva é demasiado longa.', BLOCKED: 'A quadra não se pode reservar a esta hora.',
@@ -76142,6 +76488,11 @@ table.grid { border-collapse: collapse; width: 100%; min-width: 100%; }
 .steps li { margin: 8px 0; }
 .share { display: inline-block; border: 1px solid var(--outline); border-radius: 6px; padding: 0 6px; color: var(--ball); }
 .bigcode { font-size: 26px; font-weight: 700; letter-spacing: .12em; text-align: center; color: var(--ball); background: var(--high); border-radius: 12px; padding: 14px; margin-top: 8px; }
+.cell.BUSY:not(:disabled) { cursor: pointer; }
+.cell.waiting { background: var(--high); color: var(--ball); font-weight: 600; outline: 1px dashed var(--ball); outline-offset: -3px; }
+.legend .WAITING::before { background: var(--high); border: 1px dashed var(--ball); }
+.card.freed { border-color: var(--ball); }
+.card.row .small + .small { margin-left: 6px; }
 TSM_EOF
 
 # ---------------------------------------------------------------- server/src/main/resources/web/sw.js
@@ -76473,6 +76824,116 @@ class PushApiTest {
         val id = field(call("POST", "/bookings", """{"court":"Campo 1","start":${at(12, 18)},"minutes":60}""", mario).body, "id")
         assertEquals(200, call("DELETE", "/bookings/$id", token = mario).status)
         assertTrue(sent.isEmpty())
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/WaitApiTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/WaitApiTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.CourtSettings
+import com.tennis.scoremanager.data.SrvMe
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.nio.file.Files
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
+class WaitApiTest {
+    private val zone = ZoneId.of("Europe/Rome")
+    private fun at(day: Int, h: Int) = ZonedDateTime.of(2026, 11, day, h, 0, 0, 0, zone).toInstant().toEpochMilli()
+
+    private var now = at(9, 8)
+    private lateinit var store: Store
+    private lateinit var api: Api
+    private val sent = mutableListOf<String>()
+    private val json = Json { ignoreUnknownKeys = true }
+    private lateinit var admin: String
+
+    @Before fun setUp() {
+        store = Store(Files.createTempDirectory("tsm-wait").toFile()) { now }
+        api = Api(store, Limiter { now }, pusher = { _, _, payload, _ -> sent += payload; 201 }, async = false)
+        admin = field(call("POST", "/admin/pair", """{"code":"${store.ensureSetupCode()}"}""").body, "token")
+        val sync = ClubSync(club = "TC Prova", courts = listOf("Campo 1", "Campo 2"), settings = CourtSettings(openHour = 8, closeHour = 22), rules = BookingRules(maxFuture = 5))
+        call("PUT", "/admin/sync", Json.encodeToString(ClubSync.serializer(), sync), admin)
+    }
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null) = api.handle(Req(method, "/api/v1$path", body = body, token = token, ip = "1.1.1.1"))
+    private fun field(j: String, k: String) = Json.parseToJsonElement(j).jsonObject[k]!!.jsonPrimitive.content
+
+    private fun player(id: String, name: String): String {
+        val code = field(call("POST", "/admin/invites", """{"player":"$id","name":"$name"}""", admin).body, "code")
+        val t = field(call("POST", "/claim", """{"code":"$code"}""").body, "token")
+        call("POST", "/push/subscribe", """{"endpoint":"https://push.example/$id","p256dh":"${WebPush.newVapid().publicKey}","auth":"${WebPush.enc(ByteArray(16))}","lang":"it"}""", t)
+        return t
+    }
+
+    private fun book(t: String, court: String, start: Long) = call("POST", "/bookings", """{"court":"$court","start":$start,"minutes":60}""", t)
+    private fun me(t: String) = json.decodeFromString(SrvMe.serializer(), call("GET", "/me", token = t).body)
+
+    @Test fun waitThenFreedThenBooked() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()
+        val id = field(book(mario, "Campo 1", at(11, 18)).body, "id")
+        // Libero: si prenota, non si aspetta.
+        assertEquals("FREE_NOW", field(call("POST", "/waits", """{"court":"Campo 2","start":${at(11, 18)},"minutes":60}""", luca).body, "error"))
+        assertEquals(201, call("POST", "/waits", """{"court":"Campo 1","start":${at(11, 18)},"minutes":60}""", luca).status)
+        // La casella occupata dice a Luca che sta aspettando.
+        val cells = Json.parseToJsonElement(api.handle(Req("GET", "/api/v1/day", mapOf("date" to "2026-11-11"), token = luca, ip = "1.1.1.1")).body).jsonObject["cells"]!!.jsonArray.map { it.jsonObject }
+        assertEquals("true", cells.first { it["court"]!!.jsonPrimitive.content == "Campo 1" && it["start"]!!.jsonPrimitive.content == at(11, 18).toString() }["waiting"]!!.jsonPrimitive.content)
+        // Mario disdice: Luca è avvisato, una volta.
+        call("DELETE", "/bookings/$id", token = mario)
+        assertEquals(1, sent.size)
+        assertTrue(sent.single().contains("Si è liberato un campo"))
+        assertEquals("Campo 1", me(luca).waits.single().freedCourt)
+        api.tick(); assertEquals(1, sent.size)
+        // Luca prenota: l'attesa sparisce.
+        assertEquals(201, book(luca, "Campo 1", at(11, 18)).status)
+        assertTrue(me(luca).waits.isEmpty())
+    }
+
+    @Test fun freedThenTakenAgainGoesBackToWaiting() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); val anna = player("p3", "Anna"); sent.clear()
+        val id = field(book(mario, "Campo 1", at(11, 18)).body, "id")
+        call("POST", "/waits", """{"court":"Campo 1","start":${at(11, 18)},"minutes":60}""", luca)
+        call("DELETE", "/bookings/$id", token = mario)
+        // Anna è più veloce.
+        book(anna, "Campo 1", at(11, 18))
+        api.checkWaits()
+        assertNull(me(luca).waits.single().freedCourt)
+    }
+
+    @Test fun anyCourtWait() {
+        val mario = player("p1", "Mario"); val anna = player("p3", "Anna"); val luca = player("p2", "Luca"); sent.clear()
+        book(mario, "Campo 1", at(12, 10))
+        val id2 = field(book(anna, "Campo 2", at(12, 10)).body, "id")
+        assertEquals(201, call("POST", "/waits", """{"start":${at(12, 10)},"minutes":60}""", luca).status)
+        call("DELETE", "/bookings/$id2", token = anna)
+        assertEquals("Campo 2", me(luca).waits.single().freedCourt)
+        assertTrue(sent.single().contains("Campo 2"))
+    }
+
+    @Test fun limitsAndTooFar() {
+        val mario = player("p1", "Mario"); val luca = player("p2", "Luca")
+        for (d in 10..13) book(mario, "Campo 1", at(d, 18))
+        for (d in 10..12) assertEquals(201, call("POST", "/waits", """{"court":"Campo 1","start":${at(d, 18)},"minutes":60}""", luca).status)
+        assertEquals("TOO_MANY_WAITS", field(call("POST", "/waits", """{"court":"Campo 1","start":${at(13, 18)},"minutes":60}""", luca).body, "error"))
+        assertEquals("TOO_FAR", field(call("POST", "/waits", """{"court":"Campo 1","start":${at(25, 18)},"minutes":60}""", luca).body, "error"))
+        // Si toglie da sola quando l'ora è passata.
+        now = at(10, 19); api.tick()
+        assertEquals(2, me(luca).waits.size)
     }
 }
 TSM_EOF
@@ -79429,6 +79890,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 271 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 272 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

@@ -81,7 +81,25 @@ enum class CancelProblem { NOT_FOUND, NOT_YOURS, TOO_LATE }
 enum class CellState { FREE, BUSY, MINE, BLOCKED, PAST }
 
 @Serializable
-data class Cell(val court: String, val start: Long, val state: CellState, val booking: String? = null)
+data class Cell(
+    val court: String, val start: Long, val state: CellState, val booking: String? = null,
+    /** Il giocatore aspetta che questa casella si liberi (lista d'attesa). */
+    val waiting: Boolean = false,
+)
+
+/**
+ * Un giocatore in lista d'attesa per una casella occupata: quel campo, o qualsiasi campo ([court] null) alla stessa
+ * ora. Quando si libera ([freedAt], [freedCourt]) gli arriva l'avviso; vince chi prenota per primo.
+ */
+@Serializable
+data class Wait(
+    val id: String, val player: String, val court: String? = null, val start: Long, val minutes: Int,
+    val createdAt: Long = 0, val freedAt: Long? = null, val freedCourt: String? = null,
+)
+
+/** Perché non si può mettersi in lista d'attesa: oltre ai motivi della prenotazione, la casella è libera (si prenota). */
+@Serializable
+enum class WaitProblem { FREE_NOW, TOO_MANY_WAITS, BOOKING }
 
 object CourtOnline {
     /** I campi che si prenotano online. */
@@ -122,6 +140,28 @@ object CourtOnline {
         }
     }
 
+    /** I campi a cui guarda una lista d'attesa: il suo, o tutti quelli prenotabili online. */
+    fun waitCourts(sync: ClubSync, court: String?): List<String> = if (court != null) listOf(court) else bookableCourts(sync)
+
+    /**
+     * Ci si può mettere in lista d'attesa? Solo se la casella è occupata (su almeno uno dei campi guardati) e per il
+     * resto si potrebbe prenotare: null = sì; [BookingProblem] = il motivo della prenotazione che vale anche qui.
+     */
+    fun checkWait(sync: ClubSync, bookings: List<OnlineBooking>, player: String, court: String?, start: Long, minutes: Int, now: Long): Pair<WaitProblem, BookingProblem?>? {
+        val courts = waitCourts(sync, court)
+        if (courts.isEmpty()) return WaitProblem.BOOKING to BookingProblem.UNKNOWN_COURT
+        val problems = courts.map { check(sync, bookings, player, it, start, minutes, now) }
+        if (problems.any { it == null }) return WaitProblem.FREE_NOW to null
+        if (problems.none { it == BookingProblem.TAKEN }) return WaitProblem.BOOKING to problems.first()
+        // Occupato su qualche campo: va bene, a meno che il motivo vero sia un altro (troppo lontano, chiuso…).
+        val other = problems.firstOrNull { it != BookingProblem.TAKEN && it != BookingProblem.BLOCKED && it != BookingProblem.UNKNOWN_COURT }
+        return other?.let { WaitProblem.BOOKING to it }
+    }
+
+    /** Il campo che si è liberato per [w] (si può prenotare adesso), o null. */
+    fun freedCourt(sync: ClubSync, bookings: List<OnlineBooking>, w: Wait, now: Long): String? =
+        waitCourts(sync, w.court).firstOrNull { check(sync, bookings, w.player, it, w.start, w.minutes, now) == null }
+
     /** La prenotazione già fatta online, pronta da salvare (prezzo e luci come in segreteria). */
     fun make(sync: ClubSync, id: String, player: String, name: String, court: String, start: Long, minutes: Int, heating: Boolean, now: Long): OnlineBooking {
         val h = heating && sync.settings.info(court).heating
@@ -143,7 +183,7 @@ object CourtOnline {
     }
 
     /** Il giorno per il giocatore: ogni casella di ogni campo prenotabile, senza dire chi ha prenotato le altre. */
-    fun grid(sync: ClubSync, bookings: List<OnlineBooking>, player: String, day: Long, now: Long): List<Cell> {
+    fun grid(sync: ClubSync, bookings: List<OnlineBooking>, player: String, day: Long, now: Long, waits: List<Wait> = emptyList()): List<Cell> {
         val step = sync.settings.slotMinutes.coerceIn(15, 180) * 60_000L
         val slots = CourtTime.slots(day, sync.settings)
         return bookableCourts(sync).flatMap { court ->
@@ -157,7 +197,8 @@ object CourtOnline {
                     start < now -> CellState.PAST
                     else -> CellState.FREE
                 }
-                Cell(court, start, state, mine?.id)
+                val waiting = state == CellState.BUSY && waits.any { w -> w.player == player && w.freedAt == null && (w.court == null || w.court == court) && w.start < end && w.start + w.minutes * 60_000L > start }
+                Cell(court, start, state, mine?.id, waiting)
             }
         }
     }

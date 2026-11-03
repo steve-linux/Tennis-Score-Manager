@@ -2042,8 +2042,12 @@ class MatchController(
         val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
             bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
         }
-        saveBookingAccount(news.account)
-        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(app, strings, news.remind.map { it.label }, news.removed.map { it.label })
+        val (freed, acc) = com.tennis.scoremanager.data.ClubServers.freedNews(news.account, me.waits)
+        saveBookingAccount(acc)
+        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(
+            app, strings, news.remind.map { it.label }, news.removed.map { it.label },
+            freed.map { w -> bookingLabel(com.tennis.scoremanager.data.CourtBooking("", w.freedCourt!!, w.start)) },
+        )
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */

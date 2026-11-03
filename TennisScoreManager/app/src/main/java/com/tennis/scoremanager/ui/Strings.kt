@@ -1635,6 +1635,19 @@ interface Strings {
     val pbAlertChannel: String
     val pbAlertReminder: String
     val pbAlertRemoved: String
+    val pbWaiting: String
+    val pbWaitText: String
+    val pbWaitAny: String
+    val pbWaitAsk: String
+    val pbWaitAdded: String
+    val pbWaitList: String
+    val pbWaitFreed: String
+    val pbWaitAnyCourt: String
+    val pbWaitRemove: String
+    val pbBookNow: String
+    val pbErrFreeNow: String
+    val pbErrManyWaits: String
+    val pbAlertFreed: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3530,6 +3543,19 @@ object ItStrings : Strings {
     override val pbAlertChannel = "Le tue prenotazioni"
     override val pbAlertReminder = "Promemoria della partita"
     override val pbAlertRemoved = "Prenotazione tolta dalla segreteria"
+    override val pbWaiting = "In attesa"
+    override val pbWaitText = "Questa casella è occupata. Se si libera ti avvisiamo subito: vince chi prenota per primo."
+    override val pbWaitAny = "Va bene un campo qualsiasi a quest'ora"
+    override val pbWaitAsk = "Avvisami se si libera"
+    override val pbWaitAdded = "Sei in lista d'attesa"
+    override val pbWaitList = "In lista d'attesa"
+    override val pbWaitFreed = "Si è liberato!"
+    override val pbWaitAnyCourt = "Un campo qualsiasi"
+    override val pbWaitRemove = "Togli"
+    override val pbBookNow = "Prenota"
+    override val pbErrFreeNow = "Si è appena liberata: prenotala subito!"
+    override val pbErrManyWaits = "Sei già in attesa per 3 caselle: togline una prima."
+    override val pbAlertFreed = "Si è liberato un campo: prenotalo!"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5406,6 +5432,19 @@ object EnStrings : Strings {
     override val pbAlertChannel = "Your bookings"
     override val pbAlertReminder = "Match reminder"
     override val pbAlertRemoved = "Booking removed by the club office"
+    override val pbWaiting = "Waiting"
+    override val pbWaitText = "This slot is taken. If it becomes free we tell you right away: whoever books first gets it."
+    override val pbWaitAny = "Any court at this time is fine"
+    override val pbWaitAsk = "Tell me if it frees up"
+    override val pbWaitAdded = "You are on the waiting list"
+    override val pbWaitList = "On the waiting list"
+    override val pbWaitFreed = "It's free now!"
+    override val pbWaitAnyCourt = "Any court"
+    override val pbWaitRemove = "Remove"
+    override val pbBookNow = "Book"
+    override val pbErrFreeNow = "It has just become free: book it now!"
+    override val pbErrManyWaits = "You are already waiting for 3 slots: remove one first."
+    override val pbAlertFreed = "A court is free: book it!"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

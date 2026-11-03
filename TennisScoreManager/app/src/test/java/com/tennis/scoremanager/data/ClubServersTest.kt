@@ -106,4 +106,12 @@ class ClubServersTest {
         val gone = ClubServers.myNews(withCd.account.copy(cancelledHere = listOf("d")), listOf(mb("b", now + 10 * h)), 2, later, label)
         assertEquals(listOf("c"), gone.removed.map { it.label })
     }
+
+    @Test fun freedWaitsAlertOnce() {
+        val a = BookingAccount("http://x", "t")
+        val waits = listOf(SrvWait("w1", "Campo 1", now + 5 * h, 60), SrvWait("w2", null, now + 6 * h, 60, freedCourt = "Campo 2"))
+        val (fresh, next) = ClubServers.freedNews(a, waits)
+        assertEquals(listOf("w2"), fresh.map { it.id })
+        assertTrue(ClubServers.freedNews(next, waits).first.isEmpty())
+    }
 }

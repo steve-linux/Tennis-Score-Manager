@@ -56,6 +56,8 @@ data class BookingAccount(
     val mine: Map<String, SeenBooking>? = null,
     val reminded: List<String> = emptyList(),
     val cancelledHere: List<String> = emptyList(),
+    /** Le liste d'attesa liberate di cui si è già dato l'avviso. */
+    val freedSeen: List<String> = emptyList(),
 ) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 }
@@ -122,7 +124,14 @@ object ClubServers {
     }
 
     /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
-    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount)
+    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount, val freed: List<SrvWait> = emptyList())
+
+    /** Le liste d'attesa appena liberate (avviso una volta sola). */
+    fun freedNews(a: BookingAccount, waits: List<SrvWait>): Pair<List<SrvWait>, BookingAccount> {
+        val freed = waits.filter { it.freedCourt != null }
+        val fresh = freed.filter { it.id !in a.freedSeen }
+        return fresh to a.copy(freedSeen = freed.map { it.id })
+    }
 
     /**
      * Le notifiche del giocatore: il promemoria entro [remindHours] dall'inizio (una volta; la prima volta che si
@@ -231,4 +240,6 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun book(b: SrvBookIn): SrvMyBooking = call("POST", "/bookings", SrvBookIn.serializer(), b, SrvMyBooking.serializer())
     fun cancelMine(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/bookings/${enc(id)}", null, null, SrvOk.serializer())
     fun logout(): SrvOk = call<Unit, SrvOk>("POST", "/logout", null, null, SrvOk.serializer())
+    fun addWait(w: SrvWaitIn): SrvWait = call("POST", "/waits", SrvWaitIn.serializer(), w, SrvWait.serializer())
+    fun removeWait(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/waits/${enc(id)}", null, null, SrvOk.serializer())
 }
