@@ -1593,6 +1593,12 @@ object PtStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nova reserva: $it" }
     override val srvAlertGone: (String) -> String = { "Cancelada: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novidades nas reservas online" }
+    override val srvRemind = "Lembrete aos jogadores (horas antes, 0 = não)"
+    override val pbReminders = "Lembretes no telemóvel"
+    override val pbRemindersHint: (Int) -> String = { "Uma notificação $it horas antes do jogo e se a secretaria retirar uma das tuas reservas" }
+    override val pbAlertChannel = "As tuas reservas"
+    override val pbAlertReminder = "Lembrete do jogo"
+    override val pbAlertRemoved = "Reserva retirada pela secretaria"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }

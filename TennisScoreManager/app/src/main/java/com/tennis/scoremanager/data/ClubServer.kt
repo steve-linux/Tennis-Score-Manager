@@ -48,7 +48,15 @@ data class ClubServerConf(
  * l'invito. Vuoto = non è entrato in nessun circolo.
  */
 @Serializable
-data class BookingAccount(val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "") {
+data class BookingAccount(
+    val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "",
+    /** Promemoria prima della partita e avviso se la segreteria toglie una prenotazione (notifiche sul telefono). */
+    val reminders: Boolean = true,
+    /** Le prenotazioni viste l'ultima volta (null = mai guardato), quelle già ricordate e quelle disdette da qui. */
+    val mine: Map<String, SeenBooking>? = null,
+    val reminded: List<String> = emptyList(),
+    val cancelledHere: List<String> = emptyList(),
+) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 }
 
@@ -111,6 +119,27 @@ object ClubServers {
             busy = busy.filter { it.end >= now - 86_400_000L },
             rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
         )
+    }
+
+    /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
+    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount)
+
+    /**
+     * Le notifiche del giocatore: il promemoria entro [remindHours] dall'inizio (una volta; la prima volta che si
+     * guarda niente promemoria per quelle già dentro le ore) e le prenotazioni sparite che non ha disdetto lui.
+     */
+    fun myNews(a: BookingAccount, bookings: List<SrvMyBooking>, remindHours: Int, now: Long, label: (SrvMyBooking) -> String): MyNews {
+        val current = bookings.filter { it.start + it.minutes * 60_000L > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        val window = remindHours * 3_600_000L
+        val inWindow = if (remindHours <= 0) emptyMap() else current.filter { (id, b) -> id !in a.reminded && b.start > now && b.start - now <= window }
+        val first = a.mine == null
+        val removed = if (first) emptyList() else a.mine!!.filter { (id, b) -> id !in current && id !in a.cancelledHere && b.start > now }.values.sortedBy { it.start }
+        val next = a.copy(
+            mine = current,
+            reminded = (a.reminded.filter { it in current } + inWindow.keys).distinct(),
+            cancelledHere = a.cancelledHere.filter { it in current },
+        )
+        return MyNews(if (first) emptyList() else inWindow.values.sortedBy { it.start }, removed, next)
     }
 
     /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */

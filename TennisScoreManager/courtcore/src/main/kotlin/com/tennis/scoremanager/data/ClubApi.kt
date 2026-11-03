@@ -28,3 +28,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvBookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
 @Serializable data class SrvQuote(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
 
+
+/** Le notifiche push della pagina web: la chiave pubblica del server e l'abbonamento che dà il browser. */
+@Serializable data class SrvPushKey(val key: String)
+@Serializable data class SrvPushSub(val endpoint: String, val p256dh: String = "", val auth: String = "", val lang: String = "it")

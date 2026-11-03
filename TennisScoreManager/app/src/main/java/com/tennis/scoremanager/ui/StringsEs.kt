@@ -1590,6 +1590,12 @@ object EsStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nueva reserva: $it" }
     override val srvAlertGone: (String) -> String = { "Anulada: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novedades en las reservas en línea" }
+    override val srvRemind = "Recordatorio a los jugadores (horas antes, 0 = no)"
+    override val pbReminders = "Recordatorios en el teléfono"
+    override val pbRemindersHint: (Int) -> String = { "Una notificación $it horas antes del partido y si la secretaría quita una de tus reservas" }
+    override val pbAlertChannel = "Tus reservas"
+    override val pbAlertReminder = "Recordatorio del partido"
+    override val pbAlertRemoved = "Reserva quitada por la secretaría"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }

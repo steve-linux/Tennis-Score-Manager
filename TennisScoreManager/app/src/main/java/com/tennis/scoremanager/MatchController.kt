@@ -2021,6 +2021,31 @@ class MatchController(
         }
     }
 
+    init {
+        // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
+        scope.launch {
+            bookingAccount.map { it.joined && it.reminders }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+        }
+    }
+
+    fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
+
+    /** Disdetta da qui: non è una notizia da dare al giocatore. */
+    fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
+
+    /** Il controllo del giocatore (in background): promemoria della partita e prenotazioni tolte dalla segreteria. */
+    suspend fun checkMyBookings() {
+        val a = bookingAccount.value
+        if (!a.joined) return
+        val me = booking { it.me() }.getOrNull() ?: return
+        val now = System.currentTimeMillis()
+        val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
+            bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
+        }
+        saveBookingAccount(news.account)
+        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(app, strings, news.remind.map { it.label }, news.removed.map { it.label })
+    }
+
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
     fun leaveBooking() {
         val a = bookingAccount.value

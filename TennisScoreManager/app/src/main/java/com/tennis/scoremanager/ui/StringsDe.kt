@@ -1589,6 +1589,12 @@ object DeStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Neue Buchung: $it" }
     override val srvAlertGone: (String) -> String = { "Storniert: $it" }
     override val srvAlertMany: (Int) -> String = { "$it Änderungen bei den Online-Buchungen" }
+    override val srvRemind = "Erinnerung an Spieler (Stunden vorher, 0 = keine)"
+    override val pbReminders = "Erinnerungen auf dem Handy"
+    override val pbRemindersHint: (Int) -> String = { "Eine Benachrichtigung $it Stunden vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt" }
+    override val pbAlertChannel = "Deine Buchungen"
+    override val pbAlertReminder = "Erinnerung an dein Spiel"
+    override val pbAlertRemoved = "Buchung vom Vereinsbüro entfernt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }

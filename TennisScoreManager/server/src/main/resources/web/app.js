@@ -200,9 +200,64 @@ function render(dayError) {
     el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
+  parts.push(el('div', { id: 'push' }));
   const tip = installTip();
   if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
+  updatePush();
+}
+
+// --- Promemoria (notifiche push) ---
+
+const PUSH_OK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && window.isSecureContext;
+
+function keyBytes(b64) {
+  const s = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - b64.length % 4) % 4));
+  return Uint8Array.from(s, c => c.charCodeAt(0));
+}
+
+async function currentSub() {
+  if (!PUSH_OK) return null;
+  const reg = await navigator.serviceWorker.getRegistration();
+  return reg ? reg.pushManager.getSubscription() : null;
+}
+
+/** Il riquadro dei promemoria: attivarli, vederli attivi, spegnerli; o perché qui non si può. */
+async function updatePush(message) {
+  const box = $('push');
+  if (!box) return;
+  const card = (...kids) => box.replaceChildren(el('div', { class: 'card' }, el('b', null, T.pushTitle), ...kids));
+  if (!PUSH_OK) {
+    const why = IOS && !STANDALONE ? T.pushIos : !window.isSecureContext ? T.pushHttps : null;
+    if (why) card(el('p', { class: 'dim' }, why)); else box.replaceChildren();
+    return;
+  }
+  if (Notification.permission === 'denied') { card(el('p', { class: 'dim' }, T.pushDenied)); return; }
+  let sub = null;
+  try { sub = await currentSub(); } catch (_) { /* nessun abbonamento */ }
+  const note = message ? el('p', { class: 'error' }, message) : null;
+  if (sub) card(el('p', { class: 'dim' }, T.pushActive), note, el('div', { class: 'actions' }, el('button', { class: 'ghost small', onclick: pushOff }, T.pushOff)));
+  else card(el('p', { class: 'dim' }, T.pushHint), note, el('div', { class: 'actions' }, el('button', { onclick: pushOn }, T.pushOn)));
+}
+
+async function pushOn() {
+  try {
+    if (await Notification.requestPermission() !== 'granted') { updatePush(); return; }
+    const key = await api('GET', '/push/key');
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(key.key) });
+    const j = sub.toJSON();
+    await api('POST', '/push/subscribe', { endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, lang: LANG });
+    updatePush();
+  } catch (e) { updatePush(T.pushFail); }
+}
+
+async function pushOff() {
+  try {
+    const sub = await currentSub();
+    if (sub) { await api('POST', '/push/unsubscribe', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+  } catch (_) { /* resta com'è */ }
+  updatePush();
 }
 
 function courtLine(c) {
@@ -289,7 +344,7 @@ $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSh
 $('refresh').addEventListener('click', () => { if (state.me) refresh(); });
 $('logout').addEventListener('click', async () => {
   if (!confirm(T.logoutAsk)) return;
-  try { await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
+  try { await pushOff(); await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
   state.token = null; save(KEY, null); showInvite();
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(); });

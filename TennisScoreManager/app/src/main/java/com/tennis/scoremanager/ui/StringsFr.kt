@@ -1592,6 +1592,12 @@ object FrStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nouvelle réservation : $it" }
     override val srvAlertGone: (String) -> String = { "Annulée : $it" }
     override val srvAlertMany: (Int) -> String = { "$it nouveautés dans les réservations en ligne" }
+    override val srvRemind = "Rappel aux joueurs (heures avant, 0 = aucun)"
+    override val pbReminders = "Rappels sur le téléphone"
+    override val pbRemindersHint: (Int) -> String = { "Une notification $it heures avant le match et si le secrétariat retire une de vos réservations" }
+    override val pbAlertChannel = "Vos réservations"
+    override val pbAlertReminder = "Rappel du match"
+    override val pbAlertRemoved = "Réservation retirée par le secrétariat"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }

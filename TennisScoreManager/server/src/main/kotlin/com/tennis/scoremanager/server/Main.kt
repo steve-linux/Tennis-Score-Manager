@@ -58,6 +58,9 @@ fun addresses(host: String): List<String> {
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
 fun start(store: Store, host: String, port: Int): HttpServer {
     val api = Api(store)
+    // Ogni minuto i promemoria delle partite.
+    java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "promemoria").apply { isDaemon = true } }
+        .scheduleAtFixedRate({ runCatching { api.tick() }.onFailure { System.err.println("Promemoria: $it") } }, 30, 60, java.util.concurrent.TimeUnit.SECONDS)
     val server = HttpServer.create(InetSocketAddress(host, port), 0)
     server.executor = Executors.newFixedThreadPool(4)
     server.createContext("/") { ex ->

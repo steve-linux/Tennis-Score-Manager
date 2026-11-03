@@ -17,6 +17,10 @@ import java.util.TimeZone
 @Serializable
 data class Player(val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0)
 
+/** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
+@Serializable
+data class PushSub(val player: String, val endpoint: String, val p256dh: String, val auth: String, val lang: String = "it", val since: Long = 0)
+
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable
 data class Invite(val code: String, val player: String, val name: String, val expires: Long)
@@ -36,6 +40,11 @@ data class State(
     val players: List<Player> = emptyList(),
     val invites: List<Invite> = emptyList(),
     val bookings: List<OnlineBooking> = emptyList(),
+    /** Le chiavi per le notifiche push (create al primo uso). */
+    val vapid: WebPush.Vapid? = null,
+    val pushSubs: List<PushSub> = emptyList(),
+    /** Le prenotazioni di cui il promemoria è già partito. */
+    val reminded: List<String> = emptyList(),
 )
 
 object Secrets {

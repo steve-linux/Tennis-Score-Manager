@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.AlertDialog
@@ -238,6 +239,13 @@ private fun BookingView(c: MatchController) {
 
         Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
             color = TsmColors.TextDim, fontSize = 12.sp)
+        // Promemoria e avvisi sul telefono (anche ad app chiusa).
+        val acc by c.bookingAccount.collectAsState()
+        val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+        SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
+            c.setBookingReminders(on)
+            if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
         GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
 
         booking?.let { (court, start) ->
@@ -263,7 +271,7 @@ private fun BookingView(c: MatchController) {
                         busy = true
                         scope.launch {
                             c.booking { it.cancelMine(b.id) }
-                                .onSuccess { cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
+                                .onSuccess { c.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { err = bookErrorText(s, errCode(it)) }
                             busy = false
                         }

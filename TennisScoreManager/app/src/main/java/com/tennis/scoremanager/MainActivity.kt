@@ -31,6 +31,11 @@ class MainActivity : ComponentActivity() {
 
     /** La notifica di una prenotazione online apre il planning sul suo giorno. */
     private fun openFromNotification(i: android.content.Intent?) {
+        if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
+            i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
+            controller.go(Screen.BOOK_COURT)
+            return
+        }
         val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
         if (day > 0) {
             i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)

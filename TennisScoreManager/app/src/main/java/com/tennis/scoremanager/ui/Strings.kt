@@ -1629,6 +1629,12 @@ interface Strings {
     val srvAlertNew: (String) -> String
     val srvAlertGone: (String) -> String
     val srvAlertMany: (Int) -> String
+    val srvRemind: String
+    val pbReminders: String
+    val pbRemindersHint: (Int) -> String
+    val pbAlertChannel: String
+    val pbAlertReminder: String
+    val pbAlertRemoved: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3518,6 +3524,12 @@ object ItStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nuova prenotazione: $it" }
     override val srvAlertGone: (String) -> String = { "Disdetta: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novità nelle prenotazioni online" }
+    override val srvRemind = "Promemoria ai giocatori (ore prima, 0 = no)"
+    override val pbReminders = "Promemoria sul telefono"
+    override val pbRemindersHint: (Int) -> String = { "Una notifica $it ore prima della partita e se la segreteria toglie una tua prenotazione" }
+    override val pbAlertChannel = "Le tue prenotazioni"
+    override val pbAlertReminder = "Promemoria della partita"
+    override val pbAlertRemoved = "Prenotazione tolta dalla segreteria"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5388,6 +5400,12 @@ object EnStrings : Strings {
     override val srvAlertNew: (String) -> String = { "New booking: $it" }
     override val srvAlertGone: (String) -> String = { "Cancelled: $it" }
     override val srvAlertMany: (Int) -> String = { "$it changes in online bookings" }
+    override val srvRemind = "Reminder to players (hours before, 0 = none)"
+    override val pbReminders = "Reminders on the phone"
+    override val pbRemindersHint: (Int) -> String = { "A notification $it hours before the match and if the office removes one of your bookings" }
+    override val pbAlertChannel = "Your bookings"
+    override val pbAlertReminder = "Match reminder"
+    override val pbAlertRemoved = "Booking removed by the club office"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

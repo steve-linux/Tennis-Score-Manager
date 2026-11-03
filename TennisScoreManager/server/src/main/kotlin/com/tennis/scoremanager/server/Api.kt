@@ -22,6 +22,8 @@ import com.tennis.scoremanager.data.SrvInvite
 import com.tennis.scoremanager.data.SrvInviteIn
 import com.tennis.scoremanager.data.SrvOk
 import com.tennis.scoremanager.data.SrvPlayer
+import com.tennis.scoremanager.data.SrvPushKey
+import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -44,6 +46,12 @@ data class Req(
 
 class ApiError(val status: Int, val code: String) : Exception(code)
 
+/** Manda una notifica push e restituisce il codice HTTP del servizio push. */
+fun interface Pusher { fun send(vapid: WebPush.Vapid, sub: PushSub, payload: String, ttlSeconds: Int): Int }
+
+/** Il contatto nelle notifiche (richiesto da Apple): un indirizzo https o mailto. */
+val PUSH_SUBJECT: String = System.getenv("TSM_PUSH_CONTACT") ?: "https://github.com/steve-linux/Tennis-Score-Manager"
+
 /**
  * Le chiamate del server, /api/v1/…: la segreteria si abbina col codice di setup, manda il planning e crea gli
  * inviti; i giocatori usano l'invito, guardano i giorni e prenotano o disdicono.
@@ -52,7 +60,12 @@ class Api(
     private val store: Store, private val limiter: Limiter = Limiter(),
     /** Abbinare la segreteria anche da internet (TSM_PAIR_REMOTE=1); di solito solo dalla rete del circolo. */
     private val pairRemote: Boolean = System.getenv("TSM_PAIR_REMOTE") == "1",
+    /** Chi manda le notifiche push (nei test, uno finto che le conta). */
+    private val pusher: Pusher = Pusher { v, sub, payload, ttl -> WebPush.send(v, PUSH_SUBJECT, sub, payload, ttl) },
+    /** Le notifiche partono in un filo a parte, per non far aspettare chi prenota (nei test, subito). */
+    private val async: Boolean = true,
 ) {
+    private val sender = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "push").apply { isDaemon = true } }
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     private fun <T> ok(ser: KSerializer<T>, v: T, status: Int = 200) = Resp(status, json.encodeToString(ser, v))
@@ -82,6 +95,9 @@ class Api(
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
             r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
             r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
+            r.method == "GET" && p == listOf("push", "key") -> { player(r); ok(SrvPushKey.serializer(), SrvPushKey(vapid().publicKey)) }
+            r.method == "POST" && p == listOf("push", "subscribe") -> subscribe(player(r), r)
+            r.method == "POST" && p == listOf("push", "unsubscribe") -> unsubscribe(player(r), r)
             else -> throw ApiError(404, "NOT_FOUND")
         }
     }
@@ -163,14 +179,69 @@ class Api(
     }
 
     private fun adminCancel(id: String): Resp {
-        val found = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.any { it.id == id } }
-        if (!found) throw ApiError(404, "NOT_FOUND")
+        val gone = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.firstOrNull { it.id == id } }
+            ?: throw ApiError(404, "NOT_FOUND")
+        // Tolta (o spostata) dalla segreteria: il giocatore lo sa subito, se la partita non è già passata.
+        if (gone.start > store.now()) push(gone.player, ttl = 24 * 3600) { PushTexts.removed(it.lang, gone, store.state.sync.timeZone) }
         return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Notifiche push ---
+
+    private fun vapid(): WebPush.Vapid = store.state.vapid ?: store.update { s -> (s.vapid ?: WebPush.newVapid()).let { s.copy(vapid = it) to it } }
+
+    /** Manda a tutti i telefoni del giocatore; gli abbonamenti scaduti (404, 410) si tolgono. */
+    private fun push(player: String, ttl: Int, payload: (PushSub) -> String) {
+        val subs = store.state.pushSubs.filter { it.player == player }
+        if (subs.isEmpty()) return
+        val v = vapid()
+        val job = Runnable {
+            val dead = subs.filter { sub -> pusher.send(v, sub, payload(sub), ttl).let { it == 404 || it == 410 } }.map { it.endpoint }.toSet()
+            if (dead.isNotEmpty()) store.update { s -> s.copy(pushSubs = s.pushSubs.filter { it.endpoint !in dead }) to Unit }
+        }
+        if (async) sender.execute(job) else job.run()
+    }
+
+    private fun subscribe(pl: Player, r: Req): Resp {
+        val sub = read(SrvPushSub.serializer(), r)
+        val host = runCatching { java.net.URI(sub.endpoint) }.getOrNull()
+        if (host?.scheme != "https" || host.host.isNullOrBlank() || sub.endpoint.length > 1000 || sub.p256dh.isBlank() || sub.auth.isBlank()) throw ApiError(400, "BAD_REQUEST")
+        runCatching { require(WebPush.dec(sub.p256dh).size == 65 && WebPush.dec(sub.auth).size == 16) }.getOrElse { throw ApiError(400, "BAD_REQUEST") }
+        val now = store.now()
+        val ps = PushSub(pl.id, sub.endpoint, sub.p256dh, sub.auth, sub.lang.take(2).lowercase(), now)
+        // Lo stesso browser sostituisce il suo abbonamento; al massimo 5 per giocatore.
+        store.update { s -> s.copy(pushSubs = (s.pushSubs.filter { it.endpoint != ps.endpoint } + ps).let { all -> all.filter { it.player != pl.id } + all.filter { it.player == pl.id }.takeLast(5) }) to Unit }
+        // Una prima notifica: così si vede subito che funziona.
+        val job = Runnable { pusher.send(vapid(), ps, PushTexts.welcome(ps.lang, store.state.sync.club), 3600) }
+        if (async) sender.execute(job) else job.run()
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    private fun unsubscribe(pl: Player, r: Req): Resp {
+        val sub = read(SrvPushSub.serializer(), r)
+        store.update { s -> s.copy(pushSubs = s.pushSubs.filter { !(it.player == pl.id && it.endpoint == sub.endpoint) }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Ogni minuto: i promemoria delle partite che cominciano entro le ore decise dal circolo. Chi prenota già dentro
+     * quelle ore non lo riceve (lo sa); ognuno parte una volta sola.
+     */
+    fun tick(now: Long = store.now()) {
+        val hours = store.state.sync.rules.remindHours
+        val due = store.update { s ->
+            val window = hours * 3_600_000L
+            val inWindow = if (hours <= 0) emptyList() else s.bookings.filter { it.id !in s.reminded && it.start > now && it.start - now <= window }
+            val send = inWindow.filter { it.createdAt < it.start - window }
+            val ids = s.bookings.map { it.id }.toSet()
+            s.copy(reminded = (s.reminded.filter { it in ids } + inWindow.map { it.id }).distinct()) to send
+        }
+        for (b in due) push(b.player, ttl = ((b.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.reminder(it.lang, b, store.state.sync.timeZone) }
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
-        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }) to Unit }
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 

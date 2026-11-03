@@ -169,6 +169,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     stepper(s.srvMaxMinutes, rules.maxMinutes, 30, 240, 30, { s.bkMinutes(it) }) { rules = rules.copy(maxMinutes = it) }
                     stepper(s.srvCancelHours, rules.cancelHours, 0, 72) { rules = rules.copy(cancelHours = it) }
                     stepper(s.srvNotice, rules.noticeMinutes, 0, 240, 15) { rules = rules.copy(noticeMinutes = it) }
+                    stepper(s.srvRemind, rules.remindHours, 0, 24) { rules = rules.copy(remindHours = it) }
                     if (courts.size > 1) {
                         Text(s.srvCourts, color = TsmColors.TextDim, fontSize = 13.sp)
                         val on = rules.courts.ifEmpty { courts }

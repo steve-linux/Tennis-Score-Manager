@@ -87,4 +87,23 @@ class ClubServersTest {
         assertTrue(gone.cancelled.isEmpty())
         assertTrue(gone.added.isEmpty())
     }
+
+    @Test fun playerRemindersAndRemovals() {
+        fun mb(id: String, start: Long) = SrvMyBooking(id, "Campo 1", start, 60, 0, false, false, true)
+        val label = { b: SrvMyBooking -> b.id }
+        val a0 = BookingAccount("http://x", "t")
+        // La prima volta: si ricorda e basta (niente promemoria per quelle già vicine).
+        val first = ClubServers.myNews(a0, listOf(mb("a", now + h), mb("b", now + 10 * h)), 2, now, label)
+        assertTrue(first.remind.isEmpty() && first.removed.isEmpty())
+        // Più tardi b entra nelle 2 ore: promemoria una volta sola.
+        val later = now + 9 * h
+        val second = ClubServers.myNews(first.account, listOf(mb("b", now + 10 * h)), 2, later, label)
+        assertEquals(listOf("b"), second.remind.map { it.label })
+        assertTrue(second.removed.isEmpty())  // a è già passata: non è una rimozione
+        assertTrue(ClubServers.myNews(second.account, listOf(mb("b", now + 10 * h)), 2, later + 60_000, label).remind.isEmpty())
+        // c tolta dalla segreteria, d disdetta da qui.
+        val withCd = ClubServers.myNews(second.account, listOf(mb("b", now + 10 * h), mb("c", now + 30 * h), mb("d", now + 40 * h)), 2, later, label)
+        val gone = ClubServers.myNews(withCd.account.copy(cancelledHere = listOf("d")), listOf(mb("b", now + 10 * h)), 2, later, label)
+        assertEquals(listOf("c"), gone.removed.map { it.label })
+    }
 }

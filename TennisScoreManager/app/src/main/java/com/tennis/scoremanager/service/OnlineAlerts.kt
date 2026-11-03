@@ -37,6 +37,33 @@ object OnlineAlerts {
     fun allowed(context: Context): Boolean =
         Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
+    private const val PLAYER_CHANNEL = "my_bookings"
+    private const val PLAYER_ID = 7303
+    /** Dalla notifica del giocatore si apre Prenota un campo. */
+    const val EXTRA_BOOK = "tsm.bookCourt"
+
+    /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
+    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>) {
+        if (remind.isEmpty() && removed.isEmpty() || !allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        val open = PendingIntent.getActivity(
+            context, PLAYER_ID,
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        // Una notifica per ciascuna: il promemoria di una partita non deve coprire l'avviso di un'altra.
+        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it }).forEachIndexed { i, (title, text) ->
+            val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
+                .setSmallIcon(R.drawable.ic_stat_tennis)
+                .setContentTitle(title).setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setContentIntent(open).setAutoCancel(true)
+                .build()
+            nm.notify(PLAYER_ID + 1 + (text.hashCode() and 0xffff) + i, n)
+        }
+    }
+
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
@@ -72,7 +99,8 @@ class ServerCheckJob : JobService() {
     override fun onStartJob(params: JobParameters): Boolean {
         val c = (application as TsmApp).controller
         scope.launch {
-            c.syncServerNow()
+            // Lo stesso servizio per la segreteria (planning e prenotazioni online) e per il giocatore (promemoria).
+            if (params.jobId == PLAYER_JOB) c.checkMyBookings() else c.syncServerNow()
             jobFinished(params, false)
         }
         return true
@@ -82,6 +110,18 @@ class ServerCheckJob : JobService() {
 
     companion object {
         private const val JOB = 7302
+        private const val PLAYER_JOB = 7304
+
+        /** Il controllo del giocatore: promemoria e prenotazioni tolte (ogni 15 minuti circa). */
+        fun schedulePlayer(context: Context, on: Boolean) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!on) { js.cancel(PLAYER_JOB); return }
+            if (js.getPendingJob(PLAYER_JOB) != null) return
+            js.schedule(
+                JobInfo.Builder(PLAYER_JOB, ComponentName(context, ServerCheckJob::class.java))
+                    .setPeriodic(15 * 60_000L).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPersisted(true).build(),
+            )
+        }
 
         /** Accende o spegne il controllo periodico. */
         fun schedule(context: Context, on: Boolean) {

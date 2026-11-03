@@ -32,6 +32,8 @@ data class BookingRules(
     val noticeMinutes: Int = 30,
     /** I campi prenotabili online (vuoto = tutti). */
     val courts: List<String> = emptyList(),
+    /** Quante ore prima della partita arriva il promemoria ai giocatori (0 = nessun promemoria). */
+    val remindHours: Int = 2,
 )
 
 /** Quello che la segreteria manda al server: il circolo, i campi, gli orari e prezzi, i blocchi, l'occupato e le regole. */

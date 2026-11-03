@@ -782,6 +782,7 @@ Mit der Rolle **Verein**, unter **Turniere › Mannschaften und Ligen**.
 - **Auf einem Raspberry Pi Zero 2 W** (oder einem PC mit Debian/Ubuntu): Mit dem *Raspberry Pi Imager* **Raspberry Pi OS Lite (64-bit)** auf die microSD schreiben, dabei den Namen `tsm-circolo`, das WLAN des Vereins und SSH einstellen. Dann das Kit (`tsm-server-kit.tar.gz`) auf den Pi kopieren, per `ssh` anmelden und `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` starten: Es installiert Java, startet den Server bei jedem Einschalten und zeigt **Adresse** (auch `http://tsm-circolo.local:8080`) und **Kopplungscode**. Mit einem neuen Kit erneut gestartet, aktualisiert es den Server, ohne die Daten anzurühren; `sudo ./reset-admin.sh` gibt dem Büro einen neuen Code.
 - **Auf einem PC mit USB-Stick**: Das Abbild `tsm-server.iso` (Debian live) mit `sudo ./make-usb.sh /dev/sdX` schreiben (unter Windows mit **Rufus**, mit *persistenter Partition*): Der Stick bekommt eine Partition **persistence**, in der die Daten bleiben. Den PC vom Stick starten (am besten mit Netzwerkkabel): Auf dem Bildschirm stehen Adresse und Code. Ohne persistence-Partition vergisst der Server beim Ausschalten alles (und zeigt das an).
 - **Datensicherung**: Alles steckt in einer Datei, `/var/lib/tsm-server/state.json`; ab und zu kopieren, und vor dem Neuschreiben des Sticks.
+- **Erinnerungen an Spieler**: Der Verein wählt, wie viele Stunden vor dem Spiel sie kommen (*Erinnerung an Spieler*, 0 = keine; meist 2). Auf der TSM-Seite tippt der Spieler auf **Erinnerungen einschalten** (am iPhone in der TSM-App auf dem Home-Bildschirm, mit iOS 16.4 oder neuer und der https-Adresse des Vereins) und bekommt sofort eine Probe-Benachrichtigung; die TSM-App auf Android hat **Erinnerungen auf dem Handy**. Er erfährt auch, wenn das Büro eine seiner Buchungen entfernt oder verschiebt (nicht, wenn er selbst storniert).
 - **Hinweise für das Büro**: Mit *Bei Online-Buchungen benachrichtigen* (normalerweise an) bekommt das Büro-Handy eine Benachrichtigung, wenn ein Spieler bucht oder storniert, auch bei geschlossener App: etwa alle 15 Minuten, wenn Netz da ist. Antippen öffnet die Platzbelegung am Tag der Buchung. Was das Büro selbst entfernt, löst keine Benachrichtigung aus.
 - **Von zu Hause** (Internet, per HTTPS: das braucht es auch, um die Seite auf den Home-Bildschirm des iPhones zu legen). Alles kostenlos:
   1. Auf **duckdns.org** (Anmeldung mit einem GitHub-, Google-… Konto) einen Namen anlegen, z. B. `tcprova.duckdns.org`, und den **Token** kopieren.
@@ -1309,6 +1310,7 @@ With the **Club** role, under **Tournaments › Teams and leagues**.
 - **On a Raspberry Pi Zero 2 W** (or a PC with Debian/Ubuntu): with *Raspberry Pi Imager* write **Raspberry Pi OS Lite (64-bit)** to the microSD, setting the name `tsm-circolo`, the club Wi-Fi and SSH on. Then copy the kit (`tsm-server-kit.tar.gz`) to the Pi, log in with `ssh` and run `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: it installs Java, starts the server at every boot and prints the **address** (also `http://tsm-circolo.local:8080`) and the **pairing code**. Run again with a new kit, it updates the server without touching the data; `sudo ./reset-admin.sh` gives a new code for the office.
 - **On a PC with a USB stick**: write the image `tsm-server.iso` (Debian live) with `sudo ./make-usb.sh /dev/sdX` (on Windows with **Rufus**, with a *persistent partition*): the stick gets a **persistence** partition where the data stays. Boot the PC from the stick (a network cable is best): the screen shows the address and code. Without the persistence partition the server forgets everything at shutdown (and says so on screen).
 - **Data backup**: everything is in one file, `/var/lib/tsm-server/state.json`; copy it now and then, and before rewriting the stick.
+- **Reminders to players**: the club chooses how many hours before the match they arrive (*Reminder to players*, 0 = none; usually 2). On the TSM page the player taps **Turn reminders on** (on iPhone from the TSM app on the Home Screen, with iOS 16.4 or later and the club's https address) and gets a test notification right away; the TSM app on Android has **Reminders on the phone**. They are also told if the office removes or moves one of their bookings (not when they cancel it themselves).
 - **Alerts for the office**: with *Notify me of online bookings* (on by default) the office phone gets a notification when a player books or cancels, even with the app closed: about every 15 minutes, when there is a network. Tapping it opens the planner on the booking day. Bookings the office removes itself give no notification.
 - **From home** (internet, over HTTPS: also needed to put the page on the iPhone Home screen). All free:
   1. On **duckdns.org** (sign in with a GitHub, Google… account) create a name, e.g. `tcprova.duckdns.org`, and copy the **token**.
@@ -1835,6 +1837,7 @@ Con el rol **Club**, en **Torneos › Equipos y ligas**.
 - **En una Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* se escribe en la microSD **Raspberry Pi OS Lite (64-bit)**, con el nombre `tsm-circolo`, la Wi-Fi del club y SSH activado. Luego se copia el kit (`tsm-server-kit.tar.gz`) a la Pi, se entra con `ssh` y se lanza `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala Java, arranca el servidor en cada encendido y muestra la **dirección** (también `http://tsm-circolo.local:8080`) y el **código de emparejamiento**. Lanzado de nuevo con un kit nuevo, actualiza el servidor sin tocar los datos; `sudo ./reset-admin.sh` da un código nuevo a la secretaría.
 - **En un PC con una memoria USB**: la imagen `tsm-server.iso` (Debian live) se escribe con `sudo ./make-usb.sh /dev/sdX` (en Windows con **Rufus**, con una *partición persistente*): la memoria tiene una partición **persistence** donde se quedan los datos. Se arranca el PC desde la memoria (mejor con cable de red): en la pantalla aparecen dirección y código. Sin la partición persistence, el servidor lo olvida todo al apagarse (y lo avisa en la pantalla).
 - **Copia de los datos**: todo está en un solo archivo, `/var/lib/tsm-server/state.json`; conviene copiarlo de vez en cuando y antes de reescribir la memoria.
+- **Recordatorios a los jugadores**: el club elige cuántas horas antes del partido llegan (*Recordatorio a los jugadores*, 0 = no; normalmente 2). En la página TSM el jugador toca **Activar los recordatorios** (en iPhone desde la app TSM de la pantalla de inicio, con iOS 16.4 o posterior y la dirección https del club) y recibe enseguida una notificación de prueba; la app TSM en Android tiene **Recordatorios en el teléfono**. También se le avisa si la secretaría quita o mueve una de sus reservas (no si la anula él).
 - **Avisos para la secretaría**: con *Avisarme de las reservas en línea* (encendido por defecto) el teléfono de la secretaría recibe una notificación cuando un jugador reserva o anula, también con la app cerrada: cada 15 minutos más o menos, cuando hay red. Al tocarla se abre el planning en el día de la reserva. Las que quita la propia secretaría no avisan.
 - **Desde casa** (internet, en HTTPS: también hace falta para poner la página en la pantalla de inicio del iPhone). Todo gratis:
   1. En **duckdns.org** (se entra con una cuenta de GitHub, Google…) se crea un nombre, p. ej. `tcprova.duckdns.org`, y se copia el **token**.
@@ -2361,6 +2364,7 @@ Avec le rôle **Club**, dans **Tournois › Équipes et championnats**.
 - **Sur un Raspberry Pi Zero 2 W** (ou un PC sous Debian/Ubuntu) : avec *Raspberry Pi Imager*, écrivez **Raspberry Pi OS Lite (64-bit)** sur la microSD, avec le nom `tsm-circolo`, le Wi-Fi du club et SSH activé. Copiez ensuite le kit (`tsm-server-kit.tar.gz`) sur le Pi, connectez-vous en `ssh` et lancez `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh` : il installe Java, démarre le serveur à chaque allumage et affiche l'**adresse** (aussi `http://tsm-circolo.local:8080`) et le **code d'appairage**. Relancé avec un nouveau kit, il met le serveur à jour sans toucher aux données ; `sudo ./reset-admin.sh` donne un nouveau code au secrétariat.
 - **Sur un PC avec une clé USB** : l'image `tsm-server.iso` (Debian live) s'écrit avec `sudo ./make-usb.sh /dev/sdX` (sous Windows avec **Rufus**, avec une *partition persistante*) : la clé reçoit une partition **persistence** où restent les données. Démarrez le PC sur la clé (de préférence avec un câble réseau) : l'écran affiche l'adresse et le code. Sans partition persistence, le serveur oublie tout à l'extinction (et l'écrit à l'écran).
 - **Sauvegarde** : tout est dans un seul fichier, `/var/lib/tsm-server/state.json` ; copiez-le de temps en temps et avant de réécrire la clé.
+- **Rappels aux joueurs** : le club choisit combien d'heures avant le match ils arrivent (*Rappel aux joueurs*, 0 = aucun ; en général 2). Sur la page TSM le joueur touche **Activer les rappels** (sur iPhone depuis l'app TSM de l'écran d'accueil, avec iOS 16.4 ou plus récent et l'adresse https du club) et reçoit tout de suite une notification d'essai ; l'app TSM sur Android a **Rappels sur le téléphone**. Il est aussi prévenu si le secrétariat retire ou déplace une de ses réservations (pas s'il l'annule lui-même).
 - **Alertes pour le secrétariat** : avec *Me prévenir des réservations en ligne* (activé par défaut), le téléphone du secrétariat reçoit une notification quand un joueur réserve ou annule, même app fermée : environ toutes les 15 minutes, quand il y a du réseau. En la touchant, le planning s'ouvre sur le jour de la réservation. Celles que le secrétariat retire lui-même ne donnent pas de notification.
 - **Depuis chez soi** (internet, en HTTPS : il le faut aussi pour mettre la page sur l'écran d'accueil de l'iPhone). Tout est gratuit :
   1. Sur **duckdns.org** (connexion avec un compte GitHub, Google…), créez un nom, ex. `tcprova.duckdns.org`, et copiez le **jeton**.
@@ -2887,6 +2891,7 @@ Col ruolo **Circolo**, in **Tornei › Squadre e campionati**.
 - **Su un Raspberry Pi Zero 2 W** (o un PC con Debian/Ubuntu): con *Raspberry Pi Imager* si scrive sulla microSD **Raspberry Pi OS Lite (64-bit)**, mettendo nelle impostazioni il nome `tsm-circolo`, la Wi-Fi del circolo e SSH acceso. Poi dal computer si copia il kit (`tsm-server-kit.tar.gz`) sul Pi, si entra con `ssh` e si lancia `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: installa Java, avvia il server a ogni accensione e scrive **indirizzo** (anche `http://tsm-circolo.local:8080`) e **codice di abbinamento**. Rilanciato con un kit nuovo, aggiorna il server senza toccare i dati; `sudo ./reset-admin.sh` dà un codice nuovo per la segreteria.
 - **Su un PC con la chiavetta USB**: l'immagine `tsm-server.iso` (Debian live) si scrive con `sudo ./make-usb.sh /dev/sdX` (su Windows con **Rufus**, con una *partizione persistente*): la chiavetta ha una partizione **persistence** dove restano i dati. Si avvia il PC dalla chiavetta (meglio col cavo di rete): sullo schermo compaiono indirizzo e codice. Senza la partizione persistence il server dimentica tutto allo spegnimento (e lo scrive sullo schermo).
 - **Copia dei dati**: tutto è in un solo file, `/var/lib/tsm-server/state.json`; conviene copiarlo ogni tanto e prima di riscrivere la chiavetta.
+- **Promemoria ai giocatori**: il circolo sceglie quante ore prima della partita arriva (*Promemoria ai giocatori*, 0 = nessuno; di solito 2). Nella pagina TSM il giocatore tocca **Attiva i promemoria** (su iPhone dall'app TSM sulla schermata Home, con iOS 16.4 o più recente e l'indirizzo https del circolo) e riceve subito una notifica di prova; nell'app TSM su Android c'è **Promemoria sul telefono**. Arriva anche un avviso se la segreteria toglie o sposta una sua prenotazione (non se la disdice lui).
 - **Avvisi alla segreteria**: con *Avvisami delle prenotazioni online* (acceso di solito) il telefono della segreteria riceve una notifica quando un giocatore prenota o disdice, anche ad app chiusa: ogni 15 minuti circa, quando c'è rete. Toccandola si apre il planning sul giorno della prenotazione. Quelle tolte dalla segreteria stessa non danno notifica.
 - **Da casa** (internet, in HTTPS: serve anche per mettere la pagina sulla schermata Home dell'iPhone). Tutto gratuito:
   1. Su **duckdns.org** (si entra con un account GitHub, Google…) si crea un nome, es. `tcprova.duckdns.org`, e si copia il **token**.
@@ -3413,6 +3418,7 @@ Com o papel **Clube**, em **Torneios › Equipes e campeonatos**.
 - **Num Raspberry Pi Zero 2 W** (ou um PC com Debian/Ubuntu): com o *Raspberry Pi Imager* escreve-se no microSD o **Raspberry Pi OS Lite (64-bit)**, com o nome `tsm-circolo`, o Wi-Fi do clube e SSH ligado. Depois copia-se o kit (`tsm-server-kit.tar.gz`) para o Pi, entra-se com `ssh` e corre-se `tar xzf tsm-server-kit.tar.gz && cd tsm-server && sudo ./install.sh`: instala o Java, arranca o servidor a cada ligação e mostra o **endereço** (também `http://tsm-circolo.local:8080`) e o **código de emparelhamento**. Corrido de novo com um kit novo, atualiza o servidor sem mexer nos dados; `sudo ./reset-admin.sh` dá um código novo à secretaria.
 - **Num PC com uma pen USB**: a imagem `tsm-server.iso` (Debian live) escreve-se com `sudo ./make-usb.sh /dev/sdX` (no Windows com o **Rufus**, com uma *partição persistente*): a pen fica com uma partição **persistence** onde os dados ficam guardados. Arranca-se o PC pela pen (de preferência com cabo de rede): no ecrã aparecem endereço e código. Sem a partição persistence, o servidor esquece tudo ao desligar (e avisa no ecrã).
 - **Cópia dos dados**: está tudo num só ficheiro, `/var/lib/tsm-server/state.json`; convém copiá-lo de vez em quando e antes de reescrever a pen.
+- **Lembretes aos jogadores**: o clube escolhe quantas horas antes do jogo chegam (*Lembrete aos jogadores*, 0 = não; normalmente 2). Na página TSM o jogador toca em **Ativar os lembretes** (no iPhone a partir da app TSM do ecrã principal, com iOS 16.4 ou mais recente e o endereço https do clube) e recebe logo uma notificação de teste; a app TSM no Android tem **Lembretes no telemóvel**. Também é avisado se a secretaria retirar ou mudar uma das suas reservas (não se for ele a cancelar).
 - **Avisos para a secretaria**: com *Avisar-me das reservas online* (ligado por omissão) o telemóvel da secretaria recebe uma notificação quando um jogador reserva ou cancela, mesmo com a app fechada: mais ou menos a cada 15 minutos, quando há rede. Ao tocá-la abre-se a agenda no dia da reserva. As que a própria secretaria tira não dão notificação.
 - **De casa** (internet, em HTTPS: também é preciso para pôr a página no ecrã principal do iPhone). Tudo grátis:
   1. Em **duckdns.org** (entra-se com uma conta GitHub, Google…) cria-se um nome, ex. `tcprova.duckdns.org`, e copia-se o **token**.
@@ -4164,6 +4170,11 @@ class MainActivity : ComponentActivity() {
 
     /** La notifica di una prenotazione online apre il planning sul suo giorno. */
     private fun openFromNotification(i: android.content.Intent?) {
+        if (i?.getBooleanExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK, false) == true) {
+            i.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_BOOK)
+            controller.go(Screen.BOOK_COURT)
+            return
+        }
         val day = i?.getLongExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY, 0L) ?: 0L
         if (day > 0) {
             i?.removeExtra(com.tennis.scoremanager.service.OnlineAlerts.EXTRA_PLAN_DAY)
@@ -6252,6 +6263,31 @@ class MatchController(
             if (e.code == "UNAUTHORIZED") saveBookingAccount(com.tennis.scoremanager.data.BookingAccount())
             Result.failure(e)
         }
+    }
+
+    init {
+        // Promemoria e avvisi del giocatore anche ad app chiusa, solo se è entrato in un circolo e li vuole.
+        scope.launch {
+            bookingAccount.map { it.joined && it.reminders }.distinctUntilChanged().collect { com.tennis.scoremanager.service.ServerCheckJob.schedulePlayer(app, it) }
+        }
+    }
+
+    fun setBookingReminders(on: Boolean) = saveBookingAccount(bookingAccount.value.copy(reminders = on))
+
+    /** Disdetta da qui: non è una notizia da dare al giocatore. */
+    fun noteMyCancel(id: String) = saveBookingAccount(bookingAccount.value.copy(cancelledHere = (bookingAccount.value.cancelledHere + id).distinct()))
+
+    /** Il controllo del giocatore (in background): promemoria della partita e prenotazioni tolte dalla segreteria. */
+    suspend fun checkMyBookings() {
+        val a = bookingAccount.value
+        if (!a.joined) return
+        val me = booking { it.me() }.getOrNull() ?: return
+        val now = System.currentTimeMillis()
+        val news = com.tennis.scoremanager.data.ClubServers.myNews(bookingAccount.value, me.bookings, me.rules.remindHours, now) { b ->
+            bookingLabel(com.tennis.scoremanager.data.CourtBooking("", b.court, b.start))
+        }
+        saveBookingAccount(news.account)
+        if (a.reminders) com.tennis.scoremanager.service.OnlineAlerts.postPlayer(app, strings, news.remind.map { it.label }, news.removed.map { it.label })
     }
 
     /** Esce dal circolo su questo telefono (per rientrare serve un nuovo invito). */
@@ -10766,7 +10802,15 @@ data class ClubServerConf(
  * l'invito. Vuoto = non è entrato in nessun circolo.
  */
 @Serializable
-data class BookingAccount(val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "") {
+data class BookingAccount(
+    val url: String = "", val token: String = "", val name: String = "", val player: String = "", val club: String = "",
+    /** Promemoria prima della partita e avviso se la segreteria toglie una prenotazione (notifiche sul telefono). */
+    val reminders: Boolean = true,
+    /** Le prenotazioni viste l'ultima volta (null = mai guardato), quelle già ricordate e quelle disdette da qui. */
+    val mine: Map<String, SeenBooking>? = null,
+    val reminded: List<String> = emptyList(),
+    val cancelledHere: List<String> = emptyList(),
+) {
     val joined: Boolean get() = url.isNotBlank() && token.isNotBlank()
 }
 
@@ -10829,6 +10873,27 @@ object ClubServers {
             busy = busy.filter { it.end >= now - 86_400_000L },
             rules = conf.rules.copy(courts = conf.rules.courts.filter { it in courts }), payInfo = conf.payInfo,
         )
+    }
+
+    /** Per il giocatore: i promemoria da mandare ora e le prenotazioni tolte dalla segreteria. */
+    data class MyNews(val remind: List<SeenBooking>, val removed: List<SeenBooking>, val account: BookingAccount)
+
+    /**
+     * Le notifiche del giocatore: il promemoria entro [remindHours] dall'inizio (una volta; la prima volta che si
+     * guarda niente promemoria per quelle già dentro le ore) e le prenotazioni sparite che non ha disdetto lui.
+     */
+    fun myNews(a: BookingAccount, bookings: List<SrvMyBooking>, remindHours: Int, now: Long, label: (SrvMyBooking) -> String): MyNews {
+        val current = bookings.filter { it.start + it.minutes * 60_000L > now }.associate { it.id to SeenBooking(label(it), it.start) }
+        val window = remindHours * 3_600_000L
+        val inWindow = if (remindHours <= 0) emptyMap() else current.filter { (id, b) -> id !in a.reminded && b.start > now && b.start - now <= window }
+        val first = a.mine == null
+        val removed = if (first) emptyList() else a.mine!!.filter { (id, b) -> id !in current && id !in a.cancelledHere && b.start > now }.values.sortedBy { it.start }
+        val next = a.copy(
+            mine = current,
+            reminded = (a.reminded.filter { it in current } + inWindow.keys).distinct(),
+            cancelledHere = a.cancelledHere.filter { it in current },
+        )
+        return MyNews(if (first) emptyList() else inWindow.values.sortedBy { it.start }, removed, next)
     }
 
     /** Cosa c'è di nuovo online rispetto all'ultima volta: le prenotazioni arrivate e quelle disdette. */
@@ -19252,6 +19317,33 @@ object OnlineAlerts {
     fun allowed(context: Context): Boolean =
         Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
+    private const val PLAYER_CHANNEL = "my_bookings"
+    private const val PLAYER_ID = 7303
+    /** Dalla notifica del giocatore si apre Prenota un campo. */
+    const val EXTRA_BOOK = "tsm.bookCourt"
+
+    /** Al giocatore: il promemoria della partita e le prenotazioni tolte dalla segreteria. */
+    fun postPlayer(context: Context, s: Strings, remind: List<String>, removed: List<String>) {
+        if (remind.isEmpty() && removed.isEmpty() || !allowed(context)) return
+        val nm = context.getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(PLAYER_CHANNEL, s.pbAlertChannel, NotificationManager.IMPORTANCE_HIGH))
+        val open = PendingIntent.getActivity(
+            context, PLAYER_ID,
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra(EXTRA_BOOK, true),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        // Una notifica per ciascuna: il promemoria di una partita non deve coprire l'avviso di un'altra.
+        (remind.map { s.pbAlertReminder to it } + removed.map { s.pbAlertRemoved to it }).forEachIndexed { i, (title, text) ->
+            val n = NotificationCompat.Builder(context, PLAYER_CHANNEL)
+                .setSmallIcon(R.drawable.ic_stat_tennis)
+                .setContentTitle(title).setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setContentIntent(open).setAutoCancel(true)
+                .build()
+            nm.notify(PLAYER_ID + 1 + (text.hashCode() and 0xffff) + i, n)
+        }
+    }
+
     fun post(context: Context, s: Strings, added: List<String>, cancelled: List<String>, day: Long?) {
         if (added.isEmpty() && cancelled.isEmpty() || !allowed(context)) return
         val nm = context.getSystemService(NotificationManager::class.java)
@@ -19287,7 +19379,8 @@ class ServerCheckJob : JobService() {
     override fun onStartJob(params: JobParameters): Boolean {
         val c = (application as TsmApp).controller
         scope.launch {
-            c.syncServerNow()
+            // Lo stesso servizio per la segreteria (planning e prenotazioni online) e per il giocatore (promemoria).
+            if (params.jobId == PLAYER_JOB) c.checkMyBookings() else c.syncServerNow()
             jobFinished(params, false)
         }
         return true
@@ -19297,6 +19390,18 @@ class ServerCheckJob : JobService() {
 
     companion object {
         private const val JOB = 7302
+        private const val PLAYER_JOB = 7304
+
+        /** Il controllo del giocatore: promemoria e prenotazioni tolte (ogni 15 minuti circa). */
+        fun schedulePlayer(context: Context, on: Boolean) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!on) { js.cancel(PLAYER_JOB); return }
+            if (js.getPendingJob(PLAYER_JOB) != null) return
+            js.schedule(
+                JobInfo.Builder(PLAYER_JOB, ComponentName(context, ServerCheckJob::class.java))
+                    .setPeriodic(15 * 60_000L).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPersisted(true).build(),
+            )
+        }
 
         /** Accende o spegne il controllo periodico. */
         fun schedule(context: Context, on: Boolean) {
@@ -26017,6 +26122,12 @@ interface Strings {
     val srvAlertNew: (String) -> String
     val srvAlertGone: (String) -> String
     val srvAlertMany: (Int) -> String
+    val srvRemind: String
+    val pbReminders: String
+    val pbRemindersHint: (Int) -> String
+    val pbAlertChannel: String
+    val pbAlertReminder: String
+    val pbAlertRemoved: String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -27906,6 +28017,12 @@ object ItStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nuova prenotazione: $it" }
     override val srvAlertGone: (String) -> String = { "Disdetta: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novità nelle prenotazioni online" }
+    override val srvRemind = "Promemoria ai giocatori (ore prima, 0 = no)"
+    override val pbReminders = "Promemoria sul telefono"
+    override val pbRemindersHint: (Int) -> String = { "Una notifica $it ore prima della partita e se la segreteria toglie una tua prenotazione" }
+    override val pbAlertChannel = "Le tue prenotazioni"
+    override val pbAlertReminder = "Promemoria della partita"
+    override val pbAlertRemoved = "Prenotazione tolta dalla segreteria"
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -29776,6 +29893,12 @@ object EnStrings : Strings {
     override val srvAlertNew: (String) -> String = { "New booking: $it" }
     override val srvAlertGone: (String) -> String = { "Cancelled: $it" }
     override val srvAlertMany: (Int) -> String = { "$it changes in online bookings" }
+    override val srvRemind = "Reminder to players (hours before, 0 = none)"
+    override val pbReminders = "Reminders on the phone"
+    override val pbRemindersHint: (Int) -> String = { "A notification $it hours before the match and if the office removes one of your bookings" }
+    override val pbAlertChannel = "Your bookings"
+    override val pbAlertReminder = "Match reminder"
+    override val pbAlertRemoved = "Booking removed by the club office"
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -31669,6 +31792,12 @@ object DeStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Neue Buchung: $it" }
     override val srvAlertGone: (String) -> String = { "Storniert: $it" }
     override val srvAlertMany: (Int) -> String = { "$it Änderungen bei den Online-Buchungen" }
+    override val srvRemind = "Erinnerung an Spieler (Stunden vorher, 0 = keine)"
+    override val pbReminders = "Erinnerungen auf dem Handy"
+    override val pbRemindersHint: (Int) -> String = { "Eine Benachrichtigung $it Stunden vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt" }
+    override val pbAlertChannel = "Deine Buchungen"
+    override val pbAlertReminder = "Erinnerung an dein Spiel"
+    override val pbAlertRemoved = "Buchung vom Vereinsbüro entfernt"
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -33555,6 +33684,12 @@ object EsStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nueva reserva: $it" }
     override val srvAlertGone: (String) -> String = { "Anulada: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novedades en las reservas en línea" }
+    override val srvRemind = "Recordatorio a los jugadores (horas antes, 0 = no)"
+    override val pbReminders = "Recordatorios en el teléfono"
+    override val pbRemindersHint: (Int) -> String = { "Una notificación $it horas antes del partido y si la secretaría quita una de tus reservas" }
+    override val pbAlertChannel = "Tus reservas"
+    override val pbAlertReminder = "Recordatorio del partido"
+    override val pbAlertRemoved = "Reserva quitada por la secretaría"
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -35443,6 +35578,12 @@ object FrStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nouvelle réservation : $it" }
     override val srvAlertGone: (String) -> String = { "Annulée : $it" }
     override val srvAlertMany: (Int) -> String = { "$it nouveautés dans les réservations en ligne" }
+    override val srvRemind = "Rappel aux joueurs (heures avant, 0 = aucun)"
+    override val pbReminders = "Rappels sur le téléphone"
+    override val pbRemindersHint: (Int) -> String = { "Une notification $it heures avant le match et si le secrétariat retire une de vos réservations" }
+    override val pbAlertChannel = "Vos réservations"
+    override val pbAlertReminder = "Rappel du match"
+    override val pbAlertRemoved = "Réservation retirée par le secrétariat"
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -37332,6 +37473,12 @@ object PtStrings : Strings {
     override val srvAlertNew: (String) -> String = { "Nova reserva: $it" }
     override val srvAlertGone: (String) -> String = { "Cancelada: $it" }
     override val srvAlertMany: (Int) -> String = { "$it novidades nas reservas online" }
+    override val srvRemind = "Lembrete aos jogadores (horas antes, 0 = não)"
+    override val pbReminders = "Lembretes no telemóvel"
+    override val pbRemindersHint: (Int) -> String = { "Uma notificação $it horas antes do jogo e se a secretaria retirar uma das tuas reservas" }
+    override val pbAlertChannel = "As tuas reservas"
+    override val pbAlertReminder = "Lembrete do jogo"
+    override val pbAlertRemoved = "Reserva retirada pela secretaria"
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -37934,6 +38081,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.AlertDialog
@@ -38146,6 +38294,13 @@ private fun BookingView(c: MatchController) {
 
         Text(listOfNotNull(s.pbRules(m.rules.daysAhead, m.rules.maxFuture), s.pbCancelRule(m.rules.cancelHours), m.payInfo.ifBlank { null }?.let { s.pbPay(it) }).joinToString(" "),
             color = TsmColors.TextDim, fontSize = 12.sp)
+        // Promemoria e avvisi sul telefono (anche ad app chiusa).
+        val acc by c.bookingAccount.collectAsState()
+        val notifPerm = rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
+        SwitchRow(Icons.Filled.NotificationsActive, s.pbReminders, s.pbRemindersHint(m.rules.remindHours), acc.reminders) { on ->
+            c.setBookingReminders(on)
+            if (on && !com.tennis.scoremanager.service.OnlineAlerts.allowed(context) && android.os.Build.VERSION.SDK_INT >= 33) notifPerm.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
         GhostButton(s.pbLeave, Icons.AutoMirrored.Filled.Logout, { leave = true }, Modifier.fillMaxWidth())
 
         booking?.let { (court, start) ->
@@ -38171,7 +38326,7 @@ private fun BookingView(c: MatchController) {
                         busy = true
                         scope.launch {
                             c.booking { it.cancelMine(b.id) }
-                                .onSuccess { cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
+                                .onSuccess { c.noteMyCancel(b.id); cancel = null; Toast.makeText(context, s.pbCancelled, Toast.LENGTH_SHORT).show(); reload() }
                                 .onFailure { err = bookErrorText(s, errCode(it)) }
                             busy = false
                         }
@@ -38455,6 +38610,7 @@ fun ClubServerDialog(c: MatchController, onDone: () -> Unit) {
                     stepper(s.srvMaxMinutes, rules.maxMinutes, 30, 240, 30, { s.bkMinutes(it) }) { rules = rules.copy(maxMinutes = it) }
                     stepper(s.srvCancelHours, rules.cancelHours, 0, 72) { rules = rules.copy(cancelHours = it) }
                     stepper(s.srvNotice, rules.noticeMinutes, 0, 240, 15) { rules = rules.copy(noticeMinutes = it) }
+                    stepper(s.srvRemind, rules.remindHours, 0, 24) { rules = rules.copy(remindHours = it) }
                     if (courts.size > 1) {
                         Text(s.srvCourts, color = TsmColors.TextDim, fontSize = 13.sp)
                         val on = rules.courts.ifEmpty { courts }
@@ -66700,6 +66856,25 @@ class ClubServersTest {
         assertTrue(gone.cancelled.isEmpty())
         assertTrue(gone.added.isEmpty())
     }
+
+    @Test fun playerRemindersAndRemovals() {
+        fun mb(id: String, start: Long) = SrvMyBooking(id, "Campo 1", start, 60, 0, false, false, true)
+        val label = { b: SrvMyBooking -> b.id }
+        val a0 = BookingAccount("http://x", "t")
+        // La prima volta: si ricorda e basta (niente promemoria per quelle già vicine).
+        val first = ClubServers.myNews(a0, listOf(mb("a", now + h), mb("b", now + 10 * h)), 2, now, label)
+        assertTrue(first.remind.isEmpty() && first.removed.isEmpty())
+        // Più tardi b entra nelle 2 ore: promemoria una volta sola.
+        val later = now + 9 * h
+        val second = ClubServers.myNews(first.account, listOf(mb("b", now + 10 * h)), 2, later, label)
+        assertEquals(listOf("b"), second.remind.map { it.label })
+        assertTrue(second.removed.isEmpty())  // a è già passata: non è una rimozione
+        assertTrue(ClubServers.myNews(second.account, listOf(mb("b", now + 10 * h)), 2, later + 60_000, label).remind.isEmpty())
+        // c tolta dalla segreteria, d disdetta da qui.
+        val withCd = ClubServers.myNews(second.account, listOf(mb("b", now + 10 * h), mb("c", now + 30 * h), mb("d", now + 40 * h)), 2, later, label)
+        val gone = ClubServers.myNews(withCd.account.copy(cancelledHere = listOf("d")), listOf(mb("b", now + 10 * h)), 2, later, label)
+        assertEquals(listOf("c"), gone.removed.map { it.label })
+    }
 }
 TSM_EOF
 
@@ -71426,6 +71601,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class SrvDay(val date: String, val timeZone: String, val slotMinutes: Int, val open: Boolean, val courts: List<CourtInfo>, val cells: List<Cell>)
 @Serializable data class SrvBookIn(val court: String, val start: Long, val minutes: Int, val heating: Boolean = false)
 @Serializable data class SrvQuote(val cents: Int, val lights: Boolean, val heating: Boolean, val problem: String? = null)
+
+
+/** Le notifiche push della pagina web: la chiave pubblica del server e l'abbonamento che dà il browser. */
+@Serializable data class SrvPushKey(val key: String)
+@Serializable data class SrvPushSub(val endpoint: String, val p256dh: String = "", val auth: String = "", val lang: String = "it")
 TSM_EOF
 
 # ---------------------------------------------------------------- courtcore/src/main/kotlin/com/tennis/scoremanager/data/CourtOnline.kt
@@ -71464,6 +71644,8 @@ data class BookingRules(
     val noticeMinutes: Int = 30,
     /** I campi prenotabili online (vuoto = tutti). */
     val courts: List<String> = emptyList(),
+    /** Quante ore prima della partita arriva il promemoria ai giocatori (0 = nessun promemoria). */
+    val remindHours: Int = 2,
 )
 
 /** Quello che la segreteria manda al server: il circolo, i campi, gli orari e prezzi, i blocchi, l'occupato e le regole. */
@@ -73865,6 +74047,8 @@ import com.tennis.scoremanager.data.SrvInvite
 import com.tennis.scoremanager.data.SrvInviteIn
 import com.tennis.scoremanager.data.SrvOk
 import com.tennis.scoremanager.data.SrvPlayer
+import com.tennis.scoremanager.data.SrvPushKey
+import com.tennis.scoremanager.data.SrvPushSub
 import com.tennis.scoremanager.data.SrvToken
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -73887,6 +74071,12 @@ data class Req(
 
 class ApiError(val status: Int, val code: String) : Exception(code)
 
+/** Manda una notifica push e restituisce il codice HTTP del servizio push. */
+fun interface Pusher { fun send(vapid: WebPush.Vapid, sub: PushSub, payload: String, ttlSeconds: Int): Int }
+
+/** Il contatto nelle notifiche (richiesto da Apple): un indirizzo https o mailto. */
+val PUSH_SUBJECT: String = System.getenv("TSM_PUSH_CONTACT") ?: "https://github.com/steve-linux/Tennis-Score-Manager"
+
 /**
  * Le chiamate del server, /api/v1/…: la segreteria si abbina col codice di setup, manda il planning e crea gli
  * inviti; i giocatori usano l'invito, guardano i giorni e prenotano o disdicono.
@@ -73895,7 +74085,12 @@ class Api(
     private val store: Store, private val limiter: Limiter = Limiter(),
     /** Abbinare la segreteria anche da internet (TSM_PAIR_REMOTE=1); di solito solo dalla rete del circolo. */
     private val pairRemote: Boolean = System.getenv("TSM_PAIR_REMOTE") == "1",
+    /** Chi manda le notifiche push (nei test, uno finto che le conta). */
+    private val pusher: Pusher = Pusher { v, sub, payload, ttl -> WebPush.send(v, PUSH_SUBJECT, sub, payload, ttl) },
+    /** Le notifiche partono in un filo a parte, per non far aspettare chi prenota (nei test, subito). */
+    private val async: Boolean = true,
 ) {
+    private val sender = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "push").apply { isDaemon = true } }
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = false }
 
     private fun <T> ok(ser: KSerializer<T>, v: T, status: Int = 200) = Resp(status, json.encodeToString(ser, v))
@@ -73925,6 +74120,9 @@ class Api(
             r.method == "POST" && p == listOf("bookings") -> book(player(r), r)
             r.method == "DELETE" && p.size == 2 && p[0] == "bookings" -> cancel(player(r), p[1])
             r.method == "POST" && p == listOf("logout") -> logout(player(r), r.token!!)
+            r.method == "GET" && p == listOf("push", "key") -> { player(r); ok(SrvPushKey.serializer(), SrvPushKey(vapid().publicKey)) }
+            r.method == "POST" && p == listOf("push", "subscribe") -> subscribe(player(r), r)
+            r.method == "POST" && p == listOf("push", "unsubscribe") -> unsubscribe(player(r), r)
             else -> throw ApiError(404, "NOT_FOUND")
         }
     }
@@ -74006,14 +74204,69 @@ class Api(
     }
 
     private fun adminCancel(id: String): Resp {
-        val found = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.any { it.id == id } }
-        if (!found) throw ApiError(404, "NOT_FOUND")
+        val gone = store.update { s -> s.copy(bookings = s.bookings.filter { it.id != id }) to s.bookings.firstOrNull { it.id == id } }
+            ?: throw ApiError(404, "NOT_FOUND")
+        // Tolta (o spostata) dalla segreteria: il giocatore lo sa subito, se la partita non è già passata.
+        if (gone.start > store.now()) push(gone.player, ttl = 24 * 3600) { PushTexts.removed(it.lang, gone, store.state.sync.timeZone) }
         return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    // --- Notifiche push ---
+
+    private fun vapid(): WebPush.Vapid = store.state.vapid ?: store.update { s -> (s.vapid ?: WebPush.newVapid()).let { s.copy(vapid = it) to it } }
+
+    /** Manda a tutti i telefoni del giocatore; gli abbonamenti scaduti (404, 410) si tolgono. */
+    private fun push(player: String, ttl: Int, payload: (PushSub) -> String) {
+        val subs = store.state.pushSubs.filter { it.player == player }
+        if (subs.isEmpty()) return
+        val v = vapid()
+        val job = Runnable {
+            val dead = subs.filter { sub -> pusher.send(v, sub, payload(sub), ttl).let { it == 404 || it == 410 } }.map { it.endpoint }.toSet()
+            if (dead.isNotEmpty()) store.update { s -> s.copy(pushSubs = s.pushSubs.filter { it.endpoint !in dead }) to Unit }
+        }
+        if (async) sender.execute(job) else job.run()
+    }
+
+    private fun subscribe(pl: Player, r: Req): Resp {
+        val sub = read(SrvPushSub.serializer(), r)
+        val host = runCatching { java.net.URI(sub.endpoint) }.getOrNull()
+        if (host?.scheme != "https" || host.host.isNullOrBlank() || sub.endpoint.length > 1000 || sub.p256dh.isBlank() || sub.auth.isBlank()) throw ApiError(400, "BAD_REQUEST")
+        runCatching { require(WebPush.dec(sub.p256dh).size == 65 && WebPush.dec(sub.auth).size == 16) }.getOrElse { throw ApiError(400, "BAD_REQUEST") }
+        val now = store.now()
+        val ps = PushSub(pl.id, sub.endpoint, sub.p256dh, sub.auth, sub.lang.take(2).lowercase(), now)
+        // Lo stesso browser sostituisce il suo abbonamento; al massimo 5 per giocatore.
+        store.update { s -> s.copy(pushSubs = (s.pushSubs.filter { it.endpoint != ps.endpoint } + ps).let { all -> all.filter { it.player != pl.id } + all.filter { it.player == pl.id }.takeLast(5) }) to Unit }
+        // Una prima notifica: così si vede subito che funziona.
+        val job = Runnable { pusher.send(vapid(), ps, PushTexts.welcome(ps.lang, store.state.sync.club), 3600) }
+        if (async) sender.execute(job) else job.run()
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    private fun unsubscribe(pl: Player, r: Req): Resp {
+        val sub = read(SrvPushSub.serializer(), r)
+        store.update { s -> s.copy(pushSubs = s.pushSubs.filter { !(it.player == pl.id && it.endpoint == sub.endpoint) }) to Unit }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    /**
+     * Ogni minuto: i promemoria delle partite che cominciano entro le ore decise dal circolo. Chi prenota già dentro
+     * quelle ore non lo riceve (lo sa); ognuno parte una volta sola.
+     */
+    fun tick(now: Long = store.now()) {
+        val hours = store.state.sync.rules.remindHours
+        val due = store.update { s ->
+            val window = hours * 3_600_000L
+            val inWindow = if (hours <= 0) emptyList() else s.bookings.filter { it.id !in s.reminded && it.start > now && it.start - now <= window }
+            val send = inWindow.filter { it.createdAt < it.start - window }
+            val ids = s.bookings.map { it.id }.toSet()
+            s.copy(reminded = (s.reminded.filter { it in ids } + inWindow.map { it.id }).distinct()) to send
+        }
+        for (b in due) push(b.player, ttl = ((b.start - now) / 1000).toInt().coerceAtLeast(60)) { PushTexts.reminder(it.lang, b, store.state.sync.timeZone) }
     }
 
     /** Il giocatore non entra più (le sue prenotazioni restano, la segreteria le vede e le toglie se serve). */
     private fun removePlayer(id: String): Resp {
-        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }) to Unit }
+        store.update { s -> s.copy(players = s.players.filter { it.id != id }, invites = s.invites.filter { it.player != id }, pushSubs = s.pushSubs.filter { it.player != id }) to Unit }
         return ok(SrvOk.serializer(), SrvOk())
     }
 
@@ -74183,6 +74436,9 @@ fun addresses(host: String): List<String> {
 /** Avvia il server: /api/v1/… per l'app e la pagina web, il resto è la pagina web (PWA). */
 fun start(store: Store, host: String, port: Int): HttpServer {
     val api = Api(store)
+    // Ogni minuto i promemoria delle partite.
+    java.util.concurrent.Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "promemoria").apply { isDaemon = true } }
+        .scheduleAtFixedRate({ runCatching { api.tick() }.onFailure { System.err.println("Promemoria: $it") } }, 30, 60, java.util.concurrent.TimeUnit.SECONDS)
     val server = HttpServer.create(InetSocketAddress(host, port), 0)
     server.executor = Executors.newFixedThreadPool(4)
     server.createContext("/") { ex ->
@@ -74267,6 +74523,53 @@ private class Texts(val code: (String, String) -> String, val app: String, val l
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/PushTexts.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/PushTexts.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.OnlineBooking
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+/** I testi delle notifiche ai giocatori, nella lingua del loro telefono (quella della pagina quando si sono abbonati). */
+object PushTexts {
+    private data class T(val welcome: String, val welcomeBody: String, val reminder: String, val removed: String)
+
+    private val texts = mapOf(
+        "it" to T("Promemoria attivi", "Ti avviseremo prima delle partite e se la segreteria cambia una prenotazione.", "Promemoria della partita", "Prenotazione tolta dalla segreteria"),
+        "en" to T("Reminders on", "We will remind you before your matches and tell you if the office changes a booking.", "Match reminder", "Booking removed by the club office"),
+        "fr" to T("Rappels activés", "Nous vous préviendrons avant vos matchs et si le secrétariat modifie une réservation.", "Rappel du match", "Réservation retirée par le secrétariat"),
+        "de" to T("Erinnerungen an", "Wir erinnern dich vor deinen Spielen und melden, wenn das Büro eine Buchung ändert.", "Erinnerung an dein Spiel", "Buchung vom Vereinsbüro entfernt"),
+        "es" to T("Recordatorios activados", "Te avisaremos antes de tus partidos y si la secretaría cambia una reserva.", "Recordatorio del partido", "Reserva quitada por la secretaría"),
+        "pt" to T("Lembretes ativos", "Vamos avisar-te antes dos jogos e se a secretaria mudar uma reserva.", "Lembrete do jogo", "Reserva retirada pela secretaria"),
+    )
+
+    private fun t(lang: String) = texts[lang] ?: texts.getValue("en")
+
+    /** "Campo 1 · mar 3 nov 10:00", con l'ora del circolo. */
+    fun label(b: OnlineBooking, zone: String, lang: String): String {
+        val z = runCatching { ZoneId.of(zone) }.getOrDefault(ZoneId.of("Europe/Rome"))
+        val f = DateTimeFormatter.ofPattern("EEE d MMM HH:mm", Locale.forLanguageTag(lang))
+        return "${b.court} · ${f.format(Instant.ofEpochMilli(b.start).atZone(z))}"
+    }
+
+    private fun esc(s: String) = s.replace("\\", "\\\\").replace("\"", "\\\"")
+
+    /** Il contenuto della notifica: titolo, testo, il giorno da aprire e un'etichetta (le notifiche uguali si sostituiscono). */
+    private fun json(title: String, body: String, tag: String, start: Long?) =
+        """{"title":"${esc(title)}","body":"${esc(body)}","tag":"${esc(tag)}"${start?.let { ",\"start\":$it" } ?: ""}}"""
+
+    fun welcome(lang: String, club: String) = json(t(lang).welcome, (club.ifBlank { "TSM" }) + ": " + t(lang).welcomeBody, "welcome", null)
+    fun reminder(lang: String, b: OnlineBooking, zone: String) = json(t(lang).reminder, label(b, zone, lang), "r-${b.id}", b.start)
+    fun removed(lang: String, b: OnlineBooking, zone: String) = json(t(lang).removed, label(b, zone, lang), "x-${b.id}", b.start)
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/Store.kt
 cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/Store.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -74288,6 +74591,10 @@ import java.util.TimeZone
 @Serializable
 data class Player(val id: String, val name: String, val tokens: List<String> = emptyList(), val since: Long = 0, val lastSeen: Long = 0)
 
+/** Un abbonamento alle notifiche push di un giocatore (un browser, un telefono): lo dà il browser. */
+@Serializable
+data class PushSub(val player: String, val endpoint: String, val p256dh: String, val auth: String, val lang: String = "it", val since: Long = 0)
+
 /** Un invito non ancora usato: si salva solo l'impronta del codice. */
 @Serializable
 data class Invite(val code: String, val player: String, val name: String, val expires: Long)
@@ -74307,6 +74614,11 @@ data class State(
     val players: List<Player> = emptyList(),
     val invites: List<Invite> = emptyList(),
     val bookings: List<OnlineBooking> = emptyList(),
+    /** Le chiavi per le notifiche push (create al primo uso). */
+    val vapid: WebPush.Vapid? = null,
+    val pushSubs: List<PushSub> = emptyList(),
+    /** Le prenotazioni di cui il promemoria è già partito. */
+    val reminded: List<String> = emptyList(),
 )
 
 object Secrets {
@@ -74386,6 +74698,151 @@ class Store(val dir: File, private val clock: () -> Long = System::currentTimeMi
         fun applyTimeZone(id: String) {
             if (id in TimeZone.getAvailableIDs()) TimeZone.setDefault(TimeZone.getTimeZone(id))
         }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/main/kotlin/com/tennis/scoremanager/server/WebPush.kt
+cat > "$DEST/server/src/main/kotlin/com/tennis/scoremanager/server/WebPush.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import java.math.BigInteger
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.security.AlgorithmParameters
+import java.security.KeyFactory
+import java.security.KeyPairGenerator
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.SecureRandom
+import java.security.Signature
+import java.security.interfaces.ECPrivateKey
+import java.security.interfaces.ECPublicKey
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.ECParameterSpec
+import java.security.spec.ECPoint
+import java.security.spec.ECPrivateKeySpec
+import java.security.spec.ECPublicKeySpec
+import java.time.Duration
+import java.util.Base64
+import javax.crypto.Cipher
+import javax.crypto.KeyAgreement
+import javax.crypto.Mac
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
+
+/**
+ * Le notifiche push della pagina web (anche su iPhone, dalla schermata Home), senza servizi né librerie: il
+ * messaggio cifrato come vuole il browser (RFC 8291, aes128gcm) e firmato col nostro paio di chiavi (VAPID,
+ * RFC 8292), poi mandato al servizio push del browser (Apple, Google, Mozilla).
+ */
+object WebPush {
+    private val rnd = SecureRandom()
+    private val b64 = Base64.getUrlEncoder().withoutPadding()
+    private val unb64 = Base64.getUrlDecoder()
+
+    fun enc(b: ByteArray): String = b64.encodeToString(b)
+    fun dec(s: String): ByteArray = unb64.decode(s.trim().trimEnd('='))
+
+    private val p256: ECParameterSpec = AlgorithmParameters.getInstance("EC").run {
+        init(ECGenParameterSpec("secp256r1")); getParameterSpec(ECParameterSpec::class.java)
+    }
+
+    /** Il paio di chiavi del server: privata (32 byte) e pubblica (65 byte, punto non compresso), in base64url. */
+    @kotlinx.serialization.Serializable
+    data class Vapid(val privateKey: String, val publicKey: String)
+
+    fun newVapid(): Vapid {
+        val kp = KeyPairGenerator.getInstance("EC").apply { initialize(ECGenParameterSpec("secp256r1"), rnd) }.generateKeyPair()
+        val d = (kp.private as ECPrivateKey).s
+        return Vapid(enc(fixed(d.toByteArray(), 32)), enc(raw(kp.public as ECPublicKey)))
+    }
+
+    private fun fixed(b: ByteArray, n: Int): ByteArray = when {
+        b.size == n -> b
+        b.size > n -> b.copyOfRange(b.size - n, b.size)
+        else -> ByteArray(n - b.size) + b
+    }
+
+    private fun raw(k: ECPublicKey): ByteArray = byteArrayOf(4) + fixed(k.w.affineX.toByteArray(), 32) + fixed(k.w.affineY.toByteArray(), 32)
+
+    private fun publicKey(raw: ByteArray): PublicKey {
+        require(raw.size == 65 && raw[0] == 4.toByte()) { "chiave pubblica non valida" }
+        val point = ECPoint(BigInteger(1, raw.copyOfRange(1, 33)), BigInteger(1, raw.copyOfRange(33, 65)))
+        return KeyFactory.getInstance("EC").generatePublic(ECPublicKeySpec(point, p256))
+    }
+
+    private fun privateKey(raw: ByteArray): PrivateKey = KeyFactory.getInstance("EC").generatePrivate(ECPrivateKeySpec(BigInteger(1, raw), p256))
+
+    private fun hmac(key: ByteArray, data: ByteArray): ByteArray = Mac.getInstance("HmacSHA256").run { init(SecretKeySpec(key, "HmacSHA256")); doFinal(data) }
+
+    /**
+     * Il messaggio cifrato per un abbonamento ([uaPublic], [authSecret] dati dal browser). [asPrivate]/[asPublic] e
+     * [salt] sono a caso a ogni messaggio; si passano solo nei test (l'esempio dell'RFC 8291).
+     */
+    fun encrypt(
+        plaintext: ByteArray, uaPublic: ByteArray, authSecret: ByteArray,
+        asPrivate: ByteArray? = null, asPublic: ByteArray? = null, salt: ByteArray = ByteArray(16).also { rnd.nextBytes(it) },
+    ): ByteArray {
+        val (priv, pub) = if (asPrivate != null && asPublic != null) privateKey(asPrivate) to asPublic else {
+            val kp = KeyPairGenerator.getInstance("EC").apply { initialize(ECGenParameterSpec("secp256r1"), rnd) }.generateKeyPair()
+            kp.private to raw(kp.public as ECPublicKey)
+        }
+        val ecdh = KeyAgreement.getInstance("ECDH").run { init(priv); doPhase(publicKey(uaPublic), true); generateSecret() }
+        // HKDF in due passi, come nell'RFC 8291 §3.4.
+        val prkKey = hmac(authSecret, ecdh)
+        val ikm = hmac(prkKey, "WebPush: info".toByteArray() + byteArrayOf(0) + uaPublic + pub + byteArrayOf(1))
+        val prk = hmac(salt, ikm)
+        val cek = hmac(prk, "Content-Encoding: aes128gcm".toByteArray() + byteArrayOf(0, 1)).copyOf(16)
+        val nonce = hmac(prk, "Content-Encoding: nonce".toByteArray() + byteArrayOf(0, 1)).copyOf(12)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, SecretKeySpec(cek, "AES"), GCMParameterSpec(128, nonce)) }
+        // Un solo blocco: il testo e il delimitatore 0x02 dell'ultimo blocco.
+        val body = cipher.doFinal(plaintext + byteArrayOf(2))
+        val rs = byteArrayOf(0, 0, 0x10, 0)
+        return salt + rs + byteArrayOf(pub.size.toByte()) + pub + body
+    }
+
+    /** L'intestazione Authorization VAPID per il servizio push di [endpoint] (valida 12 ore). */
+    fun vapidHeader(vapid: Vapid, endpoint: String, subject: String, now: Long): String {
+        val u = URI(endpoint)
+        val aud = "${u.scheme}://${u.host}" + if (u.port > 0) ":${u.port}" else ""
+        val header = enc("""{"typ":"JWT","alg":"ES256"}""".toByteArray())
+        val claims = enc("""{"aud":"$aud","exp":${now / 1000 + 12 * 3600},"sub":"$subject"}""".toByteArray())
+        val signingInput = "$header.$claims"
+        val der = Signature.getInstance("SHA256withECDSA").run { initSign(privateKey(dec(vapid.privateKey))); update(signingInput.toByteArray()); sign() }
+        return "vapid t=$signingInput.${enc(derToRaw(der))}, k=${vapid.publicKey}"
+    }
+
+    /** La firma ECDSA da DER (quella di Java) a R||S di 64 byte (quella del JWT). */
+    internal fun derToRaw(der: ByteArray): ByteArray {
+        var i = 2
+        if (der[1].toInt() and 0x80 != 0) i += der[1].toInt() and 0x7f
+        fun int(): ByteArray { check(der[i] == 0x02.toByte()); val len = der[i + 1].toInt(); val v = der.copyOfRange(i + 2, i + 2 + len); i += 2 + len; return fixed(v, 32) }
+        return int() + int()
+    }
+
+    private val http: HttpClient by lazy { HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build() }
+
+    /**
+     * Manda [payload] all'abbonamento; restituisce il codice HTTP del servizio push (201 = preso; 404 e 410 =
+     * abbonamento scaduto, da togliere), o 0 se non si arriva.
+     */
+    fun send(vapid: Vapid, subject: String, sub: PushSub, payload: String, ttlSeconds: Int, now: Long = System.currentTimeMillis()): Int = try {
+        val body = encrypt(payload.toByteArray(), dec(sub.p256dh), dec(sub.auth))
+        val req = HttpRequest.newBuilder(URI(sub.endpoint)).timeout(Duration.ofSeconds(20))
+            .header("TTL", ttlSeconds.toString()).header("Urgency", "high")
+            .header("Content-Encoding", "aes128gcm").header("Content-Type", "application/octet-stream")
+            .header("Authorization", vapidHeader(vapid, sub.endpoint, subject, now))
+            .POST(HttpRequest.BodyPublishers.ofByteArray(body)).build()
+        http.send(req, HttpResponse.BodyHandlers.discarding()).statusCode()
+    } catch (e: Exception) {
+        System.err.println("Push non mandata a ${URI(sub.endpoint).host}: $e")
+        0
     }
 }
 TSM_EOF
@@ -74594,9 +75051,64 @@ function render(dayError) {
     el('div', { class: 'legend' }, ['FREE', 'MINE', 'BUSY', 'BLOCKED'].map(s => el('span', { class: s }, T[s]))),
     el('p', { class: 'tip' }, T.rules(r.daysAhead, r.maxFuture), ' ', T.cancelRule(r.cancelHours), me.payInfo ? ' ' + T.pay + ': ' + me.payInfo : ''),
   );
+  parts.push(el('div', { id: 'push' }));
   const tip = installTip();
   if (tip) parts.push(tip);
   $('app').replaceChildren(...parts);
+  updatePush();
+}
+
+// --- Promemoria (notifiche push) ---
+
+const PUSH_OK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && window.isSecureContext;
+
+function keyBytes(b64) {
+  const s = atob(b64.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - b64.length % 4) % 4));
+  return Uint8Array.from(s, c => c.charCodeAt(0));
+}
+
+async function currentSub() {
+  if (!PUSH_OK) return null;
+  const reg = await navigator.serviceWorker.getRegistration();
+  return reg ? reg.pushManager.getSubscription() : null;
+}
+
+/** Il riquadro dei promemoria: attivarli, vederli attivi, spegnerli; o perché qui non si può. */
+async function updatePush(message) {
+  const box = $('push');
+  if (!box) return;
+  const card = (...kids) => box.replaceChildren(el('div', { class: 'card' }, el('b', null, T.pushTitle), ...kids));
+  if (!PUSH_OK) {
+    const why = IOS && !STANDALONE ? T.pushIos : !window.isSecureContext ? T.pushHttps : null;
+    if (why) card(el('p', { class: 'dim' }, why)); else box.replaceChildren();
+    return;
+  }
+  if (Notification.permission === 'denied') { card(el('p', { class: 'dim' }, T.pushDenied)); return; }
+  let sub = null;
+  try { sub = await currentSub(); } catch (_) { /* nessun abbonamento */ }
+  const note = message ? el('p', { class: 'error' }, message) : null;
+  if (sub) card(el('p', { class: 'dim' }, T.pushActive), note, el('div', { class: 'actions' }, el('button', { class: 'ghost small', onclick: pushOff }, T.pushOff)));
+  else card(el('p', { class: 'dim' }, T.pushHint), note, el('div', { class: 'actions' }, el('button', { onclick: pushOn }, T.pushOn)));
+}
+
+async function pushOn() {
+  try {
+    if (await Notification.requestPermission() !== 'granted') { updatePush(); return; }
+    const key = await api('GET', '/push/key');
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(key.key) });
+    const j = sub.toJSON();
+    await api('POST', '/push/subscribe', { endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, lang: LANG });
+    updatePush();
+  } catch (e) { updatePush(T.pushFail); }
+}
+
+async function pushOff() {
+  try {
+    const sub = await currentSub();
+    if (sub) { await api('POST', '/push/unsubscribe', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+  } catch (_) { /* resta com'è */ }
+  updatePush();
 }
 
 function courtLine(c) {
@@ -74683,7 +75195,7 @@ $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSh
 $('refresh').addEventListener('click', () => { if (state.me) refresh(); });
 $('logout').addEventListener('click', async () => {
   if (!confirm(T.logoutAsk)) return;
-  try { await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
+  try { await pushOff(); await api('POST', '/logout'); } catch (_) { /* si esce comunque da qui */ }
   state.token = null; save(KEY, null); showInvite();
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(); });
@@ -74721,6 +75233,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Prenotato!', closedNow: 'Le prenotazioni online in questo momento sono chiuse: si vede il planning ma non si prenota.',
     notSynced: 'Il circolo non ha ancora pubblicato il planning.', offline: 'Il server del circolo non risponde. Riprova tra poco.',
     install: 'Su iPhone: Condividi › Aggiungi alla schermata Home, e la trovi come un\'app.',
+    pushTitle: 'Promemoria', pushHint: 'Una notifica sul telefono prima della partita e se la segreteria toglie una tua prenotazione.', pushOn: 'Attiva i promemoria', pushActive: 'Promemoria attivi su questo telefono.', pushOff: 'Spegni', pushDenied: 'Le notifiche per questa pagina sono bloccate: permettile nelle impostazioni del telefono.', pushIos: 'Su iPhone i promemoria arrivano nell\'app TSM sulla schermata Home (iOS 16.4 o più recente).', pushHttps: 'Per i promemoria serve l\'indirizzo https del circolo.', pushFail: 'Non sono riuscito ad attivare i promemoria: riprova.',
     refresh: 'Aggiorna', installOther: 'Per averla come un\'app: menu del browser › Aggiungi alla schermata Home.', iosTitle: 'Installa TSM sull\'iPhone', iosStep1: 'Tocca Condividi in basso', iosStep2: 'Scegli «Aggiungi alla schermata Home», poi Aggiungi.', iosStep3: 'Apri TSM dalla schermata Home e incolla questo codice d\'invito:', copy: 'Copia il codice', copied: 'Codice copiato: incollalo nell\'app TSM.', useBrowser: 'Usa nel browser, senza installare',
     rules: (d, n) => `Prenoti fino a ${d} giorni avanti, al massimo ${n} prenotazioni per volta.`,
     cancelRule: h => `Disdici da solo fino a ${h} ore prima.`,
@@ -74746,6 +75259,7 @@ const I18N = {
     pay: 'Payment', booked: 'Booked!', closedNow: 'Online booking is closed right now: you can see the schedule but not book.',
     notSynced: 'The club has not published the schedule yet.', offline: 'The club server is not answering. Try again shortly.',
     install: 'On iPhone: Share › Add to Home Screen, and it works like an app.',
+    pushTitle: 'Reminders', pushHint: 'A notification on your phone before the match and if the office removes one of your bookings.', pushOn: 'Turn reminders on', pushActive: 'Reminders are on for this phone.', pushOff: 'Turn off', pushDenied: 'Notifications for this page are blocked: allow them in the phone settings.', pushIos: 'On iPhone, reminders arrive in the TSM app on the Home Screen (iOS 16.4 or later).', pushHttps: 'Reminders need the club\'s https address.', pushFail: 'Could not turn reminders on: try again.',
     refresh: 'Refresh', installOther: 'To use it like an app: browser menu › Add to Home Screen.', iosTitle: 'Install TSM on your iPhone', iosStep1: 'Tap Share at the bottom', iosStep2: 'Choose “Add to Home Screen”, then Add.', iosStep3: 'Open TSM from the Home Screen and paste this invitation code:', copy: 'Copy the code', copied: 'Code copied: paste it in the TSM app.', useBrowser: 'Use it in the browser, without installing',
     rules: (d, n) => `You can book up to ${d} days ahead, at most ${n} bookings at a time.`,
     cancelRule: h => `You can cancel yourself up to ${h} hours before.`,
@@ -74771,6 +75285,7 @@ const I18N = {
     pay: 'Paiement', booked: 'Réservé !', closedNow: 'Les réservations en ligne sont fermées pour le moment : on voit le planning mais on ne réserve pas.',
     notSynced: 'Le club n\'a pas encore publié le planning.', offline: 'Le serveur du club ne répond pas. Réessayez dans un instant.',
     install: 'Sur iPhone : Partager › Sur l\'écran d\'accueil, et elle fonctionne comme une app.',
+    pushTitle: 'Rappels', pushHint: 'Une notification sur le téléphone avant le match et si le secrétariat retire une de vos réservations.', pushOn: 'Activer les rappels', pushActive: 'Rappels activés sur ce téléphone.', pushOff: 'Désactiver', pushDenied: 'Les notifications de cette page sont bloquées : autorisez-les dans les réglages du téléphone.', pushIos: 'Sur iPhone, les rappels arrivent dans l\'app TSM de l\'écran d\'accueil (iOS 16.4 ou plus récent).', pushHttps: 'Les rappels demandent l\'adresse https du club.', pushFail: 'Impossible d\'activer les rappels : réessayez.',
     refresh: 'Actualiser', installOther: 'Pour l\'avoir comme une app : menu du navigateur › Ajouter à l\'écran d\'accueil.', iosTitle: 'Installer TSM sur l\'iPhone', iosStep1: 'Touchez Partager en bas', iosStep2: 'Choisissez « Sur l\'écran d\'accueil », puis Ajouter.', iosStep3: 'Ouvrez TSM depuis l\'écran d\'accueil et collez ce code d\'invitation :', copy: 'Copier le code', copied: 'Code copié : collez-le dans l\'app TSM.', useBrowser: 'Utiliser dans le navigateur, sans installer',
     rules: (d, n) => `Réservation jusqu'à ${d} jours à l'avance, ${n} réservations au maximum à la fois.`,
     cancelRule: h => `Annulation par vous-même jusqu'à ${h} heures avant.`,
@@ -74796,6 +75311,7 @@ const I18N = {
     pay: 'Bezahlung', booked: 'Gebucht!', closedNow: 'Online-Buchungen sind gerade geschlossen: Der Plan ist sichtbar, aber buchen geht nicht.',
     notSynced: 'Der Verein hat den Plan noch nicht veröffentlicht.', offline: 'Der Vereinsserver antwortet nicht. Versuch es gleich noch einmal.',
     install: 'Auf dem iPhone: Teilen › Zum Home-Bildschirm, dann funktioniert sie wie eine App.',
+    pushTitle: 'Erinnerungen', pushHint: 'Eine Benachrichtigung auf dem Handy vor dem Spiel und wenn das Büro eine deiner Buchungen entfernt.', pushOn: 'Erinnerungen einschalten', pushActive: 'Erinnerungen sind auf diesem Handy an.', pushOff: 'Ausschalten', pushDenied: 'Benachrichtigungen für diese Seite sind blockiert: Erlaube sie in den Handy-Einstellungen.', pushIos: 'Auf dem iPhone kommen die Erinnerungen in der TSM-App auf dem Home-Bildschirm an (iOS 16.4 oder neuer).', pushHttps: 'Für Erinnerungen braucht es die https-Adresse des Vereins.', pushFail: 'Erinnerungen ließen sich nicht einschalten: Versuch es noch einmal.',
     refresh: 'Aktualisieren', installOther: 'Um sie wie eine App zu nutzen: Browsermenü › Zum Startbildschirm hinzufügen.', iosTitle: 'TSM auf dem iPhone installieren', iosStep1: 'Unten auf Teilen tippen', iosStep2: '„Zum Home-Bildschirm“ wählen, dann Hinzufügen.', iosStep3: 'TSM vom Home-Bildschirm öffnen und diesen Einladungscode einfügen:', copy: 'Code kopieren', copied: 'Code kopiert: In der TSM-App einfügen.', useBrowser: 'Im Browser nutzen, ohne Installation',
     rules: (d, n) => `Buchbar bis ${d} Tage im Voraus, höchstens ${n} Buchungen gleichzeitig.`,
     cancelRule: h => `Selbst stornieren bis ${h} Stunden vorher.`,
@@ -74821,6 +75337,7 @@ const I18N = {
     pay: 'Pago', booked: '¡Reservada!', closedNow: 'Las reservas en línea están cerradas ahora: se ve el planning pero no se reserva.',
     notSynced: 'El club aún no ha publicado el planning.', offline: 'El servidor del club no responde. Inténtalo en un momento.',
     install: 'En iPhone: Compartir › Añadir a pantalla de inicio, y funciona como una app.',
+    pushTitle: 'Recordatorios', pushHint: 'Una notificación en el teléfono antes del partido y si la secretaría quita una de tus reservas.', pushOn: 'Activar los recordatorios', pushActive: 'Recordatorios activados en este teléfono.', pushOff: 'Apagar', pushDenied: 'Las notificaciones de esta página están bloqueadas: permítelas en los ajustes del teléfono.', pushIos: 'En iPhone los recordatorios llegan en la app TSM de la pantalla de inicio (iOS 16.4 o posterior).', pushHttps: 'Para los recordatorios hace falta la dirección https del club.', pushFail: 'No se han podido activar los recordatorios: inténtalo de nuevo.',
     refresh: 'Actualizar', installOther: 'Para tenerla como una app: menú del navegador › Añadir a pantalla de inicio.', iosTitle: 'Instala TSM en el iPhone', iosStep1: 'Toca Compartir abajo', iosStep2: 'Elige «Añadir a pantalla de inicio» y luego Añadir.', iosStep3: 'Abre TSM desde la pantalla de inicio y pega este código de invitación:', copy: 'Copiar el código', copied: 'Código copiado: pégalo en la app TSM.', useBrowser: 'Usar en el navegador, sin instalar',
     rules: (d, n) => `Reservas hasta ${d} días antes, como mucho ${n} reservas a la vez.`,
     cancelRule: h => `Anulas tú mismo hasta ${h} horas antes.`,
@@ -74846,6 +75363,7 @@ const I18N = {
     pay: 'Pagamento', booked: 'Reservado!', closedNow: 'As reservas online estão fechadas agora: vê-se a agenda mas não se reserva.',
     notSynced: 'O clube ainda não publicou a agenda.', offline: 'O servidor do clube não responde. Tenta daqui a pouco.',
     install: 'No iPhone: Partilhar › Adicionar ao ecrã principal, e funciona como uma app.',
+    pushTitle: 'Lembretes', pushHint: 'Uma notificação no telemóvel antes do jogo e se a secretaria retirar uma das tuas reservas.', pushOn: 'Ativar os lembretes', pushActive: 'Lembretes ativos neste telemóvel.', pushOff: 'Desligar', pushDenied: 'As notificações desta página estão bloqueadas: permite-as nas definições do telemóvel.', pushIos: 'No iPhone os lembretes chegam na app TSM do ecrã principal (iOS 16.4 ou mais recente).', pushHttps: 'Para os lembretes é preciso o endereço https do clube.', pushFail: 'Não foi possível ativar os lembretes: tenta de novo.',
     refresh: 'Atualizar', installOther: 'Para a ter como uma app: menu do navegador › Adicionar ao ecrã principal.', iosTitle: 'Instala o TSM no iPhone', iosStep1: 'Toca em Partilhar em baixo', iosStep2: 'Escolhe «Adicionar ao ecrã principal» e depois Adicionar.', iosStep3: 'Abre o TSM a partir do ecrã principal e cola este código de convite:', copy: 'Copiar o código', copied: 'Código copiado: cola-o na app TSM.', useBrowser: 'Usar no navegador, sem instalar',
     rules: (d, n) => `Reservas até ${d} dias antes, no máximo ${n} reservas de cada vez.`,
     cancelRule: h => `Cancelas sozinho até ${h} horas antes.`,
@@ -75632,7 +76150,7 @@ cat > "$DEST/server/src/main/resources/web/sw.js" << 'TSM_EOF'
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // La pagina si apre anche senza rete (poi dice che il server non risponde); le chiamate /api passano sempre dalla rete.
-const CACHE = 'tsm-campi-1';
+const CACHE = 'tsm-campi-2';
 const SHELL = ['./', 'index.html', 'style.css', 'i18n.js', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -75647,6 +76165,23 @@ self.addEventListener('fetch', e => {
     if (r.ok) caches.open(CACHE).then(c => c.put(e.request, copy));
     return r;
   }).catch(() => caches.match(e.request, { ignoreSearch: true })));
+});
+
+// Le notifiche del server del circolo: promemoria della partita, prenotazione tolta dalla segreteria.
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'TSM', {
+    body: d.body || '', tag: d.tag || undefined, icon: 'icon-192.png', badge: 'icon-192.png', data: { start: d.start || null },
+  }));
+});
+// Toccandola si apre (o torna davanti) la pagina.
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    for (const c of list) if ('focus' in c) return c.focus();
+    return self.clients.openWindow('./');
+  }));
 });
 TSM_EOF
 
@@ -75830,6 +76365,173 @@ class ApiTest {
         val code = store.ensureSetupCode()!!
         val open = Api(store, Limiter { now }, pairRemote = true)
         assertEquals(200, open.handle(Req("POST", "/api/v1/admin/pair", body = """{"code":"$code"}""", viaProxy = true)).status)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/PushApiTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/PushApiTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import com.tennis.scoremanager.data.BookingRules
+import com.tennis.scoremanager.data.ClubSync
+import com.tennis.scoremanager.data.CourtSettings
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import java.nio.file.Files
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
+class PushApiTest {
+    private val zone = ZoneId.of("Europe/Rome")
+    private fun at(day: Int, h: Int) = ZonedDateTime.of(2026, 11, day, h, 0, 0, 0, zone).toInstant().toEpochMilli()
+
+    private var now = at(9, 8)
+    private lateinit var store: Store
+    private lateinit var api: Api
+    /** Le notifiche "mandate": a chi e cosa. */
+    private val sent = mutableListOf<Pair<String, String>>()
+    private var answer = 201
+
+    @Before fun setUp() {
+        store = Store(Files.createTempDirectory("tsm-push").toFile()) { now }
+        api = Api(store, Limiter { now }, pusher = { _, sub, payload, _ -> sent += sub.endpoint to payload; answer }, async = false)
+    }
+
+    private fun call(method: String, path: String, body: String = "", token: String? = null) = api.handle(Req(method, "/api/v1$path", body = body, token = token, ip = "1.1.1.1"))
+    private fun field(json: String, k: String) = Json.parseToJsonElement(json).jsonObject[k]!!.jsonPrimitive.content
+
+    /** Segreteria abbinata, planning mandato (promemoria 2 ore prima), un giocatore entrato. */
+    private fun ready(): Pair<String, String> {
+        val admin = field(call("POST", "/admin/pair", """{"code":"${store.ensureSetupCode()}"}""").body, "token")
+        val sync = ClubSync(club = "TC Prova", courts = listOf("Campo 1"), settings = CourtSettings(openHour = 8, closeHour = 22), rules = BookingRules(maxFuture = 3, remindHours = 2))
+        call("PUT", "/admin/sync", Json.encodeToString(ClubSync.serializer(), sync), admin)
+        val code = field(call("POST", "/admin/invites", """{"player":"p1","name":"Mario"}""", admin).body, "code")
+        return admin to field(call("POST", "/claim", """{"code":"$code"}""").body, "token")
+    }
+
+    private val key = WebPush.newVapid().publicKey
+    private val auth = WebPush.enc(ByteArray(16) { it.toByte() })
+    private fun subscribe(token: String, endpoint: String = "https://web.push.apple.com/abc") =
+        call("POST", "/push/subscribe", """{"endpoint":"$endpoint","p256dh":"$key","auth":"$auth","lang":"it"}""", token)
+
+    @Test fun subscribeSendsAWelcome() {
+        val (_, mario) = ready()
+        assertEquals(65, WebPush.dec(field(call("GET", "/push/key", token = mario).body, "key")).size)
+        assertEquals(200, subscribe(mario).status)
+        assertEquals(1, sent.size)
+        assertTrue(sent.single().second.contains("Promemoria attivi"))
+        assertEquals(400, subscribe(mario, "http://non-sicuro.example/x").status)
+        assertEquals(401, call("POST", "/push/subscribe", "{}").status)
+    }
+
+    @Test fun reminderOnceInTheWindow() {
+        val (_, mario) = ready()
+        subscribe(mario); sent.clear()
+        call("POST", "/bookings", """{"court":"Campo 1","start":${at(10, 18)},"minutes":60}""", mario)
+        now = at(10, 15); api.tick()
+        assertTrue(sent.isEmpty())
+        now = at(10, 16); api.tick()
+        assertEquals(1, sent.size)
+        assertTrue(sent.single().second.contains("Promemoria della partita"))
+        assertTrue(sent.single().second.contains("Campo 1"))
+        now = at(10, 17); api.tick()
+        assertEquals(1, sent.size)
+    }
+
+    @Test fun noReminderWhenBookedInsideTheWindow() {
+        val (_, mario) = ready()
+        subscribe(mario); sent.clear()
+        now = at(9, 9)
+        call("POST", "/bookings", """{"court":"Campo 1","start":${at(9, 10)},"minutes":60}""", mario)
+        api.tick()
+        assertTrue(sent.isEmpty())
+    }
+
+    @Test fun removedByTheOfficeAndDeadSubscriptions() {
+        val (admin, mario) = ready()
+        subscribe(mario); sent.clear()
+        val id = field(call("POST", "/bookings", """{"court":"Campo 1","start":${at(11, 18)},"minutes":60}""", mario).body, "id")
+        answer = 410
+        assertEquals(200, call("DELETE", "/admin/bookings/$id", token = admin).status)
+        assertTrue(sent.single().second.contains("tolta dalla segreteria"))
+        // Il servizio push ha detto che l'abbonamento non c'è più: si toglie.
+        assertTrue(store.state.pushSubs.isEmpty())
+    }
+
+    @Test fun playerCancelGivesNoNotification() {
+        val (_, mario) = ready()
+        subscribe(mario); sent.clear()
+        val id = field(call("POST", "/bookings", """{"court":"Campo 1","start":${at(12, 18)},"minutes":60}""", mario).body, "id")
+        assertEquals(200, call("DELETE", "/bookings/$id", token = mario).status)
+        assertTrue(sent.isEmpty())
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- server/src/test/kotlin/com/tennis/scoremanager/server/WebPushTest.kt
+cat > "$DEST/server/src/test/kotlin/com/tennis/scoremanager/server/WebPushTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.server
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.math.BigInteger
+import java.security.AlgorithmParameters
+import java.security.KeyFactory
+import java.security.Signature
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.ECParameterSpec
+import java.security.spec.ECPoint
+import java.security.spec.ECPublicKeySpec
+
+class WebPushTest {
+    /** L'esempio dell'RFC 8291, appendice A: stesso risultato byte per byte. */
+    @Test fun rfc8291Example() {
+        val out = WebPush.encrypt(
+            plaintext = "When I grow up, I want to be a watermelon".toByteArray(),
+            uaPublic = WebPush.dec("BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4"),
+            authSecret = WebPush.dec("BTBZMqHH6r4Tts7J_aSIgg"),
+            asPrivate = WebPush.dec("yfWPiYE-n46HLnH0KqZOF1fJJU3MYrct3AELtAQ-oRw"),
+            asPublic = WebPush.dec("BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8"),
+            salt = WebPush.dec("DGv6ra1nlYgDCS1FRnbzlw"),
+        )
+        assertEquals(
+            "DGv6ra1nlYgDCS1FRnbzlwAAEABBBP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A_yl95bQpu6cVPTpK4Mqgkf1CXztLVBSt2Ks3oZwbuwXPXLWyouBWLVWGNWQexSgSxsj_Qulcy4a-fN",
+            WebPush.enc(out),
+        )
+    }
+
+    /** La firma VAPID si verifica con la chiave pubblica che il browser riceve. */
+    @Test fun vapidSignatureVerifies() {
+        val v = WebPush.newVapid()
+        val h = WebPush.vapidHeader(v, "https://web.push.apple.com/QGuQyavXutnMH", "https://example.org", 1_800_000_000_000)
+        val jwt = h.removePrefix("vapid t=").substringBefore(",")
+        val (head, claims, sig) = jwt.split('.')
+        assertTrue(String(WebPush.dec(claims)).contains("\"aud\":\"https://web.push.apple.com\""))
+        val raw = WebPush.dec(sig)
+        assertEquals(64, raw.size)
+        // Di nuovo in DER per la verifica di Java.
+        fun derInt(b: ByteArray): ByteArray { val t = b.dropWhile { it == 0.toByte() }.toByteArray(); val v2 = if (t.isNotEmpty() && t[0] < 0) byteArrayOf(0) + t else t; return byteArrayOf(2, v2.size.toByte()) + v2 }
+        val seq = derInt(raw.copyOf(32)) + derInt(raw.copyOfRange(32, 64))
+        val der = byteArrayOf(0x30, seq.size.toByte()) + seq
+        val p256 = AlgorithmParameters.getInstance("EC").run { init(ECGenParameterSpec("secp256r1")); getParameterSpec(ECParameterSpec::class.java) }
+        val pubRaw = WebPush.dec(v.publicKey)
+        val pub = KeyFactory.getInstance("EC").generatePublic(ECPublicKeySpec(ECPoint(BigInteger(1, pubRaw.copyOfRange(1, 33)), BigInteger(1, pubRaw.copyOfRange(33, 65))), p256))
+        val ok = Signature.getInstance("SHA256withECDSA").run { initVerify(pub); update("$head.$claims".toByteArray()); verify(der) }
+        assertTrue(ok)
+        assertEquals(65, pubRaw.size)
     }
 }
 TSM_EOF
@@ -78727,6 +79429,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 267 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 271 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."
