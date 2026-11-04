@@ -10,6 +10,9 @@ import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
+import com.tennis.scoremanager.data.SrvBackupData
+import kotlinx.serialization.builtins.ListSerializer
 import com.tennis.scoremanager.data.SrvBookIn
 import com.tennis.scoremanager.data.SrvDay
 import com.tennis.scoremanager.data.SrvMe
@@ -97,6 +100,9 @@ class Api(
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
+            r.method == "POST" && p == listOf("admin", "backups") -> { admin(r); putBackup(r) }
+            r.method == "GET" && p == listOf("admin", "backups") -> { admin(r); ok(ListSerializer(SrvBackup.serializer()), backups()) }
+            r.method == "GET" && p == listOf("admin", "backup") -> { admin(r); getBackup(r.query["name"].orEmpty()) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
             r.method == "POST" && p == listOf("claim") -> claim(r)
@@ -189,6 +195,36 @@ class Api(
             s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
             s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
         ))
+    }
+
+    // --- Backup della segreteria ---
+
+    private val backupDir get() = java.io.File(store.dir, "backups")
+    private val backupName = Regex("[\\p{L}\\p{N} ._-]{1,150}\\.tsmclub")
+
+    private fun backups(): List<SrvBackup> = backupDir.listFiles { f -> f.isFile && backupName.matches(f.name) }.orEmpty()
+        .map { SrvBackup(it.name, it.lastModified(), it.length()) }.sortedByDescending { it.at }
+
+    /** Tiene la copia mandata dalla segreteria e le ultime 14; il file è com'è (compresso), non lo legge. */
+    private fun putBackup(r: Req): Resp {
+        val i = read(SrvBackupData.serializer(), r)
+        if (!backupName.matches(i.name)) throw ApiError(400, "BAD_REQUEST")
+        val bytes = runCatching { java.util.Base64.getDecoder().decode(i.data) }.getOrNull() ?: throw ApiError(400, "BAD_REQUEST")
+        if (bytes.isEmpty()) throw ApiError(400, "BAD_REQUEST")
+        backupDir.mkdirs()
+        val tmp = java.io.File(backupDir, ".${i.name}.tmp")
+        tmp.writeBytes(bytes)
+        val f = java.io.File(backupDir, i.name)
+        if (!tmp.renameTo(f)) { f.writeBytes(bytes); tmp.delete() }
+        f.setLastModified(store.now())
+        backups().drop(14).forEach { java.io.File(backupDir, it.name).delete() }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    private fun getBackup(name: String): Resp {
+        if (!backupName.matches(name)) throw ApiError(400, "BAD_REQUEST")
+        val f = java.io.File(backupDir, name).takeIf { it.isFile } ?: throw ApiError(404, "NOT_FOUND")
+        return ok(SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(f.readBytes())))
     }
 
     /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */

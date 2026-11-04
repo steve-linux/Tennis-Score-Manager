@@ -250,6 +250,12 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun putBackup(name: String, bytes: ByteArray): SrvOk =
+        call("POST", "/admin/backups", SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(bytes)), SrvOk.serializer())
+    fun backups(): List<SrvBackup> = call<Unit, List<SrvBackup>>("GET", "/admin/backups", null, null, kotlinx.serialization.builtins.ListSerializer(SrvBackup.serializer()))
+    fun backup(name: String): ByteArray = java.util.Base64.getDecoder().decode(
+        call<Unit, SrvBackupData>("GET", "/admin/backup?name=${java.net.URLEncoder.encode(name, "UTF-8")}", null, null, SrvBackupData.serializer()).data,
+    )
     fun removeWaitAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/waits/$id", null, null, SrvOk.serializer())
     fun removeSeekAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/seeks/$id", null, null, SrvOk.serializer())
 

@@ -204,7 +204,7 @@ async function start() {
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
   return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
-    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['settings', T.settingsTitle, true]]
+    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['backup', T.bkTitle, true], ['settings', T.settingsTitle, true]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -219,7 +219,7 @@ async function render() {
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, settings: showSettings })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, backup: showBackup, settings: showSettings })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -1168,6 +1168,82 @@ async function showStats() {
     h('p.dim', T.stRevenueHint),
     heat ? h('div.section', h('h2', T.stHeat), h('p.dim', T.stHeatHint), heat) : null,
     st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
+}
+
+// --- Backup della segreteria ---
+
+const kb = (n) => (n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB');
+const whenTime = (t) => new Date(t).toLocaleString(locale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+/** Un file in base64 dal telefono: lo salva sul PC col suo nome. */
+function saveB64(name, b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+  const a = h('a', { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+const fileB64 = (file) => new Promise((ok, ko) => {
+  const fr = new FileReader();
+  fr.onload = () => ok(String(fr.result).split(',')[1] || '');
+  fr.onerror = () => ko(fr.error);
+  fr.readAsDataURL(file);
+});
+
+/** Prima mostra cosa c'è nel backup, poi lo ripristina se si conferma. */
+async function restoreFlow(src) {
+  let sum;
+  try { sum = await api('POST', '/backup/preview', src); } catch (e) { toast(errText(e)); return; }
+  const rows = [[T.members, sum.members], [T.bkPlayers, sum.players], [T.money, T.bkChargesLine(sum.charges, sum.payments)], [T.plan, T.nBookings(sum.bookings)],
+    [T.cups, sum.tournaments], [T.scTitle, sum.courses], [T.tmTitle, sum.teams], [T.crtTitle, sum.courts]];
+  dialog(T.bkRestoreTitle, h('div',
+    h('p', h('b', sum.club || '—'), ' · ', whenTime(sum.createdAt), sum.app ? h('span.dim', ' · TSM ' + sum.app) : null),
+    h('div.panel', h('table', h('tbody', rows.map(([a, b]) => h('tr', h('td', a), h('td.num', b)))))),
+    h('p', h('span.tag.warn', T.bkRestoreWarn)), h('p.dim', T.bkRestoreSafe)), async () => {
+    await api('POST', '/backup/restore', src);
+    people = [];
+    toast(T.bkRestored);
+    await showBackup();
+  }, { saveText: T.bkRestore });
+}
+
+async function showBackup() {
+  const b = await api('GET', '/backup/info');
+  const auto = h('input', { type: 'checkbox', checked: b.auto });
+  auto.addEventListener('change', async () => { try { await api('PUT', '/backup/auto', { on: auto.checked }); toast(T.saved); } catch (e) { toast(errText(e)); } await showBackup(); });
+  const pick = h('input', { type: 'file', accept: '.tsmclub,application/octet-stream', 'aria-label': T.bkFromFile });
+  pick.addEventListener('change', async () => {
+    const f = pick.files[0];
+    if (!f) return;
+    if (f.size > 12 * 1024 * 1024) { toast(T.err.TOO_BIG); return; }
+    restoreFlow({ src: 'file', data: await fileB64(f) });
+    pick.value = '';
+  });
+  const copies = (list, src) => (list.length ? h('div.panel', h('table', h('tbody', list.map((x) => h('tr',
+    h('td', whenTime(x.at)), h('td.dim', x.name), h('td.num', kb(x.size)),
+    h('td.num.nowrap', h('button', { type: 'button', onclick: async () => {
+      try { const f = await api('POST', '/backup/get', { src, name: x.name }); saveB64(x.name, f.data); } catch (e) { toast(errText(e)); }
+    } }, T.bkDownload), h('button', { type: 'button', onclick: () => restoreFlow({ src, name: x.name }) }, T.bkRestore)))))))
+    : h('p.dim', T.bkNone));
+  put(main(),
+    h('div.head', h('h1', T.bkTitle)),
+    h('p.dim', T.bkHint),
+    h('div.cards',
+      h('div.card', h('h2', T.bkNowTitle), h('p.dim', T.bkNowHint), h('div.actions',
+        h('button', { type: 'button', onclick: async () => { try { await api('POST', '/backup/save'); toast(T.bkSaved); } catch (e) { toast(errText(e)); } await showBackup(); } }, T.bkSaveOnPhone),
+        h('button.primary', { type: 'button', onclick: async () => {
+          try { const f = await api('GET', '/backup/now'); saveB64(f.name, f.data); } catch (e) { toast(errText(e)); }
+        } }, T.bkDownloadNow))),
+      h('div.card', h('h2', T.bkAutoTitle), h('label.check', auto, T.bkAuto), h('p.dim', b.serverPaired ? T.bkAutoHintServer : T.bkAutoHint),
+        b.lastAt ? h('p', T.bkLast(whenTime(b.lastAt))) : h('p.dim', T.bkNever),
+        b.serverError ? h('p', h('span.tag.bad', T.bkServerFailed + ' (' + srvError(b.serverError) + ')')) : null),
+      h('div.card', h('h2', T.bkRestoreTitle), h('p.dim', T.bkRestoreHint), pick)),
+    h('div.section', h('h2', T.bkOnPhone), copies(b.local, 'local')),
+    b.serverPaired ? h('div.section', h('h2', T.bkOnServer), b.serverListError ? h('p', h('span.tag.bad', srvError(b.serverListError))) : copies(b.server, 'server')) : null,
+    h('p.dim', T.bkWhere));
 }
 
 // --- Server delle prenotazioni ---

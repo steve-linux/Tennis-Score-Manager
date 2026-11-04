@@ -1808,6 +1808,21 @@ interface Strings {
     val deskFirstTitle: String
     val deskFirstWhy: String
     val deskFirstSteps: String
+    /** Backup della segreteria (Campi). */
+    val obTitle: String
+    val obHint: String
+    val obAuto: String
+    val obAutoHint: String
+    val obNever: String
+    val obShare: String
+    val obRestoreFile: String
+    val obRestoreAsk: String
+    val obRestored: String
+    val obNotBackup: String
+    val obCopies: String
+    val obRestore: String
+    val obRestoreTitle: String
+    val obLast: (String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -3869,6 +3884,20 @@ object ItStrings : Strings {
     override val deskFirstTitle = "La prima volta il browser dirà «La connessione non è privata»"
     override val deskFirstWhy = "È normale e non è un pericolo: la pagina la serve questo telefono, con un certificato fatto da lui e non da un'azienda che il browser conosce. Il collegamento resta cifrato."
     override val deskFirstSteps = "• Chrome o Edge: Avanzate › Procedi su … (non sicuro)\n• Firefox: Avanzate… › Accetta il rischio e continua\n• Safari: Mostra dettagli › visita questo sito web"
+    override val obTitle = "Backup della segreteria"
+    override val obHint = "Soci, pagamenti, planning, tornei, corsi e squadre in un file"
+    override val obAuto = "Backup automatico ogni giorno"
+    override val obAutoHint = "Solo se è cambiato qualcosa. Sul telefono restano le ultime 14 copie, e sul server del circolo se c'è."
+    override val obNever = "Ancora nessun backup"
+    override val obShare = "Fai un backup e mandalo (Drive, email…)"
+    override val obRestoreFile = "Ripristina da un file"
+    override val obRestoreAsk = "Quello che c'è adesso nella segreteria viene sostituito da questo backup. Prima il telefono fa una copia di adesso."
+    override val obRestored = "Segreteria ripristinata"
+    override val obNotBackup = "Questo file non è un backup della segreteria di TSM."
+    override val obCopies = "Le ultime copie sul telefono"
+    override val obRestore = "Ripristina"
+    override val obRestoreTitle = "Ripristinare questo backup?"
+    override val obLast: (String) -> String = { "Ultimo backup: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -5911,6 +5940,20 @@ object EnStrings : Strings {
     override val deskFirstTitle = "The first time, the browser will say “Your connection is not private”"
     override val deskFirstWhy = "That's normal and not a danger: the page is served by this phone, with a certificate it made itself rather than one from a company the browser knows. The connection stays encrypted."
     override val deskFirstSteps = "• Chrome or Edge: Advanced › Proceed to … (unsafe)\n• Firefox: Advanced… › Accept the Risk and Continue\n• Safari: Show Details › visit this website"
+    override val obTitle = "Office backup"
+    override val obHint = "Members, payments, planner, tournaments, courses and teams in one file"
+    override val obAuto = "Automatic backup every day"
+    override val obAutoHint = "Only if something changed. The phone keeps the last 14 copies, and so does the club server if there is one."
+    override val obNever = "No backup yet"
+    override val obShare = "Back up and send it (Drive, email…)"
+    override val obRestoreFile = "Restore from a file"
+    override val obRestoreAsk = "What the office has now is replaced by this backup. The phone first makes a copy of now."
+    override val obRestored = "Office restored"
+    override val obNotBackup = "This file isn't a TSM office backup."
+    override val obCopies = "Latest copies on the phone"
+    override val obRestore = "Restore"
+    override val obRestoreTitle = "Restore this backup?"
+    override val obLast: (String) -> String = { "Last backup: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }

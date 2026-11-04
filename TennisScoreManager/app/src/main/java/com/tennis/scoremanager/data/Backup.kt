@@ -24,7 +24,7 @@ import java.util.zip.ZipOutputStream
 object Backup {
     const val VERSION = 1
     /** Cartelle interne che non entrano: il modello dell'analisi del movimento e i file di sistema. */
-    private val SKIP_FILES = setOf("pose", "profileInstalled", "profileinstaller_profileWrittenFor_lastUpdateTime.dat")
+    private val SKIP_FILES = setOf("pose", "office_backups", "profileInstalled", "profileinstaller_profileWrittenFor_lastUpdateTime.dat")
     /** Impostazioni dell'app (shared_prefs). */
     private val PREFS = listOf("tsm.xml", "tv_server.xml")
     /** Nella cartella dell'app: la voce sempre, i video (moviola, highlights) a scelta. */

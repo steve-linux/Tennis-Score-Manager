@@ -511,6 +511,40 @@ class DeskTest {
         assertEquals(404, req("PUT", "/online/rules", """{"rules":{"courts":["Campo 9"]}}""", k).first)
     }
 
+    @Test fun backupDellaSegreteria() {
+        val k = login()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true}""", k)
+        req("POST", "/fees", """{"name":"Quota","cents":5000,"chargeMembers":true}""", k)
+        // Il backup di adesso: si legge, e dice cosa c'è dentro.
+        val (st, now) = req("GET", "/backup/now", token = k)
+        assertEquals(200, st)
+        val file = field(now, "data")!!
+        assertTrue(field(now, "name")!!.endsWith(".tsmclub"))
+        val (_, prev) = req("POST", "/backup/preview", """{"src":"file","data":"$file"}""", k)
+        assertTrue(prev, "\"members\":1" in prev && "\"charges\":1" in prev)
+        assertEquals(400, req("POST", "/backup/preview", """{"src":"file","data":"${java.util.Base64.getEncoder().encodeToString("ciao".toByteArray())}"}""", k).first)
+        // Dopo il backup si cambia tutto; il ripristino lo rimette com'era (e prima tiene una copia di adesso).
+        req("POST", "/people", """{"firstName":"Luca","lastName":"Bianchi","member":true}""", k)
+        data.ledger = data.ledger.copy(charges = emptyList())
+        assertEquals(200, req("POST", "/backup/restore", """{"src":"file","data":"$file"}""", k).first)
+        assertEquals(listOf("Mario Rossi"), data.list.map { it.name })
+        assertEquals(1, data.ledger.charges.size)
+        assertEquals(1, data.copies.size)
+        // Le copie sul telefono e sul server, e il ripristino da lì; nomi strani no.
+        data.server = com.tennis.scoremanager.data.ClubServerConf(url = "http://srv", token = "t")
+        assertEquals(200, req("POST", "/backup/save", token = k).first)
+        val (_, info) = req("GET", "/backup/info", token = k)
+        val name = data.copies.keys.last()
+        assertTrue(info, "\"serverPaired\":true" in info && name in info)
+        assertEquals(200, req("POST", "/backup/preview", """{"src":"local","name":"$name"}""", k).first)
+        assertEquals(200, req("POST", "/backup/preview", """{"src":"server","name":"$name"}""", k).first)
+        assertEquals(404, req("POST", "/backup/preview", """{"src":"local","name":"../club_book.json"}""", k).first)
+        data.remoteDown = true
+        assertTrue(req("GET", "/backup/info", token = k).second.contains("\"serverListError\":\"NET\""))
+        assertEquals(200, req("PUT", "/backup/auto", """{"on":true}""", k).first)
+        assertTrue(data.auto)
+    }
+
     @Test fun prenotazioniSenzaSovrapposizioni() {
         val k = login()
         val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""

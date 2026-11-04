@@ -11,6 +11,8 @@ import java.net.URLDecoder
 import java.util.concurrent.Executors
 
 private const val MAX_BODY = 512 * 1024
+/** I backup della segreteria pesano di più (compressi, in base64). */
+private const val MAX_BACKUP = 16 * 1024 * 1024
 
 private val USAGE = """
     TSM – server del circolo per le prenotazioni dei campi
@@ -85,8 +87,9 @@ private fun forwardedFor(ex: HttpExchange): String? =
 private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
 private fun serveApi(api: Api, ex: HttpExchange) {
-    val body = ex.requestBody.use { it.readNBytes(MAX_BODY + 1) }
-    if (body.size > MAX_BODY) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
+    val max = if (ex.requestURI.path.endsWith("/admin/backups")) MAX_BACKUP else MAX_BODY
+    val body = ex.requestBody.use { it.readNBytes(max + 1) }
+    if (body.size > max) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
     val query = ex.requestURI.rawQuery.orEmpty().split('&').filter { '=' in it }.associate {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }

@@ -241,6 +241,7 @@ private fun CourtsTab(c: MatchController) {
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
     var server by remember { mutableStateOf(false) }
+    var backup by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
     val f by c.clubFeatures.collectAsState()
@@ -253,9 +254,11 @@ private fun CourtsTab(c: MatchController) {
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
     }
     if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
+    Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (server) ClubServerDialog(c) { server = false }
+    if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }

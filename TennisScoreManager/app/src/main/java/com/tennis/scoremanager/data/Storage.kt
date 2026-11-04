@@ -631,6 +631,23 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
+    var officeBackupAuto: Boolean
+        get() = prefs.getBoolean("office_backup_auto", false)
+        set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
+    var officeBackupPrint: String
+        get() = prefs.getString("office_backup_print", null) ?: ""
+        set(v) = prefs.edit().putString("office_backup_print", v).apply()
+    var officeBackupAt: Long
+        get() = prefs.getLong("office_backup_at", 0L)
+        set(v) = prefs.edit().putLong("office_backup_at", v).apply()
+    /** L'ultimo invio della copia al server non riuscito (il codice), vuoto se è andato. */
+    var officeBackupServerError: String
+        get() = prefs.getString("office_backup_server_error", null) ?: ""
+        set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
+    /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
+    val officeBackupDir: File get() = File(app.filesDir, "office_backups")
+
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
         set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()

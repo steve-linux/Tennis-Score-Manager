@@ -15,7 +15,10 @@ import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.ClubServerConf
 import com.tennis.scoremanager.data.ClubServers
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtSettings
@@ -96,6 +99,16 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
+    override fun officeBackup(): Pair<String, ByteArray> = c.officeBackupName() to c.officeBackupBytes()
+    override fun officeAuto(): Boolean = c.storage.officeBackupAuto
+    override fun setOfficeAuto(on: Boolean) = c.setOfficeBackupAuto(on)
+    override fun officeLast(): Pair<Long, String> = c.storage.officeBackupAt to c.storage.officeBackupServerError
+    override fun localBackups(): List<OfficeBackupFile> = c.officeBackups()
+    override fun localBackup(name: String): ByteArray? = c.officeBackupFile(name)?.readBytes()
+    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.officeBackupNow(onlyIfChanged = false) }
+    override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
+    override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
+    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)

@@ -327,6 +327,12 @@ cat > "$DEST/app/src/main/AndroidManifest.xml" << 'TSM_EOF'
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- Una volta al giorno, se acceso: il backup della segreteria (solo se è cambiato qualcosa). -->
+        <service
+            android:name=".service.OfficeBackupJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <!-- Segreteria da PC: server HTTPS sulla rete locale, solo quando lo si accende -->
         <service
             android:name=".service.DeskService"
@@ -3265,7 +3271,7 @@ async function start() {
 const VIEWS = () => {
   const on = (f) => !info || !info.features || !info.features.length || info.features.includes(f);
   return [['today', T.tdTitle, true], ['people', T.members, on('MEMBERS')], ['money', T.money, on('PAYMENTS')], ['plan', T.plan, on('PLANNING')], ['cups', T.cups, on('TOURNAMENTS')],
-    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['settings', T.settingsTitle, true]]
+    ['school', T.scTitle, on('SCHOOL')], ['teams', T.tmTitle, on('TEAMS')], ['online', T.onlineTitle, on('SERVER')], ['stats', T.stTitle, on('STATS')], ['backup', T.bkTitle, true], ['settings', T.settingsTitle, true]]
     .filter((v) => v[2]).map(([v, l]) => [v, l]);
 };
 const main = () => document.querySelector('main');
@@ -3280,7 +3286,7 @@ async function render() {
       h('div.note', T.phoneNote),
       h('button', { onclick: logout }, T.logout)),
     h('main')));
-  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, settings: showSettings })[view](); }
+  try { await ({ today: showToday, people: showPeople, money: showMoney, plan: showPlan, cups: showCups, school: showSchool, teams: showTeams, online: showOnline, stats: showStats, backup: showBackup, settings: showSettings })[view](); }
   catch (e) { if (e instanceof ApiError && token) put(main(), h('div.empty', errText(e))); else if (!(e instanceof ApiError)) throw e; }
 }
 
@@ -4231,6 +4237,82 @@ async function showStats() {
     st.top.length ? h('div.section', h('h2', T.stTop), h('div.panel', h('table', h('tbody', st.top.map((x, i) => h('tr', h('td.num', i + 1), h('td', x.name), h('td.num', T.stCount(x.count)))))))) : null);
 }
 
+// --- Backup della segreteria ---
+
+const kb = (n) => (n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1024 / 1024).toFixed(1).replace('.', ',') + ' MB');
+const whenTime = (t) => new Date(t).toLocaleString(locale(), { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+/** Un file in base64 dal telefono: lo salva sul PC col suo nome. */
+function saveB64(name, b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+  const a = h('a', { href: url, download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+const fileB64 = (file) => new Promise((ok, ko) => {
+  const fr = new FileReader();
+  fr.onload = () => ok(String(fr.result).split(',')[1] || '');
+  fr.onerror = () => ko(fr.error);
+  fr.readAsDataURL(file);
+});
+
+/** Prima mostra cosa c'è nel backup, poi lo ripristina se si conferma. */
+async function restoreFlow(src) {
+  let sum;
+  try { sum = await api('POST', '/backup/preview', src); } catch (e) { toast(errText(e)); return; }
+  const rows = [[T.members, sum.members], [T.bkPlayers, sum.players], [T.money, T.bkChargesLine(sum.charges, sum.payments)], [T.plan, T.nBookings(sum.bookings)],
+    [T.cups, sum.tournaments], [T.scTitle, sum.courses], [T.tmTitle, sum.teams], [T.crtTitle, sum.courts]];
+  dialog(T.bkRestoreTitle, h('div',
+    h('p', h('b', sum.club || '—'), ' · ', whenTime(sum.createdAt), sum.app ? h('span.dim', ' · TSM ' + sum.app) : null),
+    h('div.panel', h('table', h('tbody', rows.map(([a, b]) => h('tr', h('td', a), h('td.num', b)))))),
+    h('p', h('span.tag.warn', T.bkRestoreWarn)), h('p.dim', T.bkRestoreSafe)), async () => {
+    await api('POST', '/backup/restore', src);
+    people = [];
+    toast(T.bkRestored);
+    await showBackup();
+  }, { saveText: T.bkRestore });
+}
+
+async function showBackup() {
+  const b = await api('GET', '/backup/info');
+  const auto = h('input', { type: 'checkbox', checked: b.auto });
+  auto.addEventListener('change', async () => { try { await api('PUT', '/backup/auto', { on: auto.checked }); toast(T.saved); } catch (e) { toast(errText(e)); } await showBackup(); });
+  const pick = h('input', { type: 'file', accept: '.tsmclub,application/octet-stream', 'aria-label': T.bkFromFile });
+  pick.addEventListener('change', async () => {
+    const f = pick.files[0];
+    if (!f) return;
+    if (f.size > 12 * 1024 * 1024) { toast(T.err.TOO_BIG); return; }
+    restoreFlow({ src: 'file', data: await fileB64(f) });
+    pick.value = '';
+  });
+  const copies = (list, src) => (list.length ? h('div.panel', h('table', h('tbody', list.map((x) => h('tr',
+    h('td', whenTime(x.at)), h('td.dim', x.name), h('td.num', kb(x.size)),
+    h('td.num.nowrap', h('button', { type: 'button', onclick: async () => {
+      try { const f = await api('POST', '/backup/get', { src, name: x.name }); saveB64(x.name, f.data); } catch (e) { toast(errText(e)); }
+    } }, T.bkDownload), h('button', { type: 'button', onclick: () => restoreFlow({ src, name: x.name }) }, T.bkRestore)))))))
+    : h('p.dim', T.bkNone));
+  put(main(),
+    h('div.head', h('h1', T.bkTitle)),
+    h('p.dim', T.bkHint),
+    h('div.cards',
+      h('div.card', h('h2', T.bkNowTitle), h('p.dim', T.bkNowHint), h('div.actions',
+        h('button', { type: 'button', onclick: async () => { try { await api('POST', '/backup/save'); toast(T.bkSaved); } catch (e) { toast(errText(e)); } await showBackup(); } }, T.bkSaveOnPhone),
+        h('button.primary', { type: 'button', onclick: async () => {
+          try { const f = await api('GET', '/backup/now'); saveB64(f.name, f.data); } catch (e) { toast(errText(e)); }
+        } }, T.bkDownloadNow))),
+      h('div.card', h('h2', T.bkAutoTitle), h('label.check', auto, T.bkAuto), h('p.dim', b.serverPaired ? T.bkAutoHintServer : T.bkAutoHint),
+        b.lastAt ? h('p', T.bkLast(whenTime(b.lastAt))) : h('p.dim', T.bkNever),
+        b.serverError ? h('p', h('span.tag.bad', T.bkServerFailed + ' (' + srvError(b.serverError) + ')')) : null),
+      h('div.card', h('h2', T.bkRestoreTitle), h('p.dim', T.bkRestoreHint), pick)),
+    h('div.section', h('h2', T.bkOnPhone), copies(b.local, 'local')),
+    b.serverPaired ? h('div.section', h('h2', T.bkOnServer), b.serverListError ? h('p', h('span.tag.bad', srvError(b.serverListError))) : copies(b.server, 'server')) : null,
+    h('p.dim', T.bkWhere));
+}
+
 // --- Server delle prenotazioni ---
 
 const srvError = (c) => ({ NET: T.srvErrNet, UNAUTHORIZED: T.srvErrAuth, NOT_TSM: T.srvErrNotTsm })[c] || T.srvErrOther(c);
@@ -5000,6 +5082,34 @@ const DESK_I18N = {
     rulesLater: "Regole salvate: vanno al server col prossimo invio",
     removeWaitAsk: (n) => `Togliere ${n} dalla lista d'attesa?`,
     removeSeekAsk: (n) => `Togliere l'annuncio di ${n}?`,
+    bkTitle: "Backup",
+    bkHint: "Solo la segreteria: soci e giocatori, quote e pagamenti, planning, tornei, scuola tennis, squadre, campi e impostazioni. Partite, colpi e video no (per quelli c'è il backup completo nell'app).",
+    bkNowTitle: "Fai un backup adesso",
+    bkNowHint: "Un solo file .tsmclub: tienilo dove vuoi (una cartella di Google Drive o Dropbox sul PC, una chiavetta).",
+    bkSaveOnPhone: "Copia sul telefono",
+    bkDownloadNow: "Scarica sul PC",
+    bkSaved: "Copia fatta sul telefono",
+    bkAutoTitle: "Backup automatico",
+    bkAuto: "Ogni giorno, solo se è cambiato qualcosa",
+    bkAutoHint: "Sul telefono restano le ultime 14 copie, anche ad app chiusa.",
+    bkAutoHintServer: "Sul telefono e sul server del circolo restano le ultime 14 copie, anche ad app chiusa.",
+    bkNever: "Ancora nessuna copia.",
+    bkServerFailed: "L'ultima copia non è arrivata al server",
+    bkRestoreTitle: "Ripristina",
+    bkRestoreHint: "Scegli un file .tsmclub: prima vedi cosa c'è dentro, poi confermi.",
+    bkFromFile: "File di backup",
+    bkRestore: "Ripristina",
+    bkRestoreWarn: "Quello che c'è adesso nella segreteria viene sostituito da questo backup.",
+    bkRestoreSafe: "Prima il telefono fa una copia di adesso: la trovi qui sotto, se vuoi tornare indietro. Il collegamento al server resta quello di adesso.",
+    bkRestored: "Segreteria ripristinata",
+    bkOnPhone: "Copie sul telefono",
+    bkOnServer: "Copie sul server del circolo",
+    bkNone: "Nessuna copia.",
+    bkDownload: "Scarica",
+    bkPlayers: "Giocatori (con i soci)",
+    bkWhere: "Il file contiene dati personali dei soci: tienilo in un posto tuo e non condividerlo. Il ripristino si fa da qui, o dall'app in Campi › Backup della segreteria.",
+    bkLast: (t) => `Ultima copia: ${t}`,
+    bkChargesLine: (c, p) => `${c} addebiti, ${p} pagamenti`,
     kindMembership: "Quota sociale",
     kindFitp: "Tessera FITP",
     kindCourse: "Corso",
@@ -5053,6 +5163,7 @@ const DESK_I18N = {
       OTHER: "Altro",
     },
     err: {
+      NOT_BACKUP: "Questo file non è un backup della segreteria di TSM.",
       NOT_PAIRED: "Il server delle prenotazioni non è abbinato.",
       COURT_EXISTS: "C'è già un campo con questo nome.",
       PAYTYPE_EXISTS: "Due modi di pagamento hanno lo stesso nome.",
@@ -5290,6 +5401,34 @@ const DESK_I18N = {
     rulesLater: "Rules saved: they go to the server with the next send",
     removeWaitAsk: (n) => `Remove ${n} from the waiting list?`,
     removeSeekAsk: (n) => `Remove ${n}'s post?`,
+    bkTitle: "Backup",
+    bkHint: "The office only: members and players, fees and payments, planner, tournaments, tennis school, teams, courts and settings. Not matches, strokes and videos (the app's full backup has those).",
+    bkNowTitle: "Back up now",
+    bkNowHint: "A single .tsmclub file: keep it wherever you like (a Google Drive or Dropbox folder on the PC, a USB stick).",
+    bkSaveOnPhone: "Copy on the phone",
+    bkDownloadNow: "Download to the PC",
+    bkSaved: "Copy made on the phone",
+    bkAutoTitle: "Automatic backup",
+    bkAuto: "Every day, only if something changed",
+    bkAutoHint: "The phone keeps the last 14 copies, even with the app closed.",
+    bkAutoHintServer: "The phone and the club server keep the last 14 copies, even with the app closed.",
+    bkNever: "No copies yet.",
+    bkServerFailed: "The last copy didn't reach the server",
+    bkRestoreTitle: "Restore",
+    bkRestoreHint: "Choose a .tsmclub file: first you see what's inside, then you confirm.",
+    bkFromFile: "Backup file",
+    bkRestore: "Restore",
+    bkRestoreWarn: "What the office has now is replaced by this backup.",
+    bkRestoreSafe: "The phone first makes a copy of now: you'll find it below if you want to go back. The server connection stays as it is.",
+    bkRestored: "Office restored",
+    bkOnPhone: "Copies on the phone",
+    bkOnServer: "Copies on the club server",
+    bkNone: "No copies.",
+    bkDownload: "Download",
+    bkPlayers: "Players (members included)",
+    bkWhere: "The file holds members' personal data: keep it somewhere of yours and don't share it. Restore from here, or from the app under Courts › Office backup.",
+    bkLast: (t) => `Last copy: ${t}`,
+    bkChargesLine: (c, p) => `${c} charges, ${p} payments`,
     kindMembership: "Membership",
     kindFitp: "Federation card",
     kindCourse: "Course",
@@ -5343,6 +5482,7 @@ const DESK_I18N = {
       OTHER: "Other",
     },
     err: {
+      NOT_BACKUP: "This file isn't a TSM office backup.",
       NOT_PAIRED: "The booking server isn't paired.",
       COURT_EXISTS: "There's already a court with this name.",
       PAYTYPE_EXISTS: "Two payment methods have the same name.",
@@ -5581,6 +5721,34 @@ const DESK_I18N = {
     rulesLater: "Règles enregistrées : elles partent au serveur au prochain envoi",
     removeWaitAsk: (n) => `Retirer ${n} de la liste d'attente ?`,
     removeSeekAsk: (n) => `Retirer l'annonce de ${n} ?`,
+    bkTitle: "Sauvegarde",
+    bkHint: "Seulement le secrétariat : adhérents et joueurs, cotisations et paiements, planning, tournois, école de tennis, équipes, courts et réglages. Pas les matchs, coups et vidéos (la sauvegarde complète de l'app les a).",
+    bkNowTitle: "Sauvegarder maintenant",
+    bkNowHint: "Un seul fichier .tsmclub : gardez-le où vous voulez (un dossier Google Drive ou Dropbox sur le PC, une clé USB).",
+    bkSaveOnPhone: "Copie sur le téléphone",
+    bkDownloadNow: "Télécharger sur le PC",
+    bkSaved: "Copie faite sur le téléphone",
+    bkAutoTitle: "Sauvegarde automatique",
+    bkAuto: "Chaque jour, seulement si quelque chose a changé",
+    bkAutoHint: "Le téléphone garde les 14 dernières copies, même app fermée.",
+    bkAutoHintServer: "Le téléphone et le serveur du club gardent les 14 dernières copies, même app fermée.",
+    bkNever: "Pas encore de copie.",
+    bkServerFailed: "La dernière copie n'est pas arrivée au serveur",
+    bkRestoreTitle: "Restaurer",
+    bkRestoreHint: "Choisissez un fichier .tsmclub : vous voyez d'abord ce qu'il contient, puis vous confirmez.",
+    bkFromFile: "Fichier de sauvegarde",
+    bkRestore: "Restaurer",
+    bkRestoreWarn: "Ce que le secrétariat a maintenant est remplacé par cette sauvegarde.",
+    bkRestoreSafe: "Le téléphone fait d'abord une copie de maintenant : vous la trouvez ci-dessous pour revenir en arrière. La liaison au serveur reste celle d'aujourd'hui.",
+    bkRestored: "Secrétariat restauré",
+    bkOnPhone: "Copies sur le téléphone",
+    bkOnServer: "Copies sur le serveur du club",
+    bkNone: "Aucune copie.",
+    bkDownload: "Télécharger",
+    bkPlayers: "Joueurs (adhérents compris)",
+    bkWhere: "Le fichier contient des données personnelles des adhérents : gardez-le chez vous et ne le partagez pas. La restauration se fait ici, ou dans l'app sous Terrains › Sauvegarde du secrétariat.",
+    bkLast: (t) => `Dernière copie : ${t}`,
+    bkChargesLine: (c, p) => `${c} débits, ${p} paiements`,
     kindMembership: "Cotisation",
     kindFitp: "Licence fédérale",
     kindCourse: "Cours",
@@ -5634,6 +5802,7 @@ const DESK_I18N = {
       OTHER: "Autre",
     },
     err: {
+      NOT_BACKUP: "Ce fichier n'est pas une sauvegarde du secrétariat TSM.",
       NOT_PAIRED: "Le serveur des réservations n'est pas associé.",
       COURT_EXISTS: "Il y a déjà un court avec ce nom.",
       PAYTYPE_EXISTS: "Deux modes de paiement ont le même nom.",
@@ -5871,6 +6040,34 @@ const DESK_I18N = {
     rulesLater: "Regeln gespeichert: sie gehen beim nächsten Senden an den Server",
     removeWaitAsk: (n) => `${n} von der Warteliste nehmen?`,
     removeSeekAsk: (n) => `Die Anzeige von ${n} entfernen?`,
+    bkTitle: "Sicherung",
+    bkHint: "Nur das Büro: Mitglieder und Spieler, Beiträge und Zahlungen, Platzplan, Turniere, Tennisschule, Mannschaften, Plätze und Einstellungen. Keine Spiele, Schläge und Videos (die hat die komplette Sicherung der App).",
+    bkNowTitle: "Jetzt sichern",
+    bkNowHint: "Eine einzige .tsmclub-Datei: bewahre sie auf, wo du willst (ein Google-Drive- oder Dropbox-Ordner am PC, ein USB-Stick).",
+    bkSaveOnPhone: "Kopie auf dem Handy",
+    bkDownloadNow: "Auf den PC laden",
+    bkSaved: "Kopie auf dem Handy gemacht",
+    bkAutoTitle: "Automatische Sicherung",
+    bkAuto: "Jeden Tag, nur wenn sich etwas geändert hat",
+    bkAutoHint: "Das Handy behält die letzten 14 Kopien, auch bei geschlossener App.",
+    bkAutoHintServer: "Handy und Vereinsserver behalten die letzten 14 Kopien, auch bei geschlossener App.",
+    bkNever: "Noch keine Kopie.",
+    bkServerFailed: "Die letzte Kopie ist nicht beim Server angekommen",
+    bkRestoreTitle: "Wiederherstellen",
+    bkRestoreHint: "Wähle eine .tsmclub-Datei: erst siehst du, was drin ist, dann bestätigst du.",
+    bkFromFile: "Sicherungsdatei",
+    bkRestore: "Wiederherstellen",
+    bkRestoreWarn: "Was das Büro jetzt hat, wird durch diese Sicherung ersetzt.",
+    bkRestoreSafe: "Das Handy macht vorher eine Kopie vom jetzigen Stand: du findest sie unten, wenn du zurück willst. Die Verbindung zum Server bleibt wie sie ist.",
+    bkRestored: "Büro wiederhergestellt",
+    bkOnPhone: "Kopien auf dem Handy",
+    bkOnServer: "Kopien auf dem Vereinsserver",
+    bkNone: "Keine Kopien.",
+    bkDownload: "Herunterladen",
+    bkPlayers: "Spieler (mit Mitgliedern)",
+    bkWhere: "Die Datei enthält persönliche Daten der Mitglieder: bewahre sie bei dir auf und teile sie nicht. Wiederherstellen geht hier oder in der App unter Plätze › Sicherung des Büros.",
+    bkLast: (t) => `Letzte Kopie: ${t}`,
+    bkChargesLine: (c, p) => `${c} Forderungen, ${p} Zahlungen`,
     kindMembership: "Mitgliedsbeitrag",
     kindFitp: "Verbandslizenz",
     kindCourse: "Kurs",
@@ -5924,6 +6121,7 @@ const DESK_I18N = {
       OTHER: "Andere",
     },
     err: {
+      NOT_BACKUP: "Diese Datei ist keine Büro-Sicherung von TSM.",
       NOT_PAIRED: "Der Buchungsserver ist nicht gekoppelt.",
       COURT_EXISTS: "Es gibt schon einen Platz mit diesem Namen.",
       PAYTYPE_EXISTS: "Zwei Zahlungsarten haben denselben Namen.",
@@ -6161,6 +6359,34 @@ const DESK_I18N = {
     rulesLater: "Reglas guardadas: van al servidor con el próximo envío",
     removeWaitAsk: (n) => `¿Quitar a ${n} de la lista de espera?`,
     removeSeekAsk: (n) => `¿Quitar el anuncio de ${n}?`,
+    bkTitle: "Copia de seguridad",
+    bkHint: "Solo la secretaría: socios y jugadores, cuotas y pagos, planning, torneos, escuela de tenis, equipos, pistas y ajustes. No partidos, golpes ni vídeos (la copia completa de la app los tiene).",
+    bkNowTitle: "Hacer una copia ahora",
+    bkNowHint: "Un solo archivo .tsmclub: guárdalo donde quieras (una carpeta de Google Drive o Dropbox en el PC, un pendrive).",
+    bkSaveOnPhone: "Copia en el teléfono",
+    bkDownloadNow: "Descargar al PC",
+    bkSaved: "Copia hecha en el teléfono",
+    bkAutoTitle: "Copia automática",
+    bkAuto: "Cada día, solo si algo ha cambiado",
+    bkAutoHint: "El teléfono guarda las últimas 14 copias, incluso con la app cerrada.",
+    bkAutoHintServer: "El teléfono y el servidor del club guardan las últimas 14 copias, incluso con la app cerrada.",
+    bkNever: "Todavía ninguna copia.",
+    bkServerFailed: "La última copia no llegó al servidor",
+    bkRestoreTitle: "Restaurar",
+    bkRestoreHint: "Elige un archivo .tsmclub: primero ves lo que contiene, luego confirmas.",
+    bkFromFile: "Archivo de copia",
+    bkRestore: "Restaurar",
+    bkRestoreWarn: "Lo que tiene ahora la secretaría se sustituye por esta copia.",
+    bkRestoreSafe: "Antes el teléfono hace una copia de ahora: la encuentras abajo si quieres volver atrás. La conexión con el servidor queda como está.",
+    bkRestored: "Secretaría restaurada",
+    bkOnPhone: "Copias en el teléfono",
+    bkOnServer: "Copias en el servidor del club",
+    bkNone: "Ninguna copia.",
+    bkDownload: "Descargar",
+    bkPlayers: "Jugadores (con los socios)",
+    bkWhere: "El archivo contiene datos personales de los socios: guárdalo en un sitio tuyo y no lo compartas. La restauración se hace aquí, o en la app en Pistas › Copia de la secretaría.",
+    bkLast: (t) => `Última copia: ${t}`,
+    bkChargesLine: (c, p) => `${c} cargos, ${p} pagos`,
     kindMembership: "Cuota social",
     kindFitp: "Licencia federativa",
     kindCourse: "Curso",
@@ -6214,6 +6440,7 @@ const DESK_I18N = {
       OTHER: "Otro",
     },
     err: {
+      NOT_BACKUP: "Este archivo no es una copia de la secretaría de TSM.",
       NOT_PAIRED: "El servidor de reservas no está vinculado.",
       COURT_EXISTS: "Ya hay una pista con este nombre.",
       PAYTYPE_EXISTS: "Dos formas de pago tienen el mismo nombre.",
@@ -6451,6 +6678,34 @@ const DESK_I18N = {
     rulesLater: "Regras guardadas: vão para o servidor no próximo envio",
     removeWaitAsk: (n) => `Tirar ${n} da lista de espera?`,
     removeSeekAsk: (n) => `Tirar o anúncio de ${n}?`,
+    bkTitle: "Cópia de segurança",
+    bkHint: "Só a secretaria: sócios e jogadores, mensalidades e pagamentos, agenda, torneios, escola de tênis, equipes, quadras e definições. Não jogos, golpes e vídeos (a cópia completa do app tem esses).",
+    bkNowTitle: "Fazer uma cópia agora",
+    bkNowHint: "Um só arquivo .tsmclub: guarde-o onde quiser (uma pasta do Google Drive ou Dropbox no PC, um pen drive).",
+    bkSaveOnPhone: "Cópia no telefone",
+    bkDownloadNow: "Baixar para o PC",
+    bkSaved: "Cópia feita no telefone",
+    bkAutoTitle: "Cópia automática",
+    bkAuto: "Todos os dias, só se algo mudou",
+    bkAutoHint: "O telefone guarda as últimas 14 cópias, mesmo com o app fechado.",
+    bkAutoHintServer: "O telefone e o servidor do clube guardam as últimas 14 cópias, mesmo com o app fechado.",
+    bkNever: "Ainda nenhuma cópia.",
+    bkServerFailed: "A última cópia não chegou ao servidor",
+    bkRestoreTitle: "Restaurar",
+    bkRestoreHint: "Escolha um arquivo .tsmclub: primeiro vê o que tem dentro, depois confirma.",
+    bkFromFile: "Arquivo de cópia",
+    bkRestore: "Restaurar",
+    bkRestoreWarn: "O que a secretaria tem agora é substituído por esta cópia.",
+    bkRestoreSafe: "Antes o telefone faz uma cópia de agora: encontra-a abaixo se quiser voltar atrás. A ligação ao servidor fica como está.",
+    bkRestored: "Secretaria restaurada",
+    bkOnPhone: "Cópias no telefone",
+    bkOnServer: "Cópias no servidor do clube",
+    bkNone: "Nenhuma cópia.",
+    bkDownload: "Baixar",
+    bkPlayers: "Jogadores (com os sócios)",
+    bkWhere: "O arquivo contém dados pessoais dos sócios: guarde-o num lugar seu e não o partilhe. A restauração faz-se aqui, ou no app em Quadras › Cópia da secretaria.",
+    bkLast: (t) => `Última cópia: ${t}`,
+    bkChargesLine: (c, p) => `${c} débitos, ${p} pagamentos`,
     kindMembership: "Mensalidade",
     kindFitp: "Carteira federativa",
     kindCourse: "Curso",
@@ -6504,6 +6759,7 @@ const DESK_I18N = {
       OTHER: "Outro",
     },
     err: {
+      NOT_BACKUP: "Este arquivo não é uma cópia da secretaria do TSM.",
       NOT_PAIRED: "O servidor de reservas não está associado.",
       COURT_EXISTS: "Já há uma quadra com este nome.",
       PAYTYPE_EXISTS: "Duas formas de pagamento têm o mesmo nome.",
@@ -7226,6 +7482,7 @@ Mitglieder und Zahlungen lassen sich mit Tastatur und Maus leichter erfassen. **
 - **Am Computer**: Öffne die Adresse im Browser. Das Telefon zeigt sie, und **Adresse teilen** schickt sie an den Computer (WhatsApp Web, E-Mail), ohne sie abzutippen: Der Link allein gibt keinen Zugang. Beim ersten Mal warnt er, die Verbindung sei nicht privat: Das ist normal, denn das Zertifikat stammt vom Telefon und nicht von einer Zertifizierungsstelle. Wähle *Erweitert › Weiter*. Kommt die Warnung wieder, obwohl du weder das Telefon gewechselt noch die App neu installiert hast, mach nicht weiter: Vergleiche den SHA-256-Fingerabdruck im Browser mit dem auf dem Telefon.
 - **Anmelden**: Die Seite zeigt einen QR. Tippe am Telefon auf **QR des Computers scannen**, scanne ihn und tippe auf **Erlauben**; prüfe dabei die Adresse des Computers. Der Computer meldet sich selbst an. Ohne Kamera öffne am Computer *Mit dem Code anmelden* und gib den Code des Telefons ein.
 - **Was geht**: **Heute** (die erste Seite: wer spielt, was zu kassieren ist, Mitglieder zu klären, Spiele und Stunden des Tages), **Mitglieder** (suchen, hinzufügen, ändern, *Zu klären*, *Attest zu erneuern*, **Drucken** und **CSV exportieren** der angezeigten Liste), **Aus CSV importieren** aus Excel oder Sheets (erst eine Vorschau; vorhandene Mitglieder werden ergänzt, nichts wird gelöscht), **Beiträge und Zahlungen** (Beiträge, Forderungen, Zahlungen, **Beleg** als PDF, CSV-Export, Drucken), **Platzplan** (Ansicht **Tag**, **Woche** oder **Monat**; buchen, ändern, jede Woche wiederholen und auch die ganze Serie löschen; **Nicht buchbar** für Sperren und Wartung; Drucken), **Turniere** (anlegen und ändern, Meldungen über die Spielersuche mit Problemen bei Attest, Ausweis und Gebühr im Blick, Setzungen, Auslosung, Tableau und Gruppen mit Ergebnissen, Tag, Uhrzeit und Platz jedes Spiels mit Warnung im Platzplan bei belegtem Platz, und **Drucken** von Meldungen, Tableau und Spielplan). **Tennisschule** (Kurse mit Zeiten und Plätzen, Schüler, Anwesenheit, abgesagte Stunden, Monats- oder Saisongebühren zum Belasten), **Platzstatistik** (Auslastung, Einnahmen, Platz für Platz, vollste Tage und Stunden, wer am meisten bucht, nach Zeitraum, druckbar). Mit **Mahnung vorbereiten** in Beiträge und Zahlungen wählst du unter den angezeigten Forderungen, wem du schreibst: die Nachricht öffnet sich auf dem Handy und du schickst sie von dort. **Mannschaften und Ligen** (Kader, Heim- oder Auswärtsbegegnungen mit reservierten Plätzen, Verfügbarkeit, Aufstellung, Spiele und Ergebnis; Nachrichten öffnen sich auf dem Handy). **Online-Buchungen**, mit dem Vereinsserver (nächste Buchungen der Spieler, Warteliste, Anzeigen bei Partner gesucht zum Entfernen bei Bedarf, Regeln für die Spieler, **Jetzt senden**), **Einstellungen** (Vereinsname, Zeiten und Preise, Plätze mit Belag, Licht und eigenen Preisen, Zahlungsarten). WhatsApp-Nachrichten, Platzfotos und Live-Zählung bleiben in der App.
+- **Sicherung des Büros** (am PC unter Statistik; am Handy unter Plätze › Sicherung des Büros): eine einzige `.tsmclub`-Datei mit Mitgliedern und Spielern, Beiträgen und Zahlungen, Platzplan, Turnieren, Tennisschule, Mannschaften, Plätzen und Einstellungen (keine Spiele, Schläge und Videos: die hat die komplette Sicherung). **Auf den PC laden** oder vom Handy **verschicken**, wohin du willst (Google Drive, E-Mail, USB-Stick). Mit der **automatischen Sicherung** macht das Handy eine Kopie am Tag, nur wenn sich etwas geändert hat, und behält die letzten 14; mit einem Vereinsserver auch er. **Wiederherstellen** zeigt erst, was in der Datei ist, und macht eine Kopie vom jetzigen Stand, um zurückzugehen. Die Datei enthält persönliche Daten der Mitglieder: bewahre sie bei dir auf.
 - **Sicherheit**: Alles ist verschlüsselt (HTTPS, TLS 1.2 oder 1.3). Nötig sind QR oder Code, beide einmalig und befristet, und die Zustimmung am Telefon; fünf Fehler ändern den Code und sperren weitere Versuche. Immer nur ein Computer, an seine Adresse gebunden. Es antwortet nur im lokalen Netz, nie über mobile Daten. Die Sitzung endet mit **Abmelden**, beim Schließen des Tabs, nach 30 Minuten ohne Aktivität oder nach 12 Stunden. Ohne Verbindung schaltet es sich nach 30 Minuten aus; die Mitteilung zeigt, dass es an ist, und bietet **Ausschalten**. Der Zertifikatsschlüssel kommt nie in Backups. In öffentlichen oder geteilten Netzen nutze den Hotspot des Telefons.
 - **Tipps**: Lass das Telefon eingeschaltet und am Ladegerät, nahe am Router. Meldet die Seite, das Telefon antworte nicht, prüfe, ob es im selben Netz ist: Manche Gastnetze trennen Geräte voneinander; nutze dann den Hotspot des Telefons.
 
@@ -7781,6 +8038,7 @@ Entering members and payments is easier with a keyboard and mouse. **A computer 
 - **On the computer**: open the address in the browser. The phone shows it, and **Share the address** sends it to the computer (WhatsApp Web, email) so you need not copy it: the link alone gives no access. The first time it warns that the connection is not private: this is normal, because the certificate was made by the phone and not by an authority. Choose *Advanced › Proceed*. If the warning returns although you have not changed phone or reinstalled the app, do not continue: compare the SHA-256 fingerprint in the browser with the one on the phone.
 - **Sign in**: the page shows a QR. On the phone tap **Scan the computer's QR**, scan it and tap **Allow**, checking the computer's address: the computer signs in by itself. Without a camera, open *Sign in with the code* on the computer and type the phone's code.
 - **What you can do**: **Today** (the first page: who plays, what to collect, members to fix, the day's matches and lessons), **Members** (search, add, edit, *To fix*, *Certificate to renew*, **Print** and **Export CSV** of the list you see), **Import from CSV** from Excel or Sheets (a preview first; existing members are completed and nothing is erased), **Fees and payments** (fees, charges, payments, PDF **Receipt**, CSV export, print), **Planner** (**Day**, **Week** or **Month** view; book, change, repeat every week and delete the whole series too; **Not bookable** for closures and maintenance; print), **Tournaments** (create and edit, take entries by searching the players with certificate, card and fee problems in view, seeds, draw, bracket and groups with results, day, time and court of every match with the Planner warning if the court is taken, and **Print** for entries, draw and schedule). **Tennis school** (courses with times and courts, students, attendance, cancelled lessons, monthly or season fees to charge), **Court statistics** (occupancy, takings, court by court, busiest days and hours, who books most, by period, printable). With **Prepare reminder** in Fees and payments you pick whom to write to among the charges you see: the message opens on the phone and you send it from there. **Teams and leagues** (roster, home or away fixtures with held courts, availability, call-ups, rubbers and result; notices open on the phone). **Online bookings**, with the club server (players' upcoming bookings, waiting list, Looking for a partner posts to remove if needed, rules for players, **Send now**), **Settings** (club name, hours and prices, courts with surface, lights and their own prices, payment methods). WhatsApp notices, court photos and live scoring stay in the app.
+- **Office backup** (on the PC, below Statistics; on the phone under Courts › Office backup): one `.tsmclub` file with members and players, fees and payments, planner, tournaments, tennis school, teams, courts and settings (not matches, strokes and videos: the full backup has those). **Download to the PC** or, from the phone, **send it** wherever you like (Google Drive, email, a USB stick). With the **automatic backup** the phone makes a copy a day only if something changed and keeps the last 14; with a club server it keeps them too. **Restore** first shows what's in the file and makes a copy of now, so you can go back. The file holds members' personal data: keep it somewhere of yours.
 - **Security**: everything is encrypted (HTTPS, TLS 1.2 or 1.3). You need the QR or the code, both single-use and short-lived, and the consent on the phone; five mistakes change the code and block further tries. One computer at a time, tied to its address. It answers only the local network, never mobile data. The session ends with **Sign out**, by closing the tab, after 30 idle minutes or after 12 hours. With nobody connected it turns itself off after 30 minutes; the notification shows it is on and has a **Turn off** button. The certificate key is never in backups. On public or shared networks, use the phone's hotspot.
 - **Tips**: keep the phone on and charging, close to the router. If the page says the phone is not answering, check it is on the same network: some guest networks isolate devices from each other, and then use the phone's hotspot.
 
@@ -8335,6 +8593,7 @@ Introducir socios y pagos es más cómodo con teclado y ratón. **Un ordenador (
 - **En el ordenador**: abre la dirección en el navegador. La muestra el teléfono, y con **Compartir la dirección** la envías al ordenador (WhatsApp Web, correo) sin copiarla: el enlace por sí solo no da acceso. La primera vez avisa de que la conexión no es privada: es normal, porque el certificado lo ha creado el teléfono y no una autoridad. Elige *Avanzado › Continuar*. Si el aviso vuelve sin que hayas cambiado de teléfono ni reinstalado la app, no sigas: compara la huella SHA-256 del navegador con la del teléfono.
 - **Entrar**: la página muestra un QR. En el teléfono toca **Escanea el QR del ordenador**, escanéalo y toca **Permitir**, comprobando la dirección del ordenador: el ordenador entra solo. Sin cámara, abre *Entra con el código* en el ordenador y escribe el código del teléfono.
 - **Qué se puede hacer**: **Hoy** (la primera página: quién juega, qué cobrar, socios por arreglar, partidos y clases del día), **Socios** (buscar, añadir, cambiar, *Por arreglar*, *Certificado por renovar*, **Imprimir** y **Exportar CSV** de la lista que ves), **Importar de CSV** desde Excel o Sheets (primero una vista previa; los socios existentes se completan, sin borrar nada), **Cuotas y pagos** (cuotas, cargos, pagos, **Recibo** en PDF, exportación CSV, impresión), **Planning** (vista **Día**, **Semana** o **Mes**; reservar, cambiar, repetir cada semana y borrar también toda la serie; **No reservables** para cierres y mantenimiento; impresión), **Torneos** (crear y cambiar, inscribir buscando entre los jugadores con los problemas de certificado, licencia y cuota a la vista, cabezas de serie, sorteo, cuadro y grupos con resultados, día, hora y pista de cada partido con aviso del planning si la pista está ocupada, e **Imprimir** inscritos, cuadro y programa). **Escuela de tenis** (cursos con horarios y pistas, alumnos, lista de las clases, clases anuladas, cuotas del mes o de la temporada por cargar), **Estadísticas de las pistas** (ocupación, ingresos, pista por pista, días y horas más llenos, quién reserva más, por periodo, para imprimir). Con **Preparar recordatorio** en Cuotas y pagos eliges a quién escribir entre los cargos que ves: el mensaje se abre en el teléfono y lo envías desde allí. **Equipos y ligas** (plantilla, encuentros en casa o fuera con pistas reservadas, disponibilidad, convocados, partidos y resultado; los avisos se abren en el teléfono). **Reservas online**, con el servidor del club (próximas reservas de los jugadores, lista de espera, anuncios de Busco compañero que quitar si hace falta, reglas para los jugadores, **Enviar ahora**), **Ajustes** (nombre del club, horarios y precios, pistas con superficie, luces y precios propios, formas de pago). Avisos de WhatsApp, fotos de las pistas y marcador en directo siguen en la app.
+- **Copia de la secretaría** (en el PC, debajo de Estadísticas; en el teléfono en Pistas › Copia de la secretaría): un solo archivo `.tsmclub` con socios y jugadores, cuotas y pagos, planning, torneos, escuela de tenis, equipos, pistas y ajustes (no partidos, golpes ni vídeos: la copia completa los tiene). **Descargar al PC** o, desde el teléfono, **enviarla** donde quieras (Google Drive, correo, un pendrive). Con la **copia automática** el teléfono hace una copia al día solo si algo ha cambiado y guarda las últimas 14; con un servidor del club, también él. **Restaurar** muestra primero lo que hay en el archivo y hace una copia de ahora, para volver atrás. El archivo contiene datos personales de los socios: guárdalo en un sitio tuyo.
 - **Seguridad**: todo viaja cifrado (HTTPS, TLS 1.2 o 1.3). Hacen falta el QR o el código, de un solo uso y con caducidad, y el permiso en el teléfono; cinco errores cambian el código y bloquean los intentos. Un solo ordenador cada vez, ligado a su dirección. Solo responde a la red local, nunca a los datos móviles. La sesión termina con **Salir**, al cerrar la pestaña, tras 30 minutos parada o tras 12 horas. Sin nadie conectado se apaga sola tras 30 minutos; la notificación recuerda que está encendida y tiene el botón **Apagar**. La clave del certificado nunca entra en las copias de seguridad. En redes públicas o compartidas, usa el punto de acceso del teléfono.
 - **Consejos**: mantén el teléfono encendido y cargando, cerca del router. Si la página dice que el teléfono no responde, comprueba que esté en la misma red: algunas redes de invitados aíslan los dispositivos; usa entonces el punto de acceso del teléfono.
 
@@ -8889,6 +9148,7 @@ Saisir adhérents et paiements est plus simple au clavier et à la souris. **Un 
 - **Sur l'ordinateur** : ouvrez l'adresse dans le navigateur. Le téléphone l'affiche, et **Partager l'adresse** l'envoie à l'ordinateur (WhatsApp Web, e-mail) sans la recopier : le lien seul ne donne pas accès. La première fois, il signale que la connexion n'est pas privée : c'est normal, le certificat vient du téléphone et non d'une autorité. Choisissez *Avancé › Continuer*. Si l'alerte revient alors que vous n'avez ni changé de téléphone ni réinstallé l'app, n'allez pas plus loin : comparez l'empreinte SHA-256 du navigateur avec celle du téléphone.
 - **Entrer** : la page affiche un QR. Sur le téléphone, touchez **Scanner le QR de l'ordinateur**, scannez-le et touchez **Autoriser**, en vérifiant l'adresse de l'ordinateur : l'ordinateur entre tout seul. Sans caméra, ouvrez *Entrez avec le code* sur l'ordinateur et saisissez le code du téléphone.
 - **Ce qu'on peut faire** : **Aujourd'hui** (la première page : qui joue, quoi encaisser, adhérents à régulariser, matchs et cours du jour), **Adhérents** (chercher, ajouter, modifier, *À régulariser*, *Certificat à renouveler*, **Imprimer** et **Exporter en CSV** de la liste affichée), **Importer un CSV** depuis Excel ou Sheets (aperçu d'abord ; les adhérents existants sont complétés, rien n'est effacé), **Cotisations et paiements** (cotisations, débits, paiements, **Reçu** en PDF, export CSV, impression), **Planning** (vue **Jour**, **Semaine** ou **Mois** ; réserver, modifier, répéter chaque semaine et supprimer aussi toute la série ; **Non réservables** pour fermetures et entretien ; impression), **Tournois** (créer et modifier, inscrire en cherchant parmi les joueurs avec les problèmes de certificat, licence et frais en vue, têtes de série, tirage, tableau et poules avec les résultats, jour, heure et court de chaque match avec le planning qui prévient si le court est pris, et **Imprimer** inscrits, tableau et programme). **École de tennis** (groupes avec horaires et courts, élèves, appel des cours, cours annulés, frais du mois ou de la saison à débiter), **Statistiques des terrains** (occupation, recettes, court par court, jours et heures les plus pleins, qui réserve le plus, par période, à imprimer). Avec **Préparer une relance** dans Cotisations et paiements, vous choisissez à qui écrire parmi les débits affichés : le message s'ouvre sur le téléphone et vous l'envoyez de là. **Équipes et championnats** (effectif, rencontres à domicile ou à l'extérieur avec courts réservés, disponibilités, convocations, matchs et résultat ; les avis s'ouvrent sur le téléphone). **Réservations en ligne**, avec le serveur du club (prochaines réservations des joueurs, liste d'attente, annonces de « Je cherche un partenaire » à retirer si besoin, règles pour les joueurs, **Envoyer maintenant**), **Réglages** (nom du club, horaires et tarifs, courts avec surface, éclairage et tarifs propres, modes de paiement). Avis WhatsApp, photos des courts et marquage en direct restent dans l'app.
+- **Sauvegarde du secrétariat** (sur le PC, sous Statistiques ; sur le téléphone dans Terrains › Sauvegarde du secrétariat) : un seul fichier `.tsmclub` avec adhérents et joueurs, cotisations et paiements, planning, tournois, école de tennis, équipes, courts et réglages (pas les matchs, coups et vidéos : la sauvegarde complète les a). **Télécharger sur le PC** ou, depuis le téléphone, l'**envoyer** où vous voulez (Google Drive, e-mail, une clé USB). Avec la **sauvegarde automatique** le téléphone fait une copie par jour seulement si quelque chose a changé et garde les 14 dernières ; avec un serveur du club, lui aussi. **Restaurer** montre d'abord ce que contient le fichier et fait une copie de maintenant, pour revenir en arrière. Le fichier contient des données personnelles des adhérents : gardez-le chez vous.
 - **Sécurité** : tout est chiffré (HTTPS, TLS 1.2 ou 1.3). Il faut le QR ou le code, à usage unique et temporaires, et l'accord sur le téléphone ; cinq erreurs changent le code et bloquent les essais. Un seul ordinateur à la fois, lié à son adresse. Il ne répond qu'au réseau local, jamais aux données mobiles. La session se termine avec **Se déconnecter**, en fermant l'onglet, après 30 minutes d'inactivité ou après 12 heures. Sans connexion, il s'éteint seul après 30 minutes ; la notification indique qu'il est activé et propose **Désactiver**. La clé du certificat n'entre jamais dans les sauvegardes. Sur les réseaux publics ou partagés, utilisez le point d'accès du téléphone.
 - **Conseils** : gardez le téléphone allumé et en charge, près du routeur. Si la page indique que le téléphone ne répond pas, vérifiez qu'il est sur le même réseau : certains réseaux invités isolent les appareils ; utilisez alors le point d'accès du téléphone.
 
@@ -9443,6 +9703,7 @@ Inserire soci e pagamenti è più comodo con tastiera e mouse. **Un computer (Wi
 - **Sul computer**: apri l'indirizzo nel browser. Lo mostra il telefono, e con **Condividi l'indirizzo** lo mandi al computer (WhatsApp Web, email) senza ricopiarlo: il link da solo non dà accesso. La prima volta avvisa che la connessione non è privata: è normale, perché il certificato lo ha creato il telefono e non un'autorità. Scegli *Avanzate › Procedi*. Se l'avviso torna senza che tu abbia cambiato telefono o reinstallato l'app, non proseguire: confronta l'impronta SHA-256 nel browser con quella sul telefono.
 - **Entrare**: la pagina mostra un QR. Sul telefono tocca **Inquadra il QR del computer**, inquadralo e tocca **Consenti**, controllando l'indirizzo del computer: il PC entra da solo. Senza fotocamera, apri *Entra col codice* sul computer e scrivi il codice del telefono.
 - **Cosa si fa**: **Oggi** (la prima pagina: chi gioca, cosa incassare, soci da sistemare, partite e lezioni del giorno), **Soci** (cerca, aggiungi, modifica, *Da sistemare*, *Certificato da rinnovare*, **Stampa** ed **Esporta CSV** dell'elenco che vedi), **Importa da CSV** dei soci da Excel o Fogli (prima un'anteprima; i soci già presenti si completano senza cancellare niente), **Quote e pagamenti** (quote, addebiti, pagamenti, **Ricevuta** in PDF, esportazione CSV, stampa), **Planning** (vista **Giorno**, **Settimana** o **Mese**; prenoti, cambi, ripeti ogni settimana e cancelli anche tutta la serie; **Non prenotabili** per chiusure e manutenzione; stampa), **Tornei** (crea e modifica, iscrivi cercando tra i giocatori coi problemi di certificato, tessera e quota in vista, teste di serie, sorteggio, tabellone e gironi coi risultati, giorno, ora e campo di ogni partita col Planning che avvisa se il campo è occupato, e **Stampa** di iscritti, tabellone e programma). **Scuola tennis** (corsi con orari e campi, allievi, appello delle lezioni, lezioni annullate, quote del mese o della stagione da addebitare), **Statistiche dei campi** (occupazione, incassi, campo per campo, giorni e ore più pieni, chi prenota di più, per periodo, da stampare). Con **Prepara sollecito** in Quote e pagamenti scegli a chi scrivere tra gli addebiti che vedi: il messaggio si apre sul telefono e lo mandi da lì. **Squadre e campionati** (rosa, incontri in casa o in trasferta coi campi tenuti, disponibilità, convocati, partite e risultato; gli avvisi si aprono sul telefono). **Prenotazioni online**, col server del circolo (prossime prenotazioni dei giocatori, lista d'attesa, annunci di Cerco compagno da togliere se serve, regole per i giocatori, **Invia ora**), **Impostazioni** (nome del circolo, orari e prezzi, campi con superficie, luci e prezzi propri, modi di pagamento). Avvisi WhatsApp, foto dei campi e segnapunti dal vivo restano nell'app.
+- **Backup della segreteria** (sul PC, sotto Statistiche; sul telefono in Campi › Backup della segreteria): un solo file `.tsmclub` con soci e giocatori, quote e pagamenti, planning, tornei, scuola tennis, squadre, campi e impostazioni (non partite, colpi e video: per quelli c'è il backup completo). **Scarica sul PC** o, dal telefono, **mandalo** dove vuoi (Google Drive, email, una chiavetta). Col **backup automatico** il telefono fa una copia al giorno solo se è cambiato qualcosa e tiene le ultime 14; col server del circolo le tiene anche lui. **Ripristina** mostra prima cosa c'è nel file e fa una copia di adesso, per tornare indietro. Il file contiene dati personali dei soci: tienilo in un posto tuo.
 - **Sicurezza**: tutto viaggia cifrato (HTTPS, TLS 1.2 o 1.3). Servono il QR o il codice, usa e getta e a scadenza, e il consenso sul telefono; cinque errori cambiano il codice e bloccano i tentativi. Un solo computer alla volta, legato al suo indirizzo. Risponde solo alla rete locale, mai ai dati mobili. La sessione finisce con **Esci**, chiudendo la scheda, dopo 30 minuti ferma o dopo 12 ore. Senza nessuno collegato si spegne da solo dopo 30 minuti; la notifica ricorda che è acceso e ha il tasto **Spegni**. La chiave del certificato non entra nei backup. Su reti pubbliche o condivise meglio usare l'hotspot del telefono.
 - **Consigli**: tieni il telefono acceso e in carica vicino al router. Se la pagina dice che il telefono non risponde, controlla che sia sulla stessa rete: alcune reti ospiti isolano i dispositivi fra loro, e allora va usato l'hotspot del telefono.
 
@@ -9997,6 +10258,7 @@ Inserir sócios e pagamentos é mais cómodo com teclado e mouse. **Um computado
 - **No computador**: abra o endereço no navegador. O telefone o mostra, e **Compartilhar o endereço** o envia ao computador (WhatsApp Web, e-mail) sem precisar copiar: o link sozinho não dá acesso. Da primeira vez avisa que a conexão não é privada: é normal, porque o certificado foi criado pelo telefone e não por uma autoridade. Escolha *Avançado › Continuar*. Se o aviso voltar sem ter mudado de telefone nem reinstalado o app, não prossiga: compare a impressão digital SHA-256 do navegador com a do telefone.
 - **Entrar**: a página mostra um QR. No telefone toque em **Escaneie o QR do computador**, escaneie e toque em **Permitir**, verificando o endereço do computador: o computador entra sozinho. Sem câmera, abra *Entre com o código* no computador e digite o código do telefone.
 - **O que se pode fazer**: **Hoje** (a primeira página: quem joga, o que cobrar, sócios por tratar, jogos e aulas do dia), **Sócios** (procurar, adicionar, alterar, *Por tratar*, *Atestado a renovar*, **Imprimir** e **Exportar CSV** da lista que vê), **Importar de CSV** do Excel ou Sheets (primeiro uma pré-visualização; os sócios existentes são completados, sem apagar nada), **Mensalidades e pagamentos** (mensalidades, débitos, pagamentos, **Recibo** em PDF, exportação CSV, impressão), **Agenda** (vista **Dia**, **Semana** ou **Mês**; reservar, alterar, repetir todas as semanas e apagar também toda a série; **Não reserváveis** para fechos e manutenção; impressão), **Torneios** (criar e alterar, inscrever procurando entre os jogadores com os problemas de atestado, cartão e taxa à vista, cabeças de chave, sorteio, chave e grupos com resultados, dia, hora e quadra de cada jogo com aviso da agenda se a quadra estiver ocupada, e **Imprimir** inscritos, chave e programa). **Escola de tênis** (cursos com horários e quadras, alunos, chamada das aulas, aulas canceladas, mensalidades do mês ou da temporada a debitar), **Estatísticas das quadras** (ocupação, receitas, quadra a quadra, dias e horas mais cheios, quem reserva mais, por período, para imprimir). Com **Preparar lembrete** em Mensalidades e pagamentos escolhe a quem escrever entre os débitos que vê: a mensagem abre-se no telefone e envia-a de lá. **Equipes e campeonatos** (plantel, encontros em casa ou fora com quadras reservadas, disponibilidade, convocados, jogos e resultado; os avisos abrem-se no telefone). **Reservas online**, com o servidor do clube (próximas reservas dos jogadores, lista de espera, anúncios de Procuro parceiro a tirar se preciso, regras para os jogadores, **Enviar agora**), **Definições** (nome do clube, horários e preços, quadras com piso, luzes e preços próprios, formas de pagamento). Avisos de WhatsApp, fotos das quadras e marcador ao vivo continuam no app.
+- **Cópia da secretaria** (no PC, abaixo de Estatísticas; no telefone em Quadras › Cópia da secretaria): um só arquivo `.tsmclub` com sócios e jogadores, mensalidades e pagamentos, agenda, torneios, escola de tênis, equipes, quadras e definições (não jogos, golpes e vídeos: a cópia completa tem esses). **Baixar para o PC** ou, do telefone, **enviá-la** para onde quiser (Google Drive, e-mail, um pen drive). Com a **cópia automática** o telefone faz uma cópia por dia só se algo mudou e guarda as últimas 14; com um servidor do clube, ele também. **Restaurar** mostra primeiro o que há no arquivo e faz uma cópia de agora, para voltar atrás. O arquivo contém dados pessoais dos sócios: guarde-o num lugar seu.
 - **Segurança**: tudo viaja cifrado (HTTPS, TLS 1.2 ou 1.3). São necessários o QR ou o código, de uso único e temporários, e a autorização no telefone; cinco erros mudam o código e bloqueiam as tentativas. Um só computador de cada vez, vinculado ao seu endereço. Responde só à rede local, nunca aos dados móveis. A sessão termina com **Sair**, ao fechar o aba, após 30 minutos parada ou após 12 horas. Sem ninguém conectado desativa-se sozinha após 30 minutos; a notificação lembra que está ligada e tem o botão **Desativar**. A chave do certificado nunca entra nas backups. Em redes públicas ou compartilhadas, use o hotspot do telefone.
 - **Conselhos**: mantenha o telefone ligado e carregando, perto do router. Se a página disser que o telefone não responde, verifique se está na mesma rede: algumas redes de convidados isolam os dispositivos; use então o hotspot do telefone.
 
@@ -11941,6 +12203,80 @@ class MatchController(
         val list = players.value.filter { it.id !in ids } + changed
         players.value = list.sortedBy { it.name.lowercase() }
         scope.launch(io) { storage.savePlayers(list) }
+    }
+
+    // ---- Backup della segreteria ----
+
+    /** Tutto quello della segreteria, adesso (vedi [com.tennis.scoremanager.data.OfficeSnapshot]). */
+    fun officeSnapshot(): com.tennis.scoremanager.data.OfficeSnapshot = com.tennis.scoremanager.data.OfficeSnapshot(
+        createdAt = System.currentTimeMillis(), app = com.tennis.scoremanager.BuildConfig.VERSION_NAME, club = storage.clubName,
+        courts = clubCourts.value, features = clubFeatures.value.map { it.name }.sorted(), players = players.value, book = clubBook.value,
+        plan = courtPlan.value, tournaments = clubTournaments.value, courses = courses.value, teams = teams.value, ladders = ladders.value,
+        serverRules = clubServer.value.rules, payInfo = clubServer.value.payInfo,
+    )
+
+    fun officeBackupBytes(): ByteArray = com.tennis.scoremanager.data.OfficeBackup.encode(officeSnapshot())
+
+    fun officeBackupName(at: Long = System.currentTimeMillis()): String = com.tennis.scoremanager.data.OfficeBackup.fileName(storage.clubName, at)
+
+    /** Le copie sul telefono, dalla più nuova. */
+    fun officeBackups(): List<com.tennis.scoremanager.data.OfficeBackupFile> = com.tennis.scoremanager.data.OfficeBackup.list(storage.officeBackupDir)
+
+    fun officeBackupFile(name: String): File? =
+        com.tennis.scoremanager.data.OfficeBackup.safeName(name)?.let { File(storage.officeBackupDir, it) }?.takeIf { it.isFile }
+
+    /**
+     * Una copia sul telefono (e sul server del circolo, se c'è). Con [onlyIfChanged] si salta quando non è cambiato
+     * niente dall'ultima. Restituisce il nome del file, o null se saltata. La rete gira fuori dal filo principale.
+     */
+    suspend fun officeBackupNow(onlyIfChanged: Boolean): String? {
+        val snap = officeSnapshot()
+        val print = com.tennis.scoremanager.data.OfficeBackup.fingerprint(snap)
+        if (onlyIfChanged && print == storage.officeBackupPrint && officeBackups().isNotEmpty()) return null
+        val bytes = com.tennis.scoremanager.data.OfficeBackup.encode(snap)
+        val name = officeBackupName(snap.createdAt)
+        withContext(io) { com.tennis.scoremanager.data.OfficeBackup.store(storage.officeBackupDir, name, bytes) }
+        storage.officeBackupPrint = print
+        storage.officeBackupAt = snap.createdAt
+        val conf = clubServer.value
+        if (conf.paired) storage.officeBackupServerError = withContext(io) {
+            try { com.tennis.scoremanager.data.ClubServers.withServer(conf) { it.putBackup(name, bytes) }; "" } catch (e: com.tennis.scoremanager.data.ClubServerError) { e.code }
+        }
+        return name
+    }
+
+    /** Il backup automatico, una volta al giorno (anche ad app chiusa). */
+    fun setOfficeBackupAuto(on: Boolean) {
+        storage.officeBackupAuto = on
+        com.tennis.scoremanager.service.OfficeBackupJob.schedule(app, on)
+    }
+
+    /**
+     * Rimette la segreteria com'era nel backup [s]. Prima fa una copia di adesso (così si torna indietro). Il
+     * collegamento al server resta quello di adesso: dal backup prende solo le regole.
+     */
+    suspend fun restoreOffice(s: com.tennis.scoremanager.data.OfficeSnapshot) {
+        officeBackupNow(onlyIfChanged = false)
+        players.value = s.players.sortedBy { it.name.lowercase() }
+        clubBook.value = s.book
+        courtPlan.value = s.plan
+        clubTournaments.value = s.tournaments
+        courses.value = s.courses
+        teams.value = s.teams
+        ladders.value = s.ladders
+        storage.clubName = s.club
+        setClubCourts(s.courts)
+        s.features?.let { names ->
+            val set = names.mapNotNull { n -> ClubFeature.entries.firstOrNull { it.name == n } }.toSet()
+            clubFeatures.value = set
+            storage.clubFeatures = set.map { it.name }.toSet()
+        }
+        s.serverRules?.let { r -> saveServer { it.copy(rules = r, payInfo = s.payInfo) } }
+        withContext(io) {
+            storage.savePlayers(s.players); storage.saveClubBook(s.book); storage.saveCourtPlan(s.plan); storage.saveClubTournaments(s.tournaments)
+            storage.saveCourses(s.courses); storage.saveTeams(s.teams); storage.saveLadders(s.ladders)
+        }
+        storage.officeBackupPrint = ""
     }
 
     /** La Segreteria da PC: spenta finché non la si accende dall'app. */
@@ -17049,7 +17385,7 @@ import java.util.zip.ZipOutputStream
 object Backup {
     const val VERSION = 1
     /** Cartelle interne che non entrano: il modello dell'analisi del movimento e i file di sistema. */
-    private val SKIP_FILES = setOf("pose", "profileInstalled", "profileinstaller_profileWrittenFor_lastUpdateTime.dat")
+    private val SKIP_FILES = setOf("pose", "office_backups", "profileInstalled", "profileinstaller_profileWrittenFor_lastUpdateTime.dat")
     /** Impostazioni dell'app (shared_prefs). */
     private val PREFS = listOf("tsm.xml", "tv_server.xml")
     /** Nella cartella dell'app: la voce sempre, i video (moviola, highlights) a scelta. */
@@ -17759,6 +18095,12 @@ class ClubServerClient(private val url: String, private val token: String?) {
     fun invite(player: String, name: String): SrvInvite = call("POST", "/admin/invites", SrvInviteIn.serializer(), SrvInviteIn(player, name), SrvInvite.serializer())
     fun cancel(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/bookings/$id", null, null, SrvOk.serializer())
     fun removePlayer(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/players/$id", null, null, SrvOk.serializer())
+    fun putBackup(name: String, bytes: ByteArray): SrvOk =
+        call("POST", "/admin/backups", SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(bytes)), SrvOk.serializer())
+    fun backups(): List<SrvBackup> = call<Unit, List<SrvBackup>>("GET", "/admin/backups", null, null, kotlinx.serialization.builtins.ListSerializer(SrvBackup.serializer()))
+    fun backup(name: String): ByteArray = java.util.Base64.getDecoder().decode(
+        call<Unit, SrvBackupData>("GET", "/admin/backup?name=${java.net.URLEncoder.encode(name, "UTF-8")}", null, null, SrvBackupData.serializer()).data,
+    )
     fun removeWaitAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/waits/$id", null, null, SrvOk.serializer())
     fun removeSeekAdmin(id: String): SrvOk = call<Unit, SrvOk>("DELETE", "/admin/seeks/$id", null, null, SrvOk.serializer())
 
@@ -19688,6 +20030,118 @@ object Notices {
             m.at?.let { Calendar.getInstance().apply { timeInMillis = it } }?.let { c -> c.get(Calendar.YEAR) == d.get(Calendar.YEAR) && c.get(Calendar.DAY_OF_YEAR) == d.get(Calendar.DAY_OF_YEAR) } == true
         }
     }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/data/OfficeBackup.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/data/OfficeBackup.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
+
+/**
+ * Il backup della segreteria, e solo quello: giocatori e soci, quote e pagamenti, planning, tornei, scuola tennis,
+ * squadre, classifiche a sfida, campi, funzioni accese e regole delle prenotazioni online. Non entrano partite,
+ * colpi, video e il resto dell'app (per quello c'è il backup completo), né la chiave del server (si riabbina).
+ * Un solo file compresso (.tsmclub): si scarica dal PC, si condivide dal telefono, si tiene sul server del circolo.
+ */
+@Serializable
+data class OfficeSnapshot(
+    val version: Int = OfficeBackup.VERSION,
+    val createdAt: Long = 0,
+    val app: String = "",
+    val club: String = "",
+    val courts: List<String> = emptyList(),
+    val features: List<String>? = null,
+    val players: List<PlayerProfile> = emptyList(),
+    val book: ClubBook = ClubBook(),
+    val plan: CourtPlan = CourtPlan(),
+    val tournaments: List<ClubTournament> = emptyList(),
+    val courses: List<Course> = emptyList(),
+    val teams: List<Team> = emptyList(),
+    val ladders: List<Ladder> = emptyList(),
+    val serverRules: BookingRules? = null,
+    val payInfo: String = "",
+)
+
+/** Quanto c'è in un backup, per vederlo prima di ripristinarlo. */
+@Serializable
+data class OfficeSummary(
+    val createdAt: Long, val club: String, val app: String, val members: Int, val players: Int, val charges: Int, val payments: Int,
+    val bookings: Int, val tournaments: Int, val courses: Int, val teams: Int, val ladders: Int, val courts: Int,
+)
+
+/** Un backup salvato (sul telefono o sul server): nome del file, quando, quanto pesa. */
+@Serializable
+data class OfficeBackupFile(val name: String, val at: Long, val size: Long)
+
+object OfficeBackup {
+    const val VERSION = 1
+    /** Le copie automatiche che restano sul telefono (e sul server): due settimane. */
+    const val KEEP = 14
+    const val EXT = ".tsmclub"
+
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+
+    fun encode(s: OfficeSnapshot): ByteArray = ByteArrayOutputStream().also { b ->
+        GZIPOutputStream(b).use { it.write(json.encodeToString(OfficeSnapshot.serializer(), s).toByteArray()) }
+    }.toByteArray()
+
+    /** Legge un backup (compresso, o il JSON com'è); null se non è un backup della segreteria. */
+    fun decode(bytes: ByteArray): OfficeSnapshot? = runCatching {
+        val text = if (bytes.size > 2 && bytes[0] == 0x1f.toByte() && bytes[1] == 0x8b.toByte()) GZIPInputStream(ByteArrayInputStream(bytes)).use { it.readBytes() } else bytes
+        json.decodeFromString(OfficeSnapshot.serializer(), text.toString(Charsets.UTF_8))
+    }.getOrNull()?.takeIf { it.version in 1..VERSION && it.createdAt > 0 }
+
+    fun summary(s: OfficeSnapshot) = OfficeSummary(
+        s.createdAt, s.club, s.app, s.players.count { it.member != null }, s.players.size, s.book.charges.size, s.book.charges.sumOf { it.payments.size },
+        s.plan.bookings.size, s.tournaments.size, s.courses.size, s.teams.size, s.ladders.size, s.courts.size,
+    )
+
+    /** "TSM segreteria CT Sovizzo 2026-11-04 2130.tsmclub": si capisce cos'è anche in una cartella di Drive. */
+    fun fileName(club: String, at: Long): String {
+        val t = java.text.SimpleDateFormat("yyyy-MM-dd HHmm", java.util.Locale.ROOT).format(java.util.Date(at))
+        val c = club.replace(Regex("[\\\\/:*?\"<>|]"), " ").trim().take(40)
+        return listOf("TSM segreteria", c, t).filter { it.isNotEmpty() }.joinToString(" ") + EXT
+    }
+
+    /** Le copie in [dir], dalla più nuova. */
+    fun list(dir: File): List<OfficeBackupFile> = dir.listFiles { f -> f.isFile && f.name.endsWith(EXT) }.orEmpty()
+        .map { OfficeBackupFile(it.name, it.lastModified(), it.length()) }.sortedByDescending { it.at }
+
+    /** Salva una copia in [dir] e tiene solo le ultime [keep]. */
+    fun store(dir: File, name: String, bytes: ByteArray, keep: Int = KEEP): File {
+        dir.mkdirs()
+        val f = File(dir, name)
+        val tmp = File(dir, "$name.tmp")
+        tmp.writeBytes(bytes)
+        if (!tmp.renameTo(f)) { f.writeBytes(bytes); tmp.delete() }
+        list(dir).drop(keep).forEach { File(dir, it.name).delete() }
+        return f
+    }
+
+    /**
+     * L'impronta del contenuto, senza l'ora del backup: se è uguale a quella dell'ultima copia non è cambiato niente
+     * e la copia automatica si salta. Così ogni copia resta completa (si ripristina da sola) e se ne fa una nuova
+     * solo quando serve: le 14 tenute coprono più giorni.
+     */
+    fun fingerprint(s: OfficeSnapshot): String {
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        md.update(json.encodeToString(OfficeSnapshot.serializer(), s.copy(createdAt = 0, app = "")).toByteArray())
+        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    /** Solo un nome di file di [dir] (niente cartelle o percorsi strani da fuori). */
+    fun safeName(name: String): String? = name.takeIf { it.endsWith(EXT) && !it.contains('/') && !it.contains('\\') && !it.startsWith(".") && it.length < 200 }
 }
 TSM_EOF
 
@@ -22725,6 +23179,23 @@ class Storage(context: Context) {
         set(v) = prefs.edit().putString("club_courts", v.map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")).apply()
 
     /** Promemoria del backup (ogni 30 giorni) e quando si è fatto l'ultimo (ms, 0 = mai). */
+    /** Backup della segreteria: automatico ogni giorno (solo se è cambiato qualcosa), l'impronta e l'ora dell'ultimo. */
+    var officeBackupAuto: Boolean
+        get() = prefs.getBoolean("office_backup_auto", false)
+        set(v) = prefs.edit().putBoolean("office_backup_auto", v).apply()
+    var officeBackupPrint: String
+        get() = prefs.getString("office_backup_print", null) ?: ""
+        set(v) = prefs.edit().putString("office_backup_print", v).apply()
+    var officeBackupAt: Long
+        get() = prefs.getLong("office_backup_at", 0L)
+        set(v) = prefs.edit().putLong("office_backup_at", v).apply()
+    /** L'ultimo invio della copia al server non riuscito (il codice), vuoto se è andato. */
+    var officeBackupServerError: String
+        get() = prefs.getString("office_backup_server_error", null) ?: ""
+        set(v) = prefs.edit().putString("office_backup_server_error", v).apply()
+    /** Le copie automatiche della segreteria (fuori dal backup completo: sono già una copia). */
+    val officeBackupDir: File get() = File(app.filesDir, "office_backups")
+
     var backupReminder: Boolean
         get() = prefs.getBoolean("backup_reminder", false)
         set(v) = prefs.edit().putBoolean("backup_reminder", v).apply()
@@ -24127,7 +24598,12 @@ import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.data.BlockReason
 import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.OfficeBackup
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
+import com.tennis.scoremanager.data.OfficeSummary
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
@@ -24244,6 +24720,19 @@ interface DeskData {
     /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
     fun serverRemove(kind: String, id: String)
     fun paymentsCsv(year: Int): ByteArray?
+    /** Backup della segreteria: il file di adesso, col suo nome. */
+    fun officeBackup(): Pair<String, ByteArray>
+    fun officeAuto(): Boolean
+    fun setOfficeAuto(on: Boolean)
+    /** Quando è stata fatta l'ultima copia sul telefono, e l'errore dell'ultimo invio al server ("" = tutto bene). */
+    fun officeLast(): Pair<Long, String>
+    fun localBackups(): List<OfficeBackupFile>
+    fun localBackup(name: String): ByteArray?
+    /** Fuori da [tx]: una copia adesso (sul telefono e sul server), le copie del server, il ripristino. */
+    fun officeBackupNow(): String?
+    fun serverBackups(): List<SrvBackup>
+    fun serverBackup(name: String): ByteArray
+    fun officeRestore(s: OfficeSnapshot)
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
     /** Toglie il torneo: le iscrizioni non pagate si annullano, i pagamenti restano. */
@@ -24395,6 +24884,14 @@ interface DeskData {
     /** Quello che sta sul server; [stateError] se non risponde. */
     val bookings: List<DeskOnlineBooking>, val waits: List<DeskWait>, val seeks: List<DeskSeek>, val stateError: String? = null,
 )
+@Serializable data class DeskBackupInfo(
+    val auto: Boolean, val lastAt: Long, val serverPaired: Boolean, val serverError: String, val local: List<OfficeBackupFile>,
+    val server: List<OfficeBackupFile>, val serverListError: String? = null,
+)
+/** Da dove viene il backup: un file mandato dal PC ([data], base64), una copia del telefono o del server. */
+@Serializable data class DeskBackupIn(val src: String = "file", val name: String = "", val data: String = "")
+@Serializable data class DeskBackupFile(val name: String, val data: String)
+@Serializable data class DeskAutoIn(val on: Boolean)
 @Serializable data class DeskRulesIn(val rules: BookingRules, val payInfo: String = "", val alerts: Boolean = true)
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
@@ -24473,6 +24970,7 @@ class DeskApi(
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
         if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p)
+        if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
@@ -24846,6 +25344,54 @@ class DeskApi(
             rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
             rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
         ))
+    }
+
+    // --- Backup della segreteria ---
+
+    private fun backupInfo(): Resp {
+        val (info, conf) = data.tx {
+            val (at, err) = data.officeLast()
+            DeskBackupInfo(data.officeAuto(), at, data.serverConf().paired, err, data.localBackups(), emptyList()) to data.serverConf()
+        }
+        if (!conf.paired) return ok(DeskBackupInfo.serializer(), info)
+        val out = try {
+            info.copy(server = data.serverBackups().map { OfficeBackupFile(it.name, it.at, it.size) })
+        } catch (e: Exception) { info.copy(serverListError = (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }
+        return ok(DeskBackupInfo.serializer(), out)
+    }
+
+    /** I byte del backup scelto: un file dal PC, una copia del telefono o una del server. */
+    private fun backupBytes(i: DeskBackupIn): ByteArray = when (i.src) {
+        "file" -> runCatching { java.util.Base64.getDecoder().decode(i.data) }.getOrNull()?.takeIf { it.isNotEmpty() } ?: throw Fail(400, "BAD_REQUEST")
+        "local" -> OfficeBackup.safeName(i.name)?.let { n -> data.tx { data.localBackup(n) } } ?: throw Fail(404, "NOT_FOUND")
+        "server" -> OfficeBackup.safeName(i.name)?.let { n ->
+            try { data.serverBackup(n) } catch (e: Exception) { throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }
+        } ?: throw Fail(404, "NOT_FOUND")
+        else -> throw Fail(400, "BAD_REQUEST")
+    }
+
+    private fun backup(m: String, p: List<String>, r: Req): Resp = when {
+        m == "GET" && p == listOf("info") -> backupInfo()
+        m == "GET" && p == listOf("now") -> {
+            val (name, bytes) = data.tx { data.officeBackup() }
+            ok(DeskBackupFile.serializer(), DeskBackupFile(name, java.util.Base64.getEncoder().encodeToString(bytes)))
+        }
+        m == "POST" && p == listOf("get") -> {
+            val i = read(DeskBackupIn.serializer(), r)
+            ok(DeskBackupFile.serializer(), DeskBackupFile(i.name, java.util.Base64.getEncoder().encodeToString(backupBytes(i))))
+        }
+        m == "POST" && p == listOf("save") -> { data.officeBackupNow(); backupInfo() }
+        m == "PUT" && p == listOf("auto") -> { val on = read(DeskAutoIn.serializer(), r).on; data.tx { data.setOfficeAuto(on) }; backupInfo() }
+        m == "POST" && p == listOf("preview") -> {
+            val s = OfficeBackup.decode(backupBytes(read(DeskBackupIn.serializer(), r))) ?: throw Fail(400, "NOT_BACKUP")
+            ok(OfficeSummary.serializer(), OfficeBackup.summary(s))
+        }
+        m == "POST" && p == listOf("restore") -> {
+            val s = OfficeBackup.decode(backupBytes(read(DeskBackupIn.serializer(), r))) ?: throw Fail(400, "NOT_BACKUP")
+            data.officeRestore(s)
+            backupInfo()
+        }
+        else -> throw Fail(404, "NOT_FOUND")
     }
 
     // --- Server delle prenotazioni ---
@@ -25738,7 +26284,10 @@ import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.ClubServerConf
 import com.tennis.scoremanager.data.ClubServers
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtSettings
@@ -25819,6 +26368,16 @@ class DeskBridge(private val c: MatchController) : DeskData {
     override fun serverRemove(kind: String, id: String) {
         ClubServers.withServer(c.clubServer.value) { if (kind == "wait") it.removeWaitAdmin(id) else it.removeSeekAdmin(id) }
     }
+    override fun officeBackup(): Pair<String, ByteArray> = c.officeBackupName() to c.officeBackupBytes()
+    override fun officeAuto(): Boolean = c.storage.officeBackupAuto
+    override fun setOfficeAuto(on: Boolean) = c.setOfficeBackupAuto(on)
+    override fun officeLast(): Pair<Long, String> = c.storage.officeBackupAt to c.storage.officeBackupServerError
+    override fun localBackups(): List<OfficeBackupFile> = c.officeBackups()
+    override fun localBackup(name: String): ByteArray? = c.officeBackupFile(name)?.readBytes()
+    override fun officeBackupNow(): String? = runBlocking(Dispatchers.Main.immediate) { c.officeBackupNow(onlyIfChanged = false) }
+    override fun serverBackups(): List<SrvBackup> = ClubServers.withServer(c.clubServer.value) { it.backups() }
+    override fun serverBackup(name: String): ByteArray = ClubServers.withServer(c.clubServer.value) { it.backup(name) }
+    override fun officeRestore(s: OfficeSnapshot) = runBlocking(Dispatchers.Main.immediate) { c.restoreOffice(s) }
     override fun receiptPdf(chargeId: String, paymentId: String): ByteArray? = c.receiptFile(chargeId, paymentId)?.let { f -> f.readBytes().also { f.delete() } }
     override fun paymentsCsv(year: Int): ByteArray? = c.paymentsCsv(year)?.readBytes()
     override fun saveTournament(t: ClubTournament) = c.saveClubTournament(t)
@@ -26077,7 +26636,8 @@ class DeskServer(
         private const val WORKERS = 6
         private const val TIMEOUT_MS = 15_000
         private const val MAX_HEADERS = 64
-        const val MAX_BODY = 1024 * 1024
+        // I backup della segreteria arrivano interi (compressi, in base64).
+        const val MAX_BODY = 16 * 1024 * 1024
         private const val TEXT = "text/plain; charset=utf-8"
         private val SAFE_NAME = Regex("^[a-z0-9-]+\\.[a-z]+$")
         private val IPV4_HOST = Regex("^\\d{1,3}(\\.\\d{1,3}){3}(:\\d+)?$")
@@ -28516,6 +29076,59 @@ class MatchService : Service() {
 
         fun stop(ctx: Context) {
             ctx.stopService(Intent(ctx, MatchService::class.java))
+        }
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/service/OfficeBackupJob.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/service/OfficeBackupJob.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.service
+
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobScheduler
+import android.app.job.JobService
+import android.content.ComponentName
+import android.content.Context
+import com.tennis.scoremanager.TsmApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
+/**
+ * Il backup automatico della segreteria, una volta al giorno anche ad app chiusa: una copia sul telefono (le
+ * ultime 14) e, se c'è, sul server del circolo; solo se qualcosa è cambiato dall'ultima.
+ */
+class OfficeBackupJob : JobService() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onStartJob(params: JobParameters): Boolean {
+        val c = (application as TsmApp).controller
+        scope.launch {
+            runCatching { if (c.storage.officeBackupAuto) c.officeBackupNow(onlyIfChanged = true) }
+            jobFinished(params, false)
+        }
+        return true
+    }
+
+    override fun onStopJob(params: JobParameters): Boolean = true
+
+    companion object {
+        private const val JOB = 7306
+
+        fun schedule(context: Context, on: Boolean) {
+            val js = context.getSystemService(JobScheduler::class.java) ?: return
+            if (!on) { js.cancel(JOB); return }
+            if (js.getPendingJob(JOB) != null) return
+            js.schedule(
+                JobInfo.Builder(JOB, ComponentName(context, OfficeBackupJob::class.java))
+                    .setPeriodic(24 * 3_600_000L).setPersisted(true).build(),
+            )
         }
     }
 }
@@ -32094,6 +32707,137 @@ fun WorkoutStrapCard(c: MatchController) {
         StrapPicker(c, Side.P1, s.playerTag(1), straps[Side.P1], found, straps)
         straps[Side.P1]?.let { key(it.address) { ProfileRow(profiles[Side.P1]) { p -> c.setHeartProfile(Side.P1, p) } } }
         Text(s.heartProfileHint, color = TsmColors.TextDim, fontSize = 13.sp)
+    }
+}
+TSM_EOF
+
+# ---------------------------------------------------------------- app/src/main/java/com/tennis/scoremanager/ui/OfficeBackupUi.kt
+cat > "$DEST/app/src/main/java/com/tennis/scoremanager/ui/OfficeBackupUi.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.ui
+
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.tennis.scoremanager.MatchController
+import com.tennis.scoremanager.data.OfficeBackup
+import com.tennis.scoremanager.data.OfficeSnapshot
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+
+private fun whenText(t: Long, c: MatchController): String = java.text.DateFormat.getDateTimeInstance(
+    java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT, c.options.value.lang.locale,
+).format(java.util.Date(t))
+
+/**
+ * Campi › Backup della segreteria: il backup automatico, un backup da mandare dove si vuole (Drive, email…) e il
+ * ripristino da un file o dalle copie del telefono. Dal PC c'è la stessa cosa, con le copie del server.
+ */
+@Composable
+fun OfficeBackupDialog(c: MatchController, onDone: () -> Unit) {
+    val s = LocalStrings.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var auto by remember { mutableStateOf(c.storage.officeBackupAuto) }
+    var copies by remember { mutableStateOf(c.officeBackups()) }
+    var ask by remember { mutableStateOf<OfficeSnapshot?>(null) }
+    var note by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val bytes = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(uri)?.use { it.readBytes() } }.getOrNull() }
+            val snap = bytes?.let(OfficeBackup::decode)
+            if (snap == null) note = s.obNotBackup else ask = snap
+        }
+    }
+    AlertDialog(
+        onDismissRequest = onDone,
+        title = { Text(s.obTitle) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(s.obHint, color = TsmColors.TextDim, fontSize = 13.sp)
+                SwitchRow(Icons.Filled.Schedule, s.obAuto, s.obAutoHint, auto) { auto = it; c.setOfficeBackupAuto(it) }
+                val last = c.storage.officeBackupAt
+                Text(if (last > 0) s.obLast(whenText(last, c)) else s.obNever, color = TsmColors.TextDim, fontSize = 13.sp)
+                GhostButton(s.obShare, Icons.Filled.Share, {
+                    busy = true
+                    scope.launch {
+                        val name = c.officeBackupNow(onlyIfChanged = false)
+                        copies = c.officeBackups()
+                        busy = false
+                        val f = name?.let { c.officeBackupFile(it) } ?: return@launch
+                        // Si condivide una copia nella cartella "share": il FileProvider dà solo quella.
+                        val out = withContext(Dispatchers.IO) { File(File(context.cacheDir, "share").apply { mkdirs() }, f.name).also { f.copyTo(it, overwrite = true) } }
+                        context.startActivity(Intent.createChooser(c.shareFileIntent(out, "application/octet-stream"), s.obShare))
+                    }
+                }, Modifier.fillMaxWidth(), enabled = !busy)
+                GhostButton(s.obRestoreFile, Icons.Filled.Restore, { pick.launch(arrayOf("*/*")) }, Modifier.fillMaxWidth())
+                note?.let { Text(it, color = TsmColors.Orange, fontSize = 13.sp) }
+                if (copies.isNotEmpty()) {
+                    Text(s.obCopies, color = TsmColors.TextMain, fontSize = 14.sp)
+                    for (f in copies.take(5)) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(whenText(f.at, c), color = TsmColors.TextDim, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        TextButton(onClick = {
+                            scope.launch {
+                                val snap = withContext(Dispatchers.IO) { c.officeBackupFile(f.name)?.readBytes()?.let(OfficeBackup::decode) }
+                                if (snap == null) note = s.obNotBackup else ask = snap
+                            }
+                        }) { Text(s.obRestore) }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDone) { Text(s.ok) } },
+    )
+    ask?.let { snap ->
+        val sum = OfficeBackup.summary(snap)
+        AlertDialog(
+            onDismissRequest = { ask = null },
+            title = { Text(s.obRestoreTitle) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(listOf(sum.club, whenText(sum.createdAt, c)).filter { it.isNotBlank() }.joinToString(" · "), color = TsmColors.TextMain)
+                    Text("${s.membersTitle}: ${sum.members} · ${s.paymentsTitle}: ${sum.charges} · ${s.planTitle}: ${sum.bookings}", color = TsmColors.TextDim, fontSize = 13.sp)
+                    Text(s.obRestoreAsk, color = TsmColors.Orange, fontSize = 13.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    ask = null
+                    scope.launch { c.restoreOffice(snap); copies = c.officeBackups(); note = s.obRestored }
+                }) { Text(s.obRestore) }
+            },
+            dismissButton = { TextButton(onClick = { ask = null }) { Text(s.back) } },
+        )
     }
 }
 TSM_EOF
@@ -35771,6 +36515,21 @@ interface Strings {
     val deskFirstTitle: String
     val deskFirstWhy: String
     val deskFirstSteps: String
+    /** Backup della segreteria (Campi). */
+    val obTitle: String
+    val obHint: String
+    val obAuto: String
+    val obAutoHint: String
+    val obNever: String
+    val obShare: String
+    val obRestoreFile: String
+    val obRestoreAsk: String
+    val obRestored: String
+    val obNotBackup: String
+    val obCopies: String
+    val obRestore: String
+    val obRestoreTitle: String
+    val obLast: (String) -> String
     /** La scadenza nella scheda del socio, dopo il tipo di certificato. */
     val memberValidUntil: (String) -> String
     val strokeFolderName: String
@@ -37832,6 +38591,20 @@ object ItStrings : Strings {
     override val deskFirstTitle = "La prima volta il browser dirà «La connessione non è privata»"
     override val deskFirstWhy = "È normale e non è un pericolo: la pagina la serve questo telefono, con un certificato fatto da lui e non da un'azienda che il browser conosce. Il collegamento resta cifrato."
     override val deskFirstSteps = "• Chrome o Edge: Avanzate › Procedi su … (non sicuro)\n• Firefox: Avanzate… › Accetta il rischio e continua\n• Safari: Mostra dettagli › visita questo sito web"
+    override val obTitle = "Backup della segreteria"
+    override val obHint = "Soci, pagamenti, planning, tornei, corsi e squadre in un file"
+    override val obAuto = "Backup automatico ogni giorno"
+    override val obAutoHint = "Solo se è cambiato qualcosa. Sul telefono restano le ultime 14 copie, e sul server del circolo se c'è."
+    override val obNever = "Ancora nessun backup"
+    override val obShare = "Fai un backup e mandalo (Drive, email…)"
+    override val obRestoreFile = "Ripristina da un file"
+    override val obRestoreAsk = "Quello che c'è adesso nella segreteria viene sostituito da questo backup. Prima il telefono fa una copia di adesso."
+    override val obRestored = "Segreteria ripristinata"
+    override val obNotBackup = "Questo file non è un backup della segreteria di TSM."
+    override val obCopies = "Le ultime copie sul telefono"
+    override val obRestore = "Ripristina"
+    override val obRestoreTitle = "Ripristinare questo backup?"
+    override val obLast: (String) -> String = { "Ultimo backup: $it" }
     override val strokeFolderName = "Allenamento colpi"
     override val documentsFolder = "Documenti"
     override val strokeAllSessions: (Int) -> String = { n -> "Tutte le sessioni ($n)" }
@@ -39874,6 +40647,20 @@ object EnStrings : Strings {
     override val deskFirstTitle = "The first time, the browser will say “Your connection is not private”"
     override val deskFirstWhy = "That's normal and not a danger: the page is served by this phone, with a certificate it made itself rather than one from a company the browser knows. The connection stays encrypted."
     override val deskFirstSteps = "• Chrome or Edge: Advanced › Proceed to … (unsafe)\n• Firefox: Advanced… › Accept the Risk and Continue\n• Safari: Show Details › visit this website"
+    override val obTitle = "Office backup"
+    override val obHint = "Members, payments, planner, tournaments, courses and teams in one file"
+    override val obAuto = "Automatic backup every day"
+    override val obAutoHint = "Only if something changed. The phone keeps the last 14 copies, and so does the club server if there is one."
+    override val obNever = "No backup yet"
+    override val obShare = "Back up and send it (Drive, email…)"
+    override val obRestoreFile = "Restore from a file"
+    override val obRestoreAsk = "What the office has now is replaced by this backup. The phone first makes a copy of now."
+    override val obRestored = "Office restored"
+    override val obNotBackup = "This file isn't a TSM office backup."
+    override val obCopies = "Latest copies on the phone"
+    override val obRestore = "Restore"
+    override val obRestoreTitle = "Restore this backup?"
+    override val obLast: (String) -> String = { "Last backup: $it" }
     override val strokeFolderName = "Stroke practice"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "All sessions ($n)" }
@@ -41939,6 +42726,20 @@ object DeStrings : Strings {
     override val deskFirstTitle = "Beim ersten Mal sagt der Browser „Dies ist keine sichere Verbindung“"
     override val deskFirstWhy = "Das ist normal und keine Gefahr: Die Seite kommt von diesem Handy, mit einem selbst erstellten Zertifikat statt einem von einer Firma, die der Browser kennt. Die Verbindung bleibt verschlüsselt."
     override val deskFirstSteps = "• Chrome oder Edge: Erweitert › Weiter zu … (unsicher)\n• Firefox: Erweitert… › Risiko akzeptieren und fortfahren\n• Safari: Details einblenden › diese Website besuchen"
+    override val obTitle = "Sicherung des Büros"
+    override val obHint = "Mitglieder, Zahlungen, Platzplan, Turniere, Kurse und Mannschaften in einer Datei"
+    override val obAuto = "Automatische Sicherung jeden Tag"
+    override val obAutoHint = "Nur wenn sich etwas geändert hat. Das Handy behält die letzten 14 Kopien, der Vereinsserver auch, wenn es einen gibt."
+    override val obNever = "Noch keine Sicherung"
+    override val obShare = "Sichern und verschicken (Drive, E-Mail…)"
+    override val obRestoreFile = "Aus einer Datei wiederherstellen"
+    override val obRestoreAsk = "Was das Büro jetzt hat, wird durch diese Sicherung ersetzt. Das Handy macht vorher eine Kopie vom jetzigen Stand."
+    override val obRestored = "Büro wiederhergestellt"
+    override val obNotBackup = "Diese Datei ist keine Büro-Sicherung von TSM."
+    override val obCopies = "Letzte Kopien auf dem Handy"
+    override val obRestore = "Wiederherstellen"
+    override val obRestoreTitle = "Diese Sicherung wiederherstellen?"
+    override val obLast: (String) -> String = { "Letzte Sicherung: $it" }
     override val strokeFolderName = "Schlagtraining"
     override val documentsFolder = "Dokumente"
     override val strokeAllSessions: (Int) -> String = { n -> "Alle Einheiten ($n)" }
@@ -43997,6 +44798,20 @@ object EsStrings : Strings {
     override val deskFirstTitle = "La primera vez el navegador dirá «La conexión no es privada»"
     override val deskFirstWhy = "Es normal y no es un peligro: la página la sirve este teléfono, con un certificado hecho por él y no por una empresa que el navegador conoce. La conexión sigue cifrada."
     override val deskFirstSteps = "• Chrome o Edge: Configuración avanzada › Acceder a … (sitio no seguro)\n• Firefox: Avanzado… › Aceptar el riesgo y continuar\n• Safari: Mostrar detalles › visitar este sitio web"
+    override val obTitle = "Copia de la secretaría"
+    override val obHint = "Socios, pagos, planning, torneos, cursos y equipos en un archivo"
+    override val obAuto = "Copia automática cada día"
+    override val obAutoHint = "Solo si algo ha cambiado. El teléfono guarda las últimas 14 copias, y el servidor del club también si lo hay."
+    override val obNever = "Todavía ninguna copia"
+    override val obShare = "Hacer una copia y enviarla (Drive, correo…)"
+    override val obRestoreFile = "Restaurar desde un archivo"
+    override val obRestoreAsk = "Lo que tiene ahora la secretaría se sustituye por esta copia. Antes el teléfono hace una copia de ahora."
+    override val obRestored = "Secretaría restaurada"
+    override val obNotBackup = "Este archivo no es una copia de la secretaría de TSM."
+    override val obCopies = "Últimas copias en el teléfono"
+    override val obRestore = "Restaurar"
+    override val obRestoreTitle = "¿Restaurar esta copia?"
+    override val obLast: (String) -> String = { "Última copia: $it" }
     override val strokeFolderName = "Entrenamiento de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas las sesiones ($n)" }
@@ -46057,6 +46872,20 @@ object FrStrings : Strings {
     override val deskFirstTitle = "La première fois, le navigateur dira « Votre connexion n'est pas privée »"
     override val deskFirstWhy = "C'est normal et sans danger : la page est servie par ce téléphone, avec un certificat qu'il a créé lui-même et non par une société que le navigateur connaît. La liaison reste chiffrée."
     override val deskFirstSteps = "• Chrome ou Edge : Paramètres avancés › Continuer vers … (dangereux)\n• Firefox : Avancé… › Accepter le risque et poursuivre\n• Safari : Afficher les détails › visiter ce site web"
+    override val obTitle = "Sauvegarde du secrétariat"
+    override val obHint = "Adhérents, paiements, planning, tournois, cours et équipes dans un fichier"
+    override val obAuto = "Sauvegarde automatique chaque jour"
+    override val obAutoHint = "Seulement si quelque chose a changé. Le téléphone garde les 14 dernières copies, et le serveur du club aussi s'il y en a un."
+    override val obNever = "Pas encore de sauvegarde"
+    override val obShare = "Sauvegarder et l'envoyer (Drive, e-mail…)"
+    override val obRestoreFile = "Restaurer depuis un fichier"
+    override val obRestoreAsk = "Ce que le secrétariat a maintenant est remplacé par cette sauvegarde. Le téléphone fait d'abord une copie de maintenant."
+    override val obRestored = "Secrétariat restauré"
+    override val obNotBackup = "Ce fichier n'est pas une sauvegarde du secrétariat TSM."
+    override val obCopies = "Dernières copies sur le téléphone"
+    override val obRestore = "Restaurer"
+    override val obRestoreTitle = "Restaurer cette sauvegarde ?"
+    override val obLast: (String) -> String = { "Dernière sauvegarde : $it" }
     override val strokeFolderName = "Entraînement des coups"
     override val documentsFolder = "Documents"
     override val strokeAllSessions: (Int) -> String = { n -> "Toutes les séances ($n)" }
@@ -48118,6 +48947,20 @@ object PtStrings : Strings {
     override val deskFirstTitle = "Da primeira vez o navegador dirá «A sua ligação não é privada»"
     override val deskFirstWhy = "É normal e não é um perigo: a página é servida por este telefone, com um certificado feito por ele e não por uma empresa que o navegador conhece. A ligação continua cifrada."
     override val deskFirstSteps = "• Chrome ou Edge: Avançadas › Continuar para … (não seguro)\n• Firefox: Avançado… › Aceitar o risco e continuar\n• Safari: Mostrar detalhes › visitar este site"
+    override val obTitle = "Cópia da secretaria"
+    override val obHint = "Sócios, pagamentos, agenda, torneios, cursos e equipes num arquivo"
+    override val obAuto = "Cópia automática todos os dias"
+    override val obAutoHint = "Só se algo mudou. O telefone guarda as últimas 14 cópias, e o servidor do clube também, se houver."
+    override val obNever = "Ainda nenhuma cópia"
+    override val obShare = "Fazer uma cópia e enviá-la (Drive, e-mail…)"
+    override val obRestoreFile = "Restaurar de um arquivo"
+    override val obRestoreAsk = "O que a secretaria tem agora é substituído por esta cópia. Antes o telefone faz uma cópia de agora."
+    override val obRestored = "Secretaria restaurada"
+    override val obNotBackup = "Este arquivo não é uma cópia da secretaria do TSM."
+    override val obCopies = "Últimas cópias no telefone"
+    override val obRestore = "Restaurar"
+    override val obRestoreTitle = "Restaurar esta cópia?"
+    override val obLast: (String) -> String = { "Última cópia: $it" }
     override val strokeFolderName = "Treino de golpes"
     override val documentsFolder = "Documentos"
     override val strokeAllSessions: (Int) -> String = { n -> "Todas as sessões ($n)" }
@@ -52248,6 +53091,7 @@ private fun CourtsTab(c: MatchController) {
     var edit by remember { mutableStateOf(false) }
     var manage by remember { mutableStateOf(false) }
     var server by remember { mutableStateOf(false) }
+    var backup by remember { mutableStateOf(false) }
     val name = c.storage.clubName
     val courts by c.clubCourts.collectAsState()
     val f by c.clubFeatures.collectAsState()
@@ -52260,9 +53104,11 @@ private fun CourtsTab(c: MatchController) {
         Entry(Icons.Filled.Cloud, s.srvTitle, if (srv.paired) s.srvConnected(srv.club.ifBlank { srv.url }) else s.srvButtonHint) { server = true }
     }
     if (ClubFeature.DESK in f) Entry(Icons.Filled.Computer, s.deskTitle, s.deskHint) { c.go(Screen.DESK) }
+    Entry(Icons.Filled.Backup, s.obTitle, s.obHint) { backup = true }
     Entry(Icons.Filled.Tv, s.tvSection, s.moreDevicesHint) { c.go(Screen.DEVICES) }
     com.tennis.scoremanager.ui.ClubFeaturesButton(c)
     if (server) ClubServerDialog(c) { server = false }
+    if (backup) com.tennis.scoremanager.ui.OfficeBackupDialog(c) { backup = false }
     if (edit) com.tennis.scoremanager.ui.ClubDialog(c) { edit = false }
     if (manage) CourtsManageDialog(c) { manage = false }
 }
@@ -79561,6 +80407,53 @@ class NoticesTest {
 }
 TSM_EOF
 
+# ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/OfficeBackupTest.kt
+cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/OfficeBackupTest.kt" << 'TSM_EOF'
+// SPDX-FileCopyrightText: 2026 Stefano Spagnolo
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package com.tennis.scoremanager.data
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import java.nio.file.Files
+
+class OfficeBackupTest {
+    private val snap = OfficeSnapshot(createdAt = 1000, club = "TC Prova", courts = listOf("Campo 1"), players = listOf(PlayerProfile("p1", "Mario Rossi", member = Membership())))
+
+    @Test fun compressedAndBack() {
+        val bytes = OfficeBackup.encode(snap)
+        assertEquals(0x1f.toByte(), bytes[0])
+        assertEquals(snap, OfficeBackup.decode(bytes))
+        assertEquals(1, OfficeBackup.summary(snap).members)
+        // Anche il JSON com'è; niente se non è un backup.
+        assertEquals("TC Prova", OfficeBackup.decode("""{"createdAt":5,"club":"TC Prova"}""".toByteArray())?.club)
+        assertNull(OfficeBackup.decode("ciao".toByteArray()))
+        assertNull(OfficeBackup.decode("""{"version":99,"createdAt":5}""".toByteArray()))
+    }
+
+    @Test fun sameContentSameFingerprint() {
+        // L'ora del backup non conta: se non è cambiato niente, la copia automatica si salta.
+        assertEquals(OfficeBackup.fingerprint(snap), OfficeBackup.fingerprint(snap.copy(createdAt = 9999, app = "2.6")))
+        assertNotEquals(OfficeBackup.fingerprint(snap), OfficeBackup.fingerprint(snap.copy(club = "TC Altro")))
+    }
+
+    @Test fun keepsTheLastCopies() {
+        val dir = Files.createTempDirectory("tsm-office").toFile()
+        for (i in 1..16) OfficeBackup.store(dir, "TSM segreteria %02d.tsmclub".format(i), byteArrayOf(1), keep = 14).setLastModified(i * 1000L)
+        val list = OfficeBackup.list(dir)
+        assertEquals(14, list.size)
+        assertEquals("TSM segreteria 16.tsmclub", list.first().name)
+        assertTrue(OfficeBackup.fileName("CT Sovizzo / A", 0).let { it.startsWith("TSM segreteria CT Sovizzo") && "/" !in it && it.endsWith(".tsmclub") })
+        assertNull(OfficeBackup.safeName("../x.tsmclub"))
+        dir.deleteRecursively()
+    }
+}
+TSM_EOF
+
 # ---------------------------------------------------------------- app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt
 cat > "$DEST/app/src/test/java/com/tennis/scoremanager/data/PlayerStatsTest.kt" << 'TSM_EOF'
 // SPDX-FileCopyrightText: 2026 Stefano Spagnolo
@@ -81382,6 +82275,40 @@ class DeskTest {
         assertEquals(404, req("PUT", "/online/rules", """{"rules":{"courts":["Campo 9"]}}""", k).first)
     }
 
+    @Test fun backupDellaSegreteria() {
+        val k = login()
+        req("POST", "/people", """{"firstName":"Mario","lastName":"Rossi","member":true}""", k)
+        req("POST", "/fees", """{"name":"Quota","cents":5000,"chargeMembers":true}""", k)
+        // Il backup di adesso: si legge, e dice cosa c'è dentro.
+        val (st, now) = req("GET", "/backup/now", token = k)
+        assertEquals(200, st)
+        val file = field(now, "data")!!
+        assertTrue(field(now, "name")!!.endsWith(".tsmclub"))
+        val (_, prev) = req("POST", "/backup/preview", """{"src":"file","data":"$file"}""", k)
+        assertTrue(prev, "\"members\":1" in prev && "\"charges\":1" in prev)
+        assertEquals(400, req("POST", "/backup/preview", """{"src":"file","data":"${java.util.Base64.getEncoder().encodeToString("ciao".toByteArray())}"}""", k).first)
+        // Dopo il backup si cambia tutto; il ripristino lo rimette com'era (e prima tiene una copia di adesso).
+        req("POST", "/people", """{"firstName":"Luca","lastName":"Bianchi","member":true}""", k)
+        data.ledger = data.ledger.copy(charges = emptyList())
+        assertEquals(200, req("POST", "/backup/restore", """{"src":"file","data":"$file"}""", k).first)
+        assertEquals(listOf("Mario Rossi"), data.list.map { it.name })
+        assertEquals(1, data.ledger.charges.size)
+        assertEquals(1, data.copies.size)
+        // Le copie sul telefono e sul server, e il ripristino da lì; nomi strani no.
+        data.server = com.tennis.scoremanager.data.ClubServerConf(url = "http://srv", token = "t")
+        assertEquals(200, req("POST", "/backup/save", token = k).first)
+        val (_, info) = req("GET", "/backup/info", token = k)
+        val name = data.copies.keys.last()
+        assertTrue(info, "\"serverPaired\":true" in info && name in info)
+        assertEquals(200, req("POST", "/backup/preview", """{"src":"local","name":"$name"}""", k).first)
+        assertEquals(200, req("POST", "/backup/preview", """{"src":"server","name":"$name"}""", k).first)
+        assertEquals(404, req("POST", "/backup/preview", """{"src":"local","name":"../club_book.json"}""", k).first)
+        data.remoteDown = true
+        assertTrue(req("GET", "/backup/info", token = k).second.contains("\"serverListError\":\"NET\""))
+        assertEquals(200, req("PUT", "/backup/auto", """{"on":true}""", k).first)
+        assertTrue(data.auto)
+    }
+
     @Test fun prenotazioniSenzaSovrapposizioni() {
         val k = login()
         val b = """{"court":"Campo 1","date":"2026-11-10","startMin":600,"minutes":60,"names":["Rossi"]}"""
@@ -81517,7 +82444,11 @@ import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.ClubServerConf
 import com.tennis.scoremanager.data.ClubServerError
+import com.tennis.scoremanager.data.OfficeBackup
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtPlans
@@ -81605,6 +82536,24 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
     override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
     override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
+    var auto = false
+    val copies = linkedMapOf<String, ByteArray>()
+    val remoteCopies = linkedMapOf<String, ByteArray>()
+    var restored: OfficeSnapshot? = null
+    private fun snapshot() = OfficeSnapshot(createdAt = time, club = club, courts = pitches, players = list, book = ledger, plan = courtPlan, tournaments = cups, courses = school, teams = squads)
+    override fun officeBackup(): Pair<String, ByteArray> = OfficeBackup.fileName(club, time) to OfficeBackup.encode(snapshot())
+    override fun officeAuto() = auto
+    override fun setOfficeAuto(on: Boolean) { auto = on }
+    override fun officeLast(): Pair<Long, String> = (if (copies.isEmpty()) 0L else time) to ""
+    override fun localBackups(): List<OfficeBackupFile> = copies.map { (n, b) -> OfficeBackupFile(n, time, b.size.toLong()) }.reversed()
+    override fun localBackup(name: String): ByteArray? = copies[name]
+    override fun officeBackupNow(): String? { val (n, b) = officeBackup(); copies[n] = b; if (server.paired) remoteCopies[n] = b; return n }
+    override fun serverBackups(): List<SrvBackup> = if (remoteDown) throw ClubServerError("NET") else remoteCopies.map { (n, b) -> SrvBackup(n, time, b.size.toLong()) }
+    override fun serverBackup(name: String): ByteArray = remoteCopies[name] ?: throw ClubServerError("NOT_FOUND")
+    override fun officeRestore(s: OfficeSnapshot) {
+        officeBackupNow(); restored = s
+        list = s.players; ledger = s.book; courtPlan = s.plan; cups = s.tournaments; school = s.courses; squads = s.teams; club = s.club
+    }
     override fun ladders() = emptyList<Ladder>()
     override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
     override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }
@@ -84081,6 +85030,9 @@ import kotlinx.serialization.Serializable
     val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
 )
 @Serializable data class SrvOk(val ok: Boolean = true)
+/** I backup della segreteria tenuti dal server (gli ultimi 14): il file compresso in base64. */
+@Serializable data class SrvBackup(val name: String, val at: Long, val size: Long)
+@Serializable data class SrvBackupData(val name: String, val data: String)
 
 /** Il giocatore: le sue prenotazioni, il giorno, il prezzo prima di confermare (la pagina web e l'app). */
 @Serializable data class SrvMyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)
@@ -86626,6 +87578,9 @@ import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtOnline
 import com.tennis.scoremanager.data.OnlineBooking
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
+import com.tennis.scoremanager.data.SrvBackupData
+import kotlinx.serialization.builtins.ListSerializer
 import com.tennis.scoremanager.data.SrvBookIn
 import com.tennis.scoremanager.data.SrvDay
 import com.tennis.scoremanager.data.SrvMe
@@ -86713,6 +87668,9 @@ class Api(
             r.method == "POST" && p == listOf("admin", "invites") -> { admin(r); invite(r) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "bookings" -> { admin(r); adminCancel(p[2]) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "players" -> { admin(r); removePlayer(p[2]) }
+            r.method == "POST" && p == listOf("admin", "backups") -> { admin(r); putBackup(r) }
+            r.method == "GET" && p == listOf("admin", "backups") -> { admin(r); ok(ListSerializer(SrvBackup.serializer()), backups()) }
+            r.method == "GET" && p == listOf("admin", "backup") -> { admin(r); getBackup(r.query["name"].orEmpty()) }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "waits" -> { admin(r); adminRemove { s -> s.copy(waits = s.waits.filter { it.id != p[2] }) } }
             r.method == "DELETE" && p.size == 3 && p[0] == "admin" && p[1] == "seeks" -> { admin(r); adminRemove { s -> s.copy(seeks = s.seeks.filter { it.id != p[2] }) } }
             r.method == "POST" && p == listOf("claim") -> claim(r)
@@ -86805,6 +87763,36 @@ class Api(
             s.syncedAt, s.bookings.sortedBy { it.start }, s.players.map { SrvPlayer(it.id, it.name, it.since, it.lastSeen, it.tokens.size) },
             s.waits.filter { it.start > now }.sortedBy { it.start }, s.seeks.filter { it.date >= today }.sortedWith(compareBy({ it.date }, { it.fromMin })),
         ))
+    }
+
+    // --- Backup della segreteria ---
+
+    private val backupDir get() = java.io.File(store.dir, "backups")
+    private val backupName = Regex("[\\p{L}\\p{N} ._-]{1,150}\\.tsmclub")
+
+    private fun backups(): List<SrvBackup> = backupDir.listFiles { f -> f.isFile && backupName.matches(f.name) }.orEmpty()
+        .map { SrvBackup(it.name, it.lastModified(), it.length()) }.sortedByDescending { it.at }
+
+    /** Tiene la copia mandata dalla segreteria e le ultime 14; il file è com'è (compresso), non lo legge. */
+    private fun putBackup(r: Req): Resp {
+        val i = read(SrvBackupData.serializer(), r)
+        if (!backupName.matches(i.name)) throw ApiError(400, "BAD_REQUEST")
+        val bytes = runCatching { java.util.Base64.getDecoder().decode(i.data) }.getOrNull() ?: throw ApiError(400, "BAD_REQUEST")
+        if (bytes.isEmpty()) throw ApiError(400, "BAD_REQUEST")
+        backupDir.mkdirs()
+        val tmp = java.io.File(backupDir, ".${i.name}.tmp")
+        tmp.writeBytes(bytes)
+        val f = java.io.File(backupDir, i.name)
+        if (!tmp.renameTo(f)) { f.writeBytes(bytes); tmp.delete() }
+        f.setLastModified(store.now())
+        backups().drop(14).forEach { java.io.File(backupDir, it.name).delete() }
+        return ok(SrvOk.serializer(), SrvOk())
+    }
+
+    private fun getBackup(name: String): Resp {
+        if (!backupName.matches(name)) throw ApiError(400, "BAD_REQUEST")
+        val f = java.io.File(backupDir, name).takeIf { it.isFile } ?: throw ApiError(404, "NOT_FOUND")
+        return ok(SrvBackupData.serializer(), SrvBackupData(name, java.util.Base64.getEncoder().encodeToString(f.readBytes())))
     }
 
     /** La segreteria toglie un'attesa o un annuncio (fuori luogo, o già sistemato a voce). */
@@ -87156,6 +88144,8 @@ import java.net.URLDecoder
 import java.util.concurrent.Executors
 
 private const val MAX_BODY = 512 * 1024
+/** I backup della segreteria pesano di più (compressi, in base64). */
+private const val MAX_BACKUP = 16 * 1024 * 1024
 
 private val USAGE = """
     TSM – server del circolo per le prenotazioni dei campi
@@ -87230,8 +88220,9 @@ private fun forwardedFor(ex: HttpExchange): String? =
 private fun clientIp(ex: HttpExchange): String = forwardedFor(ex) ?: ex.remoteAddress.address.hostAddress
 
 private fun serveApi(api: Api, ex: HttpExchange) {
-    val body = ex.requestBody.use { it.readNBytes(MAX_BODY + 1) }
-    if (body.size > MAX_BODY) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
+    val max = if (ex.requestURI.path.endsWith("/admin/backups")) MAX_BACKUP else MAX_BODY
+    val body = ex.requestBody.use { it.readNBytes(max + 1) }
+    if (body.size > max) { send(ex, 413, "{\"error\":\"TOO_LARGE\"}".toByteArray(), "application/json"); return }
     val query = ex.requestURI.rawQuery.orEmpty().split('&').filter { '=' in it }.associate {
         val (k, v) = it.split('=', limit = 2); URLDecoder.decode(k, Charsets.UTF_8) to URLDecoder.decode(v, Charsets.UTF_8)
     }
@@ -89504,6 +90495,26 @@ class SeekApiTest {
         assertEquals(200, call("DELETE", "/admin/waits/${st.waits.single().id}", token = admin).status)
         val after = json.decodeFromString(com.tennis.scoremanager.data.SrvAdmin.serializer(), call("GET", "/admin/state", token = admin).body)
         assertTrue(after.seeks.isEmpty() && after.waits.isEmpty())
+    }
+
+    @Test fun theOfficeKeepsItsBackupsOnTheServer() {
+        val mario = player("p1", "Mario")
+        val data = java.util.Base64.getEncoder().encodeToString(byteArrayOf(0x1f, 0x8b.toByte(), 1, 2, 3))
+        for (i in 1..16) {
+            now += 60_000
+            assertEquals(200, call("POST", "/admin/backups", """{"name":"TSM segreteria TC Prova 2026-11-%02d 0900.tsmclub","data":"$data"}""".format(i), admin).status)
+        }
+        // Le ultime 14, dalla più nuova; il giocatore non le vede, i nomi strani non entrano.
+        val list = json.decodeFromString(ListSerializer(com.tennis.scoremanager.data.SrvBackup.serializer()), call("GET", "/admin/backups", token = admin).body)
+        assertEquals(14, list.size)
+        assertEquals("TSM segreteria TC Prova 2026-11-16 0900.tsmclub", list.first().name)
+        assertEquals(401, call("GET", "/admin/backups", token = mario).status)
+        assertEquals(400, call("POST", "/admin/backups", """{"name":"../state.json","data":"$data"}""", admin).status)
+        fun get(name: String) = api.handle(Req("GET", "/api/v1/admin/backup", mapOf("name" to name), token = admin, ip = "1.1.1.1"))
+        assertEquals(400, get("../state.json").status)
+        val back = get(list.first().name)
+        assertEquals(200, back.status)
+        assertTrue(back.body.contains(data))
     }
 
     @Test fun singlesFindsACourtAndBooksIt() {
@@ -92633,6 +93644,6 @@ class SwingDetector {
 }  // namespace swing
 TSM_EOF
 
-echo ">> Fatto / done: 297 file del progetto / project files in $DEST"
+echo ">> Fatto / done: 301 file del progetto / project files in $DEST"
 echo ">> Sketch del braccialetto / wristband sketch: $FWDIR/TSM_Band.ino"
 echo ">> Ora apri la cartella del progetto con Android Studio / now open the project folder in Android Studio (File > Open)."

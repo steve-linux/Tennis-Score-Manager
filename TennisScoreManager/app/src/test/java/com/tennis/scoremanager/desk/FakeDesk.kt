@@ -9,7 +9,11 @@ import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.CTEntry
 import com.tennis.scoremanager.data.ClubServerConf
 import com.tennis.scoremanager.data.ClubServerError
+import com.tennis.scoremanager.data.OfficeBackup
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.CourtInfo
 import com.tennis.scoremanager.data.CourtPlans
@@ -97,6 +101,24 @@ class FakeDesk(var time: Long = System.currentTimeMillis()) : DeskData {
     override fun serverState(): SrvAdmin = if (remoteDown) throw ClubServerError("NET") else remote
     override fun serverSync(): String? = if (remoteDown) "NET" else { server = server.copy(lastSync = time); null }
     override fun serverRemove(kind: String, id: String) { removed += "$kind:$id" }
+    var auto = false
+    val copies = linkedMapOf<String, ByteArray>()
+    val remoteCopies = linkedMapOf<String, ByteArray>()
+    var restored: OfficeSnapshot? = null
+    private fun snapshot() = OfficeSnapshot(createdAt = time, club = club, courts = pitches, players = list, book = ledger, plan = courtPlan, tournaments = cups, courses = school, teams = squads)
+    override fun officeBackup(): Pair<String, ByteArray> = OfficeBackup.fileName(club, time) to OfficeBackup.encode(snapshot())
+    override fun officeAuto() = auto
+    override fun setOfficeAuto(on: Boolean) { auto = on }
+    override fun officeLast(): Pair<Long, String> = (if (copies.isEmpty()) 0L else time) to ""
+    override fun localBackups(): List<OfficeBackupFile> = copies.map { (n, b) -> OfficeBackupFile(n, time, b.size.toLong()) }.reversed()
+    override fun localBackup(name: String): ByteArray? = copies[name]
+    override fun officeBackupNow(): String? { val (n, b) = officeBackup(); copies[n] = b; if (server.paired) remoteCopies[n] = b; return n }
+    override fun serverBackups(): List<SrvBackup> = if (remoteDown) throw ClubServerError("NET") else remoteCopies.map { (n, b) -> SrvBackup(n, time, b.size.toLong()) }
+    override fun serverBackup(name: String): ByteArray = remoteCopies[name] ?: throw ClubServerError("NOT_FOUND")
+    override fun officeRestore(s: OfficeSnapshot) {
+        officeBackupNow(); restored = s
+        list = s.players; ledger = s.book; courtPlan = s.plan; cups = s.tournaments; school = s.courses; squads = s.teams; club = s.club
+    }
     override fun ladders() = emptyList<Ladder>()
     override fun saveCourse(c: Course) { school = school.filter { it.id != c.id } + c }
     override fun deleteCourse(c: Course) { school = school.filter { it.id != c.id } }

@@ -73,6 +73,26 @@ class SeekApiTest {
         assertTrue(after.seeks.isEmpty() && after.waits.isEmpty())
     }
 
+    @Test fun theOfficeKeepsItsBackupsOnTheServer() {
+        val mario = player("p1", "Mario")
+        val data = java.util.Base64.getEncoder().encodeToString(byteArrayOf(0x1f, 0x8b.toByte(), 1, 2, 3))
+        for (i in 1..16) {
+            now += 60_000
+            assertEquals(200, call("POST", "/admin/backups", """{"name":"TSM segreteria TC Prova 2026-11-%02d 0900.tsmclub","data":"$data"}""".format(i), admin).status)
+        }
+        // Le ultime 14, dalla più nuova; il giocatore non le vede, i nomi strani non entrano.
+        val list = json.decodeFromString(ListSerializer(com.tennis.scoremanager.data.SrvBackup.serializer()), call("GET", "/admin/backups", token = admin).body)
+        assertEquals(14, list.size)
+        assertEquals("TSM segreteria TC Prova 2026-11-16 0900.tsmclub", list.first().name)
+        assertEquals(401, call("GET", "/admin/backups", token = mario).status)
+        assertEquals(400, call("POST", "/admin/backups", """{"name":"../state.json","data":"$data"}""", admin).status)
+        fun get(name: String) = api.handle(Req("GET", "/api/v1/admin/backup", mapOf("name" to name), token = admin, ip = "1.1.1.1"))
+        assertEquals(400, get("../state.json").status)
+        val back = get(list.first().name)
+        assertEquals(200, back.status)
+        assertTrue(back.body.contains(data))
+    }
+
     @Test fun singlesFindsACourtAndBooksIt() {
         val mario = player("p1", "Mario"); val luca = player("p2", "Luca"); sent.clear()
         // Sabato 14 è troppo lontano (7 giorni avanti da lunedì 9 vanno fino a lunedì 16: va bene).

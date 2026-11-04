@@ -7,7 +7,12 @@ import com.tennis.scoremanager.ClubFeature
 import com.tennis.scoremanager.data.BlockReason
 import com.tennis.scoremanager.data.BookingRules
 import com.tennis.scoremanager.data.ClubServerConf
+import com.tennis.scoremanager.data.OfficeBackup
+import com.tennis.scoremanager.data.OfficeBackupFile
+import com.tennis.scoremanager.data.OfficeSnapshot
+import com.tennis.scoremanager.data.OfficeSummary
 import com.tennis.scoremanager.data.SrvAdmin
+import com.tennis.scoremanager.data.SrvBackup
 import com.tennis.scoremanager.data.BookingKind
 import com.tennis.scoremanager.data.CourtBlock
 import com.tennis.scoremanager.data.Course
@@ -124,6 +129,19 @@ interface DeskData {
     /** La segreteria toglie un'attesa ([kind] "wait") o un annuncio ("seek") dal server, fuori da [tx]. */
     fun serverRemove(kind: String, id: String)
     fun paymentsCsv(year: Int): ByteArray?
+    /** Backup della segreteria: il file di adesso, col suo nome. */
+    fun officeBackup(): Pair<String, ByteArray>
+    fun officeAuto(): Boolean
+    fun setOfficeAuto(on: Boolean)
+    /** Quando è stata fatta l'ultima copia sul telefono, e l'errore dell'ultimo invio al server ("" = tutto bene). */
+    fun officeLast(): Pair<Long, String>
+    fun localBackups(): List<OfficeBackupFile>
+    fun localBackup(name: String): ByteArray?
+    /** Fuori da [tx]: una copia adesso (sul telefono e sul server), le copie del server, il ripristino. */
+    fun officeBackupNow(): String?
+    fun serverBackups(): List<SrvBackup>
+    fun serverBackup(name: String): ByteArray
+    fun officeRestore(s: OfficeSnapshot)
     /** Salva un torneo (nuovo o cambiato); con la quota d'iscrizione, la quota del registro lo segue. */
     fun saveTournament(t: ClubTournament)
     /** Toglie il torneo: le iscrizioni non pagate si annullano, i pagamenti restano. */
@@ -275,6 +293,14 @@ interface DeskData {
     /** Quello che sta sul server; [stateError] se non risponde. */
     val bookings: List<DeskOnlineBooking>, val waits: List<DeskWait>, val seeks: List<DeskSeek>, val stateError: String? = null,
 )
+@Serializable data class DeskBackupInfo(
+    val auto: Boolean, val lastAt: Long, val serverPaired: Boolean, val serverError: String, val local: List<OfficeBackupFile>,
+    val server: List<OfficeBackupFile>, val serverListError: String? = null,
+)
+/** Da dove viene il backup: un file mandato dal PC ([data], base64), una copia del telefono o del server. */
+@Serializable data class DeskBackupIn(val src: String = "file", val name: String = "", val data: String = "")
+@Serializable data class DeskBackupFile(val name: String, val data: String)
+@Serializable data class DeskAutoIn(val on: Boolean)
 @Serializable data class DeskRulesIn(val rules: BookingRules, val payInfo: String = "", val alerts: Boolean = true)
 @Serializable data class DeskBlock(
     val id: String = "", val label: String = "", val reason: BlockReason = BlockReason.MAINTENANCE, val courts: List<String> = emptyList(),
@@ -353,6 +379,7 @@ class DeskApi(
         if (m == "POST" && p == listOf("logout")) { auth.logout(); return done() }
         // Il server delle prenotazioni è rete: si chiama fuori da tx, per non fermare l'app intanto.
         if (p.firstOrNull() == "online" && !(m == "PUT" && p == listOf("online", "rules"))) return online(m, p)
+        if (p.firstOrNull() == "backup") return backup(m, p.drop(1), r)
         return data.tx {
             when {
                 m == "GET" && p == listOf("info") -> info()
@@ -726,6 +753,54 @@ class DeskApi(
             rep.occupancy, rep.cents, rep.bookings, rep.online, rep.tournamentHours, rep.firstHour, rep.heat,
             rep.top.map { (who, n) -> DeskTop(Players.byId(people, who)?.name ?: who, n) },
         ))
+    }
+
+    // --- Backup della segreteria ---
+
+    private fun backupInfo(): Resp {
+        val (info, conf) = data.tx {
+            val (at, err) = data.officeLast()
+            DeskBackupInfo(data.officeAuto(), at, data.serverConf().paired, err, data.localBackups(), emptyList()) to data.serverConf()
+        }
+        if (!conf.paired) return ok(DeskBackupInfo.serializer(), info)
+        val out = try {
+            info.copy(server = data.serverBackups().map { OfficeBackupFile(it.name, it.at, it.size) })
+        } catch (e: Exception) { info.copy(serverListError = (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }
+        return ok(DeskBackupInfo.serializer(), out)
+    }
+
+    /** I byte del backup scelto: un file dal PC, una copia del telefono o una del server. */
+    private fun backupBytes(i: DeskBackupIn): ByteArray = when (i.src) {
+        "file" -> runCatching { java.util.Base64.getDecoder().decode(i.data) }.getOrNull()?.takeIf { it.isNotEmpty() } ?: throw Fail(400, "BAD_REQUEST")
+        "local" -> OfficeBackup.safeName(i.name)?.let { n -> data.tx { data.localBackup(n) } } ?: throw Fail(404, "NOT_FOUND")
+        "server" -> OfficeBackup.safeName(i.name)?.let { n ->
+            try { data.serverBackup(n) } catch (e: Exception) { throw Fail(502, (e as? com.tennis.scoremanager.data.ClubServerError)?.code ?: "NET") }
+        } ?: throw Fail(404, "NOT_FOUND")
+        else -> throw Fail(400, "BAD_REQUEST")
+    }
+
+    private fun backup(m: String, p: List<String>, r: Req): Resp = when {
+        m == "GET" && p == listOf("info") -> backupInfo()
+        m == "GET" && p == listOf("now") -> {
+            val (name, bytes) = data.tx { data.officeBackup() }
+            ok(DeskBackupFile.serializer(), DeskBackupFile(name, java.util.Base64.getEncoder().encodeToString(bytes)))
+        }
+        m == "POST" && p == listOf("get") -> {
+            val i = read(DeskBackupIn.serializer(), r)
+            ok(DeskBackupFile.serializer(), DeskBackupFile(i.name, java.util.Base64.getEncoder().encodeToString(backupBytes(i))))
+        }
+        m == "POST" && p == listOf("save") -> { data.officeBackupNow(); backupInfo() }
+        m == "PUT" && p == listOf("auto") -> { val on = read(DeskAutoIn.serializer(), r).on; data.tx { data.setOfficeAuto(on) }; backupInfo() }
+        m == "POST" && p == listOf("preview") -> {
+            val s = OfficeBackup.decode(backupBytes(read(DeskBackupIn.serializer(), r))) ?: throw Fail(400, "NOT_BACKUP")
+            ok(OfficeSummary.serializer(), OfficeBackup.summary(s))
+        }
+        m == "POST" && p == listOf("restore") -> {
+            val s = OfficeBackup.decode(backupBytes(read(DeskBackupIn.serializer(), r))) ?: throw Fail(400, "NOT_BACKUP")
+            data.officeRestore(s)
+            backupInfo()
+        }
+        else -> throw Fail(404, "NOT_FOUND")
     }
 
     // --- Server delle prenotazioni ---

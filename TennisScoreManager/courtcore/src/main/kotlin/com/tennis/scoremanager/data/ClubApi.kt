@@ -20,6 +20,9 @@ import kotlinx.serialization.Serializable
     val waits: List<Wait> = emptyList(), val seeks: List<Seek> = emptyList(),
 )
 @Serializable data class SrvOk(val ok: Boolean = true)
+/** I backup della segreteria tenuti dal server (gli ultimi 14): il file compresso in base64. */
+@Serializable data class SrvBackup(val name: String, val at: Long, val size: Long)
+@Serializable data class SrvBackupData(val name: String, val data: String)
 
 /** Il giocatore: le sue prenotazioni, il giorno, il prezzo prima di confermare (la pagina web e l'app). */
 @Serializable data class SrvMyBooking(val id: String, val court: String, val start: Long, val minutes: Int, val cents: Int, val lights: Boolean, val heating: Boolean, val canCancel: Boolean)

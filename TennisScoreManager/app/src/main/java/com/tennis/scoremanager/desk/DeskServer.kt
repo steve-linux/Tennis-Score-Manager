@@ -155,7 +155,8 @@ class DeskServer(
         private const val WORKERS = 6
         private const val TIMEOUT_MS = 15_000
         private const val MAX_HEADERS = 64
-        const val MAX_BODY = 1024 * 1024
+        // I backup della segreteria arrivano interi (compressi, in base64).
+        const val MAX_BODY = 16 * 1024 * 1024
         private const val TEXT = "text/plain; charset=utf-8"
         private val SAFE_NAME = Regex("^[a-z0-9-]+\\.[a-z]+$")
         private val IPV4_HOST = Regex("^\\d{1,3}(\\.\\d{1,3}){3}(:\\d+)?$")
